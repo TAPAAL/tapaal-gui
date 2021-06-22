@@ -1,35 +1,55 @@
 package pipe.gui.widgets;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.*;
+import java.awt.event.*;
 
 import javax.swing.*;
 
+import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.GuiFrame;
+import pipe.gui.MessengerImpl;
 
-public class NewTAPNPanel extends JPanel {
+public class NewTAPNPanel extends JDialog {
 
 	private final JRootPane rootPane;
 	private final GuiFrame frame;
 	private JTextField nameTextBox;
 	private JRadioButton timedNet;
 	private JRadioButton gameNet;
+	private JRadioButton coloredNet;
+	private static int newNameCounter = 1;
+    static NewTAPNPanel newTAPNPanel;
+    private final static String COLORED_GAMES_NOT_SUPPORTED = "There exists no verification engine for colored games, we only allow modelling.\n\n Do you wish to continue?";
 
-	public NewTAPNPanel(JRootPane rootPane, GuiFrame frame) {
-		this.rootPane = rootPane;
-		this.frame = frame;
+    /* ListOfQueries is used throughout the class to check if
+    BatchProcessing was called from QueryPane
+    (should maybe be boolean)
+    */
+    public static void showNewTapnPanel(GuiFrame frame){
+        if(newTAPNPanel == null){
+            newTAPNPanel = new NewTAPNPanel(frame, "New Net", true);
+            newTAPNPanel.pack();
+            newTAPNPanel.setPreferredSize(newTAPNPanel.getSize());
+            //Set the minimum size to 150 less than the preferred, to be consistent with the minimum size of the result panel
+            newTAPNPanel.setMinimumSize(new Dimension(newTAPNPanel.getWidth(), newTAPNPanel.getHeight()-150));
+            newTAPNPanel.setLocationRelativeTo(null);
+            newTAPNPanel.setResizable(true);
+        }
+        String defaultName = String.format("New Petri net %1$d", newNameCounter);
+        newTAPNPanel.setName(defaultName);
+        newTAPNPanel.setVisible(true);
+    }
 
-		initComponents();
-	}
+    private NewTAPNPanel(GuiFrame frame, String title, boolean modal) {
+        super(frame, title, modal);
+        this.frame = frame;
+        this.rootPane = this.getRootPane();
+        initComponents();
+    }
 
 	private void initComponents() {
 		this.setLayout(new GridBagLayout());
@@ -66,7 +86,16 @@ public class NewTAPNPanel extends JPanel {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(cancelButton,gbc);		
 
-		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected()));
+		okButton.addActionListener(e -> {
+		    if(gameNet.isSelected() && coloredNet.isSelected()){
+                int cont = JOptionPane.showConfirmDialog(this, COLORED_GAMES_NOT_SUPPORTED, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if(cont == JOptionPane.OK_OPTION){
+                    createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected(), coloredNet.isSelected());
+                }
+            }else{
+                createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected(), coloredNet.isSelected());
+            }
+        });
 
 		rootPane.setDefaultButton(okButton);
 		
@@ -84,7 +113,7 @@ public class NewTAPNPanel extends JPanel {
 		rootPane.getParent().setVisible(false);
 	}
 
-	protected void createNewTAPNBasedOnSelection(String name, boolean isTimed, boolean isGame) {
+	protected void createNewTAPNBasedOnSelection(String name, boolean isTimed, boolean isGame, boolean isColored) {
 		if (!name.endsWith(".tapn")) {
 			name = name + ".tapn";
 		}
@@ -97,7 +126,7 @@ public class NewTAPNPanel extends JPanel {
 		}
 
 		try {
-			TabContent tab = TabContent.createNewEmptyTab(name, isTimed, isGame);
+			TabContent tab = TabContent.createNewEmptyTab(name, isTimed, isGame, isColored);
 			CreateGui.openNewTabFromStream(tab);
 		} catch (Exception e) {
 			JOptionPane
@@ -108,9 +137,8 @@ public class NewTAPNPanel extends JPanel {
 			e.printStackTrace();
 			return;
 		}
-
-		frame.incrementNameCounter();
-		exit();
+		newNameCounter++;
+        exit();
 	}
 
 	private void initNamePanel() {
@@ -125,8 +153,7 @@ public class NewTAPNPanel extends JPanel {
 		gbc.insets = new Insets(3, 3, 3, 3);
 		namePanel.add(nameLabel, gbc);
 
-		String defaultName = String.format("New Petri net %1$d", frame
-				.getNameCounter());
+		String defaultName = String.format("New Petri net %1$d", newNameCounter);
 		nameTextBox = new JTextField(defaultName);
         SwingHelper.setPreferredWidth(nameTextBox,330);
 		gbc = new GridBagConstraints();
@@ -152,6 +179,7 @@ public class NewTAPNPanel extends JPanel {
 
         initTimeOptions(selectionPanel);
         initGameOptions(selectionPanel);
+        initColorOptions(selectionPanel);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -245,5 +273,50 @@ public class NewTAPNPanel extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(5, 5, 5, 5);
         selectionPanel.add(isGamePanel, gbc);
+    }
+    private void initColorOptions(JPanel selectionPanel) {
+        JPanel isColorPanel = new JPanel(new GridBagLayout());
+        ButtonGroup isColorRadioButtonGroup = new ButtonGroup();
+
+        JLabel colorText = new JLabel("Use color semantics:");
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isColorPanel.add(colorText, gbc);
+
+        JRadioButton nonColorNet = new JRadioButton("No");
+        nonColorNet.setSelected(true);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isColorPanel.add(nonColorNet, gbc);
+        isColorRadioButtonGroup.add(nonColorNet);
+
+        coloredNet = new JRadioButton("Yes");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isColorPanel.add(coloredNet, gbc);
+        isColorRadioButtonGroup.add(coloredNet);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        selectionPanel.add(isColorPanel, gbc);
+    }
+
+    public void setName(String name){
+        nameTextBox.setText(name);
     }
 }

@@ -27,15 +27,17 @@ public class KBoundAnalyzer {
 	protected int k;
 
 	private final ModelChecker modelChecker;
+	private final ModelChecker unfoldingEngine;
 	private final Messenger messenger;
 	private final JSpinner spinner;
 
 	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, int k,
-			ModelChecker modelChecker, Messenger messenger, JSpinner tokensControl) {
+                          ModelChecker modelChecker, ModelChecker unfoldingEngine, Messenger messenger, JSpinner tokensControl) {
 		this.k = k;
 		this.tapnNetwork = tapnNetwork;
 		this.modelChecker = modelChecker;
-		this.messenger = messenger;
+        this.unfoldingEngine = unfoldingEngine;
+        this.messenger = messenger;
 		spinner = tokensControl;
 	}
 
@@ -43,7 +45,7 @@ public class KBoundAnalyzer {
 		TAPNQuery query = getBoundednessQuery();
 		VerifyTAPNOptions options = verificationOptions();
 
-		RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, spinner);
+		RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, unfoldingEngine, messenger, spinner);
 		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), analyzer);
 
 		analyzer.execute(options, tapnNetwork, query, null);
@@ -52,11 +54,11 @@ public class KBoundAnalyzer {
 
 	protected VerifyTAPNOptions verificationOptions() {
 		if(modelChecker instanceof VerifyPN){
-			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.Default, AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime, false, null, false);
+			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.Default, AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime,false, tapnNetwork.isColored() && !tapnNetwork.isUntimed(), null, false, true, true, true);
 		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
 		} else if(modelChecker instanceof VerifyTAPNDiscreteVerification){
-			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, !tapnNetwork.hasUrgentTransitions(), true, false, false, 1, false);
+			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, !tapnNetwork.hasUrgentTransitions(), true, false, false, 1, false, true, true);
 		}
 		return null;
 	}

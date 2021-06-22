@@ -4,10 +4,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.verification.NameMapping;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
@@ -22,14 +26,19 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
+import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
+import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.Transition;
 
 import javax.xml.crypto.Data;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 public class VerifyTAPNExporter {
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, NameMapping mapping) {
+    protected TimedArcPetriNet model;
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, NameMapping mapping, DataLayer guiModel) {
 		File modelFile = createTempFile(".xml");
 		File queryFile;
 		if (query.getCategory() == QueryCategory.CTL){
@@ -37,21 +46,31 @@ public class VerifyTAPNExporter {
 		} else {
 			queryFile = createTempFile(".q");
 		}
+		this.model = model;
 
-		return export(model, query, modelFile, queryFile, null, lens, mapping);
-
+		return export(model, query, modelFile, queryFile, null, lens, mapping, guiModel);
 	}
 
-
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens, NameMapping mapping) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens, NameMapping mapping, DataLayer guiModel) {
 		if (modelFile == null || queryFile == null)
 			return null;
 
 		try{
-			PrintStream modelStream = new PrintStream(modelFile);
+            outputModel(model, modelFile, mapping, guiModel);
 
-			outputModel(model, modelStream, mapping);
-			modelStream.close();
+            RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
+			query.getProperty().accept(placeVisitor, null);
+
+
+            if(query.getProperty() instanceof TCTLNotNode) {
+                TCTLPathToStateConverter innerQuery = (TCTLPathToStateConverter) ((TCTLNotNode) query.getProperty()).getProperty();
+                if (innerQuery.getProperty() instanceof TCTLEFNode) {
+                    TCTLAbstractStateProperty queryBody = ((TCTLEFNode) innerQuery.getProperty()).getProperty();
+                    TCTLNotNode negatedQueryBody = new TCTLNotNode(queryBody);
+                    TCTLAGNode agQuery = new TCTLAGNode(negatedQueryBody);
+                    query.setProperty(agQuery);
+                }
+            }
 
 			PrintStream queryStream = new PrintStream(queryFile);
             if (query == null) {
@@ -69,15 +88,17 @@ public class VerifyTAPNExporter {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
 			return null;
 		}
-		return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath());
+
+        return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath());
 	}
 	
-	private void outputModel(TimedArcPetriNet model, PrintStream modelStream, NameMapping mapping) {
-        Collection<DataLayer> guiModels = CreateGui.getCurrentTab().getGuiModels().values();
+	protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
+        PrintStream modelStream = new PrintStream(modelFile);
+
+	    Collection<DataLayer> guiModels = CreateGui.getCurrentTab().getGuiModels().values();
 
 		modelStream.append("<pnml>\n");
 		modelStream.append("<net id=\"" + model.name() + "\" type=\"P/T net\">\n");
-		
 		for(TimedPlace p : model.places())
 			outputPlace(p, modelStream, guiModels, mapping);
 		
@@ -95,12 +116,19 @@ public class VerifyTAPNExporter {
 		
 		for(TimedInhibitorArc inhibArc : model.inhibitorArcs())
 			outputInhibitorArc(inhibArc, modelStream);
-		
-		modelStream.append("</net>\n");
+
+		outputDeclarations(modelStream);
+
+        modelStream.append("</net>\n");
 		modelStream.append("</pnml>");
+		modelStream.close();
 	}
-	
-	private void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
+
+	protected void outputDeclarations(PrintStream modelStream){
+	    return;
+    }
+
+	protected void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         //remove the net prefix from the place name
         String placeName = mapping.map(p.name()).value2();
         Place guiPlace = null;
@@ -119,12 +147,14 @@ public class VerifyTAPNExporter {
 		modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
         modelStream.append(">\n");
-        outputPosition(modelStream, guiPlace.getPositionX(), guiPlace.getPositionY());
+        if(guiPlace != null){
+            outputPosition(modelStream, guiPlace.getPositionX(), guiPlace.getPositionY());
+        }
 
         modelStream.append("</place>\n");
 	}
 
-    private void outputTransition(TimedTransition t, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
+	protected void outputTransition(TimedTransition t, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         //remove the net prefix from the transition name
 	    String transitionName = mapping.map(t.name()).value2();
         Transition guiTransition = null;
@@ -143,7 +173,9 @@ public class VerifyTAPNExporter {
 		modelStream.append("name=\"" + t.name() + "\" ");
         modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
         modelStream.append(">\n");
-        outputPosition(modelStream, guiTransition.getPositionX(), guiTransition.getPositionY());
+        if(guiTransition != null){
+            outputPosition(modelStream, guiTransition.getPositionX(), guiTransition.getPositionY());
+        }
 
         modelStream.append("</transition>\n");
 	}
@@ -193,7 +225,7 @@ public class VerifyTAPNExporter {
 		if(transArc.getWeight().value() > 1){
 			modelStream.append("weight=\"" + transArc.getWeight().nameForSaving(false) + "\"");
 		}
-		
+
 		modelStream.append("/>\n");
 	}
 

@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.Animator;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -24,18 +28,24 @@ public class TimedTransition extends TAPNElement {
 	private TimeInterval dInterval = null;
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
+    private GuardExpression guard;
 
 	private SharedTransition sharedTransition;
 
 	private final List<TimedTransitionListener> listeners = new ArrayList<TimedTransitionListener>();
 
 	public TimedTransition(String name) {
-		this(name, false);
+		this(name, false, null);
 	}
+
+    public TimedTransition(String name, GuardExpression guard) {
+        this(name, false, guard);
+    }
 	
-	public TimedTransition(String name, boolean isUrgent) {
+	public TimedTransition(String name, boolean isUrgent, GuardExpression guard) {
 		setName(name);
 		setUrgent(isUrgent);
+		this.guard = guard;
 	}
 
 	public void addTimedTransitionListener(TimedTransitionListener listener){
@@ -81,17 +91,23 @@ public class TimedTransition extends TAPNElement {
 	public boolean hasUntimedPreset(){
 		return hasUntimedPreset(true);
 	}
-	
+
 	private boolean hasUntimedPreset(boolean cascade){
 		for(TimedInputArc arc : preset){
 			if(!arc.interval().equals(TimeInterval.ZERO_INF)){
 				return false;
 			}
+			for(ColoredTimeInterval interval : arc.getColorTimeIntervals()){
+                interval.getInterval().equals(TimeInterval.ZERO_INF);
+            }
 		}
 		for (TransportArc arc : transportArcsGoingThrough){
 			if(!arc.interval().equals(TimeInterval.ZERO_INF)){
 				return false;
 			}
+            for(ColoredTimeInterval interval : arc.getColorTimeIntervals()){
+                interval.getInterval().equals(TimeInterval.ZERO_INF);
+            }
 		}
 		
 		if(cascade && isShared()){
@@ -321,20 +337,22 @@ public class TimedTransition extends TAPNElement {
 		return true;
 	}
 
+	//TODO: parse arc expression and calculate new colors also
 	public List<TimedToken> calculateProducedTokensFrom(List<TimedToken> consumedTokens) {
 		// Assume that tokens enables transition
 
 		ArrayList<TimedToken> producedTokens = new ArrayList<TimedToken>();
 		for (TimedOutputArc arc : postset) {
 			for(int i = 0; i < arc.getWeight().value(); i++){
-				producedTokens.add(new TimedToken(arc.destination()));
+
+				producedTokens.add(new TimedToken(arc.destination(), ColorType.COLORTYPE_DOT.getFirstColor()));
 			}
 		}
 
 		for (TransportArc transportArc : transportArcsGoingThrough) {
 			for (TimedToken token : consumedTokens) {
 				if (token.place().equals(transportArc.source())) {
-					producedTokens.add(new TimedToken(transportArc.destination(), token.age()));
+					producedTokens.add(new TimedToken(transportArc.destination(), token.age(), ColorType.COLORTYPE_DOT.getFirstColor()));
 				}
 			}
 		}
@@ -383,7 +401,10 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public TimedTransition copy() {
-		return new TimedTransition(name, isUrgent);
+	    if(guard == null){
+            return new TimedTransition(name, isUrgent, null);
+        }
+		return new TimedTransition(name, isUrgent, guard.copy());
 	}
 
 	@Override
@@ -473,5 +494,22 @@ public class TimedTransition extends TAPNElement {
 		}
 
 		return biggestConstant;
+	}
+
+    public GuardExpression getGuard() {return guard;}
+    public void setGuard(GuardExpression guard) {
+        setGuard(guard,true);
+
+    }
+
+    public void setGuard(GuardExpression guard, boolean cascade) {
+        this.guard = guard;
+	    if (isShared() && cascade) {
+	        if(guard != null){
+                sharedTransition.setGuard(guard.copy());
+            } else{
+	            sharedTransition.setGuard(null);
+            }
+        }
 	}
 }

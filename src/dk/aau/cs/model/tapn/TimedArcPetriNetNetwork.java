@@ -2,6 +2,10 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
+import dk.aau.cs.gui.undo.Colored.*;
+import dk.aau.cs.model.CPN.*;
+import dk.aau.cs.model.CPN.Expressions.*;
+import org.jetbrains.annotations.NotNull;
 import pipe.gui.MessengerImpl;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
@@ -13,6 +17,8 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
+import pipe.gui.undo.UndoManager;
+import pipe.gui.widgets.ConstantsPane;
 
 public class TimedArcPetriNetNetwork {
 	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
@@ -21,7 +27,9 @@ public class TimedArcPetriNetNetwork {
 	
 	private NetworkMarking currentMarking = new NetworkMarking();
 	private final ConstantStore constants;
-	
+
+    private List<ColorType> colorTypes = new ArrayList<ColorType>();
+    private List<Variable> variables = new ArrayList<Variable>();
 	private int defaultBound = 3;
 	
 	private final List<ConstantsListener> constantsListeners = new ArrayList<ConstantsListener>();
@@ -29,11 +37,12 @@ public class TimedArcPetriNetNetwork {
 	private boolean paintNet = true;
 	
 	public TimedArcPetriNetNetwork() {
-		this(new ConstantStore());
+		this(new ConstantStore(), List.of(ColorType.COLORTYPE_DOT));
 	}
 	
-	public TimedArcPetriNetNetwork(ConstantStore constants){
+	public TimedArcPetriNetNetwork(ConstantStore constants, List<ColorType> colorTypes){
 		this.constants = constants;
+		this.colorTypes.addAll(colorTypes);
         buildConstraints();
 	}
 	
@@ -438,8 +447,18 @@ public class TimedArcPetriNetNetwork {
 	public void undoSort(SharedTransition[] oldOrder) {
 		sharedTransitions.clear();
 		sharedTransitions.addAll(Arrays.asList(oldOrder));
-	}	
-	
+	}
+
+	//TODO: maybe should be more extensive than this
+    //E.g. check expressions, invariants, intervals and tokens
+	public boolean isColored(){
+	    for (TimedArcPetriNet tapn : tapns){
+	        if(tapn.isColored()){
+	            return true;
+            }
+        }
+	    return colorTypes.size() > 1 || variables.size() > 0;
+    }
 	public boolean isUntimed(){
 		for(TimedArcPetriNet t : tapns){
 			if(!t.isUntimed()){
@@ -447,6 +466,10 @@ public class TimedArcPetriNetNetwork {
 			}
 		}
 		return true;
+	}
+
+	public boolean isTimed(){
+		return !isUntimed();
 	}
 
 	public boolean hasWeights() {
@@ -555,7 +578,7 @@ public class TimedArcPetriNetNetwork {
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 		
 		for(SharedPlace p : sharedPlaces){
-			network.add(new SharedPlace(p.name(), p.invariant().copy()));
+			network.add(new SharedPlace(p.name(), p.invariant().copy(),p.getColorType()));
             
 			/* Copy markings for shared places */
 			for(TimedToken token : currentMarking.getTokensFor(p)){
@@ -601,5 +624,267 @@ public class TimedArcPetriNetNetwork {
 	public void setPaintNet(boolean paintNet){
 		this.paintNet = paintNet;
 	}
+
+	//For colors
+
+    public List<ColorType> colorTypes() { return colorTypes;}
+    public void setColorTypes(List<ColorType> cts) { colorTypes = cts;}
+
+
+    public List<Variable> variables() {return variables;}
+    public void setVariables(List<Variable> newVariables) { variables = newVariables;}
+
+    public void renameColorType(ColorType oldColorType, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager){
+        Integer index = getColorTypeIndex(oldColorType.getName());
+
+        Command command = new UpdateColorTypeCommand(this, oldColorType, colorType, index, colorTypesListModel);
+        command.redo();
+        undoManager.addEdit(command);
+        updateProductTypes(oldColorType, colorType, undoManager);
+    }
+
+    public void updateColorType(ColorType oldColorType, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager) {
+        undoManager.newEdit();
+
+        renameColorType(oldColorType,colorType,colorTypesListModel, undoManager);
+    }
+
+
+    private void updateProductTypes(ColorType oldColorType, ColorType colorType, UndoManager undoManager){
+        for(ColorType ct : colorTypes){
+            if(ct instanceof ProductType){
+                Command command = new UpdatePTColorTypeCommand(oldColorType, colorType, (ProductType)ct);
+                command.redo();
+                undoManager.addEdit(command);
+            }
+        }
+    }
+
+    public void updateVariable(String oldName, Variable variable) {
+        Integer index = getVariableIndex(oldName);
+        Variable oldVar = getVariableByIndex(index);
+        if (index != null) {
+            variables.set(index, variable);
+        }
+    }
+
+    public Integer getColorTypeIndex(String name) {
+        for (int i = 0; i < colorTypes.size(); i++) {
+            if (colorTypes.get(i).getName().equalsIgnoreCase(name)) {
+                return i;
+            }
+        }
+        return null;
+    }
+    public ColorType getColorTypeByName(String name) {
+        for (ColorType element : colorTypes) {
+            if (element.getName().equalsIgnoreCase(name)) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    public Integer getVariableIndex(String name) {
+        for (int i = 0; i < variables.size(); i++) {
+            if (variables.get(i).getName().equalsIgnoreCase(name)) {
+                return i;
+            }
+        }
+        return null;
+    }
+    public boolean isNameUsedForColorType(String name) {
+        for (ColorType element : colorTypes) {
+            if (element.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isNameUsedForVariable(String name) {
+        for (Variable element : variables) {
+            if (element.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public Variable getVariableByName(String name){
+        for (int i = 0; i < variables.size(); i++) {
+            if (variables.get(i).getName().equalsIgnoreCase(name)) {
+                return variables.get(i);
+            }
+        }
+        return null;
+    }
+    public Color getColorByName(String name){
+        for (ColorType element : colorTypes) {
+            if(element.getColorByName(name) != null){
+                return element.getColorByName(name);
+            }
+        }
+        return null;
+    }
+    public Variable getVariableByIndex(int index) {
+        return variables.get(index);
+    }
+    public int numberOfColorTypes() {
+        return colorTypes.size();
+    }
+
+    public ColorType getColorTypeByIndex(int index) {
+        return colorTypes.get(index);
+    }
+
+    public int numberOfVariables() {
+        return variables.size();
+    }
+    public void add(ColorType colorType) {
+        if (colorType.equals(ColorType.COLORTYPE_DOT) && isNameUsedForColorType(ColorType.COLORTYPE_DOT.getName()))
+            return;
+
+        Require.that(colorType != null, "colorType must not be null");
+        Require.that(!isNameUsedForColorType(colorType.getName()), "There is already a color type with that name"); //TODO:: When using load, a nullpointer exception is thrown here
+        colorTypes.add(colorType);
+    }
+
+    public void add(Variable variable) {
+        Require.that(variable != null, "variable must not be null");
+        Require.that(!isNameUsedForVariable(variable.getName()), "There is already a variable with that name");
+
+        variables.add(variable);
+    }
+
+    public boolean remove(ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager, ArrayList<String> messages) {
+        Integer index = getColorTypeIndex(colorType.getName());
+
+        if(canColorTypeBeRemoved(colorType, messages)){
+            Command command = new RemoveColorTypeFromNetworkCommand(colorType, this, colorTypesListModel, index);
+            command.redo();
+            undoManager.addEdit(command);
+            //Success
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean canColorTypeBeRemoved(ColorType colorType, ArrayList<String> messages){
+	    isColorTypeUsedInProduct(colorType, messages);
+	    for(TimedArcPetriNet tapn : allTemplates()){
+            for(TimedPlace p : tapn.places()){
+                if(p.getColorType().equals(colorType)){
+                    messages.add("Color type is used in place " + p.name() + " \n");
+                }
+            }
+            for(TimedTransition t : tapn.transitions()){
+                for(Color c : colorType.getColors()){
+                    if(t.getGuard() != null && t.getGuard().containsColor(c)){
+                        messages.add("Colors of color type is used in transition " + t.name() + "\n");
+                    }
+                }
+            }
+        }
+        return messages.isEmpty();
+    }
+    private void isColorTypeUsedInProduct(ColorType colorType, ArrayList<String> messages){
+        for(ColorType ct : colorTypes){
+            if(ct instanceof ProductType && ((ProductType) ct).contains(colorType)){
+                messages.add("Color type is used in product type " + ct.getName() + " \n");
+            }
+        }
+    }
+
+    public void remove(Variable variable , ConstantsPane.VariablesListModel variablesListModel, UndoManager undoManager, List<String> messages) {
+	    if(canVariableBeRemoved(variable,messages)){
+            Integer index = getVariableIndex(variable.getName());
+            Command command = new RemoveVariableFromNetworkCommand(variable, this, variablesListModel, index);
+            command.redo();
+            undoManager.addEdit(command);
+
+        }
+    }
+
+    public void remove(Variable variable) {
+	    if(variable != null){
+	        variables.remove(variable);
+        }
+    }
+
+    public boolean canVariableBeRemoved(Variable variable, List<String> messages){
+        for (TimedArcPetriNet tapn : allTemplates()){
+
+            for(TimedInputArc arc : tapn.inputArcs()){
+                Set<Variable> variables = new HashSet<>();
+                arc.getArcExpression().getVariables(variables);
+                if(variables.contains(variable)){
+                    messages.add("Variable contained on input arc " + arc.fromTo());
+                }
+            }
+            for(TimedOutputArc arc : tapn.outputArcs()){
+                Set<Variable> variables = new HashSet<>();
+                arc.getExpression().getVariables(variables);
+                if(variables.contains(variable)){
+                    messages.add("Variable contained on output arc " + arc.toString());
+                }
+            }
+            for(TransportArc arc : tapn.transportArcs()){
+                Set<Variable> variables = new HashSet<>();
+                arc.getInputExpression().getVariables(variables);
+                arc.getOutputExpression().getVariables(variables);
+
+                if(variables.contains(variable)){
+                    messages.add("Variable contained on transport arc " + arc.fromTo());
+                }
+            }
+        }
+        return messages.isEmpty();
+    }
+
+    public ColorType[] sortColorTypes() {
+        ColorType[] oldorder = colorTypes.toArray(new ColorType[0]);
+        Collections.sort(colorTypes, new StringComparator());
+        return oldorder;
+    }
+    public void undoSort(ColorType[] oldorder) {
+        colorTypes.clear();
+        for (ColorType element: oldorder) {
+            colorTypes.add(element);
+        }
+    }
+    public void swapColorTypes(int currentIndex, int newIndex) {
+        ColorType temp = colorTypes.get(currentIndex);
+        colorTypes.set(currentIndex, colorTypes.get(newIndex));
+        colorTypes.set(newIndex, temp);
+    }
+
+    public void swapVariables(int currentIndex, int newIndex) {
+        Variable temp = variables.get(currentIndex);
+        variables.set(currentIndex, variables.get(newIndex));
+        variables.set(newIndex, temp);
+    }
+
+    public Variable[] sortVariables() {
+        Variable[] oldOrder = variables.toArray(new Variable[0]);
+        Collections.sort(variables, new StringComparator());
+        return oldOrder;
+    }
+
+    public void undoSort(Variable[] oldOrder) {
+        variables.clear();
+        for (Variable element: oldOrder) {
+            variables.add(element);
+        }
+    }
+
+    public ExpressionContext getContext(){
+	    HashMap<String, ColorType> hashMap = new HashMap<>();
+	    for(ColorType colorType : colorTypes){
+	        hashMap.put(colorType.getName(), colorType);
+        }
+	    return new ExpressionContext(new HashMap<String, Color>(), hashMap);
+    }
+
 
 }

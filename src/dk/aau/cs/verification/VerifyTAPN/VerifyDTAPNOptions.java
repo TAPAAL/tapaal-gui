@@ -3,7 +3,11 @@ package dk.aau.cs.verification.VerifyTAPN;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
+import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.InclusionPlaces;
+
+import java.io.File;
+import java.io.IOException;
 
 public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	
@@ -15,6 +19,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
 	private boolean useStubbornReduction = true;
+	private boolean partition;
+	private boolean colorFixpoint;
+	private String libQueryFilePath;
 	
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(
@@ -28,9 +35,11 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean enableOverApproximation,
 			boolean enableUnderApproximation,
 			int approximationDenominator,
-			boolean stubbornReduction
+			boolean stubbornReduction,
+            boolean partition,
+            boolean colorFixpoint
 	) {
-		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction);
+		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
@@ -50,7 +59,10 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean enableOverApproximation,
 			boolean enableUnderApproximation,
 			int approximationDenominator,
-			boolean stubbornReduction
+			boolean stubbornReduction,
+            String reducedModelPath,
+            boolean partition,
+            boolean colorFixpoint
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -59,6 +71,20 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		this.gcd = gcd;
 		this.workflowbound = workflowbound;
 		this.useStubbornReduction = stubbornReduction;
+		this.reducedModelPath = reducedModelPath;
+		this.partition = partition;
+		this.colorFixpoint = colorFixpoint;
+
+        try {
+            unfoldedModelPath = File.createTempFile("unfolded-", ".xml").getAbsolutePath();
+            unfoldedQueriesPath = File.createTempFile("unfolded-", ".xml").getAbsolutePath();
+            libQueryFilePath = File.createTempFile("tempLibQuery", ".q").getAbsolutePath();
+        } catch (IOException e) {
+            new MessengerImpl().displayErrorMessage(
+                e.getMessage(),
+                "Error");
+            return;
+        }
 	}
 	
 	@Override
@@ -88,6 +114,18 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		if (workflow != WorkflowMode.WORKFLOW_SOUNDNESS && workflow != WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
 			result.append(gcd ? "-c" : ""); // GCD optimization is not sound for workflow analysis
 		}
+
+        result.append(" -q " + libQueryFilePath);
+		result.append(" -q-xml " + unfoldedQueriesPath);
+		result.append(" -f " + unfoldedModelPath);
+        /* partitioning and color fixpoint is currently not available for timed nets
+        if(!this.partition){
+            result.append(" --disable-partitioning");
+        }
+
+        if(!this.colorFixpoint){
+            result.append(" --disable-cfp");
+        }*/
 
 		return result.toString();
 	}

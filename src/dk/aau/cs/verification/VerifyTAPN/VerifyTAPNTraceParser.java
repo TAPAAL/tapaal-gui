@@ -10,6 +10,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import dk.aau.cs.model.CPN.ColorType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -69,7 +70,7 @@ public class VerifyTAPNTraceParser {
 	
 		return trace;
 	}
-
+    //TODO: how to handle colors?
 	private TimedTransitionStep parseTransitionStep(Element element) {
 		TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
 		
@@ -84,7 +85,7 @@ public class VerifyTAPNTraceParser {
 				TimedPlace place = tapn.getPlaceByName(tokenElement.getAttribute("place"));
 				BigDecimal age = new BigDecimal(tokenElement.getAttribute("age"));
 				boolean greaterThanOrEqual = Boolean.parseBoolean(tokenElement.getAttribute("greaterThanOrEqual"));
-				consumedTokens.add(new TraceToken(place, age, greaterThanOrEqual));
+				consumedTokens.add(new TraceToken(place, age, greaterThanOrEqual, ColorType.COLORTYPE_DOT.getFirstColor()));
 			}
 		}
 		return new TimedTransitionStep(transition, consumedTokens);

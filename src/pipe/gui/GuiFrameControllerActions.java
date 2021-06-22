@@ -43,6 +43,7 @@ public interface GuiFrameControllerActions {
     void showBatchProcessingDialog();
     void toggleQueries();
     void toggleConstants();
+    void toggleColorTokens();
     void toggleTokenAge();
     void toggleZeroToInfinityIntervals();
     void toggleComponents();

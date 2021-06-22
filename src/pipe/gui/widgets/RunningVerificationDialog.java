@@ -29,7 +29,8 @@ public class RunningVerificationDialog extends JDialog {
 	JLabel progressLabel;
 	JLabel resourcesLabel;
 	JLabel usageLabel;
-	private Timer timer; 
+	private Timer timer;
+	private String processName;
 	
 	private int memoryTimerCount = 0;
 	private int memoryTimerMode = 0;
@@ -54,13 +55,18 @@ public class RunningVerificationDialog extends JDialog {
 	
 	private Timer memoryTimer;
 	
-	public RunningVerificationDialog(JFrame owner, final SwingWorker<?, ?> worker) {
-		super(owner, "Verification in Progress", true);
+	public RunningVerificationDialog(JFrame owner, final SwingWorker<?, ?> worker, String processName) {
+		super(owner, processName+ " in Progress", true);
 		this.worker = worker;
+		this.processName = processName;
 		initComponents();
 		initActions();
 		pack();
 	}
+
+    public RunningVerificationDialog(JFrame owner, final SwingWorker<?, ?> worker) {
+	    this(owner, worker, "Verification");
+    }
 
 	private void initActions() {
 		okButton.addActionListener(evt -> {
@@ -130,9 +136,9 @@ public class RunningVerificationDialog extends JDialog {
 			}
 		});	
 		
-		okButton = new JButton("Interrupt Verification");
+		okButton = new JButton("Interrupt " + processName);
 		headLineLabel = new JLabel();
-		headLineLabel.setText("Verification is running, please wait ...  ");
+		headLineLabel.setText(processName + " is running, please wait ...  ");
 		progressLabel = new JLabel();
 		progressLabel.setText("Elapsed time: ");
 		resourcesLabel = new JLabel();

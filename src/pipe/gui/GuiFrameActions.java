@@ -34,6 +34,8 @@ public interface GuiFrameActions {
 
     void registerViewActions(List<GuiAction> viewActions);
 
+    void registerToolsActions(List<GuiAction> toolsActions);
+
     void setStatusBarText(String s);
 
     void registerController(GuiFrameControllerActions guiFrameController, Reference<TabContentActions> currentTab);
@@ -44,6 +46,7 @@ public interface GuiFrameActions {
     void setShowComponentsSelected(boolean b);
     void setShowSharedPTSelected(boolean b);
     void setShowConstantsSelected(boolean b);
+    void setShowColoredTokensSelected(boolean b);
     void setShowQueriesSelected(boolean b);
     void setShowEnabledTransitionsSelected(boolean b);
     void setShowDelayEnabledTransitionsSelected(boolean b);

@@ -3,6 +3,8 @@ package dk.aau.cs.gui.undo;
 import java.util.Hashtable;
 import java.util.List;
 
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
@@ -30,8 +32,12 @@ public class MakePlaceNewSharedCommand extends Command {
 	private final SharedPlacesAndTransitionsPanel sharedPanel;
 	private SharedPlace sharedPlace;
 	private final boolean multiShare;
-	
-	public MakePlaceNewSharedCommand(TimedArcPetriNet tapn, String newSharedName, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab, boolean multiShare){
+	private final ColorType colorType;
+	private final ArcExpression tokenExpression;
+
+	//TODO: Add color type to this probably
+	public MakePlaceNewSharedCommand(TimedArcPetriNet tapn, String newSharedName, TimedPlace place, TimedPlaceComponent placeComponent,
+                                     TabContent currentTab, boolean multiShare){
 		Require.that(tapn != null, "tapn cannot be null");
 		Require.that(newSharedName != null, "newSharedName cannot be null");
 		Require.that(place != null, "timedPlace cannot be null");
@@ -47,6 +53,8 @@ public class MakePlaceNewSharedCommand extends Command {
 		this.sharedPanel = currentTab.getSharedPlacesAndTransitionsPanel();
 		this.multiShare = multiShare;
 		oldTokens = place.tokens();
+		this.colorType = place.getColorType();
+		this.tokenExpression = place.getTokensAsExpression();
 		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
 	}
 	
@@ -55,7 +63,8 @@ public class MakePlaceNewSharedCommand extends Command {
 		tapn.remove(place);
 
 		if(sharedPlace == null){
-			sharedPlace = new SharedPlace(newSharedName);
+			sharedPlace = new SharedPlace(newSharedName, colorType);
+			sharedPlace.setTokenExpression(tokenExpression);
 		}
 		
 		sharedPanel.addSharedPlace(sharedPlace, multiShare);

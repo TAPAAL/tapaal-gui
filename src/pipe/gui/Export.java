@@ -66,7 +66,6 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
  * @author Maxim
  */
 public class Export {
-
     public static final int PNG = 1;
     public static final int POSTSCRIPT = 2;
     public static final int PRINTER = 3;
@@ -86,7 +85,8 @@ public class Export {
 
         NetWriter tapnWriter = new PNMLWriter(
             currentTab.network(),
-            currentTab.getGuiModels()
+            currentTab.getGuiModels(),
+            currentTab.getLens()
         );
 
         tapnWriter.savePNML(new File(filename));
@@ -138,7 +138,7 @@ public class Export {
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(network);
         TimedArcPetriNet model = transformedModel.value1();
 
-        TabContent.TAPNLens lens = new TabContent.TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions());
+        TabContent.TAPNLens lens = new TabContent.TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions(), model.isColored());
 
         RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
         int i = 0;
@@ -147,9 +147,9 @@ public class Export {
             i++;
 
             if (lens.isGame() && isDTAPN) {
-                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null, lens, transformedModel.value2());
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null, lens, transformedModel.value2(), composer.getGuiModel());
             } else {
-                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null ,new TabContent.TAPNLens(true, false), transformedModel.value2());
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null ,new TabContent.TAPNLens(true, false, lens.isColored()), transformedModel.value2(), composer.getGuiModel());
             }
         }
     }

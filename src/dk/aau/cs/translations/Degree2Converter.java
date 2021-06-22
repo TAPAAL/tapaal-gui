@@ -3,6 +3,7 @@ package dk.aau.cs.translations;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -46,15 +47,15 @@ public class Degree2Converter {
 		for(TimedPlace p : conservativeModel.places()) {
 			TimedPlace copy = p.copy();
 			degree2Model.add(copy);
-			for(int i = 0; i < p.numberOfTokens(); i++) {
-				degree2Model.addToken(new TimedToken(copy));
+			for(TimedToken token : p.tokens()) {
+				degree2Model.addToken(new TimedToken(copy, token.color()));
 			}
 		}
 		
 		TimedPlace plock = new LocalTimedPlace(PLOCK);
 		degree2Model.add(plock);
-		
-		degree2Model.addToken(new TimedToken(plock));
+		//TODO: how to handle colors?
+		degree2Model.addToken(new TimedToken(plock, ColorType.COLORTYPE_DOT.getFirstColor()));
 
 		
 		for(TimedTransition t : conservativeModel.transitions())
@@ -93,11 +94,14 @@ public class Degree2Converter {
 		retainedDegree2Transitions.add(t);
 		
 		for(TimedInputArc inputArc : transition.getInputArcs()) {
-			degree2Model.add(new TimedInputArc(degree2Model.getPlaceByName(inputArc.source().name()), t, inputArc.interval().copy()));
+			degree2Model.add(new TimedInputArc(degree2Model.getPlaceByName(inputArc.source().name()), t, inputArc.interval().copy(), inputArc.getArcExpression().copy()));
 			degree2Model.add(new TimedOutputArc(t, degree2Model.getPlaceByName(pairing.getOutputArcFor(inputArc).destination().name())));
 		}
 		
 		for(TransportArc transArc : transition.getTransportArcsGoingThrough()) {
+		    TransportArc transArcCopy =new TransportArc(degree2Model.getPlaceByName(transArc.source().name()), t, degree2Model.getPlaceByName(transArc.destination().name()), transArc.interval().copy());
+		    transArcCopy.setInputExpression(transArc.getInputExpression().copy());
+		    transArcCopy.setOutputExpression(transArc.getOutputExpression().copy());
 			degree2Model.add(new TransportArc(degree2Model.getPlaceByName(transArc.source().name()), t, degree2Model.getPlaceByName(transArc.destination().name()), transArc.interval().copy()));
 		}
 		
@@ -125,7 +129,8 @@ public class Degree2Converter {
 			}
 
 			String ptName = String.format(P_T_IN_FORMAT, transitionName, i);
-			LocalTimedPlace pt = new LocalTimedPlace(ptName, new TimeInvariant(true, new IntBound(0)));
+			//TODO: what should colored time invariant be here??
+			LocalTimedPlace pt = new LocalTimedPlace(ptName, new TimeInvariant(true, new IntBound(0)), ColorType.COLORTYPE_DOT);
 			degree2Model.add(pt);
 
 			degree2Model.add(new TimedOutputArc(tiin, pt));
@@ -133,9 +138,9 @@ public class Degree2Converter {
 				degree2Model.add(new TimedInputArc(previousPlace, tiin, TimeInterval.ZERO_INF));
 			}
 			previousPlace = pt;
-
-			String holdingPlaceName = String.format(HOLDING_PLACE_FORMAT, transitionName, i);
-			degree2Model.add(new LocalTimedPlace(holdingPlaceName, TimeInvariant.LESS_THAN_INFINITY));
+            //TODO: what should colored time invariant be here??
+            String holdingPlaceName = String.format(HOLDING_PLACE_FORMAT, transitionName, i);
+			degree2Model.add(new LocalTimedPlace(holdingPlaceName, TimeInvariant.LESS_THAN_INFINITY, ColorType.COLORTYPE_DOT));
 		}
 
 		// Create t^max(t)
@@ -157,7 +162,8 @@ public class Degree2Converter {
 			degree2Model.add(tiOut);
 
 			String ptOutName = String.format(P_T_OUT_FORMAT, transitionName, i);
-			TimedPlace ptOut = new LocalTimedPlace(ptOutName, new TimeInvariant(true, new IntBound(0)));
+            //TODO: what should colored time invariant be here??
+            TimedPlace ptOut = new LocalTimedPlace(ptOutName, new TimeInvariant(true, new IntBound(0)), ColorType.COLORTYPE_DOT);
 			degree2Model.add(ptOut);
 
 			degree2Model.add(new TimedOutputArc(previousTransition, ptOut));
@@ -224,11 +230,11 @@ public class Degree2Converter {
 			if(t.presetSizeWithoutInhibitorArcs() == 1) {
 				degree2Model.add(new TimedInhibitorArc(degree2Model.getPlaceByName(inhibArc.source().name()), 
 						degree2Model.getTransitionByName(String.format(T_MAX_FORMAT, t.name(), 1)), 
-						inhibArc.interval().copy()));
+						inhibArc.interval().copy(), inhibArc.getArcExpression().copy()));
 			} else {
 				degree2Model.add(new TimedInhibitorArc(degree2Model.getPlaceByName(inhibArc.source().name()), 
 						degree2Model.getTransitionByName(String.format(T_I_IN_FORMAT, t.name(), 1)), 
-						inhibArc.interval().copy()));
+						inhibArc.interval().copy(), inhibArc.getArcExpression().copy()));
 			}
 		}
 	}

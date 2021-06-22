@@ -6,20 +6,13 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.CaretListener;
 import net.tapaal.swinghelpers.GridBagHelper;
 import dk.aau.cs.gui.undo.*;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
+import pipe.gui.ColoredComponents.ColoredTransitionGuardPanel;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
@@ -42,6 +35,8 @@ public class TAPNTransitionEditor extends JPanel {
 	private final TimedTransitionComponent transition;
 	private final JRootPane rootPane;
 	private final Context context;
+	private JScrollPane scrollPane;
+	private JPanel mainPanel;
 	
 	private final int maxNumberOfTransitionsToShowAtOnce = 20;
 	boolean doNewEdit = true;
@@ -51,19 +46,24 @@ public class TAPNTransitionEditor extends JPanel {
 		transition = _transition;
 		this.context = context;
 		initComponents();
-        hideTimedInformation();
+        hideIrrelevantInformation();
 		rootPane.setDefaultButton(okButton);
 	}
 
-	private void hideTimedInformation(){
+	private void hideIrrelevantInformation(){
 	    if(!transition.isTimed()) {
             urgentCheckBox.setVisible(false);
+        }
+	    if(!transition.isColored()){
+	        coloredTransitionGuardPanel.setVisible(false);
         }
     }
 
 	private void initComponents() {
-		GridBagConstraints gridBagConstraints;
-
+        setLayout(new BorderLayout());
+        GridBagConstraints gridBagConstraints;
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new GridBagLayout());
 		transitionEditorPanel = new JPanel();
 		nameLabel = new JLabel();
 		nameTextField = new JTextField();
@@ -83,16 +83,17 @@ public class TAPNTransitionEditor extends JPanel {
 		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);
 		SwingHelper.setPreferredWidth(sharedTransitionsComboBox,290);
 		sharedTransitionsComboBox.addActionListener(e -> {
+		    //coloredTransitionGuardPanel.onOK(context.undoManager());
 			if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
-			}else{
+                ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
+            }else{
                 urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
                 uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
-			}
+                coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
+            }
 		});
-
-		setLayout(new java.awt.GridBagLayout());
 
 		transitionEditorPanel.setLayout(new java.awt.GridBagLayout());
 		transitionEditorPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Transition Editor"));
@@ -183,7 +184,9 @@ public class TAPNTransitionEditor extends JPanel {
 
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		add(transitionEditorPanel, gridBagConstraints);
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		mainPanel.add(transitionEditorPanel, gridBagConstraints);
 
 		buttonPanel.setLayout(new java.awt.GridBagLayout());
 
@@ -212,14 +215,25 @@ public class TAPNTransitionEditor extends JPanel {
 		buttonPanel.add(okButton, gridBagConstraints);
 
 		gridBagConstraints = GridBagHelper.as(0,3, Anchor.EAST, new Insets(5, 0, 8, 3));
-		add(buttonPanel, gridBagConstraints);
+		mainPanel.add(buttonPanel, gridBagConstraints);
 
 		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
 		gridBagConstraints = GridBagHelper.as(1,3, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
-		
+
+		gridBagConstraints = GridBagHelper.as(0,1,Anchor.WEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
+        coloredTransitionGuardPanel = new ColoredTransitionGuardPanel(transition, context, this);
+		mainPanel.add(coloredTransitionGuardPanel, gridBagConstraints);
 		setupInitialState();
+		scrollPane = new JScrollPane();
+		scrollPane.setViewportView(mainPanel);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		add(scrollPane, BorderLayout.CENTER);
 
 	}	
 	
@@ -246,6 +260,7 @@ public class TAPNTransitionEditor extends JPanel {
 		sharedCheckBox.setEnabled(sharedTransitions.size() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
 		urgentCheckBox.setSelected(transition.isUrgent());
 		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
+		coloredTransitionGuardPanel.initExpr(transition.getGuardExpression());
 
 		if(transition.underlyingTransition().isShared()){
 			switchToNameDropDown();
@@ -282,6 +297,8 @@ public class TAPNTransitionEditor extends JPanel {
 	protected void switchToNameTextField() {
 		transitionEditorPanel.remove(sharedTransitionsComboBox);
 		GridBagConstraints gbc = GridBagHelper.as(1,1, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+		gbc.weightx = 1.0;
+		gbc.fill = GridBagConstraints.BOTH;
 		urgentCheckBox.setSelected(transition.isUrgent());
 		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
 		transitionEditorPanel.add(nameTextField, gbc);
@@ -292,16 +309,19 @@ public class TAPNTransitionEditor extends JPanel {
 	protected void switchToNameDropDown() {
 		transitionEditorPanel.remove(nameTextField);
 		GridBagConstraints gbc = GridBagHelper.as(1,1,Fill.HORIZONTAL,new Insets(3, 3, 3, 3));
-
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
 		transitionEditorPanel.add(sharedTransitionsComboBox, gbc);
 		if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
+            ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
         }else{
             urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
             uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
+            coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
 		}
-    		transitionEditorPanel.validate();
+		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
 	}
 
@@ -459,10 +479,15 @@ public class TAPNTransitionEditor extends JPanel {
 			transition.toggleAttributesVisible();
 		}
 		
-		transition.update(true);
+
+		coloredTransitionGuardPanel.onOK(context.undoManager());
 		
 		return true;
 	}
+
+	public void enableOKButton(boolean enable){
+	    okButton.setEnabled(enable);
+    }
 
 	private void exit() {
 		rootPane.getParent().setVisible(false);
@@ -491,4 +516,5 @@ public class TAPNTransitionEditor extends JPanel {
 
 	private boolean makeNewShared = false;
 	private javax.swing.JCheckBox attributesCheckBox;
+    private ColoredTransitionGuardPanel coloredTransitionGuardPanel;
 }

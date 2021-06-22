@@ -1,10 +1,16 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.CPN.Expressions.AddExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
@@ -18,6 +24,7 @@ public abstract class TimedPlace {
     protected String name;
     protected TimeInvariant invariant;
     protected TimedMarking currentMarking;
+    protected ArcExpression tokensAsExpression;
 
     private final List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
     private final List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
@@ -27,8 +34,11 @@ public abstract class TimedPlace {
     public enum PlaceType{
 		Standard, Invariant, Dead
 	}
-
-	public abstract boolean isShared();
+    public abstract ColorType getColorType();
+    public abstract List<ColoredTimeInvariant> getCtiList();
+    public abstract void setCtiList(List<ColoredTimeInvariant> list);
+    public abstract void setColorType(ColorType ct);
+    public abstract boolean isShared();
 
     public String name() {
         return name;
@@ -65,6 +75,7 @@ public abstract class TimedPlace {
         Require.that(tokens != null, "tokens cannot be null");
 
         for(TimedToken token : tokens){
+            //token.setColor(ColorType.COLORTYPE_DOT.getFirstColor());
             currentMarking.add(token); // avoid firing marking changed on every add
         }
         fireMarkingChanged();
@@ -72,7 +83,7 @@ public abstract class TimedPlace {
 
     public void addTokens(int numberOfTokensToAdd) {
         for (int i = 0; i < numberOfTokensToAdd; i++) {
-            addToken(new TimedToken(this, BigDecimal.ZERO));
+            addToken(new TimedToken(this, BigDecimal.ZERO, ColorType.COLORTYPE_DOT.getFirstColor()));
         }
     }
 
@@ -88,8 +99,15 @@ public abstract class TimedPlace {
             fireMarkingChanged();
         }
     }
-	
-	public abstract Tuple<PlaceType, Integer> extrapolate();
+
+    public void removeTokens(Iterable<TimedToken> tokens){
+        for(TimedToken token : tokens){
+            currentMarking.remove(token);
+        }
+        fireMarkingChanged();
+    }
+
+    public abstract Tuple<PlaceType, Integer> extrapolate();
 	
 	public abstract TimedPlace copy();
 	
@@ -205,4 +223,13 @@ public abstract class TimedPlace {
     public int postsetSize() {
         return postset.size() + transportArcs.size() + inhibitorArcs.size();
     }
+
+    public void setTokenExpression(ArcExpression newExpression){
+        tokensAsExpression = newExpression;
+    }
+
+    public ArcExpression getTokensAsExpression(){
+        return tokensAsExpression;
+    }
+
 }

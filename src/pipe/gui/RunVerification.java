@@ -12,6 +12,7 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.File;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.*;
@@ -19,30 +20,41 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.TapnXmlLoader;
+import dk.aau.cs.util.FormatException;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
+import dk.aau.cs.verification.IconSelector;
+import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.QueryType;
+import dk.aau.cs.verification.VerificationResult;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
 	private final VerificationCallback callback;
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, String reducedNetFilePath, boolean reduceNetOnly) {
-		super(modelChecker, messenger, reducedNetFilePath, reduceNetOnly);
+	public RunVerification(ModelChecker modelChecker, ModelChecker unfoldingEngine, IconSelector selector, Messenger messenger, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels,String reducedNetFilePath, boolean reduceNetOnly) {
+		super(modelChecker, unfoldingEngine, messenger, guiModels, reducedNetFilePath,reduceNetOnly);
 		iconSelector = selector;
 		this.callback = callback;
 	}
-
-    public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
-        this(modelChecker, selector, messenger, callback, null, false);
+    public RunVerification(ModelChecker modelChecker, ModelChecker unfoldingEngine, IconSelector selector, Messenger messenger, VerificationCallback callback,HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+        this(modelChecker, unfoldingEngine, selector, messenger, callback, guiModels, null, false);
     }
-	
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
-		this(modelChecker, selector, messenger, null, null, false);
+    public RunVerification(ModelChecker modelChecker, ModelChecker unfoldingEngine, IconSelector selector, Messenger messenger, VerificationCallback callback) {
+        this(modelChecker, unfoldingEngine, selector, messenger, callback, null, null, false);
 	}
+    public RunVerification(ModelChecker modelChecker, ModelChecker unfoldingEngine, IconSelector selector, Messenger messenger) {
+        this(modelChecker, unfoldingEngine, selector, messenger, null, null, null, false);
+    }
 
 	@Override
 	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
@@ -294,28 +306,29 @@ public class RunVerification extends RunVerificationBase {
 		if(modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && !isCTLQuery){
 
             displayStats(panel, result.getStatsAsString(), modelChecker.getStatsExplanations());
-			
-			if(!result.getTransitionStatistics().isEmpty()){
-				JButton transitionStatsButton = new JButton("Transition Statistics");
-				transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,true) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
-				gbc = new GridBagConstraints();
-				gbc.gridx = 0;
-				gbc.gridy = 4;
-				gbc.insets = new Insets(10,0,10,0);
-				gbc.anchor = GridBagConstraints.WEST;
-				panel.add(transitionStatsButton, gbc);
-			}
-			if(!result.getPlaceBoundStatistics().isEmpty()){
-				JButton placeStatsButton = new JButton("Place-Bound Statistics");
-				placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel,createStatisticsPanel(result,false) , "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
-				gbc = new GridBagConstraints();
-				gbc.gridx = 1;
-				gbc.gridy = 4;
-				gbc.insets = new Insets(10,0,10,0);
-				gbc.anchor = GridBagConstraints.WEST;
-				panel.add(placeStatsButton, gbc);
-			}
-			
+            if(!model.isColored()) {
+                if (!result.getTransitionStatistics().isEmpty()) {
+                    JButton transitionStatsButton = new JButton("Transition Statistics");
+                    transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, true), "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
+                    gbc = new GridBagConstraints();
+                    gbc.gridx = 0;
+                    gbc.gridy = 4;
+                    gbc.insets = new Insets(10, 0, 10, 0);
+                    gbc.anchor = GridBagConstraints.WEST;
+                    panel.add(transitionStatsButton, gbc);
+                }
+                if (!result.getPlaceBoundStatistics().isEmpty()) {
+                    JButton placeStatsButton = new JButton("Place-Bound Statistics");
+                    placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, false), "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
+                    gbc = new GridBagConstraints();
+                    gbc.gridx = 1;
+                    gbc.gridy = 4;
+                    gbc.insets = new Insets(10, 0, 10, 0);
+                    gbc.anchor = GridBagConstraints.WEST;
+                    panel.add(placeStatsButton, gbc);
+                }
+            }
+
 			if(!result.getReductionResultAsString().isEmpty()){
 				JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
 				gbc = new GridBagConstraints();
@@ -332,15 +345,20 @@ public class RunVerification extends RunVerificationBase {
                         public void actionPerformed(ActionEvent e) {
                             openReducedButton.setEnabled(false);
                             reducedNetOpened = true;
+
                             File reducedNetFile = new File(reducedNetFilePath);
 
                             if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
                                 try {
                                     TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
-                                    reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
-                                    TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
-                                    reducedNetTab.addQuery(convertedQuery);
-                                    CreateGui.openNewTabFromStream(reducedNetTab);
+                                    //Ensure that a net was created by the query reduction
+                                    if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
+                                        || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
+                                        reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
+                                        TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
+                                        reducedNetTab.addQuery(convertedQuery);
+                                        CreateGui.openNewTabFromStream(reducedNetTab);
+                                    }
                                 } catch (Exception e1){
                                     JOptionPane.showMessageDialog(CreateGui.getApp(),
                                         e1.getMessage(),
@@ -350,6 +368,7 @@ public class RunVerification extends RunVerificationBase {
                             }
                         }
                     });
+
                     gbc = new GridBagConstraints();
                     gbc.gridx = 0;
                     gbc.gridy = 5;
@@ -357,7 +376,18 @@ public class RunVerification extends RunVerificationBase {
                     gbc.anchor = GridBagConstraints.WEST;
                     panel.add(openReducedButton, gbc);
                 }
-			}
+                if (!result.getPlaceBoundStatistics().isEmpty()) {
+                    JButton placeStatsButton = new JButton("Place-Bound Statistics");
+                    placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, false), "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
+                    gbc = new GridBagConstraints();
+                    gbc.gridx = 1;
+                    gbc.gridy = 4;
+                    gbc.insets = new Insets(10, 0, 10, 0);
+                    gbc.anchor = GridBagConstraints.WEST;
+                    panel.add(placeStatsButton, gbc);
+                }
+            }
+
             if (result.getRawOutput() != null) {
                 JButton showRawQueryButton = new JButton("Show raw query results");
                 showRawQueryButton.addActionListener(arg0 -> {

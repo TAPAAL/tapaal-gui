@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -41,6 +42,8 @@ import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
+import javax.xml.crypto.Data;
+
 public class VerifyTAPN implements ModelChecker {
 	private static final String NEED_TO_LOCATE_VERIFYTAPN_MSG = "TAPAAL needs to know the location of the file verifytapn.\n\n"
 		+ "Verifytapn is a part of the TAPAAL distribution and it is\n"
@@ -48,10 +51,10 @@ public class VerifyTAPN implements ModelChecker {
 	
 	private static String verifytapnpath = "";
 	
-	private final FileFinder fileFinder;
-	private final Messenger messenger;
+	protected final FileFinder fileFinder;
+	protected final Messenger messenger;
 
-	private ProcessRunner runner;
+	protected ProcessRunner runner;
 	
 	public VerifyTAPN(FileFinder fileFinder, Messenger messenger) {
 		this.fileFinder = fileFinder;
@@ -259,7 +262,7 @@ public class VerifyTAPN implements ModelChecker {
 
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel) throws Exception {
 		if(!supportsModel(model.value1(), options))
 			throw new UnsupportedModelException("Verifytapn does not support the given model.");
 		
@@ -272,7 +275,8 @@ public class VerifyTAPN implements ModelChecker {
 		if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 		
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2());
+
+		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null,model.value2(), guiModel);
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");
@@ -281,7 +285,7 @@ public class VerifyTAPN implements ModelChecker {
 		return verify(options, model, exportedModel, query);
 	}
 
-	private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
+    protected void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
 		VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions)options;
 		
 		if(verificationOptions.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces) 
@@ -302,7 +306,7 @@ public class VerifyTAPN implements ModelChecker {
 		((VerifyTAPNOptions)options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
 	}
 
-	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
+	protected VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
 		((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 		runner = new ProcessRunner(verifytapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();

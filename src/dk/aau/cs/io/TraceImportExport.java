@@ -95,7 +95,7 @@ public class TraceImportExport {
         document.appendChild(traceRootNode);
 
         // Output the trace to XML document
-        TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), false, true);
+        TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), CreateGui.getCurrentTab().getLens(), false, true);
 
         for (TAPNNetworkTraceStep step : CreateGui.getAnimator().getActionHistory()) {
             if (step.isLoopStep()) {
@@ -169,7 +169,7 @@ public class TraceImportExport {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
 
-            TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), false, true);
+            TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), CreateGui.getCurrentTab().getLens(), false, true);
             Tuple<TimedArcPetriNet, NameMapping> model = composer.transformModel(CreateGui.getCurrentTab().network());
             VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
             TimedArcPetriNetTrace traceComposed = traceParser.parseTrace(br);

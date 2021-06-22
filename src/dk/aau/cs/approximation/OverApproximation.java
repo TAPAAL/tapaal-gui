@@ -13,6 +13,7 @@ import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.*;
 import dk.aau.cs.util.Tuple;
@@ -69,18 +70,18 @@ public class OverApproximation implements ITAPNApproximation {
 			 oldInterval.isUpperBoundNonStrict()
 			 );
 	}
-	
+	//TODO: how to handle colors
 	public void makeTraceTAPN(Tuple<TimedArcPetriNet, NameMapping> transformedModel, VerificationResult<TAPNNetworkTrace> result, dk.aau.cs.model.tapn.TAPNQuery query) {
 		TimedArcPetriNet net = transformedModel.value1();
                 
 		LocalTimedPlace currentPlace = new LocalTimedPlace("PTRACE0");
-		TimedToken currentToken = new TimedToken(currentPlace);
+		TimedToken currentToken = new TimedToken(currentPlace, ColorType.COLORTYPE_DOT.getFirstColor());
 		net.add(currentPlace);
 		currentPlace.addToken(currentToken);
 		
 		// Block place, which secures the net makes at most one transition not in the trace.
-		LocalTimedPlace blockPlace = new LocalTimedPlace("PBLOCK", TimeInvariant.LESS_THAN_INFINITY);
-		TimedToken blockToken = new TimedToken(blockPlace);
+		LocalTimedPlace blockPlace = new LocalTimedPlace("PBLOCK");
+		TimedToken blockToken = new TimedToken(blockPlace, ColorType.COLORTYPE_DOT.getFirstColor());
 		net.add(blockPlace);
 		blockPlace.addToken(blockToken);
 		
@@ -140,7 +141,7 @@ public class OverApproximation implements ITAPNApproximation {
 						(((TAPNNetworkTimedTransitionStep) step).getTransition().sharedTransition() == null ? tmpStep.getTransition().model().name() : ""), 
 						tmpStep.getTransition().name()); 
 				TimedTransition firedTransition = net.getTransitionByName(nameMap.get(key));
-				TimedTransition copyTransition = new TimedTransition(firedTransition.name() + "_traceNet_" + Integer.toString(++transitionInteger), firedTransition.isUrgent());
+				TimedTransition copyTransition = new TimedTransition(firedTransition.name() + "_traceNet_" + Integer.toString(++transitionInteger), firedTransition.isUrgent(), null);
 				
 				net.add(copyTransition);
 				net.add(new TimedInputArc(currentPlace, copyTransition, TimeInterval.ZERO_INF));
@@ -163,17 +164,17 @@ public class OverApproximation implements ITAPNApproximation {
 				
 				for (TimedInputArc arc : originalInput) {
 					if (arc.destination() == firedTransition) {
-						net.add(new TimedInputArc(arc.source(), copyTransition, arc.interval(), arc.getWeight()));
+						net.add(new TimedInputArc(arc.source(), copyTransition, arc.interval(), arc.getWeight(), arc.getArcExpression()));
 					}
 				}
 				for (TimedOutputArc arc : originalOutput) {
 					if (arc.source() == firedTransition) {
-						net.add(new TimedOutputArc(copyTransition, arc.destination(), arc.getWeight()));
+						net.add(new TimedOutputArc(copyTransition, arc.destination(), arc.getWeight(), arc.getExpression()));
 					}
 				}
 				for (TimedInhibitorArc arc : originalInhibitor) {
 					if (arc.destination() == firedTransition) {
-						net.add(new TimedInhibitorArc(arc.source(), copyTransition, arc.interval(), arc.getWeight()));
+						net.add(new TimedInhibitorArc(arc.source(), copyTransition, arc.interval(), arc.getWeight(), arc.getArcExpression()));
 					}
 				}
 				for (TransportArc arc : originalTransport) {
@@ -200,7 +201,7 @@ public class OverApproximation implements ITAPNApproximation {
 		
 		// An input arc from pBlock to all original transitions makes sure, that we can do deadlock checks.
 		for (TimedTransition transition : originalTransitions) {
-			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));	
+			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));
 		}           
 	}
 

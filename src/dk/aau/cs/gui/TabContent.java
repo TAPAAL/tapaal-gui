@@ -22,6 +22,9 @@ import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
@@ -45,6 +48,7 @@ import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.undo.*;
+import pipe.gui.widgets.ColoredWidgets.UnfoldDialog;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.QueryPane;
 import pipe.gui.widgets.WorkflowDialog;
@@ -61,7 +65,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     public static final class TAPNLens {
-        public static final TAPNLens Default = new TAPNLens(true, true);
+        public static final TAPNLens Default = new TAPNLens(true, true, true);
         public boolean isTimed() {
             return timed;
         }
@@ -69,13 +73,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public boolean isGame() {
             return game;
         }
+        public boolean isColored(){
+            return colored;
+        }
 
         private final boolean timed;
         private final boolean game;
+        private final boolean colored;
 
-        public TAPNLens(boolean timed, boolean game) {
+        public TAPNLens(boolean timed, boolean game, boolean colored) {
             this.timed = timed;
             this.game = game;
+            this.colored = colored;
         }
     }
     private final TAPNLens lens;
@@ -160,7 +169,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	        Require.notNull(c, "datalyer can't be null");
             Require.notNull(p, "Point can't be null");
 
-            dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)));
+            dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)), ColorType.COLORTYPE_DOT);
             TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, lens);
             guiModelToModel.get(c).add(tp);
             c.addPetriNetObject(pnObject);
@@ -207,10 +216,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
 
             TimedArcPetriNet modelNet = guiModelToModel.get(c);
+            ColorType ct = p.underlyingPlace().getColorType();
+            Vector<ColorExpression> vecColorExpr = new Vector<>();
+            vecColorExpr.add(ct.createColorExpressionForFirstColor());
+            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
             TimedInputArc tia = new TimedInputArc(
                 p.underlyingPlace(),
                 t.underlyingTransition(),
-                TimeInterval.ZERO_INF
+                TimeInterval.ZERO_INF,
+                numbExpr
             );
 
             TimedInputArcComponent tiac = new TimedInputArcComponent(p, t, tia, lens);
@@ -245,13 +259,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
 
             TimedArcPetriNet modelNet = guiModelToModel.get(c);
+            ColorType ct = p.underlyingPlace().getColorType();
+            Vector<ColorExpression> vecColorExpr = new Vector<>();
+            vecColorExpr.add(ct.createColorExpressionForFirstColor());
+            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
 
             TimedOutputArc toa = new TimedOutputArc(
                 t.underlyingTransition(),
-                p.underlyingPlace()
+                p.underlyingPlace(),
+                numbExpr
             );
 
-            TimedOutputArcComponent toac = new TimedOutputArcComponent(t, p, toa);
+            TimedOutputArcComponent toac = new TimedOutputArcComponent(t, p, toa, lens);
 
             if (path != null) {
                 toac.setArcPath(new ArcPath(toac, path));
@@ -287,6 +306,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 p.underlyingPlace(),
                 t.underlyingTransition()
             );
+
+            ColorType ct = tiha.source().getColorType();
+            AllExpression allExpression = new AllExpression(ct);
+            Vector<ColorExpression> vecColorExpr = new Vector<>();
+            vecColorExpr.add(allExpression);
+            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+            tiha.setExpression(numbExpr);
+
 
             TimedInhibitorArcComponent tihac = new TimedInhibitorArcComponent(p, t, tiha);
 
@@ -327,9 +354,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
             int groupNr = getNextTransportArcMaxGroupNumber(p1, t);
 
             TransportArc tta = new TransportArc(p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
+            instantiateArcExpressions(p1,t,p2,tta);
 
-            TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr);
-            TimedTransportArcComponent ttac2 = new TimedTransportArcComponent(t, p2, tta, groupNr);
+            TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr, lens);
+            TimedTransportArcComponent ttac2 = new TimedTransportArcComponent(t, p2, tta, groupNr, lens);
 
             ttac1.setConnectedTo(ttac2);
             ttac2.setConnectedTo(ttac1);
@@ -353,6 +381,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             return new Result<>(ttac1);
 
+        }
+
+        private void instantiateArcExpressions(TimedPlaceComponent p1, Transition t, TimedPlaceComponent p2, TransportArc tta){
+            //make for input
+            ColorType ctin = p1.underlyingPlace().getColorType();
+            Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+            vecColorExpr.add(ctin.createColorExpressionForFirstColor());
+            NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+            tta.setInputExpression(numbExpr);
+
+            //make for output
+            ColorType ctout = p2.underlyingPlace().getColorType();
+            vecColorExpr = new Vector<ColorExpression>();
+            vecColorExpr.add(ctout.createColorExpressionForFirstColor());
+            numbExpr = new NumberOfExpression(1, vecColorExpr);
+            tta.setOutputExpression(numbExpr);
         }
 
         private int getNextTransportArcMaxGroupNumber(TimedPlaceComponent p, TimedTransitionComponent t) {
@@ -621,6 +665,56 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	}
 
+    private TabContent createNewTabFromInputStream(InputStream file, String name, FeatureOption option, boolean isYes) throws Exception {
+
+        try {
+            ModelLoader loader = new ModelLoader();
+            LoadedModel loadedModel = loader.load(file);
+
+            if (loadedModel.getMessages().size() != 0) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                        String message = "While loading the net we found one or more warnings: \n\n";
+                        for (String s : loadedModel.getMessages()) {
+                            message += s + "\n\n";
+                        }
+
+                        new MessengerImpl().displayInfoMessage(message, "Warning");
+                    }
+                }).start();
+            }
+
+            TabContent tab;
+
+            switch (option) {
+                case TIME:
+                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), isYes, lens.isGame(), lens.isColored());
+                    break;
+                case GAME:
+                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), isYes, lens.isColored());
+                    break;
+                case COLOR:
+                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), lens.isGame(), isYes);
+                default:
+                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), lens.isGame(), lens.isColored());
+                    break;
+            }
+
+            tab.setInitialName(name);
+
+            tab.selectFirstElements();
+
+            tab.setFile(null);
+
+            return tab;
+        } catch (Exception e) {
+            throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+        }
+
+    }
+
 	private static void checkQueries(TabContent tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
         EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
@@ -652,7 +746,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 (q.getProperty() instanceof TCTLDeadlockNode && net.getHighestNetDegree() > 2),
                 tab.lens.isGame(),
                 (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
-                q.hasUntimedOnlyProperties()
+                q.hasUntimedOnlyProperties(),
+                tab.lens.isColored()
             };
             for(EngineSupportOptions engine : engineSupportOptions){
                 if(engine.areOptionsSupported(queryOptions)){
@@ -702,8 +797,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 	}
 
-    public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame){
-		TabContent tab = new TabContent(isTimed, isGame);
+	public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame, boolean isColored){
+        TabContent tab = new TabContent(isTimed, isGame, isColored);
 		tab.setInitialName(name);
 
 		//Set Default Template
@@ -844,8 +939,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private WorkflowDialog workflowDialog = null;
 
 
-	private TabContent(boolean isTimed, boolean isGame) {
-	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame));
+	private TabContent(boolean isTimed, boolean isGame, boolean isColored) {
+	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame, isColored));
     }
 
 	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
@@ -903,6 +998,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
         this.setDividerSize(8);
         //XXX must be after the animationcontroller is created
         animationModeController = new CanvasAnimationController(getAnimator());
+    }
+
+    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, boolean isTimed, boolean isGame, boolean isColored) {
+        this(network, templates, tapnqueries,  new TAPNLens(isTimed, isGame, isColored));
+    }
+
+    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
+        this(network, templates, tapnqueries,  new TAPNLens(true, false, false));
     }
 
 	public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
@@ -1566,15 +1669,37 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
     private void createNewAndConvertUntimed() {
-	    TabContent tab = duplicateTab(new TAPNLens(false, lens.isGame()), "-untimed");
+	    TabContent tab = duplicateTab(new TAPNLens(false, lens.isGame(), lens.isColored()), "-untimed");
         convertToUntimedTab(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertNonGame() {
-        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), false), "-nongame");
+        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), false, lens.isColored()), "-nongame");
         TabTransformer.removeGameInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+    }
+
+    private void createNewAndConvertNonColor(){
+        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), false), "-noncolored");
+        TabTransformer.removeColorInformation(tab);
+        guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+    }
+
+    private void createNewAndConvertColor(){
+        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), true), "-colored");
+        TabTransformer.addColorInformation(tab);
+        guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+    }
+
+    @Override
+    public void createNewAndUnfoldColor(){
+        //Verifier.runVerifyTAPNVerification(network(), TAPNQuery.getDefaultQuery(new TCTLTrueNode()), null, getGuiModels(), true);
+	    TabTransformer.unfoldTab(this, true, true, true);
+    }
+
+    public void createNewAndUnfoldColor(boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars){
+        TabTransformer.unfoldTab(this, partition, computeColorFixpoint, useSymmetricVars);
     }
 
     @Override
@@ -1592,7 +1717,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertUntimed();
                 }
             } else {
-                TabContent tab = duplicateTab(new TAPNLens(true, lens.isGame()), "-timed");
+                TabContent tab = duplicateTab(new TAPNLens(true, lens.isGame(), lens.isColored()), "-timed");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1614,8 +1739,25 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertNonGame();
                 }
             } else {
-                TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), true), "-game");
+                TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), true, lens.isColored()), "-game");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+            }
+            updateFeatureText();
+        }
+    }
+    //TODO: check for color features
+    @Override
+    public void changeColorFeature(boolean isColor) {
+        if (isColor != lens.isColored()) {
+            if (!isColor){
+                String removeTimeWarning = "The net contains color information, which will be removed. Do you still wish to make to remove the color semantics?";
+                int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove color information",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
+                if (choice == 0) {
+                    createNewAndConvertNonColor();
+                }
+            } else {
+                createNewAndConvertColor();
             }
             updateFeatureText();
         }
@@ -1690,6 +1832,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		if (!animationmode) {
 			if (numberOfActiveTemplates() > 0) {
+
 				app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
                 switchToAnimationComponents(true);
 
@@ -1762,6 +1905,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private Pipe.ElementType editorMode = Pipe.ElementType.SELECT;
 
+	public Pipe.ElementType getEditorMode() {
+	    return editorMode;
+    }
+
 	//XXX temp while refactoring, kyrke - 2019-07-25
 	@Override
 	public void setMode(Pipe.ElementType mode) {
@@ -1779,8 +1926,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     @Override
                     public void registerEvents() {
                         registerEvent(
-                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed && !lens.isColored(),
                             e -> guiModelManager.addToken(getModel(), (TimedPlaceComponent) e.pno, 1)
+                        );
+                        registerEvent(
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed && lens.isColored(),
+                            e -> ((TimedPlaceComponent) e.pno).showEditor()
                         );
                     }
                 });
@@ -1790,8 +1941,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     @Override
                     public void registerEvents() {
                         registerEvent(
-                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed,
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed && !lens.isColored(),
                             e -> guiModelManager.removeToken(getModel(), (TimedPlaceComponent) e.pno, 1)
+                        );
+                        registerEvent(
+                            e -> e.pno instanceof TimedPlaceComponent && e.a == MouseAction.pressed && lens.isColored(),
+                            e -> ((TimedPlaceComponent) e.pno).showEditor()
                         );
                     }
                 });
@@ -1899,7 +2054,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             }
         }
 
-        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true, inlineConstants);
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, inlineConstants);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 
         ArrayList<Template> templates = new ArrayList<Template>(1);
@@ -1945,6 +2100,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 		app.ifPresent(o->o.registerDrawingActions(getAvailableDrawActions()));
         app.ifPresent(o->o.registerAnimationActions(getAvailableSimActions()));
+        app.ifPresent(o->o.registerToolsActions(getAvailableToolActions()));
 
         //TODO: this is a temporary implementation untill actions can be moved
         app.ifPresent(o->o.registerViewActions(List.of()));
@@ -2539,7 +2695,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     public void updateFeatureText() {
-        boolean[] features = {lens.isTimed(), lens.isGame()};
+        boolean[] features = {lens.isTimed(), lens.isGame(), lens.isColored()};
         app.ifPresent(o->o.setFeatureInfoText(features));
     }
 
@@ -2588,7 +2744,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (place1 != null && transition == null) {
                 transition = pno;
                 connectsTo = 1;
-                arc2 = arc = new TimedTransportArcComponent(pno, -1, false);
+                arc2 = arc = new TimedTransportArcComponent(pno, -1, false, lens);
 
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
@@ -2605,7 +2761,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (place1 == null && transition == null) {
                 place1 = pno;
                 connectsTo = 2;
-                arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
+                arc1 = arc = new TimedTransportArcComponent(pno, -1, true, lens);
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
@@ -2624,7 +2780,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 if (e != null && e.isControlDown()) {
                     place1 = pno;
                     connectsTo = 2;
-                    arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
+                    arc1 = arc = new TimedTransportArcComponent(pno, -1, true, lens);
                     //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
@@ -2722,14 +2878,19 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         private void timedPlaceMouseWheelWithShift(TimedPlaceComponent p, MouseWheelEvent e) {
-            if (p.isSelected()) {
-                if (e.getWheelRotation() < 0) {
-                    guiModelManager.addToken(getModel(), p, 1);
+            //TODO: how to handle if lens is colored??
+            if(!lens.isColored()) {
+                if (p.isSelected()) {
+                    if (e.getWheelRotation() < 0) {
+                        guiModelManager.addToken(getModel(), p, 1);
+                    } else {
+                        guiModelManager.removeToken(getModel(), p, 1);
+                    }
+
                 } else {
-                    guiModelManager.removeToken(getModel(), p, 1);
+                    p.getParent().dispatchEvent(e);
+
                 }
-            } else {
-                p.getParent().dispatchEvent(e);
             }
         }
 
@@ -2767,6 +2928,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     }
 
+    public List<GuiAction> getAvailableToolActions(){
+        if(lens.isColored()){
+            return new ArrayList<>(Arrays.asList(unfoldTabAction));
+        } else {
+            return new ArrayList<>(Arrays.asList());
+        }
+    }
+
     private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
         public void actionPerformed(ActionEvent e) {
             setMode(Pipe.ElementType.SELECT);
@@ -2797,7 +2966,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
             setMode(Pipe.ElementType.ADDTOKEN);
         }
     };
-
     private final GuiAction deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
         public void actionPerformed(ActionEvent e) {
             setMode(Pipe.ElementType.DELTOKEN);
@@ -2837,6 +3005,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private final GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
         public void actionPerformed(ActionEvent e) {
             delayAndFire();
+        }
+    };
+
+    private final GuiAction unfoldTabAction = new GuiAction("Unfold tab", "Unfold the colors in the tab") {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            UnfoldDialog.showDialog(TabContent.this);
         }
     };
 

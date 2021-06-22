@@ -1,8 +1,15 @@
 package dk.aau.cs.approximation;
 
+import java.io.File;
 import java.math.BigDecimal;
 
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.TapnXmlLoader;
+import dk.aau.cs.util.FormatException;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.CreateGui;
 import pipe.gui.RunVerificationBase;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.Messenger;
@@ -32,14 +39,13 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 
 public class ApproximationWorker {
 	public VerificationResult<TAPNNetworkTrace> normalWorker(
-			VerificationOptions options,
-			ModelChecker modelChecker,
-			Tuple<TimedArcPetriNet, NameMapping> transformedModel,
-			ITAPNComposer composer,
-			TAPNQuery clonedQuery,
-			RunVerificationBase verificationBase,
-			TimedArcPetriNetNetwork model
-	) throws Exception {
+        VerificationOptions options,
+        ModelChecker modelChecker,
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel,
+        ITAPNComposer composer,
+        TAPNQuery clonedQuery,
+        RunVerificationBase verificationBase,
+        TimedArcPetriNetNetwork model, DataLayer guiModel) throws Exception {
 		
 		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them
 		InclusionPlaces oldInclusionPlaces = null;
@@ -53,7 +59,9 @@ public class ApproximationWorker {
 		}
 		
 		VerificationResult<TAPNNetworkTrace> toReturn = null;
-		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
+		VerificationResult<TimedArcPetriNetTrace> result;
+
+		result = modelChecker.verify(options, transformedModel, clonedQuery, guiModel);
 
 		if (result.error()) {
 			options.setTraceOption(oldTraceOption);
@@ -66,14 +74,19 @@ public class ApproximationWorker {
 				// If r = 1
 				// No matter what it answered -> return that answer
 				QueryResult queryResult = result.getQueryResult();
-				toReturn =  new VerificationResult<TAPNNetworkTrace>(
-						queryResult,
-						decomposeTrace(result.getTrace(), transformedModel.value2(), model),
-						decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
-						result.verificationTime(),
-						result.stats(),
-						result.isSolvedUsingStateEquation());
-				toReturn.setNameMapping(transformedModel.value2());
+                NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
+                TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
+                toReturn =  new VerificationResult<TAPNNetworkTrace>(
+                    queryResult,
+                    decomposeTrace(result.getTrace(),  nameMapping, netNetwork),
+                    decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                    result.verificationTime(),
+                    result.stats(),
+                    result.isSolvedUsingStateEquation(),
+                    result.getUnfoldedModel());
+                toReturn.setNameMapping(transformedModel.value2());
+
+
 			} else {
 				// If r > 1
 				if (result.getTrace() != null && (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && result.getQueryResult().isQuerySatisfied())
@@ -82,14 +95,19 @@ public class ApproximationWorker {
 						// The results are inconclusive, but we get a trace and can use trace TAPN for verification.
 					
 						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
-						toReturn = new VerificationResult<TAPNNetworkTrace>(
-								approxResult.getQueryResult(),
-								decomposeTrace(approxResult.getTrace(), transformedModel.value2(), model),
-								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2(), model),
-								approxResult.verificationTime(),
-								approxResult.stats(),
-								approxResult.isSolvedUsingStateEquation());
-						toReturn.setNameMapping(transformedModel.value2());
+                        NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
+                        TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
+                        toReturn = new VerificationResult<TAPNNetworkTrace>(
+                            approxResult.getQueryResult(),
+                            decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
+                            decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
+                            approxResult.verificationTime(),
+                            approxResult.stats(),
+                            approxResult.isSolvedUsingStateEquation(),
+                            approxResult.getUnfoldedModel());
+                        toReturn.setNameMapping(nameMapping);
+
+
 						
 						OverApproximation overaprx = new OverApproximation();
 			
@@ -103,7 +121,7 @@ public class ApproximationWorker {
 			
 						// run model checker again for trace TAPN
 						MemoryMonitor.cumulateMemory();
-						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
+						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery, guiModel);
 
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
@@ -127,14 +145,17 @@ public class ApproximationWorker {
 						
 						// If satisfied trace -> Return result
 						// This is satisfied for EF and EG and not satisfied for AG and AF
-						toReturn = new VerificationResult<TAPNNetworkTrace>(
-								queryResult,
-								decomposeTrace(result.getTrace(), transformedModel.value2(), model),
-								decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
-								approxResult.verificationTime() + result.verificationTime(),
-								approxResult.stats(),
-								approxResult.isSolvedUsingStateEquation());
-						toReturn.setNameMapping(transformedModel.value2());
+                        toReturn = new VerificationResult<TAPNNetworkTrace>(
+                            queryResult,
+                            decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+                            decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                            approxResult.verificationTime() + result.verificationTime(),
+                            approxResult.stats(),
+                            approxResult.isSolvedUsingStateEquation(),
+                            approxResult.getUnfoldedModel());
+                        toReturn.setNameMapping(nameMapping);
+
+
 					} 
 					else if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && !result.getQueryResult().isQuerySatisfied())
 							|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && result.getQueryResult().isQuerySatisfied())) {
@@ -147,14 +168,19 @@ public class ApproximationWorker {
 						}
 						
 						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
-						toReturn = new VerificationResult<TAPNNetworkTrace>(
-								approxResult.getQueryResult(),
-								decomposeTrace(approxResult.getTrace(), transformedModel.value2(), model),
-								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2(), model),
-								approxResult.verificationTime(),
-								approxResult.stats(),
-								approxResult.isSolvedUsingStateEquation());
-						toReturn.setNameMapping(transformedModel.value2());
+                    NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
+                    TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
+                        toReturn = new VerificationResult<TAPNNetworkTrace>(
+                            approxResult.getQueryResult(),
+                            decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
+                            decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
+                            approxResult.verificationTime(),
+                            approxResult.stats(),
+                            approxResult.isSolvedUsingStateEquation(),
+                            approxResult.getUnfoldedModel());
+                        toReturn.setNameMapping(nameMapping);
+
+
 					} else {
 						// We cannot use the result directly, and did not get a trace.
 						
@@ -162,15 +188,18 @@ public class ApproximationWorker {
 						queryResult.setApproximationInconclusive(true);
 						
 						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
-						toReturn = new VerificationResult<TAPNNetworkTrace>(
-								approxResult.getQueryResult(),
-								decomposeTrace(approxResult.getTrace(), transformedModel.value2(), model),
-								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2(), model),
-								approxResult.verificationTime(),
-								approxResult.stats(),
-								approxResult.isSolvedUsingStateEquation());
-						toReturn.setNameMapping(transformedModel.value2());
-						
+                    NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
+                    TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
+                    toReturn = new VerificationResult<TAPNNetworkTrace>(
+                        approxResult.getQueryResult(),
+                        decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
+                        decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
+                        approxResult.verificationTime(),
+                        approxResult.stats(),
+                        approxResult.isSolvedUsingStateEquation(),
+                        approxResult.getUnfoldedModel());
+                    toReturn.setNameMapping(nameMapping);
+
 					}
 			}
 		} 
@@ -194,14 +223,19 @@ public class ApproximationWorker {
 				// If r = 1
 				// No matter it answered -> return that answer
 				QueryResult queryResult= result.getQueryResult();
-				toReturn =  new VerificationResult<TAPNNetworkTrace>(
-						queryResult,
-						decomposeTrace(result.getTrace(), transformedModel.value2(), model),
-						decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
-						result.verificationTime(),
-						result.stats(),
-						result.isSolvedUsingStateEquation());
-				toReturn.setNameMapping(transformedModel.value2());
+                NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
+                TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
+                toReturn =  new VerificationResult<TAPNNetworkTrace>(
+                    queryResult,
+                    decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+                    decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                    result.verificationTime(),
+                    result.stats(),
+                    result.isSolvedUsingStateEquation(),
+                    result.getUnfoldedModel());
+                toReturn.setNameMapping(nameMapping);
+
+
 			}
 			else {
 				// If r > 1
@@ -210,14 +244,18 @@ public class ApproximationWorker {
 					// If ((EF OR EG) AND not satisfied) OR ((AG OR AF) and satisfied) -> Inconclusive
 					QueryResult queryResult= result.getQueryResult();
 					queryResult.setApproximationInconclusive(true);
-					toReturn =  new VerificationResult<TAPNNetworkTrace>(
-							queryResult,
-							decomposeTrace(result.getTrace(), transformedModel.value2(), model),
-							decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
-							result.verificationTime(),
-							result.stats(),
-							result.isSolvedUsingStateEquation());
-					toReturn.setNameMapping(transformedModel.value2());
+                    NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
+                    TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
+                    toReturn =  new VerificationResult<TAPNNetworkTrace>(
+                        queryResult,
+                        decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+                        decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                        result.verificationTime(),
+                        result.stats(),
+                        result.isSolvedUsingStateEquation(),
+                        result.getUnfoldedModel());
+                    toReturn.setNameMapping(nameMapping);
+
 				} else if ((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && result.getQueryResult().isQuerySatisfied()
 						|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && ! result.getQueryResult().isQuerySatisfied())) {
 										
@@ -225,14 +263,19 @@ public class ApproximationWorker {
 						// If query does have deadlock or EG or AF a trace -> create trace TAPN
 						//Create the verification satisfied result for the approximation
 						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
-						toReturn = new VerificationResult<TAPNNetworkTrace>(
-								approxResult.getQueryResult(),
-								decomposeTrace(approxResult.getTrace(), transformedModel.value2(), model),
-								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2(), model),
-								approxResult.verificationTime(),
-								approxResult.stats(),
-								result.isSolvedUsingStateEquation());
-						toReturn.setNameMapping(transformedModel.value2());
+                        NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
+                        TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
+                        toReturn = new VerificationResult<TAPNNetworkTrace>(
+                            approxResult.getQueryResult(),
+                            decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
+                            decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
+                            approxResult.verificationTime(),
+                            approxResult.stats(),
+                            result.isSolvedUsingStateEquation(),
+                            result.getUnfoldedModel());
+                        toReturn.setNameMapping(nameMapping);
+
+
 						
 						OverApproximation overaprx = new OverApproximation();
 						
@@ -247,7 +290,7 @@ public class ApproximationWorker {
 			
 						//run model checker again for trace TAPN
 						MemoryMonitor.cumulateMemory();
-						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
+						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery, guiModel);
 
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
@@ -271,16 +314,17 @@ public class ApproximationWorker {
 							|| (result.getQueryResult().queryType() == QueryType.AF && queryResult.isQuerySatisfied())) {
 							queryResult.setApproximationInconclusive(true);
 						}
-						
+
 						// If satisfied trace) -> Return result
 						// This is satisfied for EF and EG and not satisfied for AG and AF
 						toReturn = new VerificationResult<TAPNNetworkTrace>(
 								queryResult,
-								decomposeTrace(result.getTrace(), transformedModel.value2(), model),
-								decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
+								decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+								decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
 								approxResult.verificationTime() + result.verificationTime(),
 								approxResult.stats(),
-								approxResult.isSolvedUsingStateEquation());
+								approxResult.isSolvedUsingStateEquation(),
+                                approxResult.getUnfoldedModel());
 						toReturn.setNameMapping(transformedModel.value2());
 					}
 					else {
@@ -289,28 +333,35 @@ public class ApproximationWorker {
 						queryResult.setApproximationInconclusive(true);
 						
 						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
+                        NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
+                        TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
+
 						toReturn = new VerificationResult<TAPNNetworkTrace>(
 								approxResult.getQueryResult(),
-								decomposeTrace(approxResult.getTrace(), transformedModel.value2(), model),
-								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2(), model),
+								decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
+								decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
 								approxResult.verificationTime(),
 								approxResult.stats(),
-								approxResult.isSolvedUsingStateEquation());
-						toReturn.setNameMapping(transformedModel.value2());
+								approxResult.isSolvedUsingStateEquation(),
+                                approxResult.getUnfoldedModel());
+						toReturn.setNameMapping(nameMapping);
 					}
 				}
 			}
 		} 
 		else {
+            NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
+            TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
 			toReturn =  new VerificationResult<TAPNNetworkTrace>(
 					result.getQueryResult(),
-					decomposeTrace(result.getTrace(), transformedModel.value2(), model),
-					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2(), model),
+					decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+					decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
 					result.verificationTime(),
 					result.stats(),
 					result.isSolvedUsingStateEquation(),
-                    result.getRawOutput());
-			toReturn.setNameMapping(transformedModel.value2());
+                    result.getRawOutput(),
+                    result.getUnfoldedModel());
+			toReturn.setNameMapping(nameMapping);
 		}
 		
 		options.setTraceOption(oldTraceOption);
@@ -354,7 +405,7 @@ public class ApproximationWorker {
 			options.setTraceOption(TraceOption.SOME);
 		}
 		
-		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify);
+		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify, CreateGui.getModel());
 		
 		VerificationResult<TAPNNetworkTrace> valueNetwork = null;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
 		VerificationResult<TimedArcPetriNetTrace> value = null;
@@ -376,7 +427,8 @@ public class ApproximationWorker {
 					verificationResult.getSecondaryTrace(),
 					verificationResult.verificationTime(),
 					verificationResult.stats(),
-					verificationResult.isSolvedUsingStateEquation());
+					verificationResult.isSolvedUsingStateEquation(),
+                   verificationResult.getUnfoldedModel());
 				value.setNameMapping(composedModel.value2());
 	        } else {
 	            // If r > 1
@@ -385,14 +437,17 @@ public class ApproximationWorker {
 					// If ((EF OR EG) AND satisfied) OR ((AG OR AF) AND not satisfied)
 					//Create the verification satisfied result for the approximation
 	                VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
+                    NameMapping nameMapping = model.network().isColored()? verificationResult.getUnfoldedModel().value2(): composedModel.value2();
+                    TimedArcPetriNetNetwork netNetwork = model.network().isColored()? verificationResult.getUnfoldedModel().value1().parentNetwork(): model.network();
 	                valueNetwork = new VerificationResult<TAPNNetworkTrace>(
 	                            approxResult.getQueryResult(),
-	                            decomposeTrace(approxResult.getTrace(), composedModel.value2(), model.network()),
-	                            decomposeTrace(approxResult.getSecondaryTrace(), composedModel.value2(), model.network()),
+	                            decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
+	                            decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
 	                            approxResult.verificationTime(),
 	                            approxResult.stats(),
-	        					verificationResult.isSolvedUsingStateEquation());
-	                valueNetwork.setNameMapping(composedModel.value2());
+	        					verificationResult.isSolvedUsingStateEquation(),
+                                verificationResult.getUnfoldedModel());
+	                valueNetwork.setNameMapping(nameMapping);
 	                
 	                OverApproximation overaprx = new OverApproximation();
 	                
@@ -406,7 +461,7 @@ public class ApproximationWorker {
 
 	                //run model checker again for trace TAPN
 	                MemoryMonitor.cumulateMemory();
-	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
+	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, CreateGui.getModel());
 
 	                if (verificationResult.error()) {
 	                	options.setTraceOption(oldTraceOption);
@@ -432,7 +487,8 @@ public class ApproximationWorker {
 	                        approxResult.getSecondaryTrace(),
 	                        approxResult.verificationTime() + verificationResult.verificationTime(),
 	                        approxResult.stats(),
-	    					verificationResult.isSolvedUsingStateEquation());
+	    					verificationResult.isSolvedUsingStateEquation(),
+                            verificationResult.getUnfoldedModel());
 	                value.setNameMapping(composedModel.value2());
 	            }
 				else if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && !verificationResult.getQueryResult().isQuerySatisfied())
@@ -451,7 +507,8 @@ public class ApproximationWorker {
 						verificationResult.getSecondaryTrace(),
 						verificationResult.verificationTime(),
 						verificationResult.stats(),
-						verificationResult.isSolvedUsingStateEquation());
+						verificationResult.isSolvedUsingStateEquation(),
+                        verificationResult.getUnfoldedModel());
 				    value.setNameMapping(composedModel.value2());
 	            }
 				else {
@@ -467,7 +524,8 @@ public class ApproximationWorker {
 						verificationResult.getSecondaryTrace(),
 						verificationResult.verificationTime(),
 						verificationResult.stats(),
-						verificationResult.isSolvedUsingStateEquation());
+						verificationResult.isSolvedUsingStateEquation(),
+                        verificationResult.getUnfoldedModel());
 				    value.setNameMapping(composedModel.value2());
 				}
 	        }
@@ -485,7 +543,8 @@ public class ApproximationWorker {
                     verificationResult.getSecondaryTrace(),
                     verificationResult.verificationTime(),
                     verificationResult.stats(),
-					verificationResult.isSolvedUsingStateEquation());
+					verificationResult.isSolvedUsingStateEquation(),
+                    verificationResult.getUnfoldedModel());
                 value.setNameMapping(composedModel.value2());
 	        }
 	        else {
@@ -502,7 +561,8 @@ public class ApproximationWorker {
                             verificationResult.getSecondaryTrace(),
                             verificationResult.verificationTime(),
                             verificationResult.stats(),
-        					verificationResult.isSolvedUsingStateEquation());
+        					verificationResult.isSolvedUsingStateEquation(),
+                            verificationResult.getUnfoldedModel());
                     value.setNameMapping(composedModel.value2());
 	                    
 				}
@@ -514,14 +574,20 @@ public class ApproximationWorker {
 	                    // If query does have deadlock -> create trace TAPN
 	                    //Create the verification satisfied result for the approximation
 						VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
-	                    valueNetwork = new VerificationResult<TAPNNetworkTrace>(
-	                    		approxResult.getQueryResult(),
-	                        decomposeTrace(approxResult.getTrace(), composedModel.value2(), model.network()),
-	                        decomposeTrace(approxResult.getSecondaryTrace(), composedModel.value2(), model.network()),
-	                        approxResult.verificationTime(),
-	                        approxResult.stats(),
-	                        approxResult.isSolvedUsingStateEquation());
-	                    valueNetwork.setNameMapping(composedModel.value2());
+
+                        NameMapping nameMapping = model.network().isColored()? verificationResult.getUnfoldedModel().value2(): composedModel.value2();
+                        TimedArcPetriNetNetwork netNetwork = model.network().isColored()? verificationResult.getUnfoldedModel().value1().parentNetwork(): model.network();
+                        valueNetwork = new VerificationResult<TAPNNetworkTrace>(
+                            approxResult.getQueryResult(),
+                            decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
+                            decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
+                            approxResult.verificationTime(),
+                            approxResult.stats(),
+                            approxResult.isSolvedUsingStateEquation(),
+                            verificationResult.getUnfoldedModel());
+                        valueNetwork.setNameMapping(nameMapping);
+
+
 	                    
 	                    OverApproximation overaprx = new OverApproximation();
 	        
@@ -534,7 +600,7 @@ public class ApproximationWorker {
 	        
 	                    //run model checker again for trace TAPN
 	                    MemoryMonitor.cumulateMemory();
-	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
+	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, CreateGui.getModel());
 
 	                    if (verificationResult.error()) {
 	                    	options.setTraceOption(oldTraceOption);
@@ -564,7 +630,8 @@ public class ApproximationWorker {
 	                            verificationResult.getSecondaryTrace(),
 	                            verificationResult.verificationTime() + approxResult.verificationTime(),
 	                            verificationResult.stats(),
-	        					verificationResult.isSolvedUsingStateEquation());
+	        					verificationResult.isSolvedUsingStateEquation(),
+                                verificationResult.getUnfoldedModel());
 	                    value.setNameMapping(composedModel.value2());
 	                }
 	                else {
@@ -578,7 +645,8 @@ public class ApproximationWorker {
 							verificationResult.getSecondaryTrace(),
 							verificationResult.verificationTime(),
 							verificationResult.stats(),
-							verificationResult.isSolvedUsingStateEquation());
+							verificationResult.isSolvedUsingStateEquation(),
+                            verificationResult.getUnfoldedModel());
 					    value.setNameMapping(composedModel.value2());
 	                }
 	            }
@@ -591,7 +659,8 @@ public class ApproximationWorker {
 	                verificationResult.getSecondaryTrace(),
 	                verificationResult.verificationTime(),
 	                verificationResult.stats(),
-					verificationResult.isSolvedUsingStateEquation());
+					verificationResult.isSolvedUsingStateEquation(),
+                    verificationResult.getUnfoldedModel());
 	        value.setNameMapping(composedModel.value2());
 	    }
 		

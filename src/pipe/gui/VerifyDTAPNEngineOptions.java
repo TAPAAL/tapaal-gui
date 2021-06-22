@@ -18,7 +18,8 @@ public class VerifyDTAPNEngineOptions extends EngineSupportOptions {
             true,// support deadlock with net degree > 2
             true, //support games
             true, //support EG or AF with net degree > 2);
-            false //support for nested quantification
+            false, //support for nested quantification
+            true
         );
     }
 }

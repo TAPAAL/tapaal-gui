@@ -14,8 +14,8 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 
 	private final JSpinner spinner;
 
-	public RunKBoundAnalysis(ModelChecker modelChecker, Messenger messenger,JSpinner spinner) {
-		super(modelChecker, messenger);
+	public RunKBoundAnalysis(ModelChecker modelChecker,ModelChecker unfoldingEngine, Messenger messenger,JSpinner spinner) {
+		super(modelChecker, unfoldingEngine, messenger, null);
 		this.spinner = spinner;
 	}
 

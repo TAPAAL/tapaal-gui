@@ -2,9 +2,14 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
+import pipe.gui.graphicElements.Transition;
 
 public class TimedArcPetriNet {
 	private String name;
@@ -52,6 +57,55 @@ public class TimedArcPetriNet {
 		places.add(place);
 		place.setCurrentMarking(currentMarking);
 	}
+
+	public boolean isColored(){
+        ExprValues values = new ExprValues();
+	    for(TimedTransition transition : transitions){
+	        if(transition.getGuard() != null){
+                transition.getGuard().getValues(values);
+            }
+        }
+	    for(TimedInputArc arc : inputArcs){
+	        if(arc.getArcExpression() != null){
+                arc.getArcExpression().getValues(values);
+            }
+	        if(!arc.getColorTimeIntervals().isEmpty()){
+	            return true;
+            }
+        }
+        for(TimedOutputArc arc : outputArcs){
+            if(arc.getExpression() != null){
+                arc.getExpression().getValues(values);
+            }
+        }
+        for(TimedInhibitorArc arc : inhibitorArcs){
+            if(arc.getArcExpression() != null){
+                arc.getArcExpression().getValues(values);
+            }
+        }
+        for(TransportArc arc : transportArcs){
+            if(!arc.getColorTimeIntervals().isEmpty()){
+                return true;
+            }
+            if(arc.getInputExpression() != null){
+                arc.getInputExpression().getValues(values);
+            }
+            if(arc.getOutputExpression() != null){
+                arc.getOutputExpression().getValues(values);
+            }
+        }
+        boolean hasColors = false;
+        for(Color color : values.getColors()){
+            if(color.getColorType() != ColorType.COLORTYPE_DOT){
+                hasColors = true;
+            }
+        }
+        if(hasColors || !values.getColorTypes().isEmpty() || !values.getVariables().isEmpty()){
+            return true;
+        }
+
+	    return false;
+    }
 
 	public void add(TimedTransition transition) {
 		Require.that(transition != null, "Argument must be a non-null transition");
@@ -234,7 +288,7 @@ public class TimedArcPetriNet {
 
 	public TimedPlace getPlaceByName(String placeName) {
 		for (TimedPlace p : places) {
-			if (p.name().toLowerCase().equals(placeName.toLowerCase())) {
+			if (p.name().equalsIgnoreCase(placeName)) {
 				return p;
 			}
 		}
@@ -243,7 +297,7 @@ public class TimedArcPetriNet {
 
 	public TimedTransition getTransitionByName(String transitionName) {
 		for (TimedTransition t : transitions) {
-			if (t.name().toLowerCase().equals(transitionName.toLowerCase())) {
+			if (t.name().equalsIgnoreCase(transitionName)) {
 				return t;
 			}
 		}
@@ -291,8 +345,8 @@ public class TimedArcPetriNet {
 			if(!p.isShared()) {
 				TimedPlace copy = p.copy();
 				tapn.add(copy);
-				for (int i = 0; i < p.numberOfTokens(); i++) {
-					tapn.addToken(new TimedToken(copy));
+				for(TimedToken token : p.tokens()){
+					tapn.addToken(new TimedToken(copy, token.getColor()));
 				}
 			} else {
 				tapn.add(p);
@@ -738,4 +792,9 @@ public class TimedArcPetriNet {
 	public void setCheckNames(boolean checkNames) {
 		this.checkNames = checkNames;
 	}
+    public void replace(TimedTransition transition, int index) {
+        Require.that(transition != null, "Argument must be a non-null transition");
+        transition.setModel(this);
+        transitions.set(index, transition);
+    }
 }

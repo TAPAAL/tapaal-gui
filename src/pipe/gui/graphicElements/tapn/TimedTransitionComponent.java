@@ -12,11 +12,14 @@ import java.awt.Window;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Transition;
@@ -148,6 +151,14 @@ public class TimedTransitionComponent extends Transition {
 		super.setName(nameInput);
 	}
 
+	public GuardExpression getGuardExpression() {
+	    return transition.getGuard();
+    }
+
+    public void setGuardExpression(GuardExpression expression) {
+	    transition.setGuard(expression);
+    }
+
 	public String getName() {
 		return transition != null ? transition.name() : "";
 	}
@@ -177,13 +188,42 @@ public class TimedTransitionComponent extends Transition {
 		if(transition != null) {
 			getNameLabel().setName(transition.name());
 			getNameLabel().setVisible(attributesVisible);
+			getNameLabel().zoomUpdate(getZoom());
+			if(underlyingTransition().getGuard() != null && lens.isColored()){
+                pnName.setText("");
+                super.update(displayConstantNames);
+                ;
+                pnName.setText(pnName.getText() + "\n" + buildGuardString(this.underlyingTransition().getGuard().toString()));
+            } else {
+                getNameLabel().setText("");
+            }
 		}
 		else {
 			getNameLabel().setText("");
 		}
-		super.update(displayConstantNames);
+		//super.update(displayConstantNames);
 		repaint();
 	}
+
+	private String buildGuardString(String str){
+	    var strArray = str.split(" ");
+	    int counter = 0;
+	    StringBuilder builder  = new StringBuilder();
+	    int maxAndOr = 5;
+        for(String subStr : strArray){
+            if(subStr.equals("and") || subStr.equals("or")){
+                counter++;
+            }
+            if(counter >= maxAndOr){
+                builder.append("\n");
+                counter = 0;
+            }
+            builder.append(subStr + " ");
+        }
+
+        return builder.toString();
+
+    }
 
 	@Override
 	public void paintComponent(Graphics g) {

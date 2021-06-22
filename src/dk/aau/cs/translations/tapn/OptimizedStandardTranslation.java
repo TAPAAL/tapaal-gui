@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.visitors.OptimizedStandardTranslationQueryVisitor;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.NTA.Edge;
 import dk.aau.cs.model.NTA.Location;
 import dk.aau.cs.model.NTA.NTA;
@@ -83,7 +84,8 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 		if(model.marking().size() + extraTokens == 0){
 			LocalTimedPlace extraPlace = new LocalTimedPlace("EXTRA234526_3452365"); 
 			model.add(extraPlace);
-			model.addToken(new TimedToken(extraPlace));
+			//TODO: how to handle colors
+			model.addToken(new TimedToken(extraPlace, ColorType.COLORTYPE_DOT.getFirstColor()));
 		}
 		
 		clearLocationMappings();

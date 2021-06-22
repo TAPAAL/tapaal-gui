@@ -5,7 +5,12 @@ import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Expressions.*;
 import pipe.gui.Pipe;
 
 import dk.aau.cs.util.IntervalOperations;
@@ -16,6 +21,9 @@ public class TransportArc extends TAPNElement {
 	private TimedPlace source;
 	private final TimedTransition transition;
 	private TimedPlace destination;
+    private ArcExpression inputExpression;
+    private ArcExpression outputExpression;
+    private List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>();
 
 	private TimeInterval interval;
 	
@@ -23,7 +31,10 @@ public class TransportArc extends TAPNElement {
 		this(source, transition, destination, interval, new IntWeight(1));
 	}
 
-	public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval, Weight weight) {
+    public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval, Weight weight) {
+        this(source,transition,destination,interval,weight, null, null);
+    }
+	public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval, Weight weight,ArcExpression inputExpression, ArcExpression outputExpression) {
 		Require.that(source != null, "The source place cannot be null");
 		Require.that(transition != null, "The associated transition cannot be null");
 		Require.that(destination != null, "The destination place cannot be null");
@@ -35,6 +46,17 @@ public class TransportArc extends TAPNElement {
 		this.destination = destination;
 		setTimeInterval(interval);
 		this.weight = weight;
+
+        if(inputExpression == null){
+            createNewInputArcExpression();
+        } else{
+            this.inputExpression = inputExpression;
+        }
+        if(outputExpression == null){
+            createNewOutputArcExpression();
+        } else{
+            this.outputExpression = outputExpression;
+        }
 	}
 
     public TransportArc(TimedPlace source, TimedTransition transitions, TimedPlace destination) {
@@ -45,7 +67,7 @@ public class TransportArc extends TAPNElement {
 		return weight;
 	}
         
-        public Weight getWeightValue(){
+	public Weight getWeightValue(){
                 return new IntWeight(weight.value());
 	}
 	
@@ -103,10 +125,12 @@ public class TransportArc extends TAPNElement {
 	}
 
 	public TransportArc copy(TimedArcPetriNet tapn) {
-		return new TransportArc(tapn.getPlaceByName(source.name()), 
-								tapn.getTransitionByName(transition.name()), 
-								tapn.getPlaceByName(destination.name()), 
-								interval.copy(), weight);
+	    TransportArc ta = new TransportArc(tapn.getPlaceByName(source.name()),
+            tapn.getTransitionByName(transition.name()),
+            tapn.getPlaceByName(destination.name()),
+            interval.copy(), weight,inputExpression.deepCopy(),outputExpression.deepCopy());
+	    ta.setColorTimeIntervals(ctiList);
+		return ta;
 	}
 
 	// Should ONLY be called in relation to sharing/unsharing places
@@ -172,9 +196,49 @@ public class TransportArc extends TAPNElement {
 
 		return result;
 	}
+
+    public void createNewInputArcExpression() {
+        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(source().getColorType().getFirstColor());
+        Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+        vecColorExpr.add(userOperatorExpression);
+        NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+        setInputExpression(numbExpr);
+        setWeight(new IntWeight(1));
+    }
+
+    public void createNewOutputArcExpression() {
+        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(destination().getColorType().getFirstColor());
+        Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+        vecColorExpr.add(userOperatorExpression);
+        NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+        setOutputExpression(numbExpr);
+        setWeight(new IntWeight(1));
+    }
 	
 	@Override
 	public String toString() {
 		return "From " + source.name() + " to " + destination.name() + " through " + transition.name() + " with interval " + interval().toString();
 	}
+
+	public String fromTo(){
+        return "From " + source.name() + " to " + destination.name() + " through " + transition.name();
+    }
+    public ArcExpression getOutputExpression() {
+        return outputExpression;
+    }
+
+    public void setOutputExpression(ArcExpression outputExpression) {
+        this.outputExpression = outputExpression;
+    }
+
+    public ArcExpression getInputExpression() {
+        return inputExpression;
+    }
+
+    public void setInputExpression(ArcExpression inputExpression) {
+        this.inputExpression = inputExpression;
+    }
+
+    public List<ColoredTimeInterval> getColorTimeIntervals() {return ctiList;}
+    public void setColorTimeIntervals(List<ColoredTimeInterval> ctiList) {this.ctiList = ctiList;}
 }

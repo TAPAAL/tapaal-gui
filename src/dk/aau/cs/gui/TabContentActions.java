@@ -40,6 +40,8 @@ public interface TabContentActions {
 
     void toggleAnimationMode();
 
+    void createNewAndUnfoldColor();
+
     void setMode(Pipe.ElementType mode);
 
     void showStatistics();
@@ -95,5 +97,7 @@ public interface TabContentActions {
     void changeTimeFeature(boolean isTime);
 
     void changeGameFeature(boolean isGame);
+
+    void changeColorFeature(boolean isColor);
 
 }

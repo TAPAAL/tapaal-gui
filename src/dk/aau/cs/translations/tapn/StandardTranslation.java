@@ -10,6 +10,7 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.visitors.StandardSymmetryTranslationQueryVisitor;
 import dk.aau.cs.TCTL.visitors.StandardTranslationQueryVisitor;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.NTA.Edge;
 import dk.aau.cs.model.NTA.Location;
 import dk.aau.cs.model.NTA.NTA;
@@ -79,7 +80,8 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 		if(model.marking().size() + extraTokens == 0){
 			LocalTimedPlace extraPlace = new LocalTimedPlace("EXTRA23425242_23426894"); 
 			model.add(extraPlace);
-			model.addToken(new TimedToken(extraPlace));
+			//TODO: how to handle Colors?
+			model.addToken(new TimedToken(extraPlace, ColorType.COLORTYPE_DOT.getFirstColor()));
 		}
 		
 		clearLocationMappings();

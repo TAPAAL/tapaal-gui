@@ -46,24 +46,28 @@ public class TAPNComposer implements ITAPNComposer {
 	private HashSet<String> processedSharedObjects;
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private DataLayer composedGuiModel;
-    private final TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
+    private final TabContent.TAPNLens lens;
 
-    public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean singleComponentNoPrefix, boolean inlineConstants){
+    public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens, boolean singleComponentNoPrefix, boolean inlineConstants){
 		this.messenger = messenger;
-		
-		HashMap<TimedArcPetriNet, DataLayer> newGuiModels = new HashMap<TimedArcPetriNet, DataLayer>();
-		for(Entry<TimedArcPetriNet, DataLayer> entry : guiModels.entrySet()) {
-			newGuiModels.put(entry.getKey(), entry.getValue().copy(entry.getKey()));
-		}
-		
-		this.guiModels = newGuiModels;
+
+		if(guiModels != null){
+            HashMap<TimedArcPetriNet, DataLayer> newGuiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+            for(Entry<TimedArcPetriNet, DataLayer> entry : guiModels.entrySet()) {
+                newGuiModels.put(entry.getKey(), entry.getValue().copy(entry.getKey()));
+            }
+
+            this.guiModels = newGuiModels;
+        }
 		this.singleComponentNoPrefix = singleComponentNoPrefix;
 		this.inlineConstants = inlineConstants;
+		this.lens = lens;
 	}
 	
 	public TAPNComposer(Messenger messenger, boolean singleComponentNoPrefix) {
 		this.messenger = messenger;
 		this.singleComponentNoPrefix = singleComponentNoPrefix;
+		this.lens = TabContent.TAPNLens.Default;
 	}
 	
 	public Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model) {
@@ -72,6 +76,7 @@ public class TAPNComposer implements ITAPNComposer {
 		DataLayer guiModel = new DataLayer();
 		NameMapping mapping = new NameMapping();
 		hasShownMessage = false;
+        tapn.setParentNetwork(model);
 		
 		int greatestWidth = 0, greatestHeight = 0;
 		if (this.guiModels != null) {
@@ -165,17 +170,18 @@ public class TAPNComposer implements ITAPNComposer {
 			String uniquePlaceName = (!singleComponentNoPrefix || model.activeTemplates().size() > 1) ? composedPlaceName(place) : place.name(); 
 			
 			LocalTimedPlace constructedPlace = null;
+			//TODO: add cti list
 			if (place.invariant().upperBound() instanceof Bound.InfBound) {					
-				constructedPlace = new LocalTimedPlace(uniquePlaceName, place.invariant());
+				constructedPlace = new LocalTimedPlace(uniquePlaceName, place.invariant(), place.getColorType());
 			} else {
-				constructedPlace = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(place.invariant().isUpperNonstrict(), new IntBound(place.invariant().upperBound().value())));
+				constructedPlace = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(place.invariant().isUpperNonstrict(), new IntBound(place.invariant().upperBound().value())), place.getColorType());
 			}
 			
 			constructedModel.add(constructedPlace);
 			mapping.addMappingForShared(place.name(), uniquePlaceName);
 			
 			for (TimedToken token : place.tokens()) {
-				constructedPlace.addToken(new TimedToken(constructedPlace, token.age()));
+				constructedPlace.addToken(new TimedToken(constructedPlace, token.age(), token.color()));
 			}
 			
 			// Gui work
@@ -216,16 +222,17 @@ public class TAPNComposer implements ITAPNComposer {
 
 					LocalTimedPlace place = null;
 					if (timedPlace.invariant().upperBound() instanceof Bound.InfBound) {					
-						place = new LocalTimedPlace(uniquePlaceName, timedPlace.invariant());
+						place = new LocalTimedPlace(uniquePlaceName, timedPlace.invariant(),timedPlace.getColorType());
 					} else {
-						place = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(timedPlace.invariant().isUpperNonstrict(), new IntBound(timedPlace.invariant().upperBound().value())));
+						place = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(timedPlace.invariant().isUpperNonstrict(), new IntBound(timedPlace.invariant().upperBound().value())),timedPlace.getColorType());
 					}
 					constructedModel.add(place);
 					mapping.addMapping(tapn.name(), timedPlace.name(), uniquePlaceName);
 
 					for (TimedToken token : timedPlace.tokens()) {
-						place.addToken(new TimedToken(place, token.age()));
+						place.addToken(new TimedToken(place, token.age(), token.color()));
 					}
+					place.setTokenExpression(timedPlace.getTokensAsExpression());
 					
 					// Gui work
 					if (this.guiModels != null) {
@@ -277,8 +284,8 @@ public class TAPNComposer implements ITAPNComposer {
 						} else {
 							uniqueTransitionName = timedTransition.name();
 						}
-						
-						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent());
+						//TODO: check if guard needs to be copied
+						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent(), timedTransition.getGuard());
 						if (timedTransition.isUncontrollable()) {
 						    transition.setUncontrollable(true);
                         }
@@ -378,7 +385,8 @@ public class TAPNComposer implements ITAPNComposer {
                     }
                 }
 
-				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeightValue());
+				TimedInputArc addedArc = new TimedInputArc(source, target, newInterval, arc.getWeightValue(), arc.getArcExpression());
+				addedArc.setColorTimeIntervals(arc.getColorTimeIntervals());
 				constructedModel.add(addedArc);
 				
 				// Gui work
@@ -431,7 +439,7 @@ public class TAPNComposer implements ITAPNComposer {
 				String destinationTemplate = arc.destination().isShared() ? "" : tapn.name();
 				TimedPlace target = constructedModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
 
-				TimedOutputArc addedArc = new TimedOutputArc(source, target, arc.getWeightValue());
+				TimedOutputArc addedArc = new TimedOutputArc(source, target, arc.getWeightValue(), arc.getExpression());
 				constructedModel.add(addedArc);
 				
 				// Gui work
@@ -494,7 +502,9 @@ public class TAPNComposer implements ITAPNComposer {
                         newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
                     }
                 }
-				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeightValue());
+				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeightValue(),
+                    arc.getInputExpression().deepCopy(), arc.getOutputExpression().deepCopy());
+				addedArc.setColorTimeIntervals(arc.getColorTimeIntervals());
 				constructedModel.add(addedArc);
 				
 				//Create input transport arc
@@ -601,7 +611,7 @@ public class TAPNComposer implements ITAPNComposer {
                         newInterval.setUpperBound(new IntBound(newInterval.upperBound().value()));
                     }
                 }
-				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeightValue());
+				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeightValue(), arc.getArcExpression());
 				constructedModel.add(addedArc);
 				
 				// Gui work

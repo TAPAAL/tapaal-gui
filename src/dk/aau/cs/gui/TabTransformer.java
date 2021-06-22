@@ -1,30 +1,69 @@
 package dk.aau.cs.gui;
 
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.TapnXmlLoader;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.io.queries.XMLQueryLoader;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.FormatException;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.*;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTACPNDiscreteVerification;
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
+import pipe.gui.*;
 import pipe.gui.graphicElements.*;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
+import pipe.gui.widgets.RunningVerificationDialog;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Vector;
 
 public class TabTransformer {
+
     static public void removeTimingInformation(TabContent tab){
         for(Template template : tab.allTemplates()){
             ArrayList<TimedTransportArcComponent> transportArcComponents = new ArrayList<TimedTransportArcComponent>();
             // Make place token age invariant infinite
             for(TimedPlace place : template.model().places()){
                 place.setInvariant(TimeInvariant.LESS_THAN_INFINITY);
+                place.getCtiList().clear();
             }
             // Make transitions non-urgent
             for(TimedTransition transition : template.model().transitions()){
                 transition.setUrgent(false);
+                //TODO: what is default guard?
             }
 
             for(Arc arc : template.guiModel().getArcs()){
                 // Make output arc guards infinite
+                if(arc instanceof TimedInputArcComponent && !(arc instanceof TimedTransportArcComponent) && (!(arc instanceof TimedInhibitorArcComponent))){
+                    TimedInputArcComponent arcComp = (TimedInputArcComponent) arc;
+                    arcComp.underlyingTimedInputArc().setColorTimeIntervals(new ArrayList<ColoredTimeInterval>());
+                }
                 if(arc instanceof TimedOutputArcComponent) {
                     TimedOutputArcComponent arcComp = (TimedOutputArcComponent) arc;
                     arcComp.setGuardAndWeight(TimeInterval.ZERO_INF, arcComp.getWeight());
@@ -33,6 +72,7 @@ public class TabTransformer {
                 // Add and process transport arcs in separate list to avoid delete errors
                 if(arc instanceof TimedTransportArcComponent){
                     TimedTransportArcComponent arcComp = (TimedTransportArcComponent) arc;
+                    arcComp.underlyingTransportArc().setColorTimeIntervals(new ArrayList<ColoredTimeInterval>());
                     transportArcComponents.add(arcComp);
                 }
             }
@@ -44,7 +84,7 @@ public class TabTransformer {
                     TimedPlace source = template.model().getPlaceByName(arc.getSource().getName());
                     TimedTransition destination = template.model().getTransitionByName(arc.getTarget().getName());
 
-                    TimedInputArc addedArc = new TimedInputArc(source, destination, TimeInterval.ZERO_INF, arc.getWeight());
+                    TimedInputArc addedArc = new TimedInputArc(source, destination, TimeInterval.ZERO_INF, arc.getWeight(), arc.underlyingTransportArc().getInputExpression());
 
 
                     // GUI
@@ -75,6 +115,7 @@ public class TabTransformer {
                     //Change the partner
 
                     TimedOutputArcComponent arc2 = convertPartner(arc.getConnectedTo(), template, guiModel);
+
                     removeTransportArc(arc, guiModel);
 
                     //Add arc to model and GUI
@@ -100,7 +141,7 @@ public class TabTransformer {
         TimedPlace destination = template.model().getPlaceByName(arc.getTarget().getName());
         TimedTransition source = template.model().getTransitionByName(arc.getSource().getName());
 
-        TimedOutputArc addedArc = new TimedOutputArc(source, destination, arc.getWeight());
+        TimedOutputArc addedArc = new TimedOutputArc(source, destination, arc.getWeight(), arc.underlyingTransportArc().getOutputExpression());
         //template.model().add(addedArc);
 
         // GUI
@@ -158,4 +199,145 @@ public class TabTransformer {
             }
         }
     }
+    static public void removeColorInformation(TabContent tab) {
+        tab.network().setColorTypes(Arrays.asList(ColorType.COLORTYPE_DOT));
+        tab.network().setVariables(new ArrayList<Variable>());
+        for (Template template : tab.allTemplates()) {
+            for(TimedPlace place : template.model().places()){
+                place.setCtiList(new ArrayList<>());
+                place.setColorType(ColorType.COLORTYPE_DOT);
+                int numberOfTokens = place.tokens().size();
+
+                //kind of hack to convert from coloredTokens to uncolored
+                if(numberOfTokens > 0){
+                    Vector<ColorExpression> v = new Vector<>();
+                    v.add(new DotConstantExpression());
+                    Vector<ArcExpression> numbOfExpression = new Vector<>();
+                    numbOfExpression.add(new NumberOfExpression(place.numberOfTokens(), v));
+                    place.setTokenExpression(new AddExpression(numbOfExpression));
+                }
+            }
+
+            for (TimedTransition transition : template.model().transitions()) {
+                //TODO: what is the default guard
+                transition.setGuard(null);
+            }
+
+            for(TimedInputArc arc : template.model().inputArcs()){
+                arc.setColorTimeIntervals(new ArrayList<>());
+                int expressionWeight = arc.getArcExpression().weight();
+                ColorType ct = ColorType.COLORTYPE_DOT;
+                UserOperatorExpression userOperatorExpression = new DotConstantExpression();
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(expressionWeight, vecColorExpr);
+                arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(expressionWeight));
+            }
+
+            for(TimedOutputArc arc : template.model().outputArcs()){
+                int expressionWeight = arc.getExpression().weight();
+                UserOperatorExpression userOperatorExpression = new DotConstantExpression();
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(expressionWeight, vecColorExpr);
+                arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(expressionWeight));
+            }
+
+            for(TransportArc arc : template.model().transportArcs()){
+                ArcExpression oldInputExpr = arc.getInputExpression();
+                arc.setColorTimeIntervals(new ArrayList<>());
+                UserOperatorExpression userOperatorExpression = new DotConstantExpression();
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(oldInputExpr.weight(), vecColorExpr);
+                arc.setInputExpression(numbExpr);
+                arc.setOutputExpression(numbExpr);
+                arc.setWeight(new IntWeight(oldInputExpr.weight()));
+            }
+        }
+    }
+
+    static public void addColorInformation(TabContent tab){
+        for (Template template : tab.allTemplates()) {
+            for(TimedInputArc arc : template.model().inputArcs()){
+                arc.setColorTimeIntervals(new ArrayList<>());
+                ColorType ct = arc.source().getColorType();
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(1));
+            }
+
+            for(TimedOutputArc arc : template.model().outputArcs()){
+                ColorType ct = arc.destination().getColorType();
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setExpression(numbExpr);
+                arc.setWeight(new IntWeight(1));
+            }
+
+            for(TransportArc arc : template.model().transportArcs()){
+                ColorType ct = arc.source().getColorType();
+                UserOperatorExpression userOperatorExpression = new UserOperatorExpression(ct.getFirstColor());
+                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                vecColorExpr.add(userOperatorExpression);
+                NumberOfExpression numbExpr = new NumberOfExpression(arc.getWeight().value(), vecColorExpr);
+                arc.setInputExpression(numbExpr);
+                arc.setOutputExpression(numbExpr);
+                arc.setWeight(new IntWeight(1));
+
+            }
+        }
+    }
+
+    public static void unfoldTab(TabContent oldTab, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
+
+        ModelChecker engine;
+        if(oldTab.getLens().isTimed()){
+            engine = new VerifyTACPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+        } else {
+            engine = new VerifyPN(new FileFinder(), new MessengerImpl());
+        }
+        engine.setup();
+
+        if (!engine.isCorrectVersion()) {
+            new MessengerImpl().displayErrorMessage(
+                "No " + engine + " specified: The verification is cancelled",
+                "Verification Error");
+            return;
+        }
+        UnfoldNet thread = new UnfoldNet(engine, new MessengerImpl(), oldTab.getGuiModels(), partition, computeColorFixpoint, useSymmetricVars);
+
+        RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread, "Unfolding");
+        thread.execute(oldTab.network(), oldTab.queries(), oldTab);
+        dialog.setVisible(true);
+    }
+
+
+
+    public static void mapQueryToNewNames(pipe.dataLayer.TAPNQuery query, NameMapping mapping) {
+        RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
+        RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(mapping);
+        query.getProperty().accept(placeVisitor, null);
+        query.getProperty().accept(transitionVisitor, null);
+    }
+
+    public static String createUnfoldArgumentString(String modelFile, String queryFile, VerificationOptions options) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(options.toString());
+        buffer.append(" ");
+        buffer.append(modelFile);
+        buffer.append(" ");
+        buffer.append(queryFile);
+
+        return buffer.toString();
+    }
+
+
 }

@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
+import pipe.gui.widgets.ColoredWidgets.UnfoldDialog;
 import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
@@ -60,10 +61,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     JMenu drawMenu;
     JMenu animateMenu;
     JMenu viewMenu;
+    JMenu toolsMenu;
     private JToolBar drawingToolBar;
     private final JLabel featureInfoText = new JLabel();
-    private JComboBox<String> timeFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
-    private JComboBox<String> gameFeatureOptions = new JComboBox(new String[]{"No", "Yes"});
+    private final JComboBox<String> timeFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
+    private final JComboBox<String> gameFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
+    private final JComboBox<String> colorFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
     private JComboBox<String> zoomComboBox;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -289,7 +292,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-    private final GuiAction showTokenAgeAction = new GuiAction("Display token age", "Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)", KeyStroke.getKeyStroke('9', shortcutkey), true) {
+    private final GuiAction showTokenAgeAction = new GuiAction("Display token age", "Show/hide displaying the token age 0.0 (when hidden the age 0.0 is drawn as a dot)", KeyStroke.getKeyStroke('0', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleTokenAge);
         }
@@ -314,22 +317,27 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleConstants);
         }
     };
-    private final GuiAction showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0,inf)", "Show/hide intervals [0,inf) that do not restrict transition firing in any way.", KeyStroke.getKeyStroke('7', shortcutkey), true) {
+    private final GuiAction showColoredTokensAction = new GuiAction("Display colored tokens", "Show/hide the colored tokens in each place.", KeyStroke.getKeyStroke('5', shortcutkey),  true) {
+        public void actionPerformed(ActionEvent e) {
+            guiFrameController.ifPresent(GuiFrameControllerActions::toggleColorTokens);
+        }
+    };
+    private final GuiAction showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0,inf)", "Show/hide intervals [0,inf) that do not restrict transition firing in any way.", KeyStroke.getKeyStroke('8', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleZeroToInfinityIntervals);
         }
     };
-    private final GuiAction showEnabledTransitionsAction = new GuiAction("Display enabled transitions", "Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('5', shortcutkey), true) {
+    private final GuiAction showEnabledTransitionsAction = new GuiAction("Display enabled transitions", "Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('6', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleEnabledTransitionsList);
         }
     };
-    private final GuiAction showDelayEnabledTransitionsAction = new GuiAction("Display future-enabled transitions", "Highlight transitions which can be enabled after a delay", KeyStroke.getKeyStroke('6', shortcutkey), true) {
+    private final GuiAction showDelayEnabledTransitionsAction = new GuiAction("Display future-enabled transitions", "Highlight transitions which can be enabled after a delay", KeyStroke.getKeyStroke('7', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDelayEnabledTransitions);
         }
     };
-    private final GuiAction showToolTipsAction = new GuiAction("Display tool tips", "Show/hide tool tips when mouse is over an element", KeyStroke.getKeyStroke('8', shortcutkey), true) {
+    private final GuiAction showToolTipsAction = new GuiAction("Display tool tips", "Show/hide tool tips when mouse is over an element", KeyStroke.getKeyStroke('9', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayToolTips);
         }
@@ -389,6 +397,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction startAction = new GuiAction("Simulation mode", "Toggle simulation mode (M)", "M", true) {
         public void actionPerformed(ActionEvent e) {
+            if(getCurrentTab().getLens().isColored()){
+                UnfoldDialog.showDialog(getCurrentTab());
+            }
             currentTab.ifPresent(TabContentActions::toggleAnimationMode);
         }
     };
@@ -404,7 +415,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
 
 
-    private GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
+    private final GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::previousComponent);
         }
@@ -415,17 +426,24 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-    private GuiAction changeTimeFeatureAction = new GuiAction("Time", "Change time semantics") {
+    private final GuiAction changeTimeFeatureAction = new GuiAction("Time", "Change time semantics") {
         public void actionPerformed(ActionEvent e) {
             boolean isTime = timeFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeTimeFeature(isTime));
         }
     };
 
-    private GuiAction changeGameFeatureAction = new GuiAction("Game", "Change game semantics") {
+    private final GuiAction changeGameFeatureAction = new GuiAction("Game", "Change game semantics") {
         public void actionPerformed(ActionEvent e) {
             boolean isGame = gameFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeGameFeature(isGame));
+        }
+    };
+
+    private final GuiAction changeColorFeatureAction = new GuiAction("Color", "Change color semantics") {
+        public void actionPerformed(ActionEvent e) {
+            boolean isColor = colorFeatureOptions.getSelectedIndex() != 0;
+            currentTab.ifPresent(o -> o.changeColorFeature(isColor));
         }
     };
 
@@ -436,6 +454,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JCheckBoxMenuItem showZeroToInfinityIntervalsCheckBox;
     private JCheckBoxMenuItem showTokenAgeCheckBox;
     private JCheckBoxMenuItem showDelayEnabledTransitionsCheckbox;
+    private JCheckBoxMenuItem showColoredTokensCheckbox;
 
     private JMenu zoomMenu;
 
@@ -483,8 +502,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         featurePanel.add(timeFeatureOptions);
         featurePanel.add(new JLabel("   Game: "));
         featurePanel.add(gameFeatureOptions);
+        featurePanel.add(new JLabel("   Color: "));
+        featurePanel.add(colorFeatureOptions);
         timeFeatureOptions.addActionListener(changeTimeFeatureAction);
         gameFeatureOptions.addActionListener(changeGameFeatureAction);
+        colorFeatureOptions.addActionListener(changeColorFeatureAction);
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new GridLayout(1, 2));
@@ -665,6 +687,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         addCheckboxMenuItem(viewMenu, showConstantsAction);
 
+        showColoredTokensCheckbox = addCheckboxMenuItem(viewMenu, showColoredTokensAction);
+
         addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction);
 
         showDelayEnabledTransitionsCheckbox = addCheckboxMenuItem(viewMenu, showDelayEnabledTransitionsAction);
@@ -729,7 +753,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
 
     private JMenu buildMenuTools() {
-        JMenu toolsMenu = new JMenu("Tools");
+        toolsMenu = new JMenu("Tools");
         toolsMenu.setMnemonic('t');
 
         toolsMenu.add(verifyAction).setMnemonic('m');
@@ -935,7 +959,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 smartDrawAction.setEnabled(true);
                 mergeComponentsDialogAction.setEnabled(true);
-                if (gameFeatureOptions.getSelectedIndex() == 1) {
+                if (gameFeatureOptions.getSelectedIndex() == 1 || colorFeatureOptions.getSelectedIndex() == 1) {
                     workflowDialogAction.setEnabled(false);
                 } else {
                     workflowDialogAction.setEnabled(true);
@@ -943,6 +967,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 timeFeatureOptions.setEnabled(true);
                 gameFeatureOptions.setEnabled(true);
+                colorFeatureOptions.setEnabled(true);
 
                 //Enable editor focus traversal policy
                 setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
@@ -960,6 +985,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 showSharedPTAction.setEnabled(false);
                 showConstantsAction.setEnabled(false);
+                showColoredTokensAction.setEnabled(false);
                 showQueriesAction.setEnabled(false);
 
                 stepbackwardAction.setEnabled(true);
@@ -978,6 +1004,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 timeFeatureOptions.setEnabled(false);
                 gameFeatureOptions.setEnabled(false);
+                colorFeatureOptions.setEnabled(false);
+
 
                 // Remove constant highlight
                 getCurrentTab().removeConstantHighlights();
@@ -1011,6 +1039,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 timeFeatureOptions.setEnabled(false);
                 gameFeatureOptions.setEnabled(false);
+                colorFeatureOptions.setEnabled(false);
+
 
                 enableAllActions(false);
 
@@ -1060,6 +1090,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         showComponentsAction.setEnabled(enable);
         showSharedPTAction.setEnabled(enable);
         showConstantsAction.setEnabled(enable);
+        showColoredTokensAction.setEnabled(enable);
         showQueriesAction.setEnabled(enable);
         showZeroToInfinityIntervalsAction.setEnabled(enable);
         showEnabledTransitionsAction.setEnabled(enable);
@@ -1179,6 +1210,44 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
 
     }
+
+    @Override
+    public void registerToolsActions(@NotNull List<GuiAction> toolsActions){
+        toolsMenu.removeAll();
+        toolsMenu.setEnabled(true);
+        toolsMenu.add(verifyAction).setMnemonic('m');
+
+        toolsMenu.add(netStatisticsAction).setMnemonic('i');
+
+        JMenuItem batchProcessing = new JMenuItem(batchProcessingAction);
+        batchProcessing.setMnemonic('b');
+        toolsMenu.add(batchProcessing);
+
+        JMenuItem workflowDialog = new JMenuItem(workflowDialogAction);
+        workflowDialog.setMnemonic('f');
+        toolsMenu.add(workflowDialog);
+
+        JMenuItem smartDrawDialog = new JMenuItem(smartDrawAction);
+        smartDrawDialog.setMnemonic('D');
+        toolsMenu.add(smartDrawDialog);
+
+        JMenuItem mergeComponentsDialog = new JMenuItem(mergeComponentsDialogAction);
+        mergeComponentsDialog.setMnemonic('c');
+        toolsMenu.add(mergeComponentsDialog);
+
+        for(GuiAction action : toolsActions){
+            toolsMenu.add(action);
+        }
+
+        toolsMenu.addSeparator();
+
+        JMenuItem engineSelection = new JMenuItem(engineSelectionAction);
+        toolsMenu.add(engineSelection);
+
+        JMenuItem clearPreferences = new JMenuItem(clearPreferencesAction);
+        toolsMenu.add(clearPreferences);
+
+    }
     @Override
     public void registerAnimationActions(@NotNull List<GuiAction> animationActions) {
 
@@ -1219,6 +1288,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             showZeroToInfinityIntervalsCheckBox.setVisible(true);
             showTokenAgeCheckBox.setVisible(true);
             showDelayEnabledTransitionsCheckbox.setVisible(true);
+        }
+
+        if(!getCurrentTab().getLens().isColored()) {
+            showColoredTokensCheckbox.setVisible(false);
+        } else {
+            showColoredTokensCheckbox.setVisible(true);
         }
     }
 
@@ -1271,6 +1346,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     public void setShowConstantsSelected(boolean b) {
         showConstantsAction.setSelected(b);
     }
+
+    @Override
+    public void setShowColoredTokensSelected(boolean b) { showColoredTokensAction.setSelected(b); }
 
     @Override
     public void setShowQueriesSelected(boolean b) {
@@ -1541,6 +1619,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return Preferences.getInstance().getShowTokenAge();
     }
 
+    public boolean showColoredTokens() {
+        return Preferences.getInstance().getShowColoredTokens();
+    }
+
     public int getSelectedTabIndex() {
         return appTab.getSelectedIndex();
     }
@@ -1554,6 +1636,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         if (features != null) {
             timeFeatureOptions.setSelectedIndex(features[0] ? 1 : 0);
             gameFeatureOptions.setSelectedIndex(features[1] ? 1 : 0);
+            colorFeatureOptions.setSelectedIndex(features[2] ? 1 : 0);
         }
     }
 

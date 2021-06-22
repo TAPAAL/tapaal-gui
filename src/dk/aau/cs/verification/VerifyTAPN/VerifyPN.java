@@ -12,15 +12,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.PNMLoader;
+import dk.aau.cs.io.TapnXmlLoader;
+import dk.aau.cs.util.*;
+import dk.aau.cs.verification.*;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.CreateGui;
-import pipe.gui.FileFinder;
-import pipe.gui.MessengerImpl;
-import pipe.gui.Pipe;
+import pipe.gui.*;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.Messenger;
@@ -31,17 +35,8 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.util.ExecutabilityChecker;
-import dk.aau.cs.util.Tuple;
-import dk.aau.cs.util.UnsupportedModelException;
-import dk.aau.cs.util.UnsupportedQueryException;
-import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.ProcessRunner;
-import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.Stats;
-import dk.aau.cs.verification.VerificationOptions;
-import dk.aau.cs.verification.VerificationResult;
+
+import javax.swing.*;
 
 public class VerifyPN implements ModelChecker{
 	
@@ -56,6 +51,7 @@ public class VerifyPN implements ModelChecker{
 
 		private ProcessRunner runner;
 		private boolean ctlOutput = false;
+		private boolean supportsStats = true;
 		
 		public VerifyPN(FileFinder fileFinder, Messenger messenger) {
 			this.fileFinder = fileFinder;
@@ -63,7 +59,7 @@ public class VerifyPN implements ModelChecker{
 		}
 		
 		public boolean supportsStats(){
-			return true;
+			return supportsStats;
 		}
 
         public String[] getStatsExplanations(){
@@ -215,63 +211,60 @@ public class VerifyPN implements ModelChecker{
 		
 		public static boolean trySetup() {
 
-				String verifypn = null;
+            String verifypn = null;
 
-				//If env is set, it overwrites the value
-				verifypn = System.getenv("verifypn");
-				if (verifypn != null && !verifypn.isEmpty()) {
-					if (new File(verifypn).exists()){
-						verifypnpath = verifypn;
-						VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
-						if(v.isCorrectVersion()){
-							return true;
-						}else{
-							verifypn = null;
-							verifypnpath = null;
-						}
-					}
-				}
+            //If env is set, it overwrites the value
+            verifypn = System.getenv("verifypn");
+            if (verifypn != null && !verifypn.isEmpty()) {
+                if (new File(verifypn).exists()){
+                    verifypnpath = verifypn;
+                    VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
+                    if(v.isCorrectVersion()){
+                        return true;
+                    }else{
+                        verifypn = null;
+                        verifypnpath = null;
+                    }
+                }
+            }
 
-				//If pref is set
-				verifypn = Preferences.getInstance().getVerifypnLocation();
-				if (verifypn != null && !verifypn.isEmpty()) {
-					verifypnpath = verifypn;
-					VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
-					if(v.isCorrectVersion()){
-						return true;
-					}else{
-						verifypn = null;
-						verifypnpath = null;
-					}
-				}
+            //If pref is set
+            verifypn = Preferences.getInstance().getVerifypnLocation();
+            if (verifypn != null && !verifypn.isEmpty()) {
+                verifypnpath = verifypn;
+                VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
+                if(v.isCorrectVersion()){
+                    return true;
+                }else{
+                    verifypn = null;
+                    verifypnpath = null;
+                }
+            }
 
-				//Search the installdir for verifytapn
-				File installdir = TAPAAL.getInstallDir();
+            //Search the installdir for verifytapn
+            File installdir = TAPAAL.getInstallDir();
 
-				String[] paths = {"/bin/verifypn", "/bin/verifypn64", "/bin/verifypn.exe", "/bin/verifypn64.exe"};
-				for (String s : paths) {
-					File verifypnfile = new File(installdir + s);
+            String[] paths = {"/bin/verifypn", "/bin/verifypn64", "/bin/verifypn.exe", "/bin/verifypn64.exe"};
+            for (String s : paths) {
+                File verifypnfile = new File(installdir + s);
 
-					if (verifypnfile.exists()){
+                if (verifypnfile.exists()){
 
-						verifypnpath = verifypnfile.getAbsolutePath();
-						VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
-						if(v.isCorrectVersion()){
-							return true;
-						}else{
-							verifypn = null;
-							verifypnpath = null;
-						}
+                    verifypnpath = verifypnfile.getAbsolutePath();
+                    VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
+                    if(v.isCorrectVersion()){
+                        return true;
+                    }else{
+                        verifypn = null;
+                        verifypnpath = null;
+                    }
 
-					}
-				}
-
-
-				return false;
-
+                }
+            }
+            return false;
 		}
 
-		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
+		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel) throws Exception {
 			if(!supportsModel(model.value1(), options))
 				throw new UnsupportedModelException("Verifypn does not support the given model.");
 			
@@ -282,9 +275,15 @@ public class VerifyPN implements ModelChecker{
 //				throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
 			
 			if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
-			
-			VerifyPNExporter exporter = new VerifyPNExporter();
-			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2());
+
+			VerifyTAPNExporter exporter;
+			if(model.value1().parentNetwork().isColored()){
+			    exporter = new VerifyCPNExporter();
+			    supportsStats = false;
+            } else {
+                exporter = new VerifyPNExporter();
+            }
+			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2(), guiModel);
 
 			if (exportedModel == null) {
 				messenger.displayErrorMessage("There was an error exporting the model");
@@ -293,7 +292,7 @@ public class VerifyPN implements ModelChecker{
 			return verify(options, model, exportedModel, query);
 		}
 
-		private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
+    private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
 			VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions)options;
 			
 			if(verificationOptions.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces) 
@@ -317,7 +316,7 @@ public class VerifyPN implements ModelChecker{
 		private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) throws IOException {
 			((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 
-			runner = new ProcessRunner(verifypnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
+            runner = new ProcessRunner(verifypnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 			runner.run();
 
 			if (runner.error()) {
@@ -328,13 +327,45 @@ public class VerifyPN implements ModelChecker{
 
 				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
 
+                if(options.traceOption() != TraceOption.NONE && model.value1().isColored()){
+                    PNMLoader tapnLoader = new PNMLoader();
+                    File fileOut = new File(options.unfoldedModelPath());
+                    File queriesOut = new File(options.unfoldedQueriesPath());
+                    TabContent newTab;
+                    LoadedModel loadedModel = null;
+                    try {
+                        loadedModel = tapnLoader.load(fileOut);
+                        newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(CreateGui.getCurrentTab().getLens().isTimed(), CreateGui.getCurrentTab().getLens().isGame(), false));
+                        newTab.setInitialName(CreateGui.getCurrentTab().getTabTitle().replace(".tapn", "") + "-unfolded");
+
+                        for(pipe.dataLayer.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())){
+                            newTab.addQuery(loadedQuery);
+                        }
+
+
+                        CreateGui.openNewTabFromStream(newTab);
+
+                        int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                        if(dialogResult == JOptionPane.YES_OPTION) {
+                            SmartDrawDialog.showSmartDrawDialog();
+                        }
+
+                        TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
+                        model = newComposer.transformModel(loadedModel.network());
+                    } catch (FormatException e) {
+                        e.printStackTrace();
+                    } catch (ThreadDeath d){
+                        return null;
+                    }
+                }
+
 				if (queryResult == null || queryResult.value1() == null) {
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {
 					ctlOutput = queryResult.value1().isCTL;
 					boolean approximationResult = queryResult.value2().discoveredStates() == 0;	// Result is from over-approximation
 					TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
-					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult, standardOutput);
+					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult, standardOutput, model);
 				}
 			}
 		}

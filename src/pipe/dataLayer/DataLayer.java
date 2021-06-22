@@ -825,6 +825,7 @@ public class DataLayer {
 		for (Transition t : transitionsArray) {
 			t.updateOnMoveOrZoom();
 			t.repaint();
+			t.update(displayConstantNames);
 		}
 
 		for (Arc arc : arcsArray) {

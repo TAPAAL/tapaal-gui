@@ -3,22 +3,35 @@ package dk.aau.cs.model.tapn;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
+import dk.aau.cs.model.CPN.Color;
 import pipe.gui.Pipe;
 
 public class TimedToken {
 	private final TimedPlace place;
-	private BigDecimal age;
+	protected BigDecimal age;
+    private Color color;
 
-	public TimedToken(TimedPlace place) {
-		this(place, BigDecimal.ZERO);
+
+    public TimedToken(TimedPlace place, Color color) {
+		this(place, BigDecimal.ZERO, color);
 	}
 
-	public TimedToken(TimedPlace place, BigDecimal age) {
+	public TimedToken(TimedPlace place, BigDecimal age, Color color) {
 		this.place = place;
 		this.age = age;
+		this.color = color;
 	}
 
-	public TimedPlace place() {
+    public Color color() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public Color getColor() {return color;}
+    public TimedPlace place() {
 		return place;
 	}
 
@@ -31,20 +44,35 @@ public class TimedToken {
 	}
 	
 	public TimedToken clone() {
-		return new TimedToken(place, age); // age is immutable so ok to pass it to constructor
+		return new TimedToken(place, age, color); // age is immutable so ok to pass it to constructor
 	}
 
 	public TimedToken delay(BigDecimal delay) {
-		return new TimedToken(place, age.add(delay));
+		return new TimedToken(place, age.add(delay), color);
 	}
-
-	@Override
+    @Override
 	public String toString() {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 
-        return String.format("(%s, %s)", place.toString(), df.format(age));
+        return String.format("(%s, %s, %s)", place.toString(), df.format(age), color.toString());
 	}
+    //This is for colors
+    public String toStringForPNML() {
+        String token = "";
+        if (color.getTuple() != null && color.getTuple().size() != 0) {
+            for (Color element : color.getTuple()) {
+                token += "(" + element.getColorName() + ")";
+            }
+            return token + "";
+        } else {
+            return token += "(" + color.getColorName() + ")";
+        }
+    }
+
+    public String getFormattedTokenString(){
+        return color.getColorName();
+    }
 
 	@Override
 	public int hashCode() {
@@ -70,6 +98,13 @@ public class TimedToken {
 		} else if (age.compareTo(other.age) != 0){
 			return false;
 		}
+		if(color == null) {
+		    if (other.color != null) {
+		        return false;
+            }
+        } else if(!color.equals(other.color)){
+		    return false;
+        }
 		if (place == null) {
 			if (other.place != null)
 				return false;
@@ -77,4 +112,5 @@ public class TimedToken {
 			return false;
 		return true;
 	}
+
 }

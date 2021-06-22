@@ -296,6 +296,10 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	    this.lens = lens;
     }
 
+    public boolean isColored(){
+	    return lens.isColored();
+    }
+
     @Override
     public GraphicalElement getGraphicalElement() {
         return this;

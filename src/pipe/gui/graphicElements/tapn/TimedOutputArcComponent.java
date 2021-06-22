@@ -5,6 +5,9 @@ import java.util.Hashtable;
 
 import javax.swing.BoxLayout;
 
+import dk.aau.cs.gui.Context;
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.CreateGui;
 
@@ -52,14 +55,14 @@ public class TimedOutputArcComponent extends Arc {
 				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(getNameOffsetY(), getZoom())))
         );
 		this.lens = arc.lens;
-
 	}
 
 
-    public TimedOutputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedOutputArc modelArc){
+    public TimedOutputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedOutputArc modelArc, TabContent.TAPNLens lens){
         super(source);
         setTarget(target);
         setUnderlyingArc(modelArc);
+        this.lens = lens;
         updateLabel(true);
         sealArc();
     }
@@ -86,9 +89,24 @@ public class TimedOutputArcComponent extends Arc {
 	}
 
 	public void updateLabel(boolean displayConstantNames) {
-		getNameLabel().setText("");
-		getNameLabel().setText(getWeight().toString(displayConstantNames)+" " + getNameLabel().getText());
-		setLabelPosition();
+	    if(isColored()){
+            if (underlyingArc() != null) {
+                if (underlyingArc().getExpression() != null) {
+                    getNameLabel().setText(getWeight().toString(displayConstantNames) +
+                        "\n" + underlyingArc().getExpression().toString());
+                    setLabelPosition();
+                }
+
+            } else {
+                getNameLabel().setText("");
+                getNameLabel().setText(getWeight().toString(displayConstantNames)+" " + getNameLabel().getText());
+                setLabelPosition();
+            }
+        } else{
+            getNameLabel().setText("");
+            getNameLabel().setText(getWeight().toString(displayConstantNames)+" " + getNameLabel().getText());
+            setLabelPosition();
+        }
 	}
 
 	public void showTimeIntervalEditor() {
@@ -100,9 +118,9 @@ public class TimedOutputArcComponent extends Arc {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new GuardDialogue(guiDialog.getRootPane(), this));
+		contentPane.add(new GuardDialogue(guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab())));
 
-		guiDialog.setResizable(false);
+		guiDialog.setResizable(true);
 
 		// Make window fit contents' preferred size
 		guiDialog.pack();
@@ -139,5 +157,13 @@ public class TimedOutputArcComponent extends Arc {
 	public Weight getWeight() {
 		return outputArc.getWeight();
 	}
+    @Override
+    public void setExpression(ArcExpression expr){
+        outputArc.setExpression(expr);
+    }
+    @Override
+    public ArcExpression getExpression(){
+	    return outputArc.getExpression();
+    }
 
 }

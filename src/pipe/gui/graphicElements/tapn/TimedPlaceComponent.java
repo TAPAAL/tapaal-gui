@@ -1,17 +1,6 @@
 package pipe.gui.graphicElements.tapn;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -19,11 +8,15 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import javax.swing.BoxLayout;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.CPN.Expressions.AddExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Place;
@@ -44,23 +37,23 @@ import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 
 public class TimedPlaceComponent extends Place {
 
-	private dk.aau.cs.model.tapn.TimedPlace place;
-	private final dk.aau.cs.model.tapn.event.TimedPlaceListener listener = timedPlaceListener();
+    private dk.aau.cs.model.tapn.TimedPlace place;
+    private final dk.aau.cs.model.tapn.event.TimedPlaceListener listener = timedPlaceListener();
 
-	private Window ageOfTokensWindow = new Window(new Frame());
-	private final Shape dashedOutline = createDashedOutline();
+    private Window ageOfTokensWindow = new Window(new Frame());
+    private final Shape dashedOutline = createDashedOutline();
 
-	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place, TabContent.TAPNLens lens) {
-		super(positionXInput, positionYInput);
-		this.place = place;
+    public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place, TabContent.TAPNLens lens) {
+        super(positionXInput, positionYInput);
+        this.place = place;
         this.place.addTimedPlaceListener(listener);
         this.lens = lens;
-		attributesVisible = true;
+        attributesVisible = true;
 
     }
 
-	public TimedPlaceComponent(
-	    int positionXInput,
+    public TimedPlaceComponent(
+        int positionXInput,
         int positionYInput,
         String idInput,
         int nameOffsetXInput,
@@ -68,87 +61,166 @@ public class TimedPlaceComponent extends Place {
         TabContent.TAPNLens lens
     ) {
 
-		super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
+        super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
         attributesVisible = true;
         this.lens = lens;
 
     }
 
     @Override
-	protected void addMouseHandler() {
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		mouseHandler = new PlaceHandler(this);
-	}
+    protected void addMouseHandler() {
+        //XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
+        //XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+        mouseHandler = new PlaceHandler(this);
+    }
 
-	private TimedPlaceListener timedPlaceListener() {
-		return new TimedPlaceListener() {
-			public void nameChanged(TimedPlaceEvent e) {
-				TimedPlace place = e.source();
-				TimedPlaceComponent.super.setName(place.name());
-			}
-			
-			public void invariantChanged(TimedPlaceEvent e) { 
-				update(true); 
-			}
-			
-			public void markingChanged(TimedPlaceEvent e) { 
-				repaint();
-			}
-		};
-	}
+    private TimedPlaceListener timedPlaceListener() {
+        return new TimedPlaceListener() {
+            public void nameChanged(TimedPlaceEvent e) {
+                TimedPlace place = e.source();
+                TimedPlaceComponent.super.setName(place.name());
+            }
 
-	public String getInvariantAsString() {
-		return getInvariant().toString();
-	}
+            public void invariantChanged(TimedPlaceEvent e) {
+                update(true);
+            }
 
-	public TimeInvariant getInvariant() {
-		return place.invariant();
-	}
+            public void markingChanged(TimedPlaceEvent e) {
+                repaint();
+            }
+        };
+    }
 
-	private String getStringOfTokens() {
-		StringBuilder buffer = new StringBuilder("{");
-		DecimalFormat df = new DecimalFormat();
-		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-		df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
+    public String getInvariantAsString() {
+        return getInvariant().toString();
+    }
 
-		boolean first = true;
-		for (TimedToken token : place.tokens()) {
-			if (!first) {
+    public TimeInvariant getInvariant() {
+        return place.invariant();
+    }
+
+    private String getStringOfTokens() {
+        StringBuilder buffer = new StringBuilder("{");
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+        df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
+
+        boolean first = true;
+        for (TimedToken token : place.tokens()) {
+            if (!first) {
                 buffer.append(", ");
             }
-			buffer.append(df.format(token.age()));
+            buffer.append(df.format(token.age()));
 
-			first = false;
-		}
-		buffer.append('}');
+            first = false;
+        }
+        buffer.append('}');
 
-		return buffer.toString();
-	}
+        return buffer.toString();
+    }
 
-	public boolean isAgeOfTokensShown() {
-		return ageOfTokensWindow.isVisible();
-	}
+    private String getStringOfColoredTimedTokens() {
+        StringBuilder buffer = new StringBuilder("{");
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+        df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
 
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		paintTokens(g);
-		if(place.isShared()){
-			Graphics2D graphics = (Graphics2D)g;
-			Stroke oldStroke = graphics.getStroke();
+        boolean first = true;
+        for (TimedToken token : place.tokens()) {
+            if (!first) {
+                buffer.append(", ");
+            }
+            buffer.append("(");
+            if (((TimedToken)token).color().getColorName().equals("")) {
+                buffer.append(((TimedToken) token).color().toString());
+            } else {
+                buffer.append(((TimedToken) token).color().getColorName());
+            }
+            buffer.append(", ");
+            buffer.append(df.format(token.age()));
+            buffer.append(")");
 
-			BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] {5.0f}, 0.0f);
-			graphics.setStroke(dashed);
 
-			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			graphics.draw(dashedOutline);
+            first = false;
+        }
+        buffer.append('}');
 
-			graphics.setStroke(oldStroke);
-		}
-	}
+        return buffer.toString();
+    }
 
-	protected void paintTokens(Graphics g) {
+    private String getStringOfColoredTokens() {
+        StringBuilder buffer = new StringBuilder("{");
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+        df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
+
+        boolean first = true;
+        for (TimedToken token : place.tokens()) {
+            if (!first) {
+                buffer.append(", ");
+            }
+            if (token instanceof TimedToken) {
+                if (token.color().getColorName().equals("")) {
+                    buffer.append(token.color().toString());
+                } else {
+                    buffer.append(token.color().getColorName());
+                }
+            }
+
+            first = false;
+        }
+        buffer.append('}');
+
+        return buffer.toString();
+    }
+
+    private String getColoredTokensLabel() {
+        StringBuilder buffer = new StringBuilder();
+
+        List<TimedToken> timedTokens = place.tokens();
+
+        //TODO: this causes null pointer exceptions when importing some pnml nets
+        Map<String, Long> tokenMap = timedTokens.stream().map(
+            timedToken -> timedToken.getFormattedTokenString()).collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+
+        boolean first = true;
+
+        for (Map.Entry<String, Long> element : tokenMap.entrySet()) {
+
+            if (!first) {
+                buffer.append("\n");
+            }
+            buffer.append(element.getValue() + "'" + element.getKey());
+
+            first = false;
+        }
+
+        return buffer.toString();
+    }
+
+    public boolean isAgeOfTokensShown() {
+        return ageOfTokensWindow.isVisible();
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        paintTokens(g);
+        if(place.isShared()){
+            Graphics2D graphics = (Graphics2D)g;
+            Stroke oldStroke = graphics.getStroke();
+
+            BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] {5.0f}, 0.0f);
+            graphics.setStroke(dashed);
+
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            graphics.draw(dashedOutline);
+
+            graphics.setStroke(oldStroke);
+        }
+    }
+
+    protected void paintTokens(Graphics g) {
         DecimalFormat df = new DecimalFormat();
         df.setMinimumFractionDigits(1);
         df.setMaximumFractionDigits(1);
@@ -169,12 +241,12 @@ public class TimedPlaceComponent extends Place {
             drawDots = (marking > 0 && marking < 6);
 
             // if any token's age is > 0, do not draw dots
-			for (TimedToken token : myTokens) {
-				if (token.age().compareTo(BigDecimal.valueOf(0)) != 0) {
-					drawDots = false;
-					break;
-				}
-			}
+            for (TimedToken token : myTokens) {
+                if (token.age().compareTo(BigDecimal.valueOf(0)) != 0) {
+                    drawDots = false;
+                    break;
+                }
+            }
         }
         if(!lens.isTimed()){
             drawDots = (marking > 0 && marking < 6);
@@ -182,14 +254,14 @@ public class TimedPlaceComponent extends Place {
         // structure sees how many markings there are and fills the place in
         // with the appropriate number or tokens.
         if(drawDots) {
-			int xPos, yPos;
+            int xPos, yPos;
             switch(marking){
                 case 5:
                     g.fillOval(x + tMiddleX, y + tMiddleY, tWidth, tHeight); // middle
-                /* falls through */
+                    /* falls through */
                 case 4:
                     g.fillOval(x + tLeftX, y + tTopY, tWidth, tHeight); // top left
-                /* falls through */
+                    /* falls through */
                 case 3:
                     if (marking == 5 || marking == 4) {
                         xPos = x + tRightX;	// top right
@@ -199,7 +271,7 @@ public class TimedPlaceComponent extends Place {
                         yPos = y + tTopY;
                     }
                     g.fillOval(xPos, yPos, tWidth, tHeight);
-                /* falls through */
+                    /* falls through */
                 case 2:
                     if (marking == 5 || marking == 4){
                         xPos = x + tLeftX;       // bottom left
@@ -212,7 +284,7 @@ public class TimedPlaceComponent extends Place {
                         yPos = y + tMiddleY;
                     }
                     g.fillOval(xPos, yPos, tWidth, tHeight);
-                /* falls through */
+                    /* falls through */
                 case 1:
                     if(marking == 5 || marking == 4 || marking == 3){
                         xPos = x + tRightX;    // bottom right
@@ -228,27 +300,27 @@ public class TimedPlaceComponent extends Place {
                 case 0:
                     break;
             }
-        } else {	// print token age
+        } else if(!isColored()) {	// print token age
             switch (marking) {
                 case 2:
                     if (myTokens.get(1).age().compareTo(BigDecimal.valueOf(9)) > 0) {
                         g.setFont(new Font("new font", Font.PLAIN, 11));
                         g.drawString(df.format(myTokens.get(1).age()), x + 17 - 12,
-                                y + 13 + 1);
+                            y + 13 + 1);
                     } else {
                         g.drawString(df.format(myTokens.get(1).age()), x + 17 - 10,
-                                y + 13 + 1);
+                            y + 13 + 1);
                     }
 
-                /* falls through */
+                    /* falls through */
                 case 1:
                     if (myTokens.get(0).age().compareTo(BigDecimal.valueOf(9)) > 0) {
                         g.setFont(new Font("new font", Font.PLAIN, 11));
                         g.drawString(df.format(myTokens.get(0).age()), x + 11 - 6,
-                                y + 20 + 6);
+                            y + 20 + 6);
                     } else {
                         g.drawString(df.format(myTokens.get(0).age()), x + 11 - 4,
-                                y + 20 + 6);
+                            y + 20 + 6);
                     }
 
                 case 0:
@@ -277,158 +349,209 @@ public class TimedPlaceComponent extends Place {
                     }
                     break;
             }
+        } else{
+            if (marking > 999) {
+                // XXX could be better...
+                g.drawString("#" + marking, x, y + 20);
+            } else if (marking > 99) {
+                g.drawString("#" + marking, x, y + 20);
+            } else if (marking > 9) {
+                g.drawString("#" + marking, x + 2, y + 20);
+            } else if (marking > 0) {
+                g.drawString("#" + marking, x + 6, y + 20);
+            }
         }
-	}
+    }
 
-	public void setInvariant(TimeInvariant inv) {
-		place.setInvariant(inv);
+    public void setInvariant(TimeInvariant inv) {
+        place.setInvariant(inv);
 
-		update(true);
-	}
+        update(true);
+    }
 
-	public void showAgeOfTokens(boolean show) {
-		
-		if (ageOfTokensWindow != null){
-			ageOfTokensWindow.dispose();
-		}
-		
-		// Build interface
-		if (show && isTimed()) {
-			ageOfTokensWindow = new Window(new Frame());
-			ageOfTokensWindow.add(new JTextArea(getStringOfTokens()));
-			ageOfTokensWindow.getComponent(0).setBackground(Color.lightGray);
+    public void showAgeOfTokens(boolean show) {
 
-			// Make window fit contents' preferred size
-			ageOfTokensWindow.pack();
+        if (ageOfTokensWindow != null){
+            ageOfTokensWindow.dispose();
+        }
 
-			// Move window to the middle of the screen
-			ageOfTokensWindow.setLocationRelativeTo(this);
-			int numberOfTokens = place.numberOfTokens();
-			if (numberOfTokens <= 12) {
-				ageOfTokensWindow.setLocation(
-						ageOfTokensWindow.getLocation().x, ageOfTokensWindow
-						.getLocation().y
-						+ 31 + numberOfTokens);
-			} else if (numberOfTokens > 12 && numberOfTokens < 20) {
-				ageOfTokensWindow.setLocation(
-						ageOfTokensWindow.getLocation().x, ageOfTokensWindow
-						.getLocation().y
-						+ 40 + numberOfTokens);
-			} else if (numberOfTokens >= 20 && numberOfTokens <= 35) {
-				ageOfTokensWindow.setLocation(
-						ageOfTokensWindow.getLocation().x, ageOfTokensWindow
-						.getLocation().y
-						+ 35 + numberOfTokens);
-			} else if (numberOfTokens > 35 && numberOfTokens < 40) {
-				ageOfTokensWindow.setLocation(
-						ageOfTokensWindow.getLocation().x, ageOfTokensWindow
-						.getLocation().y
-						+ 40 + numberOfTokens);
-			} else {
-				ageOfTokensWindow.setLocation(
-						ageOfTokensWindow.getLocation().x, ageOfTokensWindow
-						.getLocation().y
-						+ 20 + numberOfTokens);
-			}
-			ageOfTokensWindow.setVisible(show);
-		}
-	}
+        // Build interface
+        if (show && (isTimed() || isColored())) {
+            ageOfTokensWindow = new Window(new Frame());
+            if (isColored() && !isTimed()) {
+                ageOfTokensWindow.add(new JTextArea(getStringOfColoredTokens()));
+            } else if (!isColored() && isTimed()){
+                ageOfTokensWindow.add(new JTextArea(getStringOfTokens()));
+            } else {
+                ageOfTokensWindow.add(new JTextArea(getStringOfColoredTimedTokens()));
 
-	@Override
-	public void showEditor() {
-		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Place", true);
+            }
+            ageOfTokensWindow.getComponent(0).setBackground(Color.lightGray);
 
-		Container contentPane = guiDialog.getContentPane();
+            // Make window fit contents' preferred size
+            ageOfTokensWindow.pack();
 
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+            // Move window to the middle of the screen
+            ageOfTokensWindow.setLocationRelativeTo(this);
+            int numberOfTokens = place.numberOfTokens();
+            if (numberOfTokens <= 12) {
+                ageOfTokensWindow.setLocation(
+                    ageOfTokensWindow.getLocation().x, ageOfTokensWindow
+                        .getLocation().y
+                        + 31 + numberOfTokens);
+            } else if (numberOfTokens > 12 && numberOfTokens < 20) {
+                ageOfTokensWindow.setLocation(
+                    ageOfTokensWindow.getLocation().x, ageOfTokensWindow
+                        .getLocation().y
+                        + 40 + numberOfTokens);
+            } else if (numberOfTokens >= 20 && numberOfTokens <= 35) {
+                ageOfTokensWindow.setLocation(
+                    ageOfTokensWindow.getLocation().x, ageOfTokensWindow
+                        .getLocation().y
+                        + 35 + numberOfTokens);
+            } else if (numberOfTokens > 35 && numberOfTokens < 40) {
+                ageOfTokensWindow.setLocation(
+                    ageOfTokensWindow.getLocation().x, ageOfTokensWindow
+                        .getLocation().y
+                        + 40 + numberOfTokens);
+            } else {
+                ageOfTokensWindow.setLocation(
+                    ageOfTokensWindow.getLocation().x, ageOfTokensWindow
+                        .getLocation().y
+                        + 20 + numberOfTokens);
+            }
+            ageOfTokensWindow.setVisible(show);
+        } else if (show && isColored()) {
 
-		// 2 Add Place editor
-		contentPane.add(new PlaceEditorPanel(guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab())));
+        }
+    }
 
-		guiDialog.setResizable(false);
+    @Override
+    public void showEditor() {
+        // Build interface
+        EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Place", true);
 
-		// Make window fit contents' preferred size
-		guiDialog.pack();
+        Container contentPane = guiDialog.getContentPane();
 
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
-	}
+        // 1 Set layout
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
-	@Override
-	public void update(boolean displayConstantNames) {
-		if(place != null) {
-			getNameLabel().setName(place.name());
+        // 2 Add Place editor
+        JPanel placeEditorPanel = new PlaceEditorPanel(guiDialog, guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab()));
+        contentPane.add(placeEditorPanel);
+        guiDialog.setResizable(true);
 
-			if (!(place.invariant().upperBound() instanceof InfBound)) {
-				getNameLabel().setText("\nInv: " + place.invariant().toString(displayConstantNames));
-			}else{
-				getNameLabel().setText("");
-			}
-			
-			// Handle constant highlighting
-			boolean focusedConstant = false;
-			Bound bound = place.invariant().upperBound();
-			if(bound instanceof ConstantBound){
-				Constant constant = ((ConstantBound) bound).constant();
-				if(constant.hasFocus()){
-					focusedConstant = true;
-				}
-				pnName.setVisible(constant.getVisible());
-			}
-			if(focusedConstant){
-				getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
-			}else{
-				getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
-			}
+        // Make window fit contents' preferred size
+        guiDialog.pack();
 
-			getNameLabel().displayName(attributesVisible);
-			
-		} else {
-			getNameLabel().setName("");
-			getNameLabel().setText("");
-		}
-		repaint();
-	}
+        // Move window to the middle of the screen
+        guiDialog.setLocationRelativeTo(null);
+        guiDialog.setVisible(true);
+    }
 
-	@Override
-	public String toString() {
-		return getName();
-	}
+    @Override
+    public void update(boolean displayConstantNames, boolean alignToGrid) {
 
-	public TimedPlace underlyingPlace() {
-		return place;
-	}
+        if(place != null) {
+            getNameLabel().setName(place.name());
+            if(this.isTimed()){
+                StringBuilder buffer = new StringBuilder();
+                if (!(place.invariant().upperBound() instanceof InfBound)) {
+                    buffer.append("\nInv: " + place.invariant().toString(displayConstantNames));
+                }
 
-	public void setUnderlyingPlace(TimedPlace place) {
-		if(this.place != null && listener != null){
-			this.place.removeTimedPlaceListener(listener);
-		}
-		place.addTimedPlaceListener(listener);
-		this.place = place;
-		this.update(true);
-	}
+                getNameLabel().setText(buffer.toString());
 
-	public int getNumberOfTokens() {
-		return place.numberOfTokens(); 
-	}
+            }
+            if (this.isColored()){
+                StringBuilder buffer = new StringBuilder();
+                String placeColorType = "[" + place.getColorType().getName() +"]";
+                buffer.append("\n"+ placeColorType);
+                if(isTimed()) {
+                    //Add default invariant
+                    buffer.append("\nInv: " + place.invariant().toString(displayConstantNames));
+                    if (place.getCtiList() != null) {
+                        //Add color specific invariants
+                        for (ColoredTimeInvariant cti : place.getCtiList()) {
+                            if (cti != null) {
+                                buffer.append("\n" + cti.toString());
+                            }
+                        }
+                    }
+                }
 
-	@Override
-	public void setName(String nameInput) {
-		place.setName(nameInput);
-		super.setName(nameInput);
-	}
+                if (CreateGui.getApp().showColoredTokens()) {
+                    if(underlyingPlace().getTokensAsExpression() != null){
+                        buffer.append("\n" + ((AddExpression)underlyingPlace().getTokensAsExpression()).toTokenString());
+                    }
+                }
 
-	private static Shape createDashedOutline(){
-		return new Ellipse2D.Double(-Pipe.DASHED_PADDING/2, -Pipe.DASHED_PADDING/2, DIAMETER + Pipe.DASHED_PADDING, DIAMETER + Pipe.DASHED_PADDING);
-	}
+                getNameLabel().setText(buffer.toString());
+            }
 
-	public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), lens);
-		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 
-		return placeComponent;
-	}
+
+            // Handle constant highlighting
+            boolean focusedConstant = false;
+            Bound bound = place.invariant().upperBound();
+            if(bound instanceof ConstantBound){
+                Constant constant = ((ConstantBound) bound).constant();
+                if(constant.hasFocus()){
+                    focusedConstant = true;
+                }
+                pnName.setVisible(constant.getVisible());
+            }
+            if(focusedConstant){
+                getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
+            }else{
+                getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+            }
+
+            getNameLabel().displayName(attributesVisible);
+
+        } else {
+            getNameLabel().setName("");
+            getNameLabel().setText("");
+        }
+        repaint();
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    public TimedPlace underlyingPlace() {
+        return place;
+    }
+
+    public void setUnderlyingPlace(TimedPlace place) {
+        if(this.place != null && listener != null){
+            this.place.removeTimedPlaceListener(listener);
+        }
+        place.addTimedPlaceListener(listener);
+        this.place = place;
+        this.update(true);
+    }
+
+    public int getNumberOfTokens() {
+        return place.numberOfTokens();
+    }
+
+    @Override
+    public void setName(String nameInput) {
+        place.setName(nameInput);
+        super.setName(nameInput);
+    }
+
+    private static Shape createDashedOutline(){
+        return new Ellipse2D.Double(-Pipe.DASHED_PADDING/2, -Pipe.DASHED_PADDING/2, DIAMETER + Pipe.DASHED_PADDING, DIAMETER + Pipe.DASHED_PADDING);
+    }
+
+    public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
+        TimedPlaceComponent placeComponent = new TimedPlaceComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), lens);
+        placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
+
+        return placeComponent;
+    }
 }

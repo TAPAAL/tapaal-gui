@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -13,6 +14,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.gui.TabContent;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -82,7 +84,6 @@ public class TapnLegacyXmlLoader {
 	private boolean firstInhibitorIntervalWarning = true;
 	private boolean firstPlaceRenameWarning = true;
 	private final IdResolver idResolver = new IdResolver();
-
     private final Collection<String> messages = new ArrayList<>(10);
     private final TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
 
@@ -136,7 +137,7 @@ public class TapnLegacyXmlLoader {
 			}
 		}
 
-		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants);
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, new ArrayList<>());
 		NodeList nets = tapnDoc.getElementsByTagName("net");
 		
 		if(nets.getLength() <= 0)
@@ -318,7 +319,7 @@ public class TapnLegacyXmlLoader {
 			firstInhibitorIntervalWarning = false;
 		}
 		
-		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval);
+		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval,null);
 
 		tempArc.setUnderlyingArc(inhibArc);
 		guiModel.addPetriNetObject(tempArc);
@@ -530,7 +531,7 @@ public class TapnLegacyXmlLoader {
 		guiModel.addPetriNetObject(transition);
 		tapn.add(t);
 	}
-
+    //TODO: implement color
     private void parseAndAddPlaceAsOldFormat(Element element, TimedMarking marking) throws FormatException {
         int positionXInput = (int) getPositionAttribute(element, "x");
         int positionYInput = (int) getPositionAttribute(element, "y");
@@ -560,14 +561,14 @@ public class TapnLegacyXmlLoader {
 
         TimedPlaceComponent place = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, lens);
 
-        LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
+        LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), ColorType.COLORTYPE_DOT);
         tapn.add(p);
 
         place.setUnderlyingPlace(p);
         guiModel.addPetriNetObject(place);
 
         for (int i = 0; i < initialMarkingInput; i++) {
-            marking.add(new TimedToken(p, new BigDecimal(0.0)));
+            marking.add(new TimedToken(p, new BigDecimal(0.0), ColorType.COLORTYPE_DOT.getFirstColor()));
         }
     }
 
