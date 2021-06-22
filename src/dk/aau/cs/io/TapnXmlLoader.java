@@ -212,8 +212,7 @@ public class TapnXmlLoader {
 		}
 		SharedPlace place = new SharedPlace(name, invariant);
         place.setCurrentMarking(marking);
-		place.addTokens(numberOfTokens);
-
+		//place.addTokens(numberOfTokens);
 
 		return place;
 	}
