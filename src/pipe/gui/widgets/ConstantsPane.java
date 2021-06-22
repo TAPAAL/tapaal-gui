@@ -137,11 +137,13 @@ public class ConstantsPane extends JPanel implements SidePane {
                     removeBtn.setEnabled(false);
                     editBtn.setEnabled(false);
                     moveDownButton.setEnabled(false);
+                    sortButton.setEnabled(false);
                     return;
                 }
                 else  {
                     removeBtn.setEnabled(true);
                     editBtn.setEnabled(true);
+                    sortButton.setEnabled(true);
                 }
 
                 int index = list.getSelectedIndex();

@@ -841,7 +841,7 @@ public class TimedArcPetriNetNetwork {
         }
         return messages.isEmpty();
     }
-    //TODO: Refactor the all these functions
+
     public ColorType[] sortColorTypes() {
         ColorType[] oldorder = colorTypes.toArray(new ColorType[0]);
         Collections.sort(colorTypes, new StringComparator());
