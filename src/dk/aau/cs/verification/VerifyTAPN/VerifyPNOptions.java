@@ -62,10 +62,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		result.append(searchMap.get(searchOption));
 		switch(getModelReduction()){
 		case AGGRESSIVE:
+			result.append(" -r 1 ");
             if (this.queryCategory == QueryCategory.LTL) {
                 break;
             }
-			result.append(" -r 1 ");
             String writeReducedCMD = " --write-reduced " +pathToReducedNet;
             result.append(writeReducedCMD);
 			break;
@@ -74,6 +74,9 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 			break;
 		case BOUNDPRESERVING:
 			result.append(" -r 2 ");
+            if (this.queryCategory == QueryCategory.LTL) {
+                break;
+            }
             writeReducedCMD = " --write-reduced " +pathToReducedNet;
             result.append(writeReducedCMD);
 			break;
