@@ -7,7 +7,6 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
 
-import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.NameMapping;
 import pipe.dataLayer.DataLayer;
