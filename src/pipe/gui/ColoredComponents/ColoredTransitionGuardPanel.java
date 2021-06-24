@@ -681,8 +681,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             lessThanButton.setEnabled(false);
             succButton.setEnabled(false);
             predButton.setEnabled(false);
-            colorCombobox.setEnabled(false);
-            colorTypeCombobox.setEnabled(false);
             addColorButton.setEnabled(false);
         }
         else if (currentSelection.getObject() instanceof ColorExpression) {
@@ -715,8 +713,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             lessThanButton.setEnabled(true);
             succButton.setEnabled(false);
             predButton.setEnabled(false);
-            colorCombobox.setEnabled(false);
-            colorTypeCombobox.setEnabled(false);
             addColorButton.setEnabled(false);
 
         }
@@ -760,7 +756,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         updateEnabledButtons();
         updateColorOptions();
     }
-    
+
     public void updateColorOptions(){
         if(currentSelection.getObject() instanceof ColorExpression) {
             ColorExpression exprToCheck = ((ColorExpression) currentSelection.getObject()).getButtomColorExpression();
