@@ -669,6 +669,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     private void updateEnabledButtons() {
+        colorCombobox.setEnabled(true);
+        colorTypeCombobox.setEnabled(true);
         if(currentSelection == null){
             andButton.setEnabled(false);
             orButton.setEnabled(false);
@@ -697,9 +699,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 succButton.setEnabled(true);
                 predButton.setEnabled(true);
             }
-            colorCombobox.setEnabled(true);
-            colorTypeCombobox.setEnabled(true);
-            addColorButton.setEnabled(true);;
+            addColorButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof GuardExpression) {
             andButton.setEnabled(true);

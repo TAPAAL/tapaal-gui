@@ -209,4 +209,12 @@ public abstract class ColorComboboxPanel extends JPanel {
     private void removeOldComboBoxes(){
         comboBoxPanel.removeAll();
     }
+
+    @Override
+    public void setEnabled(boolean enabled){
+        colorcomboBoxPanel.setEnabled(enabled);
+        for(var combobox : colorTypeComboBoxesArray){
+            combobox.setEnabled(enabled);
+        }
+    }
 }
