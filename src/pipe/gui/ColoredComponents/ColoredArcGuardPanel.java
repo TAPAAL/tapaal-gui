@@ -1,6 +1,5 @@
 package pipe.gui.ColoredComponents;
 
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.Colored.SetArcExpressionCommand;
 import dk.aau.cs.gui.undo.Colored.SetColoredArcIntervalsCommand;
@@ -17,7 +16,6 @@ import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TransportArc;
-import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -45,8 +43,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     boolean isInhibitorArc = false;
     Context context;
     private Integer transportWeight;
-    private ColorExpression transportInputExpr;
-    private ColorExpression transportOutputExpr;
     ColoredArcGuardPanel.ExpressionConstructionUndoManager undoManager;
     UndoableEditSupport undoSupport;
 
@@ -296,24 +292,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         add(nonDefaultArcColorIntervalPanel, gbc);
-    }
-
-    private void initTransportArcExpressionPanel(){
-        transportExprTabbedPane = new JTabbedPane();
-        inputPanel = new ColorExpressionDialogPanel(context, transportInputExpr, true, colorType);
-        outputPanel = new ColorExpressionDialogPanel(context, transportOutputExpr, true, colorType);
-
-        transportExprTabbedPane.add(inputPanel, "input");
-        transportExprTabbedPane.add(outputPanel, "output");
-        if(((TimedTransportArcComponent)objectToBeEdited).getTarget() instanceof Place){
-            transportExprTabbedPane.setSelectedIndex(1);
-        }
-
-        GridBagConstraints gbc = GridBagHelper.as(0, 4, GridBagHelper.Anchor.WEST, new Insets(5, 10, 5, 10));
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1.0;
-        add(transportExprTabbedPane, gbc);
-
     }
 
     private void initRegularArcExpressionPanel(){
@@ -1100,7 +1078,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private JPanel regularArcExprPanel;
     JPanel nonDefaultArcColorIntervalPanel;
     JPanel transportWeightPanel;
-    JTabbedPane transportExprTabbedPane;
     DefaultListModel timeConstraintListModel;
     JList timeConstraintList;
     private ExprStringPosition currentSelection = null;
@@ -1123,8 +1100,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     JSpinner scalarJSpinner;
     JButton addExpressionButton;
     SpinnerNumberModel numberModel;
-    ColorExpressionDialogPanel inputPanel;
-    ColorExpressionDialogPanel outputPanel;
     JSpinner colorExpressionWeightSpinner;
     ColorComboboxPanel colorIntervalComboboxPanel;
     ColoredTimeIntervalDialogPanel intervalEditorPanel;

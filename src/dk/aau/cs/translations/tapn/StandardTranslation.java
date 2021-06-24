@@ -80,7 +80,6 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 		if(model.marking().size() + extraTokens == 0){
 			LocalTimedPlace extraPlace = new LocalTimedPlace("EXTRA23425242_23426894"); 
 			model.add(extraPlace);
-			//TODO: how to handle Colors?
 			model.addToken(new TimedToken(extraPlace, ColorType.COLORTYPE_DOT.getFirstColor()));
 		}
 		

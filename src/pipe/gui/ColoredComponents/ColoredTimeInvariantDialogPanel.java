@@ -158,7 +158,7 @@ public abstract class ColoredTimeInvariantDialogPanel extends JPanel {
         invRelationNormal = new JComboBox(new String[] { "<=", "<" });
         invRelationConstant = new JComboBox(new String[] { "<=", "<" });
         //invariantSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-        invariantSpinner = new CustomJSpinner(0); //TODO: missing okButton as parameter, mby?
+        invariantSpinner = new CustomJSpinner(0);
         invariantSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if(!invariantInf.isSelected()){

@@ -70,7 +70,7 @@ public class OverApproximation implements ITAPNApproximation {
 			 oldInterval.isUpperBoundNonStrict()
 			 );
 	}
-	//TODO: how to handle colors
+
 	public void makeTraceTAPN(Tuple<TimedArcPetriNet, NameMapping> transformedModel, VerificationResult<TAPNNetworkTrace> result, dk.aau.cs.model.tapn.TAPNQuery query) {
 		TimedArcPetriNet net = transformedModel.value1();
                 

@@ -118,7 +118,6 @@ public class TapnXmlLoader {
 
 
 		ConstantStore constants = new ConstantStore(parseConstants(doc));
-        //TODO: parse colors
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, new ArrayList<>());
         NodeList declarations = doc.getElementsByTagName("declaration");
 
@@ -774,8 +773,6 @@ public class TapnXmlLoader {
 				TimedPlace destPlace = template.model().getPlaceByName(postsetTransportArc.getTarget().getName());
 
                 TimeInterval timeInterval = TimeInterval.parse(inscriptionSplit[0],	constants);
-                //TODO:this parsing needs serious work
-                //ctiList.add(ColoredTimeInterval.parse(inscriptionSplit[0], constants, sourcePlace.getColorType().getColors()));
 
 				assert (sourcePlace != null);
 				assert (trans != null);

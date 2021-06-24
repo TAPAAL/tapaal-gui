@@ -54,7 +54,6 @@ public class Degree2Converter {
 		
 		TimedPlace plock = new LocalTimedPlace(PLOCK);
 		degree2Model.add(plock);
-		//TODO: how to handle colors?
 		degree2Model.addToken(new TimedToken(plock, ColorType.COLORTYPE_DOT.getFirstColor()));
 
 		
@@ -129,7 +128,6 @@ public class Degree2Converter {
 			}
 
 			String ptName = String.format(P_T_IN_FORMAT, transitionName, i);
-			//TODO: what should colored time invariant be here??
 			LocalTimedPlace pt = new LocalTimedPlace(ptName, new TimeInvariant(true, new IntBound(0)), ColorType.COLORTYPE_DOT);
 			degree2Model.add(pt);
 
@@ -138,7 +136,6 @@ public class Degree2Converter {
 				degree2Model.add(new TimedInputArc(previousPlace, tiin, TimeInterval.ZERO_INF));
 			}
 			previousPlace = pt;
-            //TODO: what should colored time invariant be here??
             String holdingPlaceName = String.format(HOLDING_PLACE_FORMAT, transitionName, i);
 			degree2Model.add(new LocalTimedPlace(holdingPlaceName, TimeInvariant.LESS_THAN_INFINITY, ColorType.COLORTYPE_DOT));
 		}
@@ -162,7 +159,6 @@ public class Degree2Converter {
 			degree2Model.add(tiOut);
 
 			String ptOutName = String.format(P_T_OUT_FORMAT, transitionName, i);
-            //TODO: what should colored time invariant be here??
             TimedPlace ptOut = new LocalTimedPlace(ptOutName, new TimeInvariant(true, new IntBound(0)), ColorType.COLORTYPE_DOT);
 			degree2Model.add(ptOut);
 

@@ -101,7 +101,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         //updateSelection();
         updateColorType();
 
-        //TODO: implement these
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
         undoManager = new ColoredTransitionGuardPanel.ExpressionConstructionUndoManager();
@@ -277,8 +276,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         andButton = new JButton("AND");
         orButton = new JButton("OR");
         notButton = new JButton("NOT");
-
-        //TODO: set tooltip for all three buttons
 
         logicButtonGroup.add(andButton);
         logicButtonGroup.add(orButton);
@@ -486,8 +483,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         editExprButton = new JButton("Edit Expression");
         editExprButton.setEnabled(true);
 
-        //TODO: add tooltips to buttons
-
         editButtonsGroup.add(deleteExprSelectionButton);
         editButtonsGroup.add(resetExprButton);
         editButtonsGroup.add(undoButton);
@@ -585,8 +580,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.gridy = 3;
         editPanel.add(editExprButton, gbc);
 
-        //TODO: Actionlisteners
-
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 1;
@@ -671,14 +664,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         if (guard != null) {
             newProperty = guard.copy();
         }
+
         updateSelection(newProperty);
-    }
-
-    private void addPropertyToExpr(Expression property) {
-
-        //TODO: add undo functionality - line 1447 in CTLQueryDialog
-        newProperty =  newProperty.replace(currentSelection.getObject(), property);
-
     }
 
     private void updateEnabledButtons() {
@@ -772,8 +759,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         updateEnabledButtons();
         updateColorOptions();
-        //TODO: updateexprButtonsAccordingToSelection; line 573
     }
+    
     public void updateColorOptions(){
         if(currentSelection.getObject() instanceof ColorExpression) {
             ColorExpression exprToCheck = ((ColorExpression) currentSelection.getObject()).getButtomColorExpression();

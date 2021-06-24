@@ -117,16 +117,17 @@ public class TimedInputArc extends TAPNElement {
 		source = place;		
 	}
 
-	//TODO: Add color properties to this
 	@Override
 	public String toString() {
-		return "From " + source.name() + " to " + destination.name() + " with interval " + interval().toString();
+		return "From " + source.name() + " to " + destination.name() + " with interval " + interval().toString() + " and arc expression " + expression.toString();
 	}
 
     public String fromTo() {
         return "From " + source.name() + " to " + destination.name();
     }
-	//TODO: Add color properties to this
+
+    //TODO: If we ever want to simulate colored nets we need to add colors to this
+    // for now it is okay since we cannot enter colored simulation
 	public List<TimeInterval> getDEnabledInterval(){
 		ArrayList<TimeInterval> result = new ArrayList<TimeInterval>();
 		BigDecimal iLow = IntervalOperations.getRatBound(interval.lowerBound()).getBound();

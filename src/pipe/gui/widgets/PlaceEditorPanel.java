@@ -679,7 +679,6 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private void doOkColors(int newMarking){
-        //TODO: Look at this
         if(!place.isColored()){
             if(newMarking != place.underlyingPlace().numberOfTokens()){
                 Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());

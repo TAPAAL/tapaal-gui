@@ -30,37 +30,30 @@ public class ColorTypeDialogPanel extends JPanel {
     private static final String rangeOfIntegers = "Range of Integers";
     private static final String productColor = "Product Color";
     private boolean rangeOfIntegersPanelEnabled = false;
-    private TimedArcPetriNetNetwork network;
+    private final TimedArcPetriNetNetwork network;
     private EscapableDialog dialog;
     private List<ColorType> colorTypes;
     private ColorType oldColorType;
-    private String oldName;
-    private ConstantsPane.ColorTypesListModel colorTypesListModel;
-    private UndoManager undoManager;
+    private final String oldName;
+    private final ConstantsPane.ColorTypesListModel colorTypesListModel;
+    private final UndoManager undoManager;
 
     private JLabel nameLabel;
     private JTextField nameTextField;
     private JComboBox colorTypeComboBox;
     private JLabel colorTypeLabel;
-    private JList allColorTypes;
-    private JLabel productLabel;
     private DefaultListModel productModel;
-    private JButton productAddButton;
     private JButton productRemoveButton;
     private JList productColorTypeList;
     private JComboBox productTypeComboBox;
 
-    private JLabel lowerBoundLabel;
-    private JLabel upperBoundLabel;
     private JTextField lowerBoundTextField;
     private JTextField upperBoundTextField;
-    private JLabel enumNameLabel;
     private JTextField enumTextField;
     private JButton enumAddButton;
     private JScrollPane enumListScroller;
     private JPanel cyclicAndFiniteEnumerationPanel;
     private JList enumList;
-    private JPanel container;
     private JPanel rangeOfIntegersPanel;
     private JPanel productTypePanel;
     private DefaultListModel cyclicModel;
@@ -146,7 +139,7 @@ public class ColorTypeDialogPanel extends JPanel {
     }
 
     private void initComponents()  {
-        container = new JPanel();
+        JPanel container = new JPanel();
         container.setLayout(new GridBagLayout());
 
         JPanel nameAndTypePanel = createNameAndTypePanel();
@@ -350,7 +343,7 @@ public class ColorTypeDialogPanel extends JPanel {
         rangeOfIntegers.setLayout(new GridBagLayout());
         rangeOfIntegers.setBorder(BorderFactory.createTitledBorder("Range Of Integers"));
 
-        lowerBoundLabel = new JLabel("Lower Bound: ");
+        JLabel lowerBoundLabel = new JLabel("Lower Bound: ");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -374,7 +367,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.insets = new Insets(4, 4, 2, 4);
         rangeOfIntegers.add(lowerBoundTextField, gbc);
 
-        upperBoundLabel = new JLabel("Upper Bound: ");
+        JLabel upperBoundLabel = new JLabel("Upper Bound: ");
         gbc.gridx = 3;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
@@ -408,7 +401,7 @@ public class ColorTypeDialogPanel extends JPanel {
         JPanel firstRow = new JPanel();
         firstRow.setLayout(new GridBagLayout());
 
-        enumNameLabel = new JLabel("Name: ");
+        JLabel enumNameLabel = new JLabel("Name: ");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -564,7 +557,7 @@ public class ColorTypeDialogPanel extends JPanel {
         productTypePanel.setBorder(BorderFactory.createTitledBorder("Product Type/ Domain"));
         GridBagConstraints gbc = new GridBagConstraints();
 
-        productLabel = new JLabel("Color types: ");
+        JLabel productLabel = new JLabel("Color types: ");
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
@@ -573,7 +566,7 @@ public class ColorTypeDialogPanel extends JPanel {
 
         productModel = new DefaultListModel();
 
-        allColorTypes = new JList();
+        JList allColorTypes = new JList();
 
 
         colorTypes = new ArrayList<>();
@@ -636,7 +629,7 @@ public class ColorTypeDialogPanel extends JPanel {
         productButtonPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
-        productAddButton = new JButton("Add");
+        JButton productAddButton = new JButton("Add");
         productAddButton.setMnemonic(KeyEvent.VK_A);
         gbc.gridx = 1;
         gbc.gridy = 0;

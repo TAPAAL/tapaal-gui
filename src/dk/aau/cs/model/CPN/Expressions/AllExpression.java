@@ -31,7 +31,6 @@ public class AllExpression extends ColorExpression {
         this.sort = sort;
     }
 
-    //TODO unsure about this
     public List<Color> eval(ExpressionContext context) {
         return sort.getColors();
     }

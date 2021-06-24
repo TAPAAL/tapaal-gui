@@ -35,7 +35,6 @@ public class MakePlaceNewSharedCommand extends Command {
 	private final ColorType colorType;
 	private final ArcExpression tokenExpression;
 
-	//TODO: Add color type to this probably
 	public MakePlaceNewSharedCommand(TimedArcPetriNet tapn, String newSharedName, TimedPlace place, TimedPlaceComponent placeComponent,
                                      TabContent currentTab, boolean multiShare){
 		Require.that(tapn != null, "tapn cannot be null");

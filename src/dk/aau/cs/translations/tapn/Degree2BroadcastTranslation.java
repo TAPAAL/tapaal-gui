@@ -93,7 +93,6 @@ public class Degree2BroadcastTranslation implements
 		if(model.marking().size() + extraTokens == 0){
 			LocalTimedPlace extraPlace = new LocalTimedPlace("EXTRA3242342_234765"); 
 			model.add(extraPlace);
-            //TODO: how to handle colors
             model.addToken(new TimedToken(extraPlace, ColorType.COLORTYPE_DOT.getFirstColor()));
 		}
 		
@@ -145,7 +144,6 @@ public class Degree2BroadcastTranslation implements
 			for (int i = 0; i < extraTokens; i++) {
 				clearLocationMappings();
 				clearArcMappings();
-                //TODO: how to handle colors
 				TimedAutomaton tokenTemplate = createTokenAutomaton(degree2Model, conservativeModel, new TimedToken(bottom, ColorType.COLORTYPE_DOT.getFirstColor()));
 				tokenTemplate.setInitLocation(getLocationByName(P_CAPACITY));
 				nta.addTimedAutomaton(tokenTemplate);

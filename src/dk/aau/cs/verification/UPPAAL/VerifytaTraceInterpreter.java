@@ -91,7 +91,7 @@ public class VerifytaTraceInterpreter {
 
 		return new TimedTransitionStep(transition,tokens);
 	}
-    //TODO: how to handle colors?
+
 	private List<TimedToken> parseConsumedTokens(List<TransitionFiring> actions) {
 		ArrayList<TimedToken> tokens = new ArrayList<TimedToken>();
 
@@ -113,7 +113,7 @@ public class VerifytaTraceInterpreter {
 
 		return tokens;
 	}
-    //TODO: how to handle colors?
+
 	private List<TimedToken> parseConsumedTokens(TransitionFiring start, TransitionFiring end) {
 		ArrayList<TimedToken> tokens = new ArrayList<TimedToken>();
 

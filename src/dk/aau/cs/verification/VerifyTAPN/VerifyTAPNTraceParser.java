@@ -70,7 +70,7 @@ public class VerifyTAPNTraceParser {
 	
 		return trace;
 	}
-    //TODO: how to handle colors?
+
 	private TimedTransitionStep parseTransitionStep(Element element) {
 		TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
 		

@@ -312,7 +312,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         }
     }
 	private void highlightConstant(int index){
-        //TODO: Implement for these
+        //TODO: Implement for colors and variables
         if(isDisplayingColorTypes() || isDisplayingVariables()){
 	        return;
         }
@@ -335,7 +335,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	}
 	
 	public void removeConstantHighlights(){
-	    //TODO: Implement for these
+	    //TODO: Implement for colors and variables
         if(isDisplayingColorTypes() || isDisplayingVariables()){
             return;
         }

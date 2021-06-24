@@ -170,12 +170,12 @@ public class TAPNComposer implements ITAPNComposer {
 			String uniquePlaceName = (!singleComponentNoPrefix || model.activeTemplates().size() > 1) ? composedPlaceName(place) : place.name(); 
 			
 			LocalTimedPlace constructedPlace = null;
-			//TODO: add cti list
-			if (place.invariant().upperBound() instanceof Bound.InfBound) {					
+			if (place.invariant().upperBound() instanceof Bound.InfBound) {
 				constructedPlace = new LocalTimedPlace(uniquePlaceName, place.invariant(), place.getColorType());
 			} else {
 				constructedPlace = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(place.invariant().isUpperNonstrict(), new IntBound(place.invariant().upperBound().value())), place.getColorType());
 			}
+			constructedPlace.setCtiList(place.getCtiList());
 			
 			constructedModel.add(constructedPlace);
 			mapping.addMappingForShared(place.name(), uniquePlaceName);
@@ -284,8 +284,8 @@ public class TAPNComposer implements ITAPNComposer {
 						} else {
 							uniqueTransitionName = timedTransition.name();
 						}
-						//TODO: check if guard needs to be copied
-						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent(), timedTransition.getGuard());
+
+						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent(), timedTransition.getGuard().copy());
 						if (timedTransition.isUncontrollable()) {
 						    transition.setUncontrollable(true);
                         }

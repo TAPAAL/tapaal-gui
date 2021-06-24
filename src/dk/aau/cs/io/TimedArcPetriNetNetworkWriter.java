@@ -547,7 +547,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 				arcElement.setAttribute("inscription", getGuardAsString((TimedInputArcComponent)inputArc));	
 				arcElement.setAttribute("weight", inputArc.getWeight().nameForSaving(true)+"");
 				if(!(inputArc instanceof TimedInhibitorArcComponent)){
-				    //TODO: Same as with places and invariants, nasty to have two types of intervals
                     appendArcIntervals((TimedInputArcComponent)inputArc, document, arcElement);
                 }
 			} else {

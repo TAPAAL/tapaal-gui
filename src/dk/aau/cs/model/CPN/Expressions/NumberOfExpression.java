@@ -88,7 +88,7 @@ public class NumberOfExpression extends ArcExpression {
     public void expressionType() {
 
     }
-    //TODO: is this correct with AllExpressions to?
+
     public Integer weight() {
         return number * color.size();
     }

@@ -84,7 +84,6 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 		if(model.marking().size() + extraTokens == 0){
 			LocalTimedPlace extraPlace = new LocalTimedPlace("EXTRA234526_3452365"); 
 			model.add(extraPlace);
-			//TODO: how to handle colors
 			model.addToken(new TimedToken(extraPlace, ColorType.COLORTYPE_DOT.getFirstColor()));
 		}
 		

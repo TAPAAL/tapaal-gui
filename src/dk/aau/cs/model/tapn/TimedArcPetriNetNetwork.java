@@ -449,8 +449,6 @@ public class TimedArcPetriNetNetwork {
 		sharedTransitions.addAll(Arrays.asList(oldOrder));
 	}
 
-	//TODO: maybe should be more extensive than this
-    //E.g. check expressions, invariants, intervals and tokens
 	public boolean isColored(){
 	    for (TimedArcPetriNet tapn : tapns){
 	        if(tapn.isColored()){
@@ -844,14 +842,12 @@ public class TimedArcPetriNetNetwork {
 
     public ColorType[] sortColorTypes() {
         ColorType[] oldorder = colorTypes.toArray(new ColorType[0]);
-        Collections.sort(colorTypes, new StringComparator());
+        colorTypes.sort(new StringComparator());
         return oldorder;
     }
     public void undoSort(ColorType[] oldorder) {
         colorTypes.clear();
-        for (ColorType element: oldorder) {
-            colorTypes.add(element);
-        }
+        colorTypes.addAll(Arrays.asList(oldorder));
     }
     public void swapColorTypes(int currentIndex, int newIndex) {
         ColorType temp = colorTypes.get(currentIndex);
@@ -867,15 +863,13 @@ public class TimedArcPetriNetNetwork {
 
     public Variable[] sortVariables() {
         Variable[] oldOrder = variables.toArray(new Variable[0]);
-        Collections.sort(variables, new StringComparator());
+        variables.sort(new StringComparator());
         return oldOrder;
     }
 
     public void undoSort(Variable[] oldOrder) {
         variables.clear();
-        for (Variable element: oldOrder) {
-            variables.add(element);
-        }
+        variables.addAll(Arrays.asList(oldOrder));
     }
 
     public ExpressionContext getContext(){

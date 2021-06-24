@@ -157,7 +157,6 @@ public class ProductType extends ColorType {
     public Color getColor(Vector<Color> colors) {
         Color result = colorCache.get(colors);
         if (result == null) {
-            //TODO: Figure out id
             result = new Color(this, 0, colors);
             colorCache.put(colors, result);
         }

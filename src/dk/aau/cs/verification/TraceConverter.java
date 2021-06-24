@@ -65,7 +65,7 @@ public class TraceConverter {
 		}
 		return decomposedAction;
 	}
-    //TODO: how to handle colors?
+
 	private TAPNNetworkTraceStep decomposeTransitionFiring(TAPNNetworkTimedTransitionStep transitionFiring) {
 		TimedTransition transition = transitionFiring.getTransition().isShared() ? tapnNetwork.getSharedTransitionByName(transitionFiring.getTransition().name()).transitions().iterator().next() 
 				: tapnNetwork.getTAPNByName(transitionFiring.getTransition().model().name()).getTransitionByName(transitionFiring.getTransition().name());

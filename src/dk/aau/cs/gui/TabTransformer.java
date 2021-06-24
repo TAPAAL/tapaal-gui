@@ -55,7 +55,6 @@ public class TabTransformer {
             // Make transitions non-urgent
             for(TimedTransition transition : template.model().transitions()){
                 transition.setUrgent(false);
-                //TODO: what is default guard?
             }
 
             for(Arc arc : template.guiModel().getArcs()){
@@ -219,7 +218,6 @@ public class TabTransformer {
             }
 
             for (TimedTransition transition : template.model().transitions()) {
-                //TODO: what is the default guard
                 transition.setGuard(null);
             }
 

@@ -291,11 +291,9 @@ public class VariablesDialogPanel extends JPanel {
         }
         Command cmd;
         if (!oldName.equals("")) {
-            //TODO MAKE SURE THAT ID DOES NOT DESTROY ANYTHING
             cmd = new UpdateVariableCommand(variable, nameTextField.getText(), colorTypes.get(colorTypeComboBox.getSelectedIndex()), listModel);
         }
         else {
-            //TODO SAME AS THE ONE ABOVE
             cmd = new AddVariableCommand(new Variable(nameTextField.getText(), "Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()),
                 network, listModel, network.variables().size());
             //listModel.addElement(new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()));

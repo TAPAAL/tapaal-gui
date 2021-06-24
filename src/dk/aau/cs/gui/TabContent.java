@@ -1745,7 +1745,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             updateFeatureText();
         }
     }
-    //TODO: check for color features
+
     @Override
     public void changeColorFeature(boolean isColor) {
         if (isColor != lens.isColored()) {
@@ -2878,7 +2878,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         private void timedPlaceMouseWheelWithShift(TimedPlaceComponent p, MouseWheelEvent e) {
-            //TODO: how to handle if lens is colored??
+            //If the net is colored we do nothing
             if(!lens.isColored()) {
                 if (p.isSelected()) {
                     if (e.getWheelRotation() < 0) {

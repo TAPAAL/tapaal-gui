@@ -6,7 +6,6 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import java.util.Vector;
 
 // TODO: Fix this to work on the model class instead of the GUI class
-//TODO: add colors to this
 public class TimedPlaceMarkingEdit extends Command {
 	private final int numberOfTokens;
 	private final TimedPlaceComponent timedPlaceComponent;

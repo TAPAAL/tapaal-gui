@@ -337,7 +337,8 @@ public class TimedTransition extends TAPNElement {
 		return true;
 	}
 
-	//TODO: parse arc expression and calculate new colors also
+    //TODO: If we ever want to simulate colored nets we need to add colors to this
+    // for now it is okay since we cannot enter colored simulation
 	public List<TimedToken> calculateProducedTokensFrom(List<TimedToken> consumedTokens) {
 		// Assume that tokens enables transition
 

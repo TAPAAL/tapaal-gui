@@ -87,7 +87,6 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		if(model.marking().size() + extraTokens == 0){
 			LocalTimedPlace extraPlace = new LocalTimedPlace("EXTRA434723_324"); 
 			model.add(extraPlace);
-            //TODO: how to handle colors
             model.addToken(new TimedToken(extraPlace, ColorType.COLORTYPE_DOT.getFirstColor()));
 		}
 		

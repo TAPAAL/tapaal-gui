@@ -82,7 +82,7 @@ public class InequalityExpression extends GuardExpression implements LeftRightGu
 
     @Override
     public GuardExpression copy() {
-        return null;
+        return new InequalityExpression(left.copy(), right.copy());
     }
 
     @Override
