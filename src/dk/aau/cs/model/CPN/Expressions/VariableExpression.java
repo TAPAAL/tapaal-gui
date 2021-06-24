@@ -84,7 +84,7 @@ public class VariableExpression extends ColorExpression {
 
     @Override
     public VariableExpression deepCopy() {
-        return new VariableExpression(new Variable(this.variable.getName(), this.variable.getColorType().copy()));
+        return new VariableExpression(new Variable(this.variable.getName(),this.variable.getId(), this.variable.getColorType()));
     }
 
     @Override
