@@ -2,17 +2,15 @@ package dk.aau.cs.model.CPN;
 
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.TupleExpression;
-import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 
 import java.util.HashMap;
 import java.util.Vector;
 
 public class ProductType extends ColorType {
 
-    private Vector<ColorType> constituents = new Vector<ColorType>();
-    private String name;
-    private String id;
-    private HashMap<Vector<Color>, Color> colorCache = new HashMap<Vector<Color>, Color>();
+    private Vector<ColorType> constituents = new Vector<>();
+    private final String name;
+    private final HashMap<Vector<Color>, Color> colorCache = new HashMap<>();
 
     @Override
     public Integer size() {
@@ -43,11 +41,7 @@ public class ProductType extends ColorType {
         super(name);
         this.name = name;
     }
-    public ProductType(String name, String id) {
-        super(name, id);
-        this.name = name;
-        this.id = id;
-    }
+
     public boolean contains(ColorType colorType){
         for (ColorType ct : constituents){
             if(ct.equals(colorType)){
@@ -68,13 +62,13 @@ public class ProductType extends ColorType {
     }
 
     public String toString() {
-        String out = "<html>Domain: " + name + "<b> is </b> &lt;";
+        StringBuilder out = new StringBuilder("<html>Domain: " + name + "<b> is </b> &lt;");
         for (ColorType element : constituents) {
-            out += element.getName() + ", ";
+            out.append(element.getName()).append(", ");
         }
-        out = out.substring(0, out.length() -2);
-        out += "&gt; </html>";
-        return out;
+        out = new StringBuilder(out.substring(0, out.length() - 2));
+        out.append("&gt; </html>");
+        return out.toString();
     }
 
     private int getConstituentCombinationSize(){
@@ -112,7 +106,6 @@ public class ProductType extends ColorType {
 
     @Override
     public Vector<Color> getColors(){
-        Vector<Color> colors = new Vector<>();
 
         if (getConstituentCombinationSize() != colorCache.size()) {
 
@@ -143,11 +136,7 @@ public class ProductType extends ColorType {
             }
         }
 
-        for (Color cachedColor : colorCache.values()){
-            colors.add(cachedColor);
-        }
-
-        return colors;
+        return new Vector<>(colorCache.values());
     }
 
     public boolean containsTypes(Vector<ColorType> colorTypes) {
@@ -165,7 +154,7 @@ public class ProductType extends ColorType {
 
     @Override
     public Color getFirstColor() {
-        Vector<Color> colors = new Vector<Color>();
+        Vector<Color> colors = new Vector<>();
         for (ColorType ct : constituents) {
             colors.add(ct.getFirstColor());
         }

@@ -1,6 +1,5 @@
 package pipe.gui.ColoredComponents;
 
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.gui.undo.Colored.SetTransitionExpressionCommand;
@@ -11,8 +10,6 @@ import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.GuardExpressionParser.GuardExpressionParser;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
-import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.util.Tuple;
 import kotlin.Pair;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
@@ -27,30 +24,20 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.undo.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.List;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 public class ColoredTransitionGuardPanel  extends JPanel {
-    JPanel coloredTransitionPanel;
-    JLabel guardExpressionLabel;
 
-    //Edit expression buttons
-    private JPanel editPanel;
-    private ButtonGroup editButtonsGroup;
     private JButton resetExprButton;
     private JButton deleteExprSelectionButton;
     private JButton editExprButton;
     private JButton undoButton;
     private JButton redoButton;
 
-    //Variable interaction elements
-    private JPanel comparisonPanel;
-    private JLabel variableLabel;
-
-    //Logic buttons
-    private JPanel logicPanel;
-    private ButtonGroup logicButtonGroup;
     private JButton andButton;
     private JButton orButton;
     private JButton notButton;
@@ -72,13 +59,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     JLabel colorLabel;
     JButton addColorButton;
 
-    private JPanel exprPanel;
     private JTextPane exprField;
-    private JScrollPane exprScrollPane;
 
-    private Context context;
-    private TimedTransitionComponent transition;
-    private List<Variable> variables;
+    private final Context context;
+    private final TimedTransitionComponent transition;
 
     private GuardExpression newProperty;
     TAPNTransitionEditor parent;
@@ -168,7 +152,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         }
 
         colorLabel = new JLabel("Color: ");
-        colorCombobox = new ColorComboboxPanel((ColorType)colorTypeCombobox.getSelectedItem(), "",false,context) {
+        colorCombobox = new ColorComboboxPanel((ColorType)colorTypeCombobox.getSelectedItem(),false,context) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
 
@@ -184,7 +168,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         addColorButton.addActionListener(actionEvent -> {
             Expression newExpression;
             if (colorCombobox.getColorTypeComboBoxesArray().length > 1) {
-                Vector<ColorExpression> tempVec = new Vector();
+                Vector<ColorExpression> tempVec = new Vector<>();
                 for (int i = 0; i < colorCombobox.getColorTypeComboBoxesArray().length; i++) {
                     ColorExpression expr;
                     Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[i].getSelectedItem();
@@ -266,13 +250,14 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     private void initLogicPanel() {
-        logicPanel = new JPanel(new GridBagLayout());
+        //Logic buttons
+        JPanel logicPanel = new JPanel(new GridBagLayout());
         logicPanel.setBorder(BorderFactory.createTitledBorder("Logic"));
         Dimension d = new Dimension(100, 150);
         logicPanel.setPreferredSize(d);
         logicPanel.setMinimumSize(d);
 
-        logicButtonGroup = new ButtonGroup();
+        ButtonGroup logicButtonGroup = new ButtonGroup();
         andButton = new JButton("AND");
         orButton = new JButton("OR");
         notButton = new JButton("NOT");
@@ -328,14 +313,14 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         });
 
         notButton.addActionListener(actionEvent -> {
-            NotExpression notExpr = null;
-            notExpr = new NotExpression((GuardExpression)currentSelection.getObject());
+            NotExpression notExpr = new NotExpression((GuardExpression)currentSelection.getObject());
             replaceAndAddToUndo(currentSelection.getObject(), notExpr);
         });
     }
 
     private void initComparisonPanel() {
-        comparisonPanel = new JPanel(new GridBagLayout());
+        //Variable interaction elements
+        JPanel comparisonPanel = new JPanel(new GridBagLayout());
         comparisonPanel.setBorder(BorderFactory.createTitledBorder("Comparison"));
 
         ButtonGroup comparisonButtons = new ButtonGroup();
@@ -471,11 +456,12 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     private void initExprEditPanel() {
-        editPanel = new JPanel(new GridBagLayout());
+        //Edit expression buttons
+        JPanel editPanel = new JPanel(new GridBagLayout());
         editPanel.setBorder(BorderFactory.createTitledBorder("Editing"));
         //editPanel.setPreferredSize(new Dimension(260, 190));
 
-        editButtonsGroup = new ButtonGroup();
+        ButtonGroup editButtonsGroup = new ButtonGroup();
         deleteExprSelectionButton = new JButton("Delete Selection");
         resetExprButton = new JButton("Reset Expression");
         undoButton = new JButton("Undo");
@@ -606,9 +592,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         exprField.setToolTipText("Tooltip missing");
 
 
-
-
-        exprScrollPane = new JScrollPane(exprField);
+        JScrollPane exprScrollPane = new JScrollPane(exprField);
         exprScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         Dimension d = new Dimension(100, 80);
         exprScrollPane.setPreferredSize(d);
@@ -716,11 +700,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             addColorButton.setEnabled(false);
 
         }
-        if(newProperty.containsPlaceHolder() && !(newProperty instanceof PlaceHolderExpression)){
-            parent.enableOKButton(false);
-        } else{
-            parent.enableOKButton(true);
-        }
+        parent.enableOKButton(!newProperty.containsPlaceHolder() || newProperty instanceof PlaceHolderExpression);
     }
 
     private void updateSelection(Expression newSelection) {
@@ -759,7 +739,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     public void updateColorOptions(){
         if(currentSelection.getObject() instanceof ColorExpression) {
-            ColorExpression exprToCheck = ((ColorExpression) currentSelection.getObject()).getButtomColorExpression();
+            ColorExpression exprToCheck = ((ColorExpression) currentSelection.getObject()).getBottomColorExpression();
             if (exprToCheck instanceof UserOperatorExpression || exprToCheck instanceof VariableExpression) {
                 if (exprToCheck.getParent() instanceof TupleExpression) {
                     TupleExpression tupleExpression = (TupleExpression) exprToCheck.getParent();
@@ -795,8 +775,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private GuardExpression getSpecificChildOfProperty(int number, Expression property) {
         ExprStringPosition[] children = property.getChildren();
         int count = 0;
-        for (int i = 0; i < children.length; i++) {
-            Expression child = children[i].getObject();
+        for (ExprStringPosition exprStringPosition : children) {
+            Expression child = exprStringPosition.getObject();
             if (child instanceof GuardExpression) {
                 count++;
             }
@@ -918,8 +898,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     public class ExpressionConstructionEdit extends AbstractUndoableEdit {
-        private Expression original;
-        private Expression replacement;
+        private final Expression original;
+        private final Expression replacement;
 
         public Expression getOriginal() {
             return original;

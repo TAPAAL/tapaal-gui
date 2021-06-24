@@ -16,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 import javax.swing.*;
@@ -26,7 +27,6 @@ import dk.aau.cs.gui.components.ColortypeListCellRenderer;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
-import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.TabContent;
@@ -43,12 +43,11 @@ import pipe.gui.widgets.ColoredWidgets.VariablesDialogPanel;
 public class ConstantsPane extends JPanel implements SidePane {
 
 	private final JPanel constantsPanel;
-	private JScrollPane constantsScroller;
-	private final JPanel buttonsPanel;
+    private final JPanel buttonsPanel;
 
-    private ColorTypesListModel colorTypesListModel;
-    private VariablesListModel variablesListModel;
-	private JList<?> list;
+    private final ColorTypesListModel colorTypesListModel;
+    private final VariablesListModel variablesListModel;
+	private final JList<?> list;
 	private final ConstantsListModel constantsListModel;
 	private JButton editBtn;
 	private JButton removeBtn;
@@ -67,7 +66,7 @@ public class ConstantsPane extends JPanel implements SidePane {
     private static final String CONSTANTS = "Constants";
     private static final String COLORTYPES = "Color type";
     private static final String VARIABLES = "Variables";
-    private final JComboBox<String> constantsColorTypesVariablesComboBox = new JComboBox<String>(new String[]{COLORTYPES, VARIABLES, CONSTANTS });
+    private final JComboBox<String> constantsColorTypesVariablesComboBox = new JComboBox<>(new String[]{COLORTYPES, VARIABLES, CONSTANTS});
 
 
     private static final String toolTipComboBox = "Switch between constants, colors and variables";
@@ -94,16 +93,7 @@ public class ConstantsPane extends JPanel implements SidePane {
     private static final String toolTipMoveUpColorType = "Move the selected color type up";
     private static final String toolTipMoveDownColorType = "Move down the selected color type";
     private static final String toolTipColorTypeList = "Shows all color types and product types. Product types are noted with DOMAIN. only usable in CPN";
-    private static final String removeColorTypeMessage = "Removing this color type will result the following:\n" +
-        "All places with this color type will be converted to dot types. Any arc from these places will have their expression reset to 1'dot.\n" +
-        "The colortype will be pruned from guard expressions, maintaining as much of the expression as possible.\n" +
-        "Variables of this color type will be removed." +
-        "All products using this colortype will be removed recursively.\n\n" +
-        "Do you wish to continue?";
-    private static final String removeVariableMessage = "Removing this variable will result in the following:\n" +
-        "Anywhere the variable is used will be replaced with the topmost color of the variables color type.\n\n" +
-        "Do you wish to continue?";
-	Timer timer;
+    Timer timer;
 
 
 	public ConstantsPane(TabContent currentTab) {
@@ -261,17 +251,13 @@ public class ConstantsPane extends JPanel implements SidePane {
 		//showConstants();
 		
 		this.addComponentListener(new ComponentListener() {
-			int minimumHegiht = ConstantsPane.this.getMinimumSize().height;
+			final int minimumHegiht = ConstantsPane.this.getMinimumSize().height;
 			public void componentShown(ComponentEvent e) {
 			}
 			
 			
 			public void componentResized(ComponentEvent e) {
-				if(ConstantsPane.this.getSize().height <= minimumHegiht){
-					sortButton.setVisible(false);
-				} else {
-					sortButton.setVisible(true);
-				}
+                sortButton.setVisible(ConstantsPane.this.getSize().height > minimumHegiht);
 			}
 			
 			
@@ -352,7 +338,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	
 	private void blinkConstant(final Constant c) {
 		timer = new Timer(300, new ActionListener() {
-			long startTime = System.currentTimeMillis();
+			final long startTime = System.currentTimeMillis();
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(System.currentTimeMillis() - startTime < 2100) {
@@ -473,12 +459,11 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 	private void addConstantsComponents() {
         constantsColorTypesVariablesComboBox.setToolTipText(toolTipComboBox);
-        constantsColorTypesVariablesComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JComboBox<String> source = (JComboBox) e.getSource();
-                String selectedItem = source.getSelectedItem().toString();
-                if (selectedItem.equals(CONSTANTS)) {
+        constantsColorTypesVariablesComboBox.addActionListener(e -> {
+            JComboBox<String> source = (JComboBox) e.getSource();
+            String selectedItem = Objects.requireNonNull(source.getSelectedItem()).toString();
+            switch (selectedItem) {
+                case CONSTANTS:
                     list.setModel(constantsListModel);
                     list.setToolTipText(toolTipConstantList);
                     addConstantButton.setToolTipText(toolTipNewConstant);
@@ -487,8 +472,8 @@ public class ConstantsPane extends JPanel implements SidePane {
                     moveDownButton.setToolTipText(toolTipMoveDownConstant);
                     moveUpButton.setToolTipText(toolTipMoveUpConstant);
                     sortButton.setToolTipText(toolTipSortConstants);
-                }
-                else if (selectedItem.equals(COLORTYPES)) {
+                    break;
+                case COLORTYPES:
                     list.setModel(colorTypesListModel);
                     list.setToolTipText(toolTipColorTypeList);
                     addConstantButton.setToolTipText(toolTipNewColorType);
@@ -497,8 +482,8 @@ public class ConstantsPane extends JPanel implements SidePane {
                     moveDownButton.setToolTipText(toolTipMoveDownColorType);
                     moveUpButton.setToolTipText(toolTipMoveUpColorType);
                     sortButton.setToolTipText(toolTipSortColorTypes);
-                }
-                else if (selectedItem.equals(VARIABLES)) {
+                    break;
+                case VARIABLES:
                     list.setModel(variablesListModel);
                     list.setToolTipText(toolTipVariableList);
                     addConstantButton.setToolTipText(toolTipNewVariable);
@@ -507,18 +492,18 @@ public class ConstantsPane extends JPanel implements SidePane {
                     moveDownButton.setToolTipText(toolTipMoveDownVariable);
                     moveUpButton.setToolTipText(toolTipMoveUpVariable);
                     sortButton.setToolTipText(toolTipSortVariables);
-                }
-                if(list.getModel().getSize() > 0) {
-                    list.setSelectedIndex(0);
-                    list.ensureIndexIsVisible(0);
-                } else {
-                    moveDownButton.setEnabled(false);
-                    moveUpButton.setEnabled(false);
-                }
-                if (list.getModel().getSize() <= 0){
-                    editBtn.setEnabled(false);
-                    removeBtn.setEnabled(false);
-                }
+                    break;
+            }
+            if(list.getModel().getSize() > 0) {
+                list.setSelectedIndex(0);
+                list.ensureIndexIsVisible(0);
+            } else {
+                moveDownButton.setEnabled(false);
+                moveUpButton.setEnabled(false);
+            }
+            if (list.getModel().getSize() <= 0){
+                editBtn.setEnabled(false);
+                removeBtn.setEnabled(false);
             }
         });
         // GBC for the scroller
@@ -531,7 +516,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         constantsPanel.add(constantsColorTypesVariablesComboBox, gbc);
 
-        constantsScroller = new JScrollPane(list);
+        JScrollPane constantsScroller = new JScrollPane(list);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -543,26 +528,24 @@ public class ConstantsPane extends JPanel implements SidePane {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         constantsPanel.add(constantsScroller, gbc);
 
-        moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+        moveUpButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png"))));
         moveUpButton.setEnabled(false);
         moveUpButton.setToolTipText(toolTipMoveUpColorType);
-        moveUpButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int index = list.getSelectedIndex();
-                if (isDisplayingVariables() && index > 0) {
-                    parent.network().swapVariables(index, index-1);
-                    variablesListModel.updateName();
-                    list.setSelectedIndex(index-1);}
-                else if(isDisplayingGlobalConstants() && index > 0) {
-                    parent.swapConstants(index, index-1);
-                    showConstants();
-                    list.setSelectedIndex(index-1);
-                }
-                else if (isDisplayingColorTypes() && index > 0) {
-                    parent.network().swapColorTypes(index, index-1);
-                    colorTypesListModel.updateName();
-                    list.setSelectedIndex(index-1);
-                }
+        moveUpButton.addActionListener(e -> {
+            int index = list.getSelectedIndex();
+            if (isDisplayingVariables() && index > 0) {
+                parent.network().swapVariables(index, index-1);
+                variablesListModel.updateName();
+                list.setSelectedIndex(index-1);}
+            else if(isDisplayingGlobalConstants() && index > 0) {
+                parent.swapConstants(index, index-1);
+                showConstants();
+                list.setSelectedIndex(index-1);
+            }
+            else if (isDisplayingColorTypes() && index > 0) {
+                parent.network().swapColorTypes(index, index-1);
+                colorTypesListModel.updateName();
+                list.setSelectedIndex(index-1);
             }
         });
 
@@ -572,27 +555,25 @@ public class ConstantsPane extends JPanel implements SidePane {
         gbc.anchor = GridBagConstraints.NORTH;
         constantsPanel.add(moveUpButton,gbc);
 
-        moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+        moveDownButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png"))));
         moveDownButton.setEnabled(false);
         moveDownButton.setToolTipText(toolTipMoveDownColorType);
-        moveDownButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int index = list.getSelectedIndex();
-                if (isDisplayingVariables() && index < parent.network().numberOfVariables() - 1) {
-                    parent.network().swapVariables(index, index + 1);
-                    variablesListModel.updateName();
-                    list.setSelectedIndex(index + 1);
-                }
-                else if(isDisplayingGlobalConstants() && index < parent.network().constants().size() - 1) {
-                    parent.swapConstants(index, index+1);
-                    showConstants();
-                    list.setSelectedIndex(index + 1);
-                }
-                else if (isDisplayingColorTypes() && index < parent.network().numberOfColorTypes() - 1) {
-                    parent.network().swapColorTypes(index, index+1);
-                    colorTypesListModel.updateName();
-                    list.setSelectedIndex(index + 1);
-                }
+        moveDownButton.addActionListener(e -> {
+            int index = list.getSelectedIndex();
+            if (isDisplayingVariables() && index < parent.network().numberOfVariables() - 1) {
+                parent.network().swapVariables(index, index + 1);
+                variablesListModel.updateName();
+                list.setSelectedIndex(index + 1);
+            }
+            else if(isDisplayingGlobalConstants() && index < parent.network().constants().size() - 1) {
+                parent.swapConstants(index, index+1);
+                showConstants();
+                list.setSelectedIndex(index + 1);
+            }
+            else if (isDisplayingColorTypes() && index < parent.network().numberOfColorTypes() - 1) {
+                parent.network().swapColorTypes(index, index+1);
+                colorTypesListModel.updateName();
+                list.setSelectedIndex(index + 1);
             }
         });
 
@@ -603,22 +584,20 @@ public class ConstantsPane extends JPanel implements SidePane {
         constantsPanel.add(moveDownButton,gbc);
 
         //Sort button
-        sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
+        sortButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png"))));
         sortButton.setToolTipText(toolTipSortColorTypes);
         sortButton.setEnabled(false);
-        sortButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (isDisplayingGlobalConstants()) {
-                    Command sortConstantsCommand = new SortConstantsCommand(parent, ConstantsPane.this);
-                    parent.getUndoManager().addNewEdit(sortConstantsCommand);
-                    sortConstantsCommand.redo();
-                }
-                else if (isDisplayingVariables()) {
-                    variablesListModel.sort();
-                }
-                else {
-                    colorTypesListModel.sort();
-                }
+        sortButton.addActionListener(e -> {
+            if (isDisplayingGlobalConstants()) {
+                Command sortConstantsCommand = new SortConstantsCommand(parent, ConstantsPane.this);
+                parent.getUndoManager().addNewEdit(sortConstantsCommand);
+                sortConstantsCommand.redo();
+            }
+            else if (isDisplayingVariables()) {
+                variablesListModel.sort();
+            }
+            else {
+                colorTypesListModel.sort();
             }
         });
 
@@ -657,7 +636,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
     }
     private void showEditColorTypeDialog(ColorType colorType) {
-        ColorTypeDialogPanel panel = null;
+        ColorTypeDialogPanel panel;
         UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
         if (colorType != null) {
             panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network(), colorType, undoManager);
@@ -749,10 +728,6 @@ public class ConstantsPane extends JPanel implements SidePane {
             return network.getVariableByIndex(index);
         }
 
-        public void swap(int currentIndex, int newIndex) {
-            network.swapConstants(currentIndex, newIndex);
-        }
-
         public Variable[] sort() {
             Variable[] oldOrder = network.sortVariables();
             fireContentsChanged(this, 0, getSize());
@@ -829,10 +804,6 @@ public class ConstantsPane extends JPanel implements SidePane {
                 }
             });
             setNetwork(network);
-        }
-
-        public void swap(int currentIndex, int newIndex) {
-            network.swapColorTypes(currentIndex, newIndex);
         }
 
         public ColorType[] sort() {

@@ -95,7 +95,7 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
     }
 
     @Override
-    public ColorExpression getButtomColorExpression() {
+    public ColorExpression getBottomColorExpression() {
         return this;
     }
 

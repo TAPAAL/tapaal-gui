@@ -8,9 +8,6 @@ import java.util.regex.Pattern;
 
 public class ColoredTimeInterval extends TimeInterval {
 
-    public static final ColoredTimeInterval ZERO_INF_COLOR_DOT = new ColoredTimeInterval(true,
-            new IntBound(0), Bound.Infinity, false, new Color(new ColorType("dot"), 0, "dot"));
-
     private Color color;
 
     public ColoredTimeInterval(boolean isLowerIncluded, Bound lower, Bound upper, boolean isUpperIncluded, Color color) {
@@ -18,7 +15,7 @@ public class ColoredTimeInterval extends TimeInterval {
         this.color = color;
     }
 
-    public static final ColoredTimeInterval ZERO_INF_DYN_COLOR(Color color) {
+    public static ColoredTimeInterval ZERO_INF_DYN_COLOR(Color color) {
         return new ColoredTimeInterval(true,
                 new IntBound(0), Bound.Infinity, false, color);
     }
@@ -53,7 +50,7 @@ public class ColoredTimeInterval extends TimeInterval {
         if (!(rightBracket.equals("]") || rightBracket.equals(")")))
             return null;
 
-        Bound lowerBound = null;
+        Bound lowerBound;
         try {
             int intLower = Integer.parseInt(lowerBoundAsString);
             lowerBound = new IntBound(intLower);
@@ -64,7 +61,7 @@ public class ColoredTimeInterval extends TimeInterval {
                 throw new RuntimeException("A constant which was not declared was used in an time interval of an arc.");
         }
 
-        Bound upperBound = null;
+        Bound upperBound;
         if (upperBoundAsString.equals("inf"))
             upperBound = Bound.Infinity;
         else {
@@ -80,29 +77,29 @@ public class ColoredTimeInterval extends TimeInterval {
             }
         }
 
-        return new ColoredTimeInterval(leftBracket.equals("[") ? true : false,
-                lowerBound, upperBound, rightBracket.equals("]") ? true : false, color);
+        return new ColoredTimeInterval(leftBracket.equals("["),
+                lowerBound, upperBound, rightBracket.equals("]"), color);
     }
 
 
     @Override
    public String toString() {
-        String print = "";
+        StringBuilder print = new StringBuilder();
         if (color != null) {
             if (color.getTuple() != null) {
                 for (Color color1 : color.getTuple()) {
-                    print += color1.getColorName() + ", ";
+                    print.append(color1.getColorName()).append(", ");
                 }
                 print.substring(0, print.length()-2);
-                print += " \u2192 " + super.toString();
-                return print;
+                print.append(" \u2192 ").append(super.toString());
+                return print.toString();
             } else {
-                print += color.getColorName() + " \u2192 " + super.toString();
-                return print;
+                print.append(color.getColorName()).append(" \u2192 ").append(super.toString());
+                return print.toString();
             }
         } else {
-            print += super.toString();
-            return print;
+            print.append(super.toString());
+            return print.toString();
         }
     }
 
@@ -131,10 +128,7 @@ public class ColoredTimeInterval extends TimeInterval {
         if (cti.isUpperIncluded != this.isUpperIncluded)
             return false;
 
-        if (!cti.color.equals(this.color))
-            return false;
-
-        return true;
+        return cti.color.equals(this.color);
     }
 
     public boolean equalsOnlyColor(Object o) {
@@ -144,10 +138,7 @@ public class ColoredTimeInterval extends TimeInterval {
         } else {
             return false;
         }
-        if (!cti.color.equals(this.color))
-            return false;
-
-        return true;
+        return cti.color.equals(this.color);
     }
 
     @Override

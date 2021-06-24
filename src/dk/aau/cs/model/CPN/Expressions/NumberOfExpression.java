@@ -13,7 +13,7 @@ import java.util.Vector;
 
 public class NumberOfExpression extends ArcExpression {
     private Integer number;
-    private Vector<ColorExpression> color;
+    private final Vector<ColorExpression> color;
 
     public Vector<ColorExpression> getNumberOfExpression() {
         return this.color;
@@ -34,9 +34,8 @@ public class NumberOfExpression extends ArcExpression {
     public Vector<ColorExpression> getColor() {return color;}
 
     public boolean equalsColor(NumberOfExpression otherExpr){
-        Vector<ColorExpression> otherColors = otherExpr.color;
         for(int i = 0; i < color.size(); i++){
-            if(!(color.get(i).toString().equals(otherColors.get(i).toString()))){
+            if(!(color.get(i).toString().equals(otherExpr.color.get(i).toString()))){
                 return false;
             }
         }
@@ -64,7 +63,7 @@ public class NumberOfExpression extends ArcExpression {
 
     public ColorMultiset eval(ExpressionContext context) {
         assert(!color.isEmpty());
-        Vector<Color> colors = new Vector<Color>();
+        Vector<Color> colors = new Vector<>();
         ColorType ct = null;
         for (ColorExpression ce : color) {
             if(ce instanceof AllExpression){
@@ -85,10 +84,6 @@ public class NumberOfExpression extends ArcExpression {
         return new ColorMultiset(ct, number, colors);
     }
 
-    public void expressionType() {
-
-    }
-
     public Integer weight() {
         return number * color.size();
     }
@@ -105,7 +100,7 @@ public class NumberOfExpression extends ArcExpression {
 
     @Override
     public ArcExpression copy() {
-        return new NumberOfExpression(number, new Vector<ColorExpression>((Vector<ColorExpression>) color.clone()));
+        return new NumberOfExpression(number, new Vector<>((Vector<ColorExpression>) color.clone()));
     }
 
     @Override
@@ -152,12 +147,12 @@ public class NumberOfExpression extends ArcExpression {
     }
 
     public String toString() {
-        String res = number.toString() + "'" + color.get(0).toString();
+        StringBuilder res = new StringBuilder(number.toString() + "'" + color.get(0).toString());
         for (int i = 1; i < color.size(); ++i) {
-            res += " + ";
-            res += number.toString() + "'(" + color.get(i).toString() + ")";
+            res.append(" + ");
+            res.append(number.toString()).append("'(").append(color.get(i).toString()).append(")");
         }
-        return res;
+        return res.toString();
     }
 
     public ExprStringPosition[] getChildren() {
@@ -167,7 +162,6 @@ public class NumberOfExpression extends ArcExpression {
         int endPrev = 0;
         int start = 2;
         int end = 0;
-        boolean wasPrevSimple = false;
         for (ColorExpression p : color) {
             if (i == 0) {
                 end = start + p.toString().length();

@@ -6,10 +6,10 @@ import java.util.Vector;
 
 public class Color {
 
-    private Vector<Color> tuple;
+    private final Vector<Color> tuple;
     private ColorType colorType;
-    private String colorName;
-    private Integer id;
+    private final String colorName;
+    private final Integer id;
     public static final Color STAR_COLOR = new Color(new ColorType("*"), 0, "*");
 
     public Color(ColorType colorType, Integer id, Vector<Color> colors) {
@@ -118,13 +118,13 @@ public class Color {
     @Override
     public String toString() {
         if (tuple != null) {
-            String out = "(";
+            StringBuilder out = new StringBuilder("(");
             for (Color color : tuple) {
-                out += color.toString() + ", ";
+                out.append(color.toString()).append(", ");
             }
-            out = out.substring(0, out.length() -2);
-            out += ")";
-            return out;
+            out = new StringBuilder(out.substring(0, out.length() - 2));
+            out.append(")");
+            return out.toString();
         }
         else
             return colorName;

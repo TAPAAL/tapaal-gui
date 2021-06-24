@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExprValues { // We use the ExprValues object to hold all values we can extract from our expressions, we need this for typechecking.
-    private final List<Variable> variables = new ArrayList<Variable>();
-    private final List<Color> colors = new ArrayList<Color>();
-    private final List<ColorType> colorTypes = new ArrayList<ColorType>();
+    private final List<Variable> variables = new ArrayList<>();
+    private final List<Color> colors = new ArrayList<>();
+    private final List<ColorType> colorTypes = new ArrayList<>();
 
     public ExprValues() {}
 

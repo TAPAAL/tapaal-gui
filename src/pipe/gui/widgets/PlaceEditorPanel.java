@@ -1,29 +1,19 @@
 package pipe.gui.widgets;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-//import dk.aau.cs.gui.components.ColorComboBoxRenderer;
+import dk.aau.cs.gui.Context;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.gui.undo.Colored.ColoredPlaceMarkingEdit;
 import dk.aau.cs.gui.undo.Colored.SetArcExpressionCommand;
 import dk.aau.cs.gui.undo.Colored.SetColoredArcIntervalsCommand;
 import dk.aau.cs.gui.undo.Colored.SetTransportArcExpressionsCommand;
-import dk.aau.cs.model.CPN.*;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.RequireException;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
@@ -36,13 +26,22 @@ import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import dk.aau.cs.gui.Context;
-import dk.aau.cs.model.tapn.Bound.InfBound;
-import dk.aau.cs.util.RequireException;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
-import static net.tapaal.swinghelpers.GridBagHelper.Anchor.*;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.util.List;
+import java.util.*;
+
+import static net.tapaal.swinghelpers.GridBagHelper.Anchor.EAST;
+import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
 import static net.tapaal.swinghelpers.GridBagHelper.Fill.HORIZONTAL;
+
+//import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 
 public class PlaceEditorPanel extends JPanel {
 
@@ -58,10 +57,9 @@ public class PlaceEditorPanel extends JPanel {
 	private boolean doNewEdit = true;
 	private final TabContent currentTab;
 	private final EscapableDialog parent;
-	private JPanel mainPanel;
-	private JScrollPane scrollPane;
-	
-	private Vector<TimedPlace> sharedPlaces;
+	private final JPanel mainPanel;
+
+    private Vector<TimedPlace> sharedPlaces;
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
 
 	public PlaceEditorPanel(EscapableDialog parent,JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
@@ -73,7 +71,7 @@ public class PlaceEditorPanel extends JPanel {
 		this.colorType = place.underlyingPlace().getColorType();
 		setLayout(new BorderLayout());
 		mainPanel = new JPanel(new GridBagLayout());
-		scrollPane = new JScrollPane();
+        JScrollPane scrollPane = new JScrollPane();
 		initComponents();
 		hideIrrelevantInformation();
 		scrollPane.setViewportView(mainPanel);
@@ -182,7 +180,7 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private void setupInitialState() {
-		sharedPlaces = new Vector<TimedPlace>(context.network().sharedPlaces());
+		sharedPlaces = new Vector<>(context.network().sharedPlaces());
 
 		Collection<TimedPlace> usedPlaces = context.activeModel().places();
 
@@ -471,9 +469,9 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private void setRelationModelForConstants() {
-		int value = CreateGui.getCurrentTab().network().getConstantValue(invConstantsComboBox.getSelectedItem().toString());
+		int value = CreateGui.getCurrentTab().network().getConstantValue(Objects.requireNonNull(invConstantsComboBox.getSelectedItem()).toString());
 
-		String selected = invRelationConstant.getSelectedItem().toString();
+		String selected = Objects.requireNonNull(invRelationConstant.getSelectedItem()).toString();
 		if (value == 0) {
 			invRelationConstant.setModel(new DefaultComboBoxModel<>(new String[] { "<=" }));
 		} else {
@@ -596,7 +594,7 @@ public class PlaceEditorPanel extends JPanel {
 		TimedPlace underlyingPlace = place.underlyingPlace();
 
 		SharedPlace selectedPlace = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
-		if(sharedCheckBox.isSelected() && !selectedPlace.equals(underlyingPlace)){
+		if(sharedCheckBox.isSelected() && !Objects.equals(selectedPlace, underlyingPlace)){
 			Command command = new MakePlaceSharedCommand(context.activeModel(), selectedPlace, place.underlyingPlace(), place, context.tabContent());
 			context.undoManager().addEdit(command);
 			try{
@@ -710,9 +708,7 @@ public class PlaceEditorPanel extends JPanel {
             newExpression = new AddExpression(v);
             ColorMultiset cm = newExpression.eval(context.network().getContext());
             if(cm != null){
-                for (TimedToken ctElement : cm.getTokens(place.underlyingPlace())) {
-                    tokensToAdd.add(ctElement);
-                }
+                tokensToAdd.addAll(cm.getTokens(place.underlyingPlace()));
             }
         }
 
@@ -752,7 +748,7 @@ public class PlaceEditorPanel extends JPanel {
         tokenPanel.setLayout(new GridBagLayout());
         tokenPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Tokens"));
 
-        tokenColorComboboxPanel = new ColorComboboxPanel(colorType, "colors",true, null) {
+        tokenColorComboboxPanel = new ColorComboboxPanel(colorType,true, null) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
                 updateSpinnerValue(true);
@@ -898,16 +894,16 @@ public class PlaceEditorPanel extends JPanel {
         //this panel holds the buttons, the invariant editor panel and the color combobox
         JPanel colorInvariantEditPanel = new JPanel(new GridBagLayout());
 
-        colorInvariantComboboxPanel = new ColorComboboxPanel(colorType, "colors") {
+        colorInvariantComboboxPanel = new ColorComboboxPanel(colorType) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
                 ColoredTimeInvariant timeConstraint;
                 if (!(colorType instanceof ProductType)) {
                     timeConstraint = ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR((Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
                 } else {
-                    Vector<Color> colors = new Vector<Color>();
-                    for (int i = 0; i < comboBoxes.length; i++) {
-                        colors.add((Color) comboBoxes[i].getItemAt(comboBoxes[i].getSelectedIndex()));
+                    Vector<Color> colors = new Vector<>();
+                    for (JComboBox comboBox : comboBoxes) {
+                        colors.add((Color) comboBox.getItemAt(comboBox.getSelectedIndex()));
                     }
                     Color color = new Color(colorType, 0, colors);
                     timeConstraint = ColoredTimeInvariant.LESS_THAN_INFINITY_DYN_COLOR(color);
@@ -964,11 +960,7 @@ public class PlaceEditorPanel extends JPanel {
                     colorInvariantComboboxPanel.updateSelection(cti.getColor());
                     addTimeConstraintButton.setText("Modify");
                 }
-                if(timeConstraintList.isSelectionEmpty()){
-                    removeTimeConstraintButton.setEnabled(false);
-                } else{
-                    removeTimeConstraintButton.setEnabled(true);
-                }
+                removeTimeConstraintButton.setEnabled(!timeConstraintList.isSelectionEmpty());
             }
         });
         JScrollPane timeConstraintScrollPane = new JScrollPane(timeConstraintList);
@@ -1010,7 +1002,7 @@ public class PlaceEditorPanel extends JPanel {
         gbc.gridy = 0;
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = gbc.BOTH;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         colorInvariantEditPanel.add(colorInvariantComboboxPanel, gbc);
 
@@ -1140,7 +1132,7 @@ public class PlaceEditorPanel extends JPanel {
         for(Arc arc : place.getPostset()){
             if(arc instanceof TimedTransportArcComponent){
                 TransportArc transportArc = ((TimedTransportArcComponent)arc).underlyingTransportArc();
-                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                Vector<ColorExpression> vecColorExpr = new Vector<>();
                 vecColorExpr.add(colorType.createColorExpressionForFirstColor());
                 NumberOfExpression numbExpr = new NumberOfExpression(transportArc.getOutputExpression().weight(), vecColorExpr);
                 Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)arc, transportArc.getInputExpression(),
@@ -1148,14 +1140,14 @@ public class PlaceEditorPanel extends JPanel {
                 expressionsCommand.redo();
                 context.undoManager().addEdit(expressionsCommand);
             }else{
-                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                Vector<ColorExpression> vecColorExpr = new Vector<>();
                 vecColorExpr.add(colorType.createColorExpressionForFirstColor());
                 NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
                 Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
                 arcExpressionCommand.redo();
                 context.undoManager().addEdit(arcExpressionCommand);
             }
-            Command arcIntervalCommand = new SetColoredArcIntervalsCommand((TimedInputArcComponent)arc,((TimedInputArcComponent)arc).getCtiList(), new ArrayList<ColoredTimeInterval>());
+            Command arcIntervalCommand = new SetColoredArcIntervalsCommand((TimedInputArcComponent)arc,((TimedInputArcComponent)arc).getCtiList(), new ArrayList<>());
             arcIntervalCommand.redo();
             context.undoManager().addEdit(arcIntervalCommand);
 
@@ -1163,7 +1155,7 @@ public class PlaceEditorPanel extends JPanel {
         for(Arc arc : place.getPreset()) {
             if(arc instanceof TimedTransportArcComponent){
                 TransportArc transportArc = ((TimedTransportArcComponent)arc).underlyingTransportArc();
-                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                Vector<ColorExpression> vecColorExpr = new Vector<>();
                 vecColorExpr.add(colorType.createColorExpressionForFirstColor());
                 NumberOfExpression numbExpr = new NumberOfExpression(transportArc.getInputExpression().weight(), vecColorExpr);
                 Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)arc, transportArc.getInputExpression(),
@@ -1171,7 +1163,7 @@ public class PlaceEditorPanel extends JPanel {
                 expressionsCommand.redo();
                 context.undoManager().addEdit(expressionsCommand);
             }else{
-                Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+                Vector<ColorExpression> vecColorExpr = new Vector<>();
                 vecColorExpr.add(colorType.createColorExpressionForFirstColor());
                 NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
                 Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
@@ -1259,10 +1251,10 @@ public class PlaceEditorPanel extends JPanel {
     }
 
     private NumberOfExpression buildTokenExpression(int number){
-        Vector<ColorExpression> exprVec = new Vector();
+        Vector<ColorExpression> exprVec = new Vector<>();
         TupleExpression tupleExpression;
         if (colorType instanceof ProductType) {
-            Vector<ColorExpression> tempVec = new Vector();
+            Vector<ColorExpression> tempVec = new Vector<>();
             for (int i = 0; i < tokenColorComboboxPanel.getColorTypeComboBoxesArray().length; i++) {
                 ColorExpression expr;
                 if (tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i].getItemAt(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[i].getSelectedIndex()) instanceof String) {

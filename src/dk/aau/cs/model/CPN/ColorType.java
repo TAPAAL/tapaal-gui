@@ -1,7 +1,6 @@
 package dk.aau.cs.model.CPN;
 
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
-import dk.aau.cs.model.CPN.Expressions.TupleExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 
 import java.util.Iterator;
@@ -9,9 +8,9 @@ import java.util.Vector;
 
 public class ColorType implements Iterable<Color> {
     public static final ColorType COLORTYPE_DOT = new ColorType("dot") {{addColor("dot");}};
-    private Vector<Color> colors = new Vector<Color>();
-    private String id;
-    private String name;
+    private final Vector<Color> colors = new Vector<>();
+    private final String id;
+    private final String name;
 
     public ColorType(String name) { this(name, name); } //id is unused. Solution for now.
 
@@ -19,10 +18,6 @@ public class ColorType implements Iterable<Color> {
 
     public void addColor(String colorName) {
         colors.add(new Color(this, colors.size(), colorName));
-    }
-
-    public void addColor(Color color) {
-        colors.add(color);
     }
 
     public String getName() {
@@ -67,13 +62,13 @@ public class ColorType implements Iterable<Color> {
     }
 
     public String toString() {
-        String out = "<html>" + name + "<b> is </b>[";
+        StringBuilder out = new StringBuilder("<html>" + name + "<b> is </b>[");
         for (Color element : colors) {
-            out += element.getColorName() + ", ";
+            out.append(element.getColorName()).append(", ");
         }
-        out = out.substring(0, out.length() - 2);
-        out += "]" + "</html>";
-        return out;
+        out = new StringBuilder(out.substring(0, out.length() - 2));
+        out.append("]" + "</html>");
+        return out.toString();
     }
 
     public Color successorTo(Color color, int offset) {
@@ -130,8 +125,7 @@ public class ColorType implements Iterable<Color> {
     }
 
     public ColorExpression createColorExpressionForFirstColor() {
-        UserOperatorExpression userOperatorExpression = new UserOperatorExpression(getFirstColor());
-        return userOperatorExpression;
+        return new UserOperatorExpression(getFirstColor());
     }
 
     public boolean isIntegerRange(){

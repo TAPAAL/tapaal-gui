@@ -6,13 +6,10 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 public class PredecessorExpression extends ColorExpression {
-    private ColorExpression color;
+    private final ColorExpression color;
 
     public ColorExpression getPredecessorExpression(){
         return this.color;
@@ -24,7 +21,7 @@ public class PredecessorExpression extends ColorExpression {
 
     //Missing implementation for evaluation - might not be needed
     public List<Color> eval(ExpressionContext context) {
-        return Arrays.asList(color.eval(context).get(0).predecessor());
+        return Collections.singletonList(color.eval(context).get(0).predecessor());
     }
 
     @Override
@@ -104,8 +101,7 @@ public class PredecessorExpression extends ColorExpression {
     public ExprStringPosition[] getChildren() {
 
         ExprStringPosition pos = new ExprStringPosition(0, color.toString().length() - 2, color);
-        ExprStringPosition[] children = {pos};
-        return children;
+        return new ExprStringPosition[]{pos};
     }
 
     @Override
@@ -119,8 +115,8 @@ public class PredecessorExpression extends ColorExpression {
     }
 
     @Override
-    public ColorExpression getButtomColorExpression(){
-        return color.getButtomColorExpression();
+    public ColorExpression getBottomColorExpression(){
+        return color.getBottomColorExpression();
     }
 
     @Override

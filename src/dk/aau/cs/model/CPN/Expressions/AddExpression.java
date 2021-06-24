@@ -2,19 +2,16 @@ package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
-import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
 public class AddExpression extends ArcExpression {
 
-    private Vector<ArcExpression> constituents;
+    private final Vector<ArcExpression> constituents;
 
     public AddExpression(Vector<ArcExpression> constituents) {
         this.constituents = constituents;
@@ -41,10 +38,6 @@ public class AddExpression extends ArcExpression {
         }
         assert(result != null);
         return result;
-    }
-
-    public void expressionType() {
-
     }
 
     public Integer weight() {
@@ -89,8 +82,8 @@ public class AddExpression extends ArcExpression {
 
     @Override
     public boolean containsPlaceHolder() {
-        for (int i = 0; i <constituents.size(); i++) {
-            if (constituents.get(i).containsPlaceHolder()) {
+        for (ArcExpression constituent : constituents) {
+            if (constituent.containsPlaceHolder()) {
                 return true;
             }
         }
@@ -99,9 +92,9 @@ public class AddExpression extends ArcExpression {
 
     @Override
     public ArcExpression findFirstPlaceHolder() {
-        for (int i = 0; i <constituents.size(); i++) {
-            if (constituents.get(i).containsPlaceHolder()) {
-                return constituents.get(i).findFirstPlaceHolder();
+        for (ArcExpression constituent : constituents) {
+            if (constituent.containsPlaceHolder()) {
+                return constituent.findFirstPlaceHolder();
             }
         }
         return null;
@@ -122,7 +115,6 @@ public class AddExpression extends ArcExpression {
         ExprStringPosition[] children = new ExprStringPosition[constituents.size()];
         int i = 0;
         int endPrev = 0;
-        boolean wasPrevSimple = false;
         for (ArcExpression p : constituents) {
 
             int start = 1;
@@ -176,18 +168,18 @@ public class AddExpression extends ArcExpression {
     }
 
     public String toString() {
-        String res = "(" + constituents.get(0).toString();
+        StringBuilder res = new StringBuilder("(" + constituents.get(0).toString());
         for (int i = 1; i < constituents.size(); ++i) {
-            res += " + " + constituents.get(i).toString();
+            res.append(" + ").append(constituents.get(i).toString());
         }
         return res + ")";
     }
 
     public String toTokenString() {
-        String res = "";
-        for (int i = 0; i < constituents.size(); ++i) {
-            res +=  constituents.get(i).toString() + "\n";
+        StringBuilder res = new StringBuilder();
+        for (ArcExpression constituent : constituents) {
+            res.append(constituent.toString()).append("\n");
         }
-        return res;
+        return res.toString();
     }
 }

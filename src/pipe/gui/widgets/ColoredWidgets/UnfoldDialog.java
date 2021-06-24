@@ -1,19 +1,11 @@
 package pipe.gui.widgets.ColoredWidgets;
 
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.ProductType;
-import org.jdesktop.swingx.JXComboBox;
 import pipe.gui.CreateGui;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 public class UnfoldDialog extends JDialog {
     private final static String TOOL_TIP_PARTITIONING = "Partitions the colors into logically equivalent groups before unfolding";
@@ -23,9 +15,6 @@ public class UnfoldDialog extends JDialog {
     private JCheckBox usePartition;
     private JCheckBox useColorFixpoint;
     private JCheckBox useSymmetricvars;
-
-    private JPanel mainPanel;
-    private JButton okButton;
 
     private static TabContent currentTab;
 
@@ -58,7 +47,7 @@ public class UnfoldDialog extends JDialog {
 
     private void initComponents()  {
         setLayout(new FlowLayout());
-        mainPanel = new JPanel(new GridBagLayout());
+        JPanel mainPanel = new JPanel(new GridBagLayout());
 
         JPanel checkboxPanel = createCheckboxPanel();
 
@@ -121,7 +110,7 @@ public class UnfoldDialog extends JDialog {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
 
-        okButton = new JButton("OK");
+        JButton okButton = new JButton("OK");
         okButton.setMaximumSize(new Dimension(100, 25));
         okButton.setMinimumSize(new Dimension(100, 25));
         okButton.setPreferredSize(new Dimension(100, 25));

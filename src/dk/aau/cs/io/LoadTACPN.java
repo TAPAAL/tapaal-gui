@@ -11,24 +11,16 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import pipe.gui.CreateGui;
-import pipe.gui.MessengerImpl;
 
-import javax.swing.*;
-import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Vector;
 
 public class LoadTACPN { //the import feature for CPN and load for TACPN share similarities. These similarities are shared here. Feel free to find a better name for this class
 
-    private HashMap<String, ColorType> colortypes = new HashMap<String, ColorType>();
-    private HashMap<String, Variable> variables = new HashMap<String, Variable>();
-    private HashMap<String, ColorExpression> tupleVarExpressions = new HashMap<>();
+    private final HashMap<String, ColorType> colortypes = new HashMap<>();
+    private final HashMap<String, Variable> variables = new HashMap<>();
+    private final HashMap<String, ColorExpression> tupleVarExpressions = new HashMap<>();
     private final Collection<String> messages = new ArrayList<>(10);
 
     public HashMap<String, ColorType> getColortypes() {
@@ -89,15 +81,15 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                 int constituentCounter = 1;
 
                 Vector<ColorExpression> constituentVarExpressions = new Vector<>();
-                renameWarnings.append("The product variable " + var.getName() + ", was unfolded to (");
+                renameWarnings.append("The product variable ").append(var.getName()).append(", was unfolded to (");
 
                 for(ColorType colorType : var.getColorType().getProductColorTypes()){
-                    String elementSubstring = "_" + constituentCounter;
+                    StringBuilder elementSubstring = new StringBuilder("_" + constituentCounter);
                     while (variables.containsKey(varName + elementSubstring) || newVars.containsKey(varName + elementSubstring)){
-                        elementSubstring += "_1";
+                        elementSubstring.append("_1");
                     }
 
-                    renameWarnings.append(varName + elementSubstring + ",");
+                    renameWarnings.append(varName).append(elementSubstring).append(",");
 
                     Variable newVar = new Variable(var.getName() + elementSubstring, varName + elementSubstring, colorType);
                     Require.that(newVars.put(varName + elementSubstring, newVar) == null, "the id " + varName + elementSubstring + ", was already used");
@@ -137,7 +129,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         String id = getAttribute(node, "id").getNodeValue();
 
         if (typetag.equals("productsort")) {
-            ProductType pt = new ProductType(name, name);
+            ProductType pt = new ProductType(name);
             Node typechild = skipWS(type.getFirstChild());
             while (typechild != null) {
                 if (typechild.getNodeName().equals("usersort")) {
@@ -177,7 +169,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
 
     @SuppressWarnings("Duplicates")
     public ColorType parseUserSort(Node node) throws FormatException {
-        if (node != null && node instanceof Element) {
+        if (node instanceof Element) {
             Node child = skipWS(node.getFirstChild());
             while (child != null) {
                 String name = child.getNodeName();
@@ -193,41 +185,12 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         throw new FormatException(String.format("Could not parse %s as an usersort\n", node.getNodeName()));
     }
 
-    public Point parseGraphics(Node node, PNMLoader.GraphicsType type){
-        if(node == null || !(node instanceof Element)){
-            if(type == PNMLoader.GraphicsType.Offset)
-                return new Point(0, -10);
-            else
-                return new Point(100, 100);
-        }
-
-        Element offset = (Element)getFirstDirectChild(node, type == PNMLoader.GraphicsType.Offset ? "offset" : "position");
-
-        String x = offset.getAttribute("x");
-        String y = offset.getAttribute("y");
-
-        int xd = Math.round(Float.valueOf(x).floatValue());
-        int yd = Math.round(Float.valueOf(y).floatValue());
-
-        return new Point(xd, yd);
-    }
-
-    Node getFirstDirectChild(Node parent, String tagName){
-        NodeList children = parent.getChildNodes();
-        for(int i = 0; i < children.getLength(); i++){
-            if(children.item(i).getNodeName().equals(tagName)){
-                return children.item(i);
-            }
-        }
-        return null;
-    }
-
     public ArcExpression parseArcExpression(Node node) throws FormatException {
         String name = node.getNodeName();
         if (name.equals("numberof")) {
             return parseNumberOfExpression(node);
         } else if (name.equals("add")) {
-            Vector<ArcExpression> constituents = new Vector<ArcExpression>();
+            Vector<ArcExpression> constituents = new Vector<>();
 
             Node child = skipWS(node.getFirstChild());
             while (child != null) {
@@ -287,7 +250,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             subnode = number;
             numberval = 1;
         }
-        Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
+        Vector<ColorExpression> colorexps = new Vector<>();
         while (subnode != null) {
             ColorExpression colorexp = parseColorExpression(subnode);
             colorexps.add(colorexp);
@@ -338,7 +301,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             ColorType ct = parseUserSort(node);
             return new AllExpression(ct);
         } else if (name.equals("tuple")) {
-            Vector<ColorExpression> colorexps = new Vector<ColorExpression>();
+            Vector<ColorExpression> colorexps = new Vector<>();
 
             Node child = skipWS(node.getFirstChild());
             while (child != null) {
@@ -408,7 +371,6 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         } else if (name.equals("or")) {
             Node left = skipWS(node.getFirstChild());
             Node right = skipWS(left.getNextSibling());
-            GuardExpression leftg = parseGuardExpression(left);
             if(right == null){
                 return parseGuardExpression(left);
             }
@@ -430,7 +392,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         ColorExpression leftexp = parseColorExpression(left);
         Node right = skipWS(left.getNextSibling());
         ColorExpression rightexp = parseColorExpression(right);
-        return new Tuple<ColorExpression, ColorExpression>(leftexp, rightexp);
+        return new Tuple<>(leftexp, rightexp);
     }
 
     private Tuple<GuardExpression,GuardExpression> parseLRGuardExpressions(Node node) throws FormatException {
@@ -438,7 +400,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         GuardExpression leftexp = parseGuardExpression(left);
         Node right = skipWS(left.getNextSibling());
         GuardExpression rightexp = parseGuardExpression(right);
-        return new Tuple<GuardExpression, GuardExpression>(leftexp, rightexp);
+        return new Tuple<>(leftexp, rightexp);
     }
 
     Color findColorForIntRange(String value, String start, String end) throws FormatException {

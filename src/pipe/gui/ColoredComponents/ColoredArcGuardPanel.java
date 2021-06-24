@@ -42,7 +42,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     boolean isInputArc = false;
     boolean isInhibitorArc = false;
     Context context;
-    private Integer transportWeight;
     ColoredArcGuardPanel.ExpressionConstructionUndoManager undoManager;
     UndoableEditSupport undoSupport;
 
@@ -110,16 +109,16 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         JPanel colorIntervalEditPanel = new JPanel(new GridBagLayout());
         nonDefaultArcColorIntervalPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Color specific time intervals"));
 
-        colorIntervalComboboxPanel = new ColorComboboxPanel(colorType, "colors") {
+        colorIntervalComboboxPanel = new ColorComboboxPanel(colorType) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
                 ColoredTimeInterval timeConstraint;
                 if (!(colorType instanceof ProductType)) {
                     timeConstraint = ColoredTimeInterval.ZERO_INF_DYN_COLOR((dk.aau.cs.model.CPN.Color) comboBoxes[0].getItemAt(comboBoxes[0].getSelectedIndex()));
                 } else {
-                    Vector<dk.aau.cs.model.CPN.Color> colors = new Vector<dk.aau.cs.model.CPN.Color>();
-                    for (int i = 0; i < comboBoxes.length; i++) {
-                        colors.add((dk.aau.cs.model.CPN.Color) comboBoxes[i].getItemAt(comboBoxes[i].getSelectedIndex()));
+                    Vector<dk.aau.cs.model.CPN.Color> colors = new Vector<>();
+                    for (JComboBox comboBox : comboBoxes) {
+                        colors.add((dk.aau.cs.model.CPN.Color) comboBox.getItemAt(comboBox.getSelectedIndex()));
                     }
                     dk.aau.cs.model.CPN.Color color = new dk.aau.cs.model.CPN.Color(colorType, 0, colors);
                     timeConstraint = ColoredTimeInterval.ZERO_INF_DYN_COLOR(color);
@@ -176,11 +175,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
                     colorIntervalComboboxPanel.updateSelection(cti.getColor());
                     addTimeConstraintButton.setText("Modify");
                 }
-                if(timeConstraintList.isSelectionEmpty()){
-                    removeTimeConstraintButton.setEnabled(false);
-                } else{
-                    removeTimeConstraintButton.setEnabled(true);
-                }
+                removeTimeConstraintButton.setEnabled(!timeConstraintList.isSelectionEmpty());
             }
         });
         JScrollPane timeConstraintScrollPane = new JScrollPane(timeConstraintList);
@@ -304,7 +299,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
 
         regularArcExprPanel.setBorder(BorderFactory.createTitledBorder("Arc Expression"));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.weightx = 1.0;
@@ -475,7 +469,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         additionButton.addActionListener(actionEvent -> {
             AddExpression addExpr;
             if (currentSelection.getObject() instanceof ArcExpression) {
-                Vector<ArcExpression> vExpr = new Vector();
+                Vector<ArcExpression> vExpr = new Vector<>();
                 vExpr.add((ArcExpression) currentSelection.getObject());
                 vExpr.add(new PlaceHolderArcExpression());
                 addExpr = new AddExpression(vExpr);
@@ -507,7 +501,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         });
 
         scalarButton.addActionListener(actionEvent -> {
-            ScalarProductExpression scalarExpr = null;
+            ScalarProductExpression scalarExpr;
             Integer value = (Integer)scalarJSpinner.getValue();
             if (currentSelection.getObject() instanceof ArcExpression) {
                 scalarExpr = new ScalarProductExpression(value, (ArcExpression) currentSelection.getObject());
@@ -532,7 +526,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         gbc.insets = new Insets(2, 0, 2, 0);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        gbc.gridy = 3;
         arithmeticPanel.add(subtractionButton, gbc);
 
         gbc.gridx = 0;
@@ -554,7 +547,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private void initNumberExpressionsPanel() {
         numberExprPanel = new JPanel(new GridBagLayout());
         numberExprPanel.setBorder(BorderFactory.createTitledBorder("Numerical Expressions"));
-        colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, "colors", true, context) {
+        colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, true, context) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
 
@@ -733,9 +726,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             if (currentSelection.getObject() instanceof ArcExpression) {
                 replacement = getSpecificChildOfProperty(1, currentSelection.getObject());
             }
-            else if (currentSelection.getObject() instanceof ArcExpression) {
-                replacement = new PlaceHolderColorExpression();
-            }
             if (replacement != null) {
                 UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), replacement);
                 arcExpression = arcExpression.replace(currentSelection.getObject(), replacement);
@@ -748,8 +738,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private ArcExpression getSpecificChildOfProperty(int number, Expression property) {
         ExprStringPosition[] children = property.getChildren();
         int count = 0;
-        for (int i = 0; i < children.length; i++) {
-            Expression child = children[i].getObject();
+        for (ExprStringPosition exprStringPosition : children) {
+            Expression child = exprStringPosition.getObject();
             if (child instanceof ArcExpression) {
                 count++;
             }
@@ -1010,7 +1000,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
 
     public DefaultListModel getTimeConstraintModel() {return timeConstraintListModel;}
     private List<ColoredTimeInterval> getctiList() {
-        List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>();
+        List<ColoredTimeInterval> ctiList = new ArrayList<>();
         for (int i = 0; i < getTimeConstraintModel().size(); i++) {
             ctiList.add((ColoredTimeInterval) getTimeConstraintModel().get(i));
         }
@@ -1052,7 +1042,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         succButton.setEnabled(false);
         predButton.setEnabled(false);
         succButton.setEnabled(false);
-        predButton.setEnabled(false);;
+        predButton.setEnabled(false);
         resetExprButton.setText("Parse Expression");
         editExprButton.setText("Cancel");
         clearSelection();
@@ -1073,11 +1063,10 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     public abstract void disableOkButton();
     public abstract void enableOkButton();
 
-    private ColorType colorType;
+    private final ColorType colorType;
     private ColorType selectedColorType;
     private JPanel regularArcExprPanel;
     JPanel nonDefaultArcColorIntervalPanel;
-    JPanel transportWeightPanel;
     DefaultListModel timeConstraintListModel;
     JList timeConstraintList;
     private ExprStringPosition currentSelection = null;
@@ -1085,7 +1074,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private ArcExpression arcExpression;
     private JTextPane exprField;
     JButton allExpressionButton;
-    JButton editColorExpressionButton;
     JButton addTimeConstraintButton;
     JButton removeTimeConstraintButton;
     JButton editTimeConstraintButton;
@@ -1099,8 +1087,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     JButton scalarButton;
     JSpinner scalarJSpinner;
     JButton addExpressionButton;
-    SpinnerNumberModel numberModel;
-    JSpinner colorExpressionWeightSpinner;
     ColorComboboxPanel colorIntervalComboboxPanel;
     ColoredTimeIntervalDialogPanel intervalEditorPanel;
 
@@ -1134,8 +1120,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     }
 
     public class ExpressionConstructionEdit extends AbstractUndoableEdit {
-        private Expression original;
-        private Expression replacement;
+        private final Expression original;
+        private final Expression replacement;
 
         public Expression getOriginal() {
             return original;

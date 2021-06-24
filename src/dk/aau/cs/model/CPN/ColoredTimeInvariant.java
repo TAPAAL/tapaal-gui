@@ -2,13 +2,10 @@ package dk.aau.cs.model.CPN;
 
 import dk.aau.cs.model.tapn.*;
 
-import java.math.BigDecimal;
 import java.util.Vector;
 
 public class ColoredTimeInvariant extends TimeInvariant {
     private Color color;
-    private static final Color dotConstant = new Color(null, null, "dot");
-    public static final ColoredTimeInvariant LESS_THAN_INFINITY_AND_DOT = new ColoredTimeInvariant(false, Bound.Infinity, dotConstant);
     public static final ColoredTimeInvariant LESS_THAN_INFINITY_AND_STAR = new ColoredTimeInvariant(false, Bound.Infinity, Color.STAR_COLOR);
 
     public ColoredTimeInvariant(boolean isUpperIncluded, Bound upper, Color color) {
@@ -16,7 +13,7 @@ public class ColoredTimeInvariant extends TimeInvariant {
         this.color = color;
     }
 
-    public static final ColoredTimeInvariant LESS_THAN_INFINITY_DYN_COLOR(Color color) {
+    public static  ColoredTimeInvariant LESS_THAN_INFINITY_DYN_COLOR(Color color) {
         return new ColoredTimeInvariant(false, Bound.Infinity, color);
     }
 
@@ -54,7 +51,7 @@ public class ColoredTimeInvariant extends TimeInvariant {
         if (operator.equals("<=") && boundAsString.equals("inf"))
             return null;
 
-        Bound bound = null;
+        Bound bound;
         if (boundAsString.equals("inf"))
             bound = Bound.Infinity;
         else {
@@ -87,9 +84,7 @@ public class ColoredTimeInvariant extends TimeInvariant {
             return false;
         if (!(cti.isUpperNonstrict() == this.isUpperNonstrict()))
             return false;
-        if (!(cti.upperBound().value() == this.upperBound().value()))
-            return false;
-        return true;
+        return cti.upperBound().value() == this.upperBound().value();
     }
 
     public boolean equalsOnlyColor(Object o) {
@@ -99,10 +94,7 @@ public class ColoredTimeInvariant extends TimeInvariant {
         else
             cti = (ColoredTimeInvariant) o;
 
-        if (!cti.color.equals(this.color))
-            return false;
-
-        return true;
+        return cti.color.equals(this.color);
     }
 
     @Override

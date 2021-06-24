@@ -45,7 +45,7 @@ public abstract class ColorExpression extends Expression {
 
     public abstract boolean isComparable(ColorExpression otherExpr);
 
-    public abstract ColorExpression getButtomColorExpression();
+    public abstract ColorExpression getBottomColorExpression();
 
     public abstract Vector<ColorType> getColorTypes();
 

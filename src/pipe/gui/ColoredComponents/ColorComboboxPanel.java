@@ -8,22 +8,13 @@ import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.TupleExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
-import net.tapaal.swinghelpers.GridBagHelper;
-
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.util.Iterator;
-import java.util.Vector;
+
 
 public abstract class ColorComboboxPanel extends JPanel {
 
     private ColorType colorType;
-    private String panelName;
-
     private JPanel colorcomboBoxPanel;
     private JComboBox[] colorTypeComboBoxesArray;
     JScrollPane colorTypesScrollPane;
@@ -31,12 +22,11 @@ public abstract class ColorComboboxPanel extends JPanel {
     boolean showAllElement;
     Context context;
 
-    public ColorComboboxPanel(ColorType colorType, String panelName) {
-        this(colorType,panelName,false, null);
+    public ColorComboboxPanel(ColorType colorType) {
+        this(colorType,false, null);
     }
-    public ColorComboboxPanel(ColorType colorType, String panelName, boolean showAllElement, Context context){
+    public ColorComboboxPanel(ColorType colorType, boolean showAllElement, Context context){
         this.colorType = colorType;
-        this.panelName = panelName;
         this.showAllElement = showAllElement;
         this.setLayout(new BorderLayout());
         this.context = context;

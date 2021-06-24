@@ -46,7 +46,7 @@ public class WidthAdjustingComboBox extends JComboBox{
 		JPopupMenu popup = (JPopupMenu) comp;
 		//the following is a hack to fix a compatibility issue with the PopUpMenu-class
 		Component[] listOfComponents = popup.getComponents();
-		JScrollPane scrollPane = null;
+		JScrollPane scrollPane;
 		for (Component element : listOfComponents) {
 			if (element instanceof JScrollPane) {
 				scrollPane = (JScrollPane) element;

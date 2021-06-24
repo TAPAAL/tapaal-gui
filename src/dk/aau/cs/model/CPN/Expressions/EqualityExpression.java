@@ -89,7 +89,6 @@ public class EqualityExpression extends GuardExpression implements LeftRightGuar
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[2];
         int endPrev = 0;
-        boolean wasPrevSimple = false;
 
         int start = 0;
         int end = 0;

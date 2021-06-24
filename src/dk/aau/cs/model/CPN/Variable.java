@@ -31,7 +31,4 @@ public class Variable {
         return "<html>" + name + "<b> in </b>" + colorType.getName() + "</html>";
     }
 
-    public String toString2() {
-        return name;
-    }
 }

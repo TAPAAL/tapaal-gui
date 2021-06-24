@@ -19,8 +19,7 @@ public abstract class Expression {
 
     public ExprStringPosition objectAt(int index) {
         ExprStringPosition[] children = getChildren();
-        for (int i = 0; i < children.length; i++) {
-            ExprStringPosition child = children[i];
+        for (ExprStringPosition child : children) {
             if (child.getStart() <= index && index <= child.getEnd()) {
                 int start = child.getStart();
                 return child.getObject().objectAt(index - start).addOffset(start);
@@ -35,10 +34,10 @@ public abstract class Expression {
         }
         else {
             ExprStringPosition[] children = getChildren();
-            for (int i = 0; i < children.length; i++) {
-                ExprStringPosition position = children[i].getObject().indexOf(property);
+            for (ExprStringPosition child : children) {
+                ExprStringPosition position = child.getObject().indexOf(property);
                 if (position != null) {
-                    return position.addOffset(children[i].getStart());
+                    return position.addOffset(child.getStart());
                 }
             }
             return null;
@@ -51,8 +50,7 @@ public abstract class Expression {
     public abstract Expression copy();
 
     public ExprStringPosition[] getChildren() {
-        ExprStringPosition[] children = {};
-        return children;
+        return new ExprStringPosition[]{};
     }
 
     public abstract boolean containsPlaceHolder();

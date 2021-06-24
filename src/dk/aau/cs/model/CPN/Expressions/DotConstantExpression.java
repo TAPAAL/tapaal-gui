@@ -5,7 +5,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -16,7 +16,7 @@ public class DotConstantExpression extends UserOperatorExpression {
     }
 
     public List<Color> eval(ExpressionContext context) {
-        return Arrays.asList(ColorType.COLORTYPE_DOT.getFirstColor());
+        return Collections.singletonList(ColorType.COLORTYPE_DOT.getFirstColor());
     }
 
     @Override
@@ -91,17 +91,17 @@ public class DotConstantExpression extends UserOperatorExpression {
 
     @Override
     public boolean isComparable(ColorExpression otherExpr){
-        otherExpr = otherExpr.getButtomColorExpression();
+        otherExpr = otherExpr.getBottomColorExpression();
         return otherExpr instanceof DotConstantExpression;
     }
 
     @Override
-    public ColorExpression getButtomColorExpression() {
+    public ColorExpression getBottomColorExpression() {
         return this;
     }
 
     @Override
     public Vector<ColorType> getColorTypes() {
-        return new Vector<>(Arrays.asList(ColorType.COLORTYPE_DOT));
+        return new Vector<>(Collections.singletonList(ColorType.COLORTYPE_DOT));
     }
 }

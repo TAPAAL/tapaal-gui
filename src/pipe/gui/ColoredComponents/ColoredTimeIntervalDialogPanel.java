@@ -12,10 +12,7 @@ import pipe.gui.widgets.WidthAdjustingComboBox;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.List;
 import java.util.*;
 
@@ -24,10 +21,6 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
     Context context;
     ColoredTimeInterval coloredTimeInterval;
     JRootPane rootPane;
-
-    JPanel buttonPanel;
-    JButton okButton;
-    JButton cancelButton;
 
     JPanel guardEditPanel;
     JLabel label;
@@ -59,8 +52,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         coloredTimeInterval = cti;
 
         String[] partedTimeInterval = intervalAsString.split(",");
-        String firstNumber = partedTimeInterval[0].substring(1,
-                partedTimeInterval[0].length());
+        String firstNumber = partedTimeInterval[0].substring(1);
         String secondNumber = partedTimeInterval[1].substring(0,
                 partedTimeInterval[1].length() - 1);
         int first = 0, second = 0;
@@ -133,19 +125,19 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         boolean useConstantLeft = leftUseConstant.isSelected();
         boolean useConstantRight = rightUseConstant.isSelected();
 
-        String leftDelim = leftDelimiter.getSelectedItem().toString();
-        String rightDelim = rightDelimiter.getSelectedItem().toString();
-        Bound leftInterval = null;
-        Bound rightInterval = null;
+        String leftDelim = Objects.requireNonNull(leftDelimiter.getSelectedItem()).toString();
+        String rightDelim = Objects.requireNonNull(rightDelimiter.getSelectedItem()).toString();
+        Bound leftInterval;
+        Bound rightInterval;
 
         if (useConstantLeft) {
-            String constantName = leftConstantsComboBox.getSelectedItem().toString();
+            String constantName = Objects.requireNonNull(leftConstantsComboBox.getSelectedItem()).toString();
             leftInterval = new ConstantBound(CreateGui.getCurrentTab().network().getConstant(constantName));
         } else
             leftInterval = new IntBound((Integer) firstIntervalNumber.getValue());
 
         if (useConstantRight) {
-            String constantName = rightConstantsComboBox.getSelectedItem().toString();
+            String constantName = Objects.requireNonNull(rightConstantsComboBox.getSelectedItem()).toString();
             rightInterval = new ConstantBound(CreateGui.getCurrentTab().network().getConstant(constantName));
         } else if (inf.isSelected())
             rightInterval = Bound.Infinity;
@@ -155,8 +147,8 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         if (rightInterval instanceof Bound.InfBound
                 || leftInterval.value() <= rightInterval.value()) {
             return new ColoredTimeInterval(
-                    (leftDelim.equals("[") ? true : false), leftInterval,
-                    rightInterval, (rightDelim.equals("]") ? true : false), coloredTimeInterval.getColor());
+                    (leftDelim.equals("[")), leftInterval,
+                    rightInterval, (rightDelim.equals("]")), coloredTimeInterval.getColor());
         } else {
             return oldGuard;
         }
@@ -281,12 +273,10 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         //	leftConstantsComboBox.setMaximumSize(intervalBoxDims);
         //  leftConstantsComboBox.setMinimumSize(intervalBoxDims);
         leftConstantsComboBox.setPreferredSize(intervalBoxDims);
-        leftConstantsComboBox.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    updateRightConstantComboBox();
-                    setDelimiterModels();
-                }
+        leftConstantsComboBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                updateRightConstantComboBox();
+                setDelimiterModels();
             }
         });
 
@@ -352,8 +342,8 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
             secondValue = firstValue;
         }
 
-        String leftOldDelim = leftDelimiter.getSelectedItem().toString();
-        String rightOldDelim = rightDelimiter.getSelectedItem().toString();
+        String leftOldDelim = Objects.requireNonNull(leftDelimiter.getSelectedItem()).toString();
+        String rightOldDelim = Objects.requireNonNull(rightDelimiter.getSelectedItem()).toString();
 
         if (firstValue == secondValue) {
             rightDelimiter.setModel(modelRightIncludedOnly);
@@ -406,7 +396,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         int secondValue;
         if (rightUseConstant.isSelected()) {
             secondValue = CreateGui.getCurrentTab().network().getConstantValue(
-                    rightConstantsComboBox.getSelectedItem().toString());
+                    Objects.requireNonNull(rightConstantsComboBox.getSelectedItem()).toString());
         } else if (inf.isSelected()) {
             secondValue = Integer.MAX_VALUE;
         } else {
@@ -420,7 +410,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         int firstValue;
         if (leftUseConstant.isSelected()) {
             firstValue = CreateGui.getCurrentTab().network().getConstantValue(
-                    leftConstantsComboBox.getSelectedItem().toString());
+                    Objects.requireNonNull(leftConstantsComboBox.getSelectedItem()).toString());
         } else {
             firstValue = Integer.parseInt(String.valueOf(firstIntervalNumber
                     .getValue()));
@@ -439,7 +429,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
                 .constants();
 
         //List <Constant> constantList = new ArrayList(constants);
-        List<Constant> constantList = new ArrayList<Constant>(constants);
+        List<Constant> constantList = new ArrayList<>(constants);
 
         constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 
@@ -450,11 +440,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
             }
         }
 
-        if(rightConstantsComboBox.getItemCount() == 0){
-            rightUseConstant.setEnabled(false);
-        } else {
-            rightUseConstant.setEnabled(true);
-        }
+        rightUseConstant.setEnabled(rightConstantsComboBox.getItemCount() != 0);
 
         if (oldRight != null)
             rightConstantsComboBox.setSelectedItem(oldRight);

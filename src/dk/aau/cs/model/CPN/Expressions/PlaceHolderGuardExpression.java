@@ -71,12 +71,7 @@ public class PlaceHolderGuardExpression extends GuardExpression implements Place
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof PlaceHolderGuardExpression) {
-            return  true;
-        }
-        else {
-            return false;
-        }
+        return o instanceof PlaceHolderGuardExpression;
     }
 
 }

@@ -15,11 +15,6 @@ public class PlaceHolderArcExpression extends ArcExpression implements PlaceHold
     }
 
     @Override
-    public void expressionType() {
-
-    }
-
-    @Override
     public Integer weight() {
         return null;
     }

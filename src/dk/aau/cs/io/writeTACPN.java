@@ -4,7 +4,6 @@ import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 import org.w3c.dom.Document;
@@ -16,7 +15,7 @@ import pipe.gui.graphicElements.tapn.*;
 
 
 public class writeTACPN { // both export and save share some of the same syntax for CPN and TACPN. That shared code is presented here.
-    private TimedArcPetriNetNetwork network;
+    private final TimedArcPetriNetNetwork network;
 
     public writeTACPN(TimedArcPetriNetNetwork network) {
         this.network = network;
@@ -334,8 +333,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
             Element hlInitialMarking = document.createElement("hlinitialMarking");
             Element hlInitialMarkingText = document.createElement("text");
             hlInitialMarking.appendChild(hlInitialMarkingText);
-            String tokenNames = "";
-            tokenNames = inputPlace.getTokensAsExpression().toString();
+            String tokenNames = inputPlace.getTokensAsExpression().toString();
             hlInitialMarkingText.setTextContent(tokenNames);
             placeElement.appendChild(hlInitialMarking);
             Element hlStructure = document.createElement("structure");

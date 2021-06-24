@@ -6,7 +6,6 @@ import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.*;
@@ -18,9 +17,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.*;
-import dk.aau.cs.verification.VerifyTAPN.VerifyCPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNUnfoldOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
@@ -30,7 +27,10 @@ import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,8 +90,8 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         }
         try {
             TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
-            ArrayList<Template> templates = new ArrayList<Template>(1);
-            ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>(1);
+            ArrayList<Template> templates = new ArrayList<>(1);
+            ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<>(1);
 
 
             network.add(transformedModel.value1());
@@ -114,14 +114,10 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
 
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
+        } catch (IOException | ParserConfigurationException | TransformerException e) {
             e.printStackTrace();
         }
-        List<TAPNQuery> clonedQueries = new Vector<TAPNQuery>();
+        List<TAPNQuery> clonedQueries = new Vector<>();
         if (queries.iterator().hasNext()) {
             for (pipe.dataLayer.TAPNQuery query : queries) {
                 pipe.dataLayer.TAPNQuery clonedQuery = query.copy();
@@ -148,8 +144,8 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             for(pipe.dataLayer.TAPNQuery query : clonedQueries){
                 if (query.getCategory() == TAPNQuery.QueryCategory.CTL || !lens.isTimed()) {
                     formattedQueries = XMLVisitor.getXMLQueryFor(query.getProperty(), query.getName());
-                } else if (lens != null && lens.isGame()) {
-                    queryStream.append("control: " + query.getProperty().toString());
+                } else if (lens.isGame()) {
+                    queryStream.append("control: ").append(query.getProperty().toString());
                 } else {
                     queryStream.append(query.getProperty().toString());
                 }
@@ -176,12 +172,7 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
 
         if(netSize > maxNetSize){
             //We make a thread so the workers doesn't cancel itself before showing the dialog
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    JOptionPane.showMessageDialog(CreateGui.getApp(), "The unfolded net is too large to be loaded");
-                }
-            }).start();
+            new Thread(() -> JOptionPane.showMessageDialog(CreateGui.getApp(), "The unfolded net is too large to be loaded")).start();
             cancel(true);
             return null;
         }
@@ -189,7 +180,6 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         File fileOut = new File(modelOut.getAbsolutePath());
         TabContent newTab;
         LoadedModel loadedModel = null;
-        Collection<TAPNQuery> queries;
         try {
             if(lens.isTimed()){
                 loadedModel = new TapnXmlLoader().load(fileOut);
@@ -204,11 +194,7 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
                 }
             }
 
-            Thread thread = new Thread(){
-                public void run(){
-                    CreateGui.getApp().guiFrameController.ifPresent(o -> o.openTab(newTab));
-                }
-            };
+            Thread thread = new Thread(() -> CreateGui.getApp().guiFrameController.ifPresent(o -> o.openTab(newTab)));
             thread.start();
             while(thread.isAlive()){
                 if(isCancelled()){
@@ -232,9 +218,7 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
 
     public static List<pipe.dataLayer.TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network) {
         XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network);
-        List<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>();
-        queries.addAll(queryLoader.parseQueries().getQueries());
-        return queries;
+        return new ArrayList<>(queryLoader.parseQueries().getQueries());
     }
 
     private int readUnfoldedSize(BufferedReader reader){
@@ -245,7 +229,7 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             return 0;
         }
         int numElements = 0;
-        String line = null;
+        String line;
         try {
             while ((line = reader.readLine()) != null) {
                 if(line.startsWith("Size of unfolded net: ")){
@@ -263,33 +247,4 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         return numElements;
     }
 
-    @SuppressWarnings("Duplicates")
-    public static String readOutput(BufferedReader reader) {
-        try {
-            if (!reader.ready())
-                return "";
-        } catch (IOException e1) {
-            return "";
-        }
-        StringBuffer buffer = new StringBuffer();
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                if(line.startsWith("Size of unfolded net: ")){
-                    LinkedList<String> numbers = new LinkedList<String>();
-
-                    Pattern p = Pattern.compile("\\d+");
-                    Matcher m = p.matcher(line);
-                    while (m.find()) {
-                        numbers.add(m.group());
-                    }
-                }
-                buffer.append(line);
-                buffer.append(System.getProperty("line.separator"));
-            }
-        } catch (IOException e) {
-        }
-
-        return buffer.toString();
-    }
 }

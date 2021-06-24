@@ -6,10 +6,7 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Variable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 public class AllExpression extends ColorExpression {
 
@@ -109,8 +106,7 @@ public class AllExpression extends ColorExpression {
 
     @Override
     public ExprStringPosition[] getChildren() {
-        ExprStringPosition[] children = new ExprStringPosition[0];
-        return children;
+        return new ExprStringPosition[0];
     }
 
     @Override
@@ -128,12 +124,12 @@ public class AllExpression extends ColorExpression {
     }
 
     @Override
-    public ColorExpression getButtomColorExpression(){
+    public ColorExpression getBottomColorExpression(){
         return this;
     }
 
     @Override
     public Vector<ColorType> getColorTypes(){
-        return new Vector<>(Arrays.asList(sort));
+        return new Vector<>(Collections.singletonList(sort));
     }
 }

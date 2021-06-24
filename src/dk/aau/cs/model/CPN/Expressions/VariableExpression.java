@@ -6,14 +6,11 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 public class VariableExpression extends ColorExpression {
 
-    private Variable variable;
+    private final Variable variable;
 
     public Variable getVariable() {
         return this.variable;
@@ -24,7 +21,7 @@ public class VariableExpression extends ColorExpression {
     }
 
     public List<Color> eval(ExpressionContext context) {
-        return Arrays.asList(context.binding.get(variable.getName()));
+        return Collections.singletonList(context.binding.get(variable.getName()));
     }
 
     @Override
@@ -135,8 +132,7 @@ public class VariableExpression extends ColorExpression {
 
     @Override
     public ExprStringPosition[] getChildren() {
-        ExprStringPosition[] children = new ExprStringPosition[0];
-        return children;
+        return new ExprStringPosition[0];
     }
 
     @Override
@@ -152,36 +148,29 @@ public class VariableExpression extends ColorExpression {
     }
     @Override
     public boolean isComparable(ColorExpression otherExpr){
-        otherExpr = otherExpr.getButtomColorExpression();
+        otherExpr = otherExpr.getBottomColorExpression();
         if(otherExpr instanceof TupleExpression){
             return false;
         } else if (otherExpr instanceof UserOperatorExpression){
             UserOperatorExpression otherUserOpExpression = (UserOperatorExpression) otherExpr;
-            if(!variable.getColorType().equals(otherUserOpExpression.getUserOperator().getColorType())){
-                return false;
-            } else {
-                return true;
-            }
+            return variable.getColorType().equals(otherUserOpExpression.getUserOperator().getColorType());
         }
         else if(!(otherExpr instanceof VariableExpression)){
             return false;
         }
         VariableExpression otherUserOpExpression = (VariableExpression) otherExpr;
-        if(!variable.getColorType().equals(otherUserOpExpression.variable.getColorType())){
-            return false;
-        }
-        return true;
+        return variable.getColorType().equals(otherUserOpExpression.variable.getColorType());
     }
 
     @Override
-    public ColorExpression getButtomColorExpression(){
+    public ColorExpression getBottomColorExpression(){
         return this;
     }
 
     @Override
     public Vector<ColorType> getColorTypes(){
 
-        return new Vector<>(Arrays.asList(variable.getColorType()));
+        return new Vector<>(Collections.singletonList(variable.getColorType()));
     }
 
 }

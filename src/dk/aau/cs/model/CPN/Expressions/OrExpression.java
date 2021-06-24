@@ -36,9 +36,7 @@ public class OrExpression extends GuardExpression {
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[2];
 
-        int i = 0;
         int endPrev = 0;
-        boolean wasPrevSimple = false;
         int start = 0;
         int end = 0;
 

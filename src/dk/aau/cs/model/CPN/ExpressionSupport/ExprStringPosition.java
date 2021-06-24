@@ -6,7 +6,7 @@ public class ExprStringPosition {
 
     private int startIndex;
     private int endIndex;
-    private Expression object;
+    private final Expression object;
 
     public ExprStringPosition(int startIndex, int endIndex, Expression object) {
         this.startIndex = startIndex;

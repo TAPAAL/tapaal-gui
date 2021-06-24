@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class ScalarProductExpression extends ArcExpression {
 
-    private Integer scalar;
+    private final Integer scalar;
     private ArcExpression expr;
 
     public ScalarProductExpression(Integer scalar, ArcExpression expr) {
@@ -29,10 +29,6 @@ public class ScalarProductExpression extends ArcExpression {
         ColorMultiset result = expr.eval(context);
         result.scale(scalar);
         return result;
-    }
-
-    public void expressionType() {
-
     }
 
     public Integer getScalar(){
@@ -101,9 +97,8 @@ public class ScalarProductExpression extends ArcExpression {
 
         int end = start + expr.toString().length();
         ExprStringPosition pos = new ExprStringPosition(start, end, expr);
-        ExprStringPosition[] children = {pos};
 
-        return children;
+        return new ExprStringPosition[]{pos};
     }
 
     @Override

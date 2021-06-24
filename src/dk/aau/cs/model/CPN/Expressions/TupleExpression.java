@@ -27,8 +27,8 @@ public class TupleExpression extends ColorExpression {
     }
 
     public List<Color> eval(ExpressionContext context) {
-        Vector<Color> colors = new Vector<Color>();
-        Vector<ColorType> colorTypes = new Vector<ColorType>();
+        Vector<Color> colors = new Vector<>();
+        Vector<ColorType> colorTypes = new Vector<>();
 
         for (ColorExpression ce : this.colors) {
             List<Color> color = ce.eval(context);
@@ -37,7 +37,7 @@ public class TupleExpression extends ColorExpression {
         }
 
         ProductType pt = context.findProductColorType(colorTypes);
-        return Arrays.asList(pt.getColor(colors));
+        return Collections.singletonList(pt.getColor(colors));
     }
 
     @Override
@@ -73,7 +73,7 @@ public class TupleExpression extends ColorExpression {
 
     @Override
     public ColorType getColorType(List<ColorType> colorTypes) {
-        Vector<ColorType> expressionColorTypes = new Vector<ColorType>();
+        Vector<ColorType> expressionColorTypes = new Vector<>();
 
         for (ColorExpression ce : this.colors) {
             expressionColorTypes.add(ce.getColorType(colorTypes));
@@ -92,7 +92,7 @@ public class TupleExpression extends ColorExpression {
     }
     @Override
     public boolean isComparable(ColorExpression otherExpr){
-        otherExpr = otherExpr.getButtomColorExpression();
+        otherExpr = otherExpr.getBottomColorExpression();
         if(!(otherExpr instanceof TupleExpression)){
             return false;
         }
@@ -108,10 +108,6 @@ public class TupleExpression extends ColorExpression {
             }
         }
         return true;
-    }
-
-    public void addColorExpression(ColorExpression expr) {
-        colors.add(expr);
     }
 
     @Override
@@ -187,12 +183,12 @@ public class TupleExpression extends ColorExpression {
     }
 
     public String toString() {
-        String res = "(" + colors.get(0);
+        StringBuilder res = new StringBuilder("(" + colors.get(0));
         for (int i = 1; i < colors.size(); i++) {
-            res += ", " + colors.get(i).toString();
+            res.append(", ").append(colors.get(i).toString());
         }
-        res += ")";
-        return res;
+        res.append(")");
+        return res.toString();
     }
 
     @Override
@@ -226,13 +222,13 @@ public class TupleExpression extends ColorExpression {
     }
 
     @Override
-    public ColorExpression getButtomColorExpression(){
+    public ColorExpression getBottomColorExpression(){
         return this;
     }
 
     @Override
     public Vector<ColorType> getColorTypes(){
-        Vector<ColorType> constituentColorTypes = new Vector<ColorType>();
+        Vector<ColorType> constituentColorTypes = new Vector<>();
         //assumes single level producttypes
         for(ColorExpression uexpr : getColors()){
             constituentColorTypes.addAll(uexpr.getColorTypes());

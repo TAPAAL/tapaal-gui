@@ -44,8 +44,8 @@ public class GreaterThanExpression extends GuardExpression implements LeftRightG
             return obj2;
         }
         else {
-            left = (ColorExpression)left.replace(object1, object2,replaceAllInstances);
-            right = (ColorExpression)right.replace(object1, object2,replaceAllInstances);
+            left = left.replace(object1, object2,replaceAllInstances);
+            right = right.replace(object1, object2,replaceAllInstances);
             return this;
         }
     }
@@ -54,7 +54,6 @@ public class GreaterThanExpression extends GuardExpression implements LeftRightG
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[2];
         int endPrev = 0;
-        boolean wasPrevSimple = false;
 
         int start = 0;
         int end = 0;

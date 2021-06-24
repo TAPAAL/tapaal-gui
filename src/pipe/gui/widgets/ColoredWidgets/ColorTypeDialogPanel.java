@@ -18,7 +18,6 @@ import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -38,7 +37,6 @@ public class ColorTypeDialogPanel extends JPanel {
     private final ConstantsPane.ColorTypesListModel colorTypesListModel;
     private final UndoManager undoManager;
 
-    private JLabel nameLabel;
     private JTextField nameTextField;
     private JComboBox colorTypeComboBox;
     private JLabel colorTypeLabel;
@@ -51,7 +49,6 @@ public class ColorTypeDialogPanel extends JPanel {
     private JTextField upperBoundTextField;
     private JTextField enumTextField;
     private JButton enumAddButton;
-    private JScrollPane enumListScroller;
     private JPanel cyclicAndFiniteEnumerationPanel;
     private JList enumList;
     private JPanel rangeOfIntegersPanel;
@@ -62,15 +59,6 @@ public class ColorTypeDialogPanel extends JPanel {
     private JScrollPane scrollPane;
 
     private static final int MAXIMUM_INTEGER = 10000;
-    private static final String removeColorInColorTypeMessage = "You have removed a color in this color type. " +
-        "\nAll tokens of this color will be removed and all usages of this color in Arc expressions and guards will also be removed,\n " +
-        "while maintaing as much of the expression as possible.\n" +
-        "If the arc expressions are empty they will be converted to 1'{topColor}.\n" +
-        "If the guards are empty they will be removed.\n\n" +
-        "Do you wish to continue?";
-    private static final String editProductTypeMessage = "Editing product types will result in removing all tokens in all places with this colortype\n" +
-        "All arc expressions from such a place will also be reset to 1'{topColor}.\n" +
-        "Do you wish to continue?";
 
     public ColorTypeDialogPanel(JRootPane pane, ConstantsPane.ColorTypesListModel colorTypesListModel,
                                 TimedArcPetriNetNetwork network, UndoManager undoManager) {
@@ -200,7 +188,7 @@ public class ColorTypeDialogPanel extends JPanel {
         nameAndTypePanel.setLayout(new GridBagLayout());
         nameAndTypePanel.setBorder(BorderFactory.createTitledBorder("Name and Color Type"));
 
-        nameLabel = new JLabel();
+        JLabel nameLabel = new JLabel();
         nameLabel.setText("Name: ");
         GridBagConstraints gbcNL = new GridBagConstraints();
         gbcNL.gridx = 0;
@@ -264,23 +252,26 @@ public class ColorTypeDialogPanel extends JPanel {
             JComboBox source = (JXComboBox)e.getSource();
             final String selectedString = source.getSelectedItem().toString();
 
-            if (selectedString.equals(finiteEnumeration) || selectedString.equals(cyclicEnumeration)) {
-                rangeOfIntegersPanel.setVisible(false);
-                productTypePanel.setVisible(false);
-                cyclicAndFiniteEnumerationPanel.setVisible(true);
-                rangeOfIntegersPanelEnabled = false;
-            }
-            else if (selectedString.equals(rangeOfIntegers)) {
-                cyclicAndFiniteEnumerationPanel.setVisible(false);
-                productTypePanel.setVisible(false);
-                rangeOfIntegersPanel.setVisible(true);
-                rangeOfIntegersPanelEnabled = true;
-            }
-            else if (selectedString.equals(productColor)) {
-                cyclicAndFiniteEnumerationPanel.setVisible(false);
-                productTypePanel.setVisible(true);
-                rangeOfIntegersPanel.setVisible(false);
-                rangeOfIntegersPanelEnabled = false;
+            switch (selectedString) {
+                case finiteEnumeration:
+                case cyclicEnumeration:
+                    rangeOfIntegersPanel.setVisible(false);
+                    productTypePanel.setVisible(false);
+                    cyclicAndFiniteEnumerationPanel.setVisible(true);
+                    rangeOfIntegersPanelEnabled = false;
+                    break;
+                case rangeOfIntegers:
+                    cyclicAndFiniteEnumerationPanel.setVisible(false);
+                    productTypePanel.setVisible(false);
+                    rangeOfIntegersPanel.setVisible(true);
+                    rangeOfIntegersPanelEnabled = true;
+                    break;
+                case productColor:
+                    cyclicAndFiniteEnumerationPanel.setVisible(false);
+                    productTypePanel.setVisible(true);
+                    rangeOfIntegersPanel.setVisible(false);
+                    rangeOfIntegersPanelEnabled = false;
+                    break;
             }
             if(dialog != null){
                 dialog.pack();
@@ -444,25 +435,21 @@ public class ColorTypeDialogPanel extends JPanel {
                 JOptionPane.showMessageDialog(
                         CreateGui.getApp(), "You have to enter a name for the color",
                         "Error", JOptionPane.ERROR_MESSAGE);
-                return;
             } else if(!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", enumerationName)) {
                 JOptionPane.showMessageDialog(
                     CreateGui.getApp(),
                     "Acceptable names for enumerations are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
                     "Error", JOptionPane.ERROR_MESSAGE);
-                return;
             } else if(enumerationName.equals("all") || enumerationName.equals("All") || enumerationName.equals("dot") || enumerationName.equals(".all") || enumerationName.equals(".All")){
                 JOptionPane.showMessageDialog(
                     CreateGui.getApp(),
                     "The color cannot be named \"" + enumerationName + "\", as the name is reserved",
                     "Error", JOptionPane.ERROR_MESSAGE);
-                return;
             } else if (cyclicModel.contains(enumTextField.getText())) {
                 JOptionPane.showMessageDialog(
                     CreateGui.getApp(),
                     "A color with the name \"" + enumerationName + "\" already exists",
                     "Error", JOptionPane.ERROR_MESSAGE);
-                return;
             }else {
                 cyclicModel.addElement(enumTextField.getText());
                 enumList.setModel(cyclicModel);
@@ -513,11 +500,7 @@ public class ColorTypeDialogPanel extends JPanel {
         enumList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 JList source = (JList) e.getSource();
-                if (source.getSelectedIndex() == -1) {
-                    cyclicRemoveButton.setEnabled(false);
-                } else{
-                    cyclicRemoveButton.setEnabled(true);
-                }
+                cyclicRemoveButton.setEnabled(source.getSelectedIndex() != -1);
             }
         });
 
@@ -566,8 +549,6 @@ public class ColorTypeDialogPanel extends JPanel {
 
         productModel = new DefaultListModel();
 
-        JList allColorTypes = new JList();
-
 
         colorTypes = new ArrayList<>();
         colorTypes = network.colorTypes();
@@ -601,11 +582,7 @@ public class ColorTypeDialogPanel extends JPanel {
         productColorTypeList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 JList source = (JList) e.getSource();
-                if (source.getSelectedIndex() == -1) {
-                    productRemoveButton.setEnabled(false);
-                } else{
-                    productRemoveButton.setEnabled(true);
-                }
+                productRemoveButton.setEnabled(source.getSelectedIndex() != -1);
             }
         });
         JScrollPane productColorsListScrollPane = new JScrollPane(productColorTypeList);
@@ -751,116 +728,119 @@ public class ColorTypeDialogPanel extends JPanel {
         String selectedColorType = colorTypeComboBox.getSelectedItem().toString();
         ColorType newColorType = new ColorType(name);
 
-         if(selectedColorType.equals(finiteEnumeration) || selectedColorType.equals(cyclicEnumeration)) {
-            for(int i = 0; i < enumList.getModel().getSize();i++) {
-                newColorType.addColor(enumList.getModel().getElementAt(i).toString());
-            }
-            if (newColorType.size() <= 0) {
-                JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
-                    "You must specify at least one enumeration name",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            if (oldColorType != null) {
-                if(oldColorType.equals(newColorType)){
-                    exit();
+        switch (selectedColorType) {
+            case finiteEnumeration:
+            case cyclicEnumeration:
+                for (int i = 0; i < enumList.getModel().getSize(); i++) {
+                    newColorType.addColor(enumList.getModel().getElementAt(i).toString());
+                }
+                if (newColorType.size() <= 0) {
+                    JOptionPane.showMessageDialog(
+                        CreateGui.getApp(),
+                        "You must specify at least one enumeration name",
+                        "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                boolean showDialog = false;
-                for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
-                    if(!newColorType.contains(c)){
+                if (oldColorType != null) {
+                    if (oldColorType.equals(newColorType)) {
+                        exit();
+                        return;
+                    }
+                    boolean showDialog = false;
+                    for (dk.aau.cs.model.CPN.Color c : oldColorType.getColors()) {
+                        if (!newColorType.contains(c)) {
+                            showDialog = true;
+                        }
+                    }
+                    if (showDialog) {
+                        network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
+                    } else {
+                        undoManager.newEdit();
+                        network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
+                        colorTypesListModel.updateName();
+                    }
+                } else {
+                    Command cmd = new AddColorTypeCommand(newColorType,
+                        network, colorTypesListModel, network.colorTypes().size());
+                    undoManager.addNewEdit(cmd);
+                    cmd.redo();
+                }
+
+                break;
+            case rangeOfIntegers:
+                int lowerboundNumber = Integer.parseInt(lowerbound);
+                int upperboundNumber = Integer.parseInt(upperbound);
+                for (int i = lowerboundNumber; i < upperboundNumber + 1; i++) {
+                    newColorType.addColor(String.valueOf(i));
+                }
+
+                if (oldColorType != null) {
+                    if (oldColorType.equals(newColorType)) {
+                        exit();
+                        return;
+                    }
+                    boolean showDialog = false;
+                    for (dk.aau.cs.model.CPN.Color c : oldColorType.getColors()) {
+                        if (!newColorType.getColors().contains(c)) {
+                            showDialog = true;
+                        }
+                    }
+                    if (showDialog) {
+                        network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
+                    } else {
+                        undoManager.newEdit();
+                        network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
+                        colorTypesListModel.updateName();
+                    }
+                } else {
+                    Command cmd = new AddColorTypeCommand(newColorType,
+                        network, colorTypesListModel, network.colorTypes().size());
+                    undoManager.addNewEdit(cmd);
+                    cmd.redo();
+                }
+                break;
+            case productColor:
+                ProductType productType = new ProductType(name);
+                int size = productColorTypeList.getModel().getSize();
+                for (int i = 0; i < size; i++) {
+                    String colorTypeName = productColorTypeList.getModel().getElementAt(i).toString();
+                    int size2 = productTypeComboBox.getItemCount();
+                    for (int j = 0; j < size2; j++) {
+                        if (colorTypeName.equals(productTypeComboBox.getItemAt(j).toString())) {
+                            productType.addType(colorTypes.get(j));
+                        }
+                    }
+                }
+                if (oldColorType != null) {
+                    if (oldColorType.equals(productType)) {
+                        exit();
+                        return;
+                    }
+                    boolean showDialog = false;
+                    for (ColorType ct : ((ProductType) oldColorType).getColorTypes()) {
+                        if (!productType.getColorTypes().contains(ct)) {
+                            showDialog = true;
+                            break;
+                        }
+                    }
+                    if (!showDialog && ((ProductType) oldColorType).getColorTypes().size() != productType.getColorTypes().size()) {
                         showDialog = true;
                     }
-                }
-                if(showDialog){
-                    network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                } else{
-                    undoManager.newEdit();
-                    network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                    colorTypesListModel.updateName();
-                }
-            } else {
-                Command cmd = new AddColorTypeCommand(newColorType,
-                    network, colorTypesListModel, network.colorTypes().size());
-                undoManager.addNewEdit(cmd);
-                cmd.redo();
-            }
+                    if (showDialog) {
+                        network.updateColorType(oldColorType, productType, colorTypesListModel, undoManager);
 
-        }
-        else if(selectedColorType.equals(rangeOfIntegers)) {
-            int lowerboundNumber = Integer.parseInt(lowerbound);
-            int upperboundNumber = Integer.parseInt(upperbound);
-            for(int i = lowerboundNumber; i < upperboundNumber + 1; i++) {
-                newColorType.addColor(String.valueOf(i));
-            }
-
-            if (oldColorType != null) {
-                if(oldColorType.equals(newColorType)){
-                    exit();
-                    return;
-                }
-                boolean showDialog = false;
-                for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
-                    if(!newColorType.getColors().contains(c)){
-                        showDialog = true;
+                    } else {
+                        undoManager.newEdit();
+                        network.renameColorType(oldColorType, productType, colorTypesListModel, undoManager);
+                        colorTypesListModel.updateName();
                     }
+                } else {
+                    Command cmd = new AddColorTypeCommand(productType,
+                        network, colorTypesListModel, network.colorTypes().size());
+                    undoManager.addNewEdit(cmd);
+                    cmd.redo();
                 }
-                if(showDialog) {
-                    network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                } else{
-                    undoManager.newEdit();
-                    network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                    colorTypesListModel.updateName();
-                }
-            }
-            else {
-                Command cmd = new AddColorTypeCommand(newColorType,
-                    network, colorTypesListModel, network.colorTypes().size());
-                undoManager.addNewEdit(cmd);
-                cmd.redo();
-            }
-        }
-        else if(selectedColorType.equals(productColor)) {
-            ProductType productType = new ProductType(name);
-            int size = productColorTypeList.getModel().getSize();
-            for(int i = 0; i < size; i++) {
-                String colorTypeName = productColorTypeList.getModel().getElementAt(i).toString();
-                int size2 = productTypeComboBox.getItemCount();
-                for (int j = 0; j < size2; j++) {
-                    if (colorTypeName.equals(productTypeComboBox.getItemAt(j).toString())) {
-                        productType.addType(colorTypes.get(j));
-                    }
-                }
-            };
-            if (oldColorType != null) {
-                if(oldColorType.equals(productType)){
-                    exit();
-                    return;
-                }
-                boolean showDialog = false;
-                for(ColorType ct : ((ProductType)oldColorType).getColorTypes()){
-                    if(!productType.getColorTypes().contains(ct)){
-                        showDialog = true;
-                    }
-                }
-                if(!showDialog && ((ProductType)oldColorType).getColorTypes().size() != productType.getColorTypes().size()){
-                    showDialog = true;
-                }
-                if(showDialog) {
-                    network.updateColorType(oldColorType, productType, colorTypesListModel, undoManager);
-
-                } else{
-                    undoManager.newEdit();
-                    network.renameColorType(oldColorType, productType, colorTypesListModel, undoManager);
-                    colorTypesListModel.updateName();
-                }
-            } else {
-                Command cmd = new AddColorTypeCommand(productType,
-                    network, colorTypesListModel, network.colorTypes().size());
-                undoManager.addNewEdit(cmd);
-                cmd.redo();
-            }
+                break;
         }
 
         exit();

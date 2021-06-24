@@ -15,8 +15,6 @@ import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,14 +23,13 @@ import java.util.regex.Pattern;
 
 public class VariablesDialogPanel extends JPanel {
     private static final long serialVersionUID = 1L;
-    private JRootPane rootPane;
-    private TimedArcPetriNetNetwork network;
+    private final TimedArcPetriNetNetwork network;
     private EscapableDialog dialog;
     private Variable variable;
     private List<ColorType> colorTypes;
-    private ConstantsPane.VariablesListModel listModel;
+    private final ConstantsPane.VariablesListModel listModel;
 
-    private String oldName;
+    private final String oldName;
 
     JTextField nameTextField;
     Dimension size;
@@ -46,14 +43,9 @@ public class VariablesDialogPanel extends JPanel {
     JButton okButton;
     JButton cancelButton;
     private JScrollPane scrollPane;
-    private UndoManager undoManager;
-
-    public VariablesDialogPanel() throws IOException {
-        initComponents();
-    }
+    private final UndoManager undoManager;
 
     public VariablesDialogPanel(JRootPane pane, ConstantsPane.VariablesListModel listModel, TimedArcPetriNetNetwork network, UndoManager undoManager) throws IOException {
-        rootPane = pane;
         oldName = "";
         this.network = network;
         this.listModel = listModel;
@@ -65,7 +57,6 @@ public class VariablesDialogPanel extends JPanel {
     }
 
     public VariablesDialogPanel(JRootPane pane, ConstantsPane.VariablesListModel listModel, TimedArcPetriNetNetwork network, Variable variable,UndoManager undoManager) throws IOException {
-        rootPane = pane;
         this.variable = variable;
         // set combobox value to the already chosen ColorType
         oldName = variable.getName();
@@ -180,7 +171,7 @@ public class VariablesDialogPanel extends JPanel {
 
 
     private void createcolorTypesComboBox() {
-        colorTypes = new ArrayList<ColorType>();
+        colorTypes = new ArrayList<>();
         colorTypes = network.colorTypes();
 
         colorTypeComboBox = new JComboBox();
