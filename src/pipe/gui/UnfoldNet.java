@@ -130,7 +130,7 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             String placeName = model.activeTemplates().get(0).places().get(0).name();
             TCTLAtomicPropositionNode atomicStartNode = new TCTLAtomicPropositionNode(new TCTLPlaceNode(templateName, placeName), ">=", new TCTLConstNode(1));
             TCTLEFNode efNode = new TCTLEFNode(atomicStartNode);
-            pipe.dataLayer.TAPNQuery test = new pipe.dataLayer.TAPNQuery("placeholder", 1000, efNode, null, null, null, false, false, false, false, null, null);
+            pipe.dataLayer.TAPNQuery test = new pipe.dataLayer.TAPNQuery("placeholder", 1000, efNode, null, null, null, false, false, false, false, null, null, lens.isColored());
             mapQueryToNewNames(test, transformedModel.value2());
             clonedQueries.add(test);
             dummyQuery = true;

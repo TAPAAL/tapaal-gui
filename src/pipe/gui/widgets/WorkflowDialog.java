@@ -1008,7 +1008,8 @@ public class WorkflowDialog extends JDialog {
 						null,
 						ExtrapolationOption.AUTOMATIC,
 						WorkflowMode.WORKFLOW_STRONG_SOUNDNESS,
-						c
+						c,
+                        model.isColored()
 				);
 				Verifier.runVerifyTAPNVerification(model, q, result -> {
 					if(result.isQuerySatisfied()){
@@ -1113,7 +1114,8 @@ public class WorkflowDialog extends JDialog {
                     false,
                     null,
                     ExtrapolationOption.AUTOMATIC,
-                    WorkflowMode.WORKFLOW_SOUNDNESS
+                    WorkflowMode.WORKFLOW_SOUNDNESS,
+                    model.isColored()
             );
             Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
@@ -1223,7 +1225,8 @@ public class WorkflowDialog extends JDialog {
                             true,
                             true,
                             null,
-                            ExtrapolationOption.AUTOMATIC
+                            ExtrapolationOption.AUTOMATIC,
+                            model.isColored()
                     );
                     Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 

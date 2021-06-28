@@ -99,7 +99,7 @@ public class XMLQueryLoader extends QueryLoader{
             TAPNQuery query = new TAPNQuery(queryWrapper.getName(), 9999,
                 queryWrapper.getProp(),TraceOption.NONE, SearchOption.HEURISTIC, 
                 ReductionOption.VerifyPN, true, false, true, true, true, true, 
-                HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces());
+                HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces(), network.isColored());
 
             RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
                 network.activeTemplates().get(0).name());

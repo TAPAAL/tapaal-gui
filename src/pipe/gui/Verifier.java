@@ -206,7 +206,8 @@ public class Verifier {
                 query.isStubbornReductionEnabled(),
                 reducedNetTempFile.getAbsolutePath(),
                 query.usePartitioning(),
-                query.useColorFixpoint()
+                query.useColorFixpoint(),
+                query.isColored()
             );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
 

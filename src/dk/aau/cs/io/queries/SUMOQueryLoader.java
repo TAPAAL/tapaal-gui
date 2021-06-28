@@ -64,7 +64,7 @@ public class SUMOQueryLoader extends QueryLoader{
 			//The number 9999 is the number of extra tokens allowed, this is set high s.t. we don't have to change it manually
 			TAPNQuery query = new TAPNQuery(name, 9999, property, 
 					TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyPN, 
-					true, false, true, true, true, true, HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces());
+					true, false, true, true, true, true, HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces(), network.isColored());
 					
 			RenameTemplateVisitor rt = new RenameTemplateVisitor("", network.activeTemplates().get(0).name());
 			query.getProperty().accept(rt, null);

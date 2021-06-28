@@ -21,6 +21,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private boolean useStubbornReduction = true;
 	private boolean partition;
 	private boolean colorFixpoint;
+	private boolean unfoldNet = false;
 	private String libQueryFilePath;
 	
 	//Only used for boundedness analysis
@@ -37,9 +38,10 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			int approximationDenominator,
 			boolean stubbornReduction,
             boolean partition,
-            boolean colorFixpoint
+            boolean colorFixpoint,
+            boolean unfoldNet
 	) {
-		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint);
+		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
@@ -62,7 +64,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean stubbornReduction,
             String reducedModelPath,
             boolean partition,
-            boolean colorFixpoint
+            boolean colorFixpoint,
+            boolean unfoldNet
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -74,16 +77,19 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		this.reducedModelPath = reducedModelPath;
 		this.partition = partition;
 		this.colorFixpoint = colorFixpoint;
+		this.unfoldNet = unfoldNet;
 
-        try {
-            unfoldedModelPath = File.createTempFile("unfolded-", ".xml").getAbsolutePath();
-            unfoldedQueriesPath = File.createTempFile("unfolded-", ".xml").getAbsolutePath();
-            libQueryFilePath = File.createTempFile("tempLibQuery", ".q").getAbsolutePath();
-        } catch (IOException e) {
-            new MessengerImpl().displayErrorMessage(
-                e.getMessage(),
-                "Error");
-            return;
+		if(unfoldNet){
+            try {
+                unfoldedModelPath = File.createTempFile("unfolded-", ".xml").getAbsolutePath();
+                unfoldedQueriesPath = File.createTempFile("unfolded-", ".xml").getAbsolutePath();
+                libQueryFilePath = File.createTempFile("tempLibQuery", ".q").getAbsolutePath();
+            } catch (IOException e) {
+                new MessengerImpl().displayErrorMessage(
+                    e.getMessage(),
+                    "Error");
+                return;
+            }
         }
 	}
 	
@@ -115,18 +121,19 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			result.append(gcd ? "-c" : ""); // GCD optimization is not sound for workflow analysis
 		}
 
-        result.append(" -q " + libQueryFilePath);
-		result.append(" -q-xml " + unfoldedQueriesPath);
-		result.append(" -f " + unfoldedModelPath);
-        /* partitioning and color fixpoint is currently not available for timed nets
-        if(!this.partition){
-            result.append(" --disable-partitioning");
+		if(unfoldNet){
+            result.append(" -q " + libQueryFilePath);
+            result.append(" -q-xml " + unfoldedQueriesPath);
+            result.append(" -f " + unfoldedModelPath);
+            /* partitioning and color fixpoint is currently not available for timed nets
+            if(!this.partition){
+                result.append(" --disable-partitioning");
+            }
+
+            if(!this.colorFixpoint){
+                result.append(" --disable-cfp");
+            }*/
         }
-
-        if(!this.colorFixpoint){
-            result.append(" --disable-cfp");
-        }*/
-
 		return result.toString();
 	}
 

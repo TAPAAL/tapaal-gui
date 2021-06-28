@@ -58,7 +58,7 @@ public class KBoundAnalyzer {
 		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
 		} else if(modelChecker instanceof VerifyTAPNDiscreteVerification){
-			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, !tapnNetwork.hasUrgentTransitions(), true, false, false, 1, false, true, true);
+			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, !tapnNetwork.hasUrgentTransitions(), true, false, false, 1, false, true, true, tapnNetwork.isColored());
 		}
 		return null;
 	}

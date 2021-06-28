@@ -292,7 +292,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					SearchOption.DEFAULT,
 					ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 					false, true, false, null, ExtrapolationOption.AUTOMATIC,
-					WorkflowMode.WORKFLOW_SOUNDNESS);
+					WorkflowMode.WORKFLOW_SOUNDNESS, queryToVerify.isColored());
 			long time = 0;
 			try {
 				final VerificationResult<TimedArcPetriNetTrace> resultOfSoundCheck = verifyQuery(file, composedModel, queryToCheckIfSound);
@@ -372,7 +372,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					approximationDenominator = batchProcessingVerificationOptions.approximationDenominator();
 				}
 				
-				pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator, query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars());
+				pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator, query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars(), model.isColored());
 				
 				if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 					changedQuery.setActive(query.isActive());
@@ -392,7 +392,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 							SearchOption.DEFAULT,
 							ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 							false, true, false, null, ExtrapolationOption.AUTOMATIC,
-							WorkflowMode.WORKFLOW_SOUNDNESS);
+							WorkflowMode.WORKFLOW_SOUNDNESS, model.isColored());
 				filesProcessed.add(fileToBeChecked);
 				isModelCheckOnly = true;
         	
@@ -404,7 +404,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 								SearchOption.DEFAULT,
 								ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 								false, true, false, null, ExtrapolationOption.AUTOMATIC,
-								WorkflowMode.WORKFLOW_STRONG_SOUNDNESS);
+								WorkflowMode.WORKFLOW_STRONG_SOUNDNESS, model.isColored());
 				filesProcessed.add(fileToBeChecked);
 				isModelCheckOnly = true;
 			}
@@ -424,7 +424,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 							SearchOption.DEFAULT,
 							reductionOption, true, true,
 							false, true, false, null, ExtrapolationOption.AUTOMATIC,
-							WorkflowMode.WORKFLOW_SOUNDNESS);
+							WorkflowMode.WORKFLOW_SOUNDNESS, model.isColored());
 		}
 		if(option == QueryPropertyOption.SearchWholeStateSpace) {
 			filesProcessed.add(fileToBeChecked);
@@ -434,7 +434,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 							SearchOption.DEFAULT,
 							reductionOption, true, true,
 							false, true, false, null, ExtrapolationOption.AUTOMATIC,
-							WorkflowMode.WORKFLOW_SOUNDNESS);
+							WorkflowMode.WORKFLOW_SOUNDNESS, model.isColored());
 		}
 		if (option == QueryPropertyOption.Soundness) {
 			isSoundnessCheck = true;
@@ -445,7 +445,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						SearchOption.DEFAULT,
 						ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 						false, true, false, null, ExtrapolationOption.AUTOMATIC,
-						WorkflowMode.WORKFLOW_SOUNDNESS);
+						WorkflowMode.WORKFLOW_SOUNDNESS, model.isColored());
 		}
 		if(option == QueryPropertyOption.StrongSoundness) {
 			isSoundnessCheck = true;
@@ -456,7 +456,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 							SearchOption.DEFAULT,
 							ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 							false, true, false, null, ExtrapolationOption.AUTOMATIC,
-							WorkflowMode.WORKFLOW_STRONG_SOUNDNESS);
+							WorkflowMode.WORKFLOW_STRONG_SOUNDNESS, model.isColored());
 		}
 		return null;
 	}
@@ -622,7 +622,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());	// XXX DISABLES OverApprox
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
-			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), 0, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isStubbornReductionEnabled(), null, query.usePartitioning(), query.useColorFixpoint());
+			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), 0, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isStubbornReductionEnabled(), null, query.usePartitioning(), query.useColorFixpoint(), query.isColored());
 		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce)
 			if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.SearchWholeStateSpace){
 			    return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), false, false, false, false, query.approximationDenominator(), QueryCategory.Default, query.getAlgorithmOption(), false, QueryReductionTime.UnlimitedTime, false, query.isTarOptionEnabled(), query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars());
