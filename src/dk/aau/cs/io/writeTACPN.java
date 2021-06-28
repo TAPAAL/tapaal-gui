@@ -48,7 +48,6 @@ public class writeTACPN { // both export and save share some of the same syntax 
     }
 
     public Element createArcExpressionElement(Document document, ArcExpression arcExpr) {
-
         Element hlinscriptionElement = document.createElement("hlinscription");
         Element textElement = document.createElement("text");
         textElement.setTextContent(arcExpr.toString());

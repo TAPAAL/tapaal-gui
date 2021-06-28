@@ -100,7 +100,7 @@ public class TimedArcPetriNet {
                 hasColors = true;
             }
         }
-        if(hasColors || !values.getColorTypes().isEmpty() || !values.getVariables().isEmpty()){
+        if(hasColors || values.getColorTypes().size() > 1 || !values.getVariables().isEmpty()){
             return true;
         }
 

@@ -462,9 +462,9 @@ public class QueryDialog extends JPanel {
             /* enableOverApproximation */false,
             /* enableUnderApproximation */false,
             0,
-            usePartitioning.isSelected(),
-            useColorFixpoint.isSelected(),
-            useSymmetricvars.isSelected()
+            lens.isColored()? usePartitioning.isSelected(): false,
+            lens.isColored()? useColorFixpoint.isSelected() : false,
+            lens.isColored()? useSymmetricvars.isSelected() : false
         );
         query.setCategory(TAPNQuery.QueryCategory.CTL);
         query.setUseSiphontrap(useSiphonTrap.isSelected());
