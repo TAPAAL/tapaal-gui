@@ -96,7 +96,7 @@ public class TimedArcPetriNet {
         }
         boolean hasColors = false;
         for(Color color : values.getColors()){
-            if(color.getColorType() != ColorType.COLORTYPE_DOT){
+            if(color.getColorType() != ColorType.COLORTYPE_DOT && !color.getColorType().getId().equals("dot")){
                 hasColors = true;
             }
         }
