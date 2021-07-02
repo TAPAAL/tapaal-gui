@@ -695,14 +695,7 @@ public class PlaceEditorPanel extends JPanel {
         for(int i = 0; i < coloredTokenListModel.getSize();i++){
             v.add(coloredTokenListModel.getElementAt(i));
         }
-
-        if(!place.isColored()){
-            //we turn the dots into a numberofexpression to maintain the expression on the place
-            Vector<ColorExpression> cv = new Vector<>();
-            cv.add(new DotConstantExpression());
-            v.clear();
-            v.add(new NumberOfExpression(newMarking, cv));
-        }
+        
         AddExpression newExpression = null;
         if(!v.isEmpty()){
             newExpression = new AddExpression(v);
