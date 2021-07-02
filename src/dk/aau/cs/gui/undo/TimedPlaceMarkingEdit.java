@@ -22,14 +22,6 @@ public class TimedPlaceMarkingEdit extends Command {
 		} else {
 			timedPlaceComponent.underlyingPlace().removeTokens(Math.abs(numberOfTokens));
 		}
-        //This is needed to keep the colored token expression consistent
-        if(timedPlaceComponent.underlyingPlace().numberOfTokens() > 0){
-            Vector<ColorExpression> v = new Vector<>();
-            v.add(new DotConstantExpression());
-            Vector<ArcExpression> numbOfExpression = new Vector<>();
-            numbOfExpression.add(new NumberOfExpression(timedPlaceComponent.underlyingPlace().numberOfTokens(), v));
-            timedPlaceComponent.underlyingPlace().setTokenExpression(new AddExpression(numbOfExpression));
-        }
 		timedPlaceComponent.repaint();
 	}
 
@@ -40,14 +32,6 @@ public class TimedPlaceMarkingEdit extends Command {
 		} else {
 			timedPlaceComponent.underlyingPlace().addTokens(Math.abs(numberOfTokens));
 		}
-		//This is needed to keep the colored token expression consistent
-        if(timedPlaceComponent.underlyingPlace().numberOfTokens() > 0){
-            Vector<ColorExpression> v = new Vector<>();
-            v.add(new DotConstantExpression());
-            Vector<ArcExpression> numbOfExpression = new Vector<>();
-            numbOfExpression.add(new NumberOfExpression(timedPlaceComponent.underlyingPlace().numberOfTokens(), v));
-            timedPlaceComponent.underlyingPlace().setTokenExpression(new AddExpression(numbOfExpression));
-        }
 		timedPlaceComponent.repaint();
 	}
 
