@@ -260,7 +260,8 @@ public class VariablesDialogPanel extends JPanel {
             nameTextField.requestFocusInWindow();
             return;
         }
-        if (network.isNameUsedForVariable(newName)) {
+        //If we are editing a variable it is allowed to have the same name
+        if (network.isNameUsedForVariable(newName) && (variable == null || !variable.getName().equals(newName))) {
             JOptionPane
                     .showMessageDialog(
                             CreateGui.getApp(),
