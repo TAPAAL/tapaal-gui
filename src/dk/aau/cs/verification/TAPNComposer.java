@@ -176,6 +176,7 @@ public class TAPNComposer implements ITAPNComposer {
 				constructedPlace = new LocalTimedPlace(uniquePlaceName, new TimeInvariant(place.invariant().isUpperNonstrict(), new IntBound(place.invariant().upperBound().value())), place.getColorType());
 			}
 			constructedPlace.setCtiList(place.getCtiList());
+			constructedPlace.setTokenExpression(place.getTokensAsExpression());
 			
 			constructedModel.add(constructedPlace);
 			mapping.addMappingForShared(place.name(), uniquePlaceName);

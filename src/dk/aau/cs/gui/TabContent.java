@@ -2053,6 +2053,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 network.setConstants(tapnNetwork.constants());
             }
         }
+        network.setColorTypes(tapnNetwork.colorTypes());
 
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, inlineConstants);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
@@ -2065,7 +2066,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         network.add(transformedModel.value1());
 
-        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), network.constants());
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), network.constants(), lens);
 
         try {
             ByteArrayOutputStream outputStream = tapnWriter.savePNML();

@@ -191,13 +191,13 @@ public class TapnXmlLoader {
 			Node node = sharedPlaceNodes.item(i);
 
 			if(node instanceof Element){
-				SharedPlace place = parseSharedPlace((Element)node, network.marking(), constants);
+				SharedPlace place = parseSharedPlace((Element)node, network, constants);
 				network.add(place);
 			}
 		}
 	}
 
-	private SharedPlace parseSharedPlace(Element element, TimedMarking marking, ConstantStore constants) {
+	private SharedPlace parseSharedPlace(Element element, TimedArcPetriNetNetwork network, ConstantStore constants) {
 		String name = element.getAttribute("name");
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
@@ -210,10 +210,13 @@ public class TapnXmlLoader {
 			}
 		}
 		SharedPlace place = new SharedPlace(name, invariant);
-        place.setCurrentMarking(marking);
+        place.setCurrentMarking(network.marking());
+        place.setColorType(parsePlaceColorType(element));
 		//place.addTokens(numberOfTokens);
+        addColoredDependencies(place,element, network, constants);
 
-		return place;
+
+        return place;
 	}
 
 	private void parseSharedTransitions(Document doc, TimedArcPetriNetNetwork network) {
@@ -496,7 +499,7 @@ public class TapnXmlLoader {
 		    nameOffsetYInput = (int)Double.parseDouble(nameOffsetY);
         }
 
-		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
+
 		String invariant = place.getAttribute("invariant");
 		boolean displayName = place.getAttribute("displayName").equals("false") ? false : true;
 
@@ -515,8 +518,47 @@ public class TapnXmlLoader {
 				firstPlaceRenameWarning = false;
 			}
 		}
-        List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>();
+
+        idResolver.add(tapn.name(), idInput, nameInput);
+
+		TimedPlace p;
+		if(network.isNameUsedForShared(nameInput)){
+			p = network.getSharedPlaceByName(nameInput);
+            tapn.add(p);
+		}else{
+		    p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), parsePlaceColorType(place));
+		    tapn.add(p);
+		    addColoredDependencies(p,place, network, constants);
+
+		}
+		nameGenerator.updateIndicesForAllModels(nameInput);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, lens);
+		placeComponent.setUnderlyingPlace(p);
+		
+		if (!displayName){
+			placeComponent.setAttributesVisible(false);
+		}
+
+        return placeComponent;
+	}
+
+	private ColorType parsePlaceColorType(Element element){
         ColorType ct = ColorType.COLORTYPE_DOT;
+        Node typeNode = element.getElementsByTagName("type").item(0);
+        if (typeNode != null) {
+            try {
+                ct = loadTACPN.parseUserSort(typeNode);
+            } catch (FormatException e) {
+                e.printStackTrace();
+            }
+        }
+        return ct;
+    }
+
+	private void addColoredDependencies(TimedPlace p, Element place, TimedArcPetriNetNetwork network, ConstantStore constants){
+        List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>();
+        int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
+
         ArcExpression colorMarking = null;
         NodeList nodes = place.getElementsByTagName("colorinvariant");
         if (nodes != null) {
@@ -532,14 +574,7 @@ public class TapnXmlLoader {
             }}));
         }
         Node hlInitialMarkingNode = place.getElementsByTagName("hlinitialMarking").item(0);
-        Node typeNode = place.getElementsByTagName("type").item(0);
-        if (typeNode != null) {
-            try {
-                ct = loadTACPN.parseUserSort(typeNode);
-            } catch (FormatException e) {
-                e.printStackTrace();
-            }
-        }
+
         if (hlInitialMarkingNode != null && hlInitialMarkingNode instanceof Element) {
             try {
                 colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
@@ -548,33 +583,8 @@ public class TapnXmlLoader {
             }
         }
 
-        idResolver.add(tapn.name(), idInput, nameInput);
 
-		TimedPlace p;
-		if(network.isNameUsedForShared(nameInput)){
-			p = network.getSharedPlaceByName(nameInput);
-			p.setColorType(ct);
-            addColoredDependencies(p,ctiList,colorMarking,network,initialMarkingInput);
-            tapn.add(p);
-		}else{
-		    p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), ct);
-		    tapn.add(p);
-		    addColoredDependencies(p,ctiList,colorMarking,network,initialMarkingInput);
-
-		}
-		nameGenerator.updateIndicesForAllModels(nameInput);
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, lens);
-		placeComponent.setUnderlyingPlace(p);
-		
-		if (!displayName){
-			placeComponent.setAttributesVisible(false);
-		}
-
-        return placeComponent;
-	}
-
-	private void addColoredDependencies(TimedPlace p, List<ColoredTimeInvariant> ctiList, ArcExpression colorMarking, TimedArcPetriNetNetwork network, int initialMarkingInput){
-        p.setCtiList(ctiList);
+	    p.setCtiList(ctiList);
         ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
         if(colorMarking!= null){
             ColorMultiset cm = colorMarking.eval(context);
