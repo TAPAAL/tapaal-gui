@@ -399,8 +399,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent e) {
             if(getCurrentTab().getLens().isColored()){
                 UnfoldDialog.showDialog(getCurrentTab());
+                if(!UnfoldDialog.wasCancelled()){
+                    currentTab.ifPresent(TabContentActions::toggleAnimationMode);
+                }
+            } else {
+                currentTab.ifPresent(TabContentActions::toggleAnimationMode);
             }
-            currentTab.ifPresent(TabContentActions::toggleAnimationMode);
         }
     };
     public final GuiAction stepforwardAction = new GuiAction("Step forward", "Step forward", "pressed RIGHT") {

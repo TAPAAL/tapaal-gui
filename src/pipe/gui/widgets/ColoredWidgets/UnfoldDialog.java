@@ -16,6 +16,8 @@ public class UnfoldDialog extends JDialog {
     private JCheckBox useColorFixpoint;
     private JCheckBox useSymmetricvars;
 
+    private static boolean cancelled = false;
+
     private static TabContent currentTab;
 
     public static UnfoldDialog unfoldDialog;
@@ -43,6 +45,10 @@ public class UnfoldDialog extends JDialog {
         unfoldDialog.setEnabled(true);
         unfoldDialog.setVisible(true);
 
+    }
+
+    public static boolean wasCancelled(){
+        return cancelled;
     }
 
     private void initComponents()  {
@@ -136,7 +142,7 @@ public class UnfoldDialog extends JDialog {
         gbc.gridwidth = GridBagConstraints.RELATIVE;
         gbc.anchor = GridBagConstraints.EAST;
 
-        cancelButton.addActionListener(e -> exit());
+        cancelButton.addActionListener(e -> onCancel());
 
         buttonPanel.add(cancelButton,gbc);
         buttonPanel.add(okButton,gbcOk);
@@ -147,6 +153,11 @@ public class UnfoldDialog extends JDialog {
 
     private void exit() {
         unfoldDialog.setVisible(false);
+    }
+
+    private void onCancel(){
+        cancelled = true;
+        exit();
     }
 
     private void onOK() {
