@@ -239,7 +239,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabContentActions::workflowAnalyse);
         }
     };
-    private final GuiAction smartDrawAction = new GuiAction("Automatic Net Layout", "Rearrange the Petri net objects", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_DOWN_MASK)) {
+    private final GuiAction smartDrawAction = new GuiAction("Automatic net layout", "Rearrange the Petri net objects", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_DOWN_MASK)) {
         public void actionPerformed(ActionEvent e) {
             SmartDrawDialog.showSmartDrawDialog();
         }

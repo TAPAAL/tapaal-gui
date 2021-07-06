@@ -3009,7 +3009,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     };
 
-    private final GuiAction unfoldTabAction = new GuiAction("Unfold tab", "Unfold the colors in the tab") {
+    private final GuiAction unfoldTabAction = new GuiAction("Unfold net", "Unfold the colors in the tab") {
         @Override
         public void actionPerformed(ActionEvent e) {
             UnfoldDialog.showDialog(TabContent.this);
