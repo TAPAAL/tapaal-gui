@@ -100,4 +100,13 @@ public interface TabContentActions {
 
     void changeColorFeature(boolean isColor);
 
+    void exportPNG();
+
+    void exportPS();
+
+    void exportTIKZ();
+
+    void exportPNML();
+
+    void exportQueryXML();
 }

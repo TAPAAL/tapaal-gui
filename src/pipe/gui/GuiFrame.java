@@ -89,16 +89,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction saveAction = new GuiAction("Save", "Save", KeyStroke.getKeyStroke('S', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            if (canNetBeSavedAndShowMessage()) {
                 guiFrameController.ifPresent(GuiFrameControllerActions::save);
-            }
         }
     };
     private final GuiAction saveAsAction = new GuiAction("Save as", "Save as...", KeyStroke.getKeyStroke('S', (shortcutkey + InputEvent.SHIFT_MASK))) {
         public void actionPerformed(ActionEvent arg0) {
-            if (canNetBeSavedAndShowMessage()) {
-                guiFrameController.ifPresent(GuiFrameControllerActions::saveAs);
-            }
+            guiFrameController.ifPresent(GuiFrameControllerActions::saveAs);
         }
     };
     private final GuiAction exitAction = new GuiAction("Exit", "Close the program", KeyStroke.getKeyStroke('Q', shortcutkey)) {
@@ -128,46 +124,27 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction exportPNGAction = new GuiAction("PNG", "Export the net to PNG format", KeyStroke.getKeyStroke('G', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            if (canNetBeSavedAndShowMessage()) {
-                Export.exportGuiView(getCurrentTab().drawingSurface(), Export.PNG, null);
-            }
+            currentTab.ifPresent(TabContentActions::exportPNG);
         }
     };
     private final GuiAction exportPSAction = new GuiAction("PostScript", "Export the net to PostScript format", KeyStroke.getKeyStroke('T', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            if (canNetBeSavedAndShowMessage()) {
-                Export.exportGuiView(getCurrentTab().drawingSurface(), Export.POSTSCRIPT, null);
-            }
+            currentTab.ifPresent(TabContentActions::exportPS);
         }
     };
     private final GuiAction exportToTikZAction = new GuiAction("TikZ", "Export the net to LaTex (TikZ) format", KeyStroke.getKeyStroke('L', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            if (canNetBeSavedAndShowMessage()) {
-                Export.exportGuiView(getCurrentTab().drawingSurface(), Export.TIKZ, getCurrentTab().drawingSurface().getGuiModel());
-            }
+            currentTab.ifPresent(TabContentActions::exportTIKZ);
         }
     };
     private final GuiAction exportToPNMLAction = new GuiAction("PNML", "Export the net to PNML format", KeyStroke.getKeyStroke('D', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            if (canNetBeSavedAndShowMessage()) {
-                if (Preferences.getInstance().getShowPNMLWarning()) {
-                    JCheckBox showAgain = new JCheckBox("Do not show this warning.");
-                    String message = "In the saved PNML all timing information will be lost\n" +
-                        "and the components in the net will be merged into one big net.";
-                    Object[] dialogContent = {message, showAgain};
-                    JOptionPane.showMessageDialog(null, dialogContent,
-                        "PNML loss of information", JOptionPane.WARNING_MESSAGE);
-                    Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
-                }
-                Export.exportGuiView(getCurrentTab().drawingSurface(), Export.PNML, null);
-            }
+            currentTab.ifPresent(TabContentActions::exportPNML);
         }
     };
     private final GuiAction exportToXMLAction = new GuiAction("XML Queries", "Export the queries to XML format", KeyStroke.getKeyStroke('H', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            if (canNetBeSavedAndShowMessage()) {
-                Export.exportGuiView(getCurrentTab().drawingSurface(), Export.QUERY, null);
-            }
+            currentTab.ifPresent(TabContentActions::exportQueryXML);
         }
     };
     private final GuiAction exportTraceAction = new GuiAction("Export trace", "Export the current trace", "") {
@@ -1416,17 +1393,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         zoomComboBox.removeActionListener(zoomComboListener);
         zoomComboBox.setSelectedItem(getCurrentTab().drawingSurface().getZoomController().getPercent() + "%");
         zoomComboBox.addActionListener(zoomComboListener);
-    }
-
-    private boolean canNetBeSavedAndShowMessage() {
-        if (getCurrentTab().network().paintNet()) {
-            return true;
-        } else {
-            String message = "The net is too big and cannot be saved or exported.";
-            Object[] dialogContent = {message};
-            JOptionPane.showMessageDialog(null, dialogContent, "Large net limitation", JOptionPane.WARNING_MESSAGE);
-        }
-        return false;
     }
 
     private JMenu buildMenuFiles() {

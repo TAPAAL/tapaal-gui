@@ -31,6 +31,7 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
+import net.tapaal.Preferences;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.swinghelpers.JSplitPaneFix;
@@ -3157,6 +3158,62 @@ public class TabContent extends JSplitPane implements TabContentActions{
             default:
                 app.ifPresent(o->o.setStatusBarText("To-do (textfor" + type));
                 break;
+        }
+    }
+
+
+    private boolean canNetBeSavedAndShowMessage() {
+        if (network().paintNet()) {
+            return true;
+        } else {
+            String message = "The net is too big and cannot be saved or exported.";
+            Object[] dialogContent = {message};
+            JOptionPane.showMessageDialog(null, dialogContent, "Large net limitation", JOptionPane.WARNING_MESSAGE);
+        }
+        return false;
+    }
+
+    @Override
+    public void exportPNG() {
+        if (canNetBeSavedAndShowMessage()) {
+            Export.exportGuiView(drawingSurface(), Export.PNG, null);
+        }
+    }
+
+    @Override
+    public void exportPS() {
+        if (canNetBeSavedAndShowMessage()) {
+            Export.exportGuiView(drawingSurface(), Export.POSTSCRIPT, null);
+        }
+    }
+
+    @Override
+    public void exportTIKZ() {
+        if (canNetBeSavedAndShowMessage()) {
+            Export.exportGuiView(drawingSurface(), Export.TIKZ, drawingSurface().getGuiModel());
+        }
+    }
+
+    @Override
+    public void exportPNML() {
+        if (canNetBeSavedAndShowMessage()) {
+            if (Preferences.getInstance().getShowPNMLWarning()) {
+                JCheckBox showAgain = new JCheckBox("Do not show this warning.");
+                String message = "In the saved PNML all timing information will be lost\n" +
+                    "and the components in the net will be merged into one big net.";
+                Object[] dialogContent = {message, showAgain};
+                JOptionPane.showMessageDialog(null, dialogContent,
+                    "PNML loss of information", JOptionPane.WARNING_MESSAGE);
+                Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
+            }
+            Export.exportGuiView(drawingSurface(), Export.PNML, null);
+        }
+    }
+
+    @Override
+    public void exportQueryXML() {
+        if (canNetBeSavedAndShowMessage()) {
+            Export.exportGuiView(drawingSurface(), Export.QUERY, null);
         }
     }
 
