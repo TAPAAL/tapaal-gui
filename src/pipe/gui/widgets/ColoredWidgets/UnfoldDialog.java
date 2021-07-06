@@ -27,8 +27,18 @@ public class UnfoldDialog extends JDialog {
         initComponents();
     }
 
+    public static void showSimulationDialog(TabContent tab){
+        int unfoldAnswer = JOptionPane.showConfirmDialog(null, "The net will need to be unfolded before entering simulation mode", "Unfolding Required", JOptionPane.OK_CANCEL_OPTION);
+        if(unfoldAnswer == 0){
+            showDialog(tab);
+        } else {
+            cancelled = true;
+        }
+    }
+
     public static void showDialog(TabContent tab) {
         currentTab = tab;
+
         if(tab.getLens().isTimed()){
             currentTab.createNewAndUnfoldColor(false, false, false);
             return;
