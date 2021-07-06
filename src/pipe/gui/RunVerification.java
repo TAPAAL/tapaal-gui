@@ -76,7 +76,7 @@ public class RunVerification extends RunVerificationBase {
 			}
 
 		} else if(reduceNetOnly) {
-            //If the engine is only called to produce a reduced net, it will fail, but no error message should be shown
+            //If the engine is only called to produce a reduced net, verification will fail, but no error message should be shown
         }else{
 			
 			//Check if the is something like 

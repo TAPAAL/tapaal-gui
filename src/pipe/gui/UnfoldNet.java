@@ -14,8 +14,10 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNUnfoldOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -207,11 +210,6 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             return null;
         }
 
-        int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
-        if(dialogResult == JOptionPane.YES_OPTION) {
-            SmartDrawDialog.showSmartDrawDialog();
-        }
-
         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
         return newComposer.transformModel(loadedModel.network());
     }
@@ -246,5 +244,4 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
 
         return numElements;
     }
-
 }

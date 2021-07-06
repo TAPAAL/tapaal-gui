@@ -345,11 +345,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
                         CreateGui.openNewTabFromStream(newTab);
 
-                        int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
-                        if(dialogResult == JOptionPane.YES_OPTION) {
-                            SmartDrawDialog.showSmartDrawDialog();
-                        }
-
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
                         model = newComposer.transformModel(loadedModel.network());
                     } catch (FormatException e) {

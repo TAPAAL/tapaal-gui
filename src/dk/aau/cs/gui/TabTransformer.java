@@ -7,6 +7,7 @@ import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
+import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
@@ -313,6 +314,7 @@ public class TabTransformer {
         UnfoldNet thread = new UnfoldNet(engine, new MessengerImpl(), oldTab.getGuiModels(), partition, computeColorFixpoint, useSymmetricVars);
 
         RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread, "Unfolding");
+        SmartDrawDialog.setupWorkerListener(thread);
         thread.execute(oldTab.network(), oldTab.queries(), oldTab);
         dialog.setVisible(true);
     }

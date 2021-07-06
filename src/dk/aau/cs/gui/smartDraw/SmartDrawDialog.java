@@ -7,30 +7,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import javax.swing.AbstractAction;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -112,7 +94,6 @@ public class SmartDrawDialog extends JDialog {
 	long startTimeMs;
 	int objectsProgress;
 
-	
 	int xSpacing = 80;
 	int ySpacing = 80;
 	String searchOption = "DFS";
@@ -161,6 +142,22 @@ public class SmartDrawDialog extends JDialog {
 			templateSelector.addItem(name);
 		}*/
 	}
+    public static void setupWorkerListener(final SwingWorker<?, ?> worker) {
+	    if(worker != null){
+            worker.addPropertyChangeListener(event -> {
+                if (event.getPropertyName().equals("state")) {
+                    SwingWorker.StateValue stateValue = (SwingWorker.StateValue) event.getNewValue();
+                    SwingWorker.StateValue prevStateValue = (SwingWorker.StateValue) event.getOldValue();
+                    if (stateValue.equals(SwingWorker.StateValue.DONE) && prevStateValue.equals(SwingWorker.StateValue.STARTED)) {
+                        int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                        if(dialogResult == JOptionPane.YES_OPTION) {
+                            showSmartDrawDialog();
+                        }
+                    }
+                }
+            });
+        }
+    }
 	
 	private void initComponents() {
 		

@@ -161,8 +161,8 @@ public class UnfoldDialog extends JDialog {
     }
 
     private void onOK() {
-            currentTab.createNewAndUnfoldColor(usePartition.isSelected(), useColorFixpoint.isSelected(), useSymmetricvars.isSelected());
             exit();
+            currentTab.createNewAndUnfoldColor(usePartition.isSelected(), useColorFixpoint.isSelected(), useSymmetricvars.isSelected());
     }
 
 

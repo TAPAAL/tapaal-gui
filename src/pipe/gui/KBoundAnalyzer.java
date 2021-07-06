@@ -2,6 +2,7 @@ package pipe.gui;
 
 import javax.swing.JSpinner;
 
+import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;

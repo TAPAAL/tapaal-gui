@@ -3,6 +3,7 @@ package pipe.gui;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
+import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
 import pipe.dataLayer.DataLayer;
@@ -136,6 +137,9 @@ public class Verifier {
         if (timedArcPetriNetNetwork != null) {
             RunVerificationBase thread = new RunVerification(verifyta, verifyta, new UppaalIconSelector(), new MessengerImpl());
             RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
+            if(timedArcPetriNetNetwork.isColored()){
+                SmartDrawDialog.setupWorkerListener(thread);
+            }
             thread.execute(
                 verifytaOptions,
                 timedArcPetriNetNetwork,
@@ -302,6 +306,9 @@ public class Verifier {
             }
 
             RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
+            if(tapnNetwork.isColored()){
+                SmartDrawDialog.setupWorkerListener(thread);
+            }
             thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
             dialog.setVisible(true);
         } else {
