@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 import static dk.aau.cs.gui.TabTransformer.createUnfoldArgumentString;
 import static dk.aau.cs.gui.TabTransformer.mapQueryToNewNames;
 
-public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>, Void> {
+public class UnfoldNet extends SwingWorker<String, Void> {
 
     protected ModelChecker modelChecker;
     protected HashMap<TimedArcPetriNet, DataLayer> guiModels;
@@ -73,11 +73,12 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
     }
 
     @Override
-    protected Tuple<TimedArcPetriNet, NameMapping> doInBackground() throws Exception {
+    protected String doInBackground() throws Exception {
         TabContent.TAPNLens lens =  new TabContent.TAPNLens(!model.isUntimed(), false, model.isColored());
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
         boolean dummyQuery = false;
+        StringBuilder error = new StringBuilder();
 
         File modelFile = null;
         File queryFile = null;
@@ -90,6 +91,8 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             queryOut = File.createTempFile("queryOut", ".xml");
         } catch (IOException e) {
             e.printStackTrace();
+            error.append(e.getMessage());
+            return error.toString();
         }
         try {
             TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
@@ -119,6 +122,8 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
 
         } catch (IOException | ParserConfigurationException | TransformerException e) {
             e.printStackTrace();
+            error.append(e.getMessage());
+            return error.toString();
         }
         List<TAPNQuery> clonedQueries = new Vector<>();
         if (queries.iterator().hasNext()) {
@@ -157,7 +162,9 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             queryStream.close();
         } catch(FileNotFoundException e) {
             System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
-            return null;
+            error.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
+            error.append(e.getMessage());
+            return error.toString();
         }
         VerificationOptions unfoldTACPNOptions;
         if(lens.isTimed()){
@@ -206,12 +213,18 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
             }
         } catch (FormatException e) {
             e.printStackTrace();
+            error.append(e.getMessage());
+            return error.toString();
         } catch (ThreadDeath d){
-            return null;
+            error.append(d.getMessage());
+            return error.toString();
         }
 
-        TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
-        return newComposer.transformModel(loadedModel.network());
+        if(runner.error()){
+            error.append(runner.errorOutput());
+            return error.toString();
+        }
+        return null;
     }
 
     public static List<pipe.dataLayer.TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network) {
@@ -243,5 +256,38 @@ public class UnfoldNet extends SwingWorker<Tuple<TimedArcPetriNet, NameMapping>,
         }
 
         return numElements;
+    }
+
+    @Override
+    protected void done() {
+        if (!isCancelled()) {
+            String result = null;
+
+            try {
+                result = get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                showErrorMessage(e.getMessage());
+                return;
+            } catch (ExecutionException e) {
+                if(!(e.getCause() instanceof UnsupportedModelException)){
+                    e.printStackTrace();
+                }
+                showErrorMessage(e.getMessage());
+                return;
+            }
+
+            if(result != null){
+                showErrorMessage(result);
+            }
+
+        } else {
+            modelChecker.kill();
+            messenger.displayInfoMessage("Unfolding was interrupted by the user", "Unfolding Cancelled");
+
+        }
+    }
+    void showErrorMessage(String error){
+        JOptionPane.showMessageDialog(CreateGui.getApp(), "The unfolding failed with error:\n" + error, "Unfolding Error", JOptionPane.ERROR_MESSAGE);
     }
 }
