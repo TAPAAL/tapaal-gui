@@ -71,7 +71,6 @@ public abstract class TimedPlace {
         Require.that(tokens != null, "tokens cannot be null");
 
         for(TimedToken token : tokens){
-            //token.setColor(ColorType.COLORTYPE_DOT.getFirstColor());
             currentMarking.add(token); // avoid firing marking changed on every add
         }
         fireMarkingChanged();

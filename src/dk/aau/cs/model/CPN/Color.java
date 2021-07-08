@@ -1,30 +1,29 @@
 package dk.aau.cs.model.CPN;
 
-import dk.aau.cs.util.Require;
-
 import java.util.Vector;
 
 public class Color {
 
     private final Vector<Color> tuple;
-    private ColorType colorType;
+    private final ColorType colorType;
     private final String colorName;
     private final Integer id;
     public static final Color STAR_COLOR = new Color(new ColorType("*"), 0, "*");
 
-    public Color(ColorType colorType, Integer id, Vector<Color> colors) {
+    private Color(ColorType colorType, Integer id, Vector<Color> colors, String colorName) {
         this.tuple = colors;
         this.colorType = colorType;
-        this.colorName = "";
+        this.colorName = colorName;
         this.id = id;
+    }
 
+    public Color(ColorType colorType, Integer id, Vector<Color> colors) {
+        this(colorType, id, colors, "");
     }
 
     public Color(ColorType colorType, Integer id, String color) {
-        this.tuple = null;
-        this.colorType = colorType;
-        this.colorName = color;
-        this.id = id;
+        //XXX: 2021-07-06: need to remove the null, empty list or subtyping to only allow consistent internal state
+        this (colorType, id, null, color);
     }
 
 
@@ -38,11 +37,6 @@ public class Color {
 
     public ColorType getColorType() {
         return colorType;
-    }
-
-    public void setColorType(ColorType newColorType){
-        Require.that(newColorType.contains(this), "The new colortype must contain the color");
-        colorType = newColorType;
     }
 
     public boolean contains(Color color) {

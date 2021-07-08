@@ -2,6 +2,7 @@ package dk.aau.cs.model.CPN;
 
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Vector;
@@ -16,8 +17,11 @@ public class ColorType implements Iterable<Color> {
 
     public ColorType(String name, String id) { this.name = name; this.id = id;}
 
+    public void addColor(Color c) {
+        colors.add(c);
+    }
     public void addColor(String colorName) {
-        colors.add(new Color(this, colors.size(), colorName));
+        addColor(new Color(this, colors.size(), colorName));
     }
 
     public String getName() {
@@ -32,7 +36,7 @@ public class ColorType implements Iterable<Color> {
         return colors.size();
     }
 
-    public Iterator<Color> iterator() {
+    public @NotNull Iterator<Color> iterator() {
         return colors.iterator();
     }
 

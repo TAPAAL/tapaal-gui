@@ -1,6 +1,5 @@
 package dk.aau.cs.model.tapn;
 
-import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.util.Tuple;
