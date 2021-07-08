@@ -148,7 +148,7 @@ public class SmartDrawDialog extends JDialog {
                 if (event.getPropertyName().equals("state")) {
                     SwingWorker.StateValue stateValue = (SwingWorker.StateValue) event.getNewValue();
                     SwingWorker.StateValue prevStateValue = (SwingWorker.StateValue) event.getOldValue();
-                    if (stateValue.equals(SwingWorker.StateValue.DONE) && prevStateValue.equals(SwingWorker.StateValue.STARTED)) {
+                    if (stateValue.equals(SwingWorker.StateValue.DONE) && prevStateValue.equals(SwingWorker.StateValue.PENDING)) {
                         int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
                         if(dialogResult == JOptionPane.YES_OPTION) {
                             showSmartDrawDialog();
