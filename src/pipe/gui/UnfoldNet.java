@@ -279,6 +279,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
             if(result != null){
                 showErrorMessage(result);
+            } else {
+                firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
             }
 
         } else {
