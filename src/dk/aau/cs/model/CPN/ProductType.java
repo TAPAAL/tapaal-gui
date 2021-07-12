@@ -62,7 +62,7 @@ public class ProductType extends ColorType {
     }
 
     public String toString() {
-        StringBuilder out = new StringBuilder("<html>Domain: " + name + "<b> is </b> &lt;");
+        StringBuilder out = new StringBuilder("<html>" + name + "<b> is </b> &lt;");
         for (ColorType element : constituents) {
             out.append(element.getName()).append(", ");
         }
