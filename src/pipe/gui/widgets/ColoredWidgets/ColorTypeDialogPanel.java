@@ -684,7 +684,7 @@ public class ColorTypeDialogPanel extends JPanel {
         if (!Pattern.matches("[0-9]+", lowerbound) && rangeOfIntegersPanelEnabled ) {
             JOptionPane.showMessageDialog(
                             CreateGui.getApp(),
-                            "Lower bound must be a number",
+                            "Lower bound must be a nonnegative number",
                             "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -699,7 +699,7 @@ public class ColorTypeDialogPanel extends JPanel {
             if (rangeOfIntegersPanelEnabled && (Integer.parseInt(lowerBoundTextField.getText()) > Integer.parseInt(upperBoundTextField.getText()))) {
                 JOptionPane.showMessageDialog(
                     CreateGui.getApp(),
-                    "Lower bound must be smaller than Upper bound",
+                    "Lower bound must be smaller or equal than upper bound.",
                     "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
