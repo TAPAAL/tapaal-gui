@@ -423,6 +423,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent e) {
             boolean isGame = gameFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeGameFeature(isGame));
+            if(isGame){
+                colorFeatureOptions.setEnabled(false);
+            } else {
+                colorFeatureOptions.setEnabled(true);
+            }
         }
     };
 
@@ -430,6 +435,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent e) {
             boolean isColor = colorFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeColorFeature(isColor));
+            if(isColor){
+                gameFeatureOptions.setEnabled(false);
+            } else {
+                gameFeatureOptions.setEnabled(true);
+            }
         }
     };
 
@@ -952,8 +962,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 }
 
                 timeFeatureOptions.setEnabled(true);
-                gameFeatureOptions.setEnabled(true);
-                colorFeatureOptions.setEnabled(true);
+                if (colorFeatureOptions.getSelectedIndex() == 1 && gameFeatureOptions.getSelectedIndex() != 1) {
+                    gameFeatureOptions.setEnabled(false);
+                } else {
+                    gameFeatureOptions.setEnabled(true);
+                }
+                if (gameFeatureOptions.getSelectedIndex() == 1 && colorFeatureOptions.getSelectedIndex() != 1) {
+                    colorFeatureOptions.setEnabled(false);
+                } else {
+                    colorFeatureOptions.setEnabled(true);
+                }
 
                 //Enable editor focus traversal policy
                 setFocusTraversalPolicy(new EditorFocusTraversalPolicy());

@@ -180,6 +180,14 @@ public class TapnXmlLoader {
             var isColoredElement = nodeList.item(0).getAttributes().getNamedItem("isColored");
             boolean isColored = isColoredElement == null ? network.isColored() : Boolean.parseBoolean(isColoredElement.getNodeValue());
 
+            if(isGame && isColored){
+                if(!network.hasUncontrollableTransitions()){
+                    isGame = false;
+                } else if(!network.isColored()){
+                    isColored = false;
+                }
+            }
+
             lens = new TabContent.TAPNLens(isTimed, isGame, isColored);
         }
     }
@@ -212,7 +220,7 @@ public class TapnXmlLoader {
 		SharedPlace place = new SharedPlace(name, invariant);
         place.setCurrentMarking(network.marking());
         place.setColorType(parsePlaceColorType(element));
-		//place.addTokens(numberOfTokens);
+		//place.addTokens(numbesrOfTokens);
         addColoredDependencies(place,element, network, constants);
 
 

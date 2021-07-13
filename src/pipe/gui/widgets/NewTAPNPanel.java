@@ -256,6 +256,12 @@ public class NewTAPNPanel extends JDialog {
         gbc.insets = new Insets(3, 3, 3, 3);
         isGamePanel.add(nonGameNet, gbc);
         isGameRadioButtonGroup.add(nonGameNet);
+        nonGameNet.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (nonGameNet.isSelected())
+                    coloredNet.setEnabled(true);
+            }
+        });
 
         gameNet = new JRadioButton("Yes");
         gbc = new GridBagConstraints();
@@ -266,6 +272,13 @@ public class NewTAPNPanel extends JDialog {
         gbc.insets = new Insets(3, 3, 3, 3);
         isGamePanel.add(gameNet, gbc);
         isGameRadioButtonGroup.add(gameNet);
+
+        gameNet.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (gameNet.isSelected())
+                    coloredNet.setEnabled(false);
+            }
+        });
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -298,6 +311,13 @@ public class NewTAPNPanel extends JDialog {
         isColorPanel.add(nonColorNet, gbc);
         isColorRadioButtonGroup.add(nonColorNet);
 
+        nonColorNet.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (nonColorNet.isSelected())
+                    gameNet.setEnabled(true);
+            }
+        });
+
         coloredNet = new JRadioButton("Yes");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
@@ -307,6 +327,13 @@ public class NewTAPNPanel extends JDialog {
         gbc.insets = new Insets(3, 3, 3, 3);
         isColorPanel.add(coloredNet, gbc);
         isColorRadioButtonGroup.add(coloredNet);
+
+        coloredNet.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (coloredNet.isSelected())
+                    gameNet.setEnabled(false);
+            }
+        });
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
