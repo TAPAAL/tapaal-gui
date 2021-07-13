@@ -200,7 +200,7 @@ public class TapnXmlLoader {
 	private SharedPlace parseSharedPlace(Element element, TimedArcPetriNetNetwork network, ConstantStore constants) {
 		String name = element.getAttribute("name");
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
-		int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
+		//int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
 
 		if(name.toLowerCase().equals("true") || name.toLowerCase().equals("false")) {
 			name = "_" + name;

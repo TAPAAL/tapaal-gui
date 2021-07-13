@@ -77,22 +77,31 @@ public abstract class TimedPlace {
     }
 
     public void addTokens(int numberOfTokensToAdd) {
+        Require.that(getColorType().equals(ColorType.COLORTYPE_DOT), "Cannot add a number of tokens of unspecified color to a place which does not have the dot colortype");
         for (int i = 0; i < numberOfTokensToAdd; i++) {
             addToken(new TimedToken(this, BigDecimal.ZERO, ColorType.COLORTYPE_DOT.getFirstColor()));
         }
     }
 
     public void removeTokens(int numberOfTokensToRemove) {
+        Require.that(getColorType().equals(ColorType.COLORTYPE_DOT), "Cannot remove a number of tokens of unspecified color from a place which does not have the dot colortype");
+
         for (int i = 0; i < numberOfTokensToRemove; i++) {
             removeToken();
         }
     }
 
     public void removeToken() {
+        Require.that(getColorType().equals(ColorType.COLORTYPE_DOT), "Cannot remove tokens of unspecified color from a place which does not have the dot colortype");
         if (numberOfTokens() > 0) {
             currentMarking.remove(tokens().get(0));
             fireMarkingChanged();
         }
+    }
+
+    public void removeToken(TimedToken token) {
+        Require.that(getColorType().equals(token.getColor().getColorType()), "Cannot remove token with different colortype from the place colortype");
+        currentMarking.remove(token);
     }
 
     public void removeTokens(Iterable<TimedToken> tokens){

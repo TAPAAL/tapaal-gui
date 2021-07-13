@@ -165,7 +165,11 @@ public class LocalTimedPlace  extends TimedPlace {
         this.ctiList = ctiList;
     }
     public void setColorType(ColorType colorType) {
-        this.colorType = colorType;
+        if(!this.colorType.equals(colorType)) {
+            currentMarking.getTokensFor(this).removeAll(currentMarking.getTokensFor(this));
+            this.colorType = colorType;
+            fireMarkingChanged();
+        }
     }
     @Override
     public ColorType getColorType() {return colorType;}

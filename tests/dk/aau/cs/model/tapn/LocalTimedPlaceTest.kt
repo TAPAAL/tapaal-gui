@@ -2,8 +2,11 @@ package dk.aau.cs.model.tapn
 
 import dk.aau.cs.model.CPN.Color
 import dk.aau.cs.model.CPN.ColorType
+import dk.aau.cs.util.RequireException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import java.math.BigDecimal
 
 class TimedPlaceTest {
 
@@ -41,6 +44,24 @@ class TimedPlaceTest {
     }
 
     @Test
+    fun `Adding tokens for non-default ColorType using wrong function overload throws exception`() {
+
+        val place = LocalTimedPlace("test")
+        with(place) {
+            setCurrentMarking(LocalTimedMarking())
+
+            val ct = ColorType("new").apply {
+                val c = Color(this, 0, "fisk")
+                addColor(c)
+            }
+            colorType = ct
+            assertThrows<RequireException> {addTokens(1)  }
+            assertEquals(0, tokens().size)
+        }
+
+    }
+
+    @Test
     fun `Adding tokens for non-default ColorType`() {
 
         val place = LocalTimedPlace("test")
@@ -52,8 +73,7 @@ class TimedPlaceTest {
                 addColor(c)
             }
             colorType = ct
-
-            addTokens(1)
+            addToken(TimedToken(this, BigDecimal.ZERO, colorType.firstColor))
             assertEquals(1, tokens().size)
 
             assertEquals(ct.firstColor, tokens().first().color)
@@ -68,7 +88,7 @@ class TimedPlaceTest {
         with(place) {
             setCurrentMarking(LocalTimedMarking())
 
-            addTokens(1)
+            addToken(TimedToken(this, BigDecimal.ZERO, colorType.firstColor))
 
             val ct = ColorType("new").apply {
                 val c = Color(this, 0, "fisk")
@@ -76,7 +96,7 @@ class TimedPlaceTest {
             }
             colorType = ct
 
-            addTokens(1)
+            addToken(TimedToken(this, BigDecimal.ZERO, colorType.firstColor))
             assertEquals(1, tokens().size)
 
             assertEquals(ct.firstColor, tokens().first().color)
