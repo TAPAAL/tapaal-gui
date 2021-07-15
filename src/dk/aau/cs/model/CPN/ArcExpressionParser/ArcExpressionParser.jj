@@ -21,10 +21,12 @@ package dk.aau.cs.model.CPN.ArcExpressionParser;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;import java.util.Vector;
+import java.util.Arrays;
+import java.util.Vector;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.*;
-import dk.aau.cs.model.CPN.ProductType;import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.CPN.ProductType;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.CPN.Color;
 
 
@@ -46,9 +48,8 @@ public class ArcExpressionParser {
         return parser.NumberOfExpression();
     }
 }
-
-
 PARSER_END(ArcExpressionParser)
+
 TOKEN :
 {
 	<PLUS: "+">
@@ -125,7 +126,7 @@ NumberOfExpression NumberOfExpression() : {
 	{
         number = <NUM> "'" expr=ColorExpression()
         {
-            return new NumberOfExpression(Integer.parseInt(number.image), new Vector<>(Arrays.asList(expr)));
+            return new NumberOfExpression(Integer.parseInt(number.image), new Vector<ColorExpression>(Arrays.asList(expr)));
         }
 	}
 
