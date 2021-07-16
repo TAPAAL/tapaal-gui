@@ -2579,6 +2579,9 @@ public class QueryDialog extends JPanel {
                         } else {
 					        throw new Exception();
                         }
+					    if (newQuery.toString().length() <= 2) {
+                            throw new Exception();
+                        }
 					} catch (Throwable ex) {
 						int choice = JOptionPane.showConfirmDialog(
 								CreateGui.getApp(),
@@ -2593,7 +2596,7 @@ public class QueryDialog extends JPanel {
 
 					}
 
-					if (newQuery != null) // new query parsed successfully
+					if (newQuery != null && newQuery.toString().length() > 2) // new query parsed successfully
 					{
 						// check correct place names are used in atomic propositions
 						ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
