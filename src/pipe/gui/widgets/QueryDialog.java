@@ -2574,13 +2574,24 @@ public class QueryDialog extends JPanel {
                             newQuery = TAPAALQueryParser.parse(queryField.getText());
                         } else if (queryType.getSelectedIndex() == 0) {
 						    newQuery = TAPAALCTLQueryParser.parse(queryField.getText());
+                            String check = newQuery.toString();
+                            if (!check.startsWith("EG ") && !check.startsWith("EF ") &&
+                                !check.startsWith("AG ") && !check.startsWith("AF ") &&
+                                !check.startsWith("E ") && !check.startsWith("EX ") &&
+                                !check.startsWith("A ") && !check.startsWith("AX ")) {
+                                newQuery = null;
+                                throw new Exception();
+                            }
                         } else if (queryType.getSelectedIndex() == 1) {
 					        newQuery = TAPAALLTLQueryParser.parse(queryField.getText());
+                            String check = newQuery.toString();
+                            if (!check.startsWith("G ") && !check.startsWith("F ") &&
+                                !check.contains(" U ") && !check.startsWith("X ")) {
+                                newQuery = null;
+                                throw new Exception();
+                            }
                         } else {
 					        throw new Exception();
-                        }
-					    if (newQuery.toString().length() <= 2) {
-                            throw new Exception();
                         }
 					} catch (Throwable ex) {
 						int choice = JOptionPane.showConfirmDialog(
