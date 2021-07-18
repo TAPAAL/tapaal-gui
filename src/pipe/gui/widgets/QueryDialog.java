@@ -967,9 +967,16 @@ public class QueryDialog extends JPanel {
 			return;
 		} else if (queryType.getSelectedIndex() == 1) {
             breadthFirstSearch.setEnabled(false);
-            depthFirstSearch.setEnabled(true);
             heuristicSearch.setEnabled(true);
+            depthFirstSearch.setEnabled(true);
             randomSearch.setEnabled(true);
+
+            if (!useTarjan.isSelected()) {
+                heuristicSearch.setEnabled(false);
+                if (someTraceRadioButton.isSelected()) {
+                    randomSearch.setEnabled(false);
+                }
+            }
         } else {
 			breadthFirstSearch.setEnabled(true);
 			depthFirstSearch.setEnabled(true);
@@ -2996,6 +3003,8 @@ public class QueryDialog extends JPanel {
         useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
         useTraceRefinement.setToolTipText(TOOL_TIP_USE_TRACE_REFINEMENT);
         useTarjan.setToolTipText(TOOL_TIP_USE_TARJAN);
+
+        useTarjan.addActionListener(e -> updateSearchStrategies());
 
         if (lens.isTimed() || lens.isGame()) {
             initTimedReductionOptions();
