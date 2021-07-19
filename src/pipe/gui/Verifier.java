@@ -137,7 +137,7 @@ public class Verifier {
         if (timedArcPetriNetNetwork != null) {
             RunVerificationBase thread = new RunVerification(verifyta, verifyta, new UppaalIconSelector(), new MessengerImpl());
             RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
-            if(timedArcPetriNetNetwork.isColored()){
+            if(timedArcPetriNetNetwork.isColored() && input.getTraceOption() != TAPNQuery.TraceOption.NONE){
                 SmartDrawDialog.setupWorkerListener(thread);
             }
             thread.execute(
@@ -308,7 +308,7 @@ public class Verifier {
             }
 
             RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
-            if(tapnNetwork.isColored()){
+            if(tapnNetwork.isColored() && query.getTraceOption() != TAPNQuery.TraceOption.NONE){
                 SmartDrawDialog.setupWorkerListener(thread);
             }
             thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
