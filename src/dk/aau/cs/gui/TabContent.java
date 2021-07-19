@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.xml.crypto.Data;
 
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
@@ -1628,7 +1629,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	    Component[] components = drawingSurface.getComponents();
         for (Component component : components) {
             if (component instanceof TimedPlaceComponent) {
-              ((TimedPlaceComponent) component).getNameLabel().displayName(isVisible);
+                TimedPlaceComponent place = (TimedPlaceComponent) component;
+                place.setAttributesVisible(isVisible);
+                place.update(isVisible);
+                repaint();
             }
         }
         isPlaceNameVisible = isVisible;
@@ -1639,7 +1643,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
         Component[] components = drawingSurface.getComponents();
         for (Component component : components) {
             if (component instanceof TimedTransitionComponent) {
-                ((TimedTransitionComponent) component).getNameLabel().setVisible(isVisible);
+                TimedTransitionComponent transition = (TimedTransitionComponent) component;
+                transition.setAttributesVisible(isVisible);
+                transition.update(isVisible);
+                repaint();
             }
         }
         isTransitionNameVisible = isVisible;
