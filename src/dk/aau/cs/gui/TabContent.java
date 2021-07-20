@@ -12,7 +12,6 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.xml.crypto.Data;
 
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
@@ -162,7 +161,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             Require.notNull(p, "Point can't be null");
 
             dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)));
-            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, lens, isPlaceNameVisible);
+            TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, lens, isPlaceNameHidden);
             guiModelToModel.get(c).add(tp);
             c.addPetriNetObject(pnObject);
 
@@ -174,7 +173,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
 
             transition.setUncontrollable(isUncontrollable);
-            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens, isTransitionNameVisible);
+            TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens, isTransitionNameHidden);
 
             guiModelToModel.get(c).add(transition);
             c.addPetriNetObject(pnObject);
@@ -844,8 +843,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	
 	private WorkflowDialog workflowDialog = null;
 
-	private boolean isPlaceNameVisible = true;
-    private boolean isTransitionNameVisible = true;
+	private boolean isPlaceNameHidden = false;
+    private boolean isTransitionNameHidden = false;
 
 	private TabContent(boolean isTimed, boolean isGame) {
 	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame));
@@ -1625,35 +1624,35 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     @Override
-    public void showPlaceNames(boolean isVisible) {
+    public void showPlaceNames(boolean isHidden) {
 	    Component[] components = drawingSurface.getComponents();
         for (Component component : components) {
             if (component instanceof TimedPlaceComponent) {
                 TimedPlaceComponent place = (TimedPlaceComponent) component;
                 if (!place.getAttributesVisible() && !place.getAllAttributesVisible()) continue;
-                place.setAttributesVisible(isVisible);
-                place.setAllAttributesVisible(!isVisible);
+                place.setAttributesVisible(!isHidden);
+                place.setAllAttributesVisible(isHidden);
                 place.update(true);
                 repaint();
             }
         }
-        isPlaceNameVisible = isVisible;
+        isPlaceNameHidden = isHidden;
 	}
 
     @Override
-    public void showTransitionNames(boolean isVisible) {
+    public void showTransitionNames(boolean isHidden) {
         Component[] components = drawingSurface.getComponents();
         for (Component component : components) {
             if (component instanceof TimedTransitionComponent) {
                 TimedTransitionComponent transition = (TimedTransitionComponent) component;
                 if (!transition.getAttributesVisible() && !transition.getAllAttributesVisible()) continue;
-                transition.setAttributesVisible(isVisible);
-                transition.setAllAttributesVisible(!isVisible);
+                transition.setAttributesVisible(!isHidden);
+                transition.setAllAttributesVisible(isHidden);
                 transition.update(true);
                 repaint();
             }
         }
-        isTransitionNameVisible = isVisible;
+        isTransitionNameHidden = isHidden;
     }
 
     public static Split getEditorModelRoot(){
@@ -1709,8 +1708,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			drawingSurface.getSelectionObject().clearSelection();
 
 		}
-        showPlaceNames(isPlaceNameVisible);
-        showTransitionNames(isTransitionNameVisible);
+        showPlaceNames(isPlaceNameHidden);
+        showTransitionNames(isTransitionNameHidden);
     }
 
 

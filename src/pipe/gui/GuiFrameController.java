@@ -58,8 +58,8 @@ public class GuiFrameController implements GuiFrameControllerActions{
     boolean showEnabledTransitions = true;
     boolean showDelayEnabledTransitions = true;
     private boolean showToolTips = true;
-    private boolean showPlaceNames = true;
-    private boolean showTransitionNames = true;
+    private boolean hidePlaceNames = false;
+    private boolean hideTransitionNames = false;
     private boolean showZeroToInfinityIntervals = true;
     private boolean showTokenAge = true;
 
@@ -696,26 +696,26 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void toggleDisplayPlaceNames() {
-        showPlaceNames = !showPlaceNames;
+        hidePlaceNames = !hidePlaceNames;
         updateDisplayPlaceNames();
     }
 
     @Override
     public void toggleDisplayTransitionNames() {
-        showTransitionNames = !showTransitionNames;
+        hideTransitionNames = !hideTransitionNames;
         updateDisplayTransitionNames();
     }
 
     @Override
     public void updateDisplayPlaceNames() {
-        guiFrame.setShowPlaceNames(showPlaceNames);
-        CreateGui.getTabs().forEach(o -> o.showPlaceNames(showPlaceNames));
+        guiFrame.setHidePlaceNames(hidePlaceNames);
+        CreateGui.getTabs().forEach(o -> o.showPlaceNames(hidePlaceNames));
     }
 
     @Override
     public void updateDisplayTransitionNames() {
-        guiFrame.setShowTransitionNames(showTransitionNames);
-        CreateGui.getTabs().forEach(o -> o.showTransitionNames(showTransitionNames));
+        guiFrame.setHideTransitionNames(hideTransitionNames);
+        CreateGui.getTabs().forEach(o -> o.showTransitionNames(hideTransitionNames));
     }
 
     @Override

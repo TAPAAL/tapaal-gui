@@ -18,10 +18,8 @@ import javax.swing.*;
 
 import com.sun.jna.Platform;
 import dk.aau.cs.gui.*;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
@@ -29,10 +27,8 @@ import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import org.jetbrains.annotations.NotNull;
-import pipe.dataLayer.TAPNQuery;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
-import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import net.tapaal.resourcemanager.ResourceManager;
@@ -333,12 +329,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayToolTips);
         }
     };
-    private final GuiAction showPlaceNames = new GuiAction("Display place names ", "Show/hide names of all places", true) {
+    private final GuiAction hidePlaceNames = new GuiAction("Hide place names ", "Show/hide names of all places", true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayPlaceNames);
         }
     };
-    private final GuiAction showTransitionNames = new GuiAction("Display transition names", "Show/hide names of all transitions", true) {
+    private final GuiAction hideTransitionNames = new GuiAction("Hide transition names", "Show/hide names of all transitions", true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayTransitionNames);
         }
@@ -684,8 +680,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, showTokenAge(), showTokenAgeAction);
 
-        addCheckboxMenuItem(viewMenu, showPlaceNames);
-        addCheckboxMenuItem(viewMenu, showTransitionNames);
+        addCheckboxMenuItem(viewMenu, hidePlaceNames);
+        addCheckboxMenuItem(viewMenu, hideTransitionNames);
 
         viewMenu.addSeparator();
 
@@ -1080,8 +1076,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         showDelayEnabledTransitionsAction.setEnabled(enable);
         showToolTipsAction.setEnabled(enable);
         showTokenAgeAction.setEnabled(enable);
-        showPlaceNames.setEnabled(enable);
-        showTransitionNames.setEnabled(enable);
+        hidePlaceNames.setEnabled(enable);
+        hideTransitionNames.setEnabled(enable);
         showAdvancedWorkspaceAction.setEnabled(enable);
         showSimpleWorkspaceAction.setEnabled(enable);
         saveWorkSpaceAction.setEnabled(enable);
@@ -1311,13 +1307,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     @Override
-    public void setShowPlaceNames(boolean b) {
-        showPlaceNames.setSelected(b);
+    public void setHidePlaceNames(boolean b) {
+        hidePlaceNames.setSelected(b);
     }
 
     @Override
-    public void setShowTransitionNames(boolean b) {
-        showTransitionNames.setSelected(b);
+    public void setHideTransitionNames(boolean b) {
+        hideTransitionNames.setSelected(b);
     }
 
     @Override
