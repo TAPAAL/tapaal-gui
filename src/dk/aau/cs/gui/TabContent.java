@@ -1630,7 +1630,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
         for (Component component : components) {
             if (component instanceof TimedPlaceComponent) {
                 TimedPlaceComponent place = (TimedPlaceComponent) component;
+                if (!place.getAttributesVisible() && !place.getAllAttributesVisible()) continue;
                 place.setAttributesVisible(isVisible);
+                place.setAllAttributesVisible(!isVisible);
                 place.update(true);
                 repaint();
             }
@@ -1644,7 +1646,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
         for (Component component : components) {
             if (component instanceof TimedTransitionComponent) {
                 TimedTransitionComponent transition = (TimedTransitionComponent) component;
+                if (!transition.getAttributesVisible() && !transition.getAllAttributesVisible()) continue;
                 transition.setAttributesVisible(isVisible);
+                transition.setAllAttributesVisible(!isVisible);
                 transition.update(true);
                 repaint();
             }
