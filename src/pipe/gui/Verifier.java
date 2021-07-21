@@ -78,18 +78,18 @@ public class Verifier {
         return reducedNetTempFile.getAbsolutePath();
     }
 
-    public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
+    public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k, JSpinner tokensControl) {
         ModelChecker modelChecker;
 
         if (tapnNetwork.isUntimed()) {
             modelChecker = getVerifyPN();
-        } else if (tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions()) {
+        } else if (tapnNetwork.isColored()) {
+            modelChecker = getVerifydTACPN();
+        }else if (tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions()) {
             modelChecker = getVerifydTAPN();
         } else {
             modelChecker = getVerifyTAPN();
         }
-
-        ModelChecker unfoldingEngine = getVerifyPN();
 
         if (!modelChecker.isCorrectVersion()) {
             new MessengerImpl().displayErrorMessage(
@@ -97,13 +97,8 @@ public class Verifier {
                 "Verification Error");
             return;
         }
-        if (!unfoldingEngine.isCorrectVersion()) {
-            new MessengerImpl().displayErrorMessage(
-                "No " + unfoldingEngine + " specified or you are running an old version of it:\nThe verification is cancelled",
-                "Verification Error");
-            return;
-        }
-        KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, modelChecker, unfoldingEngine, new MessengerImpl(), tokensControl);
+
+        KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, guiModels, k, modelChecker, new MessengerImpl(), tokensControl);
         optimizer.analyze();
     }
 
@@ -135,7 +130,7 @@ public class Verifier {
         }
 
         if (timedArcPetriNetNetwork != null) {
-            RunVerificationBase thread = new RunVerification(verifyta, verifyta, new UppaalIconSelector(), new MessengerImpl());
+            RunVerificationBase thread = new RunVerification(verifyta, new UppaalIconSelector(), new MessengerImpl());
             RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
             if(timedArcPetriNetNetwork.isColored() && input.getTraceOption() != TAPNQuery.TraceOption.NONE){
                 SmartDrawDialog.setupWorkerListener(thread);
@@ -285,26 +280,10 @@ public class Verifier {
 
         if (tapnNetwork != null) {
             RunVerificationBase thread;
-            if (tapnNetwork.isColored() && !tapnNetwork.isUntimed()) {
-                ModelChecker unfoldingEngine = getVerifyPN();
-                if (!unfoldingEngine.isCorrectVersion()) {
-                    new MessengerImpl().displayErrorMessage(
-                        "No " + unfoldingEngine + " specified: The verification is cancelled",
-                        "Verification Error");
-                    return;
-                }
-
-                if (reducedNetTempFile != null) {
-                    thread = new RunVerification(verifytapn, unfoldingEngine, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, reducedNetTempFile.getAbsolutePath(), onlyCreateReducedNet);
-                } else {
-                    thread = new RunVerification(verifytapn, unfoldingEngine, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
-                }
+            if (reducedNetTempFile != null) {
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, reducedNetTempFile.getAbsolutePath(), onlyCreateReducedNet);
             } else {
-                if (reducedNetTempFile != null) {
-                    thread = new RunVerification(verifytapn, verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, reducedNetTempFile.getAbsolutePath(), onlyCreateReducedNet);
-                } else {
-                    thread = new RunVerification(verifytapn, verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
-                }
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
             }
 
             RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);

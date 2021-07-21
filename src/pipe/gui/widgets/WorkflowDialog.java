@@ -1290,7 +1290,7 @@ public class WorkflowDialog extends JDialog {
 	}
 
 	private void checkBound() {
-		Verifier.analyzeKBound(model,
+		Verifier.analyzeKBound(model, CreateGui.getCurrentTab().getGuiModels(),
 				(Integer) numberOfExtraTokensInNet.getValue(),
 				numberOfExtraTokensInNet);
 	}

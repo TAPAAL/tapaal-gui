@@ -41,19 +41,19 @@ import pipe.dataLayer.TAPNQuery;
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
 	private final VerificationCallback callback;
-	public RunVerification(ModelChecker modelChecker, ModelChecker unfoldingEngine, IconSelector selector, Messenger messenger, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels,String reducedNetFilePath, boolean reduceNetOnly) {
-		super(modelChecker, unfoldingEngine, messenger, guiModels, reducedNetFilePath,reduceNetOnly);
+	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, HashMap<TimedArcPetriNet, DataLayer> guiModels,String reducedNetFilePath, boolean reduceNetOnly) {
+		super(modelChecker, messenger, guiModels, reducedNetFilePath,reduceNetOnly);
 		iconSelector = selector;
 		this.callback = callback;
 	}
-    public RunVerification(ModelChecker modelChecker, ModelChecker unfoldingEngine, IconSelector selector, Messenger messenger, VerificationCallback callback,HashMap<TimedArcPetriNet, DataLayer> guiModels) {
-        this(modelChecker, unfoldingEngine, selector, messenger, callback, guiModels, null, false);
+    public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback,HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+        this(modelChecker, selector, messenger, callback, guiModels, null, false);
     }
-    public RunVerification(ModelChecker modelChecker, ModelChecker unfoldingEngine, IconSelector selector, Messenger messenger, VerificationCallback callback) {
-        this(modelChecker, unfoldingEngine, selector, messenger, callback, null, null, false);
+    public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
+        this(modelChecker, selector, messenger, callback, null, null, false);
 	}
-    public RunVerification(ModelChecker modelChecker, ModelChecker unfoldingEngine, IconSelector selector, Messenger messenger) {
-        this(modelChecker, unfoldingEngine, selector, messenger, null, null, null, false);
+    public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
+        this(modelChecker, selector, messenger, null, null, null, false);
     }
 
 	@Override

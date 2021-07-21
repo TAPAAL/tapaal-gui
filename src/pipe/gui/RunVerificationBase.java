@@ -49,7 +49,6 @@ import pipe.dataLayer.Template;
 public abstract class RunVerificationBase extends SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 
 	protected ModelChecker modelChecker;
-    protected ModelChecker unfoldingEngine;
 
 	protected VerificationOptions options;
 	protected TimedArcPetriNetNetwork model;
@@ -66,18 +65,17 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
     //if the unfolded net is too big, do not try to load it
     private final int maxNetSize = 4000;
 
-	public RunVerificationBase(ModelChecker modelChecker, ModelChecker unfoldingEngine, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels,String reducedNetFilePath, boolean reduceNetOnly) {
+	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels,String reducedNetFilePath, boolean reduceNetOnly) {
 		super();
 		this.modelChecker = modelChecker;
-		this.unfoldingEngine = unfoldingEngine;
 		this.messenger = messenger;
 		this.guiModels = guiModels;
 		this.reducedNetFilePath = reducedNetFilePath;
 		this.reduceNetOnly = reduceNetOnly;
 	}
 
-    public RunVerificationBase(ModelChecker modelChecker, ModelChecker unfoldingEngine, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
-        this(modelChecker, unfoldingEngine, messenger, guiModels, "",false);
+    public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
+        this(modelChecker, messenger, guiModels, "",false);
     }
 
 	
@@ -249,7 +247,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			showResult(result);
 
 		} else {
-		    unfoldingEngine.kill();
 			modelChecker.kill();
 			messenger.displayInfoMessage("Verification was interrupted by the user. No result found!", "Verification Cancelled");
 
