@@ -114,8 +114,6 @@ public class GuiFrameController implements GuiFrameControllerActions{
         //XXX fixes an issue where on first open of a net the time intervals are not shown
         tab.drawingSurface().repaintAll();
 
-        guiFrame.getShowPlaceNames();
-
         updateDisplayPlaceNames(guiFrame.getShowPlaceNames());
         updateDisplayTransitionNames(guiFrame.getShowTransitionNames());
     }
