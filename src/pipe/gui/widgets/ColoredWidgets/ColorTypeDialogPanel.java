@@ -474,8 +474,15 @@ public class ColorTypeDialogPanel extends JPanel {
         cyclicRemoveButton = new JButton("Remove");
         cyclicRemoveButton.setEnabled(false);
         cyclicRemoveButton.addActionListener(actionEvent -> {
-            cyclicModel.removeElementAt(enumList.getSelectedIndex());
-            enumList.setModel(cyclicModel);
+            ArrayList<String> messages = new ArrayList<>();
+            if(oldColorType == null || network.canColorTypeBeRemoved(oldColorType,messages)) {
+                cyclicModel.removeElementAt(enumList.getSelectedIndex());
+                enumList.setModel(cyclicModel);
+            }else{
+                String message = "Colortype cannot have colors removed for the following reasons: \n\n";
+                message += String.join("", messages);
+                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
+            }
         });
         cyclicRemoveButton.setPreferredSize(buttonSize);
         cyclicRemoveButton.setMinimumSize(buttonSize);
@@ -618,9 +625,16 @@ public class ColorTypeDialogPanel extends JPanel {
         productButtonPanel.add(productAddButton, gbc);
 
         productAddButton.addActionListener(e -> {
-            productModel.addElement(productTypeComboBox.getSelectedItem());
-            productColorTypeList.setModel(productModel);
-            productRemoveButton.setEnabled(true);
+            ArrayList<String> messages = new ArrayList<>();
+            if(oldColorType == null || network.canColorTypeBeRemoved(oldColorType,messages)) {
+                productModel.addElement(productTypeComboBox.getSelectedItem());
+                productColorTypeList.setModel(productModel);
+                productRemoveButton.setEnabled(true);
+            }else{
+                String message = "Colortype cannot have colors removed for the following reasons: \n\n";
+                message += String.join("", messages);
+                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
+            }
         });
 
         productRemoveButton = new JButton("Remove");
@@ -633,11 +647,17 @@ public class ColorTypeDialogPanel extends JPanel {
         productButtonPanel.add(productRemoveButton, gbc);
 
         productRemoveButton.addActionListener(e -> {
-
-            productModel.removeElementAt(productColorTypeList.getSelectedIndex());
-            productColorTypeList.setModel(productModel);
-            if(productModel.size() == 0) {
-                productRemoveButton.setEnabled(false);
+            ArrayList<String> messages = new ArrayList<>();
+            if(oldColorType == null || network.canColorTypeBeRemoved(oldColorType,messages)) {
+                productModel.removeElementAt(productColorTypeList.getSelectedIndex());
+                productColorTypeList.setModel(productModel);
+                if(productModel.size() == 0) {
+                    productRemoveButton.setEnabled(false);
+                }
+            }else{
+                String message = "Colortype cannot have colors removed for the following reasons: \n\n";
+                message += String.join("", messages);
+                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
             }
         });
         return productButtonPanel;
@@ -717,6 +737,16 @@ public class ColorTypeDialogPanel extends JPanel {
                 "We do not allow integer ranges with more than " + MAXIMUM_INTEGER + " elements",
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
+        }
+
+        if(rangeOfIntegersPanelEnabled && oldColorType != null && (Integer.parseInt(upperBoundTextField.getText()) < Integer.parseInt(oldColorType.getColors().lastElement().getColorName()) || Integer.parseInt(lowerBoundTextField.getText()) > Integer.parseInt(oldColorType.getColors().firstElement().getColorName()))){
+            ArrayList<String> messages = new ArrayList<>();
+            if(!network.canColorTypeBeRemoved(oldColorType,messages)) {
+                String message = "Colortype cannot have colors removed for the following reasons: \n\n";
+                message += String.join("", messages);
+                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
         }
 
         if((lowerbound.trim().isEmpty() || upperbound.trim().isEmpty()) && rangeOfIntegersPanelEnabled) {

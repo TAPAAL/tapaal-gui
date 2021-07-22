@@ -174,14 +174,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                             if((ct).equals(ColorType.COLORTYPE_DOT)) {
                                 JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
                             }else {
-                                ArrayList<String> messages = new ArrayList<>();
-                                if(parent.network().canColorTypeBeRemoved(ct,messages)) {
-                                    showEditColorTypeDialog(ct);
-                                }else{
-                                    String message = "Colortype cannot be edited for the following reasons: \n\n";
-                                    message += String.join("", messages);
-                                    JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not edit color type", JOptionPane.WARNING_MESSAGE);
-                                }
+                                showEditColorTypeDialog(ct);
                             }
 					    }
 					}
@@ -384,15 +377,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                 if((ct).equals(ColorType.COLORTYPE_DOT)) {
                     JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
                 }else {
-                    ArrayList<String> messages = new ArrayList<>();
-
-                    if(parent.network().canColorTypeBeRemoved(ct,messages)) {
-                        showEditColorTypeDialog(ct);
-                    }else{
-                        String message = "Colortype cannot be edited for the following reasons: \n\n";
-                        message += String.join("", messages);
-                        JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not edit color type", JOptionPane.WARNING_MESSAGE);
-                    }
+                    showEditColorTypeDialog(ct);
                 }
             }
 		});
