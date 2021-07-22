@@ -50,12 +50,11 @@ public class TimedPlaceComponent extends Place {
 	private Window ageOfTokensWindow = new Window(new Frame());
 	private final Shape dashedOutline = createDashedOutline();
 
-	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place, TabContent.TAPNLens lens, boolean placeNamesVisible) {
+	public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place, TabContent.TAPNLens lens) {
 		super(positionXInput, positionYInput);
 		this.place = place;
         this.place.addTimedPlaceListener(listener);
         this.lens = lens;
-		attributesVisible = placeNamesVisible;
 
     }
 

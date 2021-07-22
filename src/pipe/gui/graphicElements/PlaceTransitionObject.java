@@ -19,8 +19,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	private final LinkedList<Arc> connectTo = new LinkedList<Arc>();
 	private final LinkedList<Arc> connectFrom = new LinkedList<Arc>();
 
-	protected boolean attributesVisible = false;
-    protected boolean allAttributesVisible = false;
+	protected boolean attributesVisible = true;
 
     public PlaceTransitionObject(
 	        double componentWidth,
@@ -259,14 +258,6 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	public boolean getAttributesVisible() {
 		return attributesVisible;
 	}
-
-    public void setAllAttributesVisible(boolean flag) {
-        allAttributesVisible = flag;
-    }
-
-    public boolean getAllAttributesVisible() {
-        return allAttributesVisible;
-    }
 
 	@Override
 	public int getLayerOffset() {

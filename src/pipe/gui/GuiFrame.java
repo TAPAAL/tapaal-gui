@@ -329,14 +329,24 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayToolTips);
         }
     };
-    private final GuiAction hidePlaceNames = new GuiAction("Hide place names ", "Show/hide names of all places", true) {
+    private final GuiAction showPlaceNames = new GuiAction("Show place names ", "Show names of all places", true) {
         public void actionPerformed(ActionEvent e) {
-            guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayPlaceNames);
+            guiFrameController.ifPresent(o -> o.updateDisplayPlaceNames(true));
         }
     };
-    private final GuiAction hideTransitionNames = new GuiAction("Hide transition names", "Show/hide names of all transitions", true) {
+    private final GuiAction hidePlaceNames = new GuiAction("Hide place names ", "Hide names of all places", true) {
         public void actionPerformed(ActionEvent e) {
-            guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayTransitionNames);
+            guiFrameController.ifPresent(o -> o.updateDisplayPlaceNames(false));
+        }
+    };
+    private final GuiAction showTransitionNames = new GuiAction("Show transition names", "Show names of all transitions", true) {
+        public void actionPerformed(ActionEvent e) {
+            guiFrameController.ifPresent(o -> o.updateDisplayTransitionNames(true));
+        }
+    };
+    private final GuiAction hideTransitionNames = new GuiAction("Hide transition names", "Hide names of all transitions", true) {
+        public void actionPerformed(ActionEvent e) {
+            guiFrameController.ifPresent(o -> o.updateDisplayTransitionNames(false));
         }
     };
     private final GuiAction showAdvancedWorkspaceAction = new GuiAction("Show advanced workspace", "Show all panels", false) {
@@ -680,7 +690,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, showTokenAge(), showTokenAgeAction);
 
+        viewMenu.addSeparator();
+
+        addCheckboxMenuItem(viewMenu, showPlaceNames);
         addCheckboxMenuItem(viewMenu, hidePlaceNames);
+        addCheckboxMenuItem(viewMenu, showTransitionNames);
         addCheckboxMenuItem(viewMenu, hideTransitionNames);
 
         viewMenu.addSeparator();
@@ -1076,7 +1090,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         showDelayEnabledTransitionsAction.setEnabled(enable);
         showToolTipsAction.setEnabled(enable);
         showTokenAgeAction.setEnabled(enable);
+        showPlaceNames.setEnabled(enable);
         hidePlaceNames.setEnabled(enable);
+        showTransitionNames.setEnabled(enable);
         hideTransitionNames.setEnabled(enable);
         showAdvancedWorkspaceAction.setEnabled(enable);
         showSimpleWorkspaceAction.setEnabled(enable);
@@ -1266,8 +1282,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             // create a tabChanged event loop.
             // Throw exception if tab is not found
             appTab.setSelectedComponent(tab);
-            guiFrameController.ifPresent(GuiFrameControllerActions::updateDisplayPlaceNames);
-            guiFrameController.ifPresent(GuiFrameControllerActions::updateDisplayTransitionNames);
         }
     }
 
@@ -1307,13 +1321,25 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     @Override
-    public void setHidePlaceNames(boolean b) {
-        hidePlaceNames.setSelected(b);
+    public void setShowPlaceNames(boolean b) {
+        showPlaceNames.setSelected(b);
+        hidePlaceNames.setSelected(!b);
     }
 
     @Override
-    public void setHideTransitionNames(boolean b) {
-        hideTransitionNames.setSelected(b);
+    public boolean getShowPlaceNames() {
+       return showPlaceNames.isSelected();
+    }
+
+    @Override
+    public void setShowTransitionNames(boolean b) {
+        showTransitionNames.setSelected(b);
+        hideTransitionNames.setSelected(!b);
+    }
+
+    @Override
+    public boolean getShowTransitionNames() {
+        return showTransitionNames.isSelected();
     }
 
     @Override

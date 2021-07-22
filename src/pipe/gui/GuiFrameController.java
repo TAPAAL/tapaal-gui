@@ -58,8 +58,6 @@ public class GuiFrameController implements GuiFrameControllerActions{
     boolean showEnabledTransitions = true;
     boolean showDelayEnabledTransitions = true;
     private boolean showToolTips = true;
-    private boolean hidePlaceNames = false;
-    private boolean hideTransitionNames = false;
     private boolean showZeroToInfinityIntervals = true;
     private boolean showTokenAge = true;
 
@@ -116,8 +114,10 @@ public class GuiFrameController implements GuiFrameControllerActions{
         //XXX fixes an issue where on first open of a net the time intervals are not shown
         tab.drawingSurface().repaintAll();
 
-        updateDisplayPlaceNames();
-        updateDisplayTransitionNames();
+        guiFrame.getShowPlaceNames();
+
+        updateDisplayPlaceNames(guiFrame.getShowPlaceNames());
+        updateDisplayTransitionNames(guiFrame.getShowTransitionNames());
     }
 
     //If needed, add boolean forceClose, where net is not checkedForSave and just closed
@@ -695,27 +695,15 @@ public class GuiFrameController implements GuiFrameControllerActions{
     }
 
     @Override
-    public void toggleDisplayPlaceNames() {
-        hidePlaceNames = !hidePlaceNames;
-        updateDisplayPlaceNames();
+    public void updateDisplayPlaceNames(boolean showNames) {
+        guiFrame.setShowPlaceNames(showNames);
+        CreateGui.getTabs().forEach(o -> o.showPlaceNames(showNames));
     }
 
     @Override
-    public void toggleDisplayTransitionNames() {
-        hideTransitionNames = !hideTransitionNames;
-        updateDisplayTransitionNames();
-    }
-
-    @Override
-    public void updateDisplayPlaceNames() {
-        guiFrame.setHidePlaceNames(hidePlaceNames);
-        CreateGui.getTabs().forEach(o -> o.showPlaceNames(hidePlaceNames));
-    }
-
-    @Override
-    public void updateDisplayTransitionNames() {
-        guiFrame.setHideTransitionNames(hideTransitionNames);
-        CreateGui.getTabs().forEach(o -> o.showTransitionNames(hideTransitionNames));
+    public void updateDisplayTransitionNames(boolean showNames) {
+        guiFrame.setShowTransitionNames(showNames);
+        CreateGui.getTabs().forEach(o -> o.showTransitionNames(showNames));
     }
 
     @Override
