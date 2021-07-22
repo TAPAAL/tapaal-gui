@@ -329,24 +329,24 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayToolTips);
         }
     };
-    private final GuiAction showPlaceNames = new GuiAction("Show place names ", "Show names of all places", true) {
+    private final GuiAction showPlaceNames = new GuiAction("Set all place names as visible", "Executing this action will make all place names visible", true) {
         public void actionPerformed(ActionEvent e) {
-            guiFrameController.ifPresent(o -> o.updateDisplayPlaceNames(true));
+            guiFrameController.ifPresent(o -> o.updateShowPlaceNames(true));
         }
     };
-    private final GuiAction hidePlaceNames = new GuiAction("Hide place names ", "Hide names of all places", true) {
+    private final GuiAction hidePlaceNames = new GuiAction("Set all place names as hidden", "Executing this action will hide all place names", true) {
         public void actionPerformed(ActionEvent e) {
-            guiFrameController.ifPresent(o -> o.updateDisplayPlaceNames(false));
+            guiFrameController.ifPresent(o -> o.updateShowPlaceNames(false));
         }
     };
-    private final GuiAction showTransitionNames = new GuiAction("Show transition names", "Show names of all transitions", true) {
+    private final GuiAction showTransitionNames = new GuiAction("Set all transition names as visible", "Executing this action will make all transition names visible", true) {
         public void actionPerformed(ActionEvent e) {
-            guiFrameController.ifPresent(o -> o.updateDisplayTransitionNames(true));
+            guiFrameController.ifPresent(o -> o.updateShowTransitionNames(true));
         }
     };
-    private final GuiAction hideTransitionNames = new GuiAction("Hide transition names", "Hide names of all transitions", true) {
+    private final GuiAction hideTransitionNames = new GuiAction("Set all transition names as hidden", "Executing this action will hide all transition names", true) {
         public void actionPerformed(ActionEvent e) {
-            guiFrameController.ifPresent(o -> o.updateDisplayTransitionNames(false));
+            guiFrameController.ifPresent(o -> o.updateShowTransitionNames(false));
         }
     };
     private final GuiAction showAdvancedWorkspaceAction = new GuiAction("Show advanced workspace", "Show all panels", false) {
@@ -692,10 +692,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         viewMenu.addSeparator();
 
-        addCheckboxMenuItem(viewMenu, showPlaceNames);
-        addCheckboxMenuItem(viewMenu, hidePlaceNames);
-        addCheckboxMenuItem(viewMenu, showTransitionNames);
-        addCheckboxMenuItem(viewMenu, hideTransitionNames);
+        viewMenu.add(showPlaceNames);
+        viewMenu.add(hidePlaceNames);
+        viewMenu.add(showTransitionNames);
+        viewMenu.add(hideTransitionNames);
 
         viewMenu.addSeparator();
 
@@ -1318,28 +1318,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     @Override
     public void setShowToolTipsSelected(boolean b) {
         showToolTipsAction.setSelected(b);
-    }
-
-    @Override
-    public void setShowPlaceNames(boolean b) {
-        showPlaceNames.setSelected(b);
-        hidePlaceNames.setSelected(!b);
-    }
-
-    @Override
-    public boolean getShowPlaceNames() {
-       return showPlaceNames.isSelected();
-    }
-
-    @Override
-    public void setShowTransitionNames(boolean b) {
-        showTransitionNames.setSelected(b);
-        hideTransitionNames.setSelected(!b);
-    }
-
-    @Override
-    public boolean getShowTransitionNames() {
-        return showTransitionNames.isSelected();
     }
 
     @Override

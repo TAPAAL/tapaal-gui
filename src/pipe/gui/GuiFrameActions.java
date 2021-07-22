@@ -47,11 +47,7 @@ public interface GuiFrameActions {
     void setShowQueriesSelected(boolean b);
     void setShowEnabledTransitionsSelected(boolean b);
     void setShowDelayEnabledTransitionsSelected(boolean b);
-    void setShowToolTipsSelected(boolean b);
-    void setShowPlaceNames(boolean b);
-    void setShowTransitionNames(boolean b);
-    boolean getShowPlaceNames();
-    boolean getShowTransitionNames();
+    void setShowToolTipsSelected(boolean b);;
     void setShowZeroToInfinityIntervalsSelected(boolean b);
     void setShowTokenAgeSelected(boolean b);
 
