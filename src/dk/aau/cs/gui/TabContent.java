@@ -1622,10 +1622,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     @Override
-    public void showNames(boolean showNames, boolean placeNames, boolean activeComponent) {
+    public void showNames(boolean showNames, boolean placeNames, boolean selectedComponent) {
         List<PetriNetObject> components = new ArrayList<>();
 
-	    if (activeComponent) {
+	    if (selectedComponent) {
 	        Template template = currentTemplate();
 	        template.guiModel().getPetriNetObjects().forEach(components::add);
         } else {

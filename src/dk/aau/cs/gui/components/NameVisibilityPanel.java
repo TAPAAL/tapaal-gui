@@ -15,7 +15,7 @@ public class NameVisibilityPanel extends JPanel {
     private JRadioButton placeOption;
     private JRadioButton transitionOption;
     private JRadioButton bothOption;
-    private JRadioButton activeComponent;
+    private JRadioButton selectedComponent;
 
     ButtonGroup visibilityRadioButtonGroup;
     ButtonGroup objectRadioButtonGroup;
@@ -162,16 +162,16 @@ public class NameVisibilityPanel extends JPanel {
         gbc.insets = new Insets(3, 3, 3, 3);
         panel.add(text, gbc);
 
-        activeComponent = new JRadioButton("Active component");
-        activeComponent.setSelected(true);
+        selectedComponent = new JRadioButton("Selected component");
+        selectedComponent.setSelected(true);
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3, 3, 3, 3);
-        panel.add(activeComponent, gbc);
-        componentRadioButtonGroup.add(activeComponent);
+        panel.add(selectedComponent, gbc);
+        componentRadioButtonGroup.add(selectedComponent);
 
         JRadioButton allComponents = new JRadioButton("All components");
         gbc = new GridBagConstraints();
@@ -188,10 +188,10 @@ public class NameVisibilityPanel extends JPanel {
 
     protected void ChangeNameVisibilityBasedOnSelection() {
         if (placeOption.isSelected() || bothOption.isSelected()) {
-            tab.showNames(showNames.isSelected(), true, activeComponent.isSelected());
+            tab.showNames(showNames.isSelected(), true, selectedComponent.isSelected());
         }
         if (transitionOption.isSelected() || bothOption.isSelected()) {
-            tab.showNames(showNames.isSelected(), false, activeComponent.isSelected());
+            tab.showNames(showNames.isSelected(), false, selectedComponent.isSelected());
         }
 
         Command changeVisibilityCommand =
@@ -200,7 +200,7 @@ public class NameVisibilityPanel extends JPanel {
                 placeOption.isSelected() || bothOption.isSelected(),
                 transitionOption.isSelected() || bothOption.isSelected(),
                 showNames.isSelected(),
-                activeComponent.isSelected());
+                selectedComponent.isSelected());
         tab.getUndoManager().addNewEdit(changeVisibilityCommand);
     }
 
