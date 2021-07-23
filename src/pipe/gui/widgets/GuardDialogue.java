@@ -29,6 +29,7 @@ import javax.swing.event.ChangeEvent;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.*;
+import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -233,11 +234,11 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
 		weightEditPanel.add(label, gridBagConstraints);
-		
+
 		Dimension intervalBoxDims = new Dimension(190, 25);
 
 		weightNumber = new JSpinner();
-		weightNumber.setPreferredSize(intervalBoxDims);
+		SwingHelper.setPreferredWidth(weightNumber,intervalBoxDims.width);
 		weightNumber.addChangeListener(e -> {
 			if((Integer) weightNumber.getValue() < 1){
 				weightNumber.setValue(1);
@@ -271,8 +272,8 @@ public class GuardDialogue extends JPanel /*
 		weightConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
 		weightConstantsComboBox.setMaximumRowCount(20);
 		weightConstantsComboBox.setVisible(false);
-		weightConstantsComboBox.setPreferredSize(intervalBoxDims);
-		
+        SwingHelper.setPreferredWidth(weightConstantsComboBox,intervalBoxDims.width);
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 1;
@@ -379,7 +380,7 @@ public class GuardDialogue extends JPanel /*
 		firstIntervalNumber = new JSpinner();
 	//	firstIntervalNumber.setMaximumSize(intervalBoxDims);
 	//	firstIntervalNumber.setMinimumSize(intervalBoxDims);
-		firstIntervalNumber.setPreferredSize(intervalBoxDims);
+        SwingHelper.setPreferredWidth(firstIntervalNumber,intervalBoxDims.width);
 		firstIntervalNumber.addChangeListener(this::firstSpinnerStateChanged);
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 2;
@@ -393,9 +394,8 @@ public class GuardDialogue extends JPanel /*
 		guardEditPanel.add(new JLabel(" , "), gridBagConstraints);
 
 		secondIntervalNumber = new JSpinner();
-		secondIntervalNumber.setMaximumSize(intervalBoxDims);
-		secondIntervalNumber.setMinimumSize(intervalBoxDims);
-		secondIntervalNumber.setPreferredSize(intervalBoxDims);
+
+        SwingHelper.setPreferredWidth(secondIntervalNumber,intervalBoxDims.width);
 		secondIntervalNumber.addChangeListener(this::secondSpinnerStateChanged);
 
 		gridBagConstraints.gridx = 4;
@@ -430,7 +430,8 @@ public class GuardDialogue extends JPanel /*
 		leftConstantsComboBox.setVisible(false);
 	//	leftConstantsComboBox.setMaximumSize(intervalBoxDims);
 	//  leftConstantsComboBox.setMinimumSize(intervalBoxDims);
-		leftConstantsComboBox.setPreferredSize(intervalBoxDims);
+        SwingHelper.setPreferredWidth(leftConstantsComboBox,intervalBoxDims.width);
+		//leftConstantsComboBox.setPreferredSize(intervalBoxDims);
 		leftConstantsComboBox.addItemListener(e -> {
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				updateRightConstantComboBox();
@@ -462,7 +463,7 @@ public class GuardDialogue extends JPanel /*
 		rightConstantsComboBox.setVisible(false);
 	//	rightConstantsComboBox.setMaximumSize(intervalBoxDims);
 	//	rightConstantsComboBox.setMinimumSize(intervalBoxDims);
-		rightConstantsComboBox.setPreferredSize(intervalBoxDims);
+        SwingHelper.setPreferredWidth(rightConstantsComboBox,intervalBoxDims.width);
 		gridBagConstraints = new GridBagConstraints();
 		rightConstantsComboBox.addItemListener(e -> {
 			if (e.getStateChange() == ItemEvent.SELECTED) {

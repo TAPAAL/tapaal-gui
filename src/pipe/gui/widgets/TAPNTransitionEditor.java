@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 import net.tapaal.swinghelpers.GridBagHelper;
 import dk.aau.cs.gui.undo.*;
+import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
@@ -66,7 +67,7 @@ public class TAPNTransitionEditor extends JPanel {
 		transitionEditorPanel = new JPanel();
 		nameLabel = new JLabel();
 		nameTextField = new JTextField();
-		nameTextField.setPreferredSize(new Dimension(290,27));
+        SwingHelper.setPreferredWidth(nameTextField, 290);
 		rotationLabel = new JLabel();
 		rotationComboBox = new JComboBox<>();
 		buttonPanel = new JPanel();
@@ -80,7 +81,7 @@ public class TAPNTransitionEditor extends JPanel {
 
 
 		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);
-		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
+		SwingHelper.setPreferredWidth(sharedTransitionsComboBox,290);
 		sharedTransitionsComboBox.addActionListener(e -> {
 			if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
