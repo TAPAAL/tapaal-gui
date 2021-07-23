@@ -7,7 +7,6 @@ import pipe.gui.SafeGuiFrameActions;
 import pipe.gui.graphicElements.PetriNetObject;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 
 public interface TabContentActions {
