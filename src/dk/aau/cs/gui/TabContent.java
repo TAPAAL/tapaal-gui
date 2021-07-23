@@ -16,6 +16,7 @@ import javax.swing.border.BevelBorder;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
+import dk.aau.cs.gui.components.NameVisibilityPanel;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.gui.undo.*;
@@ -1621,30 +1622,33 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     @Override
-    public void showPlaceNames(boolean showNames) {
-	    Component[] components = drawingSurface.getComponents();
+    public void showNames(boolean showNames, boolean placeNames, boolean activeComponent) {
+        List<PetriNetObject> components = new ArrayList<>();
+
+	    if (activeComponent) {
+	        Template template = currentTemplate();
+	        template.guiModel().getPetriNetObjects().forEach(components::add);
+        } else {
+            Iterable<Template> templates = allTemplates();
+            for (Template template : templates) {
+                template.guiModel().getPetriNetObjects().forEach(components::add);
+            }
+        }
+
         for (Component component : components) {
-            if (component instanceof TimedPlaceComponent) {
+            if (placeNames && component instanceof TimedPlaceComponent) {
                 TimedPlaceComponent place = (TimedPlaceComponent) component;
                 place.setAttributesVisible(showNames);
                 place.update(true);
                 repaint();
-            }
-        }
-	}
-
-    @Override
-    public void showTransitionNames(boolean showNames) {
-        Component[] components = drawingSurface.getComponents();
-        for (Component component : components) {
-            if (component instanceof TimedTransitionComponent) {
+            } else if (!placeNames && component instanceof TimedTransitionComponent) {
                 TimedTransitionComponent transition = (TimedTransitionComponent) component;
                 transition.setAttributesVisible(showNames);
                 transition.update(true);
                 repaint();
             }
         }
-    }
+	}
 
     public static Split getEditorModelRoot(){
 		return editorModelroot;
@@ -1863,6 +1867,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public void showStatistics() {
         StatisticsPanel.showStatisticsPanel(drawingSurface().getModel().getStatistics());
 	}
+
+    @Override
+    public void showChangeNameVisibility() {
+	    NameVisibilityPanel panel = new NameVisibilityPanel(this);
+	    panel.showNameVisibilityPanel();
+    }
 
 	@Override
 	public void importSUMOQueries() {

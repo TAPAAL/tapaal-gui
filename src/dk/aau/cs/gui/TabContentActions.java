@@ -96,8 +96,9 @@ public interface TabContentActions {
 
     void changeGameFeature(boolean isGame);
 
-    void showPlaceNames(boolean isVisible);
+    void showNames(boolean isVisible, boolean placeNames, boolean activeComponent);
 
-    void showTransitionNames(boolean isVisible);
+    void showChangeNameVisibility();
+
 
 }

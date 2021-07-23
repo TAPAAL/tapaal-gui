@@ -50,8 +50,6 @@ public interface GuiFrameControllerActions {
     void toggleEnabledTransitionsList();
     void toggleDelayEnabledTransitions();
     void toggleDisplayToolTips();
-    void updateShowPlaceNames(boolean b);
-    void updateShowTransitionNames(boolean b);
 
     void showAdvancedWorkspace();
 

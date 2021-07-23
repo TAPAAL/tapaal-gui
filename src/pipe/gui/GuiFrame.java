@@ -329,24 +329,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayToolTips);
         }
     };
-    private final GuiAction showPlaceNames = new GuiAction("Set all place names as visible", "Executing this action will make all place names visible", true) {
+    private final GuiAction changeNameVisibility = new GuiAction("Change visibility of transition/place names", "Executing this action will open a dialog where you can hide or show place and transition names", true) {
         public void actionPerformed(ActionEvent e) {
-            guiFrameController.ifPresent(o -> o.updateShowPlaceNames(true));
-        }
-    };
-    private final GuiAction hidePlaceNames = new GuiAction("Set all place names as hidden", "Executing this action will hide all place names", true) {
-        public void actionPerformed(ActionEvent e) {
-            guiFrameController.ifPresent(o -> o.updateShowPlaceNames(false));
-        }
-    };
-    private final GuiAction showTransitionNames = new GuiAction("Set all transition names as visible", "Executing this action will make all transition names visible", true) {
-        public void actionPerformed(ActionEvent e) {
-            guiFrameController.ifPresent(o -> o.updateShowTransitionNames(true));
-        }
-    };
-    private final GuiAction hideTransitionNames = new GuiAction("Set all transition names as hidden", "Executing this action will hide all transition names", true) {
-        public void actionPerformed(ActionEvent e) {
-            guiFrameController.ifPresent(o -> o.updateShowTransitionNames(false));
+            currentTab.ifPresent(TabContentActions::showChangeNameVisibility);
         }
     };
     private final GuiAction showAdvancedWorkspaceAction = new GuiAction("Show advanced workspace", "Show all panels", false) {
@@ -692,10 +677,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         viewMenu.addSeparator();
 
-        viewMenu.add(showPlaceNames);
-        viewMenu.add(hidePlaceNames);
-        viewMenu.add(showTransitionNames);
-        viewMenu.add(hideTransitionNames);
+        viewMenu.add(changeNameVisibility);
 
         viewMenu.addSeparator();
 
@@ -1090,10 +1072,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         showDelayEnabledTransitionsAction.setEnabled(enable);
         showToolTipsAction.setEnabled(enable);
         showTokenAgeAction.setEnabled(enable);
-        showPlaceNames.setEnabled(enable);
-        hidePlaceNames.setEnabled(enable);
-        showTransitionNames.setEnabled(enable);
-        hideTransitionNames.setEnabled(enable);
+        changeNameVisibility.setEnabled(enable);
         showAdvancedWorkspaceAction.setEnabled(enable);
         showSimpleWorkspaceAction.setEnabled(enable);
         saveWorkSpaceAction.setEnabled(enable);

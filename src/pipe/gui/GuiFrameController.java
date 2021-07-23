@@ -690,17 +690,6 @@ public class GuiFrameController implements GuiFrameControllerActions{
     }
 
     @Override
-    public void updateShowPlaceNames(boolean showNames) {
-        CreateGui.getTabs().forEach(o -> o.showPlaceNames(showNames));
-    }
-
-
-    @Override
-    public void updateShowTransitionNames(boolean showNames) {
-        CreateGui.getTabs().forEach(o -> o.showTransitionNames(showNames));
-    }
-
-    @Override
     public void showAdvancedWorkspace() {
         showAdvancedWorkspace(true);
     }
