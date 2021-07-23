@@ -1622,7 +1622,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 
     @Override
-    public void showNames(boolean showNames, boolean placeNames, boolean selectedComponent) {
+    public Map<PetriNetObject, Boolean> showNames(boolean showNames, boolean placeNames, boolean selectedComponent) {
+        Map<PetriNetObject, Boolean> map = new HashMap<>();
         List<PetriNetObject> components = new ArrayList<>();
 
 	    if (selectedComponent) {
@@ -1638,16 +1639,19 @@ public class TabContent extends JSplitPane implements TabContentActions{
         for (Component component : components) {
             if (placeNames && component instanceof TimedPlaceComponent) {
                 TimedPlaceComponent place = (TimedPlaceComponent) component;
+                map.put(place, place.getAttributesVisible());
                 place.setAttributesVisible(showNames);
                 place.update(true);
                 repaint();
             } else if (!placeNames && component instanceof TimedTransitionComponent) {
                 TimedTransitionComponent transition = (TimedTransitionComponent) component;
+                map.put(transition, transition.getAttributesVisible());
                 transition.setAttributesVisible(showNames);
                 transition.update(true);
                 repaint();
             }
         }
+        return map;
 	}
 
     public static Split getEditorModelRoot(){

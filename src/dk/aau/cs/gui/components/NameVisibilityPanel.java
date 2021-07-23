@@ -3,9 +3,12 @@ package dk.aau.cs.gui.components;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.ChangeAllNamesVisibilityCommand;
 import dk.aau.cs.gui.undo.Command;
+import pipe.gui.graphicElements.PetriNetObject;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NameVisibilityPanel extends JPanel {
     private static final String DIALOG_TITLE = "Change Name Visibility";
@@ -187,21 +190,17 @@ public class NameVisibilityPanel extends JPanel {
     }
 
     protected void ChangeNameVisibilityBasedOnSelection() {
+        Map<PetriNetObject, Boolean> places = new HashMap<>();
+        Map<PetriNetObject, Boolean> transitions = new HashMap<>();
+
         if (placeOption.isSelected() || bothOption.isSelected()) {
-            tab.showNames(showNames.isSelected(), true, selectedComponent.isSelected());
+           places = tab.showNames(showNames.isSelected(), true, selectedComponent.isSelected());
         }
         if (transitionOption.isSelected() || bothOption.isSelected()) {
-            tab.showNames(showNames.isSelected(), false, selectedComponent.isSelected());
+            transitions = tab.showNames(showNames.isSelected(), false, selectedComponent.isSelected());
         }
 
-        Command changeVisibilityCommand =
-            new ChangeAllNamesVisibilityCommand(
-                tab,
-                placeOption.isSelected() || bothOption.isSelected(),
-                transitionOption.isSelected() || bothOption.isSelected(),
-                showNames.isSelected(),
-                selectedComponent.isSelected());
+        Command changeVisibilityCommand = new ChangeAllNamesVisibilityCommand(tab, places, transitions, showNames.isSelected());
         tab.getUndoManager().addNewEdit(changeVisibilityCommand);
     }
-
 }
