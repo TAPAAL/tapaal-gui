@@ -1,6 +1,9 @@
 package dk.aau.cs.gui.components;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.undo.ChangeAllNamesVisibilityCommand;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
 
@@ -194,6 +197,15 @@ public class NameVisibilityPanel extends JPanel {
         if (transitionOption.isSelected() || bothOption.isSelected()) {
             tab.showNames(showNames.isSelected(), false, activeComponent.isSelected());
         }
+
+        Command changeVisibilityCommand =
+            new ChangeAllNamesVisibilityCommand(
+                tab,
+                placeOption.isSelected() || bothOption.isSelected(),
+                transitionOption.isSelected() || bothOption.isSelected(),
+                showNames.isSelected(),
+                activeComponent.isSelected());
+        tab.getUndoManager().addNewEdit(changeVisibilityCommand);
     }
 
 }
