@@ -3,13 +3,9 @@ package dk.aau.cs.gui.components;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.ChangeAllNamesVisibilityCommand;
 import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
-import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
 public class NameVisibilityPanel extends JPanel {
     private static final String DIALOG_TITLE = "Change Name Visibility";

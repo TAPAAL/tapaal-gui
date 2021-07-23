@@ -1,13 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
-import dk.aau.cs.model.tapn.TimedTransition;
-import pipe.dataLayer.TAPNQuery;
-
-import java.time.LocalTime;
-import java.util.Dictionary;
 
 public class ChangeAllNamesVisibilityCommand extends Command {
     private final boolean placeNames;
