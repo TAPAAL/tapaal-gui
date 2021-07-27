@@ -13,6 +13,7 @@ import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.QueryType;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 
@@ -38,17 +39,17 @@ import javax.xml.transform.TransformerException;
 
 public class VerifyTAPNExporter {
     protected TimedArcPetriNet model;
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, NameMapping mapping, DataLayer guiModel) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, NameMapping mapping, DataLayer guiModel, pipe.dataLayer.TAPNQuery dataLayerQuery) {
 		File modelFile = createTempFile(".xml");
 		File queryFile;
-		if (query.getCategory() == QueryCategory.CTL){
+		if (query.getCategory() == QueryCategory.CTL || (lens != null && !lens.isGame() && lens.isColored())){
 			queryFile = createTempFile(".xml");
 		} else {
 			queryFile = createTempFile(".q");
 		}
 		this.model = model;
 
-		return export(model, query, modelFile, queryFile, null, lens, mapping, guiModel);
+		return export(model, query, modelFile, queryFile, dataLayerQuery, lens, mapping, guiModel);
 	}
 
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery, TabContent.TAPNLens lens, NameMapping mapping, DataLayer guiModel) {
@@ -75,9 +76,9 @@ public class VerifyTAPNExporter {
 			PrintStream queryStream = new PrintStream(queryFile);
             if (query == null) {
                 throw new FileNotFoundException(null);
-            } else if (query.getCategory() == QueryCategory.CTL) {
+            } else if (query.getCategory() == QueryCategory.CTL || (lens != null && !lens.isGame() && lens.isColored())) {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
-                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery.getName()));
             } else if (lens != null && lens.isGame()) {
                 queryStream.append("control: " + query.getProperty().toString());
             } else {

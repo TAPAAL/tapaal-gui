@@ -21,7 +21,7 @@ public class VerifyTACPNDiscreteVerification extends VerifyTAPNDiscreteVerificat
     }
 
     @Override
-    public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel) throws Exception {
+    public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, pipe.dataLayer.TAPNQuery dataLayerQuery) throws Exception {
         if (!supportsModel(model.value1(), options)) {
             throw new UnsupportedModelException("Verifydtapn does not support the given model.");
         }
@@ -42,7 +42,7 @@ public class VerifyTACPNDiscreteVerification extends VerifyTAPNDiscreteVerificat
 
         VerifyTAPNExporter exporter = new VerifyTACPNExporter();
 
-        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens(),model.value2(), guiModel);
+        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
 
         if (exportedModel == null) {
             messenger.displayErrorMessage("There was an error exporting the model");

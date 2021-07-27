@@ -125,6 +125,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             result.append(" -q " + libQueryFilePath);
             result.append(" -q-xml " + unfoldedQueriesPath);
             result.append(" -f " + unfoldedModelPath);
+            result.append(" -q-num 0 ");
             /* partitioning and color fixpoint is currently not available for timed nets
             if(!this.partition){
                 result.append(" --disable-partitioning");

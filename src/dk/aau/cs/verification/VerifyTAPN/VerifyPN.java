@@ -264,7 +264,7 @@ public class VerifyPN implements ModelChecker{
             return false;
 		}
 
-		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel) throws Exception {
+		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, pipe.dataLayer.TAPNQuery dataLayerQuery) throws Exception {
 			if(!supportsModel(model.value1(), options))
 				throw new UnsupportedModelException("Verifypn does not support the given model.");
 			
@@ -283,7 +283,7 @@ public class VerifyPN implements ModelChecker{
             } else {
                 exporter = new VerifyPNExporter();
             }
-			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2(), guiModel);
+			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2(), guiModel, dataLayerQuery);
 
 			if (exportedModel == null) {
 				messenger.displayErrorMessage("There was an error exporting the model");
@@ -337,9 +337,10 @@ public class VerifyPN implements ModelChecker{
                         try {
                             loadedModel = tapnLoader.load(fileOut);
                             newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(CreateGui.getCurrentTab().getLens().isTimed(), CreateGui.getCurrentTab().getLens().isGame(), false));
-                            newTab.setInitialName(CreateGui.getCurrentTab().getTabTitle().replace(".tapn", "") + "-unfolded");
 
+                            //The query being verified should be the only query
                             for (pipe.dataLayer.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
+                                newTab.setInitialName(loadedQuery.getName() + " - unfolded");
                                 newTab.addQuery(loadedQuery);
                             }
 

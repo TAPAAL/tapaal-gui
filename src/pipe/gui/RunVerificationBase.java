@@ -89,7 +89,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
-        TabContent.TAPNLens lens = new TabContent.TAPNLens(!model.isUntimed(), false, model.isColored());
+	    TabContent.TAPNLens lens = new TabContent.TAPNLens(!model.isUntimed(), false, model.isColored());
         ITAPNComposer composer = new TAPNComposer(messenger, guiModels, lens, false, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
         guiModel = composer.getGuiModel();
@@ -147,7 +147,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 dataLayerQuery.useSymmetricVars()
                             ),
                             transformedModel,
-                            clonedQuery, composer.getGuiModel());
+                            clonedQuery, composer.getGuiModel(),
+                            dataLayerQuery);
                     } else {
                         overapprox_result = verifypn.verify(
                             new VerifyPNOptions(
@@ -174,7 +175,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                             ),
                             transformedModel,
                             clonedQuery,
-                            composer.getGuiModel());
+                            composer.getGuiModel(),
+                            dataLayerQuery);
                     }
 
                     if (overapprox_result.getQueryResult() != null) {
@@ -198,7 +200,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         }
         ApproximationWorker worker = new ApproximationWorker();
 
-        return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model, guiModel);
+        return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model, guiModel, dataLayerQuery);
     }
 
     private TAPNNetworkTrace decomposeTrace(TimedArcPetriNetTrace trace, NameMapping mapping) {
