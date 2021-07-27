@@ -86,7 +86,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         File queryOut = null;
         try {
             modelFile = lens.isTimed()? File.createTempFile("modelInUnfold", ".xml"): File.createTempFile("modelInUnfold", ".tapn");
-            queryFile = lens.isTimed()? File.createTempFile("queryInUnfold", ".q"): File.createTempFile("queryInUnfold", ".xml");
+            queryFile = File.createTempFile("queryInUnfold", ".xml");
             modelOut = File.createTempFile("modelOut", ".xml");
             queryOut = File.createTempFile("queryOut", ".xml");
         } catch (IOException e) {
@@ -150,7 +150,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
             String formattedQueries = "";
             for(pipe.dataLayer.TAPNQuery query : clonedQueries){
-                if (query.getCategory() == TAPNQuery.QueryCategory.CTL || !lens.isTimed()) {
+                if (query.getCategory() == TAPNQuery.QueryCategory.CTL || clonedQueries.size() > 1) {
                     formattedQueries = XMLVisitor.getXMLQueryFor(query.getProperty(), query.getName());
                 } else if (lens.isGame()) {
                     queryStream.append("control: ").append(query.getProperty().toString());
@@ -168,7 +168,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         }
         VerificationOptions unfoldTACPNOptions;
         if(lens.isTimed()){
-            unfoldTACPNOptions = new VerifyDTAPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), model.marking().size()*2);
+            unfoldTACPNOptions = new VerifyDTAPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), model.marking().size()*2, clonedQueries.size());
         } else{
             unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), clonedQueries.size(), partition, computeColorFixpoint, symmetricVars);
         }

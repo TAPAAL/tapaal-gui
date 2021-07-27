@@ -145,10 +145,9 @@ public class SmartDrawDialog extends JDialog {
     public static void setupWorkerListener(final SwingWorker<?, ?> worker) {
 	    if(worker != null){
             worker.addPropertyChangeListener(event -> {
-                if (event.getPropertyName().equals("state")) {
+                if (event.getPropertyName().equals("unfolding")) {
                     SwingWorker.StateValue stateValue = (SwingWorker.StateValue) event.getNewValue();
-                    SwingWorker.StateValue prevStateValue = (SwingWorker.StateValue) event.getOldValue();
-                    if (stateValue.equals(SwingWorker.StateValue.DONE) && prevStateValue.equals(SwingWorker.StateValue.PENDING)) {
+                    if (stateValue.equals(SwingWorker.StateValue.DONE)) {
                         int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
                         if(dialogResult == JOptionPane.YES_OPTION) {
                             showSmartDrawDialog();

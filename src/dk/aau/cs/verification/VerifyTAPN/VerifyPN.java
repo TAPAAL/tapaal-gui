@@ -327,7 +327,7 @@ public class VerifyPN implements ModelChecker{
 
 				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
 
-                if(options.traceOption() != TraceOption.NONE && model.value1().isColored()){
+                if(options.traceOption() != TraceOption.NONE && model.value1().isColored() && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()){
                     PNMLoader tapnLoader = new PNMLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());

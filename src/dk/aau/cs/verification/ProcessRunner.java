@@ -69,8 +69,8 @@ public class ProcessRunner {
 		BufferDrain stdout = new BufferDrain(new BufferedReader(new InputStreamReader(process.getInputStream())));
 		BufferDrain stderr = new BufferDrain(new BufferedReader(new InputStreamReader(process.getErrorStream())));
 
-		stdout.start();
-		stderr.start();
+        stdout.start();
+        stderr.start();
 
 		try {
 			process.waitFor();

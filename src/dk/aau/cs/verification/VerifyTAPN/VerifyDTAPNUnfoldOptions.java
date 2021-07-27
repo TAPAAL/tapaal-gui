@@ -11,11 +11,13 @@ public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
     private String queryOut;
     private File queryLibFile;
     private int tokenSize;
+    private int numQueries;
 
-    public VerifyDTAPNUnfoldOptions(String modelOut, String queryOut, int tokenSize) {
+    public VerifyDTAPNUnfoldOptions(String modelOut, String queryOut, int tokenSize, int numQueries) {
         this.modelOut = modelOut;
         this.queryOut = queryOut;
         this.tokenSize = tokenSize;
+        this.numQueries = numQueries;
         setup();
     }
 
@@ -65,7 +67,10 @@ public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("-k " + tokenSize + " -q " + queryLibFile.getAbsolutePath() + " -q-xml " + queryOut + " -f " + modelOut);
+        result.append("-k " + tokenSize + " -q " + queryLibFile.getAbsolutePath() + " -q-xml " + queryOut + " -f " + modelOut + " -q-num 0");
+        for(int i = 1; i <= numQueries; i++){
+            result.append("," + i);
+        }
 
         return result.toString();
     }

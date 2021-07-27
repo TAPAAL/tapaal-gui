@@ -329,7 +329,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
 
-                if(options.traceOption() != TraceOption.NONE && model.value1().isColored()) {
+                if(options.traceOption() != TraceOption.NONE && model.value1().isColored() && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()) {
                     TapnXmlLoader tapnLoader = new TapnXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
