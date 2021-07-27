@@ -330,27 +330,32 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			} else {
 
                 if(options.traceOption() != TraceOption.NONE && model.value1().isColored() && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()) {
-                    TapnXmlLoader tapnLoader = new TapnXmlLoader();
-                    File fileOut = new File(options.unfoldedModelPath());
-                    File queriesOut = new File(options.unfoldedQueriesPath());
-                    TabContent newTab;
-                    LoadedModel loadedModel = null;
-                    try {
-                        loadedModel = tapnLoader.load(fileOut);
-                        newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(CreateGui.getCurrentTab().getLens().isTimed(), CreateGui.getCurrentTab().getLens().isGame(), false));
-                        newTab.setInitialName(CreateGui.getCurrentTab().getTabTitle().replace(".tapn", "") + "-unfolded");
-                        for(pipe.dataLayer.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())){
-                            newTab.addQuery(loadedQuery);
+                    int dialogResult = JOptionPane.showConfirmDialog (null, "There is a trace that will be displayed in a new tab on the unfolded net/query.","Open trace", JOptionPane.OK_CANCEL_OPTION);
+                    if(dialogResult == JOptionPane.OK_OPTION) {
+                        TapnXmlLoader tapnLoader = new TapnXmlLoader();
+                        File fileOut = new File(options.unfoldedModelPath());
+                        File queriesOut = new File(options.unfoldedQueriesPath());
+                        TabContent newTab;
+                        LoadedModel loadedModel = null;
+                        try {
+                            loadedModel = tapnLoader.load(fileOut);
+                            newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(CreateGui.getCurrentTab().getLens().isTimed(), CreateGui.getCurrentTab().getLens().isGame(), false));
+                            newTab.setInitialName(CreateGui.getCurrentTab().getTabTitle().replace(".tapn", "") + "-unfolded");
+                            for (pipe.dataLayer.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
+                                newTab.addQuery(loadedQuery);
+                            }
+
+                            CreateGui.openNewTabFromStream(newTab);
+
+                            TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
+                            model = newComposer.transformModel(loadedModel.network());
+                        } catch (FormatException e) {
+                            e.printStackTrace();
+                        } catch (ThreadDeath d) {
+                            return null;
                         }
-
-                        CreateGui.openNewTabFromStream(newTab);
-
-                        TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
-                        model = newComposer.transformModel(loadedModel.network());
-                    } catch (FormatException e) {
-                        e.printStackTrace();
-                    } catch (ThreadDeath d) {
-                        return null;
+                    } else {
+                        options.setTraceOption(TraceOption.NONE);
                     }
                 }
 

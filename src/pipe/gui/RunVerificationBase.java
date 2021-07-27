@@ -245,7 +245,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			}
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
             showResult(result);
-			if(result.getQueryResult().isQuerySatisfied()){
+			if(result.getQueryResult().isQuerySatisfied() && result.getTrace() != null){
                 firePropertyChange("unfolding", StateValue.PENDING, StateValue.DONE);
             }
 
