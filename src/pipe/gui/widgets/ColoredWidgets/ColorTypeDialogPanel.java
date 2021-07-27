@@ -7,7 +7,9 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import net.tapaal.swinghelpers.GridBagHelper;
 import org.jdesktop.swingx.JXComboBox;
+import org.jdesktop.swingx.util.GraphicsUtilities;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
@@ -18,9 +20,12 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class ColorTypeDialogPanel extends JPanel {
@@ -58,6 +63,7 @@ public class ColorTypeDialogPanel extends JPanel {
     private DefaultListModel cyclicModel;
     private JButton cyclicRemoveButton;
     private JButton okButton;
+
     private JScrollPane scrollPane;
 
     private static final int MAXIMUM_INTEGER = 10000;
@@ -169,6 +175,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 8, 0, 8);
         container.add(productTypePanel, gbc);
+
 
         JPanel buttonPanel = createButtonPanel();
         gbc.insets = new Insets(0, 8, 5, 8);
@@ -389,7 +396,9 @@ public class ColorTypeDialogPanel extends JPanel {
         final JPanel cyclicAndFiniteEnumeration = new JPanel();
         cyclicAndFiniteEnumeration.setLayout(new GridBagLayout());
         cyclicAndFiniteEnumeration.setBorder(BorderFactory.createTitledBorder("Cyclic and Finite Enumeration"));
-        cyclicAndFiniteEnumeration.setSize(550,300);
+        //cyclicAndFiniteEnumeration.setSize(550,300);
+        JButton moveUpButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png"))));
+        JButton moveDownButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png"))));
 
         JPanel firstRow = new JPanel();
         firstRow.setLayout(new GridBagLayout());
@@ -403,10 +412,10 @@ public class ColorTypeDialogPanel extends JPanel {
         firstRow.add(enumNameLabel, gbc);
 
         enumTextField = new  JTextField();
-        Dimension size = new Dimension(300, 30);
-        enumTextField.setMaximumSize(size);
-        enumTextField.setMinimumSize(size);
-        enumTextField.setPreferredSize(size);
+        //Dimension size = new Dimension(300, 30);
+        //enumTextField.setMaximumSize(size);
+        //enumTextField.setMinimumSize(size);
+        //enumTextField.setPreferredSize(size);
         GridBagConstraints gbcNTF = new GridBagConstraints();
         gbcNTF.gridx = 1;
         gbcNTF.gridy = 0;
@@ -509,7 +518,24 @@ public class ColorTypeDialogPanel extends JPanel {
         enumList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 JList source = (JList) e.getSource();
-                cyclicRemoveButton.setEnabled(source.getSelectedIndex() != -1);
+                if(source.getSelectedIndex() == -1){
+                    cyclicRemoveButton.setEnabled(false);
+                    moveUpButton.setEnabled(false);
+                    moveDownButton.setEnabled(false);
+                } else{
+                    cyclicRemoveButton.setEnabled(true);
+                    if(source.getSelectedIndex() > 0){
+                        moveUpButton.setEnabled(true);
+                    } else{
+                        moveUpButton.setEnabled(false);
+                    }
+
+                    if(source.getSelectedIndex() < source.getModel().getSize()-1){
+                        moveDownButton.setEnabled(true);
+                    } else{
+                        moveDownButton.setEnabled(false);
+                    }
+                }
             }
         });
 
@@ -520,17 +546,53 @@ public class ColorTypeDialogPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.gridheight = 2;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        Dimension listSize = new Dimension(450, 150);
-        cyclicListScrollPane.setPreferredSize(listSize);
-        cyclicListScrollPane.setMinimumSize(listSize);
-        cyclicListScrollPane.setMaximumSize(listSize);
+        //Dimension listSize = new Dimension(450, 150);
+        //cyclicListScrollPane.setPreferredSize(listSize);
+        //cyclicListScrollPane.setMinimumSize(listSize);
+        //cyclicListScrollPane.setMaximumSize(listSize);
         cyclicListScrollPane.setVisible(true);
         cyclicListScrollPane.setBorder(new LineBorder(Color.GRAY));
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.BOTH;
         thirdRow.add(cyclicListScrollPane, gbc);
+
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(0, 3, 3, 3);
+
+        thirdRow.add(moveUpButton, gbc);
+        moveUpButton.addActionListener(e -> {
+            int index = enumList.getSelectedIndex();
+            if (index > 0) {
+                enumList.setSelectedIndex(index-1);
+                System.out.println(index);
+                System.out.println(cyclicModel.size());
+                swapColors(cyclicModel,index, index -1);
+
+            }
+        });
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+
+        thirdRow.add(moveDownButton, gbc);
+        moveDownButton.addActionListener(e -> {
+            int index = enumList.getSelectedIndex();
+            if (index < cyclicModel.getSize()-1) {
+                enumList.setSelectedIndex(index+1);
+                swapColors(cyclicModel,index, index +1);
+
+            }
+        });
 
         gbc = new GridBagConstraints();
         gbc.gridy = 2;
@@ -543,18 +605,26 @@ public class ColorTypeDialogPanel extends JPanel {
         return cyclicAndFiniteEnumeration;
     }
 
+    //productTypePanel contains TopPanel and scrollPanePanel
+    //TopPanel contains label, combobox and add/remove buttons
+    //scrollPanePanel contains scrollPane and up/down buttons
     private JPanel createProductTypePanel() {
         JPanel productTypePanel = new JPanel();
         productTypePanel.setLayout(new GridBagLayout());
         productTypePanel.setBorder(BorderFactory.createTitledBorder("Product Type/ Domain"));
         GridBagConstraints gbc = new GridBagConstraints();
+        JButton moveUpButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png"))));
+        JButton moveDownButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png"))));
 
+
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new GridBagLayout());
         JLabel productLabel = new JLabel("Color types: ");
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(3, 3, 3, 3);
-        productTypePanel.add(productLabel, gbc);
+        topPanel.add(productLabel, gbc);
 
         productModel = new DefaultListModel();
 
@@ -578,7 +648,7 @@ public class ColorTypeDialogPanel extends JPanel {
         productTypeComboBox.setBackground(Color.white);
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        productTypePanel.add(productTypeComboBox,gbc);
+        topPanel.add(productTypeComboBox,gbc);
 
         JPanel productButtonPanel = createProductButtonsPanel();
         gbc.gridx = 0;
@@ -586,32 +656,100 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(3, 3, 3, 3);
-        productTypePanel.add(productButtonPanel, gbc);
+        topPanel.add(productButtonPanel, gbc);
 
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        productTypePanel.add(topPanel,gbc);
+
+        JPanel scrollPanePanel = new JPanel();
+        scrollPanePanel.setLayout(new GridBagLayout());
         productColorTypeList = new JList();
         productColorTypeList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 JList source = (JList) e.getSource();
-                productRemoveButton.setEnabled(source.getSelectedIndex() != -1);
+                if(source.getSelectedIndex() == -1){
+                    productRemoveButton.setEnabled(false);
+                    moveUpButton.setEnabled(false);
+                    moveDownButton.setEnabled(false);
+                } else{
+                    if(source.getSelectedIndex() > 0){
+                        moveUpButton.setEnabled(true);
+                    } else{
+                        moveUpButton.setEnabled(false);
+                    }
+
+                    if(source.getSelectedIndex() < source.getModel().getSize()-1){
+                        moveDownButton.setEnabled(true);
+                    } else{
+                        moveDownButton.setEnabled(false);
+                    }
+                }
             }
         });
         JScrollPane productColorsListScrollPane = new JScrollPane(productColorTypeList);
         productColorsListScrollPane.setViewportView(productColorTypeList);
         productColorsListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.gridwidth = 2;
+        gbc.gridheight = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.EAST;
+        //gbc.insets = new Insets(0,3,3,3);
+        scrollPanePanel.add(productColorsListScrollPane, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0,3,3,3);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        scrollPanePanel.add(moveUpButton,gbc);
+        moveUpButton.addActionListener(e -> {
+            int index = productColorTypeList.getSelectedIndex();
+            if (index > 0) {
+                productColorTypeList.setSelectedIndex(index-1);
+                swapColors(productModel,index, index -1);
+
+            }
+
+        });
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(3,3,3,3);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        scrollPanePanel.add(moveDownButton, gbc);
+
+        moveDownButton.addActionListener(e -> {
+            int index = productColorTypeList.getSelectedIndex();
+            if (index < productModel.getSize()-1) {
+                productColorTypeList.setSelectedIndex(index+1);
+                swapColors(productModel,index, index +1);
+
+            }
+        });
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(3,3,3,3);
-        productTypePanel.add(productColorsListScrollPane, gbc);
+        productTypePanel.add(scrollPanePanel, gbc);
 
         return productTypePanel;
     }
 
     private JPanel createProductButtonsPanel() {
+        Dimension buttonSize = new Dimension(100, 30);
         JPanel productButtonPanel = new JPanel();
         productButtonPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -622,6 +760,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.gridy = 0;
         gbc.gridwidth = GridBagConstraints.RELATIVE;
         gbc.anchor = GridBagConstraints.EAST;
+        productAddButton.setPreferredSize(buttonSize);
         productButtonPanel.add(productAddButton, gbc);
 
         productAddButton.addActionListener(e -> {
@@ -644,6 +783,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.gridy = 0;
         gbc.gridwidth = GridBagConstraints.RELATIVE;
         gbc.anchor = GridBagConstraints.EAST;
+        productRemoveButton.setPreferredSize(buttonSize);
         productButtonPanel.add(productRemoveButton, gbc);
 
         productRemoveButton.addActionListener(e -> {
@@ -877,5 +1017,11 @@ public class ColorTypeDialogPanel extends JPanel {
         }
 
         exit();
+    }
+
+    public void swapColors(DefaultListModel model, int selectedIndex, int newIndex){
+        var temp = model.get(newIndex);
+        model.set(newIndex, model.get(selectedIndex));
+        model.set(selectedIndex, temp);
     }
 }

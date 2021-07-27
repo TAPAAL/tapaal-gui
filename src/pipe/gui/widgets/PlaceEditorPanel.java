@@ -695,7 +695,7 @@ public class PlaceEditorPanel extends JPanel {
         for(int i = 0; i < coloredTokenListModel.getSize();i++){
             v.add(coloredTokenListModel.getElementAt(i));
         }
-        
+
         AddExpression newExpression = null;
         if(!v.isEmpty()){
             newExpression = new AddExpression(v);
