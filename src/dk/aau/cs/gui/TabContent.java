@@ -844,7 +844,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	
 	private WorkflowDialog workflowDialog = null;
 
-	private TabContent(boolean isTimed, boolean isGame) {
+	private NameVisibilityPanel nameVisibilityPanel = null;
+
+    private Boolean showNamesOption = null;
+    private Boolean isSelectedComponentOption = null;
+    private Boolean isPlaceOption = null;
+    private Boolean isTransitionOption = null;
+
+    private TabContent(boolean isTimed, boolean isGame) {
 	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame));
     }
 
@@ -903,6 +910,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
         this.setDividerSize(8);
         //XXX must be after the animationcontroller is created
         animationModeController = new CanvasAnimationController(getAnimator());
+
+        nameVisibilityPanel = new NameVisibilityPanel(this);
     }
 
 	public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
@@ -1875,7 +1884,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
     @Override
     public void showChangeNameVisibility() {
 	    NameVisibilityPanel panel = new NameVisibilityPanel(this);
-	    panel.showNameVisibilityPanel();
+	    if (showNamesOption != null && isSelectedComponentOption != null && isPlaceOption != null && isTransitionOption != null) {
+            panel.showNameVisibilityPanel(showNamesOption, isPlaceOption, isTransitionOption, isSelectedComponentOption);
+        } else {
+            panel.showNameVisibilityPanel();
+        }
+
+        showNamesOption = panel.isShowNamesOption();
+        isPlaceOption = panel.isPlaceOption();
+        isTransitionOption = panel.isTransitionOption();
+        isSelectedComponentOption = panel.isSelectedComponentOption();
     }
 
 	@Override

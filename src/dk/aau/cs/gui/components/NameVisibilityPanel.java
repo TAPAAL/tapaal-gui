@@ -15,14 +15,20 @@ public class NameVisibilityPanel extends JPanel {
 
     private static JDialog dialog;
     private JRadioButton showNames;
+    private JRadioButton hideNames;
     private JRadioButton placeOption;
     private JRadioButton transitionOption;
     private JRadioButton bothOption;
     private JRadioButton selectedComponent;
+    private JRadioButton allComponents;
 
     ButtonGroup visibilityRadioButtonGroup;
     ButtonGroup objectRadioButtonGroup;
     ButtonGroup componentRadioButtonGroup;
+
+    JPanel visibilityPanel;
+    JPanel placeTransitionPanel;
+    JPanel componentPanel;
 
     private final TabContent tab;
 
@@ -38,7 +44,26 @@ public class NameVisibilityPanel extends JPanel {
         JOptionPane optionPane = new JOptionPane(this, JOptionPane.INFORMATION_MESSAGE);
 
         dialog = optionPane.createDialog(DIALOG_TITLE);
+        dialog.pack();
+        dialog.setVisible(true);
 
+        Object selectedValue = optionPane.getValue();
+
+        if (selectedValue != null) ChangeNameVisibilityBasedOnSelection();
+    }
+
+    public void showNameVisibilityPanel(boolean isVisible, boolean isPlace, boolean isTransition, boolean isSelectedComponent) {
+        JOptionPane optionPane = new JOptionPane(this, JOptionPane.INFORMATION_MESSAGE);
+
+        showNames.setSelected(isVisible);
+        hideNames.setSelected(!isVisible);
+        placeOption.setSelected(isPlace && !isTransition);
+        transitionOption.setSelected(isTransition && !isPlace);
+        bothOption.setSelected(isPlace && isTransition);
+        selectedComponent.setSelected(isSelectedComponent);
+        allComponents.setSelected(!isSelectedComponent);
+
+        dialog = optionPane.createDialog(DIALOG_TITLE);
         dialog.pack();
         dialog.setVisible(true);
 
@@ -48,9 +73,9 @@ public class NameVisibilityPanel extends JPanel {
     }
 
     private void init() {
-        JPanel visibilityPanel = initVisibilityOptions();
-        JPanel placeTransitionPanel = initPlaceTransitionOptions();
-        JPanel componentPanel = initComponentOptions();
+        visibilityPanel = initVisibilityOptions();
+        placeTransitionPanel = initPlaceTransitionOptions();
+        componentPanel = initComponentOptions();
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -92,7 +117,7 @@ public class NameVisibilityPanel extends JPanel {
         panel.add(showNames, gbc);
         visibilityRadioButtonGroup.add(showNames);
 
-        JRadioButton hideNames = new JRadioButton("Hide");
+        hideNames = new JRadioButton("Hide");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;
@@ -176,7 +201,7 @@ public class NameVisibilityPanel extends JPanel {
         panel.add(selectedComponent, gbc);
         componentRadioButtonGroup.add(selectedComponent);
 
-        JRadioButton allComponents = new JRadioButton("All components");
+        allComponents = new JRadioButton("All components");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;
@@ -202,5 +227,21 @@ public class NameVisibilityPanel extends JPanel {
 
         Command changeVisibilityCommand = new ChangeAllNamesVisibilityCommand(tab, places, transitions, showNames.isSelected());
         tab.getUndoManager().addNewEdit(changeVisibilityCommand);
+    }
+
+    public boolean isShowNamesOption() {
+        return showNames.isSelected();
+    }
+
+    public boolean isSelectedComponentOption() {
+        return selectedComponent.isSelected();
+    }
+
+    public boolean isPlaceOption() {
+        return placeOption.isSelected() || bothOption.isSelected();
+    }
+
+    public boolean isTransitionOption() {
+        return transitionOption.isSelected() || bothOption.isSelected();
     }
 }
