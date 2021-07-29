@@ -484,11 +484,11 @@ public class ColorTypeDialogPanel extends JPanel {
         cyclicRemoveButton.setEnabled(false);
         cyclicRemoveButton.addActionListener(actionEvent -> {
             ArrayList<String> messages = new ArrayList<>();
-            if(oldColorType == null || network.canColorTypeBeRemoved(oldColorType,messages)) {
+            if(oldColorType == null || network.canColorBeRemoved((dk.aau.cs.model.CPN.Color) enumList.getSelectedValue(),messages)) {
                 cyclicModel.removeElementAt(enumList.getSelectedIndex());
                 enumList.setModel(cyclicModel);
             }else{
-                String message = "Colortype cannot have colors removed for the following reasons: \n\n";
+                String message = "Color cannot be removed for the following reasons: \n\n";
                 message += String.join("", messages);
                 JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
             }
@@ -878,11 +878,21 @@ public class ColorTypeDialogPanel extends JPanel {
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
+        //If upperbound has been made smaller or lowerbound has been made larger
         if(rangeOfIntegersPanelEnabled && oldColorType != null && (Integer.parseInt(upperBoundTextField.getText()) < Integer.parseInt(oldColorType.getColors().lastElement().getColorName()) || Integer.parseInt(lowerBoundTextField.getText()) > Integer.parseInt(oldColorType.getColors().firstElement().getColorName()))){
+            //collect removed colors
+            List<dk.aau.cs.model.CPN.Color> removedColors = new ArrayList<>();
             ArrayList<String> messages = new ArrayList<>();
-            if(!network.canColorTypeBeRemoved(oldColorType,messages)) {
-                String message = "Colortype cannot have colors removed for the following reasons: \n\n";
+
+            for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
+                if(Integer.parseInt(c.getName()) > Integer.parseInt(upperBoundTextField.getText()) || Integer.parseInt(c.getName()) < Integer.parseInt(lowerBoundTextField.getText())){
+                    //We need all the messages so we do nothing with the return value
+                    network.canColorBeRemoved(c, messages);
+                }
+            }
+
+            if(!messages.isEmpty()) {
+                String message = "Colortype cannot have the following colors removed for the following reasons: \n\n";
                 message += String.join("", messages);
                 JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
                 return;
