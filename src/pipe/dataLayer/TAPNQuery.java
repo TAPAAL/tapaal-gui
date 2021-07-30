@@ -125,6 +125,10 @@ public class TAPNQuery {
 		return this.denominator;
 	}
 
+    public void setApproximationDenominator(int denominator) {
+        this.denominator = denominator;
+    }
+
 	public void setDiscreteInclusion(boolean value){
 		discreteInclusion = value;
 	}
@@ -411,6 +415,30 @@ public class TAPNQuery {
 		useStubbornReduction = newQuery.isStubbornReductionEnabled();
 		useTarOption = newQuery.isTarOptionEnabled();
 	}
+
+    public void copyOptions(pipe.dataLayer.TAPNQuery query){
+        setUseOverApproximation(query.useOverApproximation());
+        setUseUnderApproximationEnabled(query.isUnderApproximationEnabled());
+        setUseSiphontrap(query.isSiphontrapEnabled());
+        setUseQueryReduction(query.isQueryReductionEnabled());
+        setUseStubbornReduction(query.isStubbornReductionEnabled());
+        setUseTarOption(query.isTarOptionEnabled());
+        setApproximationDenominator(query.approximationDenominator());
+        setDiscreteInclusion(query.discreteInclusion());
+        setCapacity(query.getCapacity());
+        setTraceOption(query.getTraceOption());
+        setSearchOption(query.getSearchOption());
+        setReductionOption(query.getReductionOption());
+        setUseSymmetricVars(query.useSymmetricVars());
+        setUseColorFixpoint(query.useColorFixpoint());
+        setUseGCD(query.useGCD());
+        setUseTimeDarts(query.useTimeDarts());
+        setUsePTrie(query.usePTrie());
+        setUsePartitioning(query.usePartitioning());
+        setUseOverApproximationEnabled(query.isOverApproximationEnabled());
+        setUseReduction(query.useReduction());
+        setExtrapolationOption(query.getExtrapolationOption());
+    }
 
 	public InclusionPlaces inclusionPlaces() {
 		return inclusionPlaces;

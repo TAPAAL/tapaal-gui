@@ -289,7 +289,7 @@ public class VerifyPN implements ModelChecker{
 				messenger.displayErrorMessage("There was an error exporting the model");
 			}
 
-			return verify(options, model, exportedModel, query);
+			return verify(options, model, exportedModel, query, dataLayerQuery);
 		}
 
     private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
@@ -313,7 +313,7 @@ public class VerifyPN implements ModelChecker{
 			((VerifyTAPNOptions)options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
 		}
 
-		private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) throws IOException {
+		private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, pipe.dataLayer.TAPNQuery dataLayerQuery) throws IOException {
 			((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 
             runner = new ProcessRunner(verifypnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
@@ -322,40 +322,53 @@ public class VerifyPN implements ModelChecker{
 			if (runner.error()) {
 				return null;
 			} else {
+                TimedArcPetriNetTrace tapnTrace = null;
 				String errorOutput = readOutput(runner.errorOutput());
 				String standardOutput = readOutput(runner.standardOutput());
 
 				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
-                if(options.traceOption() != TraceOption.NONE && model.value1().isColored() && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()){
-                    int dialogResult = JOptionPane.showConfirmDialog (null, "There is a trace that will be displayed in a new tab on the unfolded net/query.","Open trace", JOptionPane.OK_CANCEL_OPTION);
-                    if(dialogResult == JOptionPane.OK_OPTION) {
-                        PNMLoader tapnLoader = new PNMLoader();
-                        File fileOut = new File(options.unfoldedModelPath());
-                        File queriesOut = new File(options.unfoldedQueriesPath());
-                        TabContent newTab;
-                        LoadedModel loadedModel = null;
-                        try {
-                            loadedModel = tapnLoader.load(fileOut);
-                            newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(CreateGui.getCurrentTab().getLens().isTimed(), CreateGui.getCurrentTab().getLens().isGame(), false));
 
-                            //The query being verified should be the only query
-                            for (pipe.dataLayer.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
-                                newTab.setInitialName(loadedQuery.getName() + " - unfolded");
-                                newTab.addQuery(loadedQuery);
-                            }
+				if(options.traceOption() != TraceOption.NONE && model.value1().isColored() && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()){
+                    PNMLoader tapnLoader = new PNMLoader();
+                    File fileOut = new File(options.unfoldedModelPath());
+                    File queriesOut = new File(options.unfoldedQueriesPath());
+                    TabContent newTab;
+                    LoadedModel loadedModel = null;
+                    try {
+                        loadedModel = tapnLoader.load(fileOut);
+                        TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
+                        model = newComposer.transformModel(loadedModel.network());
 
 
-                            CreateGui.openNewTabFromStream(newTab);
-
-                            TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
-                            model = newComposer.transformModel(loadedModel.network());
-                        } catch (FormatException e) {
-                            e.printStackTrace();
-                        } catch (ThreadDeath d) {
-                            return null;
+                        if (queryResult != null && queryResult.value1() != null) {
+                            tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
                         }
-                    } else {
-                        options.setTraceOption(TraceOption.NONE);
+
+                        if(tapnTrace == null){
+                            String message = "No trace could be generated.\n\n";
+                            message += "Model checker output:\n" + standardOutput;
+                            messenger.displayWrappedErrorMessage(message,"No trace found");
+
+                        } else {
+                            int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
+                            if (dialogResult == JOptionPane.OK_OPTION) {
+                                newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(CreateGui.getCurrentTab().getLens().isTimed(), CreateGui.getCurrentTab().getLens().isGame(), false));
+
+                                //The query being verified should be the only query
+                                for (pipe.dataLayer.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
+                                    newTab.setInitialName(loadedQuery.getName() + " - unfolded");
+                                    loadedQuery.copyOptions(dataLayerQuery);
+                                    newTab.addQuery(loadedQuery);
+                                }
+                                CreateGui.openNewTabFromStream(newTab);
+                            }  else {
+                                options.setTraceOption(TraceOption.NONE);
+                            }
+                        }
+                    } catch (FormatException e) {
+                        e.printStackTrace();
+                    } catch (ThreadDeath d) {
+                        return null;
                     }
                 }
 
@@ -364,7 +377,9 @@ public class VerifyPN implements ModelChecker{
 				} else {
 					ctlOutput = queryResult.value1().isCTL;
 					boolean approximationResult = queryResult.value2().discoveredStates() == 0;	// Result is from over-approximation
-					TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                    if(tapnTrace == null){
+                        tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                    }
 					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult, standardOutput, model);
 				}
 			}

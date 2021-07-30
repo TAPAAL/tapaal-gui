@@ -48,6 +48,6 @@ public class VerifyTACPNDiscreteVerification extends VerifyTAPNDiscreteVerificat
             messenger.displayErrorMessage("There was an error exporting the model");
         }
 
-        return verify(options, model, exportedModel, query);
+        return verify(options, model, exportedModel, query, dataLayerQuery);
     }
 }

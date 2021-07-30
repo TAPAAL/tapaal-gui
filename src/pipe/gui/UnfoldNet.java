@@ -200,7 +200,13 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
             if(!dummyQuery){
                 for(pipe.dataLayer.TAPNQuery query : getQueries(queryOut, loadedModel.network())){
-                    newTab.addQuery(query);
+                    for(pipe.dataLayer.TAPNQuery oldQuery : queries){
+                        if(query.getName().equals(oldQuery.getName())){
+                            query.copyOptions(oldQuery);
+                            newTab.addQuery(query);
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -281,6 +287,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 showErrorMessage(result);
             } else {
                 firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
+                firePropertyChange("unfolding", StateValue.PENDING, StateValue.DONE);
             }
 
         } else {
