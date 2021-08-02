@@ -32,9 +32,11 @@ public class AllExpression extends ColorExpression {
         return sort.getColors();
     }
 
+    //We say that AllExpressions do not contain the color so that we can remove safely
+    //Maybe this needs to be refactored at some point
     @Override
     public boolean containsColor(Color color) {
-        return sort.contains(color);
+        return false;
     }
 
     @Override
