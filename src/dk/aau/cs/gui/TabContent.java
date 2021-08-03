@@ -16,6 +16,7 @@ import javax.swing.border.BevelBorder;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
+import dk.aau.cs.gui.components.NameVisibilityPanel;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.gui.undo.*;
@@ -843,8 +844,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	
 	private WorkflowDialog workflowDialog = null;
 
+	private NameVisibilityPanel nameVisibilityPanel = null;
 
-	private TabContent(boolean isTimed, boolean isGame) {
+    private Boolean showNamesOption = null;
+    private Boolean isSelectedComponentOption = null;
+    private Boolean isPlaceOption = null;
+    private Boolean isTransitionOption = null;
+
+    private TabContent(boolean isTimed, boolean isGame) {
 	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed,isGame));
     }
 
@@ -903,6 +910,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
         this.setDividerSize(8);
         //XXX must be after the animationcontroller is created
         animationModeController = new CanvasAnimationController(getAnimator());
+
+        nameVisibilityPanel = new NameVisibilityPanel(this);
     }
 
 	public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
@@ -1621,6 +1630,39 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     }
 
+    @Override
+    public Map<PetriNetObject, Boolean> showNames(boolean showNames, boolean placeNames, boolean selectedComponent) {
+        Map<PetriNetObject, Boolean> map = new HashMap<>();
+        List<PetriNetObject> components = new ArrayList<>();
+
+	    if (selectedComponent) {
+	        Template template = currentTemplate();
+	        template.guiModel().getPetriNetObjects().forEach(components::add);
+        } else {
+            Iterable<Template> templates = allTemplates();
+            for (Template template : templates) {
+                template.guiModel().getPetriNetObjects().forEach(components::add);
+            }
+        }
+
+        for (Component component : components) {
+            if (placeNames && component instanceof TimedPlaceComponent) {
+                TimedPlaceComponent place = (TimedPlaceComponent) component;
+                map.put(place, place.getAttributesVisible());
+                place.setAttributesVisible(showNames);
+                place.update(true);
+                repaint();
+            } else if (!placeNames && component instanceof TimedTransitionComponent) {
+                TimedTransitionComponent transition = (TimedTransitionComponent) component;
+                map.put(transition, transition.getAttributesVisible());
+                transition.setAttributesVisible(showNames);
+                transition.update(true);
+                repaint();
+            }
+        }
+        return map;
+	}
+
     public static Split getEditorModelRoot(){
 		return editorModelroot;
 	}
@@ -1838,6 +1880,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public void showStatistics() {
         StatisticsPanel.showStatisticsPanel(drawingSurface().getModel().getStatistics());
 	}
+
+    @Override
+    public void showChangeNameVisibility() {
+	    NameVisibilityPanel panel = new NameVisibilityPanel(this);
+	    if (showNamesOption != null && isSelectedComponentOption != null && isPlaceOption != null && isTransitionOption != null) {
+            panel.showNameVisibilityPanel(showNamesOption, isPlaceOption, isTransitionOption, isSelectedComponentOption);
+        } else {
+            panel.showNameVisibilityPanel();
+        }
+
+        showNamesOption = panel.isShowNamesOption();
+        isPlaceOption = panel.isPlaceOption();
+        isTransitionOption = panel.isTransitionOption();
+        isSelectedComponentOption = panel.isSelectedComponentOption();
+    }
 
 	@Override
 	public void importSUMOQueries() {
