@@ -237,7 +237,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             SmartDrawDialog.showSmartDrawDialog();
         }
     };
-    private final GuiAction mergeComponentsDialogAction = new GuiAction("Merge net components", "Export an xml file of composed net and approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
+    private final GuiAction mergeComponentsDialogAction = new GuiAction("Merge net components", "Open a composed net in a new tab and approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::mergeNetComponents);
         }
