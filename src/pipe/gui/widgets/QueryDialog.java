@@ -2581,22 +2581,8 @@ public class QueryDialog extends JPanel {
                             newQuery = TAPAALQueryParser.parse(queryField.getText());
                         } else if (queryType.getSelectedIndex() == 0) {
 						    newQuery = TAPAALCTLQueryParser.parse(queryField.getText());
-                            String check = newQuery.toString();
-                            if (!check.startsWith("EG ") && !check.startsWith("EF ") &&
-                                !check.startsWith("AG ") && !check.startsWith("AF ") &&
-                                !check.startsWith("E ") && !check.startsWith("EX ") &&
-                                !check.startsWith("A ") && !check.startsWith("AX ")) {
-                                newQuery = null;
-                                throw new Exception();
-                            }
                         } else if (queryType.getSelectedIndex() == 1) {
 					        newQuery = TAPAALLTLQueryParser.parse(queryField.getText());
-                            String check = newQuery.toString();
-                            if (!check.startsWith("G ") && !check.startsWith("F ") &&
-                                !check.contains(" U ") && !check.startsWith("X ")) {
-                                newQuery = null;
-                                throw new Exception();
-                            }
                         } else {
 					        throw new Exception();
                         }
@@ -2614,7 +2600,7 @@ public class QueryDialog extends JPanel {
 
 					}
 
-					if (newQuery != null && newQuery.toString().length() > 2) // new query parsed successfully
+					if (newQuery != null) // new query parsed successfully
 					{
 						// check correct place names are used in atomic propositions
 						ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
@@ -2639,7 +2625,7 @@ public class QueryDialog extends JPanel {
                         if (lens.isTimed() || lens.isGame()) {
                             isResultFalse = !c.getResult();
                         } else {
-                            isResultFalse = checkUntimedResult(newQuery) && !c.getResult();
+                            isResultFalse = checkUntimedResult(newQuery) || !c.getResult();
                         }
 
 						if (isResultFalse) {

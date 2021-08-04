@@ -17,13 +17,13 @@ public interface TAPAALLTLQueryParserConstants {
     /** RegularExpression Id. */
     int DEADLOCK = 3;
     /** RegularExpression Id. */
-    int AU = 4;
+    int U = 4;
     /** RegularExpression Id. */
-    int AF = 5;
+    int F = 5;
     /** RegularExpression Id. */
-    int AG = 6;
+    int G = 6;
     /** RegularExpression Id. */
-    int AX = 7;
+    int X = 7;
     /** RegularExpression Id. */
     int OR = 8;
     /** RegularExpression Id. */

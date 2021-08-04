@@ -44,14 +44,14 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
     final public     TCTLAbstractPathProperty AbstractPathProperty() throws ParseException {TCTLAbstractStateProperty child = null;
         TCTLAbstractStateProperty child2 = null;
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-            case AF:{
-                jj_consume_token(AF);
+            case F:{
+                jj_consume_token(F);
                 child = OrExpr();
                 {if ("" != null) return new LTLAFNode(child);}
                 break;
             }
-            case AG:{
-                jj_consume_token(AG);
+            case G:{
+                jj_consume_token(G);
                 child = OrExpr();
                 {if ("" != null) return new LTLAGNode(child);}
                 break;
@@ -59,14 +59,14 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
             case 21:{
                 jj_consume_token(21);
                 child = OrExpr();
-                jj_consume_token(AU);
+                jj_consume_token(U);
                 child2 = OrExpr();
                 jj_consume_token(22);
                 {if ("" != null) return new LTLAUNode(child, child2);}
                 break;
             }
-            case AX:{
-                jj_consume_token(AX);
+            case X:{
+                jj_consume_token(X);
                 child = OrExpr();
                 {if ("" != null) return new LTLAXNode(child);}
                 break;
