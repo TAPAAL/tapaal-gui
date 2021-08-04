@@ -64,7 +64,7 @@ public class VerifyTAPNExporter {
             } else if (query.getCategory() == QueryCategory.LTL) {
                 LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
-            }else if (lens != null && lens.isGame()) {
+            } else if (lens != null && lens.isGame()) {
                 queryStream.append("control: " + query.getProperty().toString());
             } else {
                 queryStream.append(query.getProperty().toString());
