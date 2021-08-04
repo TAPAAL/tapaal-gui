@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
 
+import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.NameMapping;
 import pipe.dataLayer.DataLayer;
@@ -57,10 +58,13 @@ public class VerifyTAPNExporter {
 			PrintStream queryStream = new PrintStream(queryFile);
             if (query == null) {
                 throw new FileNotFoundException(null);
-            } else if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL) {
+            } else if (query.getCategory() == QueryCategory.CTL) {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
-            } else if (lens != null && lens.isGame()) {
+            } else if (query.getCategory() == QueryCategory.LTL) {
+                LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
+            }else if (lens != null && lens.isGame()) {
                 queryStream.append("control: " + query.getProperty().toString());
             } else {
                 queryStream.append(query.getProperty().toString());
