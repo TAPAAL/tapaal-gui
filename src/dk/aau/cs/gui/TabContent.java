@@ -2760,7 +2760,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.wheel,
                 e->timedTranstionMouseWheelWithShift(((TimedTransitionComponent) e.pno), ((MouseWheelEvent) e.e))
             );
+            registerEvent(
+                e->e.pno instanceof Arc && e.a == MouseAction.wheel,
+                e->arcMouseWheel((PetriNetObject) e.pno, e.e)
+            );
+            registerEvent(
+                e->e.pno instanceof ArcPathPoint && e.a == MouseAction.wheel,
+                e->arcMouseWheel(((PetriNetObject) e.pno), e.e)
+            );
+        }
 
+        private void arcMouseWheel(PetriNetObject pno, MouseEvent e) {
+            pno.getParent().dispatchEvent(e);
         }
 
         private void timedTranstionMouseWheelWithShift(TimedTransitionComponent p, MouseWheelEvent e) {
