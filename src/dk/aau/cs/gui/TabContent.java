@@ -2039,8 +2039,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	@Override
 	public void deleteSelection() {
 		guiModelManager.deleteSelection();
-
-
 	}
 
 	@Override
