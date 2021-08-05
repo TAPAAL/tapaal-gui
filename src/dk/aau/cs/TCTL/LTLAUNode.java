@@ -1,6 +1,8 @@
 package dk.aau.cs.TCTL;
 
-public class LTLAUNode extends TCTLAUNode {
+import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
+
+public class LTLAUNode extends TCTLAbstractPathProperty {
     private TCTLAbstractStateProperty left;
     private TCTLAbstractStateProperty right;
 
@@ -73,6 +75,17 @@ public class LTLAUNode extends TCTLAUNode {
     }
 
     @Override
+    public void convertForReducedNet(String templateName) {
+        left.convertForReducedNet(templateName);
+        right.convertForReducedNet(templateName);
+    }
+
+    @Override
+    public boolean isSimpleProperty() {
+        return false;
+    }
+
+    @Override
     public boolean containsPlaceHolder() {
         return left.containsPlaceHolder() || right.containsPlaceHolder();
     }
@@ -115,5 +128,10 @@ public class LTLAUNode extends TCTLAUNode {
             return right.findFirstPlaceHolder();
         }
         return result;
+    }
+
+    @Override
+    public void accept(ITCTLVisitor visitor, Object context) {
+        visitor.visit(this, context);
     }
 }

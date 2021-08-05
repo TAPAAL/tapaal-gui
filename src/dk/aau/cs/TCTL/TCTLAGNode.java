@@ -64,7 +64,7 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public TCTLAbstractPathProperty copy() {
-		return new TCTLAGNode(property.copy());
+        return new TCTLAGNode(property.copy());
 	}
 
 	@Override

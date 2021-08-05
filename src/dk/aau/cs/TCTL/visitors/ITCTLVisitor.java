@@ -11,6 +11,14 @@ public interface ITCTLVisitor {
 	
 	void visit(TCTLAUNode auNode, Object context);
 
+    void visit(LTLAFNode afNode, Object context);
+
+    void visit(LTLAGNode agNode, Object context);
+
+    void visit(LTLAXNode axNode, Object context);
+
+    void visit(LTLAUNode auNode, Object context);
+
 	void visit(TCTLEFNode efNode, Object context);
 
 	void visit(TCTLEGNode egNode, Object context);

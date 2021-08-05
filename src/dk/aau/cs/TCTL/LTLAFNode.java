@@ -1,6 +1,8 @@
 package dk.aau.cs.TCTL;
 
-public class LTLAFNode extends TCTLAFNode {
+import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
+
+public class LTLAFNode extends TCTLAbstractPathProperty {
     TCTLAbstractStateProperty property;
 
     public void setProperty(TCTLAbstractStateProperty property) {
@@ -27,6 +29,11 @@ public class LTLAFNode extends TCTLAFNode {
         String s = property.isSimpleProperty() ? property.toString() : "("
             + property.toString() + ")";
         return "F " + s;
+    }
+
+    @Override
+    public boolean isSimpleProperty() {
+        return false;
     }
 
     @Override
@@ -91,5 +98,10 @@ public class LTLAFNode extends TCTLAFNode {
     @Override
     public TCTLAbstractProperty findFirstPlaceHolder() {
         return property.findFirstPlaceHolder();
+    }
+
+    @Override
+    public void accept(ITCTLVisitor visitor, Object context) {
+        visitor.visit(this, context);
     }
 }

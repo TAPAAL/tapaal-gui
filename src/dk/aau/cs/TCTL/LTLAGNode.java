@@ -1,6 +1,8 @@
 package dk.aau.cs.TCTL;
 
-public class LTLAGNode extends TCTLAGNode {
+import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
+
+public class LTLAGNode extends TCTLAbstractPathProperty {
     TCTLAbstractStateProperty property;
 
     public void setProperty(TCTLAbstractStateProperty property) {
@@ -38,6 +40,11 @@ public class LTLAGNode extends TCTLAGNode {
 
         StringPosition[] children = { position };
         return children;
+    }
+
+    @Override
+    public boolean isSimpleProperty() {
+        return false;
     }
 
     @Override
@@ -90,5 +97,10 @@ public class LTLAGNode extends TCTLAGNode {
     @Override
     public TCTLAbstractProperty findFirstPlaceHolder() {
         return property.findFirstPlaceHolder();
+    }
+
+    @Override
+    public void accept(ITCTLVisitor visitor, Object context) {
+        visitor.visit(this, context);
     }
 }

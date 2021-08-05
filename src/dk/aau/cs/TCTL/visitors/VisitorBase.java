@@ -1,31 +1,6 @@
 package dk.aau.cs.TCTL.visitors;
 
-import dk.aau.cs.TCTL.AritmeticOperator;
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLAXNode;
-import dk.aau.cs.TCTL.TCTLAUNode;
-import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
-import dk.aau.cs.TCTL.TCTLAndListNode;
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLConstNode;
-import dk.aau.cs.TCTL.TCTLDeadlockNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.TCTLEXNode;
-import dk.aau.cs.TCTL.TCTLEUNode;
-import dk.aau.cs.TCTL.TCTLFalseNode;
-import dk.aau.cs.TCTL.TCTLNotNode;
-import dk.aau.cs.TCTL.TCTLOrListNode;
-import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
-import dk.aau.cs.TCTL.TCTLPathToStateConverter;
-import dk.aau.cs.TCTL.TCTLPlaceNode;
-import dk.aau.cs.TCTL.TCTLPlusListNode;
-import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
-import dk.aau.cs.TCTL.TCTLStateToPathConverter;
-import dk.aau.cs.TCTL.TCTLTermListNode;
-import dk.aau.cs.TCTL.TCTLTransitionNode;
-import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.TCTL.*;
 
 public abstract class VisitorBase implements ITCTLVisitor {
 
@@ -33,8 +8,13 @@ public abstract class VisitorBase implements ITCTLVisitor {
 		atomicPropositionNode.getLeft().accept(this, context);
 		atomicPropositionNode.getRight().accept(this, context);
 	}
-	
-	public void visit(TCTLAFNode afNode, Object context) { afNode.getProperty().accept(this, context); }
+
+    public void visit(LTLAFNode afNode, Object context) { afNode.getProperty().accept(this, context); }
+    public void visit(LTLAGNode agNode, Object context) { agNode.getProperty().accept(this, context); }
+    public void visit(LTLAXNode axNode, Object context) { axNode.getProperty().accept(this, context); }
+    public void visit(LTLAUNode auNode, Object context) { auNode.getLeft().accept(this, context);
+                                                            auNode.getRight().accept(this, context);  }
+    public void visit(TCTLAFNode afNode, Object context) { afNode.getProperty().accept(this, context); }
 	public void visit(TCTLAGNode agNode, Object context) { agNode.getProperty().accept(this, context); }
 	public void visit(TCTLAXNode axNode, Object context) { axNode.getProperty().accept(this, context); }
 	public void visit(TCTLAUNode auNode, Object context) { auNode.getLeft().accept(this, context); 
