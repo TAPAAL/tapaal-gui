@@ -1585,8 +1585,10 @@ public class QueryDialog extends JPanel {
             if (property instanceof TCTLEGNode || property instanceof TCTLEFNode ||
                 property instanceof TCTLEXNode || property instanceof TCTLEUNode) {
                 return null;
-            } else if (!(property instanceof TCTLAGNode || property instanceof TCTLAFNode ||
-                property instanceof TCTLAXNode || property instanceof TCTLAUNode)) {
+            } else if ((!toCTL && (!(property instanceof TCTLAGNode || property instanceof TCTLAFNode ||
+                property instanceof TCTLAXNode || property instanceof TCTLAUNode))) ||
+                (toCTL && (!(property instanceof LTLAGNode || property instanceof LTLAFNode ||
+                    property instanceof LTLAXNode || property instanceof LTLAUNode)))) {
                 return property;
             }
 
