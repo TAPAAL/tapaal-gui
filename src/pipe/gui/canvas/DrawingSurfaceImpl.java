@@ -123,7 +123,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		pno.setManagerRef(null);
 		super.remove(pno); //Must be called after removeFromGui as children might use the references to Drawingsurface
 
-		validate();
+        updatePreferredSize();
+        validate();
 		repaint();
 	}
 
