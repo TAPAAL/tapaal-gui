@@ -1766,7 +1766,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				animationmode = true; //XXX: Must be called after setGuiMode as guiMode uses last state,
                 app.ifPresent(o->o.setStatusBarText(textforAnimation));
 
-			} else {
+                animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
+            } else {
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"You need at least one active template to enter simulation mode",
 						"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
@@ -1798,8 +1799,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (restoreWorkflowDialog()) {
                 WorkflowDialog.showDialog();
             }
-		}
-		animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
+        }
 	}
 
 	private Pipe.ElementType editorMode = Pipe.ElementType.SELECT;

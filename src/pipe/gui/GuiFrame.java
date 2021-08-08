@@ -393,12 +393,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabContentActions::toggleAnimationMode);
         }
     };
-    public final GuiAction stepforwardAction = new GuiAction("Step forward", "Step forward", "pressed RIGHT") {
+    public final GuiAction stepforwardAction = new GuiAction("Step forward", "Step forward", "released RIGHT") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::stepForward);
         }
     };
-    public final GuiAction stepbackwardAction = new GuiAction("Step backward", "Step backward", "pressed LEFT") {
+    public final GuiAction stepbackwardAction = new GuiAction("Step backward", "Step backward", "released LEFT") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::stepBackwards);
         }
