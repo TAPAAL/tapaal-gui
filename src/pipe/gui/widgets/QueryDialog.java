@@ -1560,7 +1560,7 @@ public class QueryDialog extends JPanel {
                    return;
                }
            } else {
-               TCTLAbstractProperty property = addForAllToProperty(newProperty);
+               TCTLAbstractProperty property = addAllPathsToProperty(newProperty);
                if (property != null) {
                    newProperty = newProperty.replace(newProperty, property);
                    updateSelection(newProperty);
@@ -1570,7 +1570,7 @@ public class QueryDialog extends JPanel {
            updateShiphonTrap(true);
            wasCTLType = false;
        } else if (queryType.getSelectedIndex() == 0 && !wasCTLType) {
-           TCTLAbstractProperty property = removeForAllFromProperty(newProperty);
+           TCTLAbstractProperty property = removeAllPathsFromProperty(newProperty);
            if (convertPropertyType(true, property, true) == null &&
                !(property instanceof TCTLStatePlaceHolder)) {
                if (showWarningMessage(true) == JOptionPane.YES_OPTION) {
@@ -1587,10 +1587,12 @@ public class QueryDialog extends JPanel {
         setEnabledOptionsAccordingToCurrentReduction();
     }
 
-    private TCTLAbstractProperty addForAllToProperty(TCTLAbstractProperty oldProperty) {
+    private TCTLAbstractProperty addAllPathsToProperty(TCTLAbstractProperty oldProperty) {
         TCTLAbstractProperty property = null;
 
-        if (oldProperty instanceof TCTLPathPlaceHolder) {
+        if (oldProperty instanceof LTLANode) {
+            property = oldProperty;
+        } else if (oldProperty instanceof TCTLPathPlaceHolder) {
             property = new LTLANode();
         } else if (oldProperty instanceof TCTLAbstractPathProperty) {
             property = new LTLANode(ConvertToStateProperty((TCTLAbstractPathProperty) oldProperty));
@@ -1599,7 +1601,7 @@ public class QueryDialog extends JPanel {
 	    return property;
     }
 
-    private TCTLAbstractProperty removeForAllFromProperty(TCTLAbstractProperty oldProperty) {
+    private TCTLAbstractProperty removeAllPathsFromProperty(TCTLAbstractProperty oldProperty) {
         TCTLAbstractProperty property = oldProperty;
         TCTLAbstractStateProperty firstChild = getSpecificChildOfProperty(1, oldProperty);
 
