@@ -1618,10 +1618,13 @@ public class QueryDialog extends JPanel {
             if (property instanceof TCTLEGNode || property instanceof TCTLEFNode ||
                 property instanceof TCTLEXNode || property instanceof TCTLEUNode) {
                 return null;
-            } else if ((!toCTL && (!(property instanceof TCTLAGNode || property instanceof TCTLAFNode ||
-                property instanceof TCTLAXNode || property instanceof TCTLAUNode))) ||
-                (toCTL && (!(property instanceof LTLAGNode || property instanceof LTLAFNode ||
-                    property instanceof LTLAXNode || property instanceof LTLAUNode || property instanceof LTLANode)))) {
+            } else if ((!toCTL && !(property instanceof TCTLAGNode || property instanceof TCTLAFNode ||
+                                    property instanceof TCTLAXNode || property instanceof TCTLAUNode)) ||
+                        (toCTL && !(property instanceof LTLAGNode || property instanceof LTLAFNode ||
+                                    property instanceof LTLAXNode || property instanceof LTLAUNode))) {
+                if (isFirst) {
+                    return replaceProperty(property);
+                }
                 return property;
             }
 
