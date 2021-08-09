@@ -17,31 +17,33 @@ public interface TAPAALLTLQueryParserConstants {
     /** RegularExpression Id. */
     int DEADLOCK = 3;
     /** RegularExpression Id. */
-    int U = 4;
+    int A = 4;
     /** RegularExpression Id. */
-    int F = 5;
+    int U = 5;
     /** RegularExpression Id. */
-    int G = 6;
+    int F = 6;
     /** RegularExpression Id. */
-    int X = 7;
+    int G = 7;
     /** RegularExpression Id. */
-    int OR = 8;
+    int X = 8;
     /** RegularExpression Id. */
-    int AND = 9;
+    int OR = 9;
     /** RegularExpression Id. */
-    int NOT = 10;
+    int AND = 10;
     /** RegularExpression Id. */
-    int PLUS = 11;
+    int NOT = 11;
     /** RegularExpression Id. */
-    int MINUS = 12;
+    int PLUS = 12;
     /** RegularExpression Id. */
-    int MULT = 13;
+    int MINUS = 13;
     /** RegularExpression Id. */
-    int NUM = 14;
+    int MULT = 14;
     /** RegularExpression Id. */
-    int IDENT = 15;
+    int NUM = 15;
     /** RegularExpression Id. */
-    int OP = 16;
+    int IDENT = 16;
+    /** RegularExpression Id. */
+    int OP = 17;
 
     /** Lexical state. */
     int DEFAULT = 0;
@@ -52,6 +54,7 @@ public interface TAPAALLTLQueryParserConstants {
         "<TRUE>",
         "<FALSE>",
         "<DEADLOCK>",
+        "\"A\"",
         "\"U\"",
         "\"F\"",
         "\"G\"",

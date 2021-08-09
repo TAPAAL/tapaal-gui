@@ -58,4 +58,6 @@ public interface ITCTLVisitor {
 	void visit(TCTLConstNode tctlConstNode, Object context);
 
 	void visit(TCTLTermListNode tctlTermListNode, Object context);
+
+    void visit(LTLANode ltlaNode, Object context);
 }

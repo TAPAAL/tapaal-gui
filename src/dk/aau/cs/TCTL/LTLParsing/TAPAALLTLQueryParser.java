@@ -10,6 +10,7 @@ import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.LTLANode;
 import dk.aau.cs.TCTL.LTLAFNode;
 import dk.aau.cs.TCTL.LTLAGNode;
 import dk.aau.cs.TCTL.LTLAUNode;
@@ -19,10 +20,6 @@ import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.TCTLEUNode;
-import dk.aau.cs.TCTL.TCTLEXNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
@@ -41,7 +38,33 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
     }
 
     /** Root production. */
-    final public     TCTLAbstractPathProperty AbstractPathProperty() throws ParseException {TCTLAbstractStateProperty child = null;
+    final public TCTLAbstractPathProperty AbstractPathProperty() throws ParseException {TCTLAbstractPathProperty pathChild = null;
+        TCTLAbstractStateProperty stateChild = null;
+        jj_consume_token(A);
+        pathChild = ParanthesesExpr();
+        {if ("" != null) return new LTLANode(new TCTLPathToStateConverter(pathChild));}
+        throw new Error("Missing return statement in function");
+    }
+
+    final public TCTLAbstractPathProperty ParanthesesExpr() throws ParseException {TCTLAbstractPathProperty pathChild = null;
+        TCTLAbstractStateProperty stateChild = null;
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+            case 22:{
+                jj_consume_token(22);
+                pathChild = QuantifierExpr();
+                jj_consume_token(23);
+                {if ("" != null) return pathChild;}
+                break;
+            }
+            default:
+                jj_la1[0] = jj_gen;
+                stateChild = OrExpr();
+            {if ("" != null) return new TCTLStateToPathConverter(stateChild);}
+        }
+        throw new Error("Missing return statement in function");
+    }
+
+    final public TCTLAbstractPathProperty QuantifierExpr() throws ParseException {TCTLAbstractStateProperty child = null;
         TCTLAbstractStateProperty child2 = null;
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
             case F:{
@@ -56,12 +79,19 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                 {if ("" != null) return new LTLAGNode(child);}
                 break;
             }
-            case 21:{
-                jj_consume_token(21);
+            case TRUE:
+            case FALSE:
+            case DEADLOCK:
+            case U:
+            case OR:
+            case AND:
+            case NOT:
+            case NUM:
+            case IDENT:
+            case 22:{
                 child = OrExpr();
                 jj_consume_token(U);
                 child2 = OrExpr();
-                jj_consume_token(22);
                 {if ("" != null) return new LTLAUNode(child, child2);}
                 break;
             }
@@ -72,9 +102,9 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                 break;
             }
             default:
-                jj_la1[0] = jj_gen;
-                child = OrExpr();
-            {if ("" != null) return new TCTLStateToPathConverter(child);}
+                jj_la1[1] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         throw new Error("Missing return statement in function");
     }
@@ -91,7 +121,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                     break;
                 }
                 default:
-                    jj_la1[1] = jj_gen;
+                    jj_la1[2] = jj_gen;
                     break label_1;
             }
             jj_consume_token(OR);
@@ -114,7 +144,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                     break;
                 }
                 default:
-                    jj_la1[2] = jj_gen;
+                    jj_la1[3] = jj_gen;
                     break label_2;
             }
             jj_consume_token(AND);
@@ -130,14 +160,14 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
             case NOT:{
                 jj_consume_token(NOT);
-                jj_consume_token(21);
-                child = OrExpr();
                 jj_consume_token(22);
+                child = OrExpr();
+                jj_consume_token(23);
                 {if ("" != null) return new TCTLNotNode(child);}
                 break;
             }
             default:
-                jj_la1[3] = jj_gen;
+                jj_la1[4] = jj_gen;
                 child = Factor();
             {if ("" != null) return child;}
         }
@@ -164,7 +194,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                 break;
             }
             default:
-                jj_la1[4] = jj_gen;
+                jj_la1[5] = jj_gen;
                 if (jj_2_2(2147483647)) {
                     thisProp = AtomicProposition();
                 } else {
@@ -172,7 +202,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                         case IDENT:{
                             if (jj_2_1(2)) {
                                 temp = jj_consume_token(IDENT);
-                                jj_consume_token(23);
+                                jj_consume_token(24);
                             } else {
                                 ;
                             }
@@ -180,15 +210,20 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                             thisProp = new TCTLTransitionNode(temp == null ? "" : temp.image, transition.image);
                             break;
                         }
-                        case 21:{
-                            jj_consume_token(21);
-                            thisProp = OrExpr();
+                        case 22:{
                             jj_consume_token(22);
+                            thisProp = OrExpr();
+                            jj_consume_token(23);
                             break;
                         }
                         default:
-                            jj_la1[5] = jj_gen;
-                            thisProp = new TCTLPathToStateConverter(AbstractPathProperty());
+                            jj_la1[6] = jj_gen;
+                            if (jj_2_3(2147483647)) {
+                                thisProp = new TCTLPathToStateConverter(AbstractPathProperty());
+                            } else {
+                                jj_consume_token(-1);
+                                throw new ParseException();
+                            }
                     }
                 }
         }
@@ -219,7 +254,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                     break;
                 }
                 default:
-                    jj_la1[6] = jj_gen;
+                    jj_la1[7] = jj_gen;
                     break label_3;
             }
             op = jj_consume_token(PLUS);
@@ -244,7 +279,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                     break;
                 }
                 default:
-                    jj_la1[7] = jj_gen;
+                    jj_la1[8] = jj_gen;
                     break label_4;
             }
             op = jj_consume_token(MINUS);
@@ -269,7 +304,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                     break;
                 }
                 default:
-                    jj_la1[8] = jj_gen;
+                    jj_la1[9] = jj_gen;
                     break label_5;
             }
             op = jj_consume_token(MULT);
@@ -288,9 +323,9 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
         Token num;
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
             case IDENT:{
-                if (jj_2_3(2)) {
+                if (jj_2_4(2)) {
                     temp = jj_consume_token(IDENT);
-                    jj_consume_token(23);
+                    jj_consume_token(24);
                 } else {
                     ;
                 }
@@ -303,14 +338,14 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                 thisProp = new TCTLConstNode(Integer.parseInt(num.image));
                 break;
             }
-            case 21:{
-                jj_consume_token(21);
-                thisProp = AritmeticExpr();
+            case 22:{
                 jj_consume_token(22);
+                thisProp = AritmeticExpr();
+                jj_consume_token(23);
                 break;
             }
             default:
-                jj_la1[9] = jj_gen;
+                jj_la1[10] = jj_gen;
                 jj_consume_token(-1);
                 throw new ParseException();
         }
@@ -342,122 +377,359 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
         finally { jj_save(2, xla); }
     }
 
-    private boolean jj_3_2()
+    private boolean jj_2_4(int xla)
     {
-        if (jj_3R_AtomicProposition_208_5_6()) return true;
-        return false;
+        jj_la = xla; jj_lastpos = jj_scanpos = token;
+        try { return (!jj_3_4()); }
+        catch(LookaheadSuccess ls) { return true; }
+        finally { jj_save(3, xla); }
     }
 
-    private boolean jj_3R_AritmeticExpr_223_5_7()
+    private boolean jj_3R_AritmeticTerm_278_5_14()
     {
-        if (jj_3R_AritmeticMinusExpr_242_5_8()) return true;
+        if (jj_3R_AritmeticFactor_299_5_18()) return true;
         Token xsp;
         while (true) {
             xsp = jj_scanpos;
-            if (jj_3R_AritmeticExpr_226_5_9()) { jj_scanpos = xsp; break; }
+            if (jj_3R_AritmeticTerm_281_5_19()) { jj_scanpos = xsp; break; }
         }
         return false;
     }
 
-    private boolean jj_3R_AritmeticMinusExpr_245_5_11()
+    private boolean jj_3R_AndExpr_178_5_30()
+    {
+        if (jj_scan_token(AND)) return true;
+        if (jj_3R_NotExpr_190_1_29()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_AndExpr_175_5_24()
+    {
+        if (jj_3R_NotExpr_190_1_29()) return true;
+        Token xsp;
+        while (true) {
+            xsp = jj_scanpos;
+            if (jj_3R_AndExpr_178_5_30()) { jj_scanpos = xsp; break; }
+        }
+        return false;
+    }
+
+    private boolean jj_3R_AritmeticMinusExpr_262_5_15()
     {
         if (jj_scan_token(MINUS)) return true;
-        if (jj_3R_AritmeticTerm_261_5_10()) return true;
+        if (jj_3R_AritmeticTerm_278_5_14()) return true;
         return false;
     }
 
-    private boolean jj_3R_AritmeticMinusExpr_242_5_8()
+    private boolean jj_3R_AritmeticMinusExpr_259_5_10()
     {
-        if (jj_3R_AritmeticTerm_261_5_10()) return true;
+        if (jj_3R_AritmeticTerm_278_5_14()) return true;
         Token xsp;
         while (true) {
             xsp = jj_scanpos;
-            if (jj_3R_AritmeticMinusExpr_245_5_11()) { jj_scanpos = xsp; break; }
+            if (jj_3R_AritmeticMinusExpr_262_5_15()) { jj_scanpos = xsp; break; }
         }
         return false;
     }
 
-    private boolean jj_3R_AritmeticFactor_285_7_16()
+    private boolean jj_3R_OrExpr_163_5_25()
     {
-        if (jj_scan_token(21)) return true;
-        if (jj_3R_AritmeticExpr_223_5_7()) return true;
-        if (jj_scan_token(22)) return true;
+        if (jj_scan_token(OR)) return true;
+        if (jj_3R_AndExpr_175_5_24()) return true;
         return false;
     }
 
-    private boolean jj_3R_AritmeticTerm_264_5_13()
+    private boolean jj_3R_OrExpr_160_5_17()
     {
-        if (jj_scan_token(MULT)) return true;
-        if (jj_3R_AritmeticFactor_282_5_12()) return true;
+        if (jj_3R_AndExpr_175_5_24()) return true;
+        Token xsp;
+        while (true) {
+            xsp = jj_scanpos;
+            if (jj_3R_OrExpr_163_5_25()) { jj_scanpos = xsp; break; }
+        }
+        return false;
+    }
+
+    private boolean jj_3R_QuantifierExpr_151_7_23()
+    {
+        if (jj_scan_token(X)) return true;
+        if (jj_3R_OrExpr_160_5_17()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_QuantifierExpr_150_7_22()
+    {
+        if (jj_3R_OrExpr_160_5_17()) return true;
+        if (jj_scan_token(U)) return true;
+        if (jj_3R_OrExpr_160_5_17()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_QuantifierExpr_149_7_21()
+    {
+        if (jj_scan_token(G)) return true;
+        if (jj_3R_OrExpr_160_5_17()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_QuantifierExpr_148_5_16()
+    {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_QuantifierExpr_148_5_20()) {
+            jj_scanpos = xsp;
+            if (jj_3R_QuantifierExpr_149_7_21()) {
+                jj_scanpos = xsp;
+                if (jj_3R_QuantifierExpr_150_7_22()) {
+                    jj_scanpos = xsp;
+                    if (jj_3R_QuantifierExpr_151_7_23()) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean jj_3R_QuantifierExpr_148_5_20()
+    {
+        if (jj_scan_token(F)) return true;
+        if (jj_3R_OrExpr_160_5_17()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_AritmeticExpr_243_5_11()
+    {
+        if (jj_scan_token(PLUS)) return true;
+        if (jj_3R_AritmeticMinusExpr_259_5_10()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_AritmeticExpr_240_5_8()
+    {
+        if (jj_3R_AritmeticMinusExpr_259_5_10()) return true;
+        Token xsp;
+        while (true) {
+            xsp = jj_scanpos;
+            if (jj_3R_AritmeticExpr_243_5_11()) { jj_scanpos = xsp; break; }
+        }
+        return false;
+    }
+
+    private boolean jj_3R_ParanthesesExpr_139_7_13()
+    {
+        if (jj_3R_OrExpr_160_5_17()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_ParanthesesExpr_138_5_12()
+    {
+        if (jj_scan_token(22)) return true;
+        if (jj_3R_QuantifierExpr_148_5_16()) return true;
+        if (jj_scan_token(23)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_ParanthesesExpr_138_5_9()
+    {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_ParanthesesExpr_138_5_12()) {
+            jj_scanpos = xsp;
+            if (jj_3R_ParanthesesExpr_139_7_13()) return true;
+        }
+        return false;
+    }
+
+    private boolean jj_3R_AtomicProposition_225_5_6()
+    {
+        if (jj_3R_AritmeticExpr_240_5_8()) return true;
+        if (jj_scan_token(OP)) return true;
+        if (jj_3R_AritmeticExpr_240_5_8()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_AbstractPathProperty_129_5_7()
+    {
+        if (jj_scan_token(A)) return true;
+        if (jj_3R_ParanthesesExpr_138_5_9()) return true;
+        return false;
+    }
+
+    private boolean jj_3_3()
+    {
+        if (jj_3R_AbstractPathProperty_129_5_7()) return true;
+        return false;
+    }
+
+    private boolean jj_3_2()
+    {
+        if (jj_3R_AtomicProposition_225_5_6()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_Factor_211_7_41()
+    {
+        return false;
+    }
+
+    private boolean jj_3R_Factor_210_7_40()
+    {
+        if (jj_scan_token(22)) return true;
+        if (jj_3R_OrExpr_160_5_17()) return true;
+        if (jj_scan_token(23)) return true;
         return false;
     }
 
     private boolean jj_3_1()
     {
         if (jj_scan_token(IDENT)) return true;
+        if (jj_scan_token(24)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_Factor_208_7_39()
+    {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3_1()) jj_scanpos = xsp;
+        if (jj_scan_token(IDENT)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_AritmeticFactor_302_7_28()
+    {
+        if (jj_scan_token(22)) return true;
+        if (jj_3R_AritmeticExpr_240_5_8()) return true;
         if (jj_scan_token(23)) return true;
         return false;
     }
 
-    private boolean jj_3R_AritmeticFactor_284_7_15()
+    private boolean jj_3R_Factor_206_7_38()
+    {
+        if (jj_3R_AtomicProposition_225_5_6()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_AritmeticFactor_301_7_27()
     {
         if (jj_scan_token(NUM)) return true;
         return false;
     }
 
-    private boolean jj_3_3()
+    private boolean jj_3R_Factor_205_7_37()
+    {
+        if (jj_scan_token(DEADLOCK)) return true;
+        return false;
+    }
+
+    private boolean jj_3_4()
     {
         if (jj_scan_token(IDENT)) return true;
-        if (jj_scan_token(23)) return true;
+        if (jj_scan_token(24)) return true;
         return false;
     }
 
-    private boolean jj_3R_AritmeticTerm_261_5_10()
+    private boolean jj_3R_Factor_204_7_36()
     {
-        if (jj_3R_AritmeticFactor_282_5_12()) return true;
-        Token xsp;
-        while (true) {
-            xsp = jj_scanpos;
-            if (jj_3R_AritmeticTerm_264_5_13()) { jj_scanpos = xsp; break; }
-        }
+        if (jj_scan_token(FALSE)) return true;
         return false;
     }
 
-    private boolean jj_3R_AritmeticFactor_283_5_14()
+    private boolean jj_3R_AritmeticFactor_300_5_26()
     {
         Token xsp;
         xsp = jj_scanpos;
-        if (jj_3_3()) jj_scanpos = xsp;
+        if (jj_3_4()) jj_scanpos = xsp;
         if (jj_scan_token(IDENT)) return true;
         return false;
     }
 
-    private boolean jj_3R_AritmeticFactor_282_5_12()
+    private boolean jj_3R_AritmeticFactor_299_5_18()
     {
         Token xsp;
         xsp = jj_scanpos;
-        if (jj_3R_AritmeticFactor_283_5_14()) {
+        if (jj_3R_AritmeticFactor_300_5_26()) {
             jj_scanpos = xsp;
-            if (jj_3R_AritmeticFactor_284_7_15()) {
+            if (jj_3R_AritmeticFactor_301_7_27()) {
                 jj_scanpos = xsp;
-                if (jj_3R_AritmeticFactor_285_7_16()) return true;
+                if (jj_3R_AritmeticFactor_302_7_28()) return true;
             }
         }
         return false;
     }
 
-    private boolean jj_3R_AtomicProposition_208_5_6()
+    private boolean jj_3R_Factor_202_5_34()
     {
-        if (jj_3R_AritmeticExpr_223_5_7()) return true;
-        if (jj_scan_token(OP)) return true;
-        if (jj_3R_AritmeticExpr_223_5_7()) return true;
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_Factor_203_1_35()) {
+            jj_scanpos = xsp;
+            if (jj_3R_Factor_204_7_36()) {
+                jj_scanpos = xsp;
+                if (jj_3R_Factor_205_7_37()) {
+                    jj_scanpos = xsp;
+                    if (jj_3R_Factor_206_7_38()) {
+                        jj_scanpos = xsp;
+                        if (jj_3R_Factor_208_7_39()) {
+                            jj_scanpos = xsp;
+                            if (jj_3R_Factor_210_7_40()) {
+                                jj_scanpos = xsp;
+                                if (jj_3R_Factor_211_7_41()) return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 
-    private boolean jj_3R_AritmeticExpr_226_5_9()
+    private boolean jj_3R_Factor_203_1_35()
     {
-        if (jj_scan_token(PLUS)) return true;
-        if (jj_3R_AritmeticMinusExpr_242_5_8()) return true;
+        if (jj_scan_token(TRUE)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_NotExpr_192_7_33()
+    {
+        if (jj_scan_token(22)) return true;
+        if (jj_3R_AbstractPathProperty_129_5_7()) return true;
+        if (jj_scan_token(23)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_NotExpr_191_7_32()
+    {
+        if (jj_3R_Factor_202_5_34()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_NotExpr_190_1_29()
+    {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_NotExpr_190_1_31()) {
+            jj_scanpos = xsp;
+            if (jj_3R_NotExpr_191_7_32()) {
+                jj_scanpos = xsp;
+                if (jj_3R_NotExpr_192_7_33()) return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean jj_3R_NotExpr_190_1_31()
+    {
+        if (jj_scan_token(NOT)) return true;
+        if (jj_scan_token(22)) return true;
+        if (jj_3R_OrExpr_160_5_17()) return true;
+        if (jj_scan_token(23)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_AritmeticTerm_281_5_19()
+    {
+        if (jj_scan_token(MULT)) return true;
+        if (jj_3R_AritmeticFactor_299_5_18()) return true;
         return false;
     }
 
@@ -472,15 +744,15 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
     private Token jj_scanpos, jj_lastpos;
     private int jj_la;
     private int jj_gen;
-    final private int[] jj_la1 = new int[10];
+    final private int[] jj_la1 = new int[11];
     static private int[] jj_la1_0;
     static {
         jj_la1_init_0();
     }
     private static void jj_la1_init_0() {
-        jj_la1_0 = new int[] {0x2000e0,0x100,0x200,0x400,0xe,0x208000,0x800,0x1000,0x2000,0x20c000,};
+        jj_la1_0 = new int[] {0x400000,0x418fee,0x200,0x400,0x800,0xe,0x410000,0x1000,0x2000,0x4000,0x418000,};
     }
-    final private JJCalls[] jj_2_rtns = new JJCalls[3];
+    final private JJCalls[] jj_2_rtns = new JJCalls[4];
     private boolean jj_rescan = false;
     private int jj_gc = 0;
 
@@ -495,7 +767,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 10; i++) jj_la1[i] = -1;
+        for (int i = 0; i < 11; i++) jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
     }
 
@@ -510,7 +782,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 10; i++) jj_la1[i] = -1;
+        for (int i = 0; i < 11; i++) jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
     }
 
@@ -521,7 +793,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 10; i++) jj_la1[i] = -1;
+        for (int i = 0; i < 11; i++) jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
     }
 
@@ -540,7 +812,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 10; i++) jj_la1[i] = -1;
+        for (int i = 0; i < 11; i++) jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
     }
 
@@ -550,7 +822,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 10; i++) jj_la1[i] = -1;
+        for (int i = 0; i < 11; i++) jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
     }
 
@@ -560,7 +832,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 10; i++) jj_la1[i] = -1;
+        for (int i = 0; i < 11; i++) jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
     }
 
@@ -691,12 +963,12 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
     /** Generate ParseException. */
     public ParseException generateParseException() {
         jj_expentries.clear();
-        boolean[] la1tokens = new boolean[24];
+        boolean[] la1tokens = new boolean[25];
         if (jj_kind >= 0) {
             la1tokens[jj_kind] = true;
             jj_kind = -1;
         }
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 11; i++) {
             if (jj_la1[i] == jj_gen) {
                 for (int j = 0; j < 32; j++) {
                     if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -705,7 +977,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                 }
             }
         }
-        for (int i = 0; i < 24; i++) {
+        for (int i = 0; i < 25; i++) {
             if (la1tokens[i]) {
                 jj_expentry = new int[1];
                 jj_expentry[0] = i;
@@ -739,7 +1011,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
 
     private void jj_rescan_token() {
         jj_rescan = true;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             try {
                 JJCalls p = jj_2_rtns[i];
 
@@ -750,6 +1022,7 @@ public class TAPAALLTLQueryParser implements TAPAALLTLQueryParserConstants {
                             case 0: jj_3_1(); break;
                             case 1: jj_3_2(); break;
                             case 2: jj_3_3(); break;
+                            case 3: jj_3_4(); break;
                         }
                     }
                     p = p.next;

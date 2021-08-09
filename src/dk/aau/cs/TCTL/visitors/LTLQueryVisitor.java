@@ -54,9 +54,9 @@ public class LTLQueryVisitor extends VisitorBase {
     }
 
     public void buildXMLQuery(TCTLAbstractProperty property, String queryName) {
-        XMLQuery.append(startTag(XML_PROP) + queryInfo(queryName) + startTag(XML_FORMULA) + startTag(XML_ALLPATHS));
+        XMLQuery.append(startTag(XML_PROP) + queryInfo(queryName) + startTag(XML_FORMULA));
         property.accept(this, null);
-        XMLQuery.append(endTag(XML_ALLPATHS) + endTag(XML_FORMULA) + endTag(XML_PROP));
+        XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP));
     }
 
     public String getFormatted() {
@@ -75,6 +75,12 @@ public class LTLQueryVisitor extends VisitorBase {
     private String queryInfo(String queryName){
         String nameToPrint = (queryName == null) ? "Query Comment/Name Here" : queryName;
         return wrapInTag(nameToPrint, XML_PROPID) + wrapInTag(nameToPrint, XML_PROPDESC);
+    }
+
+    public void visit(LTLANode aNode, Object context) {
+        XMLQuery.append(startTag(XML_ALLPATHS));
+        aNode.getProperty().accept(this, context);
+        XMLQuery.append(endTag(XML_ALLPATHS));
     }
 
     public void visit(LTLAFNode afNode, Object context) {
