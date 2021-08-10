@@ -189,7 +189,7 @@ TCTLAbstractStateProperty AndExpr() :
     {
 <NOT> "(" child = OrExpr() ")" { return new TCTLNotNode(child); }
     | child = Factor() { return child; }
-    | "(" childConverter = AbstractPathProperty() ")" { return new TCTLPathToStateConverter(childConverter); }
+    | "(" childConverter = QuantifierExpr() ")" { return new TCTLPathToStateConverter(childConverter); }
     }
 
     TCTLAbstractStateProperty Factor() :
@@ -208,8 +208,8 @@ TCTLAbstractStateProperty AndExpr() :
     | [ LOOKAHEAD(2) temp = <IDENT> "." ] transition = <IDENT> {
     thisProp = new TCTLTransitionNode(temp == null ? "" : temp.image, transition.image); }
     | "(" thisProp = OrExpr() ")"
-    | LOOKAHEAD(AbstractPathProperty()) {
-    thisProp = new TCTLPathToStateConverter(AbstractPathProperty()); }
+    | LOOKAHEAD(ParanthesesExpr()) {
+    thisProp = new TCTLPathToStateConverter(QuantifierExpr()); }
 
     )
     { return thisProp; }
