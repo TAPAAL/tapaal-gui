@@ -798,22 +798,27 @@ public class QueryDialog extends JPanel {
 	private void deleteSelection() {
 		if (currentSelection != null) {
 			TCTLAbstractProperty replacement = null;
-			if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-				replacement = getSpecificChildOfProperty(1, currentSelection.getObject());
-			} else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+            TCTLAbstractProperty selection = currentSelection.getObject();
+
+			if (selection instanceof TCTLAbstractStateProperty) {
+				replacement = getSpecificChildOfProperty(1, selection);
+			} else if (selection instanceof TCTLAbstractPathProperty) {
 				replacement = new TCTLPathPlaceHolder();
 			}
 			if (replacement != null) {
+			    if (selection instanceof LTLANode) {
+                    newProperty = newProperty.replace(selection, replacement);
+                    addAllPathsToProperty(newProperty, selection);
+                    return;
+                }
 
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), replacement);
+				UndoableEdit edit = new QueryConstructionEdit(selection, replacement);
+				newProperty = newProperty.replace(selection,	replacement);
 
-				newProperty = newProperty.replace(currentSelection.getObject(),	replacement);
-
-				if (currentSelection.getObject() instanceof TCTLAbstractPathProperty)
+				if (selection instanceof TCTLAbstractPathProperty)
 					resetQuantifierSelectionButtons();
 
 				updateSelection(replacement);
-
 				undoSupport.postEdit(edit);
 				queryChanged();
 			}
@@ -1555,16 +1560,13 @@ public class QueryDialog extends JPanel {
                !(newProperty instanceof TCTLStatePlaceHolder)) {
                if (showWarningMessage(false) == JOptionPane.YES_OPTION) {
                    deleteProperty();
+                   addAllPathsToProperty(newProperty, null);
                } else {
                    queryType.setSelectedIndex(0);
                    return;
                }
            } else {
-               TCTLAbstractProperty property = addAllPathsToProperty(newProperty);
-               if (property != null) {
-                   newProperty = newProperty.replace(newProperty, property);
-                   updateSelection(newProperty);
-               }
+              addAllPathsToProperty(newProperty, null);
            }
            showLTLButtons(true);
            updateShiphonTrap(true);
@@ -1575,6 +1577,7 @@ public class QueryDialog extends JPanel {
                !(property instanceof TCTLStatePlaceHolder)) {
                if (showWarningMessage(true) == JOptionPane.YES_OPTION) {
                    deleteProperty();
+                   removeAllPathsFromProperty(newProperty);
                } else {
                    queryType.setSelectedIndex(1);
                    return;
@@ -1585,32 +1588,6 @@ public class QueryDialog extends JPanel {
            wasCTLType = true;
        }
         setEnabledOptionsAccordingToCurrentReduction();
-    }
-
-    private TCTLAbstractProperty addAllPathsToProperty(TCTLAbstractProperty oldProperty) {
-        TCTLAbstractProperty property = null;
-
-        if (oldProperty instanceof LTLANode) {
-            property = oldProperty;
-        } else if (oldProperty instanceof TCTLPathPlaceHolder) {
-            property = new LTLANode();
-        } else if (oldProperty instanceof TCTLAbstractPathProperty) {
-            property = new LTLANode(ConvertToStateProperty((TCTLAbstractPathProperty) oldProperty));
-        }
-
-	    return property;
-    }
-
-    private TCTLAbstractProperty removeAllPathsFromProperty(TCTLAbstractProperty oldProperty) {
-        TCTLAbstractProperty property = oldProperty;
-        TCTLAbstractStateProperty firstChild = getSpecificChildOfProperty(1, oldProperty);
-
-        if (oldProperty instanceof LTLANode) {
-            TCTLAbstractPathProperty child = ConvertToPathProperty(firstChild);
-            property = oldProperty.replace(oldProperty, child);
-        }
-
-        return property;
     }
 
     private TCTLAbstractProperty convertPropertyType(boolean toCTL, TCTLAbstractProperty property, boolean isFirst) {
@@ -1689,13 +1666,11 @@ public class QueryDialog extends JPanel {
 
     private TCTLAbstractProperty replaceProperty(TCTLAbstractProperty replacement) {
         if (replacement != null) {
-            UndoableEdit edit = new QueryConstructionEdit(newProperty, replacement);
             newProperty = newProperty.replace(newProperty, replacement);
 
             if (newProperty instanceof TCTLAbstractPathProperty) resetQuantifierSelectionButtons();
 
             updateSelection(replacement);
-            if (undoSupport != null) undoSupport.postEdit(edit);
             queryChanged();
 
             return newProperty;
@@ -1727,6 +1702,42 @@ public class QueryDialog extends JPanel {
             title,
             JOptionPane.YES_NO_OPTION,
             JOptionPane.WARNING_MESSAGE);
+    }
+
+    private void addAllPathsToProperty(TCTLAbstractProperty oldProperty, TCTLAbstractProperty selection) {
+        TCTLAbstractProperty property = null;
+
+        if (oldProperty instanceof LTLANode) {
+            property = oldProperty;
+        } else if (oldProperty instanceof TCTLPathPlaceHolder) {
+            property = new LTLANode();
+        } else if (oldProperty instanceof TCTLAbstractPathProperty) {
+            property = new LTLANode(ConvertToStateProperty((TCTLAbstractPathProperty) oldProperty));
+        }
+
+        if (property != null && selection != null) {
+            UndoableEdit edit = new QueryConstructionEdit(selection, property);
+            newProperty = newProperty.replace(newProperty, property);
+            updateSelection(property);
+            undoSupport.postEdit(edit);
+            queryChanged();
+        } else if (property != null) {
+            newProperty = newProperty.replace(newProperty, property);
+            updateSelection(property);
+            queryChanged();
+        }
+    }
+
+    private TCTLAbstractProperty removeAllPathsFromProperty(TCTLAbstractProperty oldProperty) {
+        TCTLAbstractProperty property = oldProperty;
+        TCTLAbstractStateProperty firstChild = getSpecificChildOfProperty(1, oldProperty);
+
+        if (oldProperty instanceof LTLANode) {
+            TCTLAbstractPathProperty child = ConvertToPathProperty(firstChild);
+            property = oldProperty.replace(oldProperty, child);
+        }
+
+        return property;
     }
 
 	private void initBoundednessCheckPanel() {
@@ -2124,13 +2135,20 @@ public class QueryDialog extends JPanel {
     }
 
     private void addPropertyToQuery(TCTLAbstractPathProperty property) {
-        if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+	    TCTLAbstractProperty selection = currentSelection.getObject();
+	    if (selection instanceof TCTLAbstractStateProperty) {
             addPropertyToQuery(ConvertToStateProperty(property));
             return;
         }
 
-        UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-        newProperty = newProperty.replace(currentSelection.getObject(), property);
+        if (selection instanceof LTLANode) {
+            newProperty = newProperty.replace(selection, property);
+            addAllPathsToProperty(newProperty, selection);
+            return;
+        }
+
+        UndoableEdit edit = new QueryConstructionEdit(selection, property);
+        newProperty = newProperty.replace(selection, property);
         updateSelection(property);
         undoSupport.postEdit(edit);
         queryChanged();
