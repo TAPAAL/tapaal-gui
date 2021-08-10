@@ -55,7 +55,6 @@ public class TimedPlaceComponent extends Place {
 		this.place = place;
         this.place.addTimedPlaceListener(listener);
         this.lens = lens;
-		attributesVisible = true;
 
     }
 

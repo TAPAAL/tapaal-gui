@@ -6,10 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -23,6 +20,7 @@ import javax.swing.JSpinner;
 import javax.swing.event.ChangeListener;
 
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.undo.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
@@ -30,16 +28,9 @@ import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
+import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.undo.ChangedInvariantCommand;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.MakePlaceSharedCommand;
-import dk.aau.cs.gui.undo.MakePlaceNewSharedCommand;
-import dk.aau.cs.gui.undo.MakePlaceNewSharedMultiCommand;
-import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
-import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
-import dk.aau.cs.gui.undo.UnsharePlaceCommand;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
@@ -585,17 +576,19 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				JOptionPane.showMessageDialog(this, "The specified name is already used by another place or transition.", "Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}   	
-			
-			Command renameCommand = new RenameTimedPlaceCommand(context.tabContent(), (LocalTimedPlace)place.underlyingPlace(), oldName, newName);
-			context.undoManager().addEdit(renameCommand);
-			try{ // set name
-				renameCommand.redo();
-			}catch(RequireException e){
-				context.undoManager().undo(); 
-				JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
-				return false;
-			}
-			context.nameGenerator().updateIndices(context.activeModel(), newName);
+
+			if (!oldName.equals(newName)) {
+                Command renameCommand = new RenameTimedPlaceCommand(context.tabContent(), (LocalTimedPlace) place.underlyingPlace(), oldName, newName);
+                context.undoManager().addEdit(renameCommand);
+                try { // set name
+                    renameCommand.redo();
+                } catch (RequireException e) {
+                    context.undoManager().undo();
+                    JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+                context.nameGenerator().updateIndices(context.activeModel(), newName);
+            }
 		
 			if(makeNewShared){
 				Command command = new MakePlaceNewSharedCommand(context.activeModel(), newName, place.underlyingPlace(), place, context.tabContent(), false);
@@ -637,6 +630,12 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		if ((place.getAttributesVisible() && !attributesCheckBox.isSelected()) || (!place.getAttributesVisible() && attributesCheckBox.isSelected())) {
 			place.toggleAttributesVisible();
+
+            Map<PetriNetObject, Boolean> map = new HashMap<>();
+            map.put(place, !place.getAttributesVisible());
+
+            Command changeVisibility = new ChangeAllNamesVisibilityCommand(currentTab, map, null, place.getAttributesVisible());
+			context.undoManager().addEdit(changeVisibility);
 		}
 		place.update(true);
 		place.repaint();

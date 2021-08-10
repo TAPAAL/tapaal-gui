@@ -22,13 +22,13 @@ public class RenameTimedPlaceCommand extends Command {
 	public void redo() {
 		place.setName(newName);
 		updateQueries(oldName, newName);
-	}
+    }
 
 	@Override
 	public void undo() {
 		place.setName(oldName);
 		updateQueries(newName,oldName);
-	}
+    }
 	
 	private void updateQueries(String nameToFind, String nameToInsert){
 		RenamePlaceTCTLVisitor renameVisitor = new RenamePlaceTCTLVisitor(nameToFind, nameToInsert);
