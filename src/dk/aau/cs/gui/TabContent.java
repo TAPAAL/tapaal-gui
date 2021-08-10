@@ -622,6 +622,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	}
 
+    public static TAPNLens getFileLens(InputStream file) throws Exception {
+        try {
+            ModelLoader loader = new ModelLoader();
+            return loader.loadLens(file);
+        } catch (Exception e) {
+            throw e;
+        }
+
+    }
+
 	private static void checkQueries(TabContent tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
         EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
@@ -1990,8 +2000,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		updateFeatureText();
 
-		updateFeatureText();
-
 		//XXX
 		if (isInAnimationMode()) {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
@@ -2596,10 +2604,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public void updateFeatureText() {
         boolean[] features = {lens.isTimed(), lens.isGame()};
         app.ifPresent(o->o.setFeatureInfoText(features));
-    }
-
-    public boolean isNetTimed() {
-        return lens.isTimed();
     }
 
     public TAPNLens getLens() {

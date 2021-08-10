@@ -1413,13 +1413,24 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         if (nets != null && nets.length > 0) {
             JMenu exampleMenu = new JMenu("Example nets");
             exampleMenu.setIcon(ResourceManager.getIcon("Example.png"));
+            JMenu untimedMenu = new JMenu("P/T nets");
+            JMenu timedMenu = new JMenu("Timed-Arc Petri nets");
+            JMenu untimedGameMenu = new JMenu("P/T net games");
+            JMenu timedGameMenu = new JMenu("Timed-Arc Petri net games");
+            JMenu untimedColorMenu = new JMenu("Colored Petri nets");
+            JMenu timedColorMenu = new JMenu("Timed-Arc Colored Petri nets");
+
+            int i = 'A';
 
             for (String filename : nets) {
                 if (filename.toLowerCase().endsWith(".tapn")) {
 
                     final String netname = filename.replace(".tapn", "");
                     final String filenameFinal = filename;
-                    GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"") {
+
+                    if (i == 'D' || i == 'Q' || i == 'S') i++;
+
+                    GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"", KeyStroke.getKeyStroke(i, (shortcutkey + InputEvent.SHIFT_MASK))) {
                         public void actionPerformed(ActionEvent arg0) {
                             InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
                             try {
@@ -1431,10 +1442,38 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                             }
                         }
                     };
+
+                    i++;
+
                     tmp.putValue(Action.SMALL_ICON, ResourceManager.getIcon("Net.png"));
-                    exampleMenu.add(tmp);
+                    InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
+                    try {
+                        TabContent.TAPNLens lens = TabContent.getFileLens(file);
+                        if (!lens.isTimed()) { //TODO check for colored nets as well
+                            if (lens.isGame()) {
+                                untimedGameMenu.add(tmp);
+                            } else {
+                                untimedMenu.add(tmp);
+                            }
+                        } else {
+                            if (lens.isGame()) {
+                                timedGameMenu.add(tmp);
+                            } else {
+                                timedMenu.add(tmp);
+                            }
+                        }
+                    } catch (Exception e) {
+                        timedMenu.add(tmp);
+                        e.printStackTrace();
+                    }
                 }
             }
+            exampleMenu.add(untimedMenu);
+            exampleMenu.add(timedMenu);
+            exampleMenu.add(untimedGameMenu);
+            exampleMenu.add(timedGameMenu);
+            exampleMenu.add(untimedColorMenu);
+            exampleMenu.add(timedColorMenu);
             fileMenu.add(exampleMenu);
             fileMenu.addSeparator();
 

@@ -78,7 +78,21 @@ public class TapnXmlLoader {
 
 	}
 
-	public LoadedModel load(InputStream file) throws FormatException {
+    public TabContent.TAPNLens loadLens(InputStream file) throws FormatException {
+        Require.that(file != null, "file must be non-null and exist");
+
+        Document doc = loadDocument(file);
+        if(doc == null) return null;
+
+        idResolver.clear();
+        parseFeature(doc);
+
+        if (hasFeatureTag) {
+            return lens;
+        }
+        return null;
+    }
+    public LoadedModel load(InputStream file) throws FormatException {
 		Require.that(file != null, "file must be non-null and exist");
 
 		Document doc = loadDocument(file);
