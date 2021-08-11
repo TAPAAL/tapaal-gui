@@ -1420,7 +1420,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             JMenu untimedColorMenu = new JMenu("Colored Petri nets");
             JMenu timedColorMenu = new JMenu("Timed-Arc Colored Petri nets");
 
-            int i = 'A';
+            int charKey = 'A';
+            int modifier = InputEvent.ALT_MASK + InputEvent.SHIFT_MASK;
 
             for (String filename : nets) {
                 if (filename.toLowerCase().endsWith(".tapn")) {
@@ -1428,9 +1429,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     final String netname = filename.replace(".tapn", "");
                     final String filenameFinal = filename;
 
-                    if (i == 'D' || i == 'Q' || i == 'S') i++;
-
-                    GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"", KeyStroke.getKeyStroke(i, (shortcutkey + InputEvent.SHIFT_MASK))) {
+                    GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"", KeyStroke.getKeyStroke(charKey, modifier)) {
                         public void actionPerformed(ActionEvent arg0) {
                             InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
                             try {
@@ -1443,12 +1442,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                         }
                     };
 
-                    i++;
+                    if (charKey == 'Z') {
+                        charKey = '0';
+                    } else if (charKey == '9') {
+                        charKey = 'A';
+                        modifier = InputEvent.ALT_MASK;
+                    } else {
+                        charKey++;
+                    }
 
                     tmp.putValue(Action.SMALL_ICON, ResourceManager.getIcon("Net.png"));
                     InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
                     try {
                         TabContent.TAPNLens lens = TabContent.getFileLens(file);
+                        if (lens == null) lens = new TabContent.TAPNLens(true, false);
                         if (!lens.isTimed()) { //TODO check for colored nets as well
                             if (lens.isGame()) {
                                 untimedGameMenu.add(tmp);
