@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'org.jetbrains.kotlin.jvm' version '1.3.71'
+    id "ca.coglinc.javacc" version "2.4.0"
 }
 
 group 'net.tapaal'
@@ -16,11 +17,16 @@ repositories {
     mavenCentral()
 }
 
+compileJavacc {
+    inputDirectory = file('src/')
+    //outputDirectory = file(project.buildDir.absolutePath + '/generated/javacc')
+}
+
 //Set the soruce and resource dir
 sourceSets {
     main {
         java {
-            srcDirs = ['src/']
+            srcDirs = ['src/', compileJavacc.outputDirectory]
             exclude("resources/")
         }
         resources {
