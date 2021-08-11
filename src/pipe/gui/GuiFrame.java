@@ -1404,6 +1404,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         fileMenu.addSeparator();
 
+        JMenu exampleMenu = buildExampleMenu();
+        if (exampleMenu != null) {
+            fileMenu.add(exampleMenu);
+            fileMenu.addSeparator();
+        }
+
+        fileMenu.add(exitAction);
+
+        return fileMenu;
+    }
+
+    private JMenu buildExampleMenu() {
         // Loads example files, retuns null if not found
         String[] nets = loadTestNets();
 
@@ -1411,85 +1423,102 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // .xml file the Example x counter is not incremented when that file
         // is ignored
         if (nets != null && nets.length > 0) {
-            JMenu exampleMenu = new JMenu("Example nets");
-            exampleMenu.setIcon(ResourceManager.getIcon("Example.png"));
-            JMenu untimedMenu = new JMenu("P/T nets");
-            JMenu timedMenu = new JMenu("Timed-Arc Petri nets");
-            JMenu untimedGameMenu = new JMenu("P/T net games");
-            JMenu timedGameMenu = new JMenu("Timed-Arc Petri net games");
-            JMenu untimedColorMenu = new JMenu("Colored Petri nets");
-            JMenu timedColorMenu = new JMenu("Timed-Arc Colored Petri nets");
+            TabContent.TAPNLens untimedLens = new TabContent.TAPNLens(false, false);
+            TabContent.TAPNLens timedLens = new TabContent.TAPNLens(true, false);
+            TabContent.TAPNLens untimedGameLens = new TabContent.TAPNLens(false, true);
+            TabContent.TAPNLens timedGameLens = new TabContent.TAPNLens(true, true);
 
-            int charKey = 'A';
-            int modifier = InputEvent.ALT_MASK + InputEvent.SHIFT_MASK;
+            HashMap<TabContent.TAPNLens, List<String>> netMap = new HashMap<>(){{
+                    put(untimedLens, new ArrayList<>());
+                    put(timedLens, new ArrayList<>());
+                    put(untimedGameLens, new ArrayList<>());
+                    put(timedGameLens, new ArrayList<>());
+            }};
 
             for (String filename : nets) {
                 if (filename.toLowerCase().endsWith(".tapn")) {
-
-                    final String netname = filename.replace(".tapn", "");
                     final String filenameFinal = filename;
 
-                    GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"", KeyStroke.getKeyStroke(charKey, modifier)) {
-                        public void actionPerformed(ActionEvent arg0) {
-                            InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
-                            try {
-                                TabContent net = TabContent.createNewTabFromInputStream(file, netname);
-                                guiFrameController.ifPresent(o -> o.openTab(net));
-                            } catch (Exception e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                        }
-                    };
-
-                    if (charKey == 'Z') {
-                        charKey = '0';
-                    } else if (charKey == '9') {
-                        charKey = 'A';
-                        modifier = InputEvent.ALT_MASK;
-                    } else {
-                        charKey++;
-                    }
-
-                    tmp.putValue(Action.SMALL_ICON, ResourceManager.getIcon("Net.png"));
                     InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
+                    TabContent.TAPNLens lens;
                     try {
-                        TabContent.TAPNLens lens = TabContent.getFileLens(file);
-                        if (lens == null) lens = new TabContent.TAPNLens(true, false);
-                        if (!lens.isTimed()) { //TODO check for colored nets as well
-                            if (lens.isGame()) {
-                                untimedGameMenu.add(tmp);
-                            } else {
-                                untimedMenu.add(tmp);
-                            }
-                        } else {
-                            if (lens.isGame()) {
-                                timedGameMenu.add(tmp);
-                            } else {
-                                timedMenu.add(tmp);
-                            }
+                        lens = TabContent.getFileLens(file);
+                        if (lens == null) {
+                            lens = new TabContent.TAPNLens(true, false);
                         }
+                        TabContent.TAPNLens tmp = lens;
+                        netMap.forEach((v, k) -> {
+                            if (v.isTimed() == tmp.isTimed() && v.isGame() == tmp.isGame()) k.add(filename);
+                        });
                     } catch (Exception e) {
-                        timedMenu.add(tmp);
+                        if (netMap.containsKey(timedLens)) netMap.get(timedLens).add(filename);
                         e.printStackTrace();
                     }
                 }
             }
-            exampleMenu.add(untimedMenu);
-            exampleMenu.add(timedMenu);
-            exampleMenu.add(untimedGameMenu);
-            exampleMenu.add(timedGameMenu);
-            exampleMenu.add(untimedColorMenu);
-            exampleMenu.add(timedColorMenu);
-            fileMenu.add(exampleMenu);
-            fileMenu.addSeparator();
+            JMenu exampleMenu = new JMenu("Example nets");
+            exampleMenu.setIcon(ResourceManager.getIcon("Example.png"));
 
+            int charKey = 'A';
+            exampleMenu.add(addExampleNets(netMap.get(untimedLens), "P/T nets", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+
+            charKey = charKey + netMap.get(untimedLens).size();
+            exampleMenu.add(addExampleNets(netMap.get(timedLens), "Timed-Arc Petri nets", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+
+            charKey = charKey + netMap.get(timedLens).size();
+            exampleMenu.add(addExampleNets(netMap.get(untimedGameLens), "P/T net games", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+
+            charKey = charKey + netMap.get(untimedGameLens).size();
+            exampleMenu.add(addExampleNets(netMap.get(timedGameLens), "Timed-Arc Petri net games", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+
+            //TODO implement when color is added
+            /*charKey = charKey + netMap.get(timedGameLens).size();
+            exampleMenu.add(addExampleNets(netMap.get(lens), "Colored P/T nets", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+
+            charKey = charKey + netMap.get(lens).size();
+            exampleMenu.add(addExampleNets(netMap.get(lens), "Timed-Arc Colored Petri nets", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+            */
+
+            return exampleMenu;
         }
+        return null;
+    }
 
+    private JMenu addExampleNets(List<String> fileNames, String menuName, int charKey, int modifier) {
+        JMenu menu = new JMenu(menuName);
 
-        fileMenu.add(exitAction);
+        for (String filename : fileNames) {
+            if (filename.toLowerCase().endsWith(".tapn")) {
+                final String netname = filename.replace(".tapn", "");
+                final String filenameFinal = filename;
 
-        return fileMenu;
+                if (charKey == 'Z') {
+                    charKey = '0';
+                } else if (charKey == '9') {
+                    charKey = 'A';
+                    modifier = InputEvent.ALT_MASK;
+                } else if (charKey != 'A' && charKey != '0') {
+                    charKey++;
+                }
+
+                GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"", KeyStroke.getKeyStroke(charKey, modifier)) {
+                    public void actionPerformed(ActionEvent arg0) {
+                        InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
+                        try {
+                            TabContent net = TabContent.createNewTabFromInputStream(file, netname);
+                            guiFrameController.ifPresent(o -> o.openTab(net));
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                tmp.putValue(Action.SMALL_ICON, ResourceManager.getIcon("Net.png"));
+                menu.add(tmp);
+            }
+        }
+        return menu;
     }
 
     /**
