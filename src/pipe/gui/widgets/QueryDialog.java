@@ -1597,8 +1597,10 @@ public class QueryDialog extends JPanel {
 
     private TCTLAbstractProperty convertPropertyType(boolean toCTL, TCTLAbstractProperty property, boolean isFirst) {
         if (property != null) {
+            StringPosition[] children = property.getChildren();
             if (property instanceof TCTLEGNode || property instanceof TCTLEFNode ||
-                property instanceof TCTLEXNode || property instanceof TCTLEUNode) {
+                property instanceof TCTLEXNode || property instanceof TCTLEUNode ||
+                (!toCTL && children.length > 0 && children[0].getObject() instanceof TCTLDeadlockNode)) {
                 return null;
             } else if ((!toCTL && !(property instanceof TCTLAGNode || property instanceof TCTLAFNode ||
                                     property instanceof TCTLAXNode || property instanceof TCTLAUNode)) ||
@@ -2122,6 +2124,7 @@ public class QueryDialog extends JPanel {
         finallyButton.setVisible(isVisible);
         nextButton.setVisible(isVisible);
         untilButton.setVisible(isVisible);
+        if (deadLockPredicateButton != null) deadLockPredicateButton.setVisible(!isVisible);
         showCTLButtons(!isVisible);
     }
 
