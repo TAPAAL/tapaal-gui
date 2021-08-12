@@ -758,7 +758,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         if (currentSelection != null) {
             Expression replacement = null;
             if (currentSelection.getObject() instanceof GuardExpression) {
-                replacement = getSpecificChildOfProperty(1, currentSelection.getObject());
+                replacement = new PlaceHolderGuardExpression();
             }
             else if (currentSelection.getObject() instanceof ColorExpression) {
                 replacement = new PlaceHolderColorExpression();

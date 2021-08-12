@@ -724,7 +724,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         if (currentSelection != null) {
             Expression replacement = null;
             if (currentSelection.getObject() instanceof ArcExpression) {
-                replacement = getSpecificChildOfProperty(1, currentSelection.getObject());
+                replacement = new PlaceHolderArcExpression();
             }
             if (replacement != null) {
                 UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), replacement);
