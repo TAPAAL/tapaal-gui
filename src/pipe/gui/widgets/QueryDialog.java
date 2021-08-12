@@ -779,7 +779,7 @@ public class QueryDialog extends JPanel {
 		if (currentSelection != null) {
 			TCTLAbstractProperty replacement = null;
 			if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-				replacement = getSpecificChildOfProperty(1, currentSelection.getObject());
+				replacement = new TCTLStatePlaceHolder();
 			} else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
 				replacement = new TCTLPathPlaceHolder();
 			}
