@@ -732,6 +732,11 @@ public class QueryDialog extends JPanel {
         if (!lens.isTimed() && !lens.isGame()) {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
+        if (current instanceof LTLANode) {
+            negationButton.setEnabled(false);
+        } else {
+            negationButton.setEnabled(true);
+        }
 	}
 
     private void updateTimedQueryButtons(TCTLAtomicPropositionNode node) {
