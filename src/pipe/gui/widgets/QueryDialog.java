@@ -2326,8 +2326,11 @@ public class QueryDialog extends JPanel {
             addPropertyToQuery(property);
         } else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
             TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+
+            TCTLAbstractProperty oldProperty = removeAllPathsFromProperty(currentSelection.getObject());
+
             andListNode = new TCTLAndListNode(getStateProperty(
-                new TCTLPathToStateConverter((TCTLAbstractPathProperty) currentSelection.getObject())), ph);
+                new TCTLPathToStateConverter((TCTLAbstractPathProperty) oldProperty)), ph);
 
             TCTLAbstractPathProperty property = new TCTLStateToPathConverter(andListNode);
             addPropertyToQuery(property);
@@ -2354,8 +2357,10 @@ public class QueryDialog extends JPanel {
             addPropertyToQuery(property);
         } else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
             TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+            TCTLAbstractProperty oldProperty = removeAllPathsFromProperty(currentSelection.getObject());
+
             orListNode = new TCTLOrListNode(getStateProperty(
-                new TCTLPathToStateConverter((TCTLAbstractPathProperty) currentSelection.getObject())), ph);
+                new TCTLPathToStateConverter((TCTLAbstractPathProperty) oldProperty)), ph);
 
             TCTLAbstractPathProperty property = new TCTLStateToPathConverter(orListNode);
             addPropertyToQuery(property);
@@ -2721,6 +2726,13 @@ public class QueryDialog extends JPanel {
 					}
 				} else { // we are not in edit mode so the button should reset
 					// the query
+
+                    if (queryType.getSelectedIndex() == 1) {
+                        TCTLAbstractProperty oldProperty = newProperty;
+                        addAllPathsToProperty(new TCTLPathPlaceHolder(), oldProperty);
+                        resetQuantifierSelectionButtons();
+                        return;
+                    }
 
 					TCTLPathPlaceHolder ph = new TCTLPathPlaceHolder();
 					UndoableEdit edit = new QueryConstructionEdit(newProperty, ph);
