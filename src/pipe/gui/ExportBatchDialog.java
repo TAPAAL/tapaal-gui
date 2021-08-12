@@ -1,16 +1,7 @@
 package pipe.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -35,6 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import dk.aau.cs.gui.undo.*;
 import org.w3c.dom.DOMException;
 import dk.aau.cs.gui.FileNameCellRenderer;
 import dk.aau.cs.gui.components.ExportBatchResultTableModel;
@@ -45,6 +37,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.StringComparator;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class ExportBatchDialog extends JDialog {
@@ -60,8 +53,7 @@ public class ExportBatchDialog extends JDialog {
 	private final static String NAME_FailStringFolderExists = "Failed as the subfolder already exists";
 	private final static String NAME_FailStringParseError = "Failed due to net/query parsing error";
 
-	
-	private JPanel filesButtonsPanel;
+    private JPanel filesButtonsPanel;
 	private JPanel mainPanel;
 	private JButton addFilesButton;
 	private JButton clearFilesButton;
@@ -84,7 +76,9 @@ public class ExportBatchDialog extends JDialog {
 	private JDialog progressBarContainer;
 	static boolean noOrphanTransitions = false;
 
-	static ExportBatchDialog exportBatchDialog;
+    private final UndoManager undoManager = new UndoManager();
+
+    static ExportBatchDialog exportBatchDialog;
 	ModelLoader loader = new ModelLoader();
 	
 	public static boolean isDialogVisible() {
@@ -114,7 +108,8 @@ public class ExportBatchDialog extends JDialog {
 	private ExportBatchDialog(Frame frame, String title, boolean modal) {
 		super(frame, title, modal);
 		initComponents();
-	}
+        makeShortcuts();
+    }
 	
 	private void initComponents() {
 		setLayout(new FlowLayout());
@@ -412,28 +407,29 @@ public class ExportBatchDialog extends JDialog {
 		
 		File[] filesArray = browser.openFiles();
 		if (filesArray.length>0) {
-			for (File file : filesArray) {
+            undoManager.newEdit();
+            for (File file : filesArray) {
 				lastSelectPath = file.getParent();
-				if (!files.contains(file)) {
-					files.add(file);
-					listModel.addElement(file);
-				}
+                if (!files.contains(file)) {
+                    Command c = new AddFileExportBatchCommand(listModel, file, files, this);
+                    c.redo();
+                    undoManager.addEdit(c);
+                }
 			}
-
-			enableButtons();
 		}
 	}
 
 	private void removeSelectedFiles() {
-		for (Object o : fileList.getSelectedValuesList()) {
-			File file = (File) o;
-			files.remove(file);
-			listModel.removeElement(file);
-		}
-		enableButtons();
+        undoManager.newEdit();
+        for (Object o : fileList.getSelectedValuesList()) {
+            File file = (File) o;
+            Command c = new RemoveFileExportBatchCommand(listModel, file, files, this);
+            c.redo();
+            undoManager.addEdit(c);
+        }
 	}
 	
-	private void enableButtons() {
+	public void enableButtons() {
 		fileList.setEnabled(true);
 		uniqueQueryNames.setEnabled(true);
 		addFilesButton.setEnabled(true);
@@ -450,11 +446,17 @@ public class ExportBatchDialog extends JDialog {
 		}
 		else
 			exportFilesButton.setEnabled(false);
-
 	}
+
 	private void clearFiles() {
-		files.clear();
-		listModel.removeAllElements();
+        undoManager.newEdit();
+
+        for (Object o : listModel.toArray()) {
+            File file = (File)o;
+            Command c = new RemoveFileExportBatchCommand(listModel, file, files, this);
+            c.redo();
+            undoManager.addEdit(c);
+        }
 	}
 	
 	private void selectDestinationPath() {
@@ -643,6 +645,26 @@ public class ExportBatchDialog extends JDialog {
             return result[1];
 		}
 	}
+
+    private void makeShortcuts(){
+        int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        ActionMap am = mainPanel.getActionMap();
+        am.put("undo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                undoManager.undo();
+            }
+        });
+        am.put("redo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                undoManager.redo();
+            }
+        });
+        InputMap im = mainPanel.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
+        im.put(KeyStroke.getKeyStroke('Z', shortcutkey), "undo");
+        im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
+    }
 }
 
 

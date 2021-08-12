@@ -4,8 +4,10 @@ import pipe.gui.GuiFrame;
 import pipe.gui.GuiFrameActions;
 import pipe.gui.Pipe;
 import pipe.gui.SafeGuiFrameActions;
+import pipe.gui.graphicElements.PetriNetObject;
 
 import java.io.File;
+import java.util.Map;
 
 public interface TabContentActions {
 
@@ -109,4 +111,8 @@ public interface TabContentActions {
     void exportPNML();
 
     void exportQueryXML();
+
+    Map<PetriNetObject, Boolean> showNames(boolean isVisible, boolean placeNames, boolean selectedComponent);
+
+    void showChangeNameVisibility();
 }

@@ -45,7 +45,6 @@ public class TimedTransitionComponent extends Transition {
 		this.transition = transition;
 		listener = timedTransitionListener();
 		transition.addTimedTransitionListener(listener);
-		attributesVisible = true;
 		this.lens = lens;
 
 	}

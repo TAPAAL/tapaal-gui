@@ -1,6 +1,25 @@
 package pipe.gui.widgets;
 
 import dk.aau.cs.gui.Context;
+//import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ItemEvent;
+import java.util.*;
+
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JRootPane;
+import javax.swing.JSpinner;
+import javax.swing.event.ChangeListener;
+
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.gui.undo.*;
@@ -8,8 +27,8 @@ import dk.aau.cs.gui.undo.Colored.ColoredPlaceMarkingEdit;
 import dk.aau.cs.gui.undo.Colored.SetArcExpressionCommand;
 import dk.aau.cs.gui.undo.Colored.SetColoredArcIntervalsCommand;
 import dk.aau.cs.gui.undo.Colored.SetTransportArcExpressionsCommand;
-import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.*;
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.*;
@@ -25,6 +44,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
@@ -39,6 +59,22 @@ import java.util.*;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.EAST;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
+import dk.aau.cs.gui.Context;
+import dk.aau.cs.model.tapn.Bound.InfBound;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.ConstantBound;
+import dk.aau.cs.model.tapn.IntBound;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.util.RequireException;
+
+import static net.tapaal.swinghelpers.GridBagHelper.Anchor.*;
 import static net.tapaal.swinghelpers.GridBagHelper.Fill.HORIZONTAL;
 
 //import dk.aau.cs.gui.components.ColorComboBoxRenderer;
@@ -618,18 +654,21 @@ public class PlaceEditorPanel extends JPanel {
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this, "The specified name is already used by another place or transition.", "Error", JOptionPane.ERROR_MESSAGE);
 				return false;
-			}   	
-			
-			Command renameCommand = new RenameTimedPlaceCommand(context.tabContent(), (LocalTimedPlace)place.underlyingPlace(), oldName, newName);
-			context.undoManager().addEdit(renameCommand);
-			try{ // set name
-				renameCommand.redo();
-            }catch(RequireException e){
-				context.undoManager().undo(); 
-				JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
-				return false;
 			}
-			context.nameGenerator().updateIndices(context.activeModel(), newName);
+
+			if (!oldName.equals(newName)) {
+                Command renameCommand = new RenameTimedPlaceCommand(context.tabContent(), (LocalTimedPlace) place.underlyingPlace(), oldName, newName);
+                context.undoManager().addEdit(renameCommand);
+                try { // set name
+                    renameCommand.redo();
+                } catch (RequireException e) {
+                    context.undoManager().undo();
+                    JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+                context.nameGenerator().updateIndices(context.activeModel(), newName);
+            }
+
 			if(makeNewShared){
 				Command command = new MakePlaceNewSharedCommand(context.activeModel(), newName, place.underlyingPlace(),
                     place, context.tabContent(), false);
@@ -667,6 +706,12 @@ public class PlaceEditorPanel extends JPanel {
 
 		if ((place.getAttributesVisible() && !attributesCheckBox.isSelected()) || (!place.getAttributesVisible() && attributesCheckBox.isSelected())) {
 			place.toggleAttributesVisible();
+
+            Map<PetriNetObject, Boolean> map = new HashMap<>();
+            map.put(place, !place.getAttributesVisible());
+
+            Command changeVisibility = new ChangeAllNamesVisibilityCommand(currentTab, map, null, place.getAttributesVisible());
+			context.undoManager().addEdit(changeVisibility);
 		}
 		place.update(true);
 		place.repaint();

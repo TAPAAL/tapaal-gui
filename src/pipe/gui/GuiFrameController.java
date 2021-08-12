@@ -117,7 +117,6 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrame.changeToTab(tab);
         //XXX fixes an issue where on first open of a net the time intervals are not shown
         tab.drawingSurface().repaintAll();
-
     }
 
     //If needed, add boolean forceClose, where net is not checkedForSave and just closed

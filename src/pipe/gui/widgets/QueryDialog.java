@@ -334,7 +334,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SAVE_AND_VERIFY_BUTTON = "Save and verify the query.";
 	private final static String TOOL_TIP_CANCEL_BUTTON = "Cancel the changes made in this dialog.";
 	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export an xml file that can be opened in UPPAAL GUI.";
-	private final static String TOOL_TIP_SAVE_COMPOSED_BUTTON = "Export an xml file of composed net and approximated net if enabled";
+	private final static String TOOL_TIP_SAVE_COMPOSED_BUTTON = "Open a composed net in a new tab and use approximated net if enabled";
 	private final static String TOOL_TIP_OPEN_REDUCED_BUTTON = "Open the net produced after applying structural reduction rules";
 	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
 	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
@@ -807,7 +807,7 @@ public class QueryDialog extends JPanel {
 		if (currentSelection != null) {
 			TCTLAbstractProperty replacement = null;
 			if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-				replacement = getSpecificChildOfProperty(1, currentSelection.getObject());
+				replacement = new TCTLStatePlaceHolder();
 			} else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
 				replacement = new TCTLPathPlaceHolder();
 			}

@@ -18,10 +18,8 @@ import javax.swing.*;
 
 import com.sun.jna.Platform;
 import dk.aau.cs.gui.*;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
@@ -30,7 +28,6 @@ import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import org.jetbrains.annotations.NotNull;
-import pipe.dataLayer.TAPNQuery;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.ColoredWidgets.UnfoldDialog;
@@ -221,7 +218,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             SmartDrawDialog.showSmartDrawDialog();
         }
     };
-    private final GuiAction mergeComponentsDialogAction = new GuiAction("Merge net components", "Export an xml file of composed net and approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
+    private final GuiAction mergeComponentsDialogAction = new GuiAction("Merge net components", "Open a composed net in a new tab and use approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::mergeNetComponents);
         }
@@ -319,6 +316,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleDisplayToolTips);
         }
     };
+    private final GuiAction changeNameVisibility = new GuiAction("Change visibility of transition/place names", "Executing this action will open a dialog where you can hide or show place and transition names", true) {
+        public void actionPerformed(ActionEvent e) {
+            currentTab.ifPresent(TabContentActions::showChangeNameVisibility);
+        }
+    };
     private final GuiAction showAdvancedWorkspaceAction = new GuiAction("Show advanced workspace", "Show all panels", false) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::showAdvancedWorkspace);
@@ -389,12 +391,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         }
     };
-    public final GuiAction stepforwardAction = new GuiAction("Step forward", "Step forward", "pressed RIGHT") {
+    public final GuiAction stepforwardAction = new GuiAction("Step forward", "Step forward", "released RIGHT") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::stepForward);
         }
     };
-    public final GuiAction stepbackwardAction = new GuiAction("Step backward", "Step backward", "pressed LEFT") {
+    public final GuiAction stepbackwardAction = new GuiAction("Step backward", "Step backward", "released LEFT") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::stepBackwards);
         }
@@ -694,6 +696,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         addCheckboxMenuItem(viewMenu, showToolTipsAction);
 
         showTokenAgeCheckBox = addCheckboxMenuItem(viewMenu, showTokenAge(), showTokenAgeAction);
+
+        viewMenu.addSeparator();
+
+        viewMenu.add(changeNameVisibility);
 
         viewMenu.addSeparator();
 
@@ -1101,6 +1107,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         showDelayEnabledTransitionsAction.setEnabled(enable);
         showToolTipsAction.setEnabled(enable);
         showTokenAgeAction.setEnabled(enable);
+        changeNameVisibility.setEnabled(enable);
         showAdvancedWorkspaceAction.setEnabled(enable);
         showSimpleWorkspaceAction.setEnabled(enable);
         saveWorkSpaceAction.setEnabled(enable);

@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -14,6 +16,7 @@ import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.ColoredComponents.ColoredTransitionGuardPanel;
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.tapn.Bound;
@@ -403,11 +406,13 @@ public class TAPNTransitionEditor extends JPanel {
 			}
 			try{
 				String oldName = transition.underlyingTransition().name();
+				if (!oldName.equals(newName)) {
 				transition.underlyingTransition().setName(newName);
 				Command renameCommand = new RenameTimedTransitionCommand(context.tabContent(), transition.underlyingTransition(), oldName, newName);
 				context.undoManager().addEdit(renameCommand);
 				// set name
 				renameCommand.redo();
+				}
 			}catch(RequireException e){
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this,
@@ -477,6 +482,12 @@ public class TAPNTransitionEditor extends JPanel {
 		
 		if(transition.getAttributesVisible() && !attributesCheckBox.isSelected() || (!transition.getAttributesVisible() && attributesCheckBox.isSelected())) {
 			transition.toggleAttributesVisible();
+
+            Map<PetriNetObject, Boolean> map = new HashMap<>();
+            map.put(transition, !transition.getAttributesVisible());
+
+            Command changeVisibility = new ChangeAllNamesVisibilityCommand(context.tabContent(), null, map, transition.getAttributesVisible());
+            context.undoManager().addEdit(changeVisibility);
 		}
 		
 
