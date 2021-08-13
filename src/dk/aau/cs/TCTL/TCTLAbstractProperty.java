@@ -2,6 +2,8 @@ package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
+import java.util.Locale;
+
 public abstract class TCTLAbstractProperty {
 
 	// used to determine whether to put parenthesis around the property
@@ -63,6 +65,13 @@ public abstract class TCTLAbstractProperty {
 	// This method assumes that a place holder exists in the current query
 	public abstract TCTLAbstractProperty findFirstPlaceHolder();
 
+	public boolean contains(String type) {
+	    StringPosition[] children = getChildren();
+	    for (StringPosition child : children) {
+	        if (child.getObject().toString().equalsIgnoreCase(type)) return true;
+        }
+	    return false;
+    }
 	
 
 }

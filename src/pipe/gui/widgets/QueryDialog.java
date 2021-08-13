@@ -1582,7 +1582,7 @@ public class QueryDialog extends JPanel {
                !(property instanceof TCTLStatePlaceHolder)) {
                if (showWarningMessage(true) == JOptionPane.YES_OPTION) {
                    deleteProperty();
-                   removeAllPathsFromProperty(newProperty);
+                   newProperty = removeAllPathsFromProperty(newProperty);
                } else {
                    queryType.setSelectedIndex(1);
                    return;
@@ -1592,24 +1592,28 @@ public class QueryDialog extends JPanel {
            updateShiphonTrap(false);
            wasCTLType = true;
        }
+        undoManager.discardAllEdits();
+        undoButton.setEnabled(false);
+        redoButton.setEnabled(false);
         setEnabledOptionsAccordingToCurrentReduction();
     }
-
     private TCTLAbstractProperty convertPropertyType(boolean toCTL, TCTLAbstractProperty property, boolean isFirst) {
         if (property != null) {
-            StringPosition[] children = property.getChildren();
+            property = removeConverter(property);
+
             if (property instanceof TCTLEGNode || property instanceof TCTLEFNode ||
                 property instanceof TCTLEXNode || property instanceof TCTLEUNode ||
-                (!toCTL && children.length > 0 && children[0].getObject() instanceof TCTLDeadlockNode)) {
+                (!toCTL && property instanceof TCTLDeadlockNode)) {
                 return null;
-            } else if ((!toCTL && !(property instanceof TCTLAGNode || property instanceof TCTLAFNode ||
-                                    property instanceof TCTLAXNode || property instanceof TCTLAUNode)) ||
-                        (toCTL && !(property instanceof LTLAGNode || property instanceof LTLAFNode ||
-                                    property instanceof LTLAXNode || property instanceof LTLAUNode))) {
-                if (isFirst) {
-                    return replaceProperty(property);
+            } else if (((!toCTL && !(property instanceof TCTLAGNode || property instanceof TCTLAFNode || property instanceof TCTLAXNode || property instanceof TCTLAUNode)) ||
+                        (toCTL && !(property instanceof LTLAGNode || property instanceof LTLAFNode || property instanceof LTLAXNode || property instanceof LTLAUNode))) &&
+                        !(property instanceof TCTLNotNode)) {
+                if (!isFirst) {
+                    return property;
+                } else if (property instanceof TCTLAbstractStateProperty) {
+                    property = ConvertToPathProperty((TCTLAbstractStateProperty) property);
                 }
-                return property;
+                return replaceProperty(property);
             }
 
             TCTLAbstractProperty replacement = getReplacement(toCTL, property);
@@ -1620,17 +1624,25 @@ public class QueryDialog extends JPanel {
             return replaceProperty(replacement);
         }
         return null;
+	}
+
+	private TCTLAbstractProperty removeConverter(TCTLAbstractProperty property) {
+        if (property instanceof TCTLStateToPathConverter) {
+            return ConvertToStateProperty((TCTLStateToPathConverter)property);
+        } else if (property instanceof TCTLPathToStateConverter) {
+            return ConvertToPathProperty((TCTLPathToStateConverter)property);
+        }
+        return property;
     }
 
-    private TCTLAbstractProperty getReplacement(boolean toCTL, TCTLAbstractProperty property) {
-        TCTLAbstractProperty replacement = null;
-        TCTLAbstractStateProperty firstChild = getChild(toCTL, property);
-        TCTLAbstractStateProperty secondChild = getChild(toCTL, property);
+	private TCTLAbstractProperty getReplacement(boolean toCTL, TCTLAbstractProperty property) {
+	    TCTLAbstractProperty replacement = null;
+        TCTLAbstractStateProperty firstChild = getChild(toCTL, property, 1);
+        TCTLAbstractStateProperty secondChild = getChild(toCTL, property, 2);
 
-        if (firstChild == null || secondChild == null) return null;
-
-	    if (toCTL) {
-	        if (property instanceof LTLAGNode) {
+        if (firstChild == null) return null;
+        if (toCTL) {
+            if (property instanceof LTLAGNode) {
                 replacement = new TCTLAGNode(firstChild);
             } else if (property instanceof LTLAFNode) {
                 replacement = new TCTLAFNode(firstChild);
@@ -1650,30 +1662,53 @@ public class QueryDialog extends JPanel {
                 replacement = new LTLAUNode(firstChild, secondChild);
             }
         }
-	    if (replacement == null && property instanceof TCTLPathPlaceHolder)
-	        return property;
+
+        if (replacement == null) {
+            if (property instanceof TCTLPathPlaceHolder) {
+                return property;
+            } else if (property instanceof TCTLNotNode) {
+                return new TCTLNotNode(firstChild);
+            }
+        }
+
 	    return replacement;
     }
 
-    private TCTLAbstractStateProperty getChild(boolean toCTL, TCTLAbstractProperty property) {
-        TCTLAbstractStateProperty child = getSpecificChildOfProperty(1, property);
+    private TCTLAbstractStateProperty getChild(boolean toCTL, TCTLAbstractProperty property, int childNumber) {
+
+        //property:
+        // - AF true -- true
+        // - !(AF true) -- !(AF true) / AF true
+        // - !(true) -- !(true) / true
+        // - true -- <*>
+        // - <*> -- <*>
+
+        TCTLAbstractProperty child = getSpecificChildOfProperty(childNumber, property);
+        child = removeConverter(child);
+
         if (!(child instanceof TCTLStatePlaceHolder)) {
-            TCTLAbstractPathProperty convertedChild = ConvertToPathProperty(child);
-            if (!convertedChild.isSimpleProperty()) {
-                TCTLAbstractProperty childReplacement = convertPropertyType(toCTL, convertedChild, false);
-                if (childReplacement == null) return null;
-                if (!(childReplacement instanceof TCTLAbstractStateProperty)) {
-                    childReplacement = ConvertToStateProperty((TCTLAbstractPathProperty) childReplacement);
+           if (!child.isSimpleProperty() || child instanceof TCTLNotNode) {
+                TCTLAbstractProperty replacement = convertPropertyType(toCTL, child, false);
+                if (replacement == null) {
+                    return null;
                 }
-                child = child.replace(child, childReplacement);
-            }
+                replacement = removeConverter(replacement);
+                child = child.replace(child, replacement);
+          }
         }
-        return child;
+        if (child instanceof TCTLAbstractPathProperty) return ConvertToStateProperty((TCTLAbstractPathProperty)child);
+
+        return (TCTLAbstractStateProperty) child;
     }
 
     private TCTLAbstractProperty replaceProperty(TCTLAbstractProperty replacement) {
         if (replacement != null) {
+            newProperty = removeConverter(newProperty);
+            if (newProperty instanceof LTLANode && !(replacement instanceof TCTLAbstractPathProperty)) {
+                replacement = ConvertToPathProperty((TCTLAbstractStateProperty)replacement);
+            }
             newProperty = newProperty.replace(newProperty, replacement);
+            replacement = removeConverter(replacement);
 
             if (newProperty instanceof TCTLAbstractPathProperty) resetQuantifierSelectionButtons();
 
@@ -1713,6 +1748,7 @@ public class QueryDialog extends JPanel {
 
     private void addAllPathsToProperty(TCTLAbstractProperty oldProperty, TCTLAbstractProperty selection) {
         TCTLAbstractProperty property = null;
+        TCTLAbstractStateProperty child = getSpecificChildOfProperty(1, oldProperty);
 
         if (oldProperty instanceof LTLANode) {
             property = oldProperty;
@@ -1720,7 +1756,14 @@ public class QueryDialog extends JPanel {
             property = new LTLANode();
         } else if (oldProperty instanceof TCTLAbstractPathProperty) {
             property = new LTLANode(ConvertToStateProperty((TCTLAbstractPathProperty) oldProperty));
+        } else if (oldProperty instanceof TCTLNotNode) {
+            property = new LTLANode((TCTLNotNode) oldProperty);
+            property = ConvertToStateProperty((TCTLAbstractPathProperty) property);
+        } else if (oldProperty instanceof TCTLAbstractStateProperty && (selection == null || selection instanceof LTLANode)) {
+            property = new LTLANode((TCTLAbstractStateProperty) oldProperty);
+            if (!(newProperty instanceof TCTLAbstractPathProperty)) newProperty = ConvertToPathProperty((TCTLAbstractStateProperty) newProperty);
         }
+
 
         if (property != null && selection != null) {
             UndoableEdit edit = new QueryConstructionEdit(selection, property);
@@ -1739,6 +1782,10 @@ public class QueryDialog extends JPanel {
         TCTLAbstractProperty property = oldProperty;
         TCTLAbstractStateProperty firstChild = getSpecificChildOfProperty(1, oldProperty);
 
+        if (oldProperty instanceof TCTLPathToStateConverter) {
+            oldProperty = ((TCTLPathToStateConverter) oldProperty).getProperty();
+            firstChild = getSpecificChildOfProperty(1, oldProperty);
+        }
         if (oldProperty instanceof LTLANode) {
             TCTLAbstractPathProperty child = ConvertToPathProperty(firstChild);
             property = oldProperty.replace(oldProperty, child);
