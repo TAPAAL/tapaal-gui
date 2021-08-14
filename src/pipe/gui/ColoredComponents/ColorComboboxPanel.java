@@ -4,10 +4,8 @@ import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Color;
-import dk.aau.cs.model.CPN.Expressions.AllExpression;
-import dk.aau.cs.model.CPN.Expressions.ColorExpression;
-import dk.aau.cs.model.CPN.Expressions.TupleExpression;
-import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import dk.aau.cs.model.CPN.Expressions.*;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -93,7 +91,9 @@ public abstract class ColorComboboxPanel extends JPanel {
         if(expr instanceof AllExpression){
             //.all is always last so we just select the last item
             colorTypeComboBoxesArray[index].setSelectedIndex(colorTypeComboBoxesArray[index].getItemCount()-1);
-        } else{
+        } else if(expr instanceof VariableExpression){
+            colorTypeComboBoxesArray[index].setSelectedItem(((VariableExpression)expr).getVariable());
+        }else{
             colorTypeComboBoxesArray[index].setSelectedItem(((UserOperatorExpression)expr).getUserOperator());
         }
     }

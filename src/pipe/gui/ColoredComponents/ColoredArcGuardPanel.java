@@ -888,6 +888,13 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private void updateNumberExpressionsPanel() {
         colorExpressionComboBoxPanel.updateColorType(selectedColorType,context);
         numberExpressionJSpinner.setVisible(!(currentSelection.getObject() instanceof ColorExpression));
+        if(currentSelection.getObject() instanceof NumberOfExpression){
+            var numberOfExpression = ((NumberOfExpression)currentSelection.getObject());
+            numberExpressionJSpinner.setValue(numberOfExpression.getNumber());
+            var colorExpression = numberOfExpression.getNumberOfExpression().get(0).getBottomColorExpression();
+
+            colorExpressionComboBoxPanel.updateSelection(colorExpression);
+        }
     }
 
     private void toggleEnabledButtons() {
