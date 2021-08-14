@@ -892,8 +892,9 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             var numberOfExpression = ((NumberOfExpression)currentSelection.getObject());
             numberExpressionJSpinner.setValue(numberOfExpression.getNumber());
             var colorExpression = numberOfExpression.getNumberOfExpression().get(0).getBottomColorExpression();
-
             colorExpressionComboBoxPanel.updateSelection(colorExpression);
+        } else if(currentSelection.getObject() instanceof ColorExpression){
+            colorExpressionComboBoxPanel.updateSelection((ColorExpression) currentSelection.getObject());
         }
     }
 
