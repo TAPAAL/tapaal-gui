@@ -43,6 +43,7 @@ import pipe.gui.ColoredComponents.ColoredTimeInvariantDialogPanel;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
@@ -1168,6 +1169,7 @@ public class PlaceEditorPanel extends JPanel {
 
     private void updateArcsAccordingToColorType() {
         for(Arc arc : place.getPostset()){
+            //We know it goes from place to transition so it can be either InputArcComponent or TransportArc or InhibitorArc
             if(arc instanceof TimedTransportArcComponent){
                 TransportArc transportArc = ((TimedTransportArcComponent)arc).underlyingTransportArc();
                 Vector<ColorExpression> vecColorExpr = new Vector<>();
@@ -1177,18 +1179,20 @@ public class PlaceEditorPanel extends JPanel {
                     numbExpr, transportArc.getOutputExpression(), transportArc.getOutputExpression());
                 expressionsCommand.redo();
                 context.undoManager().addEdit(expressionsCommand);
-            }else{
+            }else if(!(arc instanceof TimedInhibitorArcComponent)){
                 Vector<ColorExpression> vecColorExpr = new Vector<>();
                 vecColorExpr.add(colorType.createColorExpressionForFirstColor());
                 NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
                 Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
                 arcExpressionCommand.redo();
                 context.undoManager().addEdit(arcExpressionCommand);
-            }
-            Command arcIntervalCommand = new SetColoredArcIntervalsCommand((TimedInputArcComponent)arc,((TimedInputArcComponent)arc).getCtiList(), new ArrayList<>());
-            arcIntervalCommand.redo();
-            context.undoManager().addEdit(arcIntervalCommand);
 
+            }
+            if(!(arc instanceof TimedInhibitorArcComponent)){
+                Command arcIntervalCommand = new SetColoredArcIntervalsCommand((TimedInputArcComponent)arc,((TimedInputArcComponent)arc).getCtiList(), new ArrayList<>());
+                arcIntervalCommand.redo();
+                context.undoManager().addEdit(arcIntervalCommand);
+            }
         }
         for(Arc arc : place.getPreset()) {
             if(arc instanceof TimedTransportArcComponent){
