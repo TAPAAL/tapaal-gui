@@ -82,9 +82,13 @@ public class VariableExpression extends ColorExpression {
         return new VariableExpression(this.variable);
     }
 
+    //If we ever create a new variable here instead of using the same variable
+    //Make sure to update TimedArcPetriNetNetwork.canVariableBeRemoved() so that it does not work on reference
+    //but rather equals()
+    //https://bugs.launchpad.net/tapaal/+bug/1938806
     @Override
     public VariableExpression deepCopy() {
-        return new VariableExpression(new Variable(this.variable.getName(),this.variable.getId(), this.variable.getColorType()));
+        return new VariableExpression(this.variable);
     }
 
     @Override
