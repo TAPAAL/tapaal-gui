@@ -3263,7 +3263,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     @Override
     public void exportPNML() {
         if (canNetBeSavedAndShowMessage()) {
-            if (Preferences.getInstance().getShowPNMLWarning()) {
+            if (Preferences.getInstance().getShowPNMLWarning() && lens.isTimed()) {
                 JCheckBox showAgain = new JCheckBox("Do not show this warning.");
                 String message = "In the saved PNML all timing information will be lost\n" +
                     "and the components in the net will be merged into one big net.";
