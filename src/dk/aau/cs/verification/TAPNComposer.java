@@ -167,7 +167,7 @@ public class TAPNComposer implements ITAPNComposer {
 		for(SharedPlace place : model.sharedPlaces()){
 			if(!model.isSharedPlaceUsedInTemplates(place))	continue;
 			
-			String uniquePlaceName = (!singleComponentNoPrefix || model.activeTemplates().size() > 1) ? composedPlaceName(place) : place.name(); 
+			String uniquePlaceName = composedPlaceName(place);
 			
 			LocalTimedPlace constructedPlace = null;
 			if (place.invariant().upperBound() instanceof Bound.InfBound) {
@@ -279,17 +279,13 @@ public class TAPNComposer implements ITAPNComposer {
 					//   support for such queries are added later.
 					// ONLY THE IF SENTENCE SHOULD BE REMOVED. REST OF CODE SHOULD BE LEFT INTACT
 					if(!timedTransition.isOrphan()){
-						String uniqueTransitionName = "";
-						if (!singleComponentNoPrefix || model.activeTemplates().size() > 1) {
-							uniqueTransitionName = composedTransitionName(timedTransition);
-						} else {
-							uniqueTransitionName = timedTransition.name();
-						}
+						String uniqueTransitionName = composedTransitionName(timedTransition);
 
 						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent(), timedTransition.getGuard());
 						if (timedTransition.isUncontrollable()) {
 						    transition.setUncontrollable(true);
                         }
+
 						constructedModel.add(transition);
 						
 						// Gui work
