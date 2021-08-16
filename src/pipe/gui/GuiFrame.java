@@ -1460,23 +1460,24 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             exampleMenu.setIcon(ResourceManager.getIcon("Example.png"));
 
             int charKey = 'A';
-            exampleMenu.add(addExampleNets(netMap.get(untimedLens), "P/T nets", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+            int modifier = InputEvent.ALT_MASK + InputEvent.SHIFT_MASK;
+            exampleMenu.add(addExampleNets(netMap.get(untimedLens), "P/T nets", charKey, modifier));
 
-            charKey = charKey + netMap.get(untimedLens).size();
-            exampleMenu.add(addExampleNets(netMap.get(timedLens), "Timed-Arc Petri nets", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+            charKey = countCharKey(charKey, netMap.get(untimedLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(timedLens), "Timed-Arc Petri nets", charKey, modifier));
 
-            charKey = charKey + netMap.get(timedLens).size();
-            exampleMenu.add(addExampleNets(netMap.get(untimedGameLens), "P/T net games", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+            charKey = countCharKey(charKey, netMap.get(timedLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(untimedGameLens), "P/T net games", charKey, modifier));
 
-            charKey = charKey + netMap.get(untimedGameLens).size();
-            exampleMenu.add(addExampleNets(netMap.get(timedGameLens), "Timed-Arc Petri net games", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+            charKey = countCharKey(charKey, netMap.get(untimedGameLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(timedGameLens), "Timed-Arc Petri net games", charKey, modifier));
 
             //TODO implement when color is added
-            /*charKey = charKey + netMap.get(timedGameLens).size();
-            exampleMenu.add(addExampleNets(netMap.get(lens), "Colored P/T nets", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+            /*charKey = countCharKey(charKey, netMap.get(timedGameLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(lens), "Colored P/T nets", charKey, modifier));
 
-            charKey = charKey + netMap.get(lens).size();
-            exampleMenu.add(addExampleNets(netMap.get(lens), "Timed-Arc Colored Petri nets", charKey, InputEvent.ALT_MASK + InputEvent.SHIFT_MASK));
+            charKey = countCharKey(charKey, netMap.get(lens).size());
+            exampleMenu.add(addExampleNets(netMap.get(lens), "Timed-Arc Colored Petri nets", charKey, modifier));
             */
 
             return exampleMenu;
@@ -1492,14 +1493,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 final String netname = filename.replace(".tapn", "");
                 final String filenameFinal = filename;
 
-                if (charKey == 'Z') {
-                    charKey = '0';
-                } else if (charKey == '9') {
-                    charKey = 'A';
-                    modifier = InputEvent.ALT_MASK;
-                } else if (charKey != 'A' && charKey != '0') {
-                    charKey++;
-                }
+
 
                 GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"", KeyStroke.getKeyStroke(charKey, modifier)) {
                     public void actionPerformed(ActionEvent arg0) {
@@ -1516,9 +1510,43 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 tmp.putValue(Action.SMALL_ICON, ResourceManager.getIcon("Net.png"));
                 menu.add(tmp);
+
+                if (charKey == 'Z') {
+                    charKey = '0';
+                } else if (charKey == '9') {
+                    charKey = 'A';
+                    modifier = InputEvent.ALT_MASK;
+                } else {
+                    charKey++;
+                }
             }
         }
         return menu;
+    }
+
+    private int countCharKey(int previousKey, int previousSize) {
+        int currentKey = previousKey + previousSize;
+        int addedSize = 0;
+        int missingSize = 0;
+
+        if (currentKey > 'Z') {
+            addedSize = 'Z' - previousKey;
+            missingSize = previousSize - addedSize;
+            currentKey = '0' + missingSize;
+            if (currentKey > '9') {
+                missingSize -= 10;
+                currentKey = countCharKey('A'-1, missingSize);
+            }
+        } else if (currentKey > '9' && currentKey < 'A') {
+            addedSize = '9' - previousKey;
+            missingSize = previousSize - addedSize;
+            currentKey = 'A' + missingSize;
+            if (currentKey > 'Z') {
+                missingSize -= 26;
+                currentKey = countCharKey('0'-1, missingSize);
+            }
+        }
+        return currentKey;
     }
 
     /**
