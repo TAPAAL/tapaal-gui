@@ -64,14 +64,6 @@ public abstract class TCTLAbstractProperty {
     public abstract boolean hasNestedPathQuantifiers();
 	// This method assumes that a place holder exists in the current query
 	public abstract TCTLAbstractProperty findFirstPlaceHolder();
-
-	public boolean contains(String type) {
-	    StringPosition[] children = getChildren();
-	    for (StringPosition child : children) {
-	        if (child.getObject().toString().equalsIgnoreCase(type)) return true;
-        }
-	    return false;
-    }
 	
 
 }

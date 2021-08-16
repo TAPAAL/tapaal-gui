@@ -1577,7 +1577,7 @@ public class QueryDialog extends JPanel {
            updateShiphonTrap(true);
            wasCTLType = false;
        } else if (queryType.getSelectedIndex() == 0 && !wasCTLType) {
-           TCTLAbstractProperty property = removeAllPathsFromProperty(newProperty);
+           TCTLAbstractProperty property = removeConverter(removeAllPathsFromProperty(newProperty));
            if (convertPropertyType(true, property, true) == null &&
                !(property instanceof TCTLStatePlaceHolder)) {
                if (showWarningMessage(true) == JOptionPane.YES_OPTION) {
@@ -1605,15 +1605,14 @@ public class QueryDialog extends JPanel {
                 property instanceof TCTLEXNode || property instanceof TCTLEUNode ||
                 (!toCTL && property instanceof TCTLDeadlockNode)) {
                 return null;
-            } else if (((!toCTL && !(property instanceof TCTLAGNode || property instanceof TCTLAFNode || property instanceof TCTLAXNode || property instanceof TCTLAUNode)) ||
-                        (toCTL && !(property instanceof LTLAGNode || property instanceof LTLAFNode || property instanceof LTLAXNode || property instanceof LTLAUNode))) &&
-                        !(property instanceof TCTLNotNode)) {
+            } else if (property.isSimpleProperty() && !(property instanceof TCTLNotNode)) {
                 if (!isFirst) {
                     return property;
-                } else if (property instanceof TCTLAbstractStateProperty) {
+                } else if (property instanceof TCTLTrueNode || property instanceof TCTLFalseNode ||
+                           property instanceof TCTLAtomicPropositionNode || property instanceof TCTLTransitionNode) {
                     property = ConvertToPathProperty((TCTLAbstractStateProperty) property);
+                    return replaceProperty(property);
                 }
-                return replaceProperty(property);
             }
 
             TCTLAbstractProperty replacement = getReplacement(toCTL, property);
@@ -1627,10 +1626,12 @@ public class QueryDialog extends JPanel {
 	}
 
 	private TCTLAbstractProperty removeConverter(TCTLAbstractProperty property) {
-        if (property instanceof TCTLStateToPathConverter) {
-            return ConvertToStateProperty((TCTLStateToPathConverter)property);
-        } else if (property instanceof TCTLPathToStateConverter) {
-            return ConvertToPathProperty((TCTLPathToStateConverter)property);
+	    while (property instanceof TCTLPathToStateConverter || property instanceof TCTLStateToPathConverter) {
+            if (property instanceof TCTLStateToPathConverter) {
+                property = ConvertToStateProperty((TCTLStateToPathConverter) property);
+            } else {
+                property = ConvertToPathProperty((TCTLPathToStateConverter) property);
+            }
         }
         return property;
     }
@@ -1639,6 +1640,7 @@ public class QueryDialog extends JPanel {
 	    TCTLAbstractProperty replacement = null;
         TCTLAbstractStateProperty firstChild = getChild(toCTL, property, 1);
         TCTLAbstractStateProperty secondChild = getChild(toCTL, property, 2);
+        property = removeConverter(property);
 
         if (firstChild == null) return null;
         if (toCTL) {
@@ -1664,10 +1666,14 @@ public class QueryDialog extends JPanel {
         }
 
         if (replacement == null) {
-            if (property instanceof TCTLPathPlaceHolder) {
+            if (property instanceof TCTLStatePlaceHolder || property instanceof TCTLPathPlaceHolder) {
                 return property;
             } else if (property instanceof TCTLNotNode) {
                 return new TCTLNotNode(firstChild);
+            } else if (property instanceof TCTLAndListNode) {
+                return new TCTLAndListNode(firstChild, secondChild);
+            } else if (property instanceof TCTLOrListNode) {
+                return new TCTLOrListNode(firstChild, secondChild);
             }
         }
 
@@ -1675,18 +1681,11 @@ public class QueryDialog extends JPanel {
     }
 
     private TCTLAbstractStateProperty getChild(boolean toCTL, TCTLAbstractProperty property, int childNumber) {
-
-        //property:
-        // - AF true -- true
-        // - !(AF true) -- !(AF true) / AF true
-        // - !(true) -- !(true) / true
-        // - true -- <*>
-        // - <*> -- <*>
-
+        property = removeConverter(property);
         TCTLAbstractProperty child = getSpecificChildOfProperty(childNumber, property);
         child = removeConverter(child);
 
-        if (!(child instanceof TCTLStatePlaceHolder)) {
+        if (!(child instanceof TCTLStatePlaceHolder || child instanceof TCTLPathPlaceHolder)) {
            if (!child.isSimpleProperty() || child instanceof TCTLNotNode) {
                 TCTLAbstractProperty replacement = convertPropertyType(toCTL, child, false);
                 if (replacement == null) {
@@ -1694,9 +1693,13 @@ public class QueryDialog extends JPanel {
                 }
                 replacement = removeConverter(replacement);
                 child = child.replace(child, replacement);
-          }
+          } else if (child instanceof TCTLDeadlockNode) {
+               return null;
+           }
         }
-        if (child instanceof TCTLAbstractPathProperty) return ConvertToStateProperty((TCTLAbstractPathProperty)child);
+        if (child instanceof TCTLAbstractPathProperty) {
+            return ConvertToStateProperty((TCTLAbstractPathProperty)child);
+        }
 
         return (TCTLAbstractStateProperty) child;
     }
@@ -1723,6 +1726,7 @@ public class QueryDialog extends JPanel {
     private void deleteProperty() {
         if (newProperty != null) {
             TCTLAbstractProperty replacement = null;
+            newProperty = removeConverter(newProperty);
             if (newProperty instanceof TCTLAbstractStateProperty) {
                 replacement = getSpecificChildOfProperty(1, newProperty);
             } else if (newProperty instanceof TCTLAbstractPathProperty) {
@@ -1748,7 +1752,6 @@ public class QueryDialog extends JPanel {
 
     private void addAllPathsToProperty(TCTLAbstractProperty oldProperty, TCTLAbstractProperty selection) {
         TCTLAbstractProperty property = null;
-        TCTLAbstractStateProperty child = getSpecificChildOfProperty(1, oldProperty);
 
         if (oldProperty instanceof LTLANode) {
             property = oldProperty;
@@ -1763,7 +1766,6 @@ public class QueryDialog extends JPanel {
             property = new LTLANode((TCTLAbstractStateProperty) oldProperty);
             if (!(newProperty instanceof TCTLAbstractPathProperty)) newProperty = ConvertToPathProperty((TCTLAbstractStateProperty) newProperty);
         }
-
 
         if (property != null && selection != null) {
             UndoableEdit edit = new QueryConstructionEdit(selection, property);
