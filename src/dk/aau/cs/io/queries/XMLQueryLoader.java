@@ -80,36 +80,36 @@ public class XMLQueryLoader extends QueryLoader{
 
         // Get all properties from DOM
         NodeList propList = doc.getElementsByTagName("property");
+        int choice = -1;
 
         for(int i = 0; i < propList.getLength(); i++){
             Node prop = propList.item(i);
             QueryWrapper queryWrapper = new QueryWrapper();
-            int choice = 0;
 
             // Save query for later use in dialog window
             this.faultyQueries.add(queryWrapper);
 
             boolean isCTL = isCTL(prop);
-            if (!isCTL) {
+            if (!isCTL && choice != 2 && choice != 3) {
                 choice = JOptionPane.showOptionDialog(CreateGui.getApp(),
                     "Do you want to import the queries as CTL or LTL?",
                     "Choose query category",
                     JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
                     null,
-                    new Object[]{"CTL", "LTL", "Cancel"},
+                    new Object[]{"CTL", "LTL", "All CTL", "All LTL", "Cancel"},
                     0);
 
-                if (choice == 2) return null;
+                if (choice == 4) return null;
             }
 
             // Update queryWrapper name and property
-            if (choice == 0) {
+            if (choice == 0 || choice == 2) {
                 if (!XMLCTLQueryParser.parse(prop, queryWrapper)) {
                     queries.add(null);
                     continue;
                 }
-            } else if (choice == 1) {
+            } else if (choice == 1 || choice == 3) {
                 if (!XMLLTLQueryParser.parse(prop, queryWrapper)) {
                     queries.add(null);
                     continue;
@@ -126,7 +126,7 @@ public class XMLQueryLoader extends QueryLoader{
             RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
                 network.activeTemplates().get(0).name());
 
-            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), choice == 0, choice == 1));
+            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), choice == 0 || choice == 2, choice == 1 || choice == 3));
             
             if(query.getCategory() == TAPNQuery.QueryCategory.CTL || query.getCategory() == TAPNQuery.QueryCategory.LTL){
             	query.setSearchOption(SearchOption.DFS);
@@ -162,6 +162,8 @@ public class XMLQueryLoader extends QueryLoader{
             Node child = children.item(i);
             if (child.getNodeName().equals("all-paths")) {
                 allPathsCounter++;
+            } else if (child.getNodeName().equals("exists-path") || child.getNodeName().equals("deadlock")){
+                return 100;
             }
             allPathsCounter += countAllPaths(child);
         }

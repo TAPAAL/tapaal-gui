@@ -98,35 +98,21 @@ public class XMLLTLQueryParser {
             }
             return new TCTLEFNode((TCTLAbstractStateProperty)childProperty);
         } else if(nodeName.equals("all-paths")){
-            if (childNodeName.equals("until")) {
-                childProperty = parseFormula(child);
-            } else {
-                childProperty = parseFormula(getFirstChildNode(child));
-            }
+            childProperty = parseFormula(child);
             if(childProperty instanceof TCTLAbstractPathProperty){
                 return new LTLANode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
             } else{
                 return new LTLANode((TCTLAbstractStateProperty)childProperty);
             }
         } else if (nodeName.equals("finally")){
-            Node firstChild = getFirstChildNode(child);
-            if (firstChild != null) {
-                childProperty = parseFormula(getFirstChildNode(child));
-            } else {
-                childProperty = parseFormula(child);
-            }
-            if(child instanceof TCTLAbstractPathProperty){
+            childProperty = parseFormula(child);
+            if(childProperty instanceof TCTLAbstractPathProperty){
                 return new LTLAFNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
             } else{
                 return new LTLAFNode((TCTLAbstractStateProperty)childProperty);
             }
         } else if (nodeName.equals("globally")){
-            Node firstChild = getFirstChildNode(child);
-            if (firstChild != null) {
-                childProperty = parseFormula(getFirstChildNode(child));
-            } else {
-                childProperty = parseFormula(child);
-            }
+            childProperty = parseFormula(child);
             if(childProperty instanceof TCTLAbstractPathProperty){
                 return new LTLAGNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
             } else{
