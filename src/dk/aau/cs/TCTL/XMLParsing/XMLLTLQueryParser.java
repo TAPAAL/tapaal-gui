@@ -4,31 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.lang.NumberFormatException;
 
+import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.TCTL.TCTLPlaceNode;
-import dk.aau.cs.TCTL.TCTLConstNode;
-import dk.aau.cs.TCTL.LTLAGNode;
-import dk.aau.cs.TCTL.LTLAUNode;
-import dk.aau.cs.TCTL.LTLAXNode;
-import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
-import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
-import dk.aau.cs.TCTL.TCTLAndListNode;
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.TCTLEUNode;
-import dk.aau.cs.TCTL.TCTLEXNode;
-import dk.aau.cs.TCTL.TCTLFalseNode;
-import dk.aau.cs.TCTL.TCTLNotNode;
-import dk.aau.cs.TCTL.TCTLOrListNode;
-import dk.aau.cs.TCTL.TCTLPathToStateConverter;
-import dk.aau.cs.TCTL.TCTLTrueNode;
-import dk.aau.cs.TCTL.TCTLDeadlockNode;
-import dk.aau.cs.TCTL.TCTLTermListNode;
-import dk.aau.cs.TCTL.TCTLTransitionNode;
-import dk.aau.cs.TCTL.AritmeticOperator;
-import dk.aau.cs.TCTL.LTLAFNode;
 
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -120,94 +97,70 @@ public class XMLLTLQueryParser {
                 childProperty = new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty);
             }
             return new TCTLEFNode((TCTLAbstractStateProperty)childProperty);
-        } else if(nodeName.equals("exists-path")){
-            if (childNodeName.equals("finally")){
-                childProperty = parseFormula(getFirstChildNode(child));
-                if(childProperty instanceof TCTLAbstractPathProperty){
-                    return new TCTLEFNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
-                } else{
-                    return new TCTLEFNode((TCTLAbstractStateProperty)childProperty);
-                }
-            } else if (childNodeName.equals("globally")){
-                childProperty = parseFormula(getFirstChildNode(child));
-                if(childProperty instanceof TCTLAbstractPathProperty){
-                    return new TCTLEGNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
-                } else{
-                    return new TCTLEGNode((TCTLAbstractStateProperty)childProperty);
-                }
-            } else if (childNodeName.equals("next")){
-                childProperty = parseFormula(getFirstChildNode(child));
-                if(childProperty instanceof TCTLAbstractPathProperty){
-                    return new TCTLEXNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
-                } else{
-                    return new TCTLEXNode((TCTLAbstractStateProperty)childProperty);
-                }
-            } else if (childNodeName.equals("until")){
-                children = getAllChildren(child);
-                if(children.size() != 2){
-                    Logger.log("ERROR");
-                }
-
-                TCTLAbstractProperty before = parseFormula(getFirstChildNode(children.get(0)));
-                TCTLAbstractProperty reach = parseFormula(getFirstChildNode(children.get(1)));
-
-                if(before instanceof TCTLAbstractPathProperty){
-                    before = new TCTLPathToStateConverter((TCTLAbstractPathProperty)before);
-                }
-                if(reach instanceof TCTLAbstractPathProperty){
-                    reach = new TCTLPathToStateConverter((TCTLAbstractPathProperty)reach);
-                }
-
-                return new TCTLEUNode((TCTLAbstractStateProperty)before, (TCTLAbstractStateProperty)reach);
-            } else{
-                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
-            }
         } else if(nodeName.equals("all-paths")){
-            if (childNodeName.equals("finally")){
+            if (childNodeName.equals("until")) {
+                childProperty = parseFormula(child);
+            } else {
                 childProperty = parseFormula(getFirstChildNode(child));
-                if(childProperty instanceof TCTLAbstractPathProperty){
-                    return new LTLAFNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
-                } else{
-                    return new LTLAFNode((TCTLAbstractStateProperty)childProperty);
-                }
-            } else if (childNodeName.equals("globally")){
-                childProperty = parseFormula(getFirstChildNode(child));
-                if(childProperty instanceof TCTLAbstractPathProperty){
-                    return new LTLAGNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
-                } else{
-                    return new LTLAGNode((TCTLAbstractStateProperty)childProperty);
-                }
-            } else if (childNodeName.equals("next")){
-                childProperty = parseFormula(getFirstChildNode(child));
-                if(childProperty instanceof TCTLAbstractPathProperty){
-                    return new LTLAXNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
-                } else{
-                    return new LTLAXNode((TCTLAbstractStateProperty)childProperty);
-                }
-            } else if (childNodeName.equals("until")){
-                children = getAllChildren(child);
-                if(children.size() != 2){
-                    Logger.log("ERROR");
-                }
-
-                TCTLAbstractProperty before = parseFormula(getFirstChildNode(children.get(0)));
-                TCTLAbstractProperty reach = parseFormula(getFirstChildNode(children.get(1)));
-
-                if(before instanceof TCTLAbstractPathProperty){
-                    before = new TCTLPathToStateConverter((TCTLAbstractPathProperty)before);
-                }
-                if(reach instanceof TCTLAbstractPathProperty){
-                    reach = new TCTLPathToStateConverter((TCTLAbstractPathProperty)reach);
-                }
-
-                return new LTLAUNode((TCTLAbstractStateProperty)before, (TCTLAbstractStateProperty)reach);
-            } else{
-                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
             }
-        }
+            if(childProperty instanceof TCTLAbstractPathProperty){
+                return new LTLANode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
+            } else{
+                return new LTLANode((TCTLAbstractStateProperty)childProperty);
+            }
+        } else if (nodeName.equals("finally")){
+            Node firstChild = getFirstChildNode(child);
+            if (firstChild != null) {
+                childProperty = parseFormula(getFirstChildNode(child));
+            } else {
+                childProperty = parseFormula(child);
+            }
+            if(child instanceof TCTLAbstractPathProperty){
+                return new LTLAFNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
+            } else{
+                return new LTLAFNode((TCTLAbstractStateProperty)childProperty);
+            }
+        } else if (nodeName.equals("globally")){
+            Node firstChild = getFirstChildNode(child);
+            if (firstChild != null) {
+                childProperty = parseFormula(getFirstChildNode(child));
+            } else {
+                childProperty = parseFormula(child);
+            }
+            if(childProperty instanceof TCTLAbstractPathProperty){
+                return new LTLAGNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
+            } else{
+                return new LTLAGNode((TCTLAbstractStateProperty)childProperty);
+            }
+        } else if (nodeName.equals("next")){
+            Node firstChild = getFirstChildNode(child);
+            if (firstChild != null) {
+                childProperty = parseFormula(getFirstChildNode(child));
+            } else {
+                childProperty = parseFormula(child);
+            }
+            if(childProperty instanceof TCTLAbstractPathProperty){
+                return new LTLAXNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
+            } else{
+                return new LTLAXNode((TCTLAbstractStateProperty)childProperty);
+            }
+        } else if (nodeName.equals("until")){
+            children = getAllChildren(property);
+            if(children.size() != 2){
+                Logger.log("ERROR");
+            }
 
-        else if(nodeName.equals("deadlock")){
-            return new TCTLDeadlockNode();
+            TCTLAbstractProperty before = parseFormula(getFirstChildNode(children.get(0)));
+            TCTLAbstractProperty reach = parseFormula(getFirstChildNode(children.get(1)));
+
+            if(before instanceof TCTLAbstractPathProperty){
+                before = new TCTLPathToStateConverter((TCTLAbstractPathProperty)before);
+            }
+            if(reach instanceof TCTLAbstractPathProperty){
+                reach = new TCTLPathToStateConverter((TCTLAbstractPathProperty)reach);
+            }
+
+            return new LTLAUNode((TCTLAbstractStateProperty)before, (TCTLAbstractStateProperty)reach);
         } else if(nodeName.equals("true")){
             return new TCTLTrueNode();
         } else if(nodeName.equals("false")){

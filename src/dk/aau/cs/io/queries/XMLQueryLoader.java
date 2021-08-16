@@ -3,7 +3,6 @@ package dk.aau.cs.io.queries;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import javax.swing.JOptionPane;
 
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
@@ -81,23 +80,28 @@ public class XMLQueryLoader extends QueryLoader{
 
         // Get all properties from DOM
         NodeList propList = doc.getElementsByTagName("property");
-        int choice = JOptionPane.showOptionDialog(CreateGui.getApp(),
-            "Do you want to import the queries as CTL or LTL?",
-            "Choose query category",
-            JOptionPane.YES_NO_CANCEL_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            new Object[]{"CTL", "LTL", "Cancel"},
-            0);
-
-        if (choice == 2) return null;
 
         for(int i = 0; i < propList.getLength(); i++){
             Node prop = propList.item(i);
             QueryWrapper queryWrapper = new QueryWrapper();
+            int choice = 0;
 
             // Save query for later use in dialog window
             this.faultyQueries.add(queryWrapper);
+
+            boolean isCTL = isCTL(prop);
+            if (!isCTL) {
+                choice = JOptionPane.showOptionDialog(CreateGui.getApp(),
+                    "Do you want to import the queries as CTL or LTL?",
+                    "Choose query category",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    new Object[]{"CTL", "LTL", "Cancel"},
+                    0);
+
+                if (choice == 2) return null;
+            }
 
             // Update queryWrapper name and property
             if (choice == 0) {
@@ -112,7 +116,7 @@ public class XMLQueryLoader extends QueryLoader{
                 }
             }
 
-            // The number 9999 is the number of extra tokens allowed, 
+            // The number 9999 is the number of extra tokens allowed,
             // this is set high s.t. we don't have to change it manually
             TAPNQuery query = new TAPNQuery(queryWrapper.getName(), 9999,
                 queryWrapper.getProp(),TraceOption.NONE, SearchOption.HEURISTIC, 
@@ -135,6 +139,33 @@ public class XMLQueryLoader extends QueryLoader{
         }
 
         return queries;
+    }
+
+    private boolean isCTL(Node prop) {
+        NodeList children = prop.getChildNodes();
+        int allPathsCounter = 0;
+
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeName().equals("formula")) {
+                allPathsCounter += countAllPaths(child);
+            }
+        }
+        return allPathsCounter != 1;
+    }
+
+    private int countAllPaths(Node prop) {
+        NodeList children = prop.getChildNodes();
+        int allPathsCounter = 0;
+
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeName().equals("all-paths")) {
+                allPathsCounter++;
+            }
+            allPathsCounter += countAllPaths(child);
+        }
+        return allPathsCounter;
     }
 
     public static void importQueries(File file, TimedArcPetriNetNetwork network){

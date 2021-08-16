@@ -64,6 +64,12 @@ public class LTLQueryVisitor extends VisitorBase {
         return formatter.format(getStartTag() + XMLQuery.toString() + getEndTag());
     }
 
+    public String getFormatted(StringBuffer CTLQueries) {
+        XMLFormatter formatter = new XMLFormatter();
+        XMLQuery.append(CTLQueries);
+        return formatter.format(getStartTag() + XMLQuery.toString() + getEndTag());
+    }
+
     public String getStartTag(){
         return startTag(XML_PROPSET + " " + XML_NS) + "\n";
     }

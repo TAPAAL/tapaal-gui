@@ -1577,9 +1577,8 @@ public class QueryDialog extends JPanel {
            updateShiphonTrap(true);
            wasCTLType = false;
        } else if (queryType.getSelectedIndex() == 0 && !wasCTLType) {
-           TCTLAbstractProperty property = removeConverter(removeAllPathsFromProperty(newProperty));
-           if (convertPropertyType(true, property, true) == null &&
-               !(property instanceof TCTLStatePlaceHolder)) {
+           if (convertPropertyType(true, newProperty, true) == null &&
+               !(newProperty instanceof TCTLStatePlaceHolder)) {
                if (showWarningMessage(true) == JOptionPane.YES_OPTION) {
                    deleteProperty();
                    newProperty = removeAllPathsFromProperty(newProperty);
@@ -1592,14 +1591,14 @@ public class QueryDialog extends JPanel {
            updateShiphonTrap(false);
            wasCTLType = true;
        }
-        undoManager.discardAllEdits();
-        undoButton.setEnabled(false);
-        redoButton.setEnabled(false);
-        setEnabledOptionsAccordingToCurrentReduction();
+       if (undoManager != null) undoManager.discardAllEdits();
+       if (undoButton != null) undoButton.setEnabled(false);
+       if (redoButton != null) redoButton.setEnabled(false);
+       setEnabledOptionsAccordingToCurrentReduction();
     }
     private TCTLAbstractProperty convertPropertyType(boolean toCTL, TCTLAbstractProperty property, boolean isFirst) {
         if (property != null) {
-            property = removeConverter(property);
+            property = removeAllPathsFromProperty(removeConverter(property));
 
             if (property instanceof TCTLEGNode || property instanceof TCTLEFNode ||
                 property instanceof TCTLEXNode || property instanceof TCTLEUNode ||
@@ -1674,6 +1673,8 @@ public class QueryDialog extends JPanel {
                 return new TCTLAndListNode(firstChild, secondChild);
             } else if (property instanceof TCTLOrListNode) {
                 return new TCTLOrListNode(firstChild, secondChild);
+            } else {
+                replacement = property;
             }
         }
 
