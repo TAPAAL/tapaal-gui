@@ -1459,7 +1459,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             JMenu exampleMenu = new JMenu("Example nets");
             exampleMenu.setIcon(ResourceManager.getIcon("Example.png"));
 
-            int charKey = '7';
+            int charKey = 'A';
             int modifier = InputEvent.ALT_MASK + InputEvent.SHIFT_MASK;
             exampleMenu.add(addExampleNets(netMap.get(untimedLens), "P/T nets", charKey, modifier));
 
