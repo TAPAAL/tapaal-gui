@@ -1459,25 +1459,30 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             JMenu exampleMenu = new JMenu("Example nets");
             exampleMenu.setIcon(ResourceManager.getIcon("Example.png"));
 
-            int charKey = 'A';
+            int charKey = '7';
             int modifier = InputEvent.ALT_MASK + InputEvent.SHIFT_MASK;
             exampleMenu.add(addExampleNets(netMap.get(untimedLens), "P/T nets", charKey, modifier));
 
+            modifier = getModifier(modifier, charKey, netMap.get(untimedLens).size());
             charKey = countCharKey(charKey, netMap.get(untimedLens).size());
             exampleMenu.add(addExampleNets(netMap.get(timedLens), "Timed-Arc Petri nets", charKey, modifier));
 
+            modifier = getModifier(modifier, charKey, netMap.get(timedLens).size());
             charKey = countCharKey(charKey, netMap.get(timedLens).size());
             exampleMenu.add(addExampleNets(netMap.get(untimedGameLens), "P/T net games", charKey, modifier));
 
+            modifier = getModifier(modifier, charKey, netMap.get(untimedGameLens).size());
             charKey = countCharKey(charKey, netMap.get(untimedGameLens).size());
             exampleMenu.add(addExampleNets(netMap.get(timedGameLens), "Timed-Arc Petri net games", charKey, modifier));
 
             //TODO implement when color is added
-            /*charKey = countCharKey(charKey, netMap.get(timedGameLens).size());
-            exampleMenu.add(addExampleNets(netMap.get(lens), "Colored P/T nets", charKey, modifier));
+            /*modifier = getModifier(modifier, charKey, netMap.get(timedGameLens).size());
+            charKey = countCharKey(charKey, netMap.get(timedGameLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(untimedColorLens), "Colored P/T nets", charKey, modifier));
 
-            charKey = countCharKey(charKey, netMap.get(lens).size());
-            exampleMenu.add(addExampleNets(netMap.get(lens), "Timed-Arc Colored Petri nets", charKey, modifier));
+            modifier = getModifier(modifier, charKey, netMap.get(untimedColorLens).size());
+            charKey = countCharKey(charKey, netMap.get(untimedColorLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(timedColorLens), "Timed-Arc Colored Petri nets", charKey, modifier));
             */
 
             return exampleMenu;
@@ -1492,8 +1497,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             if (filename.toLowerCase().endsWith(".tapn")) {
                 final String netname = filename.replace(".tapn", "");
                 final String filenameFinal = filename;
-
-
 
                 GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"", KeyStroke.getKeyStroke(charKey, modifier)) {
                     public void actionPerformed(ActionEvent arg0) {
@@ -1532,7 +1535,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         if (currentKey > 'Z') {
             addedSize = 'Z' - previousKey;
             missingSize = previousSize - addedSize;
-            currentKey = '0' + missingSize;
+            currentKey = ('0' - 1) + missingSize;
             if (currentKey > '9') {
                 missingSize -= 10;
                 currentKey = countCharKey('A'-1, missingSize);
@@ -1540,13 +1543,27 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         } else if (currentKey > '9' && currentKey < 'A') {
             addedSize = '9' - previousKey;
             missingSize = previousSize - addedSize;
-            currentKey = 'A' + missingSize;
+            currentKey = ('A' - 1) + missingSize;
             if (currentKey > 'Z') {
                 missingSize -= 26;
                 currentKey = countCharKey('0'-1, missingSize);
             }
         }
         return currentKey;
+    }
+
+    private int getModifier(int currentModifier, int charKey, int difference) {
+        if (currentModifier == InputEvent.ALT_MASK + InputEvent.SHIFT_MASK) {
+            if (charKey + difference > 'Z') {
+                int used = 'Z' - charKey;
+                if (difference - used > 10) {
+                    return InputEvent.ALT_MASK;
+                }
+            } else if (charKey < 'A' && (charKey + difference) > '9') {
+               return InputEvent.ALT_MASK;
+            }
+        }
+        return currentModifier;
     }
 
     /**
