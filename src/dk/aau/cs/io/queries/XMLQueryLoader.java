@@ -150,7 +150,7 @@ public class XMLQueryLoader extends QueryLoader{
         return queries;
     }
 
-    private boolean canBeCTL(Node prop) {
+    public static boolean canBeCTL(Node prop) {
         NodeList children = prop.getChildNodes();
         boolean correctQuantifiers = false;
 
@@ -163,7 +163,7 @@ public class XMLQueryLoader extends QueryLoader{
         return correctQuantifiers;
     }
 
-    private boolean checkQuantifiers(Node prop) {
+    private static boolean checkQuantifiers(Node prop) {
         NodeList children = prop.getChildNodes();
 
         for (int i = 0; i < children.getLength(); i++) {
@@ -180,7 +180,7 @@ public class XMLQueryLoader extends QueryLoader{
         return true;
     }
 
-    private boolean canBeLTL(Node prop) {
+    public static boolean canBeLTL(Node prop) {
         NodeList children = prop.getChildNodes();
         int allPathsCounter = 0;
 
@@ -193,7 +193,7 @@ public class XMLQueryLoader extends QueryLoader{
         return allPathsCounter == 1;
     }
 
-    private int countAllPaths(Node prop) {
+    private static int countAllPaths(Node prop) {
         NodeList children = prop.getChildNodes();
         int allPathsCounter = 0;
 

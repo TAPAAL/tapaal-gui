@@ -136,7 +136,8 @@ public class TAPNQueryLoader extends QueryLoader{
 		if(query instanceof LTLAGNode ||
                 query instanceof LTLAFNode ||
                 query instanceof LTLAUNode ||
-                query instanceof LTLAXNode){
+                query instanceof LTLAXNode ||
+                query instanceof LTLANode){
             return TAPNQuery.QueryCategory.LTL;
         } else if(query instanceof TCTLEUNode ||
                 query instanceof TCTLEXNode ||
@@ -209,7 +210,12 @@ public class TAPNQueryLoader extends QueryLoader{
         
 	private boolean isTypeQuery(Element queryElement, String type) {
 		if(!queryElement.hasAttribute("type")){
-			return false;
+		    if (type.equals("CTL")) {
+		        return XMLQueryLoader.canBeCTL(queryElement) && !XMLQueryLoader.canBeLTL(queryElement);
+            } else if (type.equals("LTL")) {
+                return !XMLQueryLoader.canBeCTL(queryElement) && XMLQueryLoader.canBeLTL(queryElement);
+            }
+            return false;
 		}
 		boolean result;
 		try {
