@@ -89,8 +89,10 @@ public class XMLQueryLoader extends QueryLoader{
             // Save query for later use in dialog window
             this.faultyQueries.add(queryWrapper);
 
-            boolean isCTL = isCTL(prop);
-            if (!isCTL && choice != 2 && choice != 3) {
+            boolean canBeCTL = canBeCTL(prop);
+            boolean canBeLTL = canBeLTL(prop);
+
+            if (canBeCTL && canBeLTL && choice != 2 && choice != 3) {
                 choice = JOptionPane.showOptionDialog(CreateGui.getApp(),
                     "Do you want to import the queries as CTL or LTL?",
                     "Choose query category",
@@ -99,17 +101,24 @@ public class XMLQueryLoader extends QueryLoader{
                     null,
                     new Object[]{"CTL", "LTL", "All CTL", "All LTL", "Cancel"},
                     0);
-
-                if (choice == 4) return null;
+            } else if (!canBeCTL && !canBeLTL) {
+                JOptionPane.showMessageDialog(CreateGui.getApp(),
+                    "One or more queries do not have the correct format.");
             }
+                if (choice == 4) return null;
+
+
+            boolean isCTL = (canBeCTL && !canBeLTL) || (canBeCTL && canBeLTL && (choice == 0 || choice == 2));
+            boolean isLTL = (!canBeCTL && canBeLTL) || (canBeCTL && canBeLTL && (choice == 1 || choice == 3));
+
 
             // Update queryWrapper name and property
-            if (isCTL || choice == 0 || choice == 2) {
+            if (isCTL) {
                 if (!XMLCTLQueryParser.parse(prop, queryWrapper)) {
                     queries.add(null);
                     continue;
                 }
-            } else if (choice == 1 || choice == 3) {
+            } else if (isLTL) {
                 if (!XMLLTLQueryParser.parse(prop, queryWrapper)) {
                     queries.add(null);
                     continue;
@@ -126,7 +135,7 @@ public class XMLQueryLoader extends QueryLoader{
             RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
                 network.activeTemplates().get(0).name());
 
-            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), isCTL || choice == 0 || choice == 2, !isCTL && (choice == 1 || choice == 3)));
+            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), isCTL, isLTL));
             
             if(query.getCategory() == TAPNQuery.QueryCategory.CTL || query.getCategory() == TAPNQuery.QueryCategory.LTL){
             	query.setSearchOption(SearchOption.DFS);
@@ -141,7 +150,37 @@ public class XMLQueryLoader extends QueryLoader{
         return queries;
     }
 
-    private boolean isCTL(Node prop) {
+    private boolean canBeCTL(Node prop) {
+        NodeList children = prop.getChildNodes();
+        boolean correctQuantifiers = false;
+
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeName().equals("formula")) {
+                correctQuantifiers = checkQuantifiers(child);
+            }
+        }
+        return correctQuantifiers;
+    }
+
+    private boolean checkQuantifiers(Node prop) {
+        NodeList children = prop.getChildNodes();
+
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeName().equals("finally") || child.getNodeName().equals("globally") ||
+                child.getNodeName().equals("next") || child.getNodeName().equals("until")) {
+                Node parent = child.getParentNode();
+                if (parent == null || !(parent.getNodeName().equals("all-paths") || parent.getNodeName().equals("exists-path"))) {
+                    return false;
+                }
+            }
+            if (!checkQuantifiers(child)) return false;
+        }
+        return true;
+    }
+
+    private boolean canBeLTL(Node prop) {
         NodeList children = prop.getChildNodes();
         int allPathsCounter = 0;
 
@@ -151,7 +190,7 @@ public class XMLQueryLoader extends QueryLoader{
                 allPathsCounter += countAllPaths(child);
             }
         }
-        return allPathsCounter != 1;
+        return allPathsCounter == 1;
     }
 
     private int countAllPaths(Node prop) {
