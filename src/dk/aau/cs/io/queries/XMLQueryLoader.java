@@ -104,7 +104,7 @@ public class XMLQueryLoader extends QueryLoader{
             }
 
             // Update queryWrapper name and property
-            if (choice == 0 || choice == 2) {
+            if (isCTL || choice == 0 || choice == 2) {
                 if (!XMLCTLQueryParser.parse(prop, queryWrapper)) {
                     queries.add(null);
                     continue;
@@ -126,7 +126,7 @@ public class XMLQueryLoader extends QueryLoader{
             RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
                 network.activeTemplates().get(0).name());
 
-            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), choice == 0 || choice == 2, choice == 1 || choice == 3));
+            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), isCTL || choice == 0 || choice == 2, !isCTL && (choice == 1 || choice == 3)));
             
             if(query.getCategory() == TAPNQuery.QueryCategory.CTL || query.getCategory() == TAPNQuery.QueryCategory.LTL){
             	query.setSearchOption(SearchOption.DFS);
