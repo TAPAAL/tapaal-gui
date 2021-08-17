@@ -102,6 +102,7 @@ public class VerifyTAPNExporter {
 	
 	private void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         //remove the net prefix from the place name
+        if (mapping.map(p.name()) == null) return;
         String placeName = mapping.map(p.name()).value2();
         Place guiPlace = null;
 
