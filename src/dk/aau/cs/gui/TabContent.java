@@ -589,6 +589,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
 
+			if (loadedModel == null) {
+                throw new Exception("Could not open the selected file, as it does not have the correct format.");
+			}
+
 			if (loadedModel.getMessages().size() != 0) {
                 new Thread(new Runnable() {
                     @Override
