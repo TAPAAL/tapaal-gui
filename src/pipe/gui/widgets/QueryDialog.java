@@ -2301,7 +2301,7 @@ public class QueryDialog extends JPanel {
 					} catch (Throwable ex) {
 						int choice = JOptionPane.showConfirmDialog(
 								CreateGui.getApp(),
-								"TAPAAL encountered an error trying to parse the specified query.\n\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
+								"TAPAAL encountered the following error while trying to parse the specified query:\n\n"+ex.getMessage()+"\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
 								"Error Parsing Query",
 								JOptionPane.YES_NO_OPTION,
 								JOptionPane.ERROR_MESSAGE);
