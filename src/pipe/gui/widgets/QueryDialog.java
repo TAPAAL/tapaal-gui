@@ -2293,15 +2293,28 @@ public class QueryDialog extends JPanel {
 					TCTLAbstractProperty newQuery = null;
 
 					try {
-					    if (lens.isTimed()) {
+					    if (queryField.getText().trim().equals("<*>")) {
+                            int choice = JOptionPane.showConfirmDialog(
+                                CreateGui.getApp(),
+                                "It is not possible to parse an empty query.\nThe specified query has not been saved. Do you want to edit it again?",
+                                "Error Parsing Query",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.ERROR_MESSAGE);
+                            if (choice == JOptionPane.NO_OPTION)
+                                returnFromManualEdit(null);
+                            else
+                                return;
+                        } else if (lens.isTimed()) {
                             newQuery = TAPAALQueryParser.parse(queryField.getText());
                         } else {
 						    newQuery = TAPAALCTLQueryParser.parse(queryField.getText());
                         }
 					} catch (Throwable ex) {
+					    String message = ex.getMessage() == null ? "TAPAAL encountered an error while trying to parse the specified query\n" :
+                            "TAPAAL encountered the following error while trying to parse the specified query:\n\n"+ex.getMessage();
 						int choice = JOptionPane.showConfirmDialog(
 								CreateGui.getApp(),
-								"TAPAAL encountered the following error while trying to parse the specified query:\n\n"+ex.getMessage()+"\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
+								message+"\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
 								"Error Parsing Query",
 								JOptionPane.YES_NO_OPTION,
 								JOptionPane.ERROR_MESSAGE);
@@ -2309,7 +2322,6 @@ public class QueryDialog extends JPanel {
 							returnFromManualEdit(null);
 						else
 							return;
-
 					}
 
 					if (newQuery != null) // new query parsed successfully
