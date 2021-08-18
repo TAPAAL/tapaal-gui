@@ -314,7 +314,13 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		add(listPanel, gbc);
 		
 		JPanel buttonPanel = new JPanel();
-		renameButton.setEnabled(false);
+		if (list.getModel().getSize() > 0) {
+            renameButton.setEnabled(true);
+            removeButton.setEnabled(true);
+        } else {
+            renameButton.setEnabled(false);
+            removeButton.setEnabled(false);
+        }
 		if (isDisplayingTransitions()){
 			renameButton.setToolTipText(toolTipRenameTransition);
 		}
@@ -328,7 +334,6 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 				showSharedPlaceNameDialog((SharedPlace)list.getSelectedValue());
 			}
 		});
-		removeButton.setEnabled(false);
 		if (isDisplayingTransitions()){
 			removeButton.setToolTipText(toolTipRemoveTransition);
 		}
