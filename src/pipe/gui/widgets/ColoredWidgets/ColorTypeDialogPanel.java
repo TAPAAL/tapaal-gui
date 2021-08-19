@@ -683,12 +683,12 @@ public class ColorTypeDialogPanel extends JPanel {
                     } else{
                         moveUpButton.setEnabled(false);
                     }
-
                     if(source.getSelectedIndex() < source.getModel().getSize()-1){
                         moveDownButton.setEnabled(true);
                     } else{
                         moveDownButton.setEnabled(false);
                     }
+                    productRemoveButton.setEnabled(true);
                 }
             }
         });
