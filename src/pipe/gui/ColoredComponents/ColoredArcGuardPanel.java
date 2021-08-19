@@ -370,7 +370,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
                 }
             }else{
                 PlaceHolderArcExpression pHExpr = new PlaceHolderArcExpression();
-                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), pHExpr);
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(arcExpression, pHExpr);
                 arcExpression = arcExpression.replace(arcExpression, pHExpr);
                 updateSelection(pHExpr);
                 undoSupport.postEdit(edit);
