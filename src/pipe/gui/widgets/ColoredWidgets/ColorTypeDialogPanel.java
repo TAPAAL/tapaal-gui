@@ -602,6 +602,11 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         cyclicAndFiniteEnumeration.add(thirdRow, gbc);
 
+        if (enumList.getSelectedIndex() == -1) {
+            moveUpButton.setEnabled(false);
+            moveDownButton.setEnabled(false);
+        }
+
         return cyclicAndFiniteEnumeration;
     }
 
