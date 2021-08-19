@@ -265,7 +265,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
         this.setPreferredSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 		hideIrrelevantInformation();
-
+        enableButtons(false);
 	}
 	private void hideIrrelevantInformation(){
 	    if(!parent.getLens().isColored()){
@@ -426,12 +426,42 @@ public class ConstantsPane extends JPanel implements SidePane {
             else if (isDisplayingColorTypes()) {
                 showEditColorTypeDialog(null);
             }
+            enableButtons(false);
         });
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(addConstantButton, gbc);
 	}
+
+	private void enableButtons(boolean afterRemoving) {
+	    System.out.println(list.getSelectedIndex());
+        if (list.getSelectedIndex() != -1 && list.getModel().getSize() > 0) {
+            if (afterRemoving) {
+                if (list.getSelectedIndex() == list.getModel().getSize()){
+                    editBtn.setEnabled(false);
+                    removeBtn.setEnabled(false);
+                } else if (list.getSelectedIndex() + 1 == list.getModel().getSize()) {
+                    moveDownButton.setEnabled(false);
+                }
+            } else {
+                editBtn.setEnabled(true);
+                removeBtn.setEnabled(true);
+
+                if (list.getSelectedIndex() > 0) {
+                    moveUpButton.setEnabled(true);
+                }
+                if (list.getSelectedIndex() != list.getModel().getSize() - 1) {
+                    moveDownButton.setEnabled(true);
+                }
+            }
+        } else {
+            editBtn.setEnabled(false);
+            removeBtn.setEnabled(false);
+            moveDownButton.setEnabled(false);
+            moveUpButton.setEnabled(false);
+        }
+    }
 
 	public void showConstants() {
 		TimedArcPetriNetNetwork model = parent.network();
@@ -482,14 +512,8 @@ public class ConstantsPane extends JPanel implements SidePane {
             if(list.getModel().getSize() > 0) {
                 list.setSelectedIndex(0);
                 list.ensureIndexIsVisible(0);
-            } else {
-                moveDownButton.setEnabled(false);
-                moveUpButton.setEnabled(false);
             }
-            if (list.getModel().getSize() <= 0){
-                editBtn.setEnabled(false);
-                removeBtn.setEnabled(false);
-            }
+            enableButtons(false);
         });
         // GBC for the scroller
         GridBagConstraints gbc = new GridBagConstraints();
@@ -740,11 +764,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             network.remove(variable, variablesListModel, undoManager, messages);
             if(messages.isEmpty()){
                 //Since we just removed our selection everything is false
-                moveDownButton.setEnabled(false);
-                moveUpButton.setEnabled(false);
-                removeBtn.setEnabled(false);
-                editBtn.setEnabled(false);
-
+                enableButtons(true);
                 updateName();
             } else{
                 String message = "Variable could not be removed for the following reasons: \n\n";
@@ -826,10 +846,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             network.remove(colorType, colorTypesListModel, undoManager, messages);
             if(messages.isEmpty()){
                 //Since we just removed our selection everything is false
-                moveDownButton.setEnabled(false);
-                moveUpButton.setEnabled(false);
-                removeBtn.setEnabled(false);
-                editBtn.setEnabled(false);
+                enableButtons(true);
                 updateName();
             } else{
                 String message = "Color type could not be removed for the following reasons: \n\n";
