@@ -70,11 +70,6 @@ public class XMLLTLQueryParser {
         Node child = getFirstChildNode(property);
         String nodeName = property.getNodeName();
 
-        String childNodeName = "";
-        if(child != null){
-            childNodeName = child.getNodeName();
-        }
-
         ArrayList<Node> children;
 
         if(nodeName.equals("invariant")){
@@ -119,12 +114,7 @@ public class XMLLTLQueryParser {
                 return new LTLAGNode((TCTLAbstractStateProperty)childProperty);
             }
         } else if (nodeName.equals("next")){
-            Node firstChild = getFirstChildNode(child);
-            if (firstChild != null) {
-                childProperty = parseFormula(getFirstChildNode(child));
-            } else {
-                childProperty = parseFormula(child);
-            }
+            childProperty = parseFormula(child);
             if(childProperty instanceof TCTLAbstractPathProperty){
                 return new LTLAXNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
             } else{
