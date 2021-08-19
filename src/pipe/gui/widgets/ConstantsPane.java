@@ -130,7 +130,10 @@ public class ConstantsPane extends JPanel implements SidePane {
                     sortButton.setEnabled(false);
                     return;
                 }
-                else  {
+                else if (list.getSelectedValue().equals(ColorType.COLORTYPE_DOT)) {
+                    removeBtn.setEnabled(false);
+                    editBtn.setEnabled(false);
+                } else {
                     removeBtn.setEnabled(true);
                     editBtn.setEnabled(true);
                     sortButton.setEnabled(true);
@@ -390,7 +393,6 @@ public class ConstantsPane extends JPanel implements SidePane {
 		removeBtn.setEnabled(false);
 		removeBtn.setToolTipText(toolTipRemoveColorType);
 		removeBtn.addActionListener(e -> {
-            System.out.println("Remove");
             if (isDisplayingGlobalConstants()) {
                 String constName = ((Constant) list.getSelectedValue()).name();
                 removeConstant(constName);
@@ -435,7 +437,6 @@ public class ConstantsPane extends JPanel implements SidePane {
 	}
 
 	private void enableButtons(boolean afterRemoving) {
-	    System.out.println(list.getSelectedIndex());
         if (list.getSelectedIndex() != -1 && list.getModel().getSize() > 0) {
             if (afterRemoving) {
                 if (list.getSelectedIndex() == list.getModel().getSize()){
@@ -454,6 +455,10 @@ public class ConstantsPane extends JPanel implements SidePane {
                 if (list.getSelectedIndex() != list.getModel().getSize() - 1) {
                     moveDownButton.setEnabled(true);
                 }
+            }
+            if (list.getSelectedValue().equals(ColorType.COLORTYPE_DOT)) {
+                editBtn.setEnabled(false);
+                removeBtn.setEnabled(false);
             }
         } else {
             editBtn.setEnabled(false);
