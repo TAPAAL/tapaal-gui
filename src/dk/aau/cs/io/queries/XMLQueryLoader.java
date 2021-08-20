@@ -92,24 +92,24 @@ public class XMLQueryLoader extends QueryLoader{
             boolean canBeCTL = canBeCTL(prop);
             boolean canBeLTL = canBeLTL(prop);
 
-            if (canBeCTL && canBeLTL && choice != 2 && choice != 3) {
+            if (canBeCTL && canBeLTL && choice == -1) {
                 choice = JOptionPane.showOptionDialog(CreateGui.getApp(),
-                    "Do you want to import the queries as CTL or LTL?",
+                    "There were some queries that can be classified both as LTL and CTL. \nHow do you want to import them?",
                     "Choose query category",
                     JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
                     null,
-                    new Object[]{"CTL", "LTL", "All CTL", "All LTL", "Cancel"},
+                    new Object[]{"Import all as CTL", "Import all as LTL", "Cancel"},
                     0);
             } else if (!canBeCTL && !canBeLTL) {
                 JOptionPane.showMessageDialog(CreateGui.getApp(),
                     "One or more queries do not have the correct format.");
             }
-                if (choice == 4) return null;
+                if (choice == 2) return null;
 
 
-            boolean isCTL = (canBeCTL && !canBeLTL) || (canBeCTL && canBeLTL && (choice == 0 || choice == 2));
-            boolean isLTL = (!canBeCTL && canBeLTL) || (canBeCTL && canBeLTL && (choice == 1 || choice == 3));
+            boolean isCTL = (canBeCTL && !canBeLTL) || (canBeCTL && canBeLTL && choice == 0);
+            boolean isLTL = (!canBeCTL && canBeLTL) || (canBeCTL && canBeLTL && choice == 1 );
 
 
             // Update queryWrapper name and property
@@ -215,6 +215,7 @@ public class XMLQueryLoader extends QueryLoader{
         // Suppress default error message
         loader.showErrorMessage = false;
         LoadedQueries loadedQueries = loader.parseQueries();
+        if (loadedQueries == null) return;
 	
         for(TAPNQuery query : loadedQueries.getQueries()){
             CreateGui.getCurrentTab().addQuery(query);

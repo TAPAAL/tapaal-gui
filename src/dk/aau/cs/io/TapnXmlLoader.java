@@ -128,8 +128,10 @@ public class TapnXmlLoader {
 		Collection<Template> templates = parseTemplates(doc, network, constants);
 		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network).parseQueries();
 
-		for(String message : loadedQueries.getMessages()){
-		    messages.add(message);
+		if (loadedQueries != null) {
+            for (String message : loadedQueries.getMessages()) {
+                messages.add(message);
+            }
         }
 		network.buildConstraints();
 		
