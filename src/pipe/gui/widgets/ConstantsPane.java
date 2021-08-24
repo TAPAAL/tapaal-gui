@@ -330,6 +330,13 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 		listModel.updateAll();
 
+        if (constantsList.getSelectedIndex() == -1 || constantsList.getSelectedValuesList().isEmpty()) {
+            editBtn.setEnabled(false);
+            removeBtn.setEnabled(false);
+        } else {
+            removeBtn.setEnabled(true);
+            editBtn.setEnabled(true);
+        }
 	}
 
 	private void addConstantsComponents() {
