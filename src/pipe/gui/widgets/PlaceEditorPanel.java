@@ -60,6 +60,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private final Context context;
 	private boolean makeNewShared = false;
 	private boolean doNewEdit = true;
+	private  boolean doOKChecked = false;
 	private final TabContent currentTab;
 	
 	private Vector<TimedPlace> sharedPlaces;
@@ -124,7 +125,12 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
-		cancelButton.addActionListener(evt -> exit());
+		cancelButton.addActionListener(evt -> {
+            if (doOKChecked) {
+                context.undoManager().undo();
+            }
+		    exit();
+        });
 
 		gridBagConstraints = GridBagHelper.as(0,0,EAST, new Insets(5, 5, 5, 5));
 		gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
@@ -224,15 +230,17 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		
 		makeSharedButton.addActionListener(evt -> {
 			makeNewShared = true;
+            makeSharedButton.setEnabled(false);
 			if(doOK()){
 				setupInitialState();
-				makeSharedButton.setEnabled(false);
 				sharedCheckBox.setEnabled(true);
 				sharedCheckBox.setSelected(true);
 				switchToNameDropDown();
 				sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
-			}
-			makeNewShared = false;
+			} else {
+                makeSharedButton.setEnabled(true);
+                doOKChecked = false;
+            }
 		});
 		
 		gridBagConstraints = GridBagHelper.as(3,1, WEST, new Insets(5, 5, 5, 5));
@@ -590,7 +598,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
                 context.nameGenerator().updateIndices(context.activeModel(), newName);
             }
 		
-			if(makeNewShared){
+			if(makeNewShared && !makeSharedButton.isEnabled()){
 				Command command = new MakePlaceNewSharedCommand(context.activeModel(), newName, place.underlyingPlace(), place, context.tabContent(), false);
 				context.undoManager().addEdit(command);
 				try{
@@ -613,6 +621,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 					}
 				}	
 			}
+			doOKChecked = true;
 		}
 
 		if(newMarking != place.underlyingPlace().numberOfTokens()){
