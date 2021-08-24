@@ -247,6 +247,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		basicPropertiesPanel.add(makeSharedButton, gridBagConstraints);
 		
 		nameLabel = new javax.swing.JLabel("Name:");
+		nameLabel = new javax.swing.JLabel("Name:");
 		gridBagConstraints = GridBagHelper.as(0,1, EAST, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(nameLabel, gridBagConstraints);
 
@@ -621,7 +622,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 					}
 				}	
 			}
-			doOKChecked = true;
 		}
 
 		if(newMarking != place.underlyingPlace().numberOfTokens()){
@@ -650,8 +650,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		place.repaint();
 
 		context.network().buildConstraints();
-		
-		return true;
+
+        doOKChecked = true;
+
+        return true;
 	}
 
 	private TimeInvariant constructInvariant() {
