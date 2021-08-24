@@ -19,10 +19,8 @@ import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public class ColorTypeDialogPanel extends JPanel {
@@ -490,7 +488,16 @@ public class ColorTypeDialogPanel extends JPanel {
         cyclicRemoveButton.setEnabled(false);
         cyclicRemoveButton.addActionListener(actionEvent -> {
             ArrayList<String> messages = new ArrayList<>();
-            if(oldColorType == null || network.canColorBeRemoved((dk.aau.cs.model.CPN.Color) enumList.getSelectedValue(), messages)) {
+
+            dk.aau.cs.model.CPN.Color color;
+            if (!(enumList.getSelectedValue() instanceof dk.aau.cs.model.CPN.Color)) {
+                ColorType colorType = new ColorType(nameTextField.getText());
+                color = new dk.aau.cs.model.CPN.Color(colorType, enumList.getSelectedIndex(), enumList.getSelectedValue().toString());
+            } else {
+                color = (dk.aau.cs.model.CPN.Color) enumList.getSelectedValue();
+            }
+
+            if(oldColorType == null || network.canColorBeRemoved(color, messages)) {
                 cyclicModel.removeElementAt(enumList.getSelectedIndex());
                 enumList.setModel(cyclicModel);
             }else{
@@ -995,13 +1002,21 @@ public class ColorTypeDialogPanel extends JPanel {
                 break;
             case productColor:
                 ProductType productType = new ProductType(name);
+                List<ColorType> availableColorTypes = new ArrayList<>();
+                for (ColorType type : colorTypes) {
+                    if (!type.getName().equals(name)) {
+                        availableColorTypes.add(type);
+                    }
+                }
                 int size = productColorTypeList.getModel().getSize();
+                System.out.println(productColorTypeList.getSelectedValue() instanceof ColorType);
+                System.out.println(productTypeComboBox.getSelectedItem() instanceof ColorType);
                 for (int i = 0; i < size; i++) {
                     String colorTypeName = productColorTypeList.getModel().getElementAt(i).toString();
                     int size2 = productTypeComboBox.getItemCount();
                     for (int j = 0; j < size2; j++) {
                         if (colorTypeName.equals(productTypeComboBox.getItemAt(j).toString())) {
-                            productType.addType(colorTypes.get(j));
+                            productType.addType((ColorType) productTypeComboBox.getItemAt(j));
                         }
                     }
                 }
