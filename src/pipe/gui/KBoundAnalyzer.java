@@ -81,9 +81,21 @@ public class KBoundAnalyzer {
 
 	protected TAPNQuery getPNBoundednessQuery() {
         TCTLAbstractProperty property;
+
+        int totalTokens = k + tapnNetwork.marking().size();
+        TCTLAtomicPropositionNode child = new TCTLAtomicPropositionNode(new TCTLTermListNode(getFactors()), "<=", new TCTLConstNode(totalTokens));
+
+        property = new TCTLAGNode(child);
+
+        TAPNQuery query = new TAPNQuery(property, k);
+        query.setCategory(QueryCategory.CTL);
+
+        return query;
+    }
+
+    private ArrayList<TCTLAbstractStateProperty> getFactors() {
         TimedArcPetriNet net = mergeNetComponents();
         ArrayList<TCTLAbstractStateProperty> factors = new ArrayList<>();
-        int totalTokens = k + tapnNetwork.marking().size();
 
         tapnNetwork.sharedPlaces().forEach(o -> {
             if (net.getPlaceByName(o.name()) != null && !net.getPlaceByName(o.name()).name().contains("Shared_")) {
@@ -100,11 +112,7 @@ public class KBoundAnalyzer {
         }
         if (factors.get(factors.size()-1) instanceof AritmeticOperator) factors.remove(factors.size()-1);
 
-        TCTLAtomicPropositionNode child = new TCTLAtomicPropositionNode(new TCTLTermListNode(factors), "<=", new TCTLConstNode(totalTokens));
-
-        property = new TCTLAGNode(child);
-
-        return new TAPNQuery(property, k);
+        return factors;
     }
 
     private TimedArcPetriNet mergeNetComponents() {
