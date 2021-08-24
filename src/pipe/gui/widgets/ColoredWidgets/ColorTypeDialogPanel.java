@@ -1,15 +1,12 @@
 package pipe.gui.widgets.ColoredWidgets;
 
-import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.gui.components.ColortypeListCellRenderer;
 import dk.aau.cs.gui.undo.Colored.AddColorTypeCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import net.tapaal.swinghelpers.GridBagHelper;
 import org.jdesktop.swingx.JXComboBox;
-import org.jdesktop.swingx.util.GraphicsUtilities;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
@@ -20,12 +17,12 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public class ColorTypeDialogPanel extends JPanel {
@@ -456,16 +453,25 @@ public class ColorTypeDialogPanel extends JPanel {
                     CreateGui.getApp(),
                     "The color cannot be named \"" + enumerationName + "\", as the name is reserved",
                     "Error", JOptionPane.ERROR_MESSAGE);
-            } else if (cyclicModel.contains(enumTextField.getText())) {
+            } else {
+                boolean inList = false;
+                int i = 0;
+                while (!inList && i < cyclicModel.getSize() && cyclicModel.getElementAt(i) != null) {
+                    System.out.println(cyclicModel.getElementAt(i).toString());
+                    inList = cyclicModel.getElementAt(i).toString().equals(enumTextField.getText());
+                    i++;
+                }
+               if (inList) {
                 JOptionPane.showMessageDialog(
                     CreateGui.getApp(),
                     "A color with the name \"" + enumerationName + "\" already exists",
                     "Error", JOptionPane.ERROR_MESSAGE);
-            }else {
-                cyclicModel.addElement(enumTextField.getText());
-                enumList.setModel(cyclicModel);
-                enumTextField.setText("");
-                cyclicRemoveButton.setEnabled(true);
+                } else {
+                   cyclicModel.addElement(enumTextField.getText());
+                   enumList.setModel(cyclicModel);
+                   enumTextField.setText("");
+                   cyclicRemoveButton.setEnabled(true);
+               }
             }
         });
 
@@ -484,7 +490,7 @@ public class ColorTypeDialogPanel extends JPanel {
         cyclicRemoveButton.setEnabled(false);
         cyclicRemoveButton.addActionListener(actionEvent -> {
             ArrayList<String> messages = new ArrayList<>();
-            if(oldColorType == null || network.canColorBeRemoved((dk.aau.cs.model.CPN.Color) enumList.getSelectedValue(),messages)) {
+            if(oldColorType == null || network.canColorBeRemoved((dk.aau.cs.model.CPN.Color) enumList.getSelectedValue(), messages)) {
                 cyclicModel.removeElementAt(enumList.getSelectedIndex());
                 enumList.setModel(cyclicModel);
             }else{
