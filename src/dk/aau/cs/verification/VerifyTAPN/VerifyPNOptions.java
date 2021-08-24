@@ -84,7 +84,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 			result.append(" -a 10 ");
 		}
 		if (this.queryReductionTime == QueryReductionTime.NoTime) {
-			result.append(" -q 0 ");
+			result.append(
+			    " -q 0 ");
 		} else if (this.queryReductionTime == QueryReductionTime.ShortestTime) {
 		    //Run query reduction for 1 second, to avoid conflict with -s OverApprox argument, but also still not run the verification.
 		    result.append(" -q 1");
