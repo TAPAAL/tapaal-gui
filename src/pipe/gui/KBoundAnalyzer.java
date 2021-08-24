@@ -72,20 +72,15 @@ public class KBoundAnalyzer {
 	}
 
 	protected TAPNQuery getBoundednessQuery() {
-		TCTLAbstractProperty property = null;
-
-		property = new TCTLAGNode(new TCTLTrueNode());
-
+		TCTLAbstractProperty property = new TCTLAGNode(new TCTLTrueNode());
 		return new TAPNQuery(property, k);
 	}
 
 	protected TAPNQuery getPNBoundednessQuery() {
-        TCTLAbstractProperty property;
-
         int totalTokens = k + tapnNetwork.marking().size();
-        TCTLAtomicPropositionNode child = new TCTLAtomicPropositionNode(new TCTLTermListNode(getFactors()), "<=", new TCTLConstNode(totalTokens));
 
-        property = new TCTLAGNode(child);
+        TCTLAtomicPropositionNode child = new TCTLAtomicPropositionNode(new TCTLTermListNode(getFactors()), "<=", new TCTLConstNode(totalTokens));
+        TCTLAbstractProperty property = new TCTLAGNode(child);
 
         TAPNQuery query = new TAPNQuery(property, k);
         query.setCategory(QueryCategory.CTL);
