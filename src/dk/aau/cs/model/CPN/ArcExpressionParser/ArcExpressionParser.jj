@@ -39,13 +39,13 @@ public class ArcExpressionParser {
 	    colorType = inputPlaceColorType;
 	    network = inputNetwork;
 		ArcExpressionParser parser = new ArcExpressionParser(new StringReader(expression));
-		return parser.AddExpression();
+		return parser.StartAddExpression();
 	}
 	public static ArcExpression parseNumberOfExpression(String expression, ColorType inputPlaceColorType, TimedArcPetriNetNetwork inputNetwork) throws ParseException {
         colorType = inputPlaceColorType;
         network = inputNetwork;
         ArcExpressionParser parser = new ArcExpressionParser(new StringReader(expression));
-        return parser.NumberOfExpression();
+        return parser.StartNumberOfExpression();
     }
 }
 PARSER_END(ArcExpressionParser)
@@ -73,6 +73,16 @@ SKIP :
 | "\n"
 | "\r"
 }
+ArcExpression StartAddExpression() :
+{
+	ArcExpression currentChild;
+	Vector<ArcExpression> constituents = new Vector<ArcExpression>();
+}
+{
+	currentChild = AddExpression() <EOF>
+	{ return currentChild; }
+}
+
 ArcExpression AddExpression() :
 {
 	ArcExpression currentChild;
@@ -118,6 +128,16 @@ ArcExpression term() : {
         childExpression = NumberOfExpression() {return childExpression;}
     | "(" childExpression = AddExpression() ")" {return childExpression;}
 }
+
+NumberOfExpression StartNumberOfExpression() : {
+        NumberOfExpression child;
+	}
+	{
+        child = NumberOfExpression() <EOF>
+        {
+            return child;
+        }
+	}
 
 NumberOfExpression NumberOfExpression() : {
         Token number;
