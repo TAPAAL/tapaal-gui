@@ -33,7 +33,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 			    if (modelChecker instanceof VerifyPN && !result.getRawOutput().contains("max tokens:")) {
                     Object[] options = {"Ok", "Minimize extra tokens"};
                     int answer = JOptionPane.showOptionDialog(CreateGui.getApp(),
-                        getAnswerBoundedString(), "Analysis Result,",
+                        getPNAnswerBoundedString(), "Analysis Result,",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
                         ResourceManager.satisfiedIcon(), options, JOptionPane.OK_OPTION);
                     return answer != JOptionPane.OK_OPTION;
@@ -70,7 +70,15 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 		return "The net with the specified extra number of tokens is bounded.\n\n"
 				+ "This means that the analysis will be exact and always give \n"
 				+ "the correct answer.\n\n"
-				+ "The number of extra tokens can be lowered to the minimum \n"
-                + "number of tokens needed for an exact analysis.";
+				+ "The number of extra tokens was automatically lowered to the\n"
+				+ "minimum number of tokens needed for an exact analysis.";
 	}
+
+	protected String getPNAnswerBoundedString() {
+        return "The net with the specified extra number of tokens is bounded.\n\n"
+            + "This means that the analysis will be exact and always give \n"
+            + "the correct answer.\n\n"
+            + "The number of extra tokens can be lowered to the minimum number\n"
+            + "of tokens needed for an exact analysis.";
+    }
 }
