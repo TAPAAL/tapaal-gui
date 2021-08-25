@@ -45,24 +45,27 @@ public class KBoundAnalyzer {
 	}
 
 	public void analyze() {
+		analyze(verificationOptions());
+	}
+
+    public void analyze(VerifyTAPNOptions options) {
         TAPNQuery query;
         if (modelChecker instanceof VerifyPN) {
             query = getPNBoundednessQuery();
         } else {
             query = getBoundednessQuery();
         }
-		VerifyTAPNOptions options = verificationOptions();
 
-		RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, spinner);
-		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), analyzer);
+        RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, spinner);
+        RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), analyzer);
 
-		analyzer.execute(options, tapnNetwork, query, null);
-		dialog.setVisible(true);
-	}
+        analyzer.execute(options, tapnNetwork, query, null);
+        dialog.setVisible(true);
+    }
 
 	protected VerifyTAPNOptions verificationOptions() {
 		if(modelChecker instanceof VerifyPN){
-			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.Default, AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime, false, null, false);
+			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.Default, AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime, false, null, false);
 		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
 		} else if(modelChecker instanceof VerifyTAPNDiscreteVerification){

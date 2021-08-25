@@ -45,7 +45,7 @@ public class RunVerification extends RunVerificationBase {
 	}
 
 	@Override
-	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
+	protected boolean showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if (result != null && !result.error()) {
 			if(callback != null){
 				callback.run(result);
@@ -98,6 +98,7 @@ public class RunVerification extends RunVerificationBase {
 			messenger.displayWrappedErrorMessage(message,"Error during verification");
 
 		}
+		return false;
 	}
 
 	private String toHTML(String string){
