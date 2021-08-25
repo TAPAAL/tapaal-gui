@@ -123,6 +123,12 @@ public abstract class TimedPlace {
         fireMarkingChanged();
     }
 
+    public void updateTokens(Iterable<TimedToken> tokens, ArcExpression expression) {
+        currentMarking.removePlaceFromMarking(this);
+        addTokens(tokens);
+        setTokenExpression(expression);
+    }
+
     public abstract Tuple<PlaceType, Integer> extrapolate();
 	
 	public abstract TimedPlace copy();

@@ -53,13 +53,10 @@ public class ColoredPlaceMarkingEdit extends Command {
             context.activeModel().marking().remove(token);
         }
 
-        for (TimedToken token : tokenList) {
-            context.activeModel().marking().add(token);
-        }
-
         place.underlyingPlace().setColorType(oldColorType);
         place.underlyingPlace().setCtiList(oldCtiList);
-        place.underlyingPlace().setTokenExpression(oldExpression);
+        place.underlyingPlace().updateTokens(tokenList, oldExpression);
+
 
         place.update(true);
         place.repaint();
@@ -67,23 +64,15 @@ public class ColoredPlaceMarkingEdit extends Command {
 
     @Override
     public void redo() {
-
-
         for (TimedToken token : tokenList) {
             context.activeModel().marking().remove(token);
         }
 
-        for (TimedToken token : newTokenList) {
-            context.activeModel().marking().add(token);
-        }
-
         place.underlyingPlace().setCtiList(ctiList);
         place.underlyingPlace().setColorType(colorType);
-        place.underlyingPlace().setTokenExpression(newExpression);
-
+        place.underlyingPlace().updateTokens(newTokenList, newExpression);
 
         place.update(true);
         place.repaint();
-
     }
 }

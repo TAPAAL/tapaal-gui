@@ -760,6 +760,7 @@ public class PlaceEditorPanel extends JPanel {
         Command command = new ColoredPlaceMarkingEdit(oldTokenList, tokensToAdd, oldExpression, newExpression, context, place, ctiList, colorType);
         command.redo();
         context.undoManager().addEdit(command);
+        //place.underlyingPlace().updateTokens(tokensToAdd, newExpression);
     }
 
 	private TimeInvariant constructInvariant() {
