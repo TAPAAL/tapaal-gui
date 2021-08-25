@@ -98,6 +98,7 @@ public class PlaceEditorPanel extends JPanel {
 
     private Vector<TimedPlace> sharedPlaces;
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
+	protected final ArcExpression originalExpression;
 
 	public PlaceEditorPanel(EscapableDialog parent,JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
 		this.rootPane = rootPane;
@@ -110,7 +111,8 @@ public class PlaceEditorPanel extends JPanel {
 		mainPanel = new JPanel(new GridBagLayout());
         JScrollPane scrollPane = new JScrollPane();
 		initComponents();
-		hideIrrelevantInformation();
+        originalExpression = place.underlyingPlace().getTokensAsExpression().deepCopy();
+        hideIrrelevantInformation();
 		scrollPane.setViewportView(mainPanel);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -196,7 +198,10 @@ public class PlaceEditorPanel extends JPanel {
 		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
-		cancelButton.addActionListener(evt -> exit());
+		cancelButton.addActionListener(evt -> {
+            place.underlyingPlace().setTokenExpression(originalExpression);
+		    exit();
+        });
 
 		gridBagConstraints = GridBagHelper.as(0,0,EAST, new Insets(5, 5, 5, 5));
 		gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
@@ -735,7 +740,6 @@ public class PlaceEditorPanel extends JPanel {
         ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
         ArrayList<TimedToken> oldTokenList = new ArrayList(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
         List<ColoredTimeInvariant> ctiList = new ArrayList<>();
-        ArcExpression oldExpression = place.underlyingPlace().getTokensAsExpression();
         Vector<ArcExpression> v = new Vector<>();
 
         for(int i = 0; i < coloredTokenListModel.getSize();i++){
@@ -757,10 +761,9 @@ public class PlaceEditorPanel extends JPanel {
         if(!colorType.equals(place.underlyingPlace().getColorType())){
             updateArcsAccordingToColorType();
         }
-        Command command = new ColoredPlaceMarkingEdit(oldTokenList, tokensToAdd, oldExpression, newExpression, context, place, ctiList, colorType);
+        Command command = new ColoredPlaceMarkingEdit(oldTokenList, tokensToAdd, originalExpression, newExpression, context, place, ctiList, colorType);
         command.redo();
         context.undoManager().addEdit(command);
-        //place.underlyingPlace().updateTokens(tokensToAdd, newExpression);
     }
 
 	private TimeInvariant constructInvariant() {
@@ -814,11 +817,9 @@ public class PlaceEditorPanel extends JPanel {
                 updateSpinnerValue(false);
                 addColoredTokenButton.setText("Modify");
                 removeColoredTokenButton.setEnabled(true);
-
             } else if(tokenList.isSelectionEmpty()){
                 addColoredTokenButton.setText("Add");
                 removeColoredTokenButton.setEnabled(false);
-
             }
         });
 
