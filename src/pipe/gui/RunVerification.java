@@ -31,7 +31,7 @@ public class RunVerification extends RunVerificationBase {
 	private final IconSelector iconSelector;
 	private final VerificationCallback callback;
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, String reducedNetFilePath, boolean reduceNetOnly) {
-		super(modelChecker, messenger, reducedNetFilePath, reduceNetOnly);
+		super(modelChecker, messenger, reducedNetFilePath, reduceNetOnly, null);
 		iconSelector = selector;
 		this.callback = callback;
 	}

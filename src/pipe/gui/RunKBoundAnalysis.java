@@ -73,8 +73,4 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 				+ "The number of extra tokens was automatically lowered to the\n"
 				+ "minimum number of tokens needed for an exact analysis.";
 	}
-
-	public JSpinner getSpinner() {
-	    return spinner;
-    }
 }

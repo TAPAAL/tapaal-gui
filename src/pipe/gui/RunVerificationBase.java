@@ -47,21 +47,21 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	protected Messenger messenger;
 
-	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, String reducedNetFilePath, boolean reduceNetOnly) {
+	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, String reducedNetFilePath, boolean reduceNetOnly, JSpinner spinner) {
 		super();
 		this.modelChecker = modelChecker;
 		this.messenger = messenger;
 		this.reducedNetFilePath = reducedNetFilePath;
 		this.reduceNetOnly = reduceNetOnly;
-	}
+        this.spinner = spinner;
+    }
 
     public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
-        this(modelChecker, messenger, null, false);
+        this(modelChecker, messenger, null, false, null);
     }
 
     public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, JSpinner spinner) {
-        this(modelChecker, messenger, null, false);
-        this.spinner = spinner;
+        this(modelChecker, messenger, null, false, spinner);
     }
 
 	
