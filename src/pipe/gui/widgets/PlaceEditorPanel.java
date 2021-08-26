@@ -111,8 +111,9 @@ public class PlaceEditorPanel extends JPanel {
 		mainPanel = new JPanel(new GridBagLayout());
         JScrollPane scrollPane = new JScrollPane();
 		initComponents();
-        originalExpression = place.underlyingPlace().getTokensAsExpression().deepCopy();
-        hideIrrelevantInformation();
+		if (place.underlyingPlace().getTokensAsExpression() != null) originalExpression = place.underlyingPlace().getTokensAsExpression().deepCopy();
+        else originalExpression = null;
+		hideIrrelevantInformation();
 		scrollPane.setViewportView(mainPanel);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
