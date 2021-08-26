@@ -1,8 +1,6 @@
 package pipe.gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Insets;
+import java.awt.*;
 
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -17,7 +15,7 @@ public class MessengerImpl implements Messenger {
 	}
 
 	public void displayInfoMessage(String message, String title) {
-		showMessageBox(message, title, JOptionPane.INFORMATION_MESSAGE);
+		showMessageBox(getTextArea(message), title, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public void displayErrorMessage(String message) {
@@ -25,7 +23,7 @@ public class MessengerImpl implements Messenger {
 	}
 
 	public void displayErrorMessage(String message, String title) {
-		showMessageBox(message, title, JOptionPane.ERROR_MESSAGE);
+        showMessageBox(getTextArea(message), title, JOptionPane.ERROR_MESSAGE);
 	}
 
 	private void showMessageBox(Object message, String title, int messageType) {
@@ -36,7 +34,7 @@ public class MessengerImpl implements Messenger {
 	public void displayWrappedErrorMessage(String message, String title) {
 		JTextArea textArea = new JTextArea(message);
 		textArea.setEditable(false);
-		textArea.setEnabled(false);
+		textArea.setEnabled(true);
 		textArea.setDisabledTextColor(Color.BLACK);
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
@@ -47,4 +45,15 @@ public class MessengerImpl implements Messenger {
 
 		showMessageBox(scrollPane, title, JOptionPane.ERROR_MESSAGE);
 	}
+
+	private JTextArea getTextArea(String message) {
+        JTextArea textArea = new JTextArea(message);
+        textArea.setEditable(false);
+        textArea.setEnabled(true);
+        textArea.setDisabledTextColor(Color.BLACK);
+        textArea.setBackground(Color.getColor("FFe0d0"));
+        textArea.setLineWrap(false);
+
+        return textArea;
+    }
 }
