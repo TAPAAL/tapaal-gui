@@ -455,7 +455,6 @@ public class ColorTypeDialogPanel extends JPanel {
                 boolean inList = false;
                 int i = 0;
                 while (!inList && i < cyclicModel.getSize() && cyclicModel.getElementAt(i) != null) {
-                    System.out.println(cyclicModel.getElementAt(i).toString());
                     inList = cyclicModel.getElementAt(i).toString().equals(enumTextField.getText());
                     i++;
                 }
@@ -584,8 +583,6 @@ public class ColorTypeDialogPanel extends JPanel {
             int index = enumList.getSelectedIndex();
             if (index > 0) {
                 enumList.setSelectedIndex(index-1);
-                System.out.println(index);
-                System.out.println(cyclicModel.size());
                 swapColors(cyclicModel,index, index -1);
 
             }
@@ -1009,8 +1006,6 @@ public class ColorTypeDialogPanel extends JPanel {
                     }
                 }
                 int size = productColorTypeList.getModel().getSize();
-                System.out.println(productColorTypeList.getSelectedValue() instanceof ColorType);
-                System.out.println(productTypeComboBox.getSelectedItem() instanceof ColorType);
                 for (int i = 0; i < size; i++) {
                     String colorTypeName = productColorTypeList.getModel().getElementAt(i).toString();
                     int size2 = productTypeComboBox.getItemCount();
