@@ -28,7 +28,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Vector;
+import java.util.*;
+import java.util.List;
 
 public class ColoredTransitionGuardPanel  extends JPanel {
 
@@ -142,10 +143,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         colorTypeCombobox.setPreferredSize(new Dimension(200,25));
         colorTypeCombobox.setRenderer(new ColorComboBoxRenderer(colorTypeCombobox));
 
-
-        for (ColorType element : context.network().colorTypes()) {
-            colorTypeCombobox.addItem(element);
-        }
+       addColorTypesToCombobox(context.network().colorTypes());
 
         if (colorTypeCombobox.getItemCount() != 0) {
             colorTypeCombobox.setSelectedIndex(0);
@@ -748,11 +746,53 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     colorTypeCombobox.setEnabled(false);
                 }
             }
+            updateColorTypeCombobox();
         }else{
             colorTypeCombobox.setEnabled(true);
+            addColorTypesToCombobox(context.network().colorTypes());
         }
     }
 
+    private void updateColorTypeCombobox() {
+        List<Expression> possibleExpressions = getPropertyChildren(newProperty.getChildren());
+        ColorType type = null;
+
+        int lastIndex = possibleExpressions.size() - 1;
+
+        if (lastIndex == 0 && possibleExpressions.get(lastIndex) instanceof ColorExpression) {
+            type = ((ColorExpression) possibleExpressions.get(lastIndex)).getColorType(context.network().colorTypes());
+            addColorTypesToCombobox(Arrays.asList(type));
+        } else if (lastIndex > 0) {
+            if (possibleExpressions.get(lastIndex) instanceof TupleExpression) {
+                type = ((ColorExpression) possibleExpressions.get(lastIndex)).getColorType(context.network().colorTypes());
+            } else if (possibleExpressions.get(lastIndex - 1) instanceof ColorExpression) {
+                type = ((ColorExpression) possibleExpressions.get(lastIndex - 1)).getColorType(context.network().colorTypes());
+            }
+            if (type != null) addColorTypesToCombobox(Collections.singletonList(type));
+        } else {
+            addColorTypesToCombobox(context.network().colorTypes());
+        }
+    }
+
+    private List<Expression> getPropertyChildren(ExprStringPosition[] children) {
+        List<Expression> possibleExpressions = new ArrayList<>();
+        for (ExprStringPosition child : children) {
+            if (child.getObject().getChildren().length > 0) {
+                possibleExpressions.addAll(getPropertyChildren(child.getObject().getChildren()));
+            }
+            if (child.getEnd() < currentSelection.getStart()) {
+                possibleExpressions.add(child.getObject());
+            }
+        }
+        return possibleExpressions;
+    }
+
+    private void addColorTypesToCombobox(List<ColorType> types) {
+        colorTypeCombobox.removeAllItems();
+        for (ColorType type : types) {
+            colorTypeCombobox.addItem(type);
+        }
+    }
 
     private void deleteSelection() {
         if (currentSelection != null) {
