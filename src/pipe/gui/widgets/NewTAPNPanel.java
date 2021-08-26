@@ -13,7 +13,7 @@ import pipe.gui.Grid;
 import pipe.gui.GuiFrame;
 import pipe.gui.MessengerImpl;
 
-public class NewTAPNPanel extends JDialog {
+public class NewTAPNPanel extends EscapableDialog {
 
 	private final JRootPane rootPane;
 	private final GuiFrame frame;
