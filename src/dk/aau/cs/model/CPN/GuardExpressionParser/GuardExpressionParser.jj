@@ -35,7 +35,7 @@ public class GuardExpressionParser {
 	public static GuardExpression parse(String expression, TimedArcPetriNetNetwork inputNetwork) throws ParseException {
 	    network = inputNetwork;
 		GuardExpressionParser parser = new GuardExpressionParser(new StringReader(expression));
-		return parser.OrExpr();
+		return parser.StartOrExpr();
 	}
 }
 
@@ -82,6 +82,16 @@ SKIP :
 | "\n"
 | "\r"
 }
+
+GuardExpression StartOrExpr() :
+{
+	GuardExpression child = null;
+}
+{
+    child = OrExpr() <EOF>
+	{ return child; }
+}
+
 GuardExpression OrExpr() :
 {
 	GuardExpression left = null;
