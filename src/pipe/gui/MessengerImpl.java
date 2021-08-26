@@ -50,9 +50,9 @@ public class MessengerImpl implements Messenger {
         JTextArea textArea = new JTextArea(message);
         textArea.setEditable(false);
         textArea.setEnabled(true);
+        textArea.setLineWrap(false);
         textArea.setDisabledTextColor(Color.BLACK);
         textArea.setBackground(Color.getColor("FFe0d0"));
-        textArea.setLineWrap(false);
 
         return textArea;
     }
