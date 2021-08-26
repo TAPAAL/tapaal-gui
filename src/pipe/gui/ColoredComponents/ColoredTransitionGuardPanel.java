@@ -755,22 +755,23 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     private void updateColorTypeCombobox() {
         List<Expression> possibleExpressions = getPropertyChildren(newProperty.getChildren());
+        List<ColorType> colorTypes = context.network().colorTypes();
         ColorType type = null;
 
         int lastIndex = possibleExpressions.size() - 1;
 
         if (lastIndex == 0 && possibleExpressions.get(lastIndex) instanceof ColorExpression) {
-            type = ((ColorExpression) possibleExpressions.get(lastIndex)).getColorType(context.network().colorTypes());
-            addColorTypesToCombobox(Arrays.asList(type));
+            type = ((ColorExpression) possibleExpressions.get(lastIndex)).getColorType(colorTypes);
+            addColorTypesToCombobox(Collections.singletonList(type));
         } else if (lastIndex > 0) {
             if (possibleExpressions.get(lastIndex) instanceof TupleExpression) {
-                type = ((ColorExpression) possibleExpressions.get(lastIndex)).getColorType(context.network().colorTypes());
+                type = ((ColorExpression) possibleExpressions.get(lastIndex)).getColorType(colorTypes);
             } else if (possibleExpressions.get(lastIndex - 1) instanceof ColorExpression) {
-                type = ((ColorExpression) possibleExpressions.get(lastIndex - 1)).getColorType(context.network().colorTypes());
+                type = ((ColorExpression) possibleExpressions.get(lastIndex - 1)).getColorType(colorTypes);
             }
             if (type != null) addColorTypesToCombobox(Collections.singletonList(type));
         } else {
-            addColorTypesToCombobox(context.network().colorTypes());
+            addColorTypesToCombobox(colorTypes);
         }
     }
 
