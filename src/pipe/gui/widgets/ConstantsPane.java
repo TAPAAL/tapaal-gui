@@ -398,16 +398,10 @@ public class ConstantsPane extends JPanel implements SidePane {
                 removeConstant(constName);
             }
             else if (isDisplayingVariables()) {
-                Variable variable = (Variable) list.getSelectedValue();
-                variablesListModel.removeElement(variable);
+                removeVariables();
             }
             else {
-            ColorType colorType = (ColorType)list.getSelectedValue();
-                if((colorType).equals(ColorType.COLORTYPE_DOT)) {
-                    JOptionPane.showMessageDialog(null, "Dot color cannot be removed");
-                }else {
-                    colorTypesListModel.removeElement(colorType);
-                }
+                removeColorType();
             }
 		});
 		gbc = new GridBagConstraints();
@@ -675,6 +669,26 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 		//showConstants();
 	}
+
+	private void removeVariables() {
+        for (Object variable : list.getSelectedValuesList()) {
+            if (variable instanceof Variable) {
+                variablesListModel.removeElement((Variable) variable);
+            }
+        }
+    }
+
+    private void removeColorType() {
+        for (Object colorType : list.getSelectedValuesList()) {
+            if (colorType instanceof ColorType) {
+                if (colorType.equals(ColorType.COLORTYPE_DOT)) {
+                    JOptionPane.showMessageDialog(null, "Dot color cannot be removed");
+                } else {
+                    colorTypesListModel.removeElement((ColorType) colorType);
+                }
+            }
+        }
+    }
 
 	public void setNetwork(TimedArcPetriNetNetwork tapnNetwork) {
 		constantsListModel.setNetwork(tapnNetwork);

@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 public class ColorTypeDialogPanel extends JPanel {
     private static final long serialVersionUID = 1L;
     private static final String toolTipColorComboBox = "Switch between the different defined color types";
-    private static final String finiteEnumeration= "Finite Enumeration";
+    private static final String finiteEnumeration = "Finite Enumeration";
     private static final String cyclicEnumeration = "Cyclic Enumeration";
     private static final String rangeOfIntegers = "Range of Integers";
     private static final String productColor = "Product Color";
@@ -89,13 +89,13 @@ public class ColorTypeDialogPanel extends JPanel {
 
     public void showDialog() {
         dialog = new EscapableDialog(CreateGui.getApp(),
-                "Edit color type", true);
+            "Edit color type", true);
         dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(true);
         dialog.pack();
         //size of range of integers panel
-        dialog.setMinimumSize(new Dimension(447,231));
+        dialog.setMinimumSize(new Dimension(447, 231));
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
@@ -103,15 +103,15 @@ public class ColorTypeDialogPanel extends JPanel {
     private void initValues() {
         nameTextField.setText(oldName);
         if (!(oldColorType instanceof ProductType)) { // colortype is always either ProductType or Cyclic
-            if(oldColorType.isIntegerRange()){
+            if (oldColorType.isIntegerRange()) {
                 colorTypeComboBox.setSelectedIndex(1);
                 for (dk.aau.cs.model.CPN.Color element : oldColorType) {
                     cyclicModel.addElement(element);
                 }
                 lowerBoundTextField.setText(cyclicModel.get(0).toString());
 
-                upperBoundTextField.setText(cyclicModel.get(cyclicModel.getSize()-1).toString());
-            } else{
+                upperBoundTextField.setText(cyclicModel.get(cyclicModel.getSize() - 1).toString());
+            } else {
                 colorTypeComboBox.setSelectedIndex(0);
                 for (dk.aau.cs.model.CPN.Color element : oldColorType) {
                     cyclicModel.addElement(element);
@@ -119,8 +119,7 @@ public class ColorTypeDialogPanel extends JPanel {
             }
             enumList.setModel(cyclicModel);
 
-        }
-        else {
+        } else {
             colorTypeComboBox.setSelectedIndex(2);
             for (ColorType type : ((ProductType) oldColorType).getColorTypes()) {
                 productModel.addElement(type);
@@ -129,7 +128,7 @@ public class ColorTypeDialogPanel extends JPanel {
         }
     }
 
-    private void initComponents()  {
+    private void initComponents() {
         JPanel container = new JPanel();
         container.setLayout(new GridBagLayout());
 
@@ -178,7 +177,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.gridy = 4;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        container.add(buttonPanel,gbc);
+        container.add(buttonPanel, gbc);
         scrollPane = new JScrollPane();
         scrollPane.setViewportView(container);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -208,10 +207,10 @@ public class ColorTypeDialogPanel extends JPanel {
         nameTextField.addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent ancestorEvent) {
-                final AncestorListener al= this;
+                final AncestorListener al = this;
                 JComponent component = ancestorEvent.getComponent();
                 component.requestFocusInWindow();
-                component.removeAncestorListener( al );
+                component.removeAncestorListener(al);
             }
 
             @Override
@@ -247,13 +246,13 @@ public class ColorTypeDialogPanel extends JPanel {
         gbcCTL.gridy = 1;
         gbcCTL.gridwidth = 1;
         gbcCTL.anchor = GridBagConstraints.WEST;
-        nameAndTypePanel.add(colorTypeLabel,gbcCTL);
+        nameAndTypePanel.add(colorTypeLabel, gbcCTL);
 
         colorTypeComboBox = new JXComboBox(new String[]{cyclicEnumeration, rangeOfIntegers, productColor});
         colorTypeComboBox.setToolTipText(toolTipColorComboBox);
 
         colorTypeComboBox.addActionListener(e -> {
-            JComboBox source = (JXComboBox)e.getSource();
+            JComboBox source = (JXComboBox) e.getSource();
             final String selectedString = source.getSelectedItem().toString();
 
             switch (selectedString) {
@@ -277,7 +276,7 @@ public class ColorTypeDialogPanel extends JPanel {
                     rangeOfIntegersPanelEnabled = false;
                     break;
             }
-            if(dialog != null){
+            if (dialog != null) {
                 dialog.pack();
             }
         });
@@ -327,8 +326,8 @@ public class ColorTypeDialogPanel extends JPanel {
 
         cancelButton.addActionListener(e -> exit());
 
-        buttonPanel.add(cancelButton,gbc);
-        buttonPanel.add(okButton,gbcOk);
+        buttonPanel.add(cancelButton, gbc);
+        buttonPanel.add(okButton, gbcOk);
 
         return buttonPanel;
     }
@@ -347,7 +346,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.insets = new Insets(3, 3, 3, 3);
         rangeOfIntegers.add(lowerBoundLabel, gbc);
 
-        lowerBoundTextField = new  JTextField();
+        lowerBoundTextField = new JTextField();
 
         Dimension size = new Dimension(55, 30);
         lowerBoundTextField.setPreferredSize(size);
@@ -370,7 +369,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.insets = new Insets(3, 3, 3, 3);
         rangeOfIntegers.add(upperBoundLabel, gbc);
 
-        upperBoundTextField = new  JTextField();
+        upperBoundTextField = new JTextField();
         upperBoundTextField.setPreferredSize(size);
         upperBoundTextField.setMaximumSize(size);
         upperBoundTextField.setMaximumSize(size);
@@ -406,7 +405,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.insets = new Insets(3, 3, 3, 3);
         firstRow.add(enumNameLabel, gbc);
 
-        enumTextField = new  JTextField();
+        enumTextField = new JTextField();
         //Dimension size = new Dimension(300, 30);
         //enumTextField.setMaximumSize(size);
         //enumTextField.setMinimumSize(size);
@@ -437,16 +436,16 @@ public class ColorTypeDialogPanel extends JPanel {
         enumAddButton = new JButton("Add");
         enumAddButton.addActionListener(e -> {
             String enumerationName = enumTextField.getText();
-            if(enumerationName == null || enumerationName.trim().isEmpty()) {
+            if (enumerationName == null || enumerationName.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(
-                        CreateGui.getApp(), "You have to enter a name for the color",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-            } else if(!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", enumerationName)) {
+                    CreateGui.getApp(), "You have to enter a name for the color",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", enumerationName)) {
                 JOptionPane.showMessageDialog(
                     CreateGui.getApp(),
                     "Acceptable names for enumerations are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
                     "Error", JOptionPane.ERROR_MESSAGE);
-            } else if(enumerationName.equals("all") || enumerationName.equals("All") || enumerationName.equals("dot") || enumerationName.equals(".all") || enumerationName.equals(".All")){
+            } else if (enumerationName.equals("all") || enumerationName.equals("All") || enumerationName.equals("dot") || enumerationName.equals(".all") || enumerationName.equals(".All")) {
                 JOptionPane.showMessageDialog(
                     CreateGui.getApp(),
                     "The color cannot be named \"" + enumerationName + "\", as the name is reserved",
@@ -458,17 +457,17 @@ public class ColorTypeDialogPanel extends JPanel {
                     inList = cyclicModel.getElementAt(i).toString().equals(enumTextField.getText());
                     i++;
                 }
-               if (inList) {
-                JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
-                    "A color with the name \"" + enumerationName + "\" already exists",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+                if (inList) {
+                    JOptionPane.showMessageDialog(
+                        CreateGui.getApp(),
+                        "A color with the name \"" + enumerationName + "\" already exists",
+                        "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
-                   cyclicModel.addElement(enumTextField.getText());
-                   enumList.setModel(cyclicModel);
-                   enumTextField.setText("");
-                   cyclicRemoveButton.setEnabled(true);
-               }
+                    cyclicModel.addElement(enumTextField.getText());
+                    enumList.setModel(cyclicModel);
+                    enumTextField.setText("");
+                    cyclicRemoveButton.setEnabled(true);
+                }
             }
         });
 
@@ -485,7 +484,7 @@ public class ColorTypeDialogPanel extends JPanel {
 
         cyclicRemoveButton = new JButton("Remove");
         cyclicRemoveButton.setEnabled(false);
-        cyclicRemoveButton.addActionListener(actionEvent -> removeElements());
+        cyclicRemoveButton.addActionListener(actionEvent -> removeColors());
         cyclicRemoveButton.setPreferredSize(buttonSize);
         cyclicRemoveButton.setMinimumSize(buttonSize);
         cyclicRemoveButton.setMaximumSize(buttonSize);
@@ -511,21 +510,21 @@ public class ColorTypeDialogPanel extends JPanel {
         enumList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 JList source = (JList) e.getSource();
-                if(source.getSelectedIndex() == -1){
+                if (source.getSelectedIndex() == -1) {
                     cyclicRemoveButton.setEnabled(false);
                     moveUpButton.setEnabled(false);
                     moveDownButton.setEnabled(false);
-                } else{
+                } else {
                     cyclicRemoveButton.setEnabled(true);
-                    if(source.getSelectedIndex() > 0){
+                    if (source.getSelectedIndex() > 0) {
                         moveUpButton.setEnabled(true);
-                    } else{
+                    } else {
                         moveUpButton.setEnabled(false);
                     }
 
-                    if(source.getSelectedIndex() < source.getModel().getSize()-1){
+                    if (source.getSelectedIndex() < source.getModel().getSize() - 1) {
                         moveDownButton.setEnabled(true);
-                    } else{
+                    } else {
                         moveDownButton.setEnabled(false);
                     }
                 }
@@ -563,8 +562,8 @@ public class ColorTypeDialogPanel extends JPanel {
         moveUpButton.addActionListener(e -> {
             int index = enumList.getSelectedIndex();
             if (index > 0) {
-                enumList.setSelectedIndex(index-1);
-                swapColors(cyclicModel,index, index -1);
+                enumList.setSelectedIndex(index - 1);
+                swapColors(cyclicModel, index, index - 1);
 
             }
         });
@@ -578,9 +577,9 @@ public class ColorTypeDialogPanel extends JPanel {
         thirdRow.add(moveDownButton, gbc);
         moveDownButton.addActionListener(e -> {
             int index = enumList.getSelectedIndex();
-            if (index < cyclicModel.getSize()-1) {
-                enumList.setSelectedIndex(index+1);
-                swapColors(cyclicModel,index, index +1);
+            if (index < cyclicModel.getSize() - 1) {
+                enumList.setSelectedIndex(index + 1);
+                swapColors(cyclicModel, index, index + 1);
 
             }
         });
@@ -601,7 +600,32 @@ public class ColorTypeDialogPanel extends JPanel {
         return cyclicAndFiniteEnumeration;
     }
 
-    private void removeElements() {
+    private void removeColorTypes() {
+        ArrayList<String> messages = new ArrayList<>();
+
+        for (Object value : productColorTypeList.getSelectedValuesList()) {
+            ArrayList<String> emptyMessages = new ArrayList<>();
+            if (oldColorType == null || network.canColorTypeBeRemoved(oldColorType, emptyMessages)) {
+                productModel.removeElement(value);
+                productColorTypeList.setModel(productModel);
+            } else if (!emptyMessages.isEmpty()){
+                messages.addAll(emptyMessages);
+            }
+            if(productModel.size() == 0) {
+                productRemoveButton.setEnabled(false);
+            }
+        }
+
+        if (!messages.isEmpty()) {
+            String message = "Colortype cannot have colors removed for the following reasons: \n\n";
+            for (String m : messages) {
+                if (!message.contains(m)) message += m;
+            }
+            JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void removeColors() {
         ArrayList<String> messages = new ArrayList<>();
 
         int[] indices = enumList.getSelectedIndices();
@@ -816,20 +840,7 @@ public class ColorTypeDialogPanel extends JPanel {
         productRemoveButton.setPreferredSize(buttonSize);
         productButtonPanel.add(productRemoveButton, gbc);
 
-        productRemoveButton.addActionListener(e -> {
-            ArrayList<String> messages = new ArrayList<>();
-            if(oldColorType == null || network.canColorTypeBeRemoved(oldColorType,messages)) {
-                productModel.removeElementAt(productColorTypeList.getSelectedIndex());
-                productColorTypeList.setModel(productModel);
-                if(productModel.size() == 0) {
-                    productRemoveButton.setEnabled(false);
-                }
-            }else{
-                String message = "Colortype cannot have colors removed for the following reasons: \n\n";
-                message += String.join("", messages);
-                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
-            }
-        });
+        productRemoveButton.addActionListener(e -> removeColorTypes());
         return productButtonPanel;
     }
 
