@@ -2975,15 +2975,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     }
     public List<GuiAction> getAvailableDrawActions(){
+        List<GuiAction> actions;
         if (lens.isTimed() && !lens.isGame()) {
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction));
+            actions = new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction));
         } else if (lens.isTimed()) {
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction, toggleUncontrollableAction));
+            actions = new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction, toggleUncontrollableAction));
         } else if (lens.isGame()){
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUncontrollableAction));
+            actions = new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUncontrollableAction));
         } else {
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction));
+            actions = new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction));
         }
+        if (lens.isColored()) {
+            actions.remove(tokenAction);
+            actions.remove(deleteTokenAction);
+        }
+
+        return actions;
     }
 
     public List<GuiAction> getAvailableSimActions(){
