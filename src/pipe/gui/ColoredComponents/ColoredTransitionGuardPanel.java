@@ -78,10 +78,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         this.context = context;
         this.parent = parent;
         initExprField();
-        initLogicPanel();
         initComparisonPanel();
-        initExprEditPanel();
+        initLogicPanel();
         initColorExpressionPanel();
+        initExprEditPanel();
         //initExpr(transition.underlyingTransition().getGuard());
         //updateSelection();
         updateColorType();
@@ -240,7 +240,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         colorExpressionPanel.add(colorExpressionButtons, gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 3;
+        gbc.gridx = 2;
         gbc.gridy = 1;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
@@ -285,7 +285,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         logicPanel.add(notButton, gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 0;
+        gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.BOTH;
         add(logicPanel, gbc);
@@ -402,7 +402,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         comparisonPanel.add(seperator, gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.BOTH;
         add(comparisonPanel, gbc);
@@ -565,7 +565,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         editPanel.add(editExprButton, gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = 3;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.BOTH;
@@ -705,14 +705,12 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         exprField.setText(newProperty.toString());
 
         ExprStringPosition position;
-        if (!(newSelection instanceof  ColorExpression) && newProperty.containsPlaceHolder()) {
+        if (newProperty.containsPlaceHolder()) {
             Expression ge = newProperty.findFirstPlaceHolder();
             position = newProperty.indexOf(ge);
-        }
-        else {
+        } else {
             position = newProperty.indexOf(newSelection);
         }
-
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
 
