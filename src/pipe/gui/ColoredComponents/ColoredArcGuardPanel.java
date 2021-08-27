@@ -31,9 +31,8 @@ import javax.swing.text.StyledDocument;
 import javax.swing.undo.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
 
 public abstract class ColoredArcGuardPanel extends JPanel {
     PetriNetObject objectToBeEdited;
@@ -201,10 +200,12 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         });
 
         removeTimeConstraintButton.addActionListener(actionEvent -> {
-            timeConstraintListModel.removeElementAt(timeConstraintList.getSelectedIndex());
-            if(timeConstraintListModel.isEmpty()){
+            for (Object o : timeConstraintList.getSelectedValuesList()) {
+                timeConstraintListModel.removeElement(o);
+            }
+            if (timeConstraintListModel.isEmpty()) {
                 addTimeConstraintButton.setText("Add");
-            } else{
+            } else {
                 timeConstraintList.setSelectedIndex(0);
             }
         });

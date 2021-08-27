@@ -485,26 +485,7 @@ public class ColorTypeDialogPanel extends JPanel {
 
         cyclicRemoveButton = new JButton("Remove");
         cyclicRemoveButton.setEnabled(false);
-        cyclicRemoveButton.addActionListener(actionEvent -> {
-            ArrayList<String> messages = new ArrayList<>();
-
-            dk.aau.cs.model.CPN.Color color;
-            if (!(enumList.getSelectedValue() instanceof dk.aau.cs.model.CPN.Color)) {
-                ColorType colorType = new ColorType(nameTextField.getText());
-                color = new dk.aau.cs.model.CPN.Color(colorType, enumList.getSelectedIndex(), enumList.getSelectedValue().toString());
-            } else {
-                color = (dk.aau.cs.model.CPN.Color) enumList.getSelectedValue();
-            }
-
-            if(oldColorType == null || network.canColorBeRemoved(color, messages)) {
-                cyclicModel.removeElementAt(enumList.getSelectedIndex());
-                enumList.setModel(cyclicModel);
-            }else{
-                String message = "Color cannot be removed for the following reasons: \n\n";
-                message += String.join("", messages);
-                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
-            }
-        });
+        cyclicRemoveButton.addActionListener(actionEvent -> removeElements());
         cyclicRemoveButton.setPreferredSize(buttonSize);
         cyclicRemoveButton.setMinimumSize(buttonSize);
         cyclicRemoveButton.setMaximumSize(buttonSize);
@@ -618,6 +599,40 @@ public class ColorTypeDialogPanel extends JPanel {
         }
 
         return cyclicAndFiniteEnumeration;
+    }
+
+    private void removeElements() {
+        ArrayList<String> messages = new ArrayList<>();
+
+        int[] indices = enumList.getSelectedIndices();
+        int counter = 0;
+
+        for (Object value : enumList.getSelectedValuesList()) {
+            ArrayList<String> emptyMessages = new ArrayList<>();
+            dk.aau.cs.model.CPN.Color color;
+
+            if (!(value instanceof dk.aau.cs.model.CPN.Color)) {
+                ColorType colorType = new ColorType(nameTextField.getText());
+                color = new dk.aau.cs.model.CPN.Color(colorType, indices[counter], value.toString());
+            } else {
+                color = (dk.aau.cs.model.CPN.Color) value;
+            }
+            if (oldColorType == null || network.canColorBeRemoved(color, emptyMessages)) {
+                cyclicModel.removeElement(value);
+                enumList.setModel(cyclicModel);
+            } else if (!emptyMessages.isEmpty()){
+                messages.addAll(emptyMessages);
+            }
+            counter++;
+        }
+
+        if (!messages.isEmpty()) {
+            String message = "Color(s) cannot be removed for the following reasons: \n\n";
+            for (String m : messages) {
+                if (!message.contains(m)) message += m;
+            }
+            JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     //productTypePanel contains TopPanel and scrollPanePanel

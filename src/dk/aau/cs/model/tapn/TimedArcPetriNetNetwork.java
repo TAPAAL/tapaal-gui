@@ -792,35 +792,35 @@ public class TimedArcPetriNetNetwork {
         for(TimedArcPetriNet tapn : allTemplates()){
             for(TimedPlace p : tapn.places()){
                 if(p.getTokensAsExpression() != null && p.getTokensAsExpression().containsColor(color)){
-                    messages.add("Color is used in a token in place " + p.name() + " \n");
+                    messages.add(color.getName() + " is used in a token in place " + p.name() + " \n");
                 }
                 for(ColoredTimeInvariant invariant : p.getCtiList()){
                     if(invariant.getColor().equals(color)){
-                        messages.add("Color is used in an invariant in place " + p.name() + " \n");
+                        messages.add(color.getName() + " is used in an invariant in place " + p.name() + " \n");
                     }
                 }
             }
             for(TimedTransition t : tapn.transitions()){
                 if(t.getGuard() != null && t.getGuard().containsColor(color)){
-                    messages.add("Colors of color type is used in transition " + t.name() + "\n");
+                    messages.add(color.getName() + " of color type is used in transition " + t.name() + "\n");
                 }
             }
             for(TransportArc arc : tapn.transportArcs()){
                 if(arc.getInputExpression().containsColor(color)){
-                    messages.add("Color is used on transport arc from " + arc.source().name() + " to " + arc.transition() + "\n");
+                    messages.add(color.getName() + " is used on transport arc from " + arc.source().name() + " to " + arc.transition() + "\n");
                 }
                 if(arc.getOutputExpression().containsColor(color)){
-                    messages.add("Color is used on transport arc from " + arc.transition()+ " to " + arc.destination().name() + "\n");
+                    messages.add(color.getName() + " is used on transport arc from " + arc.transition()+ " to " + arc.destination().name() + "\n");
                 }
             }
             for(TimedInputArc arc : tapn.inputArcs()){
                 if(arc.getArcExpression().containsColor(color)){
-                    messages.add("Color is used on arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
+                    messages.add(color.getName() + " is used on arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
                 }
             }
             for(TimedOutputArc arc : tapn.outputArcs()){
                 if(arc.getExpression().containsColor(color)){
-                    messages.add("Color is used on arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
+                    messages.add(color.getName() + " is used on arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
                 }
             }
         }
