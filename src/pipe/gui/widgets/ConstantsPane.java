@@ -420,6 +420,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             Command command = model.removeConstant(name);
             if (command == null) {
                 unremovableConstants.add(name);
+            } else {
                 parent.getUndoManager().addEdit(command);
             }
         }
