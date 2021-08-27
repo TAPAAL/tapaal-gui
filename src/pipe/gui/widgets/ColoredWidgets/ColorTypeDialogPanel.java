@@ -469,6 +469,7 @@ public class ColorTypeDialogPanel extends JPanel {
                     cyclicRemoveButton.setEnabled(true);
                 }
             }
+            enumTextField.requestFocusInWindow();
         });
 
         Dimension buttonSize = new Dimension(100, 30);
