@@ -521,8 +521,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         arithmeticPanel.add(additionButton, gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridx = 1;
+        gbc.gridy = 0;
         gbc.gridwidth = 3;
         gbc.insets = new Insets(2, 0, 2, 0);
         gbc.fill = GridBagConstraints.HORIZONTAL;
