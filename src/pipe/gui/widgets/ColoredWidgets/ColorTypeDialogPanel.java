@@ -671,6 +671,8 @@ public class ColorTypeDialogPanel extends JPanel {
         JButton moveUpButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png"))));
         JButton moveDownButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png"))));
 
+        moveUpButton.setEnabled(false);
+        moveDownButton.setEnabled(false);
 
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new GridBagLayout());

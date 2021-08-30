@@ -24,10 +24,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.undo.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
@@ -92,6 +89,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         undoSupport = new UndoableEditSupport();
         undoSupport.addUndoableEditListener(new ColoredTransitionGuardPanel.UndoAdapter());
         refreshUndoRedo();
+        makeShortcuts();
     }
 
     private void initColorExpressionPanel(){
@@ -973,6 +971,22 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         public boolean canRedo() {
             return true;
         }
+    }
+
+    private void makeShortcuts(){
+        int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        ActionMap am = this.getActionMap();
+        am.put("undo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) { undoButton.doClick(); }
+        });
+        am.put("redo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {  redoButton.doClick(); }
+        });
+        InputMap im = this.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
+        im.put(KeyStroke.getKeyStroke('Z', shortcutkey), "undo");
+        im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
     }
 
 }

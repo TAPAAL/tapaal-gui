@@ -1229,6 +1229,7 @@ public class QueryDialog extends JPanel {
 		refreshUndoRedo();
 
 		setEnabledOptionsAccordingToCurrentReduction();
+		makeShortcuts();
 	}
 
 	private void setupFromQuery(TAPNQuery queryToCreateFrom) {
@@ -3423,5 +3424,21 @@ public class QueryDialog extends JPanel {
 		}
 
 	}
+
+    private void makeShortcuts(){
+        int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        ActionMap am = this.getActionMap();
+        am.put("undo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) { undoButton.doClick(); }
+        });
+        am.put("redo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) { redoButton.doClick(); }
+        });
+        InputMap im = this.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
+        im.put(KeyStroke.getKeyStroke('Z', shortcutkey), "undo");
+        im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
+    }
 
 }
