@@ -828,7 +828,7 @@ public class PlaceEditorPanel extends JPanel {
         tokenListScrollPane.setViewportView(tokenList);
         tokenListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         Dimension tokenScrollPaneDim = new Dimension(100, 150);
-        tokenListScrollPane.setBorder(BorderFactory.createTitledBorder( "Tokens"));
+        tokenListScrollPane.setBorder(BorderFactory.createTitledBorder( "Tokens in initial marking"));
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
