@@ -14,7 +14,8 @@ import java.awt.event.ComponentListener;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 import javax.swing.BorderFactory;
@@ -22,7 +23,6 @@ import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
@@ -32,17 +32,15 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import dk.aau.cs.gui.undo.MoveElementDownCommand;
-import dk.aau.cs.gui.undo.MoveElementUpCommand;
+import dk.aau.cs.gui.undo.*;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.SortConstantsCommand;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.gui.components.ConstantsListModel;
 import dk.aau.cs.gui.components.NonsearchableJList;
+import pipe.gui.MessengerImpl;
 
 public class ConstantsPane extends JPanel implements SidePane {
 
@@ -95,10 +93,10 @@ public class ConstantsPane extends JPanel implements SidePane {
 		});
 
 		constantsList = new NonsearchableJList<>(listModel);
-		constantsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		constantsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		constantsList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				if (!(e.getValueIsAdjusting())) {
+				if (!e.getValueIsAdjusting()) {
 					if (constantsList.getSelectedIndex() == -1) {
 						editBtn.setEnabled(false);
 						removeBtn.setEnabled(false);
@@ -305,8 +303,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		removeBtn.setEnabled(false);
 		removeBtn.setToolTipText(toolTipRemoveConstant);
 		removeBtn.addActionListener(e -> {
-			String constName = ((Constant) constantsList.getSelectedValue()).name();
-			removeConstant(constName);
+			removeConstants();
 		});
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -413,19 +410,34 @@ public class ConstantsPane extends JPanel implements SidePane {
 		showConstants();
 	}
 
-	protected void removeConstant(String name) {
-		TimedArcPetriNetNetwork model = parent.network();
-		Command edit = model.removeConstant(name);
-		if (edit == null) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"You cannot remove a constant that is used in the net.\nRemove all references "
-							+ "to the constant in the net and try again.",
-							"Constant in use", JOptionPane.ERROR_MESSAGE);
-		} else {
-            parent.getUndoManager().addNewEdit(edit);
-        }
+	protected void removeConstants() {
+        TimedArcPetriNetNetwork model = parent.network();
+        java.util.List<String> unremovableConstants = new ArrayList<>();
+        parent.getUndoManager().newEdit();
 
-		//showConstants();
+        for (Object o : constantsList.getSelectedValuesList()) {
+            String name = ((Constant)o).name();
+            Command command = model.removeConstant(name);
+            if (command == null) {
+                unremovableConstants.add(name);
+            } else {
+                parent.getUndoManager().addEdit(command);
+            }
+        }
+        if (unremovableConstants.size() > 0) {
+            StringBuilder message = new StringBuilder("The following constants could not be removed: \n");
+
+            for (String name : unremovableConstants) {
+                message.append("   - ");
+                message.append(name);
+                message.append("\n");
+            }
+            message.append("\nYou cannot remove a constant that is used in the net.\nRemove all references " +
+                           "to the constant(s) in the net and try again.");
+
+            JOptionPane.showMessageDialog(CreateGui.getApp(), message.toString(),
+                "Constant in use", JOptionPane.ERROR_MESSAGE);
+        }
 	}
 
 	public void setNetwork(TimedArcPetriNetNetwork tapnNetwork) {
