@@ -31,7 +31,7 @@ public class RunVerification extends RunVerificationBase {
 	private final IconSelector iconSelector;
 	private final VerificationCallback callback;
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, String reducedNetFilePath, boolean reduceNetOnly) {
-		super(modelChecker, messenger, reducedNetFilePath, reduceNetOnly);
+		super(modelChecker, messenger, reducedNetFilePath, reduceNetOnly, null);
 		iconSelector = selector;
 		this.callback = callback;
 	}
@@ -45,7 +45,7 @@ public class RunVerification extends RunVerificationBase {
 	}
 
 	@Override
-	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
+	protected boolean showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if (result != null && !result.error()) {
 			if(callback != null){
 				callback.run(result);
@@ -98,6 +98,7 @@ public class RunVerification extends RunVerificationBase {
 			messenger.displayWrappedErrorMessage(message,"Error during verification");
 
 		}
+		return false;
 	}
 
 	private String toHTML(String string){
