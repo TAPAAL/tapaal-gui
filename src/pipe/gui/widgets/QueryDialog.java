@@ -2355,7 +2355,7 @@ public class QueryDialog extends JPanel {
 						if (isResultFalse) {
 							StringBuilder s = new StringBuilder();
 							s.append("The following places" + (lens.isTimed() ? "" : " or transitions") +
-                                "were used in the query, but are not present in your model:\n\n");
+                                " were used in the query, but are not present in your model:\n\n");
 
 							for (String placeName : c.getIncorrectPlaceNames()) {
 								s.append(placeName);
