@@ -3,9 +3,9 @@ package pipe.gui;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
@@ -43,20 +43,25 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected String reducedNetFilePath;
 	protected boolean reduceNetOnly;
 	protected boolean reducedNetOpened = false;
-	
-	
+	protected JSpinner spinner;
+
 	protected Messenger messenger;
 
-	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, String reducedNetFilePath, boolean reduceNetOnly) {
+	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, String reducedNetFilePath, boolean reduceNetOnly, JSpinner spinner) {
 		super();
 		this.modelChecker = modelChecker;
 		this.messenger = messenger;
 		this.reducedNetFilePath = reducedNetFilePath;
 		this.reduceNetOnly = reduceNetOnly;
-	}
+        this.spinner = spinner;
+    }
 
     public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
-        this(modelChecker, messenger, null, false);
+        this(modelChecker, messenger, null, false, null);
+    }
+
+    public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, JSpinner spinner) {
+        this(modelChecker, messenger, null, false, spinner);
     }
 
 	
@@ -214,8 +219,12 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				return;
 			}
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-			showResult(result);
 
+			if (showResult(result) && spinner != null) {
+			    options = new VerifyPNOptions(options.extraTokens(), pipe.dataLayer.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, pipe.dataLayer.TAPNQuery.QueryCategory.Default, pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime, false, null, false);
+                KBoundAnalyzer optimizer = new KBoundAnalyzer(model, options.extraTokens(), modelChecker, new MessengerImpl(), spinner);
+                optimizer.analyze((VerifyTAPNOptions) options);
+            }
 		} else {
 			modelChecker.kill();
 			messenger.displayInfoMessage("Verification was interrupted by the user. No result found!", "Verification Cancelled");
@@ -233,5 +242,5 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		});
 	}
 
-	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result);
+	protected abstract boolean showResult(VerificationResult<TAPNNetworkTrace> result);
 }
