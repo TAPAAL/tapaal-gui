@@ -68,7 +68,7 @@ public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append("-k " + tokenSize + " -q " + queryLibFile.getAbsolutePath() + " -q-xml " + queryOut + " -f " + modelOut + " -q-num 0");
-        for(int i = 1; i <= numQueries; i++){
+        for(int i = 1; i < numQueries; i++){
             result.append("," + i);
         }
 

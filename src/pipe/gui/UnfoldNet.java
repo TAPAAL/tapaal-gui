@@ -74,7 +74,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
     @Override
     protected String doInBackground() throws Exception {
-        TabContent.TAPNLens lens =  new TabContent.TAPNLens(!model.isUntimed(), false, model.isColored());
+        TabContent.TAPNLens lens = CreateGui.getCurrentTab().getLens();
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
         boolean dummyQuery = false;
@@ -150,7 +150,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
             String formattedQueries = "";
             for(pipe.dataLayer.TAPNQuery query : clonedQueries){
-                if (query.getCategory() == TAPNQuery.QueryCategory.CTL || clonedQueries.size() > 1) {
+                if (lens.isTimed() || query.getCategory() == TAPNQuery.QueryCategory.CTL || clonedQueries.size() > 1) {
                     formattedQueries = XMLVisitor.getXMLQueryFor(query.getProperty(), query.getName());
                 } else if (lens.isGame()) {
                     queryStream.append("control: ").append(query.getProperty().toString());
