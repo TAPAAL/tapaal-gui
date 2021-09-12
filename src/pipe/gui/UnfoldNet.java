@@ -150,12 +150,18 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
             String formattedQueries = "";
             for(pipe.dataLayer.TAPNQuery query : clonedQueries){
-                if (lens.isTimed() || query.getCategory() == TAPNQuery.QueryCategory.CTL || clonedQueries.size() > 1) {
+                /*if (lens.isTimed() || query.getCategory() == TAPNQuery.QueryCategory.CTL || clonedQueries.size() > 1) {
                     formattedQueries = XMLVisitor.getXMLQueryFor(query.getProperty(), query.getName());
-                } else if (lens.isGame()) {
+                } else if(lens.isGame()) {
                     queryStream.append("control: ").append(query.getProperty().toString());
                 } else {
                     queryStream.append(query.getProperty().toString());
+                }*/
+
+                if(lens.isGame()) {
+                    queryStream.append("control: ").append(query.getProperty().toString());
+                } else {
+                    formattedQueries = XMLVisitor.getXMLQueryFor(query.getProperty(), query.getName());
                 }
             }
             queryStream.append(formattedQueries);

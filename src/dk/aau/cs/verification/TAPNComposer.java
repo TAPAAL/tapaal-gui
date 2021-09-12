@@ -638,7 +638,13 @@ public class TAPNComposer implements ITAPNComposer {
 	}
 
    public String composedTransitionName(TimedTransition transition) {
-        return  transition.isShared() ? "Shared_" + transition.name() : transition.model().name() + "_" + transition.name();
+        if(transition.isShared()){
+            return "Shared_" + transition.name();
+        } else if (singleComponentNoPrefix){
+            return transition.name();
+        } else {
+            return transition.model().name() + "_" + transition.name();
+        }
    }
    
    public String composedPlaceName(TimedPlace place) {
