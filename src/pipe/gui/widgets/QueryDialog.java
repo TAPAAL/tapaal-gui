@@ -2298,10 +2298,6 @@ public class QueryDialog extends JPanel {
                         } else {
 						    newQuery = TAPAALCTLQueryParser.parse(queryField.getText());
                         }
-					    if (!newQuery.toString().equals(queryField.getText())) {
-					        newQuery = null;
-					        throw new Exception();
-                        }
 					} catch (Throwable ex) {
 						int choice = JOptionPane.showConfirmDialog(
 								CreateGui.getApp(),

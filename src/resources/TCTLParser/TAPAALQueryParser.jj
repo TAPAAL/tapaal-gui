@@ -49,7 +49,7 @@ public class TAPAALQueryParser {
 
 	public static TCTLAbstractProperty parse(String query) throws ParseException {
 		TAPAALQueryParser parser = new TAPAALQueryParser(new StringReader(query));
-		return parser.AbstractProperty();
+		return parser.Start();
 	}
 }
 
@@ -112,6 +112,16 @@ SKIP :
 }
 
 /** Root production. */
+TCTLAbstractProperty Start() :
+{
+	TCTLAbstractProperty child = null;
+}
+{
+	(
+		child = AbstractProperty() <EOF> {return child;}
+	)
+}
+
 TCTLAbstractProperty AbstractProperty() :
 {
 	TCTLAbstractStateProperty child = null; 

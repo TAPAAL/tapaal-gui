@@ -56,7 +56,7 @@ public class TAPAALCTLQueryParser {
 
 	public static TCTLAbstractPathProperty parse(String query) throws ParseException {
 		TAPAALCTLQueryParser parser = new TAPAALCTLQueryParser(new StringReader(query));
-		return parser.AbstractPathProperty();
+		return parser.Start();
 	}
 }
 
@@ -131,6 +131,16 @@ SKIP :
 }
 
 /** Root production. */
+TCTLAbstractPathProperty Start() :
+{
+	TCTLAbstractPathProperty child = null;
+}
+{
+	(
+		child = AbstractPathProperty() <EOF> {return child;}
+	)
+}
+
 TCTLAbstractPathProperty AbstractPathProperty() :
 {
 	TCTLAbstractStateProperty child = null; 
