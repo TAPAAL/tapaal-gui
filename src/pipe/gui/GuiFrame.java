@@ -18,6 +18,7 @@ import javax.swing.*;
 
 import com.sun.jna.Platform;
 import dk.aau.cs.gui.*;
+import dk.aau.cs.gui.debug.DEBUG;
 import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
@@ -587,11 +588,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         menuBar.add(buildMenuAnimation());
         menuBar.add(buildMenuTools());
+
+        if (TAPAAL.IS_DEV) {
+            menuBar.add(DEBUG.buildMenuDEBUG());
+        }
+
         menuBar.add(buildMenuHelp());
 
         setJMenuBar(menuBar);
 
     }
+
+
 
     private JMenu buildMenuEdit() {
 

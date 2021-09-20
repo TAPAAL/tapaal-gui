@@ -40,6 +40,7 @@ public class TAPAAL {
 
 	public static final String TOOLNAME = "TAPAAL";
 	public static final String VERSION = "DEV";
+	public static final boolean IS_DEV = "DEV".equals(VERSION);
 
 	public static String getProgramName(){
 		return "" + TAPAAL.TOOLNAME + " " + TAPAAL.VERSION;
@@ -69,7 +70,7 @@ public class TAPAAL {
 			Logger.enableLogging(true);
 		}
 
-		if (TAPAAL.VERSION.equals("DEV")){
+		if (IS_DEV){
 			Logger.enableLogging(true);
 			Logger.log("Debug logging is enabled by default in DEV branch");
 		}

@@ -47,7 +47,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 		menuItem.setText("Delete");
 		popup.add(menuItem);
 
-        if ("DEV".equals(TAPAAL.VERSION)){
+        if (TAPAAL.IS_DEV){
             JTextArea pane = new JTextArea();
             pane.setEditable(false);
 
