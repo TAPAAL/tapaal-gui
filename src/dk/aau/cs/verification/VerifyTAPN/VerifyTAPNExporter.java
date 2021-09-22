@@ -102,12 +102,17 @@ public class VerifyTAPNExporter {
 	
 	private void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         //remove the net prefix from the place name
-        String placeName = mapping.map(p.name()).value2();
+        String placeName;
         Place guiPlace = null;
 
-        for(DataLayer guiModel : guiModels ){
+        if (mapping.map(p.name()) == null) {
+            placeName = "ghost";
+        } else {
+            placeName = mapping.map(p.name()).value2();
+        }
+        for (DataLayer guiModel : guiModels ) {
             guiPlace = guiModel.getPlaceById(placeName);
-            if(guiPlace != null){
+            if (guiPlace != null) {
                 break;
             }
         }
@@ -119,7 +124,11 @@ public class VerifyTAPNExporter {
 		modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
         modelStream.append(">\n");
-        outputPosition(modelStream, guiPlace.getPositionX(), guiPlace.getPositionY());
+        if (guiPlace == null) {
+            outputPosition(modelStream, 0, 0);
+        } else {
+            outputPosition(modelStream, guiPlace.getPositionX(), guiPlace.getPositionY());
+        }
 
         modelStream.append("</place>\n");
 	}
