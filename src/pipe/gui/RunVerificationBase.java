@@ -221,7 +221,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			if (showResult(result) && spinner != null) {
 			    options = new VerifyPNOptions(options.extraTokens(), pipe.dataLayer.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, pipe.dataLayer.TAPNQuery.QueryCategory.Default, pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime, false, null, false);
                 KBoundAnalyzer optimizer = new KBoundAnalyzer(model, options.extraTokens(), modelChecker, new MessengerImpl(), spinner);
-                optimizer.analyze((VerifyTAPNOptions) options);
+                optimizer.analyze((VerifyTAPNOptions) options, true);
             }
 		} else {
 			modelChecker.kill();

@@ -45,10 +45,10 @@ public class KBoundAnalyzer {
 	}
 
 	public void analyze() {
-		analyze(verificationOptions());
+		analyze(verificationOptions(), false);
 	}
 
-    public void analyze(VerifyTAPNOptions options) {
+    public void analyze(VerifyTAPNOptions options, boolean resultShown) {
         TAPNQuery query;
         if (modelChecker instanceof VerifyPN) {
             query = getPNBoundednessQuery();
@@ -56,7 +56,7 @@ public class KBoundAnalyzer {
             query = getBoundednessQuery();
         }
 
-        RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, spinner);
+        RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, spinner, resultShown);
         RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), analyzer);
 
         analyzer.execute(options, tapnNetwork, query, null);
