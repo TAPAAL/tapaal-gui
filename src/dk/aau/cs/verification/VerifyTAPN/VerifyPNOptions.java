@@ -67,6 +67,13 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
             enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, colored,  false,null, useTarOption, partition, colorFixpoint, useSymmetricVars);
     }
 
+    public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction,
+                           boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
+                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, boolean useTarOption) {
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation,
+            enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, false,false, null, useTarOption,false,false,false);
+    }
+
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
@@ -111,7 +118,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 			result.append(" -a 10 ");
 		}
 		if (this.queryReductionTime == QueryReductionTime.NoTime) {
-			result.append(" -q 0 ");
+			result.append(
+			    " -q 0 ");
 		} else if (this.queryReductionTime == QueryReductionTime.ShortestTime) {
 		    //Run query reduction for 1 second, to avoid conflict with -s OverApprox argument, but also still not run the verification.
 		    result.append(" -q 1");

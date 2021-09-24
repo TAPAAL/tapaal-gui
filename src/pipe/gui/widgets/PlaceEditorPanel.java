@@ -92,6 +92,7 @@ public class PlaceEditorPanel extends JPanel {
 	private final Context context;
 	private boolean makeNewShared = false;
 	private boolean doNewEdit = true;
+	private  boolean doOKChecked = false;
 	private final TabContent currentTab;
 	private final EscapableDialog parent;
 	private final JPanel mainPanel;
@@ -201,7 +202,10 @@ public class PlaceEditorPanel extends JPanel {
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		cancelButton.addActionListener(evt -> {
             place.underlyingPlace().setTokenExpression(originalExpression);
-		    exit();
+            if (doOKChecked) {
+                context.undoManager().undo();
+            }
+            exit();
         });
 
 		gridBagConstraints = GridBagHelper.as(0,0,EAST, new Insets(5, 5, 5, 5));
@@ -302,20 +306,23 @@ public class PlaceEditorPanel extends JPanel {
 		
 		makeSharedButton.addActionListener(evt -> {
 			makeNewShared = true;
+            makeSharedButton.setEnabled(false);
 			if(doOK()){
 				setupInitialState();
-				makeSharedButton.setEnabled(false);
 				sharedCheckBox.setEnabled(true);
 				sharedCheckBox.setSelected(true);
 				switchToNameDropDown();
 				sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
-			}
-			makeNewShared = false;
+			} else {
+                makeSharedButton.setEnabled(true);
+                doOKChecked = false;
+            }
 		});
 		
 		gridBagConstraints = GridBagHelper.as(3,1, WEST, new Insets(5, 5, 5, 5));
 		basicPropertiesPanel.add(makeSharedButton, gridBagConstraints);
 		
+		nameLabel = new javax.swing.JLabel("Name:");
 		nameLabel = new javax.swing.JLabel("Name:");
 		gridBagConstraints = GridBagHelper.as(0,1, EAST, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(nameLabel, gridBagConstraints);
@@ -724,8 +731,10 @@ public class PlaceEditorPanel extends JPanel {
 		place.repaint();
 
 		context.network().buildConstraints();
-		
-		return true;
+
+        doOKChecked = true;
+
+        return true;
 	}
 
 	private void doOkColors(int newMarking){

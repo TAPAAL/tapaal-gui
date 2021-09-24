@@ -40,7 +40,9 @@ public class TAPNTransitionEditor extends JPanel {
 	private final Context context;
 	private JScrollPane scrollPane;
 	private JPanel mainPanel;
-	
+
+	private boolean doOKChecked = false;
+
 	private final int maxNumberOfTransitionsToShowAtOnce = 20;
 	boolean doNewEdit = true;
 
@@ -125,13 +127,15 @@ public class TAPNTransitionEditor extends JPanel {
 		
 		makeSharedButton.addActionListener(evt -> {
             makeNewShared = true;
+            makeSharedButton.setEnabled(false);
             if(okButtonHandler(evt)){
-                makeSharedButton.setEnabled(false);
                 sharedCheckBox.setEnabled(true);
                 sharedCheckBox.setSelected(true);
                 setupInitialState();
+            } else {
+                makeSharedButton.setEnabled(true);
+                doOKChecked = false;
             }
-            makeNewShared = false;
         });
 		
 		gridBagConstraints = GridBagHelper.as(3,1, Anchor.WEST, new Insets(5, 5, 5, 5));
@@ -423,7 +427,7 @@ public class TAPNTransitionEditor extends JPanel {
 			context.nameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
 		
 			
-			if(makeNewShared){
+			if(makeNewShared && !makeSharedButton.isEnabled()){
 				Command command = new MakeTransitionNewSharedCommand(context.activeModel(), newName, transition.underlyingTransition(), context.tabContent(), false);
 				context.undoManager().addEdit(command);
 				try{
@@ -490,9 +494,11 @@ public class TAPNTransitionEditor extends JPanel {
             context.undoManager().addEdit(changeVisibility);
 		}
 		
+		transition.update(true);
 
 		coloredTransitionGuardPanel.onOK(context.undoManager());
-		
+		doOKChecked = true;
+
 		return true;
 	}
 
@@ -505,6 +511,9 @@ public class TAPNTransitionEditor extends JPanel {
 	}
 
 	private void cancelButtonHandler(java.awt.event.ActionEvent evt) {
+        if (doOKChecked) {
+            context.undoManager().undo();
+        }
 		exit();
 	}
 

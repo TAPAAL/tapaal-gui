@@ -20,6 +20,18 @@ import java.util.Objects;
 
 
 import javax.swing.*;
+import java.util.Arrays;
+
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
@@ -28,10 +40,10 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
 import pipe.dataLayer.Template;
+import dk.aau.cs.gui.undo.*;
+import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.SortConstantsCommand;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.gui.components.ConstantsListModel;
@@ -39,6 +51,7 @@ import dk.aau.cs.gui.components.NonsearchableJList;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ColoredWidgets.ColorTypeDialogPanel;
 import pipe.gui.widgets.ColoredWidgets.VariablesDialogPanel;
+import pipe.gui.MessengerImpl;
 
 public class ConstantsPane extends JPanel implements SidePane {
 
@@ -99,6 +112,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	public ConstantsPane(TabContent currentTab) {
 		parent = currentTab;
         list = new NonsearchableJList<>();
+        list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		constantsPanel = new JPanel(new GridBagLayout());
 		buttonsPanel = new JPanel(new GridBagLayout());
         colorTypesListModel = new ColorTypesListModel(parent.network());
@@ -394,8 +408,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		removeBtn.setToolTipText(toolTipRemoveColorType);
 		removeBtn.addActionListener(e -> {
             if (isDisplayingGlobalConstants()) {
-                String constName = ((Constant) list.getSelectedValue()).name();
-                removeConstant(constName);
+                removeConstants();
             }
             else if (isDisplayingVariables()) {
                 removeVariables();
@@ -655,19 +668,34 @@ public class ConstantsPane extends JPanel implements SidePane {
         panel.showDialog();
     }
 
-	protected void removeConstant(String name) {
-		TimedArcPetriNetNetwork model = parent.network();
-		Command edit = model.removeConstant(name);
-		if (edit == null) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"You cannot remove a constant that is used in the net.\nRemove all references "
-							+ "to the constant in the net and try again.",
-							"Constant in use", JOptionPane.ERROR_MESSAGE);
-		} else {
-            parent.getUndoManager().addNewEdit(edit);
-        }
+	protected void removeConstants() {
+        TimedArcPetriNetNetwork model = parent.network();
+        java.util.List<String> unremovableConstants = new ArrayList<>();
+        parent.getUndoManager().newEdit();
 
-		//showConstants();
+        for (Object o : list.getSelectedValuesList()) {
+            String name = ((Constant)o).name();
+            Command command = model.removeConstant(name);
+            if (command == null) {
+                unremovableConstants.add(name);
+            } else {
+                parent.getUndoManager().addEdit(command);
+            }
+        }
+        if (unremovableConstants.size() > 0) {
+            StringBuilder message = new StringBuilder("The following constants could not be removed: \n");
+
+            for (String name : unremovableConstants) {
+                message.append("   - ");
+                message.append(name);
+                message.append("\n");
+            }
+            message.append("\nYou cannot remove a constant that is used in the net.\nRemove all references " +
+                           "to the constant(s) in the net and try again.");
+
+            JOptionPane.showMessageDialog(CreateGui.getApp(), message.toString(),
+                "Constant in use", JOptionPane.ERROR_MESSAGE);
+        }
 	}
 
 	private void removeVariables() {

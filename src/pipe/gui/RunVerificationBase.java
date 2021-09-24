@@ -27,6 +27,7 @@ import dk.aau.cs.util.FormatException;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
@@ -60,22 +61,32 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected String reducedNetFilePath;
 	protected boolean reduceNetOnly;
 	protected boolean reducedNetOpened = false;
-	
+	protected JSpinner spinner;
+
 	protected Messenger messenger;
     //if the unfolded net is too big, do not try to load it
     private final int maxNetSize = 4000;
 
-	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels,String reducedNetFilePath, boolean reduceNetOnly) {
+	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, String reducedNetFilePath, boolean reduceNetOnly, JSpinner spinner) {
 		super();
 		this.modelChecker = modelChecker;
 		this.messenger = messenger;
 		this.guiModels = guiModels;
 		this.reducedNetFilePath = reducedNetFilePath;
 		this.reduceNetOnly = reduceNetOnly;
-	}
+        this.spinner = spinner;
+    }
 
     public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
-        this(modelChecker, messenger, guiModels, "",false);
+        this(modelChecker, messenger, guiModels, "", false, null);
+    }
+
+    public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
+        this(modelChecker, messenger, null, "", false, null);
+    }
+
+    public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, JSpinner spinner) {
+        this(modelChecker, messenger, null, "", false, spinner);
     }
 
 	
@@ -246,13 +257,15 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				return;
 			}
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-            showResult(result);
-			if(result.getQueryResult().isQuerySatisfied() && result.getTrace() != null){
+
+			if (showResult(result) && spinner != null) {
+			    options = new VerifyPNOptions(options.extraTokens(), pipe.dataLayer.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, pipe.dataLayer.TAPNQuery.QueryCategory.Default, pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime, false, false);
+                KBoundAnalyzer optimizer = new KBoundAnalyzer(model, guiModels, options.extraTokens(), modelChecker, new MessengerImpl(), spinner);
+                optimizer.analyze((VerifyTAPNOptions) options, true);
+            }
+            if(result.getQueryResult().isQuerySatisfied() && result.getTrace() != null){
                 firePropertyChange("unfolding", StateValue.PENDING, StateValue.DONE);
             }
-
-
-
 		} else {
 			modelChecker.kill();
 			messenger.displayInfoMessage("Verification was interrupted by the user. No result found!", "Verification Cancelled");
@@ -324,5 +337,5 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		});
 	}
 
-	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result);
+	protected abstract boolean showResult(VerificationResult<TAPNNetworkTrace> result);
 }

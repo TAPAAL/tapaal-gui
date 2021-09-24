@@ -608,7 +608,7 @@ public class GuardDialogue extends JPanel /*
 			rightDelimiter.setEnabled(true);
 		else
 			rightDelimiter.setEnabled(!inf.isSelected());
-		secondIntervalNumber.setVisible(!value);
+        secondIntervalNumber.setVisible(!value);
 		rightConstantsComboBox.setVisible(value);
 
 		repackIfWindow();
@@ -718,31 +718,33 @@ public class GuardDialogue extends JPanel /*
 		String oldRight = rightConstantsComboBox.getSelectedItem() != null ? rightConstantsComboBox
 				.getSelectedItem().toString()
 				: null;
-				rightConstantsComboBox.removeAllItems();
-				Collection<Constant> constants = CreateGui.getCurrentTab().network()
-				.constants();
-				
-				//List <Constant> constantList = new ArrayList(constants);
-				List <Constant> constantList = new ArrayList<Constant>();
-				constantList.addAll(constants);
-				
-				constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
+        rightConstantsComboBox.removeAllItems();
+        Collection<Constant> constants = CreateGui.getCurrentTab().network()
+        .constants();
 
-				
-				for (Constant c : constantList) {
-					if (c.value() >= value) {
-						rightConstantsComboBox.addItem(c.name());
-					}
-				}
+        //List <Constant> constantList = new ArrayList(constants);
+        List <Constant> constantList = new ArrayList<Constant>();
+        constantList.addAll(constants);
 
-				if(rightConstantsComboBox.getItemCount() == 0){
-					rightUseConstant.setEnabled(false);
-				} else {
-					rightUseConstant.setEnabled(true);
-				}
+        constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 
-				if (oldRight != null)
-					rightConstantsComboBox.setSelectedItem(oldRight);
+
+        for (Constant c : constantList) {
+            if (c.value() >= value) {
+                rightConstantsComboBox.addItem(c.name());
+            }
+        }
+
+        if(rightConstantsComboBox.getItemCount() == 0){
+            rightUseConstant.setEnabled(false);
+            rightUseConstant.setSelected(false);
+            updateRightComponents();
+        } else {
+            rightUseConstant.setEnabled(true);
+        }
+
+        if (oldRight != null)
+            rightConstantsComboBox.setSelectedItem(oldRight);
 	}
 
 	private void firstSpinnerStateChanged(ChangeEvent evt) {
