@@ -24,6 +24,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
+import pipe.gui.graphicElements.PetriNetObject;
 
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
@@ -202,6 +203,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             } else{
                 loadedModel = new PNMLoader().load(fileOut);
             }
+            addLocation(loadedModel, composer);
             newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
             if(!dummyQuery){
@@ -242,6 +244,55 @@ public class UnfoldNet extends SwingWorker<String, Void> {
     public static List<pipe.dataLayer.TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network) {
         XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network);
         return new ArrayList<>(queryLoader.parseQueries().getQueries());
+    }
+
+    private void addLocation(LoadedModel loadedModel, TAPNComposer composer) {
+        for (Template net : loadedModel.templates()) {
+            int shifterX = calculateShift(net, true);
+            int shifterY = calculateShift(net, false);
+
+            if (shifterY > shifterX) shifterY = 0;
+            else shifterX = 0;
+
+            int counterX = shifterX;
+            int counterY = shifterY;
+
+            for (PetriNetObject object : net.guiModel().getPetriNetObjects()) {
+                for (PetriNetObject modelObject : composer.getGuiModel().getPetriNetObjects()) {
+                    if (object.getName().startsWith(modelObject.getName())) {
+                        object.setOriginalX(modelObject.getOriginalX() + shifterX);
+                        object.setOriginalY(modelObject.getOriginalY() + shifterY);
+                        break;
+                    }
+                }
+                shifterX += counterX;
+                shifterY += counterY;
+            }
+        }
+    }
+
+    private int calculateShift(Template net, boolean calculatingX) {
+        int min = Integer.MAX_VALUE;
+        int max = 0;
+        for (PetriNetObject object : net.guiModel().getPetriNetObjects()) {
+            if (calculatingX) {
+                if (object.getX() > max) {
+                    max = object.getX();
+                }
+                if (object.getX() < min) {
+                    min = object.getX();
+                }
+            } else {
+                if (object.getY() > max) {
+                    max = object.getY();
+                }
+                if (object.getY() < min) {
+                    min = object.getY();
+                }
+            }
+        }
+
+        return max - min + Pipe.PLACE_TRANSITION_HEIGHT + 10;
     }
 
     private int readUnfoldedSize(BufferedReader reader){
