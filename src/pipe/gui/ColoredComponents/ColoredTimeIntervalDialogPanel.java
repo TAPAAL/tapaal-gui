@@ -461,8 +461,5 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
     }
 
     private void repackIfWindow() {
-        if(rootPane.getParent() instanceof Window){
-            ((Window)rootPane.getParent()).pack();
-        }
     }
 }
