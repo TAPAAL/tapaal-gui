@@ -456,13 +456,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         secondIntervalNumber.setVisible(!value);
         rightConstantsComboBox.setVisible(value);
 
-        repackIfWindow();
         setDelimiterModels();
     }
 
-    private void repackIfWindow() {
-        if(rootPane.getParent() instanceof Window){
-            ((Window)rootPane.getParent()).pack();
-        }
-    }
 }
