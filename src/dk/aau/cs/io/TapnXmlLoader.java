@@ -3,6 +3,7 @@ package dk.aau.cs.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -85,8 +86,8 @@ public class TapnXmlLoader {
 		if(doc == null) return null;
 		try {
             return parse(doc);
-        } catch (NullPointerException e) {
-		    throw e;
+        } catch (FormatException | NullPointerException e) {
+            throw e;
         } catch (Exception e) {
             throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type");
         }
@@ -99,7 +100,7 @@ public class TapnXmlLoader {
 		if(doc == null) return null;
         try {
             return parse(doc);
-        } catch (NullPointerException e) {
+        } catch (FormatException | NullPointerException e) {
             throw e;
         } catch (Exception e) {
             throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type");
