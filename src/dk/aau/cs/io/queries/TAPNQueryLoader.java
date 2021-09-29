@@ -83,7 +83,8 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean siphontrap = getReductionOption(queryElement, "useSiphonTrapAnalysis", false);
 		boolean queryReduction = getReductionOption(queryElement, "useQueryReduction", true);
 		boolean stubborn = getReductionOption(queryElement, "useStubbornReduction", true);
-		boolean useTar = getTarOption(queryElement, "useTarOption", false);
+		boolean useTar = getAttributeOption(queryElement, "useTarOption", false);
+        boolean useTarjan = getAttributeOption(queryElement, "useTarjan", false);
 
 		TCTLAbstractProperty query;
 		if (queryElement.hasAttribute("type") && queryElement.getAttribute("type").equals("LTL")) {
@@ -103,7 +104,8 @@ public class TAPNQueryLoader extends QueryLoader{
 			parsedQuery.setUseSiphontrap(siphontrap);
 			parsedQuery.setUseQueryReduction(queryReduction);
 			parsedQuery.setUseStubbornReduction(stubborn);
-			parsedQuery.setUseTarOption(useTar);
+            parsedQuery.setUseTarOption(useTar);
+            parsedQuery.setUseTarjan(useTarjan);
 			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
 //				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
@@ -239,7 +241,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		return result;	
 	}
 
-	private boolean getTarOption(Element queryElement, String attributeName, boolean defaultValue) {
+	private boolean getAttributeOption(Element queryElement, String attributeName, boolean defaultValue) {
         if(!queryElement.hasAttribute(attributeName)){
             return defaultValue;
         }
@@ -251,8 +253,8 @@ public class TAPNQueryLoader extends QueryLoader{
         }
         return result;
     }
-	
-	private int getApproximationValue(Element queryElement, String attributeName, int defaultValue)
+
+    private int getApproximationValue(Element queryElement, String attributeName, int defaultValue)
 	{
 		if(!queryElement.hasAttribute(attributeName)){
 			return defaultValue;
