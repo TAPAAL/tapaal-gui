@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
 import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.Parsing.ParseException;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.NameVisibilityPanel;
@@ -619,8 +620,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			tab.setFile(null);
 
             return tab;
-		} catch (Exception e) {
-			//throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
+		} catch (ParseException e) {
+            throw new ParseException("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.getMessage());
+        } catch (Exception e) {
             throw e;
 		}
 

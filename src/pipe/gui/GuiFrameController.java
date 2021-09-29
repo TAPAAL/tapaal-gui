@@ -305,8 +305,13 @@ public class GuiFrameController implements GuiFrameControllerActions{
                     List<TabContent> tabs = get();
                     openTab(tabs);
                 } catch (Exception e) {
+                    String message = e.getMessage();
+
+                    if (message.contains("Exception:")) {
+                        message = message.split(":", 2)[1];
+                    }
                     JOptionPane.showMessageDialog(CreateGui.getApp(),
-                            e.getMessage(),
+                            message,
                             "Error loading file",
                             JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
