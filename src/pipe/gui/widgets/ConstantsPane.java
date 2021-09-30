@@ -96,31 +96,8 @@ public class ConstantsPane extends JPanel implements SidePane {
 		constantsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		constantsList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					if (constantsList.getSelectedIndex() == -1) {
-						editBtn.setEnabled(false);
-						removeBtn.setEnabled(false);
-					} else {
-						removeBtn.setEnabled(true);
-						editBtn.setEnabled(true);						
-					}
-					
-					if (constantsList.getModel().getSize() >= 2) {
-						sortButton.setEnabled(true);
-					} else
-						sortButton.setEnabled(false);
-
-					int index = constantsList.getSelectedIndex();
-					if(index > 0)
-						moveUpButton.setEnabled(true);
-					else
-						moveUpButton.setEnabled(false);
-
-
-					if(index < parent.network().constants().size() - 1)
-						moveDownButton.setEnabled(true);
-					else
-						moveDownButton.setEnabled(false);
+				if (!(e.getValueIsAdjusting())) {
+					updateButtons();
 				}
 			}
 		});
@@ -231,6 +208,20 @@ public class ConstantsPane extends JPanel implements SidePane {
 		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 
 	}
+
+    private void updateButtons() {
+        int index = constantsList.getSelectedIndex();
+        if (index == -1 || constantsList.getSelectedValuesList().isEmpty()) {
+            editBtn.setEnabled(false);
+            removeBtn.setEnabled(false);
+        } else {
+            removeBtn.setEnabled(true);
+            editBtn.setEnabled(true);
+        }
+        sortButton.setEnabled(constantsList.getModel().getSize() >= 2);
+        moveUpButton.setEnabled(index > 0 && !constantsList.getSelectedValuesList().isEmpty());
+        moveDownButton.setEnabled(index < parent.network().constants().size() - 1 && !constantsList.getSelectedValuesList().isEmpty());
+    }
 	
 	private void highlightConstant(int index){
 		ListModel model = constantsList.getModel();
@@ -288,7 +279,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 	private void addConstantsButtons() {
 		editBtn = new JButton("Edit");
-		editBtn.setEnabled(false);
+		editBtn.setEnabled(!constantsList.getSelectedValuesList().isEmpty());
 		editBtn.setToolTipText(toolTipEditConstant);
 		editBtn.addActionListener(e -> {
 			Constant c = (Constant) constantsList.getSelectedValue();
@@ -300,7 +291,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		buttonsPanel.add(editBtn, gbc);
 
 		removeBtn = new JButton("Remove");
-		removeBtn.setEnabled(false);
+		removeBtn.setEnabled(!constantsList.getSelectedValuesList().isEmpty());
 		removeBtn.setToolTipText(toolTipRemoveConstant);
 		removeBtn.addActionListener(e -> {
 			removeConstants();
@@ -327,6 +318,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 		listModel.updateAll();
 
+        updateButtons();
 	}
 
 	private void addConstantsComponents() {
@@ -344,7 +336,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
 		moveUpButton.setMargin(new Insets(2,2,2,2));
-		moveUpButton.setEnabled(false);
+		moveUpButton.setEnabled(!constantsList.getSelectedValuesList().isEmpty());
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(e -> {
 			int index = constantsList.getSelectedIndex();
@@ -365,7 +357,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
 		moveDownButton.setMargin(new Insets(2,2,2,2));
-		moveDownButton.setEnabled(false);
+		moveDownButton.setEnabled(!constantsList.getSelectedValuesList().isEmpty());
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(e -> {
 			int index = constantsList.getSelectedIndex();
