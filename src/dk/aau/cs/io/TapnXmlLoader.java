@@ -78,20 +78,32 @@ public class TapnXmlLoader {
 
 	}
 
-	public LoadedModel load(InputStream file) throws FormatException {
+	public LoadedModel load(InputStream file) throws Exception {
 		Require.that(file != null, "file must be non-null and exist");
 
 		Document doc = loadDocument(file);
 		if(doc == null) return null;
-		return parse(doc);
+		try {
+            return parse(doc);
+        } catch (FormatException | NullPointerException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type");
+        }
 	}
 	
-	public LoadedModel load(File file) throws FormatException {
+	public LoadedModel load(File file) throws Exception {
 		Require.that(file != null && file.exists(), "file must be non-null and exist");
 
 		Document doc = loadDocument(file);
 		if(doc == null) return null;
-		return parse(doc);
+        try {
+            return parse(doc);
+        } catch (FormatException | NullPointerException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type");
+        }
 	}
 	
 	
@@ -507,7 +519,6 @@ public class TapnXmlLoader {
 		    nameOffsetYInput = (int)Double.parseDouble(nameOffsetY);
         }
 
-
 		String invariant = place.getAttribute("invariant");
 		boolean displayName = place.getAttribute("displayName").equals("false") ? false : true;
 
@@ -518,7 +529,7 @@ public class TapnXmlLoader {
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
 		}
-		
+
 		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
 			nameInput = "_" + nameInput;
 			if(firstPlaceRenameWarning) {
@@ -527,7 +538,7 @@ public class TapnXmlLoader {
 			}
 		}
 
-        idResolver.add(tapn.name(), idInput, nameInput);
+		idResolver.add(tapn.name(), idInput, nameInput);
 
 		TimedPlace p;
 		if(network.isNameUsedForShared(nameInput)){
@@ -542,7 +553,7 @@ public class TapnXmlLoader {
 		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, lens);
 		placeComponent.setUnderlyingPlace(p);
-		
+
 		if (!displayName){
 			placeComponent.setAttributesVisible(false);
 		}
@@ -662,7 +673,7 @@ public class TapnXmlLoader {
 
 		int _endx = targetIn.getX() + targetIn.centreOffsetLeft();
 		int _endy = targetIn.getY() + targetIn.centreOffsetTop();
-		
+
 		//Get weight if any
 		Weight weight = new IntWeight(1);
 		if(arc.hasAttribute("weight")){

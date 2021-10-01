@@ -134,6 +134,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 			}
 			
 		});
+
         list.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 JList source = (JList)e.getSource();
@@ -161,6 +162,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         });
         list.setCellRenderer(new ColortypeListCellRenderer());
 		list.addMouseListener(new MouseAdapter() {
+
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (!list.isSelectionEmpty()) {
@@ -284,6 +286,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 		hideIrrelevantInformation();
         enableButtons(false);
 	}
+
 	private void hideIrrelevantInformation(){
 	    if(!parent.getLens().isColored()){
 	        constantsColorTypesVariablesComboBox.setVisible(false);
@@ -307,6 +310,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             constantsColorTypesVariablesComboBox.setVisible(true);
         }
     }
+
 	private void highlightConstant(int index){
         //TODO: Implement for colors and variables
         if(isDisplayingColorTypes() || isDisplayingVariables()){
@@ -371,8 +375,10 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 	private void addConstantsButtons() {
 		editBtn = new JButton("Edit");
+
 		editBtn.setEnabled(false);
 		editBtn.setToolTipText(toolTipEditColorType);
+
 		editBtn.addActionListener(e -> {
             if (isDisplayingVariables()){
                 Variable v = (Variable)  list.getSelectedValue();
@@ -404,8 +410,10 @@ public class ConstantsPane extends JPanel implements SidePane {
 		buttonsPanel.add(editBtn, gbc);
 
 		removeBtn = new JButton("Remove");
+
 		removeBtn.setEnabled(false);
 		removeBtn.setToolTipText(toolTipRemoveColorType);
+
 		removeBtn.addActionListener(e -> {
             if (isDisplayingGlobalConstants()) {
                 removeConstants();
@@ -481,10 +489,10 @@ public class ConstantsPane extends JPanel implements SidePane {
 			return;
 
 		constantsListModel.updateAll();
-
 	}
 
 	private void addConstantsComponents() {
+
         constantsColorTypesVariablesComboBox.setToolTipText(toolTipComboBox);
         constantsColorTypesVariablesComboBox.addActionListener(e -> {
             JComboBox<String> source = (JComboBox) e.getSource();
@@ -628,6 +636,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         //gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.NORTH;
         constantsPanel.add(sortButton,gbc);
+
 	}
 
 	private void showEditConstantDialog(Constant constant) {

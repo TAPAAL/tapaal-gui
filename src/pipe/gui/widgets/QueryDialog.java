@@ -2369,41 +2369,32 @@ public class QueryDialog extends JPanel {
 
 					if (newQuery != null) // new query parsed successfully
 					{
-						// check correct place names are used in atomic propositions
-						ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
-						for(TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
-							for(TimedPlace p : tapn.places()) {
-                                if (lens.isTimed() || !p.isShared() || lens.isGame()) {
-                                    templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
-                                }
-							}
-						}
-
-						for(TimedPlace p : tapnNetwork.sharedPlaces()) {
-							templatePlaceNames.add(new Tuple<String, String>("", p.name()));
-						}
-
-						FixAbbrivPlaceNames.fixAbbrivPlaceNames(templatePlaceNames, newQuery);
-						VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
-						VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(newQuery);
+						VerifyPlaceNamesVisitor.Context placeContext = getPlaceContext(newQuery);
+                        VerifyTransitionNamesVisitor.Context transitionContext = getTransitionContext(newQuery);
 
                         boolean isResultFalse;
 
                         if (lens.isTimed() || lens.isGame()) {
-                            isResultFalse = !c.getResult();
+                            isResultFalse = !placeContext.getResult();
                         } else {
-                            isResultFalse = checkUntimedResult(newQuery) && !c.getResult();
+                            isResultFalse = !transitionContext.getResult() || !placeContext.getResult();
                         }
 
 						if (isResultFalse) {
 							StringBuilder s = new StringBuilder();
+
 							s.append("The following places" + (lens.isTimed() ? "" : " or transitions") +
                                 " were used in the query, but are not present in your model:\n\n");
 
-							for (String placeName : c.getIncorrectPlaceNames()) {
+							for (String placeName : placeContext.getIncorrectPlaceNames()) {
 								s.append(placeName);
 								s.append('\n');
 							}
+
+                            for (String transitionName : transitionContext.getIncorrectTransitionNames()) {
+                                s.append(transitionName);
+                                s.append('\n');
+                            }
 
 							s.append("\nThe specified query has not been saved. Do you want to edit it again?");
 							int choice = JOptionPane.showConfirmDialog(
@@ -2485,25 +2476,44 @@ public class QueryDialog extends JPanel {
 		queryPanel.add(editingButtonPanel, gbc);
 	}
 
-    private boolean checkUntimedResult(TCTLAbstractProperty newQuery) {
+    private VerifyPlaceNamesVisitor.Context getPlaceContext(TCTLAbstractProperty newQuery) {
+        // check correct place names are used in atomic propositions
+        ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
+        for(TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
+            for(TimedPlace p : tapn.places()) {
+                if (lens.isTimed() || !p.isShared() || lens.isGame()) {
+                    templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
+                }
+            }
+        }
+
+        for(TimedPlace p : tapnNetwork.sharedPlaces()) {
+            templatePlaceNames.add(new Tuple<String, String>("", p.name()));
+        }
+
+        FixAbbrivPlaceNames.fixAbbrivPlaceNames(templatePlaceNames, newQuery);
+        VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
+        return nameChecker.verifyPlaceNames(newQuery);
+    }
+
+    private VerifyTransitionNamesVisitor.Context getTransitionContext(TCTLAbstractProperty newQuery) {
         // check correct transition names are used in atomic propositions
-        ArrayList<Tuple<String, String>> templateTransitionNames = new ArrayList<Tuple<String, String>>();
+        ArrayList<Tuple<String,String>> templateTransitionNames = new ArrayList<Tuple<String,String>>();
         for (TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
             for (TimedTransition t : tapn.transitions()) {
-                if (!t.isShared()) {
-                    templateTransitionNames.add(new Tuple<String, String>(tapn.name(), t.name()));
+                if (lens.isTimed() || !t.isShared() || lens.isGame()) {
+                    templateTransitionNames.add(new Tuple<>(tapn.name(), t.name()));
                 }
             }
         }
 
         for (SharedTransition t : tapnNetwork.sharedTransitions()) {
-            templateTransitionNames.add(new Tuple<String, String>("", t.name()));
+            templateTransitionNames.add(new Tuple<>("", t.name()));
         }
 
         FixAbbrivTransitionNames.fixAbbrivTransitionNames(templateTransitionNames, newQuery);
-        VerifyTransitionNamesVisitor transitionNameChecker = new VerifyTransitionNamesVisitor(templateTransitionNames);
-        VerifyTransitionNamesVisitor.Context c2 = transitionNameChecker.verifyTransitionNames(newQuery);
-        return !c2.getResult();
+        VerifyTransitionNamesVisitor nameChecker = new VerifyTransitionNamesVisitor(templateTransitionNames);
+        return nameChecker.verifyTransitionNames(newQuery);
     }
 
 	private void initUppaalOptionsPanel() {
