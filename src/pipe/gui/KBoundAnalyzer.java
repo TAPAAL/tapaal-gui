@@ -8,6 +8,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;
@@ -26,6 +27,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class KBoundAnalyzer {
 	protected TimedArcPetriNetNetwork tapnNetwork;
@@ -114,7 +116,15 @@ public class KBoundAnalyzer {
     }
 
     private TimedArcPetriNet mergeNetComponents() {
-        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), true, true);
+        HashMap<TimedArcPetriNet, DataLayer> guiModels = CreateGui.getCurrentTab().getGuiModels();
+        for (TimedArcPetriNet net : guiModels.keySet()) {
+            if (tapnNetwork.getTAPNByName(net.name()) != null) {
+                DataLayer dl = guiModels.get(net);
+                guiModels.remove(net);
+                guiModels.put(tapnNetwork.getTAPNByName(net.name()), dl);
+            }
+        }
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 
         return transformedModel.value1();
