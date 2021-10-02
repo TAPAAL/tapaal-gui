@@ -347,7 +347,7 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(rightDelimiter, gridBagConstraints);
 
-		inf = new JCheckBox("inf", true);
+		inf = new JCheckBox(Character.toString('\u221e'), true);
 		inf.addActionListener(evt -> {
 			if (inf.isSelected()) {
 				secondIntervalNumber.setEnabled(false);
@@ -502,7 +502,7 @@ public class GuardDialogue extends JPanel /*
 				first, 0, Integer.MAX_VALUE, 1);
 
 		SpinnerNumberModel spinnerModelForSecondNumber = null;
-		boolean isInf = secondNumber.equals("inf");
+		boolean isInf = secondNumber.equals(Character.toString('\u221e'));
 		if (isInf) {
 			inf.setSelected(true);
 			secondIntervalNumber.setEnabled(false);
