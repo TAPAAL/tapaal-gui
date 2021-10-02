@@ -52,7 +52,7 @@ public class TAPAALLTLQueryParser {
 
     public static TCTLAbstractPathProperty parse(String query) throws ParseException {
         TAPAALLTLQueryParser parser = new TAPAALLTLQueryParser(new StringReader(query));
-        return parser.AbstractPathProperty();
+        return parser.Start();
     }
 }
 
@@ -117,6 +117,14 @@ TOKEN :
     }
 
 /** Root production. */
+TCTLAbstractPathProperty Start() :
+{
+        TCTLAbstractPathProperty child = null;
+}
+{
+   child = AbstractPathProperty() <EOF> {return child; }
+}
+
 TCTLAbstractPathProperty AbstractPathProperty() :
 {
         TCTLAbstractPathProperty pathChild = null;
@@ -181,10 +189,11 @@ TCTLAbstractStateProperty AndExpr() :
     TCTLAbstractStateProperty NotExpr() :
     {
     TCTLAbstractStateProperty child;
+    TCTLAbstractStateProperty child2 = null;
     TCTLAbstractPathProperty childConverter;
     }
     {
-<NOT> "(" child = OrExpr() ")" { return new TCTLNotNode(child); }
+    <NOT> "(" child = OrExpr() [LOOKAHEAD(2) <U> child2 = OrExpr()] ")" { return new TCTLNotNode(child2 == null ? child : new TCTLPathToStateConverter(new LTLAUNode(child, child2))); }
     | child = Factor() { return child; }
     | "(" childConverter = QuantifierExpr() ")" { return new TCTLPathToStateConverter(childConverter); }
     }
