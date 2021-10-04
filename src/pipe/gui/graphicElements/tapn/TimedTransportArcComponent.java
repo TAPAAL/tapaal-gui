@@ -109,8 +109,9 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 						+ " : " + getGroup());
 			}
 			else {
+			    String compareString = "[0," + Character.toString('\u221E') + ")";
 				if (underlyingTransportArc.interval().toString(
-						displayConstantNames).equals("[0,inf)")) {
+						displayConstantNames).equals(compareString)) {
 
 					getNameLabel().setText(" : " + getGroup());
 

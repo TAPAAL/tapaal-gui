@@ -1032,7 +1032,8 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 			transportArcsToCounters.put(transArc, counter);
 
 			String guard = "";
-			if(t.isUrgent() && !transArc.destination().invariant().asIterval().toString().equals("[0,inf)")){
+			String compareString = "[0," + Character.toString('\u221E') + ")";
+			if(t.isUrgent() && !transArc.destination().invariant().asIterval().toString().equals(compareString)){
 				JOptionPane.showMessageDialog(myRootPane, "There is an invariant on a destination for a transport arc going through an urgent transition. The translation will not consider this. To get the true result remove the invariant or the urgency.", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 			else{
