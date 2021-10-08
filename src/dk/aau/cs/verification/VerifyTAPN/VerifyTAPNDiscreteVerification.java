@@ -369,7 +369,12 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
                         }
                     } catch (FormatException e) {
                         e.printStackTrace();
+                        return null;
                     } catch (ThreadDeath d) {
+                        d.printStackTrace();
+                        return null;
+                    } catch (Exception e) {
+                        e.printStackTrace();
                         return null;
                     }
                 }
