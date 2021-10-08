@@ -1185,7 +1185,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		animatorSplitPane.repaint();
 	}
 
-	public void switchToAnimationComponents(boolean showEnabledTransitions) {
+	public void switchToAnimationComponents() {
 		
 		//Remove dummy
 		Component dummy = animatorSplitPane.getMultiSplitLayout().getComponentForNode(animatorSplitPane.getMultiSplitLayout().getNodeForName(templateExplorerName));
@@ -1691,7 +1691,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if (!animationmode) {
 			if (numberOfActiveTemplates() > 0) {
 				app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
-                switchToAnimationComponents(true);
+                switchToAnimationComponents();
 
 				setManager(animationModeController);
 
