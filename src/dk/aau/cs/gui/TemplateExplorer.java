@@ -140,7 +140,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		addCreatedComponents(hideButtons);
 		
 		this.addComponentListener(new ComponentListener() {
-			int minimumHegiht = TemplateExplorer.this.getMinimumSize().height + sortButton.getMinimumSize().height;
+			final int minimumHegiht = TemplateExplorer.this.getMinimumSize().height + sortButton.getMinimumSize().height;
 			public void componentShown(ComponentEvent e) {
 			}
 			
@@ -148,11 +148,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			public void componentResized(ComponentEvent e) {
 				
 				if(!isInAnimationMode){
-					if(TemplateExplorer.this.getSize().height <= minimumHegiht){
-						sortButton.setVisible(false);
-					} else {
-						sortButton.setVisible(true);
-					}
+                    sortButton.setVisible(TemplateExplorer.this.getSize().height > minimumHegiht);
 				}
 			}
 			
@@ -195,11 +191,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 		listModel.addListDataListener(new ListDataListener() {
 			public void contentsChanged(ListDataEvent arg0) {
-				if (parent.numberOfActiveTemplates() > 1) {
-					removeTemplateButton.setEnabled(false);
-				} else {
-					removeTemplateButton.setEnabled(true);
-				}
+                removeTemplateButton.setEnabled(parent.numberOfActiveTemplates() <= 1);
 			}
 
 			public void intervalAdded(ListDataEvent arg0) {
@@ -218,7 +210,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 		templateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		templateList.setSelectedIndex(0);
-		templateList.setCellRenderer(new TemplateListCellRenderer(templateList.getCellRenderer()));
+		templateList.setCellRenderer(new TemplateListCellRenderer<>(templateList.getCellRenderer()));
 		
 		TemplateListManager manager = new TemplateListManager(templateList);
 		templateList.addListSelectionListener(manager);
@@ -244,19 +236,17 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		moveUpButton.setMargin(new Insets(2,2,2,2));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
-		moveUpButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = templateList.getSelectedIndex();
-				
-				if(index > 0) {
-				    Command c = new MoveElementUpCommand(TemplateExplorer.this, index, index-1);
-				    undoManager.addNewEdit(c);
-				    c.redo();
-                    templateList.ensureIndexIsVisible(index+1);
-					templateList.setSelectedIndex(index-1);
-				}
-			}
-		});
+		moveUpButton.addActionListener(e -> {
+            int index = templateList.getSelectedIndex();
+
+            if(index > 0) {
+                Command c = new MoveElementUpCommand(TemplateExplorer.this, index, index-1);
+                undoManager.addNewEdit(c);
+                c.redo();
+                templateList.ensureIndexIsVisible(index+1);
+                templateList.setSelectedIndex(index-1);
+            }
+        });
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -268,19 +258,17 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		moveDownButton.setMargin(new Insets(2,2,2,2));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
-		moveDownButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = templateList.getSelectedIndex();
-				
-				if(index < parent.network().allTemplates().size() - 1) {
-                    Command c = new MoveElementDownCommand(TemplateExplorer.this, index, index+1);
-                    undoManager.addNewEdit(c);
-                    c.redo();
-                    templateList.ensureIndexIsVisible(index+1);
-					templateList.setSelectedIndex(index+1);
-				}
-			}
-		});
+		moveDownButton.addActionListener(e -> {
+            int index = templateList.getSelectedIndex();
+
+            if(index < parent.network().allTemplates().size() - 1) {
+                Command c = new MoveElementDownCommand(TemplateExplorer.this, index, index+1);
+                undoManager.addNewEdit(c);
+                c.redo();
+                templateList.ensureIndexIsVisible(index+1);
+                templateList.setSelectedIndex(index+1);
+            }
+        });
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -413,12 +401,10 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		renameButton.setPreferredSize(dimension);
 		renameButton.setToolTipText(toolTipRenameComponent);
 
-		renameButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				showRenameTemplateDialog("");
-				templateList.validate();
-			}
-		});
+		renameButton.addActionListener(arg0 -> {
+            showRenameTemplateDialog("");
+            templateList.validate();
+        });
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -469,8 +455,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	private EscapableDialog dialog;
 	private JPanel container;
 	private JTextField nameTextField;
-	private Dimension size;
-	private JLabel nameLabel;
+    private JLabel nameLabel;
 	private JPanel buttonContainer;
 	private JButton okButton;
 	private JButton cancelButton;
@@ -550,9 +535,8 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		container.setLayout(new GridBagLayout());
 		nameContainer = new JPanel();
 		nameContainer.setLayout(new GridBagLayout());
-		size = new Dimension(330, 25);
 
-		nameTextField = new javax.swing.JTextField();
+        nameTextField = new javax.swing.JTextField();
         SwingHelper.setPreferredWidth(nameTextField,330);
 		nameTextField.setText(nameToShow);
 		nameTextField.addAncestorListener(new RequestFocusListener());
@@ -609,17 +593,9 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonContainer.add(cancelButton,gbc);		
 		
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				onOK();
-			}
-		});
+		okButton.addActionListener(e -> onOK());
 		
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
+		cancelButton.addActionListener(e -> exit());
 		
 		gbc = new GridBagConstraints();
 		gbc.insets = new Insets(0, 8, 5, 8);
@@ -777,7 +753,6 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		if (tapn != null) {
 			parent.changeToTemplate(tapn);
 		}
-		//parent.drawingSurface().repaintAll();
 	}
 
 	public Template selectedModel() {
@@ -809,7 +784,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 	
 	public void selectFirst() {
-			templateList.setSelectedIndex(0);
+        templateList.setSelectedIndex(0);
 	}
 
 	public void hideButtons() {
@@ -853,46 +828,45 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	    return templateList;
     }
 
-    private class TemplateListCellRenderer extends JPanel implements ListCellRenderer {
+    private class TemplateListCellRenderer<T> extends JPanel implements ListCellRenderer<T> {
 
 		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to deactive the component";
 		private static final String CHECK_TO_ACTIVATE = "Check to active the component";
 		private final JCheckBox activeCheckbox = new JCheckBox();
-		private final ListCellRenderer cellRenderer;
+		private final ListCellRenderer<T> cellRenderer;
 		
 		
-		public TemplateListCellRenderer(ListCellRenderer renderer) {
+		public TemplateListCellRenderer(ListCellRenderer<T> renderer) {
 			cellRenderer = renderer;
 			setLayout(new BorderLayout()); 
 	        setOpaque(false); 
 	        activeCheckbox.setOpaque(false);
 		}
-		
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-			Component renderer = cellRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			removeAll();
-			if(!isInAnimationMode) { 
-				boolean isActive = ((Template)value).isActive();
-				activeCheckbox.setSelected(isActive);
-				setToolTipText((isActive)? UNCHECK_TO_DEACTIVATE : CHECK_TO_ACTIVATE);
-				add(activeCheckbox, BorderLayout.WEST);
-			} else {
-				
-				setToolTipText(null);
-			}
-			add(renderer, BorderLayout.CENTER);
-			return this;
-		}
-		
-		
-	}
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends T> list, T value, int index, boolean isSelected, boolean cellHasFocus) {
+            Component renderer = cellRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            removeAll();
+            if(!isInAnimationMode) {
+                boolean isActive = ((Template)value).isActive();
+                activeCheckbox.setSelected(isActive);
+                setToolTipText((isActive)? UNCHECK_TO_DEACTIVATE : CHECK_TO_ACTIVATE);
+                add(activeCheckbox, BorderLayout.WEST);
+            } else {
+
+                setToolTipText(null);
+            }
+            add(renderer, BorderLayout.CENTER);
+            return this;
+        }
+    }
 	
 	private class TemplateListManager extends MouseAdapter implements ListSelectionListener, ActionListener {
 		private final int checkBoxWidth = new JCheckBox().getPreferredSize().width;
 		private final ListSelectionModel selectionModel;
-		private final JList list;
+		private final JList<Template> list;
 		
-		public TemplateListManager(JList list) {
+		public TemplateListManager(JList<Template> list) {
 			this.list = list;
 			selectionModel = list.getSelectionModel();
 			this.list.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), JComponent.WHEN_FOCUSED);
@@ -902,7 +876,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			if(index<0) 
 				return; 
 
-			Template item = ((Template)list.getModel().getElementAt(index));
+			Template item = list.getModel().getElementAt(index);
 
 
 			if(!selectionModel.isSelectedIndex(index)) {
@@ -925,11 +899,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			if (!selectedModel().isActive()){
 				removeTemplateButton.setEnabled(true);
 			}else {
-				if (parent.numberOfActiveTemplates() <= 1) {
-					removeTemplateButton.setEnabled(false);
-				} else {
-					removeTemplateButton.setEnabled(true);
-				}
+                removeTemplateButton.setEnabled(parent.numberOfActiveTemplates() > 1);
 			}
 			 
 			toggleAffectedQueries();
@@ -960,9 +930,10 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			if(index<0) 
 				return; 
 			
-			if(e.getX()>templateList.getCellBounds(index, index).x+checkBoxWidth) 
-				return; 
-			
+			if(e.getX()>templateList.getCellBounds(index, index).x+checkBoxWidth) {
+                return;
+            }
+
 			if (!isInAnimationMode){
 				toggleSelection(index);
 			}
@@ -984,32 +955,14 @@ public class TemplateExplorer extends JPanel implements SidePane {
 						if (parent.numberOfActiveTemplates() > 1){
 							removeTemplateButton.setEnabled(true);
 						}else{
-							if (selectedModel().isActive()){
-								removeTemplateButton.setEnabled(false);
-							} else {
-								removeTemplateButton.setEnabled(true);
-							}
+                            removeTemplateButton.setEnabled(!selectedModel().isActive());
 						}
 						renameButton.setEnabled(true);
 						copyButton.setEnabled(true);
-						if(templateList.getModel().getSize() >= 2) {
-                            sortButton.setEnabled(true);
-                        } else {
-                            sortButton.setEnabled(false);
-                        }
+                        sortButton.setEnabled(templateList.getModel().getSize() >= 2);
 
-						if(index > 0) {
-                            moveUpButton.setEnabled(true);
-                        } else {
-                            moveUpButton.setEnabled(false);
-                        }
-								
-							
-						if(index < parent.network().allTemplates().size() - 1) {
-                            moveDownButton.setEnabled(true);
-                        } else {
-                            moveDownButton.setEnabled(false);
-                        }
+                        moveUpButton.setEnabled(index > 0);
+                        moveDownButton.setEnabled(index < parent.network().allTemplates().size() - 1);
 					}
 					templateList.ensureIndexIsVisible(index);
 					openSelectedTemplate();
