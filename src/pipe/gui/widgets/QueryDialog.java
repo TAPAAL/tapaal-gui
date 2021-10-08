@@ -112,6 +112,8 @@ public class QueryDialog extends JPanel {
     private JButton finallyButton;
     private JButton nextButton;
     private JButton untilButton;
+    private JButton aButton;
+    private JButton eButton;
 
 	private JTextPane queryField;
 
@@ -266,6 +268,8 @@ public class QueryDialog extends JPanel {
     private static final String TOOL_TIP_F = "Eventually";
     private static final String TOOL_TIP_U = "Until";
     private static final String TOOL_TIP_X = "Next";
+    private static final String TOOL_TIP_E = "Switch to check if there exists a computation where the formula holds.";
+    private static final String TOOL_TIP_A = "Switch to check if the formula holds for every computation.";
 
     //Tool tips for logic panel
 	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently selected part of the query with a conjunction.";
@@ -732,7 +736,7 @@ public class QueryDialog extends JPanel {
         if (!lens.isTimed() && !lens.isGame()) {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
-        if (current instanceof LTLANode) {
+        if (current instanceof LTLANode || current instanceof LTLENode) {
             negationButton.setEnabled(false);
         } else {
             negationButton.setEnabled(true);
@@ -814,6 +818,10 @@ public class QueryDialog extends JPanel {
 			    if (selection instanceof LTLANode) {
                     newProperty = newProperty.replace(selection, replacement);
                     addAllPathsToProperty(newProperty, selection);
+                    return;
+                } else if (selection instanceof LTLENode) {
+                    newProperty = newProperty.replace(selection, replacement);
+                    addExistsPathsToProperty(newProperty, selection);
                     return;
                 }
 
@@ -1026,6 +1034,8 @@ public class QueryDialog extends JPanel {
         finallyButton.setEnabled(false);
         nextButton.setEnabled(false);
         untilButton.setEnabled(false);
+        aButton.setEnabled(false);
+        eButton.setEnabled(false);
 
         conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
@@ -1101,6 +1111,13 @@ public class QueryDialog extends JPanel {
         finallyButton.setEnabled(true);
         nextButton.setEnabled(true);
         untilButton.setEnabled(true);
+        if (queryType.getSelectedIndex() == 1 && newProperty instanceof LTLANode) {
+            aButton.setEnabled(false);
+            eButton.setEnabled(true);
+        } else if (queryType.getSelectedIndex() == 1) {
+            aButton.setEnabled(true);
+            eButton.setEnabled(false);
+        }
 
         conjunctionButton.setEnabled(true);
         disjunctionButton.setEnabled(true);
@@ -1561,7 +1578,8 @@ public class QueryDialog extends JPanel {
 
 	private void toggleDialogType() {
        if (queryType.getSelectedIndex() == 1 && wasCTLType) {
-           if (convertPropertyType(false, newProperty, true) == null &&
+           boolean isA = isA();
+           if (convertPropertyType(false, newProperty, true, isA) == null &&
                !(newProperty instanceof TCTLStatePlaceHolder)) {
                if (showWarningMessage(false) == JOptionPane.YES_OPTION) {
                    deleteProperty();
@@ -1570,18 +1588,20 @@ public class QueryDialog extends JPanel {
                    queryType.setSelectedIndex(0);
                    return;
                }
-           } else {
+           } else if (isA) {
               addAllPathsToProperty(newProperty, null);
+           } else {
+               addExistsPathsToProperty(newProperty, null);
            }
            showLTLButtons(true);
            updateShiphonTrap(true);
            wasCTLType = false;
        } else if (queryType.getSelectedIndex() == 0 && !wasCTLType) {
-           if (convertPropertyType(true, newProperty, true) == null &&
+           if (convertPropertyType(true, newProperty, true, newProperty instanceof LTLANode) == null &&
                !(newProperty instanceof TCTLStatePlaceHolder)) {
                if (showWarningMessage(true) == JOptionPane.YES_OPTION) {
                    deleteProperty();
-                   newProperty = removeAllPathsFromProperty(newProperty);
+                   newProperty = removeExistsAllPathsFromProperty(newProperty);
                } else {
                    queryType.setSelectedIndex(1);
                    return;
@@ -1596,13 +1616,28 @@ public class QueryDialog extends JPanel {
        if (redoButton != null) redoButton.setEnabled(false);
        setEnabledOptionsAccordingToCurrentReduction();
     }
-    private TCTLAbstractProperty convertPropertyType(boolean toCTL, TCTLAbstractProperty property, boolean isFirst) {
-        if (property != null) {
-            property = removeAllPathsFromProperty(removeConverter(property));
 
-            if (property instanceof TCTLEGNode || property instanceof TCTLEFNode ||
-                property instanceof TCTLEXNode || property instanceof TCTLEUNode ||
-                (!toCTL && property instanceof TCTLDeadlockNode)) {
+    private boolean isA() {
+	    if (newProperty.toString().startsWith("A"))
+	        return true;
+        if (newProperty.toString().startsWith("E"))
+            return false;
+        if (newProperty.toString().startsWith("A", 2))
+            return true;
+        if (newProperty.toString().startsWith("E", 2))
+            return false;
+        if (newProperty.toString().startsWith("A", 3))
+            return true;
+        if (newProperty.toString().startsWith("E", 3))
+            return false;
+        return true;
+    }
+
+    private TCTLAbstractProperty convertPropertyType(boolean toCTL, TCTLAbstractProperty property, boolean isFirst, boolean isA) {
+        if (property != null) {
+            property = removeExistsAllPathsFromProperty(removeConverter(property));
+
+            if (!toCTL && (property instanceof TCTLDeadlockNode || !canBeConverted(property, isA))) {
                 return null;
             } else if (property.isSimpleProperty() && !(property instanceof TCTLNotNode)) {
                 if (!isFirst) {
@@ -1614,7 +1649,7 @@ public class QueryDialog extends JPanel {
                 }
             }
 
-            TCTLAbstractProperty replacement = getReplacement(toCTL, property);
+            TCTLAbstractProperty replacement = getReplacement(toCTL, property, isA);
 
             if (!isFirst) {
                 return replacement;
@@ -1622,6 +1657,15 @@ public class QueryDialog extends JPanel {
             return replaceProperty(replacement);
         }
         return null;
+	}
+
+	private boolean canBeConverted(TCTLAbstractProperty property, boolean isA) {
+	    if (isA && property.toString().startsWith("E")) {
+	        return false;
+        } else if (!isA && property.toString().startsWith("A")) {
+            return false;
+        }
+	    return true;
 	}
 
 	private TCTLAbstractProperty removeConverter(TCTLAbstractProperty property) {
@@ -1635,32 +1679,33 @@ public class QueryDialog extends JPanel {
         return property;
     }
 
-	private TCTLAbstractProperty getReplacement(boolean toCTL, TCTLAbstractProperty property) {
+	private TCTLAbstractProperty getReplacement(boolean toCTL, TCTLAbstractProperty property, boolean isA) {
 	    TCTLAbstractProperty replacement = null;
-        TCTLAbstractStateProperty firstChild = getChild(toCTL, property, 1);
-        TCTLAbstractStateProperty secondChild = getChild(toCTL, property, 2);
+        TCTLAbstractStateProperty firstChild = getChild(toCTL, property, 1, isA);
+        TCTLAbstractStateProperty secondChild = getChild(toCTL, property, 2, isA);
         property = removeConverter(property);
 
-        if (firstChild == null) return null;
+        if (firstChild == null || secondChild == null)
+            return null;
         if (toCTL) {
-            if (property instanceof LTLAGNode) {
-                replacement = new TCTLAGNode(firstChild);
-            } else if (property instanceof LTLAFNode) {
-                replacement = new TCTLAFNode(firstChild);
-            } else if (property instanceof LTLAXNode) {
-                replacement = new TCTLAXNode(firstChild);
-            } else if (property instanceof LTLAUNode) {
-                replacement = new TCTLAUNode(firstChild, secondChild);
+            if (property instanceof LTLGNode) {
+                replacement = isA? new TCTLAGNode(firstChild) : new TCTLEGNode(firstChild);
+            } else if (property instanceof LTLFNode) {
+                replacement = isA ? new TCTLAFNode(firstChild) : new TCTLEFNode(firstChild);
+            } else if (property instanceof LTLXNode) {
+                replacement = isA ? new TCTLAXNode(firstChild) : new TCTLEXNode(firstChild);
+            } else if (property instanceof LTLUNode) {
+                replacement = isA ? new TCTLAUNode(firstChild, secondChild): new TCTLEUNode(firstChild, secondChild);
             }
         } else {
-            if (property instanceof TCTLAGNode) {
-                replacement = new LTLAGNode(firstChild);
-            } else if (property instanceof TCTLAFNode) {
-                replacement = new LTLAFNode(firstChild);
-            } else if (property instanceof TCTLAXNode) {
-                replacement = new LTLAXNode(firstChild);
-            } else if (property instanceof TCTLAUNode) {
-                replacement = new LTLAUNode(firstChild, secondChild);
+            if (property instanceof TCTLAGNode || property instanceof TCTLEGNode) {
+                replacement = new LTLGNode(firstChild);
+            } else if (property instanceof TCTLAFNode || property instanceof TCTLEFNode) {
+                replacement = new LTLFNode(firstChild);
+            } else if (property instanceof TCTLAXNode || property instanceof TCTLEXNode) {
+                replacement = new LTLXNode(firstChild);
+            } else if (property instanceof TCTLAUNode || property instanceof TCTLEUNode) {
+                replacement = new LTLUNode(firstChild, secondChild);
             }
         }
 
@@ -1677,18 +1722,17 @@ public class QueryDialog extends JPanel {
                 replacement = property;
             }
         }
-
 	    return replacement;
     }
 
-    private TCTLAbstractStateProperty getChild(boolean toCTL, TCTLAbstractProperty property, int childNumber) {
+    private TCTLAbstractStateProperty getChild(boolean toCTL, TCTLAbstractProperty property, int childNumber, boolean isA) {
         property = removeConverter(property);
         TCTLAbstractProperty child = getSpecificChildOfProperty(childNumber, property);
         child = removeConverter(child);
 
         if (!(child instanceof TCTLStatePlaceHolder || child instanceof TCTLPathPlaceHolder)) {
            if (!child.isSimpleProperty() || child instanceof TCTLNotNode) {
-                TCTLAbstractProperty replacement = convertPropertyType(toCTL, child, false);
+                TCTLAbstractProperty replacement = convertPropertyType(toCTL, child, false, isA);
                 if (replacement == null) {
                     return null;
                 }
@@ -1708,7 +1752,8 @@ public class QueryDialog extends JPanel {
     private TCTLAbstractProperty replaceProperty(TCTLAbstractProperty replacement) {
         if (replacement != null) {
             newProperty = removeConverter(newProperty);
-            if (newProperty instanceof LTLANode && !(replacement instanceof TCTLAbstractPathProperty)) {
+            if ((newProperty instanceof LTLANode || newProperty instanceof LTLENode)
+                && !(replacement instanceof TCTLAbstractPathProperty)) {
                 replacement = ConvertToPathProperty((TCTLAbstractStateProperty)replacement);
             }
             newProperty = newProperty.replace(newProperty, replacement);
@@ -1729,7 +1774,7 @@ public class QueryDialog extends JPanel {
             TCTLAbstractProperty replacement = null;
             newProperty = removeConverter(newProperty);
             if (newProperty instanceof TCTLAbstractStateProperty) {
-                replacement = getSpecificChildOfProperty(1, newProperty);
+                replacement = new TCTLStatePlaceHolder();
             } else if (newProperty instanceof TCTLAbstractPathProperty) {
                 replacement = new TCTLPathPlaceHolder();
             }
@@ -1781,7 +1826,37 @@ public class QueryDialog extends JPanel {
         }
     }
 
-    private TCTLAbstractProperty removeAllPathsFromProperty(TCTLAbstractProperty oldProperty) {
+    private void addExistsPathsToProperty(TCTLAbstractProperty oldProperty, TCTLAbstractProperty selection) {
+        TCTLAbstractProperty property = null;
+
+        if (oldProperty instanceof LTLENode) {
+            property = oldProperty;
+        } else if (oldProperty instanceof TCTLPathPlaceHolder) {
+            property = new LTLENode();
+        } else if (oldProperty instanceof TCTLAbstractPathProperty) {
+            property = new LTLENode(ConvertToStateProperty((TCTLAbstractPathProperty) oldProperty));
+        } else if (oldProperty instanceof TCTLNotNode) {
+            property = new LTLENode((TCTLNotNode) oldProperty);
+            property = ConvertToStateProperty((TCTLAbstractPathProperty) property);
+        } else if (oldProperty instanceof TCTLAbstractStateProperty && (selection == null || selection instanceof LTLENode)) {
+            property = new LTLENode((TCTLAbstractStateProperty) oldProperty);
+            if (!(newProperty instanceof TCTLAbstractPathProperty)) newProperty = ConvertToPathProperty((TCTLAbstractStateProperty) newProperty);
+        }
+
+        if (property != null && selection != null) {
+            UndoableEdit edit = new QueryConstructionEdit(selection, property);
+            newProperty = newProperty.replace(newProperty, property);
+            updateSelection(property);
+            undoSupport.postEdit(edit);
+            queryChanged();
+        } else if (property != null) {
+            newProperty = newProperty.replace(newProperty, property);
+            updateSelection(property);
+            queryChanged();
+        }
+    }
+
+    private TCTLAbstractProperty removeExistsAllPathsFromProperty(TCTLAbstractProperty oldProperty) {
         TCTLAbstractProperty property = oldProperty;
         TCTLAbstractStateProperty firstChild = getSpecificChildOfProperty(1, oldProperty);
 
@@ -1790,6 +1865,10 @@ public class QueryDialog extends JPanel {
             firstChild = getSpecificChildOfProperty(1, oldProperty);
         }
         if (oldProperty instanceof LTLANode) {
+            TCTLAbstractPathProperty child = ConvertToPathProperty(firstChild);
+            property = oldProperty.replace(oldProperty, child);
+        }
+        if (oldProperty instanceof LTLENode) {
             TCTLAbstractPathProperty child = ConvertToPathProperty(firstChild);
             property = oldProperty.replace(oldProperty, child);
         }
@@ -1959,6 +2038,8 @@ public class QueryDialog extends JPanel {
         finallyButton = new JButton("F");
         nextButton = new JButton("X");
         untilButton = new JButton("U");
+        aButton = new JButton("A");
+        eButton = new JButton("E");
 
         // Add tool-tips
         existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
@@ -1973,6 +2054,8 @@ public class QueryDialog extends JPanel {
         finallyButton.setToolTipText(TOOL_TIP_F);
         nextButton.setToolTipText(TOOL_TIP_X);
         untilButton.setToolTipText(TOOL_TIP_U);
+        aButton.setToolTipText(TOOL_TIP_A);
+        eButton.setToolTipText(TOOL_TIP_E);
 
         // Add buttons to panel
         quantificationButtonGroup.add(existsDiamond);
@@ -1987,6 +2070,8 @@ public class QueryDialog extends JPanel {
         quantificationButtonGroup.add(finallyButton);
         quantificationButtonGroup.add(nextButton);
         quantificationButtonGroup.add(untilButton);
+        quantificationButtonGroup.add(aButton);
+        quantificationButtonGroup.add(eButton);
 
         // Place buttons in GUI
         GridBagConstraints gbc = new GridBagConstraints();
@@ -2005,6 +2090,8 @@ public class QueryDialog extends JPanel {
         quantificationPanel.add(existsUntil, gbc);
         gbc.gridy = 3;
         quantificationPanel.add(existsNext, gbc);
+        gbc.gridy = 4;
+        quantificationPanel.add(aButton, gbc);
 
         // Second column of buttons
         gbc.gridx = 2;
@@ -2019,6 +2106,8 @@ public class QueryDialog extends JPanel {
         quantificationPanel.add(forAllUntil, gbc);
         gbc.gridy = 3;
         quantificationPanel.add(forAllNext, gbc);
+        gbc.gridy = 4;
+        quantificationPanel.add(eButton, gbc);
 
         // Add quantification panel to query panel
 		gbc = new GridBagConstraints();
@@ -2105,13 +2194,13 @@ public class QueryDialog extends JPanel {
         });
 
         globallyButton.addActionListener(e -> {
-            LTLAGNode property = new LTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            LTLGNode property = new LTLGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             addPropertyToQuery(property);
             unselectButtons();
         });
 
         finallyButton.addActionListener(e -> {
-            LTLAFNode property = new LTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            LTLFNode property = new LTLFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             addPropertyToQuery(property);
             unselectButtons();
         });
@@ -2146,9 +2235,9 @@ public class QueryDialog extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 TCTLAbstractPathProperty property;
                 if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    property = new LTLAXNode((TCTLAbstractStateProperty) currentSelection.getObject());
+                    property = new LTLXNode((TCTLAbstractStateProperty) currentSelection.getObject());
                 } else {
-                    property = new LTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+                    property = new LTLXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
                 }
                 addPropertyToQuery(property);
             }
@@ -2158,13 +2247,41 @@ public class QueryDialog extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 TCTLAbstractPathProperty property;
                 if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    property = new LTLAUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
+                    property = new LTLUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
                         new TCTLStatePlaceHolder());
                 } else {
-                    property = new LTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+                    property = new LTLUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
                         getSpecificChildOfProperty(2, currentSelection.getObject()));
                 }
                 addPropertyToQuery(property);
+            }
+        });
+
+        aButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TCTLAbstractProperty oldProperty = newProperty;
+
+                newProperty = removeExistsAllPathsFromProperty(newProperty);
+                addAllPathsToProperty(newProperty, null);
+                UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
+                undoSupport.postEdit(edit);
+
+                aButton.setEnabled(false);
+                eButton.setEnabled(true);
+            }
+        });
+
+        eButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TCTLAbstractProperty oldProperty = newProperty;
+
+                newProperty = removeExistsAllPathsFromProperty(newProperty);
+                addExistsPathsToProperty(newProperty, null);
+                UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
+                undoSupport.postEdit(edit);
+
+                aButton.setEnabled(true);
+                eButton.setEnabled(false);
             }
         });
     }
@@ -2174,6 +2291,8 @@ public class QueryDialog extends JPanel {
         finallyButton.setVisible(isVisible);
         nextButton.setVisible(isVisible);
         untilButton.setVisible(isVisible);
+        aButton.setVisible(isVisible);
+        eButton.setVisible(isVisible);
         if (deadLockPredicateButton != null) deadLockPredicateButton.setVisible(!isVisible);
         showCTLButtons(!isVisible);
     }
@@ -2202,6 +2321,10 @@ public class QueryDialog extends JPanel {
         if (selection instanceof LTLANode) {
             newProperty = newProperty.replace(selection, property);
             addAllPathsToProperty(newProperty, selection);
+            return;
+        } else if (selection instanceof LTLENode) {
+            newProperty = newProperty.replace(selection, property);
+            addExistsPathsToProperty(newProperty, selection);
             return;
         }
 
@@ -2377,7 +2500,7 @@ public class QueryDialog extends JPanel {
         } else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
             TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
 
-            TCTLAbstractProperty oldProperty = removeAllPathsFromProperty(currentSelection.getObject());
+            TCTLAbstractProperty oldProperty = removeExistsAllPathsFromProperty(currentSelection.getObject());
 
             andListNode = new TCTLAndListNode(getStateProperty(
                 new TCTLPathToStateConverter((TCTLAbstractPathProperty) oldProperty)), ph);
@@ -2407,7 +2530,7 @@ public class QueryDialog extends JPanel {
             addPropertyToQuery(property);
         } else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
             TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-            TCTLAbstractProperty oldProperty = removeAllPathsFromProperty(currentSelection.getObject());
+            TCTLAbstractProperty oldProperty = removeExistsAllPathsFromProperty(currentSelection.getObject());
 
             orListNode = new TCTLOrListNode(getStateProperty(
                 new TCTLPathToStateConverter((TCTLAbstractPathProperty) oldProperty)), ph);
@@ -3448,6 +3571,15 @@ public class QueryDialog extends JPanel {
 	private void queryChanged(){
     		setEnabledReductionOptions();
         if (lens.isTimed()) refreshOverApproximationOption();
+        if (queryType.getSelectedIndex() == 1) {
+            if (isA()) {
+                aButton.setEnabled(false);
+                eButton.setEnabled(true);
+            } else {
+                aButton.setEnabled(true);
+                eButton.setEnabled(false);
+            }
+        }
 	}
 
 

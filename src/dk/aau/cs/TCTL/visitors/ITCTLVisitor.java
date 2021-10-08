@@ -11,13 +11,13 @@ public interface ITCTLVisitor {
 	
 	void visit(TCTLAUNode auNode, Object context);
 
-    void visit(LTLAFNode afNode, Object context);
+    void visit(LTLFNode afNode, Object context);
 
-    void visit(LTLAGNode agNode, Object context);
+    void visit(LTLGNode agNode, Object context);
 
-    void visit(LTLAXNode axNode, Object context);
+    void visit(LTLXNode axNode, Object context);
 
-    void visit(LTLAUNode auNode, Object context);
+    void visit(LTLUNode auNode, Object context);
 
 	void visit(TCTLEFNode efNode, Object context);
 
@@ -60,4 +60,6 @@ public interface ITCTLVisitor {
 	void visit(TCTLTermListNode tctlTermListNode, Object context);
 
     void visit(LTLANode ltlaNode, Object context);
+
+    void visit(LTLENode ltleNode, Object context);
 }

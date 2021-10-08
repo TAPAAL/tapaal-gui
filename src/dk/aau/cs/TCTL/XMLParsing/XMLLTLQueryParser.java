@@ -102,23 +102,23 @@ public class XMLLTLQueryParser {
         } else if (nodeName.equals("finally")){
             childProperty = parseFormula(child);
             if(childProperty instanceof TCTLAbstractPathProperty){
-                return new LTLAFNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
+                return new LTLFNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
             } else{
-                return new LTLAFNode((TCTLAbstractStateProperty)childProperty);
+                return new LTLFNode((TCTLAbstractStateProperty)childProperty);
             }
         } else if (nodeName.equals("globally")){
             childProperty = parseFormula(child);
             if(childProperty instanceof TCTLAbstractPathProperty){
-                return new LTLAGNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
+                return new LTLGNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
             } else{
-                return new LTLAGNode((TCTLAbstractStateProperty)childProperty);
+                return new LTLGNode((TCTLAbstractStateProperty)childProperty);
             }
         } else if (nodeName.equals("next")){
             childProperty = parseFormula(child);
             if(childProperty instanceof TCTLAbstractPathProperty){
-                return new LTLAXNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
+                return new LTLXNode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
             } else{
-                return new LTLAXNode((TCTLAbstractStateProperty)childProperty);
+                return new LTLXNode((TCTLAbstractStateProperty)childProperty);
             }
         } else if (nodeName.equals("until")){
             children = getAllChildren(property);
@@ -136,7 +136,7 @@ public class XMLLTLQueryParser {
                 reach = new TCTLPathToStateConverter((TCTLAbstractPathProperty)reach);
             }
 
-            return new LTLAUNode((TCTLAbstractStateProperty)before, (TCTLAbstractStateProperty)reach);
+            return new LTLUNode((TCTLAbstractStateProperty)before, (TCTLAbstractStateProperty)reach);
         } else if(nodeName.equals("true")){
             return new TCTLTrueNode();
         } else if(nodeName.equals("false")){

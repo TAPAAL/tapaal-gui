@@ -89,25 +89,25 @@ public class LTLQueryVisitor extends VisitorBase {
         XMLQuery.append(endTag(XML_ALLPATHS));
     }
 
-    public void visit(LTLAFNode afNode, Object context) {
+    public void visit(LTLFNode afNode, Object context) {
         XMLQuery.append(startTag(XML_FINALLY));
         afNode.getProperty().accept(this, context);
         XMLQuery.append(endTag(XML_FINALLY));
     }
 
-    public void visit(LTLAGNode agNode, Object context) {
+    public void visit(LTLGNode agNode, Object context) {
         XMLQuery.append(startTag(XML_GLOBALLY));
         agNode.getProperty().accept(this, context);
         XMLQuery.append(endTag(XML_GLOBALLY));
     }
 
-    public void visit(LTLAXNode axNode, Object context) {
+    public void visit(LTLXNode axNode, Object context) {
         XMLQuery.append(startTag(XML_NEXT));
         axNode.getProperty().accept(this, context);
         XMLQuery.append(endTag(XML_NEXT));
     }
 
-    public void visit(LTLAUNode auNode, Object context) {
+    public void visit(LTLUNode auNode, Object context) {
         XMLQuery.append(startTag(XML_UNTIL) + startTag(XML_BEFORE));
         auNode.getLeft().accept(this, context);
         XMLQuery.append(endTag(XML_BEFORE) + startTag(XML_REACH));

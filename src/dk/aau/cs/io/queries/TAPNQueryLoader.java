@@ -1,14 +1,10 @@
 package dk.aau.cs.io.queries;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
-import dk.aau.cs.debug.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -21,8 +17,6 @@ import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.CreateGui;
-import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
@@ -135,10 +129,10 @@ public class TAPNQueryLoader extends QueryLoader{
 			return TAPNQuery.QueryCategory.CTL;
 		}
 
-		if(query instanceof LTLAGNode ||
-                query instanceof LTLAFNode ||
-                query instanceof LTLAUNode ||
-                query instanceof LTLAXNode ||
+		if(query instanceof LTLGNode ||
+                query instanceof LTLFNode ||
+                query instanceof LTLUNode ||
+                query instanceof LTLXNode ||
                 query instanceof LTLANode){
             return TAPNQuery.QueryCategory.LTL;
         } else if(query instanceof TCTLEUNode ||
