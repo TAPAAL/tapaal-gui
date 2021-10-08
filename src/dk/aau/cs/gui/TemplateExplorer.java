@@ -67,8 +67,8 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import pipe.gui.widgets.SidePane;
 
-import static net.tapaal.swinghelpers.GridBagHelper.Anchor.EAST;
-import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
+import static net.tapaal.swinghelpers.GridBagHelper.Anchor.*;
+import static net.tapaal.swinghelpers.GridBagHelper.Fill.BOTH;
 
 public class TemplateExplorer extends JPanel implements SidePane {
 
@@ -226,14 +226,11 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		//Add 10 pixel to the minimumsize of the scrollpane
 		scrollpane.setMinimumSize(new Dimension(scrollpane.getMinimumSize().width, scrollpane.getMinimumSize().height + 20));
 		
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
+		var gbc = GridBagHelper.as(0, 0, NORTHWEST, BOTH);
 		gbc.gridheight = 3;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+
 		templatePanel.add(scrollpane, gbc);
 		
 		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
@@ -252,10 +249,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
             }
         });
 		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.SOUTH;
+		gbc = GridBagHelper.as(1, 0, SOUTH);
 		templatePanel.add(moveUpButton,gbc);
 		
 		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
@@ -274,10 +268,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
             }
         });
 		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.NORTH;
+		gbc = GridBagHelper.as(1, 1, NORTH);
 		templatePanel.add(moveDownButton,gbc);
 		
 		//Sort button
@@ -291,11 +282,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			command.redo();
 		});
 		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 2;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.anchor = GridBagConstraints.NORTH;
+		gbc = GridBagHelper.as(1,2, NORTH, GridBagHelper.Fill.HORIZONTAL);
 		templatePanel.add(sortButton,gbc);
 	}
 

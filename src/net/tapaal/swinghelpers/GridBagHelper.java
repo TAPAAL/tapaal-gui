@@ -8,7 +8,8 @@ public class GridBagHelper {
         NORTH(11),
         EAST(13),
         WEST(17),
-        NORTHWEST(18);
+        NORTHWEST(18),
+        SOUTH(15);
 
         public final int value;
 
@@ -18,7 +19,8 @@ public class GridBagHelper {
     }
 
     public enum Fill {
-        HORIZONTAL(2);
+        HORIZONTAL(2),
+        BOTH(1);
 
         public final int value;
 
@@ -47,6 +49,10 @@ public class GridBagHelper {
 
         return gridBagConstraints;
     }
+
+    public static GridBagConstraints as(int gridx, int gridy, Anchor anchor, Fill fill) {
+        return as(gridx, gridy, anchor, fill, null);
+    }
     public static GridBagConstraints as(int gridx, int gridy, Anchor anchor, Insets inset) {
         return as(gridx, gridy, anchor, null, inset);
     }
@@ -56,7 +62,7 @@ public class GridBagHelper {
     }
 
     public static GridBagConstraints as(int gridx, int gridy, Anchor anchor) {
-        return as(gridx, gridy, anchor, null);
+        return as(gridx, gridy, anchor, (Fill)null);
     }
 
     public static GridBagConstraints as(int gridx, int gridy, Insets inset) {
