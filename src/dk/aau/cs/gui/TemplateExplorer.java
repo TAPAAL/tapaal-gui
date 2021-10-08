@@ -39,6 +39,7 @@ import javax.swing.event.ListSelectionListener;
 import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
+import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
@@ -65,6 +66,9 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import pipe.gui.widgets.SidePane;
+
+import static net.tapaal.swinghelpers.GridBagHelper.Anchor.EAST;
+import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
 
 public class TemplateExplorer extends JPanel implements SidePane {
 
@@ -545,23 +549,12 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			okButton.doClick();
 		});
 
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		//gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(4, 4, 2, 4);
+		var gbc = GridBagHelper.as(0, 1, 1, WEST, new Insets(4, 4, 2, 4));
 		nameContainer.add(nameTextField,gbc);
 		
 		nameLabel = new JLabel(); 
 		nameLabel.setText("Name of component: ");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.insets = new Insets(4, 4, 2, 4);
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0, 0, 1, WEST, new Insets(4, 4, 2, 4));
 		nameContainer.add(nameLabel,gbc);
 		
 		buttonContainer = new JPanel();
@@ -573,11 +566,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		okButton.setMnemonic(KeyEvent.VK_O);
-		gbc = new GridBagConstraints();		
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.anchor = java.awt.GridBagConstraints.WEST;
-		gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+		gbc = GridBagHelper.as(1,0, WEST, new Insets(5, 5, 5, 5));
 		buttonContainer.add(okButton,gbc);
 		
 		cancelButton = new JButton();
@@ -586,31 +575,17 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		cancelButton.setMnemonic(KeyEvent.VK_C);
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = java.awt.GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
+		gbc = GridBagHelper.as(0, 0, GridBagConstraints.RELATIVE, EAST);
 		buttonContainer.add(cancelButton,gbc);		
 		
 		okButton.addActionListener(e -> onOK());
 		
 		cancelButton.addActionListener(e -> exit());
 		
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(0, 8, 5, 8);
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.EAST;
+		gbc = GridBagHelper.as(0,1,1,EAST, new Insets(0, 8, 5, 8));
 		container.add(buttonContainer,gbc);
 		
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(0, 8, 5, 8);
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0, 0, 1, WEST, new Insets(0, 8, 5, 8));
 		container.add(nameContainer,gbc);
 	}
 
@@ -632,8 +607,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 	
 	private void initComponentsOfRenameTemplateDialog(String oldname) {
-		container = new JPanel();
-		container.setLayout(new GridBagLayout());
+
 		nameContainer = new JPanel();
 		nameContainer.setLayout(new GridBagLayout());
 
@@ -645,23 +619,13 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			okButton.requestFocusInWindow();
 			okButton.doClick();
 		});
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		//gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(4, 4, 2, 4);
+		var gbc = GridBagHelper.as(0,1, 1, WEST, new Insets(4, 4, 2, 4));
 		nameContainer.add(nameTextField,gbc);
 		
 		nameLabel = new JLabel(); 
 		nameLabel.setText("Name of component: ");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.insets = new Insets(4, 4, 2, 4);
-		gbc.anchor = GridBagConstraints.WEST;
+
+		gbc = GridBagHelper.as(0,0,1,WEST,new Insets(4, 4, 2, 4));
 		nameContainer.add(nameLabel,gbc);
 		
 		buttonContainer = new JPanel();
@@ -673,11 +637,8 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		okButton.setMnemonic(KeyEvent.VK_O);
-		gbc = new GridBagConstraints();		
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.anchor = java.awt.GridBagConstraints.WEST;
-		gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+
+		gbc = GridBagHelper.as(1,0, WEST, new Insets(5, 5, 5, 5));
 		buttonContainer.add(okButton,gbc);
 		
 		cancelButton = new JButton();
@@ -686,31 +647,21 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		cancelButton.setMnemonic(KeyEvent.VK_C);
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = java.awt.GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
+
+		gbc = GridBagHelper.as(0,0, GridBagConstraints.RELATIVE, EAST);
 		buttonContainer.add(cancelButton,gbc);		
 		
 		okButton.addActionListener(e -> onOKRenameTemplate());
 		
 		cancelButton.addActionListener(e -> exit());
+
+        container = new JPanel();
+        container.setLayout(new GridBagLayout());
 		
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(0, 8, 5, 8);
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.EAST;
+		gbc = GridBagHelper.as(0,1,1,EAST,new Insets(0, 8, 5, 8));
 		container.add(buttonContainer,gbc);
 		
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(0, 8, 5, 8);
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0,0,1,WEST,new Insets(0, 8, 5, 8));
 		container.add(nameContainer,gbc);
 
 	}
