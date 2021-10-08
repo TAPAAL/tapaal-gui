@@ -100,8 +100,6 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	private final static String toolTipSortComponents = "Sort the components alphabetically";
 	private final static String toolTipMoveUp = "Move the selected component up";
 	private final static String toolTipMoveDown = "Move the selected component down";
-    //private static final String toolTipComponents ="Here you can manage the different components of the Net.<html><br/></html>" +
-    	//	"A Net can be broken up in several components and connected via shared places and transitions.";
 	
 	public TemplateExplorer(TabContent parent) {
 		this(parent, false);
@@ -145,24 +143,16 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		
 		this.addComponentListener(new ComponentListener() {
 			final int minimumHegiht = TemplateExplorer.this.getMinimumSize().height + sortButton.getMinimumSize().height;
-			public void componentShown(ComponentEvent e) {
-			}
-			
-			
+
 			public void componentResized(ComponentEvent e) {
-				
 				if(!isInAnimationMode){
                     sortButton.setVisible(TemplateExplorer.this.getSize().height > minimumHegiht);
 				}
 			}
-			
-			
-			public void componentMoved(ComponentEvent e) {
-			}
-			
-			
-			public void componentHidden(ComponentEvent e) {
-			}
+
+            public void componentShown(ComponentEvent e) {}
+			public void componentMoved(ComponentEvent e) {}
+			public void componentHidden(ComponentEvent e) {}
 		});
 	}
 
@@ -219,8 +209,6 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		TemplateListManager manager = new TemplateListManager(templateList);
 		templateList.addListSelectionListener(manager);
 		templateList.addMouseListener(manager);
-		
-		//templateList.setFocusTraversalKeysEnabled(false);
 
 		scrollpane = new JScrollPane(templateList);
 		//Add 10 pixel to the minimumsize of the scrollpane
@@ -381,10 +369,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			}
 		});
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0, 1, WEST);
 		buttonPanel.add(removeTemplateButton, gbc);
 
 		renameButton = new JButton("Rename");
@@ -397,10 +382,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
             templateList.validate();
         });
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(1, 0, WEST);
 		buttonPanel.add(renameButton, gbc);
 
 		copyButton = new JButton("Copy");
@@ -436,10 +418,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			}
 		});
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0, 0, WEST);
 		buttonPanel.add(copyButton, gbc);
 	}
 	
