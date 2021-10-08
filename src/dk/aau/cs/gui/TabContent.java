@@ -827,7 +827,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private AnimationControlSidePanel animControlerBox;
     private AnimationHistorySidePanel animationHistorySidePanel;
 
-	private JScrollPane animationControllerScrollPane;
 	private AnimationHistoryList abstractAnimationPane = null;
 	private JPanel animationControlsPanel;
 	private TransitionFireingComponent transitionFireing;
@@ -1195,17 +1194,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 
 		//Add the templateExplorer
-		animatorSplitPane.add(templateExplorer, templateExplorerName);
-
-		// Inserts dummy to avoid nullpointerexceptions from the displaynode
-		// method. A component can only be on one splitpane at the time
-		dummy = new JButton("EditorDummy");
-		dummy.setMinimumSize(templateExplorer.getMinimumSize());
-		dummy.setPreferredSize(templateExplorer.getPreferredSize());
-		editorSplitPane.add(dummy, templateExplorerName);
-
-		templateExplorer.switchToAnimationMode();
-		showEnabledTransitionsList(showEnabledTransitions);
+        var t = new TemplateExplorer(this);
+        t.switchToAnimationMode();
+		animatorSplitPane.add(t, templateExplorerName);
 		
 		this.setLeftComponent(animatorSplitPaneScroller);
 	}
@@ -1217,32 +1208,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     }
 
-	public void switchToEditorComponents() {
-		
-		//Remove dummy
-		Component dummy = editorSplitPane.getMultiSplitLayout().getComponentForNode(editorSplitPane.getMultiSplitLayout().getNodeForName(templateExplorerName));
-		if(dummy != null){
-			editorSplitPane.remove(dummy);
-		}
-		
-		//Add the templateexplorer again
-		editorSplitPane.add(templateExplorer, templateExplorerName);
-		if (animatorSplitPane != null) {
-
-			// Inserts dummy to avoid nullpointerexceptions from the displaynode
-			// method. A component can only be on one splitpane at the time
-			dummy = new JButton("AnimatorDummy");
-			dummy.setMinimumSize(templateExplorer.getMinimumSize());
-			dummy.setPreferredSize(templateExplorer.getPreferredSize());
-			animatorSplitPane.add(dummy, templateExplorerName);
-		}
-
-		templateExplorer.switchToEditorMode();
-		this.setLeftComponent(editorSplitPaneScroller);
-		//drawingSurface.repaintAll();
-	}
-
-	public AnimationHistoryList getUntimedAnimationHistory() {
+    public AnimationHistoryList getUntimedAnimationHistory() {
 		return abstractAnimationPane;
 	}
 
@@ -1774,9 +1740,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 getAnimator().restoreModel();
             }
 
-            switchToEditorComponents();
+            this.setLeftComponent(editorSplitPaneScroller);
 
-			setManager(notingManager);
+            setManager(notingManager);
 
 			drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 			setMode(Pipe.ElementType.SELECT);
