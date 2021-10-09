@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.SwingWorker;
+
+import dk.aau.cs.verification.VerifyTAPN.*;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
@@ -53,13 +55,6 @@ import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
-import dk.aau.cs.verification.VerifyTAPN.TraceType;
-import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.ApproximationMethodOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.StubbornReductionOption;
@@ -625,9 +620,51 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), 0, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isStubbornReductionEnabled(), null, query.usePartitioning(), query.useColorFixpoint(), query.isColored());
 		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce)
 			if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.SearchWholeStateSpace){
-			    return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), false, false, false, false, query.approximationDenominator(), QueryCategory.Default, query.getAlgorithmOption(), false, QueryReductionTime.UnlimitedTime, false, query.isTarOptionEnabled(), query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars(), query.isColored());
+			    return new VerifyPNOptions(
+                        query.getCapacity(),
+                        TraceOption.NONE,
+                        query.getSearchOption(),
+                        false,
+                            false ? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION,
+                        false,
+                        false,
+                        query.approximationDenominator(),
+                        QueryCategory.Default,
+                        query.getAlgorithmOption(),
+                        false,
+                        QueryReductionTime.UnlimitedTime,
+                        false,
+                        query.isColored(),
+                        false,
+                        null,
+                        query.isTarOptionEnabled(),
+                        query.usePartitioning(),
+                        query.useColorFixpoint(),
+                        query.useSymmetricVars()
+                        );
 			} else {
-			    return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation(), query.useReduction(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.getCategory(), query.getAlgorithmOption(), query.isSiphontrapEnabled(), query.isQueryReductionEnabled()? QueryReductionTime.UnlimitedTime: QueryReductionTime.NoTime, query.isStubbornReductionEnabled(), query.isTarOptionEnabled(), query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars(), query.isColored());
+			    return new VerifyPNOptions(
+                        query.getCapacity(),
+                        TraceOption.NONE,
+                        query.getSearchOption(),
+                        query.useOverApproximation(),
+                            query.useReduction() ? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION,
+                        query.isOverApproximationEnabled(),
+                        query.isUnderApproximationEnabled(),
+                        query.approximationDenominator(),
+                        query.getCategory(),
+                        query.getAlgorithmOption(),
+                        query.isSiphontrapEnabled(),
+                        query.isQueryReductionEnabled()? QueryReductionTime.UnlimitedTime: QueryReductionTime.NoTime,
+                        query.isStubbornReductionEnabled(),
+                        query.isColored(),
+                        false,
+                        null,
+                        query.isTarOptionEnabled(),
+                        query.usePartitioning(),
+                        query.useColorFixpoint(),
+                        query.useSymmetricVars()
+                        );
 			}
 		else
 			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry(), false, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());

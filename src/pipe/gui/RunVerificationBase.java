@@ -10,22 +10,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
-import javax.xml.crypto.Data;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
-import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.TapnXmlLoader;
-import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.io.queries.XMLQueryLoader;
-import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.Variable;
-import dk.aau.cs.util.FormatException;
 import dk.aau.cs.verification.*;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -45,7 +33,6 @@ import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
-import pipe.dataLayer.Template;
 
 public abstract class RunVerificationBase extends SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 
@@ -259,7 +246,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 
 			if (showResult(result) && spinner != null) {
-			    options = new VerifyPNOptions(options.extraTokens(), pipe.dataLayer.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, pipe.dataLayer.TAPNQuery.QueryCategory.Default, pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime, false, false);
+			    options = new VerifyPNOptions(options.extraTokens(), pipe.dataLayer.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false,
+                    false, 1, pipe.dataLayer.TAPNQuery.QueryCategory.Default, pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime, false, false,false, null, false,false,false,false);
                 KBoundAnalyzer optimizer = new KBoundAnalyzer(model, guiModels, options.extraTokens(), modelChecker, new MessengerImpl(), spinner);
                 optimizer.analyze((VerifyTAPNOptions) options, true);
             }
