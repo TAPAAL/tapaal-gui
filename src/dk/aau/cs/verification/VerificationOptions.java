@@ -4,10 +4,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 
 public abstract class VerificationOptions {
-	// Probably need something like this in reality, but for now we dont need it
 
-	// void setOption(String option, String value);
-	// String getOption(String option);
 	protected SearchOption searchOption;
 	protected TraceOption traceOption;
 	protected boolean enabledOverApproximation;

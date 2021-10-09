@@ -14,27 +14,55 @@ import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.InclusionPlaces;
 
 public class VerifyPNOptions extends VerifyTAPNOptions{
-	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
-	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
+	private static final Map<TraceOption, String> traceMap = Map.of(
+        TraceOption.SOME, " -t",
+		TraceOption.NONE, ""
+    );
+	private static final Map<SearchOption, String> searchMap = Map.of(
+        SearchOption.BFS, " -s DFS",
+        SearchOption.RANDOM, " -s RDFS",
+        SearchOption.HEURISTIC, " -s BestFS",
+        SearchOption.OVERAPPROXIMATE, " -s OverApprox"
+    );
+
 	private final ModelReduction modelReduction;
 	private final QueryCategory queryCategory;
 	private final AlgorithmOption algorithmOption;
-	private boolean useSiphontrap = false; 
-	private QueryReductionTime queryReductionTime;
-	private boolean useStubbornReduction = true;
-	private boolean unfold = false;
-	private boolean colored = false;
-	private boolean useTarOption;
-	private boolean partition;
-	private boolean colorFixpoint;
-	private boolean symmetricVars;
+	private final boolean useSiphontrap;
+	private final QueryReductionTime queryReductionTime;
+	private final boolean useStubbornReduction;
+	private final boolean unfold;
+	private final boolean colored;
+	private final boolean useTarOption;
+	private final boolean partition;
+	private final boolean colorFixpoint;
+	private final boolean symmetricVars;
 
-
-	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction,
-                           boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
-                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, boolean colored, boolean unfold, String pathToReducedNet, boolean useTarOption, boolean partition, boolean colorFixpoint, boolean useSymmetricVars) {
+	public VerifyPNOptions(
+        int extraTokens,
+        TraceOption traceOption,
+        SearchOption search,
+        boolean useOverApproximation,
+        ModelReduction modelReduction,
+        boolean enableOverApproximation,
+        boolean enableUnderApproximation,
+        int approximationDenominator,
+        QueryCategory queryCategory,
+        AlgorithmOption algorithmOption,
+        boolean siphontrap,
+        QueryReductionTime queryReduction,
+        boolean stubbornReduction,
+        boolean colored,
+        boolean unfold,
+        String pathToReducedNet,
+        boolean useTarOption,
+        boolean partition,
+        boolean colorFixpoint,
+        boolean useSymmetricVars
+    ) {
 		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator, useTarOption);
-		this.modelReduction = modelReduction;
+
+        this.modelReduction = modelReduction;
 		this.queryCategory = queryCategory;
 		this.algorithmOption = algorithmOption;
 		this.useSiphontrap = siphontrap;
@@ -45,26 +73,59 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         this.partition = partition;
         this.colorFixpoint = colorFixpoint;
 		this.useTarOption = useTarOption;
-		reducedModelPath = pathToReducedNet;
-		symmetricVars = useSymmetricVars;
+		this.reducedModelPath = pathToReducedNet;
+		this.symmetricVars = useSymmetricVars;
 
         try {
             unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
             unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
         } catch (IOException e) {
-            new MessengerImpl().displayErrorMessage(
-                e.getMessage(),
-                "Error");
-            return;
+            new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
         }
-
 	}
 
-    public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction,
-                           boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
-                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, boolean useTarOption, boolean partition, boolean colorFixpoint, boolean useSymmetricVars, boolean colored) {
-        this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation,
-            enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, colored,  false,null, useTarOption, partition, colorFixpoint, useSymmetricVars);
+    public VerifyPNOptions(
+        int extraTokens,
+        TraceOption traceOption,
+        SearchOption search,
+        boolean useOverApproximation,
+        boolean useModelReduction,
+        boolean enableOverApproximation,
+        boolean enableUnderApproximation,
+        int approximationDenominator,
+        QueryCategory queryCategory,
+        AlgorithmOption algorithmOption,
+        boolean siphontrap,
+        QueryReductionTime queryReduction,
+        boolean stubbornReduction,
+        boolean useTarOption,
+        boolean partition,
+        boolean colorFixpoint,
+        boolean useSymmetricVars,
+        boolean colored
+    ) {
+        this(
+            extraTokens,
+            traceOption,
+            search,
+            useOverApproximation,
+            useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION,
+            enableOverApproximation,
+            enableUnderApproximation,
+            approximationDenominator,
+            queryCategory,
+            algorithmOption,
+            siphontrap,
+            queryReduction,
+            stubbornReduction,
+            colored,
+        false,
+        null,
+            useTarOption,
+            partition,
+            colorFixpoint,
+            useSymmetricVars
+        );
     }
 
     public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction,
@@ -146,25 +207,6 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         }
 
 		return result.toString();
-	}
-
-	public static Map<TraceOption, String> createTraceOptionsMap() {
-		HashMap<TraceOption, String> map = new HashMap<TraceOption, String>();
-		map.put(TraceOption.SOME, " -t");
-		map.put(TraceOption.NONE, "");
-
-		return map;
-	}
-
-	private static final Map<SearchOption, String> createSearchOptionsMap() {
-		HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
-		map.put(SearchOption.BFS, " -s BFS");
-		map.put(SearchOption.DFS, " -s DFS");
-		map.put(SearchOption.RANDOM, " -s RDFS");
-		map.put(SearchOption.HEURISTIC, " -s BestFS");
-		map.put(SearchOption.OVERAPPROXIMATE, " -s OverApprox");
-
-		return map;
 	}
 	
 	public ModelReduction getModelReduction(){
