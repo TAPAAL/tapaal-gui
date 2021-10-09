@@ -26,7 +26,6 @@ import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.*;
-import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
@@ -61,7 +60,7 @@ import java.awt.event.MouseWheelEvent;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
-    private MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
+    private final MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
 
     public void setGuiFrameControllerActions(GuiFrameControllerActions guiFrameControllerActions) {
         this.guiFrameControllerActions.setReference(guiFrameControllerActions);
@@ -126,22 +125,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public final static class RequirementChecker<R> {
         public final List<R> errors = new LinkedList<R>();
 
-        public final void Not(boolean b, R s) {
+        public void Not(boolean b, R s) {
             if (b) {
                 errors.add(s);
             }
         }
 
-        public final void notNull(Object c, R s) {
+        public void notNull(Object c, R s) {
             if (c == null) {
                 errors.add(s);
             }
         }
 
-        public final boolean failed() {
+        public boolean failed() {
             return errors.size() != 0;
         }
-        public final List<R> getErrors() {
+        public List<R> getErrors() {
             return Collections.unmodifiableList(errors);
         }
     }
@@ -164,9 +163,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
 	public final GuiModelManager guiModelManager = new GuiModelManager();
 	public class GuiModelManager {
-	    public GuiModelManager(){
-
-        }
+	    public GuiModelManager(){}
 
         public Result<TimedPlaceComponent, ModelViolation> addNewTimedPlace(DataLayer c, Point p){
 	        Require.notNull(c, "datalyer can't be null");
@@ -640,17 +637,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			}
 
 			if (loadedModel.getMessages().size() != 0) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                        String message = "While loading the net we found one or more warnings: \n\n";
-                        for (String s : loadedModel.getMessages()) {
-                            message += s + "\n\n";
-                        }
-
-                        new MessengerImpl().displayInfoMessage(message, "Warning");
+                new Thread(() -> {
+                    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    String message = "While loading the net we found one or more warnings: \n\n";
+                    for (String s : loadedModel.getMessages()) {
+                        message += s + "\n\n";
                     }
+
+                    new MessengerImpl().displayInfoMessage(message, "Warning");
                 }).start();
             }
 
@@ -673,57 +667,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	}
 
-    private TabContent createNewTabFromInputStream(InputStream file, String name, FeatureOption option, boolean isYes) throws Exception {
-
-        try {
-            ModelLoader loader = new ModelLoader();
-            LoadedModel loadedModel = loader.load(file);
-
-            if (loadedModel.getMessages().size() != 0) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                        String message = "While loading the net we found one or more warnings: \n\n";
-                        for (String s : loadedModel.getMessages()) {
-                            message += s + "\n\n";
-                        }
-
-                        new MessengerImpl().displayInfoMessage(message, "Warning");
-                    }
-                }).start();
-            }
-
-            TabContent tab;
-
-            switch (option) {
-                case TIME:
-                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), isYes, lens.isGame(), lens.isColored());
-                    break;
-                case GAME:
-                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), isYes, lens.isColored());
-                    break;
-                case COLOR:
-                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), lens.isGame(), isYes);
-                default:
-                    tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), lens.isTimed(), lens.isGame(), lens.isColored());
-                    break;
-            }
-
-            tab.setInitialName(name);
-
-            tab.selectFirstElements();
-
-            tab.setFile(null);
-
-            return tab;
-        } catch (Exception e) {
-            throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString());
-        }
-
-    }
-
-	private static void checkQueries(TabContent tab) {
+    private static void checkQueries(TabContent tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
         EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
         boolean gameChanged = false;
@@ -835,9 +779,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
                 String name = null;
 
-                if (file != null) {
-                    name = file.getName().replaceAll(".pnml", ".tapn");
-                }
+                name = file.getName().replaceAll(".pnml", ".tapn");
                 tab.setInitialName(name);
 
 				tab.selectFirstElements();
@@ -884,14 +826,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private static void showFileEndingChangedMessage(boolean showMessage) {
 		if(showMessage) {
 			//We thread this so it does not block the EDT
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-					new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
-							+ "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
-				}
-			}).start();
+			new Thread(() -> {
+                CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
+                        + "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+            }).start();
 		}
 	}
 
@@ -1016,15 +955,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         nameVisibilityPanel = new NameVisibilityPanel(this);
     }
 
-    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, boolean isTimed, boolean isGame, boolean isColored) {
-        this(network, templates, tapnqueries,  new TAPNLens(isTimed, isGame, isColored));
-    }
-
-    private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries) {
-        this(network, templates, tapnqueries,  new TAPNLens(true, false, false));
-    }
-
-	public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
+    public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
         this(network, templates, lens);
 
         setNetwork(network, templates);
