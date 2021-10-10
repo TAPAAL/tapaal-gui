@@ -28,10 +28,13 @@ public class TikZExporter {
 	private final String fullpath;
 	private final TikZOutputOption option;
 	private final double scale = 1.0 / 55.0;
-        
-        private double RoundCoordinate(double position) {
-            return Math.round(position * scale * 10)/10.0d;
-        }
+
+	// This might also affect scaling of entities for some reason
+    // Idea: Use pixels (px) in tikz and dont scale, and find out how much x- and y stuff have to move
+    // Then scale it down.
+    //private double RoundCoordinate(double position) {
+        //return Math.round(position * scale * 10) / 10d;
+    //}
 
 	public TikZExporter(DataLayer net, String fullpath, TikZOutputOption option) {
 		this.net = net;
@@ -92,7 +95,7 @@ public class TikZExporter {
 			String arcPoints = "";
 			for (int i = 1; i < arc.getArcPath().getEndIndex(); i++) {
 				ArcPathPoint point = arc.getArcPath().getArcPathPoint(i);
-				arcPoints += "to[bend right=0] (" + RoundCoordinate(point.getX()) + "," + RoundCoordinate(point.getY() * (-1)) + ") ";
+				arcPoints += "to[bend right=0] (" + (point.getX()) + "," + (point.getY() * (-1)) + ") ";
 			}
 
 			String arrowType = "";
@@ -105,6 +108,7 @@ public class TikZExporter {
 			} else {
 				arrowType = "arc";
 			}
+
 
 			String arcLabel = getArcLabels(arc);
 
@@ -128,7 +132,7 @@ public class TikZExporter {
 
 	protected String getArcLabels(Arc arc) {
 		String arcLabel = "";
-		String arcLabelPositionString = "\\draw (" + RoundCoordinate(arc.getNameLabel().getXPosition())+ "," + (RoundCoordinate(arc.getNameLabel().getYPosition())*(-1)) + ") node {";
+		String arcLabelPositionString = "\\draw (" + (arc.getNameLabel().getX()) + "," + (arc.getNameLabel().getY())*(-1) + ") node {";
 
 		if (arc instanceof TimedInputArcComponent) {
             if (!(arc.getSource() instanceof TimedTransitionComponent)) {
@@ -136,10 +140,17 @@ public class TikZExporter {
                 if (arc.getWeight().value() > 1) {
                         arcLabel += "$" + arc.getWeight().value() + "\\times$\\ ";
                 }
-				arcLabel += "$\\mathrm{" + replaceWithMathLatex(getGuardAsStringIfNotHidden((TimedInputArcComponent) arc)) + "}$";
-				if (arc instanceof TimedTransportArcComponent)
-					arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr();
-				arcLabel += "};\n";
+
+                if(CreateGui.getApp().getCurrentTab().getLens().isTimed()) {
+                    arcLabel += "$\\mathrm{" + replaceWithMathLatex(getGuardAsStringIfNotHidden((TimedInputArcComponent) arc)) + "}$";
+                    if (arc instanceof TimedTransportArcComponent)
+                        arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr();
+                    arcLabel += "};\n";
+                } else {
+                    arcLabel += "};\n";
+                }
+
+
 			} else {
 				arcLabel = arcLabelPositionString;
                 if (arc.getWeight().value() > 1) {
@@ -156,7 +167,7 @@ public class TikZExporter {
 	}
 
 	private String getGuardAsStringIfNotHidden(TimedInputArcComponent arc) {
-        if (!CreateGui.getApp().showZeroToInfinityIntervals() &&  arc.getGuardAsString().equals("[0,inf)")){
+        if (!CreateGui.getApp().showZeroToInfinityIntervals() && arc.getGuardAsString().equals("[0,inf)")){
 			return "";
 		} else {
 			return arc.getGuardAsString();
@@ -168,14 +179,14 @@ public class TikZExporter {
 		for (Transition trans : transitions) {
 			String angle = "";
 			if (trans.getAngle() != 0)
-				angle = ",rotate=" + (trans.getAngle() + 90);
+				angle = ",rotate=" + (trans.getAngle());
 
 			out.append("\\node[transition");
 			out.append(angle);		
 			out.append("] at (");
-			out.append(RoundCoordinate(trans.getPositionX()));
+			out.append((trans.getPositionX()));
 			out.append(',');
-			out.append(RoundCoordinate(trans.getPositionY() * (-1)));
+			out.append((trans.getPositionY() * (-1)));
 			out.append(") (");
 			out.append(trans.getId());
 			out.append(") {};\n");
@@ -203,9 +214,13 @@ public class TikZExporter {
                 out.append(".center) { };\n");
             }
 			if (trans.getAttributesVisible()){
+                boolean isLabelAboveTransition = trans.getY() > trans.getNameLabel().getY() ? true : false;
+                boolean isLabelBehindTrans = trans.getX() < trans.getNameLabel().getX() ? true : false;
+                double xOffset = trans.getName().length() > 5 && !isLabelAboveTransition && !isLabelBehindTrans ? trans.getLayerOffset() : 0;
+
 				out.append("%% label for transition " + trans.getName() + "\n");
 				out.append("\\draw (");
-				out.append(RoundCoordinate(trans.getNameLabel().getXPosition()) + "," + (RoundCoordinate(trans.getNameLabel().getYPosition()) * -1) + ")");
+				out.append(trans.getNameLabel().getX() + xOffset + "," + (trans.getNameLabel().getY() * -1) + ")");
 				out.append(" node ");
 				out.append(" {");
 				out.append(exportMathName(trans.getName()));
@@ -217,19 +232,21 @@ public class TikZExporter {
 
 	private StringBuffer exportPlacesWithTokens(Place[] places) {
 		StringBuffer out = new StringBuffer();
+
 		for (Place place : places) {
 			String invariant = getPlaceInvariantString(place);
 			String tokensInPlace = getTokenListStringFor(place);
 
 			out.append("\\node[place");
-			out.append(tokensInPlace);
 			out.append("] at (");
-			out.append(RoundCoordinate(place.getPositionX()));
+			out.append(place.getPositionX());
 			out.append(',');
-			out.append(RoundCoordinate(place.getPositionY() * (-1)));
+			out.append(place.getPositionY() * (-1));
 			out.append(") (");
 			out.append(place.getId());
 			out.append(") {};\n");
+
+            exportPlaceTokens(place, out, ((TimedPlaceComponent) place).underlyingPlace().tokens().size());
 			
 			if(((TimedPlaceComponent)place).underlyingPlace().isShared()){
 				out.append("\\node[sharedplace] at (");
@@ -237,9 +254,14 @@ public class TikZExporter {
 				out.append(".center) { };\n");
 			}
 			if (place.getAttributesVisible() || !invariant.equals("")){
+			    boolean isLabelAbovePlace = place.getY() > place.getNameLabel().getY() ? true : false;
+			    boolean isLabelBehindPlace = place.getX() < place.getNameLabel().getX() ? true : false;
+			    double xOffset = place.getName().length() > 6 && !isLabelAbovePlace && !isLabelBehindPlace ? place.getLayerOffset() : 0;
+			    double yOffset = isLabelAbovePlace ? (place.getNameLabel().getHeight() / 2) : 0;
+
 				out.append("%% label for place " + place.getName() + "\n");
 				out.append("\\draw (");
-				out.append(RoundCoordinate(place.getNameLabel().getXPosition()) + "," + (RoundCoordinate(place.getNameLabel().getYPosition()) * -1) + ")");
+				out.append((place.getNameLabel().getX() + xOffset)  + "," + ((place.getNameLabel().getY() * -1) + yOffset) +")");
 				out.append(" node[align=left] ");
 				out.append("{");
 				if(place.getAttributesVisible())
@@ -252,16 +274,159 @@ public class TikZExporter {
 					out.append("};\n");
 				}
 					
-			}	
+			}
 		}
 
 		return out;
 	}
 
+	private void exportPlaceTokens(Place place, StringBuffer out, int numOfTokens) {
+        // Dot radius
+        final double tRadius = 1;
+
+        // Token dot position offsets
+        final double tLeftX = 7;
+        final double tRightX = 7;
+        final double tTopY = 7;
+        final double tBotY = 7;
+
+        boolean isTimed = CreateGui.getApp().getCurrentTab().getLens().isTimed();
+
+        double placeXpos = (place.getPositionX());
+        double placeYpos = (place.getPositionY() * (-1));
+        double xPos, yPos;
+
+        if(isTimed && numOfTokens > 0) {
+            switch (numOfTokens) {
+                case 2:
+                    out.append("\\node at ("); // Top
+                    out.append(placeXpos);
+                    out.append(",");
+                    out.append(placeYpos + 4);
+                    out.append(")");
+                    out.append("{0,0};\n");
+
+                    out.append("\\node at ("); // Bottom
+                    out.append(placeXpos);
+                    out.append(",");
+                    out.append(placeYpos - 5);
+                    out.append(")");
+                    out.append("{0,0};\n");
+                    return;
+                case 1:
+                    out.append("\\node at ("); // Top
+                    out.append(placeXpos);
+                    out.append(",");
+                    out.append(placeYpos);
+                    out.append(")");
+                    out.append("{0,0};\n");
+                    return;
+                default:
+                    out.append("\\node at (");
+                    out.append(placeXpos);
+                    out.append(",");
+                    out.append(placeYpos);
+                    out.append(")");
+                    out.append("{$\\mathrm{");
+                    out.append("\\#" + numOfTokens + "}$};\n");
+                    return;
+            }
+        } else if(numOfTokens > 5 && !isTimed ) {
+            out.append("\\node at (");
+            out.append(placeXpos);
+            out.append(",");
+            out.append(placeYpos);
+            out.append(")");
+            out.append("{$\\mathrm{");
+            out.append("\\#" + numOfTokens + "}$};\n");
+            return;
+        }
+
+        switch (numOfTokens) {
+            case 5: // middle
+                out.append("\\node at (");
+                out.append(placeXpos);
+                out.append(",");
+                out.append(placeYpos);
+                out.append(")");
+                out.append("[circle,fill,inner sep=");
+                out.append(tRadius);
+                out.append("pt]{};\n");
+                /* falls through */
+            case 4: // top left
+                out.append("\\node at (");
+                out.append(placeXpos - tLeftX);
+                out.append(",");
+                out.append(placeYpos + tTopY);
+                out.append(")");
+                out.append("[circle,fill,inner sep=");
+                out.append(tRadius);
+                out.append("pt]{};\n");
+                /* falls through */
+            case 3:
+                if(numOfTokens == 5 || numOfTokens == 4) { // top right
+                    xPos = placeXpos + tRightX;
+                    yPos = placeYpos + tTopY;
+                } else { // top left
+                    xPos = placeXpos - tLeftX;
+                    yPos = placeYpos + tTopY;
+                }
+                out.append("\\node at (");
+                out.append(xPos);
+                out.append(",");
+                out.append(yPos);
+                out.append(")");
+                out.append("[circle,fill,inner sep=");
+                out.append(tRadius);
+                out.append("pt]{};\n");
+                /* falls through */
+            case 2:
+                if(numOfTokens == 5 || numOfTokens == 4) { // bottom left
+                    xPos = placeXpos - tLeftX;
+                    yPos = placeYpos - tBotY;
+                } else if (numOfTokens == 3){ // middle
+                    xPos = placeXpos;
+                    yPos = placeYpos;
+                } else { // left middle
+                    xPos = placeXpos - tLeftX;
+                    yPos = placeYpos;
+                }
+                out.append("\\node at (");
+                out.append(xPos);
+                out.append(",");
+                out.append(yPos);
+                out.append(")");
+                out.append("[circle,fill,inner sep=");
+                out.append(tRadius);
+                out.append("pt]{};\n");
+                /* falls through */
+            case 1:
+                if(numOfTokens == 5 || numOfTokens == 4 || numOfTokens == 3) { // bottom right
+                    xPos = placeXpos + tRightX;
+                    yPos = placeYpos - tBotY;
+                } else if (numOfTokens == 2){ // right middle
+                    xPos = placeXpos + tRightX;
+                    yPos = placeYpos;
+                } else { // middle
+                    xPos = placeXpos;
+                    yPos = placeYpos;
+                }
+                out.append("\\node at (");
+                out.append(xPos);
+                out.append(",");
+                out.append(yPos);
+                out.append(")");
+                out.append("[circle,fill,inner sep=");
+                out.append(tRadius);
+                out.append("pt]{};\n");
+            default:
+                break;
+        }
+    }
+
 	protected String getTokenListStringFor(Place place) {
-		
 		List<TimedToken> tokens = ((TimedPlaceComponent) place).underlyingPlace().tokens();
-		
+
 		String tokensInPlace = "";
 		if (tokens.size() > 0) {
             if (tokens.size() == 1) {
@@ -301,7 +466,7 @@ public class TikZExporter {
 	private StringBuffer exportTikZstyle() {
 		StringBuffer out = new StringBuffer();
 
-		out.append("\\begin{tikzpicture}[font=\\scriptsize, xscale=1, yscale=1]\n");
+		out.append("\\begin{tikzpicture}[font=\\scriptsize, xscale=0.45, yscale=0.45, x=1.33px, y=1.33px]\n");
                 out.append("%% the figure can be scaled by changing xscale and yscale\n");
                 out.append("%% positions of place/transition labels that are currently fixed to label=135 degrees\n");
                 out.append("%% can be adjusted so that they do not cover arcs\n");
