@@ -29,13 +29,6 @@ public class TikZExporter {
 	private final TikZOutputOption option;
 	private final double scale = 1.0 / 55.0;
 
-	// This might also affect scaling of entities for some reason
-    // Idea: Use pixels (px) in tikz and dont scale, and find out how much x- and y stuff have to move
-    // Then scale it down.
-    //private double RoundCoordinate(double position) {
-        //return Math.round(position * scale * 10) / 10d;
-    //}
-
 	public TikZExporter(DataLayer net, String fullpath, TikZOutputOption option) {
 		this.net = net;
 		this.fullpath = fullpath;
