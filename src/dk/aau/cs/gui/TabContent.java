@@ -624,7 +624,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 
     /**
-	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * Creates a new tab with the selected filestream
 	 */
 	public static TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
 
