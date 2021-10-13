@@ -46,7 +46,18 @@ public class RunVerification extends RunVerificationBase {
 
 	@Override
 	protected boolean showResult(VerificationResult<TAPNNetworkTrace> result) {
-		if (result != null && !result.error()) {
+        if (reduceNetOnly) {
+            //If the engine is only called to produce a reduced net, it will fail, but no error message should be shown
+            if (result != null && result.stats().transitionsCount() == 0 && result.stats().placeBoundCount() == 0) {
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    createMessagePanel(result),
+                    "Verification Result",
+                    JOptionPane.INFORMATION_MESSAGE,
+                    iconSelector.getIconFor(result)
+                );
+            }
+        } else if (result != null && !result.error()) {
 			if(callback != null){
 				callback.run(result);
 			}else{
@@ -63,9 +74,7 @@ public class RunVerification extends RunVerificationBase {
 				}
 			}
 
-		} else if(reduceNetOnly) {
-            //If the engine is only called to produce a reduced net, it will fail, but no error message should be shown
-        }else{
+		} else {
 			
 			//Check if the is something like 
 			//verifyta: relocation_error:
