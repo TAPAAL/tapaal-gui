@@ -58,6 +58,8 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 
 import java.awt.event.MouseWheelEvent;
 
+import static dk.aau.cs.gui.TabContent.DrawTool.SELECT;
+
 public class TabContent extends JSplitPane implements TabContentActions{
 
     private final MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
@@ -793,7 +795,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 				tab.selectFirstElements();
 
-				tab.setMode(DrawTool.SELECT);
+				tab.setMode(SELECT);
 
                 //appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
                 name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
@@ -1877,7 +1879,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			setManager(notingManager);
 
 			drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
-			setMode(DrawTool.SELECT);
+			setMode(SELECT);
 
 			restoreSelectedTemplate();
 
@@ -1963,7 +1965,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 break;
         }
 
-		if (mode == DrawTool.SELECT) {
+		if (mode == SELECT) {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		} else if (mode == DrawTool.DRAG) {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
@@ -2095,7 +2097,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 		} else {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
-			app.ifPresent(o->setMode(DrawTool.SELECT));
+			app.ifPresent(o->setMode(SELECT));
 		}
 		app.ifPresent(o->o.registerDrawingActions(getAvailableDrawActions()));
         app.ifPresent(o->o.registerAnimationActions(getAvailableSimActions()));
@@ -2866,6 +2868,39 @@ public class TabContent extends JSplitPane implements TabContentActions{
             );
         }
 
+
+        private Point dragStartPoint;
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            Point clickPoint = e.getPoint();
+
+            if (SwingUtilities.isLeftMouseButton(e)) {
+                canvas.getSelectionObject().dispatchEvent(e);
+            } else {
+                canvas.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                dragStartPoint = new Point(clickPoint);
+            }
+            canvas.updatePreferredSize();
+        }
+
+        @Override
+        public void drawingSurfaceMouseReleased(MouseEvent e) {
+            if (dragStartPoint != null) {
+                dragStartPoint = null;
+                canvas.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+            canvas.getSelectionObject().dispatchEvent(e);
+        }
+
+        @Override
+        public void drawingSurfaceMouseDragged(MouseEvent e) {
+            if (dragStartPoint != null) {
+                canvas.drag(dragStartPoint, e.getPoint());
+            } else {
+                canvas.getSelectionObject().dispatchEvent(e);
+            }
+        }
+
         private void arcMouseWheel(PetriNetObject pno, MouseEvent e) {
             pno.getParent().dispatchEvent(e);
         }
@@ -2953,7 +2988,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.SELECT);
+            setMode(SELECT);
         }
     };
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
@@ -3032,7 +3067,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     public void updateMode(DrawTool mode) {
         // deselect other actions
-        selectAction.setSelected(mode == DrawTool.SELECT);
+        selectAction.setSelected(mode == SELECT);
         transAction.setSelected(mode == DrawTool.TAPNTRANS);
         uncontrollableTransAction.setSelected(mode == DrawTool.UNCONTROLLABLETRANS);
         timedPlaceAction.setSelected(mode == DrawTool.TAPNPLACE);
