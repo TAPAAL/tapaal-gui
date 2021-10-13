@@ -56,67 +56,6 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
         setOriginalY(positionYInput);
 
 		addMouseHandler();
-		addMouseListener(new MouseListener() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (mouseHandler != null) {
-					mouseHandler.mouseClicked(e);
-				}
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				if (mouseHandler != null) {
-					mouseHandler.mousePressed(e);
-				}
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (mouseHandler != null) {
-					mouseHandler.mouseReleased(e);
-				}
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				if (mouseHandler != null) {
-					mouseHandler.mouseEntered(e);
-				}
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				if (mouseHandler != null) {
-					mouseHandler.mouseExited(e);
-				}
-			}
-		});
-
-		addMouseWheelListener(new MouseWheelListener() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				if (mouseHandler != null) {
-					mouseHandler.mouseWheelMoved(e);
-				}
-			}
-		});
-
-		addMouseMotionListener(new MouseMotionListener() {
-			@Override
-			public void mouseDragged(MouseEvent e) {
-				if (mouseHandler != null) {
-					mouseHandler.mouseDragged(e);
-				}
-			}
-
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				if (mouseHandler != null) {
-					mouseHandler.mouseMoved(e);
-				}
-			}
-		});
 
 	}
 

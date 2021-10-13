@@ -11,7 +11,7 @@ import pipe.gui.graphicElements.Transition;
 /**
  * Class used to implement methods corresponding to mouse events on transitions.
  */
-public class TransitionHandler extends PlaceTransitionObjectHandler implements java.awt.event.MouseWheelListener {
+public class TransitionHandler extends PlaceTransitionObjectHandler {
 
 	public TransitionHandler(Transition obj) {
 		super(obj);
