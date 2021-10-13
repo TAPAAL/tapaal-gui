@@ -12,8 +12,6 @@ import java.awt.Window;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
@@ -23,7 +21,6 @@ import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Transition;
-import pipe.gui.handler.TransitionHandler;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
 import dk.aau.cs.gui.Context;
@@ -73,13 +70,6 @@ public class TimedTransitionComponent extends Transition {
 		attributesVisible = true;
         this.lens = lens;
 
-	}
-
-	@Override
-	protected void addMouseHandler() {
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		mouseHandler = new TransitionHandler(this);
 	}
 
 	private TimedTransitionListener timedTransitionListener(){

@@ -5,11 +5,15 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.action.ShowHideInfoAction;
+
+import javax.swing.*;
 
 /**
   * Class for drawing a Place
@@ -48,6 +52,27 @@ public abstract class Place extends PlaceTransitionObject {
 	public Place(int positionXInput, int positionYInput) {
 		this(positionXInput, positionYInput, null, 0,0);
 	}
+
+    @Override
+    public JPopupMenu getPopup(MouseEvent e) {
+        int index = 0;
+        JPopupMenu popup = super.getPopup(e);
+
+        JMenuItem menuItem = new JMenuItem("Edit Place");
+        menuItem.addActionListener(o -> ((Place) this).showEditor());
+        popup.insert(menuItem, index++);
+
+        menuItem = new JMenuItem(new ShowHideInfoAction((Place) this));
+        if (((Place) this).getAttributesVisible()) {
+            menuItem.setText("Hide Place Name");
+        } else {
+            menuItem.setText("Show Place Name");
+        }
+        popup.insert(menuItem, index++);
+        popup.insert(new JPopupMenu.Separator(), index);
+
+        return popup;
+    }
 
 	@Override
 	public void paintComponent(Graphics g) {

@@ -16,11 +16,9 @@ import javax.swing.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
-import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Place;
-import pipe.gui.handler.PlaceHandler;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.gui.Context;
@@ -64,13 +62,6 @@ public class TimedPlaceComponent extends Place {
         attributesVisible = true;
         this.lens = lens;
 
-    }
-
-    @Override
-    protected void addMouseHandler() {
-        //XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-        //XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-        mouseHandler = new PlaceHandler(this);
     }
 
     private TimedPlaceListener timedPlaceListener() {

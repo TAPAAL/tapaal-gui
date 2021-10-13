@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
@@ -12,12 +13,13 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import javax.swing.Timer;
+import javax.swing.*;
 
 import pipe.gui.Animator;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.undo.TransitionRotationEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -77,6 +79,27 @@ public abstract class Transition extends PlaceTransitionObject {
 	public Transition(int positionXInput, int positionYInput) {
 		this(positionXInput, positionYInput,null, 0,0, 0);
 	}
+
+    @Override
+    public JPopupMenu getPopup(MouseEvent e) {
+        int index = 0;
+        JPopupMenu popup = super.getPopup(e);
+
+        JMenuItem menuItem = new JMenuItem("Edit Transition");
+        menuItem.addActionListener(o -> ((Transition) this).showEditor());
+        popup.insert(menuItem, index++);
+
+        menuItem = new JMenuItem(new ShowHideInfoAction((Transition) this));
+        if (((Transition) this).getAttributesVisible()) {
+            menuItem.setText("Hide Transition Name");
+        } else {
+            menuItem.setText("Show Transition Name");
+        }
+        popup.insert(menuItem, index++);
+        popup.insert(new JPopupMenu.Separator(), index);
+
+        return popup;
+    }
 
 	@Override
 	public void paintComponent(Graphics g) {

@@ -2845,15 +2845,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
             );
             registerEvent(
                 e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.rightClicked,
-                e-> ((TimedTransitionComponent) e.pno).getMouseHandler().getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+                e-> ((TimedTransitionComponent) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
             );
             registerEvent(
                 e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.rightClicked,
-                e-> ((TimedPlaceComponent) e.pno).getMouseHandler().getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+                e-> ((TimedPlaceComponent) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
             );
             registerEvent(
                 e->e.pno instanceof Arc && e.a == MouseAction.rightClicked,
-                e-> ((Arc) e.pno).getMouseHandler().getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+                e-> ((Arc) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
             );
             registerEvent(
                 e->e.pno instanceof AnnotationNote && e.a == MouseAction.doubleClicked,
@@ -2861,7 +2861,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             );
             registerEvent(
                 e->e.pno instanceof AnnotationNote && e.a == MouseAction.rightClicked,
-                e-> ((AnnotationNote) e.pno).getMouseHandler().getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+                e-> ((AnnotationNote) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
             );
             registerEvent(
                 e->e.pno instanceof Arc && e.a == MouseAction.entered,

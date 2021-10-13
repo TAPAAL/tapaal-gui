@@ -16,8 +16,6 @@ import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.handler.ArcHandler;
-import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.GuardDialogue;
@@ -67,15 +65,6 @@ public class TimedOutputArcComponent extends Arc {
         sealArc();
     }
 
-
-	@Override
-	protected void addMouseHandler() {
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		mouseHandler = new TimedArcHandler(this);
-	}
-
-
 	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
 
 		Weight oldWeight = getWeight();
@@ -109,7 +98,12 @@ public class TimedOutputArcComponent extends Arc {
         }
 	}
 
-	public void showTimeIntervalEditor() {
+    @Override
+    protected void showPropertiesEditor() {
+        showTimeIntervalEditor();
+    }
+
+    public void showTimeIntervalEditor() {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Arc", true);
 
 		Container contentPane = guiDialog.getContentPane();

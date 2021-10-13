@@ -9,7 +9,6 @@ import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.ConstantBound;
@@ -47,13 +46,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
         updateLabel(true);
         this.lens = lens;
     }
-
-    @Override
-	protected void addMouseHandler() {
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		mouseHandler = new TimedArcHandler(this);
-	}
 
 	public String getGuardAsString() {
 		return getGuard().toString();

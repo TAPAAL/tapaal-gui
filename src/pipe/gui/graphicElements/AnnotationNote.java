@@ -13,14 +13,16 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.util.EnumMap;
 
-import javax.swing.JDialog;
+import javax.swing.*;
 
 import net.tapaal.swinghelpers.DispatchEventsToParentHandler;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.handler.AnnotationNoteHandler;
+import pipe.gui.action.EditAnnotationBackgroundAction;
+import pipe.gui.action.EditAnnotationBorderAction;
+import pipe.gui.action.EditNoteAction;
 import pipe.gui.undo.AnnotationTextEdit;
 import pipe.gui.widgets.AnnotationPanel;
 import pipe.gui.widgets.EscapableDialog;
@@ -49,14 +51,35 @@ public class AnnotationNote extends Note {
         getNote().addMouseMotionListener(new DispatchEventsToParentHandler());
 	}
 
-	@Override
-	protected void addMouseHandler() {
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
+    @Override
+    public JPopupMenu getPopup(MouseEvent e) {
+        int popupIndex = 0;
+        JPopupMenu popup = super.getPopup(e);
 
-        mouseHandler = new AnnotationNoteHandler(this);
+        JMenuItem menuItem = new JMenuItem(new EditNoteAction((AnnotationNote) this));
+        menuItem.setText("Edit text");
+        popup.insert(menuItem, popupIndex++);
 
-	}
+        menuItem = new JMenuItem(new EditAnnotationBorderAction((AnnotationNote) this));
+        if (((AnnotationNote) this).isShowingBorder()) {
+            menuItem.setText("Disable Border");
+        } else {
+            menuItem.setText("Enable Border");
+        }
+        popup.insert(menuItem, popupIndex++);
+
+        menuItem = new JMenuItem(new EditAnnotationBackgroundAction((AnnotationNote) this));
+
+        if (((AnnotationNote) this).isFilled()) {
+            menuItem.setText("Transparent");
+        } else {
+            menuItem.setText("Solid Background");
+        }
+        popup.insert(new JPopupMenu.Separator(), popupIndex++);
+        popup.insert(menuItem, popupIndex);
+
+        return popup;
+    }
 
 
 	private void setDragPoints() {

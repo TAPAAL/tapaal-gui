@@ -3,16 +3,20 @@ package pipe.gui.graphicElements;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 import javax.swing.*;
 
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import net.tapaal.TAPAAL;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import dk.aau.cs.model.tapn.Weight;
+import pipe.gui.action.SplitArcAction;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 
 /**
    Implementation of Element for drawing an arc
@@ -79,6 +83,43 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		setSource(newSource);
 
 	}
+
+    abstract protected void showPropertiesEditor();
+
+    @Override
+    public JPopupMenu getPopup(MouseEvent e) {
+        int popupIndex = 0;
+        JMenuItem menuItem;
+        JPopupMenu popup = super.getPopup(e);
+
+        menuItem = new JMenuItem("Properties");
+        menuItem.addActionListener(e1 -> this.showPropertiesEditor());
+        popup.insert(menuItem, popupIndex++);
+
+        popup.insert(new JPopupMenu.Separator(), popupIndex);
+
+        menuItem = new JMenuItem(new SplitArcAction((Arc) this, e.getPoint()));
+        menuItem.setText("Insert Point");
+        popup.insert(menuItem, popupIndex++);
+
+        popup.insert(new JPopupMenu.Separator(), popupIndex);
+
+
+        if ("DEV".equals(TAPAAL.VERSION)){
+            JTextArea pane = new JTextArea();
+            pane.setEditable(false);
+
+            pane.setText(
+                "(Debug) \n" +
+                    "  Source: " + ((Arc) this).getSource().getId() +"\n"+
+                    "  Target: " + ((Arc) this).getTarget().getId()
+            );
+
+            popup.insert(pane, 1);
+        }
+
+        return popup;
+    }
 
 	abstract public void setWeight(Weight weight);
 	abstract public Weight getWeight();

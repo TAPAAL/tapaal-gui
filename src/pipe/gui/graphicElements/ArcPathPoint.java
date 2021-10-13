@@ -9,6 +9,7 @@ package pipe.gui.graphicElements;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -16,10 +17,13 @@ import java.awt.geom.RectangularShape;
 
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.handler.ArcPathPointHandler;
+import pipe.gui.action.SplitArcPointAction;
+import pipe.gui.action.ToggleArcPointAction;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.ArcPathPointTypeEdit;
 import dk.aau.cs.gui.undo.Command;
+
+import javax.swing.*;
 
 public class ArcPathPoint extends PetriNetObject {
 
@@ -56,12 +60,35 @@ public class ArcPathPoint extends PetriNetObject {
 		pointType = _pointType;
 	}
 
-	@Override
-	protected void addMouseHandler() {
-		//XXX: kyrke 2018-09-06, this is bad as we leak "this", think its ok for now, as it alwas constructed when
-		//XXX: handler is called. Make static constructor and add handler from there, to make it safe.
-		mouseHandler = new ArcPathPointHandler(this);
-	}
+    @Override
+    public JPopupMenu getPopup(MouseEvent e) {
+        JPopupMenu popup = super.getPopup(e);
+
+        if (!((ArcPathPoint) this).isDeleteable()) {
+            popup.getComponent(0).setEnabled(false);
+        }
+
+        popup.insert(new JPopupMenu.Separator(), 0);
+
+        if (((ArcPathPoint) this).getIndex() == 0) {
+            return null;
+        } else {
+            JMenuItem menuItem = new JMenuItem(new ToggleArcPointAction((ArcPathPoint) this));
+
+            if (((ArcPathPoint) this).getPointType() == ArcPathPoint.STRAIGHT) {
+                menuItem.setText("Change to Curved");
+            } else {
+                menuItem.setText("Change to Straight");
+            }
+            popup.insert(menuItem, 0);
+
+            menuItem = new JMenuItem(new SplitArcPointAction((ArcPathPoint) this));
+            menuItem.setText("Split Point");
+            popup.add(menuItem, 1);
+
+        }
+        return popup;
+    }
 
 	/**
 	 * @author Nadeem

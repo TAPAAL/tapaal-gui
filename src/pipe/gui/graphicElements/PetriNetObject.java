@@ -5,11 +5,14 @@ import java.awt.Rectangle;
 import java.awt.event.*;
 
 import dk.aau.cs.gui.TabContent;
+import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
+import pipe.gui.CreateGui;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.handler.PetriNetObjectHandler;
+
+import javax.swing.*;
 
 /**
  * Petri-Net Object Class 
@@ -42,12 +45,6 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 
 	private DataLayer guiModel;
 
-    public PetriNetObjectHandler getMouseHandler() {
-		return mouseHandler;
-	}
-
-	protected PetriNetObjectHandler mouseHandler;
-
 	PetriNetObject(String idInput, int positionXInput, int positionYInput) {
 		super();
 
@@ -55,11 +52,29 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
         setOriginalX(positionXInput);
         setOriginalY(positionYInput);
 
-		addMouseHandler();
-
 	}
 
-	protected abstract void addMouseHandler();
+    public JPopupMenu getPopup(MouseEvent e) {
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem menuItem = new JMenuItem(CreateGui.getApp().deleteAction);
+        menuItem.setText("Delete");
+        popup.add(menuItem);
+
+        if ("DEV".equals(TAPAAL.VERSION)){
+            JTextArea pane = new JTextArea();
+            pane.setEditable(false);
+
+            pane.setText(
+                "(Debug) \n" +
+                    "  org X:" + this.getOriginalX() + " Y:" + this.getOriginalY() +"\n" +
+                    "  pos X:" + this.getPositionX() + " Y:" + this.getPositionY() +""
+            );
+
+            popup.insert(pane, 1);
+        }
+
+        return popup;
+    }
 
 	public void setGuiModel(DataLayer guiModel) {
 		this.guiModel = guiModel;

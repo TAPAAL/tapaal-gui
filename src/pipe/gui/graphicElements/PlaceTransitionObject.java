@@ -1,9 +1,12 @@
 package pipe.gui.graphicElements;
 
+import net.tapaal.TAPAAL;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
 
@@ -35,6 +38,34 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 		this.componentHeight = componentHeight;
 	}
 
+    @Override
+    public JPopupMenu getPopup(MouseEvent e) {
+        JPopupMenu popup = super.getPopup(e);
+        if ("DEV".equals(TAPAAL.VERSION)){
+            JTextArea pane = new JTextArea();
+            pane.setEditable(false);
+
+            String preset = "";
+            for (Arc arc : ((PlaceTransitionObject) this).getPreset()) {
+                preset += "    "  + arc.getId() + "\n";
+            }
+            String postset = "";
+            for (Arc arc : ((PlaceTransitionObject) this).getPostset()) {
+                postset += "    "  + arc.getId() + "\n";
+            }
+
+            pane.setText(
+                "(Debug) \n" +
+                    "  preset: " +"\n" +
+                    preset +
+                    "  postset: " +"\n"+
+                    postset
+            );
+
+            popup.insert(pane, 1);
+        }
+        return popup;
+    }
 
 	/**
 	 * Set name
