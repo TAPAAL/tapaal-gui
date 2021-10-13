@@ -164,17 +164,7 @@ public class PlaceEditorPanel extends JPanel {
 		//gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		mainPanel.add(buttonPanel, gridBagConstraints);
 
-		if (currentTab.getEditorMode() == Pipe.ElementType.ADDTOKEN || currentTab.getEditorMode() == Pipe.ElementType.DELTOKEN) {
-            basicPropertiesPanel.setVisible(false);
-            timeInvariantPanel.setVisible(false);
-            colorTypePanel.setVisible(false);
-            timeInvariantColorPanel.setVisible(false);
-        } else {
-            basicPropertiesPanel.setVisible(true);
-            timeInvariantPanel.setVisible(true);
-            colorTypePanel.setVisible(true);
-            timeInvariantColorPanel.setVisible(true);
-        }
+
 	}
 
 	private void initButtonPanel() {
