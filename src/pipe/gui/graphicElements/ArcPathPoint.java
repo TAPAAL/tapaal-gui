@@ -273,4 +273,15 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 
+    @Override
+    public void select(boolean shouldRepaint) {
+        setVisible(true);
+        super.select(shouldRepaint);
+    }
+
+    @Override
+    public void deselect() {
+        setVisible(false);
+        super.deselect();
+    }
 }

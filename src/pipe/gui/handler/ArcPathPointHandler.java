@@ -55,41 +55,4 @@ public class ArcPathPointHandler extends PetriNetObjectHandler {
 		}
 		return popup;
 	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		if (myObject.isEnabled()) {
-			((ArcPathPoint) e.getComponent()).setVisibilityLock(true);
-			super.mousePressed(e);
-		}
-	}
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-	    //Can't drag endpoint at its broken
-        if (!((ArcPathPoint) myObject).isEndPoint()) {
-            super.mouseDragged(e);
-        }
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        ((ArcPathPoint) myObject).getArcPath().showPoints();
-    }
-
-    @Override
-	public void mouseReleased(MouseEvent e) {
-		((ArcPathPoint) e.getComponent()).setVisibilityLock(false);
-		super.mouseReleased(e);
-	}
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (e.isShiftDown()) {
-		    CreateGui.getCurrentTab().getUndoManager().addNewEdit(
-			    ((ArcPathPoint) myObject).togglePointType()
-            );
-		}
-	}
-
 }
