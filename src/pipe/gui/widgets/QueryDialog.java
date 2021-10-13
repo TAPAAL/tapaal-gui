@@ -359,7 +359,8 @@ public class QueryDialog extends JPanel {
 		setLayout(new GridBagLayout());
 
 		init(option, queryToCreateFrom);
-		toggleAdvancedSimpleView(false);
+        makeShortcuts();
+        toggleAdvancedSimpleView(false);
 	}
 
 	private boolean checkIfSomeReductionOption() {
