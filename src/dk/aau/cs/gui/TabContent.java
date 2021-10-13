@@ -2806,6 +2806,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
         @Override
         public void registerEvents() {
+
+            //Drag events
+            registerEvent(
+                e->e.pno instanceof PetriNetObject && e.a == MouseAction.pressed,
+                e-> pnoPressed((PetriNetObject)e.pno, e.e)
+            );
+            registerEvent(
+                e->e.pno instanceof PetriNetObject && e.a == MouseAction.released,
+                e-> pnoReleased((PetriNetObject)e.pno, e.e)
+            );
+            registerEvent(
+                e->e.pno instanceof PetriNetObject && e.a == MouseAction.dragged,
+                e-> pnoDragged((PetriNetObject)e.pno, e.e)
+            );
+
             registerEvent(
                 e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.doubleClicked,
                 e-> ((TimedTransitionComponent) e.pno).showEditor()
@@ -2866,6 +2881,70 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->e.pno instanceof ArcPathPoint && e.a == MouseAction.wheel,
                 e->arcMouseWheel(((PetriNetObject) e.pno), e.e)
             );
+        }
+
+        protected boolean justSelected = false;
+
+        protected boolean isDragging = false;
+        protected Point dragInit = new Point();
+
+        private int totalX = 0;
+        private int totalY = 0;
+        private void pnoPressed(PetriNetObject pno, MouseEvent e) {
+            if (!pno.isSelected()) {
+                if (!e.isShiftDown()) {
+                    canvas.getSelectionObject().clearSelection();
+                }
+                pno.select();
+                justSelected = true;
+            }
+            dragInit = e.getPoint();
+        }
+        private void pnoReleased(PetriNetObject pno, MouseEvent e) {
+
+            if (!SwingUtilities.isLeftMouseButton(e)) {
+                return;
+            }
+
+            if (isDragging) {
+                isDragging = false;
+                canvas.translateSelection(canvas.getSelectionObject().getSelection(), totalX, totalY);
+                totalX = 0;
+                totalY = 0;
+            } else {
+                if (!justSelected) {
+                    if (e.isShiftDown()) {
+                        pno.deselect();
+                    } else {
+                        canvas.getSelectionObject().clearSelection();
+                        pno.select();
+                    }
+                }
+            }
+            justSelected = false;
+        }
+        private void pnoDragged(PetriNetObject pno, MouseEvent e) {
+            int previousX = pno.getX();
+            int previousY = pno.getY();
+
+            if (!SwingUtilities.isLeftMouseButton(e)) {
+                return;
+            }
+
+            if (pno.isDraggable()) {
+                if (!isDragging) {
+                    isDragging = true;
+                }
+            }
+
+            // Calculate translation in mouse
+            int transX = Grid.getModifiedX(e.getX() - dragInit.x);
+            int transY = Grid.getModifiedY(e.getY() - dragInit.y);
+            canvas.getSelectionObject().translateSelection(transX, transY);
+
+            //Only register the actual distance and direction moved (in case of dragging past edge)
+            totalX += pno.getX() - previousX;
+            totalY += pno.getY() - previousY;
         }
 
 

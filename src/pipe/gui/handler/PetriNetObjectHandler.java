@@ -24,13 +24,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 	protected final PetriNetObject myObject;
 
 	// justSelected: set to true on press, and false on release;
-	protected static boolean justSelected = false;
 
-	protected boolean isDragging = false;
-    protected Point dragInit = new Point();
-
-	private int totalX = 0;
-	private int totalY = 0;
 
 	// constructor passing in all required objects
 	public PetriNetObjectHandler(PetriNetObject obj) {
@@ -65,19 +59,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
-
-        if (CreateGui.guiMode == TabContent.DrawTool.SELECT) {
-			if (!myObject.isSelected()) {
-				if (!e.isShiftDown()) {
-					myObject.getParent().getSelectionObject().clearSelection();
-				}
-				myObject.select();
-				justSelected = true;
-			}
-			dragInit = e.getPoint();
-		}
-
+        super.mousePressed(e);
 	}
 
 	/**
@@ -86,30 +68,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 	 */
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
-
-		if (!SwingUtilities.isLeftMouseButton(e)) {
-			return;
-		}
-
-        if (CreateGui.guiMode == TabContent.DrawTool.SELECT) {
-			if (isDragging) {
-				isDragging = false;
-				CreateGui.getDrawingSurface().translateSelection(myObject.getParent().getSelectionObject().getSelection(), totalX, totalY);
-				totalX = 0;
-				totalY = 0;
-			} else {
-				if (!justSelected) {
-					if (e.isShiftDown()) {
-						myObject.deselect();
-					} else {
-						myObject.getParent().getSelectionObject().clearSelection();
-						myObject.select();
-					}
-				}
-			}
-		}
-		justSelected = false;
+		super.mouseReleased(e);
 	}
 
 	/**
@@ -117,29 +76,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 	 */
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		int previousX = myObject.getX();
-		int previousY = myObject.getY();
-		
-		if (!SwingUtilities.isLeftMouseButton(e)) {
-			return;
-		}
-
-        if (CreateGui.guiMode == TabContent.DrawTool.SELECT) {
-			if (myObject.isDraggable()) {
-				if (!isDragging) {
-					isDragging = true;
-				}
-			}
-
-			// Calculate translation in mouse
-			int transX = Grid.getModifiedX(e.getX() - dragInit.x);
-			int transY = Grid.getModifiedY(e.getY() - dragInit.y);
-			myObject.getParent().getSelectionObject().translateSelection(transX, transY);
-			
-			//Only register the actual distance and direction moved (in case of dragging past edge)
-			totalX += myObject.getX() - previousX;
-			totalY += myObject.getY() - previousY;
-		}
+		super.mouseDragged(e);
 	}
 
 	@Override
