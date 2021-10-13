@@ -50,27 +50,6 @@ public class ArcHandler extends PetriNetObjectHandler {
 	}
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-	    //Dispatch click on prototype arc to parent
-        if (((Arc) myObject).isPrototype()) {
-            dispatchToParentWithMouseLocationUpdated(e);
-            return;
-        }
-	    super.mouseClicked(e);
-    }
-
-    public void mousePressed(MouseEvent e) {
-
-
-		if (((Arc) myObject).isPrototype()) {
-			dispatchToParentWithMouseLocationUpdated(e);
-			return;
-		}
-
-        super.mousePressed(e);
-	}
-
-    @Override
     public void mouseDragged(MouseEvent e) {
         //Disable mouse drag for arcs, current drag implementation does not work when dragging arcs
     }

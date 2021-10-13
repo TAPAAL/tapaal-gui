@@ -2427,7 +2427,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->e.pno instanceof PlaceTransitionObject && e.a == MouseAction.moved,
                 e->placetransitionMouseMoved(((PlaceTransitionObject) e.pno), e.e)
             );
+            registerEvent(
+                e->e.pno instanceof Arc && e.a == MouseAction.pressed,
+                e->arcClicked((Arc)e.pno, e.e)
+            );
         }
+
+        private void arcClicked(Arc pno, MouseEvent e){
+            //Avoid clicking on the arrow itself while drawing (dispatch to parent to add arc path point)
+            if ((pno).isPrototype()) {
+                //Changes dispatches an event to the parent component, with the mouse location updated to the parent
+                //MouseLocation is relative to the component
+                e.translatePoint(pno.getX(), pno.getY());
+                pno.getParent().dispatchEvent(e);
+            }
+        };
 
         protected abstract void transitionClicked(TimedTransitionComponent pno, MouseEvent e);
         protected abstract void placeClicked(TimedPlaceComponent pno, MouseEvent e);

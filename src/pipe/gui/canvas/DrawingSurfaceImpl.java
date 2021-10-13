@@ -334,6 +334,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
     @Override
     public void addPrototype(GraphicalElement pno) {
 		pno.zoomUpdate(getZoom());
+        pno.setManagerRef(managerRef);
 
         add(pno);
         setLayer(pno, Pipe.PROTOTYPE_LAYER_OFFSET);
@@ -344,6 +345,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
     @Override
     public void removePrototype(GraphicalElement pno) {
         remove(pno);
+        pno.setManagerRef(null);
         validate();
         repaint();
     }
