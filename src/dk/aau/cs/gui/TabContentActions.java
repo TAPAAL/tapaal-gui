@@ -2,7 +2,6 @@ package dk.aau.cs.gui;
 
 import pipe.gui.GuiFrame;
 import pipe.gui.GuiFrameActions;
-import pipe.gui.Pipe;
 import pipe.gui.SafeGuiFrameActions;
 import pipe.gui.graphicElements.PetriNetObject;
 
@@ -44,7 +43,7 @@ public interface TabContentActions {
 
     void createNewAndUnfoldColor();
 
-    void setMode(Pipe.ElementType mode);
+    void setMode(TabContent.DrawTool mode);
 
     void showStatistics();
 

@@ -6,10 +6,10 @@ import java.awt.event.MouseWheelEvent;
 
 import javax.swing.*;
 
+import dk.aau.cs.gui.TabContent;
 import net.tapaal.TAPAAL;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
-import pipe.gui.Pipe.ElementType;
 
 import pipe.gui.graphicElements.PetriNetObject;
 
@@ -67,7 +67,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 	public void mousePressed(MouseEvent e) {
 		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
 
-        if (CreateGui.guiMode == ElementType.SELECT) {
+        if (CreateGui.guiMode == TabContent.DrawTool.SELECT) {
 			if (!myObject.isSelected()) {
 				if (!e.isShiftDown()) {
 					myObject.getParent().getSelectionObject().clearSelection();
@@ -92,7 +92,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 			return;
 		}
 
-        if (CreateGui.guiMode == ElementType.SELECT) {
+        if (CreateGui.guiMode == TabContent.DrawTool.SELECT) {
 			if (isDragging) {
 				isDragging = false;
 				CreateGui.getDrawingSurface().translateSelection(myObject.getParent().getSelectionObject().getSelection(), totalX, totalY);
@@ -124,7 +124,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter i
 			return;
 		}
 
-        if (CreateGui.guiMode == ElementType.SELECT) {
+        if (CreateGui.guiMode == TabContent.DrawTool.SELECT) {
 			if (myObject.isDraggable()) {
 				if (!isDragging) {
 					isDragging = true;

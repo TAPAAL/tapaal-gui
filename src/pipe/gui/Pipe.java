@@ -4,16 +4,7 @@ import java.awt.Color;
 
 public class Pipe {
 
-	//Enum for all actions and types of elements
-	public enum ElementType {
-		PLACE, IMMTRANS, TIMEDTRANS, ANNOTATION, ARC, INHIBARC, 
-		//TAPN Elements
-		TAPNPLACE, TAPNTRANS, UNCONTROLLABLETRANS, TAPNARC, TRANSPORTARC, TAPNINHIBITOR_ARC,
-		//Others (might refactore)
-		ADDTOKEN, DELTOKEN, SELECT, DRAW, DRAG,
-	}
-
-	public static final int PLACE_TRANSITION_HEIGHT = 30;
+    public static final int PLACE_TRANSITION_HEIGHT = 30;
 	public static final int DASHED_PADDING = 8;
 
 	public static final Color ENABLED_TRANSITION_COLOUR = new Color(192, 0, 0);

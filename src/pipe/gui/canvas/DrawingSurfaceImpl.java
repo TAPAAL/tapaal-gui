@@ -15,7 +15,7 @@ import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.Reference;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.*;
-import pipe.gui.Pipe.ElementType;
+import dk.aau.cs.gui.TabContent.DrawTool;
 import pipe.gui.graphicElements.*;
 import pipe.gui.undo.*;
 import dk.aau.cs.gui.NameGenerator;
@@ -413,7 +413,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 			if (SwingUtilities.isLeftMouseButton(e)) {
 
-                Pipe.ElementType mode = CreateGui.guiMode;
+                DrawTool mode = CreateGui.guiMode;
 
 				switch (mode) {
 					case DRAG:
@@ -444,7 +444,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 				dragStart = null;
 				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
-            if (CreateGui.guiMode == ElementType.SELECT) {
+            if (CreateGui.guiMode == DrawTool.SELECT) {
 				getSelectionObject().dispatchEvent(e);
 			}
 		}
@@ -464,7 +464,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			}
             if (dragStart != null) {
 				view.drag(dragStart, e.getPoint());
-			} else if (CreateGui.guiMode == ElementType.SELECT) {
+			} else if (CreateGui.guiMode == DrawTool.SELECT) {
 				getSelectionObject().dispatchEvent(e);
 			}
 		}

@@ -4,7 +4,7 @@ import java.awt.*;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import com.sun.jna.Platform;
+
 import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
 import net.tapaal.resourcemanager.ResourceManager;
@@ -159,6 +159,6 @@ public class CreateGui {
 
 	//XXX Moved from guiframe to static access, while refactoring.
 	@Deprecated
-    public static Pipe.ElementType guiMode;
+    public static TabContent.DrawTool guiMode;
 
 }

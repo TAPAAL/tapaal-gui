@@ -66,6 +66,15 @@ public class TabContent extends JSplitPane implements TabContentActions{
         this.guiFrameControllerActions.setReference(guiFrameControllerActions);
     }
 
+    //Enum for all actions and types of elements
+    public enum DrawTool {
+        PLACE, IMMTRANS, TIMEDTRANS, ANNOTATION, ARC, INHIBARC,
+        //TAPN Elements
+        TAPNPLACE, TAPNTRANS, UNCONTROLLABLETRANS, TAPNARC, TRANSPORTARC, TAPNINHIBITOR_ARC,
+        //Others (might refactore)
+        ADDTOKEN, DELTOKEN, SELECT, DRAW, DRAG,
+    }
+
     public static final class TAPNLens {
         public static final TAPNLens Default = new TAPNLens(true, true, true);
         public boolean isTimed() {
@@ -784,7 +793,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 				tab.selectFirstElements();
 
-				tab.setMode(Pipe.ElementType.SELECT);
+				tab.setMode(DrawTool.SELECT);
 
                 //appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
                 name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
@@ -1868,7 +1877,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			setManager(notingManager);
 
 			drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
-			setMode(Pipe.ElementType.SELECT);
+			setMode(DrawTool.SELECT);
 
 			restoreSelectedTemplate();
 
@@ -1883,23 +1892,17 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 	}
 
-	private Pipe.ElementType editorMode = Pipe.ElementType.SELECT;
-
-	public Pipe.ElementType getEditorMode() {
-	    return editorMode;
-    }
-
-	//XXX temp while refactoring, kyrke - 2019-07-25
+    //XXX temp while refactoring, kyrke - 2019-07-25
 	@Override
-	public void setMode(Pipe.ElementType mode) {
+	public void setMode(DrawTool mode) {
 
         CreateGui.guiMode = mode;
         changeStatusbarText(mode);
 
 		//Disable selection and deselect current selection
 		drawingSurface().getSelectionObject().clearSelection();
-        editorMode = mode;
-        updateMode();
+        updateMode(mode);
+
         switch (mode) {
             case ADDTOKEN:
                 setManager(new AbstractDrawingSurfaceManager() {
@@ -1960,9 +1963,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 break;
         }
 
-		if (mode == Pipe.ElementType.SELECT) {
+		if (mode == DrawTool.SELECT) {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		} else if (mode == Pipe.ElementType.DRAG) {
+		} else if (mode == DrawTool.DRAG) {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 		} else {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
@@ -2092,7 +2095,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 		} else {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
-			app.ifPresent(o->setMode(Pipe.ElementType.SELECT));
+			app.ifPresent(o->setMode(DrawTool.SELECT));
 		}
 		app.ifPresent(o->o.registerDrawingActions(getAvailableDrawActions()));
         app.ifPresent(o->o.registerAnimationActions(getAvailableSimActions()));
@@ -2950,53 +2953,53 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(Pipe.ElementType.SELECT);
+            setMode(DrawTool.SELECT);
         }
     };
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(Pipe.ElementType.ANNOTATION);
+            setMode(DrawTool.ANNOTATION);
         }
     };
     private final GuiAction inhibarcAction = new GuiAction("Inhibitor arc", "Add an inhibitor arc (I)", "I", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(Pipe.ElementType.TAPNINHIBITOR_ARC);
+            setMode(DrawTool.TAPNINHIBITOR_ARC);
         }
     };
     private final GuiAction transAction = new GuiAction("Transition", "Add a transition (T)", "T", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(Pipe.ElementType.TAPNTRANS);
+            setMode(DrawTool.TAPNTRANS);
         }
     };
     private final GuiAction uncontrollableTransAction = new GuiAction("Uncontrollable transition", "Add an uncontrollable transition (L)", "L", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(Pipe.ElementType.UNCONTROLLABLETRANS);
+            setMode(DrawTool.UNCONTROLLABLETRANS);
         }
     };
     private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(Pipe.ElementType.ADDTOKEN);
+            setMode(DrawTool.ADDTOKEN);
         }
     };
     private final GuiAction deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(Pipe.ElementType.DELTOKEN);
+            setMode(DrawTool.DELTOKEN);
         }
     };
     private final GuiAction timedPlaceAction = new GuiAction("Place", "Add a place (P)", "P", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(Pipe.ElementType.TAPNPLACE);
+            setMode(DrawTool.TAPNPLACE);
         }
     };
 
     private final GuiAction timedArcAction = new GuiAction("Arc", "Add an arc (A)", "A", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(Pipe.ElementType.TAPNARC);
+            setMode(DrawTool.TAPNARC);
         }
     };
     private final GuiAction transportArcAction = new GuiAction("Transport arc", "Add a transport arc (R)", "R", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(Pipe.ElementType.TRANSPORTARC);
+            setMode(DrawTool.TRANSPORTARC);
         }
     };
     private final GuiAction toggleUncontrollableAction = new GuiAction("Toggle uncontrollable transition", "Toggle between control/environment transition", "E", true) {
@@ -3027,18 +3030,18 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     };
 
-    public void updateMode() {
+    public void updateMode(DrawTool mode) {
         // deselect other actions
-        selectAction.setSelected(CreateGui.guiMode == Pipe.ElementType.SELECT);
-        transAction.setSelected(editorMode == Pipe.ElementType.TAPNTRANS);
-        uncontrollableTransAction.setSelected(editorMode == Pipe.ElementType.UNCONTROLLABLETRANS);
-        timedPlaceAction.setSelected(editorMode == Pipe.ElementType.TAPNPLACE);
-        timedArcAction.setSelected(editorMode == Pipe.ElementType.TAPNARC);
-        transportArcAction.setSelected(editorMode == Pipe.ElementType.TRANSPORTARC);
-        inhibarcAction.setSelected(editorMode == Pipe.ElementType.TAPNINHIBITOR_ARC);
-        tokenAction.setSelected(editorMode == Pipe.ElementType.ADDTOKEN);
-        deleteTokenAction.setSelected(editorMode == Pipe.ElementType.DELTOKEN);
-        annotationAction.setSelected(editorMode == Pipe.ElementType.ANNOTATION);
+        selectAction.setSelected(mode == DrawTool.SELECT);
+        transAction.setSelected(mode == DrawTool.TAPNTRANS);
+        uncontrollableTransAction.setSelected(mode == DrawTool.UNCONTROLLABLETRANS);
+        timedPlaceAction.setSelected(mode == DrawTool.TAPNPLACE);
+        timedArcAction.setSelected(mode == DrawTool.TAPNARC);
+        transportArcAction.setSelected(mode == DrawTool.TRANSPORTARC);
+        inhibarcAction.setSelected(mode == DrawTool.TAPNINHIBITOR_ARC);
+        tokenAction.setSelected(mode == DrawTool.ADDTOKEN);
+        deleteTokenAction.setSelected(mode == DrawTool.DELTOKEN);
+        annotationAction.setSelected(mode == DrawTool.ANNOTATION);
     }
     @Override
     public void updateEnabledActions(GuiFrame.GUIMode mode){
@@ -3105,7 +3108,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public static final String textforAnnotation = "Annotation Mode: Right click on an annotation to see menu options; double click to edit";
     public static final String textforDrag = "Drag Mode";
 
-    public void changeStatusbarText(Pipe.ElementType type) {
+    public void changeStatusbarText(DrawTool type) {
         switch (type) {
             case UNCONTROLLABLETRANS:
                 app.ifPresent(o14 -> o14.setStatusBarText(textforUncontrollableTrans));

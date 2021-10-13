@@ -28,10 +28,8 @@ import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import org.jetbrains.annotations.NotNull;
-import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.ColoredWidgets.UnfoldDialog;
-import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import net.tapaal.resourcemanager.ResourceManager;
@@ -262,7 +260,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(ElementType.ANNOTATION));
+            currentTab.ifPresent(o -> o.setMode(TabContent.DrawTool.ANNOTATION));
         }
     };
 
