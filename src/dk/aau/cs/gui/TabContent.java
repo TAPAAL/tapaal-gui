@@ -2948,6 +2948,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
             justSelected = false;
         }
         private void pnoDragged(PetriNetObject pno, MouseEvent e) {
+
+            //Disabled dragging endpoints or arcs as its broken (sometimes)
+            if ( pno instanceof Arc ||
+                (pno instanceof ArcPathPoint && ((ArcPathPoint) pno).isEndPoint())
+            ) {
+                return;
+            }
             int previousX = pno.getX();
             int previousY = pno.getY();
 
