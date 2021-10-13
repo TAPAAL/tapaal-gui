@@ -154,7 +154,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrame.changeToTab(tab);
 
         currentTab.ifPresent(t -> t.setApp(guiFrame));
-        guiFrameDirectAccess.setTitle(currentTab.map(TabContentActions::getTabTitle).orElse(null));
+        guiFrame.setTitle(currentTab.map(TabContentActions::getTabTitle).orElse(null));
 
     }
 

@@ -55,4 +55,6 @@ public interface GuiFrameActions {
     void setShowTokenAgeSelected(boolean b);
 
     void setFeatureInfoText(boolean[] features);
+
+    void setTitle(String title);
 }

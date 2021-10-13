@@ -1392,6 +1392,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         showTokenAgeAction.setSelected(b);
     }
 
+    @Override
     public void setTitle(String title) {
         super.setTitle((title == null) ? frameTitle : frameTitle + ": " + title);
     }
