@@ -1,17 +1,16 @@
 package pipe.gui;
 
+import java.awt.geom.Point2D;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import dk.aau.cs.model.tapn.TimedToken;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.ArcPathPoint;
-import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
@@ -27,7 +26,6 @@ public class TikZExporter {
 	private final DataLayer net;
 	private final String fullpath;
 	private final TikZOutputOption option;
-	private final double scale = 1.0 / 55.0;
 
 	public TikZExporter(DataLayer net, String fullpath, TikZOutputOption option) {
 		this.net = net;
@@ -71,38 +69,44 @@ public class TikZExporter {
 		} catch (IOException e) {
 
 		} finally {
-			if (out != null)
-				out.close();
-			if (outFile != null)
-				try {
-					outFile.close();
-				} catch (IOException e2) {
+			if (out != null) {
+                out.close();
+            }
+			if (outFile != null) {
+                try {
+                    outFile.close();
+                } catch (IOException e2) {
 
-				}
+                }
+            }
 		}
 	}
 
 	private StringBuffer exportArcs(Arc[] arcs) {
 		StringBuffer out = new StringBuffer();
+
 		for (Arc arc : arcs) {
 			String arcPoints = "";
+
 			for (int i = 1; i < arc.getArcPath().getEndIndex(); i++) {
-				ArcPathPoint point = arc.getArcPath().getArcPathPoint(i);
-				arcPoints += "to[bend right=0] (" + (point.getX()) + "," + (point.getY() * (-1)) + ") ";
+                ArcPathPoint currentPoint = arc.getArcPath().getArcPathPoint(i);
+
+                if(currentPoint.getPointType() == ArcPathPoint.STRAIGHT) {
+                    arcPoints += "to[bend right=0] (" + (currentPoint.getX()) + "," + (currentPoint.getY() * (-1)) + ") ";
+                } else if (currentPoint.getPointType() == ArcPathPoint.CURVED) {
+                    double xCtrl1 = Math.round(currentPoint.getControl1().getX());
+                    double yCtrl1 = Math.round(currentPoint.getControl1().getY() * (-1));
+                    double xCtrl2 = Math.round(currentPoint.getControl2().getX());
+                    double yCtrl2 = Math.round(currentPoint.getControl2().getY() * (-1));
+
+                    arcPoints += " .. controls(" + xCtrl1 + "," + yCtrl1 + ")";
+                    arcPoints += " and ";
+                    arcPoints += "(" + xCtrl2 + "," + yCtrl2 + ") .. ";
+                    arcPoints += "(" + currentPoint.getX() + "," + currentPoint.getY() * (-1) + ") ";
+                }
 			}
 
-			String arrowType = "";
-			if (arc instanceof TimedInhibitorArcComponent) {
-				arrowType = "inhibArc";
-			} else if (arc instanceof TimedTransportArcComponent) {
-				arrowType = "transportArc";
-			} else if (arc instanceof TimedInputArcComponent) {
-				arrowType = "arc";
-			} else {
-				arrowType = "arc";
-			}
-
-
+			String arrowType = getArcArrowType(arc);
 			String arcLabel = getArcLabels(arc);
 
 			out.append("\\draw[");
@@ -112,7 +116,6 @@ public class TikZExporter {
 			out.append(") ");
 			out.append(arcPoints);
 			out.append("to[bend right=0]");
-			//out.append(arcLabel);
 			out.append(" (");
 			out.append(arc.getTarget().getId());
 			out.append(") {};\n");
@@ -122,6 +125,20 @@ public class TikZExporter {
 		}
 		return out;
 	}
+
+    private String getArcArrowType(Arc arc) {
+        String arrowType = "";
+        if (arc instanceof TimedInhibitorArcComponent) {
+            arrowType = "inhibArc";
+        } else if (arc instanceof TimedTransportArcComponent) {
+            arrowType = "transportArc";
+        } else if (arc instanceof TimedInputArcComponent) {
+            arrowType = "arc";
+        } else {
+            arrowType = "arc";
+        }
+        return arrowType;
+    }
 
 	protected String getArcLabels(Arc arc) {
 		String arcLabel = "";
@@ -143,7 +160,6 @@ public class TikZExporter {
                     arcLabel += "};\n";
                 }
 
-
 			} else {
 				arcLabel = arcLabelPositionString;
                 if (arc.getWeight().value() > 1) {
@@ -151,9 +167,10 @@ public class TikZExporter {
                 }
 				arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr() + "};\n";
 			}
+
 		} else {
             if (arc.getWeight().value() > 1) {
-                    arcLabel += arcLabelPositionString + "$" + arc.getWeight().value() + "\\times$\\ };\n";
+                arcLabel += arcLabelPositionString + "$" + arc.getWeight().value() + "\\times$\\ };\n";
             }
     	}
 		return arcLabel;
@@ -207,8 +224,8 @@ public class TikZExporter {
                 out.append(".center) { };\n");
             }
 			if (trans.getAttributesVisible()){
-                boolean isLabelAboveTransition = trans.getY() > trans.getNameLabel().getY() ? true : false;
-                boolean isLabelBehindTrans = trans.getX() < trans.getNameLabel().getX() ? true : false;
+                boolean isLabelAboveTransition = trans.getY() > trans.getNameLabel().getY();
+                boolean isLabelBehindTrans = trans.getX() < trans.getNameLabel().getX();
                 double xOffset = trans.getName().length() > 5 && !isLabelAboveTransition && !isLabelBehindTrans ? trans.getLayerOffset() : 0;
 
 				out.append("%% label for transition " + trans.getName() + "\n");
@@ -247,8 +264,8 @@ public class TikZExporter {
 				out.append(".center) { };\n");
 			}
 			if (place.getAttributesVisible() || !invariant.equals("")){
-			    boolean isLabelAbovePlace = place.getY() > place.getNameLabel().getY() ? true : false;
-			    boolean isLabelBehindPlace = place.getX() < place.getNameLabel().getX() ? true : false;
+			    boolean isLabelAbovePlace = place.getY() > place.getNameLabel().getY();
+			    boolean isLabelBehindPlace = place.getX() < place.getNameLabel().getX();
 			    double xOffset = place.getName().length() > 6 && !isLabelAbovePlace && !isLabelBehindPlace ? place.getLayerOffset() : 0;
 			    double yOffset = isLabelAbovePlace ? (place.getNameLabel().getHeight() / 2) : 0;
 
