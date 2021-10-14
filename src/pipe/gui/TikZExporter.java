@@ -8,7 +8,10 @@ import java.util.List;
 import dk.aau.cs.model.tapn.TimedToken;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.graphicElements.*;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPathPoint;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
