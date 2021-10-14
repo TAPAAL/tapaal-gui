@@ -1112,12 +1112,14 @@ public class QueryDialog extends JPanel {
         finallyButton.setEnabled(true);
         nextButton.setEnabled(true);
         untilButton.setEnabled(true);
-        if (queryType.getSelectedIndex() == 1 && newProperty instanceof LTLANode) {
-            aButton.setEnabled(false);
-            eButton.setEnabled(true);
-        } else if (queryType.getSelectedIndex() == 1) {
+        if (queryType.getSelectedIndex() == 1) {
             aButton.setEnabled(true);
-            eButton.setEnabled(false);
+            eButton.setEnabled(true);
+            if (newProperty instanceof LTLANode) {
+                aButton.setEnabled(false);
+            } else if (newProperty instanceof LTLENode) {
+                eButton.setEnabled(false);
+            }
         }
 
         conjunctionButton.setEnabled(true);
@@ -1579,19 +1581,19 @@ public class QueryDialog extends JPanel {
 
 	private void toggleDialogType() {
        if (queryType.getSelectedIndex() == 1 && wasCTLType) {
-           boolean isA = isA();
+           String ltlType = checkLTLType();
+           boolean isA = ltlType.equals("A");
            if (convertPropertyType(false, newProperty, true, isA) == null &&
                !(newProperty instanceof TCTLStatePlaceHolder)) {
                if (showWarningMessage(false) == JOptionPane.YES_OPTION) {
                    deleteProperty();
-                   addAllPathsToProperty(newProperty, null);
                } else {
                    queryType.setSelectedIndex(0);
                    return;
                }
            } else if (isA) {
               addAllPathsToProperty(newProperty, null);
-           } else {
+           } else if (ltlType.equals("E")) {
                addExistsPathsToProperty(newProperty, null);
            }
            showLTLButtons(true);
@@ -1618,20 +1620,22 @@ public class QueryDialog extends JPanel {
        setEnabledOptionsAccordingToCurrentReduction();
     }
 
-    private boolean isA() {
+    private String checkLTLType() {
+	    if (newProperty.toString().equals("<*>"))
+	        return "placeholder";
 	    if (newProperty.toString().startsWith("A"))
-	        return true;
+	        return "A";
         if (newProperty.toString().startsWith("E"))
-            return false;
+            return "E";
         if (newProperty.toString().startsWith("A", 2))
-            return true;
+            return "A";
         if (newProperty.toString().startsWith("E", 2))
-            return false;
+            return "E";
         if (newProperty.toString().startsWith("A", 3))
-            return true;
+            return "A";
         if (newProperty.toString().startsWith("E", 3))
-            return false;
-        return true;
+            return "E";
+        return "placeholder";
     }
 
     private TCTLAbstractProperty convertPropertyType(boolean toCTL, TCTLAbstractProperty property, boolean isFirst, boolean isA) {
@@ -3573,7 +3577,11 @@ public class QueryDialog extends JPanel {
     		setEnabledReductionOptions();
         if (lens.isTimed()) refreshOverApproximationOption();
         if (queryType.getSelectedIndex() == 1) {
-            if (isA()) {
+            String ltlType = checkLTLType();
+            if (ltlType.equals("placeholder")) {
+                aButton.setEnabled(true);
+                eButton.setEnabled(true);
+            } else if (ltlType.equals("A")) {
                 aButton.setEnabled(false);
                 eButton.setEnabled(true);
             } else {
