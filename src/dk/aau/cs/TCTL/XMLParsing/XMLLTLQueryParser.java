@@ -99,6 +99,13 @@ public class XMLLTLQueryParser {
             } else{
                 return new LTLANode((TCTLAbstractStateProperty)childProperty);
             }
+        }  else if(nodeName.equals("exists-path")){
+            childProperty = parseFormula(child);
+            if(childProperty instanceof TCTLAbstractPathProperty){
+                return new LTLENode(new TCTLPathToStateConverter((TCTLAbstractPathProperty)childProperty));
+            } else{
+                return new LTLENode((TCTLAbstractStateProperty)childProperty);
+            }
         } else if (nodeName.equals("finally")){
             childProperty = parseFormula(child);
             if(childProperty instanceof TCTLAbstractPathProperty){

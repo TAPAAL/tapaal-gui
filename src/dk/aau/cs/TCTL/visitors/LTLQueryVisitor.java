@@ -89,6 +89,12 @@ public class LTLQueryVisitor extends VisitorBase {
         XMLQuery.append(endTag(XML_ALLPATHS));
     }
 
+    public void visit(LTLENode eNode, Object context) {
+        XMLQuery.append(startTag(XML_EXISTSPATH));
+        eNode.getProperty().accept(this, context);
+        XMLQuery.append(endTag(XML_EXISTSPATH));
+    }
+
     public void visit(LTLFNode afNode, Object context) {
         XMLQuery.append(startTag(XML_FINALLY));
         afNode.getProperty().accept(this, context);
