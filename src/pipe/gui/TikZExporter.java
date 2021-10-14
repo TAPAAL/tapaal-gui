@@ -1,16 +1,13 @@
 package pipe.gui;
 
-import java.awt.geom.Point2D;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 import dk.aau.cs.model.tapn.TimedToken;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
