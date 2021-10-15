@@ -816,16 +816,6 @@ public class QueryDialog extends JPanel {
 				replacement = new TCTLPathPlaceHolder();
 			}
 			if (replacement != null) {
-			    if (selection instanceof LTLANode) {
-                    newProperty = newProperty.replace(selection, replacement);
-                    addAllPathsToProperty(newProperty, selection);
-                    return;
-                } else if (selection instanceof LTLENode) {
-                    newProperty = newProperty.replace(selection, replacement);
-                    addExistsPathsToProperty(newProperty, selection);
-                    return;
-                }
-
 				UndoableEdit edit = new QueryConstructionEdit(selection, replacement);
 				newProperty = newProperty.replace(selection,	replacement);
 
@@ -1108,18 +1098,8 @@ public class QueryDialog extends JPanel {
         existsNext.setEnabled(true);
         forAllUntil.setEnabled(true);
         forAllNext.setEnabled(true);
-        globallyButton.setEnabled(true);
-        finallyButton.setEnabled(true);
-        nextButton.setEnabled(true);
-        untilButton.setEnabled(true);
         if (queryType.getSelectedIndex() == 1) {
-            aButton.setEnabled(true);
-            eButton.setEnabled(true);
-            if (newProperty instanceof LTLANode) {
-                aButton.setEnabled(false);
-            } else if (newProperty instanceof LTLENode) {
-                eButton.setEnabled(false);
-            }
+            updateLTLButtons();
         }
 
         conjunctionButton.setEnabled(true);
@@ -1598,6 +1578,7 @@ public class QueryDialog extends JPanel {
            }
            showLTLButtons(true);
            updateShiphonTrap(true);
+           queryChanged();
            wasCTLType = false;
        } else if (queryType.getSelectedIndex() == 0 && !wasCTLType) {
            if (convertPropertyType(true, newProperty, true, newProperty instanceof LTLANode) == null &&
@@ -2271,8 +2252,7 @@ public class QueryDialog extends JPanel {
                 UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
                 undoSupport.postEdit(edit);
 
-                aButton.setEnabled(false);
-                eButton.setEnabled(true);
+                queryChanged();
             }
         });
 
@@ -2285,8 +2265,7 @@ public class QueryDialog extends JPanel {
                 UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
                 undoSupport.postEdit(edit);
 
-                aButton.setEnabled(true);
-                eButton.setEnabled(false);
+                queryChanged();
             }
         });
     }
@@ -3572,11 +3551,8 @@ public class QueryDialog extends JPanel {
 		}
 	}
 
-
-	private void queryChanged(){
-    		setEnabledReductionOptions();
-        if (lens.isTimed()) refreshOverApproximationOption();
-        if (queryType.getSelectedIndex() == 1) {
+	private void updateLTLButtons() {
+        if (currentSelection.getObject() == newProperty) {
             String ltlType = checkLTLType();
             if (ltlType.equals("placeholder")) {
                 aButton.setEnabled(true);
@@ -3588,9 +3564,28 @@ public class QueryDialog extends JPanel {
                 aButton.setEnabled(true);
                 eButton.setEnabled(false);
             }
+            globallyButton.setEnabled(false);
+            finallyButton.setEnabled(false);
+            nextButton.setEnabled(false);
+            untilButton.setEnabled(false);
+        } else {
+            aButton.setEnabled(false);
+            eButton.setEnabled(false);
+            globallyButton.setEnabled(true);
+            finallyButton.setEnabled(true);
+            nextButton.setEnabled(true);
+            untilButton.setEnabled(true);
+        }
+    }
+
+
+	private void queryChanged(){
+    		setEnabledReductionOptions();
+        if (lens.isTimed()) refreshOverApproximationOption();
+        if (queryType.getSelectedIndex() == 1) {
+            updateLTLButtons();
         }
 	}
-
 
 	private void initButtonPanel(QueryDialogueOption option) {
 		buttonPanel = new JPanel(new BorderLayout());
