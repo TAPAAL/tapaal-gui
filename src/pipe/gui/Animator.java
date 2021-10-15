@@ -69,19 +69,26 @@ public class Animator {
     public void setTrace(TAPNNetworkTrace trace) {
         CreateGui.getCurrentTab().setAnimationMode(true);
 
-        if (trace.isConcreteTrace()) {
-            this.trace = trace;
-            setTimedTrace(trace);
-        } else {
-            setUntimedTrace(trace);
-            isDisplayingUntimedTrace = true;
+        try {
+            if (trace.isConcreteTrace()) {
+                this.trace = trace;
+                setTimedTrace(trace);
+            } else {
+                setUntimedTrace(trace);
+                isDisplayingUntimedTrace = true;
+            }
+            currentAction = -1;
+            currentMarkingIndex = 0;
+            tab.network().setMarking(markings.get(currentMarkingIndex));
+            tab.getAnimationHistorySidePanel().setSelectedIndex(0);
+            updateAnimationButtonsEnabled();
+            updateFireableTransitions();
+        } catch (RequireException e) {
+            unhighlightDisabledTransitions();
+            CreateGui.getCurrentTab().toggleAnimationMode();
+            JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an error in the trace. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-        currentAction = -1;
-        currentMarkingIndex = 0;
-        tab.network().setMarking(markings.get(currentMarkingIndex));
-        tab.getAnimationHistorySidePanel().setSelectedIndex(0);
-        updateAnimationButtonsEnabled();
-        updateFireableTransitions();
     }
 
     private void setUntimedTrace(TAPNNetworkTrace trace) {
@@ -111,7 +118,7 @@ public class Animator {
         for (TAPNNetworkTraceStep step : trace) {
             addMarking(step, step.performStepFrom(currentMarking()));
         }
-        if(getTrace().getTraceType() != TraceType.NOT_EG){ //If the trace was not explicitly set, maybe we have calculated it is deadlock.
+        if (getTrace().getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
             tab.getAnimationHistorySidePanel().setLastShown(getTrace().getTraceType());
         }
     }
