@@ -19,7 +19,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.NameVisibilityPanel;
 import dk.aau.cs.gui.components.StatisticsPanel;
-import dk.aau.cs.gui.components.TransitionFireingComponent;
+import dk.aau.cs.gui.components.TransitionFiringComponent;
 import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
@@ -841,9 +841,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private JScrollPane animationControllerScrollPane;
 	private AnimationHistoryList abstractAnimationPane = null;
 	private JPanel animationControlsPanel;
-	private TransitionFireingComponent transitionFireing;
+	private TransitionFiringComponent transitionFiring;
 
-	private static final String transitionFireingName = "enabledTransitions";
+	private static final String transitionFiringName = "enabledTransitions";
 	private static final String animControlName = "animControl";
 
 	private JSplitPane animationHistorySplitter;
@@ -1131,14 +1131,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if (animControlerBox == null) {
             createAnimationControlSidePanel();
         }
-		if (transitionFireing == null) {
-            createTransitionFireing();
+		if (transitionFiring == null) {
+            createTransitionFiring();
         }
 		
 		boolean floatingDividers = false;
 		if(simulatorModelRoot == null){
 			Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
-			Leaf enabledTransitionsListLeaf = new Leaf(transitionFireingName);
+			Leaf enabledTransitionsListLeaf = new Leaf(transitionFiringName);
 			Leaf animControlLeaf = new Leaf(animControlName);
 
 			templateExplorerLeaf.setWeight(0.25);
@@ -1186,10 +1186,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				animationControlsPanel.getMinimumSize().height
             )
         );
-		transitionFireing.setPreferredSize(
+		transitionFiring.setPreferredSize(
 		    new Dimension(
-				transitionFireing.getPreferredSize().width,
-				transitionFireing.getMinimumSize().height
+				transitionFiring.getPreferredSize().width,
+				transitionFiring.getMinimumSize().height
             )
         );
 
@@ -1199,7 +1199,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         animatorSplitPane.add(new JPanel(), templateExplorerName);
 
 		animatorSplitPane.add(animationControlsPanel, animControlName);
-		animatorSplitPane.add(transitionFireing, transitionFireingName);
+		animatorSplitPane.add(transitionFiring, transitionFiringName);
 		
 		animatorSplitPaneScroller = createLeftScrollPane(animatorSplitPane);
 		animatorSplitPane.repaint();
@@ -1270,7 +1270,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 	
 	public DelayEnabledTransitionControl getDelayEnabledTransitionControl(){
-		return transitionFireing.getDelayEnabledTransitionControl();
+		return transitionFiring.getDelayEnabledTransitionControl();
 	}
 
 	public void addAbstractAnimationPane() {
@@ -1327,12 +1327,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		return animationHistorySidePanel.getAnimationHistoryList();
 	}
 
-	private void createTransitionFireing() {
-		transitionFireing = new TransitionFireingComponent(CreateGui.getApp().isShowingDelayEnabledTransitions(), lens);
+	private void createTransitionFiring() {
+		transitionFiring = new TransitionFiringComponent(CreateGui.getApp().isShowingDelayEnabledTransitions(), lens);
 	}
 
-	public TransitionFireingComponent getTransitionFireingComponent() {
-		return transitionFireing;
+	public TransitionFiringComponent getTransitionFiringComponent() {
+		return transitionFiring;
 	}
 
     public TimedArcPetriNetNetwork network() {
@@ -1503,13 +1503,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public void showEnabledTransitionsList(boolean enable) {
 	    //displayNode fires and relayout, so we check of value is changed
         // else elements will be set to default size.
-		if (transitionFireing.isVisible() != enable) {
-			animatorSplitPane.getMultiSplitLayout().displayNode(transitionFireingName, enable);
+		if (transitionFiring.isVisible() != enable) {
+			animatorSplitPane.getMultiSplitLayout().displayNode(transitionFiringName, enable);
 		}
 	}
 	
 	public void showDelayEnabledTransitions(boolean enable){
-		transitionFireing.showDelayEnabledTransitions(enable);
+		transitionFiring.showDelayEnabledTransitions(enable);
 		drawingSurface.repaint();
 		
 		CreateGui.getAnimator().updateFireableTransitions();
@@ -2069,7 +2069,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void delayAndFire() {
-		getTransitionFireingComponent().fireSelectedTransition();
+		getTransitionFiringComponent().fireSelectedTransition();
 	}
 
     @Override

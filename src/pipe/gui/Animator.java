@@ -16,7 +16,7 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.widgets.AnimationTokenSelectDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.components.TransitionFireingComponent;
+import dk.aau.cs.gui.components.TransitionFiringComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedInputArc;
@@ -148,7 +148,7 @@ public class Animator {
     }
 
     public void updateFireableTransitions(){
-        TransitionFireingComponent transFireComponent = tab.getTransitionFireingComponent();
+        TransitionFiringComponent transFireComponent = tab.getTransitionFiringComponent();
         transFireComponent.startReInit();
         isUrgentTransitionEnabled = false;
 
@@ -187,7 +187,7 @@ public class Animator {
         for(Template template : tab.allTemplates())
         {
             for (Transition tempTransition : template.guiModel().transitions()) {
-                tempTransition.disableHightligh();
+                tempTransition.disableHightlight();
 
                 tempTransition.repaint();
             }

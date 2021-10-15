@@ -23,7 +23,7 @@ public class SimulationControl extends JPanel {
 	final JSlider simulationSpeed = new JSlider();
 	final JCheckBox randomSimulation = new JCheckBox("Enable automatic random simulation");
     final JCheckBox randomMode = new JCheckBox("Choose next transition randomly");
-    final Timer timer = new Timer(simulationSpeed.getValue()*20, e -> CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition());
+    final Timer timer = new Timer(simulationSpeed.getValue()*20, e -> CreateGui.getCurrentTab().getTransitionFiringComponent().fireSelectedTransition());
     private static boolean defaultIsRandomTrasition;
     private static SimulationControl instance;
 	
@@ -114,12 +114,12 @@ public class SimulationControl extends JPanel {
 	
 	public void start(){
 		timer.start();
-		CreateGui.getCurrentTab().getTransitionFireingComponent().updateFireButton();
+		CreateGui.getCurrentTab().getTransitionFiringComponent().updateFireButton();
 	}
 	
 	public void stop(){
 		timer.stop();
-		CreateGui.getCurrentTab().getTransitionFireingComponent().updateFireButton();
+		CreateGui.getCurrentTab().getTransitionFiringComponent().updateFireButton();
 	}
 	
 	public boolean isRunning(){
