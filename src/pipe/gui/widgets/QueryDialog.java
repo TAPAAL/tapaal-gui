@@ -1164,7 +1164,8 @@ public class QueryDialog extends JPanel {
     }
 
 	private void setEnablednessOfAddPredicateButton() {
-		if (placeTransitionBox.getSelectedItem() == null)
+		if (placeTransitionBox.getSelectedItem() == null ||
+            (queryType.getSelectedIndex() == 1 && currentSelection.getObject() == newProperty))
 			addPredicateButton.setEnabled(false);
 		else
 			addPredicateButton.setEnabled(true);
