@@ -737,7 +737,8 @@ public class QueryDialog extends JPanel {
         if (!lens.isTimed() && !lens.isGame()) {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
-        if (current instanceof LTLANode || current instanceof LTLENode) {
+        if (current instanceof LTLANode || current instanceof LTLENode ||
+            (queryType.getSelectedIndex() == 1 && current instanceof TCTLPathPlaceHolder)) {
             negationButton.setEnabled(false);
         } else {
             negationButton.setEnabled(true);
@@ -1041,6 +1042,26 @@ public class QueryDialog extends JPanel {
 		deadLockPredicateButton.setEnabled(false);
 	}
 
+	private void disableAllLTLButtons() {
+        globallyButton.setEnabled(false);
+        finallyButton.setEnabled(false);
+        nextButton.setEnabled(false);
+        untilButton.setEnabled(false);
+        aButton.setEnabled(false);
+        eButton.setEnabled(false);
+
+        conjunctionButton.setEnabled(false);
+        disjunctionButton.setEnabled(false);
+        negationButton.setEnabled(false);
+        templateBox.setEnabled(false);
+        placeTransitionBox.setEnabled(false);
+        relationalOperatorBox.setEnabled(false);
+        placeMarking.setEnabled(false);
+        addPredicateButton.setEnabled(false);
+        truePredicateButton.setEnabled(false);
+        falsePredicateButton.setEnabled(false);
+    }
+
 	private void enableOnlyPathButtons() {
 		existsBox.setEnabled(true);
 		existsDiamond.setEnabled(true);
@@ -1098,9 +1119,6 @@ public class QueryDialog extends JPanel {
         existsNext.setEnabled(true);
         forAllUntil.setEnabled(true);
         forAllNext.setEnabled(true);
-        if (queryType.getSelectedIndex() == 1) {
-            updateLTLButtons();
-        }
 
         conjunctionButton.setEnabled(true);
         disjunctionButton.setEnabled(true);
@@ -1112,6 +1130,11 @@ public class QueryDialog extends JPanel {
         truePredicateButton.setEnabled(true);
         falsePredicateButton.setEnabled(true);
         deadLockPredicateButton.setEnabled(true);
+
+        if (queryType.getSelectedIndex() == 1) {
+            updateLTLButtons();
+        }
+
         setEnablednessOfAddPredicateButton();
     }
 
@@ -3554,20 +3577,15 @@ public class QueryDialog extends JPanel {
 	private void updateLTLButtons() {
         if (currentSelection.getObject() == newProperty) {
             String ltlType = checkLTLType();
+            disableAllLTLButtons();
             if (ltlType.equals("placeholder")) {
                 aButton.setEnabled(true);
                 eButton.setEnabled(true);
             } else if (ltlType.equals("A")) {
-                aButton.setEnabled(false);
                 eButton.setEnabled(true);
             } else {
                 aButton.setEnabled(true);
-                eButton.setEnabled(false);
             }
-            globallyButton.setEnabled(false);
-            finallyButton.setEnabled(false);
-            nextButton.setEnabled(false);
-            untilButton.setEnabled(false);
         } else {
             aButton.setEnabled(false);
             eButton.setEnabled(false);
@@ -3580,7 +3598,7 @@ public class QueryDialog extends JPanel {
 
 
 	private void queryChanged(){
-    		setEnabledReductionOptions();
+        setEnabledReductionOptions();
         if (lens.isTimed()) refreshOverApproximationOption();
         if (queryType.getSelectedIndex() == 1) {
             updateLTLButtons();
