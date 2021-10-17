@@ -356,7 +356,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				boolean stubbornReduction = batchProcessingVerificationOptions.stubbornReductionOption() == StubbornReductionOption.KeepQueryOption ? query.isStubbornReductionEnabled() : getStubbornReductionFromBatchProcessingOptions();
 				boolean overApproximation = query.isOverApproximationEnabled();
 				boolean underApproximation = query.isUnderApproximationEnabled();
-				boolean useTar = query.isTarOptionEnabled();
+                boolean useTar = query.isTarOptionEnabled();
+                boolean useTarjan = query.isTarjan();
 				int approximationDenominator = query.approximationDenominator();
 				if (batchProcessingVerificationOptions.approximationMethodOption() == ApproximationMethodOption.None) {
 					overApproximation = false;
@@ -382,7 +383,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				changedQuery.setUseSiphontrap(query.isSiphontrapEnabled());
 				changedQuery.setUseQueryReduction(query.isQueryReductionEnabled());
 				changedQuery.setUseStubbornReduction(stubbornReduction);
-				changedQuery.setUseTarOption(useTar);
+                changedQuery.setUseTarOption(useTar);
+                changedQuery.setUseTarjan(useTarjan);
 				return changedQuery;
 			} else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.Soundness) {
 				isSoundnessCheck = true;

@@ -29,7 +29,7 @@ public class ReductionStats {
 
 	}
 	
-	public int getRemovedTrantitions() {
+	public int getRemovedTransitions() {
 		return removedTrantitions;
 	}
 

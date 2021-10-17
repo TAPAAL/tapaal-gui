@@ -4,12 +4,12 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
 public class TCTLAGNode extends TCTLAbstractPathProperty {
 
-	private TCTLAbstractStateProperty property;
+    private TCTLAbstractStateProperty property;
 
-	public void setProperty(TCTLAbstractStateProperty property) {
-		this.property = property;
-		this.property.setParent(this);
-	}
+    public void setProperty(TCTLAbstractStateProperty property) {
+        this.property = property;
+        this.property.setParent(this);
+    }
 
 	public TCTLAbstractStateProperty getProperty() {
 		return property;
@@ -64,7 +64,7 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public TCTLAbstractPathProperty copy() {
-		return new TCTLAGNode(property.copy());
+        return new TCTLAGNode(property.copy());
 	}
 
 	@Override

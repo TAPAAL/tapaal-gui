@@ -17,6 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.gui.TabContent;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
@@ -287,7 +288,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			Element newQuery;
 			if (query.getCategory() == QueryCategory.CTL){
 				newQuery = createCTLQueryElement(query, document);
-			} else {
+			} else if (query.getCategory() == QueryCategory.LTL){
+			    newQuery = createLTLQueryElement(query, document);
+            }else {
 				newQuery = createQueryElement(query, document);
 			}
 			root.appendChild(newQuery);
@@ -336,7 +339,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.appendChild(document.importNode(queryFormula, true));
 		
 		queryElement.setAttribute("name", query.getName());
-		queryElement.setAttribute("type", "CTL");
+		queryElement.setAttribute("type", query.getCategory().toString());
 		queryElement.setAttribute("capacity", "" + query.getCapacity());
 		queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
 		queryElement.setAttribute("searchOption", "" + query.getSearchOption());
@@ -360,9 +363,49 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("useQueryReduction", "" + query.isQueryReductionEnabled());
 		queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
 		queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
-		
-		return queryElement;
+        queryElement.setAttribute("useTarjan", "" + query.isTarjan());
+
+        return queryElement;
 	}
+
+    private Element createLTLQueryElement(TAPNQuery query, Document document) {
+        Require.that(query != null, "Error: query was null");
+        Require.that(document != null, "Error: document was null");
+
+        Element queryElement = document.createElement("query");
+
+        Node queryFormula = XMLQueryStringToElement(new LTLQueryVisitor().getXMLQueryFor(query.getProperty(), query.getName()));
+        queryElement.appendChild(document.importNode(queryFormula, true));
+
+        queryElement.setAttribute("name", query.getName());
+        queryElement.setAttribute("type", query.getCategory().toString());
+        queryElement.setAttribute("capacity", "" + query.getCapacity());
+        queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
+        queryElement.setAttribute("searchOption", "" + query.getSearchOption());
+        queryElement.setAttribute("hashTableSize", "" + query.getHashTableSize());
+        queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
+        queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
+        queryElement.setAttribute("symmetry", "" + query.useSymmetry());
+        queryElement.setAttribute("gcd", "" + query.useGCD());
+        queryElement.setAttribute("timeDarts", "" + query.useTimeDarts());
+        queryElement.setAttribute("pTrie", "" + query.usePTrie());
+        queryElement.setAttribute("discreteInclusion", String.valueOf(query.discreteInclusion()));
+        queryElement.setAttribute("active", "" + query.isActive());
+        queryElement.setAttribute("inclusionPlaces", getInclusionPlacesString(query));
+        queryElement.setAttribute("overApproximation", "" + query.useOverApproximation());
+        queryElement.setAttribute("reduction", "" + query.useReduction());
+        queryElement.setAttribute("enableOverApproximation", "" + query.isOverApproximationEnabled());
+        queryElement.setAttribute("enableUnderApproximation", "" + query.isUnderApproximationEnabled());
+        queryElement.setAttribute("approximationDenominator", "" + query.approximationDenominator());
+        queryElement.setAttribute("algorithmOption", "" + query.getAlgorithmOption());
+        queryElement.setAttribute("useSiphonTrapAnalysis", "" + query.isSiphontrapEnabled());
+        queryElement.setAttribute("useQueryReduction", "" + query.isQueryReductionEnabled());
+        queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
+        queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
+        queryElement.setAttribute("useTarjan", "" + query.isTarjan());
+
+        return queryElement;
+    }
 	
 	private Node XMLQueryStringToElement(String formulaString){
 		
