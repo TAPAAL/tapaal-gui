@@ -478,7 +478,7 @@ public class TikZExporter {
 	private StringBuffer exportTikZstyle() {
 		StringBuffer out = new StringBuffer();
 
-		out.append("\\begin{tikzpicture}[font=\\scriptsize, xscale=0.45, yscale=0.45, x=1.33px, y=1.33px]\n");
+		out.append("\\begin{tikzpicture}[font=\\scriptsize, xscale=0.45, yscale=0.45, x=1.33pt, y=1.33pt]\n");
                 out.append("%% the figure can be scaled by changing xscale and yscale\n");
                 out.append("%% positions of place/transition labels that are currently fixed to label=135 degrees\n");
                 out.append("%% can be adjusted so that they do not cover arcs\n");
