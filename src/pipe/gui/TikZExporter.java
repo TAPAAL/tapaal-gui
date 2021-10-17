@@ -156,7 +156,7 @@ public class TikZExporter {
 	}
 
 	private String getGuardAsStringIfNotHidden(TimedInputArcComponent arc) {
-        String compareString = "[0," + Character.toString('\u221E') + ")";
+        String compareString = "[0,inf)";
         if (!CreateGui.getApp().showZeroToInfinityIntervals() &&  arc.getGuardAsString().equals(compareString)){
 			return "";
 		} else {

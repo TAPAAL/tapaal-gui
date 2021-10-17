@@ -16,7 +16,7 @@ public interface Bound {
 
 		@Override
 		public String toString() {
-			return Character.toString('\u221e');
+			return "inf";
 		}
 
 		@Override

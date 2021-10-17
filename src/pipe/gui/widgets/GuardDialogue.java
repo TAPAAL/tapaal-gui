@@ -502,7 +502,7 @@ public class GuardDialogue extends JPanel /*
 				first, 0, Integer.MAX_VALUE, 1);
 
 		SpinnerNumberModel spinnerModelForSecondNumber = null;
-		boolean isInf = secondNumber.equals(Character.toString('\u221e'));
+		boolean isInf = secondNumber.equals("inf");
 		if (isInf) {
 			inf.setSelected(true);
 			secondIntervalNumber.setEnabled(false);

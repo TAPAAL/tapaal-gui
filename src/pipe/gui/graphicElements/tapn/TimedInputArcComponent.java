@@ -91,8 +91,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
             getNameLabel().setText("");
         else {
             if (!CreateGui.getApp().showZeroToInfinityIntervals() || !lens.isTimed()) {
-                String compareString = "[0," + Character.toString('\u221E') + ")";
-                if (inputArc.interval().toString(showConstantNames).equals(compareString)){
+                if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
                     getNameLabel().setText("");
                 }
                 else {
@@ -101,6 +100,11 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
             }
             else {
                 getNameLabel().setText(inputArc.interval().toString(showConstantNames));
+            }
+
+            if(getNameLabel().getText().contains("inf")) {
+                String intervalStringWithInfSymbol = getNameLabel().getText().replace("inf", Character.toString('\u221e'));
+                getNameLabel().setText(intervalStringWithInfSymbol);
             }
 
             getNameLabel().setText(getWeight().toString(showConstantNames)+" "+getNameLabel().getText());
