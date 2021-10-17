@@ -792,8 +792,8 @@ public class DataLayer {
 			}
 		}
 
-		return null;
-	}
+		throw new NullPointerException("One or more arcs are connected to a place/transition, which can not be found in the net");
+    }
 
     public void redrawVisibleTokenLists() {
 		for (Place place : placesArray) {
