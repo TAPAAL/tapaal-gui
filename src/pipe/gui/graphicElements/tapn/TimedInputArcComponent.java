@@ -102,6 +102,11 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                 getNameLabel().setText(inputArc.interval().toString(showConstantNames));
             }
 
+            if(getNameLabel().getText().contains("inf")) {
+                String intervalStringWithInfSymbol = getNameLabel().getText().replace("inf", Character.toString('\u221e'));
+                getNameLabel().setText(intervalStringWithInfSymbol);
+            }
+
             getNameLabel().setText(getWeight().toString(showConstantNames)+" "+getNameLabel().getText());
 
             // Handle constant highlighting
