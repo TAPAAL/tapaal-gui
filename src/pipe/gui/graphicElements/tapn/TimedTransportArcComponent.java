@@ -113,8 +113,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
                 }
 			}
 			else {
-			    String compareString = "[0,inf)";
-				if (underlyingTransportArc.interval().toString(displayConstantNames).equals(compareString)) {
+				if (underlyingTransportArc.interval().toString(displayConstantNames).equals("[0,inf)")) {
 					getNameLabel().setText(" : " + getGroup());
 				}
 				else {
