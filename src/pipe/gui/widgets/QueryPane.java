@@ -431,10 +431,17 @@ public class QueryPane extends JPanel implements SidePane {
 		}
 
         private String getFormattedQueryToolTipString(String qString) {
-		    if (qString.length() > 120) {
-		        StringBuilder sb = new StringBuilder(qString);
+		    int stringLength = qString.length();
+		    if (stringLength > 80) {
+		        int numOfLineBreaks = Math.round(stringLength / 80);
+
+                StringBuilder sb = new StringBuilder(qString);
                 sb.insert(0, "<html>");
-		        sb.insert(120,"<br>");
+
+		        for(int i = 1; i <= numOfLineBreaks; i++) {
+		            sb.insert(i * 80, "<br>");
+                }
+
                 sb.insert(sb.length(), "</html>");
 		        return sb.toString();
             }
