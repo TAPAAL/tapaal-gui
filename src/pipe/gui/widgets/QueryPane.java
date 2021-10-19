@@ -421,13 +421,25 @@ public class QueryPane extends JPanel implements SidePane {
 			if(!isEnabled()){
                 setToolTipText("This query is disabled because it contains propositions involving places from a deactivated component");
             } else {
-                setToolTipText(((TAPNQuery)value).getQuery());
+			    String queryToolTipString = getFormattedQueryToolTipString(((TAPNQuery)value).getQuery());
+                setToolTipText(queryToolTipString);
             }
 
 			setFont(list.getFont());
 			setOpaque(true);
 			return superRenderer;
 		}
+
+        private String getFormattedQueryToolTipString(String qString) {
+		    if (qString.length() > 120) {
+		        StringBuilder sb = new StringBuilder(qString);
+                sb.insert(0, "<html>");
+		        sb.insert(120,"<br>");
+                sb.insert(sb.length(), "</html>");
+		        return sb.toString();
+            }
+            return qString;
+        }
 	}
 
 	public void selectFirst() {
