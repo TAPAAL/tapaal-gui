@@ -2,6 +2,8 @@ package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
+import java.util.HashMap;
+
 public class TCTLEFNode extends TCTLAbstractPathProperty {
 
 	private TCTLAbstractStateProperty property;
@@ -104,7 +106,6 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return property.findFirstPlaceHolder();
-
 	}
 
 }

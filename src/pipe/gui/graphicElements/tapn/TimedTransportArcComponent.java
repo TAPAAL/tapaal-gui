@@ -107,13 +107,14 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 				getNameLabel().setText(underlyingTransportArc.interval().toString(
 						displayConstantNames)
 						+ " : " + getGroup());
+                if(getNameLabel().getText().contains("inf")) {
+                    String intervalStringWithInfSymbol = getNameLabel().getText().replace("inf", Character.toString('\u221e'));
+                    getNameLabel().setText(intervalStringWithInfSymbol);
+                }
 			}
 			else {
-				if (underlyingTransportArc.interval().toString(
-						displayConstantNames).equals("[0,inf)")) {
-
+				if (underlyingTransportArc.interval().toString(displayConstantNames).equals("[0,inf)")) {
 					getNameLabel().setText(" : " + getGroup());
-
 				}
 				else {
 					getNameLabel().setText(underlyingTransportArc.interval().toString(

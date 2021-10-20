@@ -1,0 +1,294 @@
+options {
+    LOOKAHEAD = 1;
+    CHOICE_AMBIGUITY_CHECK = 2;
+    OTHER_AMBIGUITY_CHECK = 1;
+    STATIC = false;
+    DEBUG_PARSER = false;
+    DEBUG_LOOKAHEAD = false;
+    DEBUG_TOKEN_MANAGER = false;
+    ERROR_REPORTING = true;
+    JAVA_UNICODE_ESCAPE = false;
+    UNICODE_INPUT = false;
+    IGNORE_CASE = false;
+    USER_TOKEN_MANAGER = false;
+    USER_CHAR_STREAM = false;
+    BUILD_PARSER = true;
+    BUILD_TOKEN_MANAGER = true;
+    SANITY_CHECK = true;
+    }
+
+    PARSER_BEGIN(TAPAALLTLQueryParser)
+
+    package dk.aau.cs.TCTL.LTLParsing;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+
+import dk.aau.cs.TCTL.*;
+
+public class TAPAALLTLQueryParser {
+
+    private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL countered an error trying to parse the query";
+
+    public static TCTLAbstractPathProperty parse(String query) throws ParseException {
+        TAPAALLTLQueryParser parser = new TAPAALLTLQueryParser(new StringReader(query));
+        return parser.Start();
+    }
+}
+
+    PARSER_END(TAPAALLTLQueryParser)
+
+TOKEN :
+    {
+<TRUE: "true" | "TRUE">
+    |
+<FALSE: "false" | "FALSE">
+    }
+
+    TOKEN :
+    {
+<A: "A">
+    |
+<E: "E">
+    |
+<U: "U">
+    |
+<F: "F">
+    |
+<G: "G">
+    |
+<X: "X">
+    }
+
+    TOKEN :
+    {
+<OR: "or" | "||">
+    |
+<AND: "and" | "&&">
+    |
+<NOT: "not" | "!">
+    }
+
+    TOKEN :
+    {
+<PLUS: "+">
+    |
+<MINUS: "-">
+    |
+<MULT: "*">
+    }
+
+    TOKEN :
+    {
+< NUM: ("-")? ( ["0"-"9"] )+ >
+    |
+<IDENT: ["a"-"z","A"-"Z","_"] ( ["a"-"z","A"-"Z","_","0"-"9"] )* >
+    }
+
+    TOKEN :
+    {
+<OP: "<" | "!=" | "<=" | ">" | "=" | "==" | ">=" | ">" >
+    }
+
+    SKIP :
+    {
+    " "
+    | "\t"
+    | "\n"
+    | "\r"
+    }
+
+/** Root production. */
+TCTLAbstractPathProperty Start() :
+{
+        TCTLAbstractPathProperty child = null;
+}
+{
+   child = AbstractPathProperty() <EOF> {return child; }
+}
+
+TCTLAbstractPathProperty AbstractPathProperty() :
+{
+        TCTLAbstractPathProperty pathChild = null;
+        TCTLAbstractStateProperty stateChild = null;
+}
+{
+    <A> pathChild = ParanthesesExpr() {return new LTLANode(new TCTLPathToStateConverter(pathChild)); }
+    | <E> pathChild = ParanthesesExpr() {return new LTLENode(new TCTLPathToStateConverter(pathChild)); }
+}
+
+TCTLAbstractPathProperty ParanthesesExpr() :
+{
+    TCTLAbstractPathProperty pathChild = null;
+            TCTLAbstractStateProperty stateChild = null;
+}
+{
+    "(" pathChild = QuantifierExpr() ")" {return pathChild;}
+    | stateChild = OrExpr() {return new TCTLStateToPathConverter(stateChild); }
+}
+
+TCTLAbstractPathProperty QuantifierExpr() :
+{
+    TCTLAbstractStateProperty child = null;
+    TCTLAbstractStateProperty child2 = null;
+}
+{
+    <F> child = OrExpr() {return new LTLFNode(child); }
+    | <G> child = OrExpr() {return new LTLGNode(child); }
+    | child = OrExpr() <U> child2 = OrExpr() {return new LTLUNode(child, child2); }
+    | <X> child = OrExpr() {return new LTLXNode(child); }
+}
+
+TCTLAbstractStateProperty OrExpr() :
+{
+    TCTLAbstractStateProperty currentChild;
+    ArrayList<TCTLAbstractStateProperty> disjunctions = new ArrayList<TCTLAbstractStateProperty>();
+}
+{
+    currentChild = AndExpr()
+    { disjunctions.add(currentChild); }
+    (
+    <OR> currentChild = AndExpr()
+    { disjunctions.add(currentChild); }
+    )*
+    { return disjunctions.size() == 1 ? currentChild : new TCTLOrListNode(disjunctions); }
+}
+
+TCTLAbstractStateProperty AndExpr() :
+{
+    TCTLAbstractStateProperty currentChild;
+    ArrayList<TCTLAbstractStateProperty> conjunctions = new ArrayList<TCTLAbstractStateProperty>();
+}
+{
+    currentChild = NotExpr()
+    { conjunctions.add(currentChild); }
+    (
+    <AND> currentChild = NotExpr()
+    { conjunctions.add(currentChild); }
+    )*
+    { return conjunctions.size() == 1 ? currentChild : new TCTLAndListNode(conjunctions); }
+}
+
+    TCTLAbstractStateProperty NotExpr() :
+    {
+    TCTLAbstractStateProperty child;
+    TCTLAbstractStateProperty child2 = null;
+    TCTLAbstractPathProperty childConverter;
+    }
+    {
+    <NOT> "(" child = OrExpr() [LOOKAHEAD(2) <U> child2 = OrExpr()] ")" { return new TCTLNotNode(child2 == null ? child : new TCTLPathToStateConverter(new LTLUNode(child, child2))); }
+    | child = Factor() { return child; }
+    | "(" childConverter = QuantifierExpr() ")" { return new TCTLPathToStateConverter(childConverter); }
+    }
+
+    TCTLAbstractStateProperty Factor() :
+    {
+    TCTLAbstractStateProperty thisProp;
+    Token temp = null;
+    Token transition;
+    }
+    {
+    (
+<TRUE> {thisProp = new TCTLTrueNode(); }
+    | <FALSE> {thisProp = new TCTLFalseNode(); }
+    | LOOKAHEAD(AtomicProposition())
+    thisProp = AtomicProposition()
+    | [ LOOKAHEAD(2) temp = <IDENT> "." ] transition = <IDENT> {
+    thisProp = new TCTLTransitionNode(temp == null ? "" : temp.image, transition.image); }
+    | "(" thisProp = OrExpr() ")"
+    | LOOKAHEAD(ParanthesesExpr()) {
+    thisProp = new TCTLPathToStateConverter(QuantifierExpr()); }
+
+    )
+    { return thisProp; }
+    }
+
+    TCTLAbstractStateProperty AtomicProposition() :
+    {
+    TCTLAbstractStateProperty left;
+    TCTLAbstractStateProperty right;
+    Token op;
+    }
+    {
+    (
+    left = AritmeticExpr() op = <OP> right = AritmeticExpr()
+    )
+    {
+    return new TCTLAtomicPropositionNode(left, op.image, right);
+    }
+    }
+
+    TCTLAbstractStateProperty AritmeticExpr() :
+    {
+    TCTLAbstractStateProperty currentChild;
+    ArrayList<TCTLAbstractStateProperty> terms = new ArrayList<TCTLAbstractStateProperty>();
+    Token op;
+    }
+    {
+    currentChild = AritmeticMinusExpr()
+    { terms.add(currentChild); }
+    (
+    op = <PLUS> currentChild = AritmeticMinusExpr()
+    {
+    terms.add(new AritmeticOperator(op.image));
+    terms.add(currentChild);
+    }
+    )*
+    { return terms.size() == 1 ? currentChild : new TCTLTermListNode(terms); }
+    }
+
+    TCTLAbstractStateProperty AritmeticMinusExpr() :
+    {
+    TCTLAbstractStateProperty currentChild;
+    ArrayList<TCTLAbstractStateProperty> terms = new ArrayList<TCTLAbstractStateProperty>();
+    Token op;
+    }
+    {
+    currentChild = AritmeticTerm()
+    { terms.add(currentChild); }
+    (
+    op = <MINUS> currentChild = AritmeticTerm()
+    {
+    terms.add(new AritmeticOperator(op.image));
+    terms.add(currentChild);
+    }
+    )*
+    { return terms.size() == 1 ? currentChild : new TCTLTermListNode(terms); }
+    }
+
+    TCTLAbstractStateProperty AritmeticTerm() :
+    {
+    TCTLAbstractStateProperty currentChild;
+    ArrayList<TCTLAbstractStateProperty> factors = new ArrayList<TCTLAbstractStateProperty>();
+    Token op;
+    }
+    {
+    currentChild = AritmeticFactor()
+    { factors.add(currentChild); }
+    (
+    op = <MULT> currentChild = AritmeticFactor()
+    {
+    factors.add(new AritmeticOperator(op.image));
+    factors.add(currentChild);
+    }
+    )*
+    { return factors.size() == 1 ? currentChild : new TCTLTermListNode(factors); }
+    }
+
+    TCTLAbstractStateProperty AritmeticFactor() :
+    {
+    TCTLAbstractStateProperty thisProp;
+    Token temp = null;
+    Token place;
+    Token op;
+    Token num;
+    }
+    {
+    (
+    [ LOOKAHEAD(2) temp = <IDENT> "." ] place = <IDENT> { thisProp = new TCTLPlaceNode(temp == null ? "" : temp.image, place.image); }
+    | num = <NUM> { thisProp = new TCTLConstNode(Integer.parseInt(num.image)); }
+    | "(" thisProp = AritmeticExpr() ")"
+    )
+
+    { return thisProp; }
+    }

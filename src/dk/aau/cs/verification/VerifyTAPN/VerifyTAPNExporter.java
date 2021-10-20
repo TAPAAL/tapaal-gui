@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
 
+import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.NameMapping;
 import pipe.dataLayer.DataLayer;
@@ -32,7 +33,8 @@ public class VerifyTAPNExporter {
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, NameMapping mapping) {
 		File modelFile = createTempFile(".xml");
 		File queryFile;
-		if (query.getCategory() == QueryCategory.CTL){
+
+		if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL){
 			queryFile = createTempFile(".xml");
 		} else {
 			queryFile = createTempFile(".q");
@@ -58,6 +60,9 @@ public class VerifyTAPNExporter {
                 throw new FileNotFoundException(null);
             } else if (query.getCategory() == QueryCategory.CTL) {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
+            } else if (query.getCategory() == QueryCategory.LTL) {
+                LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
             } else if (lens != null && lens.isGame()) {
                 queryStream.append("control: " + query.getProperty().toString());
@@ -102,12 +107,17 @@ public class VerifyTAPNExporter {
 	
 	private void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         //remove the net prefix from the place name
-        String placeName = mapping.map(p.name()).value2();
+        String placeName;
         Place guiPlace = null;
 
-        for(DataLayer guiModel : guiModels ){
+        if (mapping.map(p.name()) == null) {
+            placeName = "ghost";
+        } else {
+            placeName = mapping.map(p.name()).value2();
+        }
+        for (DataLayer guiModel : guiModels ) {
             guiPlace = guiModel.getPlaceById(placeName);
-            if(guiPlace != null){
+            if (guiPlace != null) {
                 break;
             }
         }
@@ -119,7 +129,11 @@ public class VerifyTAPNExporter {
 		modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
         modelStream.append(">\n");
-        outputPosition(modelStream, guiPlace.getPositionX(), guiPlace.getPositionY());
+        if (guiPlace == null) {
+            outputPosition(modelStream, 0, 0);
+        } else {
+            outputPosition(modelStream, guiPlace.getPositionX(), guiPlace.getPositionY());
+        }
 
         modelStream.append("</place>\n");
 	}

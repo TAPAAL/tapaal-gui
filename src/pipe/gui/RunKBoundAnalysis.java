@@ -16,10 +16,12 @@ import java.util.ArrayList;
 public class RunKBoundAnalysis extends RunVerificationBase {
 
 	private final JSpinner spinner;
+    private boolean resultShown;
 
-	public RunKBoundAnalysis(ModelChecker modelChecker, Messenger messenger,JSpinner spinner) {
+	public RunKBoundAnalysis(ModelChecker modelChecker, Messenger messenger,JSpinner spinner, boolean resultShown) {
 		super(modelChecker, messenger, spinner);
 		this.spinner = spinner;
+		this.resultShown = resultShown;
 	}
 
 	@Override
@@ -30,13 +32,18 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 						getAnswerNotBoundedString(), "Analysis Result",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-			    if (modelChecker instanceof VerifyPN && !result.getRawOutput().contains("max tokens:")) {
+			    if (modelChecker instanceof VerifyPN && !resultShown) {
                     Object[] options = {"Ok", "Minimize extra tokens"};
                     int answer = JOptionPane.showOptionDialog(CreateGui.getApp(),
                         getPNAnswerBoundedString(), "Analysis Result,",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
                         ResourceManager.satisfiedIcon(), options, JOptionPane.OK_OPTION);
-                    return answer != JOptionPane.OK_OPTION;
+
+                    if (answer != JOptionPane.OK_OPTION && result.getRawOutput().contains("max tokens:")) {
+                        spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
+                    } else {
+                        return answer != JOptionPane.OK_OPTION;
+                    }
                 } else if (modelChecker instanceof VerifyPN) {
                     spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
                 } else {

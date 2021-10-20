@@ -128,7 +128,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 										dataLayerQuery.isQueryReductionEnabled()? pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime: pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime,
 										dataLayerQuery.isStubbornReductionEnabled(),
                                         reducedNetFilePath,
-                                        dataLayerQuery.isTarOptionEnabled()
+                                        dataLayerQuery.isTarOptionEnabled(),
+                                        dataLayerQuery.isTarjan()
 								),
 								transformedModel,
 								clonedQuery
@@ -150,7 +151,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                         pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime,
 										false,
                                         reducedNetFilePath,
-                                        false
+                                        false,
+                                        true
 								),
 								transformedModel,
 								clonedQuery
@@ -219,9 +221,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 
 			if (showResult(result) && spinner != null) {
-			    options = new VerifyPNOptions(options.extraTokens(), pipe.dataLayer.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, pipe.dataLayer.TAPNQuery.QueryCategory.Default, pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime, false, null, false);
+			    options = new VerifyPNOptions(options.extraTokens(), pipe.dataLayer.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, pipe.dataLayer.TAPNQuery.QueryCategory.Default, pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime, false, null, false, false);
                 KBoundAnalyzer optimizer = new KBoundAnalyzer(model, options.extraTokens(), modelChecker, new MessengerImpl(), spinner);
-                optimizer.analyze((VerifyTAPNOptions) options);
+                optimizer.analyze((VerifyTAPNOptions) options, true);
             }
 		} else {
 			modelChecker.kill();

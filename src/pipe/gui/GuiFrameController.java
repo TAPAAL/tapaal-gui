@@ -246,7 +246,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         buffer.append("TAPAAL GUI and Translations:\n");
             buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Jakob Dyhr,\nLouise Foshammer, Malte Neve-Graesboell, ");
             buffer.append("Lasse Jacobsen, Morten Jacobsen,\nThomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
-            buffer.append("Mads Johannsen,\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Thomas Pedersen,\nLena Said, Niels N. Samuelsen, Jiri Srba, Mathias G. Soerensen, Jakob H. Taankvist\nand Peter H. Taankvist\n");
+            buffer.append("Mads Johannsen,\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Kristian Morsing Pedersen,\nThomas Pedersen, Lena Said, Niels N. Samuelsen, Jiri Srba, Mathias G. Soerensen,\nJakob H. Taankvist and Peter H. Taankvist\n");
 
             buffer.append("Aalborg University 2008-2021\n\n");
 
@@ -305,11 +305,15 @@ public class GuiFrameController implements GuiFrameControllerActions{
                     List<TabContent> tabs = get();
                     openTab(tabs);
                 } catch (Exception e) {
+                    String message = e.getMessage();
+
+                    if (message.contains("Exception:")) {
+                        message = message.split(":", 2)[1];
+                    }
                     JOptionPane.showMessageDialog(CreateGui.getApp(),
-                            e.getMessage(),
+                            message,
                             "Error loading file",
                             JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
                     return;
                 }finally {
                     CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));

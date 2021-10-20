@@ -8,6 +8,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;
@@ -26,6 +27,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class KBoundAnalyzer {
 	protected TimedArcPetriNetNetwork tapnNetwork;
@@ -45,10 +47,10 @@ public class KBoundAnalyzer {
 	}
 
 	public void analyze() {
-		analyze(verificationOptions());
+		analyze(verificationOptions(), false);
 	}
 
-    public void analyze(VerifyTAPNOptions options) {
+    public void analyze(VerifyTAPNOptions options, boolean resultShown) {
         TAPNQuery query;
         if (modelChecker instanceof VerifyPN) {
             query = getPNBoundednessQuery();
@@ -56,7 +58,7 @@ public class KBoundAnalyzer {
             query = getBoundednessQuery();
         }
 
-        RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, spinner);
+        RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, spinner, resultShown);
         RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), analyzer);
 
         analyzer.execute(options, tapnNetwork, query, null);
@@ -65,7 +67,7 @@ public class KBoundAnalyzer {
 
 	protected VerifyTAPNOptions verificationOptions() {
 		if(modelChecker instanceof VerifyPN){
-			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.Default, AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime, false, null, false);
+			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.Default, AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime, false, null, false, true);
 		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
 		} else if(modelChecker instanceof VerifyTAPNDiscreteVerification){
@@ -114,7 +116,15 @@ public class KBoundAnalyzer {
     }
 
     private TimedArcPetriNet mergeNetComponents() {
-        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), true, true);
+        HashMap<TimedArcPetriNet, DataLayer> guiModels = CreateGui.getCurrentTab().getGuiModels();
+        for (TimedArcPetriNet net : guiModels.keySet()) {
+            if (tapnNetwork.getTAPNByName(net.name()) != null) {
+                DataLayer dl = guiModels.get(net);
+                guiModels.remove(net);
+                guiModels.put(tapnNetwork.getTAPNByName(net.name()), dl);
+            }
+        }
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 
         return transformedModel.value1();

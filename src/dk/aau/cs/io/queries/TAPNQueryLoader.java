@@ -1,12 +1,10 @@
 package dk.aau.cs.io.queries;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
-import dk.aau.cs.debug.Logger;
+import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,22 +17,9 @@ import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.CreateGui;
-import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
-import dk.aau.cs.TCTL.StringPosition;
-import dk.aau.cs.TCTL.TCTLAUNode;
-import dk.aau.cs.TCTL.TCTLAXNode;
-import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
-import dk.aau.cs.TCTL.TCTLEUNode;
-import dk.aau.cs.TCTL.TCTLEXNode;
-import dk.aau.cs.TCTL.TCTLPathToStateConverter;
-import dk.aau.cs.TCTL.TCTLStateToPathConverter;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
-import dk.aau.cs.TCTL.TCTLPlusListNode;
-import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -87,14 +72,19 @@ public class TAPNQueryLoader extends QueryLoader{
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
 		boolean reduction = getReductionOption(queryElement, "reduction", true);
 		String algorithmOption = queryElement.getAttribute("algorithmOption");
-		boolean isCTL = isCTLQuery(queryElement);
+        boolean isCTL = isTypeQuery(queryElement, "CTL");
+        boolean isLTL = isTypeQuery(queryElement, "LTL");
 		boolean siphontrap = getReductionOption(queryElement, "useSiphonTrapAnalysis", false);
 		boolean queryReduction = getReductionOption(queryElement, "useQueryReduction", true);
 		boolean stubborn = getReductionOption(queryElement, "useStubbornReduction", true);
-		boolean useTar = getTarOption(queryElement, "useTarOption", false);
+		boolean useTar = getAttributeOption(queryElement, "useTarOption", false);
+        boolean useTarjan = getAttributeOption(queryElement, "useTarjan", false);
 
 		TCTLAbstractProperty query;
-		if (queryElement.getElementsByTagName("formula").item(0) != null){
+		if (queryElement.hasAttribute("type") && queryElement.getAttribute("type").equals("LTL")) {
+		    query = parseLTLQueryProperty(queryElement);
+        }
+		else if (queryElement.getElementsByTagName("formula").item(0) != null){
 			query = parseCTLQueryProperty(queryElement);
 		} else {
 			query = parseQueryProperty(queryElement.getAttribute("query"));
@@ -104,11 +94,12 @@ public class TAPNQueryLoader extends QueryLoader{
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
-			parsedQuery.setCategory(detectCategory(query, isCTL));
+			parsedQuery.setCategory(detectCategory(query, isCTL, isLTL));
 			parsedQuery.setUseSiphontrap(siphontrap);
 			parsedQuery.setUseQueryReduction(queryReduction);
 			parsedQuery.setUseStubbornReduction(stubborn);
-			parsedQuery.setUseTarOption(useTar);
+            parsedQuery.setUseTarOption(useTar);
+            parsedQuery.setUseTarjan(useTarjan);
 			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
 //				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
@@ -120,45 +111,53 @@ public class TAPNQueryLoader extends QueryLoader{
 			return null;
 	}
 	
-	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query, boolean isCTL){
-                if (isCTL) return TAPNQuery.QueryCategory.CTL;
-                
-                StringPosition[] children = query.getChildren();
+	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query, boolean isCTL, boolean isLTL){
+        if (isCTL) return TAPNQuery.QueryCategory.CTL;
+        if (isLTL) return QueryCategory.LTL;
 
-                // If query is root and state property
-                if(query instanceof TCTLAbstractStateProperty){
-                        if(((TCTLAbstractStateProperty) query).getParent() == null){
-                                return TAPNQuery.QueryCategory.CTL;
-                        }
-                }
-        
-		if(query instanceof TCTLStateToPathConverter ||
+        StringPosition[] children = query.getChildren();
+
+        // If query is root and state property
+        if(query instanceof TCTLAbstractStateProperty){
+            if(((TCTLAbstractStateProperty) query).getParent() == null){
+                return TAPNQuery.QueryCategory.CTL;
+            }
+        }
+
+        if(query instanceof TCTLStateToPathConverter ||
 				query instanceof TCTLPathToStateConverter){
 			return TAPNQuery.QueryCategory.CTL;
 		}
 
-		if(query instanceof TCTLEUNode ||
-				query instanceof TCTLEXNode ||
+		if(query instanceof LTLGNode ||
+                query instanceof LTLFNode ||
+                query instanceof LTLUNode ||
+                query instanceof LTLXNode ||
+                query instanceof LTLANode ||
+                query instanceof LTLENode){
+            return TAPNQuery.QueryCategory.LTL;
+        } else if(query instanceof TCTLEUNode ||
+                query instanceof TCTLEXNode ||
 				query instanceof TCTLAUNode ||
-				query instanceof TCTLAXNode){
-			return TAPNQuery.QueryCategory.CTL;
-		}
-                
-                // If query is a fireability query
-                if(query instanceof TCTLTransitionNode) {
-                    return TAPNQuery.QueryCategory.CTL;
-                }
-                if(query instanceof TCTLPlusListNode){
-                        for(TCTLAbstractStateProperty sp : ((TCTLPlusListNode)query).getProperties()) {
-                                if(TAPNQueryLoader.detectCategory(sp, isCTL) == TAPNQuery.QueryCategory.CTL){
-                                    return TAPNQuery.QueryCategory.CTL;
-                                }
+				query instanceof TCTLAXNode) {
+            return TAPNQuery.QueryCategory.CTL;
+        }
+
+        // If query is a fireability query
+        if(query instanceof TCTLTransitionNode) {
+            return TAPNQuery.QueryCategory.CTL;
+        }
+        if(query instanceof TCTLPlusListNode){
+                for(TCTLAbstractStateProperty sp : ((TCTLPlusListNode)query).getProperties()) {
+                        if(TAPNQueryLoader.detectCategory(sp, isCTL, isLTL) == TAPNQuery.QueryCategory.CTL){
+                            return TAPNQuery.QueryCategory.CTL;
                         }
+                }
 		}
 		
                 // If any property has been converted
 		for (StringPosition child : children) {
-			if(TAPNQueryLoader.detectCategory(child.getObject(), isCTL) == TAPNQuery.QueryCategory.CTL){
+			if(TAPNQueryLoader.detectCategory(child.getObject(), isCTL, isLTL) == TAPNQuery.QueryCategory.CTL){
 				return TAPNQuery.QueryCategory.CTL;
 			} 
 		}
@@ -206,13 +205,18 @@ public class TAPNQueryLoader extends QueryLoader{
 		return new InclusionPlaces(InclusionPlacesOption.UserSpecified, places);
 	}
         
-	private boolean isCTLQuery(Element queryElement) {
+	private boolean isTypeQuery(Element queryElement, String type) {
 		if(!queryElement.hasAttribute("type")){
-			return false;
+		    if (type.equals("CTL")) {
+		        return XMLQueryLoader.canBeCTL(queryElement) && !XMLQueryLoader.canBeLTL(queryElement);
+            } else if (type.equals("LTL")) {
+                return !XMLQueryLoader.canBeCTL(queryElement) && XMLQueryLoader.canBeLTL(queryElement);
+            }
+            return false;
 		}
 		boolean result;
 		try {
-			result = queryElement.getAttribute("type").equals("CTL");
+			result = queryElement.getAttribute("type").equals(type);
 		} catch(Exception e) {
 			result = false;
 		}
@@ -232,7 +236,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		return result;	
 	}
 
-	private boolean getTarOption(Element queryElement, String attributeName, boolean defaultValue) {
+	private boolean getAttributeOption(Element queryElement, String attributeName, boolean defaultValue) {
         if(!queryElement.hasAttribute(attributeName)){
             return defaultValue;
         }
@@ -244,8 +248,8 @@ public class TAPNQueryLoader extends QueryLoader{
         }
         return result;
     }
-	
-	private int getApproximationValue(Element queryElement, String attributeName, int defaultValue)
+
+    private int getApproximationValue(Element queryElement, String attributeName, int defaultValue)
 	{
 		if(!queryElement.hasAttribute(attributeName)){
 			return defaultValue;
@@ -293,6 +297,17 @@ public class TAPNQueryLoader extends QueryLoader{
 		
 		return query;
 	}
+
+    private TCTLAbstractProperty parseLTLQueryProperty(Node queryElement){
+        TCTLAbstractProperty query = null;
+        try {
+            query = XMLLTLQueryParser.parse(queryElement);
+        } catch (XMLQueryParseException e) {
+            messages.add(ERROR_PARSING_QUERY_MESSAGE);
+        }
+
+        return query;
+    }
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {
 		TCTLAbstractProperty query = null;
