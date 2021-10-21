@@ -24,8 +24,8 @@
       <arcpath arcPointType="false" id="1" xCoord="510" yCoord="195"/>
     </arc>
     <arc id="id3" inscription="1" nameOffsetX="0" nameOffsetY="0" source="lockA" target="haveA" type="normal" weight="1">
-      <arcpath arcPointType="false" id="0" xCoord="275" yCoord="172"/>
-      <arcpath arcPointType="false" id="1" xCoord="375" yCoord="178"/>
+      <arcpath arcPointType="false" id="0" xCoord="275" yCoord="175"/>
+      <arcpath arcPointType="false" id="1" xCoord="375" yCoord="179"/>
     </arc>
     <arc id="id6" inscription="1" nameOffsetX="0" nameOffsetY="0" source="relA" target="resA" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="714" yCoord="185"/>
@@ -72,23 +72,23 @@
       <arcpath arcPointType="false" id="1" xCoord="514" yCoord="405"/>
     </arc>
     <arc id="A14" inscription="1" nameOffsetX="0" nameOffsetY="0" source="lockA2" target="haveA2andB" type="normal" weight="1">
-      <arcpath arcPointType="false" id="0" xCoord="714" yCoord="413"/>
-      <arcpath arcPointType="false" id="1" xCoord="614" yCoord="406"/>
+      <arcpath arcPointType="false" id="0" xCoord="714" yCoord="410"/>
+      <arcpath arcPointType="false" id="1" xCoord="614" yCoord="405"/>
     </arc>
     <arc id="A15" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="haveB" target="lockA2" type="timed" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="720" yCoord="300"/>
       <arcpath arcPointType="false" id="1" xCoord="720" yCoord="390"/>
     </arc>
     <arc id="A16" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="resA" target="lockA" type="timed" weight="1">
-      <arcpath arcPointType="false" id="0" xCoord="379" yCoord="274"/>
-      <arcpath arcPointType="false" id="1" xCoord="275" yCoord="175"/>
+      <arcpath arcPointType="false" id="0" xCoord="378" yCoord="274"/>
+      <arcpath arcPointType="false" id="1" xCoord="274" yCoord="180"/>
     </arc>
     <arc id="A17" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="resA" target="lockA2" type="timed" weight="1">
-      <arcpath arcPointType="false" id="0" xCoord="403" yCoord="290"/>
-      <arcpath arcPointType="false" id="1" xCoord="714" yCoord="410"/>
+      <arcpath arcPointType="false" id="0" xCoord="404" yCoord="290"/>
+      <arcpath arcPointType="false" id="1" xCoord="714" yCoord="405"/>
     </arc>
   </net>
-  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="lock_A_and_B_free" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false">
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="lock_A_and_B_free" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="false">
     <formula>
             
       <exists-path>
@@ -117,7 +117,7 @@
           
     </formula>
   </query>
-  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="have_locks_ A_and_A2" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="SOME" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false">
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="have_locks_ A_and_A2" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="SOME" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="false">
     <formula>
             
       <exists-path>
@@ -153,6 +153,54 @@
           </conjunction>
                   
         </finally>
+              
+      </exists-path>
+          
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Deadlock freedom" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="SOME" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+    <formula>
+            
+      <all-paths>
+                
+        <globally>
+                    
+          <negation>
+                        
+            <deadlock/>
+                      
+          </negation>
+                  
+        </globally>
+              
+      </all-paths>
+          
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="A_can_get_lock_infinitely_often" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="SOME" type="LTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+    <formula>
+            
+      <exists-path>
+                
+        <globally>
+                    
+          <finally>
+                        
+            <integer-eq>
+                            
+              <tokens-count>
+                                
+                <place>comp1.haveA</place>
+                              
+              </tokens-count>
+                            
+              <integer-constant>1</integer-constant>
+                          
+            </integer-eq>
+                      
+          </finally>
+                  
+        </globally>
               
       </exists-path>
           
