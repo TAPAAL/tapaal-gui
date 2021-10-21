@@ -92,20 +92,33 @@ public class TapnXmlLoader {
         }
         return null;
     }
-    public LoadedModel load(InputStream file) throws FormatException {
+
+	public LoadedModel load(InputStream file) throws Exception {
 		Require.that(file != null, "file must be non-null and exist");
 
 		Document doc = loadDocument(file);
 		if(doc == null) return null;
-		return parse(doc);
+		try {
+            return parse(doc);
+        } catch (FormatException | NullPointerException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type");
+        }
 	}
 	
-	public LoadedModel load(File file) throws FormatException {
+	public LoadedModel load(File file) throws Exception {
 		Require.that(file != null && file.exists(), "file must be non-null and exist");
 
 		Document doc = loadDocument(file);
 		if(doc == null) return null;
-		return parse(doc);
+        try {
+            return parse(doc);
+        } catch (FormatException | NullPointerException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type");
+        }
 	}
 	
 	
@@ -142,8 +155,10 @@ public class TapnXmlLoader {
 		Collection<Template> templates = parseTemplates(doc, network, constants);
 		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network).parseQueries();
 
-		for(String message : loadedQueries.getMessages()){
-		    messages.add(message);
+		if (loadedQueries != null) {
+            for (String message : loadedQueries.getMessages()) {
+                messages.add(message);
+            }
         }
 		network.buildConstraints();
 		
@@ -441,7 +456,7 @@ public class TapnXmlLoader {
 		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
 		String invariant = place.getAttribute("invariant");
 		boolean displayName = place.getAttribute("displayName").equals("false") ? false : true;
-		
+
 
 		if (idInput.length() == 0 && nameInput.length() > 0) {
 			idInput = nameInput;
@@ -450,7 +465,7 @@ public class TapnXmlLoader {
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
 		}
-		
+
 		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
 			nameInput = "_" + nameInput;
 			if(firstPlaceRenameWarning) {
@@ -458,7 +473,7 @@ public class TapnXmlLoader {
 				firstPlaceRenameWarning = false;
 			}
 		}
-		
+
 		idResolver.add(tapn.name(), idInput, nameInput);
 
 		TimedPlace p;
@@ -475,7 +490,7 @@ public class TapnXmlLoader {
 		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput, lens);
 		placeComponent.setUnderlyingPlace(p);
-		
+
 		if (!displayName){
 			placeComponent.setAttributesVisible(false);
 		}
@@ -514,7 +529,7 @@ public class TapnXmlLoader {
 
 		int _endx = targetIn.getX() + targetIn.centreOffsetLeft();
 		int _endy = targetIn.getY() + targetIn.centreOffsetTop();
-		
+
 		//Get weight if any
 		Weight weight = new IntWeight(1);
 		if(arc.hasAttribute("weight")){

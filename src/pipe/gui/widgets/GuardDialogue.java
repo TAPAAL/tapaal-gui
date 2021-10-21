@@ -133,7 +133,7 @@ public class GuardDialogue extends JPanel /*
 				if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)
 						&& ((TimedInputArcComponent) objectToBeEdited).isUrgentTransition()){
 					if(!guard.equals(TimeInterval.ZERO_INF)){
-						JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0,inf).", "Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0," + Character.toString('\u221E') + ")", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 				}
@@ -347,7 +347,7 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(rightDelimiter, gridBagConstraints);
 
-		inf = new JCheckBox("inf", true);
+		inf = new JCheckBox(Character.toString('\u221e'), true);
 		inf.addActionListener(evt -> {
 			if (inf.isSelected()) {
 				secondIntervalNumber.setEnabled(false);
@@ -561,7 +561,7 @@ public class GuardDialogue extends JPanel /*
 			rightDelimiter.setEnabled(true);
 		else
 			rightDelimiter.setEnabled(!inf.isSelected());
-		secondIntervalNumber.setVisible(!value);
+        secondIntervalNumber.setVisible(!value);
 		rightConstantsComboBox.setVisible(value);
 
 		repackIfWindow();
@@ -671,31 +671,33 @@ public class GuardDialogue extends JPanel /*
 		String oldRight = rightConstantsComboBox.getSelectedItem() != null ? rightConstantsComboBox
 				.getSelectedItem().toString()
 				: null;
-				rightConstantsComboBox.removeAllItems();
-				Collection<Constant> constants = CreateGui.getCurrentTab().network()
-				.constants();
-				
-				//List <Constant> constantList = new ArrayList(constants);
-				List <Constant> constantList = new ArrayList<Constant>();
-				constantList.addAll(constants);
-				
-				constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
+        rightConstantsComboBox.removeAllItems();
+        Collection<Constant> constants = CreateGui.getCurrentTab().network()
+        .constants();
 
-				
-				for (Constant c : constantList) {
-					if (c.value() >= value) {
-						rightConstantsComboBox.addItem(c.name());
-					}
-				}
+        //List <Constant> constantList = new ArrayList(constants);
+        List <Constant> constantList = new ArrayList<Constant>();
+        constantList.addAll(constants);
 
-				if(rightConstantsComboBox.getItemCount() == 0){
-					rightUseConstant.setEnabled(false);
-				} else {
-					rightUseConstant.setEnabled(true);
-				}
+        constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 
-				if (oldRight != null)
-					rightConstantsComboBox.setSelectedItem(oldRight);
+
+        for (Constant c : constantList) {
+            if (c.value() >= value) {
+                rightConstantsComboBox.addItem(c.name());
+            }
+        }
+
+        if(rightConstantsComboBox.getItemCount() == 0){
+            rightUseConstant.setEnabled(false);
+            rightUseConstant.setSelected(false);
+            updateRightComponents();
+        } else {
+            rightUseConstant.setEnabled(true);
+        }
+
+        if (oldRight != null)
+            rightConstantsComboBox.setSelectedItem(oldRight);
 	}
 
 	private void firstSpinnerStateChanged(ChangeEvent evt) {

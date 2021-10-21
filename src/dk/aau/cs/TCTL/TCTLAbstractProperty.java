@@ -2,6 +2,8 @@ package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
+import java.util.Locale;
+
 public abstract class TCTLAbstractProperty {
 
 	// used to determine whether to put parenthesis around the property
@@ -62,7 +64,6 @@ public abstract class TCTLAbstractProperty {
     public abstract boolean hasNestedPathQuantifiers();
 	// This method assumes that a place holder exists in the current query
 	public abstract TCTLAbstractProperty findFirstPlaceHolder();
-
 	
 
 }

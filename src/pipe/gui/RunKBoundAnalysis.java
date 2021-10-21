@@ -4,33 +4,54 @@ import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import dk.aau.cs.Messenger;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 
+import java.util.ArrayList;
+
 public class RunKBoundAnalysis extends RunVerificationBase {
 
 	private final JSpinner spinner;
+    private boolean resultShown;
 
-	public RunKBoundAnalysis(ModelChecker modelChecker, Messenger messenger,JSpinner spinner) {
-		super(modelChecker, messenger);
+	public RunKBoundAnalysis(ModelChecker modelChecker, Messenger messenger,JSpinner spinner, boolean resultShown) {
+		super(modelChecker, messenger, spinner);
 		this.spinner = spinner;
+		this.resultShown = resultShown;
 	}
 
 	@Override
-	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
+	protected boolean showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if(result != null && !result.error()) {
 			if (!result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) {
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						getAnswerNotBoundedString(), "Analysis Result",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
-						getAnswerBoundedString(), "Analysis Result",
-						JOptionPane.INFORMATION_MESSAGE, ResourceManager.satisfiedIcon());
+			    if (modelChecker instanceof VerifyPN && !resultShown) {
+                    Object[] options = {"Ok", "Minimize extra tokens"};
+                    int answer = JOptionPane.showOptionDialog(CreateGui.getApp(),
+                        getPNAnswerBoundedString(), "Analysis Result,",
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
+                        ResourceManager.satisfiedIcon(), options, JOptionPane.OK_OPTION);
+
+                    if (answer != JOptionPane.OK_OPTION && result.getRawOutput().contains("max tokens:")) {
+                        spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
+                    } else {
+                        return answer != JOptionPane.OK_OPTION;
+                    }
+                } else if (modelChecker instanceof VerifyPN) {
+                    spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
+                } else {
+                    spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
+                    JOptionPane.showMessageDialog(CreateGui.getApp(),
+                        getAnswerBoundedString(), "Analysis Result",
+                        JOptionPane.INFORMATION_MESSAGE, ResourceManager.satisfiedIcon());
+                }
 			}
 		} else {						
 			String message = "An error occured during the verification." +
@@ -40,6 +61,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 			
 			messenger.displayWrappedErrorMessage(message,"Error during verification");
 		}
+		return false;
 	}
 
 	protected String getAnswerNotBoundedString() {
@@ -58,4 +80,12 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 				+ "The number of extra tokens was automatically lowered to the\n"
 				+ "minimum number of tokens needed for an exact analysis.";
 	}
+
+	protected String getPNAnswerBoundedString() {
+        return "The net with the specified extra number of tokens is bounded.\n\n"
+            + "This means that the analysis will be exact and always give \n"
+            + "the correct answer.\n\n"
+            + "The number of extra tokens can be lowered to the minimum number\n"
+            + "of tokens needed for an exact analysis.";
+    }
 }

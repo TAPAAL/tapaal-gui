@@ -156,7 +156,7 @@ public abstract class Transition extends PlaceTransitionObject {
 	public abstract TimeInterval getDInterval();
 
     /* Called at the end of animation to reset Transitions to false */
-	public void disableHightligh() {
+	public void disableHightlight() {
 		highlightedEnabled = false;
         highlightedDelayEnabled = false;
 	}

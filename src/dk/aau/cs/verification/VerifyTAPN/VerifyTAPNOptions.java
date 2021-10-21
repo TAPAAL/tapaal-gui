@@ -16,7 +16,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	protected int tokensInModel;
 	private final boolean symmetry;
 	private final boolean discreteInclusion;
-	private final boolean tarOption;
+    private final boolean tarOption;
 	private InclusionPlaces inclusionPlaces;
 	
 	//only used for boundedness analysis
@@ -44,7 +44,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		this.enabledOverApproximation = enableOverApproximation;
 		this.enabledUnderApproximation = enableUnderApproximation;
 		this.approximationDenominator = approximationDenominator;
-		this.tarOption = tarOption;
+        this.tarOption = tarOption;
 	}
 
 	public TraceOption trace() {

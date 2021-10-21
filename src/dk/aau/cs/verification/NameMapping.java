@@ -25,7 +25,7 @@ public class NameMapping {
 	}
 
 	public Tuple<String, String> map(String key) {
-	    return mappedNamesToOriginalNames.get(key);
+        return mappedNamesToOriginalNames.getOrDefault(key, null);
 	}
 	
 	public String map(String templateName, String objectName) {

@@ -31,7 +31,7 @@ public class RunVerification extends RunVerificationBase {
 	private final IconSelector iconSelector;
 	private final VerificationCallback callback;
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback, String reducedNetFilePath, boolean reduceNetOnly) {
-		super(modelChecker, messenger, reducedNetFilePath, reduceNetOnly);
+		super(modelChecker, messenger, reducedNetFilePath, reduceNetOnly, null);
 		iconSelector = selector;
 		this.callback = callback;
 	}
@@ -45,8 +45,19 @@ public class RunVerification extends RunVerificationBase {
 	}
 
 	@Override
-	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
-		if (result != null && !result.error()) {
+	protected boolean showResult(VerificationResult<TAPNNetworkTrace> result) {
+        if (reduceNetOnly) {
+            //If the engine is only called to produce a reduced net, it will fail, but no error message should be shown
+            if (result != null && result.stats().transitionsCount() == 0 && result.stats().placeBoundCount() == 0) {
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    createMessagePanel(result),
+                    "Verification Result",
+                    JOptionPane.INFORMATION_MESSAGE,
+                    iconSelector.getIconFor(result)
+                );
+            }
+        } else if (result != null && !result.error()) {
 			if(callback != null){
 				callback.run(result);
 			}else{
@@ -63,9 +74,7 @@ public class RunVerification extends RunVerificationBase {
 				}
 			}
 
-		} else if(reduceNetOnly) {
-            //If the engine is only called to produce a reduced net, it will fail, but no error message should be shown
-        }else{
+		} else {
 			
 			//Check if the is something like 
 			//verifyta: relocation_error:
@@ -98,6 +107,7 @@ public class RunVerification extends RunVerificationBase {
 			messenger.displayWrappedErrorMessage(message,"Error during verification");
 
 		}
+		return false;
 	}
 
 	private String toHTML(String string){

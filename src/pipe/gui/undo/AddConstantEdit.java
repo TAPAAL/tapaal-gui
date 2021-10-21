@@ -25,5 +25,4 @@ public class AddConstantEdit extends Command {
 		store.remove(constant);
 		CreateGui.getCurrentTab().updateConstantsList();
 	}
-
 }

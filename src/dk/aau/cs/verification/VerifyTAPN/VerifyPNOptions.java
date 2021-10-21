@@ -21,10 +21,11 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private boolean useStubbornReduction = true;
 	private boolean useTarOption;
 	private String pathToReducedNet;
+	private boolean useTarjan = true;
 	
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, ModelReduction modelReduction,
                            boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
-                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, String pathToReducedNet, boolean useTarOption) {
+                           boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, String pathToReducedNet, boolean useTarOption, boolean useTarjan) {
 		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator, useTarOption);
 		this.modelReduction = modelReduction;
 		this.queryCategory = queryCategory;
@@ -34,20 +35,21 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		this.useStubbornReduction = stubbornReduction;
 		this.useTarOption = useTarOption;
 		this.pathToReducedNet = pathToReducedNet;
+		this.useTarjan = useTarjan;
 	}
 
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction,
                            boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
                            boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction) {
 		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, 
-			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, null, false);
+			enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, null, false, true);
 	}
 
     public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation, boolean useModelReduction,
                            boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, QueryCategory queryCategory, AlgorithmOption algorithmOption,
                            boolean siphontrap, QueryReductionTime queryReduction, boolean stubbornReduction, boolean useTarOption) {
         this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation,
-            enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, null, useTarOption);
+            enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, null, useTarOption, true);
     }
 
 	@Override
@@ -78,13 +80,20 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		if (this.queryCategory == QueryCategory.CTL){
 			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
 			result.append(" -x 1");
-		}
+		} else if (this.queryCategory == QueryCategory.LTL) {
+            result.append(" -ltl");
+            if (!this.useTarjan) {
+                result.append(" ndfs");
+            }
+            result.append(" -x 1");
+        }
 		
 		if (this.useSiphontrap) {
 			result.append(" -a 10 ");
 		}
 		if (this.queryReductionTime == QueryReductionTime.NoTime) {
-			result.append(" -q 0 ");
+			result.append(
+			    " -q 0 ");
 		} else if (this.queryReductionTime == QueryReductionTime.ShortestTime) {
 		    //Run query reduction for 1 second, to avoid conflict with -s OverApprox argument, but also still not run the verification.
 		    result.append(" -q 1");
