@@ -432,14 +432,16 @@ public class QueryPane extends JPanel implements SidePane {
 
         private String getFormattedQueryToolTipString(String qString) {
 		    int stringLength = qString.length();
-		    if (stringLength > 80) {
-		        int numOfLineBreaks = Math.round(stringLength / 80);
+		    int newLineAt = 100;
+		    if (stringLength > newLineAt) {
+		        int numOfLineBreaks = (int)Math.floor(stringLength / newLineAt);
 
                 StringBuilder sb = new StringBuilder(qString);
                 sb.insert(0, "<html>");
 
 		        for(int i = 1; i <= numOfLineBreaks; i++) {
-		            sb.insert(i * 80, "<br>");
+		            int newLineIndex =  sb.indexOf(" ", newLineAt * i);
+		            System.out.println("NewlineIndex: " + newLineIndex);
                 }
 
                 sb.insert(sb.length(), "</html>");
