@@ -441,7 +441,7 @@ public class QueryPane extends JPanel implements SidePane {
 
 		        for(int i = 1; i <= numOfLineBreaks; i++) {
 		            int newLineIndex =  sb.indexOf(" ", newLineAt * i);
-		            System.out.println("NewlineIndex: " + newLineIndex);
+                    sb.insert(newLineIndex, "<br>");
                 }
 
                 sb.insert(sb.length(), "</html>");
