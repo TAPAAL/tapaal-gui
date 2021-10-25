@@ -137,26 +137,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
         list.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                JList source = (JList)e.getSource();
-                if (source.getSelectedIndex() == -1) {
-                    removeBtn.setEnabled(false);
-                    editBtn.setEnabled(false);
-                    moveDownButton.setEnabled(false);
-                    sortButton.setEnabled(false);
-                    return;
-                }
-                else if (list.getSelectedValue().equals(ColorType.COLORTYPE_DOT)) {
-                    removeBtn.setEnabled(false);
-                    editBtn.setEnabled(false);
-                } else {
-                    removeBtn.setEnabled(true);
-                    editBtn.setEnabled(true);
-                    sortButton.setEnabled(true);
-                }
-
-                int index = list.getSelectedIndex();
-                moveUpButton.setEnabled(index > 0);
-                moveDownButton.setEnabled(index < list.getModel().getSize() - 1);
+                updateButtons();
             }
 
         });
@@ -309,6 +290,21 @@ public class ConstantsPane extends JPanel implements SidePane {
 	        list.setModel(colorTypesListModel);
             constantsColorTypesVariablesComboBox.setVisible(true);
         }
+    }
+
+    private void updateButtons() {
+        int index = list.getSelectedIndex();
+        if (index == -1 || list.getSelectedValuesList().isEmpty()) {
+            editBtn.setEnabled(false);
+            removeBtn.setEnabled(false);
+            moveDownButton.setEnabled(false);
+        } else {
+            removeBtn.setEnabled(true);
+            editBtn.setEnabled(true);
+            moveDownButton.setEnabled(index < list.getModel().getSize() - 1 && !list.getSelectedValuesList().isEmpty());
+        }
+        sortButton.setEnabled(list.getModel().getSize() >= 2);
+        moveUpButton.setEnabled(index > 0 && !list.getSelectedValuesList().isEmpty());
     }
 
 	private void highlightConstant(int index){
@@ -489,6 +485,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 			return;
 
 		constantsListModel.updateAll();
+		updateButtons();
 	}
 
 	private void addConstantsComponents() {
