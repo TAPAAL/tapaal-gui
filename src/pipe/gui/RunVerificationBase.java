@@ -111,6 +111,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                 !(options instanceof VerifyPNOptions)) {
 
                 VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
+
                 if (!verifypn.supportsModel(transformedModel.value1(), options)) {
                     // Skip over-approximation if model is not supported.
                     // Prevents verification from displaying error.
@@ -136,18 +137,21 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 dataLayerQuery.isSiphontrapEnabled(),
                                 dataLayerQuery.isQueryReductionEnabled() ? pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime : pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime,
                                 dataLayerQuery.isStubbornReductionEnabled(),
-                                model.isColored(),
-                                model.isColored() && (!model.isUntimed() || options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE),
                                 reducedNetFilePath,
                                 dataLayerQuery.isTarOptionEnabled(),
+                                dataLayerQuery.isTarjan(),
+                                model.isColored(),
+                                model.isColored() && (!model.isUntimed() || options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE),
                                 dataLayerQuery.usePartitioning(),
                                 dataLayerQuery.useColorFixpoint(),
                                 dataLayerQuery.useSymmetricVars()
                             ),
                             transformedModel,
-                            clonedQuery, composer.getGuiModel(),
-                            dataLayerQuery);
-                    } else {
+                            clonedQuery,
+                            composer.getGuiModel(),
+                            dataLayerQuery
+                        );
+                    } else { // TODO: FIX! If datalayer is null then we can't check datalayer's values...
                         overapprox_result = verifypn.verify(
                             new VerifyPNOptions(
                                 options.extraTokens(),
@@ -161,12 +165,13 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 pipe.dataLayer.TAPNQuery.QueryCategory.Default,
                                 pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO,
                                 false,
-                                dataLayerQuery.isQueryReductionEnabled() ? pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime : pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime,
+                                pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime,
                                 false,
+                                reducedNetFilePath,
+                                false,
+                                true,
                                 model.isColored(),
                                 model.isColored() && (!model.isUntimed() || options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE),
-                                reducedNetFilePath,
-                                dataLayerQuery.isTarOptionEnabled(),
                                 dataLayerQuery.usePartitioning(),
                                 dataLayerQuery.useColorFixpoint(),
                                 dataLayerQuery.useSymmetricVars()
@@ -174,7 +179,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                             transformedModel,
                             clonedQuery,
                             composer.getGuiModel(),
-                            dataLayerQuery);
+                            dataLayerQuery
+                        );
                     }
 
                     if (overapprox_result.getQueryResult() != null) {
@@ -246,8 +252,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 
 			if (showResult(result) && spinner != null) {
-			    options = new VerifyPNOptions(options.extraTokens(), pipe.dataLayer.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false,
-                    false, 1, pipe.dataLayer.TAPNQuery.QueryCategory.Default, pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime, false, false,false, null, false,false,false,false);
+			    options = new VerifyPNOptions(options.extraTokens(), pipe.dataLayer.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, pipe.dataLayer.TAPNQuery.QueryCategory.Default, pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime, false, null, false, false, false, false, false, false, false);
                 KBoundAnalyzer optimizer = new KBoundAnalyzer(model, guiModels, options.extraTokens(), modelChecker, new MessengerImpl(), spinner);
                 optimizer.analyze((VerifyTAPNOptions) options, true);
             }

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.TCTL.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.LoadedModel;
@@ -28,8 +29,6 @@ import pipe.gui.*;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.Messenger;
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -328,7 +327,7 @@ public class VerifyPN implements ModelChecker{
 
 				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
 
-				if(options.traceOption() != TraceOption.NONE && model.value1().isColored() && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()){
+				if (options.traceOption() != TraceOption.NONE && model.value1().isColored() && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()) {
                     PNMLoader tapnLoader = new PNMLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
@@ -377,10 +376,18 @@ public class VerifyPN implements ModelChecker{
 				} else {
 					ctlOutput = queryResult.value1().isCTL;
 					boolean approximationResult = queryResult.value2().discoveredStates() == 0;	// Result is from over-approximation
-                    if(tapnTrace == null){
-                        tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+
+                    if (tapnTrace == null) {
+                        if (!errorOutput.contains("Trace") && standardOutput.contains("<trace>")) {
+                            String trace = "Trace:\n";
+                            trace += (standardOutput.split("(?=<trace>)")[1]);
+                            trace = trace.split("(?<=</trace>)")[0];
+                            tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
+                        } else {
+                            tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                        }
                     }
-					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult, standardOutput, model);
+                    return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult, standardOutput, model);
 				}
 			}
 		}
@@ -442,7 +449,7 @@ public class VerifyPN implements ModelChecker{
 		}
 	
 		public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
-			if(query.getCategory() == QueryCategory.CTL){
+			if(query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL){
 				return true;
 			}
 			if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {

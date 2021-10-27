@@ -32,7 +32,7 @@ public class TAPNQuery {
 	}
 	
 	public enum QueryCategory{
-		Default, CTL
+		Default, CTL, LTL
 	}
 	
 	public enum AlgorithmOption{
@@ -76,7 +76,8 @@ public class TAPNQuery {
 	private boolean useSiphontrap = false; 
 	private boolean useQueryReduction = true; 
 	private boolean useStubbornReduction = true;
-	private boolean useTarOption = false;
+    private boolean useTarOption = false;
+    private boolean useTarjan = false;
 
 	/**
 	 * @param name
@@ -119,6 +120,14 @@ public class TAPNQuery {
 
     public void setUseTarOption(boolean useTarOption) {
 	    this.useTarOption = useTarOption;
+    }
+
+    public boolean isTarjan() {
+        return this.useTarjan;
+    }
+
+    public void setUseTarjan(boolean useTarjan) {
+        this.useTarjan = useTarjan;
     }
 
 	public int approximationDenominator() {

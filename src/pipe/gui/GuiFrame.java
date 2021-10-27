@@ -294,7 +294,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleColorTokens);
         }
     };
-    private final GuiAction showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0,inf)", "Show/hide intervals [0,inf) that do not restrict transition firing in any way.", KeyStroke.getKeyStroke('8', shortcutkey), true) {
+    private final GuiAction showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0," + Character.toString('\u221E') + ")", "Show/hide intervals [0," + Character.toString('\u221E') + ") that do not restrict transition firing in any way.", KeyStroke.getKeyStroke('8', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleZeroToInfinityIntervals);
         }

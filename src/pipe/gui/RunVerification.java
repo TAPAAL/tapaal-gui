@@ -59,7 +59,18 @@ public class RunVerification extends RunVerificationBase {
 
 	@Override
 	protected boolean showResult(VerificationResult<TAPNNetworkTrace> result) {
-		if (result != null && !result.error()) {
+        if (reduceNetOnly) {
+            //If the engine is only called to produce a reduced net, it will fail, but no error message should be shown
+            if (result != null && result.stats().transitionsCount() == 0 && result.stats().placeBoundCount() == 0) {
+                JOptionPane.showMessageDialog(
+                    CreateGui.getApp(),
+                    createMessagePanel(result),
+                    "Verification Result",
+                    JOptionPane.INFORMATION_MESSAGE,
+                    iconSelector.getIconFor(result)
+                );
+            }
+        } else if (result != null && !result.error()) {
 			if(callback != null){
 				callback.run(result);
 			}else{
@@ -75,12 +86,8 @@ public class RunVerification extends RunVerificationBase {
 					CreateGui.getAnimator().setTrace(result.getTrace());
 				}
 			}
-
-		} else if(reduceNetOnly) {
-            //If the engine is only called to produce a reduced net, verification will fail, but no error message should be shown
-        }else{
-			
-			//Check if the is something like 
+		} else {
+			//Check if the is something like
 			//verifyta: relocation_error:
 			///usr/lib32/libnss_msdn4_minimal.so.2 symbol strlen, 
 			//version GLIB_2.0 not defined in file libc.so.6 with

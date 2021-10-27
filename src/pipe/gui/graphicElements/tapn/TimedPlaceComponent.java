@@ -41,7 +41,12 @@ public class TimedPlaceComponent extends Place {
     private Window ageOfTokensWindow = new Window(new Frame());
     private final Shape dashedOutline = createDashedOutline();
 
-    public TimedPlaceComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedPlace place, TabContent.TAPNLens lens) {
+    public TimedPlaceComponent (
+        int positionXInput,
+        int positionYInput,
+        dk.aau.cs.model.tapn.TimedPlace place,
+        TabContent.TAPNLens lens
+    ) {
         super(positionXInput, positionYInput);
         this.place = place;
         this.place.addTimedPlaceListener(listener);
@@ -57,7 +62,6 @@ public class TimedPlaceComponent extends Place {
         int nameOffsetYInput,
         TabContent.TAPNLens lens
     ) {
-
         super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
         attributesVisible = true;
         this.lens = lens;
@@ -442,58 +446,60 @@ public class TimedPlaceComponent extends Place {
     @Override
     public void update(boolean displayConstantNames, boolean alignToGrid) {
 
-        if(place != null) {
+        if (place != null) {
             getNameLabel().setName(place.name());
-            if(this.isTimed()){
+
+            if (lens == null || this.isTimed()) {
                 StringBuilder buffer = new StringBuilder();
                 if (!(place.invariant().upperBound() instanceof InfBound)) {
-                    buffer.append("\nInv: " + place.invariant().toString(displayConstantNames));
+                    buffer.append("\nInv: ");
+                    buffer.append(place.invariant().toString(displayConstantNames));
                 }
-
                 getNameLabel().setText(buffer.toString());
-
             }
-            if (this.isColored()){
+            if (lens != null && this.isColored()) {
                 StringBuilder buffer = new StringBuilder();
                 String placeColorType = "[" + place.getColorType().getName() +"]";
-                buffer.append("\n"+ placeColorType);
-                if(isTimed()) {
+                buffer.append("\n");
+                buffer.append(placeColorType);
+
+                if (isTimed()) {
                     //Add default invariant
-                    buffer.append("\nInv: " + place.invariant().toString(displayConstantNames));
+                    buffer.append("\nInv: ");
+                    buffer.append(place.invariant().toString(displayConstantNames));
                     if (place.getCtiList() != null) {
                         //Add color specific invariants
                         for (ColoredTimeInvariant cti : place.getCtiList()) {
                             if (cti != null) {
-                                buffer.append("\n" + cti.toString());
+                                buffer.append("\n");
+                                buffer.append(cti.toString());
                             }
                         }
                     }
                 }
-
                 if (CreateGui.getApp().showColoredTokens()) {
-                    if(underlyingPlace().getTokensAsExpression() != null){
-                        buffer.append("\n" + ((AddExpression)underlyingPlace().getTokensAsExpression()).toTokenString());
+                    if (underlyingPlace().getTokensAsExpression() != null) {
+                        buffer.append("\n");
+                        buffer.append(((AddExpression)underlyingPlace().getTokensAsExpression()).toTokenString());
                     }
                 }
 
                 getNameLabel().setText(buffer.toString());
             }
 
-
-
             // Handle constant highlighting
             boolean focusedConstant = false;
             Bound bound = place.invariant().upperBound();
-            if(bound instanceof ConstantBound){
+            if (bound instanceof ConstantBound) {
                 Constant constant = ((ConstantBound) bound).constant();
-                if(constant.hasFocus()){
+                if (constant.hasFocus()) {
                     focusedConstant = true;
                 }
                 pnName.setVisible(constant.getVisible());
             }
-            if(focusedConstant){
+            if (focusedConstant) {
                 getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
-            }else{
+            } else {
                 getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
             }
 
@@ -516,7 +522,7 @@ public class TimedPlaceComponent extends Place {
     }
 
     public void setUnderlyingPlace(TimedPlace place) {
-        if(this.place != null && listener != null){
+        if (this.place != null && listener != null) {
             this.place.removeTimedPlaceListener(listener);
         }
         place.addTimedPlaceListener(listener);

@@ -37,6 +37,7 @@ public abstract class QueryLoader {
 	
 	public LoadedQueries parseQueries() {
 		ArrayList<TAPNQuery> queries = getQueries();
+		if (queries == null) return null;
 		
 		ArrayList<Tuple<String, String>> templatePlaceNames = getPlaceNames(network);
 		ArrayList<Tuple<String, String>> templateTransitionNames = getTransitionNames(network);

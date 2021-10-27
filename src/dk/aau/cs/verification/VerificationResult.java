@@ -186,7 +186,7 @@ public class VerificationResult<TTrace> {
 
 	public boolean reductionRulesApplied(){
         ReductionStats reductionStats = stats.getReductionStats();
-        return (reductionStats.getRemovedPlaces() + reductionStats.getRemovedTrantitions()) > 0;
+        return (reductionStats.getRemovedPlaces() + reductionStats.getRemovedTransitions()) > 0;
     }
 
 	public NetworkMarking getCoveredMarking(TimedArcPetriNetNetwork model){

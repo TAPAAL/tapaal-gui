@@ -398,7 +398,7 @@ public class PlaceEditorPanel extends JPanel {
 		gbc = GridBagHelper.as(2,0, new Insets(3, 3, 3, 3));
 		invariantGroup.add(invariantSpinner, gbc);
 
-		invariantInf = new JCheckBox("inf");
+		invariantInf = new JCheckBox(Character.toString('\u221e'));
 		invariantInf.addActionListener(arg0 -> {
 			if(!isUrgencyOK()){
 				invariantInf.setSelected(true);

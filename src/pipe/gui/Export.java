@@ -7,6 +7,7 @@
 package pipe.gui;
 
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
+import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import java.awt.image.BufferedImage;
@@ -34,6 +35,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.ExportedVerifyTAPNModel;
@@ -43,9 +45,6 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.DOMException;
 
-import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
-import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
-import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.model.tapn.NetworkMarking;
@@ -107,23 +106,35 @@ public class Export {
             NameMapping mapping = composer.transformModel(network).value2();
             Iterator<TAPNQuery> queryIterator = queries.iterator();
             PrintStream queryStream = new PrintStream(filename);
-            CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+            LTLQueryVisitor LTLXMLVisitor = new LTLQueryVisitor();
+            CTLQueryVisitor CTLXMLVisitor = new CTLQueryVisitor();
 
             while (queryIterator.hasNext()) {
+                boolean isCTL = false;
                 TAPNQuery clonedQuery = queryIterator.next().copy();
 
                 // Attempt to parse and possibly transform the string query using the manual edit parser
                 TCTLAbstractProperty newProperty;
                 try {
-                    newProperty = TAPAALCTLQueryParser.parse(clonedQuery.getProperty().toString());
+                    if (clonedQuery.getCategory().equals(TAPNQuery.QueryCategory.LTL)) {
+                        newProperty = TAPAALLTLQueryParser.parse(clonedQuery.getProperty().toString());
+                    } else {
+                        newProperty = TAPAALCTLQueryParser.parse(clonedQuery.getProperty().toString());
+                        isCTL = true;
+                    }
                 } catch (Throwable ex) {
                     newProperty = clonedQuery == null ? new TCTLPathPlaceHolder() : clonedQuery.getProperty();
                 }
                 newProperty.accept(new RenameAllPlacesVisitor(mapping), null);
                 newProperty.accept(new RenameAllTransitionsVisitor(mapping), null);
-                XMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
+
+                if (!isCTL) {
+                    LTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
+                } else {
+                    CTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
+                }
             }
-            queryStream.print(XMLVisitor.getFormatted());
+            queryStream.append(LTLXMLVisitor.getFormatted(CTLXMLVisitor.getXMLQuery()));
 
             queryStream.close();
         } catch (FileNotFoundException e) {

@@ -147,17 +147,15 @@ TCTLAbstractPathProperty AbstractPathProperty() :
 	TCTLAbstractStateProperty child2 = null; 
 }
 {
-	( 
-		<EF> child = OrExpr() {return new TCTLEFNode(child); } 
-		| <EG> child = OrExpr() {return new TCTLEGNode(child); } 
-		| <EX> child = OrExpr() {return new TCTLEXNode(child); } 
-        | <E>  "(" child = OrExpr() <U> child2 = OrExpr() ")" {return new TCTLEUNode(child, child2); }
-		| <AF> child = OrExpr() {return new TCTLAFNode(child); } 
-		| <AG> child = OrExpr() {return new TCTLAGNode(child); } 
-        | <A>  "(" child = OrExpr() <U> child2 = OrExpr() ")" {return new TCTLAUNode(child, child2); }
-		| <AX> child = OrExpr() {return new TCTLAXNode(child); } 
-        | child = OrExpr() { return new TCTLStateToPathConverter(child); }
-	) 
+	<EF> child = OrExpr() {return new TCTLEFNode(child); }
+    | <EG> child = OrExpr() {return new TCTLEGNode(child); }
+    | <EX> child = OrExpr() {return new TCTLEXNode(child); }
+    | <E>  "(" child = OrExpr() <U> child2 = OrExpr() ")" {return new TCTLEUNode(child, child2); }
+    | <AF> child = OrExpr() {return new TCTLAFNode(child); }
+    | <AG> child = OrExpr() {return new TCTLAGNode(child); }
+    | <A>  "(" child = OrExpr() <U> child2 = OrExpr() ")" {return new TCTLAUNode(child, child2); }
+    | <AX> child = OrExpr() {return new TCTLAXNode(child); }
+    | child = OrExpr() { return new TCTLStateToPathConverter(child); }
 }
 
 TCTLAbstractStateProperty OrExpr() : 

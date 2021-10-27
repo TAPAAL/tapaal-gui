@@ -85,24 +85,26 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
         if (inputArc == null)
             getNameLabel().setText("");
         else {
-            if(lens.isColored()) {
-                String arcPrint = "";
+            if (lens != null && lens.isColored()) {
+                StringBuilder arcPrint = new StringBuilder();
                 if (inputArc.getArcExpression() != null) {
-                    arcPrint = inputArc.getArcExpression().toString();
+                    arcPrint = new StringBuilder(inputArc.getArcExpression().toString());
                 }
-                if(lens.isTimed()){
-                    arcPrint += "\n" + inputArc.interval().toString(showConstantNames);
-                    arcPrint += "\n";
+                if (lens.isTimed()) {
+                    arcPrint.append("\n");
+                    arcPrint.append(inputArc.interval().toString(showConstantNames));
+                    arcPrint.append("\n");
                     List<ColoredTimeInterval> ctiList;
                     ctiList = this.underlyingTimedInputArc().getColorTimeIntervals();
                     for (ColoredTimeInterval coloredTimeInterval : ctiList) {
                         if (coloredTimeInterval != null){
-                            arcPrint += coloredTimeInterval.toString() + "\n";
+                            arcPrint.append(coloredTimeInterval.toString());
+                            arcPrint.append("\n");
                         }
                     }
                 }
-                getNameLabel().setText(arcPrint);
-            } else if (!CreateGui.getApp().showZeroToInfinityIntervals() || !lens.isTimed()) {
+                getNameLabel().setText(arcPrint.toString());
+            } else if (!CreateGui.getApp().showZeroToInfinityIntervals() || (lens != null && !lens.isTimed())) {
                 if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
                     getNameLabel().setText("");
                 }
@@ -111,6 +113,11 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                 }
             } else {
                 getNameLabel().setText(inputArc.interval().toString(showConstantNames));
+            }
+
+            if(getNameLabel().getText().contains("inf")) {
+                String intervalStringWithInfSymbol = getNameLabel().getText().replace("inf", Character.toString('\u221e'));
+                getNameLabel().setText(intervalStringWithInfSymbol);
             }
 
             getNameLabel().setText(getWeight().toString(showConstantNames)+" "+getNameLabel().getText());

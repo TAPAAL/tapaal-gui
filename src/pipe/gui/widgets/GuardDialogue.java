@@ -177,7 +177,7 @@ public class GuardDialogue extends JPanel /*
 				if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)
 						&& ((TimedInputArcComponent) objectToBeEdited).isUrgentTransition()){
 					if(!guard.equals(TimeInterval.ZERO_INF)){
-						JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0,inf).", "Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0," + Character.toString('\u221E') + ")", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 				}
@@ -393,7 +393,7 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(rightDelimiter, gridBagConstraints);
 
-		inf = new JCheckBox("inf", true);
+		inf = new JCheckBox(Character.toString('\u221e'), true);
 		inf.addActionListener(evt -> {
 			if (inf.isSelected()) {
 				secondIntervalNumber.setEnabled(false);

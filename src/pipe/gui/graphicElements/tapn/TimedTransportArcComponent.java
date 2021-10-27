@@ -107,19 +107,17 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	public void updateLabel(boolean displayConstantNames) {
         if (isInPreSet && underlyingTransportArc != null) {
             if (CreateGui.getApp() != null && CreateGui.getApp().showZeroToInfinityIntervals()) {
-                getNameLabel().setText(underlyingTransportArc.interval().toString(
-                    displayConstantNames)
-                    + " : " + getGroup());
+                getNameLabel().setText(underlyingTransportArc.interval().toString(displayConstantNames) + " : " + getGroup());
+
+                if (getNameLabel().getText().contains("inf")) {
+                    String intervalStringWithInfSymbol = getNameLabel().getText().replace("inf", Character.toString('\u221e'));
+                    getNameLabel().setText(intervalStringWithInfSymbol);
+                }
             } else {
-                if (underlyingTransportArc.interval().toString(
-                    displayConstantNames).equals("[0,inf)")) {
-
+                if (underlyingTransportArc.interval().toString(displayConstantNames).equals("[0,inf)")) {
                     getNameLabel().setText(" : " + getGroup());
-
                 } else {
-                    getNameLabel().setText(underlyingTransportArc.interval().toString(
-                        displayConstantNames)
-                        + " : " + getGroup());
+                    getNameLabel().setText(underlyingTransportArc.interval().toString(displayConstantNames) + " : " + getGroup());
                 }
             }
 
@@ -156,17 +154,15 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
                 getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
             }
             pnName.setVisible(isvisible);
-
         } else if (!isInPreSet) {
             getNameLabel().setText(" : " + getGroup());
         } else {
             getNameLabel().setText("");
         }
-
         if (underlyingTransportArc != null) {
             getNameLabel().setText(getWeight().toString(displayConstantNames) + " " + getNameLabel().getText());
         }
-        if(isColored()) {
+        if (isColored()) {
             String labelText = getNameLabel().getText() + "\n";
             if (isInPreSet() && underlyingTransportArc() != null) {
                 if (underlyingTransportArc().getInputExpression() != null)

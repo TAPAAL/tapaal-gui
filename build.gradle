@@ -22,11 +22,16 @@ repositories {
     mavenCentral()
 }
 
+compileJavacc {
+    inputDirectory = file('src/')
+    //outputDirectory = file(project.buildDir.absolutePath + '/generated/javacc')
+}
+
 //Set the soruce and resource dir
 sourceSets {
     main {
         java {
-            srcDirs = ['src/']
+            srcDirs = ['src/', compileJavacc.outputDirectory]
             exclude("resources/")
         }
         resources {

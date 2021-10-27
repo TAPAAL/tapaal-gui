@@ -209,56 +209,29 @@ public class Verifier {
                 query.isColored()
             );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
-
-
-            if (onlyCreateReducedNet) {
-                //These options should disable the verification and only produce the net after applying reduction rules
-                verifytapnOptions = new VerifyPNOptions(
-                    bound,
-                    query.getTraceOption(),
-                    TAPNQuery.SearchOption.OVERAPPROXIMATE,
-                    query.useOverApproximation(),
-                    query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION,
-                    query.isOverApproximationEnabled(),
-                    query.isUnderApproximationEnabled(),
-                    query.approximationDenominator(),
-                    query.getCategory(),
-                    query.getAlgorithmOption(),
-                    query.isSiphontrapEnabled(),
-                    TAPNQuery.QueryReductionTime.NoTime,
-                    query.isStubbornReductionEnabled(),
-                    tapnNetwork.isColored(),
-                    tapnNetwork.isColored() && (!tapnNetwork.isUntimed() || query.getTraceOption() != TAPNQuery.TraceOption.NONE),
-                    reducedNetTempFile.getAbsolutePath(),
-                    query.isTarOptionEnabled(),
-                    query.usePartitioning(),
-                    query.useColorFixpoint(),
-                    query.useSymmetricVars()
-                );
-            } else {
-                verifytapnOptions = new VerifyPNOptions(
-                    bound,
-                    query.getTraceOption(),
-                    query.getSearchOption(),
-                    query.useOverApproximation(),
-                    query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION,
-                    query.isOverApproximationEnabled(),
-                    query.isUnderApproximationEnabled(),
-                    query.approximationDenominator(),
-                    query.getCategory(),
-                    query.getAlgorithmOption(),
-                    query.isSiphontrapEnabled(),
-                    query.isQueryReductionEnabled() ? TAPNQuery.QueryReductionTime.UnlimitedTime : TAPNQuery.QueryReductionTime.NoTime,
-                    query.isStubbornReductionEnabled(),
-                    tapnNetwork.isColored(),
-                    tapnNetwork.isColored() && (!tapnNetwork.isUntimed() || query.getTraceOption() != TAPNQuery.TraceOption.NONE),
-                    reducedNetTempFile.getAbsolutePath(),
-                    query.isTarOptionEnabled(),
-                    query.usePartitioning(),
-                    query.useColorFixpoint(),
-                    query.useSymmetricVars()
-                );
-            }
+            verifytapnOptions = new VerifyPNOptions(
+                bound,
+                query.getTraceOption(),
+                query.getSearchOption(),
+                query.useOverApproximation(),
+                query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION,
+                query.isOverApproximationEnabled(),
+                query.isUnderApproximationEnabled(),
+                query.approximationDenominator(),
+                query.getCategory(),
+                query.getAlgorithmOption(),
+                query.isSiphontrapEnabled(),
+                query.isQueryReductionEnabled() ? TAPNQuery.QueryReductionTime.UnlimitedTime : TAPNQuery.QueryReductionTime.NoTime,
+                query.isStubbornReductionEnabled(),
+                reducedNetTempFile.getAbsolutePath(),
+                query.isTarOptionEnabled(),
+                query.isTarjan(),
+                tapnNetwork.isColored(),
+                tapnNetwork.isColored() && (!tapnNetwork.isUntimed() || query.getTraceOption() != TAPNQuery.TraceOption.NONE),
+                query.usePartitioning(),
+                query.useColorFixpoint(),
+                query.useSymmetricVars()
+            );
         } else {
             verifytapnOptions = new VerifyTAPNOptions(
                 bound,

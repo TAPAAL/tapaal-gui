@@ -81,9 +81,10 @@ public class TAPNComposer implements ITAPNComposer {
 		int greatestWidth = 0, greatestHeight = 0;
 		if (this.guiModels != null) {
 			for (TimedArcPetriNet tapn1 : model.activeTemplates()) {
-                                if (isComponentEmpty(this.guiModels.get(tapn1))) { 
-                                        continue;
-                                }
+			    DataLayer dl = this.guiModels.get(tapn1);
+                if (dl == null || isComponentEmpty(dl)) {
+                    continue;
+                }
 				greatestWidth = Math.max(greatestWidth, getRightmostObject(guiModels.get(tapn1)).getPositionX());
 				greatestHeight = Math.max(greatestHeight, getLowestObject(guiModels.get(tapn1)).getPositionY());
 			}
@@ -211,14 +212,14 @@ public class TAPNComposer implements ITAPNComposer {
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
-                                if (isComponentEmpty(currentGuiModel)) { 
-                                        continue;
-                                }
-                        }
+                    if (isComponentEmpty(currentGuiModel)) {
+                        continue;
+                    }
+            }
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
 			for (TimedPlace timedPlace : tapn.places()) {			
-				if(!timedPlace.isShared()){
+				if (!timedPlace.isShared()) {
 					String uniquePlaceName = (!singleComponentNoPrefix || model.activeTemplates().size() > 1) ? composedPlaceName(timedPlace) : timedPlace.name();
 
 					LocalTimedPlace place = null;
@@ -260,8 +261,8 @@ public class TAPNComposer implements ITAPNComposer {
 
 	private void createTransitions(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, int greatestWidth, int greatestHeight) {
 		int i = 0;
+
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
-                        
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
@@ -272,14 +273,22 @@ public class TAPNComposer implements ITAPNComposer {
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
 			
 			for (TimedTransition timedTransition : tapn.transitions()) {
-				if(!processedSharedObjects.contains(timedTransition.name())){
+				if (!processedSharedObjects.contains(timedTransition.name())) {
 					
 					// CAUTION: This if statement removes orphan transitions.
 					//   This changes answers for e.g. DEADLOCK queries if
 					//   support for such queries are added later.
 					// ONLY THE IF SENTENCE SHOULD BE REMOVED. REST OF CODE SHOULD BE LEFT INTACT
-					if(!timedTransition.isOrphan()){
-						String uniqueTransitionName = composedTransitionName(timedTransition);
+					if (!timedTransition.isOrphan()) {
+                        String uniqueTransitionName = "";
+                        if (!singleComponentNoPrefix || model.activeTemplates().size() > 1) {
+                            uniqueTransitionName = timedTransition.isShared() ?
+                                "Shared_" + timedTransition.name() :
+                                timedTransition.model().name() + "_" + timedTransition.name();
+
+                        } else {
+                            uniqueTransitionName = timedTransition.name();
+                        }
 
 						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent(), timedTransition.getGuard());
 						if (timedTransition.isUncontrollable()) {
@@ -308,19 +317,19 @@ public class TAPNComposer implements ITAPNComposer {
 							guiModel.addPetriNetObject(newTransition);
 						}
 						
-						if(timedTransition.isShared()){
+						if (timedTransition.isShared()) {
 							String name = timedTransition.sharedTransition().name();
 							processedSharedObjects.add(name);
 							mapping.addMappingForShared(name, uniqueTransitionName);
-						}else{
+						} else {
 							mapping.addMapping(tapn.name(), timedTransition.name(), uniqueTransitionName);
 						}
-					}else{
-						if(!hasShownMessage && !(ExportBatchDialog.isDialogVisible())){
+					} else {
+						if (!hasShownMessage && !(ExportBatchDialog.isDialogVisible())) {
 							messenger.displayInfoMessage("There are orphan transitions (no incoming and no outgoing arcs) in the model.");
 							hasShownMessage = true;
 						}
-						else if(ExportBatchDialog.isDialogVisible()) {
+						else if (ExportBatchDialog.isDialogVisible()) {
 							ExportBatchDialog.setNoOrphanTransitions(true);
 						}
 					}
@@ -638,9 +647,9 @@ public class TAPNComposer implements ITAPNComposer {
 	}
 
    public String composedTransitionName(TimedTransition transition) {
-        if(transition.isShared()){
+        if (transition.isShared()) {
             return "Shared_" + transition.name();
-        } else if (singleComponentNoPrefix){
+        } else if (singleComponentNoPrefix) {
             return transition.name();
         } else {
             return transition.model().name() + "_" + transition.name();

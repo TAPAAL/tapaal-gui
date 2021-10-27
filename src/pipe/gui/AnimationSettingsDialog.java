@@ -29,7 +29,7 @@ public class AnimationSettingsDialog {
 			if(simControl.randomSimulation()){
 				simControl.randomMode.setSelected(true);
 			}
-			CreateGui.getCurrentTab().getTransitionFireingComponent().updateFireButton();
+			CreateGui.getCurrentTab().getTransitionFiringComponent().updateFireButton();
 		});
 		
 		content.add(delayEnabled, BorderLayout.NORTH);

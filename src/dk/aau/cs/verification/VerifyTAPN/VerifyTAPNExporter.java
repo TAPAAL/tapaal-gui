@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
@@ -42,7 +43,7 @@ public class VerifyTAPNExporter {
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TabContent.TAPNLens lens, NameMapping mapping, DataLayer guiModel, pipe.dataLayer.TAPNQuery dataLayerQuery) {
 		File modelFile = createTempFile(".xml");
 		File queryFile;
-		if (query.getCategory() == QueryCategory.CTL || (lens != null && !lens.isGame() && lens.isColored())){
+		if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL || (lens != null && !lens.isGame() && lens.isColored())) {
 			queryFile = createTempFile(".xml");
 		} else {
 			queryFile = createTempFile(".q");
@@ -79,6 +80,9 @@ public class VerifyTAPNExporter {
             } else if (query.getCategory() == QueryCategory.CTL || (lens != null && !lens.isGame() && lens.isColored())) {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery == null? model.name() : dataLayerQuery.getName()));
+            } else if (query.getCategory() == QueryCategory.LTL) {
+                LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
             } else if (lens != null && lens.isGame()) {
                 queryStream.append("control: " + query.getProperty().toString());
             } else {

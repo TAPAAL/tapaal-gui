@@ -63,6 +63,10 @@ public class CTLQueryVisitor extends VisitorBase {
             XMLFormatter formatter = new XMLFormatter();
             return formatter.format(getStartTag() + XMLQuery.toString() + getEndTag());
         }
+
+        public StringBuffer getXMLQuery() {
+            return XMLQuery;
+        }
         
         public String getStartTag(){
             return startTag(XML_PROPSET + " " + XML_NS) + "\n";
@@ -128,6 +132,32 @@ public class CTLQueryVisitor extends VisitorBase {
 		euNode.getRight().accept(this, context);
 		XMLQuery.append(endTag(XML_REACH) + endTag(XML_UNTIL) + endTag(XML_EXISTSPATH));
 	}
+
+    public void visit(LTLFNode afNode, Object context) {
+        XMLQuery.append(startTag(XML_ALLPATHS) + startTag(XML_FINALLY));
+        afNode.getProperty().accept(this, context);
+        XMLQuery.append(endTag(XML_FINALLY) + endTag(XML_ALLPATHS));
+    }
+
+    public void visit(LTLGNode agNode, Object context) {
+        XMLQuery.append(startTag(XML_ALLPATHS) + startTag(XML_GLOBALLY));
+        agNode.getProperty().accept(this, context);
+        XMLQuery.append(endTag(XML_GLOBALLY) + endTag(XML_ALLPATHS));
+    }
+
+    public void visit(LTLXNode axNode, Object context) {
+        XMLQuery.append(startTag(XML_ALLPATHS) + startTag(XML_NEXT));
+        axNode.getProperty().accept(this, context);
+        XMLQuery.append(endTag(XML_NEXT) + endTag(XML_ALLPATHS));
+    }
+
+    public void visit(LTLUNode auNode, Object context) {
+        XMLQuery.append(startTag(XML_ALLPATHS) + startTag(XML_UNTIL) + startTag(XML_BEFORE));
+        auNode.getLeft().accept(this, context);
+        XMLQuery.append(endTag(XML_BEFORE) + startTag(XML_REACH));
+        auNode.getRight().accept(this, context);
+        XMLQuery.append(endTag(XML_REACH) + endTag(XML_UNTIL) + endTag(XML_ALLPATHS));
+    }
 	
 	public void visit(TCTLPathToStateConverter pathConverter, Object context) {
 		pathConverter.getProperty().accept(this, context);

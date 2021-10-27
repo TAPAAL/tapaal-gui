@@ -3,9 +3,9 @@ package dk.aau.cs.io.queries;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import dk.aau.cs.io.LoadedQueries;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
@@ -80,6 +80,7 @@ public class XMLQueryLoader extends QueryLoader{
 
         // Get all properties from DOM
         NodeList propList = doc.getElementsByTagName("property");
+        int choice = -1;
 
         for(int i = 0; i < propList.getLength(); i++){
             Node prop = propList.item(i);
@@ -88,13 +89,43 @@ public class XMLQueryLoader extends QueryLoader{
             // Save query for later use in dialog window
             this.faultyQueries.add(queryWrapper);
 
+            boolean canBeCTL = canBeCTL(prop);
+            boolean canBeLTL = canBeLTL(prop);
+
+            if (canBeCTL && canBeLTL && choice == -1) {
+                choice = JOptionPane.showOptionDialog(CreateGui.getApp(),
+                    "There were some queries that can be classified both as LTL and CTL. \nHow do you want to import them?",
+                    "Choose query category",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    new Object[]{"Import all as CTL", "Import all as LTL", "Cancel"},
+                    0);
+            } else if (!canBeCTL && !canBeLTL) {
+                JOptionPane.showMessageDialog(CreateGui.getApp(),
+                    "One or more queries do not have the correct format.");
+            }
+                if (choice == 2) return null;
+
+
+            boolean isCTL = (canBeCTL && !canBeLTL) || (canBeCTL && canBeLTL && choice == 0);
+            boolean isLTL = (!canBeCTL && canBeLTL) || (canBeCTL && canBeLTL && choice == 1 );
+
+
             // Update queryWrapper name and property
-            if(!XMLCTLQueryParser.parse(prop, queryWrapper)){
-                queries.add(null); 
-                continue; 
+            if (isCTL) {
+                if (!XMLCTLQueryParser.parse(prop, queryWrapper)) {
+                    queries.add(null);
+                    continue;
+                }
+            } else if (isLTL) {
+                if (!XMLLTLQueryParser.parse(prop, queryWrapper)) {
+                    queries.add(null);
+                    continue;
+                }
             }
 
-            // The number 9999 is the number of extra tokens allowed, 
+            // The number 9999 is the number of extra tokens allowed,
             // this is set high s.t. we don't have to change it manually
             TAPNQuery query = new TAPNQuery(queryWrapper.getName(), 9999,
                 queryWrapper.getProp(),TraceOption.NONE, SearchOption.HEURISTIC, 
@@ -103,9 +134,10 @@ public class XMLQueryLoader extends QueryLoader{
 
             RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
                 network.activeTemplates().get(0).name());
-            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), false));
+
+            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), isCTL, isLTL));
             
-            if(query.getCategory() == TAPNQuery.QueryCategory.CTL){
+            if(query.getCategory() == TAPNQuery.QueryCategory.CTL || query.getCategory() == TAPNQuery.QueryCategory.LTL){
             	query.setSearchOption(SearchOption.DFS);
             	query.setUseReduction(true);
             }
@@ -118,12 +150,72 @@ public class XMLQueryLoader extends QueryLoader{
         return queries;
     }
 
+    public static boolean canBeCTL(Node prop) {
+        NodeList children = prop.getChildNodes();
+        boolean correctQuantifiers = false;
+
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeName().equals("formula")) {
+                correctQuantifiers = checkQuantifiers(child);
+            }
+        }
+        return correctQuantifiers;
+    }
+
+    private static boolean checkQuantifiers(Node prop) {
+        NodeList children = prop.getChildNodes();
+
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeName().equals("finally") || child.getNodeName().equals("globally") ||
+                child.getNodeName().equals("next") || child.getNodeName().equals("until")) {
+                Node parent = child.getParentNode();
+                if (parent == null || !(parent.getNodeName().equals("all-paths") || parent.getNodeName().equals("exists-path"))) {
+                    return false;
+                }
+            }
+            if (!checkQuantifiers(child)) return false;
+        }
+        return true;
+    }
+
+    public static boolean canBeLTL(Node prop) {
+        NodeList children = prop.getChildNodes();
+        int allPathsCounter = 0;
+
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeName().equals("formula")) {
+                allPathsCounter += countAllPaths(child);
+            }
+        }
+        return allPathsCounter == 1;
+    }
+
+    private static int countAllPaths(Node prop) {
+        NodeList children = prop.getChildNodes();
+        int allPathsCounter = 0;
+
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeName().equals("all-paths")) {
+                allPathsCounter++;
+            } else if (child.getNodeName().equals("exists-path") || child.getNodeName().equals("deadlock")){
+                return 100;
+            }
+            allPathsCounter += countAllPaths(child);
+        }
+        return allPathsCounter;
+    }
+
     public static void importQueries(File file, TimedArcPetriNetNetwork network){
         XMLQueryLoader loader = new XMLQueryLoader(file, network);
 
         // Suppress default error message
         loader.showErrorMessage = false;
         LoadedQueries loadedQueries = loader.parseQueries();
+        if (loadedQueries == null) return;
 	
         for(TAPNQuery query : loadedQueries.getQueries()){
             CreateGui.getCurrentTab().addQuery(query);
