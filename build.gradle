@@ -75,7 +75,6 @@ dependencies {
         'org.junit.jupiter:junit-jupiter-engine:5.8.1',
         'org.junit.vintage:junit-vintage-engine:5.8.1'
     )
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31'
 }
 test {
     useJUnitPlatform()
