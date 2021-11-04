@@ -9,12 +9,13 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 
-import javax.swing.BoxLayout;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
@@ -83,7 +84,44 @@ public class TimedTransitionComponent extends Transition {
 		};
 	}
 
-	@Override
+    @Override
+    public JPopupMenu getPopup(MouseEvent e) {
+        final var popup = super.getPopup(e);
+
+        popup.add(new JPopupMenu.Separator());
+
+        if (CreateGui.getCurrentTab().getLens().isTimed()) {
+            final var urgentAction = new JCheckBoxMenuItem();
+            urgentAction.setSelected(isUrgent());
+            urgentAction.setAction(
+                new AbstractAction("Urgent") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        CreateGui.getCurrentTab().guiModelManager.toggleUrgentTrans(); //XXX: guiModelManager should prop be passed via popup generator
+                    }
+                }
+            );
+            popup.add(urgentAction);
+        }
+
+        if (CreateGui.getCurrentTab().getLens().isGame()) {
+            final var uncontrollableAction = new JCheckBoxMenuItem();
+            uncontrollableAction.setSelected(isUncontrollable());
+            uncontrollableAction.setAction(
+                new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        CreateGui.getCurrentTab().guiModelManager.toggleUncontrollableTrans(); //XXX: guiModelManager should prop be passed via popup generator
+                    }
+                }
+            );
+        }
+
+
+        return popup;
+    }
+
+    @Override
 	public void showEditor() {
 		// Build interface
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Transition", true);
