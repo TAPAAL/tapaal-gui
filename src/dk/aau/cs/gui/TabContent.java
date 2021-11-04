@@ -59,6 +59,7 @@ import pipe.gui.widgets.filebrowser.FileBrowser;
 import java.awt.event.MouseWheelEvent;
 
 import static dk.aau.cs.gui.TabContent.DrawTool.SELECT;
+import static javax.swing.text.DefaultEditorKit.copyAction;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 

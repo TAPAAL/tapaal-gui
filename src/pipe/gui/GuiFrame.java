@@ -42,6 +42,8 @@ import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
+import static javax.swing.text.DefaultEditorKit.copyAction;
+
 
 public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameActions {
 
@@ -165,7 +167,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-    private GuiAction cutAction = new GuiAction("Copy", "Copy current selection", KeyStroke.getKeyStroke('X', shortcutkey)) {
+    private GuiAction cutAction = new GuiAction("Cut", "Cut current selection", KeyStroke.getKeyStroke('X', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             String message = CopyPastImportExport.toXML(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
             getCurrentTab().deleteSelection();
@@ -1228,10 +1230,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             case draw:
                 // Enable all draw actions
                 startAction.setSelected(false);
+                pasteAction.setEnabled(true);
+                copyAction.setEnabled(true);
+                cutAction.setEnabled(true);
 
                 break;
             case animation:
                 startAction.setSelected(true);
+                pasteAction.setEnabled(false);
+                copyAction.setEnabled(false);
+                cutAction.setEnabled(false);
 
                 break;
             case noNet:
@@ -1239,6 +1247,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 registerDrawingActions(List.of());
                 registerAnimationActions(List.of());
                 //registerViewActions(List.of());
+                pasteAction.setEnabled(false);
+                copyAction.setEnabled(false);
+                cutAction.setEnabled(false);
                 break;
 
             default:
