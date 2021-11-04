@@ -272,7 +272,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     public void openTAPNFile() {
         final File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
         //show loading cursor
-        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         //Do loading
         SwingWorker<java.util.List<TabContent>, Void> worker = new SwingWorker<java.util.List<TabContent>, Void>() {
             @Override
@@ -303,7 +303,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }finally {
-                    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
             }
         };
@@ -326,7 +326,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
 
         //Show loading cursor
-        CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         //Do loading of net
         SwingWorker<List<TabContent>, Void> worker = new SwingWorker<List<TabContent>, Void>() {
             @Override
@@ -360,7 +360,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }finally {
-                    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
             }
         };
