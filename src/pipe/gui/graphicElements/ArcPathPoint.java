@@ -64,31 +64,33 @@ public class ArcPathPoint extends PetriNetObject {
     public JPopupMenu getPopup(MouseEvent e) {
         JPopupMenu popup = super.getPopup(e);
 
-        if (!((ArcPathPoint) this).isDeleteable()) {
+        if (!this.isDeleteable()) {
             popup.getComponent(0).setEnabled(false);
         }
 
         popup.insert(new JPopupMenu.Separator(), 0);
 
-        if (((ArcPathPoint) this).getIndex() == 0) {
-            return null;
+        if (this.getIndex() == 0) {
+            return popup;
         } else {
-            JMenuItem menuItem = new JMenuItem(new ToggleArcPointAction((ArcPathPoint) this));
+            JMenuItem menuItem = new JMenuItem(new ToggleArcPointAction(this));
 
-            if (((ArcPathPoint) this).getPointType() == ArcPathPoint.STRAIGHT) {
+            if (this.getPointType() == ArcPathPoint.STRAIGHT) {
                 menuItem.setText("Change to Curved");
             } else {
                 menuItem.setText("Change to Straight");
             }
             popup.insert(menuItem, 0);
 
-            menuItem = new JMenuItem(new SplitArcPointAction((ArcPathPoint) this));
+            menuItem = new JMenuItem(new SplitArcPointAction(this));
             menuItem.setText("Split Point");
             popup.add(menuItem, 1);
 
         }
         return popup;
     }
+
+
 
 	/**
 	 * @author Nadeem
