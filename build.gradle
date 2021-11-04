@@ -15,16 +15,10 @@ java {
 
 compileJavacc {
     inputDirectory = file('src/')
-    //outputDirectory = file(project.buildDir.absolutePath + '/generated/javacc')
 }
 
 repositories {
     mavenCentral()
-}
-
-compileJavacc {
-    inputDirectory = file('src/')
-    //outputDirectory = file(project.buildDir.absolutePath + '/generated/javacc')
 }
 
 //Set the soruce and resource dir
@@ -55,7 +49,9 @@ jar {
 
     //Sets the main call for the Jar, you can double click to run the jar file
     manifest {
-        attributes 'Main-Class': 'TAPAAL'
+        attributes (
+            'Main-Class': 'TAPAAL'
+        )
     }
     //The following lines makes libs a part of the build jar file (standalone jar)
     //from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -85,15 +81,5 @@ test {
     useJUnitPlatform()
     afterTest { desc, result ->
         logger.quiet "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
-    }
-}
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
     }
 }
