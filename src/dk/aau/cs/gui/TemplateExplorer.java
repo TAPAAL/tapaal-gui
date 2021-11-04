@@ -39,6 +39,7 @@ import javax.swing.event.ListSelectionListener;
 import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
+import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
@@ -65,6 +66,9 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import pipe.gui.widgets.SidePane;
+
+import static net.tapaal.swinghelpers.GridBagHelper.Anchor.*;
+import static net.tapaal.swinghelpers.GridBagHelper.Fill.BOTH;
 
 public class TemplateExplorer extends JPanel implements SidePane {
 
@@ -96,8 +100,6 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	private final static String toolTipSortComponents = "Sort the components alphabetically";
 	private final static String toolTipMoveUp = "Move the selected component up";
 	private final static String toolTipMoveDown = "Move the selected component down";
-    //private static final String toolTipComponents ="Here you can manage the different components of the Net.<html><br/></html>" +
-    	//	"A Net can be broken up in several components and connected via shared places and transitions.";
 	
 	public TemplateExplorer(TabContent parent) {
 		this(parent, false);
@@ -140,29 +142,17 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		addCreatedComponents(hideButtons);
 		
 		this.addComponentListener(new ComponentListener() {
-			int minimumHegiht = TemplateExplorer.this.getMinimumSize().height + sortButton.getMinimumSize().height;
-			public void componentShown(ComponentEvent e) {
-			}
-			
-			
+			final int minimumHegiht = TemplateExplorer.this.getMinimumSize().height + sortButton.getMinimumSize().height;
+
 			public void componentResized(ComponentEvent e) {
-				
 				if(!isInAnimationMode){
-					if(TemplateExplorer.this.getSize().height <= minimumHegiht){
-						sortButton.setVisible(false);
-					} else {
-						sortButton.setVisible(true);
-					}
+                    sortButton.setVisible(TemplateExplorer.this.getSize().height > minimumHegiht);
 				}
 			}
-			
-			
-			public void componentMoved(ComponentEvent e) {
-			}
-			
-			
-			public void componentHidden(ComponentEvent e) {
-			}
+
+            public void componentShown(ComponentEvent e) {}
+			public void componentMoved(ComponentEvent e) {}
+			public void componentHidden(ComponentEvent e) {}
 		});
 	}
 
@@ -195,11 +185,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 		listModel.addListDataListener(new ListDataListener() {
 			public void contentsChanged(ListDataEvent arg0) {
-				if (parent.numberOfActiveTemplates() > 1) {
-					removeTemplateButton.setEnabled(false);
-				} else {
-					removeTemplateButton.setEnabled(true);
-				}
+                removeTemplateButton.setEnabled(parent.numberOfActiveTemplates() <= 1);
 			}
 
 			public void intervalAdded(ListDataEvent arg0) {
@@ -218,74 +204,59 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 		templateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		templateList.setSelectedIndex(0);
-		templateList.setCellRenderer(new TemplateListCellRenderer(templateList.getCellRenderer()));
+		templateList.setCellRenderer(new TemplateListCellRenderer<>(templateList.getCellRenderer()));
 		
 		TemplateListManager manager = new TemplateListManager(templateList);
 		templateList.addListSelectionListener(manager);
 		templateList.addMouseListener(manager);
-		
-		//templateList.setFocusTraversalKeysEnabled(false);
 
 		scrollpane = new JScrollPane(templateList);
 		//Add 10 pixel to the minimumsize of the scrollpane
 		scrollpane.setMinimumSize(new Dimension(scrollpane.getMinimumSize().width, scrollpane.getMinimumSize().height + 20));
 		
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
+		var gbc = GridBagHelper.as(0, 0, NORTHWEST, BOTH);
 		gbc.gridheight = 3;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+
 		templatePanel.add(scrollpane, gbc);
 		
 		moveUpButton = new JButton(ResourceManager.getIcon("Up.png"));
 		moveUpButton.setMargin(new Insets(2,2,2,2));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
-		moveUpButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = templateList.getSelectedIndex();
-				
-				if(index > 0) {
-				    Command c = new MoveElementUpCommand(TemplateExplorer.this, index, index-1);
-				    undoManager.addNewEdit(c);
-				    c.redo();
-                    templateList.ensureIndexIsVisible(index+1);
-					templateList.setSelectedIndex(index-1);
-				}
-			}
-		});
+		moveUpButton.addActionListener(e -> {
+            int index = templateList.getSelectedIndex();
+
+            if(index > 0) {
+                Command c = new MoveElementUpCommand(TemplateExplorer.this, index, index-1);
+                undoManager.addNewEdit(c);
+                c.redo();
+                templateList.ensureIndexIsVisible(index+1);
+                templateList.setSelectedIndex(index-1);
+            }
+        });
 		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.SOUTH;
+		gbc = GridBagHelper.as(1, 0, SOUTH);
 		templatePanel.add(moveUpButton,gbc);
 		
 		moveDownButton = new JButton(ResourceManager.getIcon("Down.png"));
 		moveDownButton.setMargin(new Insets(2,2,2,2));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
-		moveDownButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = templateList.getSelectedIndex();
-				
-				if(index < parent.network().allTemplates().size() - 1) {
-                    Command c = new MoveElementDownCommand(TemplateExplorer.this, index, index+1);
-                    undoManager.addNewEdit(c);
-                    c.redo();
-                    templateList.ensureIndexIsVisible(index+1);
-					templateList.setSelectedIndex(index+1);
-				}
-			}
-		});
+		moveDownButton.addActionListener(e -> {
+            int index = templateList.getSelectedIndex();
+
+            if(index < parent.network().allTemplates().size() - 1) {
+                Command c = new MoveElementDownCommand(TemplateExplorer.this, index, index+1);
+                undoManager.addNewEdit(c);
+                c.redo();
+                templateList.ensureIndexIsVisible(index+1);
+                templateList.setSelectedIndex(index+1);
+            }
+        });
 		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.NORTH;
+		gbc = GridBagHelper.as(1, 1, NORTH);
 		templatePanel.add(moveDownButton,gbc);
 		
 		//Sort button
@@ -299,11 +270,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			command.redo();
 		});
 		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 2;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.anchor = GridBagConstraints.NORTH;
+		gbc = GridBagHelper.as(1,2, NORTH, GridBagHelper.Fill.HORIZONTAL);
 		templatePanel.add(sortButton,gbc);
 	}
 
@@ -402,10 +369,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			}
 		});
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0, 1, WEST);
 		buttonPanel.add(removeTemplateButton, gbc);
 
 		renameButton = new JButton("Rename");
@@ -413,17 +377,12 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		renameButton.setPreferredSize(dimension);
 		renameButton.setToolTipText(toolTipRenameComponent);
 
-		renameButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				showRenameTemplateDialog("");
-				templateList.validate();
-			}
-		});
+		renameButton.addActionListener(arg0 -> {
+            showRenameTemplateDialog("");
+            templateList.validate();
+        });
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(1, 0, WEST);
 		buttonPanel.add(renameButton, gbc);
 
 		copyButton = new JButton("Copy");
@@ -459,18 +418,14 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			}
 		});
 
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0, 0, WEST);
 		buttonPanel.add(copyButton, gbc);
 	}
 	
 	private EscapableDialog dialog;
 	private JPanel container;
 	private JTextField nameTextField;
-	private Dimension size;
-	private JLabel nameLabel;
+    private JLabel nameLabel;
 	private JPanel buttonContainer;
 	private JButton okButton;
 	private JButton cancelButton;
@@ -550,9 +505,8 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		container.setLayout(new GridBagLayout());
 		nameContainer = new JPanel();
 		nameContainer.setLayout(new GridBagLayout());
-		size = new Dimension(330, 25);
 
-		nameTextField = new javax.swing.JTextField();
+        nameTextField = new javax.swing.JTextField();
         SwingHelper.setPreferredWidth(nameTextField,330);
 		nameTextField.setText(nameToShow);
 		nameTextField.addAncestorListener(new RequestFocusListener());
@@ -561,23 +515,12 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			okButton.doClick();
 		});
 
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		//gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(4, 4, 2, 4);
+		var gbc = GridBagHelper.as(0, 1, 1, WEST, new Insets(4, 4, 2, 4));
 		nameContainer.add(nameTextField,gbc);
 		
 		nameLabel = new JLabel(); 
 		nameLabel.setText("Name of component: ");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.insets = new Insets(4, 4, 2, 4);
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0, 0, 1, WEST, new Insets(4, 4, 2, 4));
 		nameContainer.add(nameLabel,gbc);
 		
 		buttonContainer = new JPanel();
@@ -589,11 +532,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		okButton.setMnemonic(KeyEvent.VK_O);
-		gbc = new GridBagConstraints();		
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.anchor = java.awt.GridBagConstraints.WEST;
-		gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+		gbc = GridBagHelper.as(1,0, WEST, new Insets(5, 5, 5, 5));
 		buttonContainer.add(okButton,gbc);
 		
 		cancelButton = new JButton();
@@ -602,39 +541,17 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		cancelButton.setMnemonic(KeyEvent.VK_C);
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = java.awt.GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
+		gbc = GridBagHelper.as(0, 0, GridBagConstraints.RELATIVE, EAST);
 		buttonContainer.add(cancelButton,gbc);		
 		
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				onOK();
-			}
-		});
+		okButton.addActionListener(e -> onOK());
 		
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
+		cancelButton.addActionListener(e -> exit());
 		
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(0, 8, 5, 8);
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.EAST;
+		gbc = GridBagHelper.as(0,1,1,EAST, new Insets(0, 8, 5, 8));
 		container.add(buttonContainer,gbc);
 		
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(0, 8, 5, 8);
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0, 0, 1, WEST, new Insets(0, 8, 5, 8));
 		container.add(nameContainer,gbc);
 	}
 
@@ -656,8 +573,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 	
 	private void initComponentsOfRenameTemplateDialog(String oldname) {
-		container = new JPanel();
-		container.setLayout(new GridBagLayout());
+
 		nameContainer = new JPanel();
 		nameContainer.setLayout(new GridBagLayout());
 
@@ -669,23 +585,13 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			okButton.requestFocusInWindow();
 			okButton.doClick();
 		});
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		//gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(4, 4, 2, 4);
+		var gbc = GridBagHelper.as(0,1, 1, WEST, new Insets(4, 4, 2, 4));
 		nameContainer.add(nameTextField,gbc);
 		
 		nameLabel = new JLabel(); 
 		nameLabel.setText("Name of component: ");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.insets = new Insets(4, 4, 2, 4);
-		gbc.anchor = GridBagConstraints.WEST;
+
+		gbc = GridBagHelper.as(0,0,1,WEST,new Insets(4, 4, 2, 4));
 		nameContainer.add(nameLabel,gbc);
 		
 		buttonContainer = new JPanel();
@@ -697,11 +603,8 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		okButton.setMnemonic(KeyEvent.VK_O);
-		gbc = new GridBagConstraints();		
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.anchor = java.awt.GridBagConstraints.WEST;
-		gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+
+		gbc = GridBagHelper.as(1,0, WEST, new Insets(5, 5, 5, 5));
 		buttonContainer.add(okButton,gbc);
 		
 		cancelButton = new JButton();
@@ -710,31 +613,21 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		cancelButton.setMnemonic(KeyEvent.VK_C);
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = java.awt.GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
+
+		gbc = GridBagHelper.as(0,0, GridBagConstraints.RELATIVE, EAST);
 		buttonContainer.add(cancelButton,gbc);		
 		
 		okButton.addActionListener(e -> onOKRenameTemplate());
 		
 		cancelButton.addActionListener(e -> exit());
+
+        container = new JPanel();
+        container.setLayout(new GridBagLayout());
 		
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(0, 8, 5, 8);
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.EAST;
+		gbc = GridBagHelper.as(0,1,1,EAST,new Insets(0, 8, 5, 8));
 		container.add(buttonContainer,gbc);
 		
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(0, 8, 5, 8);
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0,0,1,WEST,new Insets(0, 8, 5, 8));
 		container.add(nameContainer,gbc);
 
 	}
@@ -777,7 +670,6 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		if (tapn != null) {
 			parent.changeToTemplate(tapn);
 		}
-		//parent.drawingSurface().repaintAll();
 	}
 
 	public Template selectedModel() {
@@ -809,7 +701,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 	
 	public void selectFirst() {
-			templateList.setSelectedIndex(0);
+        templateList.setSelectedIndex(0);
 	}
 
 	public void hideButtons() {
@@ -853,46 +745,45 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	    return templateList;
     }
 
-    private class TemplateListCellRenderer extends JPanel implements ListCellRenderer {
+    private class TemplateListCellRenderer<T> extends JPanel implements ListCellRenderer<T> {
 
 		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to deactive the component";
 		private static final String CHECK_TO_ACTIVATE = "Check to active the component";
 		private final JCheckBox activeCheckbox = new JCheckBox();
-		private final ListCellRenderer cellRenderer;
+		private final ListCellRenderer<T> cellRenderer;
 		
 		
-		public TemplateListCellRenderer(ListCellRenderer renderer) {
+		public TemplateListCellRenderer(ListCellRenderer<T> renderer) {
 			cellRenderer = renderer;
 			setLayout(new BorderLayout()); 
 	        setOpaque(false); 
 	        activeCheckbox.setOpaque(false);
 		}
-		
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-			Component renderer = cellRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			removeAll();
-			if(!isInAnimationMode) { 
-				boolean isActive = ((Template)value).isActive();
-				activeCheckbox.setSelected(isActive);
-				setToolTipText((isActive)? UNCHECK_TO_DEACTIVATE : CHECK_TO_ACTIVATE);
-				add(activeCheckbox, BorderLayout.WEST);
-			} else {
-				
-				setToolTipText(null);
-			}
-			add(renderer, BorderLayout.CENTER);
-			return this;
-		}
-		
-		
-	}
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends T> list, T value, int index, boolean isSelected, boolean cellHasFocus) {
+            Component renderer = cellRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            removeAll();
+            if(!isInAnimationMode) {
+                boolean isActive = ((Template)value).isActive();
+                activeCheckbox.setSelected(isActive);
+                setToolTipText((isActive)? UNCHECK_TO_DEACTIVATE : CHECK_TO_ACTIVATE);
+                add(activeCheckbox, BorderLayout.WEST);
+            } else {
+
+                setToolTipText(null);
+            }
+            add(renderer, BorderLayout.CENTER);
+            return this;
+        }
+    }
 	
 	private class TemplateListManager extends MouseAdapter implements ListSelectionListener, ActionListener {
 		private final int checkBoxWidth = new JCheckBox().getPreferredSize().width;
 		private final ListSelectionModel selectionModel;
-		private final JList list;
+		private final JList<Template> list;
 		
-		public TemplateListManager(JList list) {
+		public TemplateListManager(JList<Template> list) {
 			this.list = list;
 			selectionModel = list.getSelectionModel();
 			this.list.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), JComponent.WHEN_FOCUSED);
@@ -902,7 +793,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			if(index<0) 
 				return; 
 
-			Template item = ((Template)list.getModel().getElementAt(index));
+			Template item = list.getModel().getElementAt(index);
 
 
 			if(!selectionModel.isSelectedIndex(index)) {
@@ -925,11 +816,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			if (!selectedModel().isActive()){
 				removeTemplateButton.setEnabled(true);
 			}else {
-				if (parent.numberOfActiveTemplates() <= 1) {
-					removeTemplateButton.setEnabled(false);
-				} else {
-					removeTemplateButton.setEnabled(true);
-				}
+                removeTemplateButton.setEnabled(parent.numberOfActiveTemplates() > 1);
 			}
 			 
 			toggleAffectedQueries();
@@ -960,9 +847,10 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			if(index<0) 
 				return; 
 			
-			if(e.getX()>templateList.getCellBounds(index, index).x+checkBoxWidth) 
-				return; 
-			
+			if(e.getX()>templateList.getCellBounds(index, index).x+checkBoxWidth) {
+                return;
+            }
+
 			if (!isInAnimationMode){
 				toggleSelection(index);
 			}
@@ -984,32 +872,14 @@ public class TemplateExplorer extends JPanel implements SidePane {
 						if (parent.numberOfActiveTemplates() > 1){
 							removeTemplateButton.setEnabled(true);
 						}else{
-							if (selectedModel().isActive()){
-								removeTemplateButton.setEnabled(false);
-							} else {
-								removeTemplateButton.setEnabled(true);
-							}
+                            removeTemplateButton.setEnabled(!selectedModel().isActive());
 						}
 						renameButton.setEnabled(true);
 						copyButton.setEnabled(true);
-						if(templateList.getModel().getSize() >= 2) {
-                            sortButton.setEnabled(true);
-                        } else {
-                            sortButton.setEnabled(false);
-                        }
+                        sortButton.setEnabled(templateList.getModel().getSize() >= 2);
 
-						if(index > 0) {
-                            moveUpButton.setEnabled(true);
-                        } else {
-                            moveUpButton.setEnabled(false);
-                        }
-								
-							
-						if(index < parent.network().allTemplates().size() - 1) {
-                            moveDownButton.setEnabled(true);
-                        } else {
-                            moveDownButton.setEnabled(false);
-                        }
+                        moveUpButton.setEnabled(index > 0);
+                        moveDownButton.setEnabled(index < parent.network().allTemplates().size() - 1);
 					}
 					templateList.ensureIndexIsVisible(index);
 					openSelectedTemplate();

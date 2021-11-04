@@ -884,7 +884,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private AnimationControlSidePanel animControlerBox;
     private AnimationHistorySidePanel animationHistorySidePanel;
 
-	private JScrollPane animationControllerScrollPane;
 	private AnimationHistoryList abstractAnimationPane = null;
 	private JPanel animationControlsPanel;
 	private TransitionFiringComponent transitionFiring;
@@ -1165,16 +1164,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		safeApp.ifPresent(tab -> tab.updatedTabName(this));
 	}
 
-	/** Creates a new animationHistory text area, and returns a reference to it */
-	private void createAnimationHistory() {
+    private void createAnimatorSplitPane() {
+
         animationHistorySidePanel = new AnimationHistorySidePanel();
-	}
 
-	private void createAnimatorSplitPane() {
-
-	    createAnimationHistory();
-
-		if (animControlerBox == null) {
+        if (animControlerBox == null) {
             createAnimationControlSidePanel();
         }
 		if (transitionFiring == null) {
@@ -1239,9 +1233,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
             )
         );
 
-        JButton dummy = new JButton("AnimatorDummy");
-        dummy.setMinimumSize(templateExplorer.getMinimumSize());
-        dummy.setPreferredSize(templateExplorer.getPreferredSize());
         animatorSplitPane.add(new JPanel(), templateExplorerName);
 
 		animatorSplitPane.add(animationControlsPanel, animControlName);
@@ -1251,7 +1242,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		animatorSplitPane.repaint();
 	}
 
-	public void switchToAnimationComponents(boolean showEnabledTransitions) {
+	public void switchToAnimationComponents() {
 		
 		//Remove dummy
 		Component dummy = animatorSplitPane.getMultiSplitLayout().getComponentForNode(animatorSplitPane.getMultiSplitLayout().getNodeForName(templateExplorerName));
@@ -1260,17 +1251,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		}
 
 		//Add the templateExplorer
-		animatorSplitPane.add(templateExplorer, templateExplorerName);
-
-		// Inserts dummy to avoid nullpointerexceptions from the displaynode
-		// method. A component can only be on one splitpane at the time
-		dummy = new JButton("EditorDummy");
-		dummy.setMinimumSize(templateExplorer.getMinimumSize());
-		dummy.setPreferredSize(templateExplorer.getPreferredSize());
-		editorSplitPane.add(dummy, templateExplorerName);
-
-		templateExplorer.switchToAnimationMode();
-		showEnabledTransitionsList(showEnabledTransitions);
+        var t = new TemplateExplorer(this);
+        t.switchToAnimationMode();
+		animatorSplitPane.add(t, templateExplorerName);
 		
 		this.setLeftComponent(animatorSplitPaneScroller);
 	}
@@ -1282,32 +1265,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     }
 
-	public void switchToEditorComponents() {
-		
-		//Remove dummy
-		Component dummy = editorSplitPane.getMultiSplitLayout().getComponentForNode(editorSplitPane.getMultiSplitLayout().getNodeForName(templateExplorerName));
-		if(dummy != null){
-			editorSplitPane.remove(dummy);
-		}
-		
-		//Add the templateexplorer again
-		editorSplitPane.add(templateExplorer, templateExplorerName);
-		if (animatorSplitPane != null) {
-
-			// Inserts dummy to avoid nullpointerexceptions from the displaynode
-			// method. A component can only be on one splitpane at the time
-			dummy = new JButton("AnimatorDummy");
-			dummy.setMinimumSize(templateExplorer.getMinimumSize());
-			dummy.setPreferredSize(templateExplorer.getPreferredSize());
-			animatorSplitPane.add(dummy, templateExplorerName);
-		}
-
-		templateExplorer.switchToEditorMode();
-		this.setLeftComponent(editorSplitPaneScroller);
-		//drawingSurface.repaintAll();
-	}
-
-	public AnimationHistoryList getUntimedAnimationHistory() {
+    public AnimationHistoryList getUntimedAnimationHistory() {
 		return abstractAnimationPane;
 	}
 
@@ -1830,7 +1788,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			if (numberOfActiveTemplates() > 0) {
 
 				app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
-                switchToAnimationComponents(true);
+                switchToAnimationComponents();
 
 				setManager(animationModeController);
 
@@ -1879,9 +1837,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 getAnimator().restoreModel();
             }
 
-            switchToEditorComponents();
+            this.setLeftComponent(editorSplitPaneScroller);
 
-			setManager(notingManager);
+            setManager(notingManager);
 
 			drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 			setMode(SELECT);

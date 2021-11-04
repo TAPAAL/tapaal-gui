@@ -60,7 +60,7 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
         menuItem.setText("Delete");
         popup.add(menuItem);
 
-        if ("DEV".equals(TAPAAL.VERSION)){
+        if (TAPAAL.IS_DEV){
             JTextArea pane = new JTextArea();
             pane.setEditable(false);
 

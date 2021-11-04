@@ -41,7 +41,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
     @Override
     public JPopupMenu getPopup(MouseEvent e) {
         JPopupMenu popup = super.getPopup(e);
-        if ("DEV".equals(TAPAAL.VERSION)){
+        if (TAPAAL.IS_DEV){
             JTextArea pane = new JTextArea();
             pane.setEditable(false);
 

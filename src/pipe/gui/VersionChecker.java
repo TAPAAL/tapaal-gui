@@ -32,7 +32,7 @@ public class VersionChecker {
 
 	public boolean checkForNewVersion(boolean forcecheck){
 		//Disable the version check for DEV versions
-		if (!TAPAAL.VERSION.equalsIgnoreCase("DEV") && url != null){
+		if (!TAPAAL.IS_DEV && url != null){
 				getNewestVersion();
 				boolean check;
 				String ignoreversion = Preferences.getInstance().getLatestVersion();	
