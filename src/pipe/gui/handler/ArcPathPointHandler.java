@@ -37,7 +37,7 @@ public class ArcPathPointHandler extends PetriNetObjectHandler {
 		popup.insert(new JPopupMenu.Separator(), 0);
 
 		if (((ArcPathPoint) myObject).getIndex() == 0) {
-			return null;
+			return popup;
 		} else {
 			JMenuItem menuItem = new JMenuItem(new ToggleArcPointAction((ArcPathPoint) myObject));
 
