@@ -43,6 +43,6 @@ public class Context {
 	}
 
 	public NameGenerator nameGenerator() {
-		return currentTab.drawingSurface().getNameGenerator();
+		return currentTab.getNameGenerator();
 	}
 }

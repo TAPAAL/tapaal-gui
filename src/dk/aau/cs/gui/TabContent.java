@@ -180,7 +180,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	        Require.notNull(c, "datalyer can't be null");
             Require.notNull(p, "Point can't be null");
 
-            dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(drawingSurface.getNameGenerator().getNewPlaceName(guiModelToModel.get(c)), ColorType.COLORTYPE_DOT);
+            dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(getNameGenerator().getNewPlaceName(guiModelToModel.get(c)), ColorType.COLORTYPE_DOT);
             TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, lens);
             guiModelToModel.get(c).add(tp);
             c.addPetriNetObject(pnObject);
@@ -190,7 +190,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUncontrollable) {
-            dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(drawingSurface.getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
+            dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
 
             transition.setUncontrollable(isUncontrollable);
             TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens);
@@ -633,7 +633,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     }
 
-
     /**
 	 * Creates a new tab with the selected filestream
 	 */
@@ -770,7 +769,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		tab.setInitialName(name);
 
 		//Set Default Template
-		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
+		String templateName = tab.getNameGenerator().getNewTemplateName();
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
 		tab.addTemplate(template);
 
@@ -1755,10 +1754,19 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		netChanged = _netChanged;
 	}
 
+    Template currentSelectedTemplate = null; //XXX: Temp while refactoring
+    private final NameGenerator nameGenerator = new NameGenerator();
+
+    public NameGenerator getNameGenerator() {
+        return nameGenerator;
+    }
+
     public void changeToTemplate(Template tapn) {
 		Require.notNull(tapn, "Can't change to a Template that is null");
 
-		drawingSurface.setModel(tapn.guiModel(), tapn.model(), tapn.zoomer());
+		currentSelectedTemplate = tapn;
+        nameGenerator.add(tapn.model());
+        drawingSurface.setModel(tapn.guiModel(), tapn.zoomer());
 
 		//If the template is currently selected
 		//XXX: kyrke - 2019-07-06, templ solution while refactoring, there is properly a better way
@@ -1938,7 +1946,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	@Override
 	public void showStatistics() {
-        StatisticsPanel.showStatisticsPanel(drawingSurface().getModel().getStatistics());
+        if (currentSelectedTemplate != null) {
+            StatisticsPanel.showStatisticsPanel(currentSelectedTemplate.model().getStatistics());
+        }
 	}
 
     @Override

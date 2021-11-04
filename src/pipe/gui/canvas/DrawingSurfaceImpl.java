@@ -15,10 +15,8 @@ import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.Reference;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.*;
-import dk.aau.cs.gui.TabContent.DrawTool;
 import pipe.gui.graphicElements.*;
 import pipe.gui.undo.*;
-import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 /**
@@ -36,8 +34,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	private DataLayer guiModel;
 	private final TabContent tabContent;
 	private final Reference<AbstractDrawingSurfaceManager> managerRef;
-	private TimedArcPetriNet model;
-    private final NameGenerator nameGenerator = new NameGenerator();
+
 	private static final boolean showDebugBounds = false;
 
 	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent tabContent, Reference<AbstractDrawingSurfaceManager> managerRef) {
@@ -62,28 +59,17 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 	}
 
-	public NameGenerator getNameGenerator() {
-		return nameGenerator;
-	}
-
 	public DataLayer getGuiModel() {
 		return guiModel;
 	}
 
-	public TimedArcPetriNet getModel() {
-		return model;
-	}
-
-	public void setModel(DataLayer guiModel, TimedArcPetriNet model, Zoomer zoomer) {
+	public void setModel(DataLayer guiModel, Zoomer zoomer) {
 		//Remove the old model from view
 		this.guiModel.removedFromView();
 		//Add the new model to view
 		guiModel.addedToView(this);
 
-		nameGenerator.add(model);
-
 		this.guiModel = guiModel;
-		this.model = model;
 		this.zoomControl = zoomer;
 
 		this.removeAll();

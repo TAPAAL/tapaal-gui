@@ -111,7 +111,7 @@ public class TAPNTransitionEditor extends JPanel {
             }else{
                 switchToNameTextField();
                 nameTextField.setText(transition.underlyingTransition().isShared()?
-                CreateGui.getDrawingSurface().getNameGenerator().getNewTransitionName(context.activeModel()) : transition.getName());
+                CreateGui.getCurrentTab().getNameGenerator().getNewTransitionName(context.activeModel()) : transition.getName());
                 makeSharedButton.setEnabled(true);
             }
         });

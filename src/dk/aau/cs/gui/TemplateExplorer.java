@@ -457,7 +457,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			showRenameTemplateDialog(newName);
 			return;
 		} else {
-			parent.drawingSurface().getNameGenerator().updateTemplateIndex(newName);
+			parent.getNameGenerator().updateTemplateIndex(newName);
 			Command command = new RenameTemplateCommand(this, parent, template.model(), template.model().name(), newName);
 			undoManager.addNewEdit(command);
 			command.redo();

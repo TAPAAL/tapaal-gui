@@ -75,7 +75,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		Require.that(tab != null, "tab cannot be null");
 
 		undoManager = tab.getUndoManager();
-		nameGenerator = tab.drawingSurface().getNameGenerator();
+		nameGenerator = tab.getNameGenerator();
 		this.tab = tab;
 
 		sharedPlacesListModel = new SharedPlacesListModel(tab.network());
