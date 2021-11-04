@@ -2121,16 +2121,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		getAnimator().stepForward();
 	}
 
-	@Override
-	public void timeDelay() {
-		getAnimator().letTimePass(BigDecimal.ONE);
-	}
-
-	@Override
-	public void delayAndFire() {
-		getTransitionFiringComponent().fireSelectedTransition();
-	}
-
     @Override
     public void undo() {
         if (!isInAnimationMode()) {
@@ -3133,12 +3123,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
     };
     private final GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
         public void actionPerformed(ActionEvent e) {
-            timeDelay();
+            getAnimator().letTimePass(BigDecimal.ONE);
         }
     };
     private final GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
         public void actionPerformed(ActionEvent e) {
-            delayAndFire();
+            getTransitionFiringComponent().fireSelectedTransition();
         }
     };
 

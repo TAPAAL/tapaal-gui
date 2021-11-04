@@ -33,10 +33,6 @@ public interface TabContentActions {
 
     void stepForward();
 
-    void timeDelay();
-
-    void delayAndFire();
-
     boolean getNetChanged();
 
     void toggleAnimationMode();
