@@ -1,6 +1,10 @@
 package pipe.gui;
 
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -105,7 +109,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             Export.exportGuiView(getCurrentTab().drawingSurface(), Export.PRINTER, null);
         }
     };
-    private final GuiAction importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
+    private final GuiAction importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format") {
         public void actionPerformed(ActionEvent arg0) {
             guiFrameController.ifPresent(GuiFrameControllerActions::importPNMLFile);
         }
@@ -161,7 +165,38 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-    /*private GuiAction  copyAction, cutAction, pasteAction, */
+    private GuiAction cutAction = new GuiAction("Copy", "Copy current selection", KeyStroke.getKeyStroke('X', shortcutkey)) {
+        public void actionPerformed(ActionEvent e) {
+            String message = CopyPastImportExport.toXML(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
+            getCurrentTab().deleteSelection();
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+        }
+    };
+
+    private GuiAction copyAction = new GuiAction("Copy", "Copy current selection", KeyStroke.getKeyStroke('C', shortcutkey)) {
+        public void actionPerformed(ActionEvent e) {
+            String message = CopyPastImportExport.toXML(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+        }
+    };
+    //private GuiAction cutAction;
+    private GuiAction pasteAction = new GuiAction("Paste", "Paste", KeyStroke.getKeyStroke('V', shortcutkey)) {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            String s = "";
+            //odd: the Object param of getContents is not currently used
+            Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+            boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+            if (hasTransferableText) {
+                try {
+                    s = (String)contents.getTransferData(DataFlavor.stringFlavor);
+                }
+                catch (UnsupportedFlavorException | IOException ignored){}
+            }
+            CopyPastImportExport.past(s, getCurrentTab());
+        }
+    };
     private final GuiAction undoAction = new GuiAction("Undo", "Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabContentActions::undo);
@@ -631,6 +666,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         editMenu.add(redoAction);
         editMenu.addSeparator();
 
+        editMenu.add(cutAction);
+        editMenu.add(copyAction);
+        editMenu.add(pasteAction);
+
+        editMenu.addSeparator();
+
         editMenu.add(deleteAction);
 
         // Bind delete to backspace also
@@ -819,11 +860,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         toolBar.add(printAction).setRequestFocusEnabled(false);
 
         // Copy/past
-        /*
-         * Removed copy/past button toolBar.addSeparator();
-         * toolBar.add(cutAction); toolBar.add(copyAction);
-         * toolBar.add(pasteAction);
-         */
+        toolBar.add(copyAction);
+        toolBar.add(cutAction);
+        toolBar.add(pasteAction);
 
         // Undo/redo
         toolBar.addSeparator();

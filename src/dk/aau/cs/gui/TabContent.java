@@ -118,8 +118,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private enum FeatureOption { TIME, GAME, COLOR };
 
     public final static class Result<T,R> {
-        private final T result;
-        private final boolean hasErrors;
+        public final T result;
+        public final boolean hasErrors;
         private final List<R> errors;
 
         public Result(T result) {
@@ -131,6 +131,10 @@ public class TabContent extends JSplitPane implements TabContentActions{
             hasErrors = true;
             this.errors = new ArrayList<>(errors);
             result = null;
+        }
+
+        public List<R> getErrors() {
+            return Collections.unmodifiableList(errors);
         }
     }
     public final static class RequirementChecker<R> {
@@ -155,7 +159,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             return Collections.unmodifiableList(errors);
         }
     }
-    private enum ModelViolation {
+    public enum ModelViolation {
         
         //PlaceNotNull("Place can't be null"),
         //TransitionNotNull("Transion can't be null"),
@@ -189,9 +193,16 @@ public class TabContent extends JSplitPane implements TabContentActions{
             return new Result<>(pnObject);
         }
 
+        public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
+            return addNewTimedTransitions(c, p, false, false);
+        }
         public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUncontrollable) {
+            return addNewTimedTransitions(c, p, false, isUncontrollable);
+        }
+        public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUrgent, boolean isUncontrollable) {
             dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(getNameGenerator().getNewTransitionName(guiModelToModel.get(c)));
 
+            transition.setUrgent(isUrgent);
             transition.setUncontrollable(isUncontrollable);
             TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens);
 
