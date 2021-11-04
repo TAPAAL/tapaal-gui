@@ -167,22 +167,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-    private GuiAction cutAction = new GuiAction("Cut", "Cut current selection", KeyStroke.getKeyStroke('X', shortcutkey)) {
+    private final GuiAction cutAction = new GuiAction("Cut", "Cut current selection", KeyStroke.getKeyStroke('X', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             String message = CopyPastImportExport.toXML(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
             getCurrentTab().deleteSelection();
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
         }
     };
-
-    private GuiAction copyAction = new GuiAction("Copy", "Copy current selection", KeyStroke.getKeyStroke('C', shortcutkey)) {
+    private final GuiAction copyAction = new GuiAction("Copy", "Copy current selection", KeyStroke.getKeyStroke('C', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             String message = CopyPastImportExport.toXML(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
         }
     };
-    //private GuiAction cutAction;
-    private GuiAction pasteAction = new GuiAction("Paste", "Paste", KeyStroke.getKeyStroke('V', shortcutkey)) {
+    private final GuiAction pasteAction = new GuiAction("Paste", "Paste", KeyStroke.getKeyStroke('V', shortcutkey)) {
         @Override
         public void actionPerformed(ActionEvent e) {
 
