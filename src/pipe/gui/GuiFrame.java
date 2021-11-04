@@ -811,10 +811,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         toolsMenu.add(netStatisticsAction).setMnemonic('i');
 
-        JMenuItem batchProcessing = new JMenuItem(batchProcessingAction);
-        batchProcessing.setMnemonic('b');
-        toolsMenu.add(batchProcessing);
-
         JMenuItem workflowDialog = new JMenuItem(workflowDialogAction);
         workflowDialog.setMnemonic('f');
         toolsMenu.add(workflowDialog);
@@ -826,6 +822,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         JMenuItem mergeComponentsDialog = new JMenuItem(mergeComponentsDialogAction);
         mergeComponentsDialog.setMnemonic('c');
         toolsMenu.add(mergeComponentsDialog);
+
+        toolsMenu.addSeparator();
+
+        JMenuItem batchProcessing = new JMenuItem(batchProcessingAction);
+        batchProcessing.setMnemonic('b');
+        toolsMenu.add(batchProcessing);
 
         toolsMenu.addSeparator();
 
