@@ -549,6 +549,10 @@ public class Animator {
         tab.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
     }
 
+    public boolean hasNonZeroTrance() {
+        return tab.getAnimationHistorySidePanel().getListModel().size() > 1;
+    }
+
     enum FillListStatus{
         lessThanWeight,
         weight,
