@@ -1978,7 +1978,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         network.add(transformedModel.value1());
 
-        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), network.constants());
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), network.constants(), lens);
 
         try {
             ByteArrayOutputStream outputStream = tapnWriter.savePNML();
