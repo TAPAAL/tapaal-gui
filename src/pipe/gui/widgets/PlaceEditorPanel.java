@@ -728,42 +728,42 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private void doOkColors(int newMarking){
-        if(!place.isColored()){
+        if (!place.isColored()) {
             if(newMarking != place.underlyingPlace().numberOfTokens()){
                 Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
                 command.redo();
                 context.undoManager().addEdit(command);
                 return;
             }
-        }
+        } else {
+            ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
+            ArrayList<TimedToken> oldTokenList = new ArrayList(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
+            List<ColoredTimeInvariant> ctiList = new ArrayList<>();
+            Vector<ArcExpression> v = new Vector<>();
 
-        ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
-        ArrayList<TimedToken> oldTokenList = new ArrayList(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
-        List<ColoredTimeInvariant> ctiList = new ArrayList<>();
-        Vector<ArcExpression> v = new Vector<>();
-
-        for(int i = 0; i < coloredTokenListModel.getSize();i++){
-            v.add(coloredTokenListModel.getElementAt(i));
-        }
-
-        AddExpression newExpression = null;
-        if(!v.isEmpty()){
-            newExpression = new AddExpression(v);
-            ColorMultiset cm = newExpression.eval(context.network().getContext());
-            if(cm != null){
-                tokensToAdd.addAll(cm.getTokens(place.underlyingPlace()));
+            for (int i = 0; i < coloredTokenListModel.getSize(); i++) {
+                v.add(coloredTokenListModel.getElementAt(i));
             }
-        }
 
-        for (int i = 0; i < timeConstraintListModel.size(); i++) {
-            ctiList.add(timeConstraintListModel.get(i));
+            AddExpression newExpression = null;
+            if (!v.isEmpty()) {
+                newExpression = new AddExpression(v);
+                ColorMultiset cm = newExpression.eval(context.network().getContext());
+                if (cm != null) {
+                    tokensToAdd.addAll(cm.getTokens(place.underlyingPlace()));
+                }
+            }
+
+            for (int i = 0; i < timeConstraintListModel.size(); i++) {
+                ctiList.add(timeConstraintListModel.get(i));
+            }
+            if (!colorType.equals(place.underlyingPlace().getColorType())) {
+                updateArcsAccordingToColorType();
+            }
+            Command command = new ColoredPlaceMarkingEdit(oldTokenList, tokensToAdd, originalExpression, newExpression, context, place, ctiList, colorType);
+            command.redo();
+            context.undoManager().addEdit(command);
         }
-        if(!colorType.equals(place.underlyingPlace().getColorType())){
-            updateArcsAccordingToColorType();
-        }
-        Command command = new ColoredPlaceMarkingEdit(oldTokenList, tokensToAdd, originalExpression, newExpression, context, place, ctiList, colorType);
-        command.redo();
-        context.undoManager().addEdit(command);
     }
 
 	private TimeInvariant constructInvariant() {

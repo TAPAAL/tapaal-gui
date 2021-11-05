@@ -149,14 +149,8 @@ public abstract class Place extends PlaceTransitionObject {
 
 	@Override
 	public void update(boolean displayConstantNames) {
-		if (attributesVisible) {
-			getNameLabel().setText("");
-		} else {
-			getNameLabel().setText("");
-		}
-		super.update(displayConstantNames);
+        getNameLabel().setText("");
+        super.update(displayConstantNames);
 		repaint();
 	}
-
-
 }
