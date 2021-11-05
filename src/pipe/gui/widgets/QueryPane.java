@@ -418,14 +418,37 @@ public class QueryPane extends JPanel implements SidePane {
 
 			setEnabled(list.isEnabled() && ((TAPNQuery)value).isActive());
 
-			if(!isEnabled())
-				setToolTipText("This query is disabled because it contains propositions involving places from a deactivated component");
-			else
-				setToolTipText("Double-click or press the edit button to edit this query");
+			if(!isEnabled()){
+                setToolTipText("This query is disabled because it contains propositions involving places from a deactivated component");
+            } else {
+			    String queryToolTipString = getFormattedQueryToolTipString(((TAPNQuery)value).getQuery());
+                setToolTipText(queryToolTipString);
+            }
+
 			setFont(list.getFont());
 			setOpaque(true);
 			return superRenderer;
 		}
+
+        private String getFormattedQueryToolTipString(String qString) {
+		    int stringLength = qString.length();
+		    int newLineAt = 100;
+		    if (stringLength > newLineAt) {
+		        int numOfLineBreaks = (int)Math.floor(stringLength / newLineAt);
+
+                StringBuilder sb = new StringBuilder(qString);
+                sb.insert(0, "<html>");
+
+		        for(int i = 1; i <= numOfLineBreaks; i++) {
+		            int newLineIndex =  sb.indexOf(" ", newLineAt * i);
+                    sb.insert(newLineIndex, "<br>");
+                }
+
+                sb.insert(sb.length(), "</html>");
+		        return sb.toString();
+            }
+            return qString;
+        }
 	}
 
 	public void selectFirst() {
