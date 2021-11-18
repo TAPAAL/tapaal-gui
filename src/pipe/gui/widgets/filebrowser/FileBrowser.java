@@ -22,18 +22,7 @@ public abstract class FileBrowser  {
 		return constructor(filetype, ext, "", path);
 	}
 	public static FileBrowser constructor(String filetype, final String ext, final String optionalExt, String path) {
-
-		if(JavaUtil.getJREMajorVersion() >= 7){
-
-            return new NativeFileBrowser(filetype, ext, optionalExt, path);
-		}else{
-			/*if(path != null) {
-				newObject.lastPath = path;
-			}*/
-			return new NativeFileBrowserFallback(filetype, ext, optionalExt, path);
-		}
-
-
+		return new NativeFileBrowser(filetype, ext, optionalExt, path);
 	}
 
 	public abstract File openFile();
