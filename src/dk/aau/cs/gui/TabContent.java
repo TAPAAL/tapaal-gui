@@ -2945,6 +2945,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 selectAction.setEnabled(true);
                 transAction.setEnabled(true);
                 uncontrollableTransAction.setEnabled(true);
+                toggleUrgentAction.setEnabled(true);
                 timedPlaceAction.setEnabled(true);
                 timedArcAction.setEnabled(true);
                 transportArcAction.setEnabled(true);
@@ -2959,6 +2960,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 selectAction.setEnabled(false);
                 transAction.setEnabled(false);
                 uncontrollableTransAction.setEnabled(false);
+                toggleUrgentAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);
@@ -2972,6 +2974,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 selectAction.setEnabled(false);
                 transAction.setEnabled(false);
                 uncontrollableTransAction.setEnabled(false);
+                toggleUrgentAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);
