@@ -3764,7 +3764,7 @@ public class QueryDialog extends JPanel {
 
 					network.add(transformedModel.value1());
 
-					NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
+					NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0), lens);
 
 					try {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
