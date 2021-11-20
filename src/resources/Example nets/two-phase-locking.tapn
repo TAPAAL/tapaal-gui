@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="comp1" type="P/T net">
+    <place displayName="true" id="resB" initialMarking="2" invariant="&lt; inf" name="resB" nameOffsetX="49" nameOffsetY="7" positionX="495" positionY="270"/>
+    <place displayName="true" id="haveA" initialMarking="0" invariant="&lt; inf" name="haveA" nameOffsetX="53" nameOffsetY="-4" positionX="375" positionY="165"/>
+    <place displayName="true" id="haveA2" initialMarking="0" invariant="&lt; inf" name="haveA2" nameOffsetX="60" nameOffsetY="40" positionX="375" positionY="390"/>
+    <place displayName="true" id="resA" initialMarking="2" invariant="&lt; inf" name="resA" nameOffsetX="26" nameOffsetY="0" positionX="375" positionY="270"/>
+    <place displayName="true" id="haveB" initialMarking="0" invariant="&lt; inf" name="haveB" nameOffsetX="71" nameOffsetY="8" positionX="705" positionY="270"/>
+    <place displayName="true" id="Clients" initialMarking="4" invariant="&lt; inf" name="Clients" nameOffsetX="-5" nameOffsetY="18" positionX="255" positionY="270"/>
+    <place displayName="true" id="haveAandB" initialMarking="0" invariant="&lt; inf" name="haveAandB" nameOffsetX="76" nameOffsetY="-2" positionX="585" positionY="165"/>
+    <place displayName="true" id="haveA2andB" initialMarking="0" invariant="&lt; inf" name="haveA2andB" nameOffsetX="69" nameOffsetY="47" positionX="585" positionY="390"/>
+    <transition angle="0" displayName="true" id="relB" infiniteServer="false" name="relB" nameOffsetX="38" nameOffsetY="46" player="0" positionX="495" positionY="390" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="lockB" infiniteServer="false" name="lockB" nameOffsetX="52" nameOffsetY="1" player="0" positionX="495" positionY="165" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="lockA" infiniteServer="false" name="lockA" nameOffsetX="2" nameOffsetY="4" player="0" positionX="255" positionY="165" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="relA2" infiniteServer="false" name="relA2" nameOffsetX="0" nameOffsetY="15" player="0" positionX="255" positionY="390" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="relA" infiniteServer="false" name="relA" nameOffsetX="48" nameOffsetY="2" player="0" positionX="705" positionY="165" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="lockA2" infiniteServer="false" name="lockA2" nameOffsetX="62" nameOffsetY="22" player="0" positionX="705" positionY="390" priority="0" urgent="false"/>
+    <arc id="id1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="relB" target="resB" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="510" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="510" yCoord="300"/>
+    </arc>
+    <arc id="id2" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="resB" target="lockB" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="510" yCoord="270"/>
+      <arcpath arcPointType="false" id="1" xCoord="510" yCoord="195"/>
+    </arc>
+    <arc id="id3" inscription="1" nameOffsetX="0" nameOffsetY="0" source="lockA" target="haveA" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="275" yCoord="175"/>
+      <arcpath arcPointType="false" id="1" xCoord="375" yCoord="179"/>
+    </arc>
+    <arc id="id6" inscription="1" nameOffsetX="0" nameOffsetY="0" source="relA" target="resA" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="714" yCoord="185"/>
+      <arcpath arcPointType="false" id="1" xCoord="404" yCoord="280"/>
+    </arc>
+    <arc id="id7" inscription="1" nameOffsetX="0" nameOffsetY="0" source="relA2" target="Clients" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="270" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="270" yCoord="300"/>
+    </arc>
+    <arc id="id8" inscription="1" nameOffsetX="0" nameOffsetY="0" source="relA2" target="resA" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="275" yCoord="400"/>
+      <arcpath arcPointType="false" id="1" xCoord="379" yCoord="295"/>
+    </arc>
+    <arc id="id10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="relB" target="haveA2" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="504" yCoord="405"/>
+      <arcpath arcPointType="false" id="1" xCoord="405" yCoord="405"/>
+    </arc>
+    <arc id="id11" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Clients" target="lockA" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="270" yCoord="270"/>
+      <arcpath arcPointType="false" id="1" xCoord="270" yCoord="195"/>
+    </arc>
+    <arc id="id12" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="haveA2" target="relA2" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="375" yCoord="405"/>
+      <arcpath arcPointType="false" id="1" xCoord="274" yCoord="405"/>
+    </arc>
+    <arc id="id13" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="haveA" target="lockB" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="405" yCoord="180"/>
+      <arcpath arcPointType="false" id="1" xCoord="504" yCoord="180"/>
+    </arc>
+    <arc id="id14" inscription="1" nameOffsetX="0" nameOffsetY="0" source="relA" target="haveB" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="720" yCoord="195"/>
+      <arcpath arcPointType="false" id="1" xCoord="720" yCoord="270"/>
+    </arc>
+    <arc id="id15" inscription="1" nameOffsetX="0" nameOffsetY="0" source="lockB" target="haveAandB" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="514" yCoord="180"/>
+      <arcpath arcPointType="false" id="1" xCoord="585" yCoord="180"/>
+    </arc>
+    <arc id="id16" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="haveAandB" target="relA" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="615" yCoord="180"/>
+      <arcpath arcPointType="false" id="1" xCoord="714" yCoord="180"/>
+    </arc>
+    <arc id="id18" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="haveA2andB" target="relB" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="585" yCoord="405"/>
+      <arcpath arcPointType="false" id="1" xCoord="514" yCoord="405"/>
+    </arc>
+    <arc id="A14" inscription="1" nameOffsetX="0" nameOffsetY="0" source="lockA2" target="haveA2andB" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="714" yCoord="410"/>
+      <arcpath arcPointType="false" id="1" xCoord="614" yCoord="405"/>
+    </arc>
+    <arc id="A15" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="haveB" target="lockA2" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="720" yCoord="300"/>
+      <arcpath arcPointType="false" id="1" xCoord="720" yCoord="390"/>
+    </arc>
+    <arc id="A16" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="resA" target="lockA" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="378" yCoord="274"/>
+      <arcpath arcPointType="false" id="1" xCoord="274" yCoord="180"/>
+    </arc>
+    <arc id="A17" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="resA" target="lockA2" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="404" yCoord="290"/>
+      <arcpath arcPointType="false" id="1" xCoord="714" yCoord="405"/>
+    </arc>
+  </net>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="lock_A_and_B_free" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="false">
+    <formula>
+            
+      <exists-path>
+                
+        <finally>
+                    
+          <conjunction>
+                        
+            <is-fireable>
+                            
+              <transition>comp1.lockA</transition>
+                          
+            </is-fireable>
+                        
+            <is-fireable>
+                            
+              <transition>comp1.lockB</transition>
+                          
+            </is-fireable>
+                      
+          </conjunction>
+                  
+        </finally>
+              
+      </exists-path>
+          
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="have_locks_ A_and_A2" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="SOME" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="false">
+    <formula>
+            
+      <exists-path>
+                
+        <finally>
+                    
+          <conjunction>
+                        
+            <integer-ge>
+                            
+              <tokens-count>
+                                
+                <place>comp1.haveA</place>
+                              
+              </tokens-count>
+                            
+              <integer-constant>1</integer-constant>
+                          
+            </integer-ge>
+                        
+            <integer-ge>
+                            
+              <tokens-count>
+                                
+                <place>comp1.haveA2</place>
+                              
+              </tokens-count>
+                            
+              <integer-constant>1</integer-constant>
+                          
+            </integer-ge>
+                      
+          </conjunction>
+                  
+        </finally>
+              
+      </exists-path>
+          
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Deadlock freedom" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="SOME" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+    <formula>
+            
+      <all-paths>
+                
+        <globally>
+                    
+          <negation>
+                        
+            <deadlock/>
+                      
+          </negation>
+                  
+        </globally>
+              
+      </all-paths>
+          
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="A_can_get_lock_infinitely_often" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="SOME" type="LTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+    <formula>
+            
+      <exists-path>
+                
+        <globally>
+                    
+          <finally>
+                        
+            <integer-eq>
+                            
+              <tokens-count>
+                                
+                <place>comp1.haveA</place>
+                              
+              </tokens-count>
+                            
+              <integer-constant>1</integer-constant>
+                          
+            </integer-eq>
+                      
+          </finally>
+                  
+        </globally>
+              
+      </exists-path>
+          
+    </formula>
+  </query>
+  <k-bound bound="3"/>
+  <feature isGame="false" isTimed="false"/>
+</pnml>

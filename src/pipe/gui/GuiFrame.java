@@ -1404,6 +1404,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         fileMenu.addSeparator();
 
+        JMenu exampleMenu = buildExampleMenu();
+        if (exampleMenu != null) {
+            fileMenu.add(exampleMenu);
+            fileMenu.addSeparator();
+        }
+
+        fileMenu.add(exitAction);
+
+        return fileMenu;
+    }
+
+    private JMenu buildExampleMenu() {
         // Loads example files, retuns null if not found
         String[] nets = loadTestNets();
 
@@ -1411,39 +1423,147 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // .xml file the Example x counter is not incremented when that file
         // is ignored
         if (nets != null && nets.length > 0) {
-            JMenu exampleMenu = new JMenu("Example nets");
-            exampleMenu.setIcon(ResourceManager.getIcon("Example.png"));
+            TabContent.TAPNLens untimedLens = new TabContent.TAPNLens(false, false);
+            TabContent.TAPNLens timedLens = new TabContent.TAPNLens(true, false);
+            TabContent.TAPNLens untimedGameLens = new TabContent.TAPNLens(false, true);
+            TabContent.TAPNLens timedGameLens = new TabContent.TAPNLens(true, true);
+
+            HashMap<TabContent.TAPNLens, List<String>> netMap = new HashMap<>(){{
+                    put(untimedLens, new ArrayList<>());
+                    put(timedLens, new ArrayList<>());
+                    put(untimedGameLens, new ArrayList<>());
+                    put(timedGameLens, new ArrayList<>());
+            }};
 
             for (String filename : nets) {
                 if (filename.toLowerCase().endsWith(".tapn")) {
-
-                    final String netname = filename.replace(".tapn", "");
                     final String filenameFinal = filename;
-                    GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"") {
-                        public void actionPerformed(ActionEvent arg0) {
-                            InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
-                            try {
-                                TabContent net = TabContent.createNewTabFromInputStream(file, netname);
-                                guiFrameController.ifPresent(o -> o.openTab(net));
-                            } catch (Exception e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
+
+                    InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
+                    TabContent.TAPNLens lens;
+                    try {
+                        lens = TabContent.getFileLens(file);
+                        if (lens == null) {
+                            lens = new TabContent.TAPNLens(true, false);
                         }
-                    };
-                    tmp.putValue(Action.SMALL_ICON, ResourceManager.getIcon("Net.png"));
-                    exampleMenu.add(tmp);
+                        TabContent.TAPNLens tmp = lens;
+                        netMap.forEach((v, k) -> {
+                            if (v.isTimed() == tmp.isTimed() && v.isGame() == tmp.isGame()) k.add(filename);
+                        });
+                    } catch (Exception e) {
+                        if (netMap.containsKey(timedLens)) netMap.get(timedLens).add(filename);
+                        e.printStackTrace();
+                    }
                 }
             }
-            fileMenu.add(exampleMenu);
-            fileMenu.addSeparator();
+            JMenu exampleMenu = new JMenu("Example nets");
+            exampleMenu.setIcon(ResourceManager.getIcon("Example.png"));
 
+            int charKey = 'A';
+            int modifier = InputEvent.ALT_MASK + InputEvent.SHIFT_MASK;
+            exampleMenu.add(addExampleNets(netMap.get(untimedLens), "P/T nets", charKey, modifier));
+
+            modifier = getModifier(modifier, charKey, netMap.get(untimedLens).size());
+            charKey = countCharKey(charKey, netMap.get(untimedLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(timedLens), "Timed-Arc Petri nets", charKey, modifier));
+
+            modifier = getModifier(modifier, charKey, netMap.get(timedLens).size());
+            charKey = countCharKey(charKey, netMap.get(timedLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(untimedGameLens), "P/T net games", charKey, modifier));
+
+            modifier = getModifier(modifier, charKey, netMap.get(untimedGameLens).size());
+            charKey = countCharKey(charKey, netMap.get(untimedGameLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(timedGameLens), "Timed-Arc Petri net games", charKey, modifier));
+
+            //TODO implement when color is added
+            /*modifier = getModifier(modifier, charKey, netMap.get(timedGameLens).size());
+            charKey = countCharKey(charKey, netMap.get(timedGameLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(untimedColorLens), "Colored P/T nets", charKey, modifier));
+
+            modifier = getModifier(modifier, charKey, netMap.get(untimedColorLens).size());
+            charKey = countCharKey(charKey, netMap.get(untimedColorLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(timedColorLens), "Timed-Arc Colored Petri nets", charKey, modifier));
+            */
+
+            return exampleMenu;
         }
+        return null;
+    }
 
+    private JMenu addExampleNets(List<String> fileNames, String menuName, int charKey, int modifier) {
+        JMenu menu = new JMenu(menuName);
 
-        fileMenu.add(exitAction);
+        for (String filename : fileNames) {
+            if (filename.toLowerCase().endsWith(".tapn")) {
+                final String netname = filename.replace(".tapn", "");
+                final String filenameFinal = filename;
 
-        return fileMenu;
+                GuiAction tmp = new GuiAction(netname, "Open example file \"" + netname + "\"", KeyStroke.getKeyStroke(charKey, modifier)) {
+                    public void actionPerformed(ActionEvent arg0) {
+                        InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
+                        try {
+                            TabContent net = TabContent.createNewTabFromInputStream(file, netname);
+                            guiFrameController.ifPresent(o -> o.openTab(net));
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                tmp.putValue(Action.SMALL_ICON, ResourceManager.getIcon("Net.png"));
+                menu.add(tmp);
+
+                if (charKey == 'Z') {
+                    charKey = '0';
+                } else if (charKey == '9') {
+                    charKey = 'A';
+                    modifier = InputEvent.ALT_MASK;
+                } else {
+                    charKey++;
+                }
+            }
+        }
+        return menu;
+    }
+
+    private int countCharKey(int previousKey, int previousSize) {
+        int currentKey = previousKey + previousSize;
+        int addedSize = 0;
+        int missingSize = 0;
+
+        if (currentKey > 'Z') {
+            addedSize = 'Z' - previousKey;
+            missingSize = previousSize - addedSize;
+            currentKey = ('0' - 1) + missingSize;
+            if (currentKey > '9') {
+                missingSize -= 10;
+                currentKey = countCharKey('A'-1, missingSize);
+            }
+        } else if (currentKey > '9' && currentKey < 'A') {
+            addedSize = '9' - previousKey;
+            missingSize = previousSize - addedSize;
+            currentKey = ('A' - 1) + missingSize;
+            if (currentKey > 'Z') {
+                missingSize -= 26;
+                currentKey = countCharKey('0'-1, missingSize);
+            }
+        }
+        return currentKey;
+    }
+
+    private int getModifier(int currentModifier, int charKey, int difference) {
+        if (currentModifier == InputEvent.ALT_MASK + InputEvent.SHIFT_MASK) {
+            if (charKey + difference > 'Z') {
+                int used = 'Z' - charKey;
+                if (difference - used > 10) {
+                    return InputEvent.ALT_MASK;
+                }
+            } else if (charKey < 'A' && (charKey + difference) > '9') {
+               return InputEvent.ALT_MASK;
+            }
+        }
+        return currentModifier;
     }
 
     /**
