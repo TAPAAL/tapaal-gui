@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="comp1" type="P/T net">
+    <place displayName="true" id="Raf1Star" initialMarking="1" invariant="&lt; inf" name="Raf1Star" nameOffsetX="-5" nameOffsetY="35" positionX="375" positionY="75"/>
+    <place displayName="true" id="RKIP" initialMarking="1" invariant="&lt; inf" name="RKIP" nameOffsetX="-5" nameOffsetY="35" positionX="540" positionY="75"/>
+    <place displayName="true" id="Raf1Star_RKIP" initialMarking="0" invariant="&lt; inf" name="Raf1Star_RKIP" nameOffsetX="101" nameOffsetY="32" positionX="450" positionY="225"/>
+    <place displayName="true" id="ERKPP" initialMarking="0" invariant="&lt; inf" name="ERKPP" nameOffsetX="-5" nameOffsetY="35" positionX="210" positionY="225"/>
+    <place displayName="true" id="MEKPP_ERK" initialMarking="0" invariant="&lt; inf" name="MEKPP_ERK" nameOffsetX="-5" nameOffsetY="35" positionX="210" positionY="405"/>
+    <place displayName="true" id="Raf1Star_RKIP_ERKPP" initialMarking="0" invariant="&lt; inf" name="Raf1Star_RKIP_ERKPP" nameOffsetX="146" nameOffsetY="32" positionX="450" positionY="405"/>
+    <place displayName="true" id="RKIPP_RP" initialMarking="0" invariant="&lt; inf" name="RKIPP_RP" nameOffsetX="-5" nameOffsetY="35" positionX="660" positionY="315"/>
+    <place displayName="true" id="MEKPP" initialMarking="1" invariant="&lt; inf" name="MEKPP" nameOffsetX="-5" nameOffsetY="35" positionX="120" positionY="600"/>
+    <place displayName="true" id="ERK" initialMarking="1" invariant="&lt; inf" name="ERK" nameOffsetX="-5" nameOffsetY="35" positionX="330" positionY="600"/>
+    <place displayName="true" id="RKIPP" initialMarking="0" invariant="&lt; inf" name="RKIPP" nameOffsetX="-5" nameOffsetY="35" positionX="600" positionY="510"/>
+    <place displayName="true" id="RP" initialMarking="1" invariant="&lt; inf" name="RP" nameOffsetX="-5" nameOffsetY="35" positionX="750" positionY="510"/>
+    <transition angle="90" displayName="true" id="r1" infiniteServer="false" name="r1" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="420" positionY="150" priority="0" urgent="false"/>
+    <transition angle="90" displayName="true" id="r2" infiniteServer="false" name="r2" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="495" positionY="150" priority="0" urgent="false"/>
+    <transition angle="270" displayName="true" id="r3" infiniteServer="false" name="r3" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="420" positionY="315" priority="0" urgent="false"/>
+    <transition angle="90" displayName="true" id="r4" infiniteServer="false" name="r4" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="480" positionY="315" priority="0" urgent="false"/>
+    <transition angle="90" displayName="true" id="r6" infiniteServer="false" name="r6" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="165" positionY="510" priority="0" urgent="false"/>
+    <transition angle="90" displayName="true" id="r7" infiniteServer="false" name="r7" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="270" positionY="510" priority="0" urgent="false"/>
+    <transition angle="270" displayName="true" id="r9" infiniteServer="false" name="r9" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="645" positionY="405" priority="0" urgent="false"/>
+    <transition angle="90" displayName="true" id="r10" infiniteServer="false" name="r10" nameOffsetX="47" nameOffsetY="31" player="0" positionX="690" positionY="405" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="r5" infiniteServer="false" name="r5" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="450" positionY="510" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="r11" infiniteServer="false" name="r11" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="660" positionY="225" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="r8" infiniteServer="false" name="r8" nameOffsetX="0" nameOffsetY="0" player="0" positionX="210" positionY="315" priority="0" urgent="false"/>
+    <arc id="e51648" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Raf1Star" target="r1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="397" yCoord="103"/>
+      <arcpath arcPointType="false" id="1" xCoord="429" yCoord="159"/>
+    </arc>
+    <arc id="e51657" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="RKIP" target="r1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="542" yCoord="97"/>
+      <arcpath arcPointType="false" id="1" xCoord="439" yCoord="160"/>
+    </arc>
+    <arc id="e51666" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r1" target="Raf1Star_RKIP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="434" yCoord="169"/>
+      <arcpath arcPointType="false" id="1" xCoord="458" yCoord="226"/>
+    </arc>
+    <arc id="e51675" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Raf1Star_RKIP" target="r2" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="472" yCoord="227"/>
+      <arcpath arcPointType="false" id="1" xCoord="509" yCoord="169"/>
+    </arc>
+    <arc id="e51702" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Raf1Star_RKIP" target="r3" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="460" yCoord="254"/>
+      <arcpath arcPointType="false" id="1" xCoord="435" yCoord="325"/>
+    </arc>
+    <arc id="e51720" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r3" target="Raf1Star_RKIP_ERKPP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="435" yCoord="335"/>
+      <arcpath arcPointType="false" id="1" xCoord="460" yCoord="405"/>
+    </arc>
+    <arc id="e51729" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Raf1Star_RKIP_ERKPP" target="r4" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="469" yCoord="405"/>
+      <arcpath arcPointType="false" id="1" xCoord="494" yCoord="334"/>
+    </arc>
+    <arc id="e51756" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Raf1Star_RKIP_ERKPP" target="r5" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="465" yCoord="435"/>
+      <arcpath arcPointType="false" id="1" xCoord="465" yCoord="510"/>
+    </arc>
+    <arc id="e51765" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r5" target="ERK" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="459" yCoord="525"/>
+      <arcpath arcPointType="false" id="1" xCoord="356" yCoord="605"/>
+    </arc>
+    <arc id="e51774" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r5" target="RKIPP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="469" yCoord="525"/>
+      <arcpath arcPointType="false" id="1" xCoord="600" yCoord="525"/>
+    </arc>
+    <arc id="e51792" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="MEKPP_ERK" target="r7" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="232" yCoord="432"/>
+      <arcpath arcPointType="false" id="1" xCoord="284" yCoord="519"/>
+    </arc>
+    <arc id="e51801" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r7" target="ERK" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="284" yCoord="529"/>
+      <arcpath arcPointType="false" id="1" xCoord="336" yCoord="602"/>
+    </arc>
+    <arc id="e51810" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r7" target="MEKPP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="284" yCoord="529"/>
+      <arcpath arcPointType="false" id="1" xCoord="147" yCoord="607"/>
+    </arc>
+    <arc id="e51819" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="MEKPP" target="r6" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="141" yCoord="601"/>
+      <arcpath arcPointType="false" id="1" xCoord="179" yCoord="529"/>
+    </arc>
+    <arc id="e51837" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r6" target="MEKPP_ERK" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="179" yCoord="519"/>
+      <arcpath arcPointType="false" id="1" xCoord="218" yCoord="433"/>
+    </arc>
+    <arc id="e51891" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="RKIPP_RP" target="r10" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="679" yCoord="344"/>
+      <arcpath arcPointType="false" id="1" xCoord="704" yCoord="414"/>
+    </arc>
+    <arc id="e51918" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r10" target="RKIPP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="704" yCoord="424"/>
+      <arcpath arcPointType="false" id="1" xCoord="624" yCoord="513"/>
+    </arc>
+    <arc id="e51936" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="RKIPP_RP" target="r11" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="675" yCoord="315"/>
+      <arcpath arcPointType="false" id="1" xCoord="675" yCoord="255"/>
+    </arc>
+    <arc id="A34" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r2" target="RKIP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="509" yCoord="159"/>
+      <arcpath arcPointType="false" id="1" xCoord="546" yCoord="102"/>
+    </arc>
+    <arc id="A35" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r2" target="Raf1Star" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="509" yCoord="159"/>
+      <arcpath arcPointType="false" id="1" xCoord="402" yCoord="97"/>
+    </arc>
+    <arc id="A36" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r4" target="Raf1Star_RKIP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="494" yCoord="324"/>
+      <arcpath arcPointType="false" id="1" xCoord="469" yCoord="254"/>
+    </arc>
+    <arc id="A37" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r5" target="Raf1Star" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="459" yCoord="525"/>
+      <arcpath arcPointType="false" id="1" xCoord="395" yCoord="529"/>
+      <arcpath arcPointType="false" id="2" xCoord="390" yCoord="104"/>
+    </arc>
+    <arc id="A38" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r10" target="RP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="704" yCoord="424"/>
+      <arcpath arcPointType="false" id="1" xCoord="757" yCoord="512"/>
+    </arc>
+    <arc id="A39" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r9" target="RKIPP_RP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="660" yCoord="415"/>
+      <arcpath arcPointType="false" id="1" xCoord="672" yCoord="344"/>
+    </arc>
+    <arc id="A40" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="RKIPP" target="r9" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="620" yCoord="511"/>
+      <arcpath arcPointType="false" id="1" xCoord="655" yCoord="424"/>
+    </arc>
+    <arc id="A41" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="RP" target="r9" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="754" yCoord="514"/>
+      <arcpath arcPointType="false" id="1" xCoord="665" yCoord="425"/>
+    </arc>
+    <arc id="A43" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r8" target="MEKPP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="219" yCoord="330"/>
+      <arcpath arcPointType="false" id="1" xCoord="136" yCoord="334"/>
+      <arcpath arcPointType="false" id="2" xCoord="135" yCoord="600"/>
+    </arc>
+    <arc id="A44" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="MEKPP_ERK" target="r8" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="225" yCoord="405"/>
+      <arcpath arcPointType="false" id="1" xCoord="225" yCoord="345"/>
+    </arc>
+    <arc id="A45" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r8" target="ERKPP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="225" yCoord="315"/>
+      <arcpath arcPointType="false" id="1" xCoord="225" yCoord="255"/>
+    </arc>
+    <arc id="A42" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="ERK" target="r6" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="332" yCoord="607"/>
+      <arcpath arcPointType="false" id="1" xCoord="194" yCoord="525"/>
+    </arc>
+    <arc id="A33" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r11" target="RP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="679" yCoord="240"/>
+      <arcpath arcPointType="false" id="1" xCoord="771" yCoord="242"/>
+      <arcpath arcPointType="false" id="2" xCoord="765" yCoord="510"/>
+    </arc>
+    <arc id="A43" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r11" target="RKIP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="675" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="680" yCoord="92"/>
+      <arcpath arcPointType="false" id="2" xCoord="569" yCoord="90"/>
+    </arc>
+    <arc id="A34" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="ERKPP" target="r3" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="237" yCoord="248"/>
+      <arcpath arcPointType="false" id="1" xCoord="365" yCoord="336"/>
+      <arcpath arcPointType="false" id="2" xCoord="420" yCoord="329"/>
+    </arc>
+    <arc id="A44" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r4" target="ERKPP" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="494" yCoord="324"/>
+      <arcpath arcPointType="false" id="1" xCoord="363" yCoord="246"/>
+      <arcpath arcPointType="false" id="2" xCoord="239" yCoord="240"/>
+    </arc>
+  </net>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Absence of deadlock" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+    <formula>
+            
+      <all-paths>
+                
+        <globally>
+                    
+          <negation>
+                        
+            <deadlock/>
+                      
+          </negation>
+                  
+        </globally>
+              
+      </all-paths>
+          
+    </formula>
+  </query>
+  <k-bound bound="3"/>
+  <feature isGame="false" isTimed="false"/>
+</pnml>

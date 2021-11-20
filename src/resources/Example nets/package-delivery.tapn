@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="TAPN1" type="P/T net">
+    <labels border="true" height="51" positionX="601" positionY="61" width="222">Example net from the paper "Automatic Synthesis of Transiently Correct
+Network Updates via Petri Games"</labels>
+    <place displayName="true" id="Env" initialMarking="1" invariant="&lt; inf" name="Env" nameOffsetX="0" nameOffsetY="0" positionX="390" positionY="45"/>
+    <place displayName="true" id="Src" initialMarking="1" invariant="&lt; inf" name="Src" nameOffsetX="0" nameOffsetY="0" positionX="390" positionY="135"/>
+    <place displayName="true" id="R2Disabled" initialMarking="0" invariant="&lt; inf" name="R2Disabled" nameOffsetX="0" nameOffsetY="0" positionX="270" positionY="315"/>
+    <place displayName="true" id="Router" initialMarking="0" invariant="&lt; inf" name="Router" nameOffsetX="0" nameOffsetY="0" positionX="390" positionY="315"/>
+    <place displayName="true" id="R1Disabled" initialMarking="0" invariant="&lt; inf" name="R1Disabled" nameOffsetX="92" nameOffsetY="1" positionX="510" positionY="315"/>
+    <place displayName="true" id="Dst" initialMarking="0" invariant="&lt; inf" name="Dst" nameOffsetX="61" nameOffsetY="18" positionX="390" positionY="495"/>
+    <transition angle="90" displayName="true" id="DisableR2" infiniteServer="false" name="DisableR2" nameOffsetX="-10" nameOffsetY="13" player="1" positionX="270" positionY="195" priority="0" urgent="false"/>
+    <transition angle="90" displayName="true" id="DisableR1" infiniteServer="false" name="DisableR1" nameOffsetX="84" nameOffsetY="14" player="1" positionX="510" positionY="195" priority="0" urgent="false"/>
+    <transition angle="90" displayName="true" id="Route2" infiniteServer="false" name="Route2" nameOffsetX="0" nameOffsetY="0" player="0" positionX="330" positionY="405" priority="0" urgent="false"/>
+    <transition angle="90" displayName="true" id="Route1" infiniteServer="false" name="Route1" nameOffsetX="0" nameOffsetY="0" player="0" positionX="450" positionY="405" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="Inject" infiniteServer="false" name="Inject" nameOffsetX="0" nameOffsetY="0" player="0" positionX="390" positionY="225" priority="0" urgent="false"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Env" target="DisableR2" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="395" yCoord="71"/>
+      <arcpath arcPointType="false" id="1" xCoord="284" yCoord="204"/>
+    </arc>
+    <arc id="A1" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Env" target="DisableR1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="414" yCoord="71"/>
+      <arcpath arcPointType="false" id="1" xCoord="524" yCoord="204"/>
+    </arc>
+    <arc id="A4" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Route2" target="Dst" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="344" yCoord="424"/>
+      <arcpath arcPointType="false" id="1" xCoord="396" yCoord="497"/>
+    </arc>
+    <arc id="A7" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Route1" target="Dst" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="464" yCoord="424"/>
+      <arcpath arcPointType="false" id="1" xCoord="413" yCoord="497"/>
+    </arc>
+    <arc id="A10" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Router" target="Route2" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="396" yCoord="342"/>
+      <arcpath arcPointType="false" id="1" xCoord="349" yCoord="415"/>
+    </arc>
+    <arc id="A11" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Router" target="Route1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="413" yCoord="342"/>
+      <arcpath arcPointType="false" id="1" xCoord="459" yCoord="414"/>
+    </arc>
+    <arc id="A9" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Inject" target="Router" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="405" yCoord="255"/>
+      <arcpath arcPointType="false" id="1" xCoord="405" yCoord="315"/>
+    </arc>
+    <arc id="A8" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Src" target="Inject" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="405" yCoord="165"/>
+      <arcpath arcPointType="false" id="1" xCoord="405" yCoord="225"/>
+    </arc>
+    <arc id="A2" inscription="1" nameOffsetX="0" nameOffsetY="0" source="DisableR2" target="R2Disabled" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="284" yCoord="214"/>
+      <arcpath arcPointType="false" id="1" xCoord="284" yCoord="315"/>
+    </arc>
+    <arc id="A5" inscription="1" nameOffsetX="0" nameOffsetY="0" source="DisableR1" target="R1Disabled" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="524" yCoord="214"/>
+      <arcpath arcPointType="false" id="1" xCoord="524" yCoord="315"/>
+    </arc>
+    <arc id="I10" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="R2Disabled" target="Route2" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="293" yCoord="342"/>
+      <arcpath arcPointType="false" id="1" xCoord="339" yCoord="414"/>
+    </arc>
+    <arc id="I11" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="R1Disabled" target="Route1" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="516" yCoord="342"/>
+      <arcpath arcPointType="false" id="1" xCoord="469" yCoord="415"/>
+    </arc>
+  </net>
+  <query active="true" approximationDenominator="2" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Package delivered" overApproximation="false" pTrie="true" query="AG (!(deadlock) or TAPN1.Dst = 1)" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="DFS" symmetry="true" timeDarts="false" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
+  <k-bound bound="3"/>
+  <feature isGame="true" isTimed="false"/>
+</pnml>
