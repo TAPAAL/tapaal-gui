@@ -569,8 +569,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
             for (PetriNetObject o : selection) {
                 if (o instanceof TimedTransitionComponent) {
                     TimedTransitionComponent transition = (TimedTransitionComponent) o;
-                    Command cmd = new ToggleTransitionUrgent(transition.underlyingTransition(), currentTab);
+                    if(!transition.underlyingTransition().hasUntimedPreset()) {
+                        JOptionPane.showMessageDialog(null,"Incoming arcs to urgent transitions must have the interval [0,\u221e).", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
 
+                    Command cmd = new ToggleTransitionUrgent(transition.underlyingTransition(), currentTab);
                     cmd.redo();
                     getUndoManager().addEdit(cmd);
                 }
@@ -2992,6 +2996,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 urgentTransAction.setEnabled(true);
                 uncontrollableTransAction.setEnabled(true);
                 uncontrollableUrgentTransAction.setEnabled(true);
+                toggleUrgentAction.setEnabled(true);
                 timedPlaceAction.setEnabled(true);
                 timedArcAction.setEnabled(true);
                 transportArcAction.setEnabled(true);
@@ -3008,6 +3013,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 urgentTransAction.setEnabled(false);
                 uncontrollableTransAction.setEnabled(false);
                 uncontrollableUrgentTransAction.setEnabled(false);
+                toggleUrgentAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);
@@ -3023,6 +3029,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 urgentTransAction.setEnabled(false);
                 uncontrollableTransAction.setEnabled(false);
                 uncontrollableUrgentTransAction.setEnabled(false);
+                toggleUrgentAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);
