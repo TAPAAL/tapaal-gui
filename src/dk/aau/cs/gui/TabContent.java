@@ -568,8 +568,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
             for (PetriNetObject o : selection) {
                 if (o instanceof TimedTransitionComponent) {
                     TimedTransitionComponent transition = (TimedTransitionComponent) o;
-                    Command cmd = new ToggleTransitionUrgent(transition.underlyingTransition(), currentTab);
+                    if(!transition.underlyingTransition().hasUntimedPreset()) {
+                        JOptionPane.showMessageDialog(null,"Incoming arcs to urgent transitions must have the interval [0,\u221e).", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
 
+                    Command cmd = new ToggleTransitionUrgent(transition.underlyingTransition(), currentTab);
                     cmd.redo();
                     getUndoManager().addEdit(cmd);
                 }
