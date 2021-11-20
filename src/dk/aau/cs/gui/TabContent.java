@@ -2995,6 +2995,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 transAction.setEnabled(true);
                 urgentTransAction.setEnabled(true);
                 uncontrollableTransAction.setEnabled(true);
+                toggleUncontrollableAction.setEnabled(true);
                 uncontrollableUrgentTransAction.setEnabled(true);
                 toggleUrgentAction.setEnabled(true);
                 timedPlaceAction.setEnabled(true);
@@ -3012,6 +3013,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 transAction.setEnabled(false);
                 urgentTransAction.setEnabled(false);
                 uncontrollableTransAction.setEnabled(false);
+                toggleUncontrollableAction.setEnabled(false);
                 uncontrollableUrgentTransAction.setEnabled(false);
                 toggleUrgentAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
@@ -3028,6 +3030,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 transAction.setEnabled(false);
                 urgentTransAction.setEnabled(false);
                 uncontrollableTransAction.setEnabled(false);
+                toggleUncontrollableAction.setEnabled(false);
                 uncontrollableUrgentTransAction.setEnabled(false);
                 toggleUrgentAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
