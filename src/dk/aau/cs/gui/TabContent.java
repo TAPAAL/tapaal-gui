@@ -1862,6 +1862,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case UNCONTROLLABLETRANS:
                 setManager(new CanvasUncontrollableTransitionDrawController());
                 break;
+            case TAPNURGENTUNCONTROLLABLETRANS:
+                setManager(new CanvasUncontrollableUrgentTransitionDrawController());
+                break;
             case ANNOTATION:
                 setManager(new CanvasAnnotationNoteDrawController());
                 break;
@@ -2266,6 +2269,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
             guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true, false);
+        }
+
+        @Override
+        public void registerEvents() {
+
+        }
+    }
+
+    class CanvasUncontrollableUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true, true);
         }
 
         @Override
@@ -2847,7 +2865,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     }
     public List<GuiAction> getAvailableDrawActions(){
         if (lens.isTimed() && lens.isGame()) {
-            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, urgentTransAction, uncontrollableTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction, toggleUncontrollableAction));
+            return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, urgentTransAction, uncontrollableTransAction, uncontrollableUrgentTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction, toggleUncontrollableAction));
         } else if (lens.isTimed() && !lens.isGame()) {
             return new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, urgentTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction));
         } else if (!lens.isTimed() && lens.isGame()){
@@ -2895,6 +2913,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private final GuiAction uncontrollableTransAction = new GuiAction("Uncontrollable transition", "Add an uncontrollable transition (L)", "L", true) {
         public void actionPerformed(ActionEvent e) {
             setMode(Pipe.ElementType.UNCONTROLLABLETRANS);
+        }
+    };
+    private final GuiAction uncontrollableUrgentTransAction = new GuiAction("Uncontrollable urgent transition", "Add an uncontrollable urgent transition (O)", "O", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(Pipe.ElementType.TAPNURGENTUNCONTROLLABLETRANS);
         }
     };
     private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
@@ -2951,6 +2974,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         transAction.setSelected(editorMode == Pipe.ElementType.TAPNTRANS);
         urgentTransAction.setSelected(editorMode == Pipe.ElementType.TAPNURGENTTRANS);
         uncontrollableTransAction.setSelected(editorMode == Pipe.ElementType.UNCONTROLLABLETRANS);
+        uncontrollableUrgentTransAction.setSelected(editorMode == Pipe.ElementType.TAPNURGENTUNCONTROLLABLETRANS);
         timedPlaceAction.setSelected(editorMode == Pipe.ElementType.TAPNPLACE);
         timedArcAction.setSelected(editorMode == Pipe.ElementType.TAPNARC);
         transportArcAction.setSelected(editorMode == Pipe.ElementType.TRANSPORTARC);
@@ -2967,6 +2991,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 transAction.setEnabled(true);
                 urgentTransAction.setEnabled(true);
                 uncontrollableTransAction.setEnabled(true);
+                uncontrollableUrgentTransAction.setEnabled(true);
                 timedPlaceAction.setEnabled(true);
                 timedArcAction.setEnabled(true);
                 transportArcAction.setEnabled(true);
@@ -2982,6 +3007,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 transAction.setEnabled(false);
                 urgentTransAction.setEnabled(false);
                 uncontrollableTransAction.setEnabled(false);
+                uncontrollableUrgentTransAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);
@@ -2996,6 +3022,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 transAction.setEnabled(false);
                 urgentTransAction.setEnabled(false);
                 uncontrollableTransAction.setEnabled(false);
+                uncontrollableUrgentTransAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);
