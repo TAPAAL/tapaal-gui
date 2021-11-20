@@ -40,7 +40,7 @@ import static net.tapaal.swinghelpers.GridBagHelper.Anchor;
 
 public class TAPNTransitionEditor extends JPanel {
 
-	private static final String untimed_preset_warning = "Incoming arcs to urgent transitions must have the interval [0,inf).";
+	private static final String untimed_preset_warning = "Incoming arcs to urgent transitions must have the interval [0,\u221e).";
 	private static final String transport_destination_invariant_warning = "Transport arcs going through urgent transitions cannot have an invariant at the destination.";
 	private final TimedTransitionComponent transition;
 	private final JRootPane rootPane;
