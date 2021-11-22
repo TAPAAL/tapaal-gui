@@ -39,7 +39,7 @@ import pipe.gui.Verifier;
 public class TAPAAL {
 
 	public static final String TOOLNAME = "TAPAAL";
-	public static final String VERSION = "3.9.0";
+	public static final String VERSION = "3.9.1";
 
 	public static String getProgramName(){
 		return "" + TAPAAL.TOOLNAME + " " + TAPAAL.VERSION;
