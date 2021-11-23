@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="HouseConstruction1" type="P/T net">
+    <place displayName="true" id="Start" initialMarking="2" invariant="&lt; inf" name="Start" nameOffsetX="-3" nameOffsetY="10" positionX="542" positionY="8"/>
+    <place displayName="true" id="p2" initialMarking="0" invariant="&lt; inf" name="p2" nameOffsetX="0" nameOffsetY="11" positionX="543" positionY="168"/>
+    <place displayName="true" id="p3" initialMarking="0" invariant="&lt; inf" name="p3" nameOffsetX="0" nameOffsetY="1" positionX="543" positionY="336"/>
+    <place displayName="true" id="p4" initialMarking="0" invariant="&lt; inf" name="p4" nameOffsetX="19" nameOffsetY="-2" positionX="335" positionY="410"/>
+    <place displayName="true" id="p6" initialMarking="0" invariant="&lt; inf" name="p6" nameOffsetX="-19" nameOffsetY="-4" positionX="543" positionY="485"/>
+    <place displayName="true" id="p5" initialMarking="0" invariant="&lt; inf" name="p5" nameOffsetX="-20" nameOffsetY="-3" positionX="935" positionY="410"/>
+    <place displayName="true" id="p7" initialMarking="0" invariant="&lt; inf" name="p7" nameOffsetX="19" nameOffsetY="-2" positionX="428" positionY="543"/>
+    <place displayName="true" id="p15" initialMarking="0" invariant="&lt; inf" name="p15" nameOffsetX="-20" nameOffsetY="-3" positionX="428" positionY="843"/>
+    <place displayName="true" id="p11" initialMarking="0" invariant="&lt; inf" name="p11" nameOffsetX="25" nameOffsetY="-3" positionX="428" positionY="673"/>
+    <place displayName="true" id="p12" initialMarking="0" invariant="&lt; inf" name="p12" nameOffsetX="25" nameOffsetY="-4" positionX="543" positionY="673"/>
+    <place displayName="true" id="p8" initialMarking="0" invariant="&lt; inf" name="p8" nameOffsetX="-1" nameOffsetY="13" positionX="635" positionY="543"/>
+    <place displayName="true" id="p9" initialMarking="0" invariant="&lt; inf" name="p9" nameOffsetX="-3" nameOffsetY="14" positionX="843" positionY="543"/>
+    <place displayName="true" id="p10" initialMarking="0" invariant="&lt; inf" name="p10" nameOffsetX="-19" nameOffsetY="-3" positionX="748" positionY="618"/>
+    <place displayName="true" id="p13" initialMarking="0" invariant="&lt; inf" name="p13" nameOffsetX="-19" nameOffsetY="-4" positionX="935" positionY="673"/>
+    <place displayName="true" id="p17" initialMarking="0" invariant="&lt; inf" name="p17" nameOffsetX="-44" nameOffsetY="-10" positionX="749" positionY="897"/>
+    <place displayName="true" id="p14" initialMarking="0" invariant="&lt; inf" name="p14" nameOffsetX="-19" nameOffsetY="-4" positionX="748" positionY="748"/>
+    <place displayName="true" id="p19" initialMarking="0" invariant="&lt; inf" name="p19" nameOffsetX="-19" nameOffsetY="-4" positionX="936" positionY="971"/>
+    <place displayName="true" id="p20" initialMarking="0" invariant="&lt; inf" name="p20" nameOffsetX="24" nameOffsetY="-4" positionX="748" positionY="1048"/>
+    <place displayName="true" id="p18" initialMarking="0" invariant="&lt; inf" name="p18" nameOffsetX="25" nameOffsetY="-4" positionX="543" positionY="971"/>
+    <place displayName="true" id="p22" initialMarking="0" invariant="&lt; inf" name="p22" nameOffsetX="-19" nameOffsetY="-4" positionX="935" positionY="1123"/>
+    <place displayName="true" id="p27" initialMarking="0" invariant="&lt; inf" name="p27" nameOffsetX="-19" nameOffsetY="-4" positionX="936" positionY="1336"/>
+    <place displayName="true" id="p26" initialMarking="0" invariant="&lt; inf" name="p26" nameOffsetX="24" nameOffsetY="-2" positionX="543" positionY="1250"/>
+    <place displayName="true" id="p21" initialMarking="0" invariant="&lt; inf" name="p21" nameOffsetX="25" nameOffsetY="-2" positionX="543" positionY="1123"/>
+    <place displayName="true" id="p23" initialMarking="0" invariant="&lt; inf" name="p23" nameOffsetX="1" nameOffsetY="13" positionX="748" positionY="1178"/>
+    <place displayName="true" id="p25" initialMarking="0" invariant="&lt; inf" name="p25" nameOffsetX="25" nameOffsetY="-3" positionX="336" positionY="1336"/>
+    <place displayName="true" id="p16" initialMarking="0" invariant="&lt; inf" name="p16" nameOffsetX="26" nameOffsetY="-3" positionX="336" positionY="983"/>
+    <place displayName="true" id="Finished" initialMarking="0" invariant="&lt; inf" name="Finished" nameOffsetX="0" nameOffsetY="0" positionX="540" positionY="1440"/>
+    <transition angle="0" displayName="true" id="t1" infiniteServer="false" name="t1" nameOffsetX="-3" nameOffsetY="5" player="0" positionX="543" positionY="80" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t2" infiniteServer="false" name="t2" nameOffsetX="-4" nameOffsetY="1" player="0" positionX="543" positionY="248" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t3" infiniteServer="false" name="t3" nameOffsetX="-21" nameOffsetY="10" player="0" positionX="543" positionY="410" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t4" infiniteServer="false" name="t4" nameOffsetX="-21" nameOffsetY="10" player="0" positionX="543" positionY="543" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t6" infiniteServer="false" name="t6" nameOffsetX="-21" nameOffsetY="3" player="0" positionX="935" positionY="543" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t7" infiniteServer="false" name="t7" nameOffsetX="16" nameOffsetY="3" player="0" positionX="428" positionY="603" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t10" infiniteServer="false" name="t10" nameOffsetX="22" nameOffsetY="3" player="0" positionX="335" positionY="843" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t9" infiniteServer="false" name="t9" nameOffsetX="16" nameOffsetY="1" player="0" positionX="428" positionY="760" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t5" infiniteServer="false" name="t5" nameOffsetX="-4" nameOffsetY="13" player="0" positionX="748" positionY="543" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t8" infiniteServer="false" name="t8" nameOffsetX="-15" nameOffsetY="13" player="0" positionX="748" positionY="673" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t11" infiniteServer="false" name="t11" nameOffsetX="-14" nameOffsetY="13" player="0" positionX="749" positionY="821" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t13" infiniteServer="false" name="t13" nameOffsetX="-14" nameOffsetY="13" player="0" positionX="749" positionY="971" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t17" infiniteServer="false" name="t17" nameOffsetX="-21" nameOffsetY="2" player="0" positionX="935" positionY="1178" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t15" infiniteServer="false" name="t15" nameOffsetX="-21" nameOffsetY="2" player="0" positionX="935" positionY="1048" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t14" infiniteServer="false" name="t14" nameOffsetX="22" nameOffsetY="4" player="0" positionX="543" positionY="1048" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t16" infiniteServer="false" name="t16" nameOffsetX="22" nameOffsetY="3" player="0" positionX="543" positionY="1178" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="t12" infiniteServer="false" name="t12" nameOffsetX="22" nameOffsetY="2" player="0" positionX="336" positionY="1186" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="T19" infiniteServer="false" name="T19" nameOffsetX="0" nameOffsetY="0" player="0" positionX="540" positionY="1336" priority="0" urgent="false"/>
+    <arc id="cId71567688273787826568" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Start" target="t1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="557" yCoord="37"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="80"/>
+    </arc>
+    <arc id="cId71501588902170788489" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t1" target="p2" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="558" yCoord="110"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="168"/>
+    </arc>
+    <arc id="cId715015889021707884810" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p2" target="t2" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="558" yCoord="198"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="248"/>
+    </arc>
+    <arc id="cId715015889021707884811" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t2" target="p3" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="558" yCoord="278"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="336"/>
+    </arc>
+    <arc id="cId715015889021707884812" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p3" target="t3" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="558" yCoord="366"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="410"/>
+    </arc>
+    <arc id="cId715015889021707884825" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t3" target="p6" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="558" yCoord="440"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="485"/>
+    </arc>
+    <arc id="cId715015889021707884827" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p4" target="t10" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="350" yCoord="440"/>
+      <arcpath arcPointType="false" id="1" xCoord="350" yCoord="843"/>
+    </arc>
+    <arc id="cId715015889021707884826" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t3" target="p4" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="552" yCoord="425"/>
+      <arcpath arcPointType="false" id="1" xCoord="365" yCoord="425"/>
+    </arc>
+    <arc id="cId715015889021707884829" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t4" target="p7" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="552" yCoord="558"/>
+      <arcpath arcPointType="false" id="1" xCoord="458" yCoord="558"/>
+    </arc>
+    <arc id="cId715015889021707884828" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p6" target="t4" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="558" yCoord="515"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="543"/>
+    </arc>
+    <arc id="cId715015889021707884831" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t7" target="p11" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="443" yCoord="633"/>
+      <arcpath arcPointType="false" id="1" xCoord="443" yCoord="673"/>
+    </arc>
+    <arc id="cId715015889021707884830" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p7" target="t7" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="443" yCoord="573"/>
+      <arcpath arcPointType="false" id="1" xCoord="443" yCoord="603"/>
+    </arc>
+    <arc id="cId715015889021707884834" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p15" target="t10" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="428" yCoord="858"/>
+      <arcpath arcPointType="false" id="1" xCoord="354" yCoord="858"/>
+    </arc>
+    <arc id="cId715015889021707884835" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t3" target="p5" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="562" yCoord="425"/>
+      <arcpath arcPointType="false" id="1" xCoord="935" yCoord="425"/>
+    </arc>
+    <arc id="cId715015889021707884832" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p11" target="t9" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="443" yCoord="703"/>
+      <arcpath arcPointType="false" id="1" xCoord="443" yCoord="760"/>
+    </arc>
+    <arc id="cId715015889021707884833" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t9" target="p15" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="443" yCoord="790"/>
+      <arcpath arcPointType="false" id="1" xCoord="443" yCoord="843"/>
+    </arc>
+    <arc id="cId715015889021707884836" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t4" target="p12" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="558" yCoord="573"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="673"/>
+    </arc>
+    <arc id="cId715015889021707884837" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p5" target="t6" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="950" yCoord="440"/>
+      <arcpath arcPointType="false" id="1" xCoord="950" yCoord="543"/>
+    </arc>
+    <arc id="cId715015889021707884846" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p9" target="t5" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="843" yCoord="558"/>
+      <arcpath arcPointType="false" id="1" xCoord="767" yCoord="558"/>
+    </arc>
+    <arc id="cId715015889021707884847" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p8" target="t5" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="665" yCoord="558"/>
+      <arcpath arcPointType="false" id="1" xCoord="757" yCoord="558"/>
+    </arc>
+    <arc id="cId715015889021707884844" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t6" target="p9" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="944" yCoord="558"/>
+      <arcpath arcPointType="false" id="1" xCoord="873" yCoord="558"/>
+    </arc>
+    <arc id="cId715015889021707884845" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t4" target="p8" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="562" yCoord="558"/>
+      <arcpath arcPointType="false" id="1" xCoord="635" yCoord="558"/>
+    </arc>
+    <arc id="cId715015889021707884851" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p10" target="t8" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="763" yCoord="648"/>
+      <arcpath arcPointType="false" id="1" xCoord="763" yCoord="673"/>
+    </arc>
+    <arc id="cId708901698542996233450" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p13" target="t8" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="935" yCoord="688"/>
+      <arcpath arcPointType="false" id="1" xCoord="767" yCoord="688"/>
+    </arc>
+    <arc id="cId708901698542996233449" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t6" target="p13" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="950" yCoord="573"/>
+      <arcpath arcPointType="false" id="1" xCoord="950" yCoord="673"/>
+    </arc>
+    <arc id="cId708901698542996233448" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t5" target="p10" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="763" yCoord="573"/>
+      <arcpath arcPointType="false" id="1" xCoord="763" yCoord="618"/>
+    </arc>
+    <arc id="cId708901698542996233452" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p12" target="t8" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="573" yCoord="688"/>
+      <arcpath arcPointType="false" id="1" xCoord="757" yCoord="688"/>
+    </arc>
+    <arc id="cId708901698542996233463" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p17" target="t13" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="764" yCoord="927"/>
+      <arcpath arcPointType="false" id="1" xCoord="764" yCoord="971"/>
+    </arc>
+    <arc id="cId708901698542996233462" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t11" target="p17" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="764" yCoord="851"/>
+      <arcpath arcPointType="false" id="1" xCoord="764" yCoord="897"/>
+    </arc>
+    <arc id="cId708901698542996233461" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p14" target="t11" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="763" yCoord="777"/>
+      <arcpath arcPointType="false" id="1" xCoord="764" yCoord="821"/>
+    </arc>
+    <arc id="cId708901698542996233460" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t8" target="p14" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="763" yCoord="703"/>
+      <arcpath arcPointType="false" id="1" xCoord="763" yCoord="748"/>
+    </arc>
+    <arc id="cId708901698542996233464" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t13" target="p18" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="758" yCoord="986"/>
+      <arcpath arcPointType="false" id="1" xCoord="573" yCoord="986"/>
+    </arc>
+    <arc id="cId708901698542996233465" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t13" target="p20" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="764" yCoord="1001"/>
+      <arcpath arcPointType="false" id="1" xCoord="763" yCoord="1048"/>
+    </arc>
+    <arc id="cId708901698542996233466" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t13" target="p19" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="768" yCoord="986"/>
+      <arcpath arcPointType="false" id="1" xCoord="936" yCoord="986"/>
+    </arc>
+    <arc id="cId709232195615829788677" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p20" target="t15" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="778" yCoord="1063"/>
+      <arcpath arcPointType="false" id="1" xCoord="944" yCoord="1063"/>
+    </arc>
+    <arc id="cId709232195615829788672" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p19" target="t15" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="950" yCoord="1000"/>
+      <arcpath arcPointType="false" id="1" xCoord="950" yCoord="1048"/>
+    </arc>
+    <arc id="cId709232195615829788673" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t15" target="p22" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="950" yCoord="1078"/>
+      <arcpath arcPointType="false" id="1" xCoord="950" yCoord="1123"/>
+    </arc>
+    <arc id="cId709232195615829788674" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p22" target="t17" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="950" yCoord="1153"/>
+      <arcpath arcPointType="false" id="1" xCoord="950" yCoord="1178"/>
+    </arc>
+    <arc id="cId709232195615829788675" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t17" target="p27" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="950" yCoord="1208"/>
+      <arcpath arcPointType="false" id="1" xCoord="950" yCoord="1336"/>
+    </arc>
+    <arc id="cId709232195615829788685" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t14" target="p21" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="558" yCoord="1078"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="1123"/>
+    </arc>
+    <arc id="cId709232195615829788684" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p18" target="t14" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="558" yCoord="1001"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="1048"/>
+    </arc>
+    <arc id="cId709232195615829788687" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t16" target="p26" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="558" yCoord="1208"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="1250"/>
+    </arc>
+    <arc id="cId709232195615829788686" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p21" target="t16" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="558" yCoord="1153"/>
+      <arcpath arcPointType="false" id="1" xCoord="558" yCoord="1178"/>
+    </arc>
+    <arc id="cId709232195615829788693" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t10" target="p16" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="350" yCoord="873"/>
+      <arcpath arcPointType="false" id="1" xCoord="350" yCoord="983"/>
+    </arc>
+    <arc id="cId709232195615829788695" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t12" target="p25" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="351" yCoord="1216"/>
+      <arcpath arcPointType="false" id="1" xCoord="351" yCoord="1336"/>
+    </arc>
+    <arc id="cId709232195615829788694" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p16" target="t12" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="351" yCoord="1013"/>
+      <arcpath arcPointType="false" id="1" xCoord="351" yCoord="1186"/>
+    </arc>
+    <arc id="cId709232195615829788689" inscription="1" nameOffsetX="0" nameOffsetY="0" source="t17" target="p23" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="944" yCoord="1193"/>
+      <arcpath arcPointType="false" id="1" xCoord="778" yCoord="1193"/>
+    </arc>
+    <arc id="cId709066947294161375890" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p23" target="t16" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="748" yCoord="1193"/>
+      <arcpath arcPointType="false" id="1" xCoord="562" yCoord="1193"/>
+    </arc>
+    <arc id="A48" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p26" target="T19" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="557" yCoord="1279"/>
+      <arcpath arcPointType="false" id="1" xCoord="555" yCoord="1336"/>
+    </arc>
+    <arc id="A49" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p25" target="T19" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="366" yCoord="1351"/>
+      <arcpath arcPointType="false" id="1" xCoord="549" yCoord="1351"/>
+    </arc>
+    <arc id="A50" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="p27" target="T19" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="936" yCoord="1351"/>
+      <arcpath arcPointType="false" id="1" xCoord="559" yCoord="1351"/>
+    </arc>
+    <arc id="A51" inscription="1" nameOffsetX="0" nameOffsetY="0" source="T19" target="Finished" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="555" yCoord="1366"/>
+      <arcpath arcPointType="true" id="1" xCoord="555" yCoord="1440"/>
+    </arc>
+  </net>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="10" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Finish two constructions" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+    <formula>
+            
+      <exists-path>
+                
+        <finally>
+                    
+          <integer-eq>
+                        
+            <tokens-count>
+                            
+              <place>HouseConstruction1.Finished</place>
+                          
+            </tokens-count>
+                        
+            <integer-constant>2</integer-constant>
+                      
+          </integer-eq>
+                  
+        </finally>
+              
+      </exists-path>
+          
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="12" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Soundness" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="true" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+    <formula>
+            
+      <all-paths>
+                
+        <globally>
+                    
+          <exists-path>
+                        
+            <finally>
+                            
+              <integer-eq>
+                                
+                <tokens-count>
+                                    
+                  <place>HouseConstruction1.Finished</place>
+                                  
+                </tokens-count>
+                                
+                <integer-constant>2</integer-constant>
+                              
+              </integer-eq>
+                          
+            </finally>
+                      
+          </exists-path>
+                  
+        </globally>
+              
+      </all-paths>
+          
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="10" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Guaranteed Termination" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="LTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+    <formula>
+            
+      <all-paths>
+                
+        <finally>
+                    
+          <integer-eq>
+                        
+            <tokens-count>
+                            
+              <place>HouseConstruction1.Finished</place>
+                          
+            </tokens-count>
+                        
+            <integer-constant>2</integer-constant>
+                      
+          </integer-eq>
+                  
+        </finally>
+              
+      </all-paths>
+          
+    </formula>
+  </query>
+  <k-bound bound="3"/>
+  <feature isGame="false" isTimed="false"/>
+</pnml>

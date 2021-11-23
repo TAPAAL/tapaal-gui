@@ -74,6 +74,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         PLACE, IMMTRANS, TIMEDTRANS, ANNOTATION, ARC, INHIBARC,
         //TAPN Elements
         TAPNPLACE, TAPNTRANS, UNCONTROLLABLETRANS, TAPNARC, TRANSPORTARC, TAPNINHIBITOR_ARC,
+        TAPNURGENTTRANS, TAPNURGENTUNCONTROLLABLETRANS,
         //Others (might refactore)
         ADDTOKEN, DELTOKEN, SELECT, DRAW, DRAG,
     }
@@ -161,7 +162,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
     }
     public enum ModelViolation {
-        
+
         //PlaceNotNull("Place can't be null"),
         //TransitionNotNull("Transion can't be null"),
         //ModelNotNull("Model can't be null"),
@@ -205,6 +206,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             transition.setUrgent(isUrgent);
             transition.setUncontrollable(isUncontrollable);
+            transition.setUrgent(isUrgent);
             TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, lens);
 
             guiModelToModel.get(c).add(transition);
@@ -633,8 +635,12 @@ public class TabContent extends JSplitPane implements TabContentActions{
             for (PetriNetObject o : selection) {
                 if (o instanceof TimedTransitionComponent) {
                     TimedTransitionComponent transition = (TimedTransitionComponent) o;
-                    Command cmd = new ToggleTransitionUrgent(transition.underlyingTransition(), currentTab);
+                    if(!transition.underlyingTransition().hasUntimedPreset()) {
+                        JOptionPane.showMessageDialog(null,"Incoming arcs to urgent transitions must have the interval [0,\u221e).", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
 
+                    Command cmd = new ToggleTransitionUrgent(transition.underlyingTransition(), currentTab);
                     cmd.redo();
                     getUndoManager().addEdit(cmd);
                 }
@@ -689,7 +695,17 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	}
 
-    private static void checkQueries(TabContent tab) {
+    public static TAPNLens getFileLens(InputStream file) throws Exception {
+        try {
+            ModelLoader loader = new ModelLoader();
+            return loader.loadLens(file);
+        } catch (Exception e) {
+            throw e;
+        }
+
+    }
+
+	private static void checkQueries(TabContent tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
         EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
         boolean gameChanged = false;
@@ -875,7 +891,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	private DrawingSurfaceImpl drawingSurface;
 	private File appFile;
 	private final JPanel drawingSurfaceDummy;
-	
+
 	// Normal mode
 	private BugHandledJXMultisplitPane editorSplitPane;
 	private static Split editorModelroot = null;
@@ -908,7 +924,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 	private Integer selectedTemplate = 0;
 	private Boolean selectedTemplateWasActive = false;
-	
+
 	private WorkflowDialog workflowDialog = null;
 
 	private NameVisibilityPanel nameVisibilityPanel = null;
@@ -992,11 +1008,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
 		return sharedPTPanel;
 	}
-	
+
 	public TemplateExplorer getTemplateExplorer(){
 		return templateExplorer;
 	}
-	
+
 	public void createEditorLeftPane() {
 
 		constantsPanel = new ConstantsPane(this);
@@ -1030,7 +1046,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 						sharedPTPanel.getMinimumSize().height
 				)
 		);
-		
+
 		boolean floatingDividers = false;
 		if(editorModelroot == null){
 			Leaf constantsLeaf = new Leaf(constantsName);
@@ -1062,22 +1078,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		editorSplitPane = new BugHandledJXMultisplitPane();
 		editorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
 		editorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
-		
+
 		editorSplitPane.setSize(editorModelroot.getBounds().width, editorModelroot.getBounds().height);
-		
+
 		editorSplitPane.getMultiSplitLayout().setModel(editorModelroot);
 
 		editorSplitPane.add(templateExplorer, templateExplorerName);
 		editorSplitPane.add(sharedPTPanel, sharedPTName);
 		editorSplitPane.add(queries, queriesName);
 		editorSplitPane.add(constantsPanel, constantsName);
-		
+
 		editorSplitPaneScroller = createLeftScrollPane(editorSplitPane);
 		this.setLeftComponent(editorSplitPaneScroller);
-		
+
 		editorSplitPane.repaint();
 	}
-	
+
 	private JScrollPane createLeftScrollPane(JPanel panel){
 		JScrollPane scroller = new JScrollPane(panel);
 		scroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -1120,7 +1136,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public void updateConstantsList() {
 		constantsPanel.showConstants();
 	}
-	
+
 	public void removeConstantHighlights() {
 		constantsPanel.removeConstantHighlights();
 	}
@@ -1133,7 +1149,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public DataLayer getModel() {
 		return drawingSurface.getGuiModel();
 	}
-	
+
 	public HashMap<TimedArcPetriNet, DataLayer> getGuiModels() {
 		return this.guiModels;
 	}
@@ -1185,7 +1201,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if (transitionFiring == null) {
             createTransitionFiring();
         }
-		
+
 		boolean floatingDividers = false;
 		if(simulatorModelRoot == null){
 			Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
@@ -1211,7 +1227,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         animatorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
 
 		animatorSplitPane.setSize(simulatorModelRoot.getBounds().width, simulatorModelRoot.getBounds().height);
-		
+
 		animatorSplitPane.getMultiSplitLayout().setModel(simulatorModelRoot);
 
 		animationControlsPanel = new JPanel(new GridBagLayout());
@@ -1248,13 +1264,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		animatorSplitPane.add(animationControlsPanel, animControlName);
 		animatorSplitPane.add(transitionFiring, transitionFiringName);
-		
+
 		animatorSplitPaneScroller = createLeftScrollPane(animatorSplitPane);
 		animatorSplitPane.repaint();
 	}
 
 	public void switchToAnimationComponents() {
-		
+
 		//Remove dummy
 		Component dummy = animatorSplitPane.getMultiSplitLayout().getComponentForNode(animatorSplitPane.getMultiSplitLayout().getNodeForName(templateExplorerName));
 		if(dummy != null){
@@ -1265,7 +1281,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         var t = new TemplateExplorer(this);
         t.switchToAnimationMode();
 		animatorSplitPane.add(t, templateExplorerName);
-		
+
 		this.setLeftComponent(animatorSplitPaneScroller);
 	}
 
@@ -1283,7 +1299,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public AnimationControlSidePanel getAnimationController() {
 		return animControlerBox;
 	}
-	
+
 	public DelayEnabledTransitionControl getDelayEnabledTransitionControl(){
 		return transitionFiring.getDelayEnabledTransitionControl();
 	}
@@ -1442,7 +1458,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		templateExplorer.updateTemplateList();
 
 		constantsPanel.setNetwork(tapnNetwork);
-		
+
 		if(network.paintNet()){
 			this.setRightComponent(drawingSurfaceScroller);
 		} else {
@@ -1512,7 +1528,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if (enable != constantsPanel.isVisible()) {
 			editorSplitPane.getMultiSplitLayout().displayNode(constantsName, enable);
 			makeSureEditorPanelIsVisible(constantsPanel);
-		}		
+		}
 	}
 
 	public void showEnabledTransitionsList(boolean enable) {
@@ -1522,20 +1538,20 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			animatorSplitPane.getMultiSplitLayout().displayNode(transitionFiringName, enable);
 		}
 	}
-	
+
 	public void showDelayEnabledTransitions(boolean enable){
 		transitionFiring.showDelayEnabledTransitions(enable);
 		drawingSurface.repaint();
-		
+
 		CreateGui.getAnimator().updateFireableTransitions();
 	}
-	
+
 	public void selectFirstElements() {
 		templateExplorer.selectFirst();
 		queries.selectFirst();
 		constantsPanel.selectFirst();
-	}	
-	
+	}
+
 	public boolean isQueryPossible() {
 		return queries.isQueryPossible();
 	}
@@ -1586,7 +1602,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			}
 		}
 	}
-	
+
 	public void setResizeingDefault(){
 		if(animatorSplitPane != null){
 			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(true);
@@ -1731,27 +1747,27 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public static Split getEditorModelRoot(){
 		return editorModelroot;
 	}
-	
+
 	public static void setEditorModelRoot(Split model){
 		editorModelroot = model;
 	}
-	
+
 	public static Split getSimulatorModelRoot(){
 		return simulatorModelRoot;
 	}
-	
+
 	public static void setSimulatorModelRoot(Split model){
 		simulatorModelRoot = model;
 	}
-	
+
 	public boolean restoreWorkflowDialog(){
 		return workflowDialog != null && workflowDialog.restoreWindow();
 	}
-	
+
 	public WorkflowDialog getWorkflowDialog() {
 		return workflowDialog;
 	}
-	
+
 	public void setWorkflowDialog(WorkflowDialog dialog) {
 		this.workflowDialog = dialog;
 	}
@@ -1924,8 +1940,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case TAPNTRANS:
                 setManager(new CanvasTransitionDrawController());
                 break;
+            case TAPNURGENTTRANS:
+                setManager(new CanvasUrgentTransitionDrawController());
+                break;
             case UNCONTROLLABLETRANS:
                 setManager(new CanvasUncontrollableTransitionDrawController());
+                break;
+            case TAPNURGENTUNCONTROLLABLETRANS:
+                setManager(new CanvasUncontrollableUrgentTransitionDrawController());
                 break;
             case ANNOTATION:
                 setManager(new CanvasAnnotationNoteDrawController());
@@ -2068,8 +2090,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	public void setApp(GuiFrameActions newApp) {
 		app.setReference(newApp);
 		undoManager.setApp(app);
-
-		updateFeatureText();
 
 		updateFeatureText();
 
@@ -2292,7 +2312,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, false);
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, false, false);
+        }
+
+        @Override
+        public void registerEvents() {
+
+        }
+    }
+
+    class CanvasUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, false, true);
         }
 
         @Override
@@ -2307,7 +2342,22 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true);
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true, false);
+        }
+
+        @Override
+        public void registerEvents() {
+
+        }
+    }
+
+    class CanvasUncontrollableUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
+
+        @Override
+        public void drawingSurfaceMousePressed(MouseEvent e) {
+            Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
+
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true, true);
         }
 
         @Override
@@ -2458,7 +2508,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                         var r = guiModelManager.addNewTimedPlace(getModel(), p);
                         placeClicked(r.result, e);
                     } else { //Transition
-                        var r = guiModelManager.addNewTimedTransitions(getModel(), p, false);
+                        var r = guiModelManager.addNewTimedTransitions(getModel(), p, false, false);
                         transitionClicked(r.result, e);
                     }
                 }
@@ -2682,10 +2732,6 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public void updateFeatureText() {
         boolean[] features = {lens.isTimed(), lens.isGame(), lens.isColored()};
         app.ifPresent(o->o.setFeatureInfoText(features));
-    }
-
-    public boolean isNetTimed() {
-        return lens.isTimed();
     }
 
     public TAPNLens getLens() {
@@ -3038,9 +3084,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public List<GuiAction> getAvailableDrawActions(){
         List<GuiAction> actions;
         if (lens.isTimed() && !lens.isGame()) {
-            actions = new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction));
+            actions = new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, urgentTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction));
         } else if (lens.isTimed()) {
-            actions = new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction, toggleUncontrollableAction));
+            actions = new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, urgentTransAction, uncontrollableTransAction, uncontrollableUrgentTransAction, timedArcAction, transportArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUrgentAction, toggleUncontrollableAction));
         } else if (lens.isGame()){
             actions = new ArrayList<>(Arrays.asList(selectAction, timedPlaceAction, transAction, uncontrollableTransAction, timedArcAction, inhibarcAction, tokenAction, deleteTokenAction, annotationAction, toggleUncontrollableAction));
         } else {
@@ -3092,9 +3138,19 @@ public class TabContent extends JSplitPane implements TabContentActions{
             setMode(DrawTool.TAPNTRANS);
         }
     };
+    private final GuiAction urgentTransAction = new GuiAction("Urgent transition", "Add an urgent transition (Y)", "Y", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(DrawTool.TAPNURGENTTRANS);
+        }
+    };
     private final GuiAction uncontrollableTransAction = new GuiAction("Uncontrollable transition", "Add an uncontrollable transition (L)", "L", true) {
         public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.UNCONTROLLABLETRANS);
+        }
+    };
+    private final GuiAction uncontrollableUrgentTransAction = new GuiAction("Uncontrollable urgent transition", "Add an uncontrollable urgent transition (O)", "O", true) {
+        public void actionPerformed(ActionEvent e) {
+            setMode(DrawTool.TAPNURGENTUNCONTROLLABLETRANS);
         }
     };
     private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
@@ -3155,7 +3211,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
         // deselect other actions
         selectAction.setSelected(mode == SELECT);
         transAction.setSelected(mode == DrawTool.TAPNTRANS);
+        urgentTransAction.setSelected(mode == DrawTool.TAPNURGENTTRANS);
         uncontrollableTransAction.setSelected(mode == DrawTool.UNCONTROLLABLETRANS);
+        uncontrollableUrgentTransAction.setSelected(mode == DrawTool.TAPNURGENTUNCONTROLLABLETRANS);
         timedPlaceAction.setSelected(mode == DrawTool.TAPNPLACE);
         timedArcAction.setSelected(mode == DrawTool.TAPNARC);
         transportArcAction.setSelected(mode == DrawTool.TRANSPORTARC);
@@ -3170,7 +3228,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case draw:
                 selectAction.setEnabled(true);
                 transAction.setEnabled(true);
+                urgentTransAction.setEnabled(true);
                 uncontrollableTransAction.setEnabled(true);
+                toggleUncontrollableAction.setEnabled(true);
+                uncontrollableUrgentTransAction.setEnabled(true);
+                toggleUrgentAction.setEnabled(true);
                 timedPlaceAction.setEnabled(true);
                 timedArcAction.setEnabled(true);
                 transportArcAction.setEnabled(true);
@@ -3184,7 +3246,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case noNet:
                 selectAction.setEnabled(false);
                 transAction.setEnabled(false);
+                urgentTransAction.setEnabled(false);
                 uncontrollableTransAction.setEnabled(false);
+                toggleUncontrollableAction.setEnabled(false);
+                uncontrollableUrgentTransAction.setEnabled(false);
+                toggleUrgentAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);
@@ -3197,7 +3263,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
             case animation:
                 selectAction.setEnabled(false);
                 transAction.setEnabled(false);
+                urgentTransAction.setEnabled(false);
                 uncontrollableTransAction.setEnabled(false);
+                toggleUncontrollableAction.setEnabled(false);
+                uncontrollableUrgentTransAction.setEnabled(false);
+                toggleUrgentAction.setEnabled(false);
                 timedPlaceAction.setEnabled(false);
                 timedArcAction.setEnabled(false);
                 transportArcAction.setEnabled(false);

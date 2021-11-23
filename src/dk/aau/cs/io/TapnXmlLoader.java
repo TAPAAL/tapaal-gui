@@ -78,6 +78,21 @@ public class TapnXmlLoader {
 
 	}
 
+    public TabContent.TAPNLens loadLens(InputStream file) throws FormatException {
+        Require.that(file != null, "file must be non-null and exist");
+
+        Document doc = loadDocument(file);
+        if(doc == null) return null;
+
+        idResolver.clear();
+        parseFeature(doc);
+
+        if (hasFeatureTag) {
+            return lens;
+        }
+        return null;
+    }
+
 	public LoadedModel load(InputStream file) throws Exception {
 		Require.that(file != null, "file must be non-null and exist");
 
@@ -202,6 +217,24 @@ public class TapnXmlLoader {
                 }
             }
 
+            lens = new TabContent.TAPNLens(isTimed, isGame, isColored);
+        }
+    }
+
+    private void parseFeature(Document doc) {
+        if (doc.getElementsByTagName("feature").getLength() > 0) {
+            NodeList nodeList = doc.getElementsByTagName("feature");
+
+            hasFeatureTag = true;
+
+            var isTimed = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isTimed").getNodeValue());
+            var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
+            var isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
+
+            if (isColored && isGame) {
+                isGame = false;
+                isColored = false;
+            }
             lens = new TabContent.TAPNLens(isTimed, isGame, isColored);
         }
     }
