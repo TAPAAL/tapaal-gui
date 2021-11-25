@@ -58,11 +58,11 @@ public class VerifyTAPNExporter {
 			return null;
 
 		try{
+            this.model = model;
             outputModel(model, modelFile, mapping, guiModel);
 
             RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
 			query.getProperty().accept(placeVisitor, null);
-
 
             if(query.getProperty() instanceof TCTLNotNode) {
                 TCTLPathToStateConverter innerQuery = (TCTLPathToStateConverter) ((TCTLNotNode) query.getProperty()).getProperty();

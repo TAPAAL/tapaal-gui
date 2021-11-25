@@ -318,8 +318,6 @@ public class TabTransformer {
         dialog.setVisible(true);
     }
 
-
-
     public static void mapQueryToNewNames(pipe.dataLayer.TAPNQuery query, NameMapping mapping) {
         RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
         RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(mapping);

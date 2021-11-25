@@ -34,10 +34,14 @@ import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.TabTransformer;
+import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.util.FormatException;
+import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.VerifyTAPN.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
@@ -58,8 +62,6 @@ import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class QueryDialog extends JPanel {
@@ -3807,7 +3809,11 @@ public class QueryDialog extends JPanel {
                             RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(transformedModel.value2());
                             clonedQuery.getProperty().accept(transitionVisitor, null);
                         }
-						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification) {
+                        if (lens.isColored()) {
+                            VerifyCPNExporter exporter = new VerifyCPNExporter();
+                            exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
+
+                        } else if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
 

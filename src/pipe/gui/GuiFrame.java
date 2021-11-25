@@ -1563,14 +1563,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             TabContent.TAPNLens timedLens = new TabContent.TAPNLens(true, false, false);
             TabContent.TAPNLens untimedGameLens = new TabContent.TAPNLens(false, true, false);
             TabContent.TAPNLens timedGameLens = new TabContent.TAPNLens(true, true, false);
-            //TabContent.TAPNLens untimedColorLens = new TabContent.TAPNLens(false, false, true);
-            //TabContent.TAPNLens timedColorLens = new TabContent.TAPNLens(true, false, true);
+            TabContent.TAPNLens untimedColorLens = new TabContent.TAPNLens(false, false, true);
+            TabContent.TAPNLens timedColorLens = new TabContent.TAPNLens(true, false, true);
 
             HashMap<TabContent.TAPNLens, List<String>> netMap = new HashMap<>(){{
                     put(untimedLens, new ArrayList<>());
                     put(timedLens, new ArrayList<>());
                     put(untimedGameLens, new ArrayList<>());
                     put(timedGameLens, new ArrayList<>());
+                    put(untimedColorLens, new ArrayList<>());
+                    put(timedColorLens, new ArrayList<>());
             }};
 
             for (String filename : nets) {
@@ -1613,15 +1615,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             charKey = countCharKey(charKey, netMap.get(untimedGameLens).size());
             exampleMenu.add(addExampleNets(netMap.get(timedGameLens), "Timed-Arc Petri net games", charKey, modifier));
 
-            //TODO implement when color is added
-            /*modifier = getModifier(modifier, charKey, netMap.get(timedGameLens).size());
+            modifier = getModifier(modifier, charKey, netMap.get(timedGameLens).size());
             charKey = countCharKey(charKey, netMap.get(timedGameLens).size());
             exampleMenu.add(addExampleNets(netMap.get(untimedColorLens), "Colored P/T nets", charKey, modifier));
 
             modifier = getModifier(modifier, charKey, netMap.get(untimedColorLens).size());
             charKey = countCharKey(charKey, netMap.get(untimedColorLens).size());
             exampleMenu.add(addExampleNets(netMap.get(timedColorLens), "Timed-Arc Colored Petri nets", charKey, modifier));
-            */
 
             return exampleMenu;
         }
