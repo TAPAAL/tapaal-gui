@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -28,6 +29,8 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
@@ -38,6 +41,8 @@ import dk.aau.cs.gui.TabTransformer;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.TapnXmlLoader;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.verification.ModelChecker;
@@ -3809,7 +3814,9 @@ public class QueryDialog extends JPanel {
                             RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(transformedModel.value2());
                             clonedQuery.getProperty().accept(transitionVisitor, null);
                         }
-                        if (lens.isColored()) {
+                        if (lens.isColored() && lens.isTimed()) {
+                            exportTACPN(transformedModel, xmlFile);
+                        } else if (lens.isColored()) {
                             VerifyCPNExporter exporter = new VerifyCPNExporter();
                             exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
 
@@ -3971,6 +3978,32 @@ public class QueryDialog extends JPanel {
 		add(buttonPanel, gridBagConstraints);
 
 	}
+
+	private void exportTACPN(Tuple<TimedArcPetriNet, NameMapping> transformedModel, String xmlFile) {
+        TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+        ArrayList<Template> templates = new ArrayList<>(1);
+        ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<>(1);
+
+        network.add(transformedModel.value1());
+        for (ColorType ct : QueryDialog.this.tapnNetwork.colorTypes()) {
+            network.add(ct);
+        }
+        for (Variable variable: QueryDialog.this.tapnNetwork.variables()) {
+            network.add(variable);
+        }
+        for (int i = 0; i < templateBox.getItemCount(); i++) {
+            TimedArcPetriNet tapn = (TimedArcPetriNet) templateBox.getItemAt(i);
+            templates.add(new Template(tapn, guiModels.get(tapn), new Zoomer()));
+        }
+        // guimodel not working
+        //templates.add(new Template(transformedModel.value1(), null, new Zoomer()));
+        TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(QueryDialog.this.tapnNetwork, templates, queries, QueryDialog.this.tapnNetwork.constants());
+        try {
+            writerTACPN.savePNML(new File(xmlFile));
+        } catch (IOException | ParserConfigurationException | TransformerException exception) {
+            exception.printStackTrace();
+        }
+    }
 
 	// /////////////////////////////////////////////////////////////////////
 	// Undo support stuff
