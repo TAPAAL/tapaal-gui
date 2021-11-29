@@ -86,8 +86,9 @@ public abstract class Transition extends PlaceTransitionObject {
 		//Oct 30 2020: In Ubuntu dark mode the namelabel is hidden for some reason
         //This line fixes it, though it should not matter
         //https://bugs.launchpad.net/tapaal/+bug/1897539
-        pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
-
+        if(!selected) {
+            pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+        }
 
         g2.setStroke(new BasicStroke(2.0f));
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
