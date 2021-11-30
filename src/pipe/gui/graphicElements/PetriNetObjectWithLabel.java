@@ -22,6 +22,7 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
         this.nameOffsetY = nameOffsetY;
 
         pnName.setPosition(nameOffsetX, nameOffsetY);
+        pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 
         //See note in function
         setLabelHandler();
