@@ -2326,7 +2326,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, false, true);
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true, false);
         }
 
         @Override
@@ -2341,7 +2341,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true, false);
+            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, false, true);
         }
 
         @Override

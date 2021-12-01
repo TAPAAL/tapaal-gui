@@ -209,14 +209,6 @@ public class TapnXmlLoader {
             var isColoredElement = nodeList.item(0).getAttributes().getNamedItem("isColored");
             boolean isColored = isColoredElement == null ? network.isColored() : Boolean.parseBoolean(isColoredElement.getNodeValue());
 
-            if(isGame && isColored){
-                if(!network.hasUncontrollableTransitions()){
-                    isGame = false;
-                } else if(!network.isColored()){
-                    isColored = false;
-                }
-            }
-
             lens = new TabContent.TAPNLens(isTimed, isGame, isColored);
         }
     }
@@ -231,10 +223,6 @@ public class TapnXmlLoader {
             var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
             var isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
 
-            if (isColored && isGame) {
-                isGame = false;
-                isColored = false;
-            }
             lens = new TabContent.TAPNLens(isTimed, isGame, isColored);
         }
     }
