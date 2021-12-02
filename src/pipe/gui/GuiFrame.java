@@ -111,7 +111,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             Export.exportGuiView(getCurrentTab().drawingSurface(), Export.PRINTER, null);
         }
     };
-    private final GuiAction importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format") {
+    private final GuiAction importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             guiFrameController.ifPresent(GuiFrameControllerActions::importPNMLFile);
         }
