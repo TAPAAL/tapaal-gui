@@ -342,5 +342,5 @@ Try to also use in the menu Tools/Workflow analysis to see that the workflow is 
   </net>
   <query active="true" approximationDenominator="2" capacity="14" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Find Schedule" overApproximation="true" pTrie="true" query="EF Workflow.done &gt;= 1" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="BFS" symmetry="true" timeDarts="true" traceOption="SOME" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="14"/>
-  <feature isGame="false" isTimed="true"/>
+  <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>

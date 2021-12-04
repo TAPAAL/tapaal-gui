@@ -1570,7 +1570,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                         }
                         TabContent.TAPNLens tmp = lens;
                         netMap.forEach((v, k) -> {
-                            if (v.isTimed() == tmp.isTimed() && v.isGame() == tmp.isGame()) k.add(filename);
+                            if (v.isTimed() == tmp.isTimed() && v.isGame() == tmp.isGame() && v.isColored() == tmp.isColored()) k.add(filename);
                         });
                     } catch (Exception e) {
                         if (netMap.containsKey(timedLens)) netMap.get(timedLens).add(filename);

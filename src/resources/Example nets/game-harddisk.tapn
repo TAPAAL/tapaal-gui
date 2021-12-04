@@ -255,5 +255,5 @@
   </net>
   <query active="true" approximationDenominator="2" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="false" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Never Fail" overApproximation="true" pTrie="true" query="AG stream_requests.Fail &lt;= 0" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="DFS" symmetry="true" timeDarts="false" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="3"/>
-  <feature isGame="true" isTimed="true"/>
+  <feature isGame="true" isTimed="true" isColored="false"/>
 </pnml>

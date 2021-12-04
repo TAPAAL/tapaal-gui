@@ -94,5 +94,5 @@ This net is a workflow net and by going to menu Tools/Workflow analysis, one can
   </net>
   <query active="true" approximationDenominator="2" capacity="3" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Target Reachable" overApproximation="true" pTrie="true" query="EF IntroExample.Target = 1" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="BFS" symmetry="true" timeDarts="false" traceOption="SOME" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="3"/>
-  <feature isGame="false" isTimed="true"/>
+  <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>

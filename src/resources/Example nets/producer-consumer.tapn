@@ -79,5 +79,5 @@ and these items wait in place In_transit for Transport.</labels>
   <query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Three in Garbage" overApproximation="true" pTrie="true" query="EF ProducerConsumer.Garbage = 3" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="SOME" useStubbornReduction="true" useTarOption="false"/>
   <query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="false" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Avoid Garbage" overApproximation="false" pTrie="true" query="EG ProducerConsumer.Garbage = 0" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="DFS" symmetry="true" timeDarts="true" traceOption="SOME" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="3"/>
-  <feature isGame="false" isTimed="true"/>
+  <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>

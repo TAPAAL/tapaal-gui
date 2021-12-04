@@ -268,5 +268,5 @@
   <query active="true" approximationDenominator="2" capacity="2" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Arrival-to-Treatment Deadline OK" overApproximation="true" pTrie="false" query="AG Monitor.MissedDeadline &lt;= 0" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="SOME" useStubbornReduction="true" useTarOption="false"/>
   <query active="true" approximationDenominator="2" capacity="2" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="false" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Eventually All Patients Finished" overApproximation="false" pTrie="false" query="AF Patient.PatientFinished &gt;= 4" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="SOME" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="3"/>
-  <feature isGame="false" isTimed="true"/>
+  <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>

@@ -94,5 +94,5 @@ The user of the tool can now experiments with different values of the periods an
   </net>
   <query active="true" approximationDenominator="2" capacity="6" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="5 responses, no drops" overApproximation="true" pTrie="true" query="EF (WebServer.Responses = 5 and WebServer.Dropped = 0)" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="SOME" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="3"/>
-  <feature isGame="false" isTimed="true"/>
+  <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>

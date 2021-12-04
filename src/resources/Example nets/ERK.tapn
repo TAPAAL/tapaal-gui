@@ -186,5 +186,5 @@
     </formula>
   </query>
   <k-bound bound="3"/>
-  <feature isGame="false" isTimed="false"/>
+  <feature isGame="false" isTimed="false" isColored="false"/>
 </pnml>

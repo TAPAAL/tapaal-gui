@@ -207,5 +207,5 @@ The query asks about violation of the synchronization between sender and receive
   </net>
   <query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Synchronization Violation" overApproximation="true" pTrie="true" query="EF ((Protocol.Sender_A &gt;= 1 and Protocol.Receiver_B &gt;= 1) or (Protocol.Sender_A &gt;= 1 and Protocol.Receiver_C &gt;= 1) or (Protocol.Sender_C &gt;= 1 and Protocol.Receiver_A &gt;= 1) or (Protocol.Sender_C &gt;= 1 and Protocol.Receiver_D &gt;= 1))" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="3"/>
-  <feature isGame="false" isTimed="true"/>
+  <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>
