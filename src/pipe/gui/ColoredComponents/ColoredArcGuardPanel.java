@@ -548,12 +548,23 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private void initNumberExpressionsPanel() {
         numberExprPanel = new JPanel(new GridBagLayout());
         numberExprPanel.setBorder(BorderFactory.createTitledBorder("Numerical Expressions"));
-        colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, true, context) {
-            @Override
-            public void changedColor(JComboBox[] comboBoxes) {
 
-            }
-        };
+        if(isTransportArc) {
+            colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, false, context) {
+                @Override
+                public void changedColor(JComboBox[] comboBoxes) {
+
+                }
+            };
+        } else {
+            colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, true, context) {
+                @Override
+                public void changedColor(JComboBox[] comboBoxes) {
+
+                }
+            };
+        }
+
         colorExpressionComboBoxPanel.removeScrollPaneBorder();
         Integer current = 1;
         Integer min = 1;
