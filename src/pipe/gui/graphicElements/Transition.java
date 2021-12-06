@@ -83,12 +83,6 @@ public abstract class Transition extends PlaceTransitionObject {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 
-		//Oct 30 2020: In Ubuntu dark mode the namelabel is hidden for some reason
-        //This line fixes it, though it should not matter
-        //https://bugs.launchpad.net/tapaal/+bug/1897539
-        pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
-
-
         g2.setStroke(new BasicStroke(2.0f));
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
