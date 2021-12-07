@@ -1836,8 +1836,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 				getAnimator().reset(false);
 				getAnimator().storeModel();
-				getAnimator().highlightEnabledTransitions();
-				getAnimator().reportBlockingPlaces();
+                getAnimator().updateFireableTransitions();
+                getAnimator().reportBlockingPlaces();
 				getAnimator().setFiringmode("Random");
 
 				// Set a light blue backgound color for animation mode
