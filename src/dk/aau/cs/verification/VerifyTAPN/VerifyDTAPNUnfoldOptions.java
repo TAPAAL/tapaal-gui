@@ -9,7 +9,6 @@ import java.io.IOException;
 public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
     private String modelOut;
     private String queryOut;
-    private File queryLibFile;
     private int tokenSize;
     private int numQueries;
 
@@ -18,19 +17,9 @@ public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
         this.queryOut = queryOut;
         this.tokenSize = tokenSize;
         this.numQueries = numQueries;
-        setup();
     }
 
-    void setup(){
-        //Create file for internal library communication
-        try {
-            queryLibFile = File.createTempFile("libQuery", ".q");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
+    
     @Override
     public boolean enabledOverApproximation() {
         return false;
@@ -67,11 +56,9 @@ public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("-k " + tokenSize + " -q " + queryLibFile.getAbsolutePath() + " -q-xml " + queryOut + " -f " + modelOut + " -q-num 0");
         for(int i = 1; i < numQueries; i++){
             result.append("," + i);
         }
-
         return result.toString();
     }
 }
