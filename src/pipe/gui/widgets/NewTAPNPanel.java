@@ -263,7 +263,7 @@ public class NewTAPNPanel extends EscapableDialog {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         selectionPanel.add(isGamePanel, gbc);
     }
@@ -304,7 +304,7 @@ public class NewTAPNPanel extends EscapableDialog {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         selectionPanel.add(isColorPanel, gbc);
     }
