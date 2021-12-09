@@ -205,5 +205,5 @@ Network Updates via Petri Games"</labels>
   </net>
   <query active="true" approximationDenominator="2" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Is p4 visited" overApproximation="false" pTrie="true" query="AG (!(deadlock) or injection_components.p4_visited &gt;= 1)" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="DFS" symmetry="true" timeDarts="false" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="3"/>
-  <feature isGame="true" isTimed="false"/>
+  <feature isGame="true" isTimed="false" isColored="false"/>
 </pnml>

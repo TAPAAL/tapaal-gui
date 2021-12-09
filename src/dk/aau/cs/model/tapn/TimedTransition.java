@@ -25,7 +25,7 @@ public class TimedTransition extends TAPNElement {
 	private final List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
 	private final List<TransportArc> transportArcsGoingThrough = new ArrayList<TransportArc>();
 	private final List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
-	private TimeInterval dInterval = null;
+
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
     private GuardExpression guard;
@@ -259,7 +259,8 @@ public class TimedTransition extends TAPNElement {
 		if(Animator.isUrgentTransitionEnabled()){
 			result = IntervalOperations.intersectingInterval(result, Arrays.asList(new TimeInterval(true, new IntBound(0), new IntBound(0), true)));
 		}
-		
+
+        TimeInterval dInterval;
 		//cache result
 		if(result.isEmpty()){
 			dInterval = null;
@@ -459,10 +460,7 @@ public class TimedTransition extends TAPNElement {
 	 * Returns the dInterval lastly calculated
 	 */
 	public TimeInterval getdInterval() {
-		if(dInterval == null){
-			dInterval = calculateDInterval();
-		}
-		return dInterval;
+		return calculateDInterval();
 	}
 
 	public int getLagestAssociatedConstant() {

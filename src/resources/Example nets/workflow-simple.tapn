@@ -228,5 +228,5 @@ You can also analyse the workflow by using Tool/Workflow analysis menu and reali
   </net>
   <query active="true" approximationDenominator="2" capacity="3" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Find Schedule" overApproximation="true" pTrie="true" query="EF Workflow.Work_Done = 1" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="SOME" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="3"/>
-  <feature isGame="false" isTimed="true"/>
+  <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>

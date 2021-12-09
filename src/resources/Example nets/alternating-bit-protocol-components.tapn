@@ -238,5 +238,5 @@ The query asks about violation of the synchronization between sender and receive
   </net>
   <query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Violation  of Behaviour" overApproximation="true" pTrie="true" query="EF ((Sender.Sender_A &gt;= 1 and Receiver.Receiver_B &gt;= 1) or (Sender.Sender_A &gt;= 1 and Receiver.Receiver_C &gt;= 1) or (Sender.Sender_C &gt;= 1 and Receiver.Receiver_A &gt;= 1) or (Sender.Sender_C &gt;= 1 and Receiver.Receiver_D &gt;= 1))" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE" useStubbornReduction="false" useTarOption="false"/>
   <k-bound bound="3"/>
-  <feature isGame="false" isTimed="true"/>
+  <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>

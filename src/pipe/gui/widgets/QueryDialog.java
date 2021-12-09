@@ -1462,7 +1462,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void setupQueryCategoryFromQuery(TAPNQuery queryToCreateFrom) {
-        if (!lens.isTimed() && !lens.isGame() && !lens.isColored()) {
+        if (!lens.isTimed() && !lens.isGame()) {
             TAPNQuery.QueryCategory category = queryToCreateFrom.getCategory();
             if (category.equals(TAPNQuery.QueryCategory.CTL)) {
                 queryType.setSelectedIndex(0);

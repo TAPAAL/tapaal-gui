@@ -134,13 +134,6 @@ public class Animator {
     }
 
     /**
-     * Highlights enabled transitions
-     */
-    public void highlightEnabledTransitions() {
-        updateFireableTransitions();
-    }
-
-    /**
      * Called during animation to unhighlight previously highlighted transitions
      */
     private void unhighlightDisabledTransitions() {
@@ -236,7 +229,7 @@ public class Animator {
 
             activeGuiModel().repaintPlaces();
             unhighlightDisabledTransitions();
-            highlightEnabledTransitions();
+            updateFireableTransitions();
             currentAction--;
             currentMarkingIndex--;
 
@@ -282,7 +275,7 @@ public class Animator {
 
             activeGuiModel().repaintPlaces();
             unhighlightDisabledTransitions();
-            highlightEnabledTransitions();
+            updateFireableTransitions();
             currentAction++;
             currentMarkingIndex++;
             activeGuiModel().redrawVisibleTokenLists();
@@ -394,7 +387,7 @@ public class Animator {
 
         activeGuiModel().repaintPlaces();
         unhighlightDisabledTransitions();
-        highlightEnabledTransitions();
+        updateFireableTransitions();
 
         addMarking(new TAPNNetworkTimedTransitionStep(transition, next.value2()), next.value1());
 
@@ -420,7 +413,7 @@ public class Animator {
 
         activeGuiModel().repaintPlaces();
         unhighlightDisabledTransitions();
-        highlightEnabledTransitions();
+        updateFireableTransitions();
 
         updateAnimationButtonsEnabled();
         updateMouseOverInformation();

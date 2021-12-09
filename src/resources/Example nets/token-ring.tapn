@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="TokenRing_dash_COL_dash_005" type="P/T net">
+    <place displayName="true" id="state" initialMarking="6" invariant="&lt; inf" name="state" nameOffsetX="85" nameOffsetY="50" positionX="450" positionY="255">
+      <type>
+        <text>Couple</text>
+        <structure>
+          <usersort declaration="Couple"/>
+        </structure>
+      </type>
+      <hlinitialMarking>
+        <text>(1'(process0, process0) + 1'(process1, process1) + 1'(process2, process2) + 1'(process3, process3) + 1'(process4, process4) + 1'(process5, process5))</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="process0"/>
+                    </subterm>
+                    <subterm>
+                      <useroperator declaration="process0"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="process1"/>
+                    </subterm>
+                    <subterm>
+                      <useroperator declaration="process1"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="process2"/>
+                    </subterm>
+                    <subterm>
+                      <useroperator declaration="process2"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="process3"/>
+                    </subterm>
+                    <subterm>
+                      <useroperator declaration="process3"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="process4"/>
+                    </subterm>
+                    <subterm>
+                      <useroperator declaration="process4"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="process5"/>
+                    </subterm>
+                    <subterm>
+                      <useroperator declaration="process5"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinitialMarking>
+    </place>
+    <transition angle="0" displayName="true" id="mainprocess" infiniteServer="false" name="mainprocess" nameOffsetX="100" nameOffsetY="21" player="0" positionX="750" positionY="255" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="otherprocess" infiniteServer="false" name="otherprocess" nameOffsetX="0" nameOffsetY="18" player="0" positionX="165" positionY="255" priority="0" urgent="false">
+      <condition>
+        <text>i !eq process0 and x !eq y</text>
+        <structure>
+          <and>
+            <subterm>
+              <inequality>
+                <subterm>
+                  <variable refvariable="vari"/>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="process0"/>
+                </subterm>
+              </inequality>
+            </subterm>
+            <subterm>
+              <inequality>
+                <subterm>
+                  <variable refvariable="varx"/>
+                </subterm>
+                <subterm>
+                  <variable refvariable="vary"/>
+                </subterm>
+              </inequality>
+            </subterm>
+          </and>
+        </structure>
+      </condition>
+    </transition>
+    <arc id="mainproc2state" inscription="1" nameOffsetX="108" nameOffsetY="-22" source="mainprocess" target="state" type="normal" weight="1">
+      <hlinscription>
+        <text>(1'(process0, x++) + 1'(process5, x))</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="process0"/>
+                    </subterm>
+                    <subterm>
+                      <successor>
+                        <subterm>
+                          <variable refvariable="varx"/>
+                        </subterm>
+                      </successor>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="process5"/>
+                    </subterm>
+                    <subterm>
+                      <variable refvariable="varx"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="760" yCoord="265"/>
+      <arcpath arcPointType="false" id="1" xCoord="620" yCoord="233"/>
+      <arcpath arcPointType="false" id="2" xCoord="479" yCoord="266"/>
+    </arc>
+    <arc id="state2mainproc" inscription="[0,inf)" nameOffsetX="123" nameOffsetY="23" source="state" target="mainprocess" type="timed" weight="1">
+      <hlinscription>
+        <text>(1'(process0, x) + 1'(process5, x))</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="process0"/>
+                    </subterm>
+                    <subterm>
+                      <variable refvariable="varx"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="process5"/>
+                    </subterm>
+                    <subterm>
+                      <variable refvariable="varx"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="479" yCoord="273"/>
+      <arcpath arcPointType="false" id="1" xCoord="626" yCoord="303"/>
+      <arcpath arcPointType="false" id="2" xCoord="759" yCoord="275"/>
+    </arc>
+    <arc id="otherproc2state" inscription="1" nameOffsetX="52" nameOffsetY="-25" source="otherprocess" target="state" type="normal" weight="1">
+      <hlinscription>
+        <text>(1'(i, y) + 1'(i--, y))</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <variable refvariable="vari"/>
+                    </subterm>
+                    <subterm>
+                      <variable refvariable="vary"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <predecessor>
+                        <subterm>
+                          <variable refvariable="vari"/>
+                        </subterm>
+                      </predecessor>
+                    </subterm>
+                    <subterm>
+                      <variable refvariable="vary"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="185" yCoord="265"/>
+      <arcpath arcPointType="false" id="1" xCoord="320" yCoord="233"/>
+      <arcpath arcPointType="false" id="2" xCoord="450" yCoord="266"/>
+    </arc>
+    <arc id="state2otherproc" inscription="[0,inf)" nameOffsetX="38" nameOffsetY="20" source="state" target="otherprocess" type="timed" weight="1">
+      <hlinscription>
+        <text>(1'(i, x) + 1'(i--, y))</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <variable refvariable="vari"/>
+                    </subterm>
+                    <subterm>
+                      <variable refvariable="varx"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <predecessor>
+                        <subterm>
+                          <variable refvariable="vari"/>
+                        </subterm>
+                      </predecessor>
+                    </subterm>
+                    <subterm>
+                      <variable refvariable="vary"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="450" yCoord="273"/>
+      <arcpath arcPointType="false" id="1" xCoord="320" yCoord="302"/>
+      <arcpath arcPointType="false" id="2" xCoord="184" yCoord="275"/>
+    </arc>
+  </net>
+  <declaration>
+    <structure>
+      <declarations>
+        <namedsort id="dot" name="dot">
+          <dot/>
+        </namedsort>
+        <namedsort id="process" name="Process">
+          <cyclicenumeration>
+            <feconstant id="process0" name="Process"/>
+            <feconstant id="process1" name="Process"/>
+            <feconstant id="process2" name="Process"/>
+            <feconstant id="process3" name="Process"/>
+            <feconstant id="process4" name="Process"/>
+            <feconstant id="process5" name="Process"/>
+          </cyclicenumeration>
+        </namedsort>
+        <namedsort id="Couple" name="Couple">
+          <productsort>
+            <usersort declaration="process"/>
+            <usersort declaration="process"/>
+          </productsort>
+        </namedsort>
+        <variabledecl id="vari" name="i">
+          <usersort declaration="process"/>
+        </variabledecl>
+        <variabledecl id="varx" name="x">
+          <usersort declaration="process"/>
+        </variabledecl>
+        <variabledecl id="vary" name="y">
+          <usersort declaration="process"/>
+        </variabledecl>
+      </declarations>
+    </structure>
+  </declaration>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" colorFixpoint="true" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Always six tokens in state" overApproximation="false" pTrie="false" partitioning="true" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetricVars="true" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+    <formula>
+            
+      <all-paths>
+                
+        <globally>
+                    
+          <integer-eq>
+                        
+            <tokens-count>
+                            
+              <place>TokenRing_dash_COL_dash_005.state</place>
+                          
+            </tokens-count>
+                        
+            <integer-constant>6</integer-constant>
+                      
+          </integer-eq>
+                  
+        </globally>
+              
+      </all-paths>
+          
+    </formula>
+  </query>
+  <k-bound bound="3"/>
+  <feature isColored="true" isGame="false" isTimed="false"/>
+</pnml>

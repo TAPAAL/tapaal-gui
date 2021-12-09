@@ -213,5 +213,5 @@ Try to experiment with the values of the constants deadline and delay in order t
   </net>
   <query active="true" approximationDenominator="2" capacity="7" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Synchronization Violation" overApproximation="true" pTrie="true" query="EF ((Protocol.Sender_0_A &gt;= 1 and (Protocol.Receiver_0_B &gt;= 1 or Protocol.Receiver_1_A &gt;= 1)) or (Protocol.Sender_1_A &gt;= 1 and (Protocol.Receiver_0_A &gt;= 1 or Protocol.Receiver_1_B &gt;= 1)))" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="3"/>
-  <feature isGame="false" isTimed="true"/>
+  <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>
