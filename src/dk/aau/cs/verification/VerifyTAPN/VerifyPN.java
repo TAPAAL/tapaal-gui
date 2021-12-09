@@ -278,7 +278,7 @@ public class VerifyPN implements ModelChecker{
 			VerifyTAPNExporter exporter;
 			if(model.value1().parentNetwork().isColored()){
 			    exporter = new VerifyCPNExporter();
-			    supportsStats = false;
+			    //supportsStats = false;
             } else {
                 exporter = new VerifyPNExporter();
             }

@@ -9,7 +9,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import pipe.dataLayer.DataLayer;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.Transition;
 
+import javax.xml.crypto.Data;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,18 +22,15 @@ import java.util.Collection;
 public class VerifyCPNExporter extends VerifyTAPNExporter{
     protected void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         modelStream.append("<place ");
-
         modelStream.append("id=\"" + p.name() + "\" ");
         modelStream.append("name=\"" + p.name() + "\" ");
         modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
-
         modelStream.append(">\n");
         modelStream.append(colorInformationToXMLString(p));
         modelStream.append("</place>\n");
     }
     protected void outputTransition(TimedTransition t, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         modelStream.append("<transition ");
-
         modelStream.append("player=\"" + (t.isUncontrollable() ? "1" : "0") + "\" ");
         modelStream.append("id=\"" + t.name() + "\" ");
         modelStream.append("name=\"" + t.name() + "\" ");
