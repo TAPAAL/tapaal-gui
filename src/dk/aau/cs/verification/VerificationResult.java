@@ -84,7 +84,8 @@ public class VerificationResult<TTrace> {
 		List<Tuple<String,Integer>> returnList = new ArrayList<Tuple<String,Integer>>();
 		for (int i = 0; i < stats.transitionsCount();i++) {
 			Tuple<String,Integer> element = stats.getTransitionStats(i);
-			String transitionName = nameMapping.map(element.value1()).value1()+ "." + nameMapping.map(element.value1()).value2();
+			//String transitionName = nameMapping.map(element.value1()).value1()+ "." + nameMapping.map(element.value1()).value2();
+            String transitionName = element.value1().replace("_", ".");
 			if(transitionName.charAt(0) == '.'){
 				transitionName = "Shared"+transitionName;
 			}
@@ -99,9 +100,10 @@ public class VerificationResult<TTrace> {
 		List<Tuple<String,Integer>> returnList = new ArrayList<Tuple<String,Integer>>();
 		for (int i = 0; i < stats.placeBoundCount();i++) {
 			Tuple<String,Integer> element = stats.getPlaceBoundStats(i);
-			String placeName = nameMapping.map(element.value1()).value1()+ "." + nameMapping.map(element.value1()).value2();
+			//String placeName = nameMapping.map(element.value1()).value1()+ "." + nameMapping.map(element.value1()).value2();
+            String placeName = element.value1().replace("_", ".");
 			if(placeName.charAt(0) == '.'){
-                            placeName = "Shared"+placeName;
+			    placeName = "Shared"+placeName;
 			}
 			Integer placeBound = element.value2();
 			returnList.add(new Tuple<String, Integer>(placeName, placeBound));

@@ -313,9 +313,8 @@ public class RunVerification extends RunVerificationBase {
 		boolean isCTLQuery = result.getQueryResult().isCTL;
 
 		if(modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && !isCTLQuery){
-
             displayStats(panel, result.getStatsAsString(), modelChecker.getStatsExplanations());
-            if(!model.isColored()) {
+            if(!result.getTransitionStatistics().isEmpty()) {
                 if (!result.getTransitionStatistics().isEmpty()) {
                     JButton transitionStatsButton = new JButton("Transition Statistics");
                     transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, true), "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
@@ -337,7 +336,6 @@ public class RunVerification extends RunVerificationBase {
                     panel.add(placeStatsButton, gbc);
                 }
             }
-
 			if(!result.getReductionResultAsString().isEmpty()){
 				JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
 				gbc = new GridBagConstraints();
