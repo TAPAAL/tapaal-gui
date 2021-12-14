@@ -17,14 +17,11 @@ import dk.aau.cs.verification.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
@@ -100,7 +97,7 @@ public class VerifyDTAPN implements ModelChecker{
         String version = getVersion(path);
 
         if (version != null) {
-            return EngineHelperFunctions.versionIsEqualOrGreater(version, Pipe.verifydtapnMinRev);
+            return EngineHelperFunctions.versionIsEqualOrGreater(version, Pipe.VERIFYDTAPN_MIN_REV);
         } else {
             return false;
         }

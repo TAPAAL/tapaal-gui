@@ -101,7 +101,7 @@ public class VerifyPN implements ModelChecker {
         String version = getVersion(path);
 
         if (version != null) {
-            return EngineHelperFunctions.versionIsEqualOrGreater(version, Pipe.verifypnMinRev);
+            return EngineHelperFunctions.versionIsEqualOrGreater(version, Pipe.VERIFYPN_MIN_REV);
         } else {
             return false;
         }

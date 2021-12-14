@@ -3,7 +3,6 @@ package dk.aau.cs.verification.UPPAAL;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 
 import dk.aau.cs.verification.*;
@@ -119,7 +118,7 @@ public class Verifyta implements ModelChecker {
 			return false;
 		} else {
 
-			EngineHelperFunctions.versionIsEqualOrGreater(versionAsString, Pipe.verifytaMinRev);
+			EngineHelperFunctions.versionIsEqualOrGreater(versionAsString, Pipe.VERIFYTA_MIN_REV);
 
 		}
 

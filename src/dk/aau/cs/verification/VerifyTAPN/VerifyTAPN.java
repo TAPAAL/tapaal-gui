@@ -3,7 +3,6 @@ package dk.aau.cs.verification.VerifyTAPN;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +93,7 @@ public class VerifyTAPN implements ModelChecker {
         String version = getVersion(path);
 
         if (version != null) {
-            return EngineHelperFunctions.versionIsEqualOrGreater(version, Pipe.verifytapnMinRev);
+            return EngineHelperFunctions.versionIsEqualOrGreater(version, Pipe.VERIFYTAPN_MIN_REV);
         } else {
             return false;
         }
