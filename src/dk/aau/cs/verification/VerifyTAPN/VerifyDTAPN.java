@@ -6,9 +6,7 @@ import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.PNMLoader;
 import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
@@ -38,20 +36,22 @@ import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 
 import javax.swing.*;
 
-public class VerifyTAPNDiscreteVerification implements ModelChecker{
+public class VerifyDTAPN implements ModelChecker{
 
 	private static final String NEED_TO_LOCATE_VERIFYDTAPN_MSG = "TAPAAL needs to know the location of the file verifydtapn.\n\n"
 			+ "Verifydtapn is a part of the TAPAAL distribution and it is\n"
 			+ "normally located in the directory lib.";
 
-	protected static String verifydtapnpath = "";
+    private static String VERIFYDTAPN_VERSION_PATTERN = "^VerifyDTAPN (\\d+\\.\\d+\\.\\d+)$";
+
+    protected static String verifydtapnpath = "";
 
 	protected final FileFinder fileFinder;
 	protected final Messenger messenger;
 
 	protected ProcessRunner runner;
 
-	public VerifyTAPNDiscreteVerification(FileFinder fileFinder, Messenger messenger) {
+	public VerifyDTAPN(FileFinder fileFinder, Messenger messenger) {
 		this.fileFinder = fileFinder;
 		this.messenger = messenger;
 	}
@@ -72,82 +72,39 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		return verifydtapnpath;
 	}
 
-	public String getVersion() {
-		String result = null;
 
-		if (!isNotSetup()) {
-			String[] commands;
-			commands = new String[]{verifydtapnpath, "-v"};
+    public String getVersion() {
+        return EngineHelperFunctions.getVersion(new String[]{verifydtapnpath, "-v"}, VERIFYDTAPN_VERSION_PATTERN);
+    }
+    public String getVersion(String path) {
+        return EngineHelperFunctions.getVersion(new String[]{path, "-v"}, VERIFYDTAPN_VERSION_PATTERN);
+    }
 
-			InputStream stream = null;
-			try {
-				Process child = Runtime.getRuntime().exec(commands);
-				stream = child.getInputStream();
-				if (stream != null) {
-					result = readVersionNumberFrom(stream);
-				}
-				child.waitFor();
-			} catch (IOException | InterruptedException e) {
-			}
-		}
+    public boolean isCorrectVersion() {
+        return isCorrectVersion(getPath());
+    }
+    public boolean isCorrectVersion(String path) {
 
-		return result;
-	}
+        if ((path == null || path.isBlank() || !(new File(path).exists()))) {
+            return false;
+        }
 
-	private String readVersionNumberFrom(InputStream stream) {
-		String result = null;
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
+        File file = new File(path);
+        if (!file.canExecute()) {
+            messenger.displayErrorMessage("The engine verifydtapn is not executable.\n"
+                + "The verifydtapn path will be reset. Please try again, "
+                + "to manually set the verifydtapn path.", "Verifydtapn Error");
+            return false;
+        }
 
-		String versioninfo = null;
-		try {
-			versioninfo = bufferedReader.readLine();
-			while (bufferedReader.readLine() != null) {
-			}    // Empty buffer
-		} catch (IOException e) {
-			result = null;
-		}
+        String version = getVersion(path);
 
-		Pattern pattern = Pattern.compile("^VerifyDTAPN (\\d+\\.\\d+\\.\\d+)$");
-		Matcher m = pattern.matcher(versioninfo);
-		m.find();
-		result = m.group(1);
-		return result;
-	}
-
-	public boolean isCorrectVersion() {
-		if (isNotSetup()) {
-			return false;
-		}
-
-		File file = new File(getPath());
-		if (!file.canExecute()) {
-			messenger.displayErrorMessage("The engine verifydtapn is not executable.\n"
-					+ "The verifydtapn path will be reset. Please try again, "
-					+ "to manually set the verifydtapn path.", "Verifydtapn Error");
-			resetVerifytapn();
-			return false;
-		}
-
-		if (getVersion() != null) {
-
-			String[] version = getVersion().split("\\.");
-			String[] targetversion = Pipe.verifydtapnMinRev.split("\\.");
-
-			for (int i = 0; i < targetversion.length; i++) {
-				if (version.length < i + 1) version[i] = "0";
-				int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
-				if (diff > 0) {
-					break;
-				} else if (diff < 0) {
-					return false;
-				}
-			}
-
-			return true;
-		} else {
-			return false;
-		}
-	}
+        if (version != null) {
+            return EngineHelperFunctions.versionIsEqualOrGreater(version, Pipe.verifydtapnMinRev);
+        } else {
+            return false;
+        }
+    }
 
 	private void resetVerifytapn() {
 		verifydtapnpath = null;
@@ -162,15 +119,15 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 	}
 
 	public void setPath(String path) throws IllegalArgumentException {
-		ExecutabilityChecker.check(path);
-		String oldPath = verifydtapnpath;
-		verifydtapnpath = path;
-		Preferences.getInstance().setVerifydtapnLocation(path);
-		if (!isCorrectVersion()) {
-			messenger.displayErrorMessage("The specified version of the file verifydtapn is too old.", "Verifydtapn Error");
-			verifydtapnpath = oldPath;
-			Preferences.getInstance().setVerifydtapnLocation(oldPath);
-		}
+
+        if (isCorrectVersion(path)) {
+            verifydtapnpath = path;
+            Preferences.getInstance().setVerifydtapnLocation(path);
+        } else {
+            messenger.displayErrorMessage(
+                "The specified version of the file verifydtapn is too old, or not recognized as verifypn", "Verifydtapn Error"
+            );
+        }
 	}
 
 	public boolean setup() {
@@ -209,7 +166,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		if (verifydtapn != null && !verifydtapn.isEmpty()) {
 			if (new File(verifydtapn).exists()) {
 				verifydtapnpath = verifydtapn;
-				VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+				VerifyDTAPN v = new VerifyDTAPN(new FileFinder(), new MessengerImpl());
 				if (v.isCorrectVersion()) {
 					return true;
 				} else {
@@ -222,7 +179,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		verifydtapn = Preferences.getInstance().getVerifydtapnLocation();
 		if (verifydtapn != null && !verifydtapn.isEmpty()) {
 			verifydtapnpath = verifydtapn;
-			VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+			VerifyDTAPN v = new VerifyDTAPN(new FileFinder(), new MessengerImpl());
 			if (v.isCorrectVersion()) {
 				return true;
 			} else {
@@ -240,7 +197,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			if (verifydtapnfile.exists()) {
 
 				verifydtapnpath = verifydtapnfile.getAbsolutePath();
-				VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+				VerifyDTAPN v = new VerifyDTAPN(new FileFinder(), new MessengerImpl());
 				if (v.isCorrectVersion()) {
 					return true;
 				} else {

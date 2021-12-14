@@ -9,12 +9,11 @@ import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
 import pipe.gui.widgets.EngineDialogPanel;
-import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
@@ -165,7 +164,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         // Engines reset individually to remove preferences for already setup engines
         Verifyta.reset();
         VerifyTAPN.reset();
-        VerifyTAPNDiscreteVerification.reset();
+        VerifyDTAPN.reset();
     }
 
     @Override

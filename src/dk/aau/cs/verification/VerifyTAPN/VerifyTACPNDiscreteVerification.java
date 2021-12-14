@@ -14,7 +14,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 
-public class VerifyTACPNDiscreteVerification extends VerifyTAPNDiscreteVerification {
+public class VerifyTACPNDiscreteVerification extends VerifyDTAPN {
 
     public VerifyTACPNDiscreteVerification(FileFinder fileFinder, Messenger messenger) {
         super(fileFinder, messenger);
