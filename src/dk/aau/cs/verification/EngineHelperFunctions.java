@@ -76,8 +76,8 @@ public class EngineHelperFunctions {
     }
 
     public static boolean versionIsEqualOrGreater(String versionStr, String versionToCompareStr) {
-        String[] version = versionStr.split("\\.");
-        String[] targetVersion = versionToCompareStr.split("\\.");
+        String[] version = versionStr.split("-")[0].split("\\.");
+        String[] targetVersion = versionToCompareStr.split("\\."); // Pattern is X.Y.Z-something
 
         for (int i = 0; i < targetVersion.length; i++) {
             if (version.length < i + 1) version[i] = "0";

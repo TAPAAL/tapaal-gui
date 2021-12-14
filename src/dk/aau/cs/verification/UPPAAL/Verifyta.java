@@ -90,33 +90,24 @@ public class Verifyta implements ModelChecker {
 		return verifytapath;
 	}
 
-	public String getVersion() {
-		String result = null;
+    public String getVersion() {
+        return EngineHelperFunctions.getVersion(new String[]{verifytapath, "-v"}, VERIFYTA_VERSION_PATTERN);
+    }
+    public String getVersion(String path) {
+        return EngineHelperFunctions.getVersion(new String[]{path, "-v"}, VERIFYTA_VERSION_PATTERN);
+    }
 
-		if (!isNotSetup()) {
-			String[] commands;
-			commands = new String[] { verifytapath, "-v" };
 
-			InputStream stream = null;
-			try {
-				Process child = Runtime.getRuntime().exec(commands);
-				stream = child.getInputStream();
-				if (stream != null) {
-					result = EngineHelperFunctions.readVersionNumberFrom(stream, VERIFYTA_VERSION_PATTERN);
-				}
-				child.waitFor();
-			} catch (IOException | InterruptedException e) {}
+    public boolean isCorrectVersion() {
+        return isCorrectVersion(getPath());
+    }
+	public boolean isCorrectVersion(String path) {
+
+        if ((path == null || path.isBlank() || !(new File(path).exists()))) {
+            return false;
         }
 
-		return result;
-	}
-
-	public boolean isCorrectVersion() {
-		if (isNotSetup()) {
-			return false;
-		}
-
-		String versionAsString = getVersion();
+		String versionAsString = getVersion(path);
 
 		if (versionAsString == null) {
 			messenger
@@ -125,22 +116,10 @@ public class Verifyta implements ModelChecker {
 									+ "The verifyta path will be reset. Please try again, "
 									+ "to manually set the verifyta path.",
 							"Verifyta Error");
-			resetVerifyta();
 			return false;
 		} else {
 
-			String[] version = getVersion().split("\\.");
-			String[] targetversion = Pipe.verifytaMinRev.split("\\.");
-
-			for (int i = 0; i < targetversion.length; i++) {
-				if (version.length < i + 1) version[i] = "0";
-				int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
-				if (diff > 0) {
-					break;
-				} else if (diff < 0) {
-					return false;
-				}
-			}
+			EngineHelperFunctions.versionIsEqualOrGreater(versionAsString, Pipe.verifytaMinRev);
 
 		}
 
@@ -211,18 +190,16 @@ public class Verifyta implements ModelChecker {
 	}
 	
 	public void setPath(String path) throws IllegalArgumentException{
-		String oldPath = verifytapath;
-		verifytapath = path; 
-		Preferences.getInstance().setVerifytaLocation(verifytapath);
-		if(!isCorrectVersion()){
-			messenger
-			.displayErrorMessage(
-					"The specified version of the file verifyta is too old.\n\n"
-							+ "Get the latest development version of UPPAAL from \n"
-							+ "www.uppaal.org.", "Verifyta Error");
-			verifytapath = oldPath;
-			Preferences.getInstance().setVerifytaLocation(oldPath);
-		}
+        if (isCorrectVersion(path)) {
+            verifytapath = path;
+            Preferences.getInstance().setVerifytaLocation(verifytapath);
+        } else {
+            messenger
+                .displayErrorMessage(
+                    "The specified version of the file verifyta is too old.\n\n"
+                        + "Get the latest development version of UPPAAL from \n"
+                        + "www.uppaal.org.", "Verifyta Error");
+        }
 	}
 	
 	public boolean supportsStats(){
