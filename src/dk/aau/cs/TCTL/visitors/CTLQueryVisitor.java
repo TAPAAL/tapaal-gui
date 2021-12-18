@@ -40,7 +40,8 @@ public class CTLQueryVisitor extends VisitorBase {
 	private static final String XML_TRANSITION		= "transition";
 	private static final String XML_INTEGERSUM = "integer-sum";
 	private static final String XML_INTEGERPRODUCT = "integer-product";
-	private static final String XML_INTEGERDIFFERENCE = "integer-difference";
+    private static final String XML_INTEGERDIFFERENCE = "integer-difference";
+    private static final String CONTROL = "control";
 
 	private StringBuffer XMLQuery;
         
@@ -49,15 +50,17 @@ public class CTLQueryVisitor extends VisitorBase {
         }
         
         public String getXMLQueryFor(TCTLAbstractProperty property, String queryName) {
-            buildXMLQuery(property, queryName);
+            buildXMLQuery(property, queryName, false);
             return getFormatted();
         }
 	
-	public void buildXMLQuery(TCTLAbstractProperty property, String queryName) {
-                XMLQuery.append(startTag(XML_PROP) + queryInfo(queryName) + startTag(XML_FORMULA));
+	public void buildXMLQuery(TCTLAbstractProperty property, String queryName, boolean control) {
+        XMLQuery.append(startTag(XML_PROP) + queryInfo(queryName) + startTag(XML_FORMULA));
+        if (control) XMLQuery.append(startTag(CONTROL));
 		property.accept(this, null);
-		XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP));              
-	}
+        if (control) XMLQuery.append(endTag(CONTROL));
+		XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP));
+    }
         
         public String getFormatted() {
             XMLFormatter formatter = new XMLFormatter();

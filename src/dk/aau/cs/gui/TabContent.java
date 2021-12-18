@@ -3379,21 +3379,21 @@ public class TabContent extends JSplitPane implements TabContentActions{
     @Override
     public void exportPNG() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.PNG, null);
+            Export.exportGuiView(drawingSurface(), Export.PNG, null, null);
         }
     }
 
     @Override
     public void exportPS() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.POSTSCRIPT, null);
+            Export.exportGuiView(drawingSurface(), Export.POSTSCRIPT, null, null);
         }
     }
 
     @Override
     public void exportTIKZ() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.TIKZ, drawingSurface().getGuiModel());
+            Export.exportGuiView(drawingSurface(), Export.TIKZ, drawingSurface().getGuiModel(), null);
         }
     }
 
@@ -3409,14 +3409,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     "PNML loss of information", JOptionPane.WARNING_MESSAGE);
                 Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
             }
-            Export.exportGuiView(drawingSurface(), Export.PNML, null);
+            Export.exportGuiView(drawingSurface(), Export.PNML, null, null);
         }
     }
 
     @Override
     public void exportQueryXML() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.QUERY, null);
+            Export.exportGuiView(drawingSurface(), Export.QUERY, null, lens);
         }
     }
 

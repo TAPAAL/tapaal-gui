@@ -529,7 +529,7 @@ public class ExportBatchDialog extends JDialog {
         switch (selectedEngine.getSelectedIndex()) {
             case 0:
                 exportPNML(path, loadedModel);
-                Export.toQueryXML(loadedModel.network(), path.toString() + "/query.xml", queries);
+                Export.toQueryXML(loadedModel.network(), path.toString() + "/query.xml", queries, null);
                 break;
             case 1:
                 Export.toVerifyTAPN(loadedModel.network(), queries, path.toString() + "/model.xml", path.toString() + "/query", false);

@@ -95,12 +95,12 @@ public class Export {
         }
     }
 
-    private static void toQueryXML(String filename) {
-        toQueryXML(CreateGui.getCurrentTab().network(), filename, CreateGui.getCurrentTab().queries());
+    private static void toQueryXML(String filename, TabContent.TAPNLens lens) {
+        toQueryXML(CreateGui.getCurrentTab().network(), filename, CreateGui.getCurrentTab().queries(), lens);
 
     }
 
-    public static void toQueryXML(TimedArcPetriNetNetwork network, String filename, Iterable<TAPNQuery> queries) {
+    public static void toQueryXML(TimedArcPetriNetNetwork network, String filename, Iterable<TAPNQuery> queries, TabContent.TAPNLens lens) {
         try {
             ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
             NameMapping mapping = composer.transformModel(network).value2();
@@ -131,9 +131,10 @@ public class Export {
                 if (!isCTL) {
                     LTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
                 } else {
-                    CTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
+                    CTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName(), lens != null && lens.isGame());
                 }
             }
+
             queryStream.append(LTLXMLVisitor.getFormatted(CTLXMLVisitor.getXMLQuery()));
 
             queryStream.close();
@@ -215,8 +216,7 @@ public class Export {
 		}
 	}
 
-	public static void exportGuiView(DrawingSurfaceImpl g, int format,
-			DataLayer model) {
+	public static void exportGuiView(DrawingSurfaceImpl g, int format, DataLayer model, TabContent.TAPNLens lens) {
 		if (g.getComponentCount() == 0) {
 			return;
 		}
@@ -304,7 +304,7 @@ public class Export {
 			case QUERY:
 				filename = FileBrowser.constructor("Query XML file", "xml", filename).saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".tapn", "-queries"));
 				if (filename != null) {
-					toQueryXML(filename);
+					toQueryXML(filename, lens);
 				}
 				break;
 			}
