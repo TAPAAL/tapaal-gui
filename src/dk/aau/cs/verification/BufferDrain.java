@@ -9,6 +9,11 @@ public class BufferDrain extends Thread {
 	StringBuffer string = null;
 	boolean running;
 
+    // Because some native platforms only provide limited buffer size
+    // for standard input and output streams, failure to promptly write
+    // the input stream or read the output stream of the subprocess may
+    // cause the subprocess to block.
+
 	public BufferDrain(BufferedReader drain) {
 		this.drain = drain;
 		string = new StringBuffer();

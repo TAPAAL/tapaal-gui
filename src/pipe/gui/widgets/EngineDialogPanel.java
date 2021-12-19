@@ -16,12 +16,11 @@ import javax.swing.JPanel;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 
 import net.tapaal.swinghelpers.RequestFocusListener;
 import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
-import pipe.gui.Grid;
 import pipe.gui.MessengerImpl;
 
 public class EngineDialogPanel {	
@@ -109,7 +108,7 @@ public class EngineDialogPanel {
 		MessengerImpl messenger = new MessengerImpl();
 		String verifytapnpath = null;
 		try {
-			File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "", (new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl())).getPath());
+			File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "", (new VerifyDTAPN(new FileFinder(), new MessengerImpl())).getPath());
 			if(file != null){
 				if(file.getName().matches("^verifydtapn.*(?:\\.exe)?$")){
 					verifytapnpath = file.getAbsolutePath();
@@ -122,7 +121,7 @@ public class EngineDialogPanel {
 		}
 		if (verifytapnpath != null) {
 			try{
-				VerifyTAPNDiscreteVerification verifyTapn = new VerifyTAPNDiscreteVerification(fileFinder,messenger);
+				VerifyDTAPN verifyTapn = new VerifyDTAPN(fileFinder,messenger);
 				verifyTapn.setPath(verifytapnpath);
 			}catch(IllegalArgumentException e){
 				messenger.displayErrorMessage(e.getMessage(), "Error selecting engine");
@@ -203,7 +202,7 @@ public class EngineDialogPanel {
 	}
 
 	private void resetVerifydtapnEngine() {
-		VerifyTAPNDiscreteVerification.reset();
+		VerifyDTAPN.reset();
 		setPathsAndVersionNumbers();
 	}
 	
@@ -244,7 +243,7 @@ public class EngineDialogPanel {
 			verifytapnversion = verifyTAPN.getVersion();
 		}
 
-		VerifyTAPNDiscreteVerification verifydTAPN = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+		VerifyDTAPN verifydTAPN = new VerifyDTAPN(new FileFinder(), new MessengerImpl());
 		String verifydtapnPath = verifydTAPN.getPath();
 		String verifydtapnversion = "";
 

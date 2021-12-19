@@ -3,14 +3,11 @@ package dk.aau.cs.verification.VerifyTAPN;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import dk.aau.cs.verification.*;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
@@ -30,25 +27,17 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
-import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.ProcessRunner;
-import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.Stats;
-import dk.aau.cs.verification.VerificationOptions;
-import dk.aau.cs.verification.VerificationResult;
-
-import javax.xml.crypto.Data;
 
 public class VerifyTAPN implements ModelChecker {
 	private static final String NEED_TO_LOCATE_VERIFYTAPN_MSG = "TAPAAL needs to know the location of the file verifytapn.\n\n"
 		+ "Verifytapn is a part of the TAPAAL distribution and it is\n"
 		+ "normally located in the directory lib.";
-	
+
+    private static String VERIFYTAPN_VERSION_PATTERN = "^VerifyTAPN (\\d+\\.\\d+\\.\\d+)$";
+
 	private static String verifytapnpath = "";
 	
 	protected final FileFinder fileFinder;
@@ -76,81 +65,39 @@ public class VerifyTAPN implements ModelChecker {
 	public String getPath() {
 		return verifytapnpath;
 	}
+    public String getVersion() {
+        return EngineHelperFunctions.getVersion(new String[]{verifytapnpath, "-v"}, VERIFYTAPN_VERSION_PATTERN);
+    }
+    public String getVersion(String path) {
+        return EngineHelperFunctions.getVersion(new String[]{path, "-v"}, VERIFYTAPN_VERSION_PATTERN);
+    }
 
-	public String getVersion() {
-		String result = null;
+    public boolean isCorrectVersion() {
+        return isCorrectVersion(getPath());
+    }
 
-		if (!isNotSetup()) {
-			String[] commands;
-			commands = new String[] { verifytapnpath, "-v" };
+    public boolean isCorrectVersion(String path) {
 
-			InputStream stream = null;
-			try {
-				Process child = Runtime.getRuntime().exec(commands);
-				stream = child.getInputStream();
-				if (stream != null) {
-					result = readVersionNumberFrom(stream);
-				}
-				child.waitFor();
-			} catch (IOException | InterruptedException e) {
-			}
-		}
+        if ((path == null || path.isBlank() || !(new File(path).exists()))) {
+            return false;
+        }
 
-		return result;
-	}
+        File file = new File(path);
+        if (!file.canExecute()) {
+            messenger.displayErrorMessage("The engine verifytapn is not executable.\n"
+                + "The verifytapn path will be reset. Please try again, "
+                + "to manually set the verifytapn path.", "Verifytapn Error");
+            return false;
+        }
 
-	private String readVersionNumberFrom(InputStream stream) {
-		String result = null;
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
+        String version = getVersion(path);
 
-		String versioninfo = null;
-		try {
-			versioninfo = bufferedReader.readLine();
-			while(bufferedReader.readLine() != null){}	// Empty buffer
-		} catch (IOException e) {
-			result = null;
-		}
-
-		Pattern pattern = Pattern.compile("^VerifyTAPN (\\d+\\.\\d+\\.\\d+)$");
-		Matcher m = pattern.matcher(versioninfo);
-		m.find();
-		result = m.group(1);
-		return result;
-	}
-
-	public boolean isCorrectVersion() {
-		if (isNotSetup()) {
-			return false;
-		}
-		
-		File file = new File(getPath());
-		if(!file.canExecute()){
-			messenger.displayErrorMessage("The engine verifytapn is not executable.\n"
-									+ "The verifytapn path will be reset. Please try again, "
-									+ "to manually set the verifytapn path.", "Verifytapn Error");
-			resetVerifytapn();
-			return false;
-		}
-
-		if (getVersion() != null) {
-			String[] version = getVersion().split("\\.");
-			String[] targetversion = Pipe.verifytapnMinRev.split("\\.");
-
-			for (int i = 0; i < targetversion.length; i++) {
-				if (version.length < i + 1) version[i] = "0";
-				int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
-				if (diff > 0) {
-					break;
-				} else if (diff < 0) {
-					return false;
-				}
-			}
-
-			return true;
-		} else {
-			return false;
-		}
-	}
+        if (version != null) {
+            return EngineHelperFunctions.versionIsEqualOrGreater(version, Pipe.VERIFYTAPN_MIN_REV);
+        } else {
+            return false;
+        }
+    }
 
 	private void resetVerifytapn() {
 		verifytapnpath = null;	
@@ -164,17 +111,14 @@ public class VerifyTAPN implements ModelChecker {
 	}
 	
 	public void setPath(String path) throws IllegalArgumentException {
-		ExecutabilityChecker.check(path);
-		String oldPath = verifytapnpath; 
-		verifytapnpath = path;
-		Preferences.getInstance().setVerifytapnLocation(path);
-		if(!isCorrectVersion()){
-			messenger
-			.displayErrorMessage(
-					"The specified version of the file verifytapn is too old.", "Verifytapn Error");
-			verifytapnpath = oldPath;
-			Preferences.getInstance().setVerifytapnLocation(oldPath);
-		}
+        if (isCorrectVersion(path)) {
+            verifytapnpath = path;
+            Preferences.getInstance().setVerifytapnLocation(path);
+        } else {
+            messenger.displayErrorMessage(
+                "The specified version of the file verifytapn is too old.", "Verifytapn Error"
+            );
+        }
 	}
 
 	public boolean setup() {

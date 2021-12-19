@@ -655,8 +655,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return verifypn;
 	}
 	
-	private static VerifyTAPNDiscreteVerification getVerifyTAPNDiscreteVerification() {
-		VerifyTAPNDiscreteVerification verifytapnDiscreteVerification = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+	private static VerifyDTAPN getVerifyTAPNDiscreteVerification() {
+		VerifyDTAPN verifytapnDiscreteVerification = new VerifyDTAPN(new FileFinder(), new MessengerImpl());
 		verifytapnDiscreteVerification.setup();
 		return verifytapnDiscreteVerification;
 	}
