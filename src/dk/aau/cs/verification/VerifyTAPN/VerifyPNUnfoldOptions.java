@@ -64,7 +64,11 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
     public String toString() {
         StringBuilder result = new StringBuilder();
         //for now we don't want to do structural or query reductions, could be options later
-        result.append("--write-unfolded-queries " + queryOut + " --write-unfolded-net " + modelOut + " -s OverApprox -r 0 -q 0 -x 1");
+        result.append("--write-unfolded-queries ");
+        result.append(queryOut);
+        result.append(" --write-unfolded-net ");
+        result.append(modelOut);
+        result.append(" --search-strategy OverApprox --reduction 0 --query-reduction 0 --xml-query 1");
         for(int i = 2; i <= numQueries; i++){
             result.append("," + i);
         }
@@ -85,11 +89,11 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
 
     private static final Map<TAPNQuery.SearchOption, String> createSearchOptionsMap() {
         HashMap<TAPNQuery.SearchOption, String> map = new HashMap<TAPNQuery.SearchOption, String>();
-        map.put(TAPNQuery.SearchOption.BFS, " -s BFS");
-        map.put(TAPNQuery.SearchOption.DFS, " -s DFS");
-        map.put(TAPNQuery.SearchOption.RANDOM, " -s RDFS");
-        map.put(TAPNQuery.SearchOption.HEURISTIC, " -s BestFS");
-        map.put(TAPNQuery.SearchOption.OVERAPPROXIMATE, " -s OverApprox");
+        map.put(TAPNQuery.SearchOption.BFS, " --search-strategy BFS");
+        map.put(TAPNQuery.SearchOption.DFS, " --search-strategy DFS");
+        map.put(TAPNQuery.SearchOption.RANDOM, " --search-strategy RDFS");
+        map.put(TAPNQuery.SearchOption.HEURISTIC, " --search-strategy BestFS");
+        map.put(TAPNQuery.SearchOption.OVERAPPROXIMATE, " --search-strategy OverApprox");
 
         return map;
     }

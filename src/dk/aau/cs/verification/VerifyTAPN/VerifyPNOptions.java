@@ -153,24 +153,24 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 
-		result.append("-k ");
+		result.append("--k-bound ");
 		result.append(extraTokens+tokensInModel);
 		result.append(traceMap.get(traceOption));
 		result.append(searchMap.get(searchOption));
 		switch(getModelReduction()){
 		case AGGRESSIVE:
-			result.append(" -r 1 ");
+			result.append(" --reduction 1 ");
 			if(reducedModelPath != null && !reducedModelPath.isEmpty()){
                 result.append(" --write-reduced " +reducedModelPath);
             }
 
 			break;
 		case NO_REDUCTION:
-			result.append(" -r 0 ");
+			result.append(" --reduction 0 ");
 
 			break;
 		case BOUNDPRESERVING:
-			result.append(" -r 2 ");
+			result.append(" --reduction 2 ");
             if(reducedModelPath != null && !reducedModelPath.isEmpty()){
                 result.append(" --write-reduced " +reducedModelPath);
             }
@@ -186,26 +186,26 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 
 		if (this.queryCategory == QueryCategory.CTL){
 			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
-			result.append(" -x 1");
+			result.append(" --xml-query 1");
 		} else if (this.queryCategory == QueryCategory.LTL) {
             result.append(" -ltl");
             if (!this.useTarjan) {
                 result.append(" ndfs");
             }
-            result.append(" -x 1");
+            result.append(" --xml-query 1");
         }
 		if (this.useSiphontrap) {
 			result.append(" -a 10 ");
 		}
 		if (this.queryReductionTime == QueryReductionTime.NoTime) {
 			result.append(
-			    " -q 0 ");
+			    " --query-reduction 0 ");
 		} else if (this.queryReductionTime == QueryReductionTime.ShortestTime) {
 		    //Run query reduction for 1 second, to avoid conflict with -s OverApprox argument, but also still not run the verification.
-		    result.append(" -q 1");
+		    result.append(" --query-reduction 1");
         }
 		if (!this.useStubbornReduction) {
-			result.append(" -p ");
+			result.append(" --partial-order-reduction ");
 		}
 		if (this.useTarOption) {
 		    result.append(" -tar ");

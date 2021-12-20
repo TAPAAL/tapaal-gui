@@ -56,7 +56,11 @@ public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("--write-unfolded-queries " + queryOut + " --write-unfolded-net " + modelOut + " -s OverApprox -r 0 -q 0 -x 1");
+        result.append("--write-unfolded-queries ");
+        result.append(queryOut);
+        result.append(" --write-unfolded-net ");
+        result.append(modelOut);
+        result.append(" --search-strategy OverApprox -r 0 --write-query 0 --xml-trace 1");
         for(int i = 1; i < numQueries; i++){
             result.append("," + i);
         }

@@ -67,19 +67,19 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 
-		result.append("-k ");
+		result.append("--k-bound ");
 		result.append(extraTokens+tokensInModel);
 		result.append(' ');
 		result.append(traceMap.get(traceOption));
 		result.append(' ');
 		result.append(searchMap.get(searchOption));
 		result.append(' ');
-		result.append(symmetry ? "" : "-s"); // symmetry is on by default in verifyTAPN so "-s" disables it
+		result.append(symmetry ? "" : "--legacy"); // symmetry is on by default in verifyTAPN so "-s" disables it
 		result.append(' ');
-		result.append(dontUseDeadPlaces ? "-d" : "");
+		result.append(dontUseDeadPlaces ? "--keep-dead-tokens" : "");
 		result.append(' ');
-		result.append(discreteInclusion ? " -f 1" : "");
-		result.append(discreteInclusion ? " -i " + generateDiscretePlacesList() : "");
+		result.append(discreteInclusion ? " --write-file 1" : "");
+		result.append(discreteInclusion ? " --partial-order " + generateDiscretePlacesList() : "");
 		return result.toString();
 	}
 
@@ -101,8 +101,8 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 	public static Map<TraceOption, String> createTraceOptionsMap() {
 		HashMap<TraceOption, String> map = new HashMap<TraceOption, String>();
-		map.put(TraceOption.SOME, "-t 1 -x");
-		map.put(TraceOption.FASTEST, "-t 2 -x");
+		map.put(TraceOption.SOME, "--trace 1 --xml-trace");
+		map.put(TraceOption.FASTEST, "--trace 2 --xml-trace");
 		map.put(TraceOption.NONE, "");
 
 		return map;
@@ -110,10 +110,10 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 	private static Map<SearchOption, String> createSearchOptionsMap() {
 		HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
-		map.put(SearchOption.BFS, "-o 0");
-		map.put(SearchOption.DFS, "-o 1");
-		map.put(SearchOption.RANDOM, "-o 2");
-		map.put(SearchOption.HEURISTIC, "-o 3");
+		map.put(SearchOption.BFS, "--search-type 0");
+		map.put(SearchOption.DFS, "--search-type 1");
+		map.put(SearchOption.RANDOM, "--search-type 2");
+		map.put(SearchOption.HEURISTIC, "--search-type 3");
 		map.put(SearchOption.DEFAULT, "");
 		return map;
 	}
