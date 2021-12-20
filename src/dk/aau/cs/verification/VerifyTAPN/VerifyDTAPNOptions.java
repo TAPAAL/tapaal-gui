@@ -83,27 +83,27 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		StringBuilder result = new StringBuilder(super.toString());
 		
 		result.append(' ');
-		result.append("-m ");
+		result.append("--verification-method ");
 		result.append(timeDarts ? "1" : "0");
 		result.append(' ');
-		result.append("-p ");
+		result.append("--memory-optimization ");
 		result.append(pTrie ? "1" : "0");
 		if (! useStubbornReduction) {
-			result.append(" -i");
+			result.append(" --partial-order");
 		}
 		if(workflow == WorkflowMode.WORKFLOW_SOUNDNESS){
-			result.append(" -w 1");
+			result.append(" --workflow 1");
 		}else if(workflow == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS){
-			result.append(" -w 2");
-			result.append(" -b ");
+			result.append(" --workflow 2");
+			result.append(" --strong-workflow-bound ");
 			result.append(workflowbound);
 		}
 		result.append(' ');
-		result.append(dontUseDeadPlaces ? "-d" : "");
+		result.append(dontUseDeadPlaces ? "--keep-dead-tokens" : "");
 		result.append(' ');
 
 		if (workflow != WorkflowMode.WORKFLOW_SOUNDNESS && workflow != WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
-			result.append(gcd ? "-c" : ""); // GCD optimization is not sound for workflow analysis
+			result.append(gcd ? "--gcd" : ""); // GCD optimization is not sound for workflow analysis
 		}
 
 		return result.toString();

@@ -74,12 +74,12 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		result.append(' ');
 		result.append(searchMap.get(searchOption));
 		result.append(' ');
-		result.append(symmetry ? "" : "--legacy"); // symmetry is on by default in verifyTAPN so "-s" disables it
+		result.append(symmetry ? "" : "--disable-symmetry"); // symmetry is on by default in verifyTAPN so "-s" disables it
 		result.append(' ');
 		result.append(dontUseDeadPlaces ? "--keep-dead-tokens" : "");
 		result.append(' ');
-		result.append(discreteInclusion ? " --write-file 1" : "");
-		result.append(discreteInclusion ? " --partial-order " + generateDiscretePlacesList() : "");
+		result.append(discreteInclusion ? " --factory 1" : "");
+		result.append(discreteInclusion ? " --inc-places " + generateDiscretePlacesList() : "");
 		return result.toString();
 	}
 

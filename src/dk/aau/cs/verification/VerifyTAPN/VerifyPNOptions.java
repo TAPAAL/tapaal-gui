@@ -15,14 +15,14 @@ import pipe.gui.widgets.InclusionPlaces;
 
 public class VerifyPNOptions extends VerifyTAPNOptions{
 	private static final Map<TraceOption, String> traceMap = Map.of(
-        TraceOption.SOME, " -t",
+        TraceOption.SOME, " --trace",
 		TraceOption.NONE, ""
     );
 	private static final Map<SearchOption, String> searchMap = Map.of(
-        SearchOption.BFS, " -s DFS",
-        SearchOption.RANDOM, " -s RDFS",
-        SearchOption.HEURISTIC, " -s BestFS",
-        SearchOption.OVERAPPROXIMATE, " -s OverApprox"
+        SearchOption.BFS, " --search-strategy DFS",
+        SearchOption.RANDOM, " --search-strategy RDFS",
+        SearchOption.HEURISTIC, " --search-strategy BestFS",
+        SearchOption.OVERAPPROXIMATE, " --search-strategy OverApprox"
     );
 
 	private final ModelReduction modelReduction;
