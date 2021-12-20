@@ -44,14 +44,14 @@ public class Verifier {
         return verifytapn;
     }
 
-    private static VerifyTAPNDiscreteVerification getVerifydTAPN() {
-        VerifyTAPNDiscreteVerification verifydtapn = new VerifyTAPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+    private static VerifyDTAPN getVerifydTAPN() {
+        VerifyDTAPN verifydtapn = new VerifyDTAPN(new FileFinder(), new MessengerImpl());
         verifydtapn.setup();
         return verifydtapn;
     }
 
-    private static VerifyTAPNDiscreteVerification getVerifydTACPN() {
-        VerifyTAPNDiscreteVerification verifydtacpn = new VerifyTACPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+    private static VerifyDTAPN getVerifydTACPN() {
+        VerifyDTAPN verifydtacpn = new VerifyTACPNDiscreteVerification(new FileFinder(), new MessengerImpl());
         verifydtacpn.setup();
         return verifydtacpn;
     }

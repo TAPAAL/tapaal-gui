@@ -40,9 +40,7 @@ import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
-
-import static javax.swing.text.DefaultEditorKit.copyAction;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 
 
 public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameActions {
@@ -556,7 +554,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         //XXX 2018-05-23 kyrke: Moved from CreatGUI (static), needs further refactoring to seperate conserns
         Verifyta.trySetup();
         VerifyTAPN.trySetup();
-        VerifyTAPNDiscreteVerification.trySetup();
+        VerifyDTAPN.trySetup();
         VerifyPN.trySetup();
 
     }
