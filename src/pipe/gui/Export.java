@@ -131,7 +131,7 @@ public class Export {
                 if (!isCTL) {
                     LTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
                 } else {
-                    CTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName(), lens != null && lens.isGame());
+                    CTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName(), lens != null && lens.isGame() && lens.isTimed());
                 }
             }
 
