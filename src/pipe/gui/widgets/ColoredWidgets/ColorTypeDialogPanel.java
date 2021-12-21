@@ -877,6 +877,14 @@ public class ColorTypeDialogPanel extends JPanel {
                             "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        if (network.isNameUsedForVariable(name)) {
+            JOptionPane.showMessageDialog(
+                CreateGui.getApp(),
+                "There is already variable with the same name.\n\n"
+                    + "Choose a different name for the color type.",
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         if (!oldName.equals("") && !oldName.equalsIgnoreCase(name) && network.isNameUsedForColorType(name)) {
             JOptionPane.showMessageDialog(
                             CreateGui.getApp(),
@@ -953,6 +961,34 @@ public class ColorTypeDialogPanel extends JPanel {
 
         //If everything is false add the colortype
         String selectedColorType = colorTypeComboBox.getSelectedItem().toString();
+
+        //Enum named are not allow to overlap with variable names
+        switch (selectedColorType) {
+            case finiteEnumeration: //Fall through
+            case cyclicEnumeration:
+
+                ArrayList<String> overlaps = new ArrayList<>();
+                for (int i = 0; i < enumList.getModel().getSize(); i++) {
+                    String e = enumList.getModel().getElementAt(i).toString();
+                    if (network.isNameUsedForVariable(e) || network.isNameUsedForColor(e, oldColorType)) {
+                        overlaps.add(e);
+                    }
+                }
+                if (overlaps.size() > 0) {
+                    JOptionPane.showMessageDialog(
+                        CreateGui.getApp(),
+                        "Color names must not overlap with variable names or other color names: \n" +
+                        "Remove or rename the following: \n" +
+                            String.join(", ", overlaps),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                //No overlap between
+
+                break;
+        }
+
         ColorType newColorType = new ColorType(name);
 
         switch (selectedColorType) {

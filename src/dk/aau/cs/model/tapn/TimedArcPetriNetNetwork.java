@@ -5,7 +5,6 @@ import java.util.*;
 import dk.aau.cs.gui.undo.Colored.*;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
-import org.jetbrains.annotations.NotNull;
 import pipe.gui.MessengerImpl;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
@@ -708,10 +707,23 @@ public class TimedArcPetriNetNetwork {
         }
         return false;
     }
+    public boolean isNameUsedForColor(String name, ColorType ignored) {
+        for (ColorType e : colorTypes) {
+            if (e != ignored && !e.isIntegerRange() && !e.isProductColorType()){
+                for (Color c : e.getColors()) {
+                    if (c.getName().equals(name)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public Variable getVariableByName(String name){
-        for (int i = 0; i < variables.size(); i++) {
-            if (variables.get(i).getName().equalsIgnoreCase(name)) {
-                return variables.get(i);
+        for (Variable variable : variables) {
+            if (variable.getName().equalsIgnoreCase(name)) {
+                return variable;
             }
         }
         return null;
