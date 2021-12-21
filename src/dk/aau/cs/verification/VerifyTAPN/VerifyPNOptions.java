@@ -79,11 +79,13 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		this.reducedModelPath = pathToReducedNet;
 		this.symmetricVars = useSymmetricVars;
 
-        try {
-            unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
-            unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
-        } catch (IOException e) {
-            new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
+        if(unfold) {
+            try {
+                unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+                unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+            } catch (IOException e) {
+                new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
+            }
         }
 	}
 

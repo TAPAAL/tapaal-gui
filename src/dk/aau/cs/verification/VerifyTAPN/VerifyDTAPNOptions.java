@@ -23,8 +23,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private boolean useStubbornReduction = true;
 	private boolean partition;
 	private boolean colorFixpoint;
-	private String libQueryFilePath;
-	
+    private final boolean unfold;
+
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(
 			boolean dontUseDeadPlaces,
@@ -78,6 +78,16 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		this.reducedModelPath = reducedModelPath;
 		this.partition = partition;
 		this.colorFixpoint = colorFixpoint;
+        this.unfold = unfoldNet;
+        if(unfold && trace() != TraceOption.NONE) // we only force unfolding when traces are involved
+        {
+            try {
+                unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+                unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+            } catch (IOException e) {
+                new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
+            }
+        }
 	}
 	
 	@Override
@@ -87,6 +97,14 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         result.append(kBoundArg());
         result.append(deadTokenArg());
         result.append(traceArg(traceOption));
+        if(trace() != TraceOption.NONE)
+        {
+            result.append(" --write-unfolded-net ");
+            result.append(unfoldedModelPath);
+            result.append(" --write-unfolded-queries ");
+            result.append(unfoldedQueriesPath);
+            result.append(" ");
+        }
         result.append(searchArg(searchOption));
 		result.append("--verification-method ");
 		result.append(timeDarts ? "1" : "0");
