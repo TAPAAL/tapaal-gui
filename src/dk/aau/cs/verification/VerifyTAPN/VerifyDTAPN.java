@@ -378,7 +378,6 @@ public class VerifyDTAPN implements ModelChecker{
 			buffer.append(' ');
 			buffer.append(queryFile);
 		}
-
 		return buffer.toString();
 	}
 

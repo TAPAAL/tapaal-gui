@@ -8,6 +8,8 @@ import pipe.gui.widgets.InclusionPlaces;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	
@@ -80,30 +82,31 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	
 	@Override
 	public String toString() {
-		StringBuilder result = new StringBuilder(super.toString());
-		
-		result.append(' ');
+		StringBuilder result = new StringBuilder();
+
+        result.append(kBoundArg());
+        result.append(deadTokenArg());
+        result.append(traceArg(traceOption));
+        result.append(searchArg(searchOption));
 		result.append("--verification-method ");
 		result.append(timeDarts ? "1" : "0");
 		result.append(' ');
 		result.append("--memory-optimization ");
 		result.append(pTrie ? "1" : "0");
 		if (! useStubbornReduction) {
-			result.append(" --partial-order");
+			result.append(" --disable-partial-order ");
 		}
 		if(workflow == WorkflowMode.WORKFLOW_SOUNDNESS){
-			result.append(" --workflow 1");
-		}else if(workflow == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS){
-			result.append(" --workflow 2");
+			result.append(" --workflow 1 ");
+		} else if(workflow == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS){
+			result.append(" --workflow 2 ");
 			result.append(" --strong-workflow-bound ");
 			result.append(workflowbound);
 		}
 		result.append(' ');
-		result.append(dontUseDeadPlaces ? "--keep-dead-tokens" : "");
-		result.append(' ');
 
 		if (workflow != WorkflowMode.WORKFLOW_SOUNDNESS && workflow != WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
-			result.append(gcd ? "--gcd" : ""); // GCD optimization is not sound for workflow analysis
+			result.append(gcd ? " --gcd-lower " : ""); // GCD optimization is not sound for workflow analysis
 		}
 
 		return result.toString();
@@ -120,5 +123,41 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	public WorkflowMode getWorkflowMode(){
 		return workflow;
 	}
-	
+
+    // TODO make this a proper class member s.t. this can be reused where it makes sense
+    public static String traceArg(TraceOption opt) {
+        switch (opt)
+        {
+            case SOME:
+                return "--trace 1 ";
+            case FASTEST:
+                return "--trace 2 ";
+            default:
+                assert (false);
+            case NONE:
+                return "--trace 0 ";
+        }
+    }
+
+    private static String searchArg(SearchOption arg) {
+        switch (arg)
+        {
+            case BFS:
+                return "--search-strategy BFS ";
+            case DFS:
+                return "--search-strategy DFS ";
+            case RANDOM:
+                return "--search-strategy RDFS ";
+            case HEURISTIC:
+                return "--search-strategy BestFS ";
+            case OVERAPPROXIMATE:
+                return "--search-strategy OverApprox ";
+            default:
+            case BatchProcessingKeepQueryOption:
+                assert (false);
+            case DEFAULT:
+                return "--search-strategy default ";
+        }
+    }
+
 }

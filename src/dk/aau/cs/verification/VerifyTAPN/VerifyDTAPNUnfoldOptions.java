@@ -60,9 +60,10 @@ public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
         result.append(queryOut);
         result.append(" --write-unfolded-net ");
         result.append(modelOut);
-        result.append(" --search-strategy OverApprox --reduction 0 --query-reduction 0");
-        for(int i = 1; i < numQueries; i++){
-            result.append("," + i);
+        result.append(" --search-strategy OverApprox --xml-queries ");
+        for(int i = 0; i < numQueries; ++i){
+            if(i != 0) result.append(",");
+            result.append(i + 1);
         }
 
         return result.toString();

@@ -202,23 +202,23 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 			    " --query-reduction 0 ");
 		} else if (this.queryReductionTime == QueryReductionTime.ShortestTime) {
 		    //Run query reduction for 1 second, to avoid conflict with -s OverApprox argument, but also still not run the verification.
-		    result.append(" --query-reduction 1");
+		    result.append(" --query-reduction 1 ");
         }
 		if (!this.useStubbornReduction) {
-			result.append(" --disable-partial-order");
+			result.append(" --disable-partial-order ");
 		}
 		if (this.useTarOption) {
 		    result.append(" --trace-abstraction ");
         }
 		if (colored) {
             if (!this.partition) {
-                result.append(" --disable-partitioning");
+                result.append(" --disable-partitioning ");
             }
             if (!this.colorFixpoint) {
-                result.append(" --disable-cfp");
+                result.append(" --disable-cfp ");
             }
             if (!symmetricVars) {
-                result.append(" --disable-symmetry-vars");
+                result.append(" --disable-symmetry-vars ");
             }
         }
 
