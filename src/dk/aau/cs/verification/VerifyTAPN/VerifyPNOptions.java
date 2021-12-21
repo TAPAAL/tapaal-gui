@@ -185,17 +185,17 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         }
 
 		if (this.queryCategory == QueryCategory.CTL){
-			result.append(" -ctl " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
-			result.append(" --xml-query 1");
+			result.append(" --ctl-algorithm " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
+			result.append(" --xml-queries 1");
 		} else if (this.queryCategory == QueryCategory.LTL) {
-            result.append(" -ltl");
+            result.append(" --ltl-algorithm");
             if (!this.useTarjan) {
                 result.append(" ndfs");
             }
-            result.append(" --xml-query 1");
+            result.append(" --xml-queries 1");
         }
 		if (this.useSiphontrap) {
-			result.append(" -a 10 ");
+			result.append(" --siphon-trap 10 ");
 		}
 		if (this.queryReductionTime == QueryReductionTime.NoTime) {
 			result.append(
@@ -208,7 +208,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 			result.append(" --partial-order-reduction ");
 		}
 		if (this.useTarOption) {
-		    result.append(" -tar ");
+		    result.append(" --trace-abstraction ");
         }
 		if (colored) {
             if (!this.partition) {

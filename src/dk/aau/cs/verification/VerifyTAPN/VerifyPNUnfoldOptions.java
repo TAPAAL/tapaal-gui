@@ -68,7 +68,7 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
         result.append(queryOut);
         result.append(" --write-unfolded-net ");
         result.append(modelOut);
-        result.append(" --search-strategy OverApprox --reduction 0 --query-reduction 0 --xml-query 1");
+        result.append(" --search-strategy OverApprox --reduction 0 --query-reduction 0 --xml-queries 1");
         for(int i = 2; i <= numQueries; i++){
             result.append("," + i);
         }
