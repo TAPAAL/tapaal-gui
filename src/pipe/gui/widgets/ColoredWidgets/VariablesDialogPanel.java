@@ -282,6 +282,16 @@ public class VariablesDialogPanel extends JPanel {
             return;
         }
 
+        if (network.isConstantNameUsed(newName)) {
+            JOptionPane
+                .showMessageDialog(
+                    CreateGui.getApp(),
+                    "There is already a constant with this name.\n\n"
+                        + "Choose a different name for the variable.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         if (network.isNameUsedForColorType(newName)) {
             JOptionPane
                 .showMessageDialog(

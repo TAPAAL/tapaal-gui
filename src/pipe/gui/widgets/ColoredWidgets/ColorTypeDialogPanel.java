@@ -885,6 +885,22 @@ public class ColorTypeDialogPanel extends JPanel {
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        if (network.isConstantNameUsed(name)) {
+            JOptionPane.showMessageDialog(
+                CreateGui.getApp(),
+                "There is already a constant with the same name.\n\n"
+                    + "Choose a different name for the color type.",
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (network.isNameUsedForColor(name, null)) {
+            JOptionPane.showMessageDialog(
+                CreateGui.getApp(),
+                "There is already a color with the same name.\n\n"
+                    + "Choose a different name for the color type.",
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         if (!oldName.equals("") && !oldName.equalsIgnoreCase(name) && network.isNameUsedForColorType(name)) {
             JOptionPane.showMessageDialog(
                             CreateGui.getApp(),
@@ -970,7 +986,7 @@ public class ColorTypeDialogPanel extends JPanel {
                 ArrayList<String> overlaps = new ArrayList<>();
                 for (int i = 0; i < enumList.getModel().getSize(); i++) {
                     String e = enumList.getModel().getElementAt(i).toString();
-                    if (network.isNameUsedForVariable(e) || network.isNameUsedForColor(e, oldColorType)) {
+                    if (network.isNameUsedForVariable(e) || network.isNameUsedForColor(e, oldColorType) || network.isNameUsedForColorType(e) || name.equals(e)) {
                         overlaps.add(e);
                     }
                 }
