@@ -205,7 +205,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		    result.append(" --query-reduction 1");
         }
 		if (!this.useStubbornReduction) {
-			result.append(" --partial-order-reduction ");
+			result.append(" --disable-partial-order");
 		}
 		if (this.useTarOption) {
 		    result.append(" --trace-abstraction ");
