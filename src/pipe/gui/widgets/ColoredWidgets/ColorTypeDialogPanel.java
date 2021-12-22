@@ -189,7 +189,7 @@ public class ColorTypeDialogPanel extends JPanel {
     private JPanel createNameAndTypePanel() {
         JPanel nameAndTypePanel = new JPanel();
         nameAndTypePanel.setLayout(new GridBagLayout());
-        nameAndTypePanel.setBorder(BorderFactory.createTitledBorder("Name and Color Type"));
+        nameAndTypePanel.setBorder(BorderFactory.createTitledBorder("Name of Color Type"));
 
         JLabel nameLabel = new JLabel();
         nameLabel.setText("Name: ");
@@ -451,16 +451,12 @@ public class ColorTypeDialogPanel extends JPanel {
                     "The color cannot be named \"" + enumerationName + "\", as the name is reserved",
                     "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                boolean inList = false;
-                int i = 0;
-                while (!inList && i < cyclicModel.getSize() && cyclicModel.getElementAt(i) != null) {
-                    inList = cyclicModel.getElementAt(i).toString().equals(enumTextField.getText());
-                    i++;
-                }
-                if (inList) {
+                boolean nameIsInUse = network.isNameUsedForVariable(enumerationName) || network.isNameUsedForColor(enumerationName, null) || network.isNameUsedForColorType(enumerationName) || network.isConstantNameUsed(enumerationName) || nameTextField.getText().equals(enumerationName);
+
+                if (nameIsInUse) {
                     JOptionPane.showMessageDialog(
                         CreateGui.getApp(),
-                        "A color with the name \"" + enumerationName + "\" already exists",
+                        "A color, color type, variable or constant with the name \"" + enumerationName + "\" already exists. Please chose an other name.",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
                     cyclicModel.addElement(enumTextField.getText());
@@ -986,7 +982,7 @@ public class ColorTypeDialogPanel extends JPanel {
                 ArrayList<String> overlaps = new ArrayList<>();
                 for (int i = 0; i < enumList.getModel().getSize(); i++) {
                     String e = enumList.getModel().getElementAt(i).toString();
-                    if (network.isNameUsedForVariable(e) || network.isNameUsedForColor(e, oldColorType) || network.isNameUsedForColorType(e) || name.equals(e)) {
+                    if (network.isNameUsedForVariable(e) || network.isNameUsedForColor(e, oldColorType) || network.isNameUsedForColorType(e) || network.isConstantNameUsed(e) || name.equals(e)) {
                         overlaps.add(e);
                     }
                 }
