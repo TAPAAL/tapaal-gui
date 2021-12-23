@@ -261,7 +261,7 @@ public class VariablesDialogPanel extends JPanel {
             return;
         }
         //If we are editing a variable it is allowed to have the same name
-        if (network.isNameUsedForVariable(newName) && (variable == null || !variable.getName().equals(newName))) {
+        if ((variable == null || !variable.getName().equalsIgnoreCase(newName)) && network.isNameUsedForVariable(newName) ) {
             JOptionPane
                     .showMessageDialog(
                             CreateGui.getApp(),
@@ -282,7 +282,7 @@ public class VariablesDialogPanel extends JPanel {
             return;
         }
 
-        if (network.isConstantNameUsed(newName)) {
+        if (network.isNameUsedForConstant(newName)) {
             JOptionPane
                 .showMessageDialog(
                     CreateGui.getApp(),

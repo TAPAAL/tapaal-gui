@@ -194,10 +194,6 @@ public class TimedArcPetriNetNetwork {
 		}
 	}
 
-	public boolean isConstantNameUsed(String newName) {
-		return constants.containsConstantByName(newName);
-	}
-
 	public void buildConstraints() {
 		constants.buildConstraints(this);
 	}
@@ -690,15 +686,15 @@ public class TimedArcPetriNetNetwork {
         }
         return null;
     }
+
     public boolean isNameUsedForColorType(String name) {
         for (ColorType element : colorTypes) {
-            if (element.getName().equals(name)) {
+            if (element.getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
         return false;
     }
-
     public boolean isNameUsedForVariable(String name) {
         for (Variable element : variables) {
             if (element.getName().equalsIgnoreCase(name)) {
@@ -711,13 +707,16 @@ public class TimedArcPetriNetNetwork {
         for (ColorType e : colorTypes) {
             if (e != ignored && !e.isIntegerRange() && !e.isProductColorType()){
                 for (Color c : e.getColors()) {
-                    if (c.getName().equals(name)) {
+                    if (c.getName().equalsIgnoreCase(name)) {
                         return true;
                     }
                 }
             }
         }
         return false;
+    }
+    public boolean isNameUsedForConstant(String newName) {
+        return constants.containsConstantByName(newName);
     }
 
     public Variable getVariableByName(String name){

@@ -11,7 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
@@ -218,7 +217,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 			int val = (Integer) valueSpinner.getValue();
 			if (!oldName.equals("")) {
 				if (!oldName.equalsIgnoreCase(newName)
-						&& model.isConstantNameUsed(newName)) {
+						&& model.isNameUsedForConstant(newName)) {
 					JOptionPane
 					.showMessageDialog(
 							CreateGui.getApp(),

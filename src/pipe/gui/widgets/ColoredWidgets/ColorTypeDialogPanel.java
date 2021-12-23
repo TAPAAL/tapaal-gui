@@ -451,7 +451,15 @@ public class ColorTypeDialogPanel extends JPanel {
                     "The color cannot be named \"" + enumerationName + "\", as the name is reserved",
                     "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                boolean nameIsInUse = network.isNameUsedForVariable(enumerationName) || network.isNameUsedForColor(enumerationName, null) || network.isNameUsedForColorType(enumerationName) || network.isConstantNameUsed(enumerationName) || nameTextField.getText().equals(enumerationName);
+                boolean nameIsInUse = network.isNameUsedForVariable(enumerationName) || network.isNameUsedForColor(enumerationName, null) || network.isNameUsedForColorType(enumerationName) || network.isNameUsedForConstant(enumerationName) || nameTextField.getText().equalsIgnoreCase(enumerationName);
+                for (int i = 0; i < cyclicModel.getSize(); i++) {
+                    String n = cyclicModel.getElementAt(i).toString();
+
+                    if (n.equalsIgnoreCase(enumerationName)) {
+                        nameIsInUse = true;
+                        break;
+                    }
+                }
 
                 if (nameIsInUse) {
                     JOptionPane.showMessageDialog(
@@ -881,7 +889,7 @@ public class ColorTypeDialogPanel extends JPanel {
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (network.isConstantNameUsed(name)) {
+        if (network.isNameUsedForConstant(name)) {
             JOptionPane.showMessageDialog(
                 CreateGui.getApp(),
                 "There is already a constant with the same name.\n\n"
@@ -982,7 +990,7 @@ public class ColorTypeDialogPanel extends JPanel {
                 ArrayList<String> overlaps = new ArrayList<>();
                 for (int i = 0; i < enumList.getModel().getSize(); i++) {
                     String e = enumList.getModel().getElementAt(i).toString();
-                    if (network.isNameUsedForVariable(e) || network.isNameUsedForColor(e, oldColorType) || network.isNameUsedForColorType(e) || network.isConstantNameUsed(e) || name.equals(e)) {
+                    if (network.isNameUsedForVariable(e) || network.isNameUsedForColor(e, oldColorType) || network.isNameUsedForColorType(e) || network.isNameUsedForConstant(e) || name.equalsIgnoreCase(e)) {
                         overlaps.add(e);
                     }
                 }
