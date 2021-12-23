@@ -1,135 +1,250 @@
 package pipe.gui;
 
 import dk.aau.cs.gui.TabContent
-import dk.aau.cs.model.tapn.TimedTransition
+import dk.aau.cs.model.tapn.TimeInterval
+import dk.aau.cs.model.tapn.TimeInvariant
+import dk.aau.cs.model.tapn.Weight
 import org.jetbrains.annotations.NotNull
-import org.w3c.dom.Element
 import pipe.gui.graphicElements.*
 import pipe.gui.graphicElements.tapn.*
 import java.awt.Point
-import java.io.StringBufferInputStream
 import java.util.*
-import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.collections.HashMap
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import java.lang.Exception
 
 
 class CopyPastImportExport {
+
+    @Serializable
+    data class TAPAALCopyPastModel(
+        val places: List<PlaceModel>,
+        val transitions: List<TransitionModel>,
+        val inputArcs: List<InputArcModel>,
+        val outputArc: List<OutputArcModel>,
+        val inhibitorArc: List<InhibitorArcModel>,
+        val transportArcs: List<TransportArcModel>,
+    )
+
+    @Serializable
+    data class PlaceModel(val name: String, val x: Int, val y: Int, val tokens: Int, val invariant: String)
+    @Serializable
+    data class TransitionModel(
+        val name: String,
+        val x: Int,
+        val y: Int,
+        val uncontrollable: Boolean,
+        val urgent: Boolean,
+        val rotation: Int,
+    )
+    @Serializable
+    data class InputArcModel(val source: String, val target: String, val defaultGuard: String, val weight: String)
+    @Serializable
+    data class OutputArcModel(val source: String, val target: String, val weight: String)
+    @Serializable
+    data class InhibitorArcModel(val source: String, val target: String, val weight: String)
+    @Serializable
+    data class TransportArcModel(val source: String, val mid: String, val target: String, val defaultGuard: String, val weight: String)
 
 
     companion object {
         @JvmStatic
         fun toXML(selection: ArrayList<PetriNetObject>): @NotNull String {
 
-            val r = StringBuilder();
+            val foundTransportArcs = mutableSetOf<TimedTransportArcComponent>()
 
-            r.append("<root>")
+            val places = mutableListOf<PlaceModel>()
+            val transitions = mutableListOf<TransitionModel>()
+            val inputArcs = mutableListOf<InputArcModel>()
+            val outputArcs = mutableListOf<OutputArcModel>()
+            val transportArcs = mutableListOf<TransportArcModel>()
+            val inhibitorArcs = mutableListOf<InhibitorArcModel>()
 
             for (o in selection) {
                 when (o) {
-                    is Place -> {
-                        val s = """
-                            <place name="%s" x="%d" y="%d" />
-                        """.trimIndent()
-                        r.append(s.format(o.name, o.originalX, o.originalY))
+                    is TimedPlaceComponent -> {
+                        val tokens = o.numberOfTokens
+                        val invariant = o.invariant.toString(false)
+                        places.add(PlaceModel(o.name, o.originalX, o.originalY, tokens, invariant))
                     }
                     is TimedTransitionComponent -> {
-                        val s = """
-                            <transition name="%s" x="%d" y="%d" isUncontrollable="%b" isUrgent="%b" />
-                        """.trimIndent()
-                        r.append(s.format(o.name, o.originalX, o.originalY, o.isUncontrollable, o.isUrgent))
+                        transitions.add(TransitionModel(o.name, o.originalX, o.originalY, uncontrollable = o.isUncontrollable, urgent = o.isUrgent, rotation = o.angle))
                     }
-                    is TimedTransportArcComponent -> Unit
+                    is TimedInhibitorArcComponent -> {
+                        val defaultWeight = o.weight.nameForSaving(false).ifBlank {"1"}
+                        inhibitorArcs.add(InhibitorArcModel(o.source.name, o.target.name, defaultWeight))
+                    }
+                    is TimedTransportArcComponent -> {
+                        if (foundTransportArcs.contains(o.connectedTo)) {
+                            val source1 = o.source
+                            val target1 = o.target
+                            val source2 = o.connectedTo.source
+                            val target2 = o.connectedTo.target
+
+                            val start: TimedPlaceComponent;
+                            val mid: TimedTransitionComponent
+                            val end: TimedPlaceComponent
+                            if (source1 is TimedPlaceComponent) {
+                                start = source1 as TimedPlaceComponent
+                                mid = target1 as TimedTransitionComponent
+                                end = target2 as TimedPlaceComponent
+                            } else if (source1 is TimedTransitionComponent) {
+                                start = source2 as TimedPlaceComponent
+                                mid =  source1 as TimedTransitionComponent
+                                end = target1 as TimedPlaceComponent
+                            } else {
+                                //Ignored not a valid arc
+                                break;
+                            }
+
+                            val defaultGuard = o.guard.toString(false)
+                            val defaultWeight = o.weight.nameForSaving(false).ifBlank {"1"}
+
+                            transportArcs.add(TransportArcModel(start.name, mid.name, end.name, defaultGuard, defaultWeight))
+                        } else  {
+                            foundTransportArcs.add(o);
+                        }
+                    }
                     is TimedInputArcComponent -> {
-                        val s = """
-                            <inputarc from="%s" to="%s" />
-                        """.trimIndent()
-                        r.append(s.format(o.source.name, o.target.name))
+                        val defaultGuard = o.guard.toString(false)
+                        val defaultWeight = o.weight.nameForSaving(false).ifBlank {"1"}
+                        inputArcs.add(InputArcModel(o.source.name, o.target.name, defaultGuard, defaultWeight))
                     }
                     is TimedOutputArcComponent -> {
-                        val s = """
-                            <outputarc from="%s" to="%s" />
-                        """.trimIndent()
-                        r.append(s.format(o.source.name, o.target.name))
+                        val defaultWeight = o.weight.nameForSaving(false).ifBlank {"1"}
+                        outputArcs.add(OutputArcModel(o.source.name, o.target.name, defaultWeight))
                     }
                 }
             }
-            r.append("</root>")
-            return r.toString();
+
+            return Json.encodeToString(TAPAALCopyPastModel(
+                places,
+                transitions,
+                inputArcs,
+                outputArcs,
+                inhibitorArcs,
+                transportArcs,
+            ))
         }
 
         @JvmStatic
         fun past(s: String, tab: TabContent) {
 
+            val model: TAPAALCopyPastModel
+            try {
+                model = Json.decodeFromString<TAPAALCopyPastModel>(s)
+            } catch (e: Exception) { // It seems the throw exception is internal to the library
+                return;
+            }
+
             val nameToElementMap = HashMap<String, PlaceTransitionObject>()
 
-            val factory = DocumentBuilderFactory.newInstance()
-            val builder = factory.newDocumentBuilder()
-            val xmlStringBuilder = StringBuilder(s);
-            val input = StringBufferInputStream(xmlStringBuilder.toString())
-            val document = builder.parse(input)
+            for ( p in model.places) {
+                val tokens = p.tokens
+                val invariant = TimeInvariant.parse(p.invariant, tab.network().constantStore)
 
-            val places = document.getElementsByTagName("place");
-            for (i in 0 until places.length) {
-                val node = places.item(i) as? Element
-                val name = node?.getAttribute("name")!!
-                val x = Integer.parseInt(node?.getAttribute("x"))
-                val y = Integer.parseInt(node?.getAttribute("y"))
+                val r = tab.guiModelManager.addNewTimedPlace(tab.model, Point(p.x + Pipe.PLACE_TRANSITION_HEIGHT, p.y + Pipe.PLACE_TRANSITION_HEIGHT))
+                if (!r.hasErrors) {
+                    r.result.underlyingPlace().addTokens(tokens)
+                    r.result.invariant = invariant
+                    nameToElementMap[p.name] = r.result
+                }
+            }
 
-                if (node != null) {
-                    val r = tab.guiModelManager.addNewTimedPlace(tab.model, Point(x + Pipe.PLACE_TRANSITION_HEIGHT, y + Pipe.PLACE_TRANSITION_HEIGHT))
+            for (t in model.transitions) {
+                val r = tab.guiModelManager.addNewTimedTransitions(tab.model, Point(t.x + Pipe.PLACE_TRANSITION_HEIGHT, t.y + Pipe.PLACE_TRANSITION_HEIGHT), t.urgent, t.uncontrollable)
+                if (!r.hasErrors) {
+                    nameToElementMap[t.name] = r.result
+                    r.result.rotate(t.rotation)
+                }
+            }
+
+            for (a in model.inputArcs) {
+
+                val from = nameToElementMap[a.source] as? TimedPlaceComponent
+                val to = nameToElementMap[a.target] as? TimedTransitionComponent
+                val guard = try {
+                    TimeInterval.parse(a.defaultGuard, tab.network().constantStore);
+                } catch (e: Exception) {
+                    null
+                }
+
+                val weight = try {
+                    Weight.parseWeight(a.weight, tab.network().constantStore)
+                } catch (e: Exception) {
+                    null
+                }
+
+                if (from != null && to != null && guard != null) {
+                    val r = tab.guiModelManager.addTimedInputArc(tab.model, from, to, null)
                     if (!r.hasErrors) {
-                        nameToElementMap[name] = r.result
+                        r.result.setGuardAndWeight(guard, weight)
                     }
                 }
+
             }
 
-            val transition = document.getElementsByTagName("transition");
-            for (i in 0 until transition.length) {
-                val node = transition.item(i) as? Element
-                val name = node?.getAttribute("name")!!
-                val isUncontrollable:Boolean = (node?.getAttribute("isUncontrollable")).toBoolean()
-                val isUrgent = (node?.getAttribute("isUrgent")).toBoolean()
-                val x = Integer.parseInt(node?.getAttribute("x"))
-                val y = Integer.parseInt(node?.getAttribute("y"))
+            for (a in model.outputArc) {
 
-                if (node != null) {
-                    val r = tab.guiModelManager.addNewTimedTransitions(tab.model, Point(x + Pipe.PLACE_TRANSITION_HEIGHT, y + Pipe.PLACE_TRANSITION_HEIGHT), isUrgent, isUncontrollable)
+                val to = nameToElementMap[a.source] as? TimedTransitionComponent
+                val from = nameToElementMap[a.target] as? TimedPlaceComponent
+
+                val weight = try {
+                    Weight.parseWeight(a.weight, tab.network().constantStore)
+                } catch (e: Exception) {
+                    null
+                }
+
+                if (from != null && to != null) {
+                    val r = tab.guiModelManager.addTimedOutputArc(tab.model, to, from, null)
                     if (!r.hasErrors) {
-                        nameToElementMap[name] = r.result
+                        r.result.weight = weight
                     }
                 }
 
             }
 
+            for (a in model.inhibitorArc) {
+                val from = nameToElementMap[a.source] as? TimedPlaceComponent
+                val to = nameToElementMap[a.target] as? TimedTransitionComponent
 
-            val inputArc = document.getElementsByTagName("inputarc");
-            for (i in 0 until inputArc.length) {
-                val node = inputArc.item(i) as? Element
-                val from = node?.getAttribute("from")!!
-                val to = node?.getAttribute("to")!!
+                val weight = try {
+                    Weight.parseWeight(a.weight, tab.network().constantStore)
+                } catch (e: Exception) {
+                    null
+                }
 
-                if (node != null) {
-                    val from = nameToElementMap[from] as? TimedPlaceComponent
-                    val to = nameToElementMap[to] as? TimedTransitionComponent
-
-                    if (from != null && to != null) {
-                        tab.guiModelManager.addTimedInputArc(tab.model, from, to, null)
+                if (from != null && to != null) {
+                    val r = tab.guiModelManager.addInhibitorArc(tab.model, from, to, null)
+                    if (!r.hasErrors) {
+                        r.result.setGuardAndWeight(TimeInterval.ZERO_INF, weight)
                     }
                 }
             }
 
-            val outputArc = document.getElementsByTagName("outputarc");
-            for (i in 0 until outputArc.length) {
-                val node = outputArc.item(i) as? Element
-                val from = node?.getAttribute("from")!!
-                val to = node?.getAttribute("to")!!
+            for (a in model.transportArcs) {
+                val from = nameToElementMap[a.source] as? TimedPlaceComponent
+                val mid = nameToElementMap[a.mid] as? TimedTransitionComponent
+                val to = nameToElementMap[a.target] as? TimedPlaceComponent
 
-                if (node != null) {
-                    val from = nameToElementMap[from] as? TimedTransitionComponent
-                    val to = nameToElementMap[to] as? TimedPlaceComponent
+                val guard = try {
+                    TimeInterval.parse(a.defaultGuard, tab.network().constantStore);
+                } catch (e: Exception) {
+                    null
+                }
 
-                    if (from != null && to != null) {
-                        tab.guiModelManager.addTimedOutputArc(tab.model, from, to, null)
+                val weight = try {
+                    Weight.parseWeight(a.weight, tab.network().constantStore)
+                } catch (e: Exception) {
+                    null
+                }
+
+                if (from != null && mid != null && to != null && guard != null && weight != null) {
+                    val r = tab.guiModelManager.addTimedTransportArc(tab.model, from, mid, to, null, null);
+                    if (!r.hasErrors) {
+                        r.result.setGuardAndWeight(guard, weight);
                     }
                 }
             }
@@ -142,3 +257,5 @@ class CopyPastImportExport {
     }
 
 }
+
+

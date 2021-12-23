@@ -330,7 +330,12 @@ public class TimedArcPetriNetNetwork {
 		return constants.getConstantByIndex(index);
 	}
 
-	public TimedArcPetriNet getTAPNByName(String name) {
+    public ConstantStore getConstantStore() {
+        return constants;
+    }
+
+
+    public TimedArcPetriNet getTAPNByName(String name) {
 		for (TimedArcPetriNet tapn : tapns) {
 			if (tapn.name().equals(name))
 				return tapn;

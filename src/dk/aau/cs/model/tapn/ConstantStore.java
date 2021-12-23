@@ -72,7 +72,6 @@ public class ConstantStore {
 
 	}
 
-
 	public boolean containsConstantByName(String name) {
 		for(Constant c : constants) {
 			if(c.name().equalsIgnoreCase(name))
