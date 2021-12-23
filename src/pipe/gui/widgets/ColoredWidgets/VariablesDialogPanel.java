@@ -261,7 +261,7 @@ public class VariablesDialogPanel extends JPanel {
             return;
         }
         //If we are editing a variable it is allowed to have the same name
-        if (network.isNameUsedForVariable(newName) && (variable == null || !variable.getName().equals(newName))) {
+        if ((variable == null || !variable.getName().equalsIgnoreCase(newName)) && network.isNameUsedForVariable(newName) ) {
             JOptionPane
                     .showMessageDialog(
                             CreateGui.getApp(),
@@ -281,6 +281,38 @@ public class VariablesDialogPanel extends JPanel {
             nameTextField.requestFocusInWindow();
             return;
         }
+
+        if (network.isNameUsedForConstant(newName)) {
+            JOptionPane
+                .showMessageDialog(
+                    CreateGui.getApp(),
+                    "There is already a constant with this name.\n\n"
+                        + "Choose a different name for the variable.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (network.isNameUsedForColorType(newName)) {
+            JOptionPane
+                .showMessageDialog(
+                    CreateGui.getApp(),
+                    "There is already a Color Type with this name.\n\n"
+                        + "Choose a different name for the variable.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        //Variable name is not allow to overlap with enum names
+        if (network.isNameUsedForColor(newName, null)) {
+            JOptionPane
+                .showMessageDialog(
+                    CreateGui.getApp(),
+                    "There is already a Color with this name.\n\n"
+                        + "Choose a different name for the variable.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         Command cmd;
         if (!oldName.equals("")) {
             cmd = new UpdateVariableCommand(variable, nameTextField.getText(), colorTypes.get(colorTypeComboBox.getSelectedIndex()), listModel);
