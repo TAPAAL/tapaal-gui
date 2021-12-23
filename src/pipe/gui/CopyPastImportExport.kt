@@ -1,19 +1,17 @@
 package pipe.gui;
 
 import dk.aau.cs.gui.TabContent
+import dk.aau.cs.model.tapn.IntWeight
 import dk.aau.cs.model.tapn.TimeInterval
 import dk.aau.cs.model.tapn.TimeInvariant
 import dk.aau.cs.model.tapn.Weight
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 import org.jetbrains.annotations.NotNull
 import pipe.gui.graphicElements.*
 import pipe.gui.graphicElements.tapn.*
 import java.awt.Point
 import java.util.*
-import kotlin.collections.HashMap
-
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-import java.lang.Exception
 
 
 class CopyPastImportExport {
@@ -40,13 +38,13 @@ class CopyPastImportExport {
         val rotation: Int,
     )
     @Serializable
-    data class InputArcModel(val source: String, val target: String, val defaultGuard: String, val weight: String)
+    data class InputArcModel(val source: String, val target: String, val guard: String, val weight: String)
     @Serializable
     data class OutputArcModel(val source: String, val target: String, val weight: String)
     @Serializable
     data class InhibitorArcModel(val source: String, val target: String, val weight: String)
     @Serializable
-    data class TransportArcModel(val source: String, val mid: String, val target: String, val defaultGuard: String, val weight: String)
+    data class TransportArcModel(val source: String, val mid: String, val target: String, val guard: String, val weight: String)
 
 
     companion object {
@@ -120,6 +118,7 @@ class CopyPastImportExport {
             }
 
             return Json.encodeToString(TAPAALCopyPastModel(
+                //lens,
                 places,
                 transitions,
                 inputArcs,
@@ -143,7 +142,11 @@ class CopyPastImportExport {
 
             for ( p in model.places) {
                 val tokens = p.tokens
-                val invariant = TimeInvariant.parse(p.invariant, tab.network().constantStore)
+                val invariant = if (tab.lens.isTimed) {
+                    TimeInvariant.parse(p.invariant, tab.network().constantStore)
+                } else {
+                    TimeInvariant.LESS_THAN_INFINITY
+                }
 
                 val r = tab.guiModelManager.addNewTimedPlace(tab.model, Point(p.x + Pipe.PLACE_TRANSITION_HEIGHT, p.y + Pipe.PLACE_TRANSITION_HEIGHT))
                 if (!r.hasErrors) {
@@ -154,7 +157,7 @@ class CopyPastImportExport {
             }
 
             for (t in model.transitions) {
-                val r = tab.guiModelManager.addNewTimedTransitions(tab.model, Point(t.x + Pipe.PLACE_TRANSITION_HEIGHT, t.y + Pipe.PLACE_TRANSITION_HEIGHT), t.urgent, t.uncontrollable)
+                val r = tab.guiModelManager.addNewTimedTransitions(tab.model, Point(t.x + Pipe.PLACE_TRANSITION_HEIGHT, t.y + Pipe.PLACE_TRANSITION_HEIGHT), t.urgent && tab.lens.isTimed, t.uncontrollable && tab.lens.isGame)
                 if (!r.hasErrors) {
                     nameToElementMap[t.name] = r.result
                     r.result.rotate(t.rotation)
@@ -165,17 +168,9 @@ class CopyPastImportExport {
 
                 val from = nameToElementMap[a.source] as? TimedPlaceComponent
                 val to = nameToElementMap[a.target] as? TimedTransitionComponent
-                val guard = try {
-                    TimeInterval.parse(a.defaultGuard, tab.network().constantStore);
-                } catch (e: Exception) {
-                    null
-                }
+                val guard = findGuard(a.guard, tab)
 
-                val weight = try {
-                    Weight.parseWeight(a.weight, tab.network().constantStore)
-                } catch (e: Exception) {
-                    null
-                }
+                val weight = findWeight(a.weight, tab)
 
                 if (from != null && to != null && guard != null) {
                     val r = tab.guiModelManager.addTimedInputArc(tab.model, from, to, null)
@@ -191,11 +186,7 @@ class CopyPastImportExport {
                 val to = nameToElementMap[a.source] as? TimedTransitionComponent
                 val from = nameToElementMap[a.target] as? TimedPlaceComponent
 
-                val weight = try {
-                    Weight.parseWeight(a.weight, tab.network().constantStore)
-                } catch (e: Exception) {
-                    null
-                }
+                val weight = findWeight(a.weight, tab)
 
                 if (from != null && to != null) {
                     val r = tab.guiModelManager.addTimedOutputArc(tab.model, to, from, null)
@@ -210,11 +201,7 @@ class CopyPastImportExport {
                 val from = nameToElementMap[a.source] as? TimedPlaceComponent
                 val to = nameToElementMap[a.target] as? TimedTransitionComponent
 
-                val weight = try {
-                    Weight.parseWeight(a.weight, tab.network().constantStore)
-                } catch (e: Exception) {
-                    null
-                }
+                val weight = findWeight(a.weight, tab)
 
                 if (from != null && to != null) {
                     val r = tab.guiModelManager.addInhibitorArc(tab.model, from, to, null)
@@ -229,31 +216,58 @@ class CopyPastImportExport {
                 val mid = nameToElementMap[a.mid] as? TimedTransitionComponent
                 val to = nameToElementMap[a.target] as? TimedPlaceComponent
 
-                val guard = try {
-                    TimeInterval.parse(a.defaultGuard, tab.network().constantStore);
-                } catch (e: Exception) {
-                    null
-                }
+                val guard = findGuard(a.guard, tab)
 
-                val weight = try {
-                    Weight.parseWeight(a.weight, tab.network().constantStore)
-                } catch (e: Exception) {
-                    null
-                }
+                val weight = findWeight(a.weight, tab)
 
                 if (from != null && mid != null && to != null && guard != null && weight != null) {
-                    val r = tab.guiModelManager.addTimedTransportArc(tab.model, from, mid, to, null, null);
-                    if (!r.hasErrors) {
-                        r.result.setGuardAndWeight(guard, weight);
+                    if (tab.lens.isTimed) {
+                        val r = tab.guiModelManager.addTimedTransportArc(tab.model, from, mid, to, null, null);
+                        if (!r.hasErrors) {
+                            r.result.setGuardAndWeight(guard, weight);
+                        }
+                    } else {
+                        val r = tab.guiModelManager.addTimedInputArc(tab.model, from, mid, null)
+                        val r2 = tab.guiModelManager.addTimedOutputArc(tab.model, mid, to, null)
+
+                        if (!r.hasErrors && !r2.hasErrors) {
+                            r.result.setGuardAndWeight(guard, weight)
+                            r2.result.weight = weight
+                        }
                     }
+
                 }
             }
 
             tab.drawingSurface().selectionObject.clearSelection()
             nameToElementMap.values.forEach { it.select() }
 
-
         }
+
+        private fun findWeight(weight: String, tab: TabContent): Weight? {
+            return if (tab.lens.isColored) {
+                IntWeight(1)
+            } else {
+                try {
+                    Weight.parseWeight(weight, tab.network().constantStore)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        }
+        private fun findGuard(guard: String, tab: TabContent): TimeInterval? {
+            return if (tab.lens.isTimed) {
+                try {
+                    TimeInterval.parse(guard, tab.network().constantStore);
+                } catch (e: Exception) {
+                    null
+                }
+            } else {
+                TimeInterval.ZERO_INF
+            }
+        }
+
+
     }
 
 }
