@@ -345,6 +345,7 @@ public class ArcPath implements Shape {
             arcpath.zoomUpdate(myArc.getZoom());
         }
 		pathPoints.add(arcpath);
+        addPointsToGui(myArc.getGuiModel());
 	}
 
 
@@ -550,6 +551,8 @@ public class ArcPath implements Shape {
 	}
 
 	public void addPointsToGui(DataLayer model) {
+
+        if (model == null) return;
 
 		(pathPoints.get(0)).setDraggable(false);
 		(pathPoints.get(pathPoints.size() - 1)).setDraggable(false);

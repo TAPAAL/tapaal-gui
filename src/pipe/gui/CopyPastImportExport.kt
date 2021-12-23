@@ -27,6 +27,9 @@ class CopyPastImportExport {
     )
 
     @Serializable
+    data class PathPointModel(val x: Int, val y: Int, val curve: Boolean = false)
+
+    @Serializable
     data class PlaceModel(val name: String, val x: Int, val y: Int, val tokens: Int, val invariant: String)
     @Serializable
     data class TransitionModel(
@@ -38,13 +41,13 @@ class CopyPastImportExport {
         val rotation: Int,
     )
     @Serializable
-    data class InputArcModel(val source: String, val target: String, val guard: String, val weight: String)
+    data class InputArcModel(val source: String, val target: String, val guard: String, val weight: String, val path: List<PathPointModel> = listOf())
     @Serializable
-    data class OutputArcModel(val source: String, val target: String, val weight: String)
+    data class OutputArcModel(val source: String, val target: String, val weight: String, val path: List<PathPointModel> = listOf())
     @Serializable
-    data class InhibitorArcModel(val source: String, val target: String, val weight: String)
+    data class InhibitorArcModel(val source: String, val target: String, val weight: String, val path: List<PathPointModel> = listOf())
     @Serializable
-    data class TransportArcModel(val source: String, val mid: String, val target: String, val guard: String, val weight: String)
+    data class TransportArcModel(val source: String, val mid: String, val target: String, val guard: String, val weight: String, val path1: List<PathPointModel> = listOf(), val path2: List<PathPointModel> = listOf())
 
 
     companion object {
@@ -72,35 +75,40 @@ class CopyPastImportExport {
                     }
                     is TimedInhibitorArcComponent -> {
                         val defaultWeight = o.weight.nameForSaving(false).ifBlank {"1"}
-                        inhibitorArcs.add(InhibitorArcModel(o.source.name, o.target.name, defaultWeight))
+                        val path = o.arcPath.arcPathPoints.map {
+                            PathPointModel(it.originalX, it.originalY, it.pointType)
+                        }
+                        inhibitorArcs.add(InhibitorArcModel(o.source.name, o.target.name, defaultWeight, path))
                     }
                     is TimedTransportArcComponent -> {
                         if (foundTransportArcs.contains(o.connectedTo)) {
-                            val source1 = o.source
-                            val target1 = o.target
-                            val source2 = o.connectedTo.source
-                            val target2 = o.connectedTo.target
 
-                            val start: TimedPlaceComponent;
-                            val mid: TimedTransitionComponent
-                            val end: TimedPlaceComponent
-                            if (source1 is TimedPlaceComponent) {
-                                start = source1 as TimedPlaceComponent
-                                mid = target1 as TimedTransitionComponent
-                                end = target2 as TimedPlaceComponent
-                            } else if (source1 is TimedTransitionComponent) {
-                                start = source2 as TimedPlaceComponent
-                                mid =  source1 as TimedTransitionComponent
-                                end = target1 as TimedPlaceComponent
+                            val arc1: TimedTransportArcComponent
+                            val arc2: TimedTransportArcComponent
+
+                            if (o.source is TimedPlaceComponent) {
+                                arc1 = o;
+                                arc2 = o.connectedTo
                             } else {
-                                //Ignored not a valid arc
-                                break;
+                                arc1 = o.connectedTo
+                                arc2 = o
+                            }
+
+                            val start = arc1.source as TimedPlaceComponent;
+                            val mid = arc1.target as TimedTransitionComponent
+                            val end = arc2.target as TimedPlaceComponent
+
+                            val path1 = arc1.arcPath.arcPathPoints.map {
+                                PathPointModel(it.originalX, it.originalY, it.pointType)
+                            }
+                            val path2 = arc2.arcPath.arcPathPoints.map {
+                                PathPointModel(it.originalX, it.originalY, it.pointType)
                             }
 
                             val defaultGuard = o.guard.toString(false)
                             val defaultWeight = o.weight.nameForSaving(false).ifBlank {"1"}
 
-                            transportArcs.add(TransportArcModel(start.name, mid.name, end.name, defaultGuard, defaultWeight))
+                            transportArcs.add(TransportArcModel(start.name, mid.name, end.name, defaultGuard, defaultWeight, path1, path2))
                         } else  {
                             foundTransportArcs.add(o);
                         }
@@ -108,17 +116,25 @@ class CopyPastImportExport {
                     is TimedInputArcComponent -> {
                         val defaultGuard = o.guard.toString(false)
                         val defaultWeight = o.weight.nameForSaving(false).ifBlank {"1"}
-                        inputArcs.add(InputArcModel(o.source.name, o.target.name, defaultGuard, defaultWeight))
+
+                        val path = o.arcPath.arcPathPoints.map {
+                            PathPointModel(it.originalX, it.originalY, it.pointType)
+                        }
+
+                        inputArcs.add(InputArcModel(o.source.name, o.target.name, defaultGuard, defaultWeight, path))
                     }
                     is TimedOutputArcComponent -> {
                         val defaultWeight = o.weight.nameForSaving(false).ifBlank {"1"}
-                        outputArcs.add(OutputArcModel(o.source.name, o.target.name, defaultWeight))
+
+                        val path = o.arcPath.arcPathPoints.map {
+                            PathPointModel(it.originalX, it.originalY, it.pointType)
+                        }
+                        outputArcs.add(OutputArcModel(o.source.name, o.target.name, defaultWeight, path))
                     }
                 }
             }
 
             return Json.encodeToString(TAPAALCopyPastModel(
-                //lens,
                 places,
                 transitions,
                 inputArcs,
@@ -138,6 +154,7 @@ class CopyPastImportExport {
                 return;
             }
 
+            tab.drawingSurface().selectionObject.clearSelection()
             val nameToElementMap = HashMap<String, PlaceTransitionObject>()
 
             for ( p in model.places) {
@@ -176,6 +193,7 @@ class CopyPastImportExport {
                     val r = tab.guiModelManager.addTimedInputArc(tab.model, from, to, null)
                     if (!r.hasErrors) {
                         r.result.setGuardAndWeight(guard, weight)
+                        addArcPath(a.path, r.result)
                     }
                 }
 
@@ -192,6 +210,7 @@ class CopyPastImportExport {
                     val r = tab.guiModelManager.addTimedOutputArc(tab.model, to, from, null)
                     if (!r.hasErrors) {
                         r.result.weight = weight
+                        addArcPath(a.path, r.result)
                     }
                 }
 
@@ -207,6 +226,7 @@ class CopyPastImportExport {
                     val r = tab.guiModelManager.addInhibitorArc(tab.model, from, to, null)
                     if (!r.hasErrors) {
                         r.result.setGuardAndWeight(TimeInterval.ZERO_INF, weight)
+                        addArcPath(a.path, r.result)
                     }
                 }
             }
@@ -225,6 +245,8 @@ class CopyPastImportExport {
                         val r = tab.guiModelManager.addTimedTransportArc(tab.model, from, mid, to, null, null);
                         if (!r.hasErrors) {
                             r.result.setGuardAndWeight(guard, weight);
+                            addArcPath(a.path1, r.result)
+                            addArcPath(a.path2, r.result.connectedTo)
                         }
                     } else {
                         val r = tab.guiModelManager.addTimedInputArc(tab.model, from, mid, null)
@@ -233,13 +255,14 @@ class CopyPastImportExport {
                         if (!r.hasErrors && !r2.hasErrors) {
                             r.result.setGuardAndWeight(guard, weight)
                             r2.result.weight = weight
+                            addArcPath(a.path1, r.result)
+                            addArcPath(a.path2, r2.result)
                         }
                     }
 
                 }
             }
 
-            tab.drawingSurface().selectionObject.clearSelection()
             nameToElementMap.values.forEach { it.select() }
 
         }
@@ -265,6 +288,14 @@ class CopyPastImportExport {
             } else {
                 TimeInterval.ZERO_INF
             }
+        }
+        private fun addArcPath(path: List<PathPointModel>, arc: Arc) {
+            arc.arcPath.purgePathPoints()
+            path.forEach {
+                arc.arcPath.addPoint(it.x.toDouble()+ Pipe.PLACE_TRANSITION_HEIGHT, it.y.toDouble()+ Pipe.PLACE_TRANSITION_HEIGHT, it.curve)
+            }
+            arc.arcPath.updateArc()
+            arc.select()
         }
 
 
