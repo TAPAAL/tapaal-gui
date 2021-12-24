@@ -8,8 +8,8 @@ import java.util.List;
 public class CompundCommand extends Command {
     private final List<Command> commands;
 
-    CompundCommand(List<Command> commands) {
-        this.commands = new ArrayList(commands);
+    public CompundCommand(List<Command> commands) {
+        this.commands = new ArrayList<>(commands);
     }
 
     @Override

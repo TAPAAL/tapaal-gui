@@ -155,6 +155,7 @@ class CopyPastImportExport {
             }
 
             tab.drawingSurface().selectionObject.clearSelection()
+            tab.guiModelManager.startTransaction()
             val nameToElementMap = HashMap<String, PlaceTransitionObject>()
 
             for ( p in model.places) {
@@ -262,9 +263,8 @@ class CopyPastImportExport {
 
                 }
             }
-
+            tab.guiModelManager.commit()
             nameToElementMap.values.forEach { it.select() }
-
         }
 
         private fun findWeight(weight: String, tab: TabContent): Weight? {
