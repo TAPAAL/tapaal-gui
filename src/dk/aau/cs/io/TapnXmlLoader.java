@@ -295,6 +295,7 @@ public class TapnXmlLoader {
 		
 		for (int i = 0; i < nets.getLength(); i++) {
 			Template template = parseTimedArcPetriNet(nets.item(i), network, constants);
+            template.setHasPositionalInfo(true); //We assume that all templates have positional info
 			templates.add(template);
 		}
 		return templates;
