@@ -44,7 +44,6 @@ public class VerifyPN implements ModelChecker {
 
     private ProcessRunner runner;
     private boolean ctlOutput = false;
-    private boolean supportsStats = true;
 
     public VerifyPN(FileFinder fileFinder, Messenger messenger) {
         this.fileFinder = fileFinder;
@@ -52,7 +51,7 @@ public class VerifyPN implements ModelChecker {
     }
 
     public boolean supportsStats() {
-        return supportsStats;
+        return true;
     }
 
     public String[] getStatsExplanations() {

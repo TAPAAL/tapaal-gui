@@ -49,12 +49,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected boolean reduceNetOnly;
 	protected boolean reducedNetOpened = false;
 	protected JSpinner spinner;
-
 	protected Messenger messenger;
-    //if the unfolded net is too big, do not try to load it
-    private final int maxNetSize = 4000;
 
-	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, String reducedNetFilePath, boolean reduceNetOnly, JSpinner spinner) {
+    public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, String reducedNetFilePath, boolean reduceNetOnly, JSpinner spinner) {
 		super();
 		this.modelChecker = modelChecker;
 		this.messenger = messenger;
@@ -252,62 +249,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 		}
 	}
-    private String createUnfoldArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(modelFile);
-        buffer.append(" ");
-        buffer.append(queryFile);
-        buffer.append(" ");
-        buffer.append(options.toString());
-        return buffer.toString();
-    }
-    @SuppressWarnings("Duplicates")
-    private String readOutput(BufferedReader reader) {
-        try {
-            if (!reader.ready())
-                return "";
-        } catch (IOException e1) {
-            return "";
-        }
-        StringBuffer buffer = new StringBuffer();
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line);
-                buffer.append(System.getProperty("line.separator"));
-            }
-        } catch (IOException e) {
-        }
 
-        return buffer.toString();
-    }
-
-    private int readUnfoldedSize(BufferedReader reader){
-        try {
-            if (!reader.ready())
-                return 0;
-        } catch (IOException e1) {
-            return 0;
-        }
-        int numElements = 0;
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                if(line.startsWith("Size of unfolded net: ")){
-                    Pattern p = Pattern.compile("\\d+");
-                    Matcher m = p.matcher(line);
-                    while (m.find()) {
-                        numElements += Integer.parseInt(m.group());
-                    }
-                }
-            }
-        } catch (IOException e) {
-        }
-
-        return numElements;
-    }
-
-	private String error;
+    private String error;
 	private void showErrorMessage(String errorMessage) {
 		error = errorMessage;
 		//The invoke later will make sure all the verification is finished before showing the error

@@ -20,10 +20,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.TapnXmlLoader;
-import dk.aau.cs.util.FormatException;
-import dk.aau.cs.verification.*;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
@@ -47,12 +43,11 @@ public class RunVerification extends RunVerificationBase {
 		iconSelector = selector;
 		this.callback = callback;
 	}
+
     public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback,HashMap<TimedArcPetriNet, DataLayer> guiModels) {
         this(modelChecker, selector, messenger, callback, guiModels, null, false);
     }
-    public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
-        this(modelChecker, selector, messenger, callback, null, null, false);
-	}
+
     public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
         this(modelChecker, selector, messenger, null, null, null, false);
     }
