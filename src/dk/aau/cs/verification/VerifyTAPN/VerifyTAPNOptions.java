@@ -63,20 +63,25 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		tokensInModel = tokens;
 	}
 
+    public String kBoundArg() {
+        return " --k-bound " + extraTokens+tokensInModel + " ";
+    }
+
+    public String deadTokenArg() {
+        return dontUseDeadPlaces ? " --keep-dead-tokens " : "";
+    }
+
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 
-		result.append("--k-bound ");
-		result.append(extraTokens+tokensInModel);
-		result.append(' ');
+		result.append(kBoundArg());
+        result.append(deadTokenArg());
 		result.append(traceMap.get(traceOption));
 		result.append(' ');
 		result.append(searchMap.get(searchOption));
 		result.append(' ');
 		result.append(symmetry ? "" : "--disable-symmetry"); // symmetry is on by default in verifyTAPN so "-s" disables it
-		result.append(' ');
-		result.append(dontUseDeadPlaces ? "--keep-dead-tokens" : "");
 		result.append(' ');
 		result.append(discreteInclusion ? " --factory 1" : "");
 		result.append(discreteInclusion ? " --inc-places " + generateDiscretePlacesList() : "");

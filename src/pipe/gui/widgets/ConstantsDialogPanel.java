@@ -11,7 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
@@ -197,6 +196,17 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 			return;
 		}
 
+        if (model.isNameUsedForColorType(newName) || model.isNameUsedForVariable(newName) || model.isNameUsedForColor(newName, null)) {
+            JOptionPane
+                .showMessageDialog(
+                    CreateGui.getApp(),
+                    "There is already another Color, Color Type or Variable with the same name.\n\n"
+                        + "Choose a different name for the constant.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            nameTextField.requestFocusInWindow();
+            return;
+        }
+
 		if (newName.trim().isEmpty()) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"You must specify a name.", "Missing name",
@@ -207,7 +217,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 			int val = (Integer) valueSpinner.getValue();
 			if (!oldName.equals("")) {
 				if (!oldName.equalsIgnoreCase(newName)
-						&& model.isConstantNameUsed(newName)) {
+						&& model.isNameUsedForConstant(newName)) {
 					JOptionPane
 					.showMessageDialog(
 							CreateGui.getApp(),
@@ -217,6 +227,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					nameTextField.requestFocusInWindow();
 					return;
 				}
+
 				//Kyrke - This is messy, but a quck fix for bug #815487			
 				//Check that the value is within the allowed bounds
 				if (!( lowerBound <= val && val <= upperBound )){
