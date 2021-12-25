@@ -26,6 +26,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 		super(modelChecker, messenger, spinner);
 		this.spinner = spinner;
 		this.resultShown = resultShown;
+		this.guiModels = guiModels;
 	}
 
 	@Override
