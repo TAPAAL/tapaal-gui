@@ -1,12 +1,6 @@
 package dk.aau.cs.approximation;
 
-import java.io.File;
 import java.math.BigDecimal;
-
-import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.TapnXmlLoader;
-import dk.aau.cs.util.FormatException;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
@@ -47,7 +41,8 @@ public class ApproximationWorker {
         RunVerificationBase verificationBase,
         TimedArcPetriNetNetwork model,
         DataLayer guiModel,
-        pipe.dataLayer.TAPNQuery dataLayerQuery) throws Exception {
+        pipe.dataLayer.TAPNQuery dataLayerQuery
+    ) throws Exception {
 		
 		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them
 		InclusionPlaces oldInclusionPlaces = null;

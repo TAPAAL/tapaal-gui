@@ -64,20 +64,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         this.spinner = spinner;
     }
 
-    public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
-        this(modelChecker, messenger, guiModels, "", false, null);
-    }
-
-    public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
-        this(modelChecker, messenger, null, "", false, null);
-    }
-
-    public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, JSpinner spinner) {
-        this(modelChecker, messenger, null, "", false, spinner);
-    }
-
-	
-	public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, pipe.dataLayer.TAPNQuery dataLayerQuery) {
+    public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, pipe.dataLayer.TAPNQuery dataLayerQuery) {
 		this.model = model;
 		this.options = options;
 		this.query = query;

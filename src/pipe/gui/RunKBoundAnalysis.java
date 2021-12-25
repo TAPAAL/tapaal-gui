@@ -15,15 +15,13 @@ import pipe.dataLayer.DataLayer;
 
 import java.util.HashMap;
 
-import java.util.ArrayList;
-
 public class RunKBoundAnalysis extends RunVerificationBase {
 
 	private final JSpinner spinner;
     private boolean resultShown;
 
 	public RunKBoundAnalysis(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, JSpinner spinner, boolean resultShown) {
-		super(modelChecker, messenger, spinner);
+		super(modelChecker, messenger, null, "", false, spinner);
 		this.spinner = spinner;
 		this.resultShown = resultShown;
 	}
