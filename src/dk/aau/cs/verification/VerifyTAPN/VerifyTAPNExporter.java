@@ -168,13 +168,15 @@ public class VerifyTAPNExporter {
 
 	protected void outputTransition(TimedTransition t, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         //remove the net prefix from the transition name
-	    String transitionName = mapping.map(t.name()).value2();
+        var m = mapping.map(t.name());
         Transition guiTransition = null;
-
-        for(DataLayer guiModel : guiModels){
-	        guiTransition = guiModel.getTransitionById(transitionName);
-	        if(guiTransition != null){
-	            break;
+        if (m != null) {
+            String transitionName = m.value2();
+            for(DataLayer guiModel : guiModels){
+                guiTransition = guiModel.getTransitionById(transitionName);
+                if(guiTransition != null){
+                    break;
+                }
             }
         }
 
