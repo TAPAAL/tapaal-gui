@@ -627,7 +627,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		scroller.setBorder(null);
 		scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scroller.setMinimumSize(new Dimension(
-				panel.getMinimumSize().width,
+				panel.getPreferredSize().width,
 				panel.getMinimumSize().height
 		));
 		return scroller;
