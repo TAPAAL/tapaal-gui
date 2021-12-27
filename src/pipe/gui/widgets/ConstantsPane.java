@@ -555,6 +555,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         constantsPanel.add(constantsScroller, gbc);
 
         moveUpButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png"))));
+        moveUpButton.setMargin(new Insets(2,2,2,2));
         moveUpButton.setEnabled(false);
         moveUpButton.setToolTipText(toolTipMoveUpColorType);
         moveUpButton.addActionListener(e -> {
@@ -582,6 +583,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         constantsPanel.add(moveUpButton,gbc);
 
         moveDownButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png"))));
+        moveDownButton.setMargin(new Insets(2,2,2,2));
         moveDownButton.setEnabled(false);
         moveDownButton.setToolTipText(toolTipMoveDownColorType);
         moveDownButton.addActionListener(e -> {
@@ -611,6 +613,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
         //Sort button
         sortButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png"))));
+        sortButton.setMargin(new Insets(2,2,2,2));
         sortButton.setToolTipText(toolTipSortColorTypes);
         sortButton.setEnabled(false);
         sortButton.addActionListener(e -> {
