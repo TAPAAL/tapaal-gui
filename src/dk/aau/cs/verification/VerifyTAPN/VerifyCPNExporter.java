@@ -27,6 +27,18 @@ public class VerifyCPNExporter extends VerifyTAPNExporter{
         modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
         modelStream.append(">\n");
         modelStream.append(colorInformationToXMLString(p));
+
+        // This is a hack to export position information for unfolding, we need to refactor what data is passed
+        // We assume that the net only has one guiModels at this point
+        if (guiModels.size() == 1) {
+            var g = guiModels.stream().findFirst().get().getPlaceByName(mapping.map(p.name()).value2());
+            if (g != null) {
+                modelStream.append("<graphics>");
+                modelStream.append("<position x=\""+ g.getOriginalX() + "\" y=\"" + g.getOriginalY() + "\" />");
+                modelStream.append("</graphics>");
+            }
+        }
+
         modelStream.append("</place>\n");
     }
     protected void outputTransition(TimedTransition t, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
@@ -36,6 +48,18 @@ public class VerifyCPNExporter extends VerifyTAPNExporter{
         modelStream.append("name=\"" + t.name() + "\" ");
         modelStream.append(">\n");
         modelStream.append(colorInformationToXMLString(t));
+
+        // This is a hack to export position information for unfolding, we need to refactor what data is passed
+        // We assume that the net only has one guiModels at this point
+        if (guiModels.size() == 1) {
+            var g = guiModels.stream().findFirst().get().getTransitionByName(mapping.map(t.name()).value2());
+            if (g != null) {
+                modelStream.append("<graphics>");
+                modelStream.append("<position x=\""+ g.getOriginalX() + "\" y=\"" + g.getOriginalY() + "\" />");
+                modelStream.append("</graphics>");
+            }
+        }
+
         modelStream.append("</transition>\n");
     }
     @Override
