@@ -199,11 +199,11 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         LoadedModel loadedModel = null;
         try {
             if(lens.isTimed()){
-                loadedModel = new TapnXmlLoader().load(fileOut);
+                loadedModel = new TapnEngineXmlLoader().load(fileOut);
             } else{
                 loadedModel = new PNMLoader().load(fileOut);
             }
-            addLocation(loadedModel, composer);
+            // addLocation(loadedModel, composer); // We can not get coords from server
             newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
             if(!dummyQuery){

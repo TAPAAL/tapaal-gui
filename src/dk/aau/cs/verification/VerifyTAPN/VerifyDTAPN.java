@@ -7,6 +7,7 @@ import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.TapnEngineXmlLoader;
 import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
@@ -286,7 +287,7 @@ public class VerifyDTAPN implements ModelChecker{
                 TimedArcPetriNetTrace tapnTrace = null;
 
                 if(options.traceOption() != TraceOption.NONE && model.value1().isColored() && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()) {
-                    TapnXmlLoader tapnLoader = new TapnXmlLoader();
+                    TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
                     TabContent newTab;
