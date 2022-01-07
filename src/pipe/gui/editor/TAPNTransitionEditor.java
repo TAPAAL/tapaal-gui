@@ -14,7 +14,7 @@ import net.tapaal.swinghelpers.GridBagHelper;
 import dk.aau.cs.gui.undo.*;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
-import pipe.gui.ColoredComponents.ColoredTransitionGuardPanel;
+import net.tapaal.gui.editor.ColoredTransitionGuardPanel;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;

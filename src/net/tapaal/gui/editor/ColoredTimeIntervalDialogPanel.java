@@ -1,4 +1,4 @@
-package pipe.gui.ColoredComponents;
+package net.tapaal.gui.editor;
 
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;

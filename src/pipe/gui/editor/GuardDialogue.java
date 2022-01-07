@@ -17,7 +17,7 @@ import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
-import pipe.gui.ColoredComponents.ColoredArcGuardPanel;
+import net.tapaal.gui.editor.ColoredArcGuardPanel;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Transition;
