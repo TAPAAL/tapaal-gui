@@ -1,4 +1,4 @@
-package dk.aau.cs.gui.components;
+package net.tapaal.gui.dialog;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

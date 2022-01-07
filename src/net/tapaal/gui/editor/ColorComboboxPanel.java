@@ -1,7 +1,6 @@
 package net.tapaal.gui.editor;
 
 import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.Expressions.*;

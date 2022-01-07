@@ -20,7 +20,7 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.components.ColorComboBoxRenderer;
+import net.tapaal.gui.editor.ColorComboBoxRenderer;
 import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.gui.undo.Colored.ColoredPlaceMarkingEdit;
 import dk.aau.cs.gui.undo.Colored.SetArcExpressionCommand;

@@ -4,7 +4,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.TemplateExplorer;
+import net.tapaal.gui.editor.TemplateExplorer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import pipe.dataLayer.Template;
 

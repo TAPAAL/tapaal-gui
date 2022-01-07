@@ -1,4 +1,4 @@
-package dk.aau.cs.gui.components;
+package net.tapaal.gui.editor;
 
 import dk.aau.cs.model.CPN.Variable;
 

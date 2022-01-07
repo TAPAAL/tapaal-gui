@@ -18,7 +18,7 @@ import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.swingcomponents.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.components.TransitionFiringComponent;
+import net.tapaal.gui.animation.TransitionFiringComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedInputArc;

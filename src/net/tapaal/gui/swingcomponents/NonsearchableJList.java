@@ -1,4 +1,4 @@
-package dk.aau.cs.gui.components;
+package net.tapaal.gui.swingcomponents;
 
 import java.awt.event.KeyListener;
 import java.util.Vector;

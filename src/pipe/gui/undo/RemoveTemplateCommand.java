@@ -5,7 +5,7 @@ import java.util.Collection;
 import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.TemplateExplorer;
+import net.tapaal.gui.editor.TemplateExplorer;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;

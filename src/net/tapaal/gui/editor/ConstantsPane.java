@@ -34,7 +34,6 @@ import javax.swing.Timer;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import dk.aau.cs.gui.components.ColortypeListCellRenderer;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
@@ -44,8 +43,7 @@ import pipe.gui.TAPAALGUI;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.gui.components.ConstantsListModel;
-import dk.aau.cs.gui.components.NonsearchableJList;
+import net.tapaal.gui.swingcomponents.NonsearchableJList;
 import pipe.gui.undo.UndoManager;
 import net.tapaal.gui.widgets.SidePane;
 

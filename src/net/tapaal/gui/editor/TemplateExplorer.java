@@ -1,4 +1,4 @@
-package dk.aau.cs.gui;
+package net.tapaal.gui.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -36,6 +36,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
@@ -55,7 +56,7 @@ import pipe.gui.swingcomponents.EscapableDialog;
 import net.tapaal.swinghelpers.RequestFocusListener;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsPlaceWithDisabledTemplateVisitor;
-import dk.aau.cs.gui.components.NonsearchableJList;
+import net.tapaal.gui.swingcomponents.NonsearchableJList;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.SortTemplatesCommand;
 import dk.aau.cs.model.tapn.Constant;

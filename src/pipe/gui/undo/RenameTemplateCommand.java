@@ -4,7 +4,7 @@ import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.TemplateExplorer;
+import net.tapaal.gui.editor.TemplateExplorer;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 

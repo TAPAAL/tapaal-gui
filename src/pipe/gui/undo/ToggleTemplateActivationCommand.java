@@ -1,7 +1,7 @@
 package pipe.gui.undo;
 
 import pipe.dataLayer.Template;
-import dk.aau.cs.gui.TemplateExplorer;
+import net.tapaal.gui.editor.TemplateExplorer;
 import dk.aau.cs.gui.undo.Command;
 
 public class ToggleTemplateActivationCommand  extends Command{

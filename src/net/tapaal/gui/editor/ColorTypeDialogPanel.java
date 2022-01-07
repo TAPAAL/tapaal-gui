@@ -1,6 +1,5 @@
 package net.tapaal.gui.editor;
 
-import dk.aau.cs.gui.components.ColortypeListCellRenderer;
 import dk.aau.cs.gui.undo.Colored.AddColorTypeCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;

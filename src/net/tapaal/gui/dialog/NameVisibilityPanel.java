@@ -1,4 +1,4 @@
-package dk.aau.cs.gui.components;
+package net.tapaal.gui.dialog;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.ChangeAllNamesVisibilityCommand;

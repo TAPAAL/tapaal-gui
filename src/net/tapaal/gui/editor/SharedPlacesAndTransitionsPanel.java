@@ -29,7 +29,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.swingcomponents.EscapableDialog;
 
-import dk.aau.cs.gui.components.NonsearchableJList;
+import net.tapaal.gui.swingcomponents.NonsearchableJList;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;

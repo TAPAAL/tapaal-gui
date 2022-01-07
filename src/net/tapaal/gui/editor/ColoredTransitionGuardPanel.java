@@ -1,7 +1,6 @@
 package net.tapaal.gui.editor;
 
 import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 import dk.aau.cs.gui.undo.Colored.SetTransitionExpressionCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;

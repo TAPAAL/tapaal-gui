@@ -1,4 +1,4 @@
-package dk.aau.cs.gui.components;
+package pipe.gui.animation;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

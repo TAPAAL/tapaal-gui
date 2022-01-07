@@ -1,4 +1,4 @@
-package dk.aau.cs.gui;
+package net.tapaal.gui.dialog;
 
 import java.awt.Component;
 import java.io.File;

@@ -36,11 +36,11 @@ import pipe.gui.undo.RemoveQueriesCommand;
 import pipe.gui.undo.UndoManager;
 import net.tapaal.gui.dialog.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.Messenger;
-import dk.aau.cs.gui.BatchProcessingDialog;
+import net.tapaal.gui.dialog.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.SortQueriesCommand;
-import dk.aau.cs.gui.components.NonsearchableJList;
+import net.tapaal.gui.swingcomponents.NonsearchableJList;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 

@@ -1,4 +1,4 @@
-package dk.aau.cs.gui.components;
+package net.tapaal.gui.animation;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -11,9 +11,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import dk.aau.cs.gui.TabContent;
+import pipe.gui.animation.EnabledTransitionsList;
 import pipe.dataLayer.Template;
 import pipe.gui.animation.AnimationSettingsDialog;
-import net.tapaal.gui.animation.DelayEnabledTransitionControl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.animation.SimulationControl;
 import pipe.gui.graphicElements.Transition;

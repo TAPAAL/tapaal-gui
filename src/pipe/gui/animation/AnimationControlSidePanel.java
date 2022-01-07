@@ -24,7 +24,7 @@ import javax.swing.text.AbstractDocument;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.util.Require;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
-import dk.aau.cs.gui.components.NonsearchableJComboBox;
+import net.tapaal.gui.swingcomponents.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import pipe.gui.Constants;
 import pipe.gui.TAPAALGUI;

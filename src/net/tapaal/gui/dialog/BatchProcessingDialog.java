@@ -1,4 +1,4 @@
-package dk.aau.cs.gui;
+package net.tapaal.gui.dialog;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -36,8 +36,7 @@ import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 import net.tapaal.gui.widgets.QueryPane;
 import net.tapaal.gui.verification.InclusionPlaces.InclusionPlacesOption;
-import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
-import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
+import net.tapaal.gui.swingcomponents.MultiLineAutoWrappingToolTip;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;

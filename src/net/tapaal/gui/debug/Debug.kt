@@ -1,14 +1,8 @@
-package dk.aau.cs.gui.debug
+package net.tapaal.gui.debug
 
-import dk.aau.cs.gui.TabContentActions
-import pipe.gui.GuiFrame
-import pipe.gui.action.GuiAction
 import java.awt.event.ActionEvent
-import java.util.function.Consumer
 import javax.swing.AbstractAction
-import javax.swing.Action
 import javax.swing.JMenu
-import javax.swing.KeyStroke
 
 fun noOp() {}
 object DEBUG {

@@ -1,4 +1,4 @@
-package dk.aau.cs.gui.debug
+package net.tapaal.gui.debug
 
 import dk.aau.cs.gui.undo.Command
 import pipe.gui.TAPAALGUI

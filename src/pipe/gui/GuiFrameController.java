@@ -1,7 +1,7 @@
 package pipe.gui;
 
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.gui.BatchProcessingDialog;
+import net.tapaal.gui.dialog.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TabContentActions;
 import net.tapaal.gui.smartdraw.SmartDrawDialog;
