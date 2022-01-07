@@ -1,6 +1,6 @@
 package net.tapaal.copypaste;
 
-import dk.aau.cs.gui.TabContent
+import pipe.gui.TabContent
 import dk.aau.cs.model.tapn.IntWeight
 import dk.aau.cs.model.tapn.TimeInterval
 import dk.aau.cs.model.tapn.TimeInvariant

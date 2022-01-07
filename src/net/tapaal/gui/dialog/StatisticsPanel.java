@@ -21,7 +21,7 @@ import pipe.gui.undo.DeleteTimedTransitionCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.dataLayer.*;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedTransition;
 

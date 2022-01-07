@@ -1,7 +1,8 @@
-package dk.aau.cs.gui;
+package net.tapaal.gui;
 
 import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
+import pipe.gui.TabContent;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;

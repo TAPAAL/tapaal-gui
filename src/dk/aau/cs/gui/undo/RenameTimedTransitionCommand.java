@@ -3,7 +3,7 @@ package dk.aau.cs.gui.undo;
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.TCTL.visitors.RenameTransitionTCTLVisitor;
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 
 public class RenameTimedTransitionCommand extends Command {
 	private final TimedTransition transition;

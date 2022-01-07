@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo.Colored;
 
-import dk.aau.cs.gui.Context;
+import net.tapaal.gui.Context;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;

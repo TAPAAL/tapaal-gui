@@ -21,7 +21,6 @@ import java.util.jar.JarFile;
 import javax.swing.*;
 
 import com.sun.jna.Platform;
-import dk.aau.cs.gui.*;
 import net.tapaal.gui.debug.DEBUG;
 import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;

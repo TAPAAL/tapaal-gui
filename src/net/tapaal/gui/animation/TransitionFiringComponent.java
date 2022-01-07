@@ -10,7 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import pipe.gui.animation.EnabledTransitionsList;
 import pipe.dataLayer.Template;
 import pipe.gui.animation.AnimationSettingsDialog;

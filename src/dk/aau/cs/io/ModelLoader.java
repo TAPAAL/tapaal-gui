@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import dk.aau.cs.TCTL.Parsing.ParseException;
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 
 public class ModelLoader {
 

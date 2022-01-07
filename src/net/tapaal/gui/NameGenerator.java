@@ -1,4 +1,4 @@
-package dk.aau.cs.gui;
+package net.tapaal.gui;
 
 import java.util.Hashtable;
 import java.util.regex.Matcher;

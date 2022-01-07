@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.*;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
 import pipe.gui.TAPAALGUI;
@@ -21,7 +21,7 @@ import pipe.gui.Constants;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.editor.PlaceEditorPanel;
-import dk.aau.cs.gui.Context;
+import net.tapaal.gui.Context;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.Bound;

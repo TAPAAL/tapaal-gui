@@ -1,7 +1,7 @@
 package dk.aau.cs.io;
 
-import dk.aau.cs.gui.NameGenerator;
-import dk.aau.cs.gui.TabContent;
+import net.tapaal.gui.NameGenerator;
+import pipe.gui.TabContent;
 import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;

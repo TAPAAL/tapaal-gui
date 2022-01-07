@@ -1,8 +1,5 @@
-package dk.aau.cs.gui;
+package pipe.gui;
 
-import pipe.gui.GuiFrame;
-import pipe.gui.GuiFrameActions;
-import pipe.gui.SafeGuiFrameActions;
 import pipe.gui.graphicElements.PetriNetObject;
 
 import java.io.File;

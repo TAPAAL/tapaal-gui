@@ -17,8 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.model.tapn.TimedTransition;
+import pipe.gui.TabContent;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

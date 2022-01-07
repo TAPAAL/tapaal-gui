@@ -6,7 +6,7 @@ import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
@@ -39,8 +39,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static dk.aau.cs.gui.TabTransformer.createUnfoldArgumentString;
-import static dk.aau.cs.gui.TabTransformer.mapQueryToNewNames;
+import static net.tapaal.gui.TabTransformer.createUnfoldArgumentString;
+import static net.tapaal.gui.TabTransformer.mapQueryToNewNames;
 
 public class UnfoldNet extends SwingWorker<String, Void> {
 

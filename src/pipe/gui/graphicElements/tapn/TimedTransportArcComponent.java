@@ -4,7 +4,7 @@ import java.awt.Polygon;
 import java.util.Hashtable;
 import java.util.List;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.TAPAALGUI;

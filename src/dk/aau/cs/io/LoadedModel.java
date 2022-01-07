@@ -2,7 +2,7 @@ package dk.aau.cs.io;
 
 import java.util.Collection;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;

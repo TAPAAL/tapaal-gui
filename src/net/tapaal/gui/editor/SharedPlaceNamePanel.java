@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
-import dk.aau.cs.gui.Context;
+import net.tapaal.gui.Context;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedPlaceVisitor;

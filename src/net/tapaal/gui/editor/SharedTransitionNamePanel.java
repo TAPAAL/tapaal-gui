@@ -14,8 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
-import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.NameGenerator;
+import net.tapaal.gui.Context;
+import net.tapaal.gui.NameGenerator;
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.undo.UndoManager;
 import net.tapaal.gui.verification.TAPNQuery;

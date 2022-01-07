@@ -3,7 +3,7 @@ package dk.aau.cs.gui.undo;
 import java.util.Collection;
 
 import net.tapaal.gui.verification.TAPNQuery;
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 
 public class DeleteQueriesCommand extends Command {
 	private final Collection<TAPNQuery> queries;

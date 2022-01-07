@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;

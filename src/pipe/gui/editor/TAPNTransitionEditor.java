@@ -18,7 +18,7 @@ import net.tapaal.gui.editor.ColoredTransitionGuardPanel;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import dk.aau.cs.gui.Context;
+import net.tapaal.gui.Context;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;

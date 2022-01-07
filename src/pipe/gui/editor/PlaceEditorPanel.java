@@ -1,6 +1,6 @@
 package pipe.gui.editor;
 
-import dk.aau.cs.gui.Context;
+import net.tapaal.gui.Context;
 //import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -19,7 +19,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import net.tapaal.gui.editor.ColorComboBoxRenderer;
 import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.gui.undo.Colored.ColoredPlaceMarkingEdit;

@@ -13,7 +13,7 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 
-import dk.aau.cs.gui.Context;
+import net.tapaal.gui.Context;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;

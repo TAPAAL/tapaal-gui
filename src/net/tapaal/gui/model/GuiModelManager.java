@@ -1,5 +1,6 @@
-package dk.aau.cs.gui;
+package net.tapaal.gui.model;
 
+import pipe.gui.TabContent;
 import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.AllExpression;
@@ -37,7 +38,7 @@ public class GuiModelManager {
     }
     public void commit() {
         if (pendingEdits != null && pendingEdits.size() > 0) {
-            tabContent.undoManager.addNewEdit(new CompundCommand(pendingEdits));
+            tabContent.getUndoManager().addNewEdit(new CompundCommand(pendingEdits));
             pendingEdits = null;
         }
     }
@@ -47,7 +48,7 @@ public class GuiModelManager {
 
     private void addCommand(Command c) {
         if (pendingEdits == null) {
-            tabContent.undoManager.addNewEdit(c);
+            tabContent.getUndoManager().addNewEdit(c);
         } else {
             pendingEdits.add(c);
         }

@@ -1,4 +1,4 @@
-package dk.aau.cs.gui;
+package pipe.gui;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,7 +16,10 @@ import javax.swing.border.BevelBorder;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.Parsing.ParseException;
 import dk.aau.cs.debug.Logger;
+import net.tapaal.gui.NameGenerator;
+import net.tapaal.gui.TabTransformer;
 import net.tapaal.gui.editor.TemplateExplorer;
+import net.tapaal.gui.model.GuiModelManager;
 import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
 import net.tapaal.gui.dialog.NameVisibilityPanel;
 import net.tapaal.gui.dialog.StatisticsPanel;
@@ -44,7 +47,6 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.*;
 import pipe.gui.action.GuiAction;
 import pipe.gui.animation.*;
 import pipe.gui.canvas.DrawingSurfaceImpl;
@@ -61,7 +63,7 @@ import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import java.awt.event.MouseWheelEvent;
 
-import static dk.aau.cs.gui.TabContent.DrawTool.SELECT;
+import static pipe.gui.TabContent.DrawTool.SELECT;
 
 public class TabContent extends JSplitPane implements TabContentActions{
 
@@ -104,14 +106,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
             this.colored = colored;
         }
     }
-    final TAPNLens lens;
+    public final TAPNLens lens;
 
 	//Model and state
 	private final TimedArcPetriNetNetwork tapnNetwork;
 
 	//XXX: Replace with bi-map
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
-	final HashMap<DataLayer, TimedArcPetriNet> guiModelToModel = new HashMap<>();
+	public final HashMap<DataLayer, TimedArcPetriNet> guiModelToModel = new HashMap<>();
 
 	//XXX: should be replaced iwth DataLayer->Zoomer, TimedArcPetriNet has nothing to do with zooming
 	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();

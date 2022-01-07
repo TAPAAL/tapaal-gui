@@ -5,7 +5,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.GuiFrame;

@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dk.aau.cs.gui;
+package pipe.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

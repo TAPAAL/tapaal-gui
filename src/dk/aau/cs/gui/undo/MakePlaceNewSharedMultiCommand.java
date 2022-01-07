@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import dk.aau.cs.gui.Context;
+import net.tapaal.gui.Context;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.util.Require;
 import pipe.dataLayer.Template;
@@ -20,7 +20,7 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 
 
 		
-		public MakePlaceNewSharedMultiCommand(dk.aau.cs.gui.Context context, String newSharedName, TimedPlaceComponent place){
+		public MakePlaceNewSharedMultiCommand(Context context, String newSharedName, TimedPlaceComponent place){
 			Require.that(context.network().allTemplates() != null, "tapns cannot be null");
 			Require.that(newSharedName != null, "newSharedName cannot be null");
 			Require.that(context.tabContent() != null, "currentTab cannot be null");

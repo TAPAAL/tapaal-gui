@@ -28,7 +28,6 @@ import javax.xml.transform.TransformerException;
 
 import dk.aau.cs.gui.undo.*;
 import org.w3c.dom.DOMException;
-import dk.aau.cs.gui.components.ExportBatchResultTableModel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLWriter;

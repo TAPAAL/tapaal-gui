@@ -20,9 +20,9 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.NameGenerator;
-import dk.aau.cs.gui.TabContent;
+import net.tapaal.gui.Context;
+import net.tapaal.gui.NameGenerator;
+import pipe.gui.TabContent;
 import dk.aau.cs.gui.undo.*;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.TAPAALGUI;

@@ -1,7 +1,7 @@
 package dk.aau.cs.gui.undo;
 
 import net.tapaal.gui.editor.ConstantsPane;
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import dk.aau.cs.model.tapn.Constant;
 
 public class SortConstantsCommand extends Command{

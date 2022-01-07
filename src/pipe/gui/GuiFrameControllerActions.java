@@ -1,7 +1,5 @@
 package pipe.gui;
 
-import dk.aau.cs.gui.TabContent;
-
 public interface GuiFrameControllerActions {
     void openTab(TabContent tab);
     default void openTab(Iterable<TabContent> tabs) {

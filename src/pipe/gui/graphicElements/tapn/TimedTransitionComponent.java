@@ -17,14 +17,14 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.*;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.editor.TAPNTransitionEditor;
-import dk.aau.cs.gui.Context;
+import net.tapaal.gui.Context;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;

@@ -9,7 +9,7 @@ import java.util.Collection;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import dk.aau.cs.verification.NameMapping;
 import pipe.dataLayer.DataLayer;
 import net.tapaal.gui.verification.TAPNQuery.QueryCategory;

@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.*;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;

@@ -1,4 +1,4 @@
-package dk.aau.cs.gui.components;
+package net.tapaal.gui.dialog;
 
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;

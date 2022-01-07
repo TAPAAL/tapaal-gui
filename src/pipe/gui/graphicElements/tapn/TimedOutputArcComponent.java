@@ -5,8 +5,8 @@ import java.util.Hashtable;
 
 import javax.swing.BoxLayout;
 
-import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.TabContent;
+import net.tapaal.gui.Context;
+import pipe.gui.TabContent;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.TAPAALGUI;

@@ -2,7 +2,7 @@ package pipe.gui.undo;
 
 import java.util.List;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import net.tapaal.gui.verification.TAPNQuery;
 

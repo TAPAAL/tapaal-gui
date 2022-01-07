@@ -1,7 +1,7 @@
 package pipe.gui.undo;
 
 import net.tapaal.gui.verification.TAPNQuery;
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 
 public class AddQueryCommand extends Command {

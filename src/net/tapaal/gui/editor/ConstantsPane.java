@@ -40,7 +40,7 @@ import dk.aau.cs.util.Require;
 import pipe.dataLayer.Template;
 import dk.aau.cs.gui.undo.*;
 import pipe.gui.TAPAALGUI;
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.swingcomponents.NonsearchableJList;

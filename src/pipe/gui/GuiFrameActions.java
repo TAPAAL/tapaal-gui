@@ -1,7 +1,5 @@
 package pipe.gui;
 
-import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.TabContentActions;
 import net.tapaal.helpers.Reference.Reference;
 import pipe.gui.action.GuiAction;
 

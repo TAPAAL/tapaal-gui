@@ -1,4 +1,4 @@
-package dk.aau.cs.gui;
+package net.tapaal.gui;
 
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;

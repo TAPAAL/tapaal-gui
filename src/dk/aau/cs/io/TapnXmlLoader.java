@@ -12,7 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
 import kotlin.Pair;
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -27,7 +27,7 @@ import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
-import dk.aau.cs.gui.NameGenerator;
+import net.tapaal.gui.NameGenerator;
 import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;

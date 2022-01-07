@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
-import dk.aau.cs.gui.TabContent;
+import pipe.gui.TabContent;
 import pipe.dataLayer.DataLayer;
 import net.tapaal.gui.dialog.ExportBatchDialog;
 import pipe.gui.graphicElements.Arc;

@@ -41,7 +41,6 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import net.tapaal.export.TikZExporter;
 import org.w3c.dom.DOMException;
 
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;

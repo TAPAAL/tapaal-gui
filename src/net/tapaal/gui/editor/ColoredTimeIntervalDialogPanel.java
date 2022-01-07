@@ -1,6 +1,6 @@
 package net.tapaal.gui.editor;
 
-import dk.aau.cs.gui.Context;
+import net.tapaal.gui.Context;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;

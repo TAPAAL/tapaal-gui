@@ -2,8 +2,6 @@ package pipe.gui;
 
 import dk.aau.cs.debug.Logger;
 import net.tapaal.gui.dialog.BatchProcessingDialog;
-import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.TabContentActions;
 import net.tapaal.gui.smartdraw.SmartDrawDialog;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
