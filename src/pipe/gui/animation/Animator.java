@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.animation;
 
 import java.awt.Container;
 import java.math.BigDecimal;
@@ -10,6 +10,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;

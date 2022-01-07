@@ -9,6 +9,7 @@ import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.DataLayer;
+import pipe.gui.animation.Animator;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import dk.aau.cs.gui.TabContent;
 

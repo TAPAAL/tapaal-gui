@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.animation;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -10,6 +10,8 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import dk.aau.cs.gui.TabContent;
+import pipe.gui.DelayEnabledTransitionControl;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.widgets.EscapableDialog;
 
 public class AnimationSettingsDialog {

@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.animation;
 
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
@@ -9,6 +9,7 @@ import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
 import pipe.dataLayer.Template;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.Transition;
 
 import dk.aau.cs.verification.VerifyTAPN.TraceType;

@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.animation;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -26,6 +26,8 @@ import dk.aau.cs.util.Require;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
+import pipe.gui.Constants;
+import pipe.gui.TAPAALGUI;
 
 import java.util.Hashtable;
 
@@ -53,7 +55,7 @@ public class AnimationControlSidePanel extends JPanel {
 
 
 
-    JTextField TimeDelayField = new JTextField();
+    public JTextField TimeDelayField = new JTextField();
 	JComboBox<String> firermodebox;
 
 

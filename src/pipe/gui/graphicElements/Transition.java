@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import javax.swing.*;
 
-import pipe.gui.Animator;
+import pipe.gui.animation.Animator;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.Zoomer;

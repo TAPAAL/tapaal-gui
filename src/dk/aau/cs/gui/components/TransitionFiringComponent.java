@@ -12,10 +12,10 @@ import javax.swing.JPanel;
 
 import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.Template;
-import pipe.gui.AnimationSettingsDialog;
+import pipe.gui.animation.AnimationSettingsDialog;
 import pipe.gui.DelayEnabledTransitionControl;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.SimulationControl;
+import pipe.gui.animation.SimulationControl;
 import pipe.gui.graphicElements.Transition;
 
 public class TransitionFiringComponent extends JPanel {

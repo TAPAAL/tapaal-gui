@@ -20,7 +20,7 @@ import dk.aau.cs.util.StringComparator;
 import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.Template;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.SimulationControl;
+import pipe.gui.animation.SimulationControl;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 //TODO clean up!!! 

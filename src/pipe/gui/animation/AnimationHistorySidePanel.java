@@ -1,4 +1,6 @@
-package pipe.gui;
+package pipe.gui.animation;
+
+import pipe.gui.TAPAALGUI;
 
 import javax.swing.*;
 import java.awt.*;

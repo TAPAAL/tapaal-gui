@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.animation;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.Timer;
 
+import pipe.gui.TAPAALGUI;
 import pipe.gui.widgets.EscapableDialog;
 
 public class SimulationControl extends JPanel {
