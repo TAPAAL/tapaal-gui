@@ -2,7 +2,7 @@ package dk.aau.cs.gui;
 
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
-import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
+import net.tapaal.gui.smartdraw.SmartDrawDialog;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.*;

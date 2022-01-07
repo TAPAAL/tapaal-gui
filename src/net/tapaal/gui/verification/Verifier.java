@@ -3,7 +3,7 @@ package net.tapaal.gui.verification;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
-import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
+import net.tapaal.gui.smartdraw.SmartDrawDialog;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
 import pipe.dataLayer.DataLayer;

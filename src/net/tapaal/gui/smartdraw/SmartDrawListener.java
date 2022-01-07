@@ -1,4 +1,4 @@
-package dk.aau.cs.gui.smartDraw;
+package net.tapaal.gui.smartdraw;
 
 public interface SmartDrawListener {
 	void fireStatusChanged(int objectsPlaced);

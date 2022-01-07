@@ -1,4 +1,4 @@
-package dk.aau.cs.gui.smartDraw;
+package net.tapaal.gui.smartdraw;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;

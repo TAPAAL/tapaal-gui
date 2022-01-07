@@ -39,7 +39,7 @@ import pipe.gui.canvas.Grid;
 import net.tapaal.gui.dialog.ExportBatchDialog;
 import net.tapaal.gui.dialog.UnfoldDialog;
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
+import net.tapaal.gui.smartdraw.SmartDrawDialog;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
