@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.verification;
 
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
@@ -12,6 +12,7 @@ import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 import pipe.dataLayer.DataLayer;
+import pipe.gui.CreateGui;
 
 import java.util.HashMap;
 

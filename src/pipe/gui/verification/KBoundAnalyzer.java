@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.verification;
 
 import javax.swing.JSpinner;
 
@@ -13,6 +13,8 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
+import pipe.gui.CreateGui;
+import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.TAPNQuery;

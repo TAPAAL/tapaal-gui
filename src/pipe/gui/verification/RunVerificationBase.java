@@ -1,13 +1,10 @@
-package pipe.gui;
+package pipe.gui.verification;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.*;
 
@@ -33,6 +30,9 @@ import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
+import pipe.gui.CreateGui;
+import pipe.gui.FileFinder;
+import pipe.gui.MessengerImpl;
 
 public abstract class RunVerificationBase extends SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 

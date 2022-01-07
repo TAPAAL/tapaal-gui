@@ -1,23 +1,25 @@
-package pipe.gui;
+package pipe.gui.verification;
 
-public class UPPAALOptimizedStandardOptions extends EngineSupportOptions {
+import pipe.gui.EngineSupportOptions;
 
-    public UPPAALOptimizedStandardOptions() {
-        super (
-            "UPPAAL: Optimised Standard Reduction",//name of engine
+public class UPPAALBroadcastDegree2Options extends EngineSupportOptions {
+
+    public UPPAALBroadcastDegree2Options() {
+        super(
+            "UPPAAL: Broadcast Degree 2 Reduction",//name of engine
             false,//  support fastest trace
-            false,// support deadlock with net degree 2 and (EF or AG)
+            true,// support deadlock with net degree 2 and (EF or AG)
             false,//  support deadlock with EG or AF
             false,// support deadlock with inhibitor arcs
             false, //support weights
-            false, //support inhibitor arcs
+            true, //support inhibitor arcs
             false,// support urgent transitions
             true,// support EG or AF
             true,// support strict nets
             true,//  support timed nets/time intervals
             false,// support deadlock with net degree > 2
             false, //support games
-            false,//support EG or AF with net degree > 2);
+            true,//support EG or AF with net degree > 2);
             false, //support for nested quantification
             false
         );

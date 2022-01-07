@@ -37,15 +37,9 @@ import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.TabTransformer;
-import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
-import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
-import dk.aau.cs.util.FormatException;
-import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerifyTAPN.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
@@ -67,6 +61,7 @@ import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
+import pipe.gui.verification.*;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 public class QueryDialog extends JPanel {

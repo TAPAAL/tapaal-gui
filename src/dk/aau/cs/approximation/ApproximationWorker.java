@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
-import pipe.gui.RunVerificationBase;
+import pipe.gui.verification.RunVerificationBase;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;

@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.verification;
 
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -33,6 +33,7 @@ import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationResult;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
+import pipe.gui.CreateGui;
 
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;

@@ -29,7 +29,7 @@ import org.apache.commons.cli.PosixParser;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import dk.aau.cs.debug.Logger;
-import pipe.gui.Verifier;
+import pipe.gui.verification.Verifier;
 
 /**
  * Main class for lunching TAPAAL

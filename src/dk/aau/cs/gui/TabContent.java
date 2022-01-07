@@ -46,6 +46,7 @@ import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.undo.*;
+import pipe.gui.verification.*;
 import pipe.gui.widgets.ColoredWidgets.UnfoldDialog;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.QueryPane;

@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.verification;
 
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
@@ -8,6 +8,9 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
+import pipe.gui.CreateGui;
+import pipe.gui.FileFinder;
+import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;

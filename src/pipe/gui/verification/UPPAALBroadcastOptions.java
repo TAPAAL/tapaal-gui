@@ -1,17 +1,19 @@
-package pipe.gui;
+package pipe.gui.verification;
 
-public class UPPAALCombiOptions extends EngineSupportOptions {
+import pipe.gui.EngineSupportOptions;
 
-    public UPPAALCombiOptions() {
-        super(
-            "UPPAAL: Optimized Broadcast Reduction",//name of engine
-            false,//  support fastest trace
+public class UPPAALBroadcastOptions extends EngineSupportOptions {
+
+    public UPPAALBroadcastOptions() {
+       super(
+           "UPPAAL: Broadcast Reduction",//name of engine
+           false,//  support fastest trace
             true,// support deadlock with net degree 2 and (EF or AG)
             false,//  support deadlock with EG or AF
             false,// support deadlock with inhibitor arcs
-            true, //support weights
+            false, //support weights
             true, //support inhibitor arcs
-            true,// support urgent transitions
+            false,// support urgent transitions
             true,// support EG or AF
             true,// support strict nets
             true,//  support timed nets/time intervals
@@ -19,7 +21,7 @@ public class UPPAALCombiOptions extends EngineSupportOptions {
             false, //support games
             true, //support EG or AF with net degree > 2);
             false, //support for nested quantification
-            false
-        );
+           false
+       );
     }
 }

@@ -14,7 +14,7 @@ import pipe.dataLayer.TAPNQuery.QueryReductionTime;
 import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
-import pipe.gui.Verifier;
+import pipe.gui.verification.Verifier;
 import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAGNode;
