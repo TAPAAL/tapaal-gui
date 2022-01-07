@@ -27,7 +27,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import dk.aau.cs.debug.Logger;
 import pipe.gui.verification.Verifier;
 
@@ -91,7 +91,7 @@ public class TAPAAL {
 		}
 
 		// Create the TAPAAL GUI
-		CreateGui.init();
+		TAPAALGUI.init();
 
 		// Open files
 		String[] files = commandline.getArgs();
@@ -102,7 +102,7 @@ public class TAPAAL {
 			if (file.exists()) { // Open the file
 				if (file.canRead()) {
 					try {
-                        CreateGui.getAppGuiController().openTab(TabContent.createNewTabFromFile(file));
+                        TAPAALGUI.getAppGuiController().openTab(TabContent.createNewTabFromFile(file));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -123,8 +123,8 @@ public class TAPAAL {
 
 	private static void batchProcessing(File batchFolder) throws Exception {
 		//Sadly needs to create the gui
-		CreateGui.init();
-		CreateGui.getApp().setVisible(false);
+		TAPAALGUI.init();
+		TAPAALGUI.getApp().setVisible(false);
 
 		System.out.println("=============================================================");
 		System.out.println("Batch Porcessing");

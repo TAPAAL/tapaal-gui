@@ -8,7 +8,7 @@ import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
@@ -114,7 +114,7 @@ public abstract class Place extends PlaceTransitionObject {
 		double unZoomedX = Zoomer.getUnzoomedValue(x - COMPONENT_DRAW_OFFSET, getZoom());
 		double unZoomedY = Zoomer.getUnzoomedValue(y - COMPONENT_DRAW_OFFSET, getZoom());
 
-		if (CreateGui.useExtendedBounds) { // Must be drawing a new Arc if non-NULL.
+		if (TAPAALGUI.useExtendedBounds) { // Must be drawing a new Arc if non-NULL.
 			return (proximityPlace.contains((int) unZoomedX, (int) unZoomedY) ||
 					placeEllipse.contains((int) unZoomedX, (int) unZoomedY));
 		} else {

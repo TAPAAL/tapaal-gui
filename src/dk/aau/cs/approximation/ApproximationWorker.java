@@ -3,7 +3,7 @@ package dk.aau.cs.approximation;
 import java.math.BigDecimal;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.verification.RunVerificationBase;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.Messenger;
@@ -402,7 +402,7 @@ public class ApproximationWorker {
 			options.setTraceOption(TraceOption.SOME);
 		}
 		
-		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify, CreateGui.getModel(), query);
+		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify, TAPAALGUI.getModel(), query);
 		
 		VerificationResult<TAPNNetworkTrace> valueNetwork = null;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
 		VerificationResult<TimedArcPetriNetTrace> value = null;
@@ -458,7 +458,7 @@ public class ApproximationWorker {
 
 	                //run model checker again for trace TAPN
 	                MemoryMonitor.cumulateMemory();
-	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, CreateGui.getModel(), query);
+	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, TAPAALGUI.getModel(), query);
 
 	                if (verificationResult.error()) {
 	                	options.setTraceOption(oldTraceOption);
@@ -597,7 +597,7 @@ public class ApproximationWorker {
 	        
 	                    //run model checker again for trace TAPN
 	                    MemoryMonitor.cumulateMemory();
-	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, CreateGui.getModel(), query);
+	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, TAPAALGUI.getModel(), query);
 
 	                    if (verificationResult.error()) {
 	                    	options.setTraceOption(oldTraceOption);

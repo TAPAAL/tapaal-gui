@@ -7,7 +7,7 @@ import java.util.List;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.undo.ArcTimeIntervalEdit;
@@ -106,7 +106,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
         if (isInPreSet && underlyingTransportArc != null) {
-            if (CreateGui.getApp() != null && CreateGui.getApp().showZeroToInfinityIntervals()) {
+            if (TAPAALGUI.getApp() != null && TAPAALGUI.getApp().showZeroToInfinityIntervals()) {
                 getNameLabel().setText(underlyingTransportArc.interval().toString(displayConstantNames) + " : " + getGroup());
 
                 if (getNameLabel().getText().contains("inf")) {

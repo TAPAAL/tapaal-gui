@@ -15,7 +15,7 @@ import dk.aau.cs.gui.undo.*;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.ColoredComponents.ColoredTransitionGuardPanel;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
@@ -111,7 +111,7 @@ public class TAPNTransitionEditor extends JPanel {
             }else{
                 switchToNameTextField();
                 nameTextField.setText(transition.underlyingTransition().isShared()?
-                CreateGui.getCurrentTab().getNameGenerator().getNewTransitionName(context.activeModel()) : transition.getName());
+                TAPAALGUI.getCurrentTab().getNameGenerator().getNewTransitionName(context.activeModel()) : transition.getName());
                 makeSharedButton.setEnabled(true);
             }
         });

@@ -39,7 +39,7 @@ public class AnimationHistorySidePanel extends JPanel {
 
                     if (clicked != -1) {
                         int steps = clicked - selected;
-                        Animator anim = CreateGui.getAnimator();
+                        Animator anim = TAPAALGUI.getAnimator();
                         if (steps < 0) {
                             for (int i = 0; i < Math.abs(steps); i++) {
                                 anim.stepBack();
@@ -54,7 +54,7 @@ public class AnimationHistorySidePanel extends JPanel {
                     }
                 }
                 // Remove focus
-                CreateGui.getApp().requestFocus();
+                TAPAALGUI.getApp().requestFocus();
             }
         });
 

@@ -1,7 +1,7 @@
 package dk.aau.cs.gui.debug
 
 import dk.aau.cs.gui.undo.Command
-import pipe.gui.CreateGui
+import pipe.gui.TAPAALGUI
 import pipe.gui.undo.UndoManager
 import java.awt.event.ActionEvent
 import java.util.ArrayList
@@ -26,7 +26,7 @@ class UndoRedoSpy() : JFrame() {
 
         val edits = UndoManager::class.java.getDeclaredField("edits")
         edits.isAccessible = true
-        val e = edits.get(CreateGui.getCurrentTab().undoManager) as ArrayList<ArrayList<Command>?>
+        val e = edits.get(TAPAALGUI.getCurrentTab().undoManager) as ArrayList<ArrayList<Command>?>
 
         e.forEach {
             if (it != null && it.size > 0) {

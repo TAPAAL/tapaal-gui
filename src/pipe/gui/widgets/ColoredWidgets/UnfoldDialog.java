@@ -1,7 +1,7 @@
 package pipe.gui.widgets.ColoredWidgets;
 
 import dk.aau.cs.gui.TabContent;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +45,7 @@ public class UnfoldDialog extends JDialog {
         }
 
         if(unfoldDialog == null){
-            unfoldDialog = new UnfoldDialog(CreateGui.getApp(), "Unfold", true);
+            unfoldDialog = new UnfoldDialog(TAPAALGUI.getApp(), "Unfold", true);
             unfoldDialog.pack();
             unfoldDialog.setPreferredSize(unfoldDialog.getSize());
             unfoldDialog.setMinimumSize(new Dimension(unfoldDialog.getWidth(), unfoldDialog.getHeight()));

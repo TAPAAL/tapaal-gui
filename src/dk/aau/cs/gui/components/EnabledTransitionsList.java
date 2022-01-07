@@ -19,7 +19,7 @@ import dk.aau.cs.util.StringComparator;
 
 import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.SimulationControl;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
@@ -108,7 +108,7 @@ public class EnabledTransitionsList extends JPanel{
 		TransitionListItem item = transitionsList.getSelectedValue();
 
 		if(item != null) {
-			CreateGui.getAnimator().dFireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
+			TAPAALGUI.getAnimator().dFireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
 		}
 	}
 
@@ -139,7 +139,7 @@ public class EnabledTransitionsList extends JPanel{
 		}
 		
 		public String toString(){
-			if(CreateGui.getApp().isShowingDelayEnabledTransitions()){
+			if(TAPAALGUI.getApp().isShowingDelayEnabledTransitions()){
 				return toString(true);
 			} else {
 				return toString(false);

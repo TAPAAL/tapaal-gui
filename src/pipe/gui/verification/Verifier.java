@@ -8,7 +8,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.RunningVerificationDialog;
@@ -134,7 +134,7 @@ public class Verifier {
 
         if (timedArcPetriNetNetwork != null) {
             RunVerificationBase thread = new RunVerification(verifyta, new UppaalIconSelector(), new MessengerImpl());
-            RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
+            RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread);
             if(timedArcPetriNetNetwork.isColored() && input.getTraceOption() != TAPNQuery.TraceOption.NONE){
                 SmartDrawDialog.setupWorkerListener(thread);
             }
@@ -146,7 +146,7 @@ public class Verifier {
             );
             dialog.setVisible(true);
         } else {
-            JOptionPane.showMessageDialog(CreateGui.getApp(),
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                 "There was an error converting the model.",
                 "Conversion error", JOptionPane.ERROR_MESSAGE);
         }
@@ -262,14 +262,14 @@ public class Verifier {
                 thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
             }
 
-            RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
+            RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread);
             if(tapnNetwork.isColored() && query.getTraceOption() != TAPNQuery.TraceOption.NONE){
                 SmartDrawDialog.setupWorkerListener(thread);
             }
             thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
             dialog.setVisible(true);
         } else {
-            JOptionPane.showMessageDialog(CreateGui.getApp(),
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                 "There was an error converting the model.",
                 "Conversion error", JOptionPane.ERROR_MESSAGE);
         }

@@ -7,7 +7,7 @@ package pipe.gui.action;
 
 import java.awt.event.ActionEvent;
 
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.ArcPathPoint;
 
 /**
@@ -25,7 +25,7 @@ public class SplitArcPointAction extends javax.swing.AbstractAction {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		CreateGui.getCurrentTab().getUndoManager().addNewEdit(arcPathPoint.splitPoint());
+		TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(arcPathPoint.splitPoint());
 	}
 
 }

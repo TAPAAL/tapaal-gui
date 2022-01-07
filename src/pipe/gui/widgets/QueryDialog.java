@@ -385,7 +385,7 @@ public class QueryDialog extends JPanel {
 
 	private boolean checkIfSomeReductionOption() {
 		if (reductionOption.getSelectedItem() == null){
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+			JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 					"No verification engine supports the combination of this query and the current model",
 					"No verification engine", JOptionPane.ERROR_MESSAGE);
 			return false;
@@ -620,13 +620,13 @@ public class QueryDialog extends JPanel {
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork,
                                            HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
-		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+		if(TAPAALGUI.getCurrentTab().network().hasWeights() && !TAPAALGUI.getCurrentTab().network().isNonStrict()){
+			JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs",
 					"No reduction option", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
-		guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
+		guiDialog = new EscapableDialog(TAPAALGUI.getApp(),	"Edit Query", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
@@ -1842,7 +1842,7 @@ public class QueryDialog extends JPanel {
 	    String title = "Incompatible query";
 
 	    return JOptionPane.showConfirmDialog(
-            CreateGui.getApp(),
+            TAPAALGUI.getApp(),
             message,
             title,
             JOptionPane.YES_NO_OPTION,
@@ -2872,7 +2872,7 @@ public class QueryDialog extends JPanel {
 					try {
 					    if (queryField.getText().trim().equals("<*>")) {
                             int choice = JOptionPane.showConfirmDialog(
-                                CreateGui.getApp(),
+                                TAPAALGUI.getApp(),
                                 "It is not possible to parse an empty query.\nThe specified query has not been saved. Do you want to edit it again?",
                                 "Error Parsing Query",
                                 JOptionPane.YES_NO_OPTION,
@@ -2894,7 +2894,7 @@ public class QueryDialog extends JPanel {
 					    String message = ex.getMessage() == null ? "TAPAAL encountered an error while trying to parse the specified query\n" :
                             "TAPAAL encountered the following error while trying to parse the specified query:\n\n"+ex.getMessage();
 						int choice = JOptionPane.showConfirmDialog(
-								CreateGui.getApp(),
+								TAPAALGUI.getApp(),
 								message+"\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
 								"Error Parsing Query",
 								JOptionPane.YES_NO_OPTION,
@@ -2936,7 +2936,7 @@ public class QueryDialog extends JPanel {
 
 							s.append("\nThe specified query has not been saved. Do you want to edit it again?");
 							int choice = JOptionPane.showConfirmDialog(
-									CreateGui.getApp(), s.toString(),
+									TAPAALGUI.getApp(), s.toString(),
 									"Error Parsing Query",
 									JOptionPane.YES_NO_OPTION,
 									JOptionPane.ERROR_MESSAGE);
@@ -3739,7 +3739,7 @@ public class QueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved, the net is marked as modified
-						CreateGui.getCurrentTab().setNetChanged(true);
+						TAPAALGUI.getCurrentTab().setNetChanged(true);
 						exit();
 					}
 				}
@@ -3749,7 +3749,7 @@ public class QueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
                         querySaved = true;
                         // Now if a query is saved and verified, the net is marked as modified
-                        CreateGui.getCurrentTab().setNetChanged(true);
+                        TAPAALGUI.getCurrentTab().setNetChanged(true);
                         exit();
                         TAPNQuery query = getQuery();
 
@@ -3778,7 +3778,7 @@ public class QueryDialog extends JPanel {
 						}
 
 					} catch (Exception ex) {
-						JOptionPane.showMessageDialog(CreateGui.getApp(),
+						JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 								"There were errors performing the requested action:\n"
 										+ e, "Error",
 										JOptionPane.ERROR_MESSAGE);
@@ -3838,7 +3838,7 @@ public class QueryDialog extends JPanel {
 								else
 									s.append(NO_UPPAAL_XML_FILE_SAVED);
 
-								JOptionPane.showMessageDialog(CreateGui.getApp(), s.toString());
+								JOptionPane.showMessageDialog(TAPAALGUI.getApp(), s.toString());
 							}
 						}
 					}
@@ -3875,9 +3875,9 @@ public class QueryDialog extends JPanel {
 
 					try {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-						String composedName = "composed-" + CreateGui.getApp().getCurrentTabName();
+						String composedName = "composed-" + TAPAALGUI.getApp().getCurrentTabName();
 						composedName = composedName.replace(".tapn", "");
-						CreateGui.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+						TAPAALGUI.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 						exit();
 					} catch (Exception e1) {
 						System.console().printf(e1.getMessage());
@@ -3890,11 +3890,11 @@ public class QueryDialog extends JPanel {
                     if (checkIfSomeReductionOption()) {
                         querySaved = true;
                         // Now if a query is saved and verified, the net is marked as modified
-                        CreateGui.getCurrentTab().setNetChanged(true);
+                        TAPAALGUI.getCurrentTab().setNetChanged(true);
 
                         TAPNQuery query = getQuery();
                         if(query.getReductionOption() != ReductionOption.VerifyPN) {
-                            JOptionPane.showMessageDialog(CreateGui.getApp(),
+                            JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                                 "The selected verification engine does not support application of reduction rules",
                                 "Reduction rules unsupported", JOptionPane.ERROR_MESSAGE);
                             return;
@@ -3912,13 +3912,13 @@ public class QueryDialog extends JPanel {
                                 //Ensure that a net was created by the query reduction
                                 if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
                                     || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
-                                    reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
+                                    reducedNetTab.setInitialName("reduced-" + TAPAALGUI.getAppGui().getCurrentTabName());
                                     TAPNQuery convertedQuery = query.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
                                     reducedNetTab.addQuery(convertedQuery);
-                                    CreateGui.openNewTabFromStream(reducedNetTab);
+                                    TAPAALGUI.openNewTabFromStream(reducedNetTab);
                                 }
                             } catch (Exception e1){
-                                JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                                     e1.getMessage(),
                                     "Error loading reduced net file",
                                     JOptionPane.ERROR_MESSAGE);

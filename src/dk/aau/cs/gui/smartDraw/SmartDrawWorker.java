@@ -12,7 +12,7 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import dk.aau.cs.util.Require;
 import pipe.gui.Constants;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.Zoomer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
@@ -33,7 +33,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
 	ArrayList<Point> pointsReserved = new ArrayList<Point>();
-	pipe.gui.undo.UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
+	pipe.gui.undo.UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
 	
 	//weights
 	int diagonalWeight;
@@ -381,7 +381,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	
 	private void removeArcPathPoints() {
 		ArrayList<ArcPathPoint> toRemove = new ArrayList<ArcPathPoint>();
-		for(PetriNetObject object : CreateGui.getDrawingSurface().getGuiModel().getPNObjects()) {
+		for(PetriNetObject object : TAPAALGUI.getDrawingSurface().getGuiModel().getPNObjects()) {
 			if(object instanceof ArcPathPoint) {
 				ArcPathPoint arcPathPoint = (ArcPathPoint)object;
 				if(!(arcPathPoint.isEndPoint())) {
@@ -391,7 +391,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 
 		}
 		for(ArcPathPoint p : toRemove) {
-			Command command = new DeleteArcPathPointEdit(p.getArcPath().getArc(), p, p.getIndex(), CreateGui.getModel());
+			Command command = new DeleteArcPathPointEdit(p.getArcPath().getArc(), p, p.getIndex(), TAPAALGUI.getModel());
 			command.redo();
 			undoManager.addEdit(command);
 		}
@@ -429,11 +429,11 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
     //XXX: out bad handeling of zoom bleads over we need to adjust point relative to zoom
     // midpoint is at current zoom level, but when creaing a new point its coords is at 100% zoom
 	private double unzoom(double pos) {
-	    return Zoomer.getUnzoomedValue(pos, CreateGui.getDrawingSurface().getZoom());
+	    return Zoomer.getUnzoomedValue(pos, TAPAALGUI.getDrawingSurface().getZoom());
     }
     //XXX: when setting nameoffset the position is unzoomed, so we zoom it first so it gets the value we want
     private double zoom(double pos){
-	    return Zoomer.getZoomedValue(pos, CreateGui.getDrawingSurface().getZoom());
+	    return Zoomer.getZoomedValue(pos, TAPAALGUI.getDrawingSurface().getZoom());
     }
 	/*
 	 * Add arcPathPoints for arcs where
@@ -520,8 +520,8 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		if(objectsPlaced.size() == drawingSurface.getGuiModel().getPlaceTransitionObjects().size()) {
 			setTransitionsToUpright();
 			doOffsetForLoops();
-			CreateGui.getModel().repaintAll(true);
-			CreateGui.getDrawingSurface().updatePreferredSize();
+			TAPAALGUI.getModel().repaintAll(true);
+			TAPAALGUI.getDrawingSurface().updatePreferredSize();
 			fireDone(false);
 		} else {
 			fireDone(true);

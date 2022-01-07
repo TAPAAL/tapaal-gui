@@ -67,7 +67,7 @@ public class Animator {
     }
 
     public void setTrace(TAPNNetworkTrace trace) {
-        CreateGui.getCurrentTab().setAnimationMode(true);
+        TAPAALGUI.getCurrentTab().setAnimationMode(true);
 
         try {
             if (trace.isConcreteTrace()) {
@@ -85,8 +85,8 @@ public class Animator {
             updateFireableTransitions();
         } catch (RequireException e) {
             unhighlightDisabledTransitions();
-            CreateGui.getCurrentTab().toggleAnimationMode();
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an error in the trace. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            TAPAALGUI.getCurrentTab().toggleAnimationMode();
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "There was an error in the trace. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
     }
@@ -102,7 +102,7 @@ public class Animator {
         tab.getUntimedAnimationHistory().setSelectedIndex(0);
         setFiringmode("Random");
 
-        JOptionPane.showMessageDialog(CreateGui.getApp(),
+        JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
             "The verification process returned an untimed trace.\n\n"
                 + "This means that with appropriate time delays the displayed\n"
                 + "sequence of discrete transitions can become a concrete trace.\n"
@@ -159,7 +159,7 @@ public class Animator {
                 if (t.isTransitionEnabled()) {
                     t.markTransitionEnabled(true);
                     transFireComponent.addTransition(template, t);
-                } else if (CreateGui.getApp().isShowingDelayEnabledTransitions() &&
+                } else if (TAPAALGUI.getApp().isShowingDelayEnabledTransitions() &&
                     t.isDelayEnabled() && !isUrgentTransitionEnabled
                 ) {
                     t.markTransitionDelayEnabled(true);
@@ -304,7 +304,7 @@ public class Animator {
     }
 
     public void dFireTransition(TimedTransition transition){
-        if(!CreateGui.getApp().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
+        if(!TAPAALGUI.getApp().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
             fireTransition(transition);
             return;
         }
@@ -321,7 +321,7 @@ public class Animator {
         }
 
         if(delayGranularity.compareTo(new BigDecimal("0.00001")) < 0){
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "<html>Due to the limit of only five decimal points in the simulator</br> its not possible to fire the transition</html>");
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "<html>Due to the limit of only five decimal points in the simulator</br> its not possible to fire the transition</html>");
         } else {
             BigDecimal delay = tab.getDelayEnabledTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
             if(delay != null){
@@ -354,7 +354,7 @@ public class Animator {
                 next = new Tuple<NetworkMarking, List<TimedToken>> (currentMarking().fireTransition(transition, tokensToConsume), tokensToConsume);
             }
         }catch(RequireException e){
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an error firing the transition. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "There was an error firing the transition. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -369,7 +369,7 @@ public class Animator {
                 if(nextFromUntimedTrace.equals(transition.model().name() + "." + transition.name()) || transition.isShared() && nextFromUntimedTrace.equals(transition.name())){
                     untimedAnimationHistory.stepForward();
                 }else{
-                    int fireTransition = JOptionPane.showConfirmDialog(CreateGui.getApp(),
+                    int fireTransition = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(),
                         "Are you sure you want to fire a transition which does not follow the untimed trace?\n"
                             + "Firing this transition will discard the untimed trace and revert to standard simulation.",
                         "Discrading Untimed Trace", JOptionPane.YES_NO_OPTION );
@@ -609,7 +609,7 @@ public class Animator {
     }
 
     private List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
-        EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Select Tokens", true);
+        EscapableDialog guiDialog = new EscapableDialog(TAPAALGUI.getApp(), "Select Tokens", true);
 
         Container contentPane = guiDialog.getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
@@ -640,7 +640,7 @@ public class Animator {
 
     private boolean removeSetTrace(boolean askUser){
         if(askUser && isShowingTrace()){ //Warn about deleting trace
-            int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(),
+            int answer = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(),
                 "You are about to remove the current trace.",
                 "Removing Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
             if(answer != JOptionPane.OK_OPTION) return false;
@@ -685,11 +685,11 @@ public class Animator {
         stepforwardAction.setEnabled(b);
     }
 
-    public final GuiAction stepforwardAction = CreateGui.getAppGui().stepforwardAction;
-    public final GuiAction stepbackwardAction = CreateGui.getAppGui().stepbackwardAction;
+    public final GuiAction stepforwardAction = TAPAALGUI.getAppGui().stepforwardAction;
+    public final GuiAction stepbackwardAction = TAPAALGUI.getAppGui().stepbackwardAction;
 
     public void updateAnimationButtonsEnabled() {
-        AnimationHistoryList animationHistory = CreateGui.getCurrentTab().getAnimationHistorySidePanel();
+        AnimationHistoryList animationHistory = TAPAALGUI.getCurrentTab().getAnimationHistorySidePanel();
 
         setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
         setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
@@ -702,7 +702,7 @@ public class Animator {
      */
     private void updateMouseOverInformation() {
         // update mouseOverView
-        for (pipe.gui.graphicElements.Place p : CreateGui.getCurrentTab().getModel().getPlaces()) {
+        for (pipe.gui.graphicElements.Place p : TAPAALGUI.getCurrentTab().getModel().getPlaces()) {
             if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
                 ((TimedPlaceComponent) p).showAgeOfTokens(true);
             }

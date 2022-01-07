@@ -5,13 +5,10 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabContent;
 import net.tapaal.swinghelpers.SwingHelper;
-import pipe.gui.CreateGui;
-import pipe.gui.Grid;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.GuiFrame;
-import pipe.gui.MessengerImpl;
 
 public class NewTAPNPanel extends EscapableDialog {
 
@@ -112,7 +109,7 @@ public class NewTAPNPanel extends EscapableDialog {
 		}
 
 		if (name.isEmpty()) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+			JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 					"You must provide a name for the net.", "Error",
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
@@ -120,11 +117,11 @@ public class NewTAPNPanel extends EscapableDialog {
 
 		try {
 			TabContent tab = TabContent.createNewEmptyTab(name, isTimed, isGame, isColored);
-			CreateGui.openNewTabFromStream(tab);
+			TAPAALGUI.openNewTabFromStream(tab);
 		} catch (Exception e) {
 			JOptionPane
 					.showMessageDialog(
-							CreateGui.getApp(),
+							TAPAALGUI.getApp(),
 							"Something went wrong while creating a new model. Please try again.",
 							"Error", JOptionPane.INFORMATION_MESSAGE);
 			e.printStackTrace();

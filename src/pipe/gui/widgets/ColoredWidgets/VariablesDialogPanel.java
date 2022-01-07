@@ -6,7 +6,7 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.EscapableDialog;
@@ -70,7 +70,7 @@ public class VariablesDialogPanel extends JPanel {
     public void showDialog() {
         String panelHeader = variable != null? "Edit Variable" : "Create Variable";
 
-        dialog = new EscapableDialog(CreateGui.getApp(),
+        dialog = new EscapableDialog(TAPAALGUI.getApp(),
                 panelHeader, true);
         dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
@@ -236,7 +236,7 @@ public class VariablesDialogPanel extends JPanel {
     private void onOK() {
         if (colorTypeComboBox.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     "You have to choose a color type for the variable. If none are present you have to create one first under variables.",
                     "Error", JOptionPane.ERROR_MESSAGE);
             colorTypeComboBox.requestFocusInWindow();
@@ -245,7 +245,7 @@ public class VariablesDialogPanel extends JPanel {
         String newName = nameTextField.getText();
         if (newName.trim().isEmpty()) {
             JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     "You have to enter a name in the textfield in order to create a new variable",
                     "Error", JOptionPane.ERROR_MESSAGE);
             colorTypeComboBox.requestFocusInWindow();
@@ -254,7 +254,7 @@ public class VariablesDialogPanel extends JPanel {
         if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName)) {
             JOptionPane
                     .showMessageDialog(
-                            CreateGui.getApp(),
+                            TAPAALGUI.getApp(),
                             "Acceptable names for variables are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
                             "Error", JOptionPane.ERROR_MESSAGE);
             nameTextField.requestFocusInWindow();
@@ -264,7 +264,7 @@ public class VariablesDialogPanel extends JPanel {
         if ((variable == null || !variable.getName().equalsIgnoreCase(newName)) && network.isNameUsedForVariable(newName) ) {
             JOptionPane
                     .showMessageDialog(
-                            CreateGui.getApp(),
+                            TAPAALGUI.getApp(),
                             "There is already another variable with the same name.\n\n"
                                     + "Choose a different name for the variable.",
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -274,7 +274,7 @@ public class VariablesDialogPanel extends JPanel {
         if (!oldName.equals("") && !oldName.equalsIgnoreCase(newName) && network.isNameUsedForVariable(newName)) {
             JOptionPane
                     .showMessageDialog(
-                            CreateGui.getApp(),
+                            TAPAALGUI.getApp(),
                             "There is already another variable with the same name.\n\n"
                                     + "Choose a different name for the variable.",
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -285,7 +285,7 @@ public class VariablesDialogPanel extends JPanel {
         if (network.isNameUsedForConstant(newName)) {
             JOptionPane
                 .showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     "There is already a constant with this name.\n\n"
                         + "Choose a different name for the variable.",
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -295,7 +295,7 @@ public class VariablesDialogPanel extends JPanel {
         if (network.isNameUsedForColorType(newName)) {
             JOptionPane
                 .showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     "There is already a Color Type with this name.\n\n"
                         + "Choose a different name for the variable.",
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -306,7 +306,7 @@ public class VariablesDialogPanel extends JPanel {
         if (network.isNameUsedForColor(newName, null)) {
             JOptionPane
                 .showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     "There is already a Color with this name.\n\n"
                         + "Choose a different name for the variable.",
                     "Error", JOptionPane.ERROR_MESSAGE);

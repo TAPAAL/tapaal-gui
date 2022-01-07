@@ -19,7 +19,7 @@ import javax.swing.*;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.widgets.EscapableDialog;
@@ -90,28 +90,28 @@ public class TimedTransitionComponent extends Transition {
 
         popup.add(new JPopupMenu.Separator());
 
-        if (CreateGui.getCurrentTab().getLens().isTimed()) {
+        if (TAPAALGUI.getCurrentTab().getLens().isTimed()) {
             final var urgentAction = new JCheckBoxMenuItem();
             urgentAction.setSelected(isUrgent());
             urgentAction.setAction(
                 new AbstractAction("Urgent") {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        CreateGui.getCurrentTab().guiModelManager.toggleUrgentTrans(); //XXX: guiModelManager should prop be passed via popup generator
+                        TAPAALGUI.getCurrentTab().guiModelManager.toggleUrgentTrans(); //XXX: guiModelManager should prop be passed via popup generator
                     }
                 }
             );
             popup.add(urgentAction);
         }
 
-        if (CreateGui.getCurrentTab().getLens().isGame()) {
+        if (TAPAALGUI.getCurrentTab().getLens().isGame()) {
             final var uncontrollableAction = new JCheckBoxMenuItem();
             uncontrollableAction.setSelected(isUncontrollable());
             uncontrollableAction.setAction(
                 new AbstractAction() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        CreateGui.getCurrentTab().guiModelManager.toggleUncontrollableTrans(); //XXX: guiModelManager should prop be passed via popup generator
+                        TAPAALGUI.getCurrentTab().guiModelManager.toggleUncontrollableTrans(); //XXX: guiModelManager should prop be passed via popup generator
                     }
                 }
             );
@@ -124,7 +124,7 @@ public class TimedTransitionComponent extends Transition {
     @Override
 	public void showEditor() {
 		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Transition", true);
+		EscapableDialog guiDialog = new EscapableDialog(TAPAALGUI.getApp(), "Edit Transition", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
@@ -132,7 +132,7 @@ public class TimedTransitionComponent extends Transition {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new TAPNTransitionEditor(guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab())));
+		contentPane.add(new TAPNTransitionEditor(guiDialog.getRootPane(), this, new Context(TAPAALGUI.getCurrentTab())));
 
 		guiDialog.setResizable(true);
 

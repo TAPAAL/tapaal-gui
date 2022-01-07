@@ -294,7 +294,7 @@ public class TabTransformer {
             return;
         }
         UnfoldNet thread = new UnfoldNet(engine, new MessengerImpl(), oldTab.getGuiModels(), partition, computeColorFixpoint, useSymmetricVars);
-        RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread, "Unfolding");
+        RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread, "Unfolding");
         SmartDrawDialog.setupWorkerListener(thread);
         thread.execute(oldTab.network(), oldTab.queries(), oldTab);
         dialog.setVisible(true);

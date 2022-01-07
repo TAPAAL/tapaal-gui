@@ -2,7 +2,7 @@ package dk.aau.cs.gui.undo;
 
 import java.awt.Point;
 
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 
 public class MovePlaceTransitionObject extends Command {
@@ -30,7 +30,7 @@ public class MovePlaceTransitionObject extends Command {
 		
 		objectToBeMoved.updateOnMoveOrZoom();
 		objectToBeMoved.repaint();
-		CreateGui.getDrawingSurface().updatePreferredSize();
+		TAPAALGUI.getDrawingSurface().updatePreferredSize();
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class MovePlaceTransitionObject extends Command {
 
 		objectToBeMoved.updateOnMoveOrZoom();
 		objectToBeMoved.repaint();
-		CreateGui.getDrawingSurface().updatePreferredSize();
+		TAPAALGUI.getDrawingSurface().updatePreferredSize();
 
 	}
 

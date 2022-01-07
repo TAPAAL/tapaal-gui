@@ -1,11 +1,10 @@
 package pipe.gui.widgets.filebrowser;
 
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +22,7 @@ public class FileBrowser {
     protected String specifiedPath;
 
     private FileBrowser(String filetype, final String ext, final String optionalExt, String path) {
-        fileDialog = new FileDialog(CreateGui.getAppGui(), filetype);
+        fileDialog = new FileDialog(TAPAALGUI.getAppGui(), filetype);
         this.ext = ext;
         this.optionalExt = optionalExt;
         this.specifiedPath = path;
@@ -92,10 +91,10 @@ public class FileBrowser {
     }
 
     public String saveFile() {
-        if (CreateGui.getAppGui().getCurrentTabName().endsWith(".tapn")) {
-            return saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".tapn", ""));
+        if (TAPAALGUI.getAppGui().getCurrentTabName().endsWith(".tapn")) {
+            return saveFile(TAPAALGUI.getAppGui().getCurrentTabName().replaceAll(".tapn", ""));
         } else {
-            return saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".xml", ""));
+            return saveFile(TAPAALGUI.getAppGui().getCurrentTabName().replaceAll(".xml", ""));
         }
     }
 
@@ -135,7 +134,7 @@ public class FileBrowser {
 
             // Overwrite dialog is already shown, but since we changed the named file, we need to show it again
             if (destination.exists()) {
-                int overRide = JOptionPane.showConfirmDialog(CreateGui.getAppGui(), newName + "\nDo you want to overwrite this file?");
+                int overRide = JOptionPane.showConfirmDialog(TAPAALGUI.getAppGui(), newName + "\nDo you want to overwrite this file?");
                 switch (overRide) {
                     case JOptionPane.NO_OPTION:
                         return saveFile(suggestedName); // Reopen dialog to select new name

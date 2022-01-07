@@ -9,7 +9,7 @@ import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.*;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 
 import pipe.gui.Grid;
 import pipe.gui.Zoomer;
@@ -104,7 +104,7 @@ public class TimedOutputArcComponent extends Arc {
     }
 
     public void showTimeIntervalEditor() {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Arc", true);
+		EscapableDialog guiDialog = new EscapableDialog(TAPAALGUI.getApp(), "Edit Arc", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
@@ -112,7 +112,7 @@ public class TimedOutputArcComponent extends Arc {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new GuardDialogue(guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab())));
+		contentPane.add(new GuardDialogue(guiDialog.getRootPane(), this, new Context(TAPAALGUI.getCurrentTab())));
 
 		guiDialog.setResizable(true);
 

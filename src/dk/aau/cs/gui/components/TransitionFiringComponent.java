@@ -14,7 +14,7 @@ import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.Template;
 import pipe.gui.AnimationSettingsDialog;
 import pipe.gui.DelayEnabledTransitionControl;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.SimulationControl;
 import pipe.gui.graphicElements.Transition;
 
@@ -50,7 +50,7 @@ public class TransitionFiringComponent extends JPanel {
 		fireButton = new JButton("Delay & Fire");
 		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size
 		fireButton.addActionListener(e -> {
-			if(SimulationControl.getInstance().randomSimulation() && CreateGui.getApp().isShowingDelayEnabledTransitions()){
+			if(SimulationControl.getInstance().randomSimulation() && TAPAALGUI.getApp().isShowingDelayEnabledTransitions()){
 				SimulationControl.startSimulation();
 			} else {
 				fireSelectedTransition();
@@ -115,7 +115,7 @@ public class TransitionFiringComponent extends JPanel {
 		fireButton.setEnabled(true);
 		
 		//If random simulation is enabled
-		if(CreateGui.getApp().isShowingDelayEnabledTransitions() && SimulationControl.getInstance().randomSimulation()){
+		if(TAPAALGUI.getApp().isShowingDelayEnabledTransitions() && SimulationControl.getInstance().randomSimulation()){
 			fireButton.setText("Simulate");
 			
 			if(enabledTransitionsList.getNumberOfTransitions() == 0){
@@ -126,7 +126,7 @@ public class TransitionFiringComponent extends JPanel {
 				fireButton.setToolTipText(SIMULATE_ACTIVATED_TOOL_TIP);
 			}
 		} else { //If random simulation is not enabled.
-			fireButton.setText(CreateGui.getApp().isShowingDelayEnabledTransitions()  ? "Delay & Fire" : "Fire");
+			fireButton.setText(TAPAALGUI.getApp().isShowingDelayEnabledTransitions()  ? "Delay & Fire" : "Fire");
 			if(!lens.isTimed()){
 			    fireButton.setText("Fire");
             }

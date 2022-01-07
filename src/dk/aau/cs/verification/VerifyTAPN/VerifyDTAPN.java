@@ -222,13 +222,13 @@ public class VerifyDTAPN implements ModelChecker{
 		//throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
 
 		if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
-		if (CreateGui.getCurrentTab().getLens().isGame() && !CreateGui.getCurrentTab().getLens().isTimed()) {
+		if (TAPAALGUI.getCurrentTab().getLens().isGame() && !TAPAALGUI.getCurrentTab().getLens().isTimed()) {
 		    addGhostPlace(model.value1());
         }
 
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");
@@ -307,7 +307,7 @@ public class VerifyDTAPN implements ModelChecker{
                         } else {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
-                                newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(CreateGui.getCurrentTab().getLens().isTimed(), CreateGui.getCurrentTab().getLens().isGame(), false));
+                                newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(TAPAALGUI.getCurrentTab().getLens().isTimed(), TAPAALGUI.getCurrentTab().getLens().isGame(), false));
 
                                 //The query being verified should be the only query
                                 for (pipe.dataLayer.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
@@ -316,7 +316,7 @@ public class VerifyDTAPN implements ModelChecker{
                                     newTab.addQuery(loadedQuery);
                                 }
 
-                                CreateGui.openNewTabFromStream(newTab);
+                                TAPAALGUI.openNewTabFromStream(newTab);
                             } else {
                                 options.setTraceOption(TraceOption.NONE);
                             }

@@ -1,7 +1,7 @@
 package dk.aau.cs.io;
 
 import pipe.gui.Animator;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,7 +50,7 @@ public class TraceImportExport {
 
             FileBrowser fb = FileBrowser.constructor("Export Trace", "trc");
             // path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
-            path = fb.saveFile(CreateGui.getAppGui().getCurrentTabName().substring(0, CreateGui.getAppGui().getCurrentTabName().lastIndexOf('.')));
+            path = fb.saveFile(TAPAALGUI.getAppGui().getCurrentTabName().substring(0, TAPAALGUI.getAppGui().getCurrentTabName().lastIndexOf('.')));
 
             FileOutputStream fs = new FileOutputStream(path);
             fs.write(os.toByteArray());
@@ -78,7 +78,7 @@ public class TraceImportExport {
         } catch (NullPointerException e) {
             // Aborted by user
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -96,9 +96,9 @@ public class TraceImportExport {
         document.appendChild(traceRootNode);
 
         // Output the trace to XML document
-        TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), CreateGui.getCurrentTab().getLens(), false, true);
+        TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), TAPAALGUI.getCurrentTab().getGuiModels(), TAPAALGUI.getCurrentTab().getLens(), false, true);
 
-        for (TAPNNetworkTraceStep step : CreateGui.getAnimator().getActionHistory()) {
+        for (TAPNNetworkTraceStep step : TAPAALGUI.getAnimator().getActionHistory()) {
             if (step.isLoopStep()) {
                 Element loopElement = document.createElement("loop");
                 traceRootNode.appendChild(loopElement);
@@ -128,7 +128,7 @@ public class TraceImportExport {
 
         }
 
-        if (CreateGui.getAnimator().getTrace() != null && CreateGui.getAnimator().getTrace().getTraceType() == EG_DELAY_FOREVER) {
+        if (TAPAALGUI.getAnimator().getTrace() != null && TAPAALGUI.getAnimator().getTrace().getTraceType() == EG_DELAY_FOREVER) {
             Element delayForeverElement = document.createElement("delay");
             traceRootNode.appendChild(delayForeverElement);
             delayForeverElement.setTextContent("forever");
@@ -150,7 +150,7 @@ public class TraceImportExport {
 
     public static void importTrace(Animator animator) {
         if (animator.hasNonZeroTrance()) {
-            int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(),
+            int answer = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(),
                     "You are about to import a trace. This removes the current trace.",
                     "Import Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
             if (answer != JOptionPane.OK_OPTION) {
@@ -170,11 +170,11 @@ public class TraceImportExport {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
 
-            TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), CreateGui.getCurrentTab().getGuiModels(), CreateGui.getCurrentTab().getLens(), false, true);
-            Tuple<TimedArcPetriNet, NameMapping> model = composer.transformModel(CreateGui.getCurrentTab().network());
+            TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), TAPAALGUI.getCurrentTab().getGuiModels(), TAPAALGUI.getCurrentTab().getLens(), false, true);
+            Tuple<TimedArcPetriNet, NameMapping> model = composer.transformModel(TAPAALGUI.getCurrentTab().network());
             VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
             TimedArcPetriNetTrace traceComposed = traceParser.parseTrace(br);
-            TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(traceComposed, CreateGui.getCurrentTab().network(), model.value2());
+            TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(traceComposed, TAPAALGUI.getCurrentTab().network(), model.value2());
 
             animator.setTrace(decomposer.decompose());
 
@@ -182,7 +182,7 @@ public class TraceImportExport {
             // Will never happen
         } catch (Exception e) { //IOException
             animator.reset(true);
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
     }

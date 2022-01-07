@@ -6,7 +6,7 @@ import java.util.List;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.undo.ArcTimeIntervalEdit;
@@ -79,7 +79,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	@Override
 	public void updateLabel(boolean showConstantNames) {
 		//If there is no model we can't set the labels
-		if(CreateGui.getModel() == null) {
+		if(TAPAALGUI.getModel() == null) {
 			return;
 		}
         if (inputArc == null)
@@ -104,7 +104,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                     }
                 }
                 getNameLabel().setText(arcPrint.toString());
-            } else if (!CreateGui.getApp().showZeroToInfinityIntervals() || (lens != null && !lens.isTimed())) {
+            } else if (!TAPAALGUI.getApp().showZeroToInfinityIntervals() || (lens != null && !lens.isTimed())) {
                 if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
                     getNameLabel().setText("");
                 }

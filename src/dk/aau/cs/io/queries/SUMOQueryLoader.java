@@ -1,11 +1,9 @@
 package dk.aau.cs.io.queries;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,7 +13,7 @@ import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
@@ -88,7 +86,7 @@ public class SUMOQueryLoader extends QueryLoader{
         }
 
 		for(TAPNQuery query : loadedQueries.getQueries()){
-			CreateGui.getCurrentTab().addQuery(query);
+			TAPAALGUI.getCurrentTab().addQuery(query);
 		}
 	}
 }

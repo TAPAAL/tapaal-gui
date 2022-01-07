@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
@@ -46,7 +46,7 @@ public class NetworkMarking implements TimedMarking {
 
 	public boolean isDelayPossible(BigDecimal delay) {
 		for(Entry<TimedPlace, List<TimedToken>> entry: sharedPlacesTokens.entrySet()){
-			if(CreateGui.getCurrentTab().network().isSharedPlaceUsedInTemplates((SharedPlace)entry.getKey())){
+			if(TAPAALGUI.getCurrentTab().network().isSharedPlaceUsedInTemplates((SharedPlace)entry.getKey())){
 				for(TimedToken token : entry.getValue()){
 					TimeInvariant invariant = token.place().invariant();
 					if (!invariant.isSatisfied(token.age().add(delay))) {
@@ -69,7 +69,7 @@ public class NetworkMarking implements TimedMarking {
 	public List<TimedPlace> getBlockingPlaces(BigDecimal delay){
 		List<TimedPlace> result = new ArrayList<TimedPlace>();
 		for(Entry<TimedPlace, List<TimedToken>> entry: sharedPlacesTokens.entrySet()){
-			if(CreateGui.getCurrentTab().network().isSharedPlaceUsedInTemplates((SharedPlace)entry.getKey())){
+			if(TAPAALGUI.getCurrentTab().network().isSharedPlaceUsedInTemplates((SharedPlace)entry.getKey())){
 				for(TimedToken token : entry.getValue()){
 					TimeInvariant invariant = token.place().invariant();
 					if (!invariant.isSatisfied(token.age().add(delay))) {

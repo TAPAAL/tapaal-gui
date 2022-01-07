@@ -10,7 +10,7 @@ import dk.aau.cs.util.Require;
 import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.undo.*;
@@ -380,7 +380,7 @@ public class GuiModelManager {
         s.append("\nAre you sure you want to remove the current selection and all associated queries?");
 
         int choice = queriesAffected ? JOptionPane.showConfirmDialog(
-            CreateGui.getApp(), s.toString(), "Warning",
+            TAPAALGUI.getApp(), s.toString(), "Warning",
             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
             : JOptionPane.YES_OPTION;
 

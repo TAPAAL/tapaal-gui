@@ -12,7 +12,7 @@ import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 import pipe.dataLayer.DataLayer;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 
 import java.util.HashMap;
 
@@ -32,13 +32,13 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 	protected boolean showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if(result != null && !result.error()) {
 			if (!result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
+				JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 						getAnswerNotBoundedString(), "Analysis Result",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
 			    if (modelChecker instanceof VerifyPN && !resultShown) {
                     Object[] options = {"Ok", "Minimize extra tokens"};
-                    int answer = JOptionPane.showOptionDialog(CreateGui.getApp(),
+                    int answer = JOptionPane.showOptionDialog(TAPAALGUI.getApp(),
                         getPNAnswerBoundedString(), "Analysis Result,",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
                         ResourceManager.satisfiedIcon(), options, JOptionPane.OK_OPTION);
@@ -52,7 +52,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
                     spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
                 } else {
                     spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
-                    JOptionPane.showMessageDialog(CreateGui.getApp(),
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                         getAnswerBoundedString(), "Analysis Result",
                         JOptionPane.INFORMATION_MESSAGE, ResourceManager.satisfiedIcon());
                 }

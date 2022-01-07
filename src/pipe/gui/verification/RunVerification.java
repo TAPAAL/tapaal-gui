@@ -33,7 +33,7 @@ import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationResult;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
@@ -59,7 +59,7 @@ public class RunVerification extends RunVerificationBase {
             //If the engine is only called to produce a reduced net, it will fail, but no error message should be shown
             if (result != null && result.stats().transitionsCount() == 0 && result.stats().placeBoundCount() == 0) {
                 JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     createMessagePanel(result),
                     "Verification Result",
                     JOptionPane.INFORMATION_MESSAGE,
@@ -71,7 +71,7 @@ public class RunVerification extends RunVerificationBase {
 				callback.run(result);
 			}else{
 				JOptionPane.showMessageDialog(
-						CreateGui.getApp(),
+						TAPAALGUI.getApp(),
 						createMessagePanel(result),
 						"Verification Result",
 						JOptionPane.INFORMATION_MESSAGE,
@@ -79,7 +79,7 @@ public class RunVerification extends RunVerificationBase {
 				);
 	
 				if (!reducedNetOpened && result.getTrace() != null) {
-					CreateGui.getAnimator().setTrace(result.getTrace());
+					TAPAALGUI.getAnimator().setTrace(result.getTrace());
 				}
 			}
 		} else {
@@ -357,13 +357,13 @@ public class RunVerification extends RunVerificationBase {
                                     //Ensure that a net was created by the query reduction
                                     if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
                                         || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
-                                        reducedNetTab.setInitialName("reduced-" + CreateGui.getAppGui().getCurrentTabName());
+                                        reducedNetTab.setInitialName("reduced-" + TAPAALGUI.getAppGui().getCurrentTabName());
                                         TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
                                         reducedNetTab.addQuery(convertedQuery);
-                                        CreateGui.openNewTabFromStream(reducedNetTab);
+                                        TAPAALGUI.openNewTabFromStream(reducedNetTab);
                                     }
                                 } catch (Exception e1){
-                                    JOptionPane.showMessageDialog(CreateGui.getApp(),
+                                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                                         e1.getMessage(),
                                         "Error loading reduced net file",
                                         JOptionPane.ERROR_MESSAGE);

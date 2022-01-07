@@ -11,7 +11,7 @@ import dk.aau.cs.model.CPN.GuardExpressionParser.GuardExpressionParser;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 import kotlin.Pair;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.widgets.TAPNTransitionEditor;
 
@@ -488,7 +488,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     newExpression = GuardExpressionParser.parse(exprField.getText(),context.network());
                 } catch (Throwable ex) {
                     int choice = JOptionPane.showConfirmDialog(
-                        CreateGui.getApp(),
+                        TAPAALGUI.getApp(),
                         "TAPAAL encountered an error trying to parse the specified Expression with the following error: \n\n" + ex.getMessage()+ ".\n\nWe recommend using the expression construction buttons unless you are an experienced user.\n\n The specified expression has not been saved. Do you want to edit it again?",
                         "Error Parsing Expression",
                         JOptionPane.YES_NO_OPTION,

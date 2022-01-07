@@ -7,7 +7,7 @@ import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import dk.aau.cs.util.Tuple;
 
 public class SharedPlace extends TimedPlace{
@@ -55,7 +55,7 @@ public class SharedPlace extends TimedPlace{
 	
 	public ArrayList<String> getComponentsUsingThisPlace(){
 		ArrayList<String> components = new ArrayList<String>();
-		for(Template t : CreateGui.getCurrentTab().allTemplates()){
+		for(Template t : TAPAALGUI.getCurrentTab().allTemplates()){
 			TimedPlace tp = t.model().getPlaceByName(SharedPlace.this.name);
 			if(tp != null){
 				components.add(t.model().name());
@@ -102,7 +102,7 @@ public class SharedPlace extends TimedPlace{
 		
 		extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
 		
-		for(Template t : CreateGui.getCurrentTab().activeTemplates()){
+		for(Template t : TAPAALGUI.getCurrentTab().activeTemplates()){
 			TimedPlace tp = t.model().getPlaceByName(SharedPlace.this.name);
 			if(tp != null){
 				cmax = Math.max(cmax, tp.extrapolate().value2());

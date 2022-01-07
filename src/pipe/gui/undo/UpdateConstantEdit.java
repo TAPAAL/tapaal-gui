@@ -1,6 +1,6 @@
 package pipe.gui.undo;
 
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
@@ -26,7 +26,7 @@ public class UpdateConstantEdit extends Command {
 		store.remove(oldConstant);
 		store.add(newConstant);
 		model.updateGuardsAndWeightsWithNewConstant(oldConstant.name(), newConstant);
-		CreateGui.getCurrentTab().updateConstantsList();
+		TAPAALGUI.getCurrentTab().updateConstantsList();
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class UpdateConstantEdit extends Command {
 		store.remove(newConstant);
 		store.add(oldConstant);
 		model.updateGuardsAndWeightsWithNewConstant(newConstant.name(), oldConstant);
-		CreateGui.getCurrentTab().updateConstantsList();
+		TAPAALGUI.getCurrentTab().updateConstantsList();
 
 	}
 

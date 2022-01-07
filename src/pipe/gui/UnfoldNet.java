@@ -73,7 +73,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
     @Override
     protected String doInBackground() throws Exception {
-        TabContent.TAPNLens lens = CreateGui.getCurrentTab().getLens();
+        TabContent.TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
         boolean dummyQuery = false;
@@ -187,7 +187,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
         if(netSize > maxNetSize){
             //We make a thread so the workers doesn't cancel itself before showing the dialog
-            new Thread(() -> JOptionPane.showMessageDialog(CreateGui.getApp(), "The unfolded net is too large to be loaded")).start();
+            new Thread(() -> JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The unfolded net is too large to be loaded")).start();
             cancel(true);
             return null;
         }
@@ -216,7 +216,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 }
             }
 
-            Thread thread = new Thread(() -> CreateGui.getApp().guiFrameController.ifPresent(o -> o.openTab(newTab)));
+            Thread thread = new Thread(() -> TAPAALGUI.getApp().guiFrameController.ifPresent(o -> o.openTab(newTab)));
             thread.start();
             while(thread.isAlive()){
                 if(isCancelled()){
@@ -352,6 +352,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         }
     }
     void showErrorMessage(String error){
-        JOptionPane.showMessageDialog(CreateGui.getApp(), "The unfolding failed with error:\n" + error, "Unfolding Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The unfolding failed with error:\n" + error, "Unfolding Error", JOptionPane.ERROR_MESSAGE);
     }
 }

@@ -108,7 +108,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void openTab(TabContent tab) {
-        CreateGui.addTab(tab);
+        TAPAALGUI.addTab(tab);
         tab.setSafeGuiFrameActions(guiFrameDirectAccess);
         tab.setGuiFrameControllerActions(this);
 
@@ -133,7 +133,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                 tab.setGuiFrameControllerActions(null);
                 //Close the gui part first, else we get an error bug #826578
                 guiFrame.detachTabFromGuiFrame(tab);
-                CreateGui.removeTab(tab);
+                TAPAALGUI.removeTab(tab);
             }
         }
 
@@ -296,7 +296,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                     if (message.contains("Exception:")) {
                         message = message.split(":", 2)[1];
                     }
-                    JOptionPane.showMessageDialog(CreateGui.getApp(),
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                             message,
                             "Error loading file",
                             JOptionPane.ERROR_MESSAGE);
@@ -345,7 +345,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                     List<TabContent> tabs = get();
                     openTab(tabs);
 
-                    if(files.length != 0 && !CreateGui.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
+                    if(files.length != 0 && !TAPAALGUI.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
                         int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
                         if(dialogResult == JOptionPane.YES_OPTION) {
                             SmartDrawDialog.showSmartDrawDialog();
@@ -353,7 +353,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                     }
 
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(CreateGui.getApp(),
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                             e.getMessage(),
                             "Error loading file",
                             JOptionPane.ERROR_MESSAGE);
@@ -524,7 +524,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
             //XXX: this cast should not be done, its a quick fix while refactoring //kyrke 2019-12-31
             changeToTab((TabContent) tab);
 
-            int result = JOptionPane.showConfirmDialog(CreateGui.getApp(),
+            int result = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(),
                     "The net has been modified. Save the current net?",
                     "Confirm Save Current File",
                     JOptionPane.YES_NO_CANCEL_OPTION,
@@ -552,7 +552,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
      */
     private boolean showSavePendingChangesDialogForAllTabs() {
         // Loop through all tabs and check if they have been saved
-        for (TabContent tab : CreateGui.getTabs()) {
+        for (TabContent tab : TAPAALGUI.getTabs()) {
             if (tab.getNetChanged()) {
                 if (!(showSavePendingChangesDialog(tab))) {
                     return false;
@@ -571,7 +571,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.setShowQueriesSelected(showQueries);
         //currentTab.ifPresent(o->o.showQueries(showQueries));
-        CreateGui.getTabs().forEach(o->o.showQueries(showQueries));
+        TAPAALGUI.getTabs().forEach(o->o.showQueries(showQueries));
 
     }
 
@@ -585,7 +585,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.setShowConstantsSelected(showConstants);
         //currentTab.ifPresent(o->o.showConstantsPanel(showConstants));
-        CreateGui.getTabs().forEach(o->o.showConstantsPanel(showConstants));
+        TAPAALGUI.getTabs().forEach(o->o.showConstantsPanel(showConstants));
 
     }
 
@@ -638,7 +638,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.setShowComponentsSelected(showComponents);
         //currentTab.ifPresent(o->o.showComponents(showComponents));
-        CreateGui.getTabs().forEach(o->o.showComponents(showComponents));
+        TAPAALGUI.getTabs().forEach(o->o.showComponents(showComponents));
     }
 
     @Override
@@ -650,7 +650,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         showSharedPT = b;
 
         guiFrame.setShowSharedPTSelected(showSharedPT);
-        CreateGui.getTabs().forEach(o->o.showSharedPT(showSharedPT));
+        TAPAALGUI.getTabs().forEach(o->o.showSharedPT(showSharedPT));
     }
 
     @Override

@@ -12,7 +12,7 @@ import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
@@ -93,7 +93,7 @@ public class XMLQueryLoader extends QueryLoader{
             boolean canBeLTL = canBeLTL(prop);
 
             if (canBeCTL && canBeLTL && choice == -1) {
-                choice = JOptionPane.showOptionDialog(CreateGui.getApp(),
+                choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(),
                     "There were some queries that can be classified both as LTL and CTL. \nHow do you want to import them?",
                     "Choose query category",
                     JOptionPane.YES_NO_CANCEL_OPTION,
@@ -102,7 +102,7 @@ public class XMLQueryLoader extends QueryLoader{
                     new Object[]{"Import all as CTL", "Import all as LTL", "Cancel"},
                     0);
             } else if (!canBeCTL && !canBeLTL) {
-                JOptionPane.showMessageDialog(CreateGui.getApp(),
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                     "One or more queries do not have the correct format.");
             }
                 if (choice == 2) return null;
@@ -218,7 +218,7 @@ public class XMLQueryLoader extends QueryLoader{
         if (loadedQueries == null) return;
 	
         for(TAPNQuery query : loadedQueries.getQueries()){
-            CreateGui.getCurrentTab().addQuery(query);
+            TAPAALGUI.getCurrentTab().addQuery(query);
 
             // Remove successfully parsed queries from list
             for(QueryWrapper q : loader.faultyQueries){
@@ -261,7 +261,7 @@ public class XMLQueryLoader extends QueryLoader{
     }
 
     private void createDialogBox(String text, String header){
-        JOptionPane.showMessageDialog(CreateGui.getApp(), text, 
+        JOptionPane.showMessageDialog(TAPAALGUI.getApp(), text,
             header, JOptionPane.ERROR_MESSAGE);
     }
 }

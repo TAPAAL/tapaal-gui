@@ -12,7 +12,7 @@ import java.awt.geom.RectangularShape;
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultHighlighter;
 
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.AnnotationBorderEdit;
@@ -160,7 +160,7 @@ public abstract class Note extends PetriNetObject {
 	// 
 	@Override
 	public void addedToGui() {
-		if (CreateGui.getDrawingSurface() != null) {
+		if (TAPAALGUI.getDrawingSurface() != null) {
 			setDeleted(false);
 			updateBounds();
 		}

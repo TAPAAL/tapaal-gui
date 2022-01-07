@@ -27,7 +27,7 @@ import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.MessengerImpl;
 import pipe.gui.verification.Verifier;
 import pipe.gui.undo.AddQueryCommand;
@@ -476,9 +476,9 @@ public class QueryPane extends JPanel implements SidePane {
 		//Saves the net in a temporary file which is used in batchProcessing
 		//File is deleted on exit
 		try {
-			tempFile = File.createTempFile(CreateGui.getAppGui().getCurrentTabName(), ".xml");
+			tempFile = File.createTempFile(TAPAALGUI.getAppGui().getCurrentTabName(), ".xml");
 
-			TabContent tab = CreateGui.getApp().getCurrentTab();
+			TabContent tab = TAPAALGUI.getApp().getCurrentTab();
 			tab.writeNetToFile(tempFile, selectedQueries, tab.getLens());
 			BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();

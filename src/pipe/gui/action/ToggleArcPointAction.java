@@ -7,7 +7,7 @@ package pipe.gui.action;
 
 import java.awt.event.ActionEvent;
 
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.ArcPathPoint;
 
 public class ToggleArcPointAction extends javax.swing.AbstractAction {
@@ -25,7 +25,7 @@ public class ToggleArcPointAction extends javax.swing.AbstractAction {
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent e) {
-		CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+		TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
 				arcPathPoint.togglePointType());
 	}
 

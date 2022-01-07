@@ -16,7 +16,7 @@ import javax.swing.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.widgets.EscapableDialog;
@@ -230,7 +230,7 @@ public class TimedPlaceComponent extends Place {
 
         // Decide whether or not to draw tokens as dots
         boolean drawDots = false;
-        if(!CreateGui.getApp().showTokenAge()) {
+        if(!TAPAALGUI.getApp().showTokenAge()) {
             // only draw dots if there're 1-5 tokens.
             drawDots = (marking > 0 && marking < 6);
 
@@ -423,7 +423,7 @@ public class TimedPlaceComponent extends Place {
     @Override
     public void showEditor() {
         // Build interface
-        EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Place", true);
+        EscapableDialog guiDialog = new EscapableDialog(TAPAALGUI.getApp(), "Edit Place", true);
 
         Container contentPane = guiDialog.getContentPane();
 
@@ -431,7 +431,7 @@ public class TimedPlaceComponent extends Place {
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
         // 2 Add Place editor
-        JPanel placeEditorPanel = new PlaceEditorPanel(guiDialog, guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab()));
+        JPanel placeEditorPanel = new PlaceEditorPanel(guiDialog, guiDialog.getRootPane(), this, new Context(TAPAALGUI.getCurrentTab()));
         contentPane.add(placeEditorPanel);
         guiDialog.setResizable(true);
 
@@ -477,7 +477,7 @@ public class TimedPlaceComponent extends Place {
                         }
                     }
                 }
-                if (CreateGui.getApp().showColoredTokens()) {
+                if (TAPAALGUI.getApp().showColoredTokens()) {
                     if (underlyingPlace().getTokensAsExpression() != null) {
                         buffer.append("\n");
                         buffer.append(((AddExpression)underlyingPlace().getTokensAsExpression()).toTokenString());

@@ -13,7 +13,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.MessengerImpl;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.Messenger;
@@ -63,7 +63,7 @@ public class KBoundAnalyzer {
         }
 
         RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, guiModels, spinner, resultShown);
-        RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), analyzer);
+        RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), analyzer);
 
         analyzer.execute(options, tapnNetwork, query, null);
         dialog.setVisible(true);
@@ -121,7 +121,7 @@ public class KBoundAnalyzer {
 
     private TimedArcPetriNet mergeNetComponents() {
 
-        HashMap<TimedArcPetriNet, DataLayer> guiModels = CreateGui.getCurrentTab().getGuiModels();
+        HashMap<TimedArcPetriNet, DataLayer> guiModels = TAPAALGUI.getCurrentTab().getGuiModels();
         for (TimedArcPetriNet net : guiModels.keySet()) {
             if (tapnNetwork.getTAPNByName(net.name()) != null) {
                 DataLayer dl = guiModels.get(net);

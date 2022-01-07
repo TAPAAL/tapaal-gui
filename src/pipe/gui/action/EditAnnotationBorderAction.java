@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.AnnotationNote;
 
 public class EditAnnotationBorderAction extends AbstractAction {
@@ -21,7 +21,7 @@ public class EditAnnotationBorderAction extends AbstractAction {
 
 	/** Action for editing the text in an AnnotationNote */
 	public void actionPerformed(ActionEvent e) {
-		CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+		TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
 				selected.showBorder(!selected.isShowingBorder()));
 	}
 

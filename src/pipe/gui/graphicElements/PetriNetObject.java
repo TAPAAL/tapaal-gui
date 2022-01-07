@@ -7,7 +7,7 @@ import java.awt.event.*;
 import dk.aau.cs.gui.TabContent;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Constants;
 import pipe.gui.Zoomer;
@@ -56,7 +56,7 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 
     public JPopupMenu getPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
-        JMenuItem menuItem = new JMenuItem(CreateGui.getApp().deleteAction);
+        JMenuItem menuItem = new JMenuItem(TAPAALGUI.getApp().deleteAction);
         menuItem.setText("Delete");
         popup.add(menuItem);
 

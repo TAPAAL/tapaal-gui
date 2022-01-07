@@ -20,7 +20,6 @@ import java.util.Objects;
 
 
 import javax.swing.*;
-import java.util.Arrays;
 
 
 import javax.swing.BorderFactory;
@@ -41,8 +40,7 @@ import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
 import pipe.dataLayer.Template;
 import dk.aau.cs.gui.undo.*;
-import net.tapaal.resourcemanager.ResourceManager;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -51,7 +49,6 @@ import dk.aau.cs.gui.components.NonsearchableJList;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ColoredWidgets.ColorTypeDialogPanel;
 import pipe.gui.widgets.ColoredWidgets.VariablesDialogPanel;
-import pipe.gui.MessengerImpl;
 
 public class ConstantsPane extends JPanel implements SidePane {
 
@@ -167,7 +164,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                             }else{
                                 String message = "Variable cannot be edited for the following reasons: \n\n";
                                 message += String.join("", messages);
-                                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not edit variable", JOptionPane.WARNING_MESSAGE);
+                                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not edit variable", JOptionPane.WARNING_MESSAGE);
                             }
                         } else{
                             ColorType ct = (ColorType) dlm.getElementAt(index);
@@ -193,7 +190,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 							if (!(c.lowerBound() == c.value())){
 								Command edit = parent.network().updateConstant(c.name(), new Constant(
 										c.name(), c.value()-1));
-								CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);
+								TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
 								parent.network().buildConstraints();
 							}
 						}
@@ -201,7 +198,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 							if (!(c.upperBound() == c.value())){
 								Command edit = parent.network().updateConstant(c.name(), new Constant(
 										c.name(), c.value()+1));
-								CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);
+								TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
 								parent.network().buildConstraints();
 							}
 						} 
@@ -325,7 +322,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 				((Constant) model.getElementAt(i)).setVisible(true);
 			}
 			c.setFocused(true);
-			CreateGui.getCurrentTab().drawingSurface().repaintAll();
+			TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
 			blinkConstant(c);
 		}
 	}
@@ -340,7 +337,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 			((Constant) model.getElementAt(i)).setFocused(false);
 		}
 		try{
-			CreateGui.getCurrentTab().drawingSurface().repaintAll();
+			TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
 		}catch(Exception e){
 			// It is okay, the tab has just been closed
 		}
@@ -354,10 +351,10 @@ public class ConstantsPane extends JPanel implements SidePane {
 				if(System.currentTimeMillis() - startTime < 2100) {
 					if(!c.getVisible()) {
 						c.setVisible(true);
-						CreateGui.getCurrentTab().drawingSurface().repaintAll();
+						TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
 					} else {
 						c.setVisible(false);
-						CreateGui.getCurrentTab().drawingSurface().repaintAll();
+						TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
 					}
 				} else {
 					((Timer) e.getSource()).stop();
@@ -384,7 +381,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                 }else{
                     String message = "Variable cannot be edited for the following reasons: \n\n";
                     message += String.join("", messages);
-                    JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not edit variable", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not edit variable", JOptionPane.WARNING_MESSAGE);
                 }
             }
             else if (isDisplayingGlobalConstants()) {
@@ -667,7 +664,7 @@ public class ConstantsPane extends JPanel implements SidePane {
     }
     private void showEditColorTypeDialog(ColorType colorType) {
         ColorTypeDialogPanel panel;
-        UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
+        UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
         if (colorType != null) {
             panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network(), colorType, undoManager);
         }
@@ -702,7 +699,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             message.append("\nYou cannot remove a constant that is used in the net.\nRemove all references " +
                            "to the constant(s) in the net and try again.");
 
-            JOptionPane.showMessageDialog(CreateGui.getApp(), message.toString(),
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message.toString(),
                 "Constant in use", JOptionPane.ERROR_MESSAGE);
         }
 	}
@@ -814,7 +811,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         }
 
         public void removeElement(Variable variable) {
-            UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
+            UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
             undoManager.newEdit();
             ArrayList<String> messages = new ArrayList<>();
             network.remove(variable, variablesListModel, undoManager, messages);
@@ -825,7 +822,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             } else{
                 String message = "Variable could not be removed for the following reasons: \n\n";
                 message += String.join("", messages);
-                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove variable", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove variable", JOptionPane.WARNING_MESSAGE);
             }
         }
 
@@ -896,7 +893,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         }
 
         public void removeElement(ColorType colorType) {
-            UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
+            UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
             undoManager.newEdit();
             ArrayList<String> messages = new ArrayList<>();
             network.remove(colorType, colorTypesListModel, undoManager, messages);
@@ -907,7 +904,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             } else{
                 String message = "Color type could not be removed for the following reasons: \n\n";
                 message += String.join("", messages);
-                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color type", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color type", JOptionPane.WARNING_MESSAGE);
             }
 
         }

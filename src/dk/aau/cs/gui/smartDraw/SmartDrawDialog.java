@@ -6,7 +6,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +18,7 @@ import javax.swing.event.ChangeListener;
 
 import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.swinghelpers.CustomJSpinner;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.PetriNetObject;
 
 public class SmartDrawDialog extends JDialog {
@@ -113,7 +112,7 @@ public class SmartDrawDialog extends JDialog {
 	public static void showSmartDrawDialog() {
 		
 		if(smartDrawDialog == null){
-			smartDrawDialog = new SmartDrawDialog(CreateGui.getApp(), "Smart Draw", true);
+			smartDrawDialog = new SmartDrawDialog(TAPAALGUI.getApp(), "Smart Draw", true);
 			smartDrawDialog.pack();
 			smartDrawDialog.setPreferredSize(smartDrawDialog.getSize());
 			smartDrawDialog.setMinimumSize(new Dimension(smartDrawDialog.getWidth(), smartDrawDialog.getHeight()));
@@ -148,7 +147,7 @@ public class SmartDrawDialog extends JDialog {
                 if (event.getPropertyName().equals("unfolding")) {
                     SwingWorker.StateValue stateValue = (SwingWorker.StateValue) event.getNewValue();
                     if (stateValue.equals(SwingWorker.StateValue.DONE)) {
-                        if (!CreateGui.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
+                        if (!TAPAALGUI.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if (dialogResult == JOptionPane.YES_OPTION) {
                                 showSmartDrawDialog();
@@ -187,7 +186,7 @@ public class SmartDrawDialog extends JDialog {
 		helpButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-					JOptionPane.showMessageDialog(CreateGui.getAppGui(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(TAPAALGUI.getAppGui(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 		
@@ -207,13 +206,13 @@ public class SmartDrawDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				initLoadingFrame();
-				worker = new SmartDrawWorker(xSpacing, ySpacing, CreateGui.getDrawingSurface(), searchOption, 
+				worker = new SmartDrawWorker(xSpacing, ySpacing, TAPAALGUI.getDrawingSurface(), searchOption,
 						straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, startingObject, minimumIterations);
 				worker.addSmartDrawListener(new SmartDrawListener() {
 					
 					@Override
 					public void fireStatusChanged(int objectsPlaced) {
-						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + CreateGui.getDrawingSurface().getGuiModel().getPlaceTransitionObjects().size());
+						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + TAPAALGUI.getDrawingSurface().getGuiModel().getPlaceTransitionObjects().size());
 					}
 					
 					@Override
@@ -231,8 +230,8 @@ public class SmartDrawDialog extends JDialog {
 					public void fireDone(boolean cancelled) {
 						if(!(cancelled)) {
 							loadingDialogFrame.dispose();
-							CreateGui.getAppGui().toFront();
-							CreateGui.getAppGui().requestFocus();
+							TAPAALGUI.getAppGui().toFront();
+							TAPAALGUI.getAppGui().requestFocus();
 						} else {
 							statusLabel.setText("Cancelling/Undoing");
 						}
@@ -668,7 +667,7 @@ public class SmartDrawDialog extends JDialog {
 	
 	private String[] getTemplatesAsString() {
 		String[] templateNames = {"Choose Template"};
-		Iterator<pipe.dataLayer.Template> iterator = CreateGui.getCurrentTab().activeTemplates().iterator();
+		Iterator<pipe.dataLayer.Template> iterator = TAPAALGUI.getCurrentTab().activeTemplates().iterator();
 		int i = 0;
 		while(iterator.hasNext()) {
 			pipe.dataLayer.Template template = iterator.next();
@@ -679,14 +678,14 @@ public class SmartDrawDialog extends JDialog {
 	
 	static private String[] getObjectNames() {
 		ArrayList<String> names = new ArrayList<String>();
-		for(PetriNetObject object : CreateGui.getDrawingSurface().getGuiModel().getPlaceTransitionObjects()) {
+		for(PetriNetObject object : TAPAALGUI.getDrawingSurface().getGuiModel().getPlaceTransitionObjects()) {
 			names.add(object.getName());
 		}
 		return Arrays.copyOf(names.toArray(), names.toArray().length, String[].class);
 	}
 	
 	private void initLoadingFrame() {
-		loadingDialogFrame = new JDialog(CreateGui.getApp(), "Working...", true);
+		loadingDialogFrame = new JDialog(TAPAALGUI.getApp(), "Working...", true);
 		loadingDialogFrame.setLayout(new GridBagLayout());
 		ImageIcon loadingGIF = ResourceManager.getIcon("ajax-loader.gif");
 
@@ -736,12 +735,12 @@ public class SmartDrawDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cancelWorker();
-				CreateGui.getCurrentTab().getUndoManager().undo();
-				CreateGui.getDrawingSurface().repaintAll();
+				TAPAALGUI.getCurrentTab().getUndoManager().undo();
+				TAPAALGUI.getDrawingSurface().repaintAll();
 				loadingDialogFrame.setVisible(false);
 				//smartDrawDialog.setVisible(true);
-				CreateGui.getAppGui().toFront();
-				CreateGui.getAppGui().requestFocus();
+				TAPAALGUI.getAppGui().toFront();
+				TAPAALGUI.getAppGui().requestFocus();
 				
 			}
 		});
@@ -758,7 +757,7 @@ public class SmartDrawDialog extends JDialog {
 		loadingDialogFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		loadingDialogFrame.setSize(400, 300);
 		loadingDialogFrame.setVisible(false);
-		loadingDialogFrame.setLocationRelativeTo(CreateGui.getAppGui());
+		loadingDialogFrame.setLocationRelativeTo(TAPAALGUI.getAppGui());
 		loadingDialogFrame.pack();
 		loadingDialogFrame.setAlwaysOnTop(false);
 		loadingDialogFrame.setAutoRequestFocus(false);
@@ -881,7 +880,7 @@ public class SmartDrawDialog extends JDialog {
 	}
 	
 	private void enableButtons() {
-		if(CreateGui.getDrawingSurface().getGuiModel().getPlaceTransitionObjects().size() > 0) {
+		if(TAPAALGUI.getDrawingSurface().getGuiModel().getPlaceTransitionObjects().size() > 0) {
 			drawButton.setEnabled(true);
 			drawButton.setToolTipText("Smart draw with the current options");
 			if(!(randomStartObjectCheckBox.isSelected()))

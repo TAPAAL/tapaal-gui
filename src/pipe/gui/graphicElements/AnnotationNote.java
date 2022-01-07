@@ -16,7 +16,7 @@ import java.util.EnumMap;
 import javax.swing.*;
 
 import net.tapaal.swinghelpers.DispatchEventsToParentHandler;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.Grid;
 import pipe.gui.Constants;
 import pipe.gui.Zoomer;
@@ -185,7 +185,7 @@ public class AnnotationNote extends Note {
 		String oldText = note.getText();
 		JDialog.setDefaultLookAndFeelDecorated(true);
 		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Annotation", true);
+		EscapableDialog guiDialog = new EscapableDialog(TAPAALGUI.getApp(), "Edit Annotation", true);
 
 		guiDialog.add(new AnnotationPanel(this));
 		guiDialog.setMinimumSize(new Dimension(300, 200));
@@ -211,7 +211,7 @@ public class AnnotationNote extends Note {
 		if (oldText != null && !newText.equals(oldText)) {
 			// Text has been changed
 
-			CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+			TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
 					new AnnotationTextEdit(this, oldText, newText)
 			);
 			updateBounds();
@@ -285,7 +285,7 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if(CreateGui.getCurrentTab().isInAnimationMode()) return;
+			if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
 			myPoint.myNote.setDraggable(false);
 			myPoint.isPressed = true;
 			myPoint.repaint();
@@ -294,7 +294,7 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			if(CreateGui.getCurrentTab().isInAnimationMode()) return;
+			if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
 
 			myPoint.drag(Grid.getModifiedX(e.getX() - start.x), Grid
 					.getModifiedY(e.getY() - start.y));
@@ -304,7 +304,7 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			if(CreateGui.getCurrentTab().isInAnimationMode()) return;
+			if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
 
 			myPoint.myNote.setDraggable(true);
 			myPoint.isPressed = false;
@@ -365,7 +365,7 @@ public class AnnotationNote extends Note {
 			if ((typeMask & RIGHT) == RIGHT) {
 				myNote.adjustRight(Zoomer.getUnzoomedValue(x, getZoom()));
 			}
-			CreateGui.getCurrentTab().setNetChanged(true);
+			TAPAALGUI.getCurrentTab().setNetChanged(true);
 		}
 
 		public void myPaintComponent(Graphics g) {

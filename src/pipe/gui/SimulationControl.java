@@ -23,7 +23,7 @@ public class SimulationControl extends JPanel {
 	final JSlider simulationSpeed = new JSlider();
 	final JCheckBox randomSimulation = new JCheckBox("Enable automatic random simulation");
     final JCheckBox randomMode = new JCheckBox("Choose next transition randomly");
-    final Timer timer = new Timer(simulationSpeed.getValue()*20, e -> CreateGui.getCurrentTab().getTransitionFiringComponent().fireSelectedTransition());
+    final Timer timer = new Timer(simulationSpeed.getValue()*20, e -> TAPAALGUI.getCurrentTab().getTransitionFiringComponent().fireSelectedTransition());
     private static boolean defaultIsRandomTrasition;
     private static SimulationControl instance;
 	
@@ -114,12 +114,12 @@ public class SimulationControl extends JPanel {
 	
 	public void start(){
 		timer.start();
-		CreateGui.getCurrentTab().getTransitionFiringComponent().updateFireButton();
+		TAPAALGUI.getCurrentTab().getTransitionFiringComponent().updateFireButton();
 	}
 	
 	public void stop(){
 		timer.stop();
-		CreateGui.getCurrentTab().getTransitionFiringComponent().updateFireButton();
+		TAPAALGUI.getCurrentTab().getTransitionFiringComponent().updateFireButton();
 	}
 	
 	public boolean isRunning(){
@@ -148,7 +148,7 @@ public class SimulationControl extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		contentPane.add(stopSimulationButton, gbc);
 		
-		dialog = new EscapableDialog(CreateGui.getApp(), "Simulation controls", true);
+		dialog = new EscapableDialog(TAPAALGUI.getApp(), "Simulation controls", true);
 		
 		dialog.addComponentListener(new ComponentAdapter() {
 			public void componentHidden(ComponentEvent e) {
@@ -164,8 +164,8 @@ public class SimulationControl extends JPanel {
 		dialog.setResizable(false);
 		
 		//Calculate location
-		int x = CreateGui.getApp().getLocation().x + CreateGui.getApp().getWidth() - dialog.getWidth() - 30;
-		int y = CreateGui.getApp().getLocation().y + 30;
+		int x = TAPAALGUI.getApp().getLocation().x + TAPAALGUI.getApp().getWidth() - dialog.getWidth() - 30;
+		int y = TAPAALGUI.getApp().getLocation().y + 30;
 		
 		dialog.setLocation(x, y);
 		dialog.setVisible(true);

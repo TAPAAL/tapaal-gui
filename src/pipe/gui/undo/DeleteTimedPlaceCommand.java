@@ -5,7 +5,7 @@ import java.util.List;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -24,7 +24,7 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 		timedPlace = timedPlaceComponent.underlyingPlace();
 		
 		// queries this place is an inclusion place in 
-		Iterable<TAPNQuery> queries = CreateGui.getCurrentTab().queries();
+		Iterable<TAPNQuery> queries = TAPAALGUI.getCurrentTab().queries();
 		
 		for (TAPNQuery q : queries) {
 			if(q.inclusionPlaces().inclusionPlaces().contains(timedPlace)){

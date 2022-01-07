@@ -7,7 +7,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import org.jdesktop.swingx.JXComboBox;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.EscapableDialog;
@@ -88,7 +88,7 @@ public class ColorTypeDialogPanel extends JPanel {
     }
 
     public void showDialog() {
-        dialog = new EscapableDialog(CreateGui.getApp(),
+        dialog = new EscapableDialog(TAPAALGUI.getApp(),
             "Edit color type", true);
         dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
@@ -438,16 +438,16 @@ public class ColorTypeDialogPanel extends JPanel {
             String enumerationName = enumTextField.getText();
             if (enumerationName == null || enumerationName.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(
-                    CreateGui.getApp(), "You have to enter a name for the color",
+                    TAPAALGUI.getApp(), "You have to enter a name for the color",
                     "Error", JOptionPane.ERROR_MESSAGE);
             } else if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", enumerationName)) {
                 JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     "Acceptable names for enumerations are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
                     "Error", JOptionPane.ERROR_MESSAGE);
             } else if (enumerationName.equals("all") || enumerationName.equals("All") || enumerationName.equals("dot") || enumerationName.equals(".all") || enumerationName.equals(".All")) {
                 JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     "The color cannot be named \"" + enumerationName + "\", as the name is reserved",
                     "Error", JOptionPane.ERROR_MESSAGE);
             } else {
@@ -463,7 +463,7 @@ public class ColorTypeDialogPanel extends JPanel {
 
                 if (nameIsInUse) {
                     JOptionPane.showMessageDialog(
-                        CreateGui.getApp(),
+                        TAPAALGUI.getApp(),
                         "A color, color type, variable or constant with the name \"" + enumerationName + "\" already exists. Please chose an other name.",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
@@ -626,7 +626,7 @@ public class ColorTypeDialogPanel extends JPanel {
             for (String m : messages) {
                 if (!message.contains(m)) message += m;
             }
-            JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -660,7 +660,7 @@ public class ColorTypeDialogPanel extends JPanel {
             for (String m : messages) {
                 if (!message.contains(m)) message += m;
             }
-            JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -833,7 +833,7 @@ public class ColorTypeDialogPanel extends JPanel {
             }else{
                 String message = "Colortype cannot have colors removed for the following reasons: \n\n";
                 message += String.join("", messages);
-                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -862,20 +862,20 @@ public class ColorTypeDialogPanel extends JPanel {
 
         if (name == null || name.trim().isEmpty()) {
             JOptionPane.showMessageDialog(
-                    CreateGui.getApp(), "You have to enter a name for the color",
+                    TAPAALGUI.getApp(), "You have to enter a name for the color",
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", name)) {
             JOptionPane.showMessageDialog(
-                            CreateGui.getApp(),
+                            TAPAALGUI.getApp(),
                             "Acceptable names for color types are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
                             "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (network.isNameUsedForColorType(name) && oldColorType == null) {
             JOptionPane.showMessageDialog(
-                            CreateGui.getApp(),
+                            TAPAALGUI.getApp(),
                             "There is already another color type with the same name.\n\n"
                                     + "Choose a different name for the color type.",
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -883,7 +883,7 @@ public class ColorTypeDialogPanel extends JPanel {
         }
         if (network.isNameUsedForVariable(name)) {
             JOptionPane.showMessageDialog(
-                CreateGui.getApp(),
+                TAPAALGUI.getApp(),
                 "There is already variable with the same name.\n\n"
                     + "Choose a different name for the color type.",
                 "Error", JOptionPane.ERROR_MESSAGE);
@@ -891,7 +891,7 @@ public class ColorTypeDialogPanel extends JPanel {
         }
         if (network.isNameUsedForConstant(name)) {
             JOptionPane.showMessageDialog(
-                CreateGui.getApp(),
+                TAPAALGUI.getApp(),
                 "There is already a constant with the same name.\n\n"
                     + "Choose a different name for the color type.",
                 "Error", JOptionPane.ERROR_MESSAGE);
@@ -899,7 +899,7 @@ public class ColorTypeDialogPanel extends JPanel {
         }
         if (network.isNameUsedForColor(name, null)) {
             JOptionPane.showMessageDialog(
-                CreateGui.getApp(),
+                TAPAALGUI.getApp(),
                 "There is already a color with the same name.\n\n"
                     + "Choose a different name for the color type.",
                 "Error", JOptionPane.ERROR_MESSAGE);
@@ -907,7 +907,7 @@ public class ColorTypeDialogPanel extends JPanel {
         }
         if (!oldName.equals("") && !oldName.equalsIgnoreCase(name) && network.isNameUsedForColorType(name)) {
             JOptionPane.showMessageDialog(
-                            CreateGui.getApp(),
+                            TAPAALGUI.getApp(),
                             "There is already another color type with the same name.\n\n"
                                     + "Choose a different name for the color type.",
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -915,14 +915,14 @@ public class ColorTypeDialogPanel extends JPanel {
         }
         if (!Pattern.matches("[0-9]+", lowerbound) && rangeOfIntegersPanelEnabled ) {
             JOptionPane.showMessageDialog(
-                            CreateGui.getApp(),
+                            TAPAALGUI.getApp(),
                             "Lower bound must be a nonnegative number",
                             "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (!Pattern.matches("[0-9]+", upperbound) && rangeOfIntegersPanelEnabled ) {
             JOptionPane.showMessageDialog(
-                            CreateGui.getApp(),
+                            TAPAALGUI.getApp(),
                             "Upper bound must be a number",
                             "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -930,14 +930,14 @@ public class ColorTypeDialogPanel extends JPanel {
         try{
             if (rangeOfIntegersPanelEnabled && (Integer.parseInt(lowerBoundTextField.getText()) > Integer.parseInt(upperBoundTextField.getText()))) {
                 JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     "Lower bound must be smaller or equal than upper bound.",
                     "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
         } catch (NumberFormatException e){
             JOptionPane.showMessageDialog(
-                CreateGui.getApp(),
+                TAPAALGUI.getApp(),
                 "Input could not be parsed as integers",
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -945,7 +945,7 @@ public class ColorTypeDialogPanel extends JPanel {
 
         if(rangeOfIntegersPanelEnabled && (Integer.parseInt(upperBoundTextField.getText()) - Integer.parseInt(lowerBoundTextField.getText())  > MAXIMUM_INTEGER)){
             JOptionPane.showMessageDialog(
-                CreateGui.getApp(),
+                TAPAALGUI.getApp(),
                 "We do not allow integer ranges with more than " + MAXIMUM_INTEGER + " elements",
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -966,14 +966,14 @@ public class ColorTypeDialogPanel extends JPanel {
             if(!messages.isEmpty()) {
                 String message = "Colortype cannot have the following colors removed for the following reasons: \n\n";
                 message += String.join("", messages);
-                JOptionPane.showMessageDialog(CreateGui.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
                 return;
             }
         }
 
         if((lowerbound.trim().isEmpty() || upperbound.trim().isEmpty()) && rangeOfIntegersPanelEnabled) {
             JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     "You must specify both a lower and upper bound",
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -996,7 +996,7 @@ public class ColorTypeDialogPanel extends JPanel {
                 }
                 if (overlaps.size() > 0) {
                     JOptionPane.showMessageDialog(
-                        CreateGui.getApp(),
+                        TAPAALGUI.getApp(),
                         "Color names must not overlap with variable names or other color names: \n" +
                         "Remove or rename the following: \n" +
                             String.join(", ", overlaps),
@@ -1019,7 +1019,7 @@ public class ColorTypeDialogPanel extends JPanel {
                 }
                 if (newColorType.size() <= 0) {
                     JOptionPane.showMessageDialog(
-                        CreateGui.getApp(),
+                        TAPAALGUI.getApp(),
                         "You must specify at least one enumeration name",
                         "Error", JOptionPane.ERROR_MESSAGE);
                     return;

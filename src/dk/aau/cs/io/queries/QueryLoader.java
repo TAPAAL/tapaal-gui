@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.swing.JOptionPane;
-
 import dk.aau.cs.io.LoadedQueries;
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.CreateGui;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyTransitionNamesVisitor;
 import dk.aau.cs.model.tapn.SharedTransition;

@@ -14,12 +14,11 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 
 import dk.aau.cs.gui.Context;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.gui.ColoredComponents.ColoredArcGuardPanel;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
@@ -165,7 +164,7 @@ public class GuardDialogue extends JPanel /*
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				TimedOutputArcComponent arc = (TimedOutputArcComponent) objectToBeEdited;
-				UndoManager undoManager = CreateGui.getCurrentTab().getUndoManager();
+				UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
 				undoManager.newEdit();
 
 				dk.aau.cs.model.tapn.TimeInterval guard  = null;
@@ -185,7 +184,7 @@ public class GuardDialogue extends JPanel /*
 				coloredArcGuardPanel.onOkColored(undoManager);
 				Weight weight = composeWeight();
 				undoManager.addEdit(arc.setGuardAndWeight(guard, weight));
-				CreateGui.getCurrentTab().network().buildConstraints();
+				TAPAALGUI.getCurrentTab().network().buildConstraints();
 				exit();
 			}
 			
@@ -196,7 +195,7 @@ public class GuardDialogue extends JPanel /*
 				if(weightUseConstant.isSelected()){
 					String constantName = weightConstantsComboBox
 							.getSelectedItem().toString();
-					weight = new ConstantWeight(CreateGui.getCurrentTab().network().getConstant(constantName));
+					weight = new ConstantWeight(TAPAALGUI.getCurrentTab().network().getConstant(constantName));
 				} else {
 					weight = new IntWeight((Integer) weightNumber.getValue());
 				}
@@ -217,7 +216,7 @@ public class GuardDialogue extends JPanel /*
 				if (useConstantLeft) {
 					String constantName = leftConstantsComboBox
 					.getSelectedItem().toString();
-					leftInterval = new ConstantBound(CreateGui.getCurrentTab()
+					leftInterval = new ConstantBound(TAPAALGUI.getCurrentTab()
 							.network().getConstant(constantName));
 				} else
 					leftInterval = new IntBound((Integer) firstIntervalNumber
@@ -226,7 +225,7 @@ public class GuardDialogue extends JPanel /*
 				if (useConstantRight) {
 					String constantName = rightConstantsComboBox
 					.getSelectedItem().toString();
-					rightInterval = new ConstantBound(CreateGui.getCurrentTab()
+					rightInterval = new ConstantBound(TAPAALGUI.getCurrentTab()
 							.network().getConstant(constantName));
 				} else if (inf.isSelected())
 					rightInterval = Bound.Infinity;
@@ -298,11 +297,11 @@ public class GuardDialogue extends JPanel /*
 		weightEditPanel.add(weightNumber, gridBagConstraints);
 		
 
-		Set<String> constants = CreateGui.getCurrentTab().network()
+		Set<String> constants = TAPAALGUI.getCurrentTab().network()
 		.getConstantNames();
 		ArrayList<String> filteredConstants = new ArrayList<String>();
 		for(String constant : constants){
-			if(CreateGui.getCurrentTab().network().getConstantValue(constant) != 0){
+			if(TAPAALGUI.getCurrentTab().network().getConstantValue(constant) != 0){
 				filteredConstants.add(constant);
 			}
 		}
@@ -449,7 +448,7 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(secondIntervalNumber, gridBagConstraints);
 
-		Set<String> constants = CreateGui.getCurrentTab().network()
+		Set<String> constants = TAPAALGUI.getCurrentTab().network()
 		.getConstantNames();
 		String[] constantArray = constants.toArray(new String[constants.size()]);
 	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
@@ -659,7 +658,7 @@ public class GuardDialogue extends JPanel /*
 	private int getSecondValue() {
 		int secondValue;
 		if (rightUseConstant.isSelected()) {
-			secondValue = CreateGui.getCurrentTab().network().getConstantValue(
+			secondValue = TAPAALGUI.getCurrentTab().network().getConstantValue(
 					rightConstantsComboBox.getSelectedItem().toString());
 		} else if (inf.isSelected()) {
 			secondValue = Integer.MAX_VALUE;
@@ -673,7 +672,7 @@ public class GuardDialogue extends JPanel /*
 	private int getFirstValue() {
 		int firstValue;
 		if (leftUseConstant.isSelected()) {
-			firstValue = CreateGui.getCurrentTab().network().getConstantValue(
+			firstValue = TAPAALGUI.getCurrentTab().network().getConstantValue(
 					leftConstantsComboBox.getSelectedItem().toString());
 		} else {
 			firstValue = Integer.parseInt(String.valueOf(firstIntervalNumber
@@ -689,7 +688,7 @@ public class GuardDialogue extends JPanel /*
 				.getSelectedItem().toString()
 				: null;
 				weightConstantsComboBox.removeAllItems();
-				Collection<Constant> constants = CreateGui.getCurrentTab().network()
+				Collection<Constant> constants = TAPAALGUI.getCurrentTab().network()
 						.constants();
 
 				//List <Constant> constantList = new ArrayList(constants);
@@ -719,7 +718,7 @@ public class GuardDialogue extends JPanel /*
 				.getSelectedItem().toString()
 				: null;
         rightConstantsComboBox.removeAllItems();
-        Collection<Constant> constants = CreateGui.getCurrentTab().network()
+        Collection<Constant> constants = TAPAALGUI.getCurrentTab().network()
         .constants();
 
         //List <Constant> constantList = new ArrayList(constants);
@@ -754,7 +753,7 @@ public class GuardDialogue extends JPanel /*
 			rightUseConstant.setSelected(false);
 			updateRightComponents();
 		}
-		if (firstValue > CreateGui.getCurrentTab().network()
+		if (firstValue > TAPAALGUI.getCurrentTab().network()
 				.getLargestConstantValue())
 			rightUseConstant.setEnabled(false);
 		else {

@@ -27,7 +27,7 @@ public class MessengerImpl implements Messenger {
 	}
 
 	private void showMessageBox(Object message, String title, int messageType) {
-		JOptionPane.showMessageDialog(CreateGui.getApp(), message, title,
+		JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, title,
 				messageType);
 	}
 

@@ -138,19 +138,19 @@ public class AnimationHistoryList extends JList<String> {
 
     private void layoutAdjustment() {
         // if the trace ends with "deadlock", "delay for ever" or "goto *" makes sure we don't have to scrool to see it
-        int selectedIndex = CreateGui.getCurrentTab().getAnimationHistorySidePanel().getSelectedIndex();
-        if (selectedIndex == CreateGui.getCurrentTab().getAnimationHistorySidePanel().getListModel().getSize() - 2) {
-            CreateGui.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex + 1);
-            CreateGui.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
+        int selectedIndex = TAPAALGUI.getCurrentTab().getAnimationHistorySidePanel().getSelectedIndex();
+        if (selectedIndex == TAPAALGUI.getCurrentTab().getAnimationHistorySidePanel().getListModel().getSize() - 2) {
+            TAPAALGUI.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex + 1);
+            TAPAALGUI.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
         }
     }
 	
 	private void updateAccordingToDeadlock() {
 		
-		if(CreateGui.getApp().getSelectedTabIndex() == -1 || lastShown == TraceType.EG_DELAY_FOREVER){
+		if(TAPAALGUI.getApp().getSelectedTabIndex() == -1 || lastShown == TraceType.EG_DELAY_FOREVER){
 			return;
 		}
-		for (Template t : CreateGui.getCurrentTab().activeTemplates()){
+		for (Template t : TAPAALGUI.getCurrentTab().activeTemplates()){
 			for(Transition trans : t.guiModel().getTransitions()){
 				if(trans.isTransitionEnabled() || trans.isDelayEnabled()){
 					return;

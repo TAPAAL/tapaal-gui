@@ -303,7 +303,7 @@ public class VerifyPN implements ModelChecker {
                     } else {
                         int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                         if (dialogResult == JOptionPane.OK_OPTION) {
-                            newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(CreateGui.getCurrentTab().getLens().isTimed(), CreateGui.getCurrentTab().getLens().isGame(), false));
+                            newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(TAPAALGUI.getCurrentTab().getLens().isTimed(), TAPAALGUI.getCurrentTab().getLens().isGame(), false));
 
                             //The query being verified should be the only query
                             for (pipe.dataLayer.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
@@ -311,7 +311,7 @@ public class VerifyPN implements ModelChecker {
                                 loadedQuery.copyOptions(dataLayerQuery);
                                 newTab.addQuery(loadedQuery);
                             }
-                            CreateGui.openNewTabFromStream(newTab);
+                            TAPAALGUI.openNewTabFromStream(newTab);
                         } else {
                             options.setTraceOption(TraceOption.NONE);
                         }

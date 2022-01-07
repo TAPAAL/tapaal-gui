@@ -22,7 +22,7 @@ import javax.swing.event.ListSelectionListener;
 
 import dk.aau.cs.gui.undo.*;
 import net.tapaal.resourcemanager.ResourceManager;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
 
@@ -390,7 +390,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 	}
 
 	private void showSharedTransitionNameDialog(SharedTransition transitionToEdit) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Shared Transition", true);
+		EscapableDialog guiDialog = new EscapableDialog(TAPAALGUI.getApp(), "Edit Shared Transition", true);
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		JPanel panel = new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel, undoManager, nameGenerator, new Context(tab), transitionToEdit);
@@ -403,7 +403,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 	}
 
 	private void showSharedPlaceNameDialog(SharedPlace placeToEdit) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Shared Place", true);
+		EscapableDialog guiDialog = new EscapableDialog(TAPAALGUI.getApp(), "Edit Shared Place", true);
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 

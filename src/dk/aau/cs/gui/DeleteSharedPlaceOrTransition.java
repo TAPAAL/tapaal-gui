@@ -32,7 +32,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
@@ -82,7 +82,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		JList listOfComponents = new JList(affectedComponents.toArray());
 		JScrollPane scrollPane = new JScrollPane(listOfComponents);
 		Object[] params = {label, checkBox, new JLabel("Components affected:"), scrollPane};
-		result = JOptionPane.showConfirmDialog(CreateGui.getApp(), params, "Warning", JOptionPane.OK_CANCEL_OPTION);
+		result = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), params, "Warning", JOptionPane.OK_CANCEL_OPTION);
 		boolean deleteFromTemplates = checkBox.isSelected();
 		return new DeleteSharedResult(result, deleteFromTemplates);
 	}
@@ -150,7 +150,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 			}
 			buffer.append(System.getProperty("line.separator"));
 			buffer.append("Do you want to continue?");
-			int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), buffer.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			int choice = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), buffer.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if(choice == JOptionPane.NO_OPTION) return;
 			
 			Command cmd = new DeleteQueriesCommand(tab, affectedQueries);
@@ -273,7 +273,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	        }
 	        buffer.append(System.getProperty("line.separator"));
 	        buffer.append("Do you want to continue?");
-	        int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), buffer.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+	        int choice = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), buffer.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 	        if(choice == JOptionPane.NO_OPTION) return;
 	
 	        Command cmd = new DeleteQueriesCommand(tab, affectedQueries);

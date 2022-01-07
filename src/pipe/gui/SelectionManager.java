@@ -173,8 +173,8 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public void mousePressed(MouseEvent e) {
-		CreateGui.getCurrentTab().requestFocusInWindow();
-		CreateGui.getCurrentTab().removeConstantHighlights();
+		TAPAALGUI.getCurrentTab().requestFocusInWindow();
+		TAPAALGUI.getCurrentTab().removeConstantHighlights();
 		if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
 			isSelecting = true;
 			enableSelection();
@@ -206,7 +206,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		if(CreateGui.getCurrentTab().isInAnimationMode()) return;
+		if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
 		
 		if (isSelecting) {
 			selectionRectangle.setSize(

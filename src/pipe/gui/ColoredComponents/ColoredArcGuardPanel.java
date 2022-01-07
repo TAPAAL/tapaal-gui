@@ -16,7 +16,7 @@ import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TransportArc;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
@@ -351,7 +351,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
                     }
                 } catch (Throwable ex) {
                     int choice = JOptionPane.showConfirmDialog(
-                        CreateGui.getApp(),
+                        TAPAALGUI.getApp(),
                         "TAPAAL encountered an error trying to parse the specified expression with the following error: \n\n" + ex.getMessage() + ".\n\nWe recommend using the expression construction buttons unless you are an experienced user.\n\n The specified expression has not been saved. Do you want to edit it again?",
                         "Error Parsing Expression",
                         JOptionPane.YES_NO_OPTION,

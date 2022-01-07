@@ -152,7 +152,7 @@ public class TikZExporter {
                         arcLabel += "$" + arc.getWeight().value() + "\\times$\\ ";
                 }
 
-                if(CreateGui.getApp().getCurrentTab().getLens().isTimed()) {
+                if(TAPAALGUI.getApp().getCurrentTab().getLens().isTimed()) {
                     arcLabel += "$\\mathrm{" + replaceWithMathLatex(getGuardAsStringIfNotHidden((TimedInputArcComponent) arc)) + "}$";
                     if (arc instanceof TimedTransportArcComponent)
                         arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr();
@@ -178,7 +178,7 @@ public class TikZExporter {
 	}
 
 	private String getGuardAsStringIfNotHidden(TimedInputArcComponent arc) {
-        if (!CreateGui.getApp().showZeroToInfinityIntervals() && arc.getGuardAsString().equals("[0,inf)")){
+        if (!TAPAALGUI.getApp().showZeroToInfinityIntervals() && arc.getGuardAsString().equals("[0,inf)")){
 			return "";
 		} else {
 			return arc.getGuardAsString();
@@ -302,7 +302,7 @@ public class TikZExporter {
         final double tTopY = 7;
         final double tBotY = 7;
 
-        boolean isTimed = CreateGui.getApp().getCurrentTab().getLens().isTimed();
+        boolean isTimed = TAPAALGUI.getApp().getCurrentTab().getLens().isTimed();
 
         double placeXpos = (place.getPositionX());
         double placeYpos = (place.getPositionY() * (-1));

@@ -29,7 +29,7 @@ public class AnimationSettingsDialog {
 			if(simControl.randomSimulation()){
 				simControl.randomMode.setSelected(true);
 			}
-			CreateGui.getCurrentTab().getTransitionFiringComponent().updateFireButton();
+			TAPAALGUI.getCurrentTab().getTransitionFiringComponent().updateFireButton();
 		});
 		
 		content.add(delayEnabled, BorderLayout.NORTH);
@@ -61,12 +61,12 @@ public class AnimationSettingsDialog {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		contentPane.add(closeDialogButton, gbc);
 		
-		dialog = new EscapableDialog(CreateGui.getApp(), "Settings", true);
+		dialog = new EscapableDialog(TAPAALGUI.getApp(), "Settings", true);
 		dialog.getRootPane().setDefaultButton(closeDialogButton);
 		dialog.setContentPane(contentPane);
 		dialog.pack();
 		dialog.setResizable(false);
-		dialog.setLocationRelativeTo(CreateGui.getApp());
+		dialog.setLocationRelativeTo(TAPAALGUI.getApp());
 		dialog.setVisible(true);
 	}
 

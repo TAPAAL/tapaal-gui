@@ -4,17 +4,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.QueryType;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 
@@ -28,15 +24,9 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
-import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
-import pipe.gui.Zoomer;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.Transition;
-
-import javax.xml.crypto.Data;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 public class VerifyTAPNExporter {
     protected TimedArcPetriNet model;
@@ -100,7 +90,7 @@ public class VerifyTAPNExporter {
 	protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
         PrintStream modelStream = new PrintStream(modelFile);
 
-	    Collection<DataLayer> guiModels = CreateGui.getCurrentTab().getGuiModels().values();
+	    Collection<DataLayer> guiModels = TAPAALGUI.getCurrentTab().getGuiModels().values();
 
 		modelStream.append("<pnml>\n");
 		modelStream.append("<net id=\"" + model.name() + "\" type=\"P/T net\">\n");

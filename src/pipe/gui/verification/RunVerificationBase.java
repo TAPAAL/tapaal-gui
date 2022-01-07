@@ -30,7 +30,7 @@ import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 
@@ -256,7 +256,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		//The invoke later will make sure all the verification is finished before showing the error
 		SwingUtilities.invokeLater(() -> {
 			messenger.displayErrorMessage("The engine selected in the query dialog cannot verify this model.\nPlease choose another engine.\n" + error);
-			CreateGui.getCurrentTab().editSelectedQuery();
+			TAPAALGUI.getCurrentTab().editSelectedQuery();
 		});
 	}
 

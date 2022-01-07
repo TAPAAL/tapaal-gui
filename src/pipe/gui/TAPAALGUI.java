@@ -12,7 +12,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import dk.aau.cs.gui.TabContent;
 
-public class CreateGui {
+public class TAPAALGUI {
 
 	private final static GuiFrame appGui = new GuiFrame(TAPAAL.getProgramName());
     private final static GuiFrameController appGuiController = new GuiFrameController(appGui);

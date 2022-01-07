@@ -16,7 +16,7 @@ import java.util.Iterator;
 import javax.swing.*;
 
 import pipe.gui.Animator;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
@@ -121,7 +121,7 @@ public abstract class Transition extends PlaceTransitionObject {
 
 		if (highlightedEnabled) {
 			g2.setPaint(Constants.ENABLED_TRANSITION_COLOUR);
-		} else if (highlightedDelayEnabled && CreateGui.getApp().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
+		} else if (highlightedDelayEnabled && TAPAALGUI.getApp().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
 			g2.setPaint(Constants.YELLOW_TRANSITION_COLOR);
 		} else if (selected) {
 			g2.setPaint(Constants.SELECTION_LINE_COLOUR);
@@ -203,7 +203,7 @@ public abstract class Transition extends PlaceTransitionObject {
 		double unZoomedX = (x - COMPONENT_DRAW_OFFSET) / (zoomPercentage / 100.0);
 		double unZoomedY = (y - COMPONENT_DRAW_OFFSET) / (zoomPercentage / 100.0);
 
-		if (CreateGui.useExtendedBounds) { // Must be drawing a new Arc if non-NULL.
+		if (TAPAALGUI.useExtendedBounds) { // Must be drawing a new Arc if non-NULL.
 			return (proximityTransition.contains((int) unZoomedX, (int) unZoomedY) ||
 					transition.contains((int) unZoomedX, (int) unZoomedY));
 		} else {

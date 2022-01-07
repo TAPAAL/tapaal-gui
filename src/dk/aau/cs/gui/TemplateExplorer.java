@@ -44,7 +44,7 @@ import net.tapaal.swinghelpers.SwingHelper;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.AddTemplateCommand;
 import pipe.gui.undo.RemoveTemplateCommand;
@@ -308,7 +308,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 					StringBuilder warning = buildWarningMessage(queriesToDelete);
 		
 					choice = JOptionPane.showConfirmDialog(
-							CreateGui.getApp(), warning.toString(), "Warning",
+							TAPAALGUI.getApp(), warning.toString(), "Warning",
 							JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 		
 					if (choice == JOptionPane.YES_OPTION) {
@@ -556,7 +556,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 
 	private void ShowNewTemplateDialog(String nameToShow) {
-		dialog = new EscapableDialog(CreateGui.getApp(), "Enter Component Name", true);
+		dialog = new EscapableDialog(TAPAALGUI.getApp(), "Enter Component Name", true);
 		initComponentsOfNewTemplateDialog(nameToShow);
 		dialog.add(container);
 		dialog.setResizable(false);
@@ -633,7 +633,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	}
 
 	private void showRenameTemplateDialog(String nameToShow) {		
-		dialog = new EscapableDialog(CreateGui.getApp(), "Enter Component Name", true);
+		dialog = new EscapableDialog(TAPAALGUI.getApp(), "Enter Component Name", true);
 		Template template = selectedModel();
 		if (nameToShow.equals("")){
 			initComponentsOfRenameTemplateDialog(template.model().name());

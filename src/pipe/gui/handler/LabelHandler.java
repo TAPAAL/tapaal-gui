@@ -6,7 +6,7 @@ import java.awt.event.MouseWheelEvent;
 import javax.swing.SwingUtilities;
 
 import dk.aau.cs.gui.undo.UpdateNameLabelOffsetCommand;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.NameLabel;
 import pipe.gui.graphicElements.PetriNetObjectWithLabel;
@@ -40,7 +40,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 				return;
 			}
 	
-			if (CreateGui.getApp().isEditionAllowed()) {
+			if (TAPAALGUI.getApp().isEditionAllowed()) {
 				if (e.getClickCount() == 2) {
 					Arc arc = (Arc) obj;
 					((TimedOutputArcComponent) arc).showTimeIntervalEditor();
@@ -57,7 +57,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		// 
-		if (!SwingUtilities.isLeftMouseButton(e) || CreateGui.getCurrentTab().isInAnimationMode()) {
+		if (!SwingUtilities.isLeftMouseButton(e) || TAPAALGUI.getCurrentTab().isInAnimationMode()) {
 			return;
 		}
 
@@ -73,7 +73,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	public void mouseReleased(MouseEvent e) {
 
 	    if (originalOffsetX!=obj.getNameOffsetX() && originalOffsetY != obj.getNameOffsetY()) {
-            CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+            TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
                 new UpdateNameLabelOffsetCommand(obj.getNameOffsetX(), obj.getNameOffsetY(), originalOffsetX, originalOffsetY, obj)
             );
         }

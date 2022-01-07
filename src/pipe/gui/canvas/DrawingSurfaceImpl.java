@@ -27,7 +27,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 	private final SelectionManager selection;
 
-	private final GuiFrame app = CreateGui.getApp();
+	private final GuiFrame app = TAPAALGUI.getApp();
 	private Zoomer zoomControl;
 
 	private DataLayer guiModel;
@@ -426,7 +426,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 				} else {
 					view.zoomOut();
 				}
-				CreateGui.getAppGui().updateZoomCombo();
+				TAPAALGUI.getAppGui().updateZoomCombo();
 			} else {
 				//Dispatch Event to scroll pane to allow scrolling up/down. -- kyrke
 				getParent().dispatchEvent(e);

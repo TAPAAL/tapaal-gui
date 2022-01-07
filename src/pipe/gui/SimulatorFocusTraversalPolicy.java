@@ -10,9 +10,9 @@ public class SimulatorFocusTraversalPolicy extends FocusTraversalPolicy {
 	public Component getComponentAfter(Container aContainer,
 			Component aComponent) {
 		
-		Component comp = CreateGui.getApp();
+		Component comp = TAPAALGUI.getApp();
 		if(aComponent instanceof GuiFrame){
-			comp = CreateGui.getCurrentTab().getAnimationController().TimeDelayField;
+			comp = TAPAALGUI.getCurrentTab().getAnimationController().TimeDelayField;
 		}
 		
 		return comp;
@@ -21,26 +21,26 @@ public class SimulatorFocusTraversalPolicy extends FocusTraversalPolicy {
 	@Override
 	public Component getComponentBefore(Container aContainer,
 			Component aComponent) {
-		Component comp = CreateGui.getApp();
+		Component comp = TAPAALGUI.getApp();
 		if(aComponent instanceof GuiFrame){
-			comp = CreateGui.getCurrentTab().getAnimationController().TimeDelayField;
+			comp = TAPAALGUI.getCurrentTab().getAnimationController().TimeDelayField;
 		}
 		return comp;
 	}
 
 	@Override
 	public Component getDefaultComponent(Container aContainer) {
-		return CreateGui.getApp();
+		return TAPAALGUI.getApp();
 	}
 
 	@Override
 	public Component getFirstComponent(Container aContainer) {
-		return CreateGui.getApp();
+		return TAPAALGUI.getApp();
 	}
 
 	@Override
 	public Component getLastComponent(Container aContainer) {
-		return CreateGui.getCurrentTab().getAnimationController().TimeDelayField;
+		return TAPAALGUI.getCurrentTab().getAnimationController().TimeDelayField;
 	}
 
 }

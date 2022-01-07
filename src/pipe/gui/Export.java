@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.lang.reflect.Array;
 import java.util.*;
 
 import javax.imageio.ImageIO;
@@ -38,11 +37,7 @@ import javax.xml.transform.TransformerException;
 import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.VerifyTAPN.ExportedVerifyTAPNModel;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
-import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.DOMException;
 
 import dk.aau.cs.gui.TabContent;
@@ -56,7 +51,6 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.canvas.DrawingSurfaceImpl;
-import pipe.gui.widgets.QueryDialog;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 /**
@@ -75,11 +69,11 @@ public class Export {
     private static void toPnml(DrawingSurfaceImpl g, String filename)
         throws NullPointerException, DOMException, TransformerConfigurationException,
         IOException, ParserConfigurationException, TransformerException {
-        TabContent currentTab = CreateGui.getCurrentTab();
+        TabContent currentTab = TAPAALGUI.getCurrentTab();
         NetworkMarking currentMarking = null;
-        if (CreateGui.getCurrentTab().isInAnimationMode()) {
+        if (TAPAALGUI.getCurrentTab().isInAnimationMode()) {
             currentMarking = currentTab.network().marking();
-            currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
+            currentTab.network().setMarking(TAPAALGUI.getAnimator().getInitialMarking());
         }
 
         NetWriter tapnWriter = new PNMLWriter(
@@ -90,13 +84,13 @@ public class Export {
 
         tapnWriter.savePNML(new File(filename));
 
-        if (CreateGui.getCurrentTab().isInAnimationMode()) {
+        if (TAPAALGUI.getCurrentTab().isInAnimationMode()) {
             currentTab.network().setMarking(currentMarking);
         }
     }
 
     private static void toQueryXML(String filename, TabContent.TAPNLens lens) {
-        toQueryXML(CreateGui.getCurrentTab().network(), filename, CreateGui.getCurrentTab().queries(), lens);
+        toQueryXML(TAPAALGUI.getCurrentTab().network(), filename, TAPAALGUI.getCurrentTab().queries(), lens);
 
     }
 
@@ -222,8 +216,8 @@ public class Export {
 		}
 
 		String filename = null;
-		if (CreateGui.getCurrentTab().getFile() != null) {
-			filename = CreateGui.getCurrentTab().getFile().getAbsolutePath();
+		if (TAPAALGUI.getCurrentTab().getFile() != null) {
+			filename = TAPAALGUI.getCurrentTab().getFile().getAbsolutePath();
 			// change file extension
 			int dotpos = filename.lastIndexOf('.');
 			if (dotpos > filename.lastIndexOf(System.getProperty("file.separator"))) {
@@ -275,7 +269,7 @@ public class Export {
 				Object[] possibilities = { "Only the TikZ figure",
 				"Full compilable LaTex including your figure" };
 				String figureOptions = (String) JOptionPane.showInputDialog(
-						CreateGui.getApp(),
+						TAPAALGUI.getApp(),
 						"Choose how you would like your TikZ figure outputted: \n",
 						"Export to TikZ", JOptionPane.PLAIN_MESSAGE,
 						null, possibilities, "Only the TikZ figure");
@@ -302,7 +296,7 @@ public class Export {
 				}
 				break;
 			case QUERY:
-				filename = FileBrowser.constructor("Query XML file", "xml", filename).saveFile(CreateGui.getAppGui().getCurrentTabName().replaceAll(".tapn", "-queries"));
+				filename = FileBrowser.constructor("Query XML file", "xml", filename).saveFile(TAPAALGUI.getAppGui().getCurrentTabName().replaceAll(".tapn", "-queries"));
 				if (filename != null) {
 					toQueryXML(filename, lens);
 				}
@@ -310,7 +304,7 @@ public class Export {
 			}
         } catch (Exception e) {
 			// There was some problem with the action
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+			JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 					"There were errors performing the requested action:\n" + e,
 					"Error", JOptionPane.ERROR_MESSAGE);
 		}

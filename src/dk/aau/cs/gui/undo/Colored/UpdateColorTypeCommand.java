@@ -4,10 +4,9 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.widgets.ConstantsPane;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public class UpdateColorTypeCommand extends Command {
@@ -47,7 +46,7 @@ public class UpdateColorTypeCommand extends Command {
                 var.setColorType(oldColorType);
             }
         }
-        CreateGui.getModel().repaintPlaces();
+        TAPAALGUI.getModel().repaintPlaces();
         colorTypesListModel.updateName();
     }
 
@@ -72,7 +71,7 @@ public class UpdateColorTypeCommand extends Command {
                 var.setColorType(newColorType);
             }
         }
-        CreateGui.getModel().repaintPlaces();
+        TAPAALGUI.getModel().repaintPlaces();
         colorTypesListModel.updateName();
     }
 }

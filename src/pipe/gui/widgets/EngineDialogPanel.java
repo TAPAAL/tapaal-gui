@@ -19,7 +19,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 
 import net.tapaal.swinghelpers.RequestFocusListener;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 
@@ -693,7 +693,7 @@ public class EngineDialogPanel {
 	}
 
 	public void showDialog() {
-		dialog = new EscapableDialog(CreateGui.getApp(),
+		dialog = new EscapableDialog(TAPAALGUI.getApp(),
 				"Selection of Verification Engines", true);
 		dialog.add(enginePanel);
 		dialog.getRootPane().setDefaultButton(closeButton);

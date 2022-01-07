@@ -34,7 +34,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -218,7 +218,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 
 
 	public static InclusionPlaces showInclusionPlacesDialog(TimedArcPetriNetNetwork tapnNetwork, InclusionPlaces inclusionPlaces) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),	"Choose Inclustion Places", true);
+		EscapableDialog guiDialog = new EscapableDialog(TAPAALGUI.getApp(),	"Choose Inclustion Places", true);
 
 		Container contentPane = guiDialog.getContentPane();
 

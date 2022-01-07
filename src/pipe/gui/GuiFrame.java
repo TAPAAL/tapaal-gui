@@ -564,7 +564,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         int version = JavaUtil.getJREMajorVersion();
 
         if (version < 11) {
-            JOptionPane.showMessageDialog(CreateGui.getApp(), "You are using an older version of Java than 11. Some of the functionalities may not be shown correctly.");
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "You are using an older version of Java than 11. Some of the functionalities may not be shown correctly.");
             System.out.println("You are using an older version of Java than 11. Some of the functionalities may not be shown correctly.");
         }
     }
@@ -1795,7 +1795,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     public TabContent getCurrentTab() {
-        return CreateGui.getCurrentTab();
+        return TAPAALGUI.getCurrentTab();
     }
 
     @Override

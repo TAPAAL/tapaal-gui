@@ -11,7 +11,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import pipe.dataLayer.TAPNQuery.QueryReductionTime;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.verification.Verifier;
@@ -550,7 +550,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		BatchProcessingVerificationResult result;		
 		if(QueryPane.getTemporaryFile() != null && fileName.equals(QueryPane.getTemporaryFile().getName())) {
 			//removes numbers from tempFile so it looks good
-			result = new BatchProcessingVerificationResult(CreateGui.getAppGui().getCurrentTabName(), query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), stats);
+			result = new BatchProcessingVerificationResult(TAPAALGUI.getAppGui().getCurrentTabName(), query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), stats);
 		} else {
 			result = new BatchProcessingVerificationResult(fileName, query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), stats);
 		}

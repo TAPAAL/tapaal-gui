@@ -332,7 +332,7 @@ public class AnimationControlSidePanel extends JPanel {
 		if (Pattern.matches("^(([1-9]([0-9])*)?|0)(" + Pattern.quote(Character.toString(localDecimalseparator)) + "([0-9]){6,})?$",  oldText)) {
 			if (oldText.indexOf('.') != -1) {
 				TimeDelayField.setText(oldText.substring(0,oldText.indexOf('.')+6));	
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
+				JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 						PRECISION_ERROR_MESSAGE, PRECISION_ERROR_DIALOG_TITLE,
 						JOptionPane.INFORMATION_MESSAGE);				
 			}

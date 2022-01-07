@@ -22,7 +22,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.text.NumberFormatter;
 
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.widgets.EscapableDialog;
 
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -62,7 +62,7 @@ public class ManualDelayMode implements DelayMode{
 
 		//Ask the user
 		ChooseDelayPanel panel;
-		dialog = new EscapableDialog(CreateGui.getApp(), "Choose delay", true);
+		dialog = new EscapableDialog(TAPAALGUI.getApp(), "Choose delay", true);
 		panel = new ChooseDelayPanel(transition, dInterval, delayGranularity);
 		dialog.setContentPane(panel);
 		dialog.pack();

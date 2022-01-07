@@ -176,7 +176,7 @@ public class StatisticsPanel extends JPanel{
     private void addTransitionAction() {
 	    removeOrphanTransitions.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                TabContent tab = CreateGui.getCurrentTab();
+                TabContent tab = TAPAALGUI.getCurrentTab();
                 Iterable<Template> templates = tab.allTemplates();
 
                 UndoManager undoManager = tab.getUndoManager();
@@ -218,7 +218,7 @@ public class StatisticsPanel extends JPanel{
 	private void addPlaceAction() {
         removeOrphanPlaces.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                TabContent tab = CreateGui.getCurrentTab();
+                TabContent tab = TAPAALGUI.getCurrentTab();
                 Iterable<Template> templates = tab.allTemplates();
 
                 UndoManager undoManager = tab.getUndoManager();

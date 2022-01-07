@@ -11,7 +11,7 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 import pipe.dataLayer.DataLayer;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 
 public class VerifyDTACPN extends VerifyDTAPN {
@@ -36,13 +36,13 @@ public class VerifyDTACPN extends VerifyDTAPN {
         //throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
 
         if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
-        if (CreateGui.getCurrentTab().getLens().isGame() && !CreateGui.getCurrentTab().getLens().isTimed() && !CreateGui.getCurrentTab().getLens().isColored()) {
+        if (TAPAALGUI.getCurrentTab().getLens().isGame() && !TAPAALGUI.getCurrentTab().getLens().isTimed() && !TAPAALGUI.getCurrentTab().getLens().isColored()) {
             addGhostPlace(model.value1());
         }
 
         VerifyTAPNExporter exporter = new VerifyTACPNExporter();
 
-        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, CreateGui.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
 
         if (exportedModel == null) {
             messenger.displayErrorMessage("There was an error exporting the model");

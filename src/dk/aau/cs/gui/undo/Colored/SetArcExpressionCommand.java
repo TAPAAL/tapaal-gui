@@ -2,11 +2,7 @@ package dk.aau.cs.gui.undo.Colored;
 
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedOutputArc;
-import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 
 public class SetArcExpressionCommand extends Command {
     private final Arc arc;

@@ -191,7 +191,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 			if (loadedModel.getMessages().size() != 0) {
                 new Thread(() -> {
-                    CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    TAPAALGUI.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                     String message = "While loading the net we found one or more warnings: \n\n";
                     for (String s : loadedModel.getMessages()) {
                         message += s + "\n\n";
@@ -395,7 +395,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		if(showMessage) {
 			//We thread this so it does not block the EDT
 			new Thread(() -> {
-                CreateGui.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                TAPAALGUI.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
                         + "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
             }).start();
@@ -494,7 +494,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         drawingSurface.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                CreateGui.getApp().requestFocus();
+                TAPAALGUI.getApp().requestFocus();
             }
         });
 
@@ -689,8 +689,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	String initialName = "";
 	public void setInitialName(String name) {
 		if (name == null || name.isEmpty()) {
-			name = "New Petri net " + (CreateGui.getApp().getNameCounter()) + ".tapn";
-			CreateGui.getApp().incrementNameCounter();
+			name = "New Petri net " + (TAPAALGUI.getApp().getNameCounter()) + ".tapn";
+			TAPAALGUI.getApp().incrementNameCounter();
 		} else if (!name.toLowerCase().endsWith(".tapn")){
 			name = name + ".tapn";
 		}
@@ -884,7 +884,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
 	private void createTransitionFiring() {
-		transitionFiring = new TransitionFiringComponent(CreateGui.getApp().isShowingDelayEnabledTransitions(), lens);
+		transitionFiring = new TransitionFiringComponent(TAPAALGUI.getApp().isShowingDelayEnabledTransitions(), lens);
 	}
 
 	public TransitionFiringComponent getTransitionFiringComponent() {
@@ -1068,7 +1068,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		transitionFiring.showDelayEnabledTransitions(enable);
 		drawingSurface.repaint();
 
-		CreateGui.getAnimator().updateFireableTransitions();
+		TAPAALGUI.getAnimator().updateFireableTransitions();
 	}
 
 	public void selectFirstElements() {
@@ -1181,7 +1181,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (!isTime){
                 if (!network().isUntimed()){
                     String removeTimeWarning = "The net contains time information, which will be removed. Do you still wish to make the net untimed?";
-                    int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove time information",
+                    int choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(), removeTimeWarning, "Remove time information",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
                     if (choice == 0) {
                         createNewAndConvertUntimed();
@@ -1203,7 +1203,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (!isGame){
                 if (network().hasUncontrollableTransitions()){
                     String removeTimeWarning = "The net contains game information, which will be removed. Do you still wish to make to remove the game semantics?";
-                    int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove game information",
+                    int choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(), removeTimeWarning, "Remove game information",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
                     if (choice == 0) {
                         createNewAndConvertNonGame();
@@ -1224,7 +1224,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         if (isColor != lens.isColored()) {
             if (!isColor){
                 String removeTimeWarning = "The net contains color information, which will be removed. Do you still wish to make to remove the color semantics?";
-                int choice = JOptionPane.showOptionDialog(CreateGui.getApp(), removeTimeWarning, "Remove color information",
+                int choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(), removeTimeWarning, "Remove color information",
                     JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
                 if (choice == 0) {
                     createNewAndConvertNonColor();
@@ -1323,7 +1323,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		//If the template is currently selected
 		//XXX: kyrke - 2019-07-06, templ solution while refactoring, there is properly a better way
-		if (CreateGui.getCurrentTab() == this) {
+		if (TAPAALGUI.getCurrentTab() == this) {
 
 			app.ifPresent(GuiFrameActions::updateZoomCombo);
 
@@ -1384,7 +1384,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
                 animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
             } else {
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
+				JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 						"You need at least one active template to enter simulation mode",
 						"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 				animationmode = false;
@@ -1578,7 +1578,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
             };
 
             String optionText = "Do you want to replace constants with values?";
-            openCTLDialog = JOptionPane.showOptionDialog(CreateGui.getApp(), optionText, "Merge Net Components Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            openCTLDialog = JOptionPane.showOptionDialog(TAPAALGUI.getApp(), optionText, "Merge Net Components Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
             if (openCTLDialog == JOptionPane.YES_OPTION) {
                 inlineConstants = true;
             } else if (openCTLDialog == JOptionPane.NO_OPTION) {
@@ -1599,9 +1599,9 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         try {
             ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-            String composedName = "composed-" + CreateGui.getApp().getCurrentTabName();
+            String composedName = "composed-" + TAPAALGUI.getApp().getCurrentTabName();
             composedName = composedName.replace(".tapn", "");
-            CreateGui.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+            TAPAALGUI.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
         } catch (Exception e1) {
             System.console().printf(e1.getMessage());
         }
@@ -1727,7 +1727,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		} catch (Exception e) {
 			Logger.log(e);
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(CreateGui.getApp(), e.toString(),
+			JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.toString(),
 					"File Output Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -1748,7 +1748,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(CreateGui.getApp(), e.toString(), "File Output Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.toString(), "File Output Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -1914,7 +1914,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         protected void transitionClicked(TimedTransitionComponent pno, MouseEvent e) {
             if (place != null && transition == null) {
                 transition = pno;
-                CreateGui.getDrawingSurface().clearAllPrototype();
+                TAPAALGUI.getDrawingSurface().clearAllPrototype();
                 var result = guiModelManager.addInhibitorArc(getModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -1930,7 +1930,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                CreateGui.getDrawingSurface().addPrototype(arc);
+                TAPAALGUI.getDrawingSurface().addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -1940,7 +1940,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            CreateGui.getDrawingSurface().clearAllPrototype();
+            TAPAALGUI.getDrawingSurface().clearAllPrototype();
             place = null;
             transition = null;
             arc = null;
@@ -1999,13 +1999,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
         @Override
         public void setupManager() {
-            CreateGui.useExtendedBounds = true;
+            TAPAALGUI.useExtendedBounds = true;
         }
 
         @Override
         public void teardownManager() {
             clearPendingArc();
-            CreateGui.useExtendedBounds = false;
+            TAPAALGUI.useExtendedBounds = false;
         }
 
         @Override
@@ -2020,8 +2020,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
             if (arc!=null) {
                 if (!e.isControlDown()) {
                     Point p = e.getPoint();
-                    int x = Zoomer.getUnzoomedValue(p.x, CreateGui.getDrawingSurface().getZoom());
-                    int y = Zoomer.getUnzoomedValue(p.y, CreateGui.getDrawingSurface().getZoom());
+                    int x = Zoomer.getUnzoomedValue(p.x, TAPAALGUI.getDrawingSurface().getZoom());
+                    int y = Zoomer.getUnzoomedValue(p.y, TAPAALGUI.getDrawingSurface().getZoom());
 
                     boolean shiftDown = e.isShiftDown();
                     //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
@@ -2054,7 +2054,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }
 
                 JOptionPane.showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     errorMessage,
                     "Error", JOptionPane.ERROR_MESSAGE
                 );
@@ -2107,13 +2107,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                CreateGui.getDrawingSurface().addPrototype(arc);
+                TAPAALGUI.getDrawingSurface().addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (place != null && transition == null) {
                 transition = pno;
-                CreateGui.getDrawingSurface().clearAllPrototype();
+                TAPAALGUI.getDrawingSurface().clearAllPrototype();
                 var result = guiModelManager.addTimedInputArc(getModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2126,7 +2126,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    TAPAALGUI.getDrawingSurface().addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2143,13 +2143,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                CreateGui.getDrawingSurface().addPrototype(arc);
+                TAPAALGUI.getDrawingSurface().addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place == null) {
                 place = pno;
-                CreateGui.getDrawingSurface().clearAllPrototype();
+                TAPAALGUI.getDrawingSurface().clearAllPrototype();
                 var result = guiModelManager.addTimedOutputArc(getModel(), transition, place, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2162,7 +2162,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    TAPAALGUI.getDrawingSurface().addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2173,7 +2173,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            CreateGui.getDrawingSurface().clearAllPrototype();
+            TAPAALGUI.getDrawingSurface().clearAllPrototype();
             place = null;
             transition = null;
             arc = null;
@@ -2231,7 +2231,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         public void teardownManager() {
             //Remove all mouse-over menus if we exit animation mode
-            ArrayList<PetriNetObject> selection = CreateGui.getCurrentTab().drawingSurface().getGuiModel().getPNObjects();
+            ArrayList<PetriNetObject> selection = TAPAALGUI.getCurrentTab().drawingSurface().getGuiModel().getPNObjects();
 
             for (PetriNetObject pn : selection) {
                 if (pn instanceof TimedPlaceComponent) {
@@ -2306,7 +2306,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                CreateGui.getDrawingSurface().addPrototype(arc);
+                TAPAALGUI.getDrawingSurface().addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2322,13 +2322,13 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                CreateGui.getDrawingSurface().addPrototype(arc);
+                TAPAALGUI.getDrawingSurface().addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place2 == null) {
                 place2 = pno;
-                CreateGui.getDrawingSurface().clearAllPrototype();
+                TAPAALGUI.getDrawingSurface().clearAllPrototype();
                 var result = guiModelManager.addTimedTransportArc(getModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2341,7 +2341,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    CreateGui.getDrawingSurface().addPrototype(arc);
+                    TAPAALGUI.getDrawingSurface().addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2352,7 +2352,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            CreateGui.getDrawingSurface().clearAllPrototype();
+            TAPAALGUI.getDrawingSurface().clearAllPrototype();
             place1 = place2 = null;
             transition = null;
             arc = arc1 = arc2 = null;
@@ -2438,7 +2438,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 e->e.pno instanceof ArcPathPoint && e.a == MouseAction.wheel,
                 e->{
                     if (e.e.isShiftDown()) {
-                        CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+                        TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
                             ((ArcPathPoint) e.pno).togglePointType()
                         );
                     }
@@ -2571,7 +2571,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     rotation = e.getWheelRotation() * 45;
                 }
 
-                CreateGui.getCurrentTab().getUndoManager().addNewEdit(((Transition) p).rotate(rotation));
+                TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(((Transition) p).rotate(rotation));
             } else {
                 p.getParent().dispatchEvent(e);
             }
@@ -2595,7 +2595,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 
         private void arcDoubleClickedWithContrl(Arc arc, MouseEvent e) {
-            CreateGui.getCurrentTab().getUndoManager().addNewEdit(
+            TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
                 arc.getArcPath().insertPoint(
                     new Point2D.Double(
                         Zoomer.getUnzoomedValue(arc.getX() + e.getX(), arc.getZoom()),

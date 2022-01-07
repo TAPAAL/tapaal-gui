@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.RequestFocusListener;
 import net.tapaal.swinghelpers.SwingHelper;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -63,7 +63,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	}
 
 	public void showDialog() {
-		dialog = new EscapableDialog(CreateGui.getApp(), "Edit Constant", true);
+		dialog = new EscapableDialog(TAPAALGUI.getApp(), "Edit Constant", true);
 		dialog.add(container);
 		dialog.getRootPane().setDefaultButton(okButton);
 		dialog.setResizable(false);
@@ -173,7 +173,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private void onOK() {
 		if (((JSpinner.NumberEditor)valueSpinner.getEditor()).getTextField().getText().equals("")){
 			JOptionPane.showMessageDialog(
-					CreateGui.getApp(),
+					TAPAALGUI.getApp(),
 					"The specified value is invalid for the current net.\n"
 					+ "Updating the constant to the specified value invalidates the guard\n"
 					+ "on one or more arcs, or it sets the weight of an arc to 0.",
@@ -189,7 +189,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 			.println("Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
 			JOptionPane
 			.showMessageDialog(
-					CreateGui.getApp(),
+					TAPAALGUI.getApp(),
 					"Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
 					"Error", JOptionPane.ERROR_MESSAGE);
 			nameTextField.requestFocusInWindow();
@@ -199,7 +199,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
         if (model.isNameUsedForColorType(newName) || model.isNameUsedForVariable(newName) || model.isNameUsedForColor(newName, null)) {
             JOptionPane
                 .showMessageDialog(
-                    CreateGui.getApp(),
+                    TAPAALGUI.getApp(),
                     "There is already another Color, Color Type or Variable with the same name.\n\n"
                         + "Choose a different name for the constant.",
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -208,7 +208,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
         }
 
 		if (newName.trim().isEmpty()) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
+			JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 					"You must specify a name.", "Missing name",
 					JOptionPane.ERROR_MESSAGE);
 			nameTextField.requestFocusInWindow();
@@ -220,7 +220,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 						&& model.isNameUsedForConstant(newName)) {
 					JOptionPane
 					.showMessageDialog(
-							CreateGui.getApp(),
+							TAPAALGUI.getApp(),
 							"There is already another constant with the same name.\n\n"
 							+ "Choose a different name for the constant.",
 							"Error", JOptionPane.ERROR_MESSAGE);
@@ -232,7 +232,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 				//Check that the value is within the allowed bounds
 				if (!( lowerBound <= val && val <= upperBound )){
 					JOptionPane.showMessageDialog(
-							CreateGui.getApp(),
+							TAPAALGUI.getApp(),
 							"The specified value is invalid for the current net.\n"
 							+ "Updating the constant to the specified value invalidates the guard\n"
 							+ "on one or more arcs, or it sets the weight of an arc to 0.",
@@ -246,7 +246,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 				if (edit == null) {
 					JOptionPane
 					.showMessageDialog(
-							CreateGui.getApp(),
+							TAPAALGUI.getApp(),
 							"The specified value is invalid for the current net.\n"
 							+ "Updating the constant to the specified value invalidates the guard\n"
 							+ "on one or more arcs, or it sets the weight of an arc to 0.",
@@ -255,9 +255,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					valueSpinner.requestFocusInWindow();
 					return;
 				} else {
-					CreateGui.getCurrentTab().getUndoManager()
+					TAPAALGUI.getCurrentTab().getUndoManager()
 					.addNewEdit(edit);
-					CreateGui.getCurrentTab().drawingSurface().repaintAll();
+					TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
 					exit();
 				}
 			} else {
@@ -266,14 +266,14 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 				if (edit==null) {
 					JOptionPane
 					.showMessageDialog(
-							CreateGui.getApp(),
+							TAPAALGUI.getApp(),
 							"A constant with the specified name already exists.",
 							"Constant exists",
 							JOptionPane.ERROR_MESSAGE);
 					nameTextField.requestFocusInWindow();
 					return;
 				} else
-					CreateGui.getCurrentTab().getUndoManager().addNewEdit(edit);
+					TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
 				exit();
 			}
 			model.buildConstraints();

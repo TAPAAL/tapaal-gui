@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import dk.aau.cs.gui.undo.Command;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
-import pipe.gui.CreateGui;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.GuiFrameActions;
 import pipe.gui.Constants;
 
@@ -116,8 +116,8 @@ public class UndoManager {
 		undoneEdits = 0;
 		app.ifPresent(a -> a.setUndoActionEnabled(true));
 		app.ifPresent(a -> a.setRedoActionEnabled(false));
-		if(CreateGui.getCurrentTab() != null) {
-            CreateGui.getCurrentTab().setNetChanged(true);
+		if(TAPAALGUI.getCurrentTab() != null) {
+            TAPAALGUI.getCurrentTab().setNetChanged(true);
         }
 
 		ArrayList<Command> compoundEdit = new ArrayList<Command>();
