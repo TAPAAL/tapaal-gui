@@ -1,4 +1,4 @@
-package pipe.gui.animation;
+package net.tapaal.gui.animation;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -14,6 +14,7 @@ import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import net.tapaal.gui.animation.ArcTokenSelector;
 
 public class AnimationTokenSelectDialog extends JPanel {
 

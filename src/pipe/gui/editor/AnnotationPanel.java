@@ -1,4 +1,4 @@
-package pipe.gui.animation;
+package pipe.gui.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

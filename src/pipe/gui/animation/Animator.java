@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
+
+import net.tapaal.gui.animation.AnimationTokenSelectDialog;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.TAPAALGUI;

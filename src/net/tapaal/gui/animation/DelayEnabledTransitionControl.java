@@ -1,4 +1,4 @@
-package pipe.gui.animation;
+package net.tapaal.gui.animation;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

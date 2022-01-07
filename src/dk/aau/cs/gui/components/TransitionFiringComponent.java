@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.Template;
 import pipe.gui.animation.AnimationSettingsDialog;
-import pipe.gui.animation.DelayEnabledTransitionControl;
+import net.tapaal.gui.animation.DelayEnabledTransitionControl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.animation.SimulationControl;
 import pipe.gui.graphicElements.Transition;
