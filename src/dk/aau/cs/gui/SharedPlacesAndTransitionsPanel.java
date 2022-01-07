@@ -31,7 +31,7 @@ import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Require;
-import pipe.gui.widgets.SidePane;
+import net.tapaal.gui.widgets.SidePane;
 
 public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane {
 	private static final String TRANSITION_IS_USED_MESSAGE = "<html>The shared transition is used in one or more components.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in the components.</html>";

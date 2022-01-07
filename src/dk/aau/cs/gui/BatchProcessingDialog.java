@@ -34,7 +34,7 @@ import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
-import pipe.gui.widgets.QueryPane;
+import net.tapaal.gui.widgets.QueryPane;
 import pipe.gui.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;

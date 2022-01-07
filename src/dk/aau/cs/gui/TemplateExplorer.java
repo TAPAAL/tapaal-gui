@@ -65,7 +65,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
-import pipe.gui.widgets.SidePane;
+import net.tapaal.gui.widgets.SidePane;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.*;
 import static net.tapaal.swinghelpers.GridBagHelper.Fill.BOTH;

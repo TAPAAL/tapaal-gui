@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import pipe.gui.widgets.SidePane;
+import net.tapaal.gui.widgets.SidePane;
 
 public class MoveElementUpCommand extends Command{
     final int oldIndex;

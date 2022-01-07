@@ -52,7 +52,7 @@ import pipe.gui.undo.*;
 import pipe.gui.verification.*;
 import pipe.gui.dialog.UnfoldDialog;
 import pipe.gui.editor.ConstantsPane;
-import pipe.gui.widgets.QueryPane;
+import net.tapaal.gui.widgets.QueryPane;
 import pipe.gui.dialog.WorkflowDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 

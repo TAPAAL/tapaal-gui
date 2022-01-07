@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package net.tapaal.gui.widgets;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
