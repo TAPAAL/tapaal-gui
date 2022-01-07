@@ -1,30 +1,17 @@
 package dk.aau.cs.gui;
 
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLConstNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLPlaceNode;
-import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
-import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.TapnXmlLoader;
-import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
-import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
-import dk.aau.cs.util.FormatException;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTACPNDiscreteVerification;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTACPN;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.*;
 import pipe.gui.graphicElements.*;
@@ -34,13 +21,8 @@ import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.widgets.RunningVerificationDialog;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.awt.*;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Vector;
 
 public class TabTransformer {
@@ -299,7 +281,7 @@ public class TabTransformer {
 
         ModelChecker engine;
         if(oldTab.getLens().isTimed()){
-            engine = new VerifyTACPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+            engine = new VerifyDTACPN(new FileFinder(), new MessengerImpl());
         } else {
             engine = new VerifyPN(new FileFinder(), new MessengerImpl());
         }

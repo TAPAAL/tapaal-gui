@@ -2,10 +2,8 @@ package dk.aau.cs.verification.VerifyTAPN;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
-import dk.aau.cs.util.UnsupportedQueryException;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.QueryReductionTime;
 import pipe.dataLayer.TAPNQuery.TraceOption;
@@ -116,44 +114,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars);
     }
 
-	public VerifyPNOptions(
-	    int extraTokens,
-        TraceOption traceOption,
-        SearchOption search,
-        boolean useOverApproximation,
-        boolean useModelReduction,
-        boolean enableOverApproximation,
-        boolean enableUnderApproximation,
-        int approximationDenominator,
-        QueryCategory queryCategory,
-        AlgorithmOption algorithmOption,
-        boolean siphontrap,
-        QueryReductionTime queryReduction,
-        boolean stubbornReduction
-    ) {
-		this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, null, false, true, false, false, false, false, false);
-	}
-
-    public VerifyPNOptions(
-        int extraTokens,
-        TraceOption traceOption,
-        SearchOption search,
-        boolean useOverApproximation,
-        boolean useModelReduction,
-        boolean enableOverApproximation,
-        boolean enableUnderApproximation,
-        int approximationDenominator,
-        QueryCategory queryCategory,
-        AlgorithmOption algorithmOption,
-        boolean siphontrap,
-        QueryReductionTime queryReduction,
-        boolean stubbornReduction,
-        boolean useTarOption
-    ) {
-        this(extraTokens, traceOption, search, useOverApproximation, useModelReduction? ModelReduction.AGGRESSIVE:ModelReduction.NO_REDUCTION, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, null, useTarOption, true, false, false, false, false, false);
-    }
-
-	@Override
+    @Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 

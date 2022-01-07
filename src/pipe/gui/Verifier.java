@@ -51,7 +51,7 @@ public class Verifier {
     }
 
     private static VerifyDTAPN getVerifydTACPN() {
-        VerifyDTAPN verifydtacpn = new VerifyTACPNDiscreteVerification(new FileFinder(), new MessengerImpl());
+        VerifyDTAPN verifydtacpn = new VerifyDTACPN(new FileFinder(), new MessengerImpl());
         verifydtacpn.setup();
         return verifydtacpn;
     }
