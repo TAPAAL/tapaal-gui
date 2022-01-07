@@ -4,7 +4,7 @@ import net.tapaal.gui.petrinet.Context;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.swingcomponents.WidthAdjustingComboBox;

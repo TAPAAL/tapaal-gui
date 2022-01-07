@@ -6,7 +6,7 @@ import java.awt.event.*;
 
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.TAPAAL;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Constants;

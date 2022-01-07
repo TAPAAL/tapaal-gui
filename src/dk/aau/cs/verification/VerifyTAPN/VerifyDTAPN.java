@@ -24,7 +24,7 @@ import java.util.List;
 
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
 import pipe.gui.*;

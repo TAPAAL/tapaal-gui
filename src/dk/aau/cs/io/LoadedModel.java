@@ -5,7 +5,7 @@ import java.util.Collection;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public class LoadedModel implements LoadedBatchProcessingModel {

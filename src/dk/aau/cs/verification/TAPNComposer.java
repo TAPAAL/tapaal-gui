@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 
 import pipe.gui.petrinet.PetriNetTab;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.dialog.ExportBatchDialog;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.ArcPath;

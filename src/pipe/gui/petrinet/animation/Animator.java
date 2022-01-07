@@ -10,8 +10,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 
 import net.tapaal.gui.petrinet.animation.AnimationTokenSelectDialog;
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Template;
+import pipe.gui.petrinet.dataLayer.DataLayer;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.petrinet.graphicElements.Transition;

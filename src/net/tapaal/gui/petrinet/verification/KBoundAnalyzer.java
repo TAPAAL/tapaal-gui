@@ -4,7 +4,7 @@ import javax.swing.JSpinner;
 
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;

@@ -39,7 +39,7 @@ import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.SortConstantsCommand;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.Constant;

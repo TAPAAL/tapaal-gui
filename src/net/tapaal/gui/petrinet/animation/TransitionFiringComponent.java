@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.animation.EnabledTransitionsList;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.petrinet.animation.AnimationSettingsDialog;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.animation.SimulationControl;

@@ -4,7 +4,7 @@
 
 package pipe.gui.petrinet.undo;
 
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.ArcPath;
 import pipe.gui.petrinet.graphicElements.ArcPathPoint;

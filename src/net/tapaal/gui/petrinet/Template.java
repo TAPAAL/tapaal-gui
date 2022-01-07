@@ -1,5 +1,6 @@
-package pipe.dataLayer;
+package net.tapaal.gui.petrinet;
 
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.canvas.Zoomer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 

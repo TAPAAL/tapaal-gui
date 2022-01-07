@@ -6,7 +6,7 @@ import java.util.List;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
 import dk.aau.cs.util.Tuple;
 

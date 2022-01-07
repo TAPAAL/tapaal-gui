@@ -36,7 +36,7 @@ import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.editor.ColorComboboxPanel;
 import net.tapaal.gui.petrinet.editor.ColoredTimeInvariantDialogPanel;
 import pipe.gui.TAPAALGUI;

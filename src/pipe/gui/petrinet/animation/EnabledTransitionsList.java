@@ -18,7 +18,7 @@ import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.StringComparator;
 
 import org.jetbrains.annotations.NotNull;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.Transition;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;

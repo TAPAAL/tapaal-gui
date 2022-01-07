@@ -1,7 +1,7 @@
 package dk.aau.cs.approximation;
 
 import java.math.BigDecimal;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.verification.RunVerificationBase;

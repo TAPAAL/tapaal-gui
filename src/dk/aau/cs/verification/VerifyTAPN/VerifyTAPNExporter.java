@@ -11,7 +11,7 @@ import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.verification.NameMapping;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 
 import dk.aau.cs.model.tapn.TAPNQuery;

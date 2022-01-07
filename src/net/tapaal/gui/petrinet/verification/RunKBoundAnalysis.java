@@ -11,7 +11,7 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 
 import java.util.HashMap;

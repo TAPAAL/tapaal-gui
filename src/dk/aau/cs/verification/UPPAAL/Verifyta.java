@@ -7,7 +7,7 @@ import java.io.StringReader;
 
 import dk.aau.cs.verification.*;
 import net.tapaal.Preferences;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;

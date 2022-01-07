@@ -1,6 +1,6 @@
 package net.tapaal.gui.petrinet.undo;
 
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 
 public class AddTemplateCommand extends Command {

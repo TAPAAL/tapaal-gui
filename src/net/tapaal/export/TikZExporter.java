@@ -7,7 +7,7 @@ import java.util.List;
 
 import dk.aau.cs.model.tapn.TimedToken;
 
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.ArcPathPoint;

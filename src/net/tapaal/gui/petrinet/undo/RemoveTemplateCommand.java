@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import java.util.Collection;
 
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import dk.aau.cs.model.tapn.SharedTransition;

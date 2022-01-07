@@ -16,6 +16,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.TAPAALGUI;
@@ -667,10 +668,10 @@ public class SmartDrawDialog extends JDialog {
 	
 	private String[] getTemplatesAsString() {
 		String[] templateNames = {"Choose Template"};
-		Iterator<pipe.dataLayer.Template> iterator = TAPAALGUI.getCurrentTab().activeTemplates().iterator();
+		Iterator<Template> iterator = TAPAALGUI.getCurrentTab().activeTemplates().iterator();
 		int i = 0;
 		while(iterator.hasNext()) {
-			pipe.dataLayer.Template template = iterator.next();
+			Template template = iterator.next();
 			templateNames[i] = template.model().name();
 		}
 		return templateNames;

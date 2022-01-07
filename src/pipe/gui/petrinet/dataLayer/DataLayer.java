@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.petrinet.dataLayer;
 
 import java.util.*;
 

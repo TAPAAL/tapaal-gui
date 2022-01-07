@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import java.util.ArrayList;
 import java.util.List;
 
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;

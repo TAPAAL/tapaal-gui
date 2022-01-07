@@ -1,6 +1,6 @@
 package net.tapaal.gui.petrinet.undo;
 
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import pipe.gui.petrinet.undo.TAPNElementCommand;

@@ -33,7 +33,7 @@ import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.petrinet.graphicElements.Arc;

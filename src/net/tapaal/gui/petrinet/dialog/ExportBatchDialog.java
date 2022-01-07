@@ -26,6 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.undo.AddFileExportBatchCommand;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.RemoveFileExportBatchCommand;
@@ -35,7 +36,7 @@ import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.StringComparator;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.gui.petrinet.Export;
 import pipe.gui.MessengerImpl;
@@ -546,7 +547,7 @@ public class ExportBatchDialog extends JDialog {
 	private void exportPNML(Path path, LoadedModel loadedModel) throws DOMException, TransformerConfigurationException, IOException, ParserConfigurationException, TransformerException {
 		File f = new File(path.toString() + "/model.pnml");
 		HashMap<TimedArcPetriNet, DataLayer> guiModel = new HashMap<TimedArcPetriNet, DataLayer>();
-		for(pipe.dataLayer.Template template : loadedModel.templates()) {
+		for(Template template : loadedModel.templates()) {
 			guiModel.put(template.model(), template.guiModel());
 		}
 		PNMLWriter pnmlWriter = new PNMLWriter(loadedModel.network(), guiModel, null);

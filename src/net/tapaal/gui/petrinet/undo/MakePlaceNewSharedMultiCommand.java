@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import net.tapaal.gui.petrinet.Context;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.util.Require;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.petrinet.graphicElements.Place;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 

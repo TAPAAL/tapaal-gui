@@ -31,7 +31,7 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationResult;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 
 public class RunVerification extends RunVerificationBase {	

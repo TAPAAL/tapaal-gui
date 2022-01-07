@@ -8,7 +8,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.Transition;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
 
 public class SharedTransition {

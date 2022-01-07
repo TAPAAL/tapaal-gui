@@ -22,8 +22,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NetWriter;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.MessengerImpl;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.Place;

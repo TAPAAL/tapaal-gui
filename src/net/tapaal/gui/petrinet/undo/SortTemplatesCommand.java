@@ -6,7 +6,7 @@ import javax.swing.JList;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 
 public class SortTemplatesCommand extends Command{
 	TimedArcPetriNet[] oldOrder;

@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import net.tapaal.gui.petrinet.Context;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.util.Require;
-import pipe.dataLayer.Template;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.petrinet.graphicElements.Transition;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 

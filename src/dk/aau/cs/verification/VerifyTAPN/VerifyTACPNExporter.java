@@ -4,8 +4,8 @@ import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.NameMapping;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Template;
+import pipe.gui.petrinet.dataLayer.DataLayer;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.canvas.Zoomer;
 
 import javax.xml.parsers.ParserConfigurationException;

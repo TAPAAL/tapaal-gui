@@ -10,7 +10,7 @@ import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 

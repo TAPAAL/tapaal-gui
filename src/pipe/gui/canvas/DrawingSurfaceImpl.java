@@ -12,7 +12,7 @@ import javax.swing.event.MouseInputAdapter;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.Reference;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.*;
 import pipe.gui.petrinet.graphicElements.GraphicalElement;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;

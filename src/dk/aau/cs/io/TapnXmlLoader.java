@@ -16,8 +16,8 @@ import pipe.gui.petrinet.PetriNetTab;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Template;
+import pipe.gui.petrinet.dataLayer.DataLayer;
+import net.tapaal.gui.petrinet.Template;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.graphicElements.AnnotationNote;

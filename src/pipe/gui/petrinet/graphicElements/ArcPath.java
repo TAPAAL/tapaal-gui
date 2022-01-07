@@ -12,7 +12,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.Constants;
 import pipe.gui.petrinet.undo.AddArcPathPointEditCommand;
 import net.tapaal.gui.petrinet.undo.Command;

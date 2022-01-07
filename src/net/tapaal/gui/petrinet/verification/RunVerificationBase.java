@@ -11,7 +11,7 @@ import javax.swing.*;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.verification.*;
-import pipe.dataLayer.DataLayer;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
