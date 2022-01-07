@@ -8,7 +8,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 import java.util.Hashtable;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 
 public class MakeTransitionSharedCommand extends Command {
         private final TimedArcPetriNet tapn;

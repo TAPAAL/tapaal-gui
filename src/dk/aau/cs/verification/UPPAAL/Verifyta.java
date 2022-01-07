@@ -8,7 +8,7 @@ import java.io.StringReader;
 import dk.aau.cs.verification.*;
 import net.tapaal.Preferences;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Constants;
@@ -251,7 +251,7 @@ public class Verifyta implements ModelChecker {
 		return true;
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, pipe.dataLayer.TAPNQuery dataLayerQuery) throws Exception {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.verification.TAPNQuery dataLayerQuery) throws Exception {
 		
 		if(!model.value1().isDegree2() && new HasDeadlockVisitor().hasDeadLock(query.getProperty()))
 			throw new UnsupportedModelException("\nBecause the query contains a deadlock proposition, the selected engine\nsupports only nets where transitions have at most two input places.");

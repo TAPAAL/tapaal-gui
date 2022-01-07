@@ -3,8 +3,8 @@ package dk.aau.cs.verification.VerifyTAPN;
 import java.util.HashMap;
 import java.util.Map;
 
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.verification.InclusionPlaces;
 import net.tapaal.gui.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.TimedPlace;

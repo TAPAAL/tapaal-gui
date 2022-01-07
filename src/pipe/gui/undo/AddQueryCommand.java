@@ -1,6 +1,6 @@
 package pipe.gui.undo;
 
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 

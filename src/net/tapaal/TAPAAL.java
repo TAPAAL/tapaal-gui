@@ -26,7 +26,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.gui.TAPAALGUI;
 import dk.aau.cs.debug.Logger;
 import net.tapaal.gui.verification.Verifier;

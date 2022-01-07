@@ -30,7 +30,7 @@ import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;

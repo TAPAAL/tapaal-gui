@@ -1,8 +1,8 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.dataLayer.TAPNQuery.WorkflowMode;
+import net.tapaal.gui.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery.WorkflowMode;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.verification.InclusionPlaces;
 

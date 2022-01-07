@@ -2,7 +2,7 @@ package dk.aau.cs.io.batchProcessing;
 
 import java.util.Collection;
 
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public interface LoadedBatchProcessingModel{

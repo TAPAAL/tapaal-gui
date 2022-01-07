@@ -26,7 +26,7 @@ import javax.swing.event.ListDataListener;
 import dk.aau.cs.gui.undo.MoveElementDownCommand;
 import dk.aau.cs.gui.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.dialog.QueryDialog;

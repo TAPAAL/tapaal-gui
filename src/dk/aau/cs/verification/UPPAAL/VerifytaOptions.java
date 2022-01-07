@@ -3,8 +3,8 @@ package dk.aau.cs.verification.UPPAAL;
 import java.util.HashMap;
 import java.util.Map;
 
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.VerificationOptions;
 

@@ -1,6 +1,5 @@
 package dk.aau.cs.gui;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,7 +16,7 @@ import javax.swing.JTextField;
 
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.undo.UndoManager;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedTransitionVisitor;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
 import dk.aau.cs.gui.undo.AddSharedTransitionCommand;

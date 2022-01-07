@@ -11,7 +11,7 @@ import dk.aau.cs.verification.*;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Constants;
@@ -206,7 +206,7 @@ public class VerifyTAPN implements ModelChecker {
 
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, pipe.dataLayer.TAPNQuery dataLayerQuery) throws Exception {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.verification.TAPNQuery dataLayerQuery) throws Exception {
 		if(!supportsModel(model.value1(), options))
 			throw new UnsupportedModelException("Verifytapn does not support the given model.");
 		

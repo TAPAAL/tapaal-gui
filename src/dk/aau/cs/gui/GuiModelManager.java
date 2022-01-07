@@ -9,7 +9,7 @@ import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.util.Require;
 import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
@@ -344,15 +344,15 @@ public class GuiModelManager {
     public void deleteSelection() {
 // check if queries need to be removed
         ArrayList<PetriNetObject> selection = tabContent.drawingSurface().getSelectionObject().getSelection();
-        Iterable<pipe.dataLayer.TAPNQuery> queries = tabContent.queries();
-        HashSet<pipe.dataLayer.TAPNQuery> queriesToDelete = new HashSet<pipe.dataLayer.TAPNQuery>();
+        Iterable<TAPNQuery> queries = tabContent.queries();
+        HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 
         boolean queriesAffected = false;
         for (PetriNetObject pn : selection) {
             if (pn instanceof TimedPlaceComponent) {
                 TimedPlaceComponent place = (TimedPlaceComponent) pn;
                 if (!place.underlyingPlace().isShared()) {
-                    for (pipe.dataLayer.TAPNQuery q : queries) {
+                    for (TAPNQuery q : queries) {
                         if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace) place.underlyingPlace()).model().name(), place.underlyingPlace().name())) {
                             queriesAffected = true;
                             queriesToDelete.add(q);
@@ -362,7 +362,7 @@ public class GuiModelManager {
             } else if (pn instanceof TimedTransitionComponent) {
                 TimedTransitionComponent transition = (TimedTransitionComponent) pn;
                 if (!transition.underlyingTransition().isShared()) {
-                    for (pipe.dataLayer.TAPNQuery q : queries) {
+                    for (TAPNQuery q : queries) {
                         if (q.getProperty().containsAtomicPropositionWithSpecificTransitionInTemplate((transition.underlyingTransition()).model().name(), transition.underlyingTransition().name())) {
                             queriesAffected = true;
                             queriesToDelete.add(q);
@@ -373,7 +373,7 @@ public class GuiModelManager {
         }
         StringBuilder s = new StringBuilder();
         s.append("The following queries are associated with the currently selected objects:\n\n");
-        for (pipe.dataLayer.TAPNQuery q : queriesToDelete) {
+        for (TAPNQuery q : queriesToDelete) {
             s.append(q.getName());
             s.append('\n');
         }

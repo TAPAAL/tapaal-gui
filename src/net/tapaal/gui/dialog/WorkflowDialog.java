@@ -51,12 +51,12 @@ import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
+import net.tapaal.gui.verification.TAPNQuery;
 import net.tapaal.swinghelpers.CustomJSpinner;
-import pipe.dataLayer.*;
-import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.dataLayer.TAPNQuery.WorkflowMode;
+import net.tapaal.gui.verification.TAPNQuery.ExtrapolationOption;
+import net.tapaal.gui.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery.WorkflowMode;
 import pipe.gui.*;
 import net.tapaal.gui.verification.Verifier;
 

@@ -32,7 +32,6 @@ import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationResult;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
 import pipe.gui.TAPAALGUI;
 
 public class RunVerification extends RunVerificationBase {	

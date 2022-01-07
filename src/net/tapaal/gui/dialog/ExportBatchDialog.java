@@ -36,7 +36,7 @@ import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.StringComparator;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.gui.Export;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
@@ -553,12 +553,12 @@ public class ExportBatchDialog extends JDialog {
 		pnmlWriter.savePNML(f);
 	}
 	
-	private Collection<pipe.dataLayer.TAPNQuery> renameQueries(String fileName, Collection<pipe.dataLayer.TAPNQuery> queries){
-		Collection<pipe.dataLayer.TAPNQuery> renamedQueries = new ArrayList<pipe.dataLayer.TAPNQuery>(); 
+	private Collection<TAPNQuery> renameQueries(String fileName, Collection<TAPNQuery> queries){
+		Collection<TAPNQuery> renamedQueries = new ArrayList<TAPNQuery>();
 		int index = 1;
 		
-		for(pipe.dataLayer.TAPNQuery query : queries) {
-			pipe.dataLayer.TAPNQuery copy = query;
+		for(TAPNQuery query : queries) {
+			TAPNQuery copy = query;
 			copy.setName((fileName.replaceAll(".xml", "") + "." + query.getName() + "-" + index).replaceAll(" ", "_").replaceAll(".tapn", ""));
 			renamedQueries.add(copy);
 			index++;

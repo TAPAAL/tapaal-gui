@@ -50,7 +50,7 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.canvas.Grid;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;

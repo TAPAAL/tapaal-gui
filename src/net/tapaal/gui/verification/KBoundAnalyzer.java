@@ -9,10 +9,10 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.dataLayer.TAPNQuery.AlgorithmOption;
-import pipe.dataLayer.TAPNQuery.QueryCategory;
+import net.tapaal.gui.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery.AlgorithmOption;
+import net.tapaal.gui.verification.TAPNQuery.QueryCategory;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.MessengerImpl;
 import dk.aau.cs.Messenger;
@@ -70,7 +70,7 @@ public class KBoundAnalyzer {
 
 	protected VerifyTAPNOptions verificationOptions() {
 		if(modelChecker instanceof VerifyPN){
-			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.Default, AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime,false, null, false, true, tapnNetwork.isColored(), false, true, true, true);
+			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.Default, AlgorithmOption.CERTAIN_ZERO, false, net.tapaal.gui.verification.TAPNQuery.QueryReductionTime.UnlimitedTime,false, null, false, true, tapnNetwork.isColored(), false, true, true, true);
 		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
 		} else if(modelChecker instanceof VerifyDTAPN){

@@ -7,7 +7,6 @@ import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;

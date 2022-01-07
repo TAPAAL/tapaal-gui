@@ -20,7 +20,6 @@ import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNUnfoldOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Constants;
 import pipe.gui.MessengerImpl;
@@ -100,7 +99,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         try {
             TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
             ArrayList<Template> templates = new ArrayList<>(1);
-            ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<>(1);
+            ArrayList<TAPNQuery> queries = new ArrayList<>(1);
 
 
             network.add(transformedModel.value1());
@@ -130,8 +129,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         }
         List<TAPNQuery> clonedQueries = new Vector<>();
         if (queries.iterator().hasNext()) {
-            for (pipe.dataLayer.TAPNQuery query : queries) {
-                pipe.dataLayer.TAPNQuery clonedQuery = query.copy();
+            for (TAPNQuery query : queries) {
+                TAPNQuery clonedQuery = query.copy();
                 mapQueryToNewNames(clonedQuery, transformedModel.value2());
                 clonedQueries.add(clonedQuery);
             }
@@ -141,7 +140,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             String placeName = model.activeTemplates().get(0).places().get(0).name();
             TCTLAtomicPropositionNode atomicStartNode = new TCTLAtomicPropositionNode(new TCTLPlaceNode(templateName, placeName), ">=", new TCTLConstNode(1));
             TCTLEFNode efNode = new TCTLEFNode(atomicStartNode);
-            pipe.dataLayer.TAPNQuery test = new pipe.dataLayer.TAPNQuery("placeholder", 1000, efNode, null, null, null, false, false, false, false, null, null, lens.isColored());
+            TAPNQuery test = new TAPNQuery("placeholder", 1000, efNode, null, null, null, false, false, false, false, null, null, lens.isColored());
             mapQueryToNewNames(test, transformedModel.value2());
             clonedQueries.add(test);
             dummyQuery = true;
@@ -152,7 +151,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             PrintStream queryStream = new PrintStream(queryFile);
             CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
             String formattedQueries = "";
-            for(pipe.dataLayer.TAPNQuery query : clonedQueries){
+            for(TAPNQuery query : clonedQueries){
                 /*if (lens.isTimed() || query.getCategory() == TAPNQuery.QueryCategory.CTL || clonedQueries.size() > 1) {
                     formattedQueries = XMLVisitor.getXMLQueryFor(query.getProperty(), query.getName());
                 } else if(lens.isGame()) {
@@ -209,8 +208,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
             if(!dummyQuery){
-                for(pipe.dataLayer.TAPNQuery query : getQueries(queryOut, loadedModel.network())){
-                    for(pipe.dataLayer.TAPNQuery oldQuery : queries){
+                for(TAPNQuery query : getQueries(queryOut, loadedModel.network())){
+                    for(TAPNQuery oldQuery : queries){
                         if(query.getName().equals(oldQuery.getName())){
                             query.copyOptions(oldQuery);
                             newTab.addQuery(query);
@@ -243,7 +242,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         return null;
     }
 
-    public static List<pipe.dataLayer.TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network) {
+    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network) {
         XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network);
         return new ArrayList<>(queryLoader.parseQueries().getQueries());
     }

@@ -1,6 +1,6 @@
 package dk.aau.cs.verification.batchProcessing;
 
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.verification.NullStats;
 import dk.aau.cs.verification.Stats;
 

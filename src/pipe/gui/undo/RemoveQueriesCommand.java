@@ -4,7 +4,7 @@ import java.util.List;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 
 public class RemoveQueriesCommand extends Command {
 	

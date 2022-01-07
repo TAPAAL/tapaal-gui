@@ -40,7 +40,7 @@ import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.*;
 import pipe.gui.action.GuiAction;
@@ -1599,7 +1599,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
         network.add(transformedModel.value1());
 
-        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), network.constants(), lens);
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<TAPNQuery>(0), network.constants(), lens);
 
         try {
             ByteArrayOutputStream outputStream = tapnWriter.savePNML();

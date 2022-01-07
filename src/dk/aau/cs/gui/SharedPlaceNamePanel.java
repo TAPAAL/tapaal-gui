@@ -1,6 +1,5 @@
 package dk.aau.cs.gui;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,7 +15,7 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
 import net.tapaal.swinghelpers.SwingHelper;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedPlaceVisitor;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.gui.undo.AddSharedPlaceCommand;

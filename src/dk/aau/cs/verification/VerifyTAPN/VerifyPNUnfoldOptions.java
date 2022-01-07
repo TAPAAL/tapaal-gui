@@ -1,7 +1,7 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
 import dk.aau.cs.verification.VerificationOptions;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 
 import java.util.HashMap;
 import java.util.Map;

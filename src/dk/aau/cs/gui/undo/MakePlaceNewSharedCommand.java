@@ -5,7 +5,7 @@ import java.util.List;
 
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.MakePlaceSharedVisitor;

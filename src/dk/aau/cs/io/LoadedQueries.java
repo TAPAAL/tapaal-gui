@@ -1,6 +1,5 @@
 package dk.aau.cs.io;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import java.util.Collection;
 
 public class LoadedQueries {

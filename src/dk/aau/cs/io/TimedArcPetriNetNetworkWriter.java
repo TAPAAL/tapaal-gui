@@ -34,8 +34,8 @@ import org.xml.sax.SAXException;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
-import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TAPNQuery.QueryCategory;
+import net.tapaal.gui.verification.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery.QueryCategory;
 import pipe.dataLayer.Template;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;

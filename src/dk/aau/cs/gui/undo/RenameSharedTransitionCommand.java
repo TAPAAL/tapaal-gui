@@ -1,7 +1,7 @@
 package dk.aau.cs.gui.undo;
 
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedTransitionVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.SharedTransition;

@@ -45,10 +45,10 @@ import net.tapaal.gui.verification.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
 import pipe.gui.*;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.approximation.OverApproximation;
@@ -3873,7 +3873,7 @@ public class QueryDialog extends JPanel {
 					network.setConstants(tapnNetwork.constants());
 					network.setVariables(tapnNetwork.variables());
 
-					NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0), lens);
+					NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<TAPNQuery>(0), new ArrayList<Constant>(0), lens);
 
 					try {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
@@ -3978,7 +3978,7 @@ public class QueryDialog extends JPanel {
 	private void exportTACPN(Tuple<TimedArcPetriNet, NameMapping> transformedModel, String xmlFile) {
         TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
         ArrayList<Template> templates = new ArrayList<>(1);
-        ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<>(1);
+        ArrayList<TAPNQuery> queries = new ArrayList<>(1);
 
         network.add(transformedModel.value1());
         for (ColorType ct : QueryDialog.this.tapnNetwork.colorTypes()) {

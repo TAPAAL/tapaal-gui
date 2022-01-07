@@ -1,6 +1,6 @@
 package pipe.gui.undo;
 
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.gui.TabContent;

@@ -13,7 +13,7 @@ import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.verification.*;
 import pipe.dataLayer.DataLayer;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
-import pipe.dataLayer.TAPNQuery.SearchOption;
+import net.tapaal.gui.verification.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
@@ -43,7 +43,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected DataLayer guiModel;
 	protected TAPNQuery query;
 	protected TAPNQuery clonedQuery;
-	protected pipe.dataLayer.TAPNQuery dataLayerQuery;
+	protected net.tapaal.gui.verification.TAPNQuery dataLayerQuery;
     protected HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	protected String reducedNetFilePath;
 	protected boolean reduceNetOnly;
@@ -61,7 +61,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         this.spinner = spinner;
     }
 
-    public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, pipe.dataLayer.TAPNQuery dataLayerQuery) {
+    public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, net.tapaal.gui.verification.TAPNQuery dataLayerQuery) {
 		this.model = model;
 		this.options = options;
 		this.query = query;
@@ -119,13 +119,13 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 dataLayerQuery.getCategory(),
                                 dataLayerQuery.getAlgorithmOption(),
                                 dataLayerQuery.isSiphontrapEnabled(),
-                                dataLayerQuery.isQueryReductionEnabled() ? pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime : pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime,
+                                dataLayerQuery.isQueryReductionEnabled() ? net.tapaal.gui.verification.TAPNQuery.QueryReductionTime.UnlimitedTime : net.tapaal.gui.verification.TAPNQuery.QueryReductionTime.NoTime,
                                 dataLayerQuery.isStubbornReductionEnabled(),
                                 reducedNetFilePath,
                                 dataLayerQuery.isTarOptionEnabled(),
                                 dataLayerQuery.isTarjan(),
                                 model.isColored(),
-                                model.isColored() && (!model.isUntimed() || options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE),
+                                model.isColored() && (!model.isUntimed() || options.traceOption() != net.tapaal.gui.verification.TAPNQuery.TraceOption.NONE),
                                 dataLayerQuery.usePartitioning(),
                                 dataLayerQuery.useColorFixpoint(),
                                 dataLayerQuery.useSymmetricVars()
@@ -146,16 +146,16 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 options.enabledOverApproximation(),
                                 options.enabledUnderApproximation(),
                                 options.approximationDenominator(),
-                                pipe.dataLayer.TAPNQuery.QueryCategory.Default,
-                                pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO,
+                                net.tapaal.gui.verification.TAPNQuery.QueryCategory.Default,
+                                net.tapaal.gui.verification.TAPNQuery.AlgorithmOption.CERTAIN_ZERO,
                                 false,
-                                pipe.dataLayer.TAPNQuery.QueryReductionTime.UnlimitedTime,
+                                net.tapaal.gui.verification.TAPNQuery.QueryReductionTime.UnlimitedTime,
                                 false,
                                 reducedNetFilePath,
                                 false,
                                 true,
                                 model.isColored(),
-                                model.isColored() && (!model.isUntimed() || options.traceOption() != pipe.dataLayer.TAPNQuery.TraceOption.NONE),
+                                model.isColored() && (!model.isUntimed() || options.traceOption() != net.tapaal.gui.verification.TAPNQuery.TraceOption.NONE),
                                 dataLayerQuery.usePartitioning(),
                                 dataLayerQuery.useColorFixpoint(),
                                 dataLayerQuery.useSymmetricVars()
@@ -200,9 +200,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		return decomposer.decompose();
 	}
 
-    private static pipe.dataLayer.TAPNQuery getQuery(File queryFile, TimedArcPetriNetNetwork network) {
+    private static net.tapaal.gui.verification.TAPNQuery getQuery(File queryFile, TimedArcPetriNetNetwork network) {
         XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network);
-        List<pipe.dataLayer.TAPNQuery> queries = new ArrayList<pipe.dataLayer.TAPNQuery>();
+        List<net.tapaal.gui.verification.TAPNQuery> queries = new ArrayList<net.tapaal.gui.verification.TAPNQuery>();
         queries.addAll(queryLoader.parseQueries().getQueries());
         return queries.get(0);
     }
@@ -236,7 +236,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 
 			if (showResult(result) && spinner != null) {
-			    options = new VerifyPNOptions(options.extraTokens(), pipe.dataLayer.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, pipe.dataLayer.TAPNQuery.QueryCategory.Default, pipe.dataLayer.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, pipe.dataLayer.TAPNQuery.QueryReductionTime.NoTime, false, null, false, false, false, false, false, false, false);
+			    options = new VerifyPNOptions(options.extraTokens(), net.tapaal.gui.verification.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, net.tapaal.gui.verification.TAPNQuery.QueryCategory.Default, net.tapaal.gui.verification.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, net.tapaal.gui.verification.TAPNQuery.QueryReductionTime.NoTime, false, null, false, false, false, false, false, false, false);
                 KBoundAnalyzer optimizer = new KBoundAnalyzer(model, guiModels, options.extraTokens(), modelChecker, new MessengerImpl(), spinner);
                 optimizer.analyze((VerifyTAPNOptions) options, true);
             }

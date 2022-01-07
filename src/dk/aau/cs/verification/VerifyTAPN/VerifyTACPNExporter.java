@@ -3,6 +3,7 @@ package dk.aau.cs.verification.VerifyTAPN;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.NameMapping;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.canvas.Zoomer;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 public class VerifyTACPNExporter extends  VerifyTAPNExporter {
     protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
         ArrayList<Template> templates = new ArrayList<>(1);
-        ArrayList<pipe.dataLayer.TAPNQuery> queries = new ArrayList<>(1);
+        ArrayList<TAPNQuery> queries = new ArrayList<>(1);
         templates.add(new Template(model, guiModel, new Zoomer()));
 
         TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(model.parentNetwork(), templates, queries, model.parentNetwork().constants());

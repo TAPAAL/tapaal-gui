@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import dk.aau.cs.io.LoadedQueries;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyTransitionNamesVisitor;
 import dk.aau.cs.model.tapn.SharedTransition;

@@ -2,7 +2,7 @@ package dk.aau.cs.verification.batchProcessing;
 
 import java.util.List;
 
-import pipe.dataLayer.TAPNQuery.SearchOption;
+import net.tapaal.gui.verification.TAPNQuery.SearchOption;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 

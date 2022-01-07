@@ -7,10 +7,10 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import dk.aau.cs.verification.VerifyTAPN.*;
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.dataLayer.TAPNQuery.WorkflowMode;
-import pipe.dataLayer.TAPNQuery.QueryReductionTime;
+import net.tapaal.gui.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery.WorkflowMode;
+import net.tapaal.gui.verification.TAPNQuery.QueryReductionTime;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -59,8 +59,8 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.StubbornReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
-import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
-import pipe.dataLayer.TAPNQuery.QueryCategory;
+import net.tapaal.gui.verification.TAPNQuery.ExtrapolationOption;
+import net.tapaal.gui.verification.TAPNQuery.QueryCategory;
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
 	private final List<File> files;
@@ -128,7 +128,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			this.model = model;
 			if(model != null) {	
                 Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
-				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
+				for(net.tapaal.gui.verification.TAPNQuery query : model.queries()) {
                     if(exiting()) {
                         return null;
                     }
@@ -138,7 +138,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
                     	continue;
                     }
                                         
-					pipe.dataLayer.TAPNQuery queryToVerify = overrideVerificationOptions(composedModel.value1(), query, file);
+					net.tapaal.gui.verification.TAPNQuery queryToVerify = overrideVerificationOptions(composedModel.value1(), query, file);
 					
 					if (batchProcessingVerificationOptions.isReductionOptionUserdefined()){
 						processQueryForUserdefinedReductions(file, composedModel, queryToVerify);
@@ -147,7 +147,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					}
 				}
 				if(model.queries().isEmpty() && batchProcessingVerificationOptions.queryPropertyOption() != QueryPropertyOption.KeepQueryOption) {
-					pipe.dataLayer.TAPNQuery queryToVerify = createQueryFromQueryPropertyOption(composedModel.value1(), batchProcessingVerificationOptions.queryPropertyOption(), file);
+					net.tapaal.gui.verification.TAPNQuery queryToVerify = createQueryFromQueryPropertyOption(composedModel.value1(), batchProcessingVerificationOptions.queryPropertyOption(), file);
 					processQuery(file, composedModel, queryToVerify);
 				}
 			}
@@ -157,8 +157,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return null;
 	}
 
-	private void processQueryForUserdefinedReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
-		pipe.dataLayer.TAPNQuery query = queryToVerify;
+	private void processQueryForUserdefinedReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.verification.TAPNQuery queryToVerify) throws Exception {
+		net.tapaal.gui.verification.TAPNQuery query = queryToVerify;
 		query.setDiscreteInclusion(false);
 		if(!exiting() && batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyTAPN)){
 			query = query.copy();
@@ -249,7 +249,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		}
 	}
 
-	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
+	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.verification.TAPNQuery queryToVerify) throws Exception {
 		if(queryToVerify.isActive()) {
 
 			if(isSoundnessCheck) {
@@ -267,7 +267,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		
 		fireVerificationTaskComplete();
 	}
-	private void processSoundnessCheck(final File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, final pipe.dataLayer.TAPNQuery queryToVerify) throws Exception{
+	private void processSoundnessCheck(final File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, final net.tapaal.gui.verification.TAPNQuery queryToVerify) throws Exception{
 		VerificationResult<TimedArcPetriNetTrace> verificationResult;
 		if(queryToVerify.getWorkflowMode() == WorkflowMode.WORKFLOW_SOUNDNESS) {
 			try {
@@ -281,7 +281,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		}
 		if(queryToVerify.getWorkflowMode() == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
 			//Test for Soundness before Strong Soundness
-			pipe.dataLayer.TAPNQuery queryToCheckIfSound = new pipe.dataLayer.TAPNQuery(
+			net.tapaal.gui.verification.TAPNQuery queryToCheckIfSound = new net.tapaal.gui.verification.TAPNQuery(
 					"Workflow soundness check", queryToVerify.getCapacity(),
 					new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
 					SearchOption.DEFAULT,
@@ -325,7 +325,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		}
 	}
 
-	private pipe.dataLayer.TAPNQuery overrideVerificationOptions(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query, File fileToBeChecked) throws Exception {
+	private net.tapaal.gui.verification.TAPNQuery overrideVerificationOptions(TimedArcPetriNet model, net.tapaal.gui.verification.TAPNQuery query, File fileToBeChecked) throws Exception {
 		if(batchProcessingVerificationOptions != null) {
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
 			if(!(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.StrongSoundness || batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.Soundness)) {
@@ -368,7 +368,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					approximationDenominator = batchProcessingVerificationOptions.approximationDenominator();
 				}
 				
-				pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator, query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars(), model.isColored());
+				net.tapaal.gui.verification.TAPNQuery changedQuery = new net.tapaal.gui.verification.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator, query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars(), model.isColored());
 				
 				if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 					changedQuery.setActive(query.isActive());
@@ -383,7 +383,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				return changedQuery;
 			} else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.Soundness) {
 				isSoundnessCheck = true;
-				query = new pipe.dataLayer.TAPNQuery(
+				query = new net.tapaal.gui.verification.TAPNQuery(
 					"Workflow soundness check", capacity,
 							new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
 							SearchOption.DEFAULT,
@@ -395,7 +395,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         	
 	        } else if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.StrongSoundness) {
 	        	isSoundnessCheck = true;
-	        	query = new pipe.dataLayer.TAPNQuery(
+	        	query = new net.tapaal.gui.verification.TAPNQuery(
 						"Workflow soundness check", capacity,
 								new TCTLEGNode(new TCTLTrueNode()), TraceOption.SOME,
 								SearchOption.DEFAULT,
@@ -410,12 +410,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return query;
 	}
 	
-	private pipe.dataLayer.TAPNQuery createQueryFromQueryPropertyOption(TimedArcPetriNet model, QueryPropertyOption option, File fileToBeChecked) throws Exception {
+	private net.tapaal.gui.verification.TAPNQuery createQueryFromQueryPropertyOption(TimedArcPetriNet model, QueryPropertyOption option, File fileToBeChecked) throws Exception {
 		int capacity = batchProcessingVerificationOptions.capacity();
 		ReductionOption reductionOption = model.isUntimed() ? ReductionOption.VerifyPN : ReductionOption.VerifyTAPN;
 		if(option == QueryPropertyOption.ExistDeadlock) {
 			filesProcessed.add(fileToBeChecked);
-			return new pipe.dataLayer.TAPNQuery(
+			return new net.tapaal.gui.verification.TAPNQuery(
 					"Existence of a deadlock", capacity,
 							generateExistDeadlock(model), TraceOption.NONE,
 							SearchOption.DEFAULT,
@@ -425,7 +425,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		}
 		if(option == QueryPropertyOption.SearchWholeStateSpace) {
 			filesProcessed.add(fileToBeChecked);
-			return new pipe.dataLayer.TAPNQuery(
+			return new net.tapaal.gui.verification.TAPNQuery(
 					"Search whole state space", capacity,
 							generateSearchWholeStateSpaceProperty(model), TraceOption.NONE,
 							SearchOption.DEFAULT,
@@ -436,7 +436,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if (option == QueryPropertyOption.Soundness) {
 			isSoundnessCheck = true;
 			filesProcessed.add(fileToBeChecked);
-			return new pipe.dataLayer.TAPNQuery(
+			return new net.tapaal.gui.verification.TAPNQuery(
 				"Workflow soundness check", capacity,
 						new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
 						SearchOption.DEFAULT,
@@ -447,7 +447,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if(option == QueryPropertyOption.StrongSoundness) {
 			isSoundnessCheck = true;
 			filesProcessed.add(fileToBeChecked);
-        	return new pipe.dataLayer.TAPNQuery(
+        	return new net.tapaal.gui.verification.TAPNQuery(
 					"Workflow soundness check", capacity,
 							new TCTLEGNode(new TCTLTrueNode()), TraceOption.SOME,
 							SearchOption.DEFAULT,
@@ -478,7 +478,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         return composer.transformModel(model.network());
 	}
 
-	private VerificationResult<TimedArcPetriNetTrace> verifyQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
+	private VerificationResult<TimedArcPetriNetTrace> verifyQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.verification.TAPNQuery query) throws Exception {
 		fireStatusChanged(query.getName());
 		
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = null;
@@ -500,7 +500,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return verificationResult;
 	}
 
-	private void processVerificationResult(File file, pipe.dataLayer.TAPNQuery query, VerificationResult<TimedArcPetriNetTrace> verificationResult) {
+	private void processVerificationResult(File file, net.tapaal.gui.verification.TAPNQuery query, VerificationResult<TimedArcPetriNetTrace> verificationResult) {
 		if(skippingCurrentVerification) {
 			publishResult(file.getName(), query, "Skipped - by the user", verificationResult.verificationTime(), new NullStats());
 			skippingCurrentVerification = false;
@@ -546,7 +546,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		}		
 	}
 
-	private void publishResult(String fileName, pipe.dataLayer.TAPNQuery query, String verificationResult, long verificationTime, Stats stats) {
+	private void publishResult(String fileName, net.tapaal.gui.verification.TAPNQuery query, String verificationResult, long verificationTime, Stats stats) {
 		BatchProcessingVerificationResult result;		
 		if(QueryPane.getTemporaryFile() != null && fileName.equals(QueryPane.getTemporaryFile().getName())) {
 			//removes numbers from tempFile so it looks good
@@ -571,7 +571,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return decomposer.decompose();
 	}
 	
-	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {		
+	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.verification.TAPNQuery query) throws Exception {
 		TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(),query);
 		queryToVerify.setCategory(query.getCategory());
 		MapQueryToNewNames(queryToVerify, composedModel.value2());
@@ -588,7 +588,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return worker.batchWorker(composedModel, options, query, model, modelChecker, queryToVerify, clonedQuery, this);
 	}
 
-	private TAPNQuery getTAPNQuery(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query) throws Exception {
+	private TAPNQuery getTAPNQuery(TimedArcPetriNet model, net.tapaal.gui.verification.TAPNQuery query) throws Exception {
 		return new TAPNQuery(query.getProperty().copy(), query.getCapacity());
 	}
 
@@ -604,7 +604,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return new TCTLEFNode(new TCTLDeadlockNode()); 
 	}
 	
-	private ModelChecker getModelChecker(pipe.dataLayer.TAPNQuery query) {
+	private ModelChecker getModelChecker(net.tapaal.gui.verification.TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return getVerifyTAPN();
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
@@ -615,7 +615,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return getVerifyta();
 	}
 
-	public VerificationOptions getVerificationOptionsFromQuery(pipe.dataLayer.TAPNQuery query) {
+	public VerificationOptions getVerificationOptionsFromQuery(net.tapaal.gui.verification.TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());	// XXX DISABLES OverApprox
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)

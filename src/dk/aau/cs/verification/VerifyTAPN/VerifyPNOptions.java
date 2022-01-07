@@ -4,11 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.QueryReductionTime;
-import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.dataLayer.TAPNQuery.AlgorithmOption;
-import pipe.dataLayer.TAPNQuery.QueryCategory;
+import net.tapaal.gui.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.verification.TAPNQuery.QueryReductionTime;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery.AlgorithmOption;
+import net.tapaal.gui.verification.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.verification.InclusionPlaces;
 

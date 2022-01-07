@@ -25,8 +25,8 @@ import java.util.List;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.dataLayer.TAPNQuery.WorkflowMode;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery.WorkflowMode;
 import pipe.gui.*;
 import net.tapaal.gui.verification.UnfoldNet;
 import net.tapaal.gui.verification.InclusionPlaces;
@@ -208,7 +208,7 @@ public class VerifyDTAPN implements ModelChecker{
 
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, pipe.dataLayer.TAPNQuery dataLayerQuery) throws Exception {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.verification.TAPNQuery dataLayerQuery) throws Exception {
 		if (!supportsModel(model.value1(), options)) {
 			throw new UnsupportedModelException("Verifydtapn does not support the given model.");
 		}
@@ -266,7 +266,7 @@ public class VerifyDTAPN implements ModelChecker{
 		((VerifyTAPNOptions) options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
 	}
 
-	protected VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, pipe.dataLayer.TAPNQuery dataLayerQuery) {
+	protected VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, net.tapaal.gui.verification.TAPNQuery dataLayerQuery) {
 		((VerifyTAPNOptions) options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 
         runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
@@ -311,7 +311,7 @@ public class VerifyDTAPN implements ModelChecker{
                                 newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(TAPAALGUI.getCurrentTab().getLens().isTimed(), TAPAALGUI.getCurrentTab().getLens().isGame(), false));
 
                                 //The query being verified should be the only query
-                                for (pipe.dataLayer.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
+                                for (net.tapaal.gui.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
                                     newTab.setInitialName(loadedQuery.getName() + " - unfolded");
                                     loadedQuery.copyOptions(dataLayerQuery);
                                     newTab.addQuery(loadedQuery);

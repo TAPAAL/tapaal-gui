@@ -1,7 +1,6 @@
-package pipe.dataLayer;
+package net.tapaal.gui.verification;
 
 import dk.aau.cs.TCTL.*;
-import net.tapaal.gui.verification.InclusionPlaces;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.QueryType;
 
@@ -425,7 +424,7 @@ public class TAPNQuery {
 		useTarOption = newQuery.isTarOptionEnabled();
 	}
 
-    public void copyOptions(pipe.dataLayer.TAPNQuery query){
+    public void copyOptions(TAPNQuery query){
         setUseOverApproximation(query.useOverApproximation());
         setUseUnderApproximationEnabled(query.isUnderApproximationEnabled());
         setUseSiphontrap(query.isSiphontrapEnabled());

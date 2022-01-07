@@ -1,10 +1,7 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
 import dk.aau.cs.verification.VerificationOptions;
-import pipe.dataLayer.TAPNQuery;
-
-import java.io.File;
-import java.io.IOException;
+import net.tapaal.gui.verification.TAPNQuery;
 
 public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
     private String modelOut;

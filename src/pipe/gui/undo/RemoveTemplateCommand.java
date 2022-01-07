@@ -2,7 +2,7 @@ package pipe.gui.undo;
 
 import java.util.Collection;
 
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TemplateExplorer;

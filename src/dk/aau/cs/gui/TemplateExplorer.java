@@ -42,7 +42,7 @@ import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.Zoomer;

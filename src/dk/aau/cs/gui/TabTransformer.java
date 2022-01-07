@@ -11,6 +11,7 @@ import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTACPN;
+import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.*;
@@ -301,7 +302,7 @@ public class TabTransformer {
         dialog.setVisible(true);
     }
 
-    public static void mapQueryToNewNames(pipe.dataLayer.TAPNQuery query, NameMapping mapping) {
+    public static void mapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
         RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
         RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(mapping);
         query.getProperty().accept(placeVisitor, null);

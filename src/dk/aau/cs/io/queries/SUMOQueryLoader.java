@@ -8,11 +8,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.io.LoadedQueries;
-import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
-import pipe.dataLayer.TAPNQuery.HashTableSize;
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
+import net.tapaal.gui.verification.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery.ExtrapolationOption;
+import net.tapaal.gui.verification.TAPNQuery.HashTableSize;
+import net.tapaal.gui.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.verification.TAPNQuery.TraceOption;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.verification.InclusionPlaces;

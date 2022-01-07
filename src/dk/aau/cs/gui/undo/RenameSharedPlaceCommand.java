@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import pipe.dataLayer.TAPNQuery;
+import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedPlaceVisitor;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.gui.TabContent;
