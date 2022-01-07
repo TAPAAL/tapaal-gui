@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.verification;
 
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
@@ -22,6 +22,9 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
+import pipe.gui.Constants;
+import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.graphicElements.PetriNetObject;
 
@@ -217,7 +220,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 }
             }
 
-            Thread thread = new Thread(() -> TAPAALGUI.getApp().guiFrameController.ifPresent(o -> o.openTab(newTab)));
+            Thread thread = new Thread(() -> TAPAALGUI.getAppGuiController().openTab(newTab));
             thread.start();
             while(thread.isAlive()){
                 if(isCancelled()){

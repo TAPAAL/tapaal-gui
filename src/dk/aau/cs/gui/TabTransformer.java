@@ -19,6 +19,7 @@ import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
+import pipe.gui.verification.UnfoldNet;
 import pipe.gui.widgets.RunningVerificationDialog;
 
 import java.util.ArrayList;

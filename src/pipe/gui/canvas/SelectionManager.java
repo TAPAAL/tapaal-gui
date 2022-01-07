@@ -1,7 +1,7 @@
 /*
  * Created on 08-Feb-2004
  */
-package pipe.gui;
+package pipe.gui.canvas;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
+import pipe.gui.Constants;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PetriNetObject;
