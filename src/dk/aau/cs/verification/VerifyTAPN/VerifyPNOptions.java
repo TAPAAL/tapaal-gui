@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import dk.aau.cs.util.UnsupportedQueryException;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.QueryReductionTime;
 import pipe.dataLayer.TAPNQuery.TraceOption;
@@ -19,9 +20,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		TraceOption.NONE, ""
     );
 	private static final Map<SearchOption, String> searchMap = Map.of(
-        SearchOption.BFS, " --search-strategy DFS",
-        SearchOption.RANDOM, " --search-strategy RDFS",
         SearchOption.HEURISTIC, " --search-strategy BestFS",
+        SearchOption.BFS, "--search-strategy BFS",
+        SearchOption.DFS, " --search-strategy DFS",
+        SearchOption.RANDOM, " --search-strategy RDFS",
         SearchOption.OVERAPPROXIMATE, " --search-strategy OverApprox"
     );
 
@@ -157,8 +159,17 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 
 		result.append("--k-bound ");
 		result.append(extraTokens+tokensInModel);
-		result.append(traceMap.get(traceOption));
-		result.append(searchMap.get(searchOption));
+
+        var traceSwitch =traceMap.get(traceOption) ;
+        if (traceSwitch != null) {
+            result.append(traceSwitch + " ");
+        }
+
+        var searchSwitch = searchMap.get(searchOption);
+        if (searchSwitch != null) {
+            result.append(searchSwitch + " ");
+        }
+
 		switch(getModelReduction()){
 		case AGGRESSIVE:
 			result.append(" --reduction 1 ");
