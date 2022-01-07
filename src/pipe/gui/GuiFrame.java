@@ -21,6 +21,10 @@ import java.util.jar.JarFile;
 import javax.swing.*;
 
 import com.sun.jna.Platform;
+import net.tapaal.gui.GuiFrameActions;
+import net.tapaal.gui.GuiFrameControllerActions;
+import net.tapaal.gui.SafeGuiFrameActions;
+import net.tapaal.gui.TabActions;
 import net.tapaal.gui.debug.DEBUG;
 import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
@@ -46,6 +50,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import pipe.gui.petrinet.Export;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.animation.SimulatorFocusTraversalPolicy;
+import pipe.gui.petrinet.editor.EditorFocusTraversalPolicy;
 
 
 public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameActions {

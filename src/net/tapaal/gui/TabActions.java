@@ -1,5 +1,6 @@
-package pipe.gui;
+package net.tapaal.gui;
 
+import pipe.gui.GuiFrame;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.petrinet.PetriNetTab;
 

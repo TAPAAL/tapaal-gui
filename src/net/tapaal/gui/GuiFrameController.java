@@ -1,4 +1,4 @@
-package pipe.gui;
+package net.tapaal.gui;
 
 import dk.aau.cs.debug.Logger;
 import net.tapaal.gui.petrinet.dialog.BatchProcessingDialog;
@@ -13,6 +13,8 @@ import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.versioncheck.VersionChecker;
 import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
+import pipe.gui.GuiFrame;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.animation.SimulationControl;
 import net.tapaal.gui.petrinet.verification.EngineDialogPanel;
 import net.tapaal.gui.petrinet.dialog.NewTAPNPanel;

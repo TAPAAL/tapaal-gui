@@ -1,4 +1,4 @@
-package pipe.gui;
+package net.tapaal.gui;
 
 import pipe.gui.petrinet.PetriNetTab;
 

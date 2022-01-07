@@ -7,6 +7,7 @@ import java.util.List;
 
 import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
+import net.tapaal.gui.GuiFrameController;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.petrinet.animation.Animator;

@@ -1,4 +1,6 @@
-package pipe.gui;
+package pipe.gui.petrinet.editor;
+
+import pipe.gui.TAPAALGUI;
 
 import java.awt.Component;
 import java.awt.Container;

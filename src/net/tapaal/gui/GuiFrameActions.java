@@ -1,6 +1,7 @@
-package pipe.gui;
+package net.tapaal.gui;
 
 import net.tapaal.helpers.Reference.Reference;
+import pipe.gui.GuiFrame;
 import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.petrinet.PetriNetTab;
 

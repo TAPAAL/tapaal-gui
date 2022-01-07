@@ -9,7 +9,7 @@ import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.GuiFrameActions;
+import net.tapaal.gui.GuiFrameActions;
 import pipe.gui.Constants;
 
 /**
