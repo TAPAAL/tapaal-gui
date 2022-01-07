@@ -1,4 +1,4 @@
-package pipe.gui;
+package net.tapaal.copypaste;
 
 import dk.aau.cs.gui.TabContent
 import dk.aau.cs.model.tapn.IntWeight
@@ -8,6 +8,7 @@ import dk.aau.cs.model.tapn.Weight
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import org.jetbrains.annotations.NotNull
+import pipe.gui.Pipe
 import pipe.gui.graphicElements.*
 import pipe.gui.graphicElements.tapn.*
 import java.awt.Point
@@ -134,14 +135,16 @@ class CopyPastImportExport {
                 }
             }
 
-            return Json.encodeToString(TAPAALCopyPastModel(
+            return Json.encodeToString(
+                TAPAALCopyPastModel(
                 places,
                 transitions,
                 inputArcs,
                 outputArcs,
                 inhibitorArcs,
                 transportArcs,
-            ))
+            )
+            )
         }
 
         @JvmStatic
