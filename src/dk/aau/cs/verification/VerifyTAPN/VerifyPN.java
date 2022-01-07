@@ -20,9 +20,9 @@ import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.*;
-import pipe.gui.verification.UnfoldNet;
-import pipe.gui.verification.InclusionPlaces;
-import pipe.gui.verification.InclusionPlaces.InclusionPlacesOption;
+import net.tapaal.gui.verification.UnfoldNet;
+import net.tapaal.gui.verification.InclusionPlaces;
+import net.tapaal.gui.verification.InclusionPlaces.InclusionPlacesOption;
 
 import javax.swing.*;
 import java.io.*;

@@ -1,4 +1,4 @@
-package pipe.gui.verification;
+package net.tapaal.gui.verification;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;

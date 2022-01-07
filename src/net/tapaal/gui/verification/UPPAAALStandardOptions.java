@@ -1,10 +1,10 @@
-package pipe.gui.verification;
+package net.tapaal.gui.verification;
 
-public class UPPAALOptimizedStandardOptions extends EngineSupportOptions {
+public class UPPAAALStandardOptions extends EngineSupportOptions {
 
-    public UPPAALOptimizedStandardOptions() {
+    public UPPAAALStandardOptions() {
         super (
-            "UPPAAL: Optimised Standard Reduction",//name of engine
+            "UPPAAL: Standard Reduction",//name of engine
             false,//  support fastest trace
             false,// support deadlock with net degree 2 and (EF or AG)
             false,//  support deadlock with EG or AF
@@ -12,13 +12,13 @@ public class UPPAALOptimizedStandardOptions extends EngineSupportOptions {
             false, //support weights
             false, //support inhibitor arcs
             false,// support urgent transitions
-            true,// support EG or AF
+            false,// support EG or AF
             true,// support strict nets
             true,//  support timed nets/time intervals
             false,// support deadlock with net degree > 2
             false, //support games
-            false,//support EG or AF with net degree > 2);
-            false, //support for nested quantification
+            false, //support EG or AF with net degree > 2);
+            false, //support for nested quantification,
             false
         );
     }

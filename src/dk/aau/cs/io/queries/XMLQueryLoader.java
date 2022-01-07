@@ -13,7 +13,7 @@ import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.verification.InclusionPlaces;
+import net.tapaal.gui.verification.InclusionPlaces;
 import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;

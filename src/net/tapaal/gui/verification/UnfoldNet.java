@@ -1,4 +1,4 @@
-package pipe.gui.verification;
+package net.tapaal.gui.verification;
 
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;

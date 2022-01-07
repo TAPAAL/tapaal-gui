@@ -41,6 +41,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.verification.VerifyTAPN.*;
+import net.tapaal.gui.verification.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
@@ -62,10 +63,7 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import pipe.gui.canvas.Zoomer;
-import pipe.gui.verification.*;
-import pipe.gui.verification.ChooseInclusionPlacesDialog;
 import pipe.gui.swingcomponents.EscapableDialog;
-import pipe.gui.verification.InclusionPlaces;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 public class QueryDialog extends JPanel {

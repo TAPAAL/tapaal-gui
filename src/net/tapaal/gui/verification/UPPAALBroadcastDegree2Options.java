@@ -1,4 +1,4 @@
-package pipe.gui.verification;
+package net.tapaal.gui.verification;
 
 public class UPPAALBroadcastDegree2Options extends EngineSupportOptions {
 

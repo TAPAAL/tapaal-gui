@@ -1,7 +1,7 @@
 package pipe.dataLayer;
 
 import dk.aau.cs.TCTL.*;
-import pipe.gui.verification.InclusionPlaces;
+import net.tapaal.gui.verification.InclusionPlaces;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.QueryType;
 

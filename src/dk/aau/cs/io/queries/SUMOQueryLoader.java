@@ -15,7 +15,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.MessengerImpl;
-import pipe.gui.verification.InclusionPlaces;
+import net.tapaal.gui.verification.InclusionPlaces;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.SUMOParsing.TokenMgrError;
 import dk.aau.cs.TCTL.SUMOParsing.ParseException;

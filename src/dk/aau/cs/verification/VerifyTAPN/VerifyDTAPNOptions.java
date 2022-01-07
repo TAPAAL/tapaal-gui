@@ -4,7 +4,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import pipe.gui.MessengerImpl;
-import pipe.gui.verification.InclusionPlaces;
+import net.tapaal.gui.verification.InclusionPlaces;
 
 import java.io.File;
 import java.io.IOException;

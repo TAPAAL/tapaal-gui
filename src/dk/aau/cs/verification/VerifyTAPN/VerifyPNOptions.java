@@ -10,7 +10,7 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
-import pipe.gui.verification.InclusionPlaces;
+import net.tapaal.gui.verification.InclusionPlaces;
 
 public class VerifyPNOptions extends VerifyTAPNOptions{
 	private static final Map<TraceOption, String> traceMap = Map.of(

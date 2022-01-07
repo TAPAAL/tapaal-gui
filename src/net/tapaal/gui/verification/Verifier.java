@@ -1,4 +1,4 @@
-package pipe.gui.verification;
+package net.tapaal.gui.verification;
 
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;

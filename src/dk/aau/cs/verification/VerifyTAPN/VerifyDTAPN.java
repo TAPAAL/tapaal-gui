@@ -28,9 +28,9 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import pipe.gui.*;
-import pipe.gui.verification.UnfoldNet;
-import pipe.gui.verification.InclusionPlaces;
-import pipe.gui.verification.InclusionPlaces.InclusionPlacesOption;
+import net.tapaal.gui.verification.UnfoldNet;
+import net.tapaal.gui.verification.InclusionPlaces;
+import net.tapaal.gui.verification.InclusionPlaces.InclusionPlacesOption;
 
 import javax.swing.*;
 

@@ -30,7 +30,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.MessengerImpl;
 import pipe.gui.dialog.QueryDialog;
-import pipe.gui.verification.Verifier;
+import net.tapaal.gui.verification.Verifier;
 import pipe.gui.undo.AddQueryCommand;
 import pipe.gui.undo.RemoveQueriesCommand;
 import pipe.gui.undo.UndoManager;

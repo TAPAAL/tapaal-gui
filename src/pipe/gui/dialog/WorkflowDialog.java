@@ -58,7 +58,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import pipe.gui.*;
-import pipe.gui.verification.Verifier;
+import net.tapaal.gui.verification.Verifier;
 
 public class WorkflowDialog extends JDialog {
 
