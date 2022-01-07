@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.dialog;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -63,7 +63,10 @@ import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.verification.*;
-import pipe.gui.widgets.filebrowser.FileBrowser;
+import pipe.gui.verification.ChooseInclusionPlacesDialog;
+import pipe.gui.swingcomponents.EscapableDialog;
+import pipe.gui.verification.InclusionPlaces;
+import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 public class QueryDialog extends JPanel {
 

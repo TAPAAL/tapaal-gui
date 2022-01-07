@@ -1,6 +1,6 @@
 package pipe.gui;
 
-import pipe.gui.widgets.filebrowser.FileBrowser;
+import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import java.io.File;
 

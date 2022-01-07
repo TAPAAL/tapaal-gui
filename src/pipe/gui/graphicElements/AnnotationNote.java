@@ -24,8 +24,8 @@ import pipe.gui.action.EditAnnotationBackgroundAction;
 import pipe.gui.action.EditAnnotationBorderAction;
 import pipe.gui.action.EditNoteAction;
 import pipe.gui.undo.AnnotationTextEdit;
-import pipe.gui.widgets.AnnotationPanel;
-import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.animation.AnnotationPanel;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 public class AnnotationNote extends Note {
 

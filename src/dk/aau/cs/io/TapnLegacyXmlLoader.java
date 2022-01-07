@@ -38,7 +38,7 @@ import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
-import pipe.gui.widgets.InclusionPlaces;
+import pipe.gui.verification.InclusionPlaces;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.AddTemplateVisitor;

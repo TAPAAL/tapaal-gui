@@ -18,7 +18,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
@@ -48,7 +47,7 @@ import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
-import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
+import pipe.gui.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.util.Require;
 

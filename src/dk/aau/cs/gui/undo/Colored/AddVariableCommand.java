@@ -3,7 +3,7 @@ package dk.aau.cs.gui.undo.Colored;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import pipe.gui.widgets.ConstantsPane;
+import pipe.gui.editor.ConstantsPane;
 
 public class AddVariableCommand extends Command {
     private final Variable variable;

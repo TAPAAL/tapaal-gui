@@ -1,7 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import dk.aau.cs.gui.BatchProcessingDialog;
-import pipe.gui.ExportBatchDialog;
+import pipe.gui.dialog.ExportBatchDialog;
 
 import javax.swing.*;
 import java.io.File;

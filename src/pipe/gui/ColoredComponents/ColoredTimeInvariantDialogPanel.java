@@ -7,7 +7,7 @@ import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.Template;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.widgets.WidthAdjustingComboBox;
+import pipe.gui.swingcomponents.WidthAdjustingComboBox;
 
 import javax.swing.*;
 import java.awt.*;

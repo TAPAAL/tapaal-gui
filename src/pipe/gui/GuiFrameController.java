@@ -16,10 +16,10 @@ import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.versioncheck.VersionChecker;
 import pipe.gui.animation.DelayEnabledTransitionControl;
 import pipe.gui.animation.SimulationControl;
-import pipe.gui.widgets.EngineDialogPanel;
-import pipe.gui.widgets.NewTAPNPanel;
-import pipe.gui.widgets.QueryDialog;
-import pipe.gui.widgets.filebrowser.FileBrowser;
+import pipe.gui.verification.EngineDialogPanel;
+import pipe.gui.dialog.NewTAPNPanel;
+import pipe.gui.dialog.QueryDialog;
+import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import javax.swing.*;
 import java.awt.*;

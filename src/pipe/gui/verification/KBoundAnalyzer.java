@@ -15,7 +15,6 @@ import pipe.dataLayer.TAPNQuery.AlgorithmOption;
 import pipe.dataLayer.TAPNQuery.QueryCategory;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.MessengerImpl;
-import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;

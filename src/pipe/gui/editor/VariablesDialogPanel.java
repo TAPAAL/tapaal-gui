@@ -1,4 +1,4 @@
-package pipe.gui.widgets.ColoredWidgets;
+package pipe.gui.editor;
 
 import dk.aau.cs.gui.undo.Colored.AddVariableCommand;
 import dk.aau.cs.gui.undo.Colored.UpdateVariableCommand;
@@ -8,8 +8,7 @@ import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.ConstantsPane;
-import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;

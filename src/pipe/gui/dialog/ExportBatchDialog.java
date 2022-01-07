@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.dialog;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -37,8 +37,11 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.StringComparator;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
+import pipe.gui.Export;
+import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.filebrowser.FileBrowser;
+import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 public class ExportBatchDialog extends JDialog {
 

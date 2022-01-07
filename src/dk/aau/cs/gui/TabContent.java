@@ -50,11 +50,11 @@ import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.undo.*;
 import pipe.gui.verification.*;
-import pipe.gui.widgets.ColoredWidgets.UnfoldDialog;
-import pipe.gui.widgets.ConstantsPane;
+import pipe.gui.dialog.UnfoldDialog;
+import pipe.gui.editor.ConstantsPane;
 import pipe.gui.widgets.QueryPane;
-import pipe.gui.widgets.WorkflowDialog;
-import pipe.gui.widgets.filebrowser.FileBrowser;
+import pipe.gui.dialog.WorkflowDialog;
+import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import java.awt.event.MouseWheelEvent;
 

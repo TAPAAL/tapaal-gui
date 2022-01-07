@@ -17,8 +17,8 @@ import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.undo.ArcTimeIntervalEdit;
-import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.GuardDialogue;
+import pipe.gui.swingcomponents.EscapableDialog;
+import pipe.gui.editor.GuardDialogue;
 import dk.aau.cs.gui.undo.Command;
 
 public class TimedOutputArcComponent extends Arc {

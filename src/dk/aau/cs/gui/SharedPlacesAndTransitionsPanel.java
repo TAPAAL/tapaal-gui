@@ -24,7 +24,7 @@ import dk.aau.cs.gui.undo.*;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.model.tapn.SharedPlace;

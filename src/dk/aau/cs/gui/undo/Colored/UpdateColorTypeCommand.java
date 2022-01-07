@@ -5,7 +5,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.widgets.ConstantsPane;
+import pipe.gui.editor.ConstantsPane;
 
 import java.util.List;
 

@@ -14,7 +14,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.swing.JOptionPane;
-import pipe.gui.widgets.filebrowser.FileBrowser;
+import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;

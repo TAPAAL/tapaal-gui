@@ -53,7 +53,7 @@ import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.canvas.Grid;
-import pipe.gui.widgets.filebrowser.FileBrowser;
+import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 /**
  * Class for exporting things to other formats, as well as printing.

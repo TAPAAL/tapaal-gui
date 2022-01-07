@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.verification;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -35,7 +35,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.TAPAALGUI;
-import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
+import pipe.gui.swingcomponents.EscapableDialog;
+import pipe.gui.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;

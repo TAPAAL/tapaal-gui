@@ -13,7 +13,7 @@ import dk.aau.cs.model.CPN.Variable;
 import kotlin.Pair;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.widgets.TAPNTransitionEditor;
+import pipe.gui.editor.TAPNTransitionEditor;
 
 import javax.swing.*;
 import javax.swing.event.UndoableEditEvent;

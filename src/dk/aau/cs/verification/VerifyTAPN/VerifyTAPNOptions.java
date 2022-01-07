@@ -5,8 +5,8 @@ import java.util.Map;
 
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.widgets.InclusionPlaces;
-import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
+import pipe.gui.verification.InclusionPlaces;
+import pipe.gui.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerificationOptions;

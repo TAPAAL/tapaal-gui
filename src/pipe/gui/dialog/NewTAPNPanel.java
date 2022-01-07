@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.dialog;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -9,6 +9,7 @@ import dk.aau.cs.gui.TabContent;
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.GuiFrame;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 public class NewTAPNPanel extends EscapableDialog {
 

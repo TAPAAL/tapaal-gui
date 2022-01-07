@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.animation;
 
 import java.awt.Component;
 import java.awt.GridLayout;

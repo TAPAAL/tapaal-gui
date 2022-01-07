@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.editor;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -47,8 +47,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.gui.components.ConstantsListModel;
 import dk.aau.cs.gui.components.NonsearchableJList;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.ColoredWidgets.ColorTypeDialogPanel;
-import pipe.gui.widgets.ColoredWidgets.VariablesDialogPanel;
+import pipe.gui.widgets.SidePane;
 
 public class ConstantsPane extends JPanel implements SidePane {
 

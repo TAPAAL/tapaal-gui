@@ -23,7 +23,7 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.text.NumberFormatter;
 
 import pipe.gui.TAPAALGUI;
-import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedTransition;

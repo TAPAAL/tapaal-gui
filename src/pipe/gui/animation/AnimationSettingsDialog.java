@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 
 import dk.aau.cs.gui.TabContent;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 public class AnimationSettingsDialog {
 

@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.editor;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -21,6 +21,7 @@ import pipe.gui.TAPAALGUI;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 public class ConstantsDialogPanel extends javax.swing.JPanel {
 

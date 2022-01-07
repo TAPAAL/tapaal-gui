@@ -17,7 +17,7 @@ import javax.swing.JSlider;
 import javax.swing.Timer;
 
 import pipe.gui.TAPAALGUI;
-import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 public class SimulationControl extends JPanel {
 	

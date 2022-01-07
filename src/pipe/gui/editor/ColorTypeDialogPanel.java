@@ -1,4 +1,4 @@
-package pipe.gui.widgets.ColoredWidgets;
+package pipe.gui.editor;
 
 import dk.aau.cs.gui.components.ColortypeListCellRenderer;
 import dk.aau.cs.gui.undo.Colored.AddColorTypeCommand;
@@ -9,8 +9,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import org.jdesktop.swingx.JXComboBox;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.ConstantsPane;
-import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;

@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.verification;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -22,6 +22,7 @@ import net.tapaal.swinghelpers.RequestFocusListener;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 public class EngineDialogPanel {	
 	private EscapableDialog dialog;

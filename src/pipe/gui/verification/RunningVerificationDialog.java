@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.verification;
 
 import java.awt.Container;
 import java.awt.GridBagConstraints;

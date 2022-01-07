@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.animation;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;

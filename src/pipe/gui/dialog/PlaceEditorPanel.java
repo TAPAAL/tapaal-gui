@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.dialog;
 
 import dk.aau.cs.gui.Context;
 //import java.awt.Color;
@@ -69,6 +69,7 @@ import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TransportArc;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Fill.HORIZONTAL;
 

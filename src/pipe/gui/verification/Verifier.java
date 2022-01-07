@@ -11,7 +11,6 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
-import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.translations.ReductionOption;

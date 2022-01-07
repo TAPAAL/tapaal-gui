@@ -7,7 +7,7 @@ import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.IntBound;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.widgets.WidthAdjustingComboBox;
+import pipe.gui.swingcomponents.WidthAdjustingComboBox;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

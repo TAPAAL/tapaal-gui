@@ -21,8 +21,8 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.*;
 import pipe.gui.verification.UnfoldNet;
-import pipe.gui.widgets.InclusionPlaces;
-import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
+import pipe.gui.verification.InclusionPlaces;
+import pipe.gui.verification.InclusionPlaces.InclusionPlacesOption;
 
 import javax.swing.*;
 import java.io.*;

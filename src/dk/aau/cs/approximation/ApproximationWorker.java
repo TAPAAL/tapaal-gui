@@ -5,7 +5,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.verification.RunVerificationBase;
-import pipe.gui.widgets.InclusionPlaces;
+import pipe.gui.verification.InclusionPlaces;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import dk.aau.cs.model.tapn.TAPNQuery;

@@ -4,12 +4,10 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import pipe.gui.MessengerImpl;
-import pipe.gui.widgets.InclusionPlaces;
+import pipe.gui.verification.InclusionPlaces;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	

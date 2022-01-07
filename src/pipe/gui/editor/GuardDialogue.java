@@ -1,4 +1,4 @@
-package pipe.gui.widgets;
+package pipe.gui.editor;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
