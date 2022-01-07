@@ -37,7 +37,7 @@ import pipe.gui.undo.UndoManager;
 import net.tapaal.gui.dialog.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.Messenger;
 import net.tapaal.gui.dialog.BatchProcessingDialog;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.undo.Command;
 import net.tapaal.gui.undo.SortQueriesCommand;
 import net.tapaal.gui.swingcomponents.NonsearchableJList;
@@ -60,7 +60,7 @@ public class QueryPane extends JPanel implements SidePane {
 	private JButton verifyButton;
 
 	private JButton removeQueryButton;
-	private final TabContent tabContent;
+	private final PetriNetTab tabContent;
 	private final UndoManager undoManager;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
@@ -77,7 +77,7 @@ public class QueryPane extends JPanel implements SidePane {
 
 	//private static final String toolTipQueryPane = "Here you can manage queries. Queries can explore properties of the Net.";
 
-	public QueryPane(ArrayList<TAPNQuery> queriesToSet,	TabContent tabContent) {
+	public QueryPane(ArrayList<TAPNQuery> queriesToSet,	PetriNetTab tabContent) {
 		this.tabContent = tabContent;
 		undoManager = tabContent.getUndoManager();
 		queryCollectionPanel = new JPanel(new GridBagLayout());
@@ -479,7 +479,7 @@ public class QueryPane extends JPanel implements SidePane {
 		try {
 			tempFile = File.createTempFile(TAPAALGUI.getAppGui().getCurrentTabName(), ".xml");
 
-			TabContent tab = TAPAALGUI.getApp().getCurrentTab();
+			PetriNetTab tab = TAPAALGUI.getApp().getCurrentTab();
 			tab.writeNetToFile(tempFile, selectedQueries, tab.getLens());
 			BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();

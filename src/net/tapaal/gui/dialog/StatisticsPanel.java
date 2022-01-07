@@ -21,7 +21,7 @@ import net.tapaal.gui.undo.DeleteTimedTransitionCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.dataLayer.*;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedTransition;
 
@@ -176,7 +176,7 @@ public class StatisticsPanel extends JPanel{
     private void addTransitionAction() {
 	    removeOrphanTransitions.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                TabContent tab = TAPAALGUI.getCurrentTab();
+                PetriNetTab tab = TAPAALGUI.getCurrentTab();
                 Iterable<Template> templates = tab.allTemplates();
 
                 UndoManager undoManager = tab.getUndoManager();
@@ -218,7 +218,7 @@ public class StatisticsPanel extends JPanel{
 	private void addPlaceAction() {
         removeOrphanPlaces.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                TabContent tab = TAPAALGUI.getCurrentTab();
+                PetriNetTab tab = TAPAALGUI.getCurrentTab();
                 Iterable<Template> templates = tab.allTemplates();
 
                 UndoManager undoManager = tab.getUndoManager();

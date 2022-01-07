@@ -17,7 +17,7 @@ import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.swingcomponents.EscapableDialog;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.animation.TransitionFiringComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -48,7 +48,7 @@ public class Animator {
     private TAPNNetworkTrace trace = null;
 
     public FiringMode firingmode = new RandomFiringMode();
-    private final TabContent tab;
+    private final PetriNetTab tab;
     private NetworkMarking initialMarking;
 
     private boolean isDisplayingUntimedTrace = false;
@@ -58,7 +58,7 @@ public class Animator {
         return isUrgentTransitionEnabled;
     }
 
-    public Animator(TabContent tab) {
+    public Animator(PetriNetTab tab) {
         super();
 
         this.tab = tab;
@@ -711,7 +711,7 @@ public class Animator {
         }
     }
 
-    public TabContent getTab(){
+    public PetriNetTab getTab(){
         return tab;
     }
 

@@ -3,19 +3,19 @@ package net.tapaal.gui.undo;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.editor.TemplateExplorer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import pipe.dataLayer.Template;
 
 public class SortTemplatesCommand extends Command{
 	TimedArcPetriNet[] oldOrder;
-	final TabContent tabContent;
+	final PetriNetTab tabContent;
 	final TemplateExplorer templateExplorer;
 	final JList<Template> templateList;
 	final DefaultListModel<Template> listModel;
 	
-	public SortTemplatesCommand(TabContent tabContent, TemplateExplorer templateExplorer, JList<Template> templateList, DefaultListModel<Template> listModel) {
+	public SortTemplatesCommand(PetriNetTab tabContent, TemplateExplorer templateExplorer, JList<Template> templateList, DefaultListModel<Template> listModel) {
 		this.templateList = templateList;
 		this.tabContent = tabContent;
 		this.templateExplorer = templateExplorer;

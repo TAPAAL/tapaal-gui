@@ -1,6 +1,6 @@
 package net.tapaal.copypaste;
 
-import pipe.gui.TabContent
+import pipe.gui.PetriNetTab
 import dk.aau.cs.model.tapn.IntWeight
 import dk.aau.cs.model.tapn.TimeInterval
 import dk.aau.cs.model.tapn.TimeInvariant
@@ -148,7 +148,7 @@ class CopyPastImportExport {
         }
 
         @JvmStatic
-        fun past(s: String, tab: TabContent) {
+        fun past(s: String, tab: PetriNetTab) {
 
             val model: TAPAALCopyPastModel
             try {
@@ -270,7 +270,7 @@ class CopyPastImportExport {
             nameToElementMap.values.forEach { it.select() }
         }
 
-        private fun findWeight(weight: String, tab: TabContent): Weight? {
+        private fun findWeight(weight: String, tab: PetriNetTab): Weight? {
             return if (tab.lens.isColored) {
                 IntWeight(1)
             } else {
@@ -281,7 +281,7 @@ class CopyPastImportExport {
                 }
             }
         }
-        private fun findGuard(guard: String, tab: TabContent): TimeInterval? {
+        private fun findGuard(guard: String, tab: PetriNetTab): TimeInterval? {
             return if (tab.lens.isTimed) {
                 try {
                     TimeInterval.parse(guard, tab.network().constantStore);

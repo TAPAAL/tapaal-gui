@@ -3,9 +3,8 @@ package net.tapaal.gui.undo;
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.editor.TemplateExplorer;
-import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class RenameTemplateCommand extends Command {
@@ -13,9 +12,9 @@ public class RenameTemplateCommand extends Command {
 	private final TimedArcPetriNet tapn;
 	private final String oldName;
 	private final String newName;
-	private final TabContent tab;
+	private final PetriNetTab tab;
 
-	public RenameTemplateCommand(TemplateExplorer templateExplorer, TabContent tab,
+	public RenameTemplateCommand(TemplateExplorer templateExplorer, PetriNetTab tab,
 			TimedArcPetriNet tapn, String oldName, String newName) {
 		this.templateExplorer = templateExplorer;
 		this.tab = tab;

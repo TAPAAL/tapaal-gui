@@ -70,7 +70,7 @@ public class Export {
     private static void toPnml(DrawingSurfaceImpl g, String filename)
         throws NullPointerException, DOMException, TransformerConfigurationException,
         IOException, ParserConfigurationException, TransformerException {
-        TabContent currentTab = TAPAALGUI.getCurrentTab();
+        PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
         NetworkMarking currentMarking = null;
         if (TAPAALGUI.getCurrentTab().isInAnimationMode()) {
             currentMarking = currentTab.network().marking();
@@ -90,12 +90,12 @@ public class Export {
         }
     }
 
-    private static void toQueryXML(String filename, TabContent.TAPNLens lens) {
+    private static void toQueryXML(String filename, PetriNetTab.TAPNLens lens) {
         toQueryXML(TAPAALGUI.getCurrentTab().network(), filename, TAPAALGUI.getCurrentTab().queries(), lens);
 
     }
 
-    public static void toQueryXML(TimedArcPetriNetNetwork network, String filename, Iterable<TAPNQuery> queries, TabContent.TAPNLens lens) {
+    public static void toQueryXML(TimedArcPetriNetNetwork network, String filename, Iterable<TAPNQuery> queries, PetriNetTab.TAPNLens lens) {
         try {
             ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
             NameMapping mapping = composer.transformModel(network).value2();
@@ -145,7 +145,7 @@ public class Export {
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(network);
         TimedArcPetriNet model = transformedModel.value1();
 
-        TabContent.TAPNLens lens = new TabContent.TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions(), model.isColored());
+        PetriNetTab.TAPNLens lens = new PetriNetTab.TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions(), model.isColored());
 
         RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
         int i = 0;
@@ -156,7 +156,7 @@ public class Export {
             if (lens.isGame() && isDTAPN) {
                 exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null, lens, transformedModel.value2(), composer.getGuiModel());
             } else {
-                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null ,new TabContent.TAPNLens(true, false, lens.isColored()), transformedModel.value2(), composer.getGuiModel());
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null ,new PetriNetTab.TAPNLens(true, false, lens.isColored()), transformedModel.value2(), composer.getGuiModel());
             }
         }
     }
@@ -211,7 +211,7 @@ public class Export {
 		}
 	}
 
-	public static void exportGuiView(DrawingSurfaceImpl g, int format, DataLayer model, TabContent.TAPNLens lens) {
+	public static void exportGuiView(DrawingSurfaceImpl g, int format, DataLayer model, PetriNetTab.TAPNLens lens) {
 		if (g.getComponentCount() == 0) {
 			return;
 		}

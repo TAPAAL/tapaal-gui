@@ -64,9 +64,9 @@ import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import java.awt.event.MouseWheelEvent;
 
-import static pipe.gui.TabContent.DrawTool.SELECT;
+import static pipe.gui.PetriNetTab.DrawTool.SELECT;
 
-public class TabContent extends JSplitPane implements TabContentActions{
+public class PetriNetTab extends JSplitPane implements TabActions {
 
     private final MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
 
@@ -188,7 +188,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     /**
 	 * Creates a new tab with the selected filestream
 	 */
-	public static TabContent createNewTabFromInputStream(InputStream file, String name) throws Exception {
+	public static PetriNetTab createNewTabFromInputStream(InputStream file, String name) throws Exception {
 
 	    try {
 			ModelLoader loader = new ModelLoader();
@@ -210,7 +210,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                 }).start();
             }
 
-            TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
+            PetriNetTab tab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
             checkQueries(tab);
 
@@ -239,7 +239,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
     }
 
-	private static void checkQueries(TabContent tab) {
+	private static void checkQueries(PetriNetTab tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
         EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
         boolean gameChanged = false;
@@ -326,8 +326,8 @@ public class TabContent extends JSplitPane implements TabContentActions{
         }
 	}
 
-	public static TabContent createNewEmptyTab(String name, boolean isTimed, boolean isGame, boolean isColored){
-        TabContent tab = new TabContent(isTimed, isGame, isColored);
+	public static PetriNetTab createNewEmptyTab(String name, boolean isTimed, boolean isGame, boolean isColored){
+        PetriNetTab tab = new PetriNetTab(isTimed, isGame, isColored);
 		tab.setInitialName(name);
 
 		//Set Default Template
@@ -342,7 +342,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
 
-	public static TabContent createNewTabFromPNMLFile(File file) throws Exception {
+	public static PetriNetTab createNewTabFromPNMLFile(File file) throws Exception {
 
 		if (file != null) {
 			try {
@@ -352,7 +352,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				PNMLoader loader = new PNMLoader();
 				loadedModel = loader.load(file);
 
-                TabContent tab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
+                PetriNetTab tab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
                 String name = null;
 
@@ -378,7 +378,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 */
 	//XXX should properly be in controller?
-	public static TabContent createNewTabFromFile(File file) throws Exception {
+	public static PetriNetTab createNewTabFromFile(File file) throws Exception {
 		try {
 			String name = file.getName();
 			boolean showFileEndingChangedMessage = false;
@@ -389,7 +389,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 			}
 
 			InputStream stream = new FileInputStream(file);
-			TabContent tab = createNewTabFromInputStream(stream, name);
+			PetriNetTab tab = createNewTabFromInputStream(stream, name);
 			if (tab != null && !showFileEndingChangedMessage) tab.setFile(file);
 
 			showFileEndingChangedMessage(showFileEndingChangedMessage);
@@ -468,11 +468,11 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private Boolean isPlaceOption = null;
     private Boolean isTransitionOption = null;
 
-    private TabContent(boolean isTimed, boolean isGame, boolean isColored) {
+    private PetriNetTab(boolean isTimed, boolean isGame, boolean isColored) {
 	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed, isGame, isColored));
     }
 
-	private TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
+	private PetriNetTab(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
 
         Require.that(network != null, "network cannot be null");
         Require.notNull(lens, "Lens can't be null");
@@ -531,7 +531,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         nameVisibilityPanel = new NameVisibilityPanel(this);
     }
 
-    public TabContent(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
+    public PetriNetTab(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
         this(network, templates, lens);
 
         setNetwork(network, templates);
@@ -1151,25 +1151,25 @@ public class TabContent extends JSplitPane implements TabContentActions{
 	}
 
     private void createNewAndConvertUntimed() {
-	    TabContent tab = duplicateTab(new TAPNLens(false, lens.isGame(), lens.isColored()), "-untimed");
+	    PetriNetTab tab = duplicateTab(new TAPNLens(false, lens.isGame(), lens.isColored()), "-untimed");
         convertToUntimedTab(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertNonGame() {
-        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), false, lens.isColored()), "-nongame");
+        PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), false, lens.isColored()), "-nongame");
         TabTransformer.removeGameInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertNonColor(){
-        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), false), "-noncolored");
+        PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), false), "-noncolored");
         TabTransformer.removeColorInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertColor(){
-        TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), true), "-colored");
+        PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), true), "-colored");
         TabTransformer.addColorInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
@@ -1199,7 +1199,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertUntimed();
                 }
             } else {
-                TabContent tab = duplicateTab(new TAPNLens(true, lens.isGame(), lens.isColored()), "-timed");
+                PetriNetTab tab = duplicateTab(new TAPNLens(true, lens.isGame(), lens.isColored()), "-timed");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1221,7 +1221,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
                     createNewAndConvertNonGame();
                 }
             } else {
-                TabContent tab = duplicateTab(new TAPNLens(lens.isTimed(), true, lens.isColored()), "-game");
+                PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), true, lens.isColored()), "-game");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1803,7 +1803,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 		drawingSurface().updatePreferredSize();
 	}
 
-	public TabContent duplicateTab(TAPNLens overwriteLens, String appendName) {
+	public PetriNetTab duplicateTab(TAPNLens overwriteLens, String appendName) {
         NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
             network(),
             allTemplates(),
@@ -2272,7 +2272,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
         return lens;
     }
 
-    private void convertToUntimedTab(TabContent tab) {
+    private void convertToUntimedTab(PetriNetTab tab) {
         TabTransformer.removeTimingInformation(tab);
     }
 
@@ -2737,7 +2737,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
     private final GuiAction unfoldTabAction = new GuiAction("Unfold net", "Unfold the colors in the tab") {
         @Override
         public void actionPerformed(ActionEvent e) {
-            UnfoldDialog.showDialog(TabContent.this);
+            UnfoldDialog.showDialog(PetriNetTab.this);
         }
     };
 

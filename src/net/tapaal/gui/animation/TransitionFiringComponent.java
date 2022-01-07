@@ -10,7 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import pipe.gui.animation.EnabledTransitionsList;
 import pipe.dataLayer.Template;
 import pipe.gui.animation.AnimationSettingsDialog;
@@ -23,9 +23,9 @@ public class TransitionFiringComponent extends JPanel {
 	private final EnabledTransitionsList enabledTransitionsList;
 	private final JButton fireButton;
 	private final JButton settingsButton;
-	private final TabContent.TAPNLens lens;
+	private final PetriNetTab.TAPNLens lens;
 
-	public TransitionFiringComponent(boolean showDelayEnabledTransitions, TabContent.TAPNLens lens) {
+	public TransitionFiringComponent(boolean showDelayEnabledTransitions, PetriNetTab.TAPNLens lens) {
 		super(new GridBagLayout());
 		enabledTransitionsList = new EnabledTransitionsList();
         this.lens = lens;

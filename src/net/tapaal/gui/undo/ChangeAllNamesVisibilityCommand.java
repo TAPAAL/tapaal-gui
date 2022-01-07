@@ -1,6 +1,6 @@
 package net.tapaal.gui.undo;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
@@ -11,9 +11,9 @@ public class ChangeAllNamesVisibilityCommand extends Command {
     private final Map<PetriNetObject, Boolean> places;
     private final Map<PetriNetObject, Boolean> transitions;
     private final boolean isVisible;
-	private final TabContent tabContent;
+	private final PetriNetTab tabContent;
 
-	public ChangeAllNamesVisibilityCommand(TabContent tabContent, Map<PetriNetObject, Boolean> places, Map<PetriNetObject, Boolean> transitions, boolean isVisible) {
+	public ChangeAllNamesVisibilityCommand(PetriNetTab tabContent, Map<PetriNetObject, Boolean> places, Map<PetriNetObject, Boolean> transitions, boolean isVisible) {
 		this.tabContent = tabContent;
 		this.places = places;
 		this.transitions= transitions;

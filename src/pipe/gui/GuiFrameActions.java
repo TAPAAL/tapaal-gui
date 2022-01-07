@@ -20,9 +20,9 @@ public interface GuiFrameActions {
 
     void setWindowSize(Dimension dimension);
 
-    void attachTabToGuiFrame(TabContent tab);
+    void attachTabToGuiFrame(PetriNetTab tab);
 
-    void detachTabFromGuiFrame(TabContent tab);
+    void detachTabFromGuiFrame(PetriNetTab tab);
 
     void setGUIMode(GuiFrame.GUIMode animation);
 
@@ -36,9 +36,9 @@ public interface GuiFrameActions {
 
     void setStatusBarText(String s);
 
-    void registerController(GuiFrameControllerActions guiFrameController, Reference<TabContentActions> currentTab);
+    void registerController(GuiFrameControllerActions guiFrameController, Reference<TabActions> currentTab);
 
-    void changeToTab(TabContent tab);
+    void changeToTab(PetriNetTab tab);
 
     //Actions for controller
     void setShowComponentsSelected(boolean b);

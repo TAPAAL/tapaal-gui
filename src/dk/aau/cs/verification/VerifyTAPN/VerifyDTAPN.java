@@ -5,7 +5,7 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.TapnEngineXmlLoader;
 import dk.aau.cs.model.CPN.ColorType;
@@ -290,7 +290,7 @@ public class VerifyDTAPN implements ModelChecker{
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
-                    TabContent newTab;
+                    PetriNetTab newTab;
                     LoadedModel loadedModel = null;
                     try {
                         loadedModel = tapnLoader.load(fileOut);
@@ -308,7 +308,7 @@ public class VerifyDTAPN implements ModelChecker{
                         } else {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
-                                newTab = new TabContent(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TabContent.TAPNLens(TAPAALGUI.getCurrentTab().getLens().isTimed(), TAPAALGUI.getCurrentTab().getLens().isGame(), false));
+                                newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new PetriNetTab.TAPNLens(TAPAALGUI.getCurrentTab().getLens().isTimed(), TAPAALGUI.getCurrentTab().getLens().isGame(), false));
 
                                 //The query being verified should be the only query
                                 for (net.tapaal.gui.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {

@@ -20,7 +20,7 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 
 import net.tapaal.gui.undo.*;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.editor.ColorComboBoxRenderer;
 import net.tapaal.gui.undo.Colored.ColoredPlaceMarkingEditCommand;
 import net.tapaal.gui.undo.Colored.SetArcExpressionCommand;
@@ -88,7 +88,7 @@ public class PlaceEditorPanel extends JPanel {
 	private boolean makeNewShared = false;
 	private boolean doNewEdit = true;
 	private  boolean doOKChecked = false;
-	private final TabContent currentTab;
+	private final PetriNetTab currentTab;
 	private final EscapableDialog parent;
 	private final JPanel mainPanel;
 

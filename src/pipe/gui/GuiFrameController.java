@@ -36,7 +36,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     final GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
     final GuiFrameActions guiFrame;
 
-    final MutableReference<TabContentActions> currentTab = new MutableReference<>();
+    final MutableReference<TabActions> currentTab = new MutableReference<>();
 
     public GuiFrameController(GuiFrame appGui) {
         super();
@@ -66,8 +66,8 @@ public class GuiFrameController implements GuiFrameControllerActions{
         Preferences prefs = Preferences.getInstance();
 
         QueryDialog.setAdvancedView(prefs.getAdvancedQueryView());
-        TabContent.setEditorModelRoot(prefs.getEditorModelRoot());
-        TabContent.setSimulatorModelRoot(prefs.getSimulatorModelRoot());
+        PetriNetTab.setEditorModelRoot(prefs.getEditorModelRoot());
+        PetriNetTab.setSimulatorModelRoot(prefs.getSimulatorModelRoot());
 
         showComponents = prefs.getShowComponents();
         guiFrame.setShowComponentsSelected(showComponents);
@@ -108,7 +108,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
 
     @Override
-    public void openTab(TabContent tab) {
+    public void openTab(PetriNetTab tab) {
         TAPAALGUI.addTab(tab);
         tab.setSafeGuiFrameActions(guiFrameDirectAccess);
         tab.setGuiFrameControllerActions(this);
@@ -122,7 +122,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     //If needed, add boolean forceClose, where net is not checkedForSave and just closed
     //XXX 2018-05-23 kyrke, implementation close to undoAddTab, needs refactoring
     @Override
-    public void closeTab(TabContent tab) {
+    public void closeTab(PetriNetTab tab) {
         if(tab != null) {
             boolean closeNet = true;
             if (tab.getNetChanged()) {
@@ -143,7 +143,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
     //TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
     //XXX: Temp solution to call getCurrentTab to get new new selected tab (should use index) --kyrke 2019-07-08
     @Override
-    public void changeToTab(TabContent tab) {
+    public void changeToTab(PetriNetTab tab) {
 
         //De-register old model
         currentTab.ifPresent(t -> t.setApp(null));
@@ -154,7 +154,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrame.changeToTab(tab);
 
         currentTab.ifPresent(t -> t.setApp(guiFrame));
-        guiFrame.setTitle(currentTab.map(TabContentActions::getTabTitle).orElse(null));
+        guiFrame.setTitle(currentTab.map(TabActions::getTabTitle).orElse(null));
 
     }
 
@@ -193,8 +193,8 @@ public class GuiFrameController implements GuiFrameControllerActions{
         Preferences prefs = Preferences.getInstance();
 
         prefs.setAdvancedQueryView(QueryDialog.getAdvancedView());
-        prefs.setEditorModelRoot(TabContent.getEditorModelRoot());
-        prefs.setSimulatorModelRoot(TabContent.getSimulatorModelRoot());
+        prefs.setEditorModelRoot(PetriNetTab.getEditorModelRoot());
+        prefs.setSimulatorModelRoot(PetriNetTab.getSimulatorModelRoot());
         prefs.setWindowSize(guiFrameDirectAccess.getSize());
 
         prefs.setShowComponents(showComponents);
@@ -274,14 +274,14 @@ public class GuiFrameController implements GuiFrameControllerActions{
         //show loading cursor
         guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         //Do loading
-        SwingWorker<java.util.List<TabContent>, Void> worker = new SwingWorker<java.util.List<TabContent>, Void>() {
+        SwingWorker<java.util.List<PetriNetTab>, Void> worker = new SwingWorker<java.util.List<PetriNetTab>, Void>() {
             @Override
-            protected java.util.List<TabContent> doInBackground() throws InterruptedException, Exception, FileNotFoundException {
-                java.util.List<TabContent> filesOpened = new ArrayList<>();
+            protected java.util.List<PetriNetTab> doInBackground() throws InterruptedException, Exception, FileNotFoundException {
+                java.util.List<PetriNetTab> filesOpened = new ArrayList<>();
                 for(File f : files){
                     if(f.exists() && f.isFile() && f.canRead()){
                         FileBrowser.userPath = f.getParent();
-                        filesOpened.add(TabContent.createNewTabFromFile(f));
+                        filesOpened.add(PetriNetTab.createNewTabFromFile(f));
                     }
                 }
                 return filesOpened;
@@ -289,7 +289,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
             @Override
             protected void done() {
                 try {
-                    List<TabContent> tabs = get();
+                    List<PetriNetTab> tabs = get();
                     openTab(tabs);
                 } catch (Exception e) {
                     String message = e.getMessage();
@@ -328,14 +328,14 @@ public class GuiFrameController implements GuiFrameControllerActions{
         //Show loading cursor
         guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         //Do loading of net
-        SwingWorker<List<TabContent>, Void> worker = new SwingWorker<List<TabContent>, Void>() {
+        SwingWorker<List<PetriNetTab>, Void> worker = new SwingWorker<List<PetriNetTab>, Void>() {
             @Override
-            protected List<TabContent> doInBackground() throws InterruptedException, Exception {
-                List<TabContent> fileOpened = new ArrayList<>();
+            protected List<PetriNetTab> doInBackground() throws InterruptedException, Exception {
+                List<PetriNetTab> fileOpened = new ArrayList<>();
                 for(File f : files){
                     if(f.exists() && f.isFile() && f.canRead()){
                         FileBrowser.userPath = f.getParent();
-                        fileOpened.add(TabContent.createNewTabFromPNMLFile(f));
+                        fileOpened.add(PetriNetTab.createNewTabFromPNMLFile(f));
                     }
                 }
                 return fileOpened;
@@ -343,7 +343,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
             @Override
             protected void done() {
                 try {
-                    List<TabContent> tabs = get();
+                    List<PetriNetTab> tabs = get();
                     openTab(tabs);
 
                     if(files.length != 0 && !TAPAALGUI.getCurrentTab().currentTemplate().getHasPositionalInfo()) {
@@ -483,7 +483,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         }
     }
 
-    private boolean save(TabContentActions tab) {
+    private boolean save(TabActions tab) {
         File modelFile = tab.getFile();
         boolean result;
         if (modelFile != null ) { // ordinary save
@@ -495,7 +495,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         return result;
     }
 
-    private boolean saveAs(TabContentActions tab) {
+    private boolean saveAs(TabActions tab) {
         boolean result;
         // save as
         String path = tab.getTabTitle();
@@ -518,12 +518,12 @@ public class GuiFrameController implements GuiFrameControllerActions{
      *
      * @return true if handled, false if cancelled
      */
-    private boolean showSavePendingChangesDialog(TabContentActions tab) {
+    private boolean showSavePendingChangesDialog(TabActions tab) {
         if(null == tab) return false;
 
         if (tab.getNetChanged()) {
             //XXX: this cast should not be done, its a quick fix while refactoring //kyrke 2019-12-31
-            changeToTab((TabContent) tab);
+            changeToTab((PetriNetTab) tab);
 
             int result = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(),
                     "The net has been modified. Save the current net?",
@@ -553,7 +553,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
      */
     private boolean showSavePendingChangesDialogForAllTabs() {
         // Loop through all tabs and check if they have been saved
-        for (TabContent tab : TAPAALGUI.getTabs()) {
+        for (PetriNetTab tab : TAPAALGUI.getTabs()) {
             if (tab.getNetChanged()) {
                 if (!(showSavePendingChangesDialog(tab))) {
                     return false;
@@ -600,7 +600,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         Preferences.getInstance().setShowTokenAge(showTokenAge);
 
         guiFrame.setShowTokenAgeSelected(showTokenAge);
-        currentTab.ifPresent(TabContentActions::repaintAll);
+        currentTab.ifPresent(TabActions::repaintAll);
 
     }
 
@@ -613,7 +613,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         Preferences.getInstance().setShowColoredTokens(showColoredTokens);
         guiFrame.setShowColoredTokensSelected(showColoredTokens);
-        currentTab.ifPresent(TabContentActions::repaintAll);
+        currentTab.ifPresent(TabActions::repaintAll);
     }
 
     @Override
@@ -626,7 +626,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         guiFrame.setShowZeroToInfinityIntervalsSelected(showZeroToInfinityIntervals);
 
         Preferences.getInstance().setShowZeroInfIntervals(showZeroToInfinityIntervals);
-        currentTab.ifPresent(TabContentActions::repaintAll);
+        currentTab.ifPresent(TabActions::repaintAll);
     }
 
     @Override
@@ -712,7 +712,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         setEnabledTransitionsList(true);
         setDisplayToolTips(true);
 
-        currentTab.ifPresent(TabContentActions::setResizeingDefault);
+        currentTab.ifPresent(TabActions::setResizeingDefault);
 
         if (advanced) {
 

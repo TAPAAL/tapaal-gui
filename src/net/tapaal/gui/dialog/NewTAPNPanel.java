@@ -5,7 +5,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.GuiFrame;
@@ -117,7 +117,7 @@ public class NewTAPNPanel extends EscapableDialog {
 		}
 
 		try {
-			TabContent tab = TabContent.createNewEmptyTab(name, isTimed, isGame, isColored);
+			PetriNetTab tab = PetriNetTab.createNewEmptyTab(name, isTimed, isGame, isColored);
 			TAPAALGUI.openNewTabFromStream(tab);
 		} catch (Exception e) {
 			JOptionPane

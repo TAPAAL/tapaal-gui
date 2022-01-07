@@ -2,7 +2,7 @@ package net.tapaal.gui;
 
 import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -13,9 +13,9 @@ public class Context {
 	private final Template selectedTemplate;
 	
 	private final UndoManager undoManager;
-	private final TabContent currentTab;
+	private final PetriNetTab currentTab;
 	
-	public Context(TabContent tab) {
+	public Context(PetriNetTab tab) {
 		Require.that(tab != null, "tab cannot be null");
 		currentTab = tab;
 		network = tab.network();
@@ -39,7 +39,7 @@ public class Context {
 		return currentTab.queries();
 	}
 
-	public TabContent tabContent() {
+	public PetriNetTab tabContent() {
 		return currentTab;
 	}
 

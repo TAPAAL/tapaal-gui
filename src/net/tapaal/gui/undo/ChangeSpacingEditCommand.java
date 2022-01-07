@@ -1,14 +1,13 @@
 package net.tapaal.gui.undo;
 
-import pipe.gui.TabContent;
-import net.tapaal.gui.undo.Command;
+import pipe.gui.PetriNetTab;
 
 public class ChangeSpacingEditCommand extends Command {
 
 	private final double factor;
-	private final TabContent tab;
+	private final PetriNetTab tab;
 
-    public ChangeSpacingEditCommand(double factor, TabContent tabContent) {
+    public ChangeSpacingEditCommand(double factor, PetriNetTab tabContent) {
         super();
         this.factor = factor;
         this.tab = tabContent;

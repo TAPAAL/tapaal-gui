@@ -1,6 +1,6 @@
 package net.tapaal.gui.dialog;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.undo.ChangeAllNamesVisibilityCommand;
 import net.tapaal.gui.undo.Command;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -30,9 +30,9 @@ public class NameVisibilityPanel extends JPanel {
     JPanel placeTransitionPanel;
     JPanel componentPanel;
 
-    private final TabContent tab;
+    private final PetriNetTab tab;
 
-    public NameVisibilityPanel(TabContent tab) {
+    public NameVisibilityPanel(PetriNetTab tab) {
         super(new GridBagLayout());
 
         this.tab = tab;

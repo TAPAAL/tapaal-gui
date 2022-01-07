@@ -1,6 +1,6 @@
 package net.tapaal.gui.dialog;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import pipe.gui.TAPAALGUI;
 
 import javax.swing.*;
@@ -18,7 +18,7 @@ public class UnfoldDialog extends JDialog {
 
     private static boolean cancelled = false;
 
-    private static TabContent currentTab;
+    private static PetriNetTab currentTab;
 
     public static UnfoldDialog unfoldDialog;
 
@@ -27,7 +27,7 @@ public class UnfoldDialog extends JDialog {
         initComponents();
     }
 
-    public static void showSimulationDialog(TabContent tab){
+    public static void showSimulationDialog(PetriNetTab tab){
         int unfoldAnswer = JOptionPane.showConfirmDialog(null, "The net will need to be unfolded before entering simulation mode", "Unfolding Required", JOptionPane.OK_CANCEL_OPTION);
         if(unfoldAnswer == 0){
             showDialog(tab);
@@ -36,7 +36,7 @@ public class UnfoldDialog extends JDialog {
         }
     }
 
-    public static void showDialog(TabContent tab) {
+    public static void showDialog(PetriNetTab tab) {
         currentTab = tab;
 
         if(tab.getLens().isTimed()){

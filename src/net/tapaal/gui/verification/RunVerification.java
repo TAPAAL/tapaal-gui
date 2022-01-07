@@ -19,7 +19,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
@@ -352,7 +352,7 @@ public class RunVerification extends RunVerificationBase {
 
                             if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
                                 try {
-                                    TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
+                                    PetriNetTab reducedNetTab = PetriNetTab.createNewTabFromPNMLFile(reducedNetFile);
                                     //Ensure that a net was created by the query reduction
                                     if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
                                         || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){

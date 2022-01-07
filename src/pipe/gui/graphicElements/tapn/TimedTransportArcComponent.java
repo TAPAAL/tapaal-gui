@@ -4,7 +4,7 @@ import java.awt.Polygon;
 import java.util.Hashtable;
 import java.util.List;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.TAPAALGUI;
@@ -26,7 +26,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	private TimedTransportArcComponent connectedTo;
 	private TransportArc underlyingTransportArc;
 
-	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet, TabContent.TAPNLens lens) {
+	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet, PetriNetTab.TAPNLens lens) {
 		super(new TimedOutputArcComponent(newSource));
 		this.isInPreSet = isInPreSet;
         this.lens = lens;
@@ -44,7 +44,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		updateLabel(true);
 	}
 
-	public TimedTransportArcComponent(TimedPlaceComponent p, TimedTransitionComponent t, TransportArc model, int group,TabContent.TAPNLens lens){
+	public TimedTransportArcComponent(TimedPlaceComponent p, TimedTransitionComponent t, TransportArc model, int group, PetriNetTab.TAPNLens lens){
 	    super(p);
 	    setTarget(t);
 	    this.isInPreSet = true;
@@ -55,7 +55,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	    sealArc();
     }
 
-    public TimedTransportArcComponent(TimedTransitionComponent t, TimedPlaceComponent p, TransportArc model, int group, TabContent.TAPNLens lens){
+    public TimedTransportArcComponent(TimedTransitionComponent t, TimedPlaceComponent p, TransportArc model, int group, PetriNetTab.TAPNLens lens){
         super(t);
         setTarget(p);
         this.isInPreSet = false;

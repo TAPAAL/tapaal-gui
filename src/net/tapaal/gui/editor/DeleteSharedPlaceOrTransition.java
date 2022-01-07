@@ -16,7 +16,7 @@ import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsSharedPlaceVisitor;
 import dk.aau.cs.TCTL.visitors.ContainsSharedTransitionVisitor;
 import net.tapaal.gui.NameGenerator;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
 import net.tapaal.gui.undo.Command;
@@ -58,14 +58,14 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	
 	final JList list;
 	final SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel;
-	final TabContent tab;
+	final PetriNetTab tab;
 	final UndoManager undoManager;
 	final SharedPlacesListModel sharedPlacesListModel;
 	final SharedTransitionsListModel sharedTransitionsListModel;
 	final NameGenerator nameGenerator;
 	boolean messageShown;
 	
-	public DeleteSharedPlaceOrTransition(JList list, SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel, TabContent tab, 
+	public DeleteSharedPlaceOrTransition(JList list, SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel, PetriNetTab tab,
 			SharedPlacesListModel sharedPlacesListModel, SharedTransitionsListModel sharedTransitionsListModel, NameGenerator nameGenerator) {
 		this.list = list;
 		this.sharedPlacesAndTransitionsPanel = sharedPlacesAndTransitionsPanel;

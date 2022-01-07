@@ -5,7 +5,7 @@ import pipe.gui.graphicElements.PetriNetObject;
 import java.io.File;
 import java.util.Map;
 
-public interface TabContentActions {
+public interface TabActions {
 
     //public interface UndoRedo {
     void undo();
@@ -36,7 +36,7 @@ public interface TabContentActions {
 
     void createNewAndUnfoldColor();
 
-    void setMode(TabContent.DrawTool mode);
+    void setMode(PetriNetTab.DrawTool mode);
 
     void showStatistics();
 

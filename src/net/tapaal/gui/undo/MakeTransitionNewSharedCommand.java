@@ -1,7 +1,7 @@
 package net.tapaal.gui.undo;
 
 import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -15,7 +15,7 @@ public class MakeTransitionNewSharedCommand extends Command {
 	private final SharedPlacesAndTransitionsPanel sharedPanel;
 	private final boolean multiShare;
 	
-	public MakeTransitionNewSharedCommand(TimedArcPetriNet tapn, String newName, TimedTransition timedTransition, TabContent tabContent, boolean multiShare){
+	public MakeTransitionNewSharedCommand(TimedArcPetriNet tapn, String newName, TimedTransition timedTransition, PetriNetTab tabContent, boolean multiShare){
 		this.sharedTransition = null;
 		this.tapn = tapn;
 		this.timedTransition = timedTransition;

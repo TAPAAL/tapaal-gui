@@ -17,7 +17,7 @@ public class TAPAALGUI {
 	private final static GuiFrame appGui = new GuiFrame(TAPAAL.getProgramName());
     private final static GuiFrameController appGuiController = new GuiFrameController(appGui);
 
-	private static final ArrayList<TabContent> tabs = new ArrayList<TabContent>();
+	private static final ArrayList<PetriNetTab> tabs = new ArrayList<PetriNetTab>();
 
 	public static void init() {
 
@@ -62,7 +62,7 @@ public class TAPAALGUI {
 			return null;
 		}
 
-		TabContent tab = (tabs.get(index));
+		PetriNetTab tab = (tabs.get(index));
 		return tab.getModel();
 	}
 
@@ -78,13 +78,13 @@ public class TAPAALGUI {
 			return null;
 		}
 
-		TabContent tab = (tabs.get(index));
+		PetriNetTab tab = (tabs.get(index));
 
 		return tab.drawingSurface();
 	}
 
 	@Deprecated
-	public static void addTab (TabContent tab ) {
+	public static void addTab (PetriNetTab tab ) {
 		tabs.add(tab);
 	}
 
@@ -94,12 +94,12 @@ public class TAPAALGUI {
 	}
 
 	@Deprecated
-	public static void removeTab(TabContent tab) {
+	public static void removeTab(PetriNetTab tab) {
 		tabs.remove(tab);
 	}
 
 	@Deprecated
-	public static TabContent getTab(int index) {
+	public static PetriNetTab getTab(int index) {
 		if (index < 0) {
 			return null;
 		}
@@ -107,12 +107,12 @@ public class TAPAALGUI {
 	}
 
 	@Deprecated
-	public static List<TabContent> getTabs() {
+	public static List<PetriNetTab> getTabs() {
 		return tabs;
 	}
 
 	@Deprecated
-	public static TabContent getCurrentTab() {
+	public static PetriNetTab getCurrentTab() {
 		return getTab(appGui.getSelectedTabIndex());
 	}
 
@@ -139,12 +139,12 @@ public class TAPAALGUI {
 
 	//XXX The following function should properly not be used and is only used while refactoring, but is better
 	// that the chained access via guiFrame, App or drawingsurface now marked with deprecation.
-	public static TabContent openNewTabFromStream(InputStream file, String name) throws Exception {
-		TabContent tab = TabContent.createNewTabFromInputStream(file, name);
+	public static PetriNetTab openNewTabFromStream(InputStream file, String name) throws Exception {
+		PetriNetTab tab = PetriNetTab.createNewTabFromInputStream(file, name);
 		appGuiController.openTab(tab);
 		return tab;
 	}
-	public static TabContent openNewTabFromStream(TabContent tab) {
+	public static PetriNetTab openNewTabFromStream(PetriNetTab tab) {
 		appGuiController.openTab(tab);
 		return tab;
 	}

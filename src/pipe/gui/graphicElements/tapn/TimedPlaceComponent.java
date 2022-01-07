@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.*;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
 import pipe.gui.TAPAALGUI;
@@ -45,7 +45,7 @@ public class TimedPlaceComponent extends Place {
         int positionXInput,
         int positionYInput,
         dk.aau.cs.model.tapn.TimedPlace place,
-        TabContent.TAPNLens lens
+        PetriNetTab.TAPNLens lens
     ) {
         super(positionXInput, positionYInput);
         this.place = place;
@@ -60,7 +60,7 @@ public class TimedPlaceComponent extends Place {
         String idInput,
         int nameOffsetXInput,
         int nameOffsetYInput,
-        TabContent.TAPNLens lens
+        PetriNetTab.TAPNLens lens
     ) {
         super(positionXInput, positionYInput, idInput, nameOffsetXInput, nameOffsetYInput);
         attributesVisible = true;

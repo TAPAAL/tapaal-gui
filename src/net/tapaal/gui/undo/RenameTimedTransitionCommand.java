@@ -3,15 +3,15 @@ package net.tapaal.gui.undo;
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.TCTL.visitors.RenameTransitionTCTLVisitor;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 
 public class RenameTimedTransitionCommand extends Command {
 	private final TimedTransition transition;
 	private final String oldName;
 	private final String newName;
-	private final TabContent tabContent;
+	private final PetriNetTab tabContent;
 
-	public RenameTimedTransitionCommand(TabContent tabContent, TimedTransition transition, String oldName, String newName) {
+	public RenameTimedTransitionCommand(PetriNetTab tabContent, TimedTransition transition, String oldName, String newName) {
 		this.tabContent = tabContent;
 		this.transition = transition;
 		this.oldName = oldName;

@@ -29,7 +29,7 @@ import java.util.Vector;
 
 public class TabTransformer {
 
-    static public void removeTimingInformation(TabContent tab){
+    static public void removeTimingInformation(PetriNetTab tab){
         for(Template template : tab.allTemplates()){
             ArrayList<TimedTransportArcComponent> transportArcComponents = new ArrayList<TimedTransportArcComponent>();
             // Make place token age invariant infinite
@@ -174,7 +174,7 @@ public class TabTransformer {
         return newArcPath;
     }
 
-    static public void removeGameInformation(TabContent tab) {
+    static public void removeGameInformation(PetriNetTab tab) {
         for (Template template : tab.allTemplates()) {
             for (TimedTransition transition : template.model().transitions()) {
                 if (transition.isUncontrollable()) {
@@ -183,7 +183,7 @@ public class TabTransformer {
             }
         }
     }
-    static public void removeColorInformation(TabContent tab) {
+    static public void removeColorInformation(PetriNetTab tab) {
         tab.network().setColorTypes(Arrays.asList(ColorType.COLORTYPE_DOT));
         tab.network().setVariables(new ArrayList<Variable>());
         for (Template template : tab.allTemplates()) {
@@ -242,7 +242,7 @@ public class TabTransformer {
         }
     }
 
-    static public void addColorInformation(TabContent tab){
+    static public void addColorInformation(PetriNetTab tab){
         for (Template template : tab.allTemplates()) {
             for(TimedInputArc arc : template.model().inputArcs()){
                 arc.setColorTimeIntervals(new ArrayList<>());
@@ -279,7 +279,7 @@ public class TabTransformer {
         }
     }
 
-    public static void unfoldTab(TabContent oldTab, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
+    public static void unfoldTab(PetriNetTab oldTab, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
 
         ModelChecker engine;
         if(oldTab.getLens().isTimed()){

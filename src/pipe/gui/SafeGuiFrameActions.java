@@ -5,6 +5,6 @@ Defines GuiFrameActions that are safe to do, even if the current tab does not ha
  */
 public interface SafeGuiFrameActions {
 
-    void updatedTabName(TabContent tab);
+    void updatedTabName(PetriNetTab tab);
 
 }

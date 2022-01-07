@@ -1,14 +1,14 @@
 package net.tapaal.gui.undo;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.tapn.TimedTransition;
 
 public class ToggleTransitionUrgentCommand extends Command {
 	private final TimedTransition transition;
 	private final boolean oldValue;
-	private final TabContent tab;
+	private final PetriNetTab tab;
 	
-	public ToggleTransitionUrgentCommand(TimedTransition transition, TabContent tab){
+	public ToggleTransitionUrgentCommand(TimedTransition transition, PetriNetTab tab){
 		this.transition = transition;
 		oldValue = transition.isUrgent();
 		this.tab = tab;

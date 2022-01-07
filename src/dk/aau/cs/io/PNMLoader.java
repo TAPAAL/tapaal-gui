@@ -12,7 +12,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
 import org.w3c.dom.Document;
@@ -49,7 +49,7 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
 public class PNMLoader {
-    private TabContent.TAPNLens lens;
+    private PetriNetTab.TAPNLens lens;
 
     enum GraphicsType { Position, Offset }
 
@@ -68,7 +68,7 @@ public class PNMLoader {
     private LoadTACPN loadTACPN;
 
     public PNMLoader() {
-        this.lens = TabContent.TAPNLens.Default;
+        this.lens = PetriNetTab.TAPNLens.Default;
         loadTACPN = new LoadTACPN();
     }
 
@@ -106,7 +106,7 @@ public class PNMLoader {
         Node pnmlElement = doc.getElementsByTagName("pnml").item(0);
         Node netNode = getFirstDirectChild(pnmlElement, "net");
 
-        lens = new TabContent.TAPNLens(false, false, getFirstDirectChild(netNode, "declaration") != null);
+        lens = new PetriNetTab.TAPNLens(false, false, getFirstDirectChild(netNode, "declaration") != null);
 
         String name = getTAPNName(netNode);
 

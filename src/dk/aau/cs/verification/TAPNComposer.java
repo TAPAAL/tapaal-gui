@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import pipe.dataLayer.DataLayer;
 import net.tapaal.gui.dialog.ExportBatchDialog;
 import pipe.gui.graphicElements.Arc;
@@ -46,9 +46,9 @@ public class TAPNComposer implements ITAPNComposer {
 	private HashSet<String> processedSharedObjects;
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private DataLayer composedGuiModel;
-    private final TabContent.TAPNLens lens;
+    private final PetriNetTab.TAPNLens lens;
 
-    public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens, boolean singleComponentNoPrefix, boolean inlineConstants){
+    public TAPNComposer(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, PetriNetTab.TAPNLens lens, boolean singleComponentNoPrefix, boolean inlineConstants){
 		this.messenger = messenger;
 
 		if(guiModels != null){
@@ -67,7 +67,7 @@ public class TAPNComposer implements ITAPNComposer {
 	public TAPNComposer(Messenger messenger, boolean singleComponentNoPrefix) {
 		this.messenger = messenger;
 		this.singleComponentNoPrefix = singleComponentNoPrefix;
-		this.lens = TabContent.TAPNLens.Default;
+		this.lens = PetriNetTab.TAPNLens.Default;
 	}
 	
 	public Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model) {

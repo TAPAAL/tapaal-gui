@@ -6,7 +6,7 @@ import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
@@ -49,7 +49,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
     protected Messenger messenger;
     protected TimedArcPetriNetNetwork model;
     protected Iterable<TAPNQuery> queries;
-    protected TabContent oldTab;
+    protected PetriNetTab oldTab;
     protected boolean partition;
     protected boolean computeColorFixpoint;
     protected boolean symmetricVars;
@@ -67,7 +67,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         symmetricVars = useSymmetricVars;
     }
 
-    public void execute(TimedArcPetriNetNetwork model, Iterable<TAPNQuery> queries, TabContent oldTab) {
+    public void execute(TimedArcPetriNetNetwork model, Iterable<TAPNQuery> queries, PetriNetTab oldTab) {
         this.model = model;
         this.queries = queries;
         this.oldTab = oldTab;
@@ -76,7 +76,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
     @Override
     protected String doInBackground() throws Exception {
-        TabContent.TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
+        PetriNetTab.TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
         boolean dummyQuery = false;
@@ -196,7 +196,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         }
 
         File fileOut = new File(modelOut.getAbsolutePath());
-        TabContent newTab;
+        PetriNetTab newTab;
         LoadedModel loadedModel = null;
         try {
             if(lens.isTimed()){
@@ -205,7 +205,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 loadedModel = new PNMLoader().load(fileOut);
             }
             // addLocation(loadedModel, composer); // We can not get coords from server
-            newTab = new TabContent(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TabContent.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
+            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new PetriNetTab.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
             if(!dummyQuery){
                 for(TAPNQuery query : getQueries(queryOut, loadedModel.network())){

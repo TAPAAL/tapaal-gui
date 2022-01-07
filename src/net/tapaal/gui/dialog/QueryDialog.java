@@ -36,7 +36,7 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
@@ -224,7 +224,7 @@ public class QueryDialog extends JPanel {
 	private int highestNetDegree;
 	private boolean hasInhibitorArcs;
 	private InclusionPlaces inclusionPlaces;
-	private TabContent.TAPNLens lens;
+	private PetriNetTab.TAPNLens lens;
 
 	private static final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
 	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
@@ -367,7 +367,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_UNDER = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
 	private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 
-	public QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
+	public QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, PetriNetTab.TAPNLens lens) {
 		this.tapnNetwork = tapnNetwork;
 		this.guiModels = guiModels;
 		this.lens = lens;
@@ -621,7 +621,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork,
-                                           HashMap<TimedArcPetriNet, DataLayer> guiModels, TabContent.TAPNLens lens) {
+                                           HashMap<TimedArcPetriNet, DataLayer> guiModels, PetriNetTab.TAPNLens lens) {
 		if(TAPAALGUI.getCurrentTab().network().hasWeights() && !TAPAALGUI.getCurrentTab().network().isNonStrict()){
 			JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs",
@@ -3910,7 +3910,7 @@ public class QueryDialog extends JPanel {
 
                         if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
                             try {
-                                TabContent reducedNetTab = TabContent.createNewTabFromPNMLFile(reducedNetFile);
+                                PetriNetTab reducedNetTab = PetriNetTab.createNewTabFromPNMLFile(reducedNetFile);
                                 //Ensure that a net was created by the query reduction
                                 if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
                                     || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){

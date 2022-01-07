@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.editor.TemplateExplorer;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -13,11 +13,11 @@ import dk.aau.cs.util.Tuple;
 
 public class RemoveTemplateCommand extends AddTemplateCommand {
 	private final Collection<TAPNQuery> queriesToDelete;
-	private final TabContent tabContent;
+	private final PetriNetTab tabContent;
 	private final Collection<Tuple<TimedTransition, SharedTransition>> transitionsToUnshare;
 
 	public RemoveTemplateCommand(
-			TabContent tabContent, 
+			PetriNetTab tabContent,
 			TemplateExplorer templateExplorer, 
 			Template template, 
 			int listIndex, 

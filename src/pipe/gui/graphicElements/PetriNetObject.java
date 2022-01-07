@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.*;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
@@ -24,7 +24,7 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	/** x/y position position on screen (zoomed) */
 	protected int positionX;
 	protected int positionY;
-	protected TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
+	protected PetriNetTab.TAPNLens lens = PetriNetTab.TAPNLens.Default;
 
 	// The x/y coordinate of object at 100% zoom.
 	//XXX: pushed down from PlaceTransitionObject and consolidated from note, need further refactoring and rename, //kyrke 2019-08-23
@@ -246,7 +246,7 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	    return lens.isTimed();
     }
 
-    public void setLens(TabContent.TAPNLens lens){
+    public void setLens(PetriNetTab.TAPNLens lens){
 	    this.lens = lens;
     }
 

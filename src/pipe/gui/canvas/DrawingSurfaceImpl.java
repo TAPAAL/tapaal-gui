@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.Reference;
 import pipe.dataLayer.DataLayer;
@@ -31,12 +31,12 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	private Zoomer zoomControl;
 
 	private DataLayer guiModel;
-	private final TabContent tabContent;
+	private final PetriNetTab tabContent;
 	private final Reference<AbstractDrawingSurfaceManager> managerRef;
 
 	private static final boolean showDebugBounds = false;
 
-	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent tabContent, Reference<AbstractDrawingSurfaceManager> managerRef) {
+	public DrawingSurfaceImpl(DataLayer dataLayer, PetriNetTab tabContent, Reference<AbstractDrawingSurfaceManager> managerRef) {
 		guiModel = dataLayer;
 		this.tabContent = tabContent;
 		this.managerRef = managerRef;

@@ -1,14 +1,13 @@
 package net.tapaal.gui.undo;
 
 import net.tapaal.gui.verification.TAPNQuery;
-import pipe.gui.TabContent;
-import net.tapaal.gui.undo.Command;
+import pipe.gui.PetriNetTab;
 
 public class AddQueryCommand extends Command {
 	private final TAPNQuery query;
-	private final TabContent tabContent;
+	private final PetriNetTab tabContent;
 	
-	public AddQueryCommand(TAPNQuery query, TabContent tabContent) {
+	public AddQueryCommand(TAPNQuery query, PetriNetTab tabContent) {
 		this.query = query;
 		this.tabContent = tabContent;
 	}

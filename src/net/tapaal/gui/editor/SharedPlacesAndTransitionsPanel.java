@@ -23,7 +23,7 @@ import javax.swing.event.ListSelectionListener;
 import net.tapaal.gui.Context;
 import net.tapaal.gui.NameGenerator;
 import net.tapaal.gui.undo.*;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.undo.UndoManager;
@@ -50,7 +50,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 	private final JComboBox<String> placesTransitionsComboBox = new JComboBox<>(new String[]{ PLACES, TRANSITIONS });
 	private final UndoManager undoManager;
 	private final NameGenerator nameGenerator;
-	private final TabContent tab;
+	private final PetriNetTab tab;
 
 	private final JButton renameButton = new JButton("Rename");
 	private final JButton removeButton  = new JButton("Remove");
@@ -74,7 +74,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 	private static final String toolTipRemoveTransition ="Remove the selected transition";
 	private static final String toolTipChangeBetweenPlacesAndTransitions = "Switch between shared places and transitions";
 
-	public SharedPlacesAndTransitionsPanel(TabContent tab){
+	public SharedPlacesAndTransitionsPanel(PetriNetTab tab){
 		Require.that(tab != null, "tab cannot be null");
 
 		undoManager = tab.getUndoManager();

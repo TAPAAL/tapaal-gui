@@ -2,7 +2,7 @@ package net.tapaal.gui.undo;
 
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.MakeTransitionSharedVisitor;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -16,9 +16,9 @@ public class MakeTransitionSharedCommand extends Command {
 	private final TimedTransition timedTransition;
 	private final String oldName;
         private final Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
-        private final TabContent currentTab;
+        private final PetriNetTab currentTab;
 	
-	public MakeTransitionSharedCommand(TimedArcPetriNet tapn, SharedTransition sharedTransition, TimedTransition timedTransition, TabContent currentTab){
+	public MakeTransitionSharedCommand(TimedArcPetriNet tapn, SharedTransition sharedTransition, TimedTransition timedTransition, PetriNetTab currentTab){
                 Require.that(tapn != null, "tapn cannot be null");
 		Require.that(sharedTransition != null, "sharedTransition cannot be null");
 		Require.that(timedTransition != null, "timedTransition cannot be null");

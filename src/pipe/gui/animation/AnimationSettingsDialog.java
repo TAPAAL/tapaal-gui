@@ -9,7 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.animation.DelayEnabledTransitionControl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.swingcomponents.EscapableDialog;
@@ -20,7 +20,7 @@ public class AnimationSettingsDialog {
 	private static DelayEnabledTransitionControl delayEnabled;
 	private static SimulationControl simControl;
 
-	private static JPanel getContent(TabContent.TAPNLens lens){
+	private static JPanel getContent(PetriNetTab.TAPNLens lens){
 		JPanel content = new JPanel(new BorderLayout());
 		 
 		delayEnabled = DelayEnabledTransitionControl.getInstance();
@@ -40,11 +40,11 @@ public class AnimationSettingsDialog {
 		return content;
 	}
 
-    private static void hideTimedInformation(TabContent.TAPNLens lens){
+    private static void hideTimedInformation(PetriNetTab.TAPNLens lens){
 	    delayEnabled.setVisible(lens.isTimed());
     }
 	
-	public static void showAnimationSettings(TabContent.TAPNLens lens){
+	public static void showAnimationSettings(PetriNetTab.TAPNLens lens){
 		JPanel contentPane = new JPanel(new GridBagLayout());
 		
 		JButton closeDialogButton = new JButton("Close");

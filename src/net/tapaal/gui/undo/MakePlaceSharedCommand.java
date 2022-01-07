@@ -7,7 +7,7 @@ import net.tapaal.gui.verification.TAPNQuery;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.MakePlaceSharedVisitor;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -27,9 +27,9 @@ public class MakePlaceSharedCommand extends Command {
 	
 	private final Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
 	private final List<TimedToken> oldTokens;
-	private final TabContent currentTab;
+	private final PetriNetTab currentTab;
 
-	public MakePlaceSharedCommand(TimedArcPetriNet tapn, SharedPlace sharedPlace, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab, boolean multishare){
+	public MakePlaceSharedCommand(TimedArcPetriNet tapn, SharedPlace sharedPlace, TimedPlace place, TimedPlaceComponent placeComponent, PetriNetTab currentTab, boolean multishare){
 		Require.that(tapn != null, "tapn cannot be null");
 		Require.that(sharedPlace != null, "sharedPlace cannot be null");
 		Require.that(place != null, "timedPlace cannot be null");
@@ -45,7 +45,7 @@ public class MakePlaceSharedCommand extends Command {
 		this.currentTab = currentTab;
 		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
 	}
-	public MakePlaceSharedCommand(TimedArcPetriNet tapn, SharedPlace sharedPlace, TimedPlace place, TimedPlaceComponent placeComponent, TabContent currentTab){
+	public MakePlaceSharedCommand(TimedArcPetriNet tapn, SharedPlace sharedPlace, TimedPlace place, TimedPlaceComponent placeComponent, PetriNetTab currentTab){
 		this(tapn, sharedPlace, place, placeComponent, currentTab, false);
 	}
 	

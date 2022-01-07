@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.dialog.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -102,7 +102,7 @@ public class TAPAAL {
 			if (file.exists()) { // Open the file
 				if (file.canRead()) {
 					try {
-                        TAPAALGUI.getAppGuiController().openTab(TabContent.createNewTabFromFile(file));
+                        TAPAALGUI.getAppGuiController().openTab(PetriNetTab.createNewTabFromFile(file));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -138,7 +138,7 @@ public class TAPAAL {
 			if (f.getName().toLowerCase().endsWith(".tapn") || f.getName().toLowerCase().endsWith(".xml")) {
 				System.out.println("Processing File: " + f);
 
-				TabContent tab = TabContent.createNewTabFromInputStream(new FileInputStream(f), f.getName());
+				PetriNetTab tab = PetriNetTab.createNewTabFromInputStream(new FileInputStream(f), f.getName());
 				TimedArcPetriNetNetwork network = tab.network();
 				List<TAPNQuery> queries = StreamSupport
 						.stream(tab.queries().spliterator(), false)

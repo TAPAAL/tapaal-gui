@@ -10,7 +10,7 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.MakePlaceSharedVisitor;
 import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -28,7 +28,7 @@ public class MakePlaceNewSharedCommand extends Command {
 	private final TimedPlaceComponent placeComponent;
 	private final Hashtable<TAPNQuery, TAPNQuery> newQueryToOldQueryMapping;
 	private final List<TimedToken> oldTokens;
-	private final TabContent currentTab;
+	private final PetriNetTab currentTab;
 	private final SharedPlacesAndTransitionsPanel sharedPanel;
 	private SharedPlace sharedPlace;
 	private final boolean multiShare;
@@ -36,7 +36,7 @@ public class MakePlaceNewSharedCommand extends Command {
 	private final ArcExpression tokenExpression;
 
 	public MakePlaceNewSharedCommand(TimedArcPetriNet tapn, String newSharedName, TimedPlace place, TimedPlaceComponent placeComponent,
-                                     TabContent currentTab, boolean multiShare){
+                                     PetriNetTab currentTab, boolean multiShare){
 		Require.that(tapn != null, "tapn cannot be null");
 		Require.that(newSharedName != null, "newSharedName cannot be null");
 		Require.that(place != null, "timedPlace cannot be null");

@@ -41,7 +41,7 @@ import net.tapaal.gui.undo.Command;
 import net.tapaal.gui.undo.SortConstantsCommand;
 import pipe.dataLayer.Template;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.swingcomponents.NonsearchableJList;
@@ -61,7 +61,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	private JButton removeBtn;
 	private JButton addConstantButton;
 
-	private final TabContent parent;
+	private final PetriNetTab parent;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;
@@ -104,7 +104,7 @@ public class ConstantsPane extends JPanel implements SidePane {
     Timer timer;
 
 
-	public ConstantsPane(TabContent currentTab) {
+	public ConstantsPane(PetriNetTab currentTab) {
 		parent = currentTab;
         list = new NonsearchableJList<>();
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

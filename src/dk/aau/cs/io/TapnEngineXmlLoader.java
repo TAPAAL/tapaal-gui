@@ -1,7 +1,7 @@
 package dk.aau.cs.io;
 
 import net.tapaal.gui.NameGenerator;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
@@ -57,13 +57,13 @@ public class TapnEngineXmlLoader {
     int groupPlaceHolder = 1;
     private LoadTACPN loadTACPN = new LoadTACPN();
     boolean hasFeatureTag = false;
-    private TabContent.TAPNLens lens = TabContent.TAPNLens.Default;
+    private PetriNetTab.TAPNLens lens = PetriNetTab.TAPNLens.Default;
 
 	public TapnEngineXmlLoader() {
 
 	}
 
-    public TabContent.TAPNLens loadLens(InputStream file) throws FormatException {
+    public PetriNetTab.TAPNLens loadLens(InputStream file) throws FormatException {
         Require.that(file != null, "file must be non-null and exist");
 
         Document doc = loadDocument(file);
@@ -194,7 +194,7 @@ public class TapnEngineXmlLoader {
             var isColoredElement = nodeList.item(0).getAttributes().getNamedItem("isColored");
             boolean isColored = isColoredElement == null ? network.isColored() : Boolean.parseBoolean(isColoredElement.getNodeValue());
 
-            lens = new TabContent.TAPNLens(isTimed, isGame, isColored);
+            lens = new PetriNetTab.TAPNLens(isTimed, isGame, isColored);
         }
     }
 
@@ -208,7 +208,7 @@ public class TapnEngineXmlLoader {
             var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
             var isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
 
-            lens = new TabContent.TAPNLens(isTimed, isGame, isColored);
+            lens = new PetriNetTab.TAPNLens(isTimed, isGame, isColored);
         }
     }
 

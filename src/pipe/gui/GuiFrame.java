@@ -56,7 +56,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
 
-    private final ExtendedJTabbedPane<TabContent> appTab;
+    private final ExtendedJTabbedPane<PetriNetTab> appTab;
 
     private final StatusBar statusBar;
     private JMenuBar menuBar;
@@ -87,7 +87,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction closeAction = new GuiAction("Close", "Close the current tab", KeyStroke.getKeyStroke('W', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            TabContent index = (TabContent) appTab.getSelectedComponent();
+            PetriNetTab index = (PetriNetTab) appTab.getSelectedComponent();
             guiFrameController.ifPresent(o -> o.closeTab(index));
         }
     };
@@ -118,47 +118,47 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction importSUMOAction = new GuiAction("SUMO queries (.txt)", "Import SUMO queries in a plain text format") {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::importSUMOQueries);
+            currentTab.ifPresent(TabActions::importSUMOQueries);
         }
     };
     private final GuiAction importXMLAction = new GuiAction("XML queries (.xml)", "Import MCC queries in XML format", KeyStroke.getKeyStroke('R', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::importXMLQueries);
+            currentTab.ifPresent(TabActions::importXMLQueries);
         }
     };
     private final GuiAction exportPNGAction = new GuiAction("PNG", "Export the net to PNG format", KeyStroke.getKeyStroke('G', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::exportPNG);
+            currentTab.ifPresent(TabActions::exportPNG);
         }
     };
     private final GuiAction exportPSAction = new GuiAction("PostScript", "Export the net to PostScript format", KeyStroke.getKeyStroke('T', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::exportPS);
+            currentTab.ifPresent(TabActions::exportPS);
         }
     };
     private final GuiAction exportToTikZAction = new GuiAction("TikZ", "Export the net to LaTex (TikZ) format", KeyStroke.getKeyStroke('L', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::exportTIKZ);
+            currentTab.ifPresent(TabActions::exportTIKZ);
         }
     };
     private final GuiAction exportToPNMLAction = new GuiAction("PNML", "Export the net to PNML format", KeyStroke.getKeyStroke('D', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::exportPNML);
+            currentTab.ifPresent(TabActions::exportPNML);
         }
     };
     private final GuiAction exportToXMLAction = new GuiAction("XML Queries", "Export the queries to XML format", KeyStroke.getKeyStroke('H', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::exportQueryXML);
+            currentTab.ifPresent(TabActions::exportQueryXML);
         }
     };
     private final GuiAction exportTraceAction = new GuiAction("Export trace", "Export the current trace", "") {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::exportTrace);
+            currentTab.ifPresent(TabActions::exportTrace);
         }
     };
     private final GuiAction importTraceAction = new GuiAction("Import trace", "Import trace to simulator", "") {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::importTrace);
+            currentTab.ifPresent(TabActions::importTrace);
         }
     };
     private final GuiAction exportBatchAction = new GuiAction("Batch Export of model and queries", "Export multiple nets and queries for the command line use with the verification engines.", KeyStroke.getKeyStroke('D', (shortcutkey + InputEvent.SHIFT_DOWN_MASK))) {
@@ -199,12 +199,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction undoAction = new GuiAction("Undo", "Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::undo);
+            currentTab.ifPresent(TabActions::undo);
         }
     };
     private final GuiAction redoAction = new GuiAction("Redo", "Redo", KeyStroke.getKeyStroke('Y', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::redo);
+            currentTab.ifPresent(TabActions::redo);
         }
     };
     private final GuiAction toggleGrid = new GuiAction("Cycle grid", "Change the grid size", "G") {
@@ -220,7 +220,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::showStatistics);
+            currentTab.ifPresent(TabActions::showStatistics);
         }
     };
     private final GuiAction batchProcessingAction = new GuiAction("Batch processing", "Batch verification of multiple nets and queries", KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcutkey)) {
@@ -241,12 +241,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction verifyAction = new GuiAction("Verify query", "Verifies the currently selected query", KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::verifySelectedQuery);
+            currentTab.ifPresent(TabActions::verifySelectedQuery);
         }
     };
     private final GuiAction workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::workflowAnalyse);
+            currentTab.ifPresent(TabActions::workflowAnalyse);
         }
     };
     private final GuiAction smartDrawAction = new GuiAction("Automatic net layout", "Rearrange the Petri net objects", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_DOWN_MASK)) {
@@ -256,17 +256,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction mergeComponentsDialogAction = new GuiAction("Merge net components", "Open a composed net in a new tab and use approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::mergeNetComponents);
+            currentTab.ifPresent(TabActions::mergeNetComponents);
         }
     };
     private final GuiAction zoomOutAction = new GuiAction("Zoom out", "Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::zoomOut);
+            currentTab.ifPresent(TabActions::zoomOut);
         }
     };
     private final GuiAction zoomInAction = new GuiAction("Zoom in", "Zoom in by 10% ", KeyStroke.getKeyStroke('J', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::zoomIn);
+            currentTab.ifPresent(TabActions::zoomIn);
         }
     };
     private final GuiAction zoomToAction = new GuiAction("Zoom", "Select zoom percentage ", "") {
@@ -281,24 +281,24 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction incSpacingAction = new GuiAction("Increase node spacing", "Increase spacing by 20% ", KeyStroke.getKeyStroke('U', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::increaseSpacing);
+            currentTab.ifPresent(TabActions::increaseSpacing);
         }
     };
     private final GuiAction decSpacingAction = new GuiAction("Decrease node spacing", "Decrease spacing by 20% ", KeyStroke.getKeyStroke("shift U")) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::decreaseSpacing);
+            currentTab.ifPresent(TabActions::decreaseSpacing);
         }
     };
     public final GuiAction deleteAction = new GuiAction("Delete", "Delete selection", "DELETE") {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabContentActions::deleteSelection);
+            currentTab.ifPresent(TabActions::deleteSelection);
         }
 
     };
 
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(TabContent.DrawTool.ANNOTATION));
+            currentTab.ifPresent(o -> o.setMode(PetriNetTab.DrawTool.ANNOTATION));
         }
     };
 
@@ -354,7 +354,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction changeNameVisibility = new GuiAction("Change visibility of transition/place names", "Executing this action will open a dialog where you can hide or show place and transition names", true) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::showChangeNameVisibility);
+            currentTab.ifPresent(TabActions::showChangeNameVisibility);
         }
     };
     private final GuiAction showAdvancedWorkspaceAction = new GuiAction("Show advanced workspace", "Show all panels", false) {
@@ -406,47 +406,47 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction selectAllAction = new GuiAction("Select all", "Select all components", KeyStroke.getKeyStroke('A', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::selectAll);
+            currentTab.ifPresent(TabActions::selectAll);
         }
     };
 
     private final GuiAction startAction = new GuiAction("Simulation mode", "Toggle simulation mode (M)", "M", true) {
         public void actionPerformed(ActionEvent e) {
             if(getCurrentTab().getLens().isColored()){
-                TabContent oldTab = getCurrentTab();
+                PetriNetTab oldTab = getCurrentTab();
                 UnfoldDialog.showSimulationDialog(oldTab);
 
                 if(!UnfoldDialog.wasCancelled() && oldTab != getCurrentTab()){
-                    currentTab.ifPresent(TabContentActions::toggleAnimationMode);
+                    currentTab.ifPresent(TabActions::toggleAnimationMode);
                 } else {
                     this.setSelected(false);
                 }
             } else {
-                currentTab.ifPresent(TabContentActions::toggleAnimationMode);
+                currentTab.ifPresent(TabActions::toggleAnimationMode);
             }
 
         }
     };
     public final GuiAction stepforwardAction = new GuiAction("Step forward", "Step forward", "released RIGHT") {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::stepForward);
+            currentTab.ifPresent(TabActions::stepForward);
         }
     };
     public final GuiAction stepbackwardAction = new GuiAction("Step backward", "Step backward", "released LEFT") {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::stepBackwards);
+            currentTab.ifPresent(TabActions::stepBackwards);
         }
     };
 
 
     private final GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::previousComponent);
+            currentTab.ifPresent(TabActions::previousComponent);
         }
     };
     private final GuiAction nextcomponentAction = new GuiAction("Next component", "Next component", "pressed DOWN") {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabContentActions::nextComponent);
+            currentTab.ifPresent(TabActions::nextComponent);
         }
     };
 
@@ -498,12 +498,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         this.setMinimumSize(new Dimension(825, 480));
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        appTab = new ExtendedJTabbedPane<TabContent>() {
+        appTab = new ExtendedJTabbedPane<PetriNetTab>() {
             @Override
             public Component generator() {
                 return new TabComponent(this) {
                     @Override
-                    protected void closeTab(TabContent tab) {
+                    protected void closeTab(PetriNetTab tab) {
                         GuiFrame.this.guiFrameController.ifPresent(o -> o.closeTab(tab));
                     }
                 };
@@ -1157,7 +1157,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         appTab.addChangeListener(e -> {
                 //This event will only fire if the tab index is changed, so it won't trigger if once
                 // also if code calls setSelectedIndex(index), thereby avoiding a loop.
-                TabContent tab = (TabContent) appTab.getSelectedComponent();
+                PetriNetTab tab = (PetriNetTab) appTab.getSelectedComponent();
 
                 if (tab != null) {
                     guiFrameController.ifPresent(o -> o.changeToTab(tab));
@@ -1167,7 +1167,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     @Override
-    public void updatedTabName(TabContent tab) {
+    public void updatedTabName(PetriNetTab tab) {
         int index = appTab.indexOfComponent(tab);
 
         appTab.setTitleAt(index, tab.getTabTitle());
@@ -1181,12 +1181,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     @Override
-    public void attachTabToGuiFrame(TabContent tab) {
+    public void attachTabToGuiFrame(PetriNetTab tab) {
         appTab.addTab(tab.getTabTitle(), tab);
     }
 
     @Override
-    public void detachTabFromGuiFrame(TabContent tab) {
+    public void detachTabFromGuiFrame(PetriNetTab tab) {
         appTab.remove(tab);
 
         if (appTab.getTabCount() == 0) {
@@ -1370,16 +1370,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
 
-    Reference<TabContentActions> currentTab = null;
+    Reference<TabActions> currentTab = null;
 
     @Override
-    public void registerController(GuiFrameControllerActions guiFrameController, Reference<TabContentActions> currentTab) {
+    public void registerController(GuiFrameControllerActions guiFrameController, Reference<TabActions> currentTab) {
         this.guiFrameController.setReference(guiFrameController);
         this.currentTab = currentTab;
     }
 
     @Override
-    public void changeToTab(TabContent tab) {
+    public void changeToTab(PetriNetTab tab) {
         if (tab != null) {
             //Change tab event will only fire if index != currentIndex, to changing it via setSelectIndex will not
             // create a tabChanged event loop.
@@ -1541,14 +1541,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // .xml file the Example x counter is not incremented when that file
         // is ignored
         if (nets != null && nets.length > 0) {
-            TabContent.TAPNLens untimedLens = new TabContent.TAPNLens(false, false, false);
-            TabContent.TAPNLens timedLens = new TabContent.TAPNLens(true, false, false);
-            TabContent.TAPNLens untimedGameLens = new TabContent.TAPNLens(false, true, false);
-            TabContent.TAPNLens timedGameLens = new TabContent.TAPNLens(true, true, false);
-            TabContent.TAPNLens untimedColorLens = new TabContent.TAPNLens(false, false, true);
-            TabContent.TAPNLens timedColorLens = new TabContent.TAPNLens(true, false, true);
+            PetriNetTab.TAPNLens untimedLens = new PetriNetTab.TAPNLens(false, false, false);
+            PetriNetTab.TAPNLens timedLens = new PetriNetTab.TAPNLens(true, false, false);
+            PetriNetTab.TAPNLens untimedGameLens = new PetriNetTab.TAPNLens(false, true, false);
+            PetriNetTab.TAPNLens timedGameLens = new PetriNetTab.TAPNLens(true, true, false);
+            PetriNetTab.TAPNLens untimedColorLens = new PetriNetTab.TAPNLens(false, false, true);
+            PetriNetTab.TAPNLens timedColorLens = new PetriNetTab.TAPNLens(true, false, true);
 
-            HashMap<TabContent.TAPNLens, List<String>> netMap = new HashMap<>(){{
+            HashMap<PetriNetTab.TAPNLens, List<String>> netMap = new HashMap<>(){{
                     put(untimedLens, new ArrayList<>());
                     put(timedLens, new ArrayList<>());
                     put(untimedGameLens, new ArrayList<>());
@@ -1562,13 +1562,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     final String filenameFinal = filename;
 
                     InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
-                    TabContent.TAPNLens lens;
+                    PetriNetTab.TAPNLens lens;
                     try {
-                        lens = TabContent.getFileLens(file);
+                        lens = PetriNetTab.getFileLens(file);
                         if (lens == null) {
-                            lens = new TabContent.TAPNLens(true, false, false);
+                            lens = new PetriNetTab.TAPNLens(true, false, false);
                         }
-                        TabContent.TAPNLens tmp = lens;
+                        PetriNetTab.TAPNLens tmp = lens;
                         netMap.forEach((v, k) -> {
                             if (v.isTimed() == tmp.isTimed() && v.isGame() == tmp.isGame() && v.isColored() == tmp.isColored()) k.add(filename);
                         });
@@ -1622,7 +1622,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     public void actionPerformed(ActionEvent arg0) {
                         InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
                         try {
-                            TabContent net = TabContent.createNewTabFromInputStream(file, netname);
+                            PetriNetTab net = PetriNetTab.createNewTabFromInputStream(file, netname);
                             guiFrameController.ifPresent(o -> o.openTab(net));
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
@@ -1795,7 +1795,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return appTab.getSelectedIndex();
     }
 
-    public TabContent getCurrentTab() {
+    public PetriNetTab getCurrentTab() {
         return TAPAALGUI.getCurrentTab();
     }
 

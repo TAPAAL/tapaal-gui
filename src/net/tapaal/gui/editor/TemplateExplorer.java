@@ -36,7 +36,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.undo.MoveElementDownCommand;
 import net.tapaal.gui.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
@@ -86,7 +86,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	private JButton renameButton;
 	private JButton copyButton;
 
-	private final TabContent parent;
+	private final PetriNetTab parent;
 	private final UndoManager undoManager;
 	private boolean isInAnimationMode;
 
@@ -102,11 +102,11 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	private final static String toolTipMoveUp = "Move the selected component up";
 	private final static String toolTipMoveDown = "Move the selected component down";
 	
-	public TemplateExplorer(TabContent parent) {
+	public TemplateExplorer(PetriNetTab parent) {
 		this(parent, false);
 	}
 
-	public TemplateExplorer(TabContent parent, boolean hideButtons) {
+	public TemplateExplorer(PetriNetTab parent, boolean hideButtons) {
 		this.parent = parent;
 		undoManager = parent.getUndoManager();
 		init(hideButtons);

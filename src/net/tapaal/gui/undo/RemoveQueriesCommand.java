@@ -2,19 +2,18 @@ package net.tapaal.gui.undo;
 
 import java.util.List;
 
-import pipe.gui.TabContent;
-import net.tapaal.gui.undo.Command;
+import pipe.gui.PetriNetTab;
 import net.tapaal.gui.verification.TAPNQuery;
 
 public class RemoveQueriesCommand extends Command {
 	
 	private final List<TAPNQuery> queriesToRemove;
-	private final TabContent tabContent;
+	private final PetriNetTab tabContent;
 
 
-	public RemoveQueriesCommand(List<TAPNQuery> QueriesToRemove, TabContent TabContent) {
+	public RemoveQueriesCommand(List<TAPNQuery> QueriesToRemove, PetriNetTab PetriNetTab) {
 		this.queriesToRemove = QueriesToRemove;
-		this.tabContent = TabContent;
+		this.tabContent = PetriNetTab;
 	}
 	
 	@Override

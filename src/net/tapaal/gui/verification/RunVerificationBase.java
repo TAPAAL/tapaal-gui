@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.*;
 
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.verification.*;
 import pipe.dataLayer.DataLayer;
@@ -71,7 +71,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
-	    TabContent.TAPNLens lens = new TabContent.TAPNLens(!model.isUntimed(), false, model.isColored());
+	    PetriNetTab.TAPNLens lens = new PetriNetTab.TAPNLens(!model.isUntimed(), false, model.isColored());
         ITAPNComposer composer = new TAPNComposer(messenger, guiModels, lens, false, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
         guiModel = composer.getGuiModel();

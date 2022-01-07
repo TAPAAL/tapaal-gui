@@ -2,16 +2,16 @@ package net.tapaal.gui.undo;
 
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 
 public class RenameTimedPlaceCommand extends Command {
 	private final LocalTimedPlace place;
 	private final String oldName;
 	private final String newName;
-	private final TabContent tabContent;
+	private final PetriNetTab tabContent;
 
-	public RenameTimedPlaceCommand(TabContent tabContent, LocalTimedPlace place, String oldName, String newName) {
+	public RenameTimedPlaceCommand(PetriNetTab tabContent, LocalTimedPlace place, String oldName, String newName) {
 		this.tabContent = tabContent;
 		this.place = place;
 		this.oldName = oldName;

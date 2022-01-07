@@ -1,7 +1,7 @@
 package net.tapaal.gui.model;
 
 import net.tapaal.gui.undo.*;
-import pipe.gui.TabContent;
+import pipe.gui.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Vector;
 
 public class GuiModelManager {
-    private final TabContent tabContent;
+    private final PetriNetTab tabContent;
 
     private List<Command> pendingEdits = null;
 
@@ -54,11 +54,11 @@ public class GuiModelManager {
         }
     }
 
-    public GuiModelManager(TabContent tabContent) {
+    public GuiModelManager(PetriNetTab tabContent) {
         this.tabContent = tabContent;
     }
 
-    public TabContent.Result<TimedPlaceComponent, TabContent.ModelViolation> addNewTimedPlace(DataLayer c, Point p) {
+    public PetriNetTab.Result<TimedPlaceComponent, PetriNetTab.ModelViolation> addNewTimedPlace(DataLayer c, Point p) {
         Require.notNull(c, "datalyer can't be null");
         Require.notNull(p, "Point can't be null");
 
@@ -68,18 +68,18 @@ public class GuiModelManager {
         c.addPetriNetObject(pnObject);
 
         addCommand(new AddTimedPlaceCommand(pnObject, tabContent.guiModelToModel.get(c), c));
-        return new TabContent.Result<>(pnObject);
+        return new PetriNetTab.Result<>(pnObject);
     }
 
-    public TabContent.Result<TimedTransitionComponent, TabContent.ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
+    public PetriNetTab.Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
         return addNewTimedTransitions(c, p, false, false);
     }
 
-    public TabContent.Result<TimedTransitionComponent, TabContent.ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUncontrollable) {
+    public PetriNetTab.Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUncontrollable) {
         return addNewTimedTransitions(c, p, false, isUncontrollable);
     }
 
-    public TabContent.Result<TimedTransitionComponent, TabContent.ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUrgent, boolean isUncontrollable) {
+    public PetriNetTab.Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUrgent, boolean isUncontrollable) {
         dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(tabContent.getNameGenerator().getNewTransitionName(tabContent.guiModelToModel.get(c)));
 
         transition.setUrgent(isUrgent);
@@ -91,7 +91,7 @@ public class GuiModelManager {
         c.addPetriNetObject(pnObject);
 
         addCommand(new AddTimedTransitionCommand(pnObject, tabContent.guiModelToModel.get(c), c));
-        return new TabContent.Result<>(pnObject);
+        return new PetriNetTab.Result<>(pnObject);
     }
 
     public void addAnnotationNote(DataLayer c, Point p) {
@@ -105,17 +105,17 @@ public class GuiModelManager {
         }
     }
 
-    public TabContent.Result<TimedInputArcComponent, TabContent.ModelViolation> addTimedInputArc(@NotNull DataLayer c, @NotNull TimedPlaceComponent p, @NotNull TimedTransitionComponent t, ArcPath path) {
+    public PetriNetTab.Result<TimedInputArcComponent, PetriNetTab.ModelViolation> addTimedInputArc(@NotNull DataLayer c, @NotNull TimedPlaceComponent p, @NotNull TimedTransitionComponent t, ArcPath path) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p, "Place can't be null");
         Require.notNull(t, "Transitions can't be null");
 
-        var require = new TabContent.RequirementChecker<TabContent.ModelViolation>();
-        require.Not(tabContent.guiModelToModel.get(c).hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), TabContent.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
-        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), TabContent.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+        var require = new PetriNetTab.RequirementChecker<PetriNetTab.ModelViolation>();
+        require.Not(tabContent.guiModelToModel.get(c).hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), PetriNetTab.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
+        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
-            return new TabContent.Result<>(require.getErrors());
+            return new PetriNetTab.Result<>(require.getErrors());
         }
 
         TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
@@ -145,20 +145,20 @@ public class GuiModelManager {
 
         addCommand(edit);
 
-        return new TabContent.Result<>(tiac);
+        return new PetriNetTab.Result<>(tiac);
     }
 
-    public TabContent.Result<TimedOutputArcComponent, TabContent.ModelViolation> addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
+    public PetriNetTab.Result<TimedOutputArcComponent, PetriNetTab.ModelViolation> addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p, "Place can't be null");
         Require.notNull(t, "Transitions can't be null");
 
-        var require = new TabContent.RequirementChecker<TabContent.ModelViolation>();
-        require.Not(tabContent.guiModelToModel.get(c).hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace()), TabContent.ModelViolation.MaxOneArcBetweenTransitionAndPlace);
-        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), TabContent.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+        var require = new PetriNetTab.RequirementChecker<PetriNetTab.ModelViolation>();
+        require.Not(tabContent.guiModelToModel.get(c).hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace()), PetriNetTab.ModelViolation.MaxOneArcBetweenTransitionAndPlace);
+        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
-            return new TabContent.Result<>(require.getErrors());
+            return new PetriNetTab.Result<>(require.getErrors());
         }
 
         TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
@@ -187,22 +187,22 @@ public class GuiModelManager {
         edit.redo();
         addCommand(edit);
 
-        return new TabContent.Result<>(toac);
+        return new PetriNetTab.Result<>(toac);
     }
 
-    public TabContent.Result<TimedInhibitorArcComponent, TabContent.ModelViolation> addInhibitorArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
+    public PetriNetTab.Result<TimedInhibitorArcComponent, PetriNetTab.ModelViolation> addInhibitorArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p, "Place can't be null");
         Require.notNull(t, "Transitions can't be null");
 
         TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
 
-        var require = new TabContent.RequirementChecker<TabContent.ModelViolation>();
-        require.Not(modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), TabContent.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
-        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), TabContent.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+        var require = new PetriNetTab.RequirementChecker<PetriNetTab.ModelViolation>();
+        require.Not(modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), PetriNetTab.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
+        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
-            return new TabContent.Result<>(require.getErrors());
+            return new PetriNetTab.Result<>(require.getErrors());
         }
 
         TimedInhibitorArc tiha = new TimedInhibitorArc(
@@ -232,10 +232,10 @@ public class GuiModelManager {
         edit.redo();
         addCommand(edit);
 
-        return new TabContent.Result<>(tihac);
+        return new PetriNetTab.Result<>(tihac);
     }
 
-    public TabContent.Result<TimedTransportArcComponent, TabContent.ModelViolation> addTimedTransportArc(DataLayer c, TimedPlaceComponent p1, TimedTransitionComponent t, TimedPlaceComponent p2, ArcPath path1, ArcPath path2) {
+    public PetriNetTab.Result<TimedTransportArcComponent, PetriNetTab.ModelViolation> addTimedTransportArc(DataLayer c, TimedPlaceComponent p1, TimedTransitionComponent t, TimedPlaceComponent p2, ArcPath path1, ArcPath path2) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p1, "Place1 can't be null");
         Require.notNull(t, "Transitions can't be null");
@@ -243,14 +243,14 @@ public class GuiModelManager {
 
         TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
 
-        var require = new TabContent.RequirementChecker<TabContent.ModelViolation>();
-        require.Not(modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()), TabContent.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
-        require.Not(modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p2.underlyingPlace()), TabContent.ModelViolation.MaxOneArcBetweenTransitionAndPlace);
-        require.Not((p1.underlyingPlace().isShared() && t.underlyingTransition().isShared()), TabContent.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
-        require.Not((p2.underlyingPlace().isShared() && t.underlyingTransition().isShared()), TabContent.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+        var require = new PetriNetTab.RequirementChecker<PetriNetTab.ModelViolation>();
+        require.Not(modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()), PetriNetTab.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
+        require.Not(modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p2.underlyingPlace()), PetriNetTab.ModelViolation.MaxOneArcBetweenTransitionAndPlace);
+        require.Not((p1.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+        require.Not((p2.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
-            return new TabContent.Result<>(require.getErrors());
+            return new PetriNetTab.Result<>(require.getErrors());
         }
 
 
@@ -282,7 +282,7 @@ public class GuiModelManager {
         edit.redo();
         addCommand(edit);
 
-        return new TabContent.Result<>(ttac1);
+        return new PetriNetTab.Result<>(ttac1);
 
     }
 
@@ -388,7 +388,7 @@ public class GuiModelManager {
         if (choice == JOptionPane.YES_OPTION) {
             tabContent.getUndoManager().newEdit(); // new "transaction""
             if (queriesAffected) {
-                TabContent currentTab = tabContent;
+                PetriNetTab currentTab = tabContent;
                 for (TAPNQuery q : queriesToDelete) {
                     Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
                     cmd.redo();
@@ -490,7 +490,7 @@ public class GuiModelManager {
 
     public void toggleUncontrollableTrans() {
         ArrayList<PetriNetObject> selection = tabContent.drawingSurface().getSelectionObject().getSelection();
-        TabContent currentTab = tabContent;
+        PetriNetTab currentTab = tabContent;
         tabContent.getUndoManager().newEdit();
 
         for (PetriNetObject o : selection) {
@@ -507,7 +507,7 @@ public class GuiModelManager {
 
     public void toggleUrgentTrans() {
         ArrayList<PetriNetObject> selection = tabContent.drawingSurface().getSelectionObject().getSelection();
-        TabContent currentTab = tabContent;
+        PetriNetTab currentTab = tabContent;
         tabContent.getUndoManager().newEdit();
 
         for (PetriNetObject o : selection) {
