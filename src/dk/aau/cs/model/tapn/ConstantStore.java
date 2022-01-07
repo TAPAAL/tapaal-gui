@@ -2,9 +2,9 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
-import pipe.gui.undo.AddConstantEdit;
-import pipe.gui.undo.RemoveConstantEdit;
-import pipe.gui.undo.UpdateConstantEdit;
+import pipe.gui.undo.AddConstantEditCommand;
+import pipe.gui.undo.RemoveConstantEditCommand;
+import pipe.gui.undo.UpdateConstantEditCommand;
 import net.tapaal.gui.undo.Command;
 import dk.aau.cs.util.StringComparator;
 
@@ -162,7 +162,7 @@ public class ConstantStore {
 		if (!containsConstantByName(name)) {
 			Constant c = new Constant(name, val);
 			add(c);
-			return new AddConstantEdit(c, this);
+			return new AddConstantEditCommand(c, this);
 		}
 		
 
@@ -183,7 +183,7 @@ public class ConstantStore {
 				Constant c = getConstantByName(name);
 				remove(c);
 				findLargestConstantValue();
-				return new RemoveConstantEdit(c, this);
+				return new RemoveConstantEditCommand(c, this);
 			}
 		}
 
@@ -232,7 +232,7 @@ public class ConstantStore {
 				constants.remove(old);
 				constants.add(index, updatedConstant);
 				findLargestConstantValue();
-				return new UpdateConstantEdit(old, updatedConstant, this, model);
+				return new UpdateConstantEditCommand(old, updatedConstant, this, model);
 			}
 		}
 		return null;

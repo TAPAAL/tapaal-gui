@@ -445,7 +445,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		if (transX != 0 || transY != 0) {
             tabContent.getUndoManager().newEdit(); // new "transaction""
             for (PetriNetObject pnobject : objects) {
-                tabContent.getUndoManager().addEdit(new TranslatePetriNetObjectEdit(pnobject, transX, transY, this));
+                tabContent.getUndoManager().addEdit(new TranslatePetriNetObjectEditCommand(pnobject, transX, transY, this));
             }
         }
 	}

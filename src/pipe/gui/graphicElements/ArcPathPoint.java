@@ -19,8 +19,8 @@ import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.action.SplitArcPointAction;
 import pipe.gui.action.ToggleArcPointAction;
-import pipe.gui.undo.AddArcPathPointEdit;
-import pipe.gui.undo.ArcPathPointTypeEdit;
+import pipe.gui.undo.AddArcPathPointEditCommand;
+import pipe.gui.undo.ArcPathPointTypeEditCommand;
 import net.tapaal.gui.undo.Command;
 
 import javax.swing.*;
@@ -125,7 +125,7 @@ public class ArcPathPoint extends PetriNetObject {
 		pointType = !pointType;
 		myArcPath.createPath();
 		myArcPath.getArc().updateArcPosition();
-		return new ArcPathPointTypeEdit(this);
+		return new ArcPathPointTypeEditCommand(this);
 	}
 
 	public void setVisibilityLock(boolean lock) {
@@ -194,7 +194,7 @@ public class ArcPathPoint extends PetriNetObject {
 		ArcPathPoint newPoint = new ArcPathPoint(getPositionX() + DELTA, getPositionY(), pointType, myArcPath);
 		myArcPath.insertPoint(i + 1, newPoint);
 		myArcPath.getArc().updateArcPosition();
-		return new AddArcPathPointEdit(myArcPath.getArc(), newPoint, myArcPath.getArc().getGuiModel());
+		return new AddArcPathPointEditCommand(myArcPath.getArc(), newPoint, myArcPath.getArc().getGuiModel());
 	}
 
 	public Point2D.Double getMidPoint(ArcPathPoint target) {

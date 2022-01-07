@@ -321,7 +321,7 @@ public class GuiModelManager {
         Require.notNull(p, "TimedPlaceComponent can't be null");
         Require.that(numberOfTokens > 0, "Number of tokens to add must be strictly greater than 0");
 
-        Command command = new TimedPlaceMarkingEdit(p, numberOfTokens);
+        Command command = new TimedPlaceMarkingEditCommand(p, numberOfTokens);
         command.redo();
         addCommand(command);
     }
@@ -336,7 +336,7 @@ public class GuiModelManager {
 
 //Ignore if number of tokens to remove is 0
         if (tokensToRemove > 0) {
-            Command command = new TimedPlaceMarkingEdit(p, -tokensToRemove);
+            Command command = new TimedPlaceMarkingEditCommand(p, -tokensToRemove);
             command.redo();
             addCommand(command);
         }
@@ -412,7 +412,7 @@ public class GuiModelManager {
 
 //Don't delete the two last arc path points
                 if (arcPathPoint.isDeleteable()) {
-                    Command cmd = new DeleteArcPathPointEdit(
+                    Command cmd = new DeleteArcPathPointEditCommand(
                         arcPathPoint.getArcPath().getArc(),
                         arcPathPoint,
                         arcPathPoint.getIndex(),
@@ -496,7 +496,7 @@ public class GuiModelManager {
         for (PetriNetObject o : selection) {
             if (o instanceof TimedTransitionComponent) {
                 TimedTransitionComponent transition = (TimedTransitionComponent) o;
-                Command cmd = new ToggleTransitionUncontrollable(transition.underlyingTransition(), currentTab);
+                Command cmd = new ToggleTransitionUncontrollableCommand(transition.underlyingTransition(), currentTab);
 
                 cmd.redo();
                 tabContent.getUndoManager().addEdit(cmd);
@@ -518,7 +518,7 @@ public class GuiModelManager {
                     return;
                 }
 
-                Command cmd = new ToggleTransitionUrgent(transition.underlyingTransition(), currentTab);
+                Command cmd = new ToggleTransitionUrgentCommand(transition.underlyingTransition(), currentTab);
                 cmd.redo();
                 tabContent.getUndoManager().addEdit(cmd);
             }

@@ -15,7 +15,7 @@ import javax.swing.text.DefaultHighlighter;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
-import pipe.gui.undo.AnnotationBorderEdit;
+import pipe.gui.undo.AnnotationBorderEditCommand;
 import net.tapaal.gui.undo.Command;
 
 public abstract class Note extends PetriNetObject {
@@ -96,7 +96,7 @@ public abstract class Note extends PetriNetObject {
 	public Command showBorder(boolean show) {
 		drawBorder = show;
 		repaint();
-		return new AnnotationBorderEdit(this);
+		return new AnnotationBorderEditCommand(this);
 	}
 
 	public JTextArea getNote() {

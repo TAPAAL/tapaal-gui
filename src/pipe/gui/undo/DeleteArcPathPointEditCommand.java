@@ -1,5 +1,5 @@
 /*
- * AddArcPathPointEdit.java
+ * DeleteArcPathPointEdit.java
  */
 
 package pipe.gui.undo;
@@ -14,38 +14,35 @@ import net.tapaal.gui.undo.Command;
  * 
  * @author Pere Bonet
  */
-public class AddArcPathPointEdit extends Command {
+public class DeleteArcPathPointEditCommand extends Command {
 
-	final ArcPath arcPath;
-	final ArcPathPoint point;
+	ArcPath arcPath;
+	ArcPathPoint point;
+	Integer index;
 	private final DataLayer guiModel;
-	final Integer index;
 
-	/** Creates a new instance of AddArcPathPointEdit */
-	public AddArcPathPointEdit(Arc _arc, ArcPathPoint _point, DataLayer guiModel) {
+	/** Creates a new instance of placeWeightEdit */
+	public DeleteArcPathPointEditCommand(Arc _arc, ArcPathPoint _point, Integer _index, DataLayer guiModel) {
 		arcPath = _arc.getArcPath();
 		point = _point;
+		index = _index;
 		this.guiModel = guiModel;
-		index = point.getIndex();
 	}
 
-	/**
-    *
-    */
+	/** */
 	@Override
 	public void undo() {
-		arcPath.deletePoint(point);
+		//guiModel.addPetriNetObject(point);
+	    point.deselect();
+		arcPath.insertPoint(index, point);
 		arcPath.updateArc();
-
-		guiModel.removePetriNetObject(point);
 	}
 
 	/** */
 	@Override
 	public void redo() {
-		//guiModel.addPetriNetObject(point);
-
-		arcPath.insertPoint(index, point);
+		guiModel.removePetriNetObject(point);
+		arcPath.deletePoint(point);
 		arcPath.updateArc();
 	}
 

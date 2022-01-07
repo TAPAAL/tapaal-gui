@@ -5,7 +5,7 @@ import java.awt.Point;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 
-public class MovePlaceTransitionObject extends Command {
+public class MovePlaceTransitionObjectCommand extends Command {
 	
 	private final int newY;
 	private final int newX;
@@ -14,7 +14,7 @@ public class MovePlaceTransitionObject extends Command {
 	private final int oldX;
 	
 	
-	public MovePlaceTransitionObject(PlaceTransitionObject object, Point point) {
+	public MovePlaceTransitionObjectCommand(PlaceTransitionObject object, Point point) {
 		objectToBeMoved = object;
 		this.newX = point.x;
 		this.newY = point.y;

@@ -22,7 +22,7 @@ import javax.swing.JSpinner;
 import net.tapaal.gui.undo.*;
 import pipe.gui.TabContent;
 import net.tapaal.gui.editor.ColorComboBoxRenderer;
-import net.tapaal.gui.undo.Colored.ColoredPlaceMarkingEdit;
+import net.tapaal.gui.undo.Colored.ColoredPlaceMarkingEditCommand;
 import net.tapaal.gui.undo.Colored.SetArcExpressionCommand;
 import net.tapaal.gui.undo.Colored.SetColoredArcIntervalsCommand;
 import net.tapaal.gui.undo.Colored.SetTransportArcExpressionsCommand;
@@ -725,7 +725,7 @@ public class PlaceEditorPanel extends JPanel {
 	private void doOkColors(int newMarking){
         if (!place.isColored()) {
             if(newMarking != place.underlyingPlace().numberOfTokens()){
-                Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
+                Command command = new TimedPlaceMarkingEditCommand(place, newMarking - place.underlyingPlace().numberOfTokens());
                 command.redo();
                 context.undoManager().addEdit(command);
                 return;
@@ -755,7 +755,7 @@ public class PlaceEditorPanel extends JPanel {
             if (!colorType.equals(place.underlyingPlace().getColorType())) {
                 updateArcsAccordingToColorType();
             }
-            Command command = new ColoredPlaceMarkingEdit(oldTokenList, tokensToAdd, originalExpression, newExpression, context, place, ctiList, colorType);
+            Command command = new ColoredPlaceMarkingEditCommand(oldTokenList, tokensToAdd, originalExpression, newExpression, context, place, ctiList, colorType);
             command.redo();
             context.undoManager().addEdit(command);
         }

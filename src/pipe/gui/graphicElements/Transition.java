@@ -20,7 +20,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
-import pipe.gui.undo.TransitionRotationEdit;
+import pipe.gui.undo.TransitionRotationEditCommand;
 import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 
@@ -149,7 +149,7 @@ public abstract class Transition extends PlaceTransitionObject {
 		updateEndPoints();
 		repaint();
 
-		return new TransitionRotationEdit(this, angle);
+		return new TransitionRotationEditCommand(this, angle);
 	}
 
 	private void outlineTransition() {

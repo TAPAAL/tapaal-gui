@@ -16,7 +16,7 @@ import pipe.gui.canvas.Zoomer;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.undo.ArcTimeIntervalEdit;
+import pipe.gui.undo.ArcTimeIntervalEditCommand;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.editor.GuardDialogue;
 import net.tapaal.gui.undo.Command;
@@ -74,7 +74,7 @@ public class TimedOutputArcComponent extends Arc {
 		updateLabel(true);
 		repaint();
 
-		return new ArcTimeIntervalEdit(this, guard, guard, oldWeight, weight);
+		return new ArcTimeIntervalEditCommand(this, guard, guard, oldWeight, weight);
 	}
 
 	public void updateLabel(boolean displayConstantNames) {

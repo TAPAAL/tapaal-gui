@@ -1764,14 +1764,14 @@ public class TabContent extends JSplitPane implements TabContentActions{
     public void increaseSpacing() {
 		double factor = 1.25;
 		changeSpacing(factor);
-		getUndoManager().addNewEdit(new ChangeSpacingEdit(factor, this));
+		getUndoManager().addNewEdit(new ChangeSpacingEditCommand(factor, this));
     }
 
 	@Override
 	public void decreaseSpacing() {
 		double factor = 0.8;
 		changeSpacing(factor);
-		getUndoManager().addNewEdit(new ChangeSpacingEdit(factor, this));
+		getUndoManager().addNewEdit(new ChangeSpacingEditCommand(factor, this));
 	}
 
 	public void changeSpacing(double factor){

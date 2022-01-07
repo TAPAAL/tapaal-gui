@@ -6,7 +6,7 @@ import java.util.Hashtable;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.Constants;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.undo.ArcTimeIntervalEdit;
+import pipe.gui.undo.ArcTimeIntervalEditCommand;
 import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.ConstantWeight;
 import dk.aau.cs.model.tapn.IntWeight;
@@ -90,7 +90,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		updateLabel(true);
 		repaint();
 
-		return new ArcTimeIntervalEdit(this, oldTimeInterval, inhibitorArc.interval(), oldWeight, weight);
+		return new ArcTimeIntervalEditCommand(this, oldTimeInterval, inhibitorArc.interval(), oldWeight, weight);
 	}
 
 	@Override

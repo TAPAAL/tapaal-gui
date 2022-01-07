@@ -11,15 +11,15 @@ import net.tapaal.gui.undo.Command;
  * 
  * @author corveau
  */
-public final class AnnotationTextEdit extends Command {
+public final class AnnotationTextEditCommand extends Command {
 
 	final AnnotationNote annotationNote;
 	final String oldText;
 	final String newText;
 
 	/** Creates a new instance of placeRateEdit */
-	public AnnotationTextEdit(AnnotationNote _annotationNote, String _oldText,
-			String _newText) {
+	public AnnotationTextEditCommand(AnnotationNote _annotationNote, String _oldText,
+                                     String _newText) {
 		annotationNote = _annotationNote;
 		oldText = _oldText;
 		newText = _newText;

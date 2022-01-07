@@ -3,11 +3,11 @@ package net.tapaal.gui.undo;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 
 // TODO: Fix this to work on the model class instead of the GUI class
-public class TimedPlaceMarkingEdit extends Command {
+public class TimedPlaceMarkingEditCommand extends Command {
 	private final int numberOfTokens;
 	private final TimedPlaceComponent timedPlaceComponent;
 
-	public TimedPlaceMarkingEdit(TimedPlaceComponent tpc, int numberOfTokens) {
+	public TimedPlaceMarkingEditCommand(TimedPlaceComponent tpc, int numberOfTokens) {
 		timedPlaceComponent = tpc;
 		this.numberOfTokens = numberOfTokens;
 	}

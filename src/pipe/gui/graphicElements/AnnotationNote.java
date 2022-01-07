@@ -23,7 +23,7 @@ import pipe.gui.canvas.Zoomer;
 import pipe.gui.action.EditAnnotationBackgroundAction;
 import pipe.gui.action.EditAnnotationBorderAction;
 import pipe.gui.action.EditNoteAction;
-import pipe.gui.undo.AnnotationTextEdit;
+import pipe.gui.undo.AnnotationTextEditCommand;
 import pipe.gui.editor.AnnotationPanel;
 import pipe.gui.swingcomponents.EscapableDialog;
 
@@ -212,7 +212,7 @@ public class AnnotationNote extends Note {
 			// Text has been changed
 
 			TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
-					new AnnotationTextEdit(this, oldText, newText)
+					new AnnotationTextEditCommand(this, oldText, newText)
 			);
 			updateBounds();
 			return true;

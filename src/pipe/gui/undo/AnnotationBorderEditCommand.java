@@ -11,12 +11,12 @@ import net.tapaal.gui.undo.Command;
  * 
  * @author corveau
  */
-public class AnnotationBorderEdit extends Command {
+public class AnnotationBorderEditCommand extends Command {
 
 	final Note note;
 
 	/** Creates a new instance of placeRateEdit */
-	public AnnotationBorderEdit(Note _note) {
+	public AnnotationBorderEditCommand(Note _note) {
 		note = _note;
 	}
 

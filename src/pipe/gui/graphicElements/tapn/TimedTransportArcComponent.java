@@ -10,7 +10,7 @@ import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.undo.ArcTimeIntervalEdit;
+import pipe.gui.undo.ArcTimeIntervalEditCommand;
 import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.ConstantWeight;
@@ -231,7 +231,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		
 		repaint();
 
-		return new ArcTimeIntervalEdit(this, oldTimeInterval,
+		return new ArcTimeIntervalEditCommand(this, oldTimeInterval,
 				underlyingTransportArc.interval(), oldWeight, weight);
 	}
 	

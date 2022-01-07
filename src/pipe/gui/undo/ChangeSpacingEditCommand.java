@@ -3,12 +3,12 @@ package pipe.gui.undo;
 import pipe.gui.TabContent;
 import net.tapaal.gui.undo.Command;
 
-public class ChangeSpacingEdit extends Command {
+public class ChangeSpacingEditCommand extends Command {
 
 	private final double factor;
 	private final TabContent tab;
 
-    public ChangeSpacingEdit(double factor, TabContent tabContent) {
+    public ChangeSpacingEditCommand(double factor, TabContent tabContent) {
         super();
         this.factor = factor;
         this.tab = tabContent;

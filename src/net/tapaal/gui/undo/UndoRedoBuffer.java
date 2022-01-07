@@ -1,4 +1,4 @@
-package pipe.gui.undo;
+package net.tapaal.gui.undo;
 
 //WIP: Implemented 2021-10 to takeover current undo/redo implementation
 import java.util.ArrayList;

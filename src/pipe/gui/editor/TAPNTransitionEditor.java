@@ -456,11 +456,11 @@ public class TAPNTransitionEditor extends JPanel {
 		}
 		
 		if(transition.isUrgent() != urgentCheckBox.isSelected()){
-			context.undoManager().addEdit(new ToggleTransitionUrgent(transition.underlyingTransition(), context.tabContent()));
+			context.undoManager().addEdit(new ToggleTransitionUrgentCommand(transition.underlyingTransition(), context.tabContent()));
 			transition.setUrgent(urgentCheckBox.isSelected());
 		}
         if(transition.isUncontrollable() != uncontrollableCheckBox.isSelected()){
-            context.undoManager().addEdit(new ToggleTransitionUncontrollable(transition.underlyingTransition(), context.tabContent()));
+            context.undoManager().addEdit(new ToggleTransitionUncontrollableCommand(transition.underlyingTransition(), context.tabContent()));
             transition.setUncontrollable(uncontrollableCheckBox.isSelected());
         }
 

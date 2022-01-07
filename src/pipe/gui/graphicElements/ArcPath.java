@@ -14,7 +14,7 @@ import java.util.List;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.Constants;
-import pipe.gui.undo.AddArcPathPointEdit;
+import pipe.gui.undo.AddArcPathPointEditCommand;
 import net.tapaal.gui.undo.Command;
 
 /**
@@ -620,7 +620,7 @@ public class ArcPath implements Shape {
 		myArc.updateArcPosition();
         showPoints();
 
-		return new AddArcPathPointEdit(this.getArc(), newPoint, getArc().getGuiModel());
+		return new AddArcPathPointEditCommand(this.getArc(), newPoint, getArc().getGuiModel());
 	}
 
 	private int findPoint(final Point2D.Double mouseposition) {

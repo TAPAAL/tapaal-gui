@@ -9,15 +9,15 @@ import javax.swing.SwingWorker;
 
 import net.tapaal.gui.undo.UpdateNameLabelOffsetCommand;
 import net.tapaal.gui.undo.Command;
-import net.tapaal.gui.undo.MovePlaceTransitionObject;
+import net.tapaal.gui.undo.MovePlaceTransitionObjectCommand;
 import dk.aau.cs.util.Require;
 import pipe.gui.Constants;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
-import pipe.gui.undo.DeleteArcPathPointEdit;
-import pipe.gui.undo.TransitionRotationEdit;
+import pipe.gui.undo.DeleteArcPathPointEditCommand;
+import pipe.gui.undo.TransitionRotationEditCommand;
 
 public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	List<SmartDrawListener> listeners = new ArrayList<SmartDrawListener>();
@@ -212,7 +212,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		return arcsForObject;
 	}
 	private void moveObject(PlaceTransitionObject object, Point point) {
-		Command command = new MovePlaceTransitionObject(object, point);
+		Command command = new MovePlaceTransitionObjectCommand(object, point);
 		undoManager.addEdit(command);
 		command.redo();
 	}
@@ -391,7 +391,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 
 		}
 		for(ArcPathPoint p : toRemove) {
-			Command command = new DeleteArcPathPointEdit(p.getArcPath().getArc(), p, p.getIndex(), TAPAALGUI.getModel());
+			Command command = new DeleteArcPathPointEditCommand(p.getArcPath().getArc(), p, p.getIndex(), TAPAALGUI.getModel());
 			command.redo();
 			undoManager.addEdit(command);
 		}
@@ -402,7 +402,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 			if(ptObject instanceof Transition) {
 				Transition transition = (Transition)ptObject;
 				int newAngle = 0 - transition.getAngle();
-				Command command = new TransitionRotationEdit(transition, newAngle);
+				Command command = new TransitionRotationEditCommand(transition, newAngle);
 				command.redo();
 				undoManager.addEdit(command);
 			}

@@ -11,12 +11,12 @@ import net.tapaal.gui.undo.Command;
  * 
  * @author corveau
  */
-public class ArcPathPointTypeEdit extends Command {
+public class ArcPathPointTypeEditCommand extends Command {
 
 	final ArcPathPoint arcPathPoint;
 
 	/** Creates a new instance of placeWeightEdit */
-	public ArcPathPointTypeEdit(ArcPathPoint _arcPathPoint) {
+	public ArcPathPointTypeEditCommand(ArcPathPoint _arcPathPoint) {
 		arcPathPoint = _arcPathPoint;
 	}
 

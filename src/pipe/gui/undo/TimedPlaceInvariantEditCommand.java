@@ -4,14 +4,14 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInvariant;
 
-public class TimedPlaceInvariantEdit extends Command {
+public class TimedPlaceInvariantEditCommand extends Command {
 
 	private final TimeInvariant oldvalue;
 	private final TimeInvariant newvalue;
 	private final TimedPlaceComponent place;
 
-	public TimedPlaceInvariantEdit(TimedPlaceComponent place,
-			TimeInvariant oldvalue, TimeInvariant newvalue) {
+	public TimedPlaceInvariantEditCommand(TimedPlaceComponent place,
+                                          TimeInvariant oldvalue, TimeInvariant newvalue) {
 
 		this.oldvalue = oldvalue;
 		this.newvalue = newvalue;

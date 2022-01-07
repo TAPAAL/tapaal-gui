@@ -5,15 +5,15 @@ import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.Weight;
 
-public class ArcTimeIntervalEdit extends Command {
+public class ArcTimeIntervalEditCommand extends Command {
 	private final TimedOutputArcComponent arc;
 	final TimeInterval oldTimeInterval;
 	final TimeInterval newTimeInterval;
 	final Weight oldWeight;
 	final Weight newWeight;
 
-	public ArcTimeIntervalEdit(TimedOutputArcComponent arc,
-			TimeInterval oldTimeInterval, TimeInterval newTimeInterval, Weight oldWeight, Weight newWeight) {
+	public ArcTimeIntervalEditCommand(TimedOutputArcComponent arc,
+                                      TimeInterval oldTimeInterval, TimeInterval newTimeInterval, Weight oldWeight, Weight newWeight) {
 		this.arc = arc;
 		this.oldTimeInterval = oldTimeInterval;
 		this.newTimeInterval = newTimeInterval;

@@ -3,12 +3,12 @@ package net.tapaal.gui.undo;
 import pipe.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedTransition;
 
-public class ToggleTransitionUncontrollable extends Command {
+public class ToggleTransitionUncontrollableCommand extends Command {
     private final TimedTransition transition;
     private final boolean oldValue;
     private final TabContent tab;
 
-    public ToggleTransitionUncontrollable(TimedTransition transition, TabContent tab){
+    public ToggleTransitionUncontrollableCommand(TimedTransition transition, TabContent tab){
         this.transition = transition;
         oldValue = transition.isUncontrollable();
         this.tab = tab;

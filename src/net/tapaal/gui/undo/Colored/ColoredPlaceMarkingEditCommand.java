@@ -11,7 +11,7 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ColoredPlaceMarkingEdit extends Command {
+public class ColoredPlaceMarkingEditCommand extends Command {
 
     private final ArrayList<TimedToken> tokenList;
     private final ArrayList<TimedToken> newTokenList;
@@ -24,7 +24,7 @@ public class ColoredPlaceMarkingEdit extends Command {
     private final ArcExpression oldExpression;
     private final ArcExpression newExpression;
 
-    public ColoredPlaceMarkingEdit(
+    public ColoredPlaceMarkingEditCommand(
         ArrayList<TimedToken> tokenList,
         ArrayList<TimedToken> newTokenList,
         ArcExpression oldExpression,

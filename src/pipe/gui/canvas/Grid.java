@@ -9,7 +9,7 @@ import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 
 import net.tapaal.gui.undo.Command;
-import net.tapaal.gui.undo.MovePlaceTransitionObject;
+import net.tapaal.gui.undo.MovePlaceTransitionObjectCommand;
 import pipe.gui.Constants;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.PetriNetObject;
@@ -112,7 +112,7 @@ public class Grid {
 			int x = Grid.getModifiedX(ptobject.getPositionX());
 			int y = Grid.getModifiedY(ptobject.getPositionY());
 			Point point = new Point(x,y);
-			Command command = new MovePlaceTransitionObject(ptobject, point);
+			Command command = new MovePlaceTransitionObjectCommand(ptobject, point);
 			command.redo();
 			undoManager.addEdit(command);
 			ptobject.updateOnMoveOrZoom();

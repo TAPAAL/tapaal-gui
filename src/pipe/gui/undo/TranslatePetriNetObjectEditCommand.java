@@ -13,7 +13,7 @@ import net.tapaal.gui.undo.Command;
  * 
  * @author Pere Bonet
  */
-public class TranslatePetriNetObjectEdit extends Command {
+public class TranslatePetriNetObjectEditCommand extends Command {
 
 	final PetriNetObject pnObject;
 	final Integer transX;
@@ -21,7 +21,7 @@ public class TranslatePetriNetObjectEdit extends Command {
 	final DrawingSurfaceImpl ds;
 
 	/** Creates a new instance of */
-	public TranslatePetriNetObjectEdit(PetriNetObject _pnObject, Integer _transX, Integer _transY, DrawingSurfaceImpl drawingSurface) {
+	public TranslatePetriNetObjectEditCommand(PetriNetObject _pnObject, Integer _transX, Integer _transY, DrawingSurfaceImpl drawingSurface) {
 		pnObject = _pnObject;
 		transX = Zoomer.getUnzoomedValue(_transX, pnObject.getZoom());
 		transY = Zoomer.getUnzoomedValue(_transY, pnObject.getZoom());

@@ -6,15 +6,15 @@ import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
-public class UpdateConstantEdit extends Command {
+public class UpdateConstantEditCommand extends Command {
 
 	private final Constant newConstant;
 	private final ConstantStore store;
 	private final Constant oldConstant;
 	private final TimedArcPetriNetNetwork model;
 
-	public UpdateConstantEdit(Constant oldConstant, Constant newConstant,
-			ConstantStore store, TimedArcPetriNetNetwork model) {
+	public UpdateConstantEditCommand(Constant oldConstant, Constant newConstant,
+                                     ConstantStore store, TimedArcPetriNetNetwork model) {
 		this.oldConstant = oldConstant;
 		this.newConstant = newConstant;
 		this.store = store;
