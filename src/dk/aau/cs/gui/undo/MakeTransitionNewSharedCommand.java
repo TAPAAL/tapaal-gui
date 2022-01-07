@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel;
+import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;

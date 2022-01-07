@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
+import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.model.tapn.SharedPlace;
 
 public class DeleteSharedPlaceCommand extends Command {

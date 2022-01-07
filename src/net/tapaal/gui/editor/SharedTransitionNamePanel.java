@@ -1,4 +1,4 @@
-package dk.aau.cs.gui;
+package net.tapaal.gui.editor;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,37 +14,45 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
+import dk.aau.cs.gui.Context;
+import dk.aau.cs.gui.NameGenerator;
 import net.tapaal.swinghelpers.SwingHelper;
+import pipe.gui.undo.UndoManager;
 import net.tapaal.gui.verification.TAPNQuery;
-import dk.aau.cs.TCTL.visitors.RenameSharedPlaceVisitor;
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
-import dk.aau.cs.gui.undo.AddSharedPlaceCommand;
-import dk.aau.cs.gui.undo.RenameSharedPlaceCommand;
-import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.TCTL.visitors.RenameSharedTransitionVisitor;
+import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
+import dk.aau.cs.gui.undo.AddSharedTransitionCommand;
+import dk.aau.cs.gui.undo.RenameSharedTransitionCommand;
+import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.util.RequireException;
 
-public class SharedPlaceNamePanel extends JPanel {
+public class SharedTransitionNamePanel extends JPanel {
 
 	private final JRootPane rootPane;
-	private final SharedPlacesListModel listModel;
+	private final SharedTransitionsListModel listModel;
 	private JTextField nameField;
-	private final SharedPlace placeToEdit;
-	private final Context context;
+	private final SharedTransition transitionToEdit;
+
+	private final UndoManager undoManager;
+	private final NameGenerator nameGenerator;
+        private final Context context;
 	
 	JButton okButton;
 
-	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel sharedPlacesListModel, Context context) {
-		this(rootPane, sharedPlacesListModel, context, null);	
+	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator, Context context) {
+		this(rootPane, sharedTransitionsListModel, undoManager, nameGenerator, context, null);
 	}
 	
-	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel sharedPlacesListModel, Context context, SharedPlace placeToEdit) {
+	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator, Context context, SharedTransition transitionToEdit) {
 		this.rootPane = rootPane;
-		listModel = sharedPlacesListModel;
-		this.placeToEdit = placeToEdit;
-		this.context = context;
-		initComponents();		
+		listModel = sharedTransitionsListModel;
+		this.undoManager = undoManager;
+		this.nameGenerator = nameGenerator;
+		this.transitionToEdit = transitionToEdit;
+                this.context = context;
+		initComponents();	
 	}
-	
+
 	public void initComponents(){
 		setLayout(new GridBagLayout());
 		
@@ -72,13 +80,13 @@ public class SharedPlaceNamePanel extends JPanel {
 	private JPanel createNamePanel() {
 		JPanel namePanel = new JPanel(new GridBagLayout());
 		
-		JLabel label = new JLabel("Enter a shared place name:");
+		JLabel label = new JLabel("Enter a shared transition name:");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(4, 4, 2, 4);
 		namePanel.add(label, gbc);
 		
-		String initialText = (placeToEdit == null) ? "" : placeToEdit.name();
+		String initialText = (transitionToEdit == null) ? "" : transitionToEdit.name();
 		nameField = new JTextField(initialText);
         SwingHelper.setPreferredWidth(nameField,330);
 		nameField.addActionListener(e -> {
@@ -108,81 +116,77 @@ public class SharedPlaceNamePanel extends JPanel {
 		gbcOk.anchor = java.awt.GridBagConstraints.WEST;
 		gbcOk.insets = new java.awt.Insets(5, 5, 5, 5);
 
-
 	//	rootPane.setDefaultButton(okButton);
 		okButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				String name = nameField.getText();
+						
 				if(name == null || name.isEmpty()){
-					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "You must specify a name.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "You must specify a name.", "Error", JOptionPane.ERROR_MESSAGE);
 					nameField.requestFocusInWindow();
 					return;
 				}else{
-					boolean success = false;
-					if(placeToEdit == null){
-						success = addNewSharedPlace(name);
-					}else{
-						if (!name.equals(placeToEdit.name())){ //Name is different
-							success = updateExistingPlace(name);
-						}else {
-							success = true;
-						}
+					boolean success = true;
+					if(transitionToEdit == null){
+						success = addNewSharedTransition(name);
+					}else if(!name.equals(transitionToEdit.name())){
+						success = updateExistingTransition(name);
 					}
-
+					
 					if(success){
-						context.nameGenerator().updateIndicesForAllModels(name);
+						nameGenerator.updateIndicesForAllModels(name);
 						exit();
 					}
-
 				}
 			}
 
-			private boolean updateExistingPlace(String name) {
-				String oldName = placeToEdit.name();
+			private boolean updateExistingTransition(String name) {
 				
-				if(placeToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
-					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
+				String oldName = transitionToEdit.name();
+				
+				if(transitionToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
 					nameField.requestFocusInWindow();
 					return false;
 				}
 				
 				
 				try{
-					placeToEdit.setName(name);
-                }catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					transitionToEdit.setName(name);
+				}catch(RequireException e){
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
 					nameField.requestFocusInWindow();
 					return false;
 				}
-				
-				for(TAPNQuery query : context.queries()){
-					query.getProperty().accept(new RenameSharedPlaceVisitor(oldName, name), null);
+                                
+                                for(TAPNQuery query : context.queries()){
+					query.getProperty().accept(new RenameSharedTransitionVisitor(oldName, name), null);
 				}
 				
 				listModel.updatedName();
-				context.undoManager().addNewEdit(new RenameSharedPlaceCommand(placeToEdit, listModel, context.tabContent(), oldName, name));
+				undoManager.addNewEdit(new RenameSharedTransitionCommand(transitionToEdit, context.tabContent(), oldName, name, listModel));
 				return true;
 			}
-
-			private boolean addNewSharedPlace(String name) {
-				SharedPlace place = null;
+			private boolean addNewSharedTransition(String name) {
+				SharedTransition transition = null;
+				
 				try{
-					place = new SharedPlace(name);
+					transition = new SharedTransition(name);
 				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
 					nameField.requestFocusInWindow();
 					return false;
 				}
 				
 				try{
-					listModel.addElement(place);
+					listModel.addElement(transition);
 				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
 					nameField.requestFocusInWindow();
 					return false;
 				}
 				
-				context.undoManager().addNewEdit(new AddSharedPlaceCommand(listModel, place));
+				undoManager.addNewEdit(new AddSharedTransitionCommand(listModel, transition));
 				return true;
 			}
 		});
@@ -197,12 +201,13 @@ public class SharedPlaceNamePanel extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = java.awt.GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;		
+		gbc.anchor = GridBagConstraints.EAST;	
 
 		cancelButton.addActionListener(e -> exit());
 		
 		buttonPanel.add(cancelButton,gbc);
 		buttonPanel.add(okButton,gbcOk);
+		
 		
 		return buttonPanel;
 	}
@@ -212,4 +217,3 @@ public class SharedPlaceNamePanel extends JPanel {
 	}
 
 }
-

@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
+import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
 import dk.aau.cs.model.tapn.SharedTransition;
 
 public class SortSharedTransitionsCommand extends Command {

@@ -9,7 +9,7 @@ import net.tapaal.gui.verification.TAPNQuery;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.MakePlaceSharedVisitor;
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel;
+import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;

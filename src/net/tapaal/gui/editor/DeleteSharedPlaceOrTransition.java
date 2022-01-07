@@ -1,4 +1,4 @@
-package dk.aau.cs.gui;
+package net.tapaal.gui.editor;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,8 +15,11 @@ import javax.swing.JScrollPane;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsSharedPlaceVisitor;
 import dk.aau.cs.TCTL.visitors.ContainsSharedTransitionVisitor;
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
-import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
+import dk.aau.cs.gui.NameGenerator;
+import dk.aau.cs.gui.TabContent;
+import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel;
+import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
+import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.gui.undo.DeleteSharedPlaceCommand;
