@@ -21,7 +21,7 @@ import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.undo.TransitionRotationEdit;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 
 /**

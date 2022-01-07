@@ -22,8 +22,8 @@ import javax.swing.event.ListSelectionListener;
 
 import net.tapaal.gui.Context;
 import net.tapaal.gui.NameGenerator;
+import net.tapaal.gui.undo.*;
 import pipe.gui.TabContent;
-import dk.aau.cs.gui.undo.*;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.undo.UndoManager;

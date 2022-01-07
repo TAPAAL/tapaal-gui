@@ -26,7 +26,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import dk.aau.cs.gui.undo.*;
+import net.tapaal.gui.undo.AddFileExportBatchCommand;
+import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.undo.RemoveFileExportBatchCommand;
 import org.w3c.dom.DOMException;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;

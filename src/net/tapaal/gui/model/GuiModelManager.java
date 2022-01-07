@@ -1,7 +1,7 @@
 package net.tapaal.gui.model;
 
+import net.tapaal.gui.undo.*;
 import pipe.gui.TabContent;
-import dk.aau.cs.gui.undo.*;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;

@@ -5,7 +5,7 @@ import java.util.*;
 import pipe.gui.undo.AddConstantEdit;
 import pipe.gui.undo.RemoveConstantEdit;
 import pipe.gui.undo.UpdateConstantEdit;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 import dk.aau.cs.util.StringComparator;
 
 public class ConstantStore {

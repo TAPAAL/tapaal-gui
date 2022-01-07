@@ -3,7 +3,7 @@ package pipe.gui.undo;
 import java.util.List;
 
 import pipe.gui.TabContent;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 import net.tapaal.gui.verification.TAPNQuery;
 
 public class RemoveQueriesCommand extends Command {

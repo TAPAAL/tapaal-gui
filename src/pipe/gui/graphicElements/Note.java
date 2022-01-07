@@ -16,7 +16,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.undo.AnnotationBorderEdit;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 
 public abstract class Note extends PetriNetObject {
 

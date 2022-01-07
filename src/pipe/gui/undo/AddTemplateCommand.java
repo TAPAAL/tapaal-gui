@@ -2,7 +2,7 @@ package pipe.gui.undo;
 
 import pipe.dataLayer.Template;
 import net.tapaal.gui.editor.TemplateExplorer;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 
 public class AddTemplateCommand extends Command {
 	protected final Template template;

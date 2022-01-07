@@ -1,6 +1,6 @@
 package pipe.gui.undo;
 
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,11 +2,11 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
-import dk.aau.cs.gui.undo.Colored.*;
+import net.tapaal.gui.undo.Colored.*;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
 import pipe.gui.MessengerImpl;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
 import dk.aau.cs.model.tapn.event.ConstantsListener;

@@ -5,7 +5,7 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import pipe.gui.TabContent;
 import net.tapaal.gui.editor.TemplateExplorer;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class RenameTemplateCommand extends Command {

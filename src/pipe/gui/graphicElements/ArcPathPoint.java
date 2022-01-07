@@ -21,7 +21,7 @@ import pipe.gui.action.SplitArcPointAction;
 import pipe.gui.action.ToggleArcPointAction;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.ArcPathPointTypeEdit;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 
 import javax.swing.*;
 

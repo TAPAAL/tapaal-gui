@@ -1,10 +1,10 @@
 package net.tapaal.gui.editor;
 
 import net.tapaal.gui.Context;
-import dk.aau.cs.gui.undo.Colored.SetArcExpressionCommand;
-import dk.aau.cs.gui.undo.Colored.SetColoredArcIntervalsCommand;
-import dk.aau.cs.gui.undo.Colored.SetTransportArcExpressionsCommand;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Colored.SetArcExpressionCommand;
+import net.tapaal.gui.undo.Colored.SetColoredArcIntervalsCommand;
+import net.tapaal.gui.undo.Colored.SetTransportArcExpressionsCommand;
+import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.CPN.ArcExpressionParser.ArcExpressionParser;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;

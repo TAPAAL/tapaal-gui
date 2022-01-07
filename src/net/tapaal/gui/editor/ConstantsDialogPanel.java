@@ -18,7 +18,7 @@ import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.swinghelpers.RequestFocusListener;
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.TAPAALGUI;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import pipe.gui.swingcomponents.EscapableDialog;

@@ -1,8 +1,8 @@
 package net.tapaal.gui.dialog;
 
 import pipe.gui.TabContent;
-import dk.aau.cs.gui.undo.ChangeAllNamesVisibilityCommand;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.ChangeAllNamesVisibilityCommand;
+import net.tapaal.gui.undo.Command;
 import pipe.gui.graphicElements.PetriNetObject;
 
 import javax.swing.*;

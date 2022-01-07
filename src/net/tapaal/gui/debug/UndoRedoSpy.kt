@@ -1,6 +1,6 @@
 package net.tapaal.gui.debug
 
-import dk.aau.cs.gui.undo.Command
+import net.tapaal.gui.undo.Command
 import pipe.gui.TAPAALGUI
 import pipe.gui.undo.UndoManager
 import java.awt.event.ActionEvent

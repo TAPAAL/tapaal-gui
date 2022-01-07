@@ -19,8 +19,8 @@ import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedPlaceVisitor;
 import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
-import dk.aau.cs.gui.undo.AddSharedPlaceCommand;
-import dk.aau.cs.gui.undo.RenameSharedPlaceCommand;
+import net.tapaal.gui.undo.AddSharedPlaceCommand;
+import net.tapaal.gui.undo.RenameSharedPlaceCommand;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.util.RequireException;
 

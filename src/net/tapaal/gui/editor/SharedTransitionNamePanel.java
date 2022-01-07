@@ -21,8 +21,8 @@ import pipe.gui.undo.UndoManager;
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedTransitionVisitor;
 import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
-import dk.aau.cs.gui.undo.AddSharedTransitionCommand;
-import dk.aau.cs.gui.undo.RenameSharedTransitionCommand;
+import net.tapaal.gui.undo.AddSharedTransitionCommand;
+import net.tapaal.gui.undo.RenameSharedTransitionCommand;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.util.RequireException;
 

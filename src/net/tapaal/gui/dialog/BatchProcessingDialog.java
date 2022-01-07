@@ -24,9 +24,9 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import dk.aau.cs.gui.undo.AddFileBatchProcessingCommand;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.RemoveFileBatchProcessingCommand;
+import net.tapaal.gui.undo.AddFileBatchProcessingCommand;
+import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.undo.RemoveFileBatchProcessingCommand;
 import net.tapaal.gui.verification.TAPNQuery;
 import net.tapaal.gui.verification.TAPNQuery.SearchOption;
 import pipe.gui.TAPAALGUI;

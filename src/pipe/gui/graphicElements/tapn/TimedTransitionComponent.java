@@ -25,7 +25,7 @@ import pipe.gui.graphicElements.Transition;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.editor.TAPNTransitionEditor;
 import net.tapaal.gui.Context;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;

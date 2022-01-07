@@ -1,7 +1,7 @@
 package pipe.gui.undo;
 
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.Weight;
 

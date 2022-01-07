@@ -1,7 +1,7 @@
 package pipe.gui.undo;
 
 import pipe.gui.TabContent;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 
 public class ChangeSpacingEdit extends Command {
 

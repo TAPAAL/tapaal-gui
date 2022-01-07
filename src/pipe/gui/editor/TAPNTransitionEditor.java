@@ -10,8 +10,9 @@ import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.CaretListener;
+
+import net.tapaal.gui.undo.*;
 import net.tapaal.swinghelpers.GridBagHelper;
-import dk.aau.cs.gui.undo.*;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import net.tapaal.gui.editor.ColoredTransitionGuardPanel;
@@ -438,7 +439,7 @@ public class TAPNTransitionEditor extends JPanel {
 					if(transition.underlyingTransition().model().parentNetwork().isNameUsedForTransitionsOnly(newName)) {
 						int dialogResult = JOptionPane.showConfirmDialog(this, "A transition with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\nThis transition name will be changed into shared one also in all other components.", "Error", JOptionPane.OK_CANCEL_OPTION);
 						if(dialogResult == JOptionPane.OK_OPTION) {
-							Command cmd = new MakeTransitionNewSharedMultiCommand(context, newName, transition);	
+							Command cmd = new MakeTransitionNewSharedMultiCommand(context, newName, transition);
 							cmd.redo();
 							context.undoManager().addEdit(cmd);
 						} else {

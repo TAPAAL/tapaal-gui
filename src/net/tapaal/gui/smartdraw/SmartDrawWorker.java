@@ -7,9 +7,9 @@ import java.util.Random;
 
 import javax.swing.SwingWorker;
 
-import dk.aau.cs.gui.undo.UpdateNameLabelOffsetCommand;
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
+import net.tapaal.gui.undo.UpdateNameLabelOffsetCommand;
+import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.undo.MovePlaceTransitionObject;
 import dk.aau.cs.util.Require;
 import pipe.gui.Constants;
 import pipe.gui.TAPAALGUI;

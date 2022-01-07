@@ -10,7 +10,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.undo.ArcTimeIntervalEdit;
-import dk.aau.cs.gui.undo.Command;
+import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.ConstantWeight;
 import dk.aau.cs.model.tapn.TimeInterval;
