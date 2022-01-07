@@ -1,4 +1,4 @@
-package pipe.gui.editor;
+package net.tapaal.gui.editor;
 
 import dk.aau.cs.gui.undo.Colored.AddVariableCommand;
 import dk.aau.cs.gui.undo.Colored.UpdateVariableCommand;

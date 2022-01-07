@@ -1,4 +1,4 @@
-package pipe.gui.dialog;
+package net.tapaal.gui.dialog;
 
 import java.awt.*;
 import java.awt.event.*;

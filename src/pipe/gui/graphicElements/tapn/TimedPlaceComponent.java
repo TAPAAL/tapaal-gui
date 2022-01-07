@@ -20,7 +20,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.swingcomponents.EscapableDialog;
-import pipe.gui.dialog.PlaceEditorPanel;
+import pipe.gui.editor.PlaceEditorPanel;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.Constant;

@@ -1,4 +1,4 @@
-package pipe.gui.dialog;
+package net.tapaal.gui.dialog;
 
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLConstNode;

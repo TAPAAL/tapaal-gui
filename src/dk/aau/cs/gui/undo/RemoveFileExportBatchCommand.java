@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import pipe.gui.dialog.ExportBatchDialog;
+import net.tapaal.gui.dialog.ExportBatchDialog;
 
 import javax.swing.*;
 import java.io.File;

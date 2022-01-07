@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import dk.aau.cs.gui.TabContent;
 import pipe.dataLayer.DataLayer;
-import pipe.gui.dialog.ExportBatchDialog;
+import net.tapaal.gui.dialog.ExportBatchDialog;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.ArcPathPoint;

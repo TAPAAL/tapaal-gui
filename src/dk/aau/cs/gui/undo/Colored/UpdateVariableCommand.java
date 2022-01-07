@@ -3,7 +3,7 @@ package dk.aau.cs.gui.undo.Colored;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
-import pipe.gui.editor.ConstantsPane;
+import net.tapaal.gui.editor.ConstantsPane;
 
 public class UpdateVariableCommand extends Command {
 

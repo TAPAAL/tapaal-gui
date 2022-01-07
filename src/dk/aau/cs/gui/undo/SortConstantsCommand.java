@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import pipe.gui.editor.ConstantsPane;
+import net.tapaal.gui.editor.ConstantsPane;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.Constant;
 

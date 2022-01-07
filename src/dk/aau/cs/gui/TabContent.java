@@ -50,10 +50,10 @@ import pipe.gui.canvas.Zoomer;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.*;
 import pipe.gui.undo.*;
-import pipe.gui.dialog.UnfoldDialog;
-import pipe.gui.editor.ConstantsPane;
+import net.tapaal.gui.dialog.UnfoldDialog;
+import net.tapaal.gui.editor.ConstantsPane;
 import net.tapaal.gui.widgets.QueryPane;
-import pipe.gui.dialog.WorkflowDialog;
+import net.tapaal.gui.dialog.WorkflowDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import java.awt.event.MouseWheelEvent;

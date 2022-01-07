@@ -17,7 +17,7 @@ import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.editor.ConstantsPane;
+import net.tapaal.gui.editor.ConstantsPane;
 
 public class TimedArcPetriNetNetwork {
 	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();

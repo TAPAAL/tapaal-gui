@@ -1,4 +1,4 @@
-package pipe.gui.editor;
+package net.tapaal.gui.editor;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

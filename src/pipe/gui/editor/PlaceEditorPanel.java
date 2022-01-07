@@ -1,4 +1,4 @@
-package pipe.gui.dialog;
+package pipe.gui.editor;
 
 import dk.aau.cs.gui.Context;
 //import java.awt.Color;

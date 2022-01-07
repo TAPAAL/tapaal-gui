@@ -17,8 +17,8 @@ import net.tapaal.versioncheck.VersionChecker;
 import pipe.gui.animation.DelayEnabledTransitionControl;
 import pipe.gui.animation.SimulationControl;
 import net.tapaal.gui.verification.EngineDialogPanel;
-import pipe.gui.dialog.NewTAPNPanel;
-import pipe.gui.dialog.QueryDialog;
+import net.tapaal.gui.dialog.NewTAPNPanel;
+import net.tapaal.gui.dialog.QueryDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import javax.swing.*;
