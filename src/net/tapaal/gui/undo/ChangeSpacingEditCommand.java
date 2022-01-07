@@ -1,4 +1,4 @@
-package pipe.gui.undo;
+package net.tapaal.gui.undo;
 
 import pipe.gui.TabContent;
 import net.tapaal.gui.undo.Command;

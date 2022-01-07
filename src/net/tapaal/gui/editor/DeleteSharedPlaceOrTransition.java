@@ -43,12 +43,12 @@ import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
-import pipe.gui.undo.DeleteTimedInhibitorArcCommand;
-import pipe.gui.undo.DeleteTimedInputArcCommand;
-import pipe.gui.undo.DeleteTimedOutputArcCommand;
-import pipe.gui.undo.DeleteTimedPlaceCommand;
-import pipe.gui.undo.DeleteTimedTransitionCommand;
-import pipe.gui.undo.DeleteTransportArcCommand;
+import net.tapaal.gui.undo.DeleteTimedInhibitorArcCommand;
+import net.tapaal.gui.undo.DeleteTimedInputArcCommand;
+import net.tapaal.gui.undo.DeleteTimedOutputArcCommand;
+import net.tapaal.gui.undo.DeleteTimedPlaceCommand;
+import net.tapaal.gui.undo.DeleteTimedTransitionCommand;
+import net.tapaal.gui.undo.DeleteTransportArcCommand;
 import pipe.gui.undo.UndoManager;
 
 public class DeleteSharedPlaceOrTransition implements ActionListener{

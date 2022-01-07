@@ -1,22 +1,23 @@
-package pipe.gui.undo;
+package net.tapaal.gui.undo;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TransportArc;
+import pipe.gui.undo.TAPNElementCommand;
 
-public class AddTransportArcCommand extends TAPNElementCommand {
+public class DeleteTransportArcCommand extends TAPNElementCommand {
 	private final TimedTransportArcComponent transportArcComponent;
 	private final TransportArc transportArc;
 
-	public AddTransportArcCommand(TimedTransportArcComponent transportArcComponent, TransportArc transportArc, TimedArcPetriNet tapn, DataLayer guiModel) {
+	public DeleteTransportArcCommand(TimedTransportArcComponent transportArcComponent, TransportArc transportArc, TimedArcPetriNet tapn, DataLayer guiModel) {
 		super(tapn, guiModel);
 		this.transportArcComponent = transportArcComponent;
 		this.transportArc = transportArc;
 	}
 
 	@Override
-	public void undo() {
+	public void redo() {
 		transportArc.delete();
 
 		TimedTransportArcComponent partner = transportArcComponent.getConnectedTo();
@@ -24,16 +25,18 @@ public class AddTransportArcCommand extends TAPNElementCommand {
 		guiModel.removePetriNetObject(transportArcComponent);
 		guiModel.removePetriNetObject(partner);
 
-
 	}
 
 	@Override
-	public void redo() {
+	public void undo() {
 		TimedTransportArcComponent partner = transportArcComponent.getConnectedTo();
 
-		guiModel.addPetriNetObject(transportArcComponent);
+        transportArcComponent.deselect();
+
+        guiModel.addPetriNetObject(transportArcComponent);
 		guiModel.addPetriNetObject(partner);
 
 		tapn.add(transportArc);
 	}
+
 }

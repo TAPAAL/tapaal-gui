@@ -37,6 +37,7 @@ import net.tapaal.Preferences;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.gui.animation.DelayEnabledTransitionControl;
 import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel;
+import net.tapaal.gui.undo.ChangeSpacingEditCommand;
 import net.tapaal.gui.verification.*;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.swinghelpers.JSplitPaneFix;

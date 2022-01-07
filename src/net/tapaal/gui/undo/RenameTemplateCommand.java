@@ -1,4 +1,4 @@
-package pipe.gui.undo;
+package net.tapaal.gui.undo;
 
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;

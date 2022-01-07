@@ -1,4 +1,4 @@
-package pipe.gui.undo;
+package net.tapaal.gui.undo;
 
 import pipe.dataLayer.Template;
 import net.tapaal.gui.editor.TemplateExplorer;

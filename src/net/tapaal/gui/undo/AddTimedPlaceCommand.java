@@ -1,8 +1,9 @@
-package pipe.gui.undo;
+package net.tapaal.gui.undo;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import pipe.gui.undo.TAPNElementCommand;
 
 public class AddTimedPlaceCommand extends TAPNElementCommand {
 	final TimedPlaceComponent timedPlace;

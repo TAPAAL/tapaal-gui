@@ -2,9 +2,9 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
-import pipe.gui.undo.AddConstantEditCommand;
-import pipe.gui.undo.RemoveConstantEditCommand;
-import pipe.gui.undo.UpdateConstantEditCommand;
+import net.tapaal.gui.undo.AddConstantEditCommand;
+import net.tapaal.gui.undo.RemoveConstantEditCommand;
+import net.tapaal.gui.undo.UpdateConstantEditCommand;
 import net.tapaal.gui.undo.Command;
 import dk.aau.cs.util.StringComparator;
 

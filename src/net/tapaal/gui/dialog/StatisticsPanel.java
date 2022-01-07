@@ -16,8 +16,8 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import pipe.gui.*;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.undo.DeleteTimedPlaceCommand;
-import pipe.gui.undo.DeleteTimedTransitionCommand;
+import net.tapaal.gui.undo.DeleteTimedPlaceCommand;
+import net.tapaal.gui.undo.DeleteTimedTransitionCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.dataLayer.*;
 

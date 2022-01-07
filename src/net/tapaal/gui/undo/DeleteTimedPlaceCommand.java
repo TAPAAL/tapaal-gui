@@ -1,4 +1,4 @@
-package pipe.gui.undo;
+package net.tapaal.gui.undo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,7 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
+import pipe.gui.undo.TAPNElementCommand;
 
 public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	private final TimedPlaceComponent timedPlaceComponent;

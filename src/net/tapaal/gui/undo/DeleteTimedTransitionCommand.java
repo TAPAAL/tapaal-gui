@@ -1,9 +1,10 @@
-package pipe.gui.undo;
+package net.tapaal.gui.undo;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import pipe.gui.undo.TAPNElementCommand;
 
 public class DeleteTimedTransitionCommand extends TAPNElementCommand {
 	private final TimedTransitionComponent transition;

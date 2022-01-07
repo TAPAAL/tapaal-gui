@@ -1,4 +1,4 @@
-package pipe.gui.undo;
+package net.tapaal.gui.undo;
 
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import net.tapaal.gui.undo.Command;
