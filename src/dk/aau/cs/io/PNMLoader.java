@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.locks.Condition;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,7 +15,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
-import dk.aau.cs.util.Tuple;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,11 +22,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import dk.aau.cs.gui.NameGenerator;
-import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -42,7 +38,7 @@ import dk.aau.cs.util.Require;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PlaceTransitionObject;
@@ -399,8 +395,8 @@ public class PNMLoader {
 
                         double arcPointX = Double.parseDouble(arcTempX);
                         double arcPointY = Double.parseDouble(arcTempY);
-                        arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-                        arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
+                        arcPointX += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
+                        arcPointY += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
 
                         //We add the point at i+1 as the starting and end points of
                         //the arc is already in the path as point number 0 and 1

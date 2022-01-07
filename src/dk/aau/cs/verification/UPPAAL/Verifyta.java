@@ -11,7 +11,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -118,7 +118,7 @@ public class Verifyta implements ModelChecker {
 			return false;
 		} else {
 
-			EngineHelperFunctions.versionIsEqualOrGreater(versionAsString, Pipe.VERIFYTA_MIN_REV);
+			EngineHelperFunctions.versionIsEqualOrGreater(versionAsString, Constants.VERIFYTA_MIN_REV);
 
 		}
 

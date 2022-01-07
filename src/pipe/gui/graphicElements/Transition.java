@@ -17,7 +17,7 @@ import javax.swing.*;
 
 import pipe.gui.Animator;
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.undo.TransitionRotationEdit;
@@ -34,7 +34,7 @@ public abstract class Transition extends PlaceTransitionObject {
 	private Shape proximityTransition;
 
 	// Transition Size
-	protected static final int TRANSITION_HEIGHT = Pipe.PLACE_TRANSITION_HEIGHT;
+	protected static final int TRANSITION_HEIGHT = Constants.PLACE_TRANSITION_HEIGHT;
 	protected static final int TRANSITION_WIDTH = TRANSITION_HEIGHT / 3;
 	
 	protected int angle;
@@ -111,22 +111,22 @@ public abstract class Transition extends PlaceTransitionObject {
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		if (selected) {
-			g2.setColor(Pipe.SELECTION_FILL_COLOUR);
+			g2.setColor(Constants.SELECTION_FILL_COLOUR);
 			//pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
-			g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
+			g2.setColor(Constants.ELEMENT_FILL_COLOUR);
 			//pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
         g2.fill(transition);
 
 		if (highlightedEnabled) {
-			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
+			g2.setPaint(Constants.ENABLED_TRANSITION_COLOUR);
 		} else if (highlightedDelayEnabled && CreateGui.getApp().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
-			g2.setPaint(Pipe.YELLOW_TRANSITION_COLOR);
+			g2.setPaint(Constants.YELLOW_TRANSITION_COLOR);
 		} else if (selected) {
-			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			g2.setPaint(Constants.SELECTION_LINE_COLOUR);
 		} else {
-			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			g2.setPaint(Constants.ELEMENT_LINE_COLOUR);
 		}
 
 		g2.draw(transition);
@@ -153,7 +153,7 @@ public abstract class Transition extends PlaceTransitionObject {
 	}
 
 	private void outlineTransition() {
-		proximityTransition = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(transition);
+		proximityTransition = (new BasicStroke(Constants.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(transition);
 	}
 
 	/**

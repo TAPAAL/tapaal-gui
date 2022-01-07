@@ -8,7 +8,6 @@ import java.math.MathContext;
 import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -106,7 +105,7 @@ public class DelayEnabledTransitionControl extends JPanel{
 
 	//0 corresponds to 0.00001, 5 corresponds to 1 (   thus x corresponds to 1/(10^(5−x))  )
 	public BigDecimal getValue(){ 
-		return new BigDecimal(1.0/(Math.pow(10.0, (5.0- delayEnabledPrecision.getValue()))), new MathContext(Pipe.AGE_PRECISION));
+		return new BigDecimal(1.0/(Math.pow(10.0, (5.0- delayEnabledPrecision.getValue()))), new MathContext(Constants.AGE_PRECISION));
 	}
 	
 	public void setValue(BigDecimal value){

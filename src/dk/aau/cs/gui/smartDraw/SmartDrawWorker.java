@@ -11,6 +11,7 @@ import dk.aau.cs.gui.undo.UpdateNameLabelOffsetCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import dk.aau.cs.util.Require;
+import pipe.gui.Constants;
 import pipe.gui.CreateGui;
 import pipe.gui.Zoomer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
@@ -472,7 +473,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	public void resetLabelsToDefault() {
 		for(PetriNetObject pNetObject : drawingSurface.getGuiModel().getPNObjects()) {
 			if(pNetObject instanceof PlaceTransitionObject) {
-				Command cmd = new UpdateNameLabelOffsetCommand((int)zoom(pipe.gui.Pipe.DEFAULT_OFFSET_X), (int)zoom(pipe.gui.Pipe.DEFAULT_OFFSET_Y), ((PlaceTransitionObject) pNetObject).getNameOffsetX(),
+				Command cmd = new UpdateNameLabelOffsetCommand((int)zoom(Constants.DEFAULT_OFFSET_X), (int)zoom(Constants.DEFAULT_OFFSET_Y), ((PlaceTransitionObject) pNetObject).getNameOffsetX(),
 																((PlaceTransitionObject) pNetObject).getNameOffsetY(), (PetriNetObjectWithLabel) pNetObject);
 				cmd.redo();
 				undoManager.addEdit(cmd);

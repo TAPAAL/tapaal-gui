@@ -9,7 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
 
@@ -20,7 +20,7 @@ import javax.swing.*;
  */
 public abstract class Place extends PlaceTransitionObject {
 
-	protected static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
+	protected static final int DIAMETER = Constants.PLACE_TRANSITION_HEIGHT;
 
 	// Token Width and Height
 	protected static final int tWidth = 5;
@@ -36,7 +36,7 @@ public abstract class Place extends PlaceTransitionObject {
 
 	// Ellipse2D.Double place
 	protected static final Ellipse2D.Double placeEllipse = new Ellipse2D.Double(0, 0,	DIAMETER, DIAMETER);
-	protected static final Shape proximityPlace = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
+	protected static final Shape proximityPlace = (new BasicStroke(Constants.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
 
 
 	public Place(
@@ -84,18 +84,18 @@ public abstract class Place extends PlaceTransitionObject {
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		if (selected) {
-			g2.setColor(Pipe.SELECTION_FILL_COLOUR);
+			g2.setColor(Constants.SELECTION_FILL_COLOUR);
 			//pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
-			g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
+			g2.setColor(Constants.ELEMENT_FILL_COLOUR);
 			//pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 		g2.fill(placeEllipse);
 
 		if (selected) {
-			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			g2.setPaint(Constants.SELECTION_LINE_COLOUR);
 		} else {
-			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			g2.setPaint(Constants.ELEMENT_LINE_COLOUR);
 		}
 		g2.draw(placeEllipse);
 

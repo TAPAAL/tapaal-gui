@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import dk.aau.cs.model.CPN.Color;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 
 public class TimedToken {
 	private final TimedPlace place;
@@ -53,7 +53,7 @@ public class TimedToken {
     @Override
 	public String toString() {
 		DecimalFormat df = new DecimalFormat();
-		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		df.setMaximumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
 
         return String.format("(%s, %s, %s)", place.toString(), df.format(age), color.toString());
 	}

@@ -252,8 +252,8 @@ public class AnimationControlSidePanel extends JPanel {
 		});
 
 		DecimalFormat df = new DecimalFormat();
-		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-		df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		df.setMaximumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
+		df.setMinimumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
 
 		TimeDelayField.setText(df.format(1f));
 		TimeDelayField.setColumns(6);
@@ -296,18 +296,18 @@ public class AnimationControlSidePanel extends JPanel {
 
 			// Hack to allow usage of localised numbes
 			DecimalFormat df = new DecimalFormat();
-			df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-			df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+			df.setMaximumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
+			df.setMinimumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
 			df.applyLocalizedPattern("#.#");
 
 			DecimalFormat parser = new DecimalFormat();
-			parser.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-			parser.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+			parser.setMaximumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
+			parser.setMinimumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
 
 			Number parseTime = parser.parse(TimeDelayField.getText()); // Parse the number localised
 			// Try parse
 
-			BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(), new MathContext(Pipe.AGE_PRECISION));
+			BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(), new MathContext(Constants.AGE_PRECISION));
 
 			if (timeDelayToSet.compareTo(new BigDecimal(0L)) < 0) {
 				// Nothing to do, illegal value
@@ -339,17 +339,17 @@ public class AnimationControlSidePanel extends JPanel {
 		}
 		// Hack to allow usage of localised numbes		
 		DecimalFormat df = new DecimalFormat();
-		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-		df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		df.setMaximumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
+		df.setMinimumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
 		df.applyLocalizedPattern("#.#");
 
 		DecimalFormat parser = new DecimalFormat();
-		parser.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-		parser.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		parser.setMaximumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
+		parser.setMinimumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
 
 		Number parseTime = parser.parse(TimeDelayField.getText()); // Parse the number localised
 
-		return new BigDecimal(parseTime.toString(), new MathContext(Pipe.AGE_PRECISION));
+		return new BigDecimal(parseTime.toString(), new MathContext(Constants.AGE_PRECISION));
 	}
 
 

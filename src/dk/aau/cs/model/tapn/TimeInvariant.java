@@ -5,7 +5,7 @@ import java.math.MathContext;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.IntervalOperations;
@@ -83,7 +83,7 @@ public class TimeInvariant {
 		if(iUp.compareTo(BigDecimal.ZERO) < 0){
 			return new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
 		} else{
-			BigDecimal newUpper = iUp.subtract(age, new MathContext(Pipe.AGE_PRECISION));
+			BigDecimal newUpper = iUp.subtract(age, new MathContext(Constants.AGE_PRECISION));
 			return new TimeInterval(true, new IntBound(0), new RatBound(newUpper), isUpperNonstrict());
 		}
 	}

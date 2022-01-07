@@ -4,7 +4,7 @@ import java.awt.geom.Ellipse2D;
 import java.util.Hashtable;
 
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import dk.aau.cs.gui.undo.Command;
@@ -69,9 +69,9 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
             pnName.setVisible(((ConstantWeight) getWeight()).constant().getVisible());
         }
         if(focusedConstant){
-            getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
+            getNameLabel().setForeground(Constants.SELECTION_TEXT_COLOUR);
         }else{
-            getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+            getNameLabel().setForeground(Constants.ELEMENT_TEXT_COLOUR);
         }
 
 

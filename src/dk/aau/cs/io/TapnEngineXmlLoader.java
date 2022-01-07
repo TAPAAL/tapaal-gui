@@ -16,7 +16,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
@@ -977,8 +977,8 @@ public class TapnEngineXmlLoader {
 						String arcTempType = element.getAttribute("arcPointType");
 						double arcPointX = Double.parseDouble(arcTempX);
 						double arcPointY = Double.parseDouble(arcTempY);
-						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
+						arcPointX += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
+						arcPointY += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
 						boolean arcPointType = Boolean.parseBoolean(arcTempType);
 						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	arcPointType);
 					}

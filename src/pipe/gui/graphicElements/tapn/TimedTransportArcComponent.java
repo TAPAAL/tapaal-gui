@@ -8,7 +8,7 @@ import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import dk.aau.cs.gui.undo.Command;
@@ -149,9 +149,9 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
                 }
             }
             if (focusedConstant) {
-                getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
+                getNameLabel().setForeground(Constants.SELECTION_TEXT_COLOUR);
             } else {
-                getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+                getNameLabel().setForeground(Constants.ELEMENT_TEXT_COLOUR);
             }
             pnName.setVisible(isvisible);
         } else if (!isInPreSet) {

@@ -17,7 +17,6 @@ import pipe.dataLayer.DataLayer;
 import pipe.gui.*;
 import pipe.gui.graphicElements.*;
 import pipe.gui.undo.*;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 /**
  * The petrinet is drawn onto this frame.
@@ -45,7 +44,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		setOpaque(true);
 		setDoubleBuffered(true);
 		setAutoscrolls(true);
-		setBackground(Pipe.ELEMENT_FILL_COLOUR);
+		setBackground(Constants.ELEMENT_FILL_COLOUR);
 
 		zoomControl = new Zoomer(100);
 
@@ -323,7 +322,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
         pno.setManagerRef(managerRef);
 
         add(pno);
-        setLayer(pno, Pipe.PROTOTYPE_LAYER_OFFSET);
+        setLayer(pno, Constants.PROTOTYPE_LAYER_OFFSET);
         validate();
         repaint();
     }
@@ -338,7 +337,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
     @Override
     public void clearAllPrototype() {
-        for (Component c : getComponentsInLayer(Pipe.PROTOTYPE_LAYER_OFFSET)) {
+        for (Component c : getComponentsInLayer(Constants.PROTOTYPE_LAYER_OFFSET)) {
         	remove(c);
         }
         validate();
@@ -347,7 +346,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
     public Point adjustPointToZoom(Point p, int zoom) {
         //Converts center coord to upperleft coord
-        int offset = (int) (Zoomer.getScaleFactor(zoom) * Pipe.PLACE_TRANSITION_HEIGHT / 2);
+        int offset = (int) (Zoomer.getScaleFactor(zoom) * Constants.PLACE_TRANSITION_HEIGHT / 2);
 
         int x = Zoomer.getUnzoomedValue(p.x - offset, zoom);
         int y = Zoomer.getUnzoomedValue(p.y - offset, zoom);

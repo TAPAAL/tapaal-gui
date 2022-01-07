@@ -178,7 +178,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 		if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
 			isSelecting = true;
 			enableSelection();
-			drawingSurface.setLayer(this, Pipe.SELECTION_LAYER_OFFSET);
+			drawingSurface.setLayer(this, Constants.SELECTION_LAYER_OFFSET);
 			startPoint = e.getPoint();
 			selectionRectangle.setSize(0, 0);
 			upperLeftCorner.setLocation(e.getPoint());
@@ -196,7 +196,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 			// Select anything that intersects with the rectangle.
 			processSelection(e);
 			isSelecting = false;
-			drawingSurface.setLayer(this, Pipe.LOWEST_LAYER_OFFSET);
+			drawingSurface.setLayer(this, Constants.LOWEST_LAYER_OFFSET);
 			selectionRectangle.setSize(0, 0);
 			upperLeftCorner.setLocation(0,0);
 			updateBounds();

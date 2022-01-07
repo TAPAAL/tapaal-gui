@@ -1032,7 +1032,7 @@ public class WorkflowDialog extends JDialog {
 
 						if(max.isSelected()){
 							maxResult.setText(RESULT_NOT_DEFINED);
-							maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+							maxResult.setForeground(Constants.QUERY_NOT_SATISFIED_COLOR);
 							maxResult.setVisible(true);
 						}
 					}else{
@@ -1059,7 +1059,7 @@ public class WorkflowDialog extends JDialog {
 
 	private void setMaxResult(TimedArcPetriNetNetwork model, int value){
 		maxResult.setText(value + " time units.");
-		maxResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+		maxResult.setForeground(Constants.QUERY_SATISFIED_COLOR);
 		maxResult.setVisible(true);
 		maxResultLabel.setVisible(true);
 		pack();
@@ -1072,18 +1072,18 @@ public class WorkflowDialog extends JDialog {
 	private void setStrongSoundnessResult(boolean satisfied, String explanation, boolean conclusive) {
 		if (satisfied) {
 			strongSoundnessResult.setText(RESULT_STRING_SATISFIED);
-			strongSoundnessResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+			strongSoundnessResult.setForeground(Constants.QUERY_SATISFIED_COLOR);
 		} else {
 			if(conclusive){
 				strongSoundnessResult.setText(RESULT_STRING_NOT_SATISFIED);
-				strongSoundnessResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+				strongSoundnessResult.setForeground(Constants.QUERY_NOT_SATISFIED_COLOR);
 			}else{
 				strongSoundnessResult.setText(RESULT_STRING_INCONCLUSIVE);
-				strongSoundnessResult.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
+				strongSoundnessResult.setForeground(Constants.QUERY_INCONCLUSIVE_COLOR);
 			}
 			if(max.isSelected()){
 				maxResult.setText(RESULT_NOT_DEFINED);
-				maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+				maxResult.setForeground(Constants.QUERY_NOT_SATISFIED_COLOR);
 				maxResultLabel.setVisible(true);
 				maxResult.setVisible(true);
 			}
@@ -1124,7 +1124,7 @@ public class WorkflowDialog extends JDialog {
                 public void run(VerificationResult<TAPNNetworkTrace> result) {
                     if (result.isQuerySatisfied()) {
                         soundnessResult.setText(RESULT_STRING_SATISFIED);
-                        soundnessResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+                        soundnessResult.setForeground(Constants.QUERY_SATISFIED_COLOR);
 
                         if(model.hasUrgentTransitions() || model.hasInvariants()){
                             soundnessResultExplanation.setText(DISCRETE_SEMANTICS_WARNING);
@@ -1161,13 +1161,13 @@ public class WorkflowDialog extends JDialog {
                         }
                     } else if (netType == TAWFNTypes.ETAWFN && !result.isBounded()) {
                         soundnessResult.setText(RESULT_STRING_INCONCLUSIVE);
-                        soundnessResult.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
+                        soundnessResult.setForeground(Constants.QUERY_INCONCLUSIVE_COLOR);
                         isConclusive = false;
                         soundnessResultExplanation.setText(ERROR_INCREASE_BOUND);
                         soundnessResultExplanation.setVisible(true);
                     } else {
                         soundnessResult.setText(RESULT_STRING_NOT_SATISFIED);
-                        soundnessResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+                        soundnessResult.setForeground(Constants.QUERY_NOT_SATISFIED_COLOR);
                         soundnessResultTrace = mapTraceToRealModel(result.getTrace());
                         soundnessResultTraceButton.setVisible(true);
                         soundnessResultExplanation.setText(determineSoundnessError(result.getTrace()));
@@ -1184,12 +1184,12 @@ public class WorkflowDialog extends JDialog {
                     if (min.isSelected()) {
                         if(result.isQuerySatisfied()){
                             minResult.setText(result.stats().minimumExecutionTime() + " time units.");
-                            minResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+                            minResult.setForeground(Constants.QUERY_SATISFIED_COLOR);
                             minResultTrace = mapTraceToRealModel(result.getTrace());
                             minResultTraceButton.setVisible(true);
                         }else{
                             minResult.setText(RESULT_NOT_DEFINED);
-                            minResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+                            minResult.setForeground(Constants.QUERY_NOT_SATISFIED_COLOR);
                         }
                         minResultLabel.setVisible(true);
                         minResult.setVisible(true);

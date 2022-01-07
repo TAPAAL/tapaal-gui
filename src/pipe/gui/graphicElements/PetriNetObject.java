@@ -9,7 +9,7 @@ import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.canvas.DrawingSurfaceImpl;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 
 import javax.swing.*;
@@ -41,7 +41,7 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	private boolean deleted = false;
 
 	// Integer value which represents a zoom percentage
-	private int zoom = Pipe.ZOOM_DEFAULT;
+	private int zoom = Constants.ZOOM_DEFAULT;
 
 	private DataLayer guiModel;
 

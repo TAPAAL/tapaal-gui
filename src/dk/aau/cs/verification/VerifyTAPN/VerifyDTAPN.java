@@ -8,7 +8,6 @@ import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.TapnEngineXmlLoader;
-import dk.aau.cs.io.TapnXmlLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
@@ -98,7 +97,7 @@ public class VerifyDTAPN implements ModelChecker{
         String version = getVersion(path);
 
         if (version != null) {
-            return EngineHelperFunctions.versionIsEqualOrGreater(version, Pipe.VERIFYDTAPN_MIN_REV);
+            return EngineHelperFunctions.versionIsEqualOrGreater(version, Constants.VERIFYDTAPN_MIN_REV);
         } else {
             return false;
         }

@@ -3,8 +3,6 @@ package dk.aau.cs.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.sql.Time;
 import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -12,17 +10,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.model.CPN.*;
-import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Expressions.*;
 import kotlin.Pair;
 import dk.aau.cs.gui.TabContent;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
-import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.*;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
@@ -45,7 +41,6 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedMarking;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -978,8 +973,8 @@ public class TapnXmlLoader {
 						String arcTempType = element.getAttribute("arcPointType");
 						double arcPointX = Double.parseDouble(arcTempX);
 						double arcPointY = Double.parseDouble(arcTempY);
-						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
+						arcPointX += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
+						arcPointY += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
 						boolean arcPointType = Boolean.parseBoolean(arcTempType);
 						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	arcPointType);
 					}

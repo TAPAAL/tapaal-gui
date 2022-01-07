@@ -18,7 +18,7 @@ import javax.swing.*;
 import net.tapaal.swinghelpers.DispatchEventsToParentHandler;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.action.EditAnnotationBackgroundAction;
 import pipe.gui.action.EditAnnotationBorderAction;
@@ -235,19 +235,19 @@ public class AnnotationNote extends Note {
 
 		g2.transform(Zoomer.getTransform(getZoom()));
 		if (selected) {
-			g2.setPaint(Pipe.SELECTION_FILL_COLOUR);
+			g2.setPaint(Constants.SELECTION_FILL_COLOUR);
 			g2.fill(noteRect);
 			if (drawBorder) {
-				g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+				g2.setPaint(Constants.SELECTION_LINE_COLOUR);
 				g2.draw(noteRect);
 			}
 		} else {
-			g2.setPaint(Pipe.ELEMENT_FILL_COLOUR);
+			g2.setPaint(Constants.ELEMENT_FILL_COLOUR);
 			if (fillNote) {
 				g2.fill(noteRect);
 			}
 			if (drawBorder) {
-				g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+				g2.setPaint(Constants.ELEMENT_LINE_COLOUR);
 				g2.draw(noteRect);
 			}
 		}
@@ -261,7 +261,7 @@ public class AnnotationNote extends Note {
 
 	@Override
 	public int getLayerOffset() {
-		return Pipe.NOTE_LAYER_OFFSET;
+		return Constants.NOTE_LAYER_OFFSET;
 	}
 
 	public boolean isFilled() {
@@ -340,8 +340,8 @@ public class AnnotationNote extends Note {
 			setOpaque(false);
 			setBounds(
 			    -SIZE - 1, -SIZE - 1,
-                2 * SIZE + Pipe.ANNOTATION_SIZE_OFFSET + 1,
-                2 * SIZE + Pipe.ANNOTATION_SIZE_OFFSET + 1
+                2 * SIZE + Constants.ANNOTATION_SIZE_OFFSET + 1,
+                2 * SIZE + Constants.ANNOTATION_SIZE_OFFSET + 1
             );
 			typeMask = type;
 		}
@@ -380,12 +380,12 @@ public class AnnotationNote extends Note {
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 						RenderingHints.VALUE_ANTIALIAS_ON);
 				if (isPressed) {
-					g2.setPaint(Pipe.RESIZE_POINT_DOWN_COLOUR);
+					g2.setPaint(Constants.RESIZE_POINT_DOWN_COLOUR);
 				} else {
-					g2.setPaint(Pipe.ELEMENT_FILL_COLOUR);
+					g2.setPaint(Constants.ELEMENT_FILL_COLOUR);
 				}
 				g2.fill(shape);
-				g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+				g2.setPaint(Constants.ELEMENT_LINE_COLOUR);
 				g2.draw(shape);
 				g2.setTransform(prova);
 			}

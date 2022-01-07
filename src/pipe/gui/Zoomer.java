@@ -11,7 +11,7 @@ public class Zoomer {
 	private int percent;
 
 	public Zoomer(){
-		this(Pipe.ZOOM_DEFAULT);
+		this(Constants.ZOOM_DEFAULT);
 	}
 	
 	public Zoomer(int pct) {
@@ -19,15 +19,15 @@ public class Zoomer {
 	}
 
 	public boolean zoomOut() {
-		return setPercent(percent - Pipe.ZOOM_DELTA);
+		return setPercent(percent - Constants.ZOOM_DELTA);
 	}
 
 	public boolean zoomIn() {
-			return setPercent(percent + Pipe.ZOOM_DELTA);
+			return setPercent(percent + Constants.ZOOM_DELTA);
 	}
 
 	private boolean validZoom(int newPercent){
-        return newPercent <= Pipe.ZOOM_MAX && newPercent >= Pipe.ZOOM_MIN;
+        return newPercent <= Constants.ZOOM_MAX && newPercent >= Constants.ZOOM_MIN;
 		
 	}
 	public int getPercent() {

@@ -3,7 +3,7 @@ package dk.aau.cs.model.NTA.trace;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
  All rights reserved.
@@ -45,6 +45,6 @@ public class TimeDelayFiringAction implements TAFiringAction {
 		String delayAsString = element.replace("Delay:", "").trim();
 		double delay = Double.parseDouble(delayAsString);
 		return new TimeDelayFiringAction(previousState, new BigDecimal(delay,
-				new MathContext(Pipe.AGE_DECIMAL_PRECISION)));
+				new MathContext(Constants.AGE_DECIMAL_PRECISION)));
 	}
 }

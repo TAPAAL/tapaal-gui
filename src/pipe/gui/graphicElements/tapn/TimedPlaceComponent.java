@@ -17,7 +17,7 @@ import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.PlaceEditorPanel;
@@ -96,7 +96,7 @@ public class TimedPlaceComponent extends Place {
     private String getStringOfTokens() {
         StringBuilder buffer = new StringBuilder("{");
         DecimalFormat df = new DecimalFormat();
-        df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+        df.setMaximumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
         df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
 
         boolean first = true;
@@ -116,7 +116,7 @@ public class TimedPlaceComponent extends Place {
     private String getStringOfColoredTimedTokens() {
         StringBuilder buffer = new StringBuilder("{");
         DecimalFormat df = new DecimalFormat();
-        df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+        df.setMaximumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
         df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
 
         boolean first = true;
@@ -145,7 +145,7 @@ public class TimedPlaceComponent extends Place {
     private String getStringOfColoredTokens() {
         StringBuilder buffer = new StringBuilder("{");
         DecimalFormat df = new DecimalFormat();
-        df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+        df.setMaximumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
         df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
 
         boolean first = true;
@@ -498,9 +498,9 @@ public class TimedPlaceComponent extends Place {
                 pnName.setVisible(constant.getVisible());
             }
             if (focusedConstant) {
-                getNameLabel().setForeground(Pipe.SELECTION_TEXT_COLOUR);
+                getNameLabel().setForeground(Constants.SELECTION_TEXT_COLOUR);
             } else {
-                getNameLabel().setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+                getNameLabel().setForeground(Constants.ELEMENT_TEXT_COLOUR);
             }
 
             getNameLabel().displayName(attributesVisible);
@@ -541,7 +541,7 @@ public class TimedPlaceComponent extends Place {
     }
 
     private static Shape createDashedOutline(){
-        return new Ellipse2D.Double(-Pipe.DASHED_PADDING/2, -Pipe.DASHED_PADDING/2, DIAMETER + Pipe.DASHED_PADDING, DIAMETER + Pipe.DASHED_PADDING);
+        return new Ellipse2D.Double(-Constants.DASHED_PADDING/2, -Constants.DASHED_PADDING/2, DIAMETER + Constants.DASHED_PADDING, DIAMETER + Constants.DASHED_PADDING);
     }
 
     public TimedPlaceComponent copy(TimedArcPetriNet tapn) {

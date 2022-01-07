@@ -5,7 +5,7 @@ import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.RatBound;
@@ -21,7 +21,7 @@ public class IntervalOperations {
 		if (b instanceof RatBound){
 			return (RatBound)b;
 		} else {
-			return new RatBound(new BigDecimal(b.value(), new MathContext(Pipe.AGE_PRECISION)));
+			return new RatBound(new BigDecimal(b.value(), new MathContext(Constants.AGE_PRECISION)));
 		}
 	}
 	
@@ -138,9 +138,9 @@ public class IntervalOperations {
 		while(i < IS1.size() && j < IS2.size()){
 			if(IS1.get(i) != null && IS2.get(j) != null){
 				if(IS1.get(i).upperBound() instanceof RatBound){ i1up = ((RatBound)IS1.get(i).upperBound());}
-				else{i1up = new RatBound(new BigDecimal(IS1.get(i).upperBound().value(), new MathContext(Pipe.AGE_PRECISION)));}
+				else{i1up = new RatBound(new BigDecimal(IS1.get(i).upperBound().value(), new MathContext(Constants.AGE_PRECISION)));}
 				if(IS2.get(j).upperBound() instanceof RatBound){ i2up = ((RatBound)IS2.get(j).upperBound());}
-				else{i2up = new RatBound(new BigDecimal(IS2.get(j).upperBound().value(), new MathContext(Pipe.AGE_PRECISION)));}
+				else{i2up = new RatBound(new BigDecimal(IS2.get(j).upperBound().value(), new MathContext(Constants.AGE_PRECISION)));}
 
 				if(intersection(IS1.get(i), IS2.get(j)) != null){
 					output.add(intersection(IS1.get(i), IS2.get(j)));
@@ -188,13 +188,13 @@ public class IntervalOperations {
 			TimeInterval temp = null;
 			while(i < IS1.size() && j < IS2.size()){
 				if(IS1.get(i).upperBound() instanceof RatBound){ i1up = ((RatBound)IS1.get(i).upperBound());}
-				else{i1up = new RatBound(new BigDecimal(IS1.get(i).upperBound().value(), new MathContext(Pipe.AGE_PRECISION)));}
+				else{i1up = new RatBound(new BigDecimal(IS1.get(i).upperBound().value(), new MathContext(Constants.AGE_PRECISION)));}
 				if(IS2.get(j).upperBound() instanceof RatBound){ i2up = ((RatBound)IS2.get(j).upperBound());}
-				else{i2up = new RatBound(new BigDecimal(IS2.get(j).upperBound().value(), new MathContext(Pipe.AGE_PRECISION)));}
+				else{i2up = new RatBound(new BigDecimal(IS2.get(j).upperBound().value(), new MathContext(Constants.AGE_PRECISION)));}
 				if(IS1.get(i).lowerBound() instanceof RatBound){ i1lo = ((RatBound)IS1.get(i).lowerBound());}
-				else{i1lo = new RatBound(new BigDecimal(IS1.get(i).lowerBound().value(), new MathContext(Pipe.AGE_PRECISION)));}
+				else{i1lo = new RatBound(new BigDecimal(IS1.get(i).lowerBound().value(), new MathContext(Constants.AGE_PRECISION)));}
 				if(IS2.get(j).lowerBound() instanceof RatBound){ i2lo = ((RatBound)IS2.get(j).lowerBound());}
-				else{i2lo = new RatBound(new BigDecimal(IS2.get(j).lowerBound().value(), new MathContext(Pipe.AGE_PRECISION)));}
+				else{i2lo = new RatBound(new BigDecimal(IS2.get(j).lowerBound().value(), new MathContext(Constants.AGE_PRECISION)));}
 
 				if(intersection(IS1.get(i), IS2.get(j)) != null || (i1lo.compareTo(i2up)==0 && (IS1.get(i).isLowerBoundNonStrict()||IS2.get(j).isUpperBoundNonStrict()))
 				        || (i2lo.compareTo(i1up)==0 && (IS2.get(j).isLowerBoundNonStrict()||IS1.get(i).isUpperBoundNonStrict()))){

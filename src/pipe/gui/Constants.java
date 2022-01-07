@@ -2,7 +2,7 @@ package pipe.gui;
 
 import java.awt.Color;
 
-public class Pipe {
+public class Constants {
 
     // Engine
     public static final String VERIFYTA_MIN_REV = "4.1.19";

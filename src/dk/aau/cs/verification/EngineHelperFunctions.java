@@ -1,7 +1,5 @@
 package dk.aau.cs.verification;
 
-import pipe.gui.Pipe;
-
 import java.io.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;

@@ -1367,7 +1367,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 				getAnimator().setFiringmode("Random");
 
 				// Set a light blue backgound color for animation mode
-				drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
+				drawingSurface().setBackground(Constants.ANIMATION_BACKGROUND_COLOR);
 				getAnimationController().requestFocusInWindow();
 
 				if (templateWasActiveBeforeSimulationMode()) {
@@ -1402,7 +1402,7 @@ public class TabContent extends JSplitPane implements TabContentActions{
 
             setManager(notingManager);
 
-			drawingSurface().setBackground(Pipe.ELEMENT_FILL_COLOUR);
+			drawingSurface().setBackground(Constants.ELEMENT_FILL_COLOUR);
 			setMode(SELECT);
 
 			restoreSelectedTemplate();

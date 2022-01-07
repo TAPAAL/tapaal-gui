@@ -7,11 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import dk.aau.cs.model.CPN.Color;
-import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.*;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
@@ -165,14 +163,14 @@ public class TransportArc extends TAPNElement {
 			TimedToken youngestToken = sortedTokens.get(j);
 			TimeInterval temp = null;
 			if( oldestToken.age().compareTo(iHeigh) <= 0 || iHeigh.compareTo(BigDecimal.ZERO) < 0){//token's age is smaller than the upper bound of the interval (or the intervals upperbound is infinite)
-				BigDecimal newLower = iLow.subtract(youngestToken.age(), new MathContext(Pipe.AGE_PRECISION));
+				BigDecimal newLower = iLow.subtract(youngestToken.age(), new MathContext(Constants.AGE_PRECISION));
 				if(newLower.compareTo(BigDecimal.ZERO) < 0){
 					overrideLowerInclusion = true;
 					newLower = BigDecimal.ZERO;
 				}
 				
 				if(iHeigh.compareTo(BigDecimal.ZERO) >= 0){//not infinite
-					BigDecimal newUpper = iHeigh.subtract(oldestToken.age(), new MathContext(Pipe.AGE_PRECISION));
+					BigDecimal newUpper = iHeigh.subtract(oldestToken.age(), new MathContext(Constants.AGE_PRECISION));
 					if(newUpper.compareTo(BigDecimal.ZERO) < 0){
 						newUpper = BigDecimal.ZERO;
 					}

@@ -3,7 +3,7 @@ package dk.aau.cs.model.tapn;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 
 import dk.aau.cs.util.Require;
 
@@ -11,7 +11,7 @@ public class RatBound implements Bound {
 	private final BigDecimal bound;
 
 	public RatBound(BigDecimal bound) {
-		Require.that(bound.compareTo(new BigDecimal(-1, new MathContext(Pipe.AGE_PRECISION))) >= 0, "Rational bounds must be non-negative or -1.");
+		Require.that(bound.compareTo(new BigDecimal(-1, new MathContext(Constants.AGE_PRECISION))) >= 0, "Rational bounds must be non-negative or -1.");
 		this.bound = bound;
 	}
 

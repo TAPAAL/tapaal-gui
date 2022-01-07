@@ -13,7 +13,7 @@ import javax.swing.JTextArea;
 import javax.swing.text.DefaultHighlighter;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.AnnotationBorderEdit;
 import dk.aau.cs.gui.undo.Command;
@@ -37,15 +37,15 @@ public abstract class Note extends PetriNetObject {
 
 		// Set minimum size the preferred size for an empty string:
 		note.setText("");
-		note.setFont(new Font(Pipe.ANNOTATION_DEFAULT_FONT, Font.PLAIN, Pipe.ANNOTATION_DEFAULT_FONT_SIZE));
+		note.setFont(new Font(Constants.ANNOTATION_DEFAULT_FONT, Font.PLAIN, Constants.ANNOTATION_DEFAULT_FONT_SIZE));
 		note.setSize(
 				note.getPreferredSize().width,
 				note.getPreferredSize().height
 		);
 		note.setMinimumSize(note.getPreferredSize());
 		note.setHighlighter(new DefaultHighlighter());
-		note.setDisabledTextColor(Pipe.NOTE_DISABLED_COLOUR);
-		note.setForeground(Pipe.NOTE_EDITING_COLOUR);
+		note.setDisabledTextColor(Constants.NOTE_DISABLED_COLOUR);
+		note.setForeground(Constants.NOTE_EDITING_COLOUR);
 		add(note);
 	}
 
@@ -66,11 +66,11 @@ public abstract class Note extends PetriNetObject {
 			note.setSize(note.getWidth(), newHeight);
 		}
 
-		int rectWidth = note.getWidth() + Pipe.RESERVED_BORDER;
-		int rectHeight = note.getHeight() + Pipe.RESERVED_BORDER;
+		int rectWidth = note.getWidth() + Constants.RESERVED_BORDER;
+		int rectHeight = note.getHeight() + Constants.RESERVED_BORDER;
 
-		noteRect.setFrame(Pipe.RESERVED_BORDER / 2, Pipe.RESERVED_BORDER / 2, rectWidth, rectHeight);
-		setSize(rectWidth + Pipe.ANNOTATION_SIZE_OFFSET, rectHeight + Pipe.ANNOTATION_SIZE_OFFSET);
+		noteRect.setFrame(Constants.RESERVED_BORDER / 2, Constants.RESERVED_BORDER / 2, rectWidth, rectHeight);
+		setSize(rectWidth + Constants.ANNOTATION_SIZE_OFFSET, rectHeight + Constants.ANNOTATION_SIZE_OFFSET);
 
 		note.setLocation(
 				(int) noteRect.getX() + (rectWidth - note.getWidth()) / 2,
@@ -81,8 +81,8 @@ public abstract class Note extends PetriNetObject {
 		bounds.setBounds(
 				Zoomer.getZoomedValue(originalX, getZoom()),
 				Zoomer.getZoomedValue(originalY, getZoom()),
-				(int) ((rectWidth + Pipe.RESERVED_BORDER + Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(getZoom())),
-				(int) ((rectHeight + Pipe.RESERVED_BORDER + +Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(getZoom()))
+				(int) ((rectWidth + Constants.RESERVED_BORDER + Constants.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(getZoom())),
+				(int) ((rectHeight + Constants.RESERVED_BORDER + +Constants.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(getZoom()))
 		);
 		setBounds(bounds);
 	}
@@ -138,7 +138,7 @@ public abstract class Note extends PetriNetObject {
 	}
 
 	protected void adjustLeft(int dx) {
-		if (Pipe.ANNOTATION_MIN_WIDTH <= (note.getWidth() - dx)) {
+		if (Constants.ANNOTATION_MIN_WIDTH <= (note.getWidth() - dx)) {
 			note.setSize(new Dimension(note.getWidth() - dx, note.getHeight()));
 			setLocation(getX() + dx, getY());
 			originalX += dx;
@@ -146,7 +146,7 @@ public abstract class Note extends PetriNetObject {
 	}
 
 	protected void adjustRight(int dx) {
-		if (Pipe.ANNOTATION_MIN_WIDTH <= (note.getWidth() + dx)) {
+		if (Constants.ANNOTATION_MIN_WIDTH <= (note.getWidth() + dx)) {
 			note.setSize(new Dimension(note.getWidth() + dx, note.getHeight()));
 		}
 	}
@@ -182,7 +182,7 @@ public abstract class Note extends PetriNetObject {
 
 	@Override
 	public int getLayerOffset() {
-		return Pipe.NOTE_LAYER_OFFSET;
+		return Constants.NOTE_LAYER_OFFSET;
 	}
 
 	public void zoomUpdate(int percent) {

@@ -5,7 +5,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomable;
 import pipe.gui.Zoomer;
 
@@ -22,7 +22,7 @@ public class NameLabel extends JTextArea implements Zoomable {
 	private String name = "";
 	private String text = "";
 
-	private final Font font = new Font(Pipe.LABEL_FONT, Font.BOLD, Pipe.LABEL_DEFAULT_FONT_SIZE);
+	private final Font font = new Font(Constants.LABEL_FONT, Font.BOLD, Constants.LABEL_DEFAULT_FONT_SIZE);
 
 	public NameLabel() {
 		this("");
@@ -38,7 +38,7 @@ public class NameLabel extends JTextArea implements Zoomable {
 		setFocusable(false);
 		setOpaque(false);
 		setBorder(BorderFactory.createEmptyBorder());
-		setBackground(Pipe.BACKGROUND_COLOR);
+		setBackground(Constants.BACKGROUND_COLOR);
 
 		//When redrawing a textarea added to a scroll pane, default behaviour is to move scroll pane to the location
         //of the lable. (https://docs.oracle.com/javase/7/docs/api/javax/swing/text/JTextComponent.html)
@@ -65,7 +65,7 @@ public class NameLabel extends JTextArea implements Zoomable {
 	}
 
 	public void updatePosition() {
-		setLocation(positionX - getPreferredSize().width, positionY	- Pipe.NAMELABEL_OFFSET);
+		setLocation(positionX - getPreferredSize().width, positionY	- Constants.NAMELABEL_OFFSET);
 	}
 
 	public double getYPosition() {
@@ -109,7 +109,7 @@ public class NameLabel extends JTextArea implements Zoomable {
         //Kind of important to know about deriveFont: --kyrke 2020-04-02
         // deriveFont(int) - sets text style
         // deriveFont(float) - sets text size
-		setFont(getFont().deriveFont((float)Zoomer.getZoomedValue(Pipe.LABEL_DEFAULT_FONT_SIZE, value)));
+		setFont(getFont().deriveFont((float)Zoomer.getZoomedValue(Constants.LABEL_DEFAULT_FONT_SIZE, value)));
 
 		updateSize();
 	}
@@ -123,6 +123,6 @@ public class NameLabel extends JTextArea implements Zoomable {
 	}
 	
 	public int getLayerOffset() {
-		return Pipe.NAMELABEL_LAYER_OFFSET;
+		return Constants.NAMELABEL_LAYER_OFFSET;
 	}
 }

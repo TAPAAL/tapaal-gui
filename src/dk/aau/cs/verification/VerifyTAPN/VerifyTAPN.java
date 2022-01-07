@@ -14,7 +14,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.Messenger;
@@ -93,7 +93,7 @@ public class VerifyTAPN implements ModelChecker {
         String version = getVersion(path);
 
         if (version != null) {
-            return EngineHelperFunctions.versionIsEqualOrGreater(version, Pipe.VERIFYTAPN_MIN_REV);
+            return EngineHelperFunctions.versionIsEqualOrGreater(version, Constants.VERIFYTAPN_MIN_REV);
         } else {
             return false;
         }

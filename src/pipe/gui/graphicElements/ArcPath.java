@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
 
@@ -31,8 +31,8 @@ public class ArcPath implements Shape {
 	private final List<ArcPathPoint> pathPoints = new ArrayList<ArcPathPoint>();
 	private final Arc myArc;
 	private boolean pointLock = false;
-	private static final Stroke proximityStroke = new BasicStroke(Pipe.ARC_PATH_PROXIMITY_WIDTH);
-	private static final Stroke stroke = new BasicStroke(Pipe.ARC_PATH_SELECTION_WIDTH);
+	private static final Stroke proximityStroke = new BasicStroke(Constants.ARC_PATH_PROXIMITY_WIDTH);
+	private static final Stroke stroke = new BasicStroke(Constants.ARC_PATH_SELECTION_WIDTH);
 	private Shape shape, proximityShape;
 	private int transitionAngle;
 	private final static boolean showDebugCurvedControlPoints = false;
@@ -166,8 +166,8 @@ public class ArcPath implements Shape {
 			// points are virtually superimposed anyway
 			p = (Point2D.Double) C.clone();
 		} else {
-			p.x = C.x + (ABx * modCD / Pipe.ARC_CONTROL_POINT_CONSTANT);
-			p.y = C.y + (ABy * modCD / Pipe.ARC_CONTROL_POINT_CONSTANT);
+			p.x = C.x + (ABx * modCD / Constants.ARC_CONTROL_POINT_CONSTANT);
+			p.y = C.y + (ABy * modCD / Constants.ARC_CONTROL_POINT_CONSTANT);
 		}
 		return p;
 	}
@@ -303,7 +303,7 @@ public class ArcPath implements Shape {
 		} else if (source instanceof Transition && (pathPoints.get(1)).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(1);
 			ArcPathPoint myLastPoint = pathPoints.get(0);
-			double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint()) / Pipe.ARC_CONTROL_POINT_CONSTANT;
+			double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint()) / Constants.ARC_CONTROL_POINT_CONSTANT;
 			myPoint.setControl1(
 			    (myLastPoint.getPoint().x + Math.cos(anAngle) * distance),
                 (myLastPoint.getPoint().y + Math.sin(anAngle) * distance)
@@ -314,7 +314,7 @@ public class ArcPath implements Shape {
 		} else if (target != null && source instanceof Place && (pathPoints.get(getEndIndex())).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(getEndIndex());
 			ArcPathPoint myLastPoint = pathPoints.get(getEndIndex() - 1);
-            double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint()) / Pipe.ARC_CONTROL_POINT_CONSTANT;
+            double distance = getMod(myPoint.getPoint(), myLastPoint.getPoint()) / Constants.ARC_CONTROL_POINT_CONSTANT;
 			myPoint.setControl2(
 			    (myPoint.getPoint().x + Math.cos(anAngle) * distance),
                 (myPoint.getPoint().y + Math.sin(anAngle) * distance)

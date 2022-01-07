@@ -20,7 +20,7 @@ import javax.swing.*;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
@@ -279,10 +279,10 @@ public class TimedTransitionComponent extends Transition {
 	@Override
 	protected void constructTransition() {
 		super.constructTransition();
-		double x = ((componentWidth - TRANSITION_WIDTH - Pipe.DASHED_PADDING) / 2);
-		double y = -Pipe.DASHED_PADDING/2;
-		double width = TRANSITION_WIDTH + Pipe.DASHED_PADDING;
-		double height = TRANSITION_HEIGHT + Pipe.DASHED_PADDING;
+		double x = ((componentWidth - TRANSITION_WIDTH - Constants.DASHED_PADDING) / 2);
+		double y = -Constants.DASHED_PADDING/2;
+		double width = TRANSITION_WIDTH + Constants.DASHED_PADDING;
+		double height = TRANSITION_HEIGHT + Constants.DASHED_PADDING;
 		dashedOutline = new GeneralPath(new Rectangle2D.Double(x, y, width, height));
 	}
 

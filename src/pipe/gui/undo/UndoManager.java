@@ -10,7 +10,7 @@ import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrameActions;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 
 /**
  * Class to handle undo & redo functionality
@@ -19,7 +19,7 @@ import pipe.gui.Pipe;
  */
 public class UndoManager {
 
-	private static final int UNDO_BUFFER_CAPACITY = Pipe.DEFAULT_BUFFER_CAPACITY;
+	private static final int UNDO_BUFFER_CAPACITY = Constants.DEFAULT_BUFFER_CAPACITY;
 
 	private int indexOfNextAdd = 0;
 	private int sizeOfBuffer = 0;

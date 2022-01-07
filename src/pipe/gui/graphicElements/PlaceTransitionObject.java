@@ -1,7 +1,7 @@
 package pipe.gui.graphicElements;
 
 import net.tapaal.TAPAAL;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 
 import javax.swing.*;
@@ -223,7 +223,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 			selected = true;
 
 			if (getNameLabel() != null) {
-				getNameLabel().setForeground(Pipe.SELECTION_LINE_COLOUR);
+				getNameLabel().setForeground(Constants.SELECTION_LINE_COLOUR);
 			}
 
 			// Select arcs that are connected from this object to another selected object.
@@ -292,7 +292,7 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 
 	@Override
 	public int getLayerOffset() {
-		return Pipe.PLACE_TRANSITION_LAYER_OFFSET;
+		return Constants.PLACE_TRANSITION_LAYER_OFFSET;
 	}
 
 

@@ -15,7 +15,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.action.SplitArcPointAction;
 import pipe.gui.action.ToggleArcPointAction;
@@ -159,14 +159,14 @@ public class ArcPathPoint extends PetriNetObject {
 		}
 
 		if (selected) {
-			g2.setPaint(Pipe.SELECTION_FILL_COLOUR);
+			g2.setPaint(Constants.SELECTION_FILL_COLOUR);
 			g2.fill(shape);
-			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			g2.setPaint(Constants.SELECTION_LINE_COLOUR);
 			g2.draw(shape);
 		} else {
-			g2.setPaint(Pipe.ELEMENT_FILL_COLOUR);
+			g2.setPaint(Constants.ELEMENT_FILL_COLOUR);
 			g2.fill(shape);
-			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			g2.setPaint(Constants.ELEMENT_LINE_COLOUR);
 			g2.draw(shape);
 		}
 
@@ -248,7 +248,7 @@ public class ArcPathPoint extends PetriNetObject {
 
 	@Override
 	public int getLayerOffset() {
-		return Pipe.ARC_POINT_LAYER_OFFSET;
+		return Constants.ARC_POINT_LAYER_OFFSET;
 	}
 
 	public void translate(int x, int y) {

@@ -1,7 +1,7 @@
 package pipe.gui.graphicElements;
 
 import pipe.gui.Grid;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.LabelHandler;
 import javax.swing.*;
@@ -22,7 +22,7 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
         this.nameOffsetY = nameOffsetY;
 
         pnName.setPosition(nameOffsetX, nameOffsetY);
-        pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+        pnName.setForeground(Constants.ELEMENT_LINE_COLOUR);
 
         //See note in function
         setLabelHandler();
@@ -119,7 +119,7 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
             selected = true;
 
             if (pnName != null) {
-                pnName.setForeground(Pipe.SELECTION_LINE_COLOUR);
+                pnName.setForeground(Constants.SELECTION_LINE_COLOUR);
             }
 
             if (shouldRepaint) {
@@ -134,7 +134,7 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
             selected = false;
 
             if (pnName != null) {
-                pnName.setForeground(Pipe.ELEMENT_LINE_COLOUR);
+                pnName.setForeground(Constants.ELEMENT_LINE_COLOUR);
             }
 
             repaint();

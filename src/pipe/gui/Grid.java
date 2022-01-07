@@ -18,7 +18,7 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
  */
 public class Grid {
 
-	private static double gridSpacing = Pipe.PLACE_TRANSITION_HEIGHT / 2;
+	private static double gridSpacing = Constants.PLACE_TRANSITION_HEIGHT / 2;
 	private static final Color gridColor = new Color(240, 240, 255);
 	private static GeneralPath gridDisplay;
 	private static boolean enabled;
@@ -57,7 +57,7 @@ public class Grid {
 	}
 
 	private static void setGridSpacing(double spacing) {
-		gridSpacing = (spacing * Pipe.PLACE_TRANSITION_HEIGHT);
+		gridSpacing = (spacing * Constants.PLACE_TRANSITION_HEIGHT);
 	}
 
 	public static void disableGrid() {

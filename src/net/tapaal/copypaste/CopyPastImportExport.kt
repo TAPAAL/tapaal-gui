@@ -8,7 +8,7 @@ import dk.aau.cs.model.tapn.Weight
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import org.jetbrains.annotations.NotNull
-import pipe.gui.Pipe
+import pipe.gui.Constants
 import pipe.gui.graphicElements.*
 import pipe.gui.graphicElements.tapn.*
 import java.awt.Point
@@ -169,7 +169,7 @@ class CopyPastImportExport {
                     TimeInvariant.LESS_THAN_INFINITY
                 }
 
-                val r = tab.guiModelManager.addNewTimedPlace(tab.model, Point(p.x + Pipe.PLACE_TRANSITION_HEIGHT, p.y + Pipe.PLACE_TRANSITION_HEIGHT))
+                val r = tab.guiModelManager.addNewTimedPlace(tab.model, Point(p.x + Constants.PLACE_TRANSITION_HEIGHT, p.y + Constants.PLACE_TRANSITION_HEIGHT))
                 if (!r.hasErrors) {
                     r.result.underlyingPlace().addTokens(tokens)
                     r.result.invariant = invariant
@@ -178,7 +178,7 @@ class CopyPastImportExport {
             }
 
             for (t in model.transitions) {
-                val r = tab.guiModelManager.addNewTimedTransitions(tab.model, Point(t.x + Pipe.PLACE_TRANSITION_HEIGHT, t.y + Pipe.PLACE_TRANSITION_HEIGHT), t.urgent && tab.lens.isTimed, t.uncontrollable && tab.lens.isGame)
+                val r = tab.guiModelManager.addNewTimedTransitions(tab.model, Point(t.x + Constants.PLACE_TRANSITION_HEIGHT, t.y + Constants.PLACE_TRANSITION_HEIGHT), t.urgent && tab.lens.isTimed, t.uncontrollable && tab.lens.isGame)
                 if (!r.hasErrors) {
                     nameToElementMap[t.name] = r.result
                     r.result.rotate(t.rotation)
@@ -295,7 +295,7 @@ class CopyPastImportExport {
         private fun addArcPath(path: List<PathPointModel>, arc: Arc) {
             arc.arcPath.purgePathPoints()
             path.forEach {
-                arc.arcPath.addPoint(it.x.toDouble()+ Pipe.PLACE_TRANSITION_HEIGHT, it.y.toDouble()+ Pipe.PLACE_TRANSITION_HEIGHT, it.curve)
+                arc.arcPath.addPoint(it.x.toDouble()+ Constants.PLACE_TRANSITION_HEIGHT, it.y.toDouble()+ Constants.PLACE_TRANSITION_HEIGHT, it.curve)
             }
             arc.arcPath.updateArc()
             arc.select()

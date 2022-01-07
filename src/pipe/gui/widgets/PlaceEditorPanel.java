@@ -18,7 +18,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
-import javax.swing.event.ChangeListener;
 
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.ColorComboBoxRenderer;
@@ -41,7 +40,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.ColoredComponents.ColorComboboxPanel;
 import pipe.gui.ColoredComponents.ColoredTimeInvariantDialogPanel;
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
@@ -54,14 +53,11 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.awt.*;
-import java.awt.event.ItemEvent;
 import java.util.List;
-import java.util.*;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.EAST;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
-import dk.aau.cs.gui.Context;
-import dk.aau.cs.model.tapn.Bound.InfBound;
+
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.IntBound;
@@ -73,9 +69,7 @@ import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.util.RequireException;
 
-import static net.tapaal.swinghelpers.GridBagHelper.Anchor.*;
 import static net.tapaal.swinghelpers.GridBagHelper.Fill.HORIZONTAL;
 
 //import dk.aau.cs.gui.components.ColorComboBoxRenderer;
@@ -622,8 +616,8 @@ public class PlaceEditorPanel extends JPanel {
 		}
 
 		int newMarking = (Integer)markingSpinner.getValue();
-		if (newMarking > Pipe.MAX_NUMBER_OF_TOKENS_ALLOWED) {
-			JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Pipe.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
+		if (newMarking > Constants.MAX_NUMBER_OF_TOKENS_ALLOWED) {
+			JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Constants.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		//Only make new edit if it has not already been done

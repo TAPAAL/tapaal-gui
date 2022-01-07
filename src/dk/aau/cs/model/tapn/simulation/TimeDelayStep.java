@@ -3,7 +3,7 @@ package dk.aau.cs.model.tapn.simulation;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import dk.aau.cs.model.tapn.LocalTimedMarking;
 
 public class TimeDelayStep implements TimedArcPetriNetStep {
@@ -33,8 +33,8 @@ public class TimeDelayStep implements TimedArcPetriNetStep {
 
 	private static DecimalFormat createDecimalFormat() {
 		DecimalFormat df = new DecimalFormat();
-		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-		df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		df.setMaximumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
+		df.setMinimumFractionDigits(Constants.AGE_DECIMAL_PRECISION);
 		return df;
 	}
 }

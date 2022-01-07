@@ -7,14 +7,12 @@ import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.smartDraw.SmartDrawDialog;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
@@ -292,7 +290,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             }
         }
 
-        return max - min + Pipe.PLACE_TRANSITION_HEIGHT + 10;
+        return max - min + Constants.PLACE_TRANSITION_HEIGHT + 10;
     }
 
     private int readUnfoldedSize(BufferedReader reader){

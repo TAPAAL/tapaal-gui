@@ -12,11 +12,10 @@ import javax.swing.*;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import net.tapaal.TAPAAL;
 import pipe.gui.Grid;
-import pipe.gui.Pipe;
+import pipe.gui.Constants;
 import pipe.gui.Zoomer;
 import dk.aau.cs.model.tapn.Weight;
 import pipe.gui.action.SplitArcAction;
-import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 
 /**
    Implementation of Element for drawing an arc
@@ -268,10 +267,10 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 		//Draw Path
 		if (selected) {
-			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			g2.setPaint(Constants.SELECTION_LINE_COLOUR);
 			//this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
-			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			g2.setPaint(Constants.ELEMENT_LINE_COLOUR);
 			//this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 
@@ -297,13 +296,13 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		g2.setColor(java.awt.Color.WHITE);
 
 		g2.transform(Zoomer.getTransform(getZoom()));
-		g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+		g2.setPaint(Constants.ELEMENT_LINE_COLOUR);
 
 		if (selected) {
-			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			g2.setPaint(Constants.SELECTION_LINE_COLOUR);
 			//this.label.setForeground(Pipe.SELECTION_LINE_COLOUR);
 		} else {
-			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			g2.setPaint(Constants.ELEMENT_LINE_COLOUR);
 			//this.label.setForeground(Pipe.ELEMENT_LINE_COLOUR);
 		}
 
@@ -394,7 +393,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
 	@Override
 	public int getLayerOffset() {
-		return Pipe.ARC_LAYER_OFFSET;
+		return Constants.ARC_LAYER_OFFSET;
 	}
 
 	public void translate(int x, int y) {
