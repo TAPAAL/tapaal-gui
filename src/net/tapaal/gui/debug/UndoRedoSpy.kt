@@ -2,7 +2,7 @@ package net.tapaal.gui.debug
 
 import net.tapaal.gui.undo.Command
 import pipe.gui.TAPAALGUI
-import pipe.gui.undo.UndoManager
+import pipe.gui.petrinet.undo.UndoManager
 import java.awt.event.ActionEvent
 import java.util.ArrayList
 import javax.swing.*

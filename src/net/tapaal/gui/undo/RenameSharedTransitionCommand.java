@@ -3,7 +3,7 @@ package net.tapaal.gui.undo;
 import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedTransitionVisitor;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.SharedTransition;
 
 public class RenameSharedTransitionCommand extends Command {

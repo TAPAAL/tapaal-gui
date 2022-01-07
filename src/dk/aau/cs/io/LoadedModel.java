@@ -2,7 +2,7 @@ package dk.aau.cs.io;
 
 import java.util.Collection;
 
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;

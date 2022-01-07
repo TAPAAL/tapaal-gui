@@ -12,7 +12,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
 import org.w3c.dom.Document;
@@ -40,13 +40,13 @@ import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.petrinet.graphicElements.Arc;
+import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 
 public class PNMLoader {
     private PetriNetTab.TAPNLens lens;

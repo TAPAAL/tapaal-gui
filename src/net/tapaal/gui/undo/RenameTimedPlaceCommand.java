@@ -2,7 +2,7 @@ package net.tapaal.gui.undo;
 
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 
 public class RenameTimedPlaceCommand extends Command {

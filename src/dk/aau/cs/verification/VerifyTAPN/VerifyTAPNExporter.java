@@ -9,7 +9,7 @@ import java.util.Collection;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.verification.NameMapping;
 import pipe.dataLayer.DataLayer;
 import net.tapaal.gui.verification.TAPNQuery.QueryCategory;
@@ -25,8 +25,8 @@ import dk.aau.cs.model.tapn.TransportArc;
 
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.Transition;
+import pipe.gui.petrinet.graphicElements.Place;
+import pipe.gui.petrinet.graphicElements.Transition;
 
 public class VerifyTAPNExporter {
     protected TimedArcPetriNet model;

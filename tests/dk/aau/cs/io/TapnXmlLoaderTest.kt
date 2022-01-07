@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.ThrowingSupplier
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent
+import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent
 import java.math.BigDecimal
 
 

@@ -2,7 +2,7 @@ package net.tapaal.gui.undo;
 
 import java.util.List;
 
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.verification.TAPNQuery;
 
 public class RemoveQueriesCommand extends Command {

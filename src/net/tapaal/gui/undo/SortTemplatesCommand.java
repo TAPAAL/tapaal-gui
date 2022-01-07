@@ -3,7 +3,7 @@ package net.tapaal.gui.undo;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.editor.TemplateExplorer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import pipe.dataLayer.Template;

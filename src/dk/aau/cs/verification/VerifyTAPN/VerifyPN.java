@@ -3,7 +3,7 @@ package dk.aau.cs.verification.VerifyTAPN;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.PNMLoader;
 import dk.aau.cs.model.tapn.LocalTimedPlace;

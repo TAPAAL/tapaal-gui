@@ -9,14 +9,16 @@ import java.awt.print.PrinterException;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
-
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.Reference;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.*;
-import pipe.gui.graphicElements.*;
-import pipe.gui.undo.*;
+import pipe.gui.petrinet.graphicElements.GraphicalElement;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
+import pipe.gui.petrinet.graphicElements.PetriNetObjectWithLabel;
+import pipe.gui.petrinet.graphicElements.Zoomable;
+import pipe.gui.petrinet.undo.TranslatePetriNetObjectEditCommand;
 
 /**
  * The petrinet is drawn onto this frame.

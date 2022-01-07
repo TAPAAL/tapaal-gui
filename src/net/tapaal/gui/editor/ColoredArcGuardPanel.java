@@ -17,10 +17,10 @@ import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TransportArc;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.tapn.*;
+import pipe.gui.petrinet.graphicElements.Arc;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
+import pipe.gui.petrinet.graphicElements.Place;
+import pipe.gui.petrinet.graphicElements.tapn.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -953,7 +953,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         }
 
     }
-    public void onOkColored(pipe.gui.undo.UndoManager undoManager) {
+    public void onOkColored(pipe.gui.petrinet.undo.UndoManager undoManager) {
         if(isTransportArc){
             TransportArc transportArc = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc();
             if(isInputArc){

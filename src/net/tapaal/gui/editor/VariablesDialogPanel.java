@@ -7,7 +7,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.petrinet.undo.UndoManager;
 import pipe.gui.swingcomponents.EscapableDialog;
 
 import javax.swing.*;

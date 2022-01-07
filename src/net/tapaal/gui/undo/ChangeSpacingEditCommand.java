@@ -1,6 +1,6 @@
 package net.tapaal.gui.undo;
 
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 
 public class ChangeSpacingEditCommand extends Command {
 

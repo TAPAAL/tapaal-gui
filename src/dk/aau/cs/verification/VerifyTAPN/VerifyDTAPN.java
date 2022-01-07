@@ -5,7 +5,7 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.TapnEngineXmlLoader;
 import dk.aau.cs.model.CPN.ColorType;

@@ -1,6 +1,6 @@
 package pipe.gui.canvas;
 
-import pipe.gui.graphicElements.GraphicalElement;
+import pipe.gui.petrinet.graphicElements.GraphicalElement;
 
 public interface Canvas {
 

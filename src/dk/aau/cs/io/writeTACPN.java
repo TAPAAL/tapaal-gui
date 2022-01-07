@@ -9,9 +9,12 @@ import dk.aau.cs.util.Require;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import pipe.dataLayer.DataLayer;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.Transition;
-import pipe.gui.graphicElements.tapn.*;
+import pipe.gui.petrinet.graphicElements.Arc;
+import pipe.gui.petrinet.graphicElements.Transition;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 
 
 public class writeTACPN { // both export and save share some of the same syntax for CPN and TACPN. That shared code is presented here.

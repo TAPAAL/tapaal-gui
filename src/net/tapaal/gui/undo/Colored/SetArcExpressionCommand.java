@@ -2,7 +2,7 @@ package net.tapaal.gui.undo.Colored;
 
 import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
-import pipe.gui.graphicElements.Arc;
+import pipe.gui.petrinet.graphicElements.Arc;
 
 public class SetArcExpressionCommand extends Command {
     private final Arc arc;

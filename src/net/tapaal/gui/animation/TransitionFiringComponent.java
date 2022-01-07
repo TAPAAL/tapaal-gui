@@ -10,13 +10,13 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import pipe.gui.PetriNetTab;
-import pipe.gui.animation.EnabledTransitionsList;
+import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.animation.EnabledTransitionsList;
 import pipe.dataLayer.Template;
-import pipe.gui.animation.AnimationSettingsDialog;
+import pipe.gui.petrinet.animation.AnimationSettingsDialog;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.animation.SimulationControl;
-import pipe.gui.graphicElements.Transition;
+import pipe.gui.petrinet.animation.SimulationControl;
+import pipe.gui.petrinet.graphicElements.Transition;
 
 public class TransitionFiringComponent extends JPanel {
 

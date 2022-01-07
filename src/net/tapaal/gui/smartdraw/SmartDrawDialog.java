@@ -19,7 +19,7 @@ import javax.swing.event.ChangeListener;
 import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
 public class SmartDrawDialog extends JDialog {
 

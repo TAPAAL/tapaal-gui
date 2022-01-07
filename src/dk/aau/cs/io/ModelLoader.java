@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import dk.aau.cs.TCTL.Parsing.ParseException;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 
 public class ModelLoader {
 

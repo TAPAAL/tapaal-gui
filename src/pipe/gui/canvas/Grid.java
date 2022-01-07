@@ -12,8 +12,9 @@ import net.tapaal.gui.undo.Command;
 import net.tapaal.gui.undo.MovePlaceTransitionObjectCommand;
 import pipe.gui.Constants;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
+import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
+import pipe.gui.petrinet.undo.UndoManager;
 
 /**
  * @author Peter Kyme
@@ -104,7 +105,7 @@ public class Grid {
 	
 	public static void alignPNObjectsToGrid() {
 		ArrayList<PetriNetObject> petriNetObjects = TAPAALGUI.getDrawingSurface().getGuiModel().getPlaceTransitionObjects();
-		pipe.gui.undo.UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
+		UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
 		undoManager.newEdit();
 		
 		for(PetriNetObject object : petriNetObjects) {

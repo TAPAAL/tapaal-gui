@@ -13,10 +13,11 @@ import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.versioncheck.VersionChecker;
 import net.tapaal.gui.animation.DelayEnabledTransitionControl;
-import pipe.gui.animation.SimulationControl;
+import pipe.gui.petrinet.animation.SimulationControl;
 import net.tapaal.gui.verification.EngineDialogPanel;
 import net.tapaal.gui.dialog.NewTAPNPanel;
 import net.tapaal.gui.dialog.QueryDialog;
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import javax.swing.*;

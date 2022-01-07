@@ -1,9 +1,9 @@
 package net.tapaal.gui.undo;
 
-import pipe.gui.PetriNetTab;
-import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
+import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 
 import java.util.Map;
 

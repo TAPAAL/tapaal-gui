@@ -1,6 +1,6 @@
 package net.tapaal.gui.dialog;
 
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.TAPAALGUI;
 
 import javax.swing.*;

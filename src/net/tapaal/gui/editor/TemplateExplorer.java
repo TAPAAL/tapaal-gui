@@ -36,7 +36,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.undo.MoveElementDownCommand;
 import net.tapaal.gui.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
@@ -51,7 +51,7 @@ import net.tapaal.gui.undo.AddTemplateCommand;
 import net.tapaal.gui.undo.RemoveTemplateCommand;
 import net.tapaal.gui.undo.RenameTemplateCommand;
 import net.tapaal.gui.undo.ToggleTemplateActivationCommand;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.petrinet.undo.UndoManager;
 import pipe.gui.swingcomponents.EscapableDialog;
 import net.tapaal.swinghelpers.RequestFocusListener;
 import dk.aau.cs.TCTL.visitors.BooleanResult;

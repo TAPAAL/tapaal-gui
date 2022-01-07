@@ -9,8 +9,9 @@ import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.dataLayer.DataLayer;
-import pipe.gui.animation.Animator;
+import pipe.gui.petrinet.animation.Animator;
 import pipe.gui.canvas.DrawingSurfaceImpl;
+import pipe.gui.petrinet.PetriNetTab;
 
 public class TAPAALGUI {
 

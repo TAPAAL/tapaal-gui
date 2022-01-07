@@ -1,7 +1,7 @@
 package dk.aau.cs.io;
 
 import net.tapaal.gui.NameGenerator;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
@@ -18,11 +18,11 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
-import pipe.gui.graphicElements.AnnotationNote;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.PlaceTransitionObject;
-import pipe.gui.graphicElements.tapn.*;
+import pipe.gui.petrinet.graphicElements.AnnotationNote;
+import pipe.gui.petrinet.graphicElements.Arc;
+import pipe.gui.petrinet.graphicElements.Place;
+import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
+import pipe.gui.petrinet.graphicElements.tapn.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -777,7 +777,7 @@ public class TapnEngineXmlLoader {
 	private TimedOutputArcComponent parseAndAddTimedOutputArc(String idInput, boolean taggedArc,
                                                               String inscriptionTempStorage, PlaceTransitionObject sourceIn,
                                                               PlaceTransitionObject targetIn,
-                                                              int _endx, int _endy, Template template, Weight weight,ArcExpression expr) throws FormatException {
+                                                              int _endx, int _endy, Template template, Weight weight, ArcExpression expr) throws FormatException {
 
 		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(sourceIn, targetIn,	(!inscriptionTempStorage.equals("") ? Integer.parseInt(inscriptionTempStorage) : 1), idInput);
 

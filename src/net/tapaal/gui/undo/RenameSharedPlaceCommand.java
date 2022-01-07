@@ -3,7 +3,7 @@ package net.tapaal.gui.undo;
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedPlaceVisitor;
 import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.SharedPlace;
 
 public class RenameSharedPlaceCommand extends Command {

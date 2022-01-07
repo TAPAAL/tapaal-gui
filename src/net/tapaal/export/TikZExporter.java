@@ -9,15 +9,15 @@ import dk.aau.cs.model.tapn.TimedToken;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.ArcPathPoint;
-import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.Transition;
-import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
+import pipe.gui.petrinet.graphicElements.Arc;
+import pipe.gui.petrinet.graphicElements.ArcPathPoint;
+import pipe.gui.petrinet.graphicElements.Place;
+import pipe.gui.petrinet.graphicElements.Transition;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 
 public class TikZExporter {
 

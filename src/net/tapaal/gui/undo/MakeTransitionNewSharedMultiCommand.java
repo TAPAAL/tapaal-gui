@@ -4,8 +4,8 @@ import net.tapaal.gui.Context;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.util.Require;
 import pipe.dataLayer.Template;
-import pipe.gui.graphicElements.Transition;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.petrinet.graphicElements.Transition;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 
 import java.util.ArrayList;
 import java.util.List;

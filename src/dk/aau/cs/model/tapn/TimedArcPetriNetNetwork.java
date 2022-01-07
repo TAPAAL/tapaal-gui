@@ -16,7 +16,7 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.editor.ConstantsPane;
 
 public class TimedArcPetriNetNetwork {

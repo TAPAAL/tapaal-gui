@@ -1,6 +1,6 @@
 package net.tapaal.copypaste;
 
-import pipe.gui.PetriNetTab
+import pipe.gui.petrinet.PetriNetTab
 import dk.aau.cs.model.tapn.IntWeight
 import dk.aau.cs.model.tapn.TimeInterval
 import dk.aau.cs.model.tapn.TimeInvariant
@@ -9,8 +9,10 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import org.jetbrains.annotations.NotNull
 import pipe.gui.Constants
-import pipe.gui.graphicElements.*
-import pipe.gui.graphicElements.tapn.*
+import pipe.gui.petrinet.graphicElements.Arc
+import pipe.gui.petrinet.graphicElements.PetriNetObject
+import pipe.gui.petrinet.graphicElements.PlaceTransitionObject
+import pipe.gui.petrinet.graphicElements.tapn.*
 import java.awt.Point
 import java.util.*
 

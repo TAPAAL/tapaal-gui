@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.*;
 
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.verification.*;
 import pipe.dataLayer.DataLayer;

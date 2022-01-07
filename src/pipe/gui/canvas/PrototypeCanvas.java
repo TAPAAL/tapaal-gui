@@ -1,6 +1,6 @@
 package pipe.gui.canvas;
 
-import pipe.gui.graphicElements.GraphicalElement;
+import pipe.gui.petrinet.graphicElements.GraphicalElement;
 
 /**
  * ProtypeCanvas is used by controllers to draw objects that are not (yet) committed to the medel

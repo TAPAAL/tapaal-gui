@@ -4,13 +4,13 @@ import java.util.*;
 
 import dk.aau.cs.util.RequireException;
 import pipe.gui.canvas.Canvas;
-import pipe.gui.graphicElements.*;
-import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
+import pipe.gui.petrinet.graphicElements.*;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Require;

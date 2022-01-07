@@ -7,7 +7,7 @@ import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import org.jdesktop.swingx.JXComboBox;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.petrinet.undo.UndoManager;
 import pipe.gui.swingcomponents.EscapableDialog;
 
 import javax.swing.*;

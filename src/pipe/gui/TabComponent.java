@@ -50,6 +50,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import dk.aau.cs.util.Require;
+import pipe.gui.petrinet.PetriNetTab;
 
 /**
  * This class represents the component inside the "head" of a tab. That is, it

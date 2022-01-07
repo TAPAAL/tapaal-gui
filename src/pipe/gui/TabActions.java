@@ -1,6 +1,7 @@
 package pipe.gui;
 
-import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
+import pipe.gui.petrinet.PetriNetTab;
 
 import java.io.File;
 import java.util.Map;

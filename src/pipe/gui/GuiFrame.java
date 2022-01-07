@@ -33,7 +33,7 @@ import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import org.jetbrains.annotations.NotNull;
-import pipe.gui.action.GuiAction;
+import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.canvas.Grid;
 import net.tapaal.gui.dialog.ExportBatchDialog;
 import net.tapaal.gui.dialog.UnfoldDialog;
@@ -43,6 +43,9 @@ import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
+import pipe.gui.petrinet.Export;
+import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.animation.SimulatorFocusTraversalPolicy;
 
 
 public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameActions {

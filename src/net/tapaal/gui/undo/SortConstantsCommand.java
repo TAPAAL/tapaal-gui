@@ -1,7 +1,7 @@
 package net.tapaal.gui.undo;
 
 import net.tapaal.gui.editor.ConstantsPane;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.Constant;
 
 public class SortConstantsCommand extends Command{

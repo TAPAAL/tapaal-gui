@@ -2,7 +2,7 @@ package net.tapaal.gui.undo.Colored;
 
 import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 
 public class SetTransitionExpressionCommand extends Command {
     private final TimedTransitionComponent transition;

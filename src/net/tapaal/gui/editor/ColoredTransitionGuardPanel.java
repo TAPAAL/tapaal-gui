@@ -11,8 +11,8 @@ import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 import kotlin.Pair;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.editor.TAPNTransitionEditor;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.petrinet.editor.TAPNTransitionEditor;
 
 import javax.swing.*;
 import javax.swing.event.UndoableEditEvent;
@@ -880,7 +880,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         exprField.requestFocus(true);
     }
 
-    public void onOK(pipe.gui.undo.UndoManager undoManager) {
+    public void onOK(pipe.gui.petrinet.undo.UndoManager undoManager) {
         if (newProperty instanceof PlaceHolderGuardExpression) {
             Command cmd = new SetTransitionExpressionCommand(transition, transition.getGuardExpression(), null);
             cmd.redo();

@@ -1,6 +1,6 @@
 package dk.aau.cs.io;
 
-import pipe.gui.animation.Animator;
+import pipe.gui.petrinet.animation.Animator;
 import pipe.gui.TAPAALGUI;
 import java.io.BufferedReader;
 import java.io.File;

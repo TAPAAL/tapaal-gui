@@ -41,11 +41,11 @@ import net.tapaal.gui.undo.Command;
 import net.tapaal.gui.undo.SortConstantsCommand;
 import pipe.dataLayer.Template;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.swingcomponents.NonsearchableJList;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.widgets.SidePane;
 
 public class ConstantsPane extends JPanel implements SidePane {

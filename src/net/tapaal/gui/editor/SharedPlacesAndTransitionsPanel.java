@@ -23,10 +23,10 @@ import javax.swing.event.ListSelectionListener;
 import net.tapaal.gui.Context;
 import net.tapaal.gui.NameGenerator;
 import net.tapaal.gui.undo.*;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.resourcemanager.ResourceManager;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.petrinet.undo.UndoManager;
 import pipe.gui.swingcomponents.EscapableDialog;
 
 import net.tapaal.gui.swingcomponents.NonsearchableJList;

@@ -1,9 +1,9 @@
 package net.tapaal.gui.dialog;
 
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.undo.ChangeAllNamesVisibilityCommand;
 import net.tapaal.gui.undo.Command;
-import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
 import javax.swing.*;
 import java.awt.*;

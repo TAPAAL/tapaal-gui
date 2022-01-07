@@ -4,8 +4,8 @@ import net.tapaal.gui.Context;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.util.Require;
 import pipe.dataLayer.Template;
-import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.petrinet.graphicElements.Place;
+import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 
 import java.util.ArrayList;
 import java.util.List;

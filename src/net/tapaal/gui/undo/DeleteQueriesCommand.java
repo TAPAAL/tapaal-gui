@@ -3,7 +3,7 @@ package net.tapaal.gui.undo;
 import java.util.Collection;
 
 import net.tapaal.gui.verification.TAPNQuery;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 
 public class DeleteQueriesCommand extends Command {
 	private final Collection<TAPNQuery> queries;

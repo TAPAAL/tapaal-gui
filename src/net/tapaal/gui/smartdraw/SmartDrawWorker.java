@@ -15,9 +15,10 @@ import pipe.gui.Constants;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
-import pipe.gui.graphicElements.*;
-import pipe.gui.undo.DeleteArcPathPointEditCommand;
-import pipe.gui.undo.TransitionRotationEditCommand;
+import pipe.gui.petrinet.graphicElements.*;
+import pipe.gui.petrinet.undo.UndoManager;
+import pipe.gui.petrinet.undo.DeleteArcPathPointEditCommand;
+import pipe.gui.petrinet.undo.TransitionRotationEditCommand;
 
 public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	List<SmartDrawListener> listeners = new ArrayList<SmartDrawListener>();
@@ -33,7 +34,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
 	ArrayList<Point> pointsReserved = new ArrayList<Point>();
-	pipe.gui.undo.UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
+	UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
 	
 	//weights
 	int diagonalWeight;

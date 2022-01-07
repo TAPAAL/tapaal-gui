@@ -16,9 +16,8 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 import pipe.gui.Constants;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.canvas.DrawingSurfaceImpl;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.petrinet.graphicElements.Arc;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
 
 /**

@@ -6,7 +6,7 @@ import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
@@ -25,7 +25,7 @@ import pipe.gui.Constants;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.Zoomer;
-import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;

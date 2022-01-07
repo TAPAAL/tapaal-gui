@@ -1,6 +1,6 @@
 package net.tapaal.gui.undo;
 
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.TimedTransition;
 
 public class ToggleTransitionUncontrollableCommand extends Command {

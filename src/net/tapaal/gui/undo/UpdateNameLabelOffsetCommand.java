@@ -1,6 +1,6 @@
 package net.tapaal.gui.undo;
 
-import pipe.gui.graphicElements.PetriNetObjectWithLabel;
+import pipe.gui.petrinet.graphicElements.PetriNetObjectWithLabel;
 
 public class UpdateNameLabelOffsetCommand extends Command {
 	final int newXOffset;

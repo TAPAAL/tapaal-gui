@@ -5,7 +5,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.GuiFrame;

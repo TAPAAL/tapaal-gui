@@ -37,10 +37,10 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.StringComparator;
 import pipe.dataLayer.DataLayer;
 import net.tapaal.gui.verification.TAPNQuery;
-import pipe.gui.Export;
+import pipe.gui.petrinet.Export;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.petrinet.undo.UndoManager;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 public class ExportBatchDialog extends JDialog {

@@ -2,7 +2,7 @@ package net.tapaal.gui.undo.Colored;
 
 import net.tapaal.gui.undo.Command;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
-import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 
 import java.util.List;
 

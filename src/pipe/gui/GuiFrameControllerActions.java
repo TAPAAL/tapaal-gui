@@ -1,5 +1,7 @@
 package pipe.gui;
 
+import pipe.gui.petrinet.PetriNetTab;
+
 public interface GuiFrameControllerActions {
     void openTab(PetriNetTab tab);
     default void openTab(Iterable<PetriNetTab> tabs) {

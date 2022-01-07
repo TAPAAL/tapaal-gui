@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import net.tapaal.gui.verification.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.editor.TemplateExplorer;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedPlace;

@@ -3,7 +3,7 @@ package net.tapaal.gui.undo;
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.editor.TemplateExplorer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 

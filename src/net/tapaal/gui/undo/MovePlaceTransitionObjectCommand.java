@@ -3,7 +3,7 @@ package net.tapaal.gui.undo;
 import java.awt.Point;
 
 import pipe.gui.TAPAALGUI;
-import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
 
 public class MovePlaceTransitionObjectCommand extends Command {
 	

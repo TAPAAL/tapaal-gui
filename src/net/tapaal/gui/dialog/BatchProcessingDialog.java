@@ -31,7 +31,7 @@ import net.tapaal.gui.verification.TAPNQuery;
 import net.tapaal.gui.verification.TAPNQuery.SearchOption;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.swinghelpers.CustomJSpinner;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.petrinet.undo.UndoManager;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 import net.tapaal.gui.widgets.QueryPane;

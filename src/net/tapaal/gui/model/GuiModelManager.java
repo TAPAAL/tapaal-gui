@@ -1,7 +1,7 @@
 package net.tapaal.gui.model;
 
 import net.tapaal.gui.undo.*;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
@@ -12,9 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.DataLayer;
 import net.tapaal.gui.verification.TAPNQuery;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.graphicElements.*;
-import pipe.gui.graphicElements.tapn.*;
-import pipe.gui.undo.*;
+import pipe.gui.petrinet.graphicElements.*;
+import pipe.gui.petrinet.graphicElements.tapn.*;
+import pipe.gui.petrinet.undo.AddAnnotationNoteCommand;
+import pipe.gui.petrinet.undo.CompundCommand;
+import pipe.gui.petrinet.undo.DeleteAnnotationNoteCommand;
+import pipe.gui.petrinet.undo.DeleteArcPathPointEditCommand;
 
 import javax.swing.*;
 import java.util.List;

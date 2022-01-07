@@ -1,10 +1,10 @@
 package net.tapaal.gui.undo;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TransportArc;
-import pipe.gui.undo.TAPNElementCommand;
+import pipe.gui.petrinet.undo.TAPNElementCommand;
 
 public class DeleteTransportArcCommand extends TAPNElementCommand {
 	private final TimedTransportArcComponent transportArcComponent;

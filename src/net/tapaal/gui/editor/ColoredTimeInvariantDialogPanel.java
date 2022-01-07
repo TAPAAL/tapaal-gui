@@ -6,7 +6,7 @@ import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.dataLayer.Template;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.swingcomponents.WidthAdjustingComboBox;
 
 import javax.swing.*;

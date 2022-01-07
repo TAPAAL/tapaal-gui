@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 import net.tapaal.gui.Context;
 import net.tapaal.gui.NameGenerator;
 import net.tapaal.swinghelpers.SwingHelper;
-import pipe.gui.undo.UndoManager;
+import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.verification.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedTransitionVisitor;
 import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;

@@ -1,7 +1,6 @@
 package net.tapaal.gui.undo;
 
-import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
-import net.tapaal.gui.undo.Command;
+import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.model.tapn.TimeInvariant;
 
 public class TimedPlaceInvariantEditCommand extends Command {

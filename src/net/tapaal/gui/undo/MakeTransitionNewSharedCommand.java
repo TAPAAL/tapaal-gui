@@ -1,7 +1,7 @@
 package net.tapaal.gui.undo;
 
 import net.tapaal.gui.editor.SharedPlacesAndTransitionsPanel;
-import pipe.gui.PetriNetTab;
+import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;
