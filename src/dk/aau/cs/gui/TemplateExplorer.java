@@ -45,7 +45,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.undo.AddTemplateCommand;
 import pipe.gui.undo.RemoveTemplateCommand;
 import pipe.gui.undo.RenameTemplateCommand;

@@ -5,7 +5,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.NameMapping;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;

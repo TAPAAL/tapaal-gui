@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 
 import pipe.gui.TAPAALGUI;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.graphicElements.Arc;
 
 /**

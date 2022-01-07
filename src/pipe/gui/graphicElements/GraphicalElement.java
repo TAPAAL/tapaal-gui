@@ -2,8 +2,6 @@ package pipe.gui.graphicElements;
 
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.Reference;
-import pipe.gui.Translatable;
-import pipe.gui.Zoomable;
 
 import javax.swing.*;
 import java.awt.*;

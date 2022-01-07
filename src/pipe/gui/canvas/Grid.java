@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.canvas;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
+import pipe.gui.Constants;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 

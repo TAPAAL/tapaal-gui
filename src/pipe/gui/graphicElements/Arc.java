@@ -11,9 +11,9 @@ import javax.swing.*;
 
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import net.tapaal.TAPAAL;
-import pipe.gui.Grid;
+import pipe.gui.canvas.Grid;
 import pipe.gui.Constants;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import dk.aau.cs.model.tapn.Weight;
 import pipe.gui.action.SplitArcAction;
 

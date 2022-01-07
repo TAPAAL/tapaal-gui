@@ -1,6 +1,6 @@
 package pipe.dataLayer;
 
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class Template {

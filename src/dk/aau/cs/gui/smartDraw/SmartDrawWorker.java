@@ -13,7 +13,7 @@ import dk.aau.cs.gui.undo.MovePlaceTransitionObject;
 import dk.aau.cs.util.Require;
 import pipe.gui.Constants;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.*;
 import pipe.gui.undo.DeleteArcPathPointEdit;

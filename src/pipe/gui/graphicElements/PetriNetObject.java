@@ -10,7 +10,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Constants;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 
 import javax.swing.*;
 

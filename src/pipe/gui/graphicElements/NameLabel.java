@@ -6,8 +6,7 @@ import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
 import pipe.gui.Constants;
-import pipe.gui.Zoomable;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 
 /**
  * This class is for the labels of PN Objects

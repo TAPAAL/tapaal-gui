@@ -1,7 +1,5 @@
 package pipe.gui.verification;
 
-import pipe.gui.EngineSupportOptions;
-
 public class UPPAALBroadcastDegree2Options extends EngineSupportOptions {
 
     public UPPAALBroadcastDegree2Options() {

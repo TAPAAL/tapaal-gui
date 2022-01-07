@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.verification;
 
 import java.util.ArrayList;
 

@@ -11,8 +11,8 @@ import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.TAPAALGUI;
 
-import pipe.gui.Grid;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Grid;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.PlaceTransitionObject;

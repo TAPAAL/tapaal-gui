@@ -39,7 +39,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Constants;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;

@@ -35,6 +35,7 @@ import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import org.jetbrains.annotations.NotNull;
 import pipe.gui.action.GuiAction;
+import pipe.gui.canvas.Grid;
 import pipe.gui.widgets.ColoredWidgets.UnfoldDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.smartDraw.SmartDrawDialog;

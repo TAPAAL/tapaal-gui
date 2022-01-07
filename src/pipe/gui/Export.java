@@ -38,6 +38,7 @@ import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
+import net.tapaal.export.TikZExporter;
 import org.w3c.dom.DOMException;
 
 import dk.aau.cs.gui.TabContent;
@@ -51,6 +52,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.canvas.DrawingSurfaceImpl;
+import pipe.gui.canvas.Grid;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
 /**

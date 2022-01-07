@@ -1,4 +1,4 @@
-package pipe.gui;
+package pipe.gui.animation;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -17,6 +17,7 @@ import dk.aau.cs.model.tapn.simulation.DelayMode;
 import dk.aau.cs.model.tapn.simulation.ManualDelayMode;
 import dk.aau.cs.model.tapn.simulation.RandomDelayMode;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
+import pipe.gui.Constants;
 
 public class DelayEnabledTransitionControl extends JPanel{
 

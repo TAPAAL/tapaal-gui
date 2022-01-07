@@ -17,9 +17,9 @@ import javax.swing.*;
 
 import net.tapaal.swinghelpers.DispatchEventsToParentHandler;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.Grid;
+import pipe.gui.canvas.Grid;
 import pipe.gui.Constants;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.action.EditAnnotationBackgroundAction;
 import pipe.gui.action.EditAnnotationBorderAction;
 import pipe.gui.action.EditNoteAction;

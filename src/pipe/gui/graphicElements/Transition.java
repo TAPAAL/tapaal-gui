@@ -18,7 +18,7 @@ import javax.swing.*;
 import pipe.gui.animation.Animator;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.undo.TransitionRotationEdit;
 import dk.aau.cs.gui.undo.Command;

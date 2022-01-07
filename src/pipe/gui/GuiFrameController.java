@@ -13,6 +13,8 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
+import net.tapaal.versioncheck.VersionChecker;
+import pipe.gui.animation.DelayEnabledTransitionControl;
 import pipe.gui.animation.SimulationControl;
 import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.NewTAPNPanel;

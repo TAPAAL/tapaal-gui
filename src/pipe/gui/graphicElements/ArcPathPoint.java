@@ -16,7 +16,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 
 import pipe.gui.Constants;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.action.SplitArcPointAction;
 import pipe.gui.action.ToggleArcPointAction;
 import pipe.gui.undo.AddArcPathPointEdit;

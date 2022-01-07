@@ -1,7 +1,7 @@
 /*
  * Zoomable.java
  */
-package pipe.gui;
+package pipe.gui.graphicElements;
 
 /**
  * Interface that must implement an object in order to be zoomed

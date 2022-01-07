@@ -27,7 +27,7 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.Constants;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.Place;

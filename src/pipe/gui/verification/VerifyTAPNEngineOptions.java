@@ -1,7 +1,5 @@
 package pipe.gui.verification;
 
-import pipe.gui.EngineSupportOptions;
-
 public class VerifyTAPNEngineOptions extends EngineSupportOptions {
 
     public VerifyTAPNEngineOptions() {

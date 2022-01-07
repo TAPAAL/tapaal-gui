@@ -1,8 +1,8 @@
 package pipe.gui.graphicElements;
 
-import pipe.gui.Grid;
+import pipe.gui.canvas.Grid;
 import pipe.gui.Constants;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.handler.LabelHandler;
 import javax.swing.*;
 

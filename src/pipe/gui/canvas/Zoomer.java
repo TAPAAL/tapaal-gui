@@ -1,4 +1,6 @@
-package pipe.gui;
+package pipe.gui.canvas;
+
+import pipe.gui.Constants;
 
 import java.awt.geom.AffineTransform;
 

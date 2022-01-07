@@ -1,4 +1,4 @@
-package pipe.gui;
+package net.tapaal.export;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,6 +8,7 @@ import java.util.List;
 import dk.aau.cs.model.tapn.TimedToken;
 
 import pipe.dataLayer.DataLayer;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPathPoint;
 import pipe.gui.graphicElements.Place;

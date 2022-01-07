@@ -10,7 +10,7 @@ import java.awt.geom.Ellipse2D;
 
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
 
 import javax.swing.*;

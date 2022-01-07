@@ -1,4 +1,4 @@
-package pipe.gui;
+package net.tapaal.versioncheck;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

@@ -2,7 +2,7 @@ package pipe.gui.graphicElements;
 
 import net.tapaal.TAPAAL;
 import pipe.gui.Constants;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 
 import javax.swing.*;
 import java.awt.*;

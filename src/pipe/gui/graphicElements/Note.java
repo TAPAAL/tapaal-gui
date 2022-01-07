@@ -14,7 +14,7 @@ import javax.swing.text.DefaultHighlighter;
 
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
-import pipe.gui.Zoomer;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.undo.AnnotationBorderEdit;
 import dk.aau.cs.gui.undo.Command;
 

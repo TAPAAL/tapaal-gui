@@ -22,6 +22,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.graphicElements.PetriNetObject;
 
 import javax.swing.*;

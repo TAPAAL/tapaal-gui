@@ -61,6 +61,7 @@ import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.verification.*;
 import pipe.gui.widgets.filebrowser.FileBrowser;
 
