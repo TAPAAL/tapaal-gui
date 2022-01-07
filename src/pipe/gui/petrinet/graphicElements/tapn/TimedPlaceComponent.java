@@ -21,7 +21,7 @@ import pipe.gui.Constants;
 import pipe.gui.petrinet.graphicElements.Place;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.petrinet.editor.PlaceEditorPanel;
-import net.tapaal.gui.Context;
+import net.tapaal.gui.petrinet.Context;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.Bound;

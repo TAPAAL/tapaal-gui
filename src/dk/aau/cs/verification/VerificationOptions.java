@@ -1,7 +1,7 @@
 package dk.aau.cs.verification;
 
-import net.tapaal.gui.verification.TAPNQuery.SearchOption;
-import net.tapaal.gui.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 
 public abstract class VerificationOptions {
 

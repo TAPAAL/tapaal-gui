@@ -49,12 +49,11 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
-import net.tapaal.gui.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.canvas.Grid;
-import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 /**

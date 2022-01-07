@@ -21,7 +21,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import net.tapaal.gui.NameGenerator;
+import net.tapaal.gui.petrinet.NameGenerator;
 import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -36,7 +36,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
 import pipe.dataLayer.DataLayer;
-import net.tapaal.gui.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;

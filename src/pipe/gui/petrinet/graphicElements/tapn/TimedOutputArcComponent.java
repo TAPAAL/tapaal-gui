@@ -5,7 +5,7 @@ import java.util.Hashtable;
 
 import javax.swing.BoxLayout;
 
-import net.tapaal.gui.Context;
+import net.tapaal.gui.petrinet.Context;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.*;
@@ -19,7 +19,7 @@ import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
 import pipe.gui.petrinet.undo.ArcTimeIntervalEditCommand;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.petrinet.editor.GuardDialogue;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 
 public class TimedOutputArcComponent extends Arc {
 

@@ -34,8 +34,8 @@ import org.xml.sax.SAXException;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetWriter;
-import net.tapaal.gui.verification.TAPNQuery;
-import net.tapaal.gui.verification.TAPNQuery.QueryCategory;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import pipe.dataLayer.Template;
 import pipe.gui.petrinet.graphicElements.AnnotationNote;
 import pipe.gui.petrinet.graphicElements.Arc;
@@ -47,7 +47,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
-import net.tapaal.gui.verification.InclusionPlaces.InclusionPlacesOption;
+import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.util.Require;
 

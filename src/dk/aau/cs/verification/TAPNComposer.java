@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.dataLayer.DataLayer;
-import net.tapaal.gui.dialog.ExportBatchDialog;
+import net.tapaal.gui.petrinet.dialog.ExportBatchDialog;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.ArcPath;
 import pipe.gui.petrinet.graphicElements.ArcPathPoint;

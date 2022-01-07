@@ -1,7 +1,7 @@
 package pipe.gui.petrinet.undo;
 
 import pipe.dataLayer.DataLayer;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public abstract class TAPNElementCommand extends Command {

@@ -11,12 +11,12 @@ import dk.aau.cs.verification.*;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
-import net.tapaal.gui.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Constants;
-import net.tapaal.gui.verification.InclusionPlaces;
-import net.tapaal.gui.verification.InclusionPlaces.InclusionPlacesOption;
+import net.tapaal.gui.petrinet.verification.InclusionPlaces;
+import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -206,7 +206,7 @@ public class VerifyTAPN implements ModelChecker {
 
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.verification.TAPNQuery dataLayerQuery) throws Exception {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) throws Exception {
 		if(!supportsModel(model.value1(), options))
 			throw new UnsupportedModelException("Verifytapn does not support the given model.");
 		

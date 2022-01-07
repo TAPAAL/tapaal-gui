@@ -9,7 +9,7 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 
-import net.tapaal.gui.animation.AnimationTokenSelectDialog;
+import net.tapaal.gui.petrinet.animation.AnimationTokenSelectDialog;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.TAPAALGUI;
@@ -19,7 +19,7 @@ import pipe.gui.petrinet.graphicElements.Place;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.petrinet.PetriNetTab;
-import net.tapaal.gui.animation.TransitionFiringComponent;
+import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedInputArc;

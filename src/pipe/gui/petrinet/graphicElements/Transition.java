@@ -21,7 +21,7 @@ import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.action.ShowHideInfoAction;
 import pipe.gui.petrinet.undo.TransitionRotationEditCommand;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 
 /**

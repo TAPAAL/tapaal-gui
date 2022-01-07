@@ -8,7 +8,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.ArcPath;
 import pipe.gui.petrinet.graphicElements.ArcPathPoint;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 
 /**
  * 

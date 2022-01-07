@@ -11,15 +11,15 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.CaretListener;
 
-import net.tapaal.gui.undo.*;
+import net.tapaal.gui.petrinet.undo.*;
 import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
-import net.tapaal.gui.editor.ColoredTransitionGuardPanel;
+import net.tapaal.gui.petrinet.editor.ColoredTransitionGuardPanel;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
-import net.tapaal.gui.Context;
+import net.tapaal.gui.petrinet.Context;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;

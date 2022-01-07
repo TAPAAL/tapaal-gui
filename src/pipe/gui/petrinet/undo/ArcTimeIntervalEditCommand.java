@@ -1,7 +1,7 @@
 package pipe.gui.petrinet.undo;
 
 import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.Weight;
 

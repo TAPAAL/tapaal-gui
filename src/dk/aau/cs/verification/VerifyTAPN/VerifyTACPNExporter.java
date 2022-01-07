@@ -3,7 +3,7 @@ package dk.aau.cs.verification.VerifyTAPN;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.NameMapping;
-import net.tapaal.gui.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.canvas.Zoomer;

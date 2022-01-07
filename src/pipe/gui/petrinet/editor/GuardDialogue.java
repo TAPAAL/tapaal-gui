@@ -13,11 +13,11 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 
-import net.tapaal.gui.Context;
+import net.tapaal.gui.petrinet.Context;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
-import net.tapaal.gui.editor.ColoredArcGuardPanel;
+import net.tapaal.gui.petrinet.editor.ColoredArcGuardPanel;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.petrinet.graphicElements.Transition;

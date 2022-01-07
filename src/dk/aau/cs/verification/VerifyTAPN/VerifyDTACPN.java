@@ -21,7 +21,7 @@ public class VerifyDTACPN extends VerifyDTAPN {
     }
 
     @Override
-    public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.verification.TAPNQuery dataLayerQuery) throws Exception {
+    public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) throws Exception {
         if (!supportsModel(model.value1(), options)) {
             throw new UnsupportedModelException("Verifydtapn does not support the given model.");
         }

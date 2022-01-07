@@ -30,7 +30,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
-import net.tapaal.gui.NameGenerator;
+import net.tapaal.gui.petrinet.NameGenerator;
 import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;

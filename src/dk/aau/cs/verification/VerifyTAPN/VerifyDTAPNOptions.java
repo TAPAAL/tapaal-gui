@@ -1,10 +1,10 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
-import net.tapaal.gui.verification.TAPNQuery.SearchOption;
-import net.tapaal.gui.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.verification.TAPNQuery.WorkflowMode;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
 import pipe.gui.MessengerImpl;
-import net.tapaal.gui.verification.InclusionPlaces;
+import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 
 import java.io.File;
 import java.io.IOException;

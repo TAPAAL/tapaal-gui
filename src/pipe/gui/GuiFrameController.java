@@ -1,8 +1,8 @@
 package pipe.gui;
 
 import dk.aau.cs.debug.Logger;
-import net.tapaal.gui.dialog.BatchProcessingDialog;
-import net.tapaal.gui.smartdraw.SmartDrawDialog;
+import net.tapaal.gui.petrinet.dialog.BatchProcessingDialog;
+import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
@@ -12,11 +12,11 @@ import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.versioncheck.VersionChecker;
-import net.tapaal.gui.animation.DelayEnabledTransitionControl;
+import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
 import pipe.gui.petrinet.animation.SimulationControl;
-import net.tapaal.gui.verification.EngineDialogPanel;
-import net.tapaal.gui.dialog.NewTAPNPanel;
-import net.tapaal.gui.dialog.QueryDialog;
+import net.tapaal.gui.petrinet.verification.EngineDialogPanel;
+import net.tapaal.gui.petrinet.dialog.NewTAPNPanel;
+import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 

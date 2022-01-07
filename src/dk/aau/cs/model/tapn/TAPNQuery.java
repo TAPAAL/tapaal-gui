@@ -6,7 +6,7 @@ import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.verification.QueryType;
-import net.tapaal.gui.verification.TAPNQuery.QueryCategory;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 
 public class TAPNQuery {
 	private TCTLAbstractProperty property;

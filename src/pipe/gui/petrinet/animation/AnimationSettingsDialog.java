@@ -10,7 +10,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import pipe.gui.petrinet.PetriNetTab;
-import net.tapaal.gui.animation.DelayEnabledTransitionControl;
+import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.swingcomponents.EscapableDialog;
 

@@ -5,7 +5,7 @@ package pipe.gui.petrinet.undo;
 
 import java.util.ArrayList;
 
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
 import pipe.gui.TAPAALGUI;

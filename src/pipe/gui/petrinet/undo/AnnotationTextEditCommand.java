@@ -5,7 +5,7 @@
 package pipe.gui.petrinet.undo;
 
 import pipe.gui.petrinet.graphicElements.AnnotationNote;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 
 /**
  * 

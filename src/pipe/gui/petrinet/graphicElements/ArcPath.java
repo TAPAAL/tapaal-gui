@@ -15,7 +15,7 @@ import java.util.List;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.Constants;
 import pipe.gui.petrinet.undo.AddArcPathPointEditCommand;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 
 /**
  * @author Peter Kyme, Tom Barnwell and Michael Camacho

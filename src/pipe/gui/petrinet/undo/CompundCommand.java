@@ -1,6 +1,6 @@
 package pipe.gui.petrinet.undo;
 
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 
 import java.util.ArrayList;
 import java.util.List;

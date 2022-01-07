@@ -1,0 +1,993 @@
+package net.tapaal.gui.petrinet.editor;
+
+import net.tapaal.gui.petrinet.Context;
+import net.tapaal.gui.petrinet.undo.Colored.SetTransitionExpressionCommand;
+import net.tapaal.gui.petrinet.undo.Command;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
+import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.GuardExpressionParser.GuardExpressionParser;
+import dk.aau.cs.model.CPN.ProductType;
+import dk.aau.cs.model.CPN.Variable;
+import kotlin.Pair;
+import pipe.gui.TAPAALGUI;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.petrinet.editor.TAPNTransitionEditor;
+
+import javax.swing.*;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+import javax.swing.undo.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import java.util.List;
+
+public class ColoredTransitionGuardPanel  extends JPanel {
+
+    private JButton resetExprButton;
+    private JButton deleteExprSelectionButton;
+    private JButton editExprButton;
+    private JButton undoButton;
+    private JButton redoButton;
+
+    private JButton andButton;
+    private JButton orButton;
+    private JButton notButton;
+    private JButton equalityButton;
+    private JButton greaterThanEqButton;
+    private JButton greaterThanButton;
+    private JButton inequalityButton;
+    private JButton lessThanEqButton;
+    private JButton lessThanButton;
+
+    //colorexpression elements
+    JPanel colorExpressionPanel;
+    JPanel colorExpressionButtons;
+    JButton predButton;
+    JButton succButton;
+    JComboBox<ColorType> colorTypeCombobox;
+    JLabel colorTypeLabel;
+    ColorComboboxPanel colorCombobox;
+    JLabel colorLabel;
+    JButton addColorButton;
+
+    private JTextPane exprField;
+
+    private final Context context;
+    private final TimedTransitionComponent transition;
+
+    private GuardExpression newProperty;
+    TAPNTransitionEditor parent;
+    ExpressionConstructionUndoManager undoManager;
+    UndoableEditSupport undoSupport;
+
+    private ExprStringPosition currentSelection = null;
+    public ColoredTransitionGuardPanel(TimedTransitionComponent transition, Context context, TAPNTransitionEditor parent){
+        this.setLayout(new GridBagLayout());
+        this.setBorder(BorderFactory.createTitledBorder("Guard Expression"));
+        this.transition = transition;
+        this.context = context;
+        this.parent = parent;
+        initExprField();
+        initComparisonPanel();
+        initLogicPanel();
+        initColorExpressionPanel();
+        initExprEditPanel();
+        //initExpr(transition.underlyingTransition().getGuard());
+        //updateSelection();
+        updateColorType();
+
+        undoButton.setEnabled(false);
+        redoButton.setEnabled(false);
+        undoManager = new ColoredTransitionGuardPanel.ExpressionConstructionUndoManager();
+        undoSupport = new UndoableEditSupport();
+        undoSupport.addUndoableEditListener(new ColoredTransitionGuardPanel.UndoAdapter());
+        refreshUndoRedo();
+        makeShortcuts();
+    }
+
+    private void initColorExpressionPanel(){
+        colorExpressionPanel = new JPanel(new GridBagLayout());
+        colorExpressionPanel.setBorder(BorderFactory.createTitledBorder("Variables and Colors"));
+        colorExpressionButtons = new JPanel(new GridBagLayout());
+        ButtonGroup expressionButtonsGroup = new ButtonGroup();
+        predButton = new JButton("Add Pred");
+        succButton = new JButton("Add Succ");
+        predButton.setPreferredSize(new Dimension(130 , 27));
+        predButton.setMinimumSize(new Dimension(130 , 27));
+        predButton.setMaximumSize(new Dimension(130 , 27));
+        succButton.setPreferredSize(new Dimension(130 , 27));
+        succButton.setMinimumSize(new Dimension(130 , 27));
+        succButton.setMaximumSize(new Dimension(130 , 27));
+
+        expressionButtonsGroup.add(predButton);
+        expressionButtonsGroup.add(succButton);
+
+        predButton.addActionListener(actionEvent -> {
+            PredecessorExpression predExpr;
+            if (currentSelection.getObject() instanceof ColorExpression) {
+                predExpr = new PredecessorExpression((ColorExpression) currentSelection.getObject());
+                replaceAndAddToUndo(currentSelection.getObject(), predExpr);
+            }
+        });
+
+        succButton.addActionListener(actionEvent -> {
+            SuccessorExpression succExpr;
+            if (currentSelection.getObject() instanceof  ColorExpression) {
+                succExpr = new SuccessorExpression((ColorExpression) currentSelection.getObject());
+                replaceAndAddToUndo(currentSelection.getObject(), succExpr);
+            }
+        });
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0,5,0,5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        colorExpressionButtons.add(predButton, gbc);
+
+        gbc.gridx = 1;
+        gbc.insets = new Insets(0, 10, 0 , 0);
+        colorExpressionButtons.add(succButton, gbc);
+
+        colorTypeLabel = new JLabel("Color Type: ");
+        colorTypeCombobox = new JComboBox();
+        colorTypeCombobox.setPreferredSize(new Dimension(200,25));
+        colorTypeCombobox.setRenderer(new ColorComboBoxRenderer(colorTypeCombobox));
+
+       addColorTypesToCombobox(context.network().colorTypes());
+
+        if (colorTypeCombobox.getItemCount() != 0) {
+            colorTypeCombobox.setSelectedIndex(0);
+        }
+
+        colorLabel = new JLabel("Color: ");
+        colorCombobox = new ColorComboboxPanel((ColorType)colorTypeCombobox.getSelectedItem(),false,context) {
+            @Override
+            public void changedColor(JComboBox[] comboBoxes) {
+
+            }
+        };
+        colorCombobox.removeScrollPaneBorder();
+        addColorButton = new JButton("Add Color");
+        Dimension addDim = new Dimension(120, 30);
+        addColorButton.setPreferredSize(addDim);
+        addColorButton.setMinimumSize(addDim);
+        addColorButton.setMaximumSize(addDim);
+
+        addColorButton.addActionListener(actionEvent -> {
+            Expression newExpression;
+            if (colorCombobox.getColorTypeComboBoxesArray().length > 1) {
+                Vector<ColorExpression> tempVec = new Vector<>();
+                for (int i = 0; i < colorCombobox.getColorTypeComboBoxesArray().length; i++) {
+                    ColorExpression expr;
+                    Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[i].getSelectedItem();
+                    if ( selectedElement instanceof String) {
+                        expr = new AllExpression(((ProductType)colorCombobox.getColorType()).getColorTypes().get(i));
+                    }else if(selectedElement instanceof Variable){
+                        expr = new VariableExpression((Variable)selectedElement);
+                    } else {
+                        expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
+                    }
+                    expr.setIndex(i);
+                    tempVec.add(expr);
+                }
+                newExpression = new TupleExpression(tempVec);
+            } else {
+                ColorExpression expr;
+                ColorExpression oldExpression = ((ColorExpression)currentSelection.getObject());
+                Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[0].getSelectedItem();
+                if (selectedElement instanceof String) {
+                    expr = new AllExpression(colorCombobox.getColorType());
+                } else if(selectedElement instanceof Variable){
+                    expr = new VariableExpression((Variable)selectedElement);
+                }
+                else {
+                    expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
+                }
+                if(oldExpression.getParent() instanceof TupleExpression){
+                    expr.setParent(oldExpression.getParent());
+                    expr.setIndex(oldExpression.getIndex());
+                }
+                newExpression = expr;
+            }
+            if (currentSelection.getObject() instanceof ColorExpression) {
+                replaceAndAddToUndo(currentSelection.getObject(), newExpression);
+            }
+        });
+
+        colorTypeCombobox.addActionListener(actionEvent -> updateColorType());
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3,3,3,3);
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        colorExpressionPanel.add(colorTypeCombobox, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(3,3,3,3);
+        colorExpressionPanel.add(colorCombobox, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(0, 3,0 ,0);
+        colorExpressionPanel.add(addColorButton, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 0, 0,0);
+        colorExpressionPanel.add(colorExpressionButtons, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        add(colorExpressionPanel, gbc);
+    }
+
+    private void initLogicPanel() {
+        //Logic buttons
+        JPanel logicPanel = new JPanel(new GridBagLayout());
+        logicPanel.setBorder(BorderFactory.createTitledBorder("Logic"));
+        Dimension d = new Dimension(100, 150);
+        logicPanel.setPreferredSize(d);
+        logicPanel.setMinimumSize(d);
+
+        ButtonGroup logicButtonGroup = new ButtonGroup();
+        andButton = new JButton("AND");
+        orButton = new JButton("OR");
+        notButton = new JButton("NOT");
+
+        logicButtonGroup.add(andButton);
+        logicButtonGroup.add(orButton);
+        logicButtonGroup.add(notButton);
+
+
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(0, 0, 5, 5);
+        logicPanel.add(andButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 5, 5);
+        logicPanel.add(orButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.insets = new Insets(0, 0, 5, 5);
+        logicPanel.add(notButton, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        add(logicPanel, gbc);
+
+        andButton.addActionListener(actionEvent -> {
+            AndExpression andExpr = null;
+            if (currentSelection.getObject() instanceof OrExpression) {
+                andExpr = new AndExpression(((OrExpression) currentSelection.getObject()).getLeftExpression(), ((OrExpression) currentSelection.getObject()).getRightExpression());
+            } else if (currentSelection.getObject() instanceof GuardExpression) {
+                andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
+            }
+            replaceAndAddToUndo(currentSelection.getObject(), andExpr);
+        });
+
+        orButton.addActionListener(actionEvent -> {
+            OrExpression orExpr = null;
+            if (currentSelection.getObject() instanceof AndExpression) {
+                orExpr = new OrExpression(((AndExpression) currentSelection.getObject()).getLeftExpression(), ((AndExpression) currentSelection.getObject()).getRightExpression());
+            } else if (currentSelection.getObject() instanceof GuardExpression) {
+                orExpr = new OrExpression((GuardExpression) currentSelection.getObject(), new PlaceHolderGuardExpression());
+            }
+            replaceAndAddToUndo(currentSelection.getObject(), orExpr);
+        });
+
+        notButton.addActionListener(actionEvent -> {
+            NotExpression notExpr = new NotExpression((GuardExpression)currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), notExpr);
+        });
+    }
+
+    private void initComparisonPanel() {
+        //Variable interaction elements
+        JPanel comparisonPanel = new JPanel(new GridBagLayout());
+        comparisonPanel.setBorder(BorderFactory.createTitledBorder("Comparison"));
+
+        ButtonGroup comparisonButtons = new ButtonGroup();
+        equalityButton = new JButton("=");
+        greaterThanEqButton = new JButton(">=");
+        greaterThanButton = new JButton(">");
+        inequalityButton = new JButton("!=");
+        lessThanEqButton = new JButton("<=");
+        lessThanButton = new JButton("<");
+
+        comparisonButtons.add(equalityButton);
+        comparisonButtons.add(greaterThanEqButton);
+        comparisonButtons.add(greaterThanButton);
+        comparisonButtons.add(inequalityButton);
+        comparisonButtons.add(lessThanEqButton);
+        comparisonButtons.add(lessThanButton);
+
+        Dimension comparisonButtonsSize = new Dimension(75, 30);
+
+        equalityButton.setPreferredSize(comparisonButtonsSize);
+        greaterThanEqButton.setPreferredSize(comparisonButtonsSize);
+        greaterThanButton.setPreferredSize(comparisonButtonsSize);
+        inequalityButton.setPreferredSize(comparisonButtonsSize);
+        lessThanEqButton.setPreferredSize(comparisonButtonsSize);
+        lessThanButton.setPreferredSize(comparisonButtonsSize);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        comparisonPanel.add(equalityButton, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        comparisonPanel.add(inequalityButton, gbc);
+
+
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        comparisonPanel.add(greaterThanEqButton, gbc);
+
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        comparisonPanel.add(greaterThanButton, gbc);
+
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        comparisonPanel.add(lessThanEqButton, gbc);
+
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        comparisonPanel.add(lessThanButton, gbc);
+
+        JSeparator seperator = new JSeparator(SwingConstants.HORIZONTAL);
+        seperator.setEnabled(true);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 3;
+        gbc.anchor = GridBagConstraints.CENTER;
+        comparisonPanel.add(seperator, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        add(comparisonPanel, gbc);
+
+
+        equalityButton.addActionListener(actionEvent -> {
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new EqualityExpression(pair.component1(),pair.component2()));
+
+        });
+
+        greaterThanEqButton.addActionListener(actionEvent -> {
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new GreaterThanEqExpression(pair.component1(),pair.component2()));
+
+        });
+
+        greaterThanButton.addActionListener(actionEvent -> {
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new GreaterThanExpression(pair.component1(),pair.component2()));
+
+        });
+
+        inequalityButton.addActionListener(actionEvent -> {
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new InequalityExpression(pair.component1(),pair.component2()));
+
+        });
+        lessThanButton.addActionListener(actionEvent -> {
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new LessThanExpression(pair.component1(),pair.component2()));
+        });
+
+        lessThanEqButton.addActionListener(actionEvent -> {
+            var pair = getLeftRightExpression(currentSelection.getObject());
+            replaceAndAddToUndo(currentSelection.getObject(), new LessThanEqExpression(pair.component1(),pair.component2()));
+        });
+
+    }
+
+    private Pair<ColorExpression,ColorExpression> getLeftRightExpression(Expression currentSelection){
+        if (currentSelection instanceof PlaceHolderGuardExpression) {
+            return new Pair<>(new PlaceHolderColorExpression(),
+                new PlaceHolderColorExpression());
+        }else{
+            return new Pair<>(((LeftRightGuardExpression) currentSelection).getLeftExpression(),
+                ((LeftRightGuardExpression) currentSelection).getRightExpression());
+        }
+    }
+
+    private void initExprEditPanel() {
+        //Edit expression buttons
+        JPanel editPanel = new JPanel(new GridBagLayout());
+        editPanel.setBorder(BorderFactory.createTitledBorder("Editing"));
+        //editPanel.setPreferredSize(new Dimension(260, 190));
+
+        ButtonGroup editButtonsGroup = new ButtonGroup();
+        deleteExprSelectionButton = new JButton("Delete Selection");
+        resetExprButton = new JButton("Reset Expression");
+        undoButton = new JButton("Undo");
+        redoButton = new JButton("Redo");
+        editExprButton = new JButton("Edit Expression");
+        editExprButton.setEnabled(true);
+
+        editButtonsGroup.add(deleteExprSelectionButton);
+        editButtonsGroup.add(resetExprButton);
+        editButtonsGroup.add(undoButton);
+        editButtonsGroup.add(redoButton);
+        editButtonsGroup.add(editExprButton);
+
+        deleteExprSelectionButton.addActionListener(actionEvent -> deleteSelection());
+
+        editExprButton.addActionListener(actionEvent -> {
+            if (exprField.isEditable()) {
+                returnFromManualEdit(null);
+            } else {
+                changeToEditMode();
+            }
+        });
+
+        resetExprButton.addActionListener(actionEvent -> {
+            if (exprField.isEditable()) {
+                GuardExpression newExpression = null;
+                try {
+                    newExpression = GuardExpressionParser.parse(exprField.getText(),context.network());
+                } catch (Throwable ex) {
+                    int choice = JOptionPane.showConfirmDialog(
+                        TAPAALGUI.getApp(),
+                        "TAPAAL encountered an error trying to parse the specified Expression with the following error: \n\n" + ex.getMessage()+ ".\n\nWe recommend using the expression construction buttons unless you are an experienced user.\n\n The specified expression has not been saved. Do you want to edit it again?",
+                        "Error Parsing Expression",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.ERROR_MESSAGE);
+                    System.out.println(ex.getMessage());
+                    if (choice == JOptionPane.NO_OPTION)
+                        returnFromManualEdit(null);
+                    else
+                        return;
+                }
+                if(newExpression != null){
+                    UndoableEdit edit = new ExpressionConstructionEdit(newProperty, newExpression);
+                    returnFromManualEdit(newExpression);
+                    undoSupport.postEdit(edit);
+                }else{
+                    returnFromManualEdit(null);
+                }
+            } else {
+                PlaceHolderGuardExpression phGuard = new PlaceHolderGuardExpression();
+                UndoableEdit edit = new ExpressionConstructionEdit(newProperty, phGuard);
+                newProperty = newProperty.replace(newProperty, phGuard);
+                updateSelection(phGuard);
+                undoSupport.postEdit(edit);
+            }
+        });
+
+        undoButton.addActionListener(e -> {
+            UndoableEdit edit = undoManager.GetNextEditToUndo();
+
+            if (edit instanceof ColoredTransitionGuardPanel.ExpressionConstructionEdit) {
+                Expression original = ((ColoredTransitionGuardPanel.ExpressionConstructionEdit) edit)
+                    .getOriginal();
+                undoManager.undo();
+                refreshUndoRedo();
+                updateSelection(original);
+            }
+        });
+
+        redoButton.addActionListener(e -> {
+            UndoableEdit edit = undoManager.GetNextEditToRedo();
+            if (edit instanceof ColoredTransitionGuardPanel.ExpressionConstructionEdit) {
+                Expression replacement = ((ColoredTransitionGuardPanel.ExpressionConstructionEdit) edit)
+                    .getReplacement();
+                undoManager.redo();
+                refreshUndoRedo();
+                updateSelection(replacement);
+            }
+        });
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5,0,5,5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        editPanel.add(undoButton, gbc);
+
+        gbc.gridx = 1;
+        gbc.insets = new Insets(0, 10, 0 , 0);
+        editPanel.add(redoButton, gbc);
+
+        gbc.insets = new Insets(0, 0, 5 , 0);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        editPanel.add(deleteExprSelectionButton, gbc);
+
+        gbc.gridy = 2;
+        editPanel.add(resetExprButton, gbc);
+
+        gbc.gridy = 3;
+        editPanel.add(editExprButton, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.BOTH;
+        add(editPanel, gbc);
+    }
+
+    private void initExprField() {
+        exprField = new JTextPane();
+
+        StyledDocument doc = exprField.getStyledDocument();
+
+        //Set alignment to be centered for all paragraphs
+        MutableAttributeSet standard = new SimpleAttributeSet();
+        StyleConstants.setAlignment(standard, StyleConstants.ALIGN_CENTER);
+        StyleConstants.setFontSize(standard, 14);
+        doc.setParagraphAttributes(0,0, standard,true);
+
+        exprField.setBackground(java.awt.Color.white);
+
+
+        exprField.setEditable(false);
+        exprField.setToolTipText("Tooltip missing");
+
+
+        JScrollPane exprScrollPane = new JScrollPane(exprField);
+        exprScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        Dimension d = new Dimension(100, 80);
+        exprScrollPane.setPreferredSize(d);
+        //exprScrollPane.setMinimumSize(d);
+
+        exprField.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (!exprField.isEditable()) {
+                    updateSelection();
+                }
+            }
+        });
+
+        exprField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (!exprField.isEditable()) {
+                    if (e.getKeyChar() == KeyEvent.VK_DELETE
+                        || e.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
+                        deleteSelection();
+                    }else if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_LEFT){
+                        e.consume();
+                        int position = exprField.getSelectionEnd();
+                        if(e.getKeyCode() == KeyEvent.VK_LEFT){
+                            position = exprField.getSelectionStart();
+                        }
+                        changeToEditMode();
+                        exprField.setCaretPosition(position);
+                    }
+                } else {
+                    if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                        resetExprButton.doClick(); // we are in manual edit mode, so the reset button is now the Parse Expr button
+                        e.consume();
+                    }
+                }
+            }
+        });
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridwidth = 4;
+        add(exprScrollPane, gbc);
+    }
+
+    public void initExpr(GuardExpression guard) {
+        newProperty = new PlaceHolderGuardExpression();
+        //new Exception().printStackTrace();
+        if (guard != null) {
+            newProperty = guard.copy();
+        }
+
+        updateSelection(newProperty);
+    }
+
+    private void updateEnabledButtons() {
+        colorCombobox.setEnabled(true);
+        colorTypeCombobox.setEnabled(true);
+        if(currentSelection == null){
+            andButton.setEnabled(false);
+            orButton.setEnabled(false);
+            notButton.setEnabled(false);
+            equalityButton.setEnabled(false);
+            inequalityButton.setEnabled(false);
+            greaterThanButton.setEnabled(false);
+            greaterThanEqButton.setEnabled(false);
+            lessThanEqButton.setEnabled(false);
+            lessThanButton.setEnabled(false);
+            succButton.setEnabled(false);
+            predButton.setEnabled(false);
+            addColorButton.setEnabled(false);
+        }
+        else if (currentSelection.getObject() instanceof ColorExpression) {
+            andButton.setEnabled(false);
+            orButton.setEnabled(false);
+            notButton.setEnabled(false);
+            equalityButton.setEnabled(false);
+            inequalityButton.setEnabled(false);
+            greaterThanButton.setEnabled(false);
+            greaterThanEqButton.setEnabled(false);
+            lessThanEqButton.setEnabled(false);
+            lessThanButton.setEnabled(false);
+            if(!(currentSelection.getObject() instanceof PlaceHolderExpression)){
+                succButton.setEnabled(true);
+                predButton.setEnabled(true);
+            }
+            addColorButton.setEnabled(true);
+        }
+        else if (currentSelection.getObject() instanceof GuardExpression) {
+            andButton.setEnabled(true);
+            orButton.setEnabled(true);
+            notButton.setEnabled(true);
+            equalityButton.setEnabled(true);
+            inequalityButton.setEnabled(true);
+            greaterThanButton.setEnabled(true);
+            greaterThanEqButton.setEnabled(true);
+            lessThanEqButton.setEnabled(true);
+            lessThanButton.setEnabled(true);
+            succButton.setEnabled(false);
+            predButton.setEnabled(false);
+            addColorButton.setEnabled(false);
+
+        }
+        parent.enableOKButton(!newProperty.containsPlaceHolder() || newProperty instanceof PlaceHolderExpression);
+    }
+
+    private void updateSelection(Expression newSelection) {
+        exprField.setText(newProperty.toString());
+
+        ExprStringPosition position;
+        if (newProperty.containsPlaceHolder()) {
+            Expression ge = newProperty.findFirstPlaceHolder();
+            position = newProperty.indexOf(ge);
+        } else {
+            position = newProperty.indexOf(newSelection);
+        }
+        exprField.select(position.getStart(), position.getEnd());
+        currentSelection = position;
+
+        updateEnabledButtons();
+        updateColorOptions();
+    }
+
+    private void updateSelection() {
+        int index = exprField.getCaretPosition();
+        ExprStringPosition position = newProperty.objectAt(index);
+
+        if (position == null) {
+            return;
+        }
+
+        exprField.select(position.getStart(), position.getEnd());
+        currentSelection = position;
+
+        updateEnabledButtons();
+        updateColorOptions();
+    }
+
+    public void updateColorOptions(){
+        if(currentSelection.getObject() instanceof ColorExpression) {
+            ColorExpression exprToCheck = ((ColorExpression) currentSelection.getObject()).getBottomColorExpression();
+            if (exprToCheck instanceof UserOperatorExpression || exprToCheck instanceof VariableExpression) {
+                if (exprToCheck.getParent() instanceof TupleExpression) {
+                    TupleExpression tupleExpression = (TupleExpression) exprToCheck.getParent();
+                    colorTypeCombobox.setSelectedItem(tupleExpression.getColorTypes().get(exprToCheck.getIndex()));
+                    updateColorType();
+                    colorTypeCombobox.setEnabled(false);
+                }
+            }
+            updateColorTypeCombobox();
+        }else{
+            colorTypeCombobox.setEnabled(true);
+            addColorTypesToCombobox(context.network().colorTypes());
+        }
+    }
+
+    private void updateColorTypeCombobox() {
+        List<Expression> possibleExpressions = getPropertyChildren(newProperty.getChildren());
+        List<ColorType> colorTypes = context.network().colorTypes();
+        ColorType type = null;
+
+        int lastIndex = possibleExpressions.size() - 1;
+
+        if (lastIndex == 0 && possibleExpressions.get(lastIndex) instanceof ColorExpression) {
+            type = ((ColorExpression) possibleExpressions.get(lastIndex)).getColorType(colorTypes);
+            addColorTypesToCombobox(Collections.singletonList(type));
+        } else if (lastIndex > 0) {
+            if (possibleExpressions.get(lastIndex) instanceof TupleExpression) {
+                type = ((ColorExpression) possibleExpressions.get(lastIndex)).getColorType(colorTypes);
+            } else if (possibleExpressions.get(lastIndex - 1) instanceof ColorExpression) {
+                type = ((ColorExpression) possibleExpressions.get(lastIndex - 1)).getColorType(colorTypes);
+            }
+            if (type != null) addColorTypesToCombobox(Collections.singletonList(type));
+        } else {
+            addColorTypesToCombobox(colorTypes);
+        }
+    }
+
+    private List<Expression> getPropertyChildren(ExprStringPosition[] children) {
+        List<Expression> possibleExpressions = new ArrayList<>();
+        for (ExprStringPosition child : children) {
+            if (child.getObject().getChildren().length > 0) {
+                possibleExpressions.addAll(getPropertyChildren(child.getObject().getChildren()));
+            }
+            if (child.getEnd() < currentSelection.getStart()) {
+                possibleExpressions.add(child.getObject());
+            }
+        }
+        return possibleExpressions;
+    }
+
+    private void addColorTypesToCombobox(List<ColorType> types) {
+        colorTypeCombobox.removeAllItems();
+        for (ColorType type : types) {
+            colorTypeCombobox.addItem(type);
+        }
+    }
+
+    private void deleteSelection() {
+        if (currentSelection != null) {
+            Expression replacement = null;
+            if (currentSelection.getObject() instanceof GuardExpression) {
+                replacement = new PlaceHolderGuardExpression();
+            }
+            else if (currentSelection.getObject() instanceof ColorExpression) {
+                replacement = new PlaceHolderColorExpression();
+            }
+            if (replacement != null) {
+                UndoableEdit edit = new ExpressionConstructionEdit(currentSelection.getObject(), replacement);
+                newProperty = newProperty.replace(currentSelection.getObject(), replacement);
+                updateSelection(replacement);
+                undoSupport.postEdit(edit);
+            }
+        }
+    }
+
+    private GuardExpression getSpecificChildOfProperty(int number, Expression property) {
+        ExprStringPosition[] children = property.getChildren();
+        int count = 0;
+        for (ExprStringPosition exprStringPosition : children) {
+            Expression child = exprStringPosition.getObject();
+            if (child instanceof GuardExpression) {
+                count++;
+            }
+            if (count == number) {
+                return (GuardExpression) child;
+            }
+        }
+
+        return new PlaceHolderGuardExpression();
+    }
+
+    private void returnFromManualEdit(GuardExpression newExpr) {
+        setExprFieldEditable(false);
+        deleteExprSelectionButton.setEnabled(true);
+        if (newExpr != null) {
+            newProperty = newExpr;
+        }
+
+        updateSelection(newProperty);
+        resetExprButton.setText("Reset Expression");
+        editExprButton.setText("Edit Expression");
+
+        updateEnabledButtons();
+    }
+
+    private void changeToEditMode() {
+        setExprFieldEditable(true);
+        deleteExprSelectionButton.setEnabled(false);
+        undoButton.setEnabled(false);
+        redoButton.setEnabled(false);
+        andButton.setEnabled(false);
+        orButton.setEnabled(false);
+        notButton.setEnabled(false);
+        equalityButton.setEnabled(false);
+        inequalityButton.setEnabled(false);
+        greaterThanButton.setEnabled(false);
+        greaterThanEqButton.setEnabled(false);
+        lessThanEqButton.setEnabled(false);
+        lessThanButton.setEnabled(false);
+        succButton.setEnabled(false);
+        predButton.setEnabled(false);
+        colorCombobox.setEnabled(false);
+        colorTypeCombobox.setEnabled(false);
+        addColorButton.setEnabled(false);
+        resetExprButton.setText("Parse Expression");
+        editExprButton.setText("Cancel");
+        clearSelection();
+        exprField.setCaretPosition(exprField.getText().length());
+    }
+
+    private void clearSelection() {
+        exprField.select(0, 0);
+        currentSelection = null;
+
+    }
+
+    public GuardExpression getExpression(){
+        return newProperty;
+    }
+
+    private void setExprFieldEditable(boolean isEditable) {
+        exprField.setEditable(isEditable);
+        exprField.setFocusable(false);
+        exprField.setFocusable(true);
+        exprField.requestFocus(true);
+    }
+
+    public void onOK(pipe.gui.petrinet.undo.UndoManager undoManager) {
+        if (newProperty instanceof PlaceHolderGuardExpression) {
+            Command cmd = new SetTransitionExpressionCommand(transition, transition.getGuardExpression(), null);
+            cmd.redo();
+            undoManager.addEdit(cmd);
+        } else {
+            Command cmd = new SetTransitionExpressionCommand(transition, transition.getGuardExpression(), newProperty);
+            cmd.redo();
+            undoManager.addEdit(cmd);
+        }
+    }
+
+    private void replaceAndAddToUndo(Expression currentSelection, Expression newExpression){
+        UndoableEdit edit = new ExpressionConstructionEdit(currentSelection, newExpression);
+        newProperty = newProperty.replace(currentSelection, newExpression);
+        updateSelection(newExpression);
+        undoSupport.postEdit(edit);
+    }
+
+    private void updateColorType() {
+        ColorType ct;
+        ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
+        if (ct != null) {
+            colorCombobox.updateColorType(ct, context);
+        }
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // Undo support stuff
+    // /////////////////////////////////////////////////////////////////////
+    private void refreshUndoRedo() {
+        undoButton.setEnabled(undoManager.canUndo());
+        redoButton.setEnabled(undoManager.canRedo());
+    }
+
+    private class UndoAdapter implements UndoableEditListener {
+        public void undoableEditHappened(UndoableEditEvent arg0) {
+            UndoableEdit edit = arg0.getEdit();
+            undoManager.addEdit(edit);
+            refreshUndoRedo();
+        }
+    }
+
+    private static class ExpressionConstructionUndoManager extends UndoManager {
+        public UndoableEdit GetNextEditToUndo() {
+            return editToBeUndone();
+        }
+
+        public UndoableEdit GetNextEditToRedo() {
+            return editToBeRedone();
+        }
+    }
+
+    public class ExpressionConstructionEdit extends AbstractUndoableEdit {
+        private final Expression original;
+        private final Expression replacement;
+
+        public Expression getOriginal() {
+            return original;
+        }
+
+        public Expression getReplacement() {
+            return replacement;
+        }
+
+        public ExpressionConstructionEdit(Expression original,
+                                          Expression replacement) {
+            this.original = original;
+            this.replacement = replacement;
+        }
+
+        @Override
+        public void undo() throws CannotUndoException {
+            newProperty = newProperty.replace(replacement, original);
+        }
+
+        @Override
+        public void redo() throws CannotRedoException {
+            newProperty = newProperty.replace(original, replacement);
+        }
+
+        @Override
+        public boolean canUndo() {
+            return true;
+        }
+
+        @Override
+        public boolean canRedo() {
+            return true;
+        }
+    }
+
+    private void makeShortcuts(){
+        int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        ActionMap am = this.getActionMap();
+        am.put("undo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) { undoButton.doClick(); }
+        });
+        am.put("redo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {  redoButton.doClick(); }
+        });
+        InputMap im = this.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
+        im.put(KeyStroke.getKeyStroke('Z', shortcutkey), "undo");
+        im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
+    }
+
+}
+
+

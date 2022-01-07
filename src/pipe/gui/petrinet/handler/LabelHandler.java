@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.SwingUtilities;
 
-import net.tapaal.gui.undo.UpdateNameLabelOffsetCommand;
+import net.tapaal.gui.petrinet.undo.UpdateNameLabelOffsetCommand;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.NameLabel;

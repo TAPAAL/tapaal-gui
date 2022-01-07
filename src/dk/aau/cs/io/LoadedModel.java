@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
-import net.tapaal.gui.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.dataLayer.Template;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 

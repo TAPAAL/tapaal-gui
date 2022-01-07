@@ -7,7 +7,7 @@ package pipe.gui.petrinet.undo;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 
 /**
  * 

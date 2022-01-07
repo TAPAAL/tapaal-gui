@@ -2,11 +2,11 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
-import net.tapaal.gui.undo.Colored.*;
+import net.tapaal.gui.petrinet.undo.Colored.*;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
 import pipe.gui.MessengerImpl;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
 import dk.aau.cs.model.tapn.event.ConstantsListener;
@@ -17,7 +17,7 @@ import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import pipe.gui.petrinet.undo.UndoManager;
-import net.tapaal.gui.editor.ConstantsPane;
+import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
 public class TimedArcPetriNetNetwork {
 	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();

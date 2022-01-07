@@ -1,6 +1,6 @@
 package net.tapaal.gui.model;
 
-import net.tapaal.gui.undo.*;
+import net.tapaal.gui.petrinet.undo.*;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.AllExpression;
@@ -10,7 +10,7 @@ import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.util.Require;
 import org.jetbrains.annotations.NotNull;
 import pipe.dataLayer.DataLayer;
-import net.tapaal.gui.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.*;
 import pipe.gui.petrinet.graphicElements.tapn.*;

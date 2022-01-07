@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import pipe.gui.petrinet.PetriNetTab;
-import net.tapaal.gui.dialog.BatchProcessingResultsTableModel;
+import net.tapaal.gui.petrinet.dialog.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
@@ -26,10 +26,10 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
-import net.tapaal.gui.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.gui.TAPAALGUI;
 import dk.aau.cs.debug.Logger;
-import net.tapaal.gui.verification.Verifier;
+import net.tapaal.gui.petrinet.verification.Verifier;
 
 /**
  * Main class for lunching TAPAAL

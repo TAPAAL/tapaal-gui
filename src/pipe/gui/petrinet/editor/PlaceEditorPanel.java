@@ -1,6 +1,6 @@
 package pipe.gui.petrinet.editor;
 
-import net.tapaal.gui.Context;
+import net.tapaal.gui.petrinet.Context;
 //import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -19,13 +19,13 @@ import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 
-import net.tapaal.gui.undo.*;
+import net.tapaal.gui.petrinet.undo.*;
 import pipe.gui.petrinet.PetriNetTab;
-import net.tapaal.gui.editor.ColorComboBoxRenderer;
-import net.tapaal.gui.undo.Colored.ColoredPlaceMarkingEditCommand;
-import net.tapaal.gui.undo.Colored.SetArcExpressionCommand;
-import net.tapaal.gui.undo.Colored.SetColoredArcIntervalsCommand;
-import net.tapaal.gui.undo.Colored.SetTransportArcExpressionsCommand;
+import net.tapaal.gui.petrinet.editor.ColorComboBoxRenderer;
+import net.tapaal.gui.petrinet.undo.Colored.ColoredPlaceMarkingEditCommand;
+import net.tapaal.gui.petrinet.undo.Colored.SetArcExpressionCommand;
+import net.tapaal.gui.petrinet.undo.Colored.SetColoredArcIntervalsCommand;
+import net.tapaal.gui.petrinet.undo.Colored.SetTransportArcExpressionsCommand;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.Expressions.*;
@@ -37,8 +37,8 @@ import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import pipe.dataLayer.Template;
-import net.tapaal.gui.editor.ColorComboboxPanel;
-import net.tapaal.gui.editor.ColoredTimeInvariantDialogPanel;
+import net.tapaal.gui.petrinet.editor.ColorComboboxPanel;
+import net.tapaal.gui.petrinet.editor.ColoredTimeInvariantDialogPanel;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.petrinet.graphicElements.Arc;

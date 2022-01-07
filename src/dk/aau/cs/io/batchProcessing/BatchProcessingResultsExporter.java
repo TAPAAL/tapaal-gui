@@ -3,8 +3,8 @@ package dk.aau.cs.io.batchProcessing;
 import java.io.File;
 import java.io.PrintStream;
 
-import net.tapaal.gui.verification.TAPNQuery;
-import net.tapaal.gui.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 

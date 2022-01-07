@@ -7,7 +7,7 @@ import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.Constants;
 import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
 import pipe.gui.petrinet.undo.ArcTimeIntervalEditCommand;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.ConstantWeight;
 import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.TimeInterval;

@@ -4,13 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import net.tapaal.gui.verification.TAPNQuery.SearchOption;
-import net.tapaal.gui.verification.TAPNQuery.QueryReductionTime;
-import net.tapaal.gui.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.verification.TAPNQuery.AlgorithmOption;
-import net.tapaal.gui.verification.TAPNQuery.QueryCategory;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
-import net.tapaal.gui.verification.InclusionPlaces;
+import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 
 public class VerifyPNOptions extends VerifyTAPNOptions{
 	private static final Map<TraceOption, String> traceMap = Map.of(

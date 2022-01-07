@@ -1,6 +1,6 @@
 package dk.aau.cs.io;
 
-import net.tapaal.gui.NameGenerator;
+import net.tapaal.gui.petrinet.NameGenerator;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.model.CPN.*;

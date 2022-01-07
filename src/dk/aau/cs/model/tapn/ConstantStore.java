@@ -2,10 +2,10 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
-import net.tapaal.gui.undo.AddConstantEditCommand;
-import net.tapaal.gui.undo.RemoveConstantEditCommand;
-import net.tapaal.gui.undo.UpdateConstantEditCommand;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.AddConstantEditCommand;
+import net.tapaal.gui.petrinet.undo.RemoveConstantEditCommand;
+import net.tapaal.gui.petrinet.undo.UpdateConstantEditCommand;
+import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.util.StringComparator;
 
 public class ConstantStore {

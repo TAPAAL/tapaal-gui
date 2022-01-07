@@ -2,10 +2,10 @@ package dk.aau.cs.approximation;
 
 import java.math.BigDecimal;
 import pipe.dataLayer.DataLayer;
-import net.tapaal.gui.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import pipe.gui.TAPAALGUI;
-import net.tapaal.gui.verification.RunVerificationBase;
-import net.tapaal.gui.verification.InclusionPlaces;
+import net.tapaal.gui.petrinet.verification.RunVerificationBase;
+import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import dk.aau.cs.model.tapn.TAPNQuery;
@@ -41,7 +41,7 @@ public class ApproximationWorker {
         RunVerificationBase verificationBase,
         TimedArcPetriNetNetwork model,
         DataLayer guiModel,
-        net.tapaal.gui.verification.TAPNQuery dataLayerQuery
+        net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery
     ) throws Exception {
 		
 		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them
@@ -374,7 +374,7 @@ public class ApproximationWorker {
 	public VerificationResult<TimedArcPetriNetTrace> batchWorker(
 			Tuple<TimedArcPetriNet, NameMapping> composedModel,
 			VerificationOptions options,
-			net.tapaal.gui.verification.TAPNQuery query,
+			net.tapaal.gui.petrinet.verification.TAPNQuery query,
 			LoadedBatchProcessingModel model,
 			ModelChecker modelChecker,
 			TAPNQuery queryToVerify,

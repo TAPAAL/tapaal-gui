@@ -21,7 +21,7 @@ import pipe.gui.petrinet.action.SplitArcPointAction;
 import pipe.gui.petrinet.action.ToggleArcPointAction;
 import pipe.gui.petrinet.undo.AddArcPathPointEditCommand;
 import pipe.gui.petrinet.undo.ArcPathPointTypeEditCommand;
-import net.tapaal.gui.undo.Command;
+import net.tapaal.gui.petrinet.undo.Command;
 
 import javax.swing.*;
 

@@ -1,5 +1,5 @@
 package dk.aau.cs.io;
-import net.tapaal.gui.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import java.util.Collection;
 
 public class LoadedQueries {

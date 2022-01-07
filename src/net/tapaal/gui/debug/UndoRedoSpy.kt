@@ -1,6 +1,6 @@
 package net.tapaal.gui.debug
 
-import net.tapaal.gui.undo.Command
+import net.tapaal.gui.petrinet.undo.Command
 import pipe.gui.TAPAALGUI
 import pipe.gui.petrinet.undo.UndoManager
 import java.awt.event.ActionEvent

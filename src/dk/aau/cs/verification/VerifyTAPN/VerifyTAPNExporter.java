@@ -12,7 +12,7 @@ import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.verification.NameMapping;
 import pipe.dataLayer.DataLayer;
-import net.tapaal.gui.verification.TAPNQuery.QueryCategory;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -30,7 +30,7 @@ import pipe.gui.petrinet.graphicElements.Transition;
 
 public class VerifyTAPNExporter {
     protected TimedArcPetriNet model;
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, PetriNetTab.TAPNLens lens, NameMapping mapping, DataLayer guiModel, net.tapaal.gui.verification.TAPNQuery dataLayerQuery) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, PetriNetTab.TAPNLens lens, NameMapping mapping, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) {
 		File modelFile = createTempFile(".xml");
 		File queryFile;
 		if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL || (lens != null && !lens.isGame() && lens.isColored())) {
@@ -43,7 +43,7 @@ public class VerifyTAPNExporter {
 		return export(model, query, modelFile, queryFile, dataLayerQuery, lens, mapping, guiModel);
 	}
 
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, net.tapaal.gui.verification.TAPNQuery dataLayerQuery, PetriNetTab.TAPNLens lens, NameMapping mapping, DataLayer guiModel) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, PetriNetTab.TAPNLens lens, NameMapping mapping, DataLayer guiModel) {
 		if (modelFile == null || queryFile == null)
 			return null;
 

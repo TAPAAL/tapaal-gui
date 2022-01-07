@@ -8,8 +8,8 @@ import java.awt.Point;
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 
-import net.tapaal.gui.undo.Command;
-import net.tapaal.gui.undo.MovePlaceTransitionObjectCommand;
+import net.tapaal.gui.petrinet.undo.Command;
+import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
 import pipe.gui.Constants;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
