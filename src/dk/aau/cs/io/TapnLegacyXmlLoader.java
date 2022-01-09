@@ -428,23 +428,29 @@ public class TapnLegacyXmlLoader {
 		Element element;
 		if (node instanceof Element) {
 			element = (Element) node;
-			if ("labels".equals(element.getNodeName())) {
-				parseAndAddAnnotationAsOldFormat(element);
-			} else if ("place".equals(element.getNodeName())) {
-				parseAndAddPlaceAsOldFormat(element, marking);
-			} else if ("transition".equals(element.getNodeName())) {
-				parseAndAddTransitionAsOldFormat(element);
-			} else if ("arc".equals(element.getNodeName())) {
-				parseAndAddArcAsOldFormat(element);
-			} else if ("queries".equals(element.getNodeName())) {
-				TAPNQuery query = parseQueryAsOldFormat(element);
-				
-				
-				if (query != null) {
-					query.getProperty().accept(new AddTemplateVisitor(templateName), null);
-					queries.add(query);
-				}
-			}
+            switch (element.getNodeName()) {
+                case "labels":
+                    parseAndAddAnnotationAsOldFormat(element);
+                    break;
+                case "place":
+                    parseAndAddPlaceAsOldFormat(element, marking);
+                    break;
+                case "transition":
+                    parseAndAddTransitionAsOldFormat(element);
+                    break;
+                case "arc":
+                    parseAndAddArcAsOldFormat(element);
+                    break;
+                case "queries":
+                    TAPNQuery query = parseQueryAsOldFormat(element);
+
+
+                    if (query != null) {
+                        query.getProperty().accept(new AddTemplateVisitor(templateName), null);
+                        queries.add(query);
+                    }
+                    break;
+            }
 		}
 	}
 

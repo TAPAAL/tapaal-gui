@@ -448,7 +448,7 @@ public class TimedPlaceComponent extends Place {
                         for (ColoredTimeInvariant cti : place.getCtiList()) {
                             if (cti != null) {
                                 buffer.append("\n");
-                                buffer.append(cti.toString());
+                                buffer.append(cti);
                             }
                         }
                     }

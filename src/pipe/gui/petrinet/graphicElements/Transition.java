@@ -329,7 +329,7 @@ public abstract class Transition extends PlaceTransitionObject {
 		arcIterator = right.iterator();
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
-			transform.transform(new Point2D.Double(+0.5 * TRANSITION_WIDTH, current), transformed);
+			transform.transform(new Point2D.Double(0.5 * TRANSITION_WIDTH, current), transformed);
 
 			if (thisArc.sourceOrTarget()) {
 				thisArc.arc.setTargetLocation(positionX + centreOffsetLeft()

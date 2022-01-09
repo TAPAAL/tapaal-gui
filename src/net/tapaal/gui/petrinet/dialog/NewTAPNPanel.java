@@ -84,9 +84,7 @@ public class NewTAPNPanel extends EscapableDialog {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(cancelButton,gbc);		
 
-		okButton.addActionListener(e -> {
-            createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected(), coloredNet.isSelected());
-        });
+		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected(), coloredNet.isSelected()));
 
 		rootPane.setDefaultButton(okButton);
 		

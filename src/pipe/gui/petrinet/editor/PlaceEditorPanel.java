@@ -394,7 +394,7 @@ public class PlaceEditorPanel extends JPanel {
 		invariantGroup.add(invariantInf, gbc);
 
 		Set<String> constants = context.network().getConstantNames();
-		String[] constantArray = constants.toArray(new String[constants.size()]);
+		String[] constantArray = constants.toArray(new String[0]);
 		Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 
 		invConstantsComboBox = new WidthAdjustingComboBox<>(maxNumberOfPlacesToShowAtOnce);

@@ -26,7 +26,7 @@ public class TimedInhibitorArc extends TimedInputArc {
 
     public List<TimeInterval> getDEnabledInterval(){
 		if(source().tokens().size() < getWeight().value()){
-			return Arrays.asList(new TimeInterval(true, new RatBound(BigDecimal.ZERO), Bound.Infinity, false));
+			return List.of(new TimeInterval(true, new RatBound(BigDecimal.ZERO), Bound.Infinity, false));
 		} else {
 			return new ArrayList<TimeInterval>();
 		}

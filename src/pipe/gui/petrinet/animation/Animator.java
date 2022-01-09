@@ -437,7 +437,7 @@ public class Animator {
                 for (Template template : tab.activeTemplates()) {
                     for (Transition t : template.guiModel().transitions()) {
                         if (t.isTransitionEnabled() && template.model().getTransitionByName(t.getName()).isUrgent()) {
-                            sb.append(template.toString() + "." + t.getName() + "<br />");
+                            sb.append(template + "." + t.getName() + "<br />");
                         }
                     }
                 }

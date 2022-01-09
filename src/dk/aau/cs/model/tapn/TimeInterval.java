@@ -25,7 +25,7 @@ public class TimeInterval {
 		this.upper = upper;
 		this.isUpperIncluded = isUpperIncluded;
 		
-		Require.that(isValidInterval(), "The constructed interval " + toString() + " is empty.");
+		Require.that(isValidInterval(), "The constructed interval " + this + " is empty.");
 	}
 
 	public TimeInterval(TimeInterval interval) {

@@ -188,7 +188,7 @@ public class TransportArc extends TAPNElement {
 			}
 			
 			if(temp != null){
-				result = IntervalOperations.unionIntervalSequences(Arrays.asList(temp), result);
+				result = IntervalOperations.unionIntervalSequences(List.of(temp), result);
 			}
 		}
 

@@ -16,7 +16,7 @@ public class HasDeadlockVisitor extends VisitorBase {
 		((Context)context).hasDeadlock = true;
 	}
 
-	private class Context{
+	private static class Context{
 		public boolean hasDeadlock = true;
 	}
 }

@@ -5,8 +5,8 @@ import java.io.IOException;
 
 public class BufferDrain extends Thread {
 
-	BufferedReader drain = null;
-	StringBuffer string = null;
+	BufferedReader drain;
+	StringBuffer string;
 	boolean running;
 
     // Because some native platforms only provide limited buffer size

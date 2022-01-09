@@ -25,6 +25,7 @@ import pipe.gui.petrinet.PetriNetTab;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Vector;
 
 public class TabTransformer {
@@ -184,7 +185,7 @@ public class TabTransformer {
         }
     }
     static public void removeColorInformation(PetriNetTab tab) {
-        tab.network().setColorTypes(Arrays.asList(ColorType.COLORTYPE_DOT));
+        tab.network().setColorTypes(List.of(ColorType.COLORTYPE_DOT));
         tab.network().setVariables(new ArrayList<Variable>());
         for (Template template : tab.allTemplates()) {
             for(TimedPlace place : template.model().places()){

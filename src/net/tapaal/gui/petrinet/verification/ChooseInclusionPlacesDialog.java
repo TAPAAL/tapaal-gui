@@ -288,7 +288,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		}
 	}
 	
-	private class InclusionPlacesCellRenderer extends JPanel implements ListCellRenderer {
+	private static class InclusionPlacesCellRenderer extends JPanel implements ListCellRenderer {
 
 		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to exclude place from inclusion check.";
 		private static final String CHECK_TO_ACTIVATE = "Check to make place eligible for inclusion check.";
@@ -317,7 +317,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		
 	}
 	
-	private class InclusionPlacesListManager extends MouseAdapter implements ListSelectionListener, ActionListener {
+	private static class InclusionPlacesListManager extends MouseAdapter implements ListSelectionListener, ActionListener {
 		private final ListSelectionModel selectionModel;
 		private final JList list;
 		

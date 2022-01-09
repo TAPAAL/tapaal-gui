@@ -173,7 +173,7 @@ public class GuardDialogue extends JPanel
 				if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)
 						&& ((TimedInputArcComponent) objectToBeEdited).isUrgentTransition()){
 					if(!guard.equals(TimeInterval.ZERO_INF)){
-						JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0," + Character.toString('\u221E') + ")", "Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0," + '\u221E' + ")", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 				}
@@ -304,7 +304,7 @@ public class GuardDialogue extends JPanel
 		}
 		
 		
-		String[] constantArray = filteredConstants.toArray(new String[filteredConstants.size()]);
+		String[] constantArray = filteredConstants.toArray(new String[0]);
 		
 		
 	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
@@ -445,7 +445,7 @@ public class GuardDialogue extends JPanel
 
 		Set<String> constants = TAPAALGUI.getCurrentTab().network()
 		.getConstantNames();
-		String[] constantArray = constants.toArray(new String[constants.size()]);
+		String[] constantArray = constants.toArray(new String[0]);
 	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 		
 		

@@ -340,7 +340,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleColorTokens);
         }
     };
-    private final GuiAction showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0," + Character.toString('\u221E') + ")", "Show/hide intervals [0," + Character.toString('\u221E') + ") that do not restrict transition firing in any way.", KeyStroke.getKeyStroke('8', shortcutkey), true) {
+    private final GuiAction showZeroToInfinityIntervalsAction = new GuiAction("Display intervals [0," + '\u221E' + ")", "Show/hide intervals [0," + Character.toString('\u221E') + ") that do not restrict transition firing in any way.", KeyStroke.getKeyStroke('8', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleZeroToInfinityIntervals);
         }
@@ -1741,7 +1741,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                         result.add(entry);
                     }
                 }
-                nets = result.toArray(new String[result.size()]);
+                nets = result.toArray(new String[0]);
                 jar.close();
             }
 

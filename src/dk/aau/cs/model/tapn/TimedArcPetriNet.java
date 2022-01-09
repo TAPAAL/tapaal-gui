@@ -94,8 +94,9 @@ public class TimedArcPetriNet {
         }
         boolean hasColors = false;
         for(Color color : values.getColors()){
-            if(color.getColorType() != ColorType.COLORTYPE_DOT && !color.getColorType().getId().equals("dot")){
+            if (color.getColorType() != ColorType.COLORTYPE_DOT && !color.getColorType().getId().equals("dot")) {
                 hasColors = true;
+                break;
             }
         }
         if(hasColors || values.getColorTypes().size() > 1 || !values.getVariables().isEmpty()){
@@ -521,8 +522,9 @@ public class TimedArcPetriNet {
             }
 
 			for (TimedTransition transition : t.transitions) {
-			    if (transition.isUrgent()) {
-			        networkUntimed = false;
+                if (transition.isUrgent()) {
+                    networkUntimed = false;
+                    break;
                 }
             }
 			

@@ -77,8 +77,7 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 				s.append(" or ");
 			}
 
-			s.append(prop.isSimpleProperty() ? prop.toString() : "("
-					+ prop.toString() + ")");
+			s.append(prop.isSimpleProperty() ? prop.toString() : "(" + prop + ")");
 			firstTime = false;
 		}
 

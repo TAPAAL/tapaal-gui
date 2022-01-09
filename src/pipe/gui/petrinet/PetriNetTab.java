@@ -366,7 +366,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 return tab;
 
 			} catch (Exception e) {
-				throw new Exception("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e.toString());
+				throw new Exception("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nPossible explanations:\n  - " + e);
 			}
 		}
 		return null;
@@ -394,7 +394,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 			return tab;
 		}catch (FileNotFoundException e) {
-			throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e.toString());
+			throw new FileNotFoundException("TAPAAL encountered an error while loading the file: " + file.getName() + "\n\nFile not found:\n  - " + e);
 		}
 	}
 
@@ -2619,15 +2619,15 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         } else{
             delayFireAction.setName("Fire");
             delayFireAction.setTooltip("Fire Selected Transition");
-            return new ArrayList<>(Arrays.asList(delayFireAction));
+            return new ArrayList<>(List.of(delayFireAction));
         }
     }
 
     public List<GuiAction> getAvailableToolActions(){
         if(lens.isColored()){
-            return new ArrayList<>(Arrays.asList(unfoldTabAction));
+            return new ArrayList<>(List.of(unfoldTabAction));
         } else {
-            return new ArrayList<>(Arrays.asList());
+            return new ArrayList<>(List.of());
         }
     }
 

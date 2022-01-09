@@ -81,7 +81,7 @@ public abstract class Note extends PetriNetObject {
 				Zoomer.getZoomedValue(originalX, getZoom()),
 				Zoomer.getZoomedValue(originalY, getZoom()),
 				(int) ((rectWidth + Constants.RESERVED_BORDER + Constants.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(getZoom())),
-				(int) ((rectHeight + Constants.RESERVED_BORDER + +Constants.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(getZoom()))
+				(int) ((rectHeight + Constants.RESERVED_BORDER + Constants.ANNOTATION_SIZE_OFFSET) * Zoomer.getScaleFactor(getZoom()))
 		);
 		setBounds(bounds);
 	}

@@ -393,7 +393,7 @@ public class GuiModelManager {
             if (queriesAffected) {
                 PetriNetTab currentTab = tabContent;
                 for (TAPNQuery q : queriesToDelete) {
-                    Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
+                    Command cmd = new DeleteQueriesCommand(currentTab, List.of(q));
                     cmd.redo();
                     tabContent.getUndoManager().addEdit(cmd);
                 }

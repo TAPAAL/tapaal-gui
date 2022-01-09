@@ -390,9 +390,7 @@ public class RunVerification extends RunVerificationBase {
 
             if (result.getRawOutput() != null) {
                 JButton showRawQueryButton = new JButton("Show raw query results");
-                showRawQueryButton.addActionListener(arg0 -> {
-                        JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE);
-                });
+                showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
                 gbc = new GridBagConstraints();
                 gbc.gridx = 1;
                 gbc.gridy = 5;

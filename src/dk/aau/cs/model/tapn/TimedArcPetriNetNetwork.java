@@ -872,7 +872,7 @@ public class TimedArcPetriNetNetwork {
                 Set<Variable> variables = new HashSet<>();
                 arc.getExpression().getVariables(variables);
                 if(variables.contains(variable)){
-                    messages.add("Variable contained on output arc " + arc.toString());
+                    messages.add("Variable contained on output arc " + arc);
                 }
             }
             for(TransportArc arc : tapn.transportArcs()){

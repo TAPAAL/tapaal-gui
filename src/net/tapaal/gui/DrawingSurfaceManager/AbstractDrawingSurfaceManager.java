@@ -50,7 +50,7 @@ public abstract class AbstractDrawingSurfaceManager {
     }
 
     private final Map<Predicate<DrawingSurfaceEvent>, Consumer<DrawingSurfaceEvent>> filter = new LinkedHashMap<>();
-    private final AbstractDrawingSurfaceManager next = null;
+    private AbstractDrawingSurfaceManager next = null;
 
     public final void registerManager(DrawingSurfaceImpl canvas){
         this.canvas = canvas;

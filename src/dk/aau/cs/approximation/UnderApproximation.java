@@ -1,22 +1,12 @@
 package dk.aau.cs.approximation;
 
-import java.util.ArrayList;
-
-import dk.aau.cs.model.tapn.Bound;
-import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimeInvariant;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedOutputArc;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.model.tapn.*;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.Place;
 import pipe.gui.petrinet.graphicElements.Transition;
+
+import java.util.ArrayList;
 
 public class UnderApproximation implements ITAPNApproximation {
 	@Override
@@ -141,44 +131,42 @@ public class UnderApproximation implements ITAPNApproximation {
 	}
 	
 	//Returns a copy of an approximated interval
-	private TimeInterval modifyIntervals(TimeInterval oldInterval, int denominator){
-		Bound newUpperBound;
-		// Do not calculate upper bound for infinite
-		if ( ! (oldInterval.upperBound() instanceof Bound.InfBound)) {
-			
-			 // Calculate the new upper bound value.
-			int oldUpperBoundValue = oldInterval.upperBound().value();
-			newUpperBound = new IntBound((int) Math.floor((double)oldUpperBoundValue /  denominator));
-		}
-		else
-			newUpperBound = Bound.Infinity;
-		 
-		// Calculate the new lower bound
-		IntBound newLowerBound = new IntBound((int) Math.ceil((double)oldInterval.lowerBound().value() / denominator));
-		 
-		// if the lower bound has become greater than the upper bound by rounding
-				if ( ! (oldInterval.upperBound() instanceof Bound.InfBound) && newLowerBound.value() > newUpperBound.value())
-				{
-					newLowerBound = new IntBound((int) Math.floor((double)oldInterval.lowerBound().value() / denominator));
-					newUpperBound = new IntBound((int) Math.floor((double)oldInterval.upperBound().value() / denominator));
-				}
-				
-				boolean isLowerBoundNonStrict = oldInterval.isLowerBoundNonStrict();
-				boolean isUpperBoundNonStrict = oldInterval.isUpperBoundNonStrict();
-				
-				// if the interval becomes too small we make it a bit bigger to secure, that we do not have to delete the arc
-				if ( (newUpperBound.value() == newLowerBound.value()) && !(oldInterval.isLowerBoundNonStrict() && oldInterval.isUpperBoundNonStrict()))
-				{
-					isUpperBoundNonStrict = true;
-					isLowerBoundNonStrict = true;
-				}
+    private TimeInterval modifyIntervals(TimeInterval oldInterval, int denominator) {
+        Bound newUpperBound;
+        // Do not calculate upper bound for infinite
+        if (!(oldInterval.upperBound() instanceof Bound.InfBound)) {
 
-				return new TimeInterval(
-					 isLowerBoundNonStrict,
-					 newLowerBound,
-					 newUpperBound,
-					 isUpperBoundNonStrict
-					 );
-	}
+            // Calculate the new upper bound value.
+            int oldUpperBoundValue = oldInterval.upperBound().value();
+            newUpperBound = new IntBound((int) Math.floor((double) oldUpperBoundValue / denominator));
+        } else {
+            newUpperBound = Bound.Infinity;
+        }
+
+        // Calculate the new lower bound
+        IntBound newLowerBound = new IntBound((int) Math.ceil((double) oldInterval.lowerBound().value() / denominator));
+
+        // if the lower bound has become greater than the upper bound by rounding
+        if (!(oldInterval.upperBound() instanceof Bound.InfBound) && newLowerBound.value() > newUpperBound.value()) {
+            newLowerBound = new IntBound((int) Math.floor((double) oldInterval.lowerBound().value() / denominator));
+            newUpperBound = new IntBound((int) Math.floor((double) oldInterval.upperBound().value() / denominator));
+        }
+
+        boolean isLowerBoundNonStrict = oldInterval.isLowerBoundNonStrict();
+        boolean isUpperBoundNonStrict = oldInterval.isUpperBoundNonStrict();
+
+        // if the interval becomes too small we make it a bit bigger to secure, that we do not have to delete the arc
+        if ((newUpperBound.value() == newLowerBound.value()) && !(oldInterval.isLowerBoundNonStrict() && oldInterval.isUpperBoundNonStrict())) {
+            isUpperBoundNonStrict = true;
+            isLowerBoundNonStrict = true;
+        }
+
+        return new TimeInterval(
+            isLowerBoundNonStrict,
+            newLowerBound,
+            newUpperBound,
+            isUpperBoundNonStrict
+        );
+    }
 
 }

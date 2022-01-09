@@ -102,13 +102,12 @@ public class TAPAAL {
 						e.printStackTrace();
 					}
 				} else if (file.exists()) {
-					System.err.println("Can not read file " + file.toString());
+					System.err.println("Can not read file " + file);
 				}
 			} else {
-				// XXX: Can we create the file? what would the default file type
-				// be?
+				// XXX: Can we create the file? what would the default file type be?
 				// XXX: Can we check if we can write to the directory?
-				System.err.println("Can not find file " + file.toString());
+				System.err.println("Can not find file " + file);
 
 			}
 		}

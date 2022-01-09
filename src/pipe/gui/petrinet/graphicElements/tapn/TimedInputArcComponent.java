@@ -98,7 +98,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                     ctiList = this.underlyingTimedInputArc().getColorTimeIntervals();
                     for (ColoredTimeInterval coloredTimeInterval : ctiList) {
                         if (coloredTimeInterval != null){
-                            arcPrint.append(coloredTimeInterval.toString());
+                            arcPrint.append(coloredTimeInterval);
                             arcPrint.append("\n");
                         }
                     }

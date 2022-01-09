@@ -96,10 +96,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
                 VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
 
-                if (!verifypn.supportsModel(transformedModel.value1(), options)) {
-                    // Skip over-approximation if model is not supported.
-                    // Prevents verification from displaying error.
-                }
+                verifypn.supportsModel(transformedModel.value1(), options);// Skip over-approximation if model is not supported.
+// Prevents verification from displaying error.
 
                 if (!verifypn.setup()) {
                     messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");

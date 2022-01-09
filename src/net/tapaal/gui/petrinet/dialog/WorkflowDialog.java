@@ -327,8 +327,10 @@ public class WorkflowDialog extends JDialog {
 			for (String e : errorMsgs) {
 				sb.append(sep).append("- ").append(e);
 			}
-			workflowTypeError.setText("<html>This net is not a workflow net for the following reason"+(errorMsgs.size() > 1?"s":"")+":"
-					+ sb.toString() + "</html>");
+			workflowTypeError.setText("<html>This net is not a workflow net for the following reason"
+                +(errorMsgs.size() > 1?"s":"")+":"
+                + sb + "</html>"
+            );
 			workflowTypeError.setVisible(true);
 			break;
 		}

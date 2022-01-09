@@ -46,13 +46,13 @@ public class RatBound implements Bound {
 	 * Comparison of bounds, resulting in -1 if this is lesser, 0 if they are equal and 1 if this is greater.
 	 */
 	public int compareTo(RatBound b){
-		if(this.getBound().compareTo(BigDecimal.ZERO) == -1){
+		if(this.getBound().compareTo(BigDecimal.ZERO) < 0){
 			if(this.getBound().compareTo(b.getBound()) == 0){
 				return 0;
 			} else {
 				return 1;
 			}
-		} else if(b.getBound().compareTo(BigDecimal.ZERO) == -1){
+		} else if(b.getBound().compareTo(BigDecimal.ZERO) < 0){
 			return -1;
 		} else {
 			return this.getBound().compareTo(b.getBound());

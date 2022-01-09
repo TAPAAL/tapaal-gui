@@ -30,9 +30,8 @@ public class VerifyTransitionNamesVisitor extends VisitorBase {
 			c.setResult(false);
 		}
 	}
-	
-	// / context class
-	public class Context {
+
+	public static class Context {
 		private Boolean result;
 		private final HashSet<String> incorrectTransitionNames;
 

@@ -171,7 +171,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
                 List<ColoredTimeInterval> ctiList = underlyingTransportArc().getColorTimeIntervals();
                 for (ColoredTimeInterval timeInterval : ctiList) {
                     if (timeInterval != null)
-                        labelText += timeInterval.toString() + "\n";
+                        labelText += timeInterval + "\n";
                 }
                 getNameLabel().setText(labelText);
             }

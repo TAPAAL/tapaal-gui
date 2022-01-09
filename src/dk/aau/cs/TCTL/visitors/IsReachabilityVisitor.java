@@ -4,7 +4,7 @@ import dk.aau.cs.TCTL.*;
 
 public class IsReachabilityVisitor extends VisitorBase {
 
-    private class Context{
+    private static class Context{
         public boolean isReachability = true;
         public int nTempOp = 0; // number of temporal operators
     }

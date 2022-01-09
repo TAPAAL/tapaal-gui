@@ -241,7 +241,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
 
         Set<String> constants = TAPAALGUI.getCurrentTab().network()
                 .getConstantNames();
-        String[] constantArray = constants.toArray(new String[constants.size()]);
+        String[] constantArray = constants.toArray(new String[0]);
         Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 
 

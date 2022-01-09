@@ -1057,6 +1057,7 @@ public class ColorTypeDialogPanel extends JPanel {
                     for (dk.aau.cs.model.CPN.Color c : oldColorType.getColors()) {
                         if (!newColorType.getColors().contains(c)) {
                             showDialog = true;
+                            break;
                         }
                     }
                     if (showDialog) {

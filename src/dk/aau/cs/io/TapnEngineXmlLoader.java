@@ -617,14 +617,19 @@ public class TapnEngineXmlLoader {
 		String inscriptionTempStorage = arc.getAttribute("inscription");
 		String type = arc.getAttribute("type");
 		if(type.isEmpty()){
-		    if(arc.getNodeName().equals("transportArc")){
-		        type = "transport";
-            } else if (arc.getNodeName().equals("inhibitorArc")){
-		        type = "inhibitor";
-            } else if (arc.getNodeName().equals("inputArc")){
-		        type = "timed";
-            } else {
-		        type = "";
+            switch (arc.getNodeName()) {
+                case "transportArc":
+                    type = "transport";
+                    break;
+                case "inhibitorArc":
+                    type = "inhibitor";
+                    break;
+                case "inputArc":
+                    type = "timed";
+                    break;
+                default:
+                    type = "";
+                    break;
             }
         }
 		int nameOffsetXInput;

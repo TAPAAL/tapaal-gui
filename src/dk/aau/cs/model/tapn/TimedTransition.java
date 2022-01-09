@@ -249,7 +249,7 @@ public class TimedTransition extends TAPNElement {
 			for(TimedPlace place : model.places()){
 				if(!(place.invariant().upperBound() instanceof InfBound)){
 					for(TimedToken x : place.tokens()){
-						result = IntervalOperations.intersectingInterval(result, Arrays.asList(place.invariant().subtractToken(x.age())));
+						result = IntervalOperations.intersectingInterval(result, List.of(place.invariant().subtractToken(x.age())));
 					}
 				}
 			}
@@ -257,7 +257,7 @@ public class TimedTransition extends TAPNElement {
 		
 		//prevent delay if urgent transition is enabled
 		if(Animator.isUrgentTransitionEnabled()){
-			result = IntervalOperations.intersectingInterval(result, Arrays.asList(new TimeInterval(true, new IntBound(0), new IntBound(0), true)));
+			result = IntervalOperations.intersectingInterval(result, List.of(new TimeInterval(true, new IntBound(0), new IntBound(0), true)));
 		}
 
         TimeInterval dInterval;

@@ -89,7 +89,7 @@ public class BatchProcessingResultsExporter {
 			s.append(DELIMITER);
 			s.append((query != null) ? query.approximationDenominator() : "");
 			
-			outputStream.println(s.toString());
+			outputStream.println(s);
 		}
 	}
 

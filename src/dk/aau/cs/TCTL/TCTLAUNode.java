@@ -50,7 +50,7 @@ public class TCTLAUNode extends TCTLAbstractPathProperty {
 		StringPosition leftPos = new StringPosition(leftStart, leftEnd, left);
 		
 		int rightStart = right.isSimpleProperty() ? 0 : 1;
-		rightStart += leftEnd + 3 + + (left.isSimpleProperty() ? 0 : 1);
+		rightStart += leftEnd + 3 + (left.isSimpleProperty() ? 0 : 1);
 		int rightEnd = rightStart + right.toString().length();
 		StringPosition rightPos = new StringPosition(rightStart, rightEnd, right);
 

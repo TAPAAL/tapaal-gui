@@ -11,7 +11,7 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
 
     @Override
     public List<Color> eval(ExpressionContext context) {
-        return Arrays.asList();
+        return List.of();
     }
 
     @Override

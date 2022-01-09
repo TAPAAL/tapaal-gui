@@ -124,7 +124,7 @@ public class PNMLoader {
         network.setPaintNet(isNetDrawable());
         tapn.setCheckNames(true);
 
-        return new LoadedModel(network, Arrays.asList(template), new ArrayList<TAPNQuery>(), new ArrayList<>(), lens);
+        return new LoadedModel(network, List.of(template), new ArrayList<TAPNQuery>(), new ArrayList<>(), lens);
     }
 
     private String getTAPNName(Node netNode) {
