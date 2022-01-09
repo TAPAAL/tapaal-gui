@@ -159,6 +159,7 @@ public class VerifyTAPNExporter {
 	protected void outputTransition(TimedTransition t, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         //remove the net prefix from the transition name
         var m = mapping.map(t.name());
+
         Transition guiTransition = null;
         if (m != null) {
             String transitionName = m.value2();
@@ -177,7 +178,8 @@ public class VerifyTAPNExporter {
 		modelStream.append("name=\"" + t.name() + "\" ");
         modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
         modelStream.append(">\n");
-        if(guiTransition != null){
+
+        if (guiTransition != null) {
             outputPosition(modelStream, guiTransition.getPositionX(), guiTransition.getPositionY());
         }
 
