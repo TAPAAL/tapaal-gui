@@ -43,7 +43,6 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         return node.getAttributes().getNamedItem(attribute);
     }
 
-    @SuppressWarnings("Duplicates")
     public void parseDeclarations(Node node, TimedArcPetriNetNetwork network) throws FormatException {
         if(!(node instanceof Element)){
             return;
@@ -112,7 +111,6 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             //JOptionPane.showConfirmDialog(CreateGui.getApp(), renameWarnings.toString(), "Product Variables unfolded", JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE);
         }
     }
-    @SuppressWarnings("Duplicates")
     private void parseNamedSort(Node node, TimedArcPetriNetNetwork network) throws FormatException {
         //We always use the dot colortype
         colortypes.put("dot", ColorType.COLORTYPE_DOT);
@@ -162,7 +160,6 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         }
     }
 
-    @SuppressWarnings("Duplicates")
     public ColorType parseUserSort(Node node) throws FormatException {
         if (node instanceof Element) {
             Node child = skipWS(node.getFirstChild());

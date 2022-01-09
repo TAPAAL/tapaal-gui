@@ -215,8 +215,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         Dimension intervalBoxDims = new Dimension(190, 25);
 
         firstIntervalNumber = new JSpinner();
-        //	firstIntervalNumber.setMaximumSize(intervalBoxDims);
-        //	firstIntervalNumber.setMinimumSize(intervalBoxDims);
+
         firstIntervalNumber.setPreferredSize(intervalBoxDims);
         firstIntervalNumber.addChangeListener(this::firstSpinnerStateChanged);
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -263,11 +262,10 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
 
         leftConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
         leftConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
-        //	leftConstantsComboBox = new JComboBox(constants.toArray());
+
         leftConstantsComboBox.setMaximumRowCount(20);
         leftConstantsComboBox.setVisible(false);
-        //	leftConstantsComboBox.setMaximumSize(intervalBoxDims);
-        //  leftConstantsComboBox.setMinimumSize(intervalBoxDims);
+
         leftConstantsComboBox.setPreferredSize(intervalBoxDims);
         leftConstantsComboBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -301,8 +299,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         rightConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
         rightConstantsComboBox.setMaximumRowCount(20);
         rightConstantsComboBox.setVisible(false);
-        //	rightConstantsComboBox.setMaximumSize(intervalBoxDims);
-        //	rightConstantsComboBox.setMinimumSize(intervalBoxDims);
+
         rightConstantsComboBox.setPreferredSize(intervalBoxDims);
         gridBagConstraints = new GridBagConstraints();
         rightConstantsComboBox.addItemListener(e -> {

@@ -338,14 +338,6 @@ public abstract class Arc extends PetriNetObjectWithLabel {
             y + myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow
         );
 
-		//if (!CreateGui.getCurrentTab().isInAnimationMode()) {
-		//	if (myPath.proximityContains(point) || selected) {
-		//		// show also if Arc itself selected
-		//		myPath.showPoints();
-		//	} else {
-		//		myPath.hidePoints();
-		//	}
-		//}
 		return myPath.contains(point);
 	}
 

@@ -221,15 +221,11 @@ public class VerifyPN implements ModelChecker {
             throw new UnsupportedQueryException("Verifypn does not support the given query.");
         }
 
-//			if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
-//				throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
-
         if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 
         VerifyTAPNExporter exporter;
         if (model.value1().parentNetwork().isColored()) {
             exporter = new VerifyCPNExporter();
-            //supportsStats = false;
         } else {
             exporter = new VerifyPNExporter();
         }
@@ -412,13 +408,6 @@ public class VerifyPN implements ModelChecker {
 
         return true;
     }
-
-    // JS: this is not used any more
-    //private boolean isQueryUpwardClosed(TAPNQuery query) {
-    //	UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
-    //	return visitor.isUpwardClosed(query.getProperty());
-    //}
-
 
     public static void reset() {
         //Clear value

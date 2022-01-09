@@ -14,9 +14,6 @@ public class RequestFocusListener implements AncestorListener
 	
 	public void ancestorAdded(final AncestorEvent arg0)
 	{
-		//JComponent component = arg0.getComponent();
-		//component.requestFocusInWindow();
-		
 		 final AncestorListener al= this;   
 		    SwingUtilities.invokeLater(() -> {
 				JComponent component = arg0.getComponent();

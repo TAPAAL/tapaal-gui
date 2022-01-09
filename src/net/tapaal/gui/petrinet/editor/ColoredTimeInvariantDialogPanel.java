@@ -168,10 +168,6 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         invariantGroup.add(invRelationConstant, gbc);
 
-        //	invariantSpinner.setMaximumSize(new Dimension(100, 30));
-        //  invariantSpinner.setMinimumSize(new Dimension(230, 30));
-        //invariantSpinner.setPreferredSize(new Dimension(230, 30));
-
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;

@@ -216,11 +216,6 @@ public class VerifyDTAPN implements ModelChecker{
 		if (!supportsQuery(model.value1(), query, options)) {
 			throw new UnsupportedQueryException("Verifydtapn does not support the given query-option combination. ");
 		}
-		//if(!supportsQuery(model.value1(), query, options))
-		//throw new UnsupportedQueryException("Verifydtapn does not support the given query.");
-
-		//if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
-		//throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
 
 		if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 		if (TAPAALGUI.getCurrentTab().getLens().isGame() && !TAPAALGUI.getCurrentTab().getLens().isTimed()) {

@@ -103,11 +103,8 @@ public class TAPNQueryLoader extends QueryLoader{
 			parsedQuery.setUseStubbornReduction(stubborn);
             parsedQuery.setUseTarOption(useTar);
             parsedQuery.setUseTarjan(useTarjan);
-			if (parsedQuery.getCategory() == QueryCategory.CTL && algorithmOption != null){
+			if (parsedQuery.getCategory() == QueryCategory.CTL){
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
-//				RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
-//		                network.activeTemplates().get(0).name());
-//				parsedQuery.getProperty().accept(rt, null);
 			}
 			return parsedQuery;
 		} else

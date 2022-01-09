@@ -87,7 +87,7 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
         return result.toString();
     }
 
-    private static final Map<TAPNQuery.SearchOption, String> createSearchOptionsMap() {
+    private static Map<TAPNQuery.SearchOption, String> createSearchOptionsMap() {
         HashMap<TAPNQuery.SearchOption, String> map = new HashMap<TAPNQuery.SearchOption, String>();
         map.put(TAPNQuery.SearchOption.BFS, " --search-strategy BFS");
         map.put(TAPNQuery.SearchOption.DFS, " --search-strategy DFS");

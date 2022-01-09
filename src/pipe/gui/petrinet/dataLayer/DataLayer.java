@@ -441,18 +441,6 @@ public class DataLayer {
 						// get the list of attached arcs for the object we are removing
 						attachedArcs = arcsMap.get(pnObject);
 
-						// iterate over all the attached arcs, removing them all in inverse order!
-						//for (int i = attachedArcs.size() - 1; i >= 0; i--) {
-						//	try {
-						//		((Arc) attachedArcs.get(i)).delete();
-						//	} catch (IndexOutOfBoundsException e) {
-						//		// XXX - this is a hack
-						//		// This is OK, it just means that the transport
-						//		// arc already has been removed
-						//	}
-
-						//}
-
 						if (attachedArcs.size() > 0) {
 							//XXX Model is no longer valid as the pno is removed from petriNetObjects list
 							throw new RequireException("Arc to/from the object must be delete first");
@@ -466,10 +454,6 @@ public class DataLayer {
 						// get the list of attached arcs for the object we are removing
 						attachedArcs = tapnInhibitorsMap.get(pnObject);
 
-						// iterate over all the attached arcs, removing them all in inverse order!
-						//for (int i = attachedArcs.size() - 1; i >= 0; i--) {
-						//	((Arc) attachedArcs.get(i)).delete();
-						//}
 						if (attachedArcs.size() > 0) {
 							//XXX Model is no longer valid as the pno is removed from petriNetObjects list
 							throw new RequireException("Arc to/from the object must be delete first");

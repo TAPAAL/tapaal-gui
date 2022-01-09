@@ -421,8 +421,6 @@ public class GuardDialogue extends JPanel
 		Dimension intervalBoxDims = new Dimension(190, 25);
 
 		firstIntervalNumber = new JSpinner();
-	//	firstIntervalNumber.setMaximumSize(intervalBoxDims);
-	//	firstIntervalNumber.setMinimumSize(intervalBoxDims);
         SwingHelper.setPreferredWidth(firstIntervalNumber,intervalBoxDims.width);
 		firstIntervalNumber.addChangeListener(this::firstSpinnerStateChanged);
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -468,13 +466,11 @@ public class GuardDialogue extends JPanel
 	
 		leftConstantsComboBox = new WidthAdjustingComboBox<>(maxNumberOfPlacesToShowAtOnce);
 		leftConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
-	//	leftConstantsComboBox = new JComboBox(constants.toArray());
+
 		leftConstantsComboBox.setMaximumRowCount(20);
 		leftConstantsComboBox.setVisible(false);
-	//	leftConstantsComboBox.setMaximumSize(intervalBoxDims);
-	//  leftConstantsComboBox.setMinimumSize(intervalBoxDims);
+
         SwingHelper.setPreferredWidth(leftConstantsComboBox,intervalBoxDims.width);
-		//leftConstantsComboBox.setPreferredSize(intervalBoxDims);
 		leftConstantsComboBox.addItemListener(e -> {
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				updateRightConstantComboBox();
@@ -504,8 +500,7 @@ public class GuardDialogue extends JPanel
 		rightConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
 		rightConstantsComboBox.setMaximumRowCount(20);
 		rightConstantsComboBox.setVisible(false);
-	//	rightConstantsComboBox.setMaximumSize(intervalBoxDims);
-	//	rightConstantsComboBox.setMinimumSize(intervalBoxDims);
+
         SwingHelper.setPreferredWidth(rightConstantsComboBox,intervalBoxDims.width);
 		gridBagConstraints = new GridBagConstraints();
 		rightConstantsComboBox.addItemListener(e -> {
@@ -700,12 +695,9 @@ public class GuardDialogue extends JPanel
 					}
 				}
 
-				// if(rightConstantsComboBox.getItemCount() == 0){
-				// rightUseConstant.setEnabled(false);
-				// }
-
-				if (oldWeight != null)
-					weightConstantsComboBox.setSelectedItem(oldWeight);
+				if (oldWeight != null) {
+                    weightConstantsComboBox.setSelectedItem(oldWeight);
+                }
 	}
 
 	private void updateRightConstantComboBox() {

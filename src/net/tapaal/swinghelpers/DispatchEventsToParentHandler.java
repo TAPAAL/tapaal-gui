@@ -17,42 +17,42 @@ public final class DispatchEventsToParentHandler implements MouseListener, Mouse
     }
 
     @Override
-    public final void mouseClicked(MouseEvent e) {
+    public void mouseClicked(MouseEvent e) {
         dispatchEventToParent(e);
     }
 
     @Override
-    public final void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent e) {
         dispatchEventToParent(e);
     }
 
     @Override
-    public final void mouseReleased(MouseEvent e) {
+    public void mouseReleased(MouseEvent e) {
         dispatchEventToParent(e);
     }
 
     @Override
-    public final void mouseEntered(MouseEvent e) {
+    public void mouseEntered(MouseEvent e) {
         dispatchEventToParent(e);
     }
 
     @Override
-    public final void mouseExited(MouseEvent e) {
+    public void mouseExited(MouseEvent e) {
         dispatchEventToParent(e);
     }
 
     @Override
-    public final void mouseDragged(MouseEvent e) {
+    public void mouseDragged(MouseEvent e) {
         dispatchEventToParent(e);
     }
 
     @Override
-    public final void mouseMoved(MouseEvent e) {
+    public void mouseMoved(MouseEvent e) {
         dispatchEventToParent(e);
     }
 
     @Override
-    public final void mouseWheelMoved(MouseWheelEvent e) {
+    public void mouseWheelMoved(MouseWheelEvent e) {
         dispatchEventToParent(e);
     }
 }

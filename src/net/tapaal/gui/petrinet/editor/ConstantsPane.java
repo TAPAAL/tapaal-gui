@@ -225,9 +225,6 @@ public class ConstantsPane extends JPanel implements SidePane {
 				BorderFactory.createEmptyBorder(3, 3, 3, 3))
 				);
 		this.setToolTipText(titleBorderToolTip);
-
-		//this.setToolTipText(toolTipGlobalConstantsLabel);
-		//showConstants();
 		
 		this.addComponentListener(new ComponentListener() {
 			final int minimumHegiht = ConstantsPane.this.getMinimumSize().height;

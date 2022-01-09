@@ -252,9 +252,6 @@ public class AnnotationNote extends Note {
 			}
 		}
 		dragPoints.forEach((dragPoint, resizePoint) -> resizePoint.myPaintComponent(g));
-		//for (int i = 0; i < 8; i++) {
-		//	dragPoints[i].myPaintComponent(g);
-		//}
 
 		g2.transform(Zoomer.getTransform(getZoom()));
 	}

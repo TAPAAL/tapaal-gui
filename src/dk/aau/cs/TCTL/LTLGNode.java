@@ -20,7 +20,7 @@ public class LTLGNode extends TCTLAbstractPathProperty {
     }
 
     public LTLGNode() {
-        this.property = new TCTLStatePlaceHolder();;
+        this.property = new TCTLStatePlaceHolder();
         this.property.setParent(this);
     }
 

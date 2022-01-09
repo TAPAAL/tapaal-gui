@@ -53,7 +53,7 @@ public class VerifytaOptions extends VerificationOptions {
 		return result.toString();
 	}
 
-	public static final Map<TraceOption, String> createTraceOptionsMap() {
+	public static Map<TraceOption, String> createTraceOptionsMap() {
 		HashMap<TraceOption, String> map = new HashMap<TraceOption, String>();
 		map.put(TraceOption.SOME, "-t0");
 		map.put(TraceOption.NONE, "");
@@ -61,7 +61,7 @@ public class VerifytaOptions extends VerificationOptions {
 		return map;
 	}
 
-	private static final Map<SearchOption, String> createSearchOptionsMap() {
+	private static Map<SearchOption, String> createSearchOptionsMap() {
 		HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
 		map.put(SearchOption.BFS, "-o0");
 		map.put(SearchOption.DFS, "-o1");

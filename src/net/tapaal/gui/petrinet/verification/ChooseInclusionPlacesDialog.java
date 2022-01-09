@@ -355,12 +355,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			toggleSelection(list.getSelectedIndex());
 		}
-		
-//		private class PlaceNameComparer implements Comparator<TimedPlace> {
-//			public int compare(TimedPlace p1, TimedPlace p2) {
-//				return p1.name().compareTo(p2.name());
-//			}
-//		}
+
 	}
 	
 	

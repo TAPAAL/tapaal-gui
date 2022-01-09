@@ -73,8 +73,6 @@ public class UserSortExpression extends Expression {
     @Override
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[0];
-      //  ExprStringPosition pos = new ExprStringPosition(0, userSort.toString().length(), this);
-    //    children[0] = pos;
         return children;
     }
 

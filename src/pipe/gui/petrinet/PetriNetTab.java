@@ -228,19 +228,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             return tab;
 		} catch (ParseException e) {
             throw new ParseException("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.getMessage());
-        } catch (Exception e) {
-            throw e;
-		}
-
+        }
 	}
 
     public static TAPNLens getFileLens(InputStream file) throws Exception {
-        try {
-            ModelLoader loader = new ModelLoader();
-            return loader.loadLens(file);
-        } catch (Exception e) {
-            throw e;
-        }
+        ModelLoader loader = new ModelLoader();
+        return loader.loadLens(file);
 
     }
 
@@ -1983,14 +1976,14 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 e.translatePoint(pno.getX(), pno.getY());
                 pno.getParent().dispatchEvent(e);
             }
-        };
+        }
 
         protected abstract void transitionClicked(TimedTransitionComponent pno, MouseEvent e);
         protected abstract void placeClicked(TimedPlaceComponent pno, MouseEvent e);
 
         protected void clearPendingArc() {
             connectsTo = 0;
-        };
+        }
 
         @Override
         public void setupManager() {

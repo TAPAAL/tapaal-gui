@@ -404,10 +404,6 @@ public class ColorTypeDialogPanel extends JPanel {
         firstRow.add(enumNameLabel, gbc);
 
         enumTextField = new JTextField();
-        //Dimension size = new Dimension(300, 30);
-        //enumTextField.setMaximumSize(size);
-        //enumTextField.setMinimumSize(size);
-        //enumTextField.setPreferredSize(size);
         GridBagConstraints gbcNTF = new GridBagConstraints();
         gbcNTF.gridx = 1;
         gbcNTF.gridy = 0;
@@ -544,10 +540,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.gridheight = 2;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        //Dimension listSize = new Dimension(450, 150);
-        //cyclicListScrollPane.setPreferredSize(listSize);
-        //cyclicListScrollPane.setMinimumSize(listSize);
-        //cyclicListScrollPane.setMaximumSize(listSize);
+
         cyclicListScrollPane.setVisible(true);
         cyclicListScrollPane.setBorder(new LineBorder(Color.GRAY));
         gbc.anchor = GridBagConstraints.WEST;

@@ -130,11 +130,6 @@ public class SmartDrawDialog extends JDialog {
 		for(String name : getObjectNames()) {
 			objectDropdown.addItem(name);
 		}
-		
-		/*templateSelector.removeAllItems();
-		for(String name : getTemplatesAsString()) {
-			templateSelector.addItem(name);
-		}*/
 	}
     public static void setupWorkerListener(final SwingWorker<?, ?> worker) {
 	    if(worker != null){
@@ -162,20 +157,7 @@ public class SmartDrawDialog extends JDialog {
 		initSpacingSelecters();
 		initCheckBoxes();
 		initAdvancedOptionsPanel();
-		//initChoiceModal();
-		
-		/*templateSelector.setEnabled(false);
-		
-		
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		mainPanel.add(templateSelector, gbc);*/
+
 		JButton helpButton = new JButton("Help");
 		helpButton.setToolTipText("Help with the different options");
 		helpButton.addActionListener(new ActionListener() {
@@ -235,13 +217,10 @@ public class SmartDrawDialog extends JDialog {
 				worker.execute();
 				smartDrawDialog.setVisible(false);
 				loadingDialogFrame.setVisible(true);
-				/*loadingDialogFrame.toFront();
-				loadingDialogFrame.requestFocus();
-				loadingDialogFrame.setAlwaysOnTop(true);*/
+
 			}
 		});
-		
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 3;
@@ -251,8 +230,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 0, 0);
 		gbc.anchor = GridBagConstraints.SOUTHEAST;
 		mainPanel.add(drawButton, gbc);
-		
-		
+
 		this.getRootPane().setDefaultButton(drawButton);
 		drawButton.requestFocus();
 		
@@ -513,26 +491,11 @@ public class SmartDrawDialog extends JDialog {
 		JRadioButton BFS = new JRadioButton("BFS:");
 		BFS.setToolTipText("Draw in a breadth first manner from start object");
 
-		BFS.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				searchOption = "BFS";
-			}
-		});
-		
-		/*JRadioButton randomSearch = new JRadioButton("Random:");
-		randomSearch.setEnabled(false);
-		randomSearch.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				searchOption = "Random";
-			}
-		});*/
+		BFS.addActionListener(e -> searchOption = "BFS");
 		
 	    ButtonGroup group = new ButtonGroup();
 	    group.add(DFS);
 	    group.add(BFS);
-	    //group.add(randomSearch);
 	    
 	    DFS.setSelected(true);
 	    DFS.setHorizontalTextPosition(SwingConstants.LEFT);
@@ -556,18 +519,6 @@ public class SmartDrawDialog extends JDialog {
 		gbc.insets = new Insets(10, 20, 10, 0);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		checkBoxPanel.add(BFS, gbc);
-		
-		/*randomSearch.setHorizontalTextPosition(SwingConstants.LEFT);
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.insets = new Insets(10, 20, 10, 0);
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		checkBoxPanel.add(randomSearch, gbc);*/
-		
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -736,7 +687,6 @@ public class SmartDrawDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 0, 0);
 		gbc.anchor = GridBagConstraints.NORTH;
 		loadingDialogFrame.add(cancelButton, gbc);
-		
 
 		loadingDialogFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		loadingDialogFrame.setSize(400, 300);
@@ -746,95 +696,6 @@ public class SmartDrawDialog extends JDialog {
 		loadingDialogFrame.setAlwaysOnTop(false);
 		loadingDialogFrame.setAutoRequestFocus(false);
 	}
-	
-	
-	
-	
-	/*
-	 * Asks if you want to keep, revert or try again
-	 * is not used currently
-	 */
-	/*private void initChoiceModal() {
-		choiceModal = new JDialog(smartDrawDialog, "Keep?", true);
-		choiceModal.setLayout(new GridBagLayout());
-		choiceModal.setVisible(false);
-		choiceModal.setLocationRelativeTo(smartDrawDialog);
-		choiceModal.setResizable(false);
-		choiceModal.setSize(300, 100);
-
-		
-		JLabel choiceLabel = new JLabel("<html><div style='text-align: center;'>Would you like to keep the new layout,<br/> revert or try again?</div></html>", SwingConstants.CENTER);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gbc.gridwidth = 3;
-		gbc.anchor = GridBagConstraints.NORTH;
-		
-		choiceModal.add(choiceLabel, gbc);
-		
-		JButton keepButton = new JButton("Keep layout");
-		keepButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				smartDrawDialog.setVisible(false);
-				choiceModal.setVisible(false);				
-			}
-		});
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gbc.anchor = GridBagConstraints.NORTH;
-		choiceModal.add(keepButton, gbc);
-		
-		JButton revertButton = new JButton("Revert");
-		revertButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				CreateGui.getDrawingSurface().getUndoManager().undo();
-				smartDrawDialog.setVisible(false);
-				choiceModal.setVisible(false);
-			}
-		});
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gbc.anchor = GridBagConstraints.NORTH;
-		choiceModal.add(revertButton, gbc);
-		
-		JButton retryButton = new JButton("Try Again");
-		retryButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				choiceModal.setVisible(false);
-				smartDrawDialog.setVisible(true);
-			}
-		});
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gbc.anchor = GridBagConstraints.NORTH;
-		choiceModal.add(retryButton, gbc);
-		
-	}*/
 	
 	private Object getMessageComponent(){
 		JTextPane pane = new JTextPane();

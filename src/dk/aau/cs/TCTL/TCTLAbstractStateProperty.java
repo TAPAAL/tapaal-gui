@@ -18,18 +18,4 @@ public abstract class TCTLAbstractStateProperty extends TCTLAbstractProperty {
 
 	@Override
 	public abstract TCTLAbstractStateProperty copy();
-
-	// public abstract void accept(ICSLVisitor visitor) throws
-	// ModelCheckingException;
-
-	// protected abstract void setCompositionality(boolean
-	// withinSteadyStateOperator);
-
-	// public void setCompositionality() {
-	// setCompositionality(false);
-	// }
-	//	
-	// public boolean isCompositional() {
-	// return isCompositional;
-	// }
 }

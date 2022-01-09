@@ -215,16 +215,14 @@ public class TimedTransitionComponent extends Transition {
 			if(underlyingTransition().getGuard() != null && lens.isColored()){
                 pnName.setText("");
                 super.update(displayConstantNames);
-                ;
                 pnName.setText(pnName.getText() + "\n" + buildGuardString(this.underlyingTransition().getGuard().toString()));
             } else {
                 getNameLabel().setText("");
             }
-		}
-		else {
+		} else {
 			getNameLabel().setText("");
 		}
-		//super.update(displayConstantNames);
+
 		repaint();
 	}
 

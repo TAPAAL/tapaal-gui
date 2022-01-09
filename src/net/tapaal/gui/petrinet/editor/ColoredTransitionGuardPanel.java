@@ -78,8 +78,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         initLogicPanel();
         initColorExpressionPanel();
         initExprEditPanel();
-        //initExpr(transition.underlyingTransition().getGuard());
-        //updateSelection();
         updateColorType();
 
         undoButton.setEnabled(false);

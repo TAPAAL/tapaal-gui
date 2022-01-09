@@ -3659,10 +3659,6 @@ public class QueryDialog extends JPanel {
 			usePTrie.setVisible(false);
 			useStubbornReduction.setVisible(false);
 			useTimeDarts.setVisible(false);
-
-//			if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)){
-//				useReduction.setVisible(true);
-//			}
 		}
 	}
 

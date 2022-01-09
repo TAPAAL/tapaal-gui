@@ -143,18 +143,4 @@ public abstract class GraphicalElement extends JComponent implements Zoomable, T
 
     public abstract void removedFromGui();
 
-    /*public abstract static class GraphicalNode extends GraphicalElement implements Translatable{
-        protected GraphicalNode() {
-            super();
-
-        }
-    }
-
-    public abstract static class GraphicalVertex extends GraphicalElement {
-        protected GraphicalVertex() {
-            super();
-
-        }
-    }*/
-
 }

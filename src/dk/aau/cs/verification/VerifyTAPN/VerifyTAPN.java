@@ -207,14 +207,13 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) throws Exception {
-		if(!supportsModel(model.value1(), options))
-			throw new UnsupportedModelException("Verifytapn does not support the given model.");
+		if(!supportsModel(model.value1(), options)) {
+            throw new UnsupportedModelException("Verifytapn does not support the given model.");
+        }
 		
-		if(!supportsQuery(model.value1(), query, options))
-			throw new UnsupportedQueryException("Verifytapn does not support the given query.");
-		
-//		if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
-//			throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
+		if(!supportsQuery(model.value1(), query, options)) {
+            throw new UnsupportedQueryException("Verifytapn does not support the given query.");
+        }
 		
 		if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 		
@@ -332,13 +331,6 @@ public class VerifyTAPN implements ModelChecker {
             !(query.getProperty() instanceof TCTLAFNode) &&
             !query.hasDeadlock();
     }
-	
-	// JS: this is not used any more
-	//private boolean isQueryUpwardClosed(TAPNQuery query) {
-	//	UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
-	//	return visitor.isUpwardClosed(query.getProperty());
-	//}
-
 	
 	public static void reset() {
 		//Clear value
