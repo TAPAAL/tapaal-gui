@@ -46,10 +46,6 @@ public abstract class VerificationOptions {
 		return searchOption;
 	}
 
-	public String reducedModelPath(){
-	    return reducedModelPath;
-    }
-
     public String unfoldedModelPath(){
         return unfoldedModelPath;
     }

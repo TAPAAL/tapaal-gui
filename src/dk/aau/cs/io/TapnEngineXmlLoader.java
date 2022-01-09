@@ -29,7 +29,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 /*
@@ -54,43 +53,12 @@ public class TapnEngineXmlLoader {
 	private boolean firstPlaceRenameWarning = true;
 	private final IdResolver idResolver = new IdResolver();
     private final Collection<String> messages = new ArrayList<>(10);
-    int groupPlaceHolder = 1;
-    private LoadTACPN loadTACPN = new LoadTACPN();
+    private final LoadTACPN loadTACPN = new LoadTACPN();
+
     boolean hasFeatureTag = false;
     private PetriNetTab.TAPNLens lens = PetriNetTab.TAPNLens.Default;
 
-	public TapnEngineXmlLoader() {
-
-	}
-
-    public PetriNetTab.TAPNLens loadLens(InputStream file) throws FormatException {
-        Require.that(file != null, "file must be non-null and exist");
-
-        Document doc = loadDocument(file);
-        if(doc == null) return null;
-
-        idResolver.clear();
-        parseFeature(doc);
-
-        if (hasFeatureTag) {
-            return lens;
-        }
-        return null;
-    }
-
-	public LoadedModel load(InputStream file) throws Exception {
-		Require.that(file != null, "file must be non-null and exist");
-
-		Document doc = loadDocument(file);
-		if(doc == null) return null;
-		try {
-            return parse(doc);
-        } catch (FormatException | NullPointerException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type");
-        }
-	}
+	public TapnEngineXmlLoader() {}
 	
 	public LoadedModel load(File file) throws Exception {
 		Require.that(file != null && file.exists(), "file must be non-null and exist");
@@ -105,16 +73,6 @@ public class TapnEngineXmlLoader {
             throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type", e);
         }
 	}
-	
-	
-	private Document loadDocument(InputStream file) {
-		try {
-			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			return builder.parse(file);
-		} catch (ParserConfigurationException | IOException | SAXException e) {
-			return null;
-		}
-	}
 
 	private Document loadDocument(File file) {
 		try {
@@ -128,14 +86,11 @@ public class TapnEngineXmlLoader {
 	private LoadedModel parse(Document doc) throws FormatException {
 		idResolver.clear();
 
-
 		ConstantStore constants = new ConstantStore(parseConstants(doc));
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, new ArrayList<>());
         NodeList declarations = doc.getElementsByTagName("declaration");
 
         if (declarations.getLength() > 0) {
-            //throw new FormatException("File did not contain any declarations components.");
-
             for (int i = 0; i < declarations.getLength(); i++) {
                 Node node = declarations.item(i);
                 if (node.getNodeName().equals("declaration")) {
@@ -500,8 +455,8 @@ public class TapnEngineXmlLoader {
 		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(
 				positionXInput, positionYInput, idInput,
-				nameOffsetXInput, nameOffsetYInput, true,
-				infiniteServer, angle, priority, lens);
+				nameOffsetXInput, nameOffsetYInput,
+            angle, lens);
 		transitionComponent.setUnderlyingTransition(t);
 		
 		if (!displayName){

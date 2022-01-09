@@ -111,7 +111,7 @@ public class TraceImportExport {
                 traceRootNode.appendChild(transitionElement);
 
                 List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens();
-                for (TimedToken token : ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens()) {
+                for (TimedToken token : consumedTokens) {
                     Element tokenElement = document.createElement("token");
                     tokenElement.setAttribute("place", composer.composedPlaceName(token.place()));
                     tokenElement.setAttribute("age", token.age().toString());

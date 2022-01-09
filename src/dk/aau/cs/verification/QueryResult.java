@@ -72,13 +72,7 @@ public class QueryResult {
 	}
 	
 	protected String getInconclusiveString(){
-		StringBuilder buffer = new StringBuilder();
-		buffer.append("The result of the approximation was inconclusive.");
-		return buffer.toString();
-	}
-	
-	public TAPNQuery getQuery() {
-		return query;
+        return "The result of the approximation was inconclusive.";
 	}
 
 	public BoundednessAnalysisResult boundednessAnalysis() {

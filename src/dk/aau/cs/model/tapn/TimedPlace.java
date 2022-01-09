@@ -111,18 +111,6 @@ public abstract class TimedPlace {
         }
     }
 
-    public void removeToken(TimedToken token) {
-        Require.that(getColorType().equals(token.getColor().getColorType()), "Cannot remove token with different colortype from the place colortype");
-        currentMarking.remove(token);
-    }
-
-    public void removeTokens(Iterable<TimedToken> tokens){
-        for(TimedToken token : tokens){
-            currentMarking.remove(token);
-        }
-        fireMarkingChanged();
-    }
-
     public void updateTokens(Iterable<TimedToken> tokens, ArcExpression expression) {
         currentMarking.removePlaceFromMarking(this);
         addTokens(tokens);

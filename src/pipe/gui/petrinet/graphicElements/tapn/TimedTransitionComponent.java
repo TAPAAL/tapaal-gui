@@ -48,15 +48,12 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent(
-	    int positionXInput,
+        int positionXInput,
         int positionYInput,
         String idInput,
         int nameOffsetXInput,
         int nameOffsetYInput,
-        boolean timedTransition,
-        boolean infServer,
         int angleInput,
-        int priority,
         PetriNetTab.TAPNLens lens
     ) {
 		super(
@@ -70,7 +67,6 @@ public class TimedTransitionComponent extends Transition {
 		listener = timedTransitionListener();
 		attributesVisible = true;
         this.lens = lens;
-
 	}
 
 	private TimedTransitionListener timedTransitionListener(){
@@ -293,7 +289,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn) {
-		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0, lens);
+		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), getAngle(), lens);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 
 		return transitionComponent;

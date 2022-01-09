@@ -35,21 +35,17 @@ public class SharedTransitionNamePanel extends JPanel {
 
 	private final UndoManager undoManager;
 	private final NameGenerator nameGenerator;
-        private final Context context;
+    private final Context context;
 	
 	JButton okButton;
 
-	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator, Context context) {
-		this(rootPane, sharedTransitionsListModel, undoManager, nameGenerator, context, null);
-	}
-	
-	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator, Context context, SharedTransition transitionToEdit) {
+    public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator, Context context, SharedTransition transitionToEdit) {
 		this.rootPane = rootPane;
 		listModel = sharedTransitionsListModel;
 		this.undoManager = undoManager;
 		this.nameGenerator = nameGenerator;
 		this.transitionToEdit = transitionToEdit;
-                this.context = context;
+        this.context = context;
 		initComponents();	
 	}
 

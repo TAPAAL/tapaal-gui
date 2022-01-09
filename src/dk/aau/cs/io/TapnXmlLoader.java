@@ -506,8 +506,8 @@ public class TapnXmlLoader {
 		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(
 				positionXInput, positionYInput, idInput,
-				nameOffsetXInput, nameOffsetYInput, true,
-				infiniteServer, angle, priority, lens);
+				nameOffsetXInput, nameOffsetYInput,
+            angle, lens);
 		transitionComponent.setUnderlyingTransition(t);
 		
 		if (!displayName){

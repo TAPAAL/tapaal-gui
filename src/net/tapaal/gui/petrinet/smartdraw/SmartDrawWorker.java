@@ -29,9 +29,8 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	String searchOption;
 	Point rootPoint;
 	Point rightMostPointUsed = new Point(0, 0);
-	Boolean isDone = false;
-	
-	ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
+
+    ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
 	ArrayList<Point> pointsReserved = new ArrayList<Point>();
 	UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
@@ -530,6 +529,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 
 		
 	}
+
 	//For debugging
 	private void printPTObjectsAndPositions() {
 		for(PlaceTransitionObject ptObject : placeTransitionObjects) {

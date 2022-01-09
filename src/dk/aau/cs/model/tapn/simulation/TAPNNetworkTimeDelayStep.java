@@ -18,10 +18,6 @@ public class TAPNNetworkTimeDelayStep extends TAPNNetworkTraceStep {
 	public BigDecimal getDelay(){
 		return delay;
 	}
-	
-	public void setDelay(BigDecimal delay){
-		this.delay = delay;
-	}
 
 	@Override
 	public String toString() {

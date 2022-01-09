@@ -658,14 +658,6 @@ public class TimedArcPetriNetNetwork {
         }
     }
 
-    public void updateVariable(String oldName, Variable variable) {
-        Integer index = getVariableIndex(oldName);
-        Variable oldVar = getVariableByIndex(index);
-        if (index != null) {
-            variables.set(index, variable);
-        }
-    }
-
     public Integer getColorTypeIndex(String name) {
         for (int i = 0; i < colorTypes.size(); i++) {
             if (colorTypes.get(i).getName().equalsIgnoreCase(name)) {

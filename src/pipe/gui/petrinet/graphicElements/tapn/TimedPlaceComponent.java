@@ -168,30 +168,6 @@ public class TimedPlaceComponent extends Place {
         return buffer.toString();
     }
 
-    private String getColoredTokensLabel() {
-        StringBuilder buffer = new StringBuilder();
-
-        List<TimedToken> timedTokens = place.tokens();
-
-        //TODO: this causes null pointer exceptions when importing some pnml nets
-        Map<String, Long> tokenMap = timedTokens.stream().map(
-            timedToken -> timedToken.getFormattedTokenString()).collect(Collectors.groupingBy(e -> e, Collectors.counting()));
-
-        boolean first = true;
-
-        for (Map.Entry<String, Long> element : tokenMap.entrySet()) {
-
-            if (!first) {
-                buffer.append("\n");
-            }
-            buffer.append(element.getValue() + "'" + element.getKey());
-
-            first = false;
-        }
-
-        return buffer.toString();
-    }
-
     public boolean isAgeOfTokensShown() {
         return ageOfTokensWindow.isVisible();
     }

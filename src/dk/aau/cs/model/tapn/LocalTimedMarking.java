@@ -160,9 +160,9 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		Require.that(transition != null, "transition must not be null");
 		Require.that(transition.isEnabled(), "Transition must be enabled");
 
-		List<TimedToken> tokensToConsume = transition.calculateConsumedTokens(this, firingMode);
+		List<TimedToken> tokensToConsume = transition.calculateConsumedTokens(firingMode);
 
-		return new Tuple<LocalTimedMarking, List<TimedToken>> (fireTransition(transition, tokensToConsume), tokensToConsume);
+		return new Tuple<>(fireTransition(transition, tokensToConsume), tokensToConsume);
 	}
 
 	public int size() {

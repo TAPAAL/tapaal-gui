@@ -467,7 +467,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	private WorkflowDialog workflowDialog = null;
 
-	private NameVisibilityPanel nameVisibilityPanel = null;
+	private NameVisibilityPanel nameVisibilityPanel;
 
     private Boolean showNamesOption = null;
     private Boolean isSelectedComponentOption = null;
@@ -540,7 +540,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     public PetriNetTab(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
         this(network, templates, lens);
 
-        setNetwork(network, templates);
+        setNetwork(network);
         setQueries(tapnqueries);
         setConstants(network().constants());
 	}
@@ -563,7 +563,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 				)
 		);
 
-		queries = new QueryPane(new ArrayList<TAPNQuery>(), this);
+		queries = new QueryPane(this);
 		queries.setPreferredSize(
 				new Dimension(
 						queries.getPreferredSize().width,
@@ -694,12 +694,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return this.guiModels;
 	}
 
-	public void setDrawingSurface(DrawingSurfaceImpl drawingSurface) {
-		this.drawingSurface = drawingSurface;
-	}
 
-
-	//XXX this is a temp solution while refactoring
+    //XXX this is a temp solution while refactoring
 	// to keep the name of the net when the when a file is not set.
 	String initialName = "";
 	public void setInitialName(String name) {
@@ -824,13 +820,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 		this.setLeftComponent(animatorSplitPaneScroller);
 	}
-
-	private void hideTimedInformation(){
-	    if(!lens.isTimed()){
-            animControlerBox.setVisible(false);
-        }
-
-    }
 
     public AnimationHistoryList getUntimedAnimationHistory() {
 		return abstractAnimationPane;
@@ -991,9 +980,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		tapnNetwork.setConstants(constants);
 	}
 
-	private void setNetwork(TimedArcPetriNetNetwork network, Collection<Template> templates) {
-
-
+	private void setNetwork(TimedArcPetriNetNetwork network) {
 		sharedPTPanel.setNetwork(network);
 		templateExplorer.updateTemplateList();
 
@@ -1178,12 +1165,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), true), "-colored");
         TabTransformer.addColorInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
-    }
-
-    @Override
-    public void createNewAndUnfoldColor(){
-        //Verifier.runVerifyTAPNVerification(network(), TAPNQuery.getDefaultQuery(new TCTLTrueNode()), null, getGuiModels(), true);
-	    TabTransformer.unfoldTab(this, true, true, true);
     }
 
     public void createNewAndUnfoldColor(boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars){

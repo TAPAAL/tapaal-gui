@@ -306,10 +306,7 @@ public class TAPNComposer implements ITAPNComposer {
                                 oldTransition.getId(),
                                 oldTransition.getNameOffsetX(),
                                 oldTransition.getNameOffsetY(),
-                                true,
-                                false,
                                 oldTransition.getAngle(),
-                                0,
                                 lens
                             );
 							newTransition.setUnderlyingTransition(transition);

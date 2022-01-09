@@ -8,9 +8,7 @@ import java.util.Set;
 
 public class PlaceHolderGuardExpression extends GuardExpression implements PlaceHolderExpression {
 
-    public PlaceHolderGuardExpression() {
-
-    }
+    public PlaceHolderGuardExpression() {}
 
     public boolean isSimple() {return true;}
 

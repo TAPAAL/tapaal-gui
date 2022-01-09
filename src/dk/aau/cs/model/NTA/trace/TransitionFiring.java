@@ -22,8 +22,7 @@ public class TransitionFiring implements TAFiringAction {
 	private final Participant[] participants;
 	private SymbolicState nextState;
 
-	public TransitionFiring(SymbolicState state, String channel,
-			Participant... participants) {
+	public TransitionFiring(SymbolicState state, String channel, Participant... participants) {
 		previousState = state;
 		this.channel = channel;
 		this.participants = participants;
@@ -37,11 +36,7 @@ public class TransitionFiring implements TAFiringAction {
 		return previousState;
 	}
 
-	public SymbolicState targetState() {
-		return nextState;
-	}
-
-	public Participant[] participants() {
+    public Participant[] participants() {
 		return participants;
 	}
 
@@ -63,8 +58,7 @@ public class TransitionFiring implements TAFiringAction {
 		return new TransitionFiring(state, channel, participants);
 	}
 
-	private static Participant[] parseParticipants(SymbolicState state,
-			String[] lines) {
+	private static Participant[] parseParticipants(SymbolicState state, String[] lines) {
 		Participant[] participants = new Participant[lines.length - 1];
 
 		for (int i = 1; i < lines.length; i++) {
@@ -75,10 +69,8 @@ public class TransitionFiring implements TAFiringAction {
 
 			String automata = matcher.group(1);
 			String location = matcher.group(2);
-			HashMap<String, ValueRange> localClocksAndVariables = state
-					.getLocalClocksAndVariablesFor(automata);
-			participants[i - 1] = new Participant(automata, location,
-					localClocksAndVariables);
+			HashMap<String, ValueRange> localClocksAndVariables = state.getLocalClocksAndVariablesFor(automata);
+			participants[i - 1] = new Participant(automata, location, localClocksAndVariables);
 		}
 
 		return participants;

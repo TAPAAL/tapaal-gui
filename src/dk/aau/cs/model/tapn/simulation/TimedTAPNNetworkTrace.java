@@ -39,7 +39,7 @@ public class TimedTAPNNetworkTrace implements TAPNNetworkTrace {
 		return steps.subList(loopToIndex, steps.size());
 	}
         
-        public List<TAPNNetworkTraceStep> getSteps(){
+    public List<TAPNNetworkTraceStep> getSteps(){
 		return steps;
 	}
         

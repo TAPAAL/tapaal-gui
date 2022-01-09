@@ -362,7 +362,7 @@ public class TimedTransition extends TAPNElement {
 		return producedTokens;
 	}
 
-	public List<TimedToken> calculateConsumedTokens(LocalTimedMarking timedMarking, FiringMode firingMode) { // TODO: timedMarking not being used, remove it?
+	public List<TimedToken> calculateConsumedTokens(FiringMode firingMode) {
 		List<TimedToken> tokensToConsume = new ArrayList<TimedToken>();
 
 		for (TimedInputArc arc : preset) {

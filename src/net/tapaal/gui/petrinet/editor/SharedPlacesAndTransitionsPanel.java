@@ -424,11 +424,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 			sharedPlacesListModel.removeElement(place);
 		}
 	}
-	
-	public void addSharedPlace(SharedPlace place){
-		addSharedPlace(place, false);
-	}
-	public void addSharedPlace(SharedPlace place, boolean multiAdd){
+
+    public void addSharedPlace(SharedPlace place, boolean multiAdd){
 		sharedPlacesListModel.addElement(place, multiAdd);
 	}
 	
@@ -437,10 +434,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 			sharedTransitionsListModel.removeElement(transition);
 		}
 	}
-	public void addSharedTransition(SharedTransition transition){
-		addSharedTransition(transition, false);
-	}
-	public void addSharedTransition(SharedTransition transition, boolean multiAdd){
+
+    public void addSharedTransition(SharedTransition transition, boolean multiAdd){
 		sharedTransitionsListModel.addElement(transition, multiAdd);
 	}
 

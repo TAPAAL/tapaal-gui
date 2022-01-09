@@ -50,6 +50,7 @@ public class TimedToken {
 	public TimedToken delay(BigDecimal delay) {
 		return new TimedToken(place, age.add(delay), color);
 	}
+
     @Override
 	public String toString() {
 		DecimalFormat df = new DecimalFormat();
@@ -57,6 +58,7 @@ public class TimedToken {
 
         return String.format("(%s, %s, %s)", place.toString(), df.format(age), color.toString());
 	}
+
     //This is for colors
     public String toStringForPNML() {
         String token = "";

@@ -10,8 +10,4 @@ public class Require {
 		if (o == null)
 			throw new RequireException(message);
 	}
-	
-	public static void notImplemented(){
-		throw new RuntimeException("NOT IMPLEMENTED");
-	}
 }

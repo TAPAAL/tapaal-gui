@@ -47,12 +47,8 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 	public void nextIsLoop(){
 		nextIsLoop = true;
 	}
-	
-	public List<TimedArcPetriNetStep> getLoopSteps(){
-		return steps.subList(loopToIndex, steps.size());
-	}
-	
-	public int getLoopToIndex(){
+
+    public int getLoopToIndex(){
 		return loopToIndex;
 	}
 	

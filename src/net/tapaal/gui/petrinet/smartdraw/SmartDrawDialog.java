@@ -77,14 +77,9 @@ public class SmartDrawDialog extends JDialog {
 	
 	JPanel mainPanel;
 	String startingObject = "Random";
-	//String template;
-	String[] objectNames;
-	//String[] templateNames;
 	JComboBox<String> objectDropdown = new JComboBox<String>();
 	JCheckBox randomStartObjectCheckBox;
-	//JComboBox<Object> templateSelector = new JComboBox<Object>();
 	JDialog loadingDialogFrame;
-	//JDialog choiceModal;
 	SmartDrawWorker worker;
 	JLabel timerLabel = new JLabel("Time elapsed: ");
 	JLabel progressLabel = new JLabel("Objects placed: ");
@@ -92,7 +87,6 @@ public class SmartDrawDialog extends JDialog {
 	JSpinner xSpinner;
 	JButton drawButton;
 	long startTimeMs;
-	int objectsProgress;
 
 	int xSpacing = 80;
 	int ySpacing = 80;
@@ -665,19 +659,8 @@ public class SmartDrawDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		mainPanel.add(spacingPanel, gbc);
 	}
-	
-	private String[] getTemplatesAsString() {
-		String[] templateNames = {"Choose Template"};
-		Iterator<Template> iterator = TAPAALGUI.getCurrentTab().activeTemplates().iterator();
-		int i = 0;
-		while(iterator.hasNext()) {
-			Template template = iterator.next();
-			templateNames[i] = template.model().name();
-		}
-		return templateNames;
-	}
-	
-	static private String[] getObjectNames() {
+
+    static private String[] getObjectNames() {
 		ArrayList<String> names = new ArrayList<String>();
 		for(PetriNetObject object : TAPAALGUI.getDrawingSurface().getGuiModel().getPlaceTransitionObjects()) {
 			names.add(object.getName());

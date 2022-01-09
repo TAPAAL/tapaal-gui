@@ -51,8 +51,6 @@ public class VariablesDialogPanel extends JPanel {
         initComponents();
         nameTextField.setText(oldName);
         this.undoManager = undoManager;
-
-
     }
 
     public VariablesDialogPanel(JRootPane pane, ConstantsPane.VariablesListModel listModel, TimedArcPetriNetNetwork network, Variable variable,UndoManager undoManager) throws IOException {

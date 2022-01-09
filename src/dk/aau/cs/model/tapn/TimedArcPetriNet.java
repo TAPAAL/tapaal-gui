@@ -790,9 +790,5 @@ public class TimedArcPetriNet {
 	public void setCheckNames(boolean checkNames) {
 		this.checkNames = checkNames;
 	}
-    public void replace(TimedTransition transition, int index) {
-        Require.that(transition != null, "Argument must be a non-null transition");
-        transition.setModel(this);
-        transitions.set(index, transition);
-    }
+
 }

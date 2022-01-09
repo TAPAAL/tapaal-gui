@@ -120,33 +120,19 @@ public class Stats {
         return edges;
     }
 
-    public long getProcessedEdges() {
-        return processedEdges;
-    }
-    public long getProcessedNEdges() {
-        return processedNEdges;
-    }
-    public long getExploredConfigurations() {
-        return exploredConfigurations;
-    }
-
-	public ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> getCoveredMarking(){
+    public ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> getCoveredMarking(){
 		return coveredMarking;
 	}
 	
 	@Override
 	public String toString() {
-		StringBuilder buffer = new StringBuilder();
-		buffer.append("Discovered markings: ");
-		buffer.append(discovered);
-		buffer.append(System.getProperty("line.separator"));
-		
-		buffer.append("Explored markings: ");
-		buffer.append(explored);
-		buffer.append(System.getProperty("line.separator"));
-		
-		buffer.append("Stored markings: ");
-		buffer.append(stored);
-		return buffer.toString();
+        return "Discovered markings: " +
+            discovered +
+            System.getProperty("line.separator") +
+            "Explored markings: " +
+            explored +
+            System.getProperty("line.separator") +
+            "Stored markings: " +
+            stored;
 	}
 }

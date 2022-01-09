@@ -335,24 +335,21 @@ public class TAPNQuery {
 	public ExtrapolationOption getExtrapolationOption() {
 		return extrapolationOption;
 	}
-    public static TAPNQuery getDefaultQuery(TCTLAbstractProperty property){
-        //new TCTLEFNode(new TCTLTrueNode())
-        return new TAPNQuery("true", 1000, property, TraceOption.SOME, SearchOption.DFS,
-            ReductionOption.VerifyPN, false,false,false,false,false,
-            HashTableSize.MB_4, ExtrapolationOption.NONE,WorkflowMode.NOT_WORKFLOW, false);
-    }
-	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
+
+    public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
-			ExtrapolationOption extrapolationOption, WorkflowMode workflow, boolean isColored) {
+			ExtrapolationOption extrapolationOption, WorkflowMode workflow, boolean isColored
+    ) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, false, hashTabelSize, extrapolationOption, new InclusionPlaces(), isColored);
 		this.setWorkflowMode(workflow);
 	}
         
-        public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
+    public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
-			ExtrapolationOption extrapolationOption, WorkflowMode workflow, long strongSoundnessBound, boolean isColored) {
+			ExtrapolationOption extrapolationOption, WorkflowMode workflow, long strongSoundnessBound, boolean isColored
+    ) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, hashTabelSize, extrapolationOption, workflow, isColored);
 		this.setStrongSoundnessBound(strongSoundnessBound);
 	}

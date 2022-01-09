@@ -8,15 +8,7 @@ import dk.aau.cs.model.tapn.TimedToken;
 
 public class TraceToken extends TimedToken {
 	
-	private boolean greaterThanOrEqual = false;
-
-	public TraceToken(TimedPlace place, Color color) {
-		super(place, color);
-	}
-
-	public TraceToken(TimedPlace place, BigDecimal age, Color color) {
-		super(place, age, color);
-	}
+	private final boolean greaterThanOrEqual;
 	
 	public TraceToken(TimedPlace place, BigDecimal age, boolean greaterThanOrEqual, Color color) {
 		super(place, age, color);

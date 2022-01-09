@@ -718,13 +718,6 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		isInAnimationMode = true;
 		updateTemplateList();
 	}
-	
-
-	public void switchToEditorMode() {
-		showButtons();
-		isInAnimationMode = false;
-		updateTemplateList();
-	}
 
     @Override
     public void moveUp(int index) {

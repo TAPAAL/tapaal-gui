@@ -80,8 +80,7 @@ public class PlaceEditorPanel extends JPanel {
 	private final JRootPane rootPane;
 	
 	private JCheckBox sharedCheckBox;
-	private JCheckBox makeNewSharedCheckBox;
-	private WidthAdjustingComboBox sharedPlacesComboBox;
+    private WidthAdjustingComboBox sharedPlacesComboBox;
 
 	private final TimedPlaceComponent place;
 	private final Context context;

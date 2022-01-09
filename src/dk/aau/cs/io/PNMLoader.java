@@ -305,7 +305,7 @@ public class PNMLoader {
         if(isNetDrawable()){
             TimedTransitionComponent transitionComponent =
                 //We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique
-                new TimedTransitionComponent(position.x, position.y, id, name.point.x, name.point.y, true, false, 0, 0, lens);
+                new TimedTransitionComponent(position.x, position.y, id, name.point.x, name.point.y, 0, lens);
             transitionComponent.setUnderlyingTransition(transition);
             template.guiModel().addPetriNetObject(transitionComponent);
         }

@@ -522,8 +522,8 @@ public class TapnLegacyXmlLoader {
 
 		TimedTransitionComponent transition = new TimedTransitionComponent(
 				positionXInput, positionYInput, idInput,
-				nameOffsetXInput, nameOffsetYInput, timedTransition,
-				infiniteServer, angle, priority, lens);
+				nameOffsetXInput, nameOffsetYInput,
+            angle, lens);
 		transition.setUnderlyingTransition(t);
 		guiModel.addPetriNetObject(transition);
 		tapn.add(t);

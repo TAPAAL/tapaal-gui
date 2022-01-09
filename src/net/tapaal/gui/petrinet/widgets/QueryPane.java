@@ -77,7 +77,7 @@ public class QueryPane extends JPanel implements SidePane {
 
 	//private static final String toolTipQueryPane = "Here you can manage queries. Queries can explore properties of the Net.";
 
-	public QueryPane(ArrayList<TAPNQuery> queriesToSet,	PetriNetTab tabContent) {
+	public QueryPane(PetriNetTab tabContent) {
 		this.tabContent = tabContent;
 		undoManager = tabContent.getUndoManager();
 		queryCollectionPanel = new JPanel(new GridBagLayout());

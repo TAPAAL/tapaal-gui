@@ -36,8 +36,6 @@ public interface TabActions {
 
     void toggleAnimationMode();
 
-    void createNewAndUnfoldColor();
-
     void setMode(PetriNetTab.DrawTool mode);
 
     void showStatistics();
