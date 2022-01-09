@@ -1,4 +1,4 @@
-package net.tapaal.copypaste;
+package net.tapaal.copypaste
 
 import pipe.gui.petrinet.PetriNetTab
 import dk.aau.cs.model.tapn.IntWeight
@@ -90,14 +90,14 @@ class CopyPastImportExport {
                             val arc2: TimedTransportArcComponent
 
                             if (o.source is TimedPlaceComponent) {
-                                arc1 = o;
+                                arc1 = o
                                 arc2 = o.connectedTo
                             } else {
                                 arc1 = o.connectedTo
                                 arc2 = o
                             }
 
-                            val start = arc1.source as TimedPlaceComponent;
+                            val start = arc1.source as TimedPlaceComponent
                             val mid = arc1.target as TimedTransitionComponent
                             val end = arc2.target as TimedPlaceComponent
 
@@ -113,7 +113,7 @@ class CopyPastImportExport {
 
                             transportArcs.add(TransportArcModel(start.name, mid.name, end.name, defaultGuard, defaultWeight, path1, path2))
                         } else  {
-                            foundTransportArcs.add(o);
+                            foundTransportArcs.add(o)
                         }
                     }
                     is TimedInputArcComponent -> {
@@ -154,9 +154,9 @@ class CopyPastImportExport {
 
             val model: TAPAALCopyPastModel
             try {
-                model = Json.decodeFromString<TAPAALCopyPastModel>(s)
+                model = Json.decodeFromString(s)
             } catch (e: Exception) { // It seems the throw exception is internal to the library
-                return;
+                return
             }
 
             tab.drawingSurface().selectionObject.clearSelection()
@@ -248,9 +248,9 @@ class CopyPastImportExport {
 
                 if (from != null && mid != null && to != null && guard != null && weight != null) {
                     if (tab.lens.isTimed) {
-                        val r = tab.guiModelManager.addTimedTransportArc(tab.model, from, mid, to, null, null);
+                        val r = tab.guiModelManager.addTimedTransportArc(tab.model, from, mid, to, null, null)
                         if (!r.hasErrors) {
-                            r.result.setGuardAndWeight(guard, weight);
+                            r.result.setGuardAndWeight(guard, weight)
                             addArcPath(a.path1, r.result)
                             addArcPath(a.path2, r.result.connectedTo)
                         }
@@ -286,7 +286,7 @@ class CopyPastImportExport {
         private fun findGuard(guard: String, tab: PetriNetTab): TimeInterval? {
             return if (tab.lens.isTimed) {
                 try {
-                    TimeInterval.parse(guard, tab.network().constantStore);
+                    TimeInterval.parse(guard, tab.network().constantStore)
                 } catch (e: Exception) {
                     null
                 }

@@ -4,8 +4,8 @@ import dk.aau.cs.TCTL.TCTLPlaceNode;
 
 public class RenamePlaceTCTLVisitor extends VisitorBase{
 
-	private String oldPlaceName;
-	private String newPlaceName;
+	private final String oldPlaceName;
+	private final String newPlaceName;
 
 	public RenamePlaceTCTLVisitor(String oldName, String newName) {
 		oldPlaceName = oldName;

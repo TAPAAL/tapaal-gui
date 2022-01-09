@@ -65,7 +65,7 @@ public class PNMLoader {
     private int netSize = 0;
     private final int maxNetSize = 4000;
     private boolean hasPositionalInfo = false;
-    private LoadTACPN loadTACPN;
+    private final LoadTACPN loadTACPN;
 
     public PNMLoader() {
         this.lens = PetriNetTab.TAPNLens.Default;
@@ -207,7 +207,7 @@ public class PNMLoader {
             }
         }
         Node markingNode = getFirstDirectChild(node, "hlinitialMarking");
-        if (markingNode != null && markingNode instanceof Element) {
+        if (markingNode instanceof Element) {
             try {
                 colorMarking = loadTACPN.parseArcExpression(((Element) markingNode).getElementsByTagName("structure").item(0));
             } catch (FormatException e) {
@@ -443,8 +443,8 @@ public class PNMLoader {
     }
 
     private static class Name{
-        String name;
-        Point point;
+        final String name;
+        final Point point;
 
         public Name(String newPlaceName) {
             this(newPlaceName, new Point());
@@ -462,8 +462,8 @@ public class PNMLoader {
     }
 
     private static class InitialMarking{
-        int marking;
-        Point point;
+        final int marking;
+        final Point point;
 
         public InitialMarking() {
             this(0, new Point());

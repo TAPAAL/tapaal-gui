@@ -9,12 +9,12 @@ import java.util.Map;
 public class VerifyPNUnfoldOptions extends VerificationOptions {
 
     private static final Map<TAPNQuery.SearchOption, String> searchMap = createSearchOptionsMap();
-    private String modelOut;
-    private String queryOut;
-    private int numQueries;
-    private boolean partition;
-    private  boolean computeColorFixpoint;
-    private boolean symmetricVars;
+    private final String modelOut;
+    private final String queryOut;
+    private final int numQueries;
+    private final boolean partition;
+    private final boolean computeColorFixpoint;
+    private final boolean symmetricVars;
 
     public VerifyPNUnfoldOptions(String modelOut, String queryOut, int numQueries, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
         this.modelOut = modelOut;

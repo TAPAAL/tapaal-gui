@@ -43,16 +43,16 @@ public class CTLQueryVisitor extends VisitorBase {
     private static final String XML_INTEGERDIFFERENCE = "integer-difference";
     private static final String CONTROL = "control";
 
-	private StringBuffer XMLQuery;
+	private final StringBuffer XMLQuery;
         
-        public CTLQueryVisitor() {
-            this.XMLQuery = new StringBuffer();
-        }
+    public CTLQueryVisitor() {
+        this.XMLQuery = new StringBuffer();
+    }
         
-        public String getXMLQueryFor(TCTLAbstractProperty property, String queryName) {
-            buildXMLQuery(property, queryName, false);
-            return getFormatted();
-        }
+    public String getXMLQueryFor(TCTLAbstractProperty property, String queryName) {
+        buildXMLQuery(property, queryName, false);
+        return getFormatted();
+    }
 	
 	public void buildXMLQuery(TCTLAbstractProperty property, String queryName, boolean control) {
         XMLQuery.append(startTag(XML_PROP) + queryInfo(queryName) + startTag(XML_FORMULA));
@@ -235,23 +235,31 @@ public class CTLQueryVisitor extends VisitorBase {
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
 			Object context) {
 		String opTest = atomicPropositionNode.getOp();
-		String op = new String();
-		
-		if (opTest.equals("<")){
-			op = XML_INTEGERLT;
-		} else if(opTest.equals("<=")){
-			op = XML_INTEGERLE;
-		} else if(opTest.equals("=")){
-			op = XML_INTEGEREQ;
-		} else if(opTest.equals("!=")){
-			op = XML_INTEGERNE;
-		} else if(opTest.equals(">")){
-			op = XML_INTEGERGT;
-		} else if(opTest.equals(">=")){
-			op = XML_INTEGERGE;
-		} else {
-			op = "MISSING_OPERATOR";
-		}
+		String op;
+
+        switch (opTest) {
+            case "<":
+                op = XML_INTEGERLT;
+                break;
+            case "<=":
+                op = XML_INTEGERLE;
+                break;
+            case "=":
+                op = XML_INTEGEREQ;
+                break;
+            case "!=":
+                op = XML_INTEGERNE;
+                break;
+            case ">":
+                op = XML_INTEGERGT;
+                break;
+            case ">=":
+                op = XML_INTEGERGE;
+                break;
+            default:
+                op = "MISSING_OPERATOR";
+                break;
+        }
 		
 		XMLQuery.append(startTag(op));
 		atomicPropositionNode.getLeft().accept(this, context);

@@ -279,7 +279,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         //Do loading
         SwingWorker<java.util.List<PetriNetTab>, Void> worker = new SwingWorker<java.util.List<PetriNetTab>, Void>() {
             @Override
-            protected java.util.List<PetriNetTab> doInBackground() throws InterruptedException, Exception, FileNotFoundException {
+            protected java.util.List<PetriNetTab> doInBackground() throws Exception {
                 java.util.List<PetriNetTab> filesOpened = new ArrayList<>();
                 for(File f : files){
                     if(f.exists() && f.isFile() && f.canRead()){
@@ -333,7 +333,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         //Do loading of net
         SwingWorker<List<PetriNetTab>, Void> worker = new SwingWorker<List<PetriNetTab>, Void>() {
             @Override
-            protected List<PetriNetTab> doInBackground() throws InterruptedException, Exception {
+            protected List<PetriNetTab> doInBackground() throws Exception {
                 List<PetriNetTab> fileOpened = new ArrayList<>();
                 for(File f : files){
                     if(f.exists() && f.isFile() && f.canRead()){

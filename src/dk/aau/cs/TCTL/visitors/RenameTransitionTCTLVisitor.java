@@ -4,8 +4,8 @@ import dk.aau.cs.TCTL.TCTLTransitionNode;
 
 public class RenameTransitionTCTLVisitor extends VisitorBase{
 
-	private String oldTransitionName;
-	private String newTransitionName;
+	private final String oldTransitionName;
+	private final String newTransitionName;
 
 	public RenameTransitionTCTLVisitor(String oldName, String newName) {
 		oldTransitionName = oldName;

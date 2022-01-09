@@ -17,11 +17,11 @@ import javax.swing.JPanel;
 import dk.aau.cs.model.tapn.TimedToken;
 
 public class ArcTokenSelector extends JPanel{
-	String placeName;
-	HashMap<JCheckBox, TimedToken> checkboxToToken = new HashMap<JCheckBox, TimedToken>();
+	final String placeName;
+	final HashMap<JCheckBox, TimedToken> checkboxToToken = new HashMap<JCheckBox, TimedToken>();
 	int missingToSelect;
-	JLabel informationLabel;
-	ArrayList<ArcTokenSelectorListener> listeners = new ArrayList<ArcTokenSelectorListener>();
+	final JLabel informationLabel;
+	final ArrayList<ArcTokenSelectorListener> listeners = new ArrayList<ArcTokenSelectorListener>();
 	
 	public ArcTokenSelector(String placeName, List<TimedToken> elligibleTokens, int weight) {
 		super(new GridLayout(0, 1));

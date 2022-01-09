@@ -7,8 +7,8 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 	protected static final String PLOCK = "P_lock";
 	protected static final String TOKEN_TEMPLATE_NAME = "Token";
 
-	private boolean useSymmetry;
-	private int totalTokens;
+	private final boolean useSymmetry;
+	private final int totalTokens;
 
 	public BroadcastTranslationQueryVisitor(boolean useSymmetry, int totalTokens) {
 		this.useSymmetry = useSymmetry;

@@ -42,7 +42,7 @@ public abstract class TimedPlace {
 
     public void setName(String newName) {
 		Require.that(newName != null && !newName.isEmpty(), "A timed place must have a name");
-		Require.that(isValid(newName) && !newName.toLowerCase().equals("true") && !newName.toLowerCase().equals("false"), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
+		Require.that(isValid(newName) && !newName.equalsIgnoreCase("true") && !newName.equalsIgnoreCase("false"), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
         List<TimedToken> tokens = null;
 
 		if (currentMarking != null) {

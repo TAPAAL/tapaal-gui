@@ -55,8 +55,8 @@ public class AnimationControlSidePanel extends JPanel {
 
 
 
-    public JTextField TimeDelayField = new JTextField();
-	JComboBox<String> firermodebox;
+    public final JTextField TimeDelayField = new JTextField();
+	final JComboBox<String> firermodebox;
 
 
 	public AnimationControlSidePanel(Animator animator, PetriNetTab.TAPNLens lens) {

@@ -6,7 +6,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public class ContainsPlaceWithDisabledTemplateVisitor extends VisitorBase implements ITCTLVisitor {
 	
-	private TimedArcPetriNetNetwork network;
+	private final TimedArcPetriNetNetwork network;
 
 	public ContainsPlaceWithDisabledTemplateVisitor(TimedArcPetriNetNetwork network){
 		this.network = network;
@@ -14,15 +14,18 @@ public class ContainsPlaceWithDisabledTemplateVisitor extends VisitorBase implem
 
 	@Override
 	public void visit(TCTLPlaceNode placeNode, Object context) {
-		if(placeNode.getTemplate().equals("") && network.getSharedPlaceByName(placeNode.getPlace()) != null)
-			return;
+		if(placeNode.getTemplate().equals("") && network.getSharedPlaceByName(placeNode.getPlace()) != null) {
+            return;
+        }
 		
 		for(TimedArcPetriNet net : network.activeTemplates()) {
-			if(placeNode.getTemplate().equals(net.name()) && net.getPlaceByName(placeNode.getPlace()) != null) 
-				return;
+			if(placeNode.getTemplate().equals(net.name()) && net.getPlaceByName(placeNode.getPlace()) != null) {
+                return;
+            }
 		}
 		
-		if(context instanceof BooleanResult)
-			((BooleanResult)context).setResult(false);
+		if(context instanceof BooleanResult) {
+            ((BooleanResult)context).setResult(false);
+        }
 	}
 }

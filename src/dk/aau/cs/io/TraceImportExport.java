@@ -82,7 +82,7 @@ public class TraceImportExport {
         }
     }
 
-    private static ByteArrayOutputStream prepareTraceStream() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
+    private static ByteArrayOutputStream prepareTraceStream() throws IOException, ParserConfigurationException, DOMException, TransformerException {
         Document document;
         Transformer transformer;
         ByteArrayOutputStream os = new ByteArrayOutputStream();

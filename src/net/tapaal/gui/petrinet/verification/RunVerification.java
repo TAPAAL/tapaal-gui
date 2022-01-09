@@ -117,10 +117,8 @@ public class RunVerification extends RunVerificationBase {
 	}
 
 	private String toHTML(String string){
-		StringBuilder buffer = new StringBuilder("<html>");
-		buffer.append(string.replace(System.getProperty("line.separator"), "<br/>"));
-		buffer.append("</html>");
-		return buffer.toString();
+        return
+            "<html>" + string.replace(System.getProperty("line.separator"), "<br/>") + "</html>";
 	}
 
 	private void displayStats(JPanel panel, String stats, String[] explanations){

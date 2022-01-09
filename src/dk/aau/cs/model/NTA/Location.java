@@ -14,7 +14,7 @@ package dk.aau.cs.model.NTA;
 public class Location {
 	private static int newid = 0;
 
-	private int id = newid++;
+	private final int id = newid++;
 
 	private String name = "";
 	private String invariant = "";

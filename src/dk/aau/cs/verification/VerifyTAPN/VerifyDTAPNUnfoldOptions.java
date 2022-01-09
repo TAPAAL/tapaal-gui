@@ -4,10 +4,10 @@ import dk.aau.cs.verification.VerificationOptions;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 
 public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
-    private String modelOut;
-    private String queryOut;
-    private int tokenSize;
-    private int numQueries;
+    private final String modelOut;
+    private final String queryOut;
+    private final int tokenSize;
+    private final int numQueries;
 
     public VerifyDTAPNUnfoldOptions(String modelOut, String queryOut, int tokenSize, int numQueries) {
         this.modelOut = modelOut;

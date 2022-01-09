@@ -32,7 +32,7 @@ public class XMLFormatter {
 	
 			StreamResult result = new StreamResult(os);
 			transformer.transform(source, result);
-			return new String(os.toByteArray());
+			return os.toString();
 		} catch(Exception e){
 			throw new RuntimeException(e);
 		}

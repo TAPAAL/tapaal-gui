@@ -94,26 +94,16 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		
 		this.setToolTipText("Shared places and transitions define the interface among the different components");
 		this.addComponentListener(new ComponentListener() {
-			int minimumHegiht = SharedPlacesAndTransitionsPanel.this.getMinimumSize().height;
-			public void componentShown(ComponentEvent e) {
-			}
-			
-			
+			final int minimumHegiht = SharedPlacesAndTransitionsPanel.this.getMinimumSize().height;
+			public void componentShown(ComponentEvent e) {}
+
 			public void componentResized(ComponentEvent e) {
-				if(SharedPlacesAndTransitionsPanel.this.getSize().height <= minimumHegiht){
-					sortButton.setVisible(false);
-				} else {
-					sortButton.setVisible(true);
-				}
+                sortButton.setVisible(SharedPlacesAndTransitionsPanel.this.getSize().height > minimumHegiht);
 			}
-			
-		
-			public void componentMoved(ComponentEvent e) {
-			}
-			
-			
-			public void componentHidden(ComponentEvent e) {
-			}
+
+			public void componentMoved(ComponentEvent e) {}
+
+			public void componentHidden(ComponentEvent e) {}
 		});
 		
 		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));

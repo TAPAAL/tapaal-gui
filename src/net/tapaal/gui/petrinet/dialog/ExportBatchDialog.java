@@ -83,7 +83,7 @@ public class ExportBatchDialog extends JDialog {
     private final UndoManager undoManager = new UndoManager();
 
     static ExportBatchDialog exportBatchDialog;
-	ModelLoader loader = new ModelLoader();
+	final ModelLoader loader = new ModelLoader();
 	
 	public static boolean isDialogVisible() {
 		if (exportBatchDialog != null) {
@@ -544,7 +544,7 @@ public class ExportBatchDialog extends JDialog {
         }
 	}
 	
-	private void exportPNML(Path path, LoadedModel loadedModel) throws DOMException, TransformerConfigurationException, IOException, ParserConfigurationException, TransformerException {
+	private void exportPNML(Path path, LoadedModel loadedModel) throws DOMException, IOException, ParserConfigurationException, TransformerException {
 		File f = new File(path.toString() + "/model.pnml");
 		HashMap<TimedArcPetriNet, DataLayer> guiModel = new HashMap<TimedArcPetriNet, DataLayer>();
 		for(Template template : loadedModel.templates()) {

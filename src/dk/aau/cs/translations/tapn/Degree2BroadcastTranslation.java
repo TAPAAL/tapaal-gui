@@ -68,7 +68,7 @@ public class Degree2BroadcastTranslation implements
 	private int numberOfInitChannels = 0;
 	protected int extraTokens = 0;
 	private int largestPresetSize = 0;
-	protected boolean useSymmetry;
+	protected final boolean useSymmetry;
 
 	public Degree2BroadcastTranslation(boolean useSymmetry) {
 		this.useSymmetry = useSymmetry;

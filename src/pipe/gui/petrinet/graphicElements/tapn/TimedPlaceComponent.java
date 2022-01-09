@@ -125,10 +125,10 @@ public class TimedPlaceComponent extends Place {
                 buffer.append(", ");
             }
             buffer.append("(");
-            if (((TimedToken)token).color().getColorName().equals("")) {
-                buffer.append(((TimedToken) token).color().toString());
+            if (token.color().getColorName().equals("")) {
+                buffer.append(token.color().toString());
             } else {
-                buffer.append(((TimedToken) token).color().getColorName());
+                buffer.append(token.color().getColorName());
             }
             buffer.append(", ");
             buffer.append(df.format(token.age()));

@@ -11,13 +11,13 @@ public class CombiTranslationQueryVisitor extends QueryVisitor {
 	protected static final String PLOCK = "P_lock";
 	protected static final String TOKEN_TEMPLATE_NAME = "Token";
 
-	private boolean useSymmetry;
-	private int totalTokens;
-	private TimedArcPetriNet model;
-	private Hashtable<String, Boolean> placeNameToTimed;
-	private int maxDegDif;
-	private int initTransitions;
-	private int maxTimeIn;
+	private final boolean useSymmetry;
+	private final int totalTokens;
+	private final TimedArcPetriNet model;
+	private final Hashtable<String, Boolean> placeNameToTimed;
+	private final int maxDegDif;
+	private final int initTransitions;
+	private final int maxTimeIn;
 
 	public CombiTranslationQueryVisitor(boolean useSymmetry, int totalTokens, TimedArcPetriNet model, Hashtable<String, Boolean> placeNameToTimed, int maxDegDif, int initTransitions, int maxTimeIn) {
 		this.useSymmetry = useSymmetry;

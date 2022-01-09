@@ -35,14 +35,14 @@ import java.util.*;
 import java.util.List;
 
 public abstract class ColoredArcGuardPanel extends JPanel {
-    PetriNetObject objectToBeEdited;
+    final PetriNetObject objectToBeEdited;
     boolean isTransportArc = false;
     boolean isInputTransportArc = false;
     boolean isInputArc = false;
     boolean isInhibitorArc = false;
-    Context context;
-    ColoredArcGuardPanel.ExpressionConstructionUndoManager undoManager;
-    UndoableEditSupport undoSupport;
+    final Context context;
+    final ColoredArcGuardPanel.ExpressionConstructionUndoManager undoManager;
+    final UndoableEditSupport undoSupport;
 
     public ColoredArcGuardPanel(PetriNetObject objectToBeEdited, Context context){
         this.objectToBeEdited = objectToBeEdited;

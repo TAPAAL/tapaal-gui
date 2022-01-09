@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class DecimalOnlyDocumentFilter extends DocumentFilter {
 
-    int numberOfDecimalPlaces;
+    final int numberOfDecimalPlaces;
 
     public DecimalOnlyDocumentFilter(int numberOfDecimalPlaces) {
         this.numberOfDecimalPlaces = numberOfDecimalPlaces;

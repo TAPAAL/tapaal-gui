@@ -70,7 +70,7 @@ public class Export {
     public static final int QUERY = 7;
 
     private static void toPnml(DrawingSurfaceImpl g, String filename)
-        throws NullPointerException, DOMException, TransformerConfigurationException,
+        throws NullPointerException, DOMException,
         IOException, ParserConfigurationException, TransformerException {
         PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
         NetworkMarking currentMarking = null;

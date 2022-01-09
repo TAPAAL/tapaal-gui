@@ -16,9 +16,9 @@ import net.tapaal.gui.petrinet.undo.Command;
  */
 public class DeleteArcPathPointEditCommand extends Command {
 
-	ArcPath arcPath;
-	ArcPathPoint point;
-	Integer index;
+	final ArcPath arcPath;
+	final ArcPathPoint point;
+	final Integer index;
 	private final DataLayer guiModel;
 
 	/** Creates a new instance of placeWeightEdit */

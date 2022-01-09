@@ -42,7 +42,7 @@ public class PNMLWriter implements NetWriter {
 	private TimedArcPetriNet composedNetwork;
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private final PetriNetTab.TAPNLens lens;
-	private writeTACPN writeTACPN;
+	private final writeTACPN writeTACPN;
 
 	public PNMLWriter(TimedArcPetriNetNetwork network, HashMap<TimedArcPetriNet, DataLayer> guiModels, PetriNetTab.TAPNLens lens) {
 		this.network = network;
@@ -51,7 +51,7 @@ public class PNMLWriter implements NetWriter {
 		writeTACPN = new writeTACPN(network);
 	}
 	
-	public ByteArrayOutputStream savePNML() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
+	public ByteArrayOutputStream savePNML() throws ParserConfigurationException, DOMException, TransformerException {
 		Document document = null;
 		Transformer transformer = null;
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -107,7 +107,7 @@ public class PNMLWriter implements NetWriter {
 		return os;
 	}
 
-	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
+	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerException {
 		Require.that(file != null, "Error: file to save to was null");
 		
 		try {
@@ -359,12 +359,12 @@ public class PNMLWriter implements NetWriter {
 
         writeTACPN.appendColoredArcsDependencies(arc, guiModel, document, arcElement);
 
-        if (arc instanceof TimedOutputArcComponent && ((TimedOutputArcComponent)arc).getWeight().value() > 1 ) {
+        if (arc instanceof TimedOutputArcComponent && arc.getWeight().value() > 1 ) {
             Element inscription = document.createElement("inscription");
             arcElement.appendChild(inscription);
             Element text = document.createElement("text");
             inscription.appendChild(text);
-            text.setTextContent(((TimedOutputArcComponent)arc).getWeight().nameForSaving(false)+"");
+            text.setTextContent(arc.getWeight().nameForSaving(false)+"");
         }
 
         if(arc instanceof TimedInhibitorArcComponent){

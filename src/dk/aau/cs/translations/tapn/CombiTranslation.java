@@ -69,12 +69,12 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 	protected static int maxTimeIn = 0;
 	protected static int capInTokens;
 
-	private final Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
-	protected Hashtable<TimedInputArc, String> inputArcsToCounters = new Hashtable<TimedInputArc, String>();
-	protected Hashtable<TimedInhibitorArc, String> inhibitorArcsToCounters = new Hashtable<TimedInhibitorArc, String>();
-	protected Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<TransportArc, String>();
-	protected Hashtable<String, Boolean> placeNameToTimed = new Hashtable<String, Boolean>();
-	protected Hashtable<String, Boolean> placeNameToUrgent = new Hashtable<String, Boolean>();
+	private final Hashtable<String, Location> namesToLocations = new Hashtable<>();
+	protected final Hashtable<TimedInputArc, String> inputArcsToCounters = new Hashtable<>();
+	protected final Hashtable<TimedInhibitorArc, String> inhibitorArcsToCounters = new Hashtable<>();
+	protected final Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<>();
+	protected final Hashtable<String, Boolean> placeNameToTimed = new Hashtable<>();
+	protected final Hashtable<String, Boolean> placeNameToUrgent = new Hashtable<>();
 
 	public CombiTranslation(boolean useSymmetry) {
 		this.useSymmetry = useSymmetry;

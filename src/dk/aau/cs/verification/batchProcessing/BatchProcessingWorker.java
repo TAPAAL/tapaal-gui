@@ -68,7 +68,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private final BatchProcessingVerificationOptions batchProcessingVerificationOptions;
 	private boolean isExiting = false;
 	private ModelChecker modelChecker;
-	List<BatchProcessingListener> listeners = new ArrayList<BatchProcessingListener>();
+	final List<BatchProcessingListener> listeners = new ArrayList<>();
 	private boolean skippingCurrentVerification = false;
 	private boolean timeoutCurrentVerification = false;
 	private boolean oomCurrentVerification = false;

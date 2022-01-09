@@ -26,7 +26,7 @@ public abstract class QueryLoader {
     protected boolean showErrorMessage = true;
     protected final Collection<String> messages = new ArrayList<>(10);
 	
-	protected TimedArcPetriNetNetwork network;
+	protected final TimedArcPetriNetNetwork network;
 	
 	public QueryLoader(TimedArcPetriNetNetwork network) {
 		this.network = network;

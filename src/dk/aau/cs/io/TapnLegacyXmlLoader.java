@@ -547,7 +547,7 @@ public class TapnLegacyXmlLoader {
             nameInput = idInput;
         }
 
-        if (nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
+        if (nameInput.equalsIgnoreCase("true") || nameInput.equalsIgnoreCase("false")) {
             nameInput = "_" + nameInput;
             if (firstPlaceRenameWarning) {
                 messages.add(PLACENAME_ERROR_MESSAGE);

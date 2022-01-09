@@ -8,7 +8,7 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 //Represents a list of terms and the operators between then, these are all stored in the terms list
 public class TCTLPlusListNode extends TCTLAbstractStateProperty {
 
-	ArrayList<TCTLAbstractStateProperty> terms;
+	final ArrayList<TCTLAbstractStateProperty> terms;
 	
 	public TCTLPlusListNode(ArrayList<TCTLAbstractStateProperty> terms) {
 		this.terms = terms;

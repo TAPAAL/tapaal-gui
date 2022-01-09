@@ -77,12 +77,12 @@ public class SmartDrawDialog extends JDialog {
 	
 	JPanel mainPanel;
 	String startingObject = "Random";
-	JComboBox<String> objectDropdown = new JComboBox<String>();
+	final JComboBox<String> objectDropdown = new JComboBox<>();
 	JCheckBox randomStartObjectCheckBox;
 	JDialog loadingDialogFrame;
 	SmartDrawWorker worker;
-	JLabel timerLabel = new JLabel("Time elapsed: ");
-	JLabel progressLabel = new JLabel("Objects placed: ");
+	final JLabel timerLabel = new JLabel("Time elapsed: ");
+	final JLabel progressLabel = new JLabel("Objects placed: ");
 	JLabel statusLabel;
 	JSpinner xSpinner;
 	JButton drawButton;

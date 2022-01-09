@@ -4,7 +4,7 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
 public class TCTLConstNode extends TCTLAbstractStateProperty {
 
-	int constant;
+	final int constant;
 
 	public TCTLConstNode(int constant) {
 		this.constant = constant;

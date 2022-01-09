@@ -46,11 +46,11 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
             pane.setEditable(false);
 
             String preset = "";
-            for (Arc arc : ((PlaceTransitionObject) this).getPreset()) {
+            for (Arc arc : this.getPreset()) {
                 preset += "    "  + arc.getId() + "\n";
             }
             String postset = "";
-            for (Arc arc : ((PlaceTransitionObject) this).getPostset()) {
+            for (Arc arc : this.getPostset()) {
                 postset += "    "  + arc.getId() + "\n";
             }
 

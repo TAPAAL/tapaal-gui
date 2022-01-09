@@ -49,7 +49,6 @@ import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 import pipe.gui.petrinet.dataLayer.DataLayer;
-import dk.aau.cs.io.NetWriter;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.*;
@@ -2242,7 +2241,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 
 
-    MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
+    final MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
     private void setManager(AbstractDrawingSurfaceManager newManager) {
         //De-register old manager
 		managerRef.get().deregisterManager();

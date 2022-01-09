@@ -3,7 +3,7 @@ package dk.aau.cs.TCTL.visitors;
 import dk.aau.cs.TCTL.TCTLTransitionNode;
 
 public class ContainsSharedTransitionVisitor extends VisitorBase implements ITCTLVisitor {
-	private String sharedTransitionName;
+	private final String sharedTransitionName;
 
 	public ContainsSharedTransitionVisitor(String sharedTransitionName){
 		this.sharedTransitionName = sharedTransitionName;

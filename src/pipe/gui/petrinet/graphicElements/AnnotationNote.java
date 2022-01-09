@@ -56,21 +56,21 @@ public class AnnotationNote extends Note {
         int popupIndex = 0;
         JPopupMenu popup = super.getPopup(e);
 
-        JMenuItem menuItem = new JMenuItem(new EditNoteAction((AnnotationNote) this));
+        JMenuItem menuItem = new JMenuItem(new EditNoteAction(this));
         menuItem.setText("Edit text");
         popup.insert(menuItem, popupIndex++);
 
-        menuItem = new JMenuItem(new EditAnnotationBorderAction((AnnotationNote) this));
-        if (((AnnotationNote) this).isShowingBorder()) {
+        menuItem = new JMenuItem(new EditAnnotationBorderAction(this));
+        if (this.isShowingBorder()) {
             menuItem.setText("Disable Border");
         } else {
             menuItem.setText("Enable Border");
         }
         popup.insert(menuItem, popupIndex++);
 
-        menuItem = new JMenuItem(new EditAnnotationBackgroundAction((AnnotationNote) this));
+        menuItem = new JMenuItem(new EditAnnotationBackgroundAction(this));
 
-        if (((AnnotationNote) this).isFilled()) {
+        if (this.isFilled()) {
             menuItem.setText("Transparent");
         } else {
             menuItem.setText("Solid Background");
@@ -333,7 +333,7 @@ public class AnnotationNote extends Note {
 		private Rectangle shape;
 		private boolean isPressed = false;
 		private final Note myNote;
-		public int typeMask;
+		public final int typeMask;
 
 		public ResizePoint(Note obj, int type) {
 			myNote = obj;

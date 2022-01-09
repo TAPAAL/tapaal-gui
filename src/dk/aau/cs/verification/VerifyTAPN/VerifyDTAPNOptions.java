@@ -19,8 +19,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	//only used for boundedness analysis
 	private boolean dontUseDeadPlaces = false;
 	private boolean useStubbornReduction = true;
-	private boolean partition;
-	private boolean colorFixpoint;
+	private final boolean partition;
+	private final boolean colorFixpoint;
     private final boolean unfold;
 
 	//Only used for boundedness analysis

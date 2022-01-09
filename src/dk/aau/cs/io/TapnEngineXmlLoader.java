@@ -185,7 +185,7 @@ public class TapnEngineXmlLoader {
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		//int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
 
-		if(name.toLowerCase().equals("true") || name.toLowerCase().equals("false")) {
+		if(name.equalsIgnoreCase("true") || name.equalsIgnoreCase("false")) {
 			name = "_" + name;
 			if(firstPlaceRenameWarning) {
 				messages.add(PLACENAME_ERROR_MESSAGE);
@@ -508,7 +508,7 @@ public class TapnEngineXmlLoader {
 			nameInput = idInput;
 		}
 
-		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
+		if(nameInput.equalsIgnoreCase("true") || nameInput.equalsIgnoreCase("false")) {
 			nameInput = "_" + nameInput;
 			if(firstPlaceRenameWarning) {
                 messages.add(PLACENAME_ERROR_MESSAGE);
@@ -572,7 +572,7 @@ public class TapnEngineXmlLoader {
         }
         Node hlInitialMarkingNode = place.getElementsByTagName("hlinitialMarking").item(0);
 
-        if (hlInitialMarkingNode != null && hlInitialMarkingNode instanceof Element) {
+        if (hlInitialMarkingNode instanceof Element) {
             try {
                 colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
             } catch (FormatException e) {

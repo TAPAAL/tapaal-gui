@@ -86,11 +86,11 @@ public abstract class Transition extends PlaceTransitionObject {
         JPopupMenu popup = super.getPopup(e);
 
         JMenuItem menuItem = new JMenuItem("Edit Transition");
-        menuItem.addActionListener(o -> ((Transition) this).showEditor());
+        menuItem.addActionListener(o -> this.showEditor());
         popup.insert(menuItem, index++);
 
-        menuItem = new JMenuItem(new ShowHideInfoAction((Transition) this));
-        if (((Transition) this).getAttributesVisible()) {
+        menuItem = new JMenuItem(new ShowHideInfoAction(this));
+        if (this.getAttributesVisible()) {
             menuItem.setText("Hide Transition Name");
         } else {
             menuItem.setText("Show Transition Name");

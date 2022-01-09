@@ -80,7 +80,7 @@ public class ManualDelayMode implements DelayMode{
 	}
 
 	private class ChooseDelayPanel extends JPanel{
-		private JSpinner spinner;
+		private final JSpinner spinner;
 
 		public ChooseDelayPanel(TimedTransition transition, 
 				TimeInterval dInterval, BigDecimal delayGranularity) {
@@ -211,7 +211,7 @@ public class ManualDelayMode implements DelayMode{
 		}
 		
 		private class CustomBigDecimal extends BigDecimal{
-			String stringRepres;
+			final String stringRepres;
 			
 			public CustomBigDecimal(String string) {
 				super(string.endsWith(".") && !string.matches(".*\\..*\\..*") ? 
@@ -225,7 +225,7 @@ public class ManualDelayMode implements DelayMode{
 		}
 
 		private class DelaySpinnerModel extends SpinnerNumberModel{
-			TimeInterval dInterval;
+			final TimeInterval dInterval;
 
 			public DelaySpinnerModel(Number value, Number stepSize, TimeInterval dInterval) {
 				super(value, null, null, stepSize);

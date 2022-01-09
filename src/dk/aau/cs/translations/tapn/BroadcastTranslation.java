@@ -60,9 +60,9 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	protected static final String LOCK_BOOL = "lock";
 
 	private final Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
-	protected Hashtable<TimedInputArc, String> inputArcsToCounters = new Hashtable<TimedInputArc, String>();
-	protected Hashtable<TimedInhibitorArc, String> inhibitorArcsToCounters = new Hashtable<TimedInhibitorArc, String>();
-	protected Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<TransportArc, String>();
+	protected final Hashtable<TimedInputArc, String> inputArcsToCounters = new Hashtable<>();
+	protected final Hashtable<TimedInhibitorArc, String> inhibitorArcsToCounters = new Hashtable<>();
+	protected final Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<>();
 
 	public BroadcastTranslation(boolean useSymmetry) {
 		this.useSymmetry = useSymmetry;

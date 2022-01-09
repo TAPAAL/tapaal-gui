@@ -1678,8 +1678,8 @@ public class BatchProcessingDialog extends JDialog {
 	
 	public class ReductionOptionChooser extends JPanel{
 
-		private JButton chooseReductionOptions;
-		ReductionOptionDialog reductionOptionDialog;
+		private final JButton chooseReductionOptions;
+		final ReductionOptionDialog reductionOptionDialog;
 		
 		private static final String STATUS_TEXT_USERDEF = "Overridden";
 		private static final String STATUS_TEXT_DONT_OVERRIDE = "From the query";

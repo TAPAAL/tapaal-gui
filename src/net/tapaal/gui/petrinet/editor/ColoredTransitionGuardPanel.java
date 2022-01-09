@@ -62,9 +62,9 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private final TimedTransitionComponent transition;
 
     private GuardExpression newProperty;
-    TAPNTransitionEditor parent;
-    ExpressionConstructionUndoManager undoManager;
-    UndoableEditSupport undoSupport;
+    final TAPNTransitionEditor parent;
+    final ExpressionConstructionUndoManager undoManager;
+    final UndoableEditSupport undoSupport;
 
     private ExprStringPosition currentSelection = null;
     public ColoredTransitionGuardPanel(TimedTransitionComponent transition, Context context, TAPNTransitionEditor parent){

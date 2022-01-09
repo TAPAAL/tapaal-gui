@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class UserSortExpression extends Expression {
 
-    private ColorType userSort;
+    private final ColorType userSort;
 
     public UserSortExpression(ColorType usersort) {
         this.userSort = usersort;
@@ -23,7 +23,7 @@ public class UserSortExpression extends Expression {
     @Override
     public Expression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (this == object1 && object2 instanceof Expression) {
-            Expression obj2 = (Expression)object2;
+            Expression obj2 = object2;
             obj2.setParent(parent);
             return obj2;
         }

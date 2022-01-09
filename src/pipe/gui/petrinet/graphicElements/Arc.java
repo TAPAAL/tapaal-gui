@@ -46,7 +46,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	}
 
 	// Bounds of arc need to be grown in order to avoid clipping problems
-	protected int zoomGrow = 10;
+	protected final int zoomGrow = 10;
 
 	private Arc(String idInput) {
 	    super(idInput, 0, 0, 0, 0);
@@ -96,7 +96,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
         popup.insert(new JPopupMenu.Separator(), popupIndex);
 
-        menuItem = new JMenuItem(new SplitArcAction((Arc) this, e.getPoint()));
+        menuItem = new JMenuItem(new SplitArcAction(this, e.getPoint()));
         menuItem.setText("Insert Point");
         popup.insert(menuItem, popupIndex++);
 
@@ -109,8 +109,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 
             pane.setText(
                 "(Debug) \n" +
-                    "  Source: " + ((Arc) this).getSource().getId() +"\n"+
-                    "  Target: " + ((Arc) this).getTarget().getId()
+                    "  Source: " + this.getSource().getId() +"\n"+
+                    "  Target: " + this.getTarget().getId()
             );
 
             popup.insert(pane, 1);

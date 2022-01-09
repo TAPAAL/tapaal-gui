@@ -371,9 +371,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
     class MouseHandler extends MouseInputAdapter {
 
-		private DrawingSurfaceImpl view;
-
-
+		private final DrawingSurfaceImpl view;
 
 		public MouseHandler(DrawingSurfaceImpl _view) {
 			super();

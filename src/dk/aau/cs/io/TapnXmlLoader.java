@@ -68,7 +68,7 @@ public class TapnXmlLoader {
 	private final IdResolver idResolver = new IdResolver();
     private final Collection<String> messages = new ArrayList<>(10);
     int groupPlaceHolder = 1;
-    private LoadTACPN loadTACPN = new LoadTACPN();
+    private final LoadTACPN loadTACPN = new LoadTACPN();
     boolean hasFeatureTag = false;
     private PetriNetTab.TAPNLens lens = PetriNetTab.TAPNLens.Default;
 
@@ -243,7 +243,7 @@ public class TapnXmlLoader {
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		//int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
 
-		if(name.toLowerCase().equals("true") || name.toLowerCase().equals("false")) {
+		if(name.equalsIgnoreCase("true") || name.equalsIgnoreCase("false")) {
 			name = "_" + name;
 			if(firstPlaceRenameWarning) {
 				messages.add(PLACENAME_ERROR_MESSAGE);
@@ -552,7 +552,7 @@ public class TapnXmlLoader {
 			nameInput = idInput;
 		}
 
-		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
+		if(nameInput.equalsIgnoreCase("true") || nameInput.equalsIgnoreCase("false")) {
 			nameInput = "_" + nameInput;
 			if(firstPlaceRenameWarning) {
                 messages.add(PLACENAME_ERROR_MESSAGE);
@@ -616,7 +616,7 @@ public class TapnXmlLoader {
         }
         Node hlInitialMarkingNode = place.getElementsByTagName("hlinitialMarking").item(0);
 
-        if (hlInitialMarkingNode != null && hlInitialMarkingNode instanceof Element) {
+        if (hlInitialMarkingNode instanceof Element) {
             try {
                 colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
             } catch (FormatException e) {

@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;

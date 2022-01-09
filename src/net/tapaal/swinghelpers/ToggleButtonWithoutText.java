@@ -1,7 +1,6 @@
 package net.tapaal.swinghelpers;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * A JToggleButton that without any text

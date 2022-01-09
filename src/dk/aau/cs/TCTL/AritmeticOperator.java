@@ -4,7 +4,7 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
 public class AritmeticOperator extends TCTLAbstractStateProperty {
 	
-	String operator;
+	final String operator;
 	
 	public AritmeticOperator(String operator) {
 		this.operator = operator;

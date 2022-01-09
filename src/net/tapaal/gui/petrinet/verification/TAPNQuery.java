@@ -48,7 +48,7 @@ public class TAPNQuery {
 	private boolean pTrie;
 	private boolean timeDart;
 	private boolean overApproximation;
-	private boolean isColored;
+	private final boolean isColored;
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;

@@ -31,8 +31,8 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 public class KBoundAnalyzer {
-	protected TimedArcPetriNetNetwork tapnNetwork;
-	protected int k;
+	protected final TimedArcPetriNetNetwork tapnNetwork;
+	protected final int k;
 
 	private final ModelChecker modelChecker;
 	private final Messenger messenger;

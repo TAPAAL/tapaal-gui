@@ -7,7 +7,7 @@ import javax.swing.JMenu
 fun noOp() {}
 object DEBUG {
 
-    @JvmStatic fun buildMenuDEBUG(): JMenu? {
+    @JvmStatic fun buildMenuDEBUG(): JMenu {
 
         val debugMenu = JMenu("DEBUG")
 

@@ -1,6 +1,5 @@
 package net.tapaal.swinghelpers;
 
-import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.text.NumberFormat;

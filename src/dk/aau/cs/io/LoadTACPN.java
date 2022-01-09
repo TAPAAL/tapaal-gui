@@ -1,10 +1,7 @@
 package dk.aau.cs.io;
 
 import dk.aau.cs.model.CPN.*;
-import dk.aau.cs.model.CPN.Color;
-import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.*;
-import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
@@ -13,8 +10,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.*;
-import java.util.HashMap;
-import java.util.Vector;
 
 public class LoadTACPN { //the import feature for CPN and load for TACPN share similarities. These similarities are shared here. Feel free to find a better name for this class
 

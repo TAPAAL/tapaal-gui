@@ -55,10 +55,10 @@ public class GuardDialogue extends JPanel
 	private JCheckBox weightUseConstant;
 	private WidthAdjustingComboBox<String> weightConstantsComboBox;
 	private ColoredArcGuardPanel coloredArcGuardPanel;
-    PetriNetObject objectToBeEdited;
-    Context context;
-    JPanel mainPanel;
-    JScrollPane scrollPane;
+    final PetriNetObject objectToBeEdited;
+    final Context context;
+    final JPanel mainPanel;
+    final JScrollPane scrollPane;
 	
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
 

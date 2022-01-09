@@ -12,7 +12,7 @@ public class StandardTranslationQueryVisitor extends QueryVisitor {
 
 	protected static final String TOKEN_TEMPLATE_NAME = "Token";
 
-	private int totalTokens;
+	private final int totalTokens;
 
 	public StandardTranslationQueryVisitor(int totalTokens) {
 		this.totalTokens = totalTokens;

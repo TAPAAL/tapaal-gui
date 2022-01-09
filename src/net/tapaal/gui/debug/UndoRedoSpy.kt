@@ -9,7 +9,7 @@ import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 
-class UndoRedoSpy() : JFrame() {
+class UndoRedoSpy : JFrame() {
 
     private val reloadBtn = JButton(object : AbstractAction("Reload") {
         override fun actionPerformed(e: ActionEvent?) {

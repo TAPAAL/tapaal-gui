@@ -19,7 +19,7 @@ import java.util.HashMap;
 public class RunKBoundAnalysis extends RunVerificationBase {
 
 	private final JSpinner spinner;
-    private boolean resultShown;
+    private final boolean resultShown;
 
 	public RunKBoundAnalysis(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, JSpinner spinner, boolean resultShown) {
 		super(modelChecker, messenger, null, "", false, spinner);

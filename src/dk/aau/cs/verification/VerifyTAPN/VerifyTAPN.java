@@ -36,7 +36,7 @@ public class VerifyTAPN implements ModelChecker {
 		+ "Verifytapn is a part of the TAPAAL distribution and it is\n"
 		+ "normally located in the directory lib.";
 
-    private static String VERIFYTAPN_VERSION_PATTERN = "^VerifyTAPN (\\d+\\.\\d+\\.\\d+)$";
+    private static final String VERIFYTAPN_VERSION_PATTERN = "^VerifyTAPN (\\d+\\.\\d+\\.\\d+)$";
 
 	private static String verifytapnpath = "";
 	

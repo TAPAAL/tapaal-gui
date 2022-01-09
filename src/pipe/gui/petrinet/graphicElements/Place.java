@@ -59,11 +59,11 @@ public abstract class Place extends PlaceTransitionObject {
         JPopupMenu popup = super.getPopup(e);
 
         JMenuItem menuItem = new JMenuItem("Edit Place");
-        menuItem.addActionListener(o -> ((Place) this).showEditor());
+        menuItem.addActionListener(o -> this.showEditor());
         popup.insert(menuItem, index++);
 
-        menuItem = new JMenuItem(new ShowHideInfoAction((Place) this));
-        if (((Place) this).getAttributesVisible()) {
+        menuItem = new JMenuItem(new ShowHideInfoAction(this));
+        if (this.getAttributesVisible()) {
             menuItem.setText("Hide Place Name");
         } else {
             menuItem.setText("Show Place Name");

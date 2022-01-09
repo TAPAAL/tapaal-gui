@@ -16,7 +16,7 @@ public abstract class ColorComboboxPanel extends JPanel {
     private JComboBox[] colorTypeComboBoxesArray;
     JScrollPane colorTypesScrollPane;
     JPanel comboBoxPanel;
-    boolean showAllElement;
+    final boolean showAllElement;
 
     public ColorComboboxPanel(ColorType colorType) {
         this(colorType,false);

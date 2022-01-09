@@ -8,7 +8,7 @@ import dk.aau.cs.TCTL.TCTLTransitionNode;
 import dk.aau.cs.util.Tuple;
 
 public class VerifyTransitionNamesVisitor extends VisitorBase {
-	private ArrayList<Tuple<String, String>> templateTransitionNames;
+	private final ArrayList<Tuple<String, String>> templateTransitionNames;
 
 	public VerifyTransitionNamesVisitor(ArrayList<Tuple<String, String>> templateTransitionNames) {
 		this.templateTransitionNames = templateTransitionNames;
@@ -34,7 +34,7 @@ public class VerifyTransitionNamesVisitor extends VisitorBase {
 	// / context class
 	public class Context {
 		private Boolean result;
-		private HashSet<String> incorrectTransitionNames;
+		private final HashSet<String> incorrectTransitionNames;
 
 		public Boolean getResult() {
 			return result;

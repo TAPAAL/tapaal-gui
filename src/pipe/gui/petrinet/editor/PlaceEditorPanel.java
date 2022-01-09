@@ -2,22 +2,8 @@ package pipe.gui.petrinet.editor;
 
 import net.tapaal.gui.petrinet.Context;
 //import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.util.*;
-
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JRootPane;
-import javax.swing.JSpinner;
 
 import net.tapaal.gui.petrinet.undo.*;
 import pipe.gui.petrinet.PetriNetTab;
@@ -58,17 +44,6 @@ import java.util.List;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.EAST;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
 
-import dk.aau.cs.model.tapn.Constant;
-import dk.aau.cs.model.tapn.ConstantBound;
-import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
-import dk.aau.cs.model.tapn.SharedPlace;
-import dk.aau.cs.model.tapn.TimeInvariant;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedOutputArc;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TransportArc;
 import pipe.gui.swingcomponents.EscapableDialog;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Fill.HORIZONTAL;

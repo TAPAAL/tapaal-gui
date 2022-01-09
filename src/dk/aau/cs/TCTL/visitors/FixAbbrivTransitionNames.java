@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class FixAbbrivTransitionNames extends VisitorBase {
 
-        private ArrayList<Tuple<String, String>> templateTransitionNames;
+        private final ArrayList<Tuple<String, String>> templateTransitionNames;
 
         public FixAbbrivTransitionNames(ArrayList<Tuple<String, String>> templateTransitionNames) {
                 this.templateTransitionNames = templateTransitionNames;

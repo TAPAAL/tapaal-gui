@@ -17,9 +17,9 @@ import dk.aau.cs.model.tapn.TransportArc;
 
 public class AnimationTokenSelectDialog extends JPanel {
 
-	TimedTransition transition = null;
+	TimedTransition transition;
 
-	public ArrayList<ArcTokenSelector> arcTokenSelectors = new ArrayList<ArcTokenSelector>();
+	public final ArrayList<ArcTokenSelector> arcTokenSelectors = new ArrayList<>();
 
 	private final JPanel namePanel;
 

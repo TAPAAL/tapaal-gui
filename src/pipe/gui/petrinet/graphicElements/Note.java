@@ -19,9 +19,9 @@ import net.tapaal.gui.petrinet.undo.Command;
 
 public abstract class Note extends PetriNetObject {
 
-	protected JTextArea note = new JTextArea();
+	protected final JTextArea note = new JTextArea();
 	protected boolean drawBorder = true;
-	protected RectangularShape noteRect = new Rectangle();
+	protected final RectangularShape noteRect = new Rectangle();
 
 	public Note(int x, int y) {
 		super("", x, y);

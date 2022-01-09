@@ -37,7 +37,7 @@ public class ArcPath implements Shape {
 	private int transitionAngle;
 	private final static boolean showDebugCurvedControlPoints = false;
 
-	public Point2D.Double midPoint = new Point2D.Double();
+	public final Point2D.Double midPoint = new Point2D.Double();
 
 	private ArcPath(Arc a, int transitionAngle) {
 		super();
@@ -647,7 +647,7 @@ public class ArcPath implements Shape {
 
 class Cubic {
 
-	double a, b, c, d; /* a + b*u + c*u^2 + d*u^3 */
+	final double a, b, c, d; /* a + b*u + c*u^2 + d*u^3 */
 
 	public Cubic(double _a, double _b, double _c, double _d) {
 		a = _a;

@@ -21,30 +21,30 @@ import pipe.gui.petrinet.undo.DeleteArcPathPointEditCommand;
 import pipe.gui.petrinet.undo.TransitionRotationEditCommand;
 
 public class SmartDrawWorker extends SwingWorker<Void, Void>{
-	List<SmartDrawListener> listeners = new ArrayList<SmartDrawListener>();
+	final List<SmartDrawListener> listeners = new ArrayList<SmartDrawListener>();
 	PlaceTransitionObject startingObject;
-	int xSpacing;
-	int ySpacing;
-	DrawingSurfaceImpl drawingSurface;
-	String searchOption;
+	final int xSpacing;
+	final int ySpacing;
+	final DrawingSurfaceImpl drawingSurface;
+	final String searchOption;
 	Point rootPoint;
 	Point rightMostPointUsed = new Point(0, 0);
 
     ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
-	ArrayList<Point> pointsReserved = new ArrayList<Point>();
-	UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
+	final ArrayList<Point> pointsReserved = new ArrayList<Point>();
+	final UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
 	
 	//weights
-	int diagonalWeight;
-	int straightWeight;
-	int distanceWeight;
-	int overlappingArcWeight;
-	int minimumIterations;
+    final int diagonalWeight;
+	final int straightWeight;
+	final int distanceWeight;
+	final int overlappingArcWeight;
+	final int minimumIterations;
 
 	
 	//For BFS
-	ArrayList<PlaceTransitionObject> newlyPlacedObjects = new ArrayList<PlaceTransitionObject>();
+    final ArrayList<PlaceTransitionObject> newlyPlacedObjects = new ArrayList<PlaceTransitionObject>();
 
 	//For DFS
 	ArrayList<PlaceTransitionObject> unfinishedObjects = new ArrayList<PlaceTransitionObject>();

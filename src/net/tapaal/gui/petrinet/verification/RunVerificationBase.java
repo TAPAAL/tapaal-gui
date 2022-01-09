@@ -36,7 +36,7 @@ import pipe.gui.MessengerImpl;
 
 public abstract class RunVerificationBase extends SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 
-	protected ModelChecker modelChecker;
+	protected final ModelChecker modelChecker;
 
 	protected VerificationOptions options;
 	protected TimedArcPetriNetNetwork model;
@@ -45,11 +45,11 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected TAPNQuery clonedQuery;
 	protected net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery;
     protected HashMap<TimedArcPetriNet, DataLayer> guiModels;
-	protected String reducedNetFilePath;
-	protected boolean reduceNetOnly;
+	protected final String reducedNetFilePath;
+	protected final boolean reduceNetOnly;
 	protected boolean reducedNetOpened = false;
-	protected JSpinner spinner;
-	protected Messenger messenger;
+	protected final JSpinner spinner;
+	protected final Messenger messenger;
 
     public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, String reducedNetFilePath, boolean reduceNetOnly, JSpinner spinner) {
 		super();

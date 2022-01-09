@@ -135,26 +135,16 @@ public class QueryPane extends JPanel implements SidePane {
 		this.setToolTipText("List of verification queries (double click to edit)");
 
 		this.addComponentListener(new ComponentListener() {
-			int minimumHegiht = QueryPane.this.getMinimumSize().height;
-			public void componentShown(ComponentEvent e) {
-			}
+			final int minimumHegiht = QueryPane.this.getMinimumSize().height;
+			public void componentShown(ComponentEvent e) {}
 
-			
 			public void componentResized(ComponentEvent e) {
-				if(QueryPane.this.getSize().height <= minimumHegiht){
-					sortButton.setVisible(false);
-				} else {
-					sortButton.setVisible(true);
-				}
+                sortButton.setVisible(QueryPane.this.getSize().height > minimumHegiht);
 			}
 
-			
-			public void componentMoved(ComponentEvent e) {
-			}
+			public void componentMoved(ComponentEvent e) {}
 
-			
-			public void componentHidden(ComponentEvent e) {
-			}
+			public void componentHidden(ComponentEvent e) {}
 		});
 
 		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));

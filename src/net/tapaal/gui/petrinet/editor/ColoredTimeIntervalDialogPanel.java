@@ -31,7 +31,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
     JComboBox leftConstantsComboBox;
     JComboBox rightConstantsComboBox;
     JCheckBox rightUseConstant;
-    int maxNumberOfPlacesToShowAtOnce = 20;
+    final int maxNumberOfPlacesToShowAtOnce = 20;
 
     public ColoredTimeIntervalDialogPanel(ColoredTimeInterval cti) {
         this.coloredTimeInterval = cti;

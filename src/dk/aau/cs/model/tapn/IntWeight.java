@@ -2,7 +2,7 @@ package dk.aau.cs.model.tapn;
 
 public class IntWeight extends Weight{
 
-	int value;
+	final int value;
 	
 	public IntWeight(int value) {
 		this.value = value;

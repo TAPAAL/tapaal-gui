@@ -12,7 +12,7 @@ import org.w3c.dom.DOMException;
 public interface NetWriter {
 	void savePNML(File file) throws NullPointerException, IOException,
 			ParserConfigurationException, DOMException,
-			TransformerConfigurationException, TransformerException;
+        TransformerException;
 
-	ByteArrayOutputStream savePNML() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException;
+	ByteArrayOutputStream savePNML() throws IOException, ParserConfigurationException, DOMException, TransformerException;
 }

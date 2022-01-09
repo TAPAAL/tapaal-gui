@@ -20,7 +20,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	private InclusionPlaces inclusionPlaces;
 	
 	//only used for boundedness analysis
-	private boolean dontUseDeadPlaces = false;
+	private final boolean dontUseDeadPlaces = false;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();

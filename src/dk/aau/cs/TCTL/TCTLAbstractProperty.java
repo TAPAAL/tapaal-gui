@@ -2,8 +2,6 @@ package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
-import java.util.Locale;
-
 public abstract class TCTLAbstractProperty {
 
 	// used to determine whether to put parenthesis around the property

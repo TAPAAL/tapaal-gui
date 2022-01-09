@@ -10,7 +10,7 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
 
 
     /* Name Label for displaying name */
-    protected NameLabel pnName = new NameLabel();
+    protected final NameLabel pnName = new NameLabel();
     /** X/Y-axis Position on screen */
     private int nameOffsetX;
     private int nameOffsetY;

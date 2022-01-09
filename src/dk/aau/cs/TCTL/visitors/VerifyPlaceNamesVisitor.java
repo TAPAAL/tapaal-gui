@@ -9,7 +9,7 @@ import dk.aau.cs.util.Tuple;
 
 public class VerifyPlaceNamesVisitor extends VisitorBase {
 
-	private ArrayList<Tuple<String, String>> templatePlaceNames;
+	private final ArrayList<Tuple<String, String>> templatePlaceNames;
 
 	public VerifyPlaceNamesVisitor(ArrayList<Tuple<String, String>> templatePlaceNames) {
 		this.templatePlaceNames = templatePlaceNames;
@@ -35,7 +35,7 @@ public class VerifyPlaceNamesVisitor extends VisitorBase {
 	// / context class
 	public class Context {
 		private Boolean result;
-		private HashSet<String> incorrectPlaceNames;
+		private final HashSet<String> incorrectPlaceNames;
 
 		public Boolean getResult() {
 			return result;

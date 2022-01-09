@@ -37,7 +37,7 @@ public class StatisticsPanel extends JPanel{
     private static final String REMOVE_ORPHAN_PLACES_TOOL_TIP = "<html>Remove all orphan places<br /> (transitions with no arcs attached)<br /> in all components</html>";
     private static final String DIALOG_TITLE = "Statistics";
 	
-	String[] headLines = {"", "Shown component", "Active components", "All components"};
+	final String[] headLines = {"", "Shown component", "Active components", "All components"};
 	
 	private static JDialog dialog;
 	private Object[][] contents;

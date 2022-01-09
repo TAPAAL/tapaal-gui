@@ -89,7 +89,7 @@ public class QueryDialog extends JPanel {
 
 	private boolean querySaved = false;
 
-	private JRootPane rootPane;
+	private final JRootPane rootPane;
 	private static EscapableDialog guiDialog;
 
 	// Query Name Panel;
@@ -220,11 +220,11 @@ public class QueryDialog extends JPanel {
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
-	private boolean isNetDegree2;
-	private int highestNetDegree;
-	private boolean hasInhibitorArcs;
+	private final boolean isNetDegree2;
+	private final int highestNetDegree;
+	private final boolean hasInhibitorArcs;
 	private InclusionPlaces inclusionPlaces;
-	private PetriNetTab.TAPNLens lens;
+	private final PetriNetTab.TAPNLens lens;
 
 	private static final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
 	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
@@ -1532,39 +1532,37 @@ public class QueryDialog extends JPanel {
 
 			private String getHelpMessage(){
 				// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
-				StringBuilder buffer = new StringBuilder();
-				buffer.append("<html>");
-				buffer.append("<b>Boundedness Options</b><br/>");
-				buffer.append("The query dialog allows you to specify the extra number of tokens that TAPAAL is allowed to use during the verification. ");
-				buffer.append("Because TAPAAL models can produce additional tokens by firing transitions (e.g. a transition that has a single input place ");
-				buffer.append("and two output places) you may need to use additional tokens compared to those that are already in the net. By ");
-				buffer.append("specifying an extra number of tokens you can ask TAPAAL to check if your net is bounded for this number of extra tokens (i.e. ");
-				buffer.append("whether there is no reachable marking in the net that would exceed the predefined number of tokens. ");
-				buffer.append("<br/><br/>");
-				buffer.append("<b>Search Strategy Options</b><br/>");
-				buffer.append("A search strategy determines how the chosen verification engine performs the search. The possible search strategies are: ");
-				buffer.append("<ul>");
-				buffer.append("<li>Heuristic Search<br/> If available, the search is guided according to the query so that the most likely places where the query is satisfied are visited first. If discrete inclusion optimization is not enabled or the heuristic search is not available, this strategy performs a breadth first search. ");
-				buffer.append("If discrete inclusion is enabled, the search attempts to maximize the number of tokens in places where the engine checks for discrete inclusion.</li>");
-				buffer.append("<li>Breadth First Search<br/>Explores markings in a breadth first manner.</li>");
-				buffer.append("<li>Depth First Search<br/>Explores markings in a depth first manner.</li>");
-				buffer.append("<li>Random Search<br/>Performs a random exploration of the state space.</li>");
-				buffer.append("</ul>");
-				buffer.append("<br/>");
-				buffer.append("<b>Verification Options</b><br/>");
-				buffer.append("TAPAAL supports verification via its own included engines verifytapn and verifydtapn or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation). If you work with an untimed net, we recommend that you use the CTL query creation dialog and use the untimed verifypn engine.");
-				buffer.append("The TAPAAL engine verifytapn supports also the discrete inclusion optimization. ");
-				buffer.append("On some models this technique gives a considerable speedup. ");
-				buffer.append("The user selected set of places that are considered for the discrete inclusion can further finetune the performance of the engine. Try to include places where you expect to see many tokens during the execution. ");
-				buffer.append("The discrete verification engine verifydtapn performs a point-wise exploration of the state space but can be used only for models that do not contain strict intervals as in this situation it is guaranteed to give the same answers as the continuous time engine verifytapn. This discrete engine has options to handle delays in semi-symbolic way (time darts) recommended for models with larger constants and it has a memory optimization option feature (PTrie) that preserves lots of memory at the expense of a slightly longer verification time.");
-				buffer.append("The different UPPAAL verification methods perform reductions to networks of timed automata. The broadcast reductions supports ");
-				buffer.append("all query types, while standard and optimized standard support only EF and AG queries but can be sometimes faster.");
-				buffer.append("<br/>");
-				buffer.append("<b>Approximation Options</b><br/>");
-				buffer.append("TAPAAL allows to approximate the time intervals on edges by deviding them by the given approximation constant and either enlarging the resulting intervals (over-approximation) or shrinking them (under-approximation). The larger the constant is, the faster is the verification but the more often the user can get an inconclusive answer.");
-				buffer.append("<br/>");
-				buffer.append("</html>");
-				return buffer.toString();
+                return "<html>" +
+                    "<b>Boundedness Options</b><br/>" +
+                    "The query dialog allows you to specify the extra number of tokens that TAPAAL is allowed to use during the verification. " +
+                    "Because TAPAAL models can produce additional tokens by firing transitions (e.g. a transition that has a single input place " +
+                    "and two output places) you may need to use additional tokens compared to those that are already in the net. By " +
+                    "specifying an extra number of tokens you can ask TAPAAL to check if your net is bounded for this number of extra tokens (i.e. " +
+                    "whether there is no reachable marking in the net that would exceed the predefined number of tokens. " +
+                    "<br/><br/>" +
+                    "<b>Search Strategy Options</b><br/>" +
+                    "A search strategy determines how the chosen verification engine performs the search. The possible search strategies are: " +
+                    "<ul>" +
+                    "<li>Heuristic Search<br/> If available, the search is guided according to the query so that the most likely places where the query is satisfied are visited first. If discrete inclusion optimization is not enabled or the heuristic search is not available, this strategy performs a breadth first search. " +
+                    "If discrete inclusion is enabled, the search attempts to maximize the number of tokens in places where the engine checks for discrete inclusion.</li>" +
+                    "<li>Breadth First Search<br/>Explores markings in a breadth first manner.</li>" +
+                    "<li>Depth First Search<br/>Explores markings in a depth first manner.</li>" +
+                    "<li>Random Search<br/>Performs a random exploration of the state space.</li>" +
+                    "</ul>" +
+                    "<br/>" +
+                    "<b>Verification Options</b><br/>" +
+                    "TAPAAL supports verification via its own included engines verifytapn and verifydtapn or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation). If you work with an untimed net, we recommend that you use the CTL query creation dialog and use the untimed verifypn engine." +
+                    "The TAPAAL engine verifytapn supports also the discrete inclusion optimization. " +
+                    "On some models this technique gives a considerable speedup. " +
+                    "The user selected set of places that are considered for the discrete inclusion can further finetune the performance of the engine. Try to include places where you expect to see many tokens during the execution. " +
+                    "The discrete verification engine verifydtapn performs a point-wise exploration of the state space but can be used only for models that do not contain strict intervals as in this situation it is guaranteed to give the same answers as the continuous time engine verifytapn. This discrete engine has options to handle delays in semi-symbolic way (time darts) recommended for models with larger constants and it has a memory optimization option feature (PTrie) that preserves lots of memory at the expense of a slightly longer verification time." +
+                    "The different UPPAAL verification methods perform reductions to networks of timed automata. The broadcast reductions supports " +
+                    "all query types, while standard and optimized standard support only EF and AG queries but can be sometimes faster." +
+                    "<br/>" +
+                    "<b>Approximation Options</b><br/>" +
+                    "TAPAAL allows to approximate the time intervals on edges by deviding them by the given approximation constant and either enlarging the resulting intervals (over-approximation) or shrinking them (under-approximation). The larger the constant is, the faster is the verification but the more often the user can get an inconclusive answer." +
+                    "<br/>" +
+                    "</html>";
 			}
 		});
 		JPanel topButtonPanel = new JPanel(new FlowLayout());
@@ -4028,8 +4026,8 @@ public class QueryDialog extends JPanel {
 	}
 
 	public class QueryConstructionEdit extends AbstractUndoableEdit {
-		private TCTLAbstractProperty original;
-		private TCTLAbstractProperty replacement;
+		private final TCTLAbstractProperty original;
+		private final TCTLAbstractProperty replacement;
 
 		public TCTLAbstractProperty getOriginal() {
 			return original;

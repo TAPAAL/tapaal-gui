@@ -6,7 +6,6 @@ import dk.aau.cs.debug.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -17,7 +16,7 @@ import java.util.regex.Pattern;
 public class MemoryMonitor {
 
 	private static long PID = -1;
-	private static Semaphore busy = new Semaphore(1);
+	private static final Semaphore busy = new Semaphore(1);
 	private static double peakMemory = -1;
 	private static Boolean cumulativePeakMemory = false;
 	private static DecimalFormat formatter = null;

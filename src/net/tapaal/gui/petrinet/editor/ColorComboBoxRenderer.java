@@ -5,9 +5,8 @@ import dk.aau.cs.model.CPN.Variable;
 import javax.swing.*;
 import java.awt.*;
 
-public class ColorComboBoxRenderer extends JLabel
-    implements ListCellRenderer {
-    JComboBox comboBox;
+public class ColorComboBoxRenderer extends JLabel implements ListCellRenderer {
+    final JComboBox comboBox;
     public ColorComboBoxRenderer(JComboBox comboBox) {
         this.comboBox = comboBox;
     }

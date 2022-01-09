@@ -44,15 +44,15 @@ import static net.tapaal.gui.petrinet.TabTransformer.mapQueryToNewNames;
 
 public class UnfoldNet extends SwingWorker<String, Void> {
 
-    protected ModelChecker modelChecker;
-    protected HashMap<TimedArcPetriNet, DataLayer> guiModels;
-    protected Messenger messenger;
+    protected final ModelChecker modelChecker;
+    protected final HashMap<TimedArcPetriNet, DataLayer> guiModels;
+    protected final Messenger messenger;
     protected TimedArcPetriNetNetwork model;
     protected Iterable<TAPNQuery> queries;
     protected PetriNetTab oldTab;
-    protected boolean partition;
-    protected boolean computeColorFixpoint;
-    protected boolean symmetricVars;
+    protected final boolean partition;
+    protected final boolean computeColorFixpoint;
+    protected final boolean symmetricVars;
 
     //if the unfolded net is too big, do not try to load it
     private final int maxNetSize = 4000;

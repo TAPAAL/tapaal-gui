@@ -11,8 +11,8 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 	protected static final String LOCK_BOOL = "lock";
 
 	protected static final String TOKEN_TEMPLATE_NAME = "Token";
-	private boolean useSymmetry;
-	private int totalTokens;
+	private final boolean useSymmetry;
+	private final int totalTokens;
 
 	public OptimizedStandardTranslationQueryVisitor(int totalTokens, boolean useSymmetry) {
 		this.useSymmetry = useSymmetry;

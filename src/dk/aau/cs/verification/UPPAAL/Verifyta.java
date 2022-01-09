@@ -33,7 +33,7 @@ public class Verifyta implements ModelChecker {
 			+ "normally located in uppaal/bin-Linux or uppaal/bin-Win32,\n"
 			+ "depending on the operating system used.";
 
-    private static String VERIFYTA_VERSION_PATTERN = "(\\d+\\.\\d+\\.\\d+)";
+    private static final String VERIFYTA_VERSION_PATTERN = "(\\d+\\.\\d+\\.\\d+)";
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 

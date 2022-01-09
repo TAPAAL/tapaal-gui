@@ -205,7 +205,7 @@ public class WorkflowDialog extends JDialog {
 
 	private static final int maxStringLength = LABEL_UNUSED_TRANSITIONS.length();
 
-	private TimedArcPetriNetNetwork model;
+	private final TimedArcPetriNetNetwork model;
 
 	private boolean isInTraceMode = false;
 

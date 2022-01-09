@@ -30,7 +30,7 @@ public class RunningVerificationDialog extends JDialog {
 	JLabel resourcesLabel;
 	JLabel usageLabel;
 	private Timer timer;
-	private String processName;
+	private final String processName;
 	
 	private int memoryTimerCount = 0;
 	private int memoryTimerMode = 0;

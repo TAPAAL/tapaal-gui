@@ -56,7 +56,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private final Iterable<TAPNQuery> queries;
 	private final Iterable<Constant> constants;
 	private final TimedArcPetriNetNetwork network;
-    private writeTACPN writeTACPN;
+    private final writeTACPN writeTACPN;
     private boolean secondTransport = false;
     private int transporCountID = 0;
     private final PetriNetTab.TAPNLens lens;
@@ -90,7 +90,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         this.lens = lens;
     }
 	
-	public ByteArrayOutputStream savePNML() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
+	public ByteArrayOutputStream savePNML() throws ParserConfigurationException, DOMException, TransformerException {
 		Document document = null;
 		Transformer transformer = null;
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -129,7 +129,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		return os;
 	}
 
-	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
+	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerException {
 		Require.that(file != null, "Error: file to save to was null");
 		
 		try {

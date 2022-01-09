@@ -218,7 +218,7 @@ public class ConstantStore {
 	}
 
 	private boolean isNameInf(String name) {
-		return name.toLowerCase().equals("inf");
+		return name.equalsIgnoreCase("inf");
 	}
 
 	public Command updateConstant(String oldName, Constant updatedConstant,	TimedArcPetriNetNetwork model) {
