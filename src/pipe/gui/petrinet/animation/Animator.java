@@ -711,9 +711,4 @@ public class Animator {
             }
         }
     }
-
-    public PetriNetTab getTab(){
-        return tab;
-    }
-
 }

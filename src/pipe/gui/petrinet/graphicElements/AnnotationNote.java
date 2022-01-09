@@ -318,7 +318,7 @@ public class AnnotationNote extends Note {
 	public void zoomUpdate(int percent) {
 		super.zoomUpdate(percent);
 		for (ResizePoint p : dragPoints.values()) {
-			p.setZoom(percent);
+			p.setZoom();
 		}
 	}
 
@@ -392,7 +392,7 @@ public class AnnotationNote extends Note {
 		}
 
 		// Change ResizePoint's size a little bit acording to the zoom percent
-		private void setZoom(int percent) {
+		private void setZoom() {
 			if (getZoom() >= 220) {
 				SIZE = 5;
 			} else if (getZoom() >= 120) {

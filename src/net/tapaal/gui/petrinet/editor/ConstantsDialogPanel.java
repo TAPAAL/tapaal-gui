@@ -32,8 +32,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private EscapableDialog dialog;
 
     JTextField nameTextField;
-	Dimension size;
-	JLabel nameLabel;
+    JLabel nameLabel;
     JLabel valueLabel;
 	CustomJSpinner valueSpinner;
 	JPanel container;
@@ -43,11 +42,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 
 	private final String oldName;
 
-    public ConstantsDialogPanel(TimedArcPetriNetNetwork model) {
-		this(model, null);
-	}
-
-	public ConstantsDialogPanel(TimedArcPetriNetNetwork model, Constant constant) {
+    public ConstantsDialogPanel(TimedArcPetriNetNetwork model, Constant constant) {
         this.model = model;
 
         if (constant != null) {

@@ -50,8 +50,8 @@ public class BoundednessAnalysisResult {
 		return totalTokens - extraTokens;
 	}
         
-        public boolean isUPPAAL() {
-            return isUPPAAL;
-        }
+    public boolean isUPPAAL() {
+        return isUPPAAL;
+    }
 	
 }

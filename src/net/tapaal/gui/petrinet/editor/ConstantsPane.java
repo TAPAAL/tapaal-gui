@@ -664,10 +664,9 @@ public class ConstantsPane extends JPanel implements SidePane {
         ColorTypeDialogPanel panel;
         UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
         if (colorType != null) {
-            panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network(), colorType, undoManager);
-        }
-        else {
-            panel = new ColorTypeDialogPanel(new JRootPane(), colorTypesListModel, parent.network(), undoManager);
+            panel = new ColorTypeDialogPanel(colorTypesListModel, parent.network(), colorType, undoManager);
+        } else {
+            panel = new ColorTypeDialogPanel(colorTypesListModel, parent.network(), undoManager);
         }
         panel.showDialog();
     }
@@ -866,10 +865,6 @@ public class ConstantsPane extends JPanel implements SidePane {
             ColorType[] oldOrder = network.sortColorTypes();
             fireContentsChanged(this, 0, getSize());
             return oldOrder;
-        }
-
-        public void undoSort(ColorType[] oldOrder) {
-            network.undoSort(oldOrder);
         }
 
         public int getSize() {

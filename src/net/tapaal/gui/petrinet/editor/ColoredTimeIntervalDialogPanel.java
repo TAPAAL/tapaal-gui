@@ -18,9 +18,7 @@ import java.util.*;
 
 public class ColoredTimeIntervalDialogPanel extends JPanel {
 
-    Context context;
     ColoredTimeInterval coloredTimeInterval;
-    JRootPane rootPane;
 
     JPanel guardEditPanel;
     JLabel label;
@@ -35,10 +33,8 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
     JCheckBox rightUseConstant;
     int maxNumberOfPlacesToShowAtOnce = 20;
 
-    public ColoredTimeIntervalDialogPanel(JRootPane rootPane, Context context, ColoredTimeInterval cti) {
-        this.context = context;
+    public ColoredTimeIntervalDialogPanel(ColoredTimeInterval cti) {
         this.coloredTimeInterval = cti;
-        this.rootPane = rootPane;
         initPanel();
 
         setTimeInterval(cti);

@@ -252,7 +252,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        intervalEditorPanel = new ColoredTimeIntervalDialogPanel(getRootPane(),context, cti);
+        intervalEditorPanel = new ColoredTimeIntervalDialogPanel(cti);
         colorIntervalEditPanel.add(intervalEditorPanel, gbc);
 
         gbc = new GridBagConstraints();
@@ -550,14 +550,14 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         numberExprPanel.setBorder(BorderFactory.createTitledBorder("Numerical Expressions"));
 
         if(isTransportArc) {
-            colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, false, context) {
+            colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, false) {
                 @Override
                 public void changedColor(JComboBox[] comboBoxes) {
 
                 }
             };
         } else {
-            colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, true, context) {
+            colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, true) {
                 @Override
                 public void changedColor(JComboBox[] comboBoxes) {
 

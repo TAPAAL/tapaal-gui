@@ -10,14 +10,6 @@ public class ColorMultiset implements Map<Color, Integer> {
     private final HashMap<Color, Integer> map = new HashMap<>();
     private final ColorType colorType;
 
-    public ColorMultiset(ColorType colorType) {
-        this(colorType, 0, colorType);
-    }
-
-    public ColorMultiset(ColorType colorType, int numberOf) {
-        this(colorType, numberOf, colorType);
-    }
-
     public ColorMultiset(ColorType colorType, int numberOf, Iterable<Color> colors) {
         this.colorType = colorType;
         if (numberOf > 0) {
@@ -109,10 +101,6 @@ public class ColorMultiset implements Map<Color, Integer> {
         return map.entrySet();
     }
 
-    public ColorType getColorType() {
-        return colorType;
-    }
-
     public void add(Color color, int count) {
         Integer result = get(color) + count;
         put(color, result);
@@ -141,14 +129,6 @@ public class ColorMultiset implements Map<Color, Integer> {
             Integer result = get(color) * scalar;
             put(color, result);
         }
-    }
-
-    public int cardinality() {
-        int result = 0;
-        for (int count : values()) {
-            result += count;
-        }
-        return result;
     }
 
     public Vector<TimedToken> getTokens(TimedPlace place) {

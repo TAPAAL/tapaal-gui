@@ -147,7 +147,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         }
 
         colorLabel = new JLabel("Color: ");
-        colorCombobox = new ColorComboboxPanel((ColorType)colorTypeCombobox.getSelectedItem(),false,context) {
+        colorCombobox = new ColorComboboxPanel((ColorType)colorTypeCombobox.getSelectedItem(),false) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
 
@@ -806,22 +806,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 undoSupport.postEdit(edit);
             }
         }
-    }
-
-    private GuardExpression getSpecificChildOfProperty(int number, Expression property) {
-        ExprStringPosition[] children = property.getChildren();
-        int count = 0;
-        for (ExprStringPosition exprStringPosition : children) {
-            Expression child = exprStringPosition.getObject();
-            if (child instanceof GuardExpression) {
-                count++;
-            }
-            if (count == number) {
-                return (GuardExpression) child;
-            }
-        }
-
-        return new PlaceHolderGuardExpression();
     }
 
     private void returnFromManualEdit(GuardExpression newExpr) {

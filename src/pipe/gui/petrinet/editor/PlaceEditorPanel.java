@@ -786,7 +786,7 @@ public class PlaceEditorPanel extends JPanel {
         tokenPanel.setLayout(new GridBagLayout());
         tokenPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Tokens"));
 
-        tokenColorComboboxPanel = new ColorComboboxPanel(colorType,true, null) {
+        tokenColorComboboxPanel = new ColorComboboxPanel(colorType,true) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
                 updateSpinnerValue(true);
@@ -1066,13 +1066,7 @@ public class PlaceEditorPanel extends JPanel {
         } else{
             cti = place.underlyingPlace().getCtiList().get(0);
         }
-        invariantEditorPanel = new ColoredTimeInvariantDialogPanel(rootPane,context,
-            cti, place) {
-            @Override
-            public void placeHolder() {
-
-            }
-        };
+        invariantEditorPanel = new ColoredTimeInvariantDialogPanel(rootPane,context, cti, place);
         colorInvariantEditPanel.add(invariantEditorPanel,gbc);
 
         gbc=new GridBagConstraints();

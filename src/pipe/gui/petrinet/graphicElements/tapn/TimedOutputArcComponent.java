@@ -26,7 +26,7 @@ public class TimedOutputArcComponent extends Arc {
 	private dk.aau.cs.model.tapn.TimedOutputArc outputArc;
 
 	public TimedOutputArcComponent(PlaceTransitionObject sourceInput, PlaceTransitionObject targetInput, int weightInput, String idInput) {
-		super(sourceInput, targetInput, weightInput, idInput);
+		super(sourceInput, targetInput, idInput);
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class TimedOutputArcComponent extends Arc {
 
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
 
-		super(arc.getSource(), arc.getTarget(), 0, null);
+		super(arc.getSource(), arc.getTarget(), null);
 
 		myPath = new ArcPath(this, arc.myPath);
 

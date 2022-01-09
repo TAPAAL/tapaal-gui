@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
-public abstract class ColoredTimeInvariantDialogPanel extends JPanel {
+public class ColoredTimeInvariantDialogPanel extends JPanel {
 
     private JComboBox invRelationNormal;
     private JComboBox invRelationConstant;
@@ -253,8 +253,6 @@ public abstract class ColoredTimeInvariantDialogPanel extends JPanel {
         gridBagConstraints.gridy = 0;
         add(timeInvariantPanel, gridBagConstraints);
     }
-
-    public abstract void placeHolder();
 
     public ColoredTimeInvariant getInvariant(){
         ColoredTimeInvariant cti;

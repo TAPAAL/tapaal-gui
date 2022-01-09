@@ -24,12 +24,6 @@ public class NumberOfExpression extends ArcExpression {
         this.color = color;
     }
 
-    public NumberOfExpression(NumberOfExpression otherExpr){
-        super(otherExpr);
-        this.number = otherExpr.number;
-        this.color = new Vector<>(otherExpr.color);
-    }
-
     public Integer getNumber() {return number;}
     public Vector<ColorExpression> getColor() {return color;}
 

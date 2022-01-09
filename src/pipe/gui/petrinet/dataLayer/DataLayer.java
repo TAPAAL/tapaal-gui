@@ -39,9 +39,7 @@ public class DataLayer {
 		}
 	}
 
-	/** PNML File Name */
-	public String pnmlName = null;
-	/** List containing all the Place objects in the Petri-Net */
+    /** List containing all the Place objects in the Petri-Net */
 	private final ArrayList<Place> placesArray = new ArrayList<Place>();
 	/** ArrayList containing all the Transition objects in the Petri-Net */
 	private final ArrayList<Transition> transitionsArray = new ArrayList<Transition>();
@@ -244,12 +242,7 @@ public class DataLayer {
 
     }
 
-	private void addTransportArc(TimedTransportArcComponent transportArc) {
-		arcsArray.add(transportArc);
-		addArcToArcsMap(transportArc);
-	}
-
-	private void addArc(TimedInhibitorArcComponent inhibitorArcInput) {
+    private void addArc(TimedInhibitorArcComponent inhibitorArcInput) {
 		boolean unique = true;
 
 		if (inhibitorArcInput != null) {

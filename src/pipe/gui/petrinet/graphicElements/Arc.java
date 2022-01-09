@@ -59,9 +59,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * 
 	 */
 	public Arc(
-	    PlaceTransitionObject sourceInput,
+        PlaceTransitionObject sourceInput,
         PlaceTransitionObject targetInput,
-        int weightInput,
         String idInput
     ) {
 		this(idInput);

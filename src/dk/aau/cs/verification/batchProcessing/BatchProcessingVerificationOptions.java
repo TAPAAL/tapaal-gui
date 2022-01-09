@@ -57,13 +57,8 @@ public class BatchProcessingVerificationOptions {
 		this.approximationMethodOption = approximationMethodOption;
 		this.approximationDenominator = approximationDenominator;
 	}
-	
-	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, StubbornReductionOption stubbornReductionOption, ReductionOption reductionOption, boolean discreteInclusion,
-			boolean useTimeDartPTrie, boolean useTimeDart, boolean usePTrie, ApproximationMethodOption approximationMethodOption, int approximationRValue) {
-		this(queryPropertyOption, keepQueryCapacity, capacity, searchOption, symmetryOption, stubbornReductionOption, reductionOption, discreteInclusion, useTimeDartPTrie, useTimeDart, usePTrie, approximationMethodOption, approximationRValue, null); 
-	}
-	
-	public boolean isReductionOptionUserdefined(){
+
+    public boolean isReductionOptionUserdefined(){
 		return reductionOption == ReductionOption.BatchProcessingUserDefinedReductions;
 	}
 	

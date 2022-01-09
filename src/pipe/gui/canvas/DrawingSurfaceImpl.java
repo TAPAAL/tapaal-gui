@@ -29,8 +29,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 	private final SelectionManager selection;
 
-	private final GuiFrame app = TAPAALGUI.getApp();
-	private Zoomer zoomControl;
+    private Zoomer zoomControl;
 
 	private DataLayer guiModel;
 	private final PetriNetTab tabContent;

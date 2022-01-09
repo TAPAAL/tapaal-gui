@@ -130,8 +130,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	final UndoManager undoManager = new UndoManager();
 
-	private enum FeatureOption { TIME, GAME, COLOR };
-
     public final static class Result<T,R> {
         public final T result;
         public final boolean hasErrors;

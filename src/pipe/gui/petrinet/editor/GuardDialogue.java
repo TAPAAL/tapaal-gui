@@ -28,10 +28,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.petrinet.undo.UndoManager;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 
-public class GuardDialogue extends JPanel /*
- * implements ActionListener,
- * PropertyChangeListener
- */
+public class GuardDialogue extends JPanel 
 {
 	private final JRootPane myRootPane;
 	private JPanel guardEditPanel;

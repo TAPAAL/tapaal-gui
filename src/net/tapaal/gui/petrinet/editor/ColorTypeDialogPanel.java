@@ -61,7 +61,7 @@ public class ColorTypeDialogPanel extends JPanel {
 
     private static final int MAXIMUM_INTEGER = 10000;
 
-    public ColorTypeDialogPanel(JRootPane pane, ConstantsPane.ColorTypesListModel colorTypesListModel,
+    public ColorTypeDialogPanel(ConstantsPane.ColorTypesListModel colorTypesListModel,
                                 TimedArcPetriNetNetwork network, UndoManager undoManager) {
         oldName = "";
         this.network = network;
@@ -72,7 +72,7 @@ public class ColorTypeDialogPanel extends JPanel {
 
     }
 
-    public ColorTypeDialogPanel(JRootPane pane, ConstantsPane.ColorTypesListModel colorTypesListModel,
+    public ColorTypeDialogPanel(ConstantsPane.ColorTypesListModel colorTypesListModel,
                                 TimedArcPetriNetNetwork network, ColorType colortype, UndoManager undoManager) {
         this.oldColorType = colortype;
         oldName = colortype.getName();

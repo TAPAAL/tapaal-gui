@@ -24,10 +24,6 @@ public class ColoredTimeInterval extends TimeInterval {
         return color;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
     @SuppressWarnings("Duplicates")
     public static ColoredTimeInterval parse(String interval, ConstantStore constants, Vector<Color> colors) {
         Color color;

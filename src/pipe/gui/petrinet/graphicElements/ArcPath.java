@@ -413,10 +413,7 @@ public class ArcPath implements Shape {
 		return myArc;
 	}
 
-    public boolean getVisibilityLock() {
-        return pointLock;
-    }
-	public void showPoints() {
+    public void showPoints() {
 		if (!pointLock) {
 			for (ArcPathPoint pathPoint : pathPoints) {
 				pathPoint.setVisible(true);

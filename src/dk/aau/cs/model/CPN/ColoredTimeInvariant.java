@@ -21,10 +21,6 @@ public class ColoredTimeInvariant extends TimeInvariant {
         return color;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
     @Override
     public String toString() {
         if (color.getTuple() != null)
