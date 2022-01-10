@@ -6,6 +6,7 @@ import javax.swing.JSpinner;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
@@ -79,7 +80,7 @@ public class Verifier {
         return reducedNetTempFile.getAbsolutePath();
     }
 
-    public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k, JSpinner tokensControl) {
+    public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, PetriNetTab.TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k, JSpinner tokensControl) {
         ModelChecker modelChecker;
 
         if (tapnNetwork.isUntimed()) {
@@ -99,7 +100,7 @@ public class Verifier {
             return;
         }
 
-        KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, guiModels, k, modelChecker, new MessengerImpl(), tokensControl);
+        KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, lens, guiModels, k, modelChecker, new MessengerImpl(), tokensControl);
         optimizer.analyze();
     }
 

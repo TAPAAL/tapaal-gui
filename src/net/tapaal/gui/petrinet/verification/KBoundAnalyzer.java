@@ -4,6 +4,7 @@ import javax.swing.JSpinner;
 
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Tuple;
@@ -32,16 +33,19 @@ import java.util.ArrayList;
 
 public class KBoundAnalyzer {
 	protected final TimedArcPetriNetNetwork tapnNetwork;
-	protected final int k;
 
+    protected final int k;
+
+    private final PetriNetTab.TAPNLens lens;
 	private final ModelChecker modelChecker;
 	private final Messenger messenger;
 	private final JSpinner spinner;
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
 
-	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k,
+	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, PetriNetTab.TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k,
                           ModelChecker modelChecker, Messenger messenger, JSpinner tokensControl) {
-		this.k = k;
+        this.lens = lens;
+        this.k = k;
 		this.tapnNetwork = tapnNetwork;
 		this.modelChecker = modelChecker;
         this.messenger = messenger;
@@ -74,7 +78,11 @@ public class KBoundAnalyzer {
 		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
 		} else if(modelChecker instanceof VerifyDTAPN){
-			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, !tapnNetwork.hasUrgentTransitions(), true, false, false, 1, false, true, true, tapnNetwork.isColored());
+            //gdc and dart can be used together with game
+            boolean gdc = !lens.isGame();
+            boolean dart = !tapnNetwork.hasUrgentTransitions() && !lens.isGame();
+
+			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, gdc, dart, true, false, false, 1, false, true, true, tapnNetwork.isColored());
 		}
 		return null;
 	}

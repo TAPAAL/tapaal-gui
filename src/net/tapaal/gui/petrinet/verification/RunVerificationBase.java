@@ -50,6 +50,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected boolean reducedNetOpened = false;
 	protected final JSpinner spinner;
 	protected final Messenger messenger;
+    PetriNetTab.TAPNLens lens;
 
     public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, String reducedNetFilePath, boolean reduceNetOnly, JSpinner spinner) {
 		super();
@@ -62,16 +63,15 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
     }
 
     public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) {
-		this.model = model;
-		this.options = options;
-		this.query = query;
-		this.dataLayerQuery = dataLayerQuery;
-		execute();
-	}
+        this.model = model;
+        this.options = options;
+        this.query = query;
+        this.dataLayerQuery = dataLayerQuery;
+        execute();
+    }
 
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
-	    PetriNetTab.TAPNLens lens = new PetriNetTab.TAPNLens(!model.isUntimed(), false, model.isColored());
         ITAPNComposer composer = new TAPNComposer(messenger, guiModels, lens, false, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
         guiModel = composer.getGuiModel();
@@ -235,7 +235,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 			if (showResult(result) && spinner != null) {
 			    options = new VerifyPNOptions(options.extraTokens(), net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.Default, net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime.NoTime, false, null, false, false, false, false, false, false, false);
-                KBoundAnalyzer optimizer = new KBoundAnalyzer(model, guiModels, options.extraTokens(), modelChecker, new MessengerImpl(), spinner);
+                // XXX: needs refactoring, will only work if the model verified in the one on top (using getCurrentTab)
+                KBoundAnalyzer optimizer = new KBoundAnalyzer(model, TAPAALGUI.getCurrentTab().lens, guiModels, options.extraTokens(), modelChecker, new MessengerImpl(), spinner);
                 optimizer.analyze((VerifyTAPNOptions) options, true);
             }
             if(result.getQueryResult().isQuerySatisfied() && result.getTrace() != null){

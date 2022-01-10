@@ -59,10 +59,13 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
 import pipe.gui.*;
 import net.tapaal.gui.petrinet.verification.Verifier;
+import pipe.gui.petrinet.PetriNetTab;
 
 public class WorkflowDialog extends JDialog {
 
-	private static String getHelpMessage(){ 
+    private final PetriNetTab.TAPNLens lens;
+
+    private static String getHelpMessage(){
 		// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
 		StringBuilder buffer = new StringBuilder();
 		buffer.append("<html>");
@@ -249,6 +252,7 @@ public class WorkflowDialog extends JDialog {
 		/* Copy model */
 
 		model = TAPAALGUI.getCurrentTab().network().copy();
+        lens = TAPAALGUI.getCurrentTab().lens;
 		
 		// Fix - remove unused shared places
 		unusedSharedPlaces.clear();
@@ -1293,7 +1297,7 @@ public class WorkflowDialog extends JDialog {
 	}
 
 	private void checkBound() {
-		Verifier.analyzeKBound(model, TAPAALGUI.getCurrentTab().getGuiModels(),
+		Verifier.analyzeKBound(model, lens, TAPAALGUI.getCurrentTab().getGuiModels(),
 				(Integer) numberOfExtraTokensInNet.getValue(),
 				numberOfExtraTokensInNet);
 	}
