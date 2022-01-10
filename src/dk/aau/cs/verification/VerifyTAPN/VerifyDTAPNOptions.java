@@ -30,7 +30,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			TraceOption traceOption,
 			SearchOption search,
 			boolean symmetry,
-            boolean gdc,
+            boolean gcd,
 			boolean timeDarts,
 			boolean pTrie,
 			boolean enableOverApproximation,
@@ -41,7 +41,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             boolean colorFixpoint,
             boolean unfoldNet
 	) {
-		this(extraTokens, traceOption, search, symmetry, gdc, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet);
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
