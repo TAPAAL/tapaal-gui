@@ -277,6 +277,20 @@ public class TabTransformer {
 
             }
         }
+
+        boolean showConvertWarning = false;
+        for (var query: tab.queries()) {
+            if (query.isOverApproximationEnabled() || query.isUnderApproximationEnabled()) {
+                query.setUseOverApproximationEnabled(false);
+                query.setUseUnderApproximationEnabled(false);
+                showConvertWarning = true;
+            }
+        }
+        if (showConvertWarning) {
+            new MessengerImpl().displayInfoMessage(
+                "Colored nets does not support over/under approximation, the property has been removed from all queries.\n" +
+                "Unsupported Query Option");
+        }
     }
 
     public static void unfoldTab(PetriNetTab oldTab, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {

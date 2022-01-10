@@ -1607,7 +1607,8 @@ public class QueryDialog extends JPanel {
 		reductionOptionsPanel.setVisible(advancedView);
 		if (lens.isTimed() || lens.isGame()) {
 		    saveUppaalXMLButton.setVisible(advancedView);
-		    overApproximationOptionsPanel.setVisible(advancedView);
+            // Disabled approximation options for colored models, because they are not supported yet (will generate error)
+		    overApproximationOptionsPanel.setVisible(advancedView && !lens.isColored());
         } else if (!lens.isGame()){
             openReducedNetButton.setVisible(advancedView);
         }
