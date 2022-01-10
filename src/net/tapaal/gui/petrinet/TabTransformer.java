@@ -288,7 +288,7 @@ public class TabTransformer {
         }
         if (showConvertWarning) {
             new MessengerImpl().displayInfoMessage(
-                "Colored nets does not support over/under approximation, the property has been removed from all queries.\n" +
+                "Colored Petri nets do not support over/under approximation and the affected queries are modified so that this feature is disabled.\n" +
                 "Unsupported Query Option");
         }
     }
