@@ -945,7 +945,7 @@ public class QueryDialog extends JPanel {
                 }
             }
         }
-        if (lens.isTimed() && !lens.isGame()) {
+        if (lens.isTimed()) {
             for (EngineSupportOptions engine : engineSupportOptions) {
                 if (engine.areOptionsSupported(queryOptions)) {
                     options.add(engine.nameString);
