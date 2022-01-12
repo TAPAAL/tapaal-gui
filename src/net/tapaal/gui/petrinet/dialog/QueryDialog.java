@@ -159,9 +159,6 @@ public class QueryDialog extends JPanel {
 	private JRadioButton randomSearch;
 	private JRadioButton heuristicSearch;
 
-
-
-
 	// Trace options panel
 	private JPanel traceOptionsPanel;
 
@@ -169,8 +166,6 @@ public class QueryDialog extends JPanel {
 	private JRadioButton noTraceRadioButton;
 	private JRadioButton someTraceRadioButton;
 	private JRadioButton fastestTraceRadioButton;
-
-
 
     // Unfolding options panel
     private JPanel verificationPanel;
@@ -950,16 +945,14 @@ public class QueryDialog extends JPanel {
                 }
             }
         }
-        if (lens.isTimed()) {
+        if (lens.isTimed() && !lens.isGame()) {
             for (EngineSupportOptions engine : engineSupportOptions) {
                 if (engine.areOptionsSupported(queryOptions)) {
                     options.add(engine.nameString);
                 }
             }
-        } else if (!lens.isGame()) {
-            options.add(name_UNTIMED);
         } else {
-            options.add(name_DISCRETE);
+            options.add(name_UNTIMED);
         }
 
 		reductionOption.removeAllItems();

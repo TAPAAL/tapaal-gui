@@ -125,14 +125,9 @@ public class VerifyTAPNExporter {
 
 	protected void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         //remove the net prefix from the place name
-        String placeName;
+        String placeName = mapping.map(p.name()).value2();
         Place guiPlace = null;
 
-        if (mapping.map(p.name()) == null) {
-            placeName = "ghost";
-        } else {
-            placeName = mapping.map(p.name()).value2();
-        }
         for (DataLayer guiModel : guiModels ) {
             guiPlace = guiModel.getPlaceById(placeName);
             if (guiPlace != null) {
