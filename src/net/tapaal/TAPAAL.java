@@ -120,7 +120,7 @@ public class TAPAAL {
 		TAPAALGUI.getApp().setVisible(false);
 
 		System.out.println("=============================================================");
-		System.out.println("Batch Porcessing");
+		System.out.println("Batch Processing");
 		System.out.println("=============================================================");
 
 		System.out.println("Running in batch mode for " + batchFolder.getAbsolutePath());
