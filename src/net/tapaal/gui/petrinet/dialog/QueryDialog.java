@@ -159,9 +159,6 @@ public class QueryDialog extends JPanel {
 	private JRadioButton randomSearch;
 	private JRadioButton heuristicSearch;
 
-
-
-
 	// Trace options panel
 	private JPanel traceOptionsPanel;
 
@@ -169,8 +166,6 @@ public class QueryDialog extends JPanel {
 	private JRadioButton noTraceRadioButton;
 	private JRadioButton someTraceRadioButton;
 	private JRadioButton fastestTraceRadioButton;
-
-
 
     // Unfolding options panel
     private JPanel verificationPanel;
@@ -416,7 +411,7 @@ public class QueryDialog extends JPanel {
 		TAPNQuery.SearchOption searchOption = getSearchOption();
 		ReductionOption reductionOptionToSet = getReductionOption();
 
-        if (!lens.isGame() && !lens.isTimed()) {
+        if (!lens.isTimed()) {
             return getUntimedQuery(name, capacity, traceOption, searchOption, reductionOptionToSet);
         } else {
             return getTimedQuery(name, capacity, traceOption, searchOption, reductionOptionToSet);
@@ -749,7 +744,7 @@ public class QueryDialog extends JPanel {
                     templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
                 }
             }
-            if (!lens.isGame() && !lens.isTimed()) {
+            if (!lens.isTimed()) {
                 updateUntimedQueryButtons(node);
             } else {
                 updateTimedQueryButtons(node);
@@ -765,7 +760,7 @@ public class QueryDialog extends JPanel {
             placeTransitionBox.setSelectedItem(transitionNode.getTransition());
             userChangedAtomicPropSelection = true;
         }
-        if (!lens.isTimed() && !lens.isGame()) {
+        if (!lens.isTimed()) {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
         if (current instanceof LTLANode || current instanceof LTLENode ||
@@ -956,10 +951,8 @@ public class QueryDialog extends JPanel {
                     options.add(engine.nameString);
                 }
             }
-        } else if (!lens.isGame()) {
-            options.add(name_UNTIMED);
         } else {
-            options.add(name_DISCRETE);
+            options.add(name_UNTIMED);
         }
 
 		reductionOption.removeAllItems();
@@ -1307,13 +1300,20 @@ public class QueryDialog extends JPanel {
 
 		setEnabledOptionsAccordingToCurrentReduction();
 		makeShortcuts();
+
+        if (lens.isGame() && !lens.isTimed()) {
+            useReduction.setSelected(false);
+            useReduction.setEnabled(false);
+            useSiphonTrap.setSelected(false);
+            useSiphonTrap.setEnabled(false);
+        }
 	}
 
 	private void setupFromQuery(TAPNQuery queryToCreateFrom) {
 		queryName.setText(queryToCreateFrom.getName());
 		numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
 
-        if (lens.isTimed() || lens.isGame()) {
+        if (lens.isTimed()) {
             setupQuantificationFromQuery(queryToCreateFrom);
             setupApproximationOptionsFromQuery(queryToCreateFrom);
         }
@@ -1382,7 +1382,7 @@ public class QueryDialog extends JPanel {
         reductionOption.addItem(reduction);
         reductionOption.setSelectedItem(reduction);
 
-        if (lens.isTimed() || lens.isGame()) {
+        if (lens.isTimed()) {
             setupTimedReductionOptions(queryToCreateFrom);
         } else {
             setupUntimedReductionOptions(queryToCreateFrom);
@@ -1458,7 +1458,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void setupQueryCategoryFromQuery(TAPNQuery queryToCreateFrom) {
-        if (!lens.isTimed() && !lens.isGame()) {
+        if (!lens.isTimed()) {
             TAPNQuery.QueryCategory category = queryToCreateFrom.getCategory();
             if (category.equals(TAPNQuery.QueryCategory.CTL)) {
                 queryType.setSelectedIndex(0);
@@ -1605,7 +1605,7 @@ public class QueryDialog extends JPanel {
         }
 
 		reductionOptionsPanel.setVisible(advancedView);
-		if (lens.isTimed() || lens.isGame()) {
+		if (lens.isTimed()) {
 		    saveUppaalXMLButton.setVisible(advancedView);
             // Disabled approximation options for colored models, because they are not supported yet (will generate error)
 		    overApproximationOptionsPanel.setVisible(advancedView && !lens.isColored());
@@ -2515,7 +2515,7 @@ public class QueryDialog extends JPanel {
 		});
 
 		negationButton.addActionListener(e -> {
-            if (lens.isTimed() || lens.isGame()) {
+            if (lens.isTimed()) {
                 TCTLNotNode property = new TCTLNotNode(getStateProperty(currentSelection.getObject()));
                 addPropertyToQuery(property);
             } else {
@@ -2619,7 +2619,7 @@ public class QueryDialog extends JPanel {
 								placeNames.add(place.name());
 							}
 						}
-                        if (!lens.isTimed() && !lens.isGame()) {
+                        if (!lens.isTimed()) {
                             for (TimedTransition transition : tapn.transitions()) {
                                 if (!transition.isShared()) {
                                     placeNames.add(transition.name());
@@ -2641,7 +2641,7 @@ public class QueryDialog extends JPanel {
 					for (SharedPlace place : tapnNetwork.sharedPlaces()) {
 						placeNames.add(place.name());
 					}
-                    if (lens.isTimed() || lens.isGame()) {
+                    if (lens.isTimed()) {
                         for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
                             placeNames.add(transition.name());
                         }
@@ -2655,7 +2655,7 @@ public class QueryDialog extends JPanel {
                         updateQueryOnAtomicPropositionChange();
                     }
 				}
-                if (!lens.isTimed() && !lens.isGame()) setEnablednessOfOperatorAndMarkingBoxes();
+                if (!lens.isTimed()) setEnablednessOfOperatorAndMarkingBoxes();
 
 			}
 		});
@@ -2692,7 +2692,7 @@ public class QueryDialog extends JPanel {
 
         transitionIsEnabledLabel = new JLabel(" is enabled");
         transitionIsEnabledLabel.setPreferredSize(new Dimension(165, 27));
-        if (!lens.isTimed() && !lens.isGame()) placeRow.add(transitionIsEnabledLabel);
+        if (!lens.isTimed()) placeRow.add(transitionIsEnabledLabel);
 
         JPanel addPredicateRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         gbc.gridy = 2;
@@ -2754,7 +2754,7 @@ public class QueryDialog extends JPanel {
 				String template = templateBox.getSelectedItem().toString();
 				if(template.equals(SHARED)) template = "";
 
-                if ((!lens.isTimed() && !lens.isGame()) && transitionIsSelected()) {
+                if ((!lens.isTimed()) && transitionIsSelected()) {
                     addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem()));
                 } else {
                     TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
@@ -2791,7 +2791,7 @@ public class QueryDialog extends JPanel {
 			if (userChangedAtomicPropSelection) {
 				updateQueryOnAtomicPropositionChange();
 			}
-			if (!lens.isTimed() && !lens.isGame()) {
+			if (!lens.isTimed()) {
                 setEnablednessOfOperatorAndMarkingBoxes();
             }
 		});
@@ -2913,7 +2913,7 @@ public class QueryDialog extends JPanel {
 
                         boolean isResultFalse;
 
-                        if (lens.isTimed() || lens.isGame()) {
+                        if (lens.isTimed()) {
                             isResultFalse = !placeContext.getResult();
                         } else {
                             isResultFalse = !transitionContext.getResult() || !placeContext.getResult();
@@ -3027,7 +3027,7 @@ public class QueryDialog extends JPanel {
         ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
         for(TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
             for(TimedPlace p : tapn.places()) {
-                if (lens.isTimed() || !p.isShared() || lens.isGame()) {
+                if (lens.isTimed() || !p.isShared()) {
                     templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
                 }
             }
@@ -3047,7 +3047,7 @@ public class QueryDialog extends JPanel {
         ArrayList<Tuple<String,String>> templateTransitionNames = new ArrayList<Tuple<String,String>>();
         for (TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
             for (TimedTransition t : tapn.transitions()) {
-                if (lens.isTimed() || !t.isShared() || lens.isGame()) {
+                if (lens.isTimed() || !t.isShared()) {
                     templateTransitionNames.add(new Tuple<>(tapn.name(), t.name()));
                 }
             }
@@ -3229,7 +3229,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		traceOptionsPanel.add(fastestTraceRadioButton, gridBagConstraints);
 
-		if (lens.isTimed() || lens.isGame()) {
+		if (lens.isTimed()) {
             gridBagConstraints.gridy = 2;
             gridBagConstraints.weightx = 1;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -3372,7 +3372,7 @@ public class QueryDialog extends JPanel {
 
         useTarjan.addActionListener(e -> updateSearchStrategies());
 
-        if (lens.isTimed() || lens.isGame()) {
+        if (lens.isTimed()) {
             initTimedReductionOptions();
         } else {
             useReduction.addActionListener(new ActionListener() {
@@ -3467,7 +3467,7 @@ public class QueryDialog extends JPanel {
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
 		refreshTraceOptions();
-        if (lens.isTimed() || lens.isGame()) {
+        if (lens.isTimed()) {
             refreshSymmetryReduction();
             refreshStubbornReduction();
             refreshDiscreteOptions();
