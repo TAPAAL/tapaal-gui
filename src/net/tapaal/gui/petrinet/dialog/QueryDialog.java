@@ -1300,6 +1300,13 @@ public class QueryDialog extends JPanel {
 
 		setEnabledOptionsAccordingToCurrentReduction();
 		makeShortcuts();
+
+        if (lens.isGame() && !lens.isTimed()) {
+            useReduction.setSelected(false);
+            useReduction.setEnabled(false);
+            useSiphonTrap.setSelected(false);
+            useSiphonTrap.setEnabled(false);
+        }
 	}
 
 	private void setupFromQuery(TAPNQuery queryToCreateFrom) {
