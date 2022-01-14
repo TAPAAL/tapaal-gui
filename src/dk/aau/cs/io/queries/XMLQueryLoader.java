@@ -82,15 +82,16 @@ public class XMLQueryLoader extends QueryLoader{
         NodeList propList = doc.getElementsByTagName("property");
         int choice = -1;
 
-        for(int i = 0; i < propList.getLength(); i++){
+        for (int i = 0; i < propList.getLength(); i++) {
             Node prop = propList.item(i);
             QueryWrapper queryWrapper = new QueryWrapper();
 
             // Save query for later use in dialog window
             this.faultyQueries.add(queryWrapper);
 
-            boolean canBeCTL = canBeCTL(prop);
-            boolean canBeLTL = canBeLTL(prop);
+            boolean isTimed = network.isTimed();
+            boolean canBeCTL = isTimed || canBeCTL(prop);
+            boolean canBeLTL = !isTimed && canBeLTL(prop);
 
             if (canBeCTL && canBeLTL && choice == -1) {
                 choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(),
@@ -105,7 +106,7 @@ public class XMLQueryLoader extends QueryLoader{
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                     "One or more queries do not have the correct format.");
             }
-                if (choice == 2) return null;
+            if (choice == 2) return null;
 
 
             boolean isCTL = (canBeCTL && !canBeLTL) || (canBeCTL && canBeLTL && choice == 0);

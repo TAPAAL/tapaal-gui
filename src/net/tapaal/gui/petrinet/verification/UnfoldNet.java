@@ -6,6 +6,7 @@ import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
+import dk.aau.cs.TCTL.visitors.QueryVisitor;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.XMLQueryLoader;
@@ -152,11 +153,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
             String formattedQueries = "";
             for(TAPNQuery query : clonedQueries){
-                if(lens.isGame()) {
-                    queryStream.append("control: ").append(query.getProperty().toString());
-                } else {
-                    formattedQueries = XMLVisitor.getXMLQueryFor(query.getProperty(), query.getName());
-                }
+                formattedQueries = XMLVisitor.getXMLQueryFor(query.getProperty(), query.getName(), lens.isGame());
             }
             queryStream.append(formattedQueries);
             queryStream.close();

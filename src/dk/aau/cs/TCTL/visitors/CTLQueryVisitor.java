@@ -49,8 +49,8 @@ public class CTLQueryVisitor extends VisitorBase {
         this.XMLQuery = new StringBuffer();
     }
         
-    public String getXMLQueryFor(TCTLAbstractProperty property, String queryName) {
-        buildXMLQuery(property, queryName, false);
+    public String getXMLQueryFor(TCTLAbstractProperty property, String queryName, boolean control) {
+        buildXMLQuery(property, queryName, control);
         return getFormatted();
     }
 	

@@ -69,12 +69,13 @@ public class VerifyTAPNExporter {
                 throw new FileNotFoundException(null);
             } else if (query.getCategory() == QueryCategory.CTL || (lens != null && !lens.isGame() && lens.isColored())) {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
-                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery == null? model.name() : dataLayerQuery.getName()));
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery == null? model.name() : dataLayerQuery.getName(), false));
             } else if (query.getCategory() == QueryCategory.LTL) {
                 LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
             } else if (lens != null && lens.isGame()) {
-                queryStream.append("control: " + query.getProperty().toString());
+                CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null, true));
             } else {
                 queryStream.append(query.getProperty().toString());
             }
