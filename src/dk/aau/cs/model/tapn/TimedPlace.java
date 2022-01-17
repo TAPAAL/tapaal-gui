@@ -3,10 +3,11 @@ package dk.aau.cs.model.tapn;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.regex.Pattern;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
-import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
@@ -71,11 +72,29 @@ public abstract class TimedPlace {
         return tokens().size();
     }
 
+
+    /**
+     * This is a wrapper function to serve as a fix for the original
+     * color implementation breaking the agreed abstraction.
+     * We now have color tokens and "non" color tokens, this updates the
+     * color part when uncolored tokens are added/removed.
+     * XXX: This needs to be refactored later. //2022-01-17 kyrke
+     */
+    private void updateNonColoredTokenExpr() {
+        var v = new Vector<ArcExpression>();
+        var ev = new Vector<ColorExpression>();
+        ev.add(new UserOperatorExpression(ColorType.COLORTYPE_DOT.getFirstColor()));
+        v.add(new NumberOfExpression(numberOfTokens(), ev));
+        AddExpression tokenExp = new AddExpression(v);
+        setTokenExpression(tokenExp);
+    }
+
     public void addToken(TimedToken timedToken) {
         Require.that(timedToken != null, "timedToken cannot be null");
         Require.that(timedToken.place().equals(this), "token is located in a different place");
 
         currentMarking.add(timedToken);
+        updateNonColoredTokenExpr();
         fireMarkingChanged();
     }
 
@@ -85,6 +104,7 @@ public abstract class TimedPlace {
         for(TimedToken token : tokens){
             currentMarking.add(token); // avoid firing marking changed on every add
         }
+        updateNonColoredTokenExpr();
         fireMarkingChanged();
     }
 
@@ -107,6 +127,7 @@ public abstract class TimedPlace {
         Require.that(getColorType().equals(ColorType.COLORTYPE_DOT), "Cannot remove tokens of unspecified color from a place which does not have the dot colortype");
         if (numberOfTokens() > 0) {
             currentMarking.remove(tokens().get(0));
+            updateNonColoredTokenExpr();
             fireMarkingChanged();
         }
     }
