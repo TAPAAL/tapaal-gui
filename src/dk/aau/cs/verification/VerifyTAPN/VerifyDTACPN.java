@@ -31,9 +31,6 @@ public class VerifyDTACPN extends VerifyDTAPN {
         }
 
         if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
-        if (TAPAALGUI.getCurrentTab().getLens().isGame() && !TAPAALGUI.getCurrentTab().getLens().isTimed() && !TAPAALGUI.getCurrentTab().getLens().isColored()) {
-            addGhostPlace(model.value1());
-        }
 
         VerifyTAPNExporter exporter = new VerifyTACPNExporter();
 

@@ -44,9 +44,9 @@ public class XMLCTLQueryParser {
         XMLCTLQueryParser parser = new XMLCTLQueryParser(prop, queryWrapper);
         queryWrapper.setName(parser.parsePropertyName());
 
-        try{
+        try {
             queryWrapper.setProp(parser.AbstractProperty());
-        } catch (XMLQueryParseException e){
+        } catch (XMLQueryParseException e) {
             queryWrapper.setException(e);
             Logger.log(e);
             return false;
@@ -87,14 +87,14 @@ public class XMLCTLQueryParser {
     }
 
     private TCTLAbstractProperty parseFormula(Node property)
-        throws XMLQueryParseException{
+        throws XMLQueryParseException {
 
         TCTLAbstractProperty childProperty;
         Node child = getFirstChildNode(property);
         String nodeName = property.getNodeName();
         
         String childNodeName = "";
-        if(child != null){
+        if (child != null) {
         	childNodeName = child.getNodeName();
         }
         
@@ -366,38 +366,40 @@ public class XMLCTLQueryParser {
             } else if(nodeName.equals("integer-ge")){
                 return new TCTLAtomicPropositionNode(subformula1, ">=", subformula2);
             }
-        } else if (nodeName.equals("is-fireable")){
-	    // Construct a nested disjunction of transitions.
-	    
-	    children = getAllChildren(property);
+        } else if (nodeName.equals("is-fireable")) {
+            // Construct a nested disjunction of transitions.
 
-            if(children.isEmpty()){
+            children = getAllChildren(property);
+
+            if (children.isEmpty()) {
                 throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
-            } else if(children.size() == 1) {
-		String[] splits = getText(children.get(0)).replace("\n", "").split("\\.");
-		
-		// Check if transition contains a template name
-                if(splits.length > 1){
-		    return new TCTLTransitionNode(splits[0], splits[1]);
+            } else if (children.size() == 1) {
+                String[] splits = getText(children.get(0)).replace("\n", "").split("\\.");
+
+                // Check if transition contains a template name
+                if (splits.length > 1) {
+                    return new TCTLTransitionNode(splits[0], splits[1]);
                 } else {
-		    return new TCTLTransitionNode(splits[0]);
+                    return new TCTLTransitionNode(splits[0]);
                 }
-	    } else {
-		ArrayList<TCTLAbstractStateProperty> transitions = new ArrayList<TCTLAbstractStateProperty>();
-		
-		for(Node n : children) {
-		    String[] splits = getText(n).replace("\n", "").split("\\.");
-		    
-		    // Check if transition contains a template name
-		    if(splits.length > 1){
-			transitions.add(new TCTLTransitionNode(splits[0], splits[1]));
-		    } else {
-			transitions.add(new TCTLTransitionNode(splits[0]));
-		    }
-		}
-		return new TCTLOrListNode(transitions);
-	    }
-        } else{
+            } else {
+                ArrayList<TCTLAbstractStateProperty> transitions = new ArrayList<TCTLAbstractStateProperty>();
+
+                for (Node n : children) {
+                    String[] splits = getText(n).replace("\n", "").split("\\.");
+
+                    // Check if transition contains a template name
+                    if (splits.length > 1) {
+                        transitions.add(new TCTLTransitionNode(splits[0], splits[1]));
+                    } else {
+                        transitions.add(new TCTLTransitionNode(splits[0]));
+                    }
+                }
+                return new TCTLOrListNode(transitions);
+            }
+        } else if (nodeName.equals("control")) {
+            return parseFormula(child);
+        }else{
         	parseFormula(property);
         }
 

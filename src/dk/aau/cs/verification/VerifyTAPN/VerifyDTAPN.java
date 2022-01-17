@@ -218,9 +218,6 @@ public class VerifyDTAPN implements ModelChecker{
 		}
 
 		if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
-		if (TAPAALGUI.getCurrentTab().getLens().isGame() && !TAPAALGUI.getCurrentTab().getLens().isTimed()) {
-		    addGhostPlace(model.value1());
-        }
 
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 
@@ -232,13 +229,6 @@ public class VerifyDTAPN implements ModelChecker{
 
 		return verify(options, model, exportedModel, query, dataLayerQuery);
 	}
-
-    //An extra place is added before verifying the query so the timed engine is able to mimic the untimed game semantics.
-	protected void addGhostPlace(TimedArcPetriNet net) {
-	    TimedPlace place = new LocalTimedPlace("ghost", new TimeInvariant(true, new IntBound(0)), ColorType.COLORTYPE_DOT);
-	    net.add(place);
-        place.addToken(new TimedToken(place, new BigDecimal(0), ColorType.COLORTYPE_DOT.getFirstColor()));
-    }
 
 	protected void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
 		VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions) options;
