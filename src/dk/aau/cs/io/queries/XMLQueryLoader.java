@@ -31,6 +31,7 @@ import org.xml.sax.SAXParseException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+import pipe.gui.petrinet.PetriNetTab;
 
 public class XMLQueryLoader extends QueryLoader{
 
@@ -89,7 +90,8 @@ public class XMLQueryLoader extends QueryLoader{
             // Save query for later use in dialog window
             this.faultyQueries.add(queryWrapper);
 
-            boolean isTimed = network.isTimed();
+            PetriNetTab.TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
+            boolean isTimed = (lens != null && lens.isTimed()) || network.isTimed();
             boolean canBeCTL = isTimed || canBeCTL(prop);
             boolean canBeLTL = !isTimed && canBeLTL(prop);
 
