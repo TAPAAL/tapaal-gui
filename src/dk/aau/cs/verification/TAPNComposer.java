@@ -230,7 +230,7 @@ public class TAPNComposer implements ITAPNComposer {
 					}
 					constructedModel.add(place);
 					mapping.addMapping(tapn.name(), timedPlace.name(), uniquePlaceName);
-
+                    
 					for (TimedToken token : timedPlace.tokens()) {
 						place.addToken(new TimedToken(place, token.age(), token.color()));
 					}

@@ -81,12 +81,14 @@ public abstract class TimedPlace {
      * XXX: This needs to be refactored later. //2022-01-17 kyrke
      */
     private void updateNonColoredTokenExpr() {
-        var v = new Vector<ArcExpression>();
-        var ev = new Vector<ColorExpression>();
-        ev.add(new UserOperatorExpression(ColorType.COLORTYPE_DOT.getFirstColor()));
-        v.add(new NumberOfExpression(numberOfTokens(), ev));
-        AddExpression tokenExp = new AddExpression(v);
-        setTokenExpression(tokenExp);
+        if (getColorType() == ColorType.COLORTYPE_DOT) {
+            var v = new Vector<ArcExpression>();
+            var ev = new Vector<ColorExpression>();
+            ev.add(new UserOperatorExpression(ColorType.COLORTYPE_DOT.getFirstColor()));
+            v.add(new NumberOfExpression(numberOfTokens(), ev));
+            AddExpression tokenExp = new AddExpression(v);
+            setTokenExpression(tokenExp);
+        }
     }
 
     public void addToken(TimedToken timedToken) {
