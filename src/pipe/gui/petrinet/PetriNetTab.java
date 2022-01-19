@@ -1574,6 +1574,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             }
         }
         network.setColorTypes(tapnNetwork.colorTypes());
+        network.setVariables(tapnNetwork.variables());
 
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, inlineConstants);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
