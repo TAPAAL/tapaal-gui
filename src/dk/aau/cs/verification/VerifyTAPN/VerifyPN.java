@@ -2,6 +2,8 @@ package dk.aau.cs.verification.VerifyTAPN;
 
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.LoadedModel;
@@ -293,10 +295,6 @@ public class VerifyPN implements ModelChecker {
                     }
 
                     if (tapnTrace == null) {
-                        String message = "No trace could be generated.\n\n";
-                        message += "Model checker output:\n" + standardOutput;
-                        messenger.displayWrappedErrorMessage(message, "No trace found");
-
                     } else {
                         int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                         if (dialogResult == JOptionPane.OK_OPTION) {
@@ -346,7 +344,23 @@ public class VerifyPN implements ModelChecker {
 
         VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
 
-        return traceParser.parseTrace(new BufferedReader(new StringReader(output)));
+        TimedArcPetriNetTrace trace = null;
+        trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
+
+        if (trace == null) {
+            if (((VerifyTAPNOptions) options).trace() != TraceOption.NONE) {
+                if ((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())) {
+                    return null;
+                } else {
+                    String message = "No trace could be generated.\n\n";
+                    messenger.displayWrappedErrorMessage(message, "No trace found");
+                }
+            }
+        }
+        return trace;
     }
 
     private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
