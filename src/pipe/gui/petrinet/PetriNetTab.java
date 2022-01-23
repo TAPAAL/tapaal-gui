@@ -2193,6 +2193,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 					e->e.a == MouseAction.exited && e.pno instanceof PlaceTransitionObject,
 					e->mouseExitPTO((PlaceTransitionObject)e.pno)
 			);
+            registerEvent(
+                e -> e.a == MouseAction.wheel,
+                e -> e.pno.getParent().dispatchEvent(e.e) // Forward mouse wheel events to canvas
+            );
 		}
 
 		void transitionLeftClicked(TimedTransitionComponent t) {
