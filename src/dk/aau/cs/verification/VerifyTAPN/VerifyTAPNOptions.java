@@ -64,7 +64,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	}
 
     public String kBoundArg() {
-        return " --k-bound " + extraTokens+tokensInModel + " ";
+        return " --k-bound " + (extraTokens+tokensInModel) + " ";
     }
 
     public String deadTokenArg() {
