@@ -420,7 +420,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction startAction = new GuiAction("Simulation mode", "Toggle simulation mode (M)", "M", true) {
         public void actionPerformed(ActionEvent e) {
-            if(getCurrentTab().getLens().isColored()){
+            //XXX: this needs to be refactored, it break the abstraction in a really bad way -- 2022-01-23
+            if(getCurrentTab().getLens().isColored() && !getCurrentTab().isInAnimationMode()) {
                 PetriNetTab oldTab = getCurrentTab();
                 UnfoldDialog.showSimulationDialog(oldTab);
 
