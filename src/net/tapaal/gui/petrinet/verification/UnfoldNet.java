@@ -236,6 +236,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         return new ArrayList<>(queryLoader.parseQueries().getQueries());
     }
 
+    //XXX: old function to layout the model (before engine supported it)
     private void addLocation(LoadedModel loadedModel, TAPNComposer composer) {
         for (Template net : loadedModel.templates()) {
             int shifterX = calculateShift(net, true);
