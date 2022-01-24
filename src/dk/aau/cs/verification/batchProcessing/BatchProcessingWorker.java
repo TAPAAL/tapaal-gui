@@ -177,7 +177,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		//TODO This shold be made simpler in the engine refacter process
 		query = query.copy();
 		query.setDiscreteInclusion(false);
-		query.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
+		query.setReductionOption(ReductionOption.VerifyDTAPN);
 		if(!exiting() && batchProcessingVerificationOptions.useTimeDartPTrie()){
 			query = query.copy();
 			query.setUseTimeDarts(true);
@@ -199,7 +199,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			processQuery(file, composedModel, query);
 		}
 		
-		if(!exiting() && batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyTAPNdiscreteVerification)){
+		if(!exiting() && batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyDTAPN)){
 			query = query.copy();
 			query.setUseTimeDarts(false);
 			query.setUsePTrie(false);
@@ -210,7 +210,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		query = query.copy();
 		query.setDiscreteInclusion(false);
 		for(ReductionOption r : batchProcessingVerificationOptions.reductionOptions()){
-			if(r == ReductionOption.VerifyTAPN || r == ReductionOption.VerifyTAPNdiscreteVerification || r == ReductionOption.VerifyPNApprox || r == ReductionOption.VerifyPN || r == ReductionOption.VerifyPNReduce) { continue; }
+			if(r == ReductionOption.VerifyTAPN || r == ReductionOption.VerifyDTAPN || r == ReductionOption.VerifyPNApprox || r == ReductionOption.VerifyPN || r == ReductionOption.VerifyPNReduce) { continue; }
 			if(exiting()) return;
 			query = query.copy();
 			query.setReductionOption(r);
@@ -285,7 +285,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					"Workflow soundness check", queryToVerify.getCapacity(),
 					new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
 					SearchOption.DEFAULT,
-					ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+					ReductionOption.VerifyDTAPN, true, true,
 					false, true, false, null, ExtrapolationOption.AUTOMATIC,
 					WorkflowMode.WORKFLOW_SOUNDNESS, queryToVerify.isColored());
 			long time = 0;
@@ -387,7 +387,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					"Workflow soundness check", capacity,
 							new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
 							SearchOption.DEFAULT,
-							ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+							ReductionOption.VerifyDTAPN, true, true,
 							false, true, false, null, ExtrapolationOption.AUTOMATIC,
 							WorkflowMode.WORKFLOW_SOUNDNESS, model.isColored());
 				filesProcessed.add(fileToBeChecked);
@@ -399,7 +399,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						"Workflow soundness check", capacity,
 								new TCTLEGNode(new TCTLTrueNode()), TraceOption.SOME,
 								SearchOption.DEFAULT,
-								ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+								ReductionOption.VerifyDTAPN, true, true,
 								false, true, false, null, ExtrapolationOption.AUTOMATIC,
 								WorkflowMode.WORKFLOW_STRONG_SOUNDNESS, model.isColored());
 				filesProcessed.add(fileToBeChecked);
@@ -440,7 +440,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				"Workflow soundness check", capacity,
 						new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
 						SearchOption.DEFAULT,
-						ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+						ReductionOption.VerifyDTAPN, true, true,
 						false, true, false, null, ExtrapolationOption.AUTOMATIC,
 						WorkflowMode.WORKFLOW_SOUNDNESS, model.isColored());
 		}
@@ -451,7 +451,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					"Workflow soundness check", capacity,
 							new TCTLEGNode(new TCTLTrueNode()), TraceOption.SOME,
 							SearchOption.DEFAULT,
-							ReductionOption.VerifyTAPNdiscreteVerification, true, true,
+							ReductionOption.VerifyDTAPN, true, true,
 							false, true, false, null, ExtrapolationOption.AUTOMATIC,
 							WorkflowMode.WORKFLOW_STRONG_SOUNDNESS, model.isColored());
 		}
@@ -607,7 +607,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private ModelChecker getModelChecker(net.tapaal.gui.petrinet.verification.TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return getVerifyTAPN();
-		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
+		else if(query.getReductionOption() == ReductionOption.VerifyDTAPN)
 			return getVerifyTAPNDiscreteVerification();
 		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce)
 			return getVerifyPN();
@@ -618,7 +618,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	public VerificationOptions getVerificationOptionsFromQuery(net.tapaal.gui.petrinet.verification.TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());	// XXX DISABLES OverApprox
-		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
+		else if(query.getReductionOption() == ReductionOption.VerifyDTAPN)
 			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), 0, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isStubbornReductionEnabled(), null, query.usePartitioning(), query.useColorFixpoint(), query.isColored());
 		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce)
 			if (batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.SearchWholeStateSpace){

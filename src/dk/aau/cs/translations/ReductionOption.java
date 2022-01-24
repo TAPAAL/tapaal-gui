@@ -9,7 +9,7 @@ public enum ReductionOption {
 	KBOUNDANALYSIS, 
 	KBOUNDOPTMIZATION, 
 	VerifyTAPN,
-	VerifyTAPNdiscreteVerification,
+    VerifyDTAPN,
 	VerifyPN,
 	VerifyPNApprox,
 	VerifyPNReduce,

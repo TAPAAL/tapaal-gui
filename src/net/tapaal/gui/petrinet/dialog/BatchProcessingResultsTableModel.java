@@ -66,7 +66,7 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 				return "A";
 			else
 				return "B";
-		} else if(reduction == ReductionOption.VerifyTAPNdiscreteVerification)
+		} else if(reduction == ReductionOption.VerifyDTAPN)
 			if(result.query().useTimeDarts() && result.query().usePTrie()){
 				return "C";
 			} else if(result.query().useTimeDarts()){

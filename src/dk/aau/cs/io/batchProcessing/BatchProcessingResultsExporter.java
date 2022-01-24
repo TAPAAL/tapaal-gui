@@ -130,7 +130,7 @@ public class BatchProcessingResultsExporter {
 				return name_verifyTAPN_discreteInclusion;
 			}else
 				return name_verifyTAPN;
-		}else if(reduction == ReductionOption.VerifyTAPNdiscreteVerification){
+		}else if(reduction == ReductionOption.VerifyDTAPN){
 			if(query.useTimeDarts() && query.usePTrie()){
 				return name_verifyTAPNDiscreteVerificationTimeDartPTrie;
 			} else if(query.useTimeDarts()){

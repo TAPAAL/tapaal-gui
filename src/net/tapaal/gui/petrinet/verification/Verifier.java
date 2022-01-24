@@ -67,7 +67,7 @@ public class Verifier {
     public static ModelChecker getModelChecker(TAPNQuery query, boolean isColored) {
         if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
             return getVerifyTAPN();
-        } else if (query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification) {
+        } else if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
             return isColored? getVerifydTACPN(): getVerifydTAPN();
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             return getVerifyPN();
@@ -187,7 +187,7 @@ public class Verifier {
         int bound = query.getCapacity();
 
         VerifyTAPNOptions verifytapnOptions;
-        if (query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || (tapnNetwork != null && tapnNetwork.isColored() && !tapnNetwork.isUntimed())) {
+        if (query.getReductionOption() == ReductionOption.VerifyDTAPN || (tapnNetwork != null && tapnNetwork.isColored() && !tapnNetwork.isUntimed())) {
             verifytapnOptions = new VerifyDTAPNOptions(
                 bound,
                 query.getTraceOption(),

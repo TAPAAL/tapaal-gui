@@ -1616,7 +1616,7 @@ public class BatchProcessingDialog extends JDialog {
 						s.append("Discrete Inclusion Places:\n");
 						s.append(generateListOfInclusionPlaces(query));
 					}
-				} else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification) {
+				} else if(query.getReductionOption() == ReductionOption.VerifyDTAPN) {
 					if(query.useTimeDarts() && query.usePTrie()){
 						s.append(name_verifyTAPNDiscreteVerificationTimeDartPTrie);
 					} else if(query.useTimeDarts()){
@@ -2029,7 +2029,7 @@ public class BatchProcessingDialog extends JDialog {
 				result.add(ReductionOption.VerifyTAPN);
 			}
 			if(verifyTAPNDiscreteVerificationNone.isSelected()){
-				result.add(ReductionOption.VerifyTAPNdiscreteVerification);
+				result.add(ReductionOption.VerifyDTAPN);
 			}
 			if(COMBI.isSelected()){
 				result.add(ReductionOption.COMBI);

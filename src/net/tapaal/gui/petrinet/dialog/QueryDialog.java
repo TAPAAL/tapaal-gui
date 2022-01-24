@@ -552,7 +552,7 @@ public class QueryDialog extends JPanel {
 		else if (reductionOptionString.equals(name_verifyTAPN))
 			return ReductionOption.VerifyTAPN;
 		else if (reductionOptionString.equals(name_DISCRETE))
-			return ReductionOption.VerifyTAPNdiscreteVerification;
+			return ReductionOption.VerifyDTAPN;
 		else if (reductionOptionString.equals(name_UNTIMED))
 			return ReductionOption.VerifyPN;
 		else
@@ -1359,7 +1359,7 @@ public class QueryDialog extends JPanel {
 			reduction = name_BROADCAST;
 		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
 			reduction = name_BROADCASTDEG2;
-		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
+		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyDTAPN){
 			reduction = name_DISCRETE;
 		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
 			reduction = name_UNTIMED;
@@ -3522,8 +3522,8 @@ public class QueryDialog extends JPanel {
 		    saveUppaalXMLButton.setEnabled(false);
 		}
 		else {
-			saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? EXPORT_VERIFYTAPN_BTN_TEXT : reduction == ReductionOption.VerifyPN ? EXPORT_VERIFYPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
-			saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? TOOL_TIP_SAVE_TAPAAL_BUTTON : reduction == ReductionOption.VerifyPN ? TOOL_TIP_SAVE_PN_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
+			saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN ? EXPORT_VERIFYTAPN_BTN_TEXT : reduction == ReductionOption.VerifyPN ? EXPORT_VERIFYPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
+			saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN ? TOOL_TIP_SAVE_TAPAAL_BUTTON : reduction == ReductionOption.VerifyPN ? TOOL_TIP_SAVE_PN_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
 			saveUppaalXMLButton.setEnabled(true);
 		}
 	}
@@ -3750,7 +3750,7 @@ public class QueryDialog extends JPanel {
                         exit();
                         TAPNQuery query = getQuery();
 
-                        if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN) {
+                        if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN) {
                             Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false);
                         }
 						else{
@@ -3767,7 +3767,7 @@ public class QueryDialog extends JPanel {
 					String xmlFile = null, queryFile = null;
 					ReductionOption reduction = getReductionOption();
 					try {
-						FileBrowser browser = FileBrowser.constructor(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
+						FileBrowser browser = FileBrowser.constructor(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN || reduction == ReductionOption.VerifyPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
 						xmlFile = browser.saveFile();
 						if (xmlFile != null) {
 							String[] a = xmlFile.split(".xml");
@@ -3811,7 +3811,7 @@ public class QueryDialog extends JPanel {
                             VerifyCPNExporter exporter = new VerifyCPNExporter();
                             exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
 
-                        } else if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification) {
+                        } else if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
 
@@ -3830,7 +3830,7 @@ public class QueryDialog extends JPanel {
 								else if(exportException instanceof UnsupportedQueryException)
 									s.append(UNSUPPPORTED_QUERY_TEXT + "\n\n");
 
-								if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN)
+								if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN || reduction == ReductionOption.VerifyPN)
 									s.append(NO_VERIFYTAPN_XML_FILE_SAVED);
 								else
 									s.append(NO_UPPAAL_XML_FILE_SAVED);

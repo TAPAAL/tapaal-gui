@@ -289,12 +289,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     gameChanged = true;
                 }
                 if (q.useGCD() || q.useTimeDarts() || q.getTraceOption().equals(TAPNQuery.TraceOption.FASTEST) ||
-                    !q.getReductionOption().equals(ReductionOption.VerifyTAPNdiscreteVerification) ||
+                    !q.getReductionOption().equals(ReductionOption.VerifyDTAPN) ||
                     q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) gameChanged = true;
                 q.setUseGCD(false);
                 q.setUseTimeDarts(false);
                 q.setTraceOption(TAPNQuery.TraceOption.NONE);
-                q.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
+                q.setReductionOption(ReductionOption.VerifyDTAPN);
                 q.setUseOverApproximationEnabled(false);
                 q.setUseUnderApproximationEnabled(false);
             } else if (!tab.lens.isTimed()) {
