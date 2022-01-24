@@ -284,19 +284,19 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 if (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLEGNode) {
                     queriesToRemove.add(q);
                     tab.removeQuery(q);
-                } if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
+                }
+                if (q.getSearchOption().equals(TAPNQuery.SearchOption.HEURISTIC)) {
                     q.setSearchOption(TAPNQuery.SearchOption.DFS);
                     gameChanged = true;
                 }
-                if (q.useGCD() || q.useTimeDarts() || q.getTraceOption().equals(TAPNQuery.TraceOption.FASTEST) ||
-                    !q.getReductionOption().equals(ReductionOption.VerifyDTAPN) ||
-                    q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) gameChanged = true;
-                q.setUseGCD(false);
-                q.setUseTimeDarts(false);
-                q.setTraceOption(TAPNQuery.TraceOption.NONE);
-                q.setReductionOption(ReductionOption.VerifyDTAPN);
-                q.setUseOverApproximationEnabled(false);
-                q.setUseUnderApproximationEnabled(false);
+                if (q.useGCD() || q.useTimeDarts() || q.getTraceOption().equals(TAPNQuery.TraceOption.FASTEST) || q.isOverApproximationEnabled() || q.isUnderApproximationEnabled()) {
+                    q.setUseGCD(false);
+                    q.setUseTimeDarts(false);
+                    q.setTraceOption(TAPNQuery.TraceOption.NONE);
+                    q.setUseOverApproximationEnabled(false);
+                    q.setUseUnderApproximationEnabled(false);
+                    gameChanged = true;
+                }
             } else if (!tab.lens.isTimed()) {
                 q.setReductionOption(ReductionOption.VerifyPN);
                 q.setUseOverApproximationEnabled(false);
@@ -320,7 +320,14 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             message += "Some options may have been changed to make the query compatible with the net features.";
         }
         if(message.length() > 0){
-            new MessengerImpl().displayInfoMessage(message, "Information");
+            final String fmessage = message;
+            //XXX: we should not do pop-up form there! I think these check should be part of loading a net.
+            new Thread(() -> {
+                TAPAALGUI.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+                new MessengerImpl().displayInfoMessage(fmessage, "Information");
+            }).start();
+
         }
 	}
 
