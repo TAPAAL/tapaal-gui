@@ -324,14 +324,11 @@ public class TabTransformer {
     }
 
     public static String createUnfoldArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(options.toString());
-        buffer.append(" ");
-        buffer.append(modelFile);
-        buffer.append(" ");
-        buffer.append(queryFile);
-
-        return buffer.toString();
+        return options.toString() +
+            " " +
+            modelFile +
+            " " +
+            queryFile;
     }
 
 
