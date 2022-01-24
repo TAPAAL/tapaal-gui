@@ -92,8 +92,9 @@ public class XMLQueryLoader extends QueryLoader{
 
             PetriNetTab.TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
             boolean isTimed = (lens != null && lens.isTimed()) || network.isTimed();
+            boolean isKnownGame = (lens != null && lens.isGame()); // XXX: This is a hack, not sure why network does not know if it a game, also control tag should used to check if query is a game
             boolean canBeCTL = isTimed || canBeCTL(prop);
-            boolean canBeLTL = !isTimed && canBeLTL(prop);
+            boolean canBeLTL = !isTimed && !isKnownGame && canBeLTL(prop);
 
             if (canBeCTL && canBeLTL && choice == -1) {
                 choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(),
