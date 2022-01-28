@@ -112,7 +112,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                         overapprox_result = verifypn.verify(
                             new VerifyPNOptions(
                                 options.extraTokens(),
-                                options.traceOption(),
+                                net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE,
                                 SearchOption.OVERAPPROXIMATE,
                                 true,
                                 ModelReduction.AGGRESSIVE,
@@ -142,7 +142,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                         overapprox_result = verifypn.verify(
                             new VerifyPNOptions(
                                 options.extraTokens(),
-                                options.traceOption(),
+                                net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE,
                                 SearchOption.OVERAPPROXIMATE,
                                 true,
                                 ModelReduction.AGGRESSIVE,

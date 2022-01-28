@@ -179,7 +179,7 @@ public class Verifier {
         TCTLAbstractProperty inputQuery = query.getProperty();
 
         int bound = query.getCapacity();
-
+        boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
         VerifyTAPNOptions verifytapnOptions;
         if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
             verifytapnOptions = new VerifyDTAPNOptions(
@@ -202,10 +202,10 @@ public class Verifier {
                 reducedNetTempFile.getAbsolutePath(),
                 query.usePartitioning(),
                 query.useColorFixpoint(),
-                query.isColored()
+                isColored // Unfold net
             );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
-            boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
+
             verifytapnOptions = new VerifyPNOptions(
                 bound,
                 query.getTraceOption(),
