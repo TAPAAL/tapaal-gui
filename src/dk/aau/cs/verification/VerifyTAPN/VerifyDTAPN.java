@@ -219,9 +219,14 @@ public class VerifyDTAPN implements ModelChecker{
 
 		if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 
-		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+        ExportedVerifyTAPNModel exportedModel;
+        if (model.value1().parentNetwork().isColored()) {
+            VerifyTAPNExporter exporter = new VerifyTACPNExporter();
+            exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+        } else {
+            VerifyTAPNExporter exporter = new VerifyTAPNExporter();
+            exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+        }
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");

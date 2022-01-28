@@ -2,6 +2,7 @@ package net.tapaal.gui.petrinet;
 
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
@@ -10,7 +11,6 @@ import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyDTACPN;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.*;
@@ -297,7 +297,7 @@ public class TabTransformer {
 
         ModelChecker engine;
         if(oldTab.getLens().isTimed()){
-            engine = new VerifyDTACPN(new FileFinder(), new MessengerImpl());
+            engine = new VerifyDTAPN(new FileFinder(), new MessengerImpl());
         } else {
             engine = new VerifyPN(new FileFinder(), new MessengerImpl());
         }

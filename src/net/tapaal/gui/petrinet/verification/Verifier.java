@@ -52,23 +52,17 @@ public class Verifier {
         return verifydtapn;
     }
 
-    private static VerifyDTAPN getVerifydTACPN() {
-        VerifyDTAPN verifydtacpn = new VerifyDTACPN(new FileFinder(), new MessengerImpl());
-        verifydtacpn.setup();
-        return verifydtacpn;
-    }
-
     private static VerifyPN getVerifyPN() {
         VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
         verifypn.setup();
         return verifypn;
     }
 
-    public static ModelChecker getModelChecker(TAPNQuery query, boolean isColored) {
+    public static ModelChecker getModelChecker(TAPNQuery query) {
         if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
             return getVerifyTAPN();
         } else if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
-            return isColored? getVerifydTACPN(): getVerifydTAPN();
+            return getVerifydTAPN();
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             return getVerifyPN();
         } else {
@@ -86,7 +80,7 @@ public class Verifier {
         if (tapnNetwork.isUntimed()) {
             modelChecker = getVerifyPN();
         } else if (tapnNetwork.isColored()) {
-            modelChecker = getVerifydTACPN();
+            modelChecker = getVerifydTAPN();
         }else if (tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions()) {
             modelChecker = getVerifydTAPN();
         } else {
@@ -163,7 +157,7 @@ public class Verifier {
         HashMap<TimedArcPetriNet, DataLayer> guiModels,
         boolean onlyCreateReducedNet
     ) {
-        ModelChecker verifytapn = getModelChecker(query, tapnNetwork.isColored());
+        ModelChecker verifytapn = getModelChecker(query);
 
 
         try {
