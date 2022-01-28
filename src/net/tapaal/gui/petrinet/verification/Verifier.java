@@ -181,7 +181,7 @@ public class Verifier {
         int bound = query.getCapacity();
 
         VerifyTAPNOptions verifytapnOptions;
-        if (query.getReductionOption() == ReductionOption.VerifyDTAPN || (tapnNetwork != null && tapnNetwork.isColored() && !tapnNetwork.isUntimed())) {
+        if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
             verifytapnOptions = new VerifyDTAPNOptions(
                 bound,
                 query.getTraceOption(),
@@ -205,6 +205,7 @@ public class Verifier {
                 query.isColored()
             );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
+            boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
             verifytapnOptions = new VerifyPNOptions(
                 bound,
                 query.getTraceOption(),
@@ -222,8 +223,8 @@ public class Verifier {
                 reducedNetTempFile.getAbsolutePath(),
                 query.isTarOptionEnabled(),
                 query.isTarjan(),
-                tapnNetwork.isColored(),
-                tapnNetwork.isColored() && (!tapnNetwork.isUntimed() || query.getTraceOption() != TAPNQuery.TraceOption.NONE),
+                isColored,
+                isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE,
                 query.usePartitioning(),
                 query.useColorFixpoint(),
                 query.useSymmetricVars()

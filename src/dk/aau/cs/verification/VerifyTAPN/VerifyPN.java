@@ -297,8 +297,7 @@ public class VerifyPN implements ModelChecker {
                 try {
                     loadedModel = tapnLoader.load(fileOut);
                     TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
-                    //model = newComposer.transformModel(loadedModel.network());
-
+                    model = newComposer.transformModel(loadedModel.network());
 
                     if (queryResult != null && queryResult.value1() != null) {
                         tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1(), true);
