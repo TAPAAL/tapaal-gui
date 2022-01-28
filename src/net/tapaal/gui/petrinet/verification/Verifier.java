@@ -147,7 +147,7 @@ public class Verifier {
     }
 
     public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query, VerificationCallback callback) {
-        runVerifyTAPNVerification(tapnNetwork, query, callback, null, false);
+        runVerifyTAPNVerification(tapnNetwork, query, callback, null, false, null);
     }
 
     public static void runVerifyTAPNVerification(
@@ -155,8 +155,8 @@ public class Verifier {
         TAPNQuery query,
         VerificationCallback callback,
         HashMap<TimedArcPetriNet, DataLayer> guiModels,
-        boolean onlyCreateReducedNet
-    ) {
+        boolean onlyCreateReducedNet,
+        PetriNetTab.TAPNLens lens) {
         ModelChecker verifytapn = getModelChecker(query);
 
 
@@ -259,7 +259,7 @@ public class Verifier {
             if(tapnNetwork.isColored() && query.getTraceOption() != TAPNQuery.TraceOption.NONE){
                 SmartDrawDialog.setupWorkerListener(thread);
             }
-            thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
+            thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query, lens);
             dialog.setVisible(true);
         } else {
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(),

@@ -1,6 +1,8 @@
 package dk.aau.cs.approximation;
 
 import java.math.BigDecimal;
+
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import pipe.gui.TAPAALGUI;
@@ -41,7 +43,8 @@ public class ApproximationWorker {
         RunVerificationBase verificationBase,
         TimedArcPetriNetNetwork model,
         DataLayer guiModel,
-        net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery
+        net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery,
+        PetriNetTab.TAPNLens lens
     ) throws Exception {
 		
 		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them
@@ -58,7 +61,7 @@ public class ApproximationWorker {
 		VerificationResult<TAPNNetworkTrace> toReturn = null;
 		VerificationResult<TimedArcPetriNetTrace> result;
 
-		result = modelChecker.verify(options, transformedModel, clonedQuery, guiModel, dataLayerQuery);
+		result = modelChecker.verify(options, transformedModel, clonedQuery, guiModel, dataLayerQuery, lens);
 
 		if (result.error()) {
 			options.setTraceOption(oldTraceOption);
@@ -118,7 +121,7 @@ public class ApproximationWorker {
 			
 						// run model checker again for trace TAPN
 						MemoryMonitor.cumulateMemory();
-						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery, guiModel, dataLayerQuery);
+						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery, guiModel, dataLayerQuery, null);
 
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
@@ -287,7 +290,7 @@ public class ApproximationWorker {
 			
 						//run model checker again for trace TAPN
 						MemoryMonitor.cumulateMemory();
-						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery, guiModel, dataLayerQuery);
+						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery, guiModel, dataLayerQuery, null);
 
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
@@ -402,7 +405,7 @@ public class ApproximationWorker {
 			options.setTraceOption(TraceOption.SOME);
 		}
 		
-		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify, TAPAALGUI.getModel(), query);
+		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify, TAPAALGUI.getModel(), query, null);
 		
 		VerificationResult<TAPNNetworkTrace> valueNetwork = null;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
 		VerificationResult<TimedArcPetriNetTrace> value = null;
@@ -458,7 +461,7 @@ public class ApproximationWorker {
 
 	                //run model checker again for trace TAPN
 	                MemoryMonitor.cumulateMemory();
-	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, TAPAALGUI.getModel(), query);
+	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, TAPAALGUI.getModel(), query, null);
 
 	                if (verificationResult.error()) {
 	                	options.setTraceOption(oldTraceOption);
@@ -597,7 +600,7 @@ public class ApproximationWorker {
 	        
 	                    //run model checker again for trace TAPN
 	                    MemoryMonitor.cumulateMemory();
-	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, TAPAALGUI.getModel(), query);
+	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, TAPAALGUI.getModel(), query, null);
 
 	                    if (verificationResult.error()) {
 	                    	options.setTraceOption(oldTraceOption);

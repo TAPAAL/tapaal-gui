@@ -223,7 +223,7 @@ public class VerifyPN implements ModelChecker {
         return false;
     }
 
-    public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) throws Exception {
+    public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, PetriNetTab.TAPNLens lens) throws Exception {
         if (!supportsModel(model.value1(), options)) {
             throw new UnsupportedModelException("Verifypn does not support the given model.");
         }
@@ -235,7 +235,7 @@ public class VerifyPN implements ModelChecker {
         if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 
         VerifyTAPNExporter exporter;
-        if (model.value1().parentNetwork().isColored()) {
+        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
             exporter = new VerifyCPNExporter();
         } else {
             exporter = new VerifyPNExporter();
@@ -246,7 +246,7 @@ public class VerifyPN implements ModelChecker {
             messenger.displayErrorMessage("There was an error exporting the model");
         }
 
-        return verify(options, model, exportedModel, query, dataLayerQuery);
+        return verify(options, model, exportedModel, query, dataLayerQuery, lens);
     }
 
     private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
@@ -272,7 +272,7 @@ public class VerifyPN implements ModelChecker {
         ((VerifyTAPNOptions) options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
     }
 
-    private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) throws IOException {
+    private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, PetriNetTab.TAPNLens lens) throws IOException {
         ((VerifyTAPNOptions) options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 
         runner = new ProcessRunner(verifypnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
@@ -287,7 +287,8 @@ public class VerifyPN implements ModelChecker {
 
             Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
 
-            if (options.traceOption() != TraceOption.NONE && model.value1().isColored() && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()) {
+            boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
+            if (options.traceOption() != TraceOption.NONE && isColored && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()) {
                 PNMLoader tapnLoader = new PNMLoader();
                 File fileOut = new File(options.unfoldedModelPath());
                 File queriesOut = new File(options.unfoldedQueriesPath());
