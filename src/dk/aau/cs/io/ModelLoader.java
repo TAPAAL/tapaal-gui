@@ -52,7 +52,7 @@ public class ModelLoader {
                 return oldFormatLoader.load(new ByteArrayInputStream(baos.toByteArray()));
 
             } catch(Throwable e2) {
-				throw new ParseException(e1.getMessage());
+				throw new Exception(e1.getMessage(), e1);
 			}
 		}
 	}

@@ -227,7 +227,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
             return tab;
 		} catch (ParseException e) {
-            throw new ParseException("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.getMessage());
+            throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.getMessage(), e);
         }
 	}
 

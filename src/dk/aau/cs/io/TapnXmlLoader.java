@@ -101,7 +101,7 @@ public class TapnXmlLoader {
         } catch (FormatException | NullPointerException e) {
             throw e;
         } catch (Exception e) {
-            throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type");
+            throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type", e);
         }
 	}
 	

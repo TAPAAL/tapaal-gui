@@ -337,10 +337,16 @@ public class TAPNQueryLoader extends QueryLoader{
 
 	private ReductionOption getQueryReductionOption(Element queryElement) {
 		ReductionOption reductionOption;
+        var redName = queryElement.getAttribute("reductionOption");
 		try {
-			reductionOption = ReductionOption.valueOf(queryElement.getAttribute("reductionOption"));
+            if (redName.equals("VerifyTAPNdiscreteVerification")) {
+                //Verifydtapn was know as VerifyTAPNdiscreteVerification in the older versions
+                reductionOption = ReductionOption.VerifyDTAPN;
+            } else {
+                reductionOption = ReductionOption.valueOf(redName);
+            }
 		} catch (Exception e) {
-			reductionOption = ReductionOption.STANDARD;
+			throw new RuntimeException("Unknown Query reduction option: " + redName);
 		}
 		return reductionOption;
 	}
