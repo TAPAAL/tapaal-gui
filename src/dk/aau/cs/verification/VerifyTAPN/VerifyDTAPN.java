@@ -8,7 +8,6 @@ import dk.aau.cs.TCTL.TCTLEGNode;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.TapnEngineXmlLoader;
-import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.*;
@@ -18,7 +17,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -208,7 +206,7 @@ public class VerifyDTAPN implements ModelChecker{
 
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) throws Exception {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, PetriNetTab.TAPNLens lens) throws Exception {
 		if (!supportsModel(model.value1(), options)) {
 			throw new UnsupportedModelException("Verifydtapn does not support the given model.");
 		}
@@ -219,15 +217,20 @@ public class VerifyDTAPN implements ModelChecker{
 
 		if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 
-		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+        ExportedVerifyTAPNModel exportedModel;
+        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+            VerifyTAPNExporter exporter = new VerifyTACPNExporter();
+            exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+        } else {
+            VerifyTAPNExporter exporter = new VerifyTAPNExporter();
+            exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+        }
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");
 		}
 
-		return verify(options, model, exportedModel, query, dataLayerQuery);
+		return verify(options, model, exportedModel, query, dataLayerQuery, lens);
 	}
 
 	protected void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
@@ -251,7 +254,7 @@ public class VerifyDTAPN implements ModelChecker{
 		((VerifyTAPNOptions) options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
 	}
 
-	protected VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) {
+	protected VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, PetriNetTab.TAPNLens lens) {
 		((VerifyTAPNOptions) options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 
         runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
@@ -271,7 +274,9 @@ public class VerifyDTAPN implements ModelChecker{
 
                 TimedArcPetriNetTrace tapnTrace = null;
 
-                if(options.traceOption() != TraceOption.NONE && model.value1().isColored() && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()) {
+
+                boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
+                if(options.traceOption() != TraceOption.NONE && isColored && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()) {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());

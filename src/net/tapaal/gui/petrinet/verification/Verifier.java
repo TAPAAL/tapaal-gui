@@ -52,23 +52,17 @@ public class Verifier {
         return verifydtapn;
     }
 
-    private static VerifyDTAPN getVerifydTACPN() {
-        VerifyDTAPN verifydtacpn = new VerifyDTACPN(new FileFinder(), new MessengerImpl());
-        verifydtacpn.setup();
-        return verifydtacpn;
-    }
-
     private static VerifyPN getVerifyPN() {
         VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
         verifypn.setup();
         return verifypn;
     }
 
-    public static ModelChecker getModelChecker(TAPNQuery query, boolean isColored) {
+    public static ModelChecker getModelChecker(TAPNQuery query) {
         if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
             return getVerifyTAPN();
         } else if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
-            return isColored? getVerifydTACPN(): getVerifydTAPN();
+            return getVerifydTAPN();
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             return getVerifyPN();
         } else {
@@ -86,7 +80,7 @@ public class Verifier {
         if (tapnNetwork.isUntimed()) {
             modelChecker = getVerifyPN();
         } else if (tapnNetwork.isColored()) {
-            modelChecker = getVerifydTACPN();
+            modelChecker = getVerifydTAPN();
         }else if (tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions()) {
             modelChecker = getVerifydTAPN();
         } else {
@@ -153,7 +147,7 @@ public class Verifier {
     }
 
     public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query, VerificationCallback callback) {
-        runVerifyTAPNVerification(tapnNetwork, query, callback, null, false);
+        runVerifyTAPNVerification(tapnNetwork, query, callback, null, false, null);
     }
 
     public static void runVerifyTAPNVerification(
@@ -161,9 +155,9 @@ public class Verifier {
         TAPNQuery query,
         VerificationCallback callback,
         HashMap<TimedArcPetriNet, DataLayer> guiModels,
-        boolean onlyCreateReducedNet
-    ) {
-        ModelChecker verifytapn = getModelChecker(query, tapnNetwork.isColored());
+        boolean onlyCreateReducedNet,
+        PetriNetTab.TAPNLens lens) {
+        ModelChecker verifytapn = getModelChecker(query);
 
 
         try {
@@ -185,9 +179,9 @@ public class Verifier {
         TCTLAbstractProperty inputQuery = query.getProperty();
 
         int bound = query.getCapacity();
-
+        boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
         VerifyTAPNOptions verifytapnOptions;
-        if (query.getReductionOption() == ReductionOption.VerifyDTAPN || (tapnNetwork != null && tapnNetwork.isColored() && !tapnNetwork.isUntimed())) {
+        if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
             verifytapnOptions = new VerifyDTAPNOptions(
                 bound,
                 query.getTraceOption(),
@@ -208,9 +202,10 @@ public class Verifier {
                 reducedNetTempFile.getAbsolutePath(),
                 query.usePartitioning(),
                 query.useColorFixpoint(),
-                query.isColored()
+                isColored // Unfold net
             );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
+
             verifytapnOptions = new VerifyPNOptions(
                 bound,
                 query.getTraceOption(),
@@ -228,8 +223,8 @@ public class Verifier {
                 reducedNetTempFile.getAbsolutePath(),
                 query.isTarOptionEnabled(),
                 query.isTarjan(),
-                tapnNetwork.isColored(),
-                tapnNetwork.isColored() && (!tapnNetwork.isUntimed() || query.getTraceOption() != TAPNQuery.TraceOption.NONE),
+                isColored,
+                isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE,
                 query.usePartitioning(),
                 query.useColorFixpoint(),
                 query.useSymmetricVars()
@@ -265,7 +260,7 @@ public class Verifier {
             if(tapnNetwork.isColored() && query.getTraceOption() != TAPNQuery.TraceOption.NONE){
                 SmartDrawDialog.setupWorkerListener(thread);
             }
-            thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query);
+            thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query, lens);
             dialog.setVisible(true);
         } else {
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(),

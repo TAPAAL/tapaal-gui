@@ -62,13 +62,18 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         this.spinner = spinner;
     }
 
-    public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) {
+    public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, PetriNetTab.TAPNLens lens) {
         this.model = model;
         this.options = options;
         this.query = query;
         this.dataLayerQuery = dataLayerQuery;
+        this.lens = lens;
         execute();
     }
+    public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) {
+        execute(options, model, query, dataLayerQuery, null);
+    }
+
 
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
@@ -107,7 +112,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                         overapprox_result = verifypn.verify(
                             new VerifyPNOptions(
                                 options.extraTokens(),
-                                options.traceOption(),
+                                net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE,
                                 SearchOption.OVERAPPROXIMATE,
                                 true,
                                 ModelReduction.AGGRESSIVE,
@@ -131,13 +136,13 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                             transformedModel,
                             clonedQuery,
                             composer.getGuiModel(),
-                            dataLayerQuery
-                        );
+                            dataLayerQuery,
+                            null);
                     } else { // TODO: FIX! If datalayer is null then we can't check datalayer's values...
                         overapprox_result = verifypn.verify(
                             new VerifyPNOptions(
                                 options.extraTokens(),
-                                options.traceOption(),
+                                net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE,
                                 SearchOption.OVERAPPROXIMATE,
                                 true,
                                 ModelReduction.AGGRESSIVE,
@@ -161,8 +166,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                             transformedModel,
                             clonedQuery,
                             composer.getGuiModel(),
-                            dataLayerQuery
-                        );
+                            dataLayerQuery,
+                            null);
                     }
 
                     if (overapprox_result.getQueryResult() != null) {
@@ -186,7 +191,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         }
         ApproximationWorker worker = new ApproximationWorker();
 
-        return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model, guiModel, dataLayerQuery);
+        return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model, guiModel, dataLayerQuery, lens);
     }
 
     private TAPNNetworkTrace decomposeTrace(TimedArcPetriNetTrace trace, NameMapping mapping) {

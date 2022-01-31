@@ -3751,9 +3751,8 @@ public class QueryDialog extends JPanel {
                         TAPNQuery query = getQuery();
 
                         if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN) {
-                            Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false);
-                        }
-						else{
+                            Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false, lens);
+                        } else{
                             Verifier.runUppaalVerification(tapnNetwork, query);
                         }
 					}}
@@ -3899,7 +3898,7 @@ public class QueryDialog extends JPanel {
 
                         exit();
 
-                        Verifier.runVerifyTAPNVerification(tapnNetwork, query,null, guiModels, true);
+                        Verifier.runVerifyTAPNVerification(tapnNetwork, query,null, guiModels, true, null);
 
                         File reducedNetFile = new File(Verifier.getReducedNetFilePath());
 
