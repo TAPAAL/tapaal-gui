@@ -358,8 +358,8 @@ public class RunVerification extends RunVerificationBase {
                     gbc = GridBagHelper.as(1,4, WEST, new Insets(10, 0, 10, 0));
                     panel.add(placeStatsButton, gbc);
                 }
-                rowOffset = 6;
             }
+            rowOffset = 6;
 
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
             rowOffset = displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations(), 1);
@@ -373,8 +373,11 @@ public class RunVerification extends RunVerificationBase {
         }
 
 
+
+
 		if(result.isSolvedUsingStateEquation()){
 			gbc = GridBagHelper.as(0, rowOffset+2, WEST, new Insets(0,0,15,0));
+            gbc.gridwidth = 2;
 			panel.add(new JLabel(toHTML("The query was resolved using state equations.")), gbc);
 		}
 		
