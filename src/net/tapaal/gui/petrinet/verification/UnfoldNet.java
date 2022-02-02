@@ -77,7 +77,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
     @Override
     protected String doInBackground() throws Exception {
-        PetriNetTab.TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
+        PetriNetTab.TAPNLens lens = oldTab.getLens();
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
         boolean dummyQuery = false;
