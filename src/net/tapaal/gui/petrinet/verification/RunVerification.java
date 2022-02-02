@@ -388,20 +388,21 @@ public class RunVerification extends RunVerificationBase {
                 }
             }
 
-            if (result.getRawOutput() != null) {
-                JButton showRawQueryButton = new JButton("Show raw query results");
-                showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
-                gbc = new GridBagConstraints();
-                gbc.gridx = 1;
-                gbc.gridy = 5;
-                gbc.insets = new Insets(0,0,10,0);
-                gbc.anchor = GridBagConstraints.WEST;
-                panel.add(showRawQueryButton, gbc);
-            }
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
             displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations());
-
 		}
+
+        if (result.getRawOutput() != null) {
+            JButton showRawQueryButton = new JButton("Show raw query results");
+            showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
+            gbc = new GridBagConstraints();
+            gbc.gridx = 1;
+            gbc.gridy = 5;
+            gbc.insets = new Insets(0,0,10,0);
+            gbc.anchor = GridBagConstraints.WEST;
+            panel.add(showRawQueryButton, gbc);
+        }
+
 
 		if(result.isSolvedUsingStateEquation()){
 			gbc = new GridBagConstraints();
