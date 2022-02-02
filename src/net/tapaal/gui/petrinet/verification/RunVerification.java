@@ -372,7 +372,11 @@ public class RunVerification extends RunVerificationBase {
             panel.add(showRawQueryButton, gbc);
         }
 
-
+        if (result.isResolvedUsingSkeletonPreprocessor()) {
+            gbc = GridBagHelper.as(0, rowOffset+1, GridBagHelper.Anchor.WEST, new Insets(0,0,15,0));
+            gbc.gridwidth = 2;
+            panel.add(new JLabel(toHTML("The query was resolved using Skeleton Analysis preprocessing")), gbc);
+        }
 
 
 		if(result.isSolvedUsingStateEquation()){

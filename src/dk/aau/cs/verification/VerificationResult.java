@@ -20,8 +20,9 @@ public class VerificationResult<TTrace> {
 	private TTrace secondaryTrace;
 	private boolean isSolvedUsingStateEquation = false;
 	private Tuple<TimedArcPetriNet, NameMapping> unfoldedModel;
-	
-	public boolean isQuerySatisfied() {
+    private boolean resolvedUsingSkeletonPreprocessor = false;
+
+    public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
 	}
 
@@ -111,8 +112,15 @@ public class VerificationResult<TTrace> {
 		returnList.sort(new transitionTupleComparator());
 		return returnList;
 	}
-	
-	public static class transitionTupleComparator implements Comparator<Tuple<String,Integer>> {
+
+    public boolean isResolvedUsingSkeletonPreprocessor() {
+        return resolvedUsingSkeletonPreprocessor;
+    }
+    public boolean setResolvedUsingSkeletonPreprocessor(boolean b) {
+        return this.resolvedUsingSkeletonPreprocessor = b;
+    }
+
+    public static class transitionTupleComparator implements Comparator<Tuple<String,Integer>> {
 		
 		public int compare(Tuple<String,Integer> tuple1,Tuple<String,Integer> tuple2) {
             return tuple2.value2() - tuple1.value2();
