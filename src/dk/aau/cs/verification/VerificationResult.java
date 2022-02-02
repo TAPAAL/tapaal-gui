@@ -33,11 +33,6 @@ public class VerificationResult<TTrace> {
 		this.stats = stats;
 		this.rawOutput = rawOutput;
 	}
-
-    public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation){
-        this(queryResult, trace, verificationTime, stats, null);
-        this.isSolvedUsingStateEquation = isSolvedUsingStateEquation;
-    }
 	
 	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel){
 		this(queryResult, trace, verificationTime, stats, rawOutput);
@@ -116,7 +111,7 @@ public class VerificationResult<TTrace> {
     public boolean isResolvedUsingSkeletonPreprocessor() {
         return resolvedUsingSkeletonPreprocessor;
     }
-    public boolean setResolvedUsingSkeletonPreprocessor(boolean b) {
+    public boolean setResolvedUsingSkeletonAnalysisPreprocessor(boolean b) {
         return this.resolvedUsingSkeletonPreprocessor = b;
     }
 
