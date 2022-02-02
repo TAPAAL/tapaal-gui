@@ -330,7 +330,6 @@ public class VerifyPN implements ModelChecker {
                 return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
             } else {
                 ctlOutput = queryResult.value1().isCTL;
-                boolean approximationResult = queryResult.value2().discoveredStates() == 0;    // Result is from over-approximation
 
                 if (tapnTrace == null) {
                     if (!errorOutput.contains("Trace") && standardOutput.contains("<trace>")) {
@@ -342,7 +341,11 @@ public class VerifyPN implements ModelChecker {
                         tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
                     }
                 }
-                return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult, standardOutput, model);
+                var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput, model);
+                if (queryResult.value1().isSolvedUsingStateEquation()) {
+
+                }
+                return result;
             }
         }
     }

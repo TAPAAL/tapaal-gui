@@ -18,9 +18,25 @@ public class VerificationResult<TTrace> {
 	private Stats stats;
 	private NameMapping nameMapping;
 	private TTrace secondaryTrace;
-	private boolean isSolvedUsingStateEquation = false;
+
 	private Tuple<TimedArcPetriNet, NameMapping> unfoldedModel;
     private boolean resolvedUsingSkeletonPreprocessor = false;
+
+    public boolean isSolvedUsingQuerySimplification() {
+        return queryResult.isSolvedUsingQuerySimplification();
+    }
+
+    public boolean isSolvedUsingTraceAbstractRefinement() {
+        return queryResult.isSolvedUsingTraceAbstractRefinement();
+    }
+
+    public boolean isSolvedUsingStateEquation() {
+        return queryResult.isSolvedUsingStateEquation();
+    }
+
+    public boolean isSolvedUsingSiphonTrap() {
+        return queryResult.isSolvedUsingSiphonTrap();
+    }
 
     public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
@@ -36,7 +52,7 @@ public class VerificationResult<TTrace> {
 	
 	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel){
 		this(queryResult, trace, verificationTime, stats, rawOutput);
-		this.isSolvedUsingStateEquation = isSolvedUsingStateEquation;
+		//this.solvedUsingStateEquation = isSolvedUsingStateEquation; // This was the old value using for both state equation and untimed skeleton check
 		this.unfoldedModel = unfoldedModel;
 	}
 
@@ -211,10 +227,6 @@ public class VerificationResult<TTrace> {
 		}
 		
 		return m;
-	}
-	
-	public boolean isSolvedUsingStateEquation(){
-		return isSolvedUsingStateEquation;
 	}
 	
 	public void addTime(long timeToAdd) {

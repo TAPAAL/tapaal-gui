@@ -297,7 +297,7 @@ public class RunVerification extends RunVerificationBase {
 		// TODO remove this when the engine outputs statistics
 		boolean isCTLQuery = result.getQueryResult().isCTL;
         int rowOffset = 1;
-		if(modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && !isCTLQuery){
+		if(modelChecker.supportsStats() && !result.isSolvedUsingQuerySimplification() && !isCTLQuery){
             rowOffset = displayStats(panel, result.getStatsAsString(), modelChecker.getStatsExplanations(), 1);
 
             if(!result.getTransitionStatistics().isEmpty()) {
@@ -361,7 +361,7 @@ public class RunVerification extends RunVerificationBase {
             }
             rowOffset = 6;
 
-		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
+		} else if (modelChecker.supportsStats() && !result.isSolvedUsingQuerySimplification() && isCTLQuery){
             rowOffset = displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations(), 1);
 		}
 
@@ -379,11 +379,17 @@ public class RunVerification extends RunVerificationBase {
         }
 
 
-		if(result.isSolvedUsingStateEquation()){
-			gbc = GridBagHelper.as(0, rowOffset+2, WEST, new Insets(0,0,15,0));
-            gbc.gridwidth = 2;
-			panel.add(new JLabel(toHTML("The query was resolved using state equations.")), gbc);
-		}
+        gbc = GridBagHelper.as(0, rowOffset+2, WEST, new Insets(0,0,15,0));
+        gbc.gridwidth = 2;
+		if(result.isSolvedUsingQuerySimplification()){
+			panel.add(new JLabel(toHTML("The query was resolved using Query Simplification.")), gbc);
+		} else if (result.isSolvedUsingTraceAbstractRefinement()){
+            panel.add(new JLabel(toHTML("The query was not resolved using Trace Abstraction Refinement.")), gbc);
+        } else if (result.isSolvedUsingStateEquation()) {
+            panel.add(new JLabel(toHTML("The query was resolved using state equations.")), gbc);
+        } else if (result.isSolvedUsingSiphonTrap()) {
+            panel.add(new JLabel(toHTML("The query was resolved using Siphon Trap.")), gbc);
+        }
 		
 		gbc = GridBagHelper.as(0, rowOffset+3, WEST);
     	gbc.gridwidth = 2;
