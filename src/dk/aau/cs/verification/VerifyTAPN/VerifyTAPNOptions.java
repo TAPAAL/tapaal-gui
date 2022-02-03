@@ -138,8 +138,8 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 	public static Map<TraceOption, String> createTraceOptionsMap() {
 		HashMap<TraceOption, String> map = new HashMap<TraceOption, String>();
-		map.put(TraceOption.SOME, "--trace 1 --xml-trace");
-		map.put(TraceOption.FASTEST, "--trace 2 --xml-trace");
+		map.put(TraceOption.SOME, "--trace 1 ");
+		map.put(TraceOption.FASTEST, "--trace 2 ");
 		map.put(TraceOption.NONE, "");
 
 		return map;
@@ -147,10 +147,10 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 	private static Map<SearchOption, String> createSearchOptionsMap() {
 		HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
-		map.put(SearchOption.BFS, "--search-type 0");
-		map.put(SearchOption.DFS, "--search-type 1");
-		map.put(SearchOption.RANDOM, "--search-type 2");
-		map.put(SearchOption.HEURISTIC, "--search-type 3");
+		map.put(SearchOption.BFS, "--search-strategy BFS");
+		map.put(SearchOption.DFS, "--search-strategy DFS");
+		map.put(SearchOption.RANDOM, "--search-strategy RDFS");
+		map.put(SearchOption.HEURISTIC, "--search-strategy MAX-COVER");
 		map.put(SearchOption.DEFAULT, "");
 		return map;
 	}
