@@ -1,6 +1,10 @@
 package net.tapaal.gui.petrinet.verification;
 
 import dk.aau.cs.Messenger;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
@@ -9,7 +13,6 @@ import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.canvas.Grid;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
@@ -18,8 +21,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.File;
@@ -28,29 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
-import pipe.gui.petrinet.PetriNetTab;
-import dk.aau.cs.Messenger;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.util.MemoryMonitor;
-import dk.aau.cs.util.Tuple;
-import dk.aau.cs.util.VerificationCallback;
-import dk.aau.cs.verification.IconSelector;
-import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
-import dk.aau.cs.verification.VerificationResult;
-import pipe.gui.petrinet.dataLayer.DataLayer;
-import pipe.gui.TAPAALGUI;
 
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
