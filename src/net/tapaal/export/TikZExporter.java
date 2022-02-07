@@ -3,16 +3,18 @@ package net.tapaal.export;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedToken;
 
+import net.tapaal.gui.petrinet.Context;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.petrinet.graphicElements.Arc;
-import pipe.gui.petrinet.graphicElements.ArcPathPoint;
-import pipe.gui.petrinet.graphicElements.Place;
-import pipe.gui.petrinet.graphicElements.Transition;
+import pipe.gui.petrinet.graphicElements.*;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
@@ -45,7 +47,7 @@ public class TikZExporter {
 			if (option == TikZOutputOption.FULL_LATEX) {
 				out.println("\\documentclass[a4paper]{article}");
 				out.println("\\usepackage{tikz}");
-				out.println("\\usetikzlibrary{petri,arrows}");
+				out.println("\\usetikzlibrary{petri,arrows,positioning}");
 				out.println("\\usepackage{amstext}");
 				out.println();
 				out.println("\\begin{document}");
@@ -61,6 +63,8 @@ public class TikZExporter {
 			out.print(exportPlacesWithTokens(net.getPlaces()));
 			out.print(exportTransitions(net.getTransitions()));
 			out.print(exportArcs(net.getArcs()));
+
+            out.println(exportGlobalVariables());
 
 			out.println("\\end{tikzpicture}");
 			if (option == TikZOutputOption.FULL_LATEX) {
@@ -144,37 +148,19 @@ public class TikZExporter {
 
 	protected String getArcLabels(Arc arc) {
 		String arcLabel = "";
-		String arcLabelPositionString = "\\draw (" + (arc.getNameLabel().getX()) + "," + (arc.getNameLabel().getY())*(-1) + ") node {";
+		String arcLabelPositionString = "\\draw (" + (arc.getArcPath().midPoint.getX()) + "," + (arc.getNameLabel().getY())*(-1) + ") node[align=left,xshift=0pt,yshift=0pt] {";
 
-		if (arc instanceof TimedInputArcComponent) {
-            if (!(arc.getSource() instanceof TimedTransitionComponent)) {
-				arcLabel = arcLabelPositionString;
-                if (arc.getWeight().value() > 1) {
-                        arcLabel += "$" + arc.getWeight().value() + "\\times$\\ ";
-                }
+        if(!arc.getNameLabel().getText().isEmpty()) {
+            arcLabel += arcLabelPositionString;
+            arcLabel += "\\\\" + handleNameLabel(arc.getNameLabel().getText());
+        }
 
-                if(TAPAALGUI.getApp().getCurrentTab().getLens().isTimed()) {
-                    arcLabel += "$\\mathrm{" + replaceWithMathLatex(getGuardAsStringIfNotHidden((TimedInputArcComponent) arc)) + "}$";
-                    if (arc instanceof TimedTransportArcComponent)
-                        arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr();
-                    arcLabel += "};\n";
-                } else {
-                    arcLabel += "};\n";
-                }
+        if(!arcLabel.isEmpty()) {
+            arcLabel += "};\n";
+        } else {
+            arcLabel += "{};\n";
+        }
 
-			} else {
-				arcLabel = arcLabelPositionString;
-                if (arc.getWeight().value() > 1) {
-                        arcLabel += "$" + arc.getWeight().value() + "\\times$\\ ";
-                }
-				arcLabel += ":" + ((TimedTransportArcComponent) arc).getGroupNr() + "};\n";
-			}
-
-		} else {
-            if (arc.getWeight().value() > 1) {
-                arcLabel += arcLabelPositionString + "$" + arc.getWeight().value() + "\\times$\\ };\n";
-            }
-    	}
 		return arcLabel;
 	}
 
@@ -234,9 +220,10 @@ public class TikZExporter {
 				out.append("%% label for transition " + trans.getName() + "\n");
 				out.append("\\draw (");
 				out.append(trans.getNameLabel().getX() + xOffset + "," + (trans.getNameLabel().getY() * -1) + ")");
-				out.append(" node ");
+				out.append(" node[align=left,xshift=0pt,yshift=0pt]");
 				out.append(" {");
 				out.append(exportMathName(trans.getName()));
+				out.append(handleNameLabel(trans.getNameLabel().getText()));
 				out.append("};\n");
 			}	
 		}
@@ -269,29 +256,101 @@ public class TikZExporter {
 			if (place.getAttributesVisible() || !invariant.equals("")){
 			    boolean isLabelAbovePlace = place.getY() > place.getNameLabel().getY();
 			    boolean isLabelBehindPlace = place.getX() < place.getNameLabel().getX();
-			    double xOffset = place.getName().length() > 6 && !isLabelAbovePlace && !isLabelBehindPlace ? place.getLayerOffset() : 0;
-			    double yOffset = isLabelAbovePlace ? (place.getNameLabel().getHeight() / 2) : 0;
+                int longestString = 0;
+                List<String> listStringNameLabel = place.getNameLabel().getText().lines().collect(Collectors.toList());
+                for(int i = 0; i < listStringNameLabel.size(); i++) {
+                    if(listStringNameLabel.get(i).length() > longestString) {
+                        longestString = listStringNameLabel.get(i).length();
+                    }
+                }
+			    double xOffset = longestString > 6 && !isLabelAbovePlace && !isLabelBehindPlace ? place.getLayerOffset() : 0;
+			    double yOffset = place.getNameLabel().getText().lines().count() * 5;
+
+			    String nameLabel = place.getNameLabel().getText();
 
 				out.append("%% label for place " + place.getName() + "\n");
 				out.append("\\draw (");
-				out.append((place.getNameLabel().getX() + xOffset)  + "," + ((place.getNameLabel().getY() * -1) + yOffset) +")");
-				out.append(" node[align=left] ");
+                //String labelPlacement = getTikzPlacementOfNameLabel(place.getNameLabel(), place.getPositionX(), place.getPositionY(), place.getHeight(), place.getId());
+                //out.append("node" + labelPlacement);
+				out.append((place.getNameLabel().getX() + xOffset)  + "," + ((place.getNameLabel().getY() + yOffset) * -1) +")");
+				out.append(" node[align=left,xshift=0pt,yshift=0pt] ");
 				out.append("{");
-				if(place.getAttributesVisible())
-					out.append(exportMathName(place.getName()));					
-				if(!invariant.equals("")) {
-					if((place.getAttributesVisible()))
-						out.append("\\\\");
-					out.append(invariant);
-				}else {
-					out.append("};\n");
-				}
-					
+				if(place.getAttributesVisible()) {
+                    out.append(exportMathName(place.getName()));
+                    if (!place.getNameLabel().getText().isEmpty()) {
+                        out.append(handleNameLabel(nameLabel));
+                    }
+                }
+                out.append("};\n");
 			}
 		}
 
 		return out;
 	}
+
+
+	private String getTikzPlacementOfNameLabel(NameLabel nameLabel, double xcoord, double ycoord, double height, String ID) {
+        double nameLabelXCoord = nameLabel.getXPosition();
+        double nameLabelYCoord = nameLabel.getYPosition();
+        String labelPlacement = "";
+        int longestString = 0;
+        final double coordToCM = (1 / 28.45274) * 0.33;
+
+        List<String> longestEntry = nameLabel.getText().lines().collect(Collectors.toList());
+        for(int i = 0; i < longestEntry.size(); i++) {
+            if(longestEntry.get(i).length() > longestString) {
+                longestString = longestEntry.get(i).length();
+            }
+        }
+
+        boolean isRight = nameLabelXCoord > (xcoord + (longestString * 15));
+        boolean isAbove = nameLabelYCoord <= ycoord;
+
+        double yDiff = nameLabelYCoord - ycoord;
+        double xDiff = nameLabelXCoord - xcoord;
+
+        yDiff = isAbove ? yDiff - (longestEntry.size() * 15) : nameLabelYCoord - (ycoord + height);
+        xDiff = xDiff > 0 ? nameLabelXCoord - (xcoord + longestString * 12) : xDiff;
+
+
+        if(isRight) {
+            if(isAbove) {
+                labelPlacement = "[align=left, above right=" + (yDiff * coordToCM) + "cm and " + (xDiff * coordToCM) + "cm of " + ID + "] ";
+                //labelPlacement = "[align=left,anchor=south west] at (" + ID + ".north east)";
+            } else {
+                labelPlacement = "[align=left, below right=" + (yDiff * coordToCM) + "cm and " + (xDiff * coordToCM) + "cm of " + ID + "] ";
+                //labelPlacement = "[align=left,anchor=north west] at (" + ID + ".south east)";
+            }
+
+        } else {
+            if(isAbove) {
+                labelPlacement = "[align=left, above left=" + (yDiff * coordToCM) + "cm and " + (xDiff * coordToCM) + "cm of " + ID + "] ";
+                //labelPlacement = "[align=left,anchor=south east] at (" + ID + ".north west)";
+            } else {
+                labelPlacement = "[align=left, below left=" + (yDiff * coordToCM) + "cm and " + (xDiff * coordToCM) + "cm of " + ID + "] ";
+                //labelPlacement = "[align=left,anchor=north east] at (" + ID + ".south west)";
+            }
+        }
+
+        return labelPlacement;
+    }
+
+	private String handleNameLabel(String nameLabel) {
+	    String nameLabelsString = "";
+        String[] labelsInName = nameLabel.split("\n");
+        for(int i = 0; i < labelsInName.length; i++) {
+
+            if(labelsInName[i].contains("[")) {
+                nameLabelsString += "{" + replaceWithMathLatex(labelsInName[i]) +"}";
+                nameLabelsString += "\\\\";
+            }
+            else {
+                nameLabelsString += replaceWithMathLatex(labelsInName[i]);
+                nameLabelsString += "\\\\";
+            }
+        }
+        return nameLabelsString;
+    }
 
 	private void exportPlaceTokens(Place place, StringBuffer out, int numOfTokens) {
         // Dot radius
@@ -437,6 +496,75 @@ public class TikZExporter {
         }
     }
 
+    private StringBuffer exportGlobalVariables() {
+        StringBuffer out = new StringBuffer();
+
+	    Context context = new Context(TAPAALGUI.getCurrentTab());
+        List<ColorType> listColorTypes = context.network().colorTypes();
+        List<Constant> constantsList = new ArrayList<>(context.network().constants());
+        List<Variable> variableList = context.network().variables();
+        String stringColorList = "";
+        String stringVariableList = "";
+        String stringConstantsList = "";
+
+        out.append("\\node [globalBox] (globalBox) at (current bounding box.north west) [anchor=south west] {");
+
+        for(int i = 0; i < listColorTypes.size(); i++) {
+            if(i == 0) {
+                out.append("Color Types:\\\\");
+            }
+
+            out.append(listColorTypes.get(i).getName() + " is ");
+
+            if(listColorTypes.get(i).isProductColorType()) {
+                out.append("$<$" + listColorTypes.get(i).getProductColorTypes().get(0).getName() + ", " + listColorTypes.get(i).getProductColorTypes().get(1).getName() + "$>$ \\\\");
+
+            } else {
+                out.append("[");
+                for(int x = 0; x < listColorTypes.get(i).getColors().size(); x++) {
+                    stringColorList += listColorTypes.get(i).getColors().get(x).getName();
+
+                    if(x != listColorTypes.get(i).getColors().size() - 1){
+                        stringColorList += " ";
+                    }
+                }
+                out.append(stringColorList + "]\\\\");
+                stringColorList = "";
+            }
+        }
+
+        if(listColorTypes.size() > 0 && (variableList.size() > 0 || constantsList.size() > 0)) {
+            out.append("\\\\");
+        }
+
+        for(int i = 0; i < variableList.size(); i++) {
+            if (i == 0) {
+                out.append("Variables:\\\\");
+            }
+            stringVariableList += variableList.get(i).getName() + " in " + variableList.get(i).getColorType().getName();
+            if(i != variableList.size() - 1) {
+                stringVariableList += "\\\\";
+            }
+        }
+        out.append(stringVariableList);
+
+        if (variableList.size() > 0 && constantsList.size() > 0) {
+            out.append("\\\\");
+        }
+
+        for(int i = 0; i < constantsList.size(); i++) {
+            if(i == 0) {
+                out.append("Constants:\\\\");
+            }
+            stringConstantsList += constantsList.get(i).toString() + "\\\\";
+        }
+        out.append(stringConstantsList);
+
+        out.append("};");
+
+        return out;
+    }
+
 	protected String getTokenListStringFor(Place place) {
 		List<TimedToken> tokens = ((TimedPlaceComponent) place).underlyingPlace().tokens();
 
@@ -455,7 +583,7 @@ public class TikZExporter {
         String invariant = "";
 
 		if (!((TimedPlaceComponent) place).getInvariantAsString().contains("inf"))
-			invariant = "$\\mathrm{" + replaceWithMathLatex(((TimedPlaceComponent) place).getInvariantAsString()) + "}$};\n";
+			invariant = replaceWithMathLatex(((TimedPlaceComponent) place).getInvariantAsString()) + "};\n";
 		return invariant;
 	}
 
@@ -480,12 +608,13 @@ public class TikZExporter {
 		StringBuffer out = new StringBuffer();
 
 		out.append("\\begin{tikzpicture}[font=\\scriptsize, xscale=0.45, yscale=0.45, x=1.33pt, y=1.33pt]\n");
-                out.append("%% the figure can be scaled by changing xscale and yscale\n");
+                out.append("%% the figure can be scaled by changing xscale and yscale or the size of the x- and y-coordinates\n");
                 out.append("%% positions of place/transition labels that are currently fixed to label=135 degrees\n");
                 out.append("%% can be adjusted so that they do not cover arcs\n");
                 out.append("%% similarly the curving of arcs can be done by adjusting bend left/right=XX\n");
-                out.append("%% labels may be slightly skewed compared to the tapaal drawing due to rounding.\n");
-                out.append("%% This can be adjusted by tuning the coordinates of the label\n");
+                out.append("%% labels may be slightly skewed compared to the Tapaal drawing due to rounding.\n");
+                out.append("%% This can be adjusted by tuning the coordinates of the label or adjusting the x- and y-shift for the label\n");
+                out.append("%% The box containing global variables can also be moved by adjusting the anchor points / bounding box in the [globalBox] node at the end of the Tikz document\n");
 		out.append("\\tikzstyle{arc}=[->,>=stealth,thick]\n");
 
         out.append("\\tikzstyle{transportArc}=[->,>=diamond,thick]\n");
@@ -496,13 +625,15 @@ public class TikZExporter {
 		out.append("\\tikzstyle{every token}=[fill=white,text=black]\n");
 		out.append("\\tikzstyle{sharedplace}=[place,minimum size=7.5mm,dashed,thin]\n");
 		out.append("\\tikzstyle{sharedtransition}=[transition, fill opacity=0, minimum width=3.5mm, minimum height=6.5mm,dashed]\n");
-		out.append("\\tikzstyle{urgenttransition}=[place,fill=white,minimum size=2.0mm,thin]");
-        out.append("\\tikzstyle{uncontrollabletransition}=[transition,fill=white,draw=black,very thick]");
+		out.append("\\tikzstyle{urgenttransition}=[place,fill=white,minimum size=2.0mm,thin]\n");
+        out.append("\\tikzstyle{uncontrollabletransition}=[transition,fill=white,draw=black,very thick]\n");
+        out.append("\\tikzstyle{globalBox} = [draw,thick,align=left]");
         return out;
 	}
 
 	protected String replaceWithMathLatex(String text) {
-		return text.replace("inf", "\\infty").replace("<=", "\\leq ").replace("*", "\\cdot ");
+		return text.replace("inf", "$\\mathrm{\\infty}$").replace("<=", "$\\mathrm{\\leq}$").replace("*", "$\\mathrm{\\cdot}$")
+                   .replace("<","$\\mathrm{<}$").replace(">","$\\mathrm{>}$").replace("\u2192", "$\\rightarrow$").replace("\u221E", "$\\mathrm{\\infty}$");
 	}
 
 	private String exportMathName(String name) {
