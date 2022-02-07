@@ -1,28 +1,29 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.31'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.10'
     id "ca.coglinc.javacc" version "2.4.0"
 }
 
 group 'net.tapaal'
 version '4.0-SNAPSHOT'
 
-var targetVersion = JavaVersion.VERSION_11
+var targetJavaVersion = JavaVersion.VERSION_11
+var targetKotlinVersion = "1.6"
 java {
-    sourceCompatibility = targetVersion
-    targetCompatibility = targetVersion
+    sourceCompatibility = targetJavaVersion
+    targetCompatibility = targetJavaVersion
 }
 
 compileKotlin {
-    sourceCompatibility = targetVersion
-    targetCompatibility = targetVersion
+    sourceCompatibility = targetJavaVersion
+    targetCompatibility = targetJavaVersion
 
     kotlinOptions {
-        jvmTarget = targetVersion
-        //apiVersion = "1.1"
-        //languageVersion = "1.1"
+        jvmTarget = targetJavaVersion
+        apiVersion = targetKotlinVersion
+        languageVersion = targetKotlinVersion
     }
 }
 
