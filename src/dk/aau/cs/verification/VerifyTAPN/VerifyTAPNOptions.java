@@ -1,5 +1,7 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOptio
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerificationOptions;
+import pipe.gui.MessengerImpl;
 
 public class VerifyTAPNOptions extends VerificationOptions{
 
@@ -29,9 +32,29 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		this(extraTokens,traceOption, search, symmetry, useStateequationCheck, discreteInclusion, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
 	}
 
+
+
+
     public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateequationCheck, boolean discreteInclusion, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
         this(extraTokens,traceOption, search, symmetry, useStateequationCheck, discreteInclusion, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator, false);
     }
+
+
+    public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateequationCheck, boolean discreteInclusion, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, boolean tarOption, boolean isColor) {
+        this(extraTokens,traceOption, search, symmetry, useStateequationCheck, discreteInclusion, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator, tarOption);
+
+        if(isColor && trace() != TraceOption.NONE) // we only force unfolding when traces are involved
+        {
+            try {
+                unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+                unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+            } catch (IOException e) {
+                new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
+            }
+        }
+    }
+
+
 	
 	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateEquationCheck, boolean discreteInclusion, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, boolean tarOption) {
 		this.extraTokens = extraTokens;
@@ -75,6 +98,15 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 
+        if(unfoldedModelPath != null && unfoldedQueriesPath != null)
+        {
+            result.append(" --write-unfolded-net ");
+            result.append(unfoldedModelPath);
+            result.append(" --write-unfolded-queries ");
+            result.append(unfoldedQueriesPath);
+            result.append(" ");
+        }
+
 		result.append(kBoundArg());
         result.append(deadTokenArg());
 		result.append(traceMap.get(traceOption));
@@ -106,8 +138,8 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 	public static Map<TraceOption, String> createTraceOptionsMap() {
 		HashMap<TraceOption, String> map = new HashMap<TraceOption, String>();
-		map.put(TraceOption.SOME, "--trace 1 --xml-trace");
-		map.put(TraceOption.FASTEST, "--trace 2 --xml-trace");
+		map.put(TraceOption.SOME, "--trace 1 ");
+		map.put(TraceOption.FASTEST, "--trace 2 ");
 		map.put(TraceOption.NONE, "");
 
 		return map;
@@ -115,10 +147,10 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 	private static Map<SearchOption, String> createSearchOptionsMap() {
 		HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
-		map.put(SearchOption.BFS, "--search-type 0");
-		map.put(SearchOption.DFS, "--search-type 1");
-		map.put(SearchOption.RANDOM, "--search-type 2");
-		map.put(SearchOption.HEURISTIC, "--search-type 3");
+		map.put(SearchOption.BFS, "--search-strategy BFS");
+		map.put(SearchOption.DFS, "--search-strategy DFS");
+		map.put(SearchOption.RANDOM, "--search-strategy RDFS");
+		map.put(SearchOption.HEURISTIC, "--search-strategy MAX-COVER");
 		map.put(SearchOption.DEFAULT, "");
 		return map;
 	}

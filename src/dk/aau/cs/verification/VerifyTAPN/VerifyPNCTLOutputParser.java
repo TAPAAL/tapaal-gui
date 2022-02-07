@@ -48,6 +48,8 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
                     result = false;
                     foundResult = true;
                 } else {
+                    parseSolvedMethod(line);
+
                     Matcher matcher = configurationsPattern.matcher(line);
                     if (matcher.find()) {
                         configurtations = Long.parseLong(matcher.group(1));
@@ -86,7 +88,13 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
 			if(!foundResult) return null;
 
             BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-            return new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, false), new Stats(configurtations, markings, edges, processedEdges, processedNEdges, exploredConfigurations));
+            var qr = new QueryResult(result, boundedAnalysis, query, false);
+            qr.setSolvedUsingQuerySimplification(solvedUsingQuerySimplification);
+            qr.setSolvedUsingStateEquation(solvedUsingStateEquation);
+            qr.setSolvedUsingTraceAbstractRefinement(solvedUsingTraceAbstractRefinement);
+            qr.setSolvedUsingSiphonTrap(solvedUsingSiphonTrap);
+
+            return new Tuple<QueryResult, Stats>(qr, new Stats(configurtations, markings, edges, processedEdges, processedNEdges, exploredConfigurations));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

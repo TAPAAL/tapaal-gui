@@ -10,6 +10,43 @@ public class QueryResult {
 	private final TAPNQuery query;
 	private final BoundednessAnalysisResult boundednessAnalysis;
 
+    public boolean isSolvedUsingQuerySimplification() {
+        return solvedUsingQuerySimplification;
+    }
+
+    public void setSolvedUsingQuerySimplification(boolean solvedUsingQuerySimplification) {
+        this.solvedUsingQuerySimplification = solvedUsingQuerySimplification;
+    }
+
+    public boolean isSolvedUsingTraceAbstractRefinement() {
+        return solvedUsingTraceAbstractRefinement;
+    }
+
+    public void setSolvedUsingTraceAbstractRefinement(boolean solvedUsingTraceAbstractRefinement) {
+        this.solvedUsingTraceAbstractRefinement = solvedUsingTraceAbstractRefinement;
+    }
+
+    public boolean isSolvedUsingStateEquation() {
+        return solvedUsingStateEquation;
+    }
+
+    public void setSolvedUsingStateEquation(boolean solvedUsingStateEquation) {
+        this.solvedUsingStateEquation = solvedUsingStateEquation;
+    }
+
+    public boolean isSolvedUsingSiphonTrap() {
+        return solvedUsingSiphonTrap;
+    }
+
+    public void setSolvedUsingSiphonTrap(boolean solvedUsingSiphonTrap) {
+        this.solvedUsingSiphonTrap = solvedUsingSiphonTrap;
+    }
+
+    private boolean solvedUsingQuerySimplification;
+    private boolean solvedUsingTraceAbstractRefinement;
+    private boolean solvedUsingStateEquation;
+    private boolean solvedUsingSiphonTrap;
+
 	public boolean isCTL = false;
 	public QueryResult(boolean satisfied, BoundednessAnalysisResult boundednessAnalysis, TAPNQuery query, boolean discreteInclusion){
 		this.satisfied = satisfied;

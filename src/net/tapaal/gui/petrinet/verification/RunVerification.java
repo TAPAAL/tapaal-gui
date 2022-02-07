@@ -1,13 +1,26 @@
 package net.tapaal.gui.petrinet.verification;
 
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import dk.aau.cs.Messenger;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.util.MemoryMonitor;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.VerificationCallback;
+import dk.aau.cs.verification.*;
+import net.tapaal.swinghelpers.GridBagHelper;
+import pipe.gui.TAPAALGUI;
+import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.dataLayer.DataLayer;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.File;
@@ -15,29 +28,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
-import pipe.gui.petrinet.PetriNetTab;
-import dk.aau.cs.Messenger;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.util.MemoryMonitor;
-import dk.aau.cs.util.Tuple;
-import dk.aau.cs.util.VerificationCallback;
-import dk.aau.cs.verification.IconSelector;
-import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
-import dk.aau.cs.verification.VerificationResult;
-import pipe.gui.petrinet.dataLayer.DataLayer;
-import pipe.gui.TAPAALGUI;
+import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
 
 public class RunVerification extends RunVerificationBase {	
 	private final IconSelector iconSelector;
@@ -139,19 +130,16 @@ public class RunVerification extends RunVerificationBase {
             "<html>" + string.replace(System.getProperty("line.separator"), "<br/>") + "</html>";
 	}
 
-	private void displayStats(JPanel panel, String stats, String[] explanations){
+	private int displayStats(JPanel panel, String stats, String[] explanations, int startOffset){
         String[] statsStrings = stats.split(System.getProperty("line.separator"));
+
         for (int i = 0; i < statsStrings.length; i++) {
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = i+1;
-            gbc.insets = new Insets(0,0,0,0);
-            gbc.anchor = GridBagConstraints.WEST;
+            GridBagConstraints gbc = GridBagHelper.as(0, i+startOffset, WEST, new Insets(0,0,0,0));
             JLabel statLabel = new JLabel(statsStrings[i]);
             statLabel.setToolTipText(explanations[i]);
             panel.add(statLabel, gbc);
         }
-
+        return startOffset+statsStrings.length;
     }
 
 	private JPanel createStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result, boolean transitionPanel) {
@@ -322,142 +310,121 @@ public class RunVerification extends RunVerificationBase {
 
 		// TODO remove this when the engine outputs statistics
 		boolean isCTLQuery = result.getQueryResult().isCTL;
+        int rowOffset = 1;
+		if(modelChecker.supportsStats() && !result.isSolvedUsingQuerySimplification() && !isCTLQuery){
+            rowOffset = displayStats(panel, result.getStatsAsString(), modelChecker.getStatsExplanations(), 1);
 
-		if(modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && !isCTLQuery){
-            displayStats(panel, result.getStatsAsString(), modelChecker.getStatsExplanations());
             if(!result.getTransitionStatistics().isEmpty()) {
                 if (!result.getTransitionStatistics().isEmpty()) {
                     JButton transitionStatsButton = new JButton("Transition Statistics");
                     transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, true), "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
-                    gbc = new GridBagConstraints();
-                    gbc.gridx = 0;
-                    gbc.gridy = 4;
-                    gbc.insets = new Insets(10, 0, 10, 0);
-                    gbc.anchor = GridBagConstraints.WEST;
+                    gbc = GridBagHelper.as(0,4, WEST, new Insets(10, 0, 10, 0));
                     panel.add(transitionStatsButton, gbc);
                 }
                 if (!result.getPlaceBoundStatistics().isEmpty()) {
                     JButton placeStatsButton = new JButton("Place-Bound Statistics");
                     placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, false), "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
-                    gbc = new GridBagConstraints();
-                    gbc.gridx = 1;
-                    gbc.gridy = 4;
-                    gbc.insets = new Insets(10, 0, 10, 0);
-                    gbc.anchor = GridBagConstraints.WEST;
+                    gbc = GridBagHelper.as(1,4, WEST, new Insets(10, 0, 10, 0));
                     panel.add(placeStatsButton, gbc);
                 }
             }
 			if(!result.getReductionResultAsString().isEmpty()){
-				JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
-				gbc = new GridBagConstraints();
-				gbc.gridx = 0;
-				gbc.gridy = 6;
-				gbc.insets = new Insets(0,0,20,-90);
-				gbc.anchor = GridBagConstraints.WEST;
 
+                JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
+				gbc = GridBagHelper.as(0,6, WEST, new Insets(0,0,20,-90));
 				panel.add(reductionStatsLabel, gbc);
 
 				if(result.reductionRulesApplied()){
                     JButton openReducedButton = new JButton("Open reduced net");
-                    openReducedButton.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            openReducedButton.setEnabled(false);
-                            reducedNetOpened = true;
+                    openReducedButton.addActionListener(e -> {
+                        openReducedButton.setEnabled(false);
+                        reducedNetOpened = true;
 
-                            File reducedNetFile = new File(reducedNetFilePath);
+                        File reducedNetFile = new File(reducedNetFilePath);
 
-                            if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
-                                try {
-                                    PetriNetTab reducedNetTab = PetriNetTab.createNewTabFromPNMLFile(reducedNetFile);
-                                    //Ensure that a net was created by the query reduction
-                                    if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
-                                        || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
-                                        reducedNetTab.setInitialName("reduced-" + TAPAALGUI.getAppGui().getCurrentTabName());
-                                        TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
-                                        reducedNetTab.addQuery(convertedQuery);
-                                        TAPAALGUI.openNewTabFromStream(reducedNetTab);
-                                    }
-                                } catch (Exception e1){
-                                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
-                                        e1.getMessage(),
-                                        "Error loading reduced net file",
-                                        JOptionPane.ERROR_MESSAGE);
+                        if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
+                            try {
+                                PetriNetTab reducedNetTab = PetriNetTab.createNewTabFromPNMLFile(reducedNetFile);
+                                //Ensure that a net was created by the query reduction
+                                if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
+                                    || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
+                                    reducedNetTab.setInitialName("reduced-" + TAPAALGUI.getAppGui().getCurrentTabName());
+                                    TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
+                                    reducedNetTab.addQuery(convertedQuery);
+                                    TAPAALGUI.openNewTabFromStream(reducedNetTab);
                                 }
+                            } catch (Exception e1){
+                                JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
+                                    e1.getMessage(),
+                                    "Error loading reduced net file",
+                                    JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     });
 
-                    gbc = new GridBagConstraints();
-                    gbc.gridx = 0;
-                    gbc.gridy = 5;
-                    gbc.insets = new Insets(0,0,10,0);
-                    gbc.anchor = GridBagConstraints.WEST;
+                    gbc = GridBagHelper.as(0,5, WEST, new Insets(0,0,10,0));
                     panel.add(openReducedButton, gbc);
                 }
                 if (!result.getPlaceBoundStatistics().isEmpty()) {
                     JButton placeStatsButton = new JButton("Place-Bound Statistics");
                     placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, false), "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
-                    gbc = new GridBagConstraints();
-                    gbc.gridx = 1;
-                    gbc.gridy = 4;
-                    gbc.insets = new Insets(10, 0, 10, 0);
-                    gbc.anchor = GridBagConstraints.WEST;
+
+                    gbc = GridBagHelper.as(1,4, WEST, new Insets(10, 0, 10, 0));
                     panel.add(placeStatsButton, gbc);
                 }
             }
+            rowOffset = 6;
 
-            if (result.getRawOutput() != null) {
-                JButton showRawQueryButton = new JButton("Show raw query results");
-                showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
-                gbc = new GridBagConstraints();
-                gbc.gridx = 1;
-                gbc.gridy = 5;
-                gbc.insets = new Insets(0,0,10,0);
-                gbc.anchor = GridBagConstraints.WEST;
-                panel.add(showRawQueryButton, gbc);
-            }
-		} else if (modelChecker.supportsStats() && !result.isSolvedUsingStateEquation() && isCTLQuery){
-            displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations());
-
+		} else if (modelChecker.supportsStats() && !result.isSolvedUsingQuerySimplification() && isCTLQuery){
+            rowOffset = displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations(), 1);
 		}
 
-		if(result.isSolvedUsingStateEquation()){
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 6;
-			gbc.insets = new Insets(0,0,15,0);
-			gbc.anchor = GridBagConstraints.WEST;
-			panel.add(new JLabel(toHTML("The query was resolved using state equations.")), gbc);
-		}
+        if (result.getRawOutput() != null) {
+            JButton showRawQueryButton = new JButton("Show raw query results");
+            showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
+            gbc = GridBagHelper.as(1, 5, WEST, new Insets(0,0,10,0));
+            panel.add(showRawQueryButton, gbc);
+        }
+
+        if (result.isResolvedUsingSkeletonPreprocessor()) {
+            gbc = GridBagHelper.as(0, rowOffset+1, GridBagHelper.Anchor.WEST, new Insets(0,0,15,0));
+            gbc.gridwidth = 2;
+            panel.add(new JLabel(toHTML("The query was resolved using Skeleton Analysis preprocessing")), gbc);
+        }
+
+
+        gbc = GridBagHelper.as(0, rowOffset+2, WEST, new Insets(0,0,15,0));
+        gbc.gridwidth = 2;
+		if(result.isSolvedUsingQuerySimplification()){
+			panel.add(new JLabel(toHTML("The query was resolved using Query Simplification.")), gbc);
+		} else if (result.isSolvedUsingTraceAbstractRefinement()){
+            panel.add(new JLabel(toHTML("The query was not resolved using Trace Abstraction Refinement.")), gbc);
+        } else if (result.isSolvedUsingStateEquation()) {
+            panel.add(new JLabel(toHTML("The query was resolved using state equations.")), gbc);
+        } else if (result.isSolvedUsingSiphonTrap()) {
+            panel.add(new JLabel(toHTML("The query was resolved using Siphon Trap.")), gbc);
+        }
 		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 7;
-		gbc.gridwidth = 2;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc = GridBagHelper.as(0, rowOffset+3, WEST);
+    	gbc.gridwidth = 2;
 		panel.add(new JLabel(result.getVerificationTimeString()), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 8;
-		gbc.gridwidth = 2;
-		gbc.anchor = GridBagConstraints.WEST;
+
+        gbc = GridBagHelper.as(0, rowOffset+4, WEST);
+        gbc.gridwidth = 2;
 		panel.add(new JLabel("Estimated memory usage: "+MemoryMonitor.getPeakMemory()), gbc);
 		
 		//Show discrete semantics warning if needed
 		QueryResult queryResult = result.getQueryResult();
-		if(((queryResult.hasDeadlock() && queryResult.queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) || 
-                   (queryResult.hasDeadlock() && queryResult.queryType() == QueryType.AG && queryResult.isQuerySatisfied()) || 
-                   (queryResult.queryType() == QueryType.EG && !queryResult.isQuerySatisfied()) || 
-		   (queryResult.queryType() == QueryType.AF && queryResult.isQuerySatisfied())) 
-				&& modelChecker.useDiscreteSemantics()){
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 11;
-			gbc.gridwidth = 2;
-			gbc.anchor = GridBagConstraints.WEST;
-			panel.add(new JLabel("<html><font color=red>The verification answer is guaranteed for<br/>the discrete semantics only (integer delays).</font></html>"), gbc);
-		}
+        if (((queryResult.hasDeadlock() && queryResult.queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) ||
+            (queryResult.hasDeadlock() && queryResult.queryType() == QueryType.AG && queryResult.isQuerySatisfied()) ||
+            (queryResult.queryType() == QueryType.EG && !queryResult.isQuerySatisfied()) ||
+            (queryResult.queryType() == QueryType.AF && queryResult.isQuerySatisfied()))
+            && modelChecker.useDiscreteSemantics()) {
+
+            gbc = GridBagHelper.as(0, rowOffset+7, WEST);
+            gbc.gridwidth = 2;
+            panel.add(new JLabel("<html><font color=red>The verification answer is guaranteed for<br/>the discrete semantics only (integer delays).</font></html>"), gbc);
+        }
 		
 		return panel;
 	}
