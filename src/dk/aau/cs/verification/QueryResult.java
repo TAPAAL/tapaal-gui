@@ -26,14 +26,6 @@ public class QueryResult {
         this.solvedUsingTraceAbstractRefinement = solvedUsingTraceAbstractRefinement;
     }
 
-    public boolean isSolvedUsingStateEquation() {
-        return solvedUsingStateEquation;
-    }
-
-    public void setSolvedUsingStateEquation(boolean solvedUsingStateEquation) {
-        this.solvedUsingStateEquation = solvedUsingStateEquation;
-    }
-
     public boolean isSolvedUsingSiphonTrap() {
         return solvedUsingSiphonTrap;
     }
@@ -44,7 +36,6 @@ public class QueryResult {
 
     private boolean solvedUsingQuerySimplification;
     private boolean solvedUsingTraceAbstractRefinement;
-    private boolean solvedUsingStateEquation;
     private boolean solvedUsingSiphonTrap;
 
 	public boolean isCTL = false;

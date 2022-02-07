@@ -368,34 +368,32 @@ public class RunVerification extends RunVerificationBase {
         if (result.getRawOutput() != null) {
             JButton showRawQueryButton = new JButton("Show raw query results");
             showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
-            gbc = GridBagHelper.as(1, 5, WEST, new Insets(0,0,10,0));
+            gbc = GridBagHelper.as(1, rowOffset+1, WEST, new Insets(0,0,10,0));
             panel.add(showRawQueryButton, gbc);
         }
 
         if (result.isResolvedUsingSkeletonPreprocessor()) {
-            gbc = GridBagHelper.as(0, rowOffset+1, GridBagHelper.Anchor.WEST, new Insets(0,0,15,0));
+            gbc = GridBagHelper.as(0, rowOffset+2, GridBagHelper.Anchor.WEST, new Insets(0,0,15,0));
             gbc.gridwidth = 2;
-            panel.add(new JLabel(toHTML("The query was resolved using Skeleton Analysis preprocessing")), gbc);
+            panel.add(new JLabel(toHTML("The query answered using Skeleton Analysis preprocessing")), gbc);
         }
 
 
-        gbc = GridBagHelper.as(0, rowOffset+2, WEST, new Insets(0,0,15,0));
+        gbc = GridBagHelper.as(0, rowOffset+3, WEST, new Insets(0,0,15,0));
         gbc.gridwidth = 2;
 		if(result.isSolvedUsingQuerySimplification()){
 			panel.add(new JLabel(toHTML("The query was resolved using Query Simplification.")), gbc);
 		} else if (result.isSolvedUsingTraceAbstractRefinement()){
-            panel.add(new JLabel(toHTML("The query was not resolved using Trace Abstraction Refinement.")), gbc);
-        } else if (result.isSolvedUsingStateEquation()) {
-            panel.add(new JLabel(toHTML("The query was resolved using state equations.")), gbc);
+            panel.add(new JLabel(toHTML("The query was resolved using Trace Abstraction Refinement.")), gbc);
         } else if (result.isSolvedUsingSiphonTrap()) {
             panel.add(new JLabel(toHTML("The query was resolved using Siphon Trap.")), gbc);
         }
 		
-		gbc = GridBagHelper.as(0, rowOffset+3, WEST);
+		gbc = GridBagHelper.as(0, rowOffset+4, WEST);
     	gbc.gridwidth = 2;
 		panel.add(new JLabel(result.getVerificationTimeString()), gbc);
 
-        gbc = GridBagHelper.as(0, rowOffset+4, WEST);
+        gbc = GridBagHelper.as(0, rowOffset+5, WEST);
         gbc.gridwidth = 2;
 		panel.add(new JLabel("Estimated memory usage: "+MemoryMonitor.getPeakMemory()), gbc);
 		
@@ -407,7 +405,7 @@ public class RunVerification extends RunVerificationBase {
             (queryResult.queryType() == QueryType.AF && queryResult.isQuerySatisfied()))
             && modelChecker.useDiscreteSemantics()) {
 
-            gbc = GridBagHelper.as(0, rowOffset+7, WEST);
+            gbc = GridBagHelper.as(0, rowOffset+8, WEST);
             gbc.gridwidth = 2;
             panel.add(new JLabel("<html><font color=red>The verification answer is guaranteed for<br/>the discrete semantics only (integer delays).</font></html>"), gbc);
         }

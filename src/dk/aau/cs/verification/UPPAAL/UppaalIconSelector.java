@@ -11,7 +11,7 @@ public class UppaalIconSelector extends IconSelector {
 	@Override
 	public ImageIcon getIconFor(VerificationResult<?> result){
 		if (result.getQueryResult().isApproximationInconclusive()) return rerunIcon;
-		if(result.isSolvedUsingStateEquation())	return result.isQuerySatisfied()? satisfiedIcon:notSatisfiedIcon;	// If we got a result from over-approximation, this is always conclusive.
+		if(result.isResolvedUsingSkeletonPreprocessor())	return result.isQuerySatisfied()? satisfiedIcon:notSatisfiedIcon;	// If we got a result from over-approximation, this is always conclusive.
 		if(result.getQueryResult().hasDeadlock()) return inconclusiveIcon;
 		
 		switch(result.getQueryResult().queryType())

@@ -82,7 +82,7 @@ public class ApproximationWorker {
                     decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
                     result.verificationTime(),
                     result.stats(),
-                    result.isSolvedUsingStateEquation(),
+                    false,
                     result.getUnfoldedModel());
                 toReturn.setNameMapping(transformedModel.value2());
 
@@ -103,7 +103,7 @@ public class ApproximationWorker {
                             decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
                             approxResult.verificationTime(),
                             approxResult.stats(),
-                            approxResult.isSolvedUsingStateEquation(),
+                            false,
                             approxResult.getUnfoldedModel());
                         toReturn.setNameMapping(nameMapping);
 
@@ -151,7 +151,7 @@ public class ApproximationWorker {
                             decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
                             approxResult.verificationTime() + result.verificationTime(),
                             approxResult.stats(),
-                            approxResult.isSolvedUsingStateEquation(),
+                            false,
                             approxResult.getUnfoldedModel());
                         toReturn.setNameMapping(nameMapping);
 
@@ -176,7 +176,7 @@ public class ApproximationWorker {
                             decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
                             approxResult.verificationTime(),
                             approxResult.stats(),
-                            approxResult.isSolvedUsingStateEquation(),
+                            false,
                             approxResult.getUnfoldedModel());
                         toReturn.setNameMapping(nameMapping);
 
@@ -196,7 +196,7 @@ public class ApproximationWorker {
                         decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
                         approxResult.verificationTime(),
                         approxResult.stats(),
-                        approxResult.isSolvedUsingStateEquation(),
+                        false,
                         approxResult.getUnfoldedModel());
                     toReturn.setNameMapping(nameMapping);
 
@@ -231,7 +231,7 @@ public class ApproximationWorker {
                     decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
                     result.verificationTime(),
                     result.stats(),
-                    result.isSolvedUsingStateEquation(),
+                    false,
                     result.getUnfoldedModel());
                 toReturn.setNameMapping(nameMapping);
 
@@ -252,7 +252,7 @@ public class ApproximationWorker {
                         decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
                         result.verificationTime(),
                         result.stats(),
-                        result.isSolvedUsingStateEquation(),
+                        false,
                         result.getUnfoldedModel());
                     toReturn.setNameMapping(nameMapping);
 
@@ -271,7 +271,7 @@ public class ApproximationWorker {
                             decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
                             approxResult.verificationTime(),
                             approxResult.stats(),
-                            result.isSolvedUsingStateEquation(),
+                            false,
                             result.getUnfoldedModel());
                         toReturn.setNameMapping(nameMapping);
 
@@ -323,7 +323,7 @@ public class ApproximationWorker {
 								decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
 								approxResult.verificationTime() + result.verificationTime(),
 								approxResult.stats(),
-								approxResult.isSolvedUsingStateEquation(),
+								false,
                                 approxResult.getUnfoldedModel());
 						toReturn.setNameMapping(transformedModel.value2());
 					}
@@ -342,7 +342,7 @@ public class ApproximationWorker {
 								decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
 								approxResult.verificationTime(),
 								approxResult.stats(),
-								approxResult.isSolvedUsingStateEquation(),
+								false,
                                 approxResult.getUnfoldedModel());
 						toReturn.setNameMapping(nameMapping);
 					}
@@ -359,7 +359,7 @@ public class ApproximationWorker {
 					decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
 					result.verificationTime(),
 					result.stats(),
-					result.isSolvedUsingStateEquation(),
+					false,
                     result.getRawOutput(),
                     result.getUnfoldedModel());
 			toReturn.setNameMapping(nameMapping);
@@ -428,7 +428,7 @@ public class ApproximationWorker {
 					verificationResult.getSecondaryTrace(),
 					verificationResult.verificationTime(),
 					verificationResult.stats(),
-					verificationResult.isSolvedUsingStateEquation(),
+					false,
                    verificationResult.getUnfoldedModel());
 				value.setNameMapping(composedModel.value2());
 	        } else {
@@ -446,7 +446,7 @@ public class ApproximationWorker {
 	                            decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
 	                            approxResult.verificationTime(),
 	                            approxResult.stats(),
-	        					verificationResult.isSolvedUsingStateEquation(),
+	        					false,
                                 verificationResult.getUnfoldedModel());
 	                valueNetwork.setNameMapping(nameMapping);
 	                
@@ -488,7 +488,7 @@ public class ApproximationWorker {
 	                        approxResult.getSecondaryTrace(),
 	                        approxResult.verificationTime() + verificationResult.verificationTime(),
 	                        approxResult.stats(),
-	    					verificationResult.isSolvedUsingStateEquation(),
+	    					false,
                             verificationResult.getUnfoldedModel());
 	                value.setNameMapping(composedModel.value2());
 	            }
@@ -508,7 +508,7 @@ public class ApproximationWorker {
 						verificationResult.getSecondaryTrace(),
 						verificationResult.verificationTime(),
 						verificationResult.stats(),
-						verificationResult.isSolvedUsingStateEquation(),
+						false,
                         verificationResult.getUnfoldedModel());
 				    value.setNameMapping(composedModel.value2());
 	            }
@@ -525,7 +525,7 @@ public class ApproximationWorker {
 						verificationResult.getSecondaryTrace(),
 						verificationResult.verificationTime(),
 						verificationResult.stats(),
-						verificationResult.isSolvedUsingStateEquation(),
+						false,
                         verificationResult.getUnfoldedModel());
 				    value.setNameMapping(composedModel.value2());
 				}
@@ -544,7 +544,7 @@ public class ApproximationWorker {
                     verificationResult.getSecondaryTrace(),
                     verificationResult.verificationTime(),
                     verificationResult.stats(),
-					verificationResult.isSolvedUsingStateEquation(),
+					false,
                     verificationResult.getUnfoldedModel());
                 value.setNameMapping(composedModel.value2());
 	        }
@@ -562,7 +562,7 @@ public class ApproximationWorker {
                             verificationResult.getSecondaryTrace(),
                             verificationResult.verificationTime(),
                             verificationResult.stats(),
-        					verificationResult.isSolvedUsingStateEquation(),
+        					false,
                             verificationResult.getUnfoldedModel());
                     value.setNameMapping(composedModel.value2());
 	                    
@@ -584,7 +584,7 @@ public class ApproximationWorker {
                             decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
                             approxResult.verificationTime(),
                             approxResult.stats(),
-                            approxResult.isSolvedUsingStateEquation(),
+                            false,
                             verificationResult.getUnfoldedModel());
                         valueNetwork.setNameMapping(nameMapping);
 
@@ -631,7 +631,7 @@ public class ApproximationWorker {
 	                            verificationResult.getSecondaryTrace(),
 	                            verificationResult.verificationTime() + approxResult.verificationTime(),
 	                            verificationResult.stats(),
-	        					verificationResult.isSolvedUsingStateEquation(),
+	        					false,
                                 verificationResult.getUnfoldedModel());
 	                    value.setNameMapping(composedModel.value2());
 	                }
@@ -646,7 +646,7 @@ public class ApproximationWorker {
 							verificationResult.getSecondaryTrace(),
 							verificationResult.verificationTime(),
 							verificationResult.stats(),
-							verificationResult.isSolvedUsingStateEquation(),
+							false,
                             verificationResult.getUnfoldedModel());
 					    value.setNameMapping(composedModel.value2());
 	                }
@@ -660,7 +660,7 @@ public class ApproximationWorker {
 	                verificationResult.getSecondaryTrace(),
 	                verificationResult.verificationTime(),
 	                verificationResult.stats(),
-					verificationResult.isSolvedUsingStateEquation(),
+					false,
                     verificationResult.getUnfoldedModel());
 	        value.setNameMapping(composedModel.value2());
 	    }

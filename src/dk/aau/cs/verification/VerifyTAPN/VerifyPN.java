@@ -342,9 +342,6 @@ public class VerifyPN implements ModelChecker {
                     }
                 }
                 var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput, model);
-                if (queryResult.value1().isSolvedUsingStateEquation()) {
-
-                }
                 return result;
             }
         }

@@ -90,7 +90,6 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
             BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
             var qr = new QueryResult(result, boundedAnalysis, query, false);
             qr.setSolvedUsingQuerySimplification(solvedUsingQuerySimplification);
-            qr.setSolvedUsingStateEquation(solvedUsingStateEquation);
             qr.setSolvedUsingTraceAbstractRefinement(solvedUsingTraceAbstractRefinement);
             qr.setSolvedUsingSiphonTrap(solvedUsingSiphonTrap);
 
