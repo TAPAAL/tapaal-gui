@@ -9,14 +9,24 @@ plugins {
 group 'net.tapaal'
 version '4.0-SNAPSHOT'
 
+var targetVersion = JavaVersion.VERSION_11
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = targetVersion
+    targetCompatibility = targetVersion
 }
 
-compileJavacc {
-    inputDirectory = file('src/')
+compileKotlin {
+    sourceCompatibility = targetVersion
+    targetCompatibility = targetVersion
+
+    kotlinOptions {
+        jvmTarget = targetVersion
+        //apiVersion = "1.1"
+        //languageVersion = "1.1"
+    }
 }
+
+mainClassName = 'TAPAAL'
 
 repositories {
     mavenCentral()
@@ -43,7 +53,10 @@ sourceSets {
     }
 }
 
-mainClassName = 'TAPAAL'
+compileJavacc {
+    inputDirectory = file('src/')
+}
+
 
 jar {
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
@@ -51,7 +64,7 @@ jar {
     //Sets the main call for the Jar, you can double click to run the jar file
     manifest {
         attributes (
-            'Main-Class': 'TAPAAL'
+            'Main-Class': mainClassName
         )
     }
     //The following lines makes libs a part of the build jar file (standalone jar)
