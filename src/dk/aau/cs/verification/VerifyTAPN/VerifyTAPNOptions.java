@@ -115,8 +115,8 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		result.append(' ');
 		result.append(symmetry ? "" : "--disable-symmetry"); // symmetry is on by default in verifyTAPN so "-s" disables it
 		result.append(' ');
-		result.append(discreteInclusion ? " --factory 1" : "");
-		result.append(discreteInclusion ? " --inc-places " + generateDiscretePlacesList() : "");
+		result.append(discreteInclusion ? " --inclusion-check 1" : "");
+		result.append(discreteInclusion ? " --inclusion-places " + generateDiscretePlacesList() : "");
 		return result.toString();
 	}
 
