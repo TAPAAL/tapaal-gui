@@ -289,7 +289,7 @@ public class Verifyta implements ModelChecker {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
 				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult);
-				return new VerificationResult<TimedArcPetriNetTrace>(queryResult, tapnTrace, runner.getRunningTime(), standardOutput);
+				return new VerificationResult<TimedArcPetriNetTrace>(queryResult, tapnTrace, runner.getRunningTime(), standardOutput + "\n\n" + errorOutput);
 			}
 		}
 	}

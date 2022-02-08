@@ -347,7 +347,7 @@ public class VerifyPN implements ModelChecker {
                         tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
                     }
                 }
-                var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput, model);
+                var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
                 if (queryResult.value1().isSolvedUsingStateEquation()) {
 
                 }
