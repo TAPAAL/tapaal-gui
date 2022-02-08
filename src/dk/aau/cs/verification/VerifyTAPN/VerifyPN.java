@@ -25,6 +25,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
+import org.jetbrains.annotations.Nullable;
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -309,7 +310,7 @@ public class VerifyPN implements ModelChecker {
                         model = newComposer.transformModel(loadedModel.network());
 
                         if (queryResult != null && queryResult.value1() != null) {
-                            tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                            tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
                         }
 
                         if (!(tapnTrace == null)) {
@@ -338,14 +339,7 @@ public class VerifyPN implements ModelChecker {
                 ctlOutput = queryResult.value1().isCTL;
 
                 if (tapnTrace == null) {
-                    if (!errorOutput.contains("Trace") && standardOutput.contains("<trace>")) {
-                        String trace = "Trace:\n";
-                        trace += (standardOutput.split("(?=<trace>)")[1]);
-                        trace = trace.split("(?<=</trace>)")[0];
-                        tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
-                    } else {
-                        tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
-                    }
+                    tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
                 }
 
                 var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
@@ -353,6 +347,38 @@ public class VerifyPN implements ModelChecker {
                 return result;
             }
         }
+    }
+
+    @Nullable
+    private TimedArcPetriNetTrace trace(String errorOutput, String standardOutput, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, Tuple<QueryResult, Stats> queryResult) {
+        TimedArcPetriNetTrace tapnTrace;
+
+
+        if (!errorOutput.contains("Trace") && standardOutput.contains("<trace>")) {
+            // Trace is on stdout
+            String trace = "Trace:\n";
+            trace += (standardOutput.split("(?=<trace>)")[1]);
+            trace = trace.split("(?<=</trace>)")[0];
+            tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
+        } else {
+            // Trace is on stderr
+            // Verifypn will with some options output (at lest TAR) some extra information in the error output, therefor we need to find the trace tag
+            if (errorOutput.contains("<trace>")) {
+                var split = errorOutput.split("(?=<trace>)");
+                if (split.length > 2 ) {
+                    String trace = "Trace\n";
+                    trace += split[1];
+                    trace = trace.split("(?<=</trace>)")[0];
+                    tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
+                } else {
+                    tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                }
+            } else {
+                tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+            }
+        }
+
+        return tapnTrace;
     }
 
     private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
