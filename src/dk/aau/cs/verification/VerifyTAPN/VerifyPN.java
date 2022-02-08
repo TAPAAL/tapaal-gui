@@ -365,7 +365,7 @@ public class VerifyPN implements ModelChecker {
             // Verifypn will with some options output (at lest TAR) some extra information in the error output, therefor we need to find the trace tag
             if (errorOutput.contains("<trace>")) {
                 var split = errorOutput.split("(?=<trace>)");
-                if (split.length > 2 ) {
+                if (split.length > 1 ) {
                     String trace = "Trace\n";
                     trace += split[1];
                     trace = trace.split("(?<=</trace>)")[0];
@@ -383,23 +383,16 @@ public class VerifyPN implements ModelChecker {
 
     private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
         if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
+        if ((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) ||
+            (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) ||
+            (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) ||
+            (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())) {
+            return null;
+        }
 
         VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
 
-        TimedArcPetriNetTrace trace = null;
-        trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
-
-        if (trace == null) {
-            if (options.traceOption() != TraceOption.NONE) {
-                if ((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) ||
-                    (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) ||
-                    (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) ||
-                    (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())) {
-                    return null;
-                }
-            }
-        }
-        return trace;
+        return traceParser.parseTrace(new BufferedReader(new StringReader(output)));
     }
 
     private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
