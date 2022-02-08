@@ -1,20 +1,21 @@
 package net.tapaal.copypaste
 
-import pipe.gui.petrinet.PetriNetTab
 import dk.aau.cs.model.tapn.IntWeight
 import dk.aau.cs.model.tapn.TimeInterval
 import dk.aau.cs.model.tapn.TimeInvariant
 import dk.aau.cs.model.tapn.Weight
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.annotations.NotNull
 import pipe.gui.Constants
+import pipe.gui.petrinet.PetriNetTab
 import pipe.gui.petrinet.graphicElements.Arc
 import pipe.gui.petrinet.graphicElements.PetriNetObject
 import pipe.gui.petrinet.graphicElements.PlaceTransitionObject
 import pipe.gui.petrinet.graphicElements.tapn.*
 import java.awt.Point
-import java.util.*
 
 
 class CopyPastImportExport {
@@ -139,13 +140,13 @@ class CopyPastImportExport {
 
             return Json.encodeToString(
                 TAPAALCopyPastModel(
-                places,
-                transitions,
-                inputArcs,
-                outputArcs,
-                inhibitorArcs,
-                transportArcs,
-            )
+                    places,
+                    transitions,
+                    inputArcs,
+                    outputArcs,
+                    inhibitorArcs,
+                    transportArcs,
+                )
             )
         }
 

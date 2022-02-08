@@ -32,7 +32,7 @@ import dk.aau.cs.debug.Logger;
 import net.tapaal.gui.petrinet.verification.Verifier;
 
 /**
- * Main class for lunching TAPAAL
+ * Main class for launching TAPAAL
  *
  * @author Kenneth Yrke Joergensen (kenneth@yrke.dk)
  */
