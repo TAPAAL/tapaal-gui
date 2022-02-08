@@ -7,9 +7,14 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.TapnEngineXmlLoader;
+import dk.aau.cs.util.FormatException;
 import dk.aau.cs.verification.*;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
+import net.tapaal.gui.petrinet.verification.UnfoldNet;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
@@ -31,6 +36,8 @@ import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
+
+import javax.swing.*;
 
 public class VerifyTAPN implements ModelChecker {
 	private static final String NEED_TO_LOCATE_VERIFYTAPN_MSG = "TAPAAL needs to know the location of the file verifytapn.\n\n"
@@ -217,16 +224,21 @@ public class VerifyTAPN implements ModelChecker {
         }
 		
 		if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
-		
-		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 
-		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null,model.value2(), guiModel, dataLayerQuery);
+        ExportedVerifyTAPNModel exportedModel;
+        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+            VerifyTAPNExporter exporter = new VerifyTACPNExporter();
+            exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+        } else {
+            VerifyTAPNExporter exporter = new VerifyTAPNExporter();
+            exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+        }
 
-		if (exportedModel == null) {
-			messenger.displayErrorMessage("There was an error exporting the model");
-		}
+        if (exportedModel == null) {
+            messenger.displayErrorMessage("There was an error exporting the model");
+        }
 
-		return verify(options, model, exportedModel, query);
+		return verify(options, model, exportedModel, query, dataLayerQuery, lens);
 	}
 
     protected void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
@@ -250,7 +262,7 @@ public class VerifyTAPN implements ModelChecker {
 		((VerifyTAPNOptions)options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
 	}
 
-	protected VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
+	protected VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery,  PetriNetTab.TAPNLens lens) {
 		((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 		runner = new ProcessRunner(verifytapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();
@@ -265,8 +277,65 @@ public class VerifyTAPN implements ModelChecker {
 			if (queryResult == null || queryResult.value1() == null) {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
-				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
-				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), standardOutput);
+                TimedArcPetriNetTrace tapnTrace = null;
+
+
+                boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
+                boolean showTrace = ((query.getProperty() instanceof TCTLEFNode && queryResult.value1().isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLAGNode && !queryResult.value1().isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLAFNode && !queryResult.value1().isQuerySatisfied()));
+
+                if(options.traceOption() != TraceOption.NONE && isColored && showTrace) {
+                    TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
+                    File fileOut = new File(options.unfoldedModelPath());
+                    File queriesOut = new File(options.unfoldedQueriesPath());
+                    PetriNetTab newTab;
+                    LoadedModel loadedModel = null;
+                    try {
+                        loadedModel = tapnLoader.load(fileOut);
+                        TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
+                        model = newComposer.transformModel(loadedModel.network());
+
+                        if (queryResult != null && queryResult.value1() != null) {
+                            tapnTrace = parseTrace(!errorOutput.contains("Trace:") ? errorOutput : (errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
+                        }
+
+                        if (tapnTrace != null) {
+                            int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
+                            if (dialogResult == JOptionPane.OK_OPTION) {
+                                newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new PetriNetTab.TAPNLens(TAPAALGUI.getCurrentTab().getLens().isTimed(), TAPAALGUI.getCurrentTab().getLens().isGame(), false));
+
+                                //The query being verified should be the only query
+                                for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
+                                    newTab.setInitialName(loadedQuery.getName() + " - unfolded");
+                                    loadedQuery.copyOptions(dataLayerQuery);
+                                    newTab.addQuery(loadedQuery);
+                                }
+
+                                TAPAALGUI.openNewTabFromStream(newTab);
+                            } else {
+                                options.setTraceOption(TraceOption.NONE);
+                            }
+                        }
+
+                    } catch (FormatException e) {
+                        e.printStackTrace();
+                        return null;
+                    } catch (ThreadDeath d) {
+                        d.printStackTrace();
+                        return null;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
+
+                if (tapnTrace == null) {
+                    tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                }
+				//return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), standardOutput);
+                return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
 			}
 		}
 	}
@@ -276,15 +345,17 @@ public class VerifyTAPN implements ModelChecker {
 		
 		VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
 		TimedArcPetriNetTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
-		
-		if (trace == null) {
-			if (((VerifyTAPNOptions) options).trace() != TraceOption.NONE) {
-				if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()))
-					return null;
-				else
-					messenger.displayErrorMessage("Verifytapn cannot generate the requested trace for the model. Try another trace option.");
-			}
-		} 
+
+        if (trace == null) {
+            if (((VerifyTAPNOptions) options).trace() != TraceOption.NONE) {
+                if ((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())) {
+                    return null;
+                }
+            }
+        }
 		return trace;
 	}
 

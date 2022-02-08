@@ -240,7 +240,9 @@ public class Verifier {
                 query.inclusionPlaces(),
                 query.isOverApproximationEnabled(),
                 query.isUnderApproximationEnabled(),
-                query.approximationDenominator()
+                query.approximationDenominator(),
+                false,
+                isColored
             );
         }
 

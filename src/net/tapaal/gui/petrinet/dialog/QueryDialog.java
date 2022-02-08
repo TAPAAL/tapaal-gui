@@ -3409,9 +3409,6 @@ public class QueryDialog extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 3;
         reductionOptionsPanel.add(skeletonAnalysis, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
         gbc.gridx = 1;
         gbc.gridy = 2;
         reductionOptionsPanel.add(useTimeDarts, gbc);
@@ -3419,23 +3416,14 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 1;
         reductionOptionsPanel.add(useGCD, gbc);
         gbc.gridx = 1;
-        gbc.gridy = 3;
+        gbc.gridy = 2;
         reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
         gbc.gridx = 1;
         gbc.gridy = 3;
         reductionOptionsPanel.add(usePTrie, gbc);
 
-        discreteInclusion.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                selectInclusionPlacesButton.setEnabled(discreteInclusion.isSelected());
-            }
-        });
-
-        selectInclusionPlacesButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces);
-            }
-        });
+        discreteInclusion.addActionListener(e -> selectInclusionPlacesButton.setEnabled(discreteInclusion.isSelected()));
+        selectInclusionPlacesButton.addActionListener(e -> inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces));
 
         useTimeDarts.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
     }

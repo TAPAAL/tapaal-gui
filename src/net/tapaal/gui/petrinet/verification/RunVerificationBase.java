@@ -159,9 +159,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 true,
                                 model.isColored(),
                                 model.isColored() && (!model.isUntimed() || options.traceOption() != net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE),
-                                dataLayerQuery.usePartitioning(),
-                                dataLayerQuery.useColorFixpoint(),
-                                dataLayerQuery.useSymmetricVars()
+                                true,
+                                true,
+                                true
                             ),
                             transformedModel,
                             clonedQuery,
