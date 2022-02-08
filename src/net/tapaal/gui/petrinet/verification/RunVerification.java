@@ -375,7 +375,7 @@ public class RunVerification extends RunVerificationBase {
         if (result.isResolvedUsingSkeletonPreprocessor()) {
             gbc = GridBagHelper.as(0, rowOffset+2, GridBagHelper.Anchor.WEST, new Insets(0,0,15,0));
             gbc.gridwidth = 2;
-            panel.add(new JLabel(toHTML("The query answered using Skeleton Analysis preprocessing")), gbc);
+            panel.add(new JLabel(toHTML("The query was answered by Skeleton Analysis preprocessing.")), gbc);
         }
 
 
