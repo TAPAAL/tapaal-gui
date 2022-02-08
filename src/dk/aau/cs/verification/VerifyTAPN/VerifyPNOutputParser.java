@@ -177,7 +177,6 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 
             var qr = new QueryResult(result, boundedAnalysis, query, false);
             qr.setSolvedUsingQuerySimplification(solvedUsingQuerySimplification);
-            qr.setSolvedUsingStateEquation(solvedUsingStateEquation);
             qr.setSolvedUsingTraceAbstractRefinement(solvedUsingTraceAbstractRefinement);
             qr.setSolvedUsingSiphonTrap(solvedUsingSiphonTrap);
 			return new Tuple<QueryResult, Stats>(qr, new Stats(discovered, explored, explored, transitionStats, placeBoundStats, reductionStats));

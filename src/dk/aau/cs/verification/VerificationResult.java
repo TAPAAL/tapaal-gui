@@ -30,10 +30,6 @@ public class VerificationResult<TTrace> {
         return queryResult.isSolvedUsingTraceAbstractRefinement();
     }
 
-    public boolean isSolvedUsingStateEquation() {
-        return queryResult.isSolvedUsingStateEquation();
-    }
-
     public boolean isSolvedUsingSiphonTrap() {
         return queryResult.isSolvedUsingSiphonTrap();
     }
