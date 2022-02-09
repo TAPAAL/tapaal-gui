@@ -20,6 +20,7 @@ import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.GuiFrameControllerActions;
 import net.tapaal.gui.SafeGuiFrameActions;
 import net.tapaal.gui.TabActions;
+import net.tapaal.gui.model.Result;
 import net.tapaal.gui.petrinet.NameGenerator;
 import net.tapaal.gui.petrinet.TabTransformer;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
@@ -129,48 +130,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	final UndoManager undoManager = new UndoManager();
 
-    public final static class Result<T,R> {
-        public final T result;
-        public final boolean hasErrors;
-        private final List<R> errors;
 
-        public Result(T result) {
-            hasErrors = false;
-            this.result = result;
-            errors = new ArrayList<>(0);
-        }
-        public Result(Collection<R> errors) {
-            hasErrors = true;
-            this.errors = new ArrayList<>(errors);
-            result = null;
-        }
-
-        public List<R> getErrors() {
-            return Collections.unmodifiableList(errors);
-        }
-    }
-    public final static class RequirementChecker<R> {
-        public final List<R> errors = new LinkedList<R>();
-
-        public void Not(boolean b, R s) {
-            if (b) {
-                errors.add(s);
-            }
-        }
-
-        public void notNull(Object c, R s) {
-            if (c == null) {
-                errors.add(s);
-            }
-        }
-
-        public boolean failed() {
-            return errors.size() != 0;
-        }
-        public List<R> getErrors() {
-            return Collections.unmodifiableList(errors);
-        }
-    }
     public enum ModelViolation {
 
         //PlaceNotNull("Place can't be null"),
@@ -2031,7 +1991,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (result.hasErrors) {
                 StringBuilder errorMessage = new StringBuilder();
                 errorMessage.append("There was an error drawing the arc. Possible problems:");
-                for (ModelViolation v : result.errors) {
+                for (ModelViolation v : result.getErrors()) {
                     errorMessage.append("\n  - ").append(v.getErrorMessage());
                 }
 

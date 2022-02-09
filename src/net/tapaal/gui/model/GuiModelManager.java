@@ -61,7 +61,7 @@ public class GuiModelManager {
         this.tabContent = tabContent;
     }
 
-    public PetriNetTab.Result<TimedPlaceComponent, PetriNetTab.ModelViolation> addNewTimedPlace(DataLayer c, Point p) {
+    public Result<TimedPlaceComponent, PetriNetTab.ModelViolation> addNewTimedPlace(DataLayer c, Point p) {
         Require.notNull(c, "datalyer can't be null");
         Require.notNull(p, "Point can't be null");
 
@@ -71,18 +71,18 @@ public class GuiModelManager {
         c.addPetriNetObject(pnObject);
 
         addCommand(new AddTimedPlaceCommand(pnObject, tabContent.guiModelToModel.get(c), c));
-        return new PetriNetTab.Result<>(pnObject);
+        return new Result<>(pnObject);
     }
 
-    public PetriNetTab.Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
+    public Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
         return addNewTimedTransitions(c, p, false, false);
     }
 
-    public PetriNetTab.Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUncontrollable) {
+    public Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUncontrollable) {
         return addNewTimedTransitions(c, p, false, isUncontrollable);
     }
 
-    public PetriNetTab.Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUrgent, boolean isUncontrollable) {
+    public Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUrgent, boolean isUncontrollable) {
         dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(tabContent.getNameGenerator().getNewTransitionName(tabContent.guiModelToModel.get(c)));
 
         transition.setUrgent(isUrgent);
@@ -94,31 +94,31 @@ public class GuiModelManager {
         c.addPetriNetObject(pnObject);
 
         addCommand(new AddTimedTransitionCommand(pnObject, tabContent.guiModelToModel.get(c), c));
-        return new PetriNetTab.Result<>(pnObject);
+        return new Result<>(pnObject);
     }
 
     public void addAnnotationNote(DataLayer c, Point p) {
         AnnotationNote pnObject = new AnnotationNote(p.x, p.y);
 
-//enableEditMode open editor, retuns true of text added, else false
-//If no text is added,dont add it to model
+        //enableEditMode open editor, retuns true of text added, else false
+        //If no text is added,dont add it to model
         if (pnObject.enableEditMode(true)) {
             c.addPetriNetObject(pnObject);
             addCommand(new AddAnnotationNoteCommand(pnObject, c));
         }
     }
 
-    public PetriNetTab.Result<TimedInputArcComponent, PetriNetTab.ModelViolation> addTimedInputArc(@NotNull DataLayer c, @NotNull TimedPlaceComponent p, @NotNull TimedTransitionComponent t, ArcPath path) {
+    public Result<TimedInputArcComponent, PetriNetTab.ModelViolation> addTimedInputArc(@NotNull DataLayer c, @NotNull TimedPlaceComponent p, @NotNull TimedTransitionComponent t, ArcPath path) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p, "Place can't be null");
         Require.notNull(t, "Transitions can't be null");
 
-        var require = new PetriNetTab.RequirementChecker<PetriNetTab.ModelViolation>();
+        var require = new RequirementChecker<PetriNetTab.ModelViolation>();
         require.Not(tabContent.guiModelToModel.get(c).hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), PetriNetTab.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
         require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
-            return new PetriNetTab.Result<>(require.getErrors());
+            return new Result<>(require.getErrors());
         }
 
         TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
@@ -148,20 +148,20 @@ public class GuiModelManager {
 
         addCommand(edit);
 
-        return new PetriNetTab.Result<>(tiac);
+        return new Result<>(tiac);
     }
 
-    public PetriNetTab.Result<TimedOutputArcComponent, PetriNetTab.ModelViolation> addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
+    public Result<TimedOutputArcComponent, PetriNetTab.ModelViolation> addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p, "Place can't be null");
         Require.notNull(t, "Transitions can't be null");
 
-        var require = new PetriNetTab.RequirementChecker<PetriNetTab.ModelViolation>();
+        var require = new RequirementChecker<PetriNetTab.ModelViolation>();
         require.Not(tabContent.guiModelToModel.get(c).hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace()), PetriNetTab.ModelViolation.MaxOneArcBetweenTransitionAndPlace);
         require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
-            return new PetriNetTab.Result<>(require.getErrors());
+            return new Result<>(require.getErrors());
         }
 
         TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
@@ -190,22 +190,22 @@ public class GuiModelManager {
         edit.redo();
         addCommand(edit);
 
-        return new PetriNetTab.Result<>(toac);
+        return new Result<>(toac);
     }
 
-    public PetriNetTab.Result<TimedInhibitorArcComponent, PetriNetTab.ModelViolation> addInhibitorArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
+    public Result<TimedInhibitorArcComponent, PetriNetTab.ModelViolation> addInhibitorArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p, "Place can't be null");
         Require.notNull(t, "Transitions can't be null");
 
         TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
 
-        var require = new PetriNetTab.RequirementChecker<PetriNetTab.ModelViolation>();
+        var require = new RequirementChecker<PetriNetTab.ModelViolation>();
         require.Not(modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), PetriNetTab.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
         require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
-            return new PetriNetTab.Result<>(require.getErrors());
+            return new Result<>(require.getErrors());
         }
 
         TimedInhibitorArc tiha = new TimedInhibitorArc(
@@ -235,10 +235,10 @@ public class GuiModelManager {
         edit.redo();
         addCommand(edit);
 
-        return new PetriNetTab.Result<>(tihac);
+        return new Result<>(tihac);
     }
 
-    public PetriNetTab.Result<TimedTransportArcComponent, PetriNetTab.ModelViolation> addTimedTransportArc(DataLayer c, TimedPlaceComponent p1, TimedTransitionComponent t, TimedPlaceComponent p2, ArcPath path1, ArcPath path2) {
+    public Result<TimedTransportArcComponent, PetriNetTab.ModelViolation> addTimedTransportArc(DataLayer c, TimedPlaceComponent p1, TimedTransitionComponent t, TimedPlaceComponent p2, ArcPath path1, ArcPath path2) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p1, "Place1 can't be null");
         Require.notNull(t, "Transitions can't be null");
@@ -246,14 +246,14 @@ public class GuiModelManager {
 
         TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
 
-        var require = new PetriNetTab.RequirementChecker<PetriNetTab.ModelViolation>();
+        var require = new RequirementChecker<PetriNetTab.ModelViolation>();
         require.Not(modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()), PetriNetTab.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
         require.Not(modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p2.underlyingPlace()), PetriNetTab.ModelViolation.MaxOneArcBetweenTransitionAndPlace);
         require.Not((p1.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
         require.Not((p2.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
-            return new PetriNetTab.Result<>(require.getErrors());
+            return new Result<>(require.getErrors());
         }
 
 
@@ -275,7 +275,7 @@ public class GuiModelManager {
             ttac2.setArcPath(new ArcPath(ttac2, path2));
         }
 
-//XXX: the Command should take both arcs
+        //XXX: the Command should take both arcs
         Command edit = new AddTransportArcCommand(
             ttac2,
             tta,
@@ -285,19 +285,19 @@ public class GuiModelManager {
         edit.redo();
         addCommand(edit);
 
-        return new PetriNetTab.Result<>(ttac1);
+        return new Result<>(ttac1);
 
     }
 
     private void instantiateArcExpressions(TimedPlaceComponent p1, Transition t, TimedPlaceComponent p2, TransportArc tta) {
-//make for input
+        //make for input
         ColorType ctin = p1.underlyingPlace().getColorType();
         Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
         vecColorExpr.add(ctin.createColorExpressionForFirstColor());
         NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
         tta.setInputExpression(numbExpr);
 
-//make for output
+        //make for output
         ColorType ctout = p2.underlyingPlace().getColorType();
         vecColorExpr = new Vector<ColorExpression>();
         vecColorExpr.add(ctout.createColorExpressionForFirstColor());
