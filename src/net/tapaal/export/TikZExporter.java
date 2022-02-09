@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.Constant;
@@ -152,7 +153,7 @@ public class TikZExporter {
 
         if(!arc.getNameLabel().getText().isEmpty()) {
             arcLabel += arcLabelPositionString;
-            arcLabel += "\\\\" + handleNameLabel(arc.getNameLabel().getText());
+            arcLabel += "\\\\" + handleNameLabel(arc.getNameLabel().getText()) + "";
         }
 
         if(!arcLabel.isEmpty()) {
@@ -234,7 +235,7 @@ public class TikZExporter {
 		StringBuffer out = new StringBuffer();
 
 		for (Place place : places) {
-			String invariant = getPlaceInvariantString(place);
+			String invariant = "$" + getPlaceInvariantString(place) + "$";
 			String tokensInPlace = getTokenListStringFor(place);
 
 			out.append("\\node[place");
@@ -263,15 +264,13 @@ public class TikZExporter {
                         longestString = listStringNameLabel.get(i).length();
                     }
                 }
-			    double xOffset = longestString > 6 && !isLabelAbovePlace && !isLabelBehindPlace ? place.getLayerOffset() : 0;
+			    double xOffset = longestString > 8 && !isLabelAbovePlace && !isLabelBehindPlace ? place.getLayerOffset() : 0;
 			    double yOffset = place.getNameLabel().getText().lines().count() * 5;
 
 			    String nameLabel = place.getNameLabel().getText();
 
 				out.append("%% label for place " + place.getName() + "\n");
 				out.append("\\draw (");
-                //String labelPlacement = getTikzPlacementOfNameLabel(place.getNameLabel(), place.getPositionX(), place.getPositionY(), place.getHeight(), place.getId());
-                //out.append("node" + labelPlacement);
 				out.append((place.getNameLabel().getX() + xOffset)  + "," + ((place.getNameLabel().getY() + yOffset) * -1) +")");
 				out.append(" node[align=left,xshift=0pt,yshift=0pt] ");
 				out.append("{");
@@ -284,56 +283,8 @@ public class TikZExporter {
                 out.append("};\n");
 			}
 		}
-
 		return out;
 	}
-
-
-	private String getTikzPlacementOfNameLabel(NameLabel nameLabel, double xcoord, double ycoord, double height, String ID) {
-        double nameLabelXCoord = nameLabel.getXPosition();
-        double nameLabelYCoord = nameLabel.getYPosition();
-        String labelPlacement = "";
-        int longestString = 0;
-        final double coordToCM = (1 / 28.45274) * 0.33;
-
-        List<String> longestEntry = nameLabel.getText().lines().collect(Collectors.toList());
-        for(int i = 0; i < longestEntry.size(); i++) {
-            if(longestEntry.get(i).length() > longestString) {
-                longestString = longestEntry.get(i).length();
-            }
-        }
-
-        boolean isRight = nameLabelXCoord > (xcoord + (longestString * 15));
-        boolean isAbove = nameLabelYCoord <= ycoord;
-
-        double yDiff = nameLabelYCoord - ycoord;
-        double xDiff = nameLabelXCoord - xcoord;
-
-        yDiff = isAbove ? yDiff - (longestEntry.size() * 15) : nameLabelYCoord - (ycoord + height);
-        xDiff = xDiff > 0 ? nameLabelXCoord - (xcoord + longestString * 12) : xDiff;
-
-
-        if(isRight) {
-            if(isAbove) {
-                labelPlacement = "[align=left, above right=" + (yDiff * coordToCM) + "cm and " + (xDiff * coordToCM) + "cm of " + ID + "] ";
-                //labelPlacement = "[align=left,anchor=south west] at (" + ID + ".north east)";
-            } else {
-                labelPlacement = "[align=left, below right=" + (yDiff * coordToCM) + "cm and " + (xDiff * coordToCM) + "cm of " + ID + "] ";
-                //labelPlacement = "[align=left,anchor=north west] at (" + ID + ".south east)";
-            }
-
-        } else {
-            if(isAbove) {
-                labelPlacement = "[align=left, above left=" + (yDiff * coordToCM) + "cm and " + (xDiff * coordToCM) + "cm of " + ID + "] ";
-                //labelPlacement = "[align=left,anchor=south east] at (" + ID + ".north west)";
-            } else {
-                labelPlacement = "[align=left, below left=" + (yDiff * coordToCM) + "cm and " + (xDiff * coordToCM) + "cm of " + ID + "] ";
-                //labelPlacement = "[align=left,anchor=north east] at (" + ID + ".south west)";
-            }
-        }
-
-        return labelPlacement;
-    }
 
 	private String handleNameLabel(String nameLabel) {
 	    String nameLabelsString = "";
@@ -341,15 +292,21 @@ public class TikZExporter {
         for(int i = 0; i < labelsInName.length; i++) {
 
             if(labelsInName[i].contains("[")) {
-                nameLabelsString += "{" + replaceWithMathLatex(labelsInName[i]) +"}";
+                nameLabelsString += "{$" + escapeSpacesInAndOrNot(replaceWithMathLatex(labelsInName[i])) +"$}";
                 nameLabelsString += "\\\\";
             }
-            else {
-                nameLabelsString += replaceWithMathLatex(labelsInName[i]);
+            else if(!labelsInName[i].isEmpty()){
+                nameLabelsString += "$" + escapeSpacesInAndOrNot(replaceWithMathLatex(labelsInName[i]) + "$");
+                nameLabelsString += "\\\\";
+            } else {
                 nameLabelsString += "\\\\";
             }
         }
         return nameLabelsString;
+    }
+
+    private String escapeSpacesInAndOrNot(String str) {
+        return str.replace(" and ", "\\ and\\ ").replace(" or", "\\ or\\ ").replace(" not", "\\ not\\ ");
     }
 
 	private void exportPlaceTokens(Place place, StringBuffer out, int numOfTokens) {
@@ -503,66 +460,107 @@ public class TikZExporter {
         List<ColorType> listColorTypes = context.network().colorTypes();
         List<Constant> constantsList = new ArrayList<>(context.network().constants());
         List<Variable> variableList = context.network().variables();
-        String stringColorList = "";
-        String stringVariableList = "";
-        String stringConstantsList = "";
+
+        if(!context.network().isColored() || (listColorTypes.isEmpty() && constantsList.isEmpty() && variableList.isEmpty())) {
+            out.append("\\node [globalBox] (globalBox) at (current bounding box.north west) [anchor=south west] {");
+            exportConstants(constantsList, out);
+            out.append("};");
+            return out;
+        }
 
         out.append("\\node [globalBox] (globalBox) at (current bounding box.north west) [anchor=south west] {");
 
-        for(int i = 0; i < listColorTypes.size(); i++) {
-            if(i == 0) {
-                out.append("Color Types:\\\\");
-            }
-
-            out.append(listColorTypes.get(i).getName() + " is ");
-
-            if(listColorTypes.get(i).isProductColorType()) {
-                out.append("$<$" + listColorTypes.get(i).getProductColorTypes().get(0).getName() + ", " + listColorTypes.get(i).getProductColorTypes().get(1).getName() + "$>$ \\\\");
-
-            } else {
-                out.append("[");
-                for(int x = 0; x < listColorTypes.get(i).getColors().size(); x++) {
-                    stringColorList += listColorTypes.get(i).getColors().get(x).getName();
-
-                    if(x != listColorTypes.get(i).getColors().size() - 1){
-                        stringColorList += " ";
-                    }
-                }
-                out.append(stringColorList + "]\\\\");
-                stringColorList = "";
-            }
-        }
+        exportColorTypes(listColorTypes, out);
 
         if(listColorTypes.size() > 0 && (variableList.size() > 0 || constantsList.size() > 0)) {
             out.append("\\\\");
         }
 
-        for(int i = 0; i < variableList.size(); i++) {
-            if (i == 0) {
-                out.append("Variables:\\\\");
-            }
-            stringVariableList += variableList.get(i).getName() + " in " + variableList.get(i).getColorType().getName();
-            if(i != variableList.size() - 1) {
-                stringVariableList += "\\\\";
-            }
-        }
-        out.append(stringVariableList);
+        exportVariables(variableList, out);
 
-        if (variableList.size() > 0 && constantsList.size() > 0) {
+        if(variableList.size() > 0 && !constantsList.isEmpty()) {
             out.append("\\\\");
         }
 
-        for(int i = 0; i < constantsList.size(); i++) {
-            if(i == 0) {
-                out.append("Constants:\\\\");
-            }
-            stringConstantsList += constantsList.get(i).toString() + "\\\\";
-        }
-        out.append(stringConstantsList);
+        exportConstants(constantsList, out);
 
         out.append("};");
 
         return out;
+    }
+
+    private void exportColorTypes(List<ColorType> listColorTypes, StringBuffer out) {
+	    String stringColorList = "";
+        for(int i = 0; i < listColorTypes.size(); i++) {
+            if(i == 0) {
+                out.append("Color Types:\\\\");
+            }
+            out.append("$\\mathit{" + listColorTypes.get(i).getName() + "}$ \\textbf{is} ");
+
+            if(listColorTypes.get(i).isProductColorType()) {
+                out.append("$\\mathit{<");
+                for(int x = 0; x < listColorTypes.get(i).getProductColorTypes().size(); x++) {
+                    stringColorList += listColorTypes.get(i).getProductColorTypes().get(x).getName().replace("_", "\\_");
+
+                    if(x != listColorTypes.get(i).getProductColorTypes().size() - 1){
+                        stringColorList += ", ";
+                    }
+                }
+                out.append(stringColorList + ">}$\\\\");
+                stringColorList = "";
+
+            } else if(listColorTypes.get(i).isIntegerRange()) {
+                out.append("$\\mathit{");
+                if(listColorTypes.get(i).size() > 1) {
+                    int listSize = listColorTypes.get(i).size();
+                    out.append("[" + listColorTypes.get(i).getColors().get(0).getColorName().replace("_","\\_") + ".." + listColorTypes.get(i).getColors().get(listSize - 1).getColorName().replace("_","\\_") + "]");
+                } else {
+                    out.append("[" + listColorTypes.get(i).getFirstColor().getColorName().replace("_","\\_") + "]");
+                }
+                out.append("}$\\\\");
+
+            } else {
+                out.append("$\\mathit{[");
+                for(int x = 0; x < listColorTypes.get(i).getColors().size(); x++) {
+                    stringColorList += listColorTypes.get(i).getColors().get(x).getName().replace("_","\\_");
+
+                    if(x != listColorTypes.get(i).getColors().size() - 1){
+                        stringColorList += ", ";
+                    }
+                }
+                out.append(stringColorList + "]}$\\\\");
+                stringColorList = "";
+            }
+        }
+    }
+
+    private void exportVariables(List<Variable> variableList, StringBuffer out) {
+	    String result = "";
+        for(int i = 0; i < variableList.size(); i++) {
+            if (i == 0) {
+                result += "Variables:\\\\ ";
+            }
+            result += "$\\mathit{" + variableList.get(i).getName().replace("_","\\_") + " \\textbf{ in } " + variableList.get(i).getColorType().getName().replace("_","\\_") + "}$";
+            if(i != variableList.size() - 1) {
+                result += "\\\\";
+            }
+        }
+        out.append(result);
+    }
+
+    private void exportConstants(List<Constant> constantsList, StringBuffer out) {
+        String result = "";
+
+        for(int i = 0; i < constantsList.size(); i++) {
+            if(i == 0) {
+                result += "Constants:\\\\";
+            }
+            result += "$\\mathit{" + constantsList.get(i).toString().replace("_","\\_") + "}$";
+            if(i != constantsList.size() - 1) {
+                result += "\\\\";
+            }
+        }
+        out.append(result);
     }
 
 	protected String getTokenListStringFor(Place place) {
@@ -632,8 +630,8 @@ public class TikZExporter {
 	}
 
 	protected String replaceWithMathLatex(String text) {
-		return text.replace("inf", "$\\mathrm{\\infty}$").replace("<=", "$\\mathrm{\\leq}$").replace("*", "$\\mathrm{\\cdot}$")
-                   .replace("<","$\\mathrm{<}$").replace(">","$\\mathrm{>}$").replace("\u2192", "$\\rightarrow$").replace("\u221E", "$\\mathrm{\\infty}$");
+		return text.replace("inf", "\\mathrm{\\infty}").replace("<=", "\\mathrm{\\leq}").replace("*", "\\mathrm{\\cdot}")
+                   .replace("<","\\mathrm{<}").replace(">","\\mathrm{>}").replace("\u2192", "\\rightarrow").replace("\u221E", "\\mathrm{\\infty}");
 	}
 
 	private String exportMathName(String name) {
