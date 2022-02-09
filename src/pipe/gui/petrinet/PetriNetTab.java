@@ -2072,6 +2072,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 // Relates to bug #1849786
                 if (pto instanceof Transition) {
                     ((Transition)pto).removeArcCompareObject(arc);
+                    ((Transition)pto).updateEndPoints();
                 }
                 arc.updateArcPosition();
             }
