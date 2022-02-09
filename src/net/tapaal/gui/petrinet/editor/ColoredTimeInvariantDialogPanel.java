@@ -18,11 +18,11 @@ import java.util.Set;
 
 public class ColoredTimeInvariantDialogPanel extends JPanel {
 
-    private JComboBox invRelationNormal;
-    private JComboBox invRelationConstant;
+    private JComboBox<String> invRelationNormal;
+    private JComboBox<String> invRelationConstant;
     private CustomJSpinner invariantSpinner;
     private JCheckBox invariantInf;
-    private JComboBox invConstantsComboBox;
+    private JComboBox<String> invConstantsComboBox;
     private JRadioButton normalInvRadioButton;
     private JRadioButton constantInvRadioButton;
 
@@ -60,9 +60,9 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
 
         String selected = Objects.requireNonNull(invRelationConstant.getSelectedItem()).toString();
         if (value == 0) {
-            invRelationConstant.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+            invRelationConstant.setModel(new DefaultComboBoxModel<>(new String[] { "<=" }));
         } else {
-            invRelationConstant.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
+            invRelationConstant.setModel(new DefaultComboBoxModel<>(new String[] { "<=", "<" }));
         }
         invRelationConstant.setSelectedItem(selected);
     }
@@ -78,7 +78,7 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         invariantInf.setEnabled(true);
         invariantSpinner.setValue(0);
         invariantInf.setSelected(true);
-        invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<" }));
+        invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<" }));
     }
 
     private void disableInvariantComponents() {
@@ -119,15 +119,15 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
             invariantSpinner.setEnabled(true);
             invRelationNormal.setSelectedItem("<=");
             if ((Integer) invariantSpinner.getValue() < 1) {
-                invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+                invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<=" }));
             } else {
-                invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
+                invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<=", "<" }));
             }
         } else {
             invRelationNormal.setEnabled(false);
             invariantSpinner.setEnabled(false);
             invRelationNormal.setSelectedItem("<");
-            invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<" }));
+            invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<" }));
         }
 
     }
@@ -138,17 +138,17 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         timeInvariantPanel.setBorder(BorderFactory.createTitledBorder("Age Invariant"));
 
         JPanel invariantGroup = new JPanel(new GridBagLayout());
-        invRelationNormal = new JComboBox(new String[] { "<=", "<" });
-        invRelationConstant = new JComboBox(new String[] { "<=", "<" });
+        invRelationNormal = new JComboBox<>(new String[] { "<=", "<" });
+        invRelationConstant = new JComboBox<>(new String[] { "<=", "<" });
         //invariantSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
         invariantSpinner = new CustomJSpinner(0);
         invariantSpinner.addChangeListener(e -> {
             if(!invariantInf.isSelected()){
                 if ((Integer) invariantSpinner.getValue() < 1) {
-                    invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+                    invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<=" }));
                     invRelationNormal.setSelectedItem("<=");
                 } else if (invRelationNormal.getModel().getSize() == 1) {
-                    invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
+                    invRelationNormal.setModel(new DefaultComboBoxModel<>(new String[] { "<=", "<" }));
                 }
             }
         });
@@ -186,8 +186,8 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 
         int maxNumberOfPlacesToShowAtOnce = 20;
-        invConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-        invConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
+        invConstantsComboBox = new WidthAdjustingComboBox<String>(maxNumberOfPlacesToShowAtOnce);
+        invConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
         //	invConstantsComboBox = new JComboBox(constants.toArray());
         invConstantsComboBox.setMaximumRowCount(20);
         //	invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
