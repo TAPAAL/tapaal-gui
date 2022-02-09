@@ -1,4 +1,4 @@
-package net.tapaal.gui.model;
+package net.tapaal.gui.petrinet.model;
 
 import net.tapaal.gui.petrinet.undo.*;
 import pipe.gui.petrinet.PetriNetTab;
@@ -23,7 +23,6 @@ import javax.swing.*;
 import java.util.List;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Vector;
 

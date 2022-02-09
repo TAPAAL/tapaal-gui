@@ -1,4 +1,4 @@
-package net.tapaal.gui.model;
+package net.tapaal.gui.petrinet.model;
 
 import java.util.Collections;
 import java.util.LinkedList;
