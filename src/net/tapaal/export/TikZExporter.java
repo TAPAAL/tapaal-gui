@@ -22,6 +22,8 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 
+import static java.util.stream.Collectors.toList;
+
 public class TikZExporter {
 
 	public enum TikZOutputOption {
@@ -165,14 +167,6 @@ public class TikZExporter {
 		return arcLabel;
 	}
 
-	private String getGuardAsStringIfNotHidden(TimedInputArcComponent arc) {
-        if (!TAPAALGUI.getApp().showZeroToInfinityIntervals() && arc.getGuardAsString().equals("[0,inf)")){
-			return "";
-		} else {
-			return arc.getGuardAsString();
-		}
-	}
-
 	private StringBuffer exportTransitions(Transition[] transitions) {
 		StringBuffer out = new StringBuffer();
 		for (Transition trans : transitions) {
@@ -223,7 +217,7 @@ public class TikZExporter {
 				out.append(trans.getNameLabel().getX() + xOffset + "," + (trans.getNameLabel().getY() * -1) + ")");
 				out.append(" node[align=left,xshift=0pt,yshift=0pt]");
 				out.append(" {");
-				out.append(exportMathName(trans.getName()));
+				out.append("$\\mathit{" + (trans.getName().replace("_","\\_")) + "}$");
 				out.append(handleNameLabel(trans.getNameLabel().getText()));
 				out.append("};\n");
 			}	
@@ -258,7 +252,7 @@ public class TikZExporter {
 			    boolean isLabelAbovePlace = place.getY() > place.getNameLabel().getY();
 			    boolean isLabelBehindPlace = place.getX() < place.getNameLabel().getX();
                 int longestString = 0;
-                List<String> listStringNameLabel = place.getNameLabel().getText().lines().collect(Collectors.toList());
+                List<String> listStringNameLabel = place.getNameLabel().getText().lines().collect(toList());
                 for(int i = 0; i < listStringNameLabel.size(); i++) {
                     if(listStringNameLabel.get(i).length() > longestString) {
                         longestString = listStringNameLabel.get(i).length();
@@ -275,7 +269,7 @@ public class TikZExporter {
 				out.append(" node[align=left,xshift=0pt,yshift=0pt] ");
 				out.append("{");
 				if(place.getAttributesVisible()) {
-                    out.append(exportMathName(place.getName()));
+                    out.append("$\\mathit{" + (place.getName().replace("_","\\_")) + "}$");
                     if (!place.getNameLabel().getText().isEmpty()) {
                         out.append(handleNameLabel(nameLabel));
                     }
@@ -292,11 +286,11 @@ public class TikZExporter {
         for(int i = 0; i < labelsInName.length; i++) {
 
             if(labelsInName[i].contains("[")) {
-                nameLabelsString += "{$" + escapeSpacesInAndOrNot(replaceWithMathLatex(labelsInName[i])) +"$}";
+                nameLabelsString += escapeSpacesInAndOrNot(replaceWithMathLatex(labelsInName[i]));
                 nameLabelsString += "\\\\";
             }
             else if(!labelsInName[i].isEmpty()){
-                nameLabelsString += "$" + escapeSpacesInAndOrNot(replaceWithMathLatex(labelsInName[i]) + "$");
+                nameLabelsString += escapeSpacesInAndOrNot(replaceWithMathLatex(labelsInName[i]));
                 nameLabelsString += "\\\\";
             } else {
                 nameLabelsString += "\\\\";
@@ -630,34 +624,17 @@ public class TikZExporter {
 	}
 
 	protected String replaceWithMathLatex(String text) {
-		return text.replace("inf", "\\mathrm{\\infty}").replace("<=", "\\mathrm{\\leq}").replace("*", "\\mathrm{\\cdot}")
-                   .replace("<","\\mathrm{<}").replace(">","\\mathrm{>}").replace("\u2192", "\\rightarrow").replace("\u221E", "\\mathrm{\\infty}");
+	    String[] stringList = text.split(" ");
+	    String result = "";
+
+	    for(int i = 0; i < stringList.length; i++) {
+	        result += "$\\mathit{" + replaceSpecialSymbols(stringList[i]) + "}$ ";
+        }
+	    return result;
 	}
 
-	private String exportMathName(String name) {
-		StringBuilder out = new StringBuilder("$\\mathrm{");
-		int subscripts = 0;
-		for (int i = 0; i < name.length() - 1; i++) {
-			char c = name.charAt(i);
-			if (c == '_') {
-				out.append("_{");
-				subscripts++;
-			} else {
-				out.append(c);
-			}
-		}
-
-		char last = name.charAt(name.length() - 1);
-		if (last == '_') {
-			out.append("\\_");
-		} else
-			out.append(last);
-
-		for (int i = 0; i < subscripts; i++) {
-			out.append('}');
-		}
-		out.append("}$");
-		return out.toString();
-	}
-
+	protected String replaceSpecialSymbols(String text) {
+	    return text.replace("inf", "\\infty").replace("<=", "\\leq").replace("*", "\\cdot")
+                   .replace("\u2192", "\\rightarrow").replace("\u221E", "\\infty");
+    }
 }
