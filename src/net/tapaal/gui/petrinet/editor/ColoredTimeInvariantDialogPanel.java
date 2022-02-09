@@ -18,11 +18,18 @@ import java.util.Set;
 
 public class ColoredTimeInvariantDialogPanel extends JPanel {
 
-    private JComboBox invRelationNormal;
-    private JComboBox invRelationConstant;
+    public static final String INF = Character.toString('\u221e');
+    public static final String LEEQ = "<=";
+    public static final String LE = "<";
+    public static final String[] LEEQ_RELATION = {LEEQ};
+    public static final String[] LEEQ_LE_RELATION = {LEEQ, LE};
+    public static final String[] LE_RELATION = {LE};
+
+    private JComboBox<String> invRelationNormal;
+    private JComboBox<String> invRelationConstant;
     private CustomJSpinner invariantSpinner;
     private JCheckBox invariantInf;
-    private JComboBox invConstantsComboBox;
+    private JComboBox<String> invConstantsComboBox;
     private JRadioButton normalInvRadioButton;
     private JRadioButton constantInvRadioButton;
 
@@ -60,9 +67,9 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
 
         String selected = Objects.requireNonNull(invRelationConstant.getSelectedItem()).toString();
         if (value == 0) {
-            invRelationConstant.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+            invRelationConstant.setModel(new DefaultComboBoxModel<>(LEEQ_RELATION));
         } else {
-            invRelationConstant.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
+            invRelationConstant.setModel(new DefaultComboBoxModel<>(LEEQ_LE_RELATION));
         }
         invRelationConstant.setSelectedItem(selected);
     }
@@ -78,7 +85,7 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         invariantInf.setEnabled(true);
         invariantSpinner.setValue(0);
         invariantInf.setSelected(true);
-        invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<" }));
+        invRelationNormal.setModel(new DefaultComboBoxModel<>(LE_RELATION));
     }
 
     private void disableInvariantComponents() {
@@ -117,17 +124,17 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         if (!invariantInf.isSelected()) {
             invRelationNormal.setEnabled(true);
             invariantSpinner.setEnabled(true);
-            invRelationNormal.setSelectedItem("<=");
+            invRelationNormal.setSelectedItem(LEEQ);
             if ((Integer) invariantSpinner.getValue() < 1) {
-                invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+                invRelationNormal.setModel(new DefaultComboBoxModel<>(LEEQ_RELATION));
             } else {
-                invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
+                invRelationNormal.setModel(new DefaultComboBoxModel<>(LEEQ_LE_RELATION));
             }
         } else {
             invRelationNormal.setEnabled(false);
             invariantSpinner.setEnabled(false);
-            invRelationNormal.setSelectedItem("<");
-            invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<" }));
+            invRelationNormal.setSelectedItem(LE);
+            invRelationNormal.setModel(new DefaultComboBoxModel<>(LE_RELATION));
         }
 
     }
@@ -138,17 +145,17 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         timeInvariantPanel.setBorder(BorderFactory.createTitledBorder("Age Invariant"));
 
         JPanel invariantGroup = new JPanel(new GridBagLayout());
-        invRelationNormal = new JComboBox(new String[] { "<=", "<" });
-        invRelationConstant = new JComboBox(new String[] { "<=", "<" });
+        invRelationNormal = new JComboBox<>(LEEQ_LE_RELATION);
+        invRelationConstant = new JComboBox<>(LEEQ_LE_RELATION);
         //invariantSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
         invariantSpinner = new CustomJSpinner(0);
         invariantSpinner.addChangeListener(e -> {
             if(!invariantInf.isSelected()){
                 if ((Integer) invariantSpinner.getValue() < 1) {
-                    invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
-                    invRelationNormal.setSelectedItem("<=");
+                    invRelationNormal.setModel(new DefaultComboBoxModel<>(LEEQ_RELATION));
+                    invRelationNormal.setSelectedItem(LEEQ);
                 } else if (invRelationNormal.getModel().getSize() == 1) {
-                    invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
+                    invRelationNormal.setModel(new DefaultComboBoxModel<>(LEEQ_LE_RELATION));
                 }
             }
         });
@@ -174,7 +181,7 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         gbc.insets = new Insets(3, 3, 3, 3);
         invariantGroup.add(invariantSpinner, gbc);
 
-        invariantInf = new JCheckBox("inf");
+        invariantInf = new JCheckBox(INF);
         invariantInf.addActionListener(arg0 -> invariantCheckedEvent());
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
@@ -186,8 +193,8 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 
         int maxNumberOfPlacesToShowAtOnce = 20;
-        invConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-        invConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
+        invConstantsComboBox = new WidthAdjustingComboBox<>(maxNumberOfPlacesToShowAtOnce);
+        invConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
         //	invConstantsComboBox = new JComboBox(constants.toArray());
         invConstantsComboBox.setMaximumRowCount(20);
         //	invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
@@ -275,16 +282,16 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
     public void setInvariant(ColoredTimeInvariant invariantToSet){
         oldTimeInvariant = invariantToSet;
         if (invariantToSet.isUpperNonstrict()) {
-            invRelationNormal.setSelectedItem("<=");
+            invRelationNormal.setSelectedItem(LEEQ_RELATION);
         } else {
-            invRelationNormal.setSelectedItem("<");
+            invRelationNormal.setSelectedItem(LE_RELATION);
         }
 
         if (invariantToSet.upperBound() instanceof Bound.InfBound) {
             invariantSpinner.setEnabled(false);
-            invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<" }));
+            invRelationNormal.setModel(new DefaultComboBoxModel<>(LE_RELATION));
             invariantInf.setSelected(true);
-            invRelationNormal.setSelectedItem("<");
+            invRelationNormal.setSelectedItem(LE);
         }
 
         disableInvariantComponents();
@@ -292,19 +299,19 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
             enableConstantInvariantComponents();
             constantInvRadioButton.setSelected(true);
             invConstantsComboBox.setSelectedItem(((ConstantBound) invariantToSet.upperBound()).name());
-            invRelationConstant.setSelectedItem(invariantToSet.isUpperNonstrict() ? "<=" : "<");
+            invRelationConstant.setSelectedItem(invariantToSet.isUpperNonstrict() ? LEEQ : LE);
         } else {
             enableNormalInvariantComponents();
             normalInvRadioButton.setSelected(true);
             if (invariantToSet.upperBound() instanceof IntBound) {
                 if ((Integer) invariantSpinner.getValue() < 1) {
-                    invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=" }));
+                    invRelationNormal.setModel(new DefaultComboBoxModel<>(LEEQ_RELATION));
                 } else {
-                    invRelationNormal.setModel(new DefaultComboBoxModel(new String[] { "<=", "<" }));
+                    invRelationNormal.setModel(new DefaultComboBoxModel<>(LEEQ_LE_RELATION));
                 }
                 invariantSpinner.setValue(invariantToSet.upperBound().value());
                 invariantSpinner.setEnabled(true);
-                invRelationNormal.setSelectedItem(invariantToSet.isUpperNonstrict() ? "<=" : "<");
+                invRelationNormal.setSelectedItem(invariantToSet.isUpperNonstrict() ? LEEQ : LE);
                 invariantInf.setSelected(false);
             }
         }

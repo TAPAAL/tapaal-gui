@@ -118,6 +118,7 @@ public class VerifyTAPNTraceParser {
 			});
 			return builder.parse(new InputSource(reader));
 		} catch (ParserConfigurationException | IOException | SAXException e) {
+            e.printStackTrace();
 			return null;
 		}
 	}

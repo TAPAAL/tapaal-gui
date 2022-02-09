@@ -33,6 +33,23 @@ public class VerifyTAPNOutputParser {
 		this.extraTokens = extraTokens;
 		this.query = query;
 	}
+
+    private static final String SolvedUsingQuerySimplification_STRING = "Query solved by Query Simplification.";
+    boolean solvedUsingQuerySimplification = false;
+    private static final String solvedUsingTraceAbstractRefinement_STRING = "Solved using Trace Abstraction Refinement";
+    boolean solvedUsingTraceAbstractRefinement = false;
+    private static final String solvedUsingSiphonTrap_STRING = "Query solved by Siphon-Trap Analysis.";
+    boolean solvedUsingSiphonTrap  = false;
+
+    void parseSolvedMethod(String line) {
+        if (line.contains(SolvedUsingQuerySimplification_STRING)) {
+            solvedUsingQuerySimplification = true;
+        } else if (line.contains(solvedUsingTraceAbstractRefinement_STRING)) {
+            solvedUsingTraceAbstractRefinement = true;
+        } else if (line.contains(solvedUsingSiphonTrap_STRING)) {
+            solvedUsingSiphonTrap = true;
+        }
+    }
 	
 	public Tuple<QueryResult, Stats> parseOutput(String output) {
 		int discovered = 0;

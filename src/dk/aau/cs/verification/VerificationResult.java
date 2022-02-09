@@ -18,10 +18,23 @@ public class VerificationResult<TTrace> {
 	private Stats stats;
 	private NameMapping nameMapping;
 	private TTrace secondaryTrace;
-	private boolean isSolvedUsingStateEquation = false;
+
 	private Tuple<TimedArcPetriNet, NameMapping> unfoldedModel;
-	
-	public boolean isQuerySatisfied() {
+    private boolean resolvedUsingSkeletonPreprocessor = false;
+
+    public boolean isSolvedUsingQuerySimplification() {
+        return queryResult.isSolvedUsingQuerySimplification();
+    }
+
+    public boolean isSolvedUsingTraceAbstractRefinement() {
+        return queryResult.isSolvedUsingTraceAbstractRefinement();
+    }
+
+    public boolean isSolvedUsingSiphonTrap() {
+        return queryResult.isSolvedUsingSiphonTrap();
+    }
+
+    public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
 	}
 
@@ -32,15 +45,10 @@ public class VerificationResult<TTrace> {
 		this.stats = stats;
 		this.rawOutput = rawOutput;
 	}
-
-    public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation){
-        this(queryResult, trace, verificationTime, stats, null);
-        this.isSolvedUsingStateEquation = isSolvedUsingStateEquation;
-    }
 	
 	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel){
 		this(queryResult, trace, verificationTime, stats, rawOutput);
-		this.isSolvedUsingStateEquation = isSolvedUsingStateEquation;
+		//this.solvedUsingStateEquation = isSolvedUsingStateEquation; // This was the old value using for both state equation and untimed skeleton check
 		this.unfoldedModel = unfoldedModel;
 	}
 
@@ -111,8 +119,15 @@ public class VerificationResult<TTrace> {
 		returnList.sort(new transitionTupleComparator());
 		return returnList;
 	}
-	
-	public static class transitionTupleComparator implements Comparator<Tuple<String,Integer>> {
+
+    public boolean isResolvedUsingSkeletonPreprocessor() {
+        return resolvedUsingSkeletonPreprocessor;
+    }
+    public boolean setResolvedUsingSkeletonAnalysisPreprocessor(boolean b) {
+        return this.resolvedUsingSkeletonPreprocessor = b;
+    }
+
+    public static class transitionTupleComparator implements Comparator<Tuple<String,Integer>> {
 		
 		public int compare(Tuple<String,Integer> tuple1,Tuple<String,Integer> tuple2) {
             return tuple2.value2() - tuple1.value2();
@@ -208,10 +223,6 @@ public class VerificationResult<TTrace> {
 		}
 		
 		return m;
-	}
-	
-	public boolean isSolvedUsingStateEquation(){
-		return isSolvedUsingStateEquation;
 	}
 	
 	public void addTime(long timeToAdd) {

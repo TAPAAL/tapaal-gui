@@ -34,7 +34,7 @@ public class VerifyTAPNExporter {
 		File modelFile = createTempFile(".xml");
 		File queryFile;
 		if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL || (lens != null && !lens.isGame() && lens.isColored())) {
-			queryFile = createTempFile(".xml");
+			queryFile = createTempFile(".xml"); // TODO: Remeber to change this back to XML when verifytapn is updated
 		} else {
 			queryFile = createTempFile(".q");
 		}

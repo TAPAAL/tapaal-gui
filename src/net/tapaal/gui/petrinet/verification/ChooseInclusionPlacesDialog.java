@@ -52,7 +52,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 	private final TimedArcPetriNetNetwork tapnNetwork;
 
 	private JCheckBox userSpecifiedCheckBox;
-	private JCheckBox AllPlacesCheckBox;
+	private JCheckBox allPlacesCheckBox;
 	private JButton clearSelection;
 	private JButton selectAll;
 	
@@ -104,11 +104,11 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		
 		JPanel checkboxPanel = new JPanel(new BorderLayout());
-		AllPlacesCheckBox = new JCheckBox("Use all places for inclusion checking");
-		AllPlacesCheckBox.setSelected(true);
-		AllPlacesCheckBox.addActionListener(new ActionListener() {
+		allPlacesCheckBox = new JCheckBox("Use all places for inclusion checking");
+		allPlacesCheckBox.setSelected(true);
+		allPlacesCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				userSpecifiedCheckBox.setSelected(!AllPlacesCheckBox.isSelected());
+				userSpecifiedCheckBox.setSelected(!allPlacesCheckBox.isSelected());
 				placeList.setEnabled(userSpecifiedCheckBox.isSelected());
 				clearSelection.setEnabled(userSpecifiedCheckBox.isSelected());
 				selectAll.setEnabled(userSpecifiedCheckBox.isSelected());
@@ -119,14 +119,14 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		userSpecifiedCheckBox.setSelected(false);
 		userSpecifiedCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AllPlacesCheckBox.setSelected(!userSpecifiedCheckBox.isSelected());
+				allPlacesCheckBox.setSelected(!userSpecifiedCheckBox.isSelected());
 				placeList.setEnabled(userSpecifiedCheckBox.isSelected());
 				clearSelection.setEnabled(userSpecifiedCheckBox.isSelected());
 				selectAll.setEnabled(userSpecifiedCheckBox.isSelected());
 			}
 		});
 		
-		checkboxPanel.add(AllPlacesCheckBox, BorderLayout.NORTH);
+		checkboxPanel.add(allPlacesCheckBox, BorderLayout.NORTH);
 		checkboxPanel.add(userSpecifiedCheckBox, BorderLayout.SOUTH);
 		buttonPanel.add(checkboxPanel);
 		placesPanel.add(buttonPanel, BorderLayout.NORTH);
@@ -184,7 +184,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 	
 		
 		boolean allPlaces = inclusionPlaces.inclusionOption() == InclusionPlacesOption.AllPlaces;
-		AllPlacesCheckBox.setSelected(allPlaces);
+		allPlacesCheckBox.setSelected(allPlaces);
 		userSpecifiedCheckBox.setSelected(!allPlaces);
 		placeList.setEnabled(!allPlaces);
 		clearSelection.setEnabled(!allPlaces);
@@ -247,7 +247,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 
 
 	private InclusionPlaces getInclusionPlaces() {
-		if(AllPlacesCheckBox.isSelected()) 
+		if(allPlacesCheckBox.isSelected())
 			return new InclusionPlaces();
 		else {
 			List<TimedPlace> inclusionPlaces = new ArrayList<TimedPlace>();

@@ -20,10 +20,12 @@ import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.GuiFrameControllerActions;
 import net.tapaal.gui.SafeGuiFrameActions;
 import net.tapaal.gui.TabActions;
+import net.tapaal.gui.petrinet.model.ModelViolation;
+import net.tapaal.gui.petrinet.model.Result;
 import net.tapaal.gui.petrinet.NameGenerator;
 import net.tapaal.gui.petrinet.TabTransformer;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
-import net.tapaal.gui.model.GuiModelManager;
+import net.tapaal.gui.petrinet.model.GuiModelManager;
 import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
 import net.tapaal.gui.petrinet.dialog.NameVisibilityPanel;
 import net.tapaal.gui.petrinet.dialog.StatisticsPanel;
@@ -129,65 +131,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	final UndoManager undoManager = new UndoManager();
 
-    public final static class Result<T,R> {
-        public final T result;
-        public final boolean hasErrors;
-        private final List<R> errors;
 
-        public Result(T result) {
-            hasErrors = false;
-            this.result = result;
-            errors = new ArrayList<>(0);
-        }
-        public Result(Collection<R> errors) {
-            hasErrors = true;
-            this.errors = new ArrayList<>(errors);
-            result = null;
-        }
 
-        public List<R> getErrors() {
-            return Collections.unmodifiableList(errors);
-        }
-    }
-    public final static class RequirementChecker<R> {
-        public final List<R> errors = new LinkedList<R>();
-
-        public void Not(boolean b, R s) {
-            if (b) {
-                errors.add(s);
-            }
-        }
-
-        public void notNull(Object c, R s) {
-            if (c == null) {
-                errors.add(s);
-            }
-        }
-
-        public boolean failed() {
-            return errors.size() != 0;
-        }
-        public List<R> getErrors() {
-            return Collections.unmodifiableList(errors);
-        }
-    }
-    public enum ModelViolation {
-
-        //PlaceNotNull("Place can't be null"),
-        //TransitionNotNull("Transion can't be null"),
-        //ModelNotNull("Model can't be null"),
-        MaxOneArcBetweenPlaceAndTransition("There is already an arc between the selected place and transition"),
-        MaxOneArcBetweenTransitionAndPlace("There is already an arc between the selected transition and place"),
-        CantHaveArcBetweenSharedPlaceAndTransition("You are attempting to draw an arc between a shared transition and a shared place");
-
-        private final String errorMessage;
-
-        ModelViolation(String s) {
-            this.errorMessage = s;
-        }
-
-        public String getErrorMessage() { return this.errorMessage;}
-    }
 	public final GuiModelManager guiModelManager = new GuiModelManager(this);
 
     /**
@@ -466,8 +411,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	private WorkflowDialog workflowDialog = null;
 
-	private NameVisibilityPanel nameVisibilityPanel;
-
     private Boolean showNamesOption = null;
     private Boolean isSelectedComponentOption = null;
     private Boolean isPlaceOption = null;
@@ -533,16 +476,24 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         //XXX must be after the animationcontroller is created
         animationModeController = new CanvasAnimationController(getAnimator());
 
-        nameVisibilityPanel = new NameVisibilityPanel(this);
     }
 
     public PetriNetTab(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
         this(network, templates, lens);
 
-        setNetwork(network);
-        setQueries(tapnqueries);
-        setConstants(network().constants());
-	}
+        sharedPTPanel.setNetwork(network);
+        templateExplorer.updateTemplateList();
+
+        constantsPanel.setNetwork(tapnNetwork);
+
+        if(network.paintNet()){
+            this.setRightComponent(drawingSurfaceScroller);
+        } else {
+            this.setRightComponent(drawingSurfaceDummy);
+        }
+        this.queries.setQueries(tapnqueries);
+        tapnNetwork.setConstants(network().constants());
+    }
 
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
 		return sharedPTPanel;
@@ -963,11 +914,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return queries.getQueries();
 	}
 
-	private void setQueries(Iterable<TAPNQuery> queries) {
-		this.queries.setQueries(queries);
-	}
-
-	public void removeQuery(TAPNQuery queryToRemove) {
+    public void removeQuery(TAPNQuery queryToRemove) {
 		queries.removeQuery(queryToRemove);
 	}
 
@@ -975,24 +922,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		queries.addQuery(query);
 	}
 
-	private void setConstants(Iterable<Constant> constants) {
-		tapnNetwork.setConstants(constants);
-	}
-
-	private void setNetwork(TimedArcPetriNetNetwork network) {
-		sharedPTPanel.setNetwork(network);
-		templateExplorer.updateTemplateList();
-
-		constantsPanel.setNetwork(tapnNetwork);
-
-		if(network.paintNet()){
-			this.setRightComponent(drawingSurfaceScroller);
-		} else {
-			this.setRightComponent(drawingSurfaceDummy);
-		}
-	}
-
-	public void swapTemplates(int currentIndex, int newIndex) {
+    public void swapTemplates(int currentIndex, int newIndex) {
 		tapnNetwork.swapTemplates(currentIndex, newIndex);
 	}
 
@@ -2046,7 +1976,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (result.hasErrors) {
                 StringBuilder errorMessage = new StringBuilder();
                 errorMessage.append("There was an error drawing the arc. Possible problems:");
-                for (ModelViolation v : result.errors) {
+                for (ModelViolation v : result.getErrors()) {
                     errorMessage.append("\n  - ").append(v.getErrorMessage());
                 }
 
@@ -2075,6 +2005,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 // Relates to bug #1849786
                 if (pto instanceof Transition) {
                     ((Transition)pto).removeArcCompareObject(arc);
+                    ((Transition)pto).updateEndPoints();
                 }
                 arc.updateArcPosition();
             }

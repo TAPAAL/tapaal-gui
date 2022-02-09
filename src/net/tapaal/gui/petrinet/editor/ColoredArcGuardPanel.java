@@ -168,7 +168,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         timeConstraintList.addListSelectionListener(listSelectionEvent -> {
             if (!listSelectionEvent.getValueIsAdjusting()) {
                 JList source = (JList) listSelectionEvent.getSource();
-                if(source.getSelectedIndex() >= 0){
+                if(source.getSelectedIndex() >= 0 && source.getModel().getSize() > 0){
                     ColoredTimeInterval cti = (ColoredTimeInterval) source.getModel().getElementAt(source.getSelectedIndex());
                     intervalEditorPanel.setTimeInterval(cti);
                     colorIntervalComboboxPanel.updateSelection(cti.getColor());

@@ -5,7 +5,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import java.awt.*;
 
-public class WidthAdjustingComboBox extends JComboBox{
+public class WidthAdjustingComboBox<T> extends JComboBox<T>{
 
 	private static final long serialVersionUID = 1L;
 	

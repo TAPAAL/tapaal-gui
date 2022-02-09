@@ -90,6 +90,8 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 					result = false;
 					foundResult = true;
 				} else {
+                    parseSolvedMethod(line);
+
 					matcher = discoveredPattern.matcher(line);
 					if(matcher.find()){
 						discovered = Integer.parseInt(matcher.group(1));
@@ -172,7 +174,12 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 			if(!foundResult) return null;
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
 			ReductionStats reductionStats = reductionUsed? new ReductionStats(removedTransitions, removedPlaces, ruleA, ruleB, ruleC, ruleD, ruleE, ruleF, ruleG, ruleH, ruleI) : null;
-			return new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, false), new Stats(discovered, explored, explored, transitionStats, placeBoundStats, reductionStats));
+
+            var qr = new QueryResult(result, boundedAnalysis, query, false);
+            qr.setSolvedUsingQuerySimplification(solvedUsingQuerySimplification);
+            qr.setSolvedUsingTraceAbstractRefinement(solvedUsingTraceAbstractRefinement);
+            qr.setSolvedUsingSiphonTrap(solvedUsingSiphonTrap);
+			return new Tuple<QueryResult, Stats>(qr, new Stats(discovered, explored, explored, transitionStats, placeBoundStats, reductionStats));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -5,32 +5,39 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
-import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.TapnEngineXmlLoader;
-import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.TAPNQuery;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.util.*;
+import dk.aau.cs.util.FormatException;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.*;
+import net.tapaal.Preferences;
+import net.tapaal.TAPAAL;
+import net.tapaal.gui.petrinet.verification.InclusionPlaces;
+import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
+import net.tapaal.gui.petrinet.verification.UnfoldNet;
+import pipe.gui.Constants;
+import pipe.gui.FileFinder;
+import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
+import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.tapaal.Preferences;
-import net.tapaal.TAPAAL;
-import pipe.gui.petrinet.dataLayer.DataLayer;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
-import pipe.gui.*;
-import net.tapaal.gui.petrinet.verification.UnfoldNet;
-import net.tapaal.gui.petrinet.verification.InclusionPlaces;
-import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
-
-import javax.swing.*;
 
 public class VerifyDTAPN implements ModelChecker{
 
@@ -274,9 +281,13 @@ public class VerifyDTAPN implements ModelChecker{
 
                 TimedArcPetriNetTrace tapnTrace = null;
 
-
                 boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
-                if(options.traceOption() != TraceOption.NONE && isColored && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()) {
+                boolean showTrace = ((query.getProperty() instanceof TCTLEFNode && queryResult.value1().isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLAGNode && !queryResult.value1().isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLAFNode && !queryResult.value1().isQuerySatisfied()));
+
+                if(options.traceOption() != TraceOption.NONE && isColored && showTrace) {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
@@ -291,11 +302,7 @@ public class VerifyDTAPN implements ModelChecker{
                             tapnTrace = parseTrace(!errorOutput.contains("Trace:") ? errorOutput : (errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
                         }
 
-                        if(tapnTrace == null){
-                            String message = "No trace could be generated.\n\n";
-                            message += "Model checker output:\n" + standardOutput;
-                            messenger.displayWrappedErrorMessage(message,"No trace found");
-                        } else {
+                        if (tapnTrace != null) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
                                 newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new PetriNetTab.TAPNLens(TAPAALGUI.getCurrentTab().getLens().isTimed(), TAPAALGUI.getCurrentTab().getLens().isGame(), false));
@@ -312,6 +319,7 @@ public class VerifyDTAPN implements ModelChecker{
                                 options.setTraceOption(TraceOption.NONE);
                             }
                         }
+
                     } catch (FormatException e) {
                         e.printStackTrace();
                         return null;
@@ -334,7 +342,7 @@ public class VerifyDTAPN implements ModelChecker{
 					secondaryTrace = parseTrace((errorOutput.split("Trace:")[2]), options, model, exportedModel, query, queryResult.value1());
 				}
 
-				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput, model);
+				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
 			}
 		}
 	}
@@ -352,8 +360,6 @@ public class VerifyDTAPN implements ModelChecker{
 						(query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) ||
 						(query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())) {
 					return null;
-				} else {
-					messenger.displayErrorMessage("Verifydtapn cannot generate the requested trace for the model. Try another trace option.");
 				}
 			}
 		}

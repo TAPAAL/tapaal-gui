@@ -1,22 +1,33 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.31'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.10'
     id "ca.coglinc.javacc" version "2.4.0"
 }
 
 group 'net.tapaal'
 version '4.0-SNAPSHOT'
 
+var targetJavaVersion = JavaVersion.VERSION_11
+var targetKotlinVersion = "1.6"
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = targetJavaVersion
+    targetCompatibility = targetJavaVersion
 }
 
-compileJavacc {
-    inputDirectory = file('src/')
+compileKotlin {
+    sourceCompatibility = targetJavaVersion
+    targetCompatibility = targetJavaVersion
+
+    kotlinOptions {
+        jvmTarget = targetJavaVersion
+        apiVersion = targetKotlinVersion
+        languageVersion = targetKotlinVersion
+    }
 }
+
+mainClassName = 'TAPAAL'
 
 repositories {
     mavenCentral()
@@ -43,7 +54,10 @@ sourceSets {
     }
 }
 
-mainClassName = 'TAPAAL'
+compileJavacc {
+    inputDirectory = file('src/')
+}
+
 
 jar {
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
@@ -51,7 +65,7 @@ jar {
     //Sets the main call for the Jar, you can double click to run the jar file
     manifest {
         attributes (
-            'Main-Class': 'TAPAAL'
+            'Main-Class': mainClassName
         )
     }
     //The following lines makes libs a part of the build jar file (standalone jar)
@@ -59,28 +73,24 @@ jar {
 }
 
 dependencies {
-    implementation group: 'commons-cli', name: 'commons-cli', version: '20040117.000000'
+    implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
     implementation group: 'org.swinglabs.swingx', name: 'swingx-all', version: '1.6.5-1'
     implementation group: 'net.java.dev.jna', name: 'jna', version: '5.9.0'
     implementation 'org.jetbrains:annotations:22.0.0'
-    //compile group: 'com.apple', name: 'AppleJavaExtensions', version: '1.4' // Not working
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1"
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2'
 
     //Add jars from libs dir
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    //Junit
+    //JUnit
     testImplementation(
-        'org.junit.jupiter:junit-jupiter-api:5.8.1'
+        'org.junit.jupiter:junit-jupiter-api:5.8.2'
     )
     testRuntimeOnly(
-        'org.junit.jupiter:junit-jupiter-engine:5.8.1',
-        'org.junit.vintage:junit-vintage-engine:5.8.1'
+        'org.junit.jupiter:junit-jupiter-engine:5.8.2',
+        'org.junit.vintage:junit-vintage-engine:5.8.2'
     )
 }
 test {
     useJUnitPlatform()
-    afterTest { desc, result ->
-        logger.quiet "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
-    }
 }

@@ -222,7 +222,7 @@ public abstract class Transition extends PlaceTransitionObject {
 		Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
-			if (thisArc.arc.getTarget()!=this) {
+			if (thisArc.arc.getTarget()!=this && thisArc.arc.getSource()!=this || thisArc.arc.isPrototype) {
 				arcIterator.remove();
 				continue;
 			}
@@ -230,7 +230,7 @@ public abstract class Transition extends PlaceTransitionObject {
 			if (thisArc.arc == arc) {
 				thisArc.calcAngle();
 				match = true;
-				break;
+				//break; - we don't want to break here, as this method also removed the cached position of arcs no longer connected to this transition
 			}
 		}
 

@@ -25,6 +25,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
+import org.jetbrains.annotations.Nullable;
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -287,95 +288,111 @@ public class VerifyPN implements ModelChecker {
 
             Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
 
-            boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
-            if (options.traceOption() != TraceOption.NONE && isColored && queryResult != null && queryResult.value1() != null && queryResult.value1().isQuerySatisfied()) {
-                PNMLoader tapnLoader = new PNMLoader();
-                File fileOut = new File(options.unfoldedModelPath());
-                File queriesOut = new File(options.unfoldedQueriesPath());
-                PetriNetTab newTab;
-                LoadedModel loadedModel = null;
-                try {
-                    loadedModel = tapnLoader.load(fileOut);
-                    TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
-                    model = newComposer.transformModel(loadedModel.network());
-
-                    if (queryResult != null && queryResult.value1() != null) {
-                        tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1(), true);
-                    }
-
-                    if (!(tapnTrace == null)) {
-                        int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
-                        if (dialogResult == JOptionPane.OK_OPTION) {
-                            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new PetriNetTab.TAPNLens(TAPAALGUI.getCurrentTab().getLens().isTimed(), TAPAALGUI.getCurrentTab().getLens().isGame(), false));
-
-                            //The query being verified should be the only query
-                            for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
-                                newTab.setInitialName(loadedQuery.getName() + " - unfolded");
-                                loadedQuery.copyOptions(dataLayerQuery);
-                                newTab.addQuery(loadedQuery);
-                            }
-                            TAPAALGUI.openNewTabFromStream(newTab);
-                        } else {
-                            options.setTraceOption(TraceOption.NONE);
-                        }
-                    }
-                } catch (FormatException e) {
-                    e.printStackTrace();
-                } catch (ThreadDeath d) {
-                    return null;
-                }
-            }
-
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
             } else {
-                ctlOutput = queryResult.value1().isCTL;
-                boolean approximationResult = queryResult.value2().discoveredStates() == 0;    // Result is from over-approximation
 
-                if (tapnTrace == null) {
-                    if (!errorOutput.contains("Trace") && standardOutput.contains("<trace>")) {
-                        String trace = "Trace:\n";
-                        trace += (standardOutput.split("(?=<trace>)")[1]);
-                        trace = trace.split("(?<=</trace>)")[0];
-                        tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
-                    } else {
-                        tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
+                boolean showTrace = ((query.getProperty() instanceof TCTLEFNode && queryResult.value1().isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLAGNode && !queryResult.value1().isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
+                    (query.getProperty() instanceof TCTLAFNode && !queryResult.value1().isQuerySatisfied()));
+
+                if (options.traceOption() != TraceOption.NONE && isColored && showTrace) {
+                    PNMLoader tapnLoader = new PNMLoader();
+                    File fileOut = new File(options.unfoldedModelPath());
+                    File queriesOut = new File(options.unfoldedQueriesPath());
+                    PetriNetTab newTab;
+                    LoadedModel loadedModel = null;
+                    try {
+                        loadedModel = tapnLoader.load(fileOut);
+                        TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
+                        model = newComposer.transformModel(loadedModel.network());
+
+                        if (queryResult != null && queryResult.value1() != null) {
+                            tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
+                        }
+
+                        if (!(tapnTrace == null)) {
+                            int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
+                            if (dialogResult == JOptionPane.OK_OPTION) {
+                                newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new PetriNetTab.TAPNLens(TAPAALGUI.getCurrentTab().getLens().isTimed(), TAPAALGUI.getCurrentTab().getLens().isGame(), false));
+
+                                //The query being verified should be the only query
+                                for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
+                                    newTab.setInitialName(loadedQuery.getName() + " - unfolded");
+                                    loadedQuery.copyOptions(dataLayerQuery);
+                                    newTab.addQuery(loadedQuery);
+                                }
+                                TAPAALGUI.openNewTabFromStream(newTab);
+                            } else {
+                                options.setTraceOption(TraceOption.NONE);
+                            }
+                        }
+                    } catch (FormatException e) {
+                        e.printStackTrace();
+                    } catch (ThreadDeath d) {
+                        return null;
                     }
                 }
-                return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult, standardOutput, model);
+
+                ctlOutput = queryResult.value1().isCTL;
+
+                if (tapnTrace == null) {
+                    tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
+                }
+
+                var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
+
+                return result;
             }
         }
+    }
+
+    @Nullable
+    private TimedArcPetriNetTrace trace(String errorOutput, String standardOutput, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, Tuple<QueryResult, Stats> queryResult) {
+        TimedArcPetriNetTrace tapnTrace;
+
+
+        if (!errorOutput.contains("Trace") && standardOutput.contains("<trace>")) {
+            // Trace is on stdout
+            String trace = "Trace:\n";
+            trace += (standardOutput.split("(?=<trace>)")[1]);
+            trace = trace.split("(?<=</trace>)")[0];
+            tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
+        } else {
+            // Trace is on stderr
+            // Verifypn will with some options output (at lest TAR) some extra information in the error output, therefor we need to find the trace tag
+            if (errorOutput.contains("<trace>")) {
+                var split = errorOutput.split("(?=<trace>)");
+                if (split.length > 1 ) {
+                    String trace = "Trace\n";
+                    trace += split[1];
+                    trace = trace.split("(?<=</trace>)")[0];
+                    tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
+                } else {
+                    tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                }
+            } else {
+                tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+            }
+        }
+
+        return tapnTrace;
     }
 
     private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
-        return parseTrace(output, options, model, exportedModel, query, queryResult, false);
-    }
-    //XXX: this noWarning thinks is a huge hack to avoid warning shown twice for color nets, the warning should not be shown
-    // in this methods in the first case
-    private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult, boolean noWarning) {
         if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
+        if ((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) ||
+            (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) ||
+            (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) ||
+            (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())) {
+            return null;
+        }
 
         VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
 
-        TimedArcPetriNetTrace trace = null;
-        trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
-
-        if (trace == null) {
-            if (options.traceOption() != TraceOption.NONE) {
-                if ((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) ||
-                    (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) ||
-                    (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) ||
-                    (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())) {
-                    return null;
-                } else {
-                    if (!noWarning) {
-                        String message = "No trace could be generated.\n\n";
-                        messenger.displayWrappedErrorMessage(message, "No trace found");
-                    }
-                }
-            }
-        }
-        return trace;
+        return traceParser.parseTrace(new BufferedReader(new StringReader(output)));
     }
 
     private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {

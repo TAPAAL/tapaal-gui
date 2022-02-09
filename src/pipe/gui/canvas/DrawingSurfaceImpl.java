@@ -14,10 +14,7 @@ import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.helpers.Reference.Reference;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.*;
-import pipe.gui.petrinet.graphicElements.GraphicalElement;
-import pipe.gui.petrinet.graphicElements.PetriNetObject;
-import pipe.gui.petrinet.graphicElements.PetriNetObjectWithLabel;
-import pipe.gui.petrinet.graphicElements.Zoomable;
+import pipe.gui.petrinet.graphicElements.*;
 import pipe.gui.petrinet.undo.TranslatePetriNetObjectEditCommand;
 
 /**
@@ -332,6 +329,13 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
     public void removePrototype(GraphicalElement pno) {
         remove(pno);
         pno.setManagerRef(null);
+        if (pno instanceof Arc) {
+            var a = (Arc) pno;
+            //Clear the arcs target/source. Transitions caches transitions to calculate the connection points.
+            // This cache will only be removed if the arc target is removed.
+            a.setSource(null);
+            a.setTarget(null);
+        }
         validate();
         repaint();
     }

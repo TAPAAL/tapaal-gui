@@ -107,9 +107,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                 if (!verifypn.setup()) {
                     messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
                 } else {
-                    VerificationResult<TimedArcPetriNetTrace> overapprox_result = null;
+                    VerificationResult<TimedArcPetriNetTrace> skeletonAnalysisResult = null;
                     if (dataLayerQuery != null) {
-                        overapprox_result = verifypn.verify(
+                        skeletonAnalysisResult = verifypn.verify(
                             new VerifyPNOptions(
                                 options.extraTokens(),
                                 net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE,
@@ -139,7 +139,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                             dataLayerQuery,
                             null);
                     } else { // TODO: FIX! If datalayer is null then we can't check datalayer's values...
-                        overapprox_result = verifypn.verify(
+                        skeletonAnalysisResult = verifypn.verify(
                             new VerifyPNOptions(
                                 options.extraTokens(),
                                 net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE,
@@ -159,9 +159,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 true,
                                 model.isColored(),
                                 model.isColored() && (!model.isUntimed() || options.traceOption() != net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE),
-                                dataLayerQuery.usePartitioning(),
-                                dataLayerQuery.useColorFixpoint(),
-                                dataLayerQuery.useSymmetricVars()
+                                true,
+                                true,
+                                true
                             ),
                             transformedModel,
                             clonedQuery,
@@ -170,18 +170,19 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                             null);
                     }
 
-                    if (overapprox_result.getQueryResult() != null) {
-                        if (!overapprox_result.error() && model.isUntimed() || (
-                            (query.queryType() == QueryType.EF && !overapprox_result.getQueryResult().isQuerySatisfied()) ||
-                                (query.queryType() == QueryType.AG && overapprox_result.getQueryResult().isQuerySatisfied()))
+                    if (skeletonAnalysisResult.getQueryResult() != null) {
+                        if (!skeletonAnalysisResult.error() && model.isUntimed() || (
+                            (query.queryType() == QueryType.EF && !skeletonAnalysisResult.getQueryResult().isQuerySatisfied()) ||
+                                (query.queryType() == QueryType.AG && skeletonAnalysisResult.getQueryResult().isQuerySatisfied()))
                         ) {
                             VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(
-                                overapprox_result.getQueryResult(),
-                                decomposeTrace(overapprox_result.getTrace(), transformedModel.value2()),
-                                overapprox_result.verificationTime(),
-                                overapprox_result.stats(),
-                                true
+                                skeletonAnalysisResult.getQueryResult(),
+                                decomposeTrace(skeletonAnalysisResult.getTrace(), transformedModel.value2()),
+                                skeletonAnalysisResult.verificationTime(),
+                                skeletonAnalysisResult.stats(),
+                                skeletonAnalysisResult.getRawOutput()
                             );
+                            value.setResolvedUsingSkeletonAnalysisPreprocessor(true);
                             value.setNameMapping(transformedModel.value2());
                             return value;
                         }

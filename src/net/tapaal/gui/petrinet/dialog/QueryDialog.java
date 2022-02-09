@@ -183,7 +183,7 @@ public class QueryDialog extends JPanel {
 	private JCheckBox useTimeDarts;
 	private JCheckBox usePTrie;
 	private JCheckBox useGCD;
-	private JCheckBox useOverApproximation;
+	private JCheckBox skeletonAnalysis;
     private JCheckBox useSiphonTrap;
     private JCheckBox useQueryReduction;
     private JCheckBox useReduction;
@@ -423,7 +423,7 @@ public class QueryDialog extends JPanel {
 		boolean timeDarts = useTimeDarts.isSelected();
 		boolean pTrie = usePTrie.isSelected();
 		boolean gcd = useGCD.isSelected();
-		boolean overApproximation = useOverApproximation.isSelected();
+		boolean overApproximation = skeletonAnalysis.isSelected();
 		boolean reduction = useReduction.isSelected();
 
 		TAPNQuery query = new TAPNQuery(
@@ -1395,7 +1395,7 @@ public class QueryDialog extends JPanel {
         usePTrie.setSelected(queryToCreateFrom.usePTrie());
         useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
         useGCD.setSelected(queryToCreateFrom.useGCD());
-        useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
+        skeletonAnalysis.setSelected(queryToCreateFrom.useOverApproximation());
         useReduction.setSelected(queryToCreateFrom.useReduction());
         discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
 
@@ -3338,7 +3338,7 @@ public class QueryDialog extends JPanel {
         useTimeDarts = new JCheckBox("Use Time Darts");
         useGCD = new JCheckBox("Use GCD");
         usePTrie = new JCheckBox("Use PTrie");
-        useOverApproximation = new JCheckBox("Use untimed state-equations check");
+        skeletonAnalysis = new JCheckBox("Preprocess using skeleton analysis");
         useTraceRefinement = new JCheckBox("Use trace abstraction refinement");
         useTarjan = new JCheckBox("Use Tarjan");
 
@@ -3352,7 +3352,7 @@ public class QueryDialog extends JPanel {
         useTimeDarts.setSelected(false);
         useGCD.setSelected(true);
         usePTrie.setSelected(true);
-        useOverApproximation.setSelected(true);
+        skeletonAnalysis.setSelected(true);
         useTraceRefinement.setSelected(false);
         useTarjan.setSelected(true);
 
@@ -3366,7 +3366,7 @@ public class QueryDialog extends JPanel {
         useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
         useGCD.setToolTipText(TOOL_TIP_GCD);
         usePTrie.setToolTipText(TOOL_TIP_PTRIE);
-        useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
+        skeletonAnalysis.setToolTipText(TOOL_TIP_OVERAPPROX);
         useTraceRefinement.setToolTipText(TOOL_TIP_USE_TRACE_REFINEMENT);
         useTarjan.setToolTipText(TOOL_TIP_USE_TARJAN);
 
@@ -3408,10 +3408,7 @@ public class QueryDialog extends JPanel {
         reductionOptionsPanel.add(useStubbornReduction, gbc);
         gbc.gridx = 0;
         gbc.gridy = 3;
-        reductionOptionsPanel.add(useOverApproximation, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
+        reductionOptionsPanel.add(skeletonAnalysis, gbc);
         gbc.gridx = 1;
         gbc.gridy = 2;
         reductionOptionsPanel.add(useTimeDarts, gbc);
@@ -3419,23 +3416,14 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 1;
         reductionOptionsPanel.add(useGCD, gbc);
         gbc.gridx = 1;
-        gbc.gridy = 3;
+        gbc.gridy = 2;
         reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
         gbc.gridx = 1;
         gbc.gridy = 3;
         reductionOptionsPanel.add(usePTrie, gbc);
 
-        discreteInclusion.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                selectInclusionPlacesButton.setEnabled(discreteInclusion.isSelected());
-            }
-        });
-
-        selectInclusionPlacesButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces);
-            }
-        });
+        discreteInclusion.addActionListener(e -> selectInclusionPlacesButton.setEnabled(discreteInclusion.isSelected()));
+        selectInclusionPlacesButton.addActionListener(e -> inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces));
 
         useTimeDarts.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
     }
@@ -3582,13 +3570,13 @@ public class QueryDialog extends JPanel {
 
 	private void refreshOverApproximationOption() {
 	    if (queryHasDeadlock() || newProperty.toString().contains("EG") || newProperty.toString().contains("AF")){
-			useOverApproximation.setSelected(false);
-			useOverApproximation.setEnabled(false);
+			skeletonAnalysis.setSelected(false);
+			skeletonAnalysis.setEnabled(false);
 		} else {
-			if(!useOverApproximation.isEnabled()){
-				useOverApproximation.setSelected(true);
+			if(!skeletonAnalysis.isEnabled()){
+				skeletonAnalysis.setSelected(true);
 			}
-			useOverApproximation.setEnabled(true);
+			skeletonAnalysis.setEnabled(true);
 		}
 
         if (lens.isGame()) {
