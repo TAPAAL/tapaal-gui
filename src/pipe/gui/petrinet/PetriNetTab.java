@@ -466,8 +466,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	private WorkflowDialog workflowDialog = null;
 
-	private NameVisibilityPanel nameVisibilityPanel;
-
     private Boolean showNamesOption = null;
     private Boolean isSelectedComponentOption = null;
     private Boolean isPlaceOption = null;
@@ -533,7 +531,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         //XXX must be after the animationcontroller is created
         animationModeController = new CanvasAnimationController(getAnimator());
 
-        nameVisibilityPanel = new NameVisibilityPanel(this);
     }
 
     public PetriNetTab(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
