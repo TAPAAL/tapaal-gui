@@ -61,7 +61,7 @@ public class GuiModelManager {
         this.tabContent = tabContent;
     }
 
-    public Result<TimedPlaceComponent, PetriNetTab.ModelViolation> addNewTimedPlace(DataLayer c, Point p) {
+    public Result<TimedPlaceComponent, ModelViolation> addNewTimedPlace(DataLayer c, Point p) {
         Require.notNull(c, "datalyer can't be null");
         Require.notNull(p, "Point can't be null");
 
@@ -74,15 +74,15 @@ public class GuiModelManager {
         return new Result<>(pnObject);
     }
 
-    public Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
+    public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
         return addNewTimedTransitions(c, p, false, false);
     }
 
-    public Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUncontrollable) {
+    public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUncontrollable) {
         return addNewTimedTransitions(c, p, false, isUncontrollable);
     }
 
-    public Result<TimedTransitionComponent, PetriNetTab.ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUrgent, boolean isUncontrollable) {
+    public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUrgent, boolean isUncontrollable) {
         dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(tabContent.getNameGenerator().getNewTransitionName(tabContent.guiModelToModel.get(c)));
 
         transition.setUrgent(isUrgent);
@@ -108,14 +108,14 @@ public class GuiModelManager {
         }
     }
 
-    public Result<TimedInputArcComponent, PetriNetTab.ModelViolation> addTimedInputArc(@NotNull DataLayer c, @NotNull TimedPlaceComponent p, @NotNull TimedTransitionComponent t, ArcPath path) {
+    public Result<TimedInputArcComponent, ModelViolation> addTimedInputArc(@NotNull DataLayer c, @NotNull TimedPlaceComponent p, @NotNull TimedTransitionComponent t, ArcPath path) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p, "Place can't be null");
         Require.notNull(t, "Transitions can't be null");
 
-        var require = new RequirementChecker<PetriNetTab.ModelViolation>();
-        require.Not(tabContent.guiModelToModel.get(c).hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), PetriNetTab.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
-        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+        var require = new RequirementChecker<ModelViolation>();
+        require.Not(tabContent.guiModelToModel.get(c).hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
+        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
             return new Result<>(require.getErrors());
@@ -151,14 +151,14 @@ public class GuiModelManager {
         return new Result<>(tiac);
     }
 
-    public Result<TimedOutputArcComponent, PetriNetTab.ModelViolation> addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
+    public Result<TimedOutputArcComponent, ModelViolation> addTimedOutputArc(DataLayer c, TimedTransitionComponent t, TimedPlaceComponent p, ArcPath path) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p, "Place can't be null");
         Require.notNull(t, "Transitions can't be null");
 
-        var require = new RequirementChecker<PetriNetTab.ModelViolation>();
-        require.Not(tabContent.guiModelToModel.get(c).hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace()), PetriNetTab.ModelViolation.MaxOneArcBetweenTransitionAndPlace);
-        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+        var require = new RequirementChecker<ModelViolation>();
+        require.Not(tabContent.guiModelToModel.get(c).hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace()), ModelViolation.MaxOneArcBetweenTransitionAndPlace);
+        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
             return new Result<>(require.getErrors());
@@ -193,16 +193,16 @@ public class GuiModelManager {
         return new Result<>(toac);
     }
 
-    public Result<TimedInhibitorArcComponent, PetriNetTab.ModelViolation> addInhibitorArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
+    public Result<TimedInhibitorArcComponent, ModelViolation> addInhibitorArc(DataLayer c, TimedPlaceComponent p, TimedTransitionComponent t, ArcPath path) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p, "Place can't be null");
         Require.notNull(t, "Transitions can't be null");
 
         TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
 
-        var require = new RequirementChecker<PetriNetTab.ModelViolation>();
-        require.Not(modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), PetriNetTab.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
-        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+        var require = new RequirementChecker<ModelViolation>();
+        require.Not(modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
+        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
             return new Result<>(require.getErrors());
@@ -238,7 +238,7 @@ public class GuiModelManager {
         return new Result<>(tihac);
     }
 
-    public Result<TimedTransportArcComponent, PetriNetTab.ModelViolation> addTimedTransportArc(DataLayer c, TimedPlaceComponent p1, TimedTransitionComponent t, TimedPlaceComponent p2, ArcPath path1, ArcPath path2) {
+    public Result<TimedTransportArcComponent, ModelViolation> addTimedTransportArc(DataLayer c, TimedPlaceComponent p1, TimedTransitionComponent t, TimedPlaceComponent p2, ArcPath path1, ArcPath path2) {
         Require.notNull(c, "DataLayer can't be null");
         Require.notNull(p1, "Place1 can't be null");
         Require.notNull(t, "Transitions can't be null");
@@ -246,11 +246,11 @@ public class GuiModelManager {
 
         TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
 
-        var require = new RequirementChecker<PetriNetTab.ModelViolation>();
-        require.Not(modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()), PetriNetTab.ModelViolation.MaxOneArcBetweenPlaceAndTransition);
-        require.Not(modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p2.underlyingPlace()), PetriNetTab.ModelViolation.MaxOneArcBetweenTransitionAndPlace);
-        require.Not((p1.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
-        require.Not((p2.underlyingPlace().isShared() && t.underlyingTransition().isShared()), PetriNetTab.ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+        var require = new RequirementChecker<ModelViolation>();
+        require.Not(modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
+        require.Not(modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p2.underlyingPlace()), ModelViolation.MaxOneArcBetweenTransitionAndPlace);
+        require.Not((p1.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
+        require.Not((p2.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
             return new Result<>(require.getErrors());

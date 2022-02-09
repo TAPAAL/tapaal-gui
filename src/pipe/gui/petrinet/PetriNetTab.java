@@ -20,6 +20,7 @@ import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.GuiFrameControllerActions;
 import net.tapaal.gui.SafeGuiFrameActions;
 import net.tapaal.gui.TabActions;
+import net.tapaal.gui.model.ModelViolation;
 import net.tapaal.gui.model.Result;
 import net.tapaal.gui.petrinet.NameGenerator;
 import net.tapaal.gui.petrinet.TabTransformer;
@@ -131,23 +132,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	final UndoManager undoManager = new UndoManager();
 
 
-    public enum ModelViolation {
 
-        //PlaceNotNull("Place can't be null"),
-        //TransitionNotNull("Transion can't be null"),
-        //ModelNotNull("Model can't be null"),
-        MaxOneArcBetweenPlaceAndTransition("There is already an arc between the selected place and transition"),
-        MaxOneArcBetweenTransitionAndPlace("There is already an arc between the selected transition and place"),
-        CantHaveArcBetweenSharedPlaceAndTransition("You are attempting to draw an arc between a shared transition and a shared place");
-
-        private final String errorMessage;
-
-        ModelViolation(String s) {
-            this.errorMessage = s;
-        }
-
-        public String getErrorMessage() { return this.errorMessage;}
-    }
 	public final GuiModelManager guiModelManager = new GuiModelManager(this);
 
     /**
