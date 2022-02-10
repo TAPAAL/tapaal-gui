@@ -1743,7 +1743,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         return null;
     }
 
-	class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {
+	static final class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
@@ -1756,72 +1756,72 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         public void registerEvents() {}
     }
 
-    class CanvasTransitionDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasTransitionDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, false, false);
+            guiModelManager.addNewTimedTransitions(canvas.getGuiModel(), p, false, false);
         }
 
         @Override
         public void registerEvents() {}
     }
 
-    class CanvasUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true, false);
+            guiModelManager.addNewTimedTransitions(canvas.getGuiModel(), p, true, false);
         }
 
         @Override
         public void registerEvents() {}
     }
 
-    class CanvasUncontrollableTransitionDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasUncontrollableTransitionDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, false, true);
+            guiModelManager.addNewTimedTransitions(canvas.getGuiModel(), p, false, true);
         }
 
         @Override
         public void registerEvents() {}
     }
 
-    class CanvasUncontrollableUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasUncontrollableUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true, true);
+            guiModelManager.addNewTimedTransitions(canvas.getGuiModel(), p, true, true);
         }
 
         @Override
         public void registerEvents() {}
     }
 
-    class CanvasAnnotationNoteDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasAnnotationNoteDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-           guiModelManager.addAnnotationNote(drawingSurface.getGuiModel(), p);
+           guiModelManager.addAnnotationNote(canvas.getGuiModel(), p);
         }
 
         @Override
         public void registerEvents() {}
     }
 
-    final class CanvasInhibitorarcDrawController extends AbstractCanvasArcDrawController {
+    static final class CanvasInhibitorarcDrawController extends AbstractCanvasArcDrawController {
 
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place;
@@ -1830,7 +1830,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (place != null && transition == null) {
                 transition = pno;
                 TAPAALGUI.getDrawingSurface().clearAllPrototype();
-                var result = guiModelManager.addInhibitorArc(getModel(), place, transition, arc.getArcPath());
+                var result = guiModelManager.addInhibitorArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
             }
@@ -1863,7 +1863,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     }
 
-    abstract class AbstractCanvasArcDrawController extends AbstractDrawingSurfaceManager {
+    static abstract class AbstractCanvasArcDrawController extends AbstractDrawingSurfaceManager {
         protected Arc arc;
         protected int connectsTo = 1; // 0 if nothing, 1 if place, 2 if transition
 
@@ -1945,16 +1945,16 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
                     if (connectsTo == 1) { // Place
-                        var r = guiModelManager.addNewTimedPlace(getModel(), p);
+                        var r = guiModelManager.addNewTimedPlace(canvas.getGuiModel(), p);
                         placeClicked(r.result, e);
                     } else { //Transition
-                        var r = guiModelManager.addNewTimedTransitions(getModel(), p, false, false);
+                        var r = guiModelManager.addNewTimedTransitions(canvas.getGuiModel(), p, false, false);
                         transitionClicked(r.result, e);
                     }
                 }
             } else if (e.isControlDown()){ // Quick draw
                 Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
-                var r = guiModelManager.addNewTimedPlace(getModel(), p);
+                var r = guiModelManager.addNewTimedPlace(canvas.getGuiModel(), p);
 
                 placeClicked(r.result, e);
             }
@@ -2009,7 +2009,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
     }
 
-    final class CanvasArcDrawController extends AbstractCanvasArcDrawController {
+    static final class CanvasArcDrawController extends AbstractCanvasArcDrawController {
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place;
 
@@ -2030,7 +2030,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             } else if (place != null && transition == null) {
                 transition = pno;
                 TAPAALGUI.getDrawingSurface().clearAllPrototype();
-                var result = guiModelManager.addTimedInputArc(getModel(), place, transition, arc.getArcPath());
+                var result = guiModelManager.addTimedInputArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
 
@@ -2066,7 +2066,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             } else if (transition != null && place == null) {
                 place = pno;
                 TAPAALGUI.getDrawingSurface().clearAllPrototype();
-                var result = guiModelManager.addTimedOutputArc(getModel(), transition, place, arc.getArcPath());
+                var result = guiModelManager.addTimedOutputArc(canvas.getGuiModel(), transition, place, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
 
@@ -2097,7 +2097,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     }
 
-	static class CanvasAnimationController extends AbstractDrawingSurfaceManager {
+	static final class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
 
@@ -2171,7 +2171,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         //De-register old manager
 		managerRef.get().deregisterManager();
         managerRef.setReference(newManager);
-		managerRef.get().registerManager(drawingSurface);
+		managerRef.get().registerManager(drawingSurface, guiModelManager);
     }
 
     public void updateFeatureText() {
@@ -2187,7 +2187,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         TabTransformer.removeTimingInformation(tab);
     }
 
-    private final class CanvasTransportarcDrawController extends AbstractCanvasArcDrawController {
+    final class CanvasTransportarcDrawController extends AbstractCanvasArcDrawController {
 
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place1;
@@ -2280,7 +2280,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     }
 
-    private class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
+    final class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
         @Override
         public void registerEvents() {
 
@@ -2502,9 +2502,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if(!lens.isColored()) {
                 if (p.isSelected()) {
                     if (e.getWheelRotation() < 0) {
-                        guiModelManager.addToken(getModel(), p, 1);
+                        guiModelManager.addToken(canvas.getGuiModel(), p, 1);
                     } else {
-                        guiModelManager.removeToken(getModel(), p, 1);
+                        guiModelManager.removeToken(canvas.getGuiModel(), p, 1);
                     }
 
                 } else {
