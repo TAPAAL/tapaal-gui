@@ -2405,7 +2405,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
             if (isDragging) {
                 isDragging = false;
-                canvas.translateSelection(canvas.getSelectionObject().getSelection(), totalX, totalY);
+                canvas.translateSelection(totalX, totalY);
                 totalX = 0;
                 totalY = 0;
             } else {

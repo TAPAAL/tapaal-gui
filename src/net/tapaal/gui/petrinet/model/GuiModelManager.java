@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Vector;
 
 public class GuiModelManager {
+    //XXX: Insted of having access to the whole tab, it should properly take some sort of model
     private final PetriNetTab tabContent;
 
     private List<Command> pendingEdits = null;
