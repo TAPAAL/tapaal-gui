@@ -26,10 +26,9 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	private TimedTransportArcComponent connectedTo;
 	private TransportArc underlyingTransportArc;
 
-	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet, PetriNetTab.TAPNLens lens) {
+	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) {
 		super(new TimedOutputArcComponent(newSource));
 		this.isInPreSet = isInPreSet;
-        this.lens = lens;
 		setGroup(groupNr);
 		// hack to reprint the label of the arc
 		updateLabel(true);

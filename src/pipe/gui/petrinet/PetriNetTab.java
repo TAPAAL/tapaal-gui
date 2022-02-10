@@ -2187,7 +2187,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         TabTransformer.removeTimingInformation(tab);
     }
 
-    final class CanvasTransportarcDrawController extends AbstractCanvasArcDrawController {
+    static final class CanvasTransportarcDrawController extends AbstractCanvasArcDrawController {
 
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place1;
@@ -2220,7 +2220,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (place1 != null && transition == null) {
                 transition = pno;
                 connectsTo = 1;
-                arc2 = arc = new TimedTransportArcComponent(pno, -1, false, lens);
+                arc2 = arc = new TimedTransportArcComponent(pno, -1, false);
 
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
@@ -2237,7 +2237,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (place1 == null && transition == null) {
                 place1 = pno;
                 connectsTo = 2;
-                arc1 = arc = new TimedTransportArcComponent(pno, -1, true, lens);
+                arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
@@ -2249,14 +2249,14 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             } else if (transition != null && place2 == null) {
                 place2 = pno;
                 TAPAALGUI.getDrawingSurface().clearAllPrototype();
-                var result = guiModelManager.addTimedTransportArc(getModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
+                var result = guiModelManager.addTimedTransportArc(canvas.getGuiModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
 
                 if (e != null && e.isControlDown()) {
                     place1 = pno;
                     connectsTo = 2;
-                    arc1 = arc = new TimedTransportArcComponent(pno, -1, true, lens);
+                    arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
                     //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
