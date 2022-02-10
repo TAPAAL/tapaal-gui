@@ -1753,9 +1753,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
     class CanvasTransitionDrawController extends AbstractDrawingSurfaceManager {
@@ -1768,9 +1766,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
     class CanvasUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
@@ -1783,9 +1779,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
     class CanvasUncontrollableTransitionDrawController extends AbstractDrawingSurfaceManager {
@@ -1798,9 +1792,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
     class CanvasUncontrollableUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
@@ -1813,9 +1805,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
     class CanvasAnnotationNoteDrawController extends AbstractDrawingSurfaceManager {
@@ -1828,9 +1818,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
     final class CanvasInhibitorarcDrawController extends AbstractCanvasArcDrawController {
