@@ -1412,7 +1412,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 setManager(new CanvasTransportarcDrawController());
                 break;
             case SELECT:
-                setManager(new CanvasGeneralDrawController());
+                setManager(new CanvasGeneralDrawController(lens));
                 break;
             default:
                 setManager(notingManager);
@@ -2280,7 +2280,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     }
 
-    final class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
+        final TAPNLens lens;
+
+        public CanvasGeneralDrawController(TAPNLens lens) {
+            this.lens = lens;
+        }
+
         @Override
         public void registerEvents() {
 
@@ -2374,10 +2380,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             );
         }
 
-        protected boolean justSelected = false;
+        boolean justSelected = false;
 
-        protected boolean isDragging = false;
-        protected Point dragInit = new Point();
+        boolean isDragging = false;
+        Point dragInit = new Point();
 
         private int totalX = 0;
         private int totalY = 0;
