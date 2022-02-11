@@ -931,7 +931,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             colorExpressionComboBoxPanel.setEnabled(false);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
-            scalarButton.setEnabled(false);
+            scalarButton.setEnabled(true);
             succButton.setEnabled(false);
             predButton.setEnabled(false);
         }
