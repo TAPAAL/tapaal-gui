@@ -2,7 +2,7 @@ package dk.aau.cs.approximation;
 
 import java.math.BigDecimal;
 
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import pipe.gui.TAPAALGUI;
@@ -44,7 +44,7 @@ public class ApproximationWorker {
         TimedArcPetriNetNetwork model,
         DataLayer guiModel,
         net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery,
-        PetriNetTab.TAPNLens lens
+        TAPNLens lens
     ) throws Exception {
 		
 		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them

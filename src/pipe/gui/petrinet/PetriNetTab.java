@@ -20,6 +20,7 @@ import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.GuiFrameControllerActions;
 import net.tapaal.gui.SafeGuiFrameActions;
 import net.tapaal.gui.TabActions;
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
 import net.tapaal.gui.petrinet.NameGenerator;
@@ -93,29 +94,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         ADDTOKEN, DELTOKEN, SELECT, DRAW, DRAG,
     }
 
-    public static final class TAPNLens {
-        public static final TAPNLens Default = new TAPNLens(true, true, true);
-        public boolean isTimed() {
-            return timed;
-        }
-
-        public boolean isGame() {
-            return game;
-        }
-        public boolean isColored(){
-            return colored;
-        }
-
-        private final boolean timed;
-        private final boolean game;
-        private final boolean colored;
-
-        public TAPNLens(boolean timed, boolean game, boolean colored) {
-            this.timed = timed;
-            this.game = game;
-            this.colored = colored;
-        }
-    }
     public final TAPNLens lens;
 
 	//Model and state

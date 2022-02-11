@@ -6,7 +6,7 @@ import dk.aau.cs.TCTL.TCTLConstNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
-import dk.aau.cs.TCTL.visitors.QueryVisitor;
+import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.XMLQueryLoader;
@@ -77,7 +77,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
     @Override
     protected String doInBackground() throws Exception {
-        PetriNetTab.TAPNLens lens = oldTab.getLens();
+        TAPNLens lens = oldTab.getLens();
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
         boolean dummyQuery = false;
@@ -194,7 +194,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 loadedModel = new PNMLoader().load(fileOut);
             }
             // addLocation(loadedModel, composer); // We can not get coords from server
-            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new PetriNetTab.TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
+            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
             if(!dummyQuery){
                 for(TAPNQuery query : getQueries(queryOut, loadedModel.network())){

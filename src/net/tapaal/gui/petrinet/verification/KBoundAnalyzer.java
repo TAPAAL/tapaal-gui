@@ -4,7 +4,7 @@ import javax.swing.JSpinner;
 
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Tuple;
@@ -36,13 +36,13 @@ public class KBoundAnalyzer {
 
     protected final int k;
 
-    private final PetriNetTab.TAPNLens lens;
+    private final TAPNLens lens;
 	private final ModelChecker modelChecker;
 	private final Messenger messenger;
 	private final JSpinner spinner;
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
 
-	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, PetriNetTab.TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k,
+	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k,
                           ModelChecker modelChecker, Messenger messenger, JSpinner tokensControl) {
         this.lens = lens;
         this.k = k;

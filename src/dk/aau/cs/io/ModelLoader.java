@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import dk.aau.cs.TCTL.Parsing.ParseException;
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 
 public class ModelLoader {
 
@@ -57,7 +57,7 @@ public class ModelLoader {
 		}
 	}
 
-    public PetriNetTab.TAPNLens loadLens(InputStream file) throws Exception{
+    public TAPNLens loadLens(InputStream file) throws Exception{
         TapnXmlLoader newFormatLoader = new TapnXmlLoader();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];

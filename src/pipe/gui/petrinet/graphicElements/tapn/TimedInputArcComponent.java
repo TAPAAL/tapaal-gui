@@ -3,7 +3,7 @@ package pipe.gui.petrinet.graphicElements.tapn;
 import java.util.Hashtable;
 import java.util.List;
 
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.TAPAALGUI;
@@ -27,7 +27,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		updateLabel(true);
 	}
 
-	public TimedInputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedInputArc modelArc, PetriNetTab.TAPNLens lens){
+	public TimedInputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedInputArc modelArc, TAPNLens lens){
 	    super(source);
 	    setTarget(target);
 	    setUnderlyingArc(modelArc);
@@ -41,7 +41,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		updateLabel(true);
 	}
 
-    public TimedInputArcComponent(TimedOutputArcComponent arc, PetriNetTab.TAPNLens lens) {
+    public TimedInputArcComponent(TimedOutputArcComponent arc, TAPNLens lens) {
         super(arc);
         updateLabel(true);
         this.lens = lens;

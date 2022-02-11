@@ -36,6 +36,7 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
+import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
@@ -219,7 +220,7 @@ public class QueryDialog extends JPanel {
 	private final int highestNetDegree;
 	private final boolean hasInhibitorArcs;
 	private InclusionPlaces inclusionPlaces;
-	private final PetriNetTab.TAPNLens lens;
+	private final TAPNLens lens;
 
 	private static final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
 	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
@@ -362,7 +363,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_UNDER = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
 	private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 
-	public QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, PetriNetTab.TAPNLens lens) {
+	public QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens) {
 		this.tapnNetwork = tapnNetwork;
 		this.guiModels = guiModels;
 		this.lens = lens;
@@ -616,7 +617,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork,
-                                           HashMap<TimedArcPetriNet, DataLayer> guiModels, PetriNetTab.TAPNLens lens) {
+                                           HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens) {
 		if(TAPAALGUI.getCurrentTab().network().hasWeights() && !TAPAALGUI.getCurrentTab().network().isNonStrict()){
 			JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs",

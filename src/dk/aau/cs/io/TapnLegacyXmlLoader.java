@@ -13,7 +13,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.model.CPN.ColorType;
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -82,7 +82,7 @@ public class TapnLegacyXmlLoader {
 	private boolean firstPlaceRenameWarning = true;
 	private final IdResolver idResolver = new IdResolver();
     private final Collection<String> messages = new ArrayList<>(10);
-    private final PetriNetTab.TAPNLens lens = PetriNetTab.TAPNLens.Default;
+    private final TAPNLens lens = TAPNLens.Default;
 
 
     public TapnLegacyXmlLoader() {}

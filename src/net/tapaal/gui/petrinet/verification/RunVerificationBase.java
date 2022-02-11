@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.*;
 
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.verification.*;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -50,7 +50,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected boolean reducedNetOpened = false;
 	protected final JSpinner spinner;
 	protected final Messenger messenger;
-    PetriNetTab.TAPNLens lens;
+    TAPNLens lens;
 
     public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, String reducedNetFilePath, boolean reduceNetOnly, JSpinner spinner) {
 		super();
@@ -62,7 +62,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         this.spinner = spinner;
     }
 
-    public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, PetriNetTab.TAPNLens lens) {
+    public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) {
         this.model = model;
         this.options = options;
         this.query = query;

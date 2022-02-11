@@ -4,7 +4,7 @@ import java.awt.Polygon;
 import java.util.Hashtable;
 import java.util.List;
 
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.TAPAALGUI;
@@ -43,7 +43,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		updateLabel(true);
 	}
 
-	public TimedTransportArcComponent(TimedPlaceComponent p, TimedTransitionComponent t, TransportArc model, int group, PetriNetTab.TAPNLens lens){
+	public TimedTransportArcComponent(TimedPlaceComponent p, TimedTransitionComponent t, TransportArc model, int group, TAPNLens lens){
 	    super(p);
 	    setTarget(t);
 	    this.isInPreSet = true;
@@ -54,7 +54,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	    sealArc();
     }
 
-    public TimedTransportArcComponent(TimedTransitionComponent t, TimedPlaceComponent p, TransportArc model, int group, PetriNetTab.TAPNLens lens){
+    public TimedTransportArcComponent(TimedTransitionComponent t, TimedPlaceComponent p, TransportArc model, int group, TAPNLens lens){
         super(t);
         setTarget(p);
         this.isInPreSet = false;

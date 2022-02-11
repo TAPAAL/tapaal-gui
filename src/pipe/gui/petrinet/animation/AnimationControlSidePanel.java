@@ -21,7 +21,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.util.Require;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
 import net.tapaal.gui.swingcomponents.NonsearchableJComboBox;
@@ -59,7 +59,7 @@ public class AnimationControlSidePanel extends JPanel {
 	final JComboBox<String> firermodebox;
 
 
-	public AnimationControlSidePanel(Animator animator, PetriNetTab.TAPNLens lens) {
+	public AnimationControlSidePanel(Animator animator, TAPNLens lens) {
         Require.notNull(animator, "Animator can't be null");
 
         this.animator = animator;
@@ -113,7 +113,7 @@ public class AnimationControlSidePanel extends JPanel {
 		hideIrrelevantInformation(lens);
 	}
 
-	private void hideIrrelevantInformation(PetriNetTab.TAPNLens lens){
+	private void hideIrrelevantInformation(TAPNLens lens){
         sliderPanel.setVisible(lens.isTimed());
         timedelayPanel.setVisible(lens.isTimed());
         firemode.setVisible(lens.isTimed());
