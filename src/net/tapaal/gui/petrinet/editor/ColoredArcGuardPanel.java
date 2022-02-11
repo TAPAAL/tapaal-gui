@@ -553,14 +553,20 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, false) {
                 @Override
                 public void changedColor(JComboBox[] comboBoxes) {
-
+                    Expression current = currentSelection.getObject();
+                    if (!(current instanceof SuccessorExpression || current instanceof PredecessorExpression)) {
+                        addNumberExpression();
+                    }
                 }
             };
         } else {
             colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, true) {
                 @Override
                 public void changedColor(JComboBox[] comboBoxes) {
-
+                    Expression current = currentSelection.getObject();
+                    if (!(current instanceof SuccessorExpression || current instanceof PredecessorExpression)) {
+                        addNumberExpression();
+                    }
                 }
             };
         }
@@ -573,17 +579,11 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         SpinnerNumberModel numberModelNumber = new SpinnerNumberModel(current, min, max, step);
 
         numberExpressionJSpinner = new JSpinner(numberModelNumber);
-        addExpressionButton = new JButton("Add Expression");
 
         numberExpressionJSpinner.setPreferredSize(new Dimension(50, 27));
         numberExpressionJSpinner.setMinimumSize(new Dimension(50, 27));
         numberExpressionJSpinner.setMaximumSize(new Dimension(50, 27));
-
-        addExpressionButton.setPreferredSize(new Dimension(125, 30));
-        addExpressionButton.setMinimumSize(new Dimension(125, 30));
-        addExpressionButton.setMaximumSize(new Dimension(125, 30));
-
-        addExpressionButton.addActionListener(actionEvent -> addNumberExpression());
+        numberExpressionJSpinner.addChangeListener(ChangeEvent -> addNumberExpression());
 
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -597,12 +597,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         numberExprPanel.add(colorExpressionComboBoxPanel, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridy = 1;
-        gbc.gridx = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        numberExprPanel.add(addExpressionButton, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -717,17 +711,21 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         if (currentSelection.getObject() instanceof ArcExpression) {
             Integer value = (Integer) numberExpressionJSpinner.getValue();
             NumberOfExpression numbExpr = new NumberOfExpression(value, exprVec);
-            UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), numbExpr);
-            arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
-            updateSelection(numbExpr);
-            undoSupport.postEdit(edit);
+            if (!numbExpr.toString().equals(currentSelection.getObject().toString())) {
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), numbExpr);
+                arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
+                updateSelection(numbExpr);
+                undoSupport.postEdit(edit);
+            }
         } else {
             //TODO: add implementation for when the vector has more than one element, if that can ever happen
             ColorExpression colorExpr = exprVec.firstElement();
-            UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), colorExpr);
-            arcExpression = arcExpression.replace(currentSelection.getObject(), colorExpr);
-            updateSelection(colorExpr);
-            undoSupport.postEdit(edit);
+            if (!colorExpr.toString().equals(currentSelection.getObject().toString())) {
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), colorExpr);
+                arcExpression = arcExpression.replace(currentSelection.getObject(), colorExpr);
+                updateSelection(colorExpr);
+                undoSupport.postEdit(edit);
+            }
         }
 
     }
@@ -776,7 +774,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         succButton.setPreferredSize(new Dimension(130 , 27));
         succButton.setMinimumSize(new Dimension(130 , 27));
         succButton.setMaximumSize(new Dimension(130 , 27));
-
 
         expressionButtonsGroup.add(predButton);
         expressionButtonsGroup.add(succButton);
@@ -883,7 +880,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         updateSelectedColorType();
         updateNumberExpressionsPanel();
 
-
         toggleEnabledButtons();
 
     }
@@ -900,8 +896,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private void updateNumberExpressionsPanel() {
         colorExpressionComboBoxPanel.updateColorType(selectedColorType,context);
         numberExpressionJSpinner.setVisible(!(currentSelection.getObject() instanceof ColorExpression));
-        if(currentSelection.getObject() instanceof NumberOfExpression){
-            var numberOfExpression = ((NumberOfExpression)currentSelection.getObject());
+        if(currentSelection.getObject() instanceof NumberOfExpression) {
+            var numberOfExpression = ((NumberOfExpression) currentSelection.getObject());
             numberExpressionJSpinner.setValue(numberOfExpression.getNumber());
             var colorExpression = numberOfExpression.getNumberOfExpression().get(0).getBottomColorExpression();
             colorExpressionComboBoxPanel.updateSelection(colorExpression);
@@ -913,7 +909,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private void toggleEnabledButtons() {
         if(currentSelection == null){
             allExpressionButton.setEnabled(false);
-            addExpressionButton.setEnabled(false);
+            numberExpressionJSpinner.setEnabled(false);
+            colorExpressionComboBoxPanel.setEnabled(false);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
             scalarButton.setEnabled(false);
@@ -921,7 +918,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             predButton.setEnabled(false);
         }
         if (currentSelection.getObject() instanceof ColorExpression) {
-            addExpressionButton.setEnabled(true);
+            numberExpressionJSpinner.setEnabled(true);
+            colorExpressionComboBoxPanel.setEnabled(true);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
             scalarButton.setEnabled(false);
@@ -929,7 +927,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             predButton.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof AddExpression) {
-            addExpressionButton.setEnabled(false);
+            numberExpressionJSpinner.setEnabled(false);
+            colorExpressionComboBoxPanel.setEnabled(false);
             additionButton.setEnabled(false);
             subtractionButton.setEnabled(false);
             scalarButton.setEnabled(false);
@@ -937,7 +936,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             predButton.setEnabled(false);
         }
         else if (currentSelection.getObject() instanceof ArcExpression) {
-            addExpressionButton.setEnabled(true);
+            numberExpressionJSpinner.setEnabled(true);
+            colorExpressionComboBoxPanel.setEnabled(true);
             if(!isTransportArc){
                 additionButton.setEnabled(true);
                 subtractionButton.setEnabled(true);
@@ -1055,8 +1055,9 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
         //allExpressionButton.setEnabled(false);
-        addExpressionButton.setEnabled(false);
         additionButton.setEnabled(false);
+        numberExpressionJSpinner.setEnabled(false);
+        colorExpressionComboBoxPanel.setEnabled(false);
         subtractionButton.setEnabled(false);
         scalarButton.setEnabled(false);
         succButton.setEnabled(false);
@@ -1106,7 +1107,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     JButton subtractionButton;
     JButton scalarButton;
     JSpinner scalarJSpinner;
-    JButton addExpressionButton;
     ColorComboboxPanel colorIntervalComboboxPanel;
     ColoredTimeIntervalDialogPanel intervalEditorPanel;
 
@@ -1193,5 +1193,4 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         im.put(KeyStroke.getKeyStroke('Z', shortcutkey), "undo");
         im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
     }
-
 }
