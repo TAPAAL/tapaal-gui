@@ -1225,7 +1225,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		netChanged = _netChanged;
 	}
 
-    Template currentSelectedTemplate = null; //XXX: Temp while refactoring
     private final NameGenerator nameGenerator = new NameGenerator();
 
     public NameGenerator getNameGenerator() {
@@ -1235,7 +1234,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     public void changeToTemplate(Template tapn) {
 		Require.notNull(tapn, "Can't change to a Template that is null");
 
-		currentSelectedTemplate = tapn;
         nameGenerator.add(tapn.model());
         drawingSurface.setModel(tapn.guiModel(), tapn.zoomer());
 
@@ -1423,8 +1421,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	@Override
 	public void showStatistics() {
-        if (currentSelectedTemplate != null) {
-            StatisticsPanel.showStatisticsPanel(currentSelectedTemplate.model().getStatistics());
+        if (currentTemplate() != null) {
+            StatisticsPanel.showStatisticsPanel(currentTemplate().model().getStatistics());
         }
 	}
 
