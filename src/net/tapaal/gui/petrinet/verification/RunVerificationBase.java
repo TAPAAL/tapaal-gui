@@ -96,7 +96,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         }
 
         if (options.enabledStateequationsCheck()) {
-            if ((query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) && !query.hasDeadlock() &&
+                if ((query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) && !query.hasDeadlock() &&
                 !(options instanceof VerifyPNOptions)) {
 
                 VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
@@ -171,9 +171,12 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                     }
 
                     if (skeletonAnalysisResult.getQueryResult() != null) {
-                        if (!skeletonAnalysisResult.error() && model.isUntimed() || (
-                            (query.queryType() == QueryType.EF && !skeletonAnalysisResult.getQueryResult().isQuerySatisfied()) ||
-                                (query.queryType() == QueryType.AG && skeletonAnalysisResult.getQueryResult().isQuerySatisfied()))
+                        if (!skeletonAnalysisResult.error() &&
+                            (
+                                (model.isUntimed() && (options.traceOption() == net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE)) ||
+                                ((query.queryType() == QueryType.EF && !skeletonAnalysisResult.getQueryResult().isQuerySatisfied()) || (query.queryType() == QueryType.AG && skeletonAnalysisResult.getQueryResult().isQuerySatisfied())
+                            )
+                        )
                         ) {
                             VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(
                                 skeletonAnalysisResult.getQueryResult(),
