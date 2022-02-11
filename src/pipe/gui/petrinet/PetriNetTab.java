@@ -74,8 +74,6 @@ import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import java.awt.event.MouseWheelEvent;
 
-import static pipe.gui.petrinet.PetriNetTab.DrawTool.SELECT;
-
 public class PetriNetTab extends JSplitPane implements TabActions {
 
     private final MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
@@ -86,12 +84,20 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     //Enum for all actions and types of elements
     public enum DrawTool {
-        PLACE, IMMTRANS, TIMEDTRANS, ANNOTATION, ARC, INHIBARC,
-        //TAPN Elements
-        TAPNPLACE, TAPNTRANS, UNCONTROLLABLETRANS, TAPNARC, TRANSPORTARC, TAPNINHIBITOR_ARC,
-        TAPNURGENTTRANS, TAPNURGENTUNCONTROLLABLETRANS,
-        //Others (might refactore)
-        ADDTOKEN, DELTOKEN, SELECT, DRAW, DRAG,
+        ANNOTATION,
+        TAPNPLACE,
+        TAPNTRANS,
+        UNCONTROLLABLETRANS,
+        TAPNARC,
+        TRANSPORTARC,
+        TAPNINHIBITOR_ARC,
+        TAPNURGENTTRANS,
+        TAPNURGENTUNCONTROLLABLETRANS,
+        ADDTOKEN,
+        DELTOKEN,
+        SELECT,
+        DRAW,
+        DRAG,
     }
 
     public final TAPNLens lens;
@@ -289,7 +295,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 				tab.selectFirstElements();
 
-				tab.setMode(SELECT);
+				tab.setMode(DrawTool.SELECT);
 
                 //appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
                 name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
@@ -1315,7 +1321,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             setManager(notingManager);
 
 			drawingSurface().setBackground(Constants.ELEMENT_FILL_COLOUR);
-			setMode(SELECT);
+			setMode(DrawTool.SELECT);
 
 			restoreSelectedTemplate();
 
@@ -1406,7 +1412,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 break;
         }
 
-		if (mode == SELECT) {
+		if (mode == DrawTool.SELECT) {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		} else if (mode == DrawTool.DRAG) {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
@@ -1538,7 +1544,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 		} else {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
-			app.ifPresent(o->setMode(SELECT));
+			app.ifPresent(o->setMode(DrawTool.SELECT));
 		}
 		app.ifPresent(o->o.registerDrawingActions(getAvailableDrawActions()));
         app.ifPresent(o->o.registerAnimationActions(getAvailableSimActions()));
@@ -2558,7 +2564,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(SELECT);
+            setMode(DrawTool.SELECT);
         }
     };
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
@@ -2647,7 +2653,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     public void updateMode(DrawTool mode) {
         // deselect other actions
-        selectAction.setSelected(mode == SELECT);
+        selectAction.setSelected(mode == DrawTool.SELECT);
         transAction.setSelected(mode == DrawTool.TAPNTRANS);
         urgentTransAction.setSelected(mode == DrawTool.TAPNURGENTTRANS);
         uncontrollableTransAction.setSelected(mode == DrawTool.UNCONTROLLABLETRANS);
@@ -2742,24 +2748,14 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             case UNCONTROLLABLETRANS:
                 app.ifPresent(o14 -> o14.setStatusBarText(textforUncontrollableTrans));
 
-            case PLACE:
-                app.ifPresent(o13 -> o13.setStatusBarText(textforPlace));
-                break;
-
             case TAPNPLACE:
                 app.ifPresent(o12 -> o12.setStatusBarText(textforTAPNPlace));
                 break;
 
-            case IMMTRANS:
             case TAPNTRANS:
                 app.ifPresent(o11 -> o11.setStatusBarText(textforTrans));
                 break;
 
-            case TIMEDTRANS:
-                app.ifPresent(o10 -> o10.setStatusBarText(textforTimedTrans));
-                break;
-
-            case ARC:
             case TAPNARC:
                 app.ifPresent(o9 -> o9.setStatusBarText(textforArc));
                 break;
@@ -2769,7 +2765,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 break;
 
             case TAPNINHIBITOR_ARC:
-            case INHIBARC:
                 app.ifPresent(o7 -> o7.setStatusBarText(textforInhibArc));
                 break;
 
