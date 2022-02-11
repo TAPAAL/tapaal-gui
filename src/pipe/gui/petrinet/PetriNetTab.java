@@ -470,7 +470,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             this.setRightComponent(drawingSurfaceDummy);
         }
         this.queries.setQueries(tapnqueries);
-        tapnNetwork.setConstants(network().constants());
     }
 
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
