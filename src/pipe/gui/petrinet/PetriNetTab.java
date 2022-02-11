@@ -659,6 +659,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 		safeApp.ifPresent(tab -> tab.updatedTabName(this));
 	}
+
+    @Override
 	public String getTabTitle() {
 		if (getFile()!=null) {
 			return getFile().getName();
@@ -947,6 +949,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		tapnNetwork.undoSort(oldOrder);
 	}
 
+    @Override
 	public void showComponents(boolean enable) {
 		if (enable != templateExplorer.isVisible()) {
 
@@ -959,6 +962,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+    @Override
 	public void showSharedPT(boolean enable) {
 	    if (enable != sharedPTPanel.isVisible()) {
             editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
@@ -966,6 +970,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
     }
 
+    @Override
 	public void showQueries(boolean enable) {
 		if (enable != queries.isVisible()) {
 			editorSplitPane.getMultiSplitLayout().displayNode(queriesName, enable);
@@ -987,6 +992,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+    @Override
 	public void showEnabledTransitionsList(boolean enable) {
 	    //displayNode fires and relayout, so we check of value is changed
         // else elements will be set to default size.
@@ -995,6 +1001,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+    @Override
 	public void showDelayEnabledTransitions(boolean enable){
 		transitionFiring.showDelayEnabledTransitions(enable);
 		drawingSurface.repaint();
@@ -1059,6 +1066,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+    @Override
 	public void setResizeingDefault(){
 		if(animatorSplitPane != null){
 			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(true);
