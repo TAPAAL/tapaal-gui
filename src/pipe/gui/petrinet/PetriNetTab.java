@@ -983,7 +983,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		transitionFiring.showDelayEnabledTransitions(enable);
 		drawingSurface.repaint();
 
-		TAPAALGUI.getAnimator().updateFireableTransitions();
+        if (getAnimator() != null) {
+		    getAnimator().updateFireableTransitions();
+        }
 	}
 
 	public void selectFirstElements() {
