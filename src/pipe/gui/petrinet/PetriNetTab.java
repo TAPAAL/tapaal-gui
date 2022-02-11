@@ -85,16 +85,16 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     //Enum for all actions and types of elements
     public enum DrawTool {
         ANNOTATION,
-        TAPNPLACE,
-        TAPNTRANS,
-        UNCONTROLLABLETRANS,
-        TAPNARC,
-        TRANSPORTARC,
-        TAPNINHIBITOR_ARC,
-        TAPNURGENTTRANS,
-        TAPNURGENTUNCONTROLLABLETRANS,
-        ADDTOKEN,
-        DELTOKEN,
+        PLACE,
+        TRANSITION,
+        UNCONTROLLABLE_TRANSITION,
+        ARC,
+        TRANSPORT_ARC,
+        INHIBITOR_ARC,
+        URGENT_TRANSITION,
+        URGENT_UNCONTROLLABLE_TRANSITION,
+        ADD_TOKEN,
+        REMOVE_TOKEN,
         SELECT,
         DRAW,
         DRAG,
@@ -1347,7 +1347,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         updateMode(mode);
 
         switch (mode) {
-            case ADDTOKEN:
+            case ADD_TOKEN:
                 setManager(new AbstractDrawingSurfaceManager() {
                     @Override
                     public void registerEvents() {
@@ -1362,7 +1362,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     }
                 });
                 break;
-            case DELTOKEN:
+            case REMOVE_TOKEN:
                 setManager(new AbstractDrawingSurfaceManager() {
                     @Override
                     public void registerEvents() {
@@ -1377,31 +1377,31 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     }
                 });
                 break;
-            case TAPNPLACE:
+            case PLACE:
                 setManager(new CanvasPlaceDrawController());
                 break;
-            case TAPNTRANS:
+            case TRANSITION:
                 setManager(new CanvasTransitionDrawController());
                 break;
-            case TAPNURGENTTRANS:
+            case URGENT_TRANSITION:
                 setManager(new CanvasUrgentTransitionDrawController());
                 break;
-            case UNCONTROLLABLETRANS:
+            case UNCONTROLLABLE_TRANSITION:
                 setManager(new CanvasUncontrollableTransitionDrawController());
                 break;
-            case TAPNURGENTUNCONTROLLABLETRANS:
+            case URGENT_UNCONTROLLABLE_TRANSITION:
                 setManager(new CanvasUncontrollableUrgentTransitionDrawController());
                 break;
             case ANNOTATION:
                 setManager(new CanvasAnnotationNoteDrawController());
                 break;
-            case TAPNARC:
+            case ARC:
                 setManager(new CanvasArcDrawController());
                 break;
-            case TAPNINHIBITOR_ARC:
+            case INHIBITOR_ARC:
                 setManager(new CanvasInhibitorarcDrawController());
                 break;
-            case TRANSPORTARC:
+            case TRANSPORT_ARC:
                 setManager(new CanvasTransportarcDrawController());
                 break;
             case SELECT:
@@ -2574,53 +2574,53 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     };
     private final GuiAction inhibarcAction = new GuiAction("Inhibitor arc", "Add an inhibitor arc (I)", "I", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNINHIBITOR_ARC);
+            setMode(DrawTool.INHIBITOR_ARC);
         }
     };
     private final GuiAction transAction = new GuiAction("Transition", "Add a transition (T)", "T", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNTRANS);
+            setMode(DrawTool.TRANSITION);
         }
     };
     private final GuiAction urgentTransAction = new GuiAction("Urgent transition", "Add an urgent transition (Y)", "Y", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNURGENTTRANS);
+            setMode(DrawTool.URGENT_TRANSITION);
         }
     };
     private final GuiAction uncontrollableTransAction = new GuiAction("Uncontrollable transition", "Add an uncontrollable transition (L)", "L", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.UNCONTROLLABLETRANS);
+            setMode(DrawTool.UNCONTROLLABLE_TRANSITION);
         }
     };
     private final GuiAction uncontrollableUrgentTransAction = new GuiAction("Uncontrollable urgent transition", "Add an uncontrollable urgent transition (O)", "O", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNURGENTUNCONTROLLABLETRANS);
+            setMode(DrawTool.URGENT_UNCONTROLLABLE_TRANSITION);
         }
     };
     private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.ADDTOKEN);
+            setMode(DrawTool.ADD_TOKEN);
         }
     };
     private final GuiAction deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.DELTOKEN);
+            setMode(DrawTool.REMOVE_TOKEN);
         }
     };
     private final GuiAction timedPlaceAction = new GuiAction("Place", "Add a place (P)", "P", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNPLACE);
+            setMode(DrawTool.PLACE);
         }
     };
 
     private final GuiAction timedArcAction = new GuiAction("Arc", "Add an arc (A)", "A", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNARC);
+            setMode(DrawTool.ARC);
         }
     };
     private final GuiAction transportArcAction = new GuiAction("Transport arc", "Add a transport arc (R)", "R", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TRANSPORTARC);
+            setMode(DrawTool.TRANSPORT_ARC);
         }
     };
     private final GuiAction toggleUncontrollableAction = new GuiAction("Toggle uncontrollable transition", "Toggle between control/environment transition", "E", true) {
@@ -2654,16 +2654,16 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     public void updateMode(DrawTool mode) {
         // deselect other actions
         selectAction.setSelected(mode == DrawTool.SELECT);
-        transAction.setSelected(mode == DrawTool.TAPNTRANS);
-        urgentTransAction.setSelected(mode == DrawTool.TAPNURGENTTRANS);
-        uncontrollableTransAction.setSelected(mode == DrawTool.UNCONTROLLABLETRANS);
-        uncontrollableUrgentTransAction.setSelected(mode == DrawTool.TAPNURGENTUNCONTROLLABLETRANS);
-        timedPlaceAction.setSelected(mode == DrawTool.TAPNPLACE);
-        timedArcAction.setSelected(mode == DrawTool.TAPNARC);
-        transportArcAction.setSelected(mode == DrawTool.TRANSPORTARC);
-        inhibarcAction.setSelected(mode == DrawTool.TAPNINHIBITOR_ARC);
-        tokenAction.setSelected(mode == DrawTool.ADDTOKEN);
-        deleteTokenAction.setSelected(mode == DrawTool.DELTOKEN);
+        transAction.setSelected(mode == DrawTool.TRANSITION);
+        urgentTransAction.setSelected(mode == DrawTool.URGENT_TRANSITION);
+        uncontrollableTransAction.setSelected(mode == DrawTool.UNCONTROLLABLE_TRANSITION);
+        uncontrollableUrgentTransAction.setSelected(mode == DrawTool.URGENT_UNCONTROLLABLE_TRANSITION);
+        timedPlaceAction.setSelected(mode == DrawTool.PLACE);
+        timedArcAction.setSelected(mode == DrawTool.ARC);
+        transportArcAction.setSelected(mode == DrawTool.TRANSPORT_ARC);
+        inhibarcAction.setSelected(mode == DrawTool.INHIBITOR_ARC);
+        tokenAction.setSelected(mode == DrawTool.ADD_TOKEN);
+        deleteTokenAction.setSelected(mode == DrawTool.REMOVE_TOKEN);
         annotationAction.setSelected(mode == DrawTool.ANNOTATION);
     }
     @Override
@@ -2745,34 +2745,34 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     public void changeStatusbarText(DrawTool type) {
         switch (type) {
-            case UNCONTROLLABLETRANS:
+            case UNCONTROLLABLE_TRANSITION:
                 app.ifPresent(o14 -> o14.setStatusBarText(textforUncontrollableTrans));
 
-            case TAPNPLACE:
+            case PLACE:
                 app.ifPresent(o12 -> o12.setStatusBarText(textforTAPNPlace));
                 break;
 
-            case TAPNTRANS:
+            case TRANSITION:
                 app.ifPresent(o11 -> o11.setStatusBarText(textforTrans));
                 break;
 
-            case TAPNARC:
+            case ARC:
                 app.ifPresent(o9 -> o9.setStatusBarText(textforArc));
                 break;
 
-            case TRANSPORTARC:
+            case TRANSPORT_ARC:
                 app.ifPresent(o8 -> o8.setStatusBarText(textforTransportArc));
                 break;
 
-            case TAPNINHIBITOR_ARC:
+            case INHIBITOR_ARC:
                 app.ifPresent(o7 -> o7.setStatusBarText(textforInhibArc));
                 break;
 
-            case ADDTOKEN:
+            case ADD_TOKEN:
                 app.ifPresent(o6 -> o6.setStatusBarText(textforAddtoken));
                 break;
 
-            case DELTOKEN:
+            case REMOVE_TOKEN:
                 app.ifPresent(o5 -> o5.setStatusBarText(textforDeltoken));
                 break;
 
