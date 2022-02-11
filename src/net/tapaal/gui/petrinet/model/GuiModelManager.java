@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Vector;
 
 public class GuiModelManager {
-    //XXX: Insted of having access to the whole tab, it should properly take some sort of model
+    //XXX: Instead of having access to the whole tab, it should properly take some sort of model
     private final PetriNetTab tabContent;
 
     private List<Command> pendingEdits = null;
@@ -72,14 +72,6 @@ public class GuiModelManager {
 
         addCommand(new AddTimedPlaceCommand(pnObject, tabContent.guiModelToModel.get(c), c));
         return new Result<>(pnObject);
-    }
-
-    public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p) {
-        return addNewTimedTransitions(c, p, false, false);
-    }
-
-    public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUncontrollable) {
-        return addNewTimedTransitions(c, p, false, isUncontrollable);
     }
 
     public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUrgent, boolean isUncontrollable) {
@@ -220,7 +212,6 @@ public class GuiModelManager {
         NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
         tiha.setExpression(numbExpr);
 
-
         TimedInhibitorArcComponent tihac = new TimedInhibitorArcComponent(p, t, tiha);
 
         if (path != null) {
@@ -256,7 +247,6 @@ public class GuiModelManager {
             return new Result<>(require.getErrors());
         }
 
-
         int groupNr = getNextTransportArcMaxGroupNumber(p1, t);
 
         TransportArc tta = new TransportArc(p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
@@ -286,20 +276,19 @@ public class GuiModelManager {
         addCommand(edit);
 
         return new Result<>(ttac1);
-
     }
 
     private void instantiateArcExpressions(TimedPlaceComponent p1, Transition t, TimedPlaceComponent p2, TransportArc tta) {
         //make for input
         ColorType ctin = p1.underlyingPlace().getColorType();
-        Vector<ColorExpression> vecColorExpr = new Vector<ColorExpression>();
+        Vector<ColorExpression> vecColorExpr = new Vector<>();
         vecColorExpr.add(ctin.createColorExpressionForFirstColor());
         NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
         tta.setInputExpression(numbExpr);
 
         //make for output
         ColorType ctout = p2.underlyingPlace().getColorType();
-        vecColorExpr = new Vector<ColorExpression>();
+        vecColorExpr = new Vector<>();
         vecColorExpr.add(ctout.createColorExpressionForFirstColor());
         numbExpr = new NumberOfExpression(1, vecColorExpr);
         tta.setOutputExpression(numbExpr);
@@ -334,10 +323,10 @@ public class GuiModelManager {
         Require.notNull(p, "TimedPlaceComponent can't be null");
         Require.that(numberOfTokens > 0, "Number of tokens to remove must be strictly greater than 0");
 
-//Can't remove more than the number of tokens
+        //Can't remove more than the number of tokens
         int tokensToRemove = Math.min(numberOfTokens, p.getNumberOfTokens());
 
-//Ignore if number of tokens to remove is 0
+        //Ignore if number of tokens to remove is 0
         if (tokensToRemove > 0) {
             Command command = new TimedPlaceMarkingEditCommand(p, -tokensToRemove);
             command.redo();
@@ -346,10 +335,10 @@ public class GuiModelManager {
     }
 
     public void deleteSelection() {
-// check if queries need to be removed
+        // check if queries need to be removed
         ArrayList<PetriNetObject> selection = tabContent.drawingSurface().getSelectionObject().getSelection();
         Iterable<TAPNQuery> queries = tabContent.queries();
-        HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
+        HashSet<TAPNQuery> queriesToDelete = new HashSet<>();
 
         boolean queriesAffected = false;
         for (PetriNetObject pn : selection) {
@@ -389,11 +378,10 @@ public class GuiModelManager {
             : JOptionPane.YES_OPTION;
 
         if (choice == JOptionPane.YES_OPTION) {
-            tabContent.getUndoManager().newEdit(); // new "transaction""
+            tabContent.getUndoManager().newEdit(); // new "transaction"
             if (queriesAffected) {
-                PetriNetTab currentTab = tabContent;
                 for (TAPNQuery q : queriesToDelete) {
-                    Command cmd = new DeleteQueriesCommand(currentTab, List.of(q));
+                    Command cmd = new DeleteQueriesCommand(tabContent, List.of(q));
                     cmd.redo();
                     tabContent.getUndoManager().addEdit(cmd);
                 }
@@ -404,16 +392,15 @@ public class GuiModelManager {
         }
     }
 
-    //XXX: function moved from undoManager --kyrke - 2019-07-06
     private void deleteObject(PetriNetObject pnObject) {
         if (pnObject instanceof ArcPathPoint) {
 
             ArcPathPoint arcPathPoint = (ArcPathPoint) pnObject;
 
-//If the arc is marked for deletion, skip deleting individual arcpathpoint
+            //If the arc is marked for deletion, skip deleting individual ArcPathPoint
             if (!(arcPathPoint.getArcPath().getArc().isSelected())) {
 
-//Don't delete the two last arc path points
+                //Don't delete the two last arc path points
                 if (arcPathPoint.isDeleteable()) {
                     Command cmd = new DeleteArcPathPointEditCommand(
                         arcPathPoint.getArcPath().getArc(),
@@ -426,11 +413,11 @@ public class GuiModelManager {
                 }
             }
         } else {
-//The list of selected objects is not updated when a element is deleted
-//We might delete the same object twice, which will give an error
-//Eg. a place with output arc is deleted (deleted also arc) while arc is also selected.
-//There is properly a better way to track this (check model?) but while refactoring we will keeps it close
-//to the orginal code -- kyrke 2019-06-27
+            //The list of selected objects is not updated when a element is deleted
+            //We might delete the same object twice, which will give an error
+            //Eg. a place with output arc is deleted (deleted also arc) while arc is also selected.
+            //There is properly a better way to track this (check model?) but while refactoring we will keeps it close
+            //to the original code -- kyrke 2019-06-27
             if (!pnObject.isDeleted()) {
                 Command cmd = null;
                 if (pnObject instanceof TimedPlaceComponent) {
@@ -469,8 +456,8 @@ public class GuiModelManager {
 
             ArrayList<Arc> arcsToDelete = new ArrayList<>();
 
-//Notice since we delte elements from the collection we can't do this while iterating, we need to
-// capture the arcs and delete them later.
+            //Notice since we delete elements from the collection we can't do this while iterating, we need to
+            // capture the arcs and delete them later.
             for (Arc arc : pto.getPreset()) {
                 arcsToDelete.add(arc);
             }
@@ -493,13 +480,12 @@ public class GuiModelManager {
 
     public void toggleUncontrollableTrans() {
         ArrayList<PetriNetObject> selection = tabContent.drawingSurface().getSelectionObject().getSelection();
-        PetriNetTab currentTab = tabContent;
         tabContent.getUndoManager().newEdit();
 
         for (PetriNetObject o : selection) {
             if (o instanceof TimedTransitionComponent) {
                 TimedTransitionComponent transition = (TimedTransitionComponent) o;
-                Command cmd = new ToggleTransitionUncontrollableCommand(transition.underlyingTransition(), currentTab);
+                Command cmd = new ToggleTransitionUncontrollableCommand(transition.underlyingTransition(), tabContent);
 
                 cmd.redo();
                 tabContent.getUndoManager().addEdit(cmd);
@@ -510,7 +496,6 @@ public class GuiModelManager {
 
     public void toggleUrgentTrans() {
         ArrayList<PetriNetObject> selection = tabContent.drawingSurface().getSelectionObject().getSelection();
-        PetriNetTab currentTab = tabContent;
         tabContent.getUndoManager().newEdit();
 
         for (PetriNetObject o : selection) {
@@ -521,7 +506,7 @@ public class GuiModelManager {
                     return;
                 }
 
-                Command cmd = new ToggleTransitionUrgentCommand(transition.underlyingTransition(), currentTab);
+                Command cmd = new ToggleTransitionUrgentCommand(transition.underlyingTransition(), tabContent);
                 cmd.redo();
                 tabContent.getUndoManager().addEdit(cmd);
             }
