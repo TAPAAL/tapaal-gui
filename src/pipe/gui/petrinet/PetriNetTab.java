@@ -76,6 +76,11 @@ import java.awt.event.MouseWheelEvent;
 
 public class PetriNetTab extends JSplitPane implements TabActions {
 
+    final AbstractDrawingSurfaceManager notingManager = new AbstractDrawingSurfaceManager(){
+        @Override
+        public void registerEvents() {}
+    };
+
     private final MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
 
     public void setGuiFrameControllerActions(GuiFrameControllerActions guiFrameControllerActions) {
@@ -106,17 +111,19 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	private final TimedArcPetriNetNetwork tapnNetwork;
 
 	//XXX: Replace with bi-map
-	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<>();
 	public final HashMap<DataLayer, TimedArcPetriNet> guiModelToModel = new HashMap<>();
 
 	//XXX: should be replaced iwth DataLayer->Zoomer, TimedArcPetriNet has nothing to do with zooming
-	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
+	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<>();
 
 
 	final UndoManager undoManager = new UndoManager();
 
+    private final MutableReference<GuiFrameActions> app = new MutableReference<>();
+    private final MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
 
-
+    final MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
 	public final GuiModelManager guiModelManager = new GuiModelManager(this);
 
     /**
@@ -349,8 +356,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return undoManager;
 	}
 
-	//GUI
+    final AbstractDrawingSurfaceManager animationModeController;
 
+	//GUI
 	private final HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<TimedArcPetriNet, Boolean>();
 
 	private final JScrollPane drawingSurfaceScroller;
@@ -1527,8 +1535,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     /* GUI Model / Actions */
 
-	private final MutableReference<GuiFrameActions> app = new MutableReference<>();
-	private final MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
 	@Override
 	public void setApp(GuiFrameActions newApp) {
 		app.setReference(newApp);
@@ -1611,14 +1617,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             network().buildConstraints();
         }
     }
-
-    final AbstractDrawingSurfaceManager notingManager = new AbstractDrawingSurfaceManager(){
-        @Override
-        public void registerEvents() {
-            //No-thing manager
-        }
-    };
-	final AbstractDrawingSurfaceManager animationModeController;
 
 	//Writes a tapaal net to a file, with the posibility to overwrite the quires
 	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite, TAPNLens lens) {
@@ -2156,8 +2154,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
     }
 
-
-    final MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
     private void setManager(AbstractDrawingSurfaceManager newManager) {
         //De-register old manager
 		managerRef.get().deregisterManager();
