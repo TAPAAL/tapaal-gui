@@ -142,12 +142,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			if (loadedModel.getMessages().size() != 0) {
                 new Thread(() -> {
                     TAPAALGUI.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                    String message = "While loading the net we found one or more warnings: \n\n";
+                    StringBuilder message = new StringBuilder("While loading the net we found one or more warnings: \n\n");
                     for (String s : loadedModel.getMessages()) {
-                        message += s + "\n\n";
+                        message.append(s).append("\n\n");
                     }
 
-                    new MessengerImpl().displayInfoMessage(message, "Warning");
+                    new MessengerImpl().displayInfoMessage(message.toString(), "Warning");
                 }).start();
             }
 
@@ -243,19 +243,19 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 }
             }
         }
-        String message = "";
+        StringBuilder message = new StringBuilder();
         if (!queriesToRemove.isEmpty()) {
-            message = "The following queries will be removed in the conversion:";
+            message = new StringBuilder("The following queries will be removed in the conversion:");
             for (TAPNQuery q : queriesToRemove) {
-                message += "\n" + q.getName();
+                message.append("\n").append(q.getName());
             }
         }
         if (gameChanged) {
-            message += (message.length() == 0 ? "" : "\n\n");
-            message += "Some options may have been changed to make the query compatible with the net features.";
+            message.append(message.length() == 0 ? "" : "\n\n");
+            message.append("Some options may have been changed to make the query compatible with the net features.");
         }
         if(message.length() > 0){
-            final String fmessage = message;
+            final String fmessage = message.toString();
             //XXX: we should not do pop-up form there! I think these check should be part of loading a net.
             new Thread(() -> {
                 TAPAALGUI.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -294,17 +294,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
                 PetriNetTab tab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
-                String name = null;
-
-                name = file.getName().replaceAll(".pnml", ".tapn");
+                String name = file.getName().replaceAll(".pnml", ".tapn");
                 tab.setInitialName(name);
 
 				tab.selectFirstElements();
 
 				tab.setMode(DrawTool.SELECT);
-
-                //appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
-                name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
                 return tab;
 
 			} catch (Exception e) {
@@ -330,7 +325,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 			InputStream stream = new FileInputStream(file);
 			PetriNetTab tab = createNewTabFromInputStream(stream, name);
-			if (tab != null && !showFileEndingChangedMessage) tab.setFile(file);
+			if (!showFileEndingChangedMessage) tab.setFile(file);
 
 			showFileEndingChangedMessage(showFileEndingChangedMessage);
 
@@ -358,12 +353,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     final AbstractDrawingSurfaceManager animationModeController;
 
 	//GUI
-	private final HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<TimedArcPetriNet, Boolean>();
+	private final HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<>();
 
 	private final JScrollPane drawingSurfaceScroller;
 	private JScrollPane editorSplitPaneScroller;
 	private JScrollPane animatorSplitPaneScroller;
-	private DrawingSurfaceImpl drawingSurface;
+	private final DrawingSurfaceImpl drawingSurface;
 	private File appFile;
 	private final JPanel drawingSurfaceDummy;
 
@@ -850,7 +845,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public Iterable<Template> allTemplates() {
-		ArrayList<Template> list = new ArrayList<Template>();
+		ArrayList<Template> list = new ArrayList<>();
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
 			Template template = new Template(net, guiModels.get(net), zoomLevels.get(net));
 			template.setHasPositionalInfo(hasPositionalInfos.get(net));
@@ -860,7 +855,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public Iterable<Template> activeTemplates() {
-		ArrayList<Template> list = new ArrayList<Template>();
+		ArrayList<Template> list = new ArrayList<>();
 		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
 			Template template = new Template(net, guiModels.get(net), zoomLevels.get(net));
 			template.setHasPositionalInfo(hasPositionalInfos.get(net));
@@ -1490,7 +1485,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     public void mergeNetComponents() {
         TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 
-        int openCTLDialog = JOptionPane.YES_OPTION;
+        int openCTLDialog;
         boolean inlineConstants = false;
 
         if (!tapnNetwork.constants().isEmpty()) {
@@ -1513,12 +1508,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, inlineConstants);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 
-        ArrayList<Template> templates = new ArrayList<Template>(1);
+        ArrayList<Template> templates = new ArrayList<>(1);
 
         templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
         network.add(transformedModel.value1());
 
-        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<TAPNQuery>(0), network.constants(), lens);
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<>(0), network.constants(), lens);
 
         try {
             ByteArrayOutputStream outputStream = tapnWriter.savePNML();
@@ -2475,7 +2470,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         private void timedTranstionMouseWheelWithShift(TimedTransitionComponent p, MouseWheelEvent e) {
             if (p.isSelected()) {
-                int rotation = 0;
+                int rotation;
                 if (e.getWheelRotation() < 0) {
                     rotation = -e.getWheelRotation() * 135;
                 } else {
@@ -2720,10 +2715,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 
     public static final String textforDrawing = "Drawing Mode: Click on a button to start adding components to the Editor";
-    public static final String textforPlace = "Place Mode: Right click on a place to see menu options ";
     public static final String textforTAPNPlace = "Place Mode: Right click on a place to see menu options ";
-    public static final String textforTrans = "Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
-    public static final String textforTimedTrans = "Timed Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+    public static final String textforTransition = "Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
     public static final String textforUncontrollableTrans = "Uncontrollable Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
     public static final String textforAddtoken = "Add Token Mode: Click on a place to add a token";
     public static final String textforDeltoken = "Delete Token Mode: Click on a place to delete a token ";
@@ -2745,7 +2738,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 break;
 
             case TRANSITION:
-                app.ifPresent(o11 -> o11.setStatusBarText(textforTrans));
+                app.ifPresent(o11 -> o11.setStatusBarText(textforTransition));
                 break;
 
             case ARC:
