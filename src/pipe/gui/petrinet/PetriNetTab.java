@@ -422,7 +422,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         guiModels.clear();
         for (Template template : templates) {
-            addGuiModel(template.model(), template.guiModel());
+            TimedArcPetriNet net = template.model();
+            DataLayer guiModel = template.guiModel();
+
+            guiModels.put(net, guiModel);
+            guiModelToModel.put(guiModel, net);
             zoomLevels.put(template.model(), template.zoomer());
             hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
 
@@ -885,12 +889,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		templateExplorer.updateTemplateList();
 	}
 
-	public void addGuiModel(TimedArcPetriNet net, DataLayer guiModel) {
-		guiModels.put(net, guiModel);
-		guiModelToModel.put(guiModel, net);
-	}
-
-	public void removeTemplate(Template template) {
+    public void removeTemplate(Template template) {
 		tapnNetwork.remove(template.model());
 		guiModels.remove(template.model());
 		guiModelToModel.remove(template.guiModel());
