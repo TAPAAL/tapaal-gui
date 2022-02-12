@@ -170,11 +170,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     public static TAPNLens getFileLens(InputStream file) throws Exception {
         ModelLoader loader = new ModelLoader();
         return loader.loadLens(file);
-
     }
 
 	private static void checkQueries(PetriNetTab tab) {
-        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
+        List<TAPNQuery> queriesToRemove = new ArrayList<>();
         EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
         boolean gameChanged = false;
 
