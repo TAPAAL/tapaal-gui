@@ -553,20 +553,14 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, false) {
                 @Override
                 public void changedColor(JComboBox[] comboBoxes) {
-                    Expression current = currentSelection.getObject();
-                    if (!(current instanceof SuccessorExpression || current instanceof PredecessorExpression)) {
-                        addNumberExpression();
-                    }
+                    addColorExpression();
                 }
             };
         } else {
             colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, true) {
                 @Override
                 public void changedColor(JComboBox[] comboBoxes) {
-                    Expression current = currentSelection.getObject();
-                    if (!(current instanceof SuccessorExpression || current instanceof PredecessorExpression)) {
-                        addNumberExpression();
-                    }
+                    addColorExpression();
                 }
             };
         }
@@ -583,7 +577,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         numberExpressionJSpinner.setPreferredSize(new Dimension(50, 27));
         numberExpressionJSpinner.setMinimumSize(new Dimension(50, 27));
         numberExpressionJSpinner.setMaximumSize(new Dimension(50, 27));
-        numberExpressionJSpinner.addChangeListener(ChangeEvent -> addNumberExpression());
+        numberExpressionJSpinner.addChangeListener(ChangeEvent ->
+            addNumberExpression((Integer)numberExpressionJSpinner.getValue(), getColorOfSelection()));
 
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -674,18 +669,18 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         regularArcExprPanel.add(exprScrollPane, gbc);
     }
 
-    private void addNumberExpression() {
-        Vector<ColorExpression> exprVec = new Vector();
+    private void addColorExpression() {
+        Vector<ColorExpression> exprVec = new Vector<>();
         TupleExpression tupleExpression;
         if (selectedColorType instanceof ProductType) {
-            Vector<ColorExpression> tempVec = new Vector();
+            Vector<ColorExpression> tempVec = new Vector<>();
             for (int i = 0; i < colorExpressionComboBoxPanel.getColorTypeComboBoxesArray().length; i++) {
                 ColorExpression expr;
                 Object selectedElement = colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedItem();
-                if ( selectedElement instanceof String) {
-                    expr = new AllExpression(((ProductType)colorExpressionComboBoxPanel.getColorType()).getColorTypes().get(i));
-                }else if(selectedElement instanceof Variable){
-                    expr = new VariableExpression((Variable)selectedElement);
+                if (selectedElement instanceof String) {
+                    expr = new AllExpression(((ProductType) colorExpressionComboBoxPanel.getColorType()).getColorTypes().get(i));
+                } else if (selectedElement instanceof Variable) {
+                    expr = new VariableExpression((Variable) selectedElement);
                 } else {
                     expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
                 }
@@ -698,36 +693,66 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             Object selectedElement = colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedItem();
             if (selectedElement instanceof String) {
                 expr = new AllExpression(colorExpressionComboBoxPanel.getColorType());
-            } else if(selectedElement instanceof Variable){
-                expr = new VariableExpression((Variable)selectedElement);
-            }
-            else {
-                expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
+            } else if (selectedElement instanceof Variable) {
+                Vector<ColorExpression> currentColor = getColorOfSelection();
+                Set<Variable> currentVariables = getVariablesOfSelection();
+                if (currentColor.size() > 0 && (currentVariables.contains(selectedElement))) {
+                    expr = currentColor.get(0);
+                } else {
+                    expr = new VariableExpression((Variable) selectedElement);
+                }
+            } else {
+                Vector<ColorExpression> currentColor = getColorOfSelection();
+                if (currentColor.size() > 0 && currentColor.get(0).toString().contains(selectedElement.toString())) {
+                    expr = currentColor.get(0);
+                } else {
+                    expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
+                }
             }
             exprVec.add(expr);
         }
+        addNumberExpression((Integer)numberExpressionJSpinner.getValue(), exprVec);
+    }
 
-
-        if (currentSelection.getObject() instanceof ArcExpression) {
-            Integer value = (Integer) numberExpressionJSpinner.getValue();
+    private void addNumberExpression(int value, Vector<ColorExpression> exprVec) {
+        Expression current = currentSelection.getObject();
+        if (current instanceof ArcExpression && exprVec.size() > 0) {
             NumberOfExpression numbExpr = new NumberOfExpression(value, exprVec);
-            if (!numbExpr.toString().equals(currentSelection.getObject().toString())) {
-                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), numbExpr);
-                arcExpression = arcExpression.replace(currentSelection.getObject(), numbExpr);
+            if (!numbExpr.toString().equals(current.toString())) {
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(current, numbExpr);
+                arcExpression = arcExpression.replace(current, numbExpr);
                 updateSelection(numbExpr);
                 undoSupport.postEdit(edit);
             }
-        } else {
+        } else if (exprVec.size() > 0){
             //TODO: add implementation for when the vector has more than one element, if that can ever happen
             ColorExpression colorExpr = exprVec.firstElement();
-            if (!colorExpr.toString().equals(currentSelection.getObject().toString())) {
-                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), colorExpr);
-                arcExpression = arcExpression.replace(currentSelection.getObject(), colorExpr);
+            if (!colorExpr.toString().equals(current.toString())) {
+                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(current, colorExpr);
+                arcExpression = arcExpression.replace(current, colorExpr);
                 updateSelection(colorExpr);
                 undoSupport.postEdit(edit);
             }
         }
+    }
 
+    private Vector<ColorExpression> getColorOfSelection() {
+        Vector<ColorExpression> colorExpression = new Vector<>();
+        Expression current = currentSelection.getObject();
+        if (current instanceof NumberOfExpression) {
+            return ((NumberOfExpression) current).getColor();
+        } else if (current instanceof SuccessorExpression) {
+            colorExpression.add((SuccessorExpression) current);
+        } else if (current instanceof PredecessorExpression) {
+            colorExpression.add((PredecessorExpression) current);
+        }
+        return colorExpression;
+    }
+
+    private Set<Variable> getVariablesOfSelection() {
+        Set<Variable> variables = new HashSet<>();
+        currentSelection.getObject().getVariables(variables);
+        return variables;
     }
 
     private void deleteSelection() {
@@ -894,15 +919,16 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     }
 
     private void updateNumberExpressionsPanel() {
+        Expression current = currentSelection.getObject();
         colorExpressionComboBoxPanel.updateColorType(selectedColorType,context);
-        numberExpressionJSpinner.setVisible(!(currentSelection.getObject() instanceof ColorExpression));
-        if(currentSelection.getObject() instanceof NumberOfExpression) {
-            var numberOfExpression = ((NumberOfExpression) currentSelection.getObject());
+        numberExpressionJSpinner.setVisible(!(current instanceof ColorExpression));
+        if(current instanceof NumberOfExpression) {
+            var numberOfExpression = ((NumberOfExpression) current);
             numberExpressionJSpinner.setValue(numberOfExpression.getNumber());
             var colorExpression = numberOfExpression.getNumberOfExpression().get(0).getBottomColorExpression();
             colorExpressionComboBoxPanel.updateSelection(colorExpression);
-        } else if(currentSelection.getObject() instanceof ColorExpression){
-            colorExpressionComboBoxPanel.updateSelection(((ColorExpression) currentSelection.getObject()).getBottomColorExpression());
+        } else if(current instanceof ColorExpression){
+            colorExpressionComboBoxPanel.updateSelection(((ColorExpression) current).getBottomColorExpression());
         }
     }
 
@@ -1028,7 +1054,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     }
 
     private ColorType getCurrentSelectionColorType() {
-        if ( currentSelection.getObject() instanceof ColorExpression) {
+        if (currentSelection.getObject() instanceof ColorExpression) {
             return ((ColorExpression) currentSelection.getObject()).getColorType(context.network().colorTypes());
         }
 
