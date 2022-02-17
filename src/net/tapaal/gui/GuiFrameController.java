@@ -296,7 +296,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                     if(f.exists() && f.isFile() && f.canRead()){
                         FileBrowser.userPath = f.getParent();
 
-                        if (f.getName().endsWith(".pnml")) {
+                        if (f.getName().toLowerCase().endsWith(".pnml")) {
                             filesOpened.add(PetriNetTab.createNewTabFromPNMLFile(f));
                         } else {
                             filesOpened.add(PetriNetTab.createNewTabFromFile(f));
