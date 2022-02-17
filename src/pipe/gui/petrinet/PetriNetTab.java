@@ -16,15 +16,16 @@ import javax.swing.border.BevelBorder;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.Parsing.ParseException;
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Variable;
+import net.tapaal.TAPAAL;
 import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.GuiFrameControllerActions;
 import net.tapaal.gui.SafeGuiFrameActions;
 import net.tapaal.gui.TabActions;
-import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
-import net.tapaal.gui.petrinet.NameGenerator;
-import net.tapaal.gui.petrinet.TabTransformer;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import net.tapaal.gui.petrinet.model.GuiModelManager;
 import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
@@ -47,13 +48,13 @@ import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel;
 import net.tapaal.gui.petrinet.undo.ChangeSpacingEditCommand;
 import net.tapaal.gui.petrinet.verification.*;
 import net.tapaal.helpers.Reference.MutableReference;
+import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.swinghelpers.JSplitPaneFix;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import net.tapaal.gui.petrinet.Template;
 import pipe.gui.*;
 import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.canvas.DrawingSurfaceImpl;
@@ -1449,7 +1450,88 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         isSelectedComponentOption = panel.isSelectedComponentOption();
     }
 
-	@Override
+    @Override
+    public void showColorTypesVariables() {
+        StringBuilder buffer = new StringBuilder();
+        Context context = new Context(TAPAALGUI.getCurrentTab());
+
+        List<ColorType> listColorTypes = context.network().colorTypes();
+        List<Variable> variableList = context.network().variables();
+
+        getColorTypesFormattedString(listColorTypes, buffer);
+
+        if(!variableList.isEmpty()) {
+            buffer.append("<br>");
+        }
+
+        getVariablesFormattedString(variableList, buffer);
+
+        JLabel label = new JLabel("<html>" + buffer + "</html>");
+        label.setFont(new Font(label.getFont().getName(), Font.PLAIN, label.getFont().getSize()));
+
+        JOptionPane.showMessageDialog(null, label, "Global color types/variables", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private String getColorTypesFormattedString(List<ColorType> listColorTypes, StringBuilder buffer) {
+        String stringColorList = "";
+        for(int i = 0; i < listColorTypes.size(); i++) {
+            if(i == 0) {
+                buffer.append("Color Types:<br>");
+            }
+            buffer.append(listColorTypes.get(i).getName() + " <b>is</b> ");
+
+            if(listColorTypes.get(i).isProductColorType()) {
+                buffer.append("<");
+                for(int x = 0; x < listColorTypes.get(i).getProductColorTypes().size(); x++) {
+                    stringColorList += listColorTypes.get(i).getProductColorTypes().get(x).getName();
+
+                    if(x != listColorTypes.get(i).getProductColorTypes().size() - 1){
+                        stringColorList += ", ";
+                    }
+                }
+                buffer.append(stringColorList + "><br>");
+                stringColorList = "";
+
+            } else if(listColorTypes.get(i).isIntegerRange()) {
+                if(listColorTypes.get(i).size() > 1) {
+                    int listSize = listColorTypes.get(i).size();
+                    buffer.append("[" + listColorTypes.get(i).getColors().get(0).getColorName() + ".." + listColorTypes.get(i).getColors().get(listSize - 1).getColorName() + "]");
+                } else {
+                    buffer.append("[" + listColorTypes.get(i).getFirstColor().getColorName() + "]");
+                }
+                buffer.append("<br>");
+
+            } else {
+                buffer.append("[");
+                for(int x = 0; x < listColorTypes.get(i).getColors().size(); x++) {
+                    stringColorList += listColorTypes.get(i).getColors().get(x).getName();
+
+                    if(x != listColorTypes.get(i).getColors().size() - 1){
+                        stringColorList += ", ";
+                    }
+                }
+                buffer.append(stringColorList + "]<br>");
+                stringColorList = "";
+            }
+        }
+
+        return buffer.toString();
+    }
+
+    private String getVariablesFormattedString(List<Variable> variableList, StringBuilder buffer) {
+        for(int i = 0; i < variableList.size(); i++) {
+            if (i == 0) {
+                buffer.append("Variables:<br>");
+            }
+            buffer.append(variableList.get(i).getName() + " <b>in</b> " + variableList.get(i).getColorType().getName());
+            if(i != variableList.size() - 1) {
+                buffer.append("<br>");
+            }
+        }
+        return buffer.toString();
+    }
+
+    @Override
 	public void importSUMOQueries() {
 		File[] files = FileBrowser.constructor("Import SUMO", "txt", FileBrowser.userPath).openFiles();
 		for(File f : files){

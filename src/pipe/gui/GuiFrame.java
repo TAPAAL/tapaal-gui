@@ -21,10 +21,7 @@ import java.util.jar.JarFile;
 import javax.swing.*;
 
 import com.sun.jna.Platform;
-import net.tapaal.gui.GuiFrameActions;
-import net.tapaal.gui.GuiFrameControllerActions;
-import net.tapaal.gui.SafeGuiFrameActions;
-import net.tapaal.gui.TabActions;
+import net.tapaal.gui.*;
 import net.tapaal.gui.debug.DEBUG;
 import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
@@ -247,7 +244,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::clearPreferences);
         }
     };
-
+    private final GuiAction showColorTypesVariables = new GuiAction("Show color types/variables", "Opens a floating window showing the global color types/variables for the net.", KeyStroke.getKeyStroke(KeyEvent.VK_0, shortcutkey)) {
+        public void actionPerformed(ActionEvent arg0) {
+            currentTab.ifPresent(TabActions::showColorTypesVariables);
+        }
+    };
     private final GuiAction verifyAction = new GuiAction("Verify query", "Verifies the currently selected query", KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             currentTab.ifPresent(TabActions::verifySelectedQuery);
@@ -823,6 +824,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         mergeComponentsDialog.setMnemonic('c');
         toolsMenu.add(mergeComponentsDialog);
 
+        toolsMenu.add(showColorTypesVariables);
+
         toolsMenu.addSeparator();
 
         JMenuItem batchProcessing = new JMenuItem(batchProcessingAction);
@@ -1008,6 +1011,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 verifyAction.setEnabled(getCurrentTab().isQueryPossible());
 
+                showColorTypesVariables.setEnabled(getCurrentTab().lens.isColored());
+
                 smartDrawAction.setEnabled(true);
                 mergeComponentsDialogAction.setEnabled(true);
                 if (gameFeatureOptions.getSelectedIndex() == 1 || colorFeatureOptions.getSelectedIndex() == 1) {
@@ -1049,6 +1054,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 redoAction.setEnabled(false);
                 verifyAction.setEnabled(false);
 
+                showColorTypesVariables.setEnabled(getCurrentTab().lens.isColored());
+
                 smartDrawAction.setEnabled(false);
                 mergeComponentsDialogAction.setEnabled(false);
                 workflowDialogAction.setEnabled(false);
@@ -1071,6 +1078,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 exportTraceAction.setEnabled(false);
                 importTraceAction.setEnabled(false);
                 verifyAction.setEnabled(false);
+
+                showColorTypesVariables.setEnabled(false);
 
                 annotationAction.setEnabled(false);
                 selectAllAction.setEnabled(false);
@@ -1294,6 +1303,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         JMenuItem mergeComponentsDialog = new JMenuItem(mergeComponentsDialogAction);
         mergeComponentsDialog.setMnemonic('c');
         toolsMenu.add(mergeComponentsDialog);
+
+        toolsMenu.add(showColorTypesVariables);
 
         for(GuiAction action : toolsActions){
             toolsMenu.add(action);

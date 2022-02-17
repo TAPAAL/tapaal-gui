@@ -107,4 +107,6 @@ public interface TabActions {
     Map<PetriNetObject, Boolean> showNames(boolean isVisible, boolean placeNames, boolean selectedComponent);
 
     void showChangeNameVisibility();
+
+    void showColorTypesVariables();
 }
