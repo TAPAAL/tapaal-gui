@@ -74,7 +74,7 @@ public class ConstantStore {
 
 	public boolean containsConstantByName(String name) {
 		for(Constant c : constants) {
-			if(c.name().equalsIgnoreCase(name))
+			if(c.name().equals(name))
 				return true;
 		}
 		return false;
@@ -82,7 +82,7 @@ public class ConstantStore {
 
 	public Constant getConstantByName(String name) {
 		for(Constant c : constants) {
-			if(c.name().equalsIgnoreCase(name))
+			if(c.name().equals(name))
 				return c;
 		}
 		return null;
@@ -218,11 +218,11 @@ public class ConstantStore {
 	}
 
 	private boolean isNameInf(String name) {
-		return name.equalsIgnoreCase("inf");
+		return name.equals("inf");
 	}
 
 	public Command updateConstant(String oldName, Constant updatedConstant,	TimedArcPetriNetNetwork model) {
-		if (oldName.equalsIgnoreCase(updatedConstant.name()) || !containsConstantByName(updatedConstant.name())) {
+		if (oldName.equals(updatedConstant.name()) || !containsConstantByName(updatedConstant.name())) {
 			if (containsConstantByName(oldName)) {
 				Constant old = getConstantByName(oldName);
 				updatedConstant.setLowerBound(old.lowerBound());

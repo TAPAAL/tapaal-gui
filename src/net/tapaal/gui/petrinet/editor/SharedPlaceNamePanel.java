@@ -137,7 +137,7 @@ public class SharedPlaceNamePanel extends JPanel {
 			private boolean updateExistingPlace(String name) {
 				String oldName = placeToEdit.name();
 				
-				if(placeToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
+				if(placeToEdit.network().isNameUsed(name) && !oldName.equals(name)) {
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
 					nameField.requestFocusInWindow();
 					return false;
