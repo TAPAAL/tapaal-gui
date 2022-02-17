@@ -1,7 +1,7 @@
 package dk.aau.cs.io;
 
 import net.tapaal.gui.petrinet.NameGenerator;
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
@@ -56,7 +56,7 @@ public class TapnEngineXmlLoader {
     private final LoadTACPN loadTACPN = new LoadTACPN();
 
     boolean hasFeatureTag = false;
-    private PetriNetTab.TAPNLens lens = PetriNetTab.TAPNLens.Default;
+    private TAPNLens lens = TAPNLens.Default;
 
 	public TapnEngineXmlLoader() {}
 	
@@ -149,7 +149,7 @@ public class TapnEngineXmlLoader {
             var isColoredElement = nodeList.item(0).getAttributes().getNamedItem("isColored");
             boolean isColored = isColoredElement == null ? network.isColored() : Boolean.parseBoolean(isColoredElement.getNodeValue());
 
-            lens = new PetriNetTab.TAPNLens(isTimed, isGame, isColored);
+            lens = new TAPNLens(isTimed, isGame, isColored);
         }
     }
 
@@ -163,7 +163,7 @@ public class TapnEngineXmlLoader {
             var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
             var isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
 
-            lens = new PetriNetTab.TAPNLens(isTimed, isGame, isColored);
+            lens = new TAPNLens(isTimed, isGame, isColored);
         }
     }
 

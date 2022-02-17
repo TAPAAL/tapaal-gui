@@ -50,7 +50,7 @@ public class TimedArcPetriNet {
 	public void add(TimedPlace place, boolean multiRemove) {
 		Require.that(place != null, "Argument must be a non-null place");
 		if(!multiRemove)
-			Require.that(!isNameUsed(place.name()) || (place.isShared() && !places.contains(place)), "A place or transition with the specified name already exists in the petri net.");
+			Require.that(!isNameUsed(place.name()) || (place.isShared() && !places.contains(place)), "A place or transition with the specified name, "+place.name()+", already exists in the petri net.");
 		if(!place.isShared()) ((LocalTimedPlace)place).setModel(this);
 		places.add(place);
 		place.setCurrentMarking(currentMarking);
@@ -108,7 +108,7 @@ public class TimedArcPetriNet {
 
 	public void add(TimedTransition transition) {
 		Require.that(transition != null, "Argument must be a non-null transition");
-		Require.that(!isNameUsed(transition.name()) || transition.isShared(), "A place or transition with the specified name already exists in the petri net.");
+		Require.that(!isNameUsed(transition.name()) || transition.isShared(), "A place or transition with the specified name, "+transition.name()+", already exists in the petri net.");
 		transition.setModel(this);
 		transitions.add(transition);
 	}

@@ -23,7 +23,7 @@ import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -59,7 +59,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
     private final writeTACPN writeTACPN;
     private boolean secondTransport = false;
     private int transporCountID = 0;
-    private final PetriNetTab.TAPNLens lens;
+    private final TAPNLens lens;
 
     public TimedArcPetriNetNetworkWriter(
 			TimedArcPetriNetNetwork network, 
@@ -72,7 +72,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		this.queries = queries;
 		this.constants = constants;
         writeTACPN = new writeTACPN(network);
-		this.lens = PetriNetTab.TAPNLens.Default;
+		this.lens = TAPNLens.Default;
 	}
 
     public TimedArcPetriNetNetworkWriter(
@@ -80,7 +80,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         Iterable<Template> templates,
         Iterable<TAPNQuery> queries,
         Iterable<Constant> constants,
-        PetriNetTab.TAPNLens lens
+        TAPNLens lens
     ) {
         this.network = network;
         this.templates = templates;

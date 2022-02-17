@@ -51,6 +51,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.ExtrapolationOption;
@@ -59,11 +60,10 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
 import pipe.gui.*;
 import net.tapaal.gui.petrinet.verification.Verifier;
-import pipe.gui.petrinet.PetriNetTab;
 
 public class WorkflowDialog extends JDialog {
 
-    private final PetriNetTab.TAPNLens lens;
+    private final TAPNLens lens;
 
     private static String getHelpMessage(){
 		// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.

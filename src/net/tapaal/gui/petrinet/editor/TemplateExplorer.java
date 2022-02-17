@@ -409,13 +409,6 @@ public class TemplateExplorer extends JPanel implements SidePane {
 				undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
 				
 				parent.addTemplate(template);
-				ArrayList<Constant> tmp = new ArrayList<Constant>();
-				for(Constant c : parent.network().constants()){
-					tmp.add(new Constant(c.name(), c.value()));
-				}
-				for(Constant c : tmp){
-					parent.network().updateConstant(c.name(), c);
-				}
 			}
 		});
 

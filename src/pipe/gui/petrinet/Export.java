@@ -31,7 +31,6 @@ import javax.print.StreamPrintServiceFactory;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import dk.aau.cs.TCTL.visitors.*;
@@ -39,6 +38,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import net.tapaal.export.TikZExporter;
+import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.DOMException;
 
 import dk.aau.cs.io.PNMLWriter;
@@ -92,12 +92,12 @@ public class Export {
         }
     }
 
-    private static void toQueryXML(String filename, PetriNetTab.TAPNLens lens) {
+    private static void toQueryXML(String filename, TAPNLens lens) {
         toQueryXML(TAPAALGUI.getCurrentTab().network(), filename, TAPAALGUI.getCurrentTab().queries(), lens);
 
     }
 
-    public static void toQueryXML(TimedArcPetriNetNetwork network, String filename, Iterable<TAPNQuery> queries, PetriNetTab.TAPNLens lens) {
+    public static void toQueryXML(TimedArcPetriNetNetwork network, String filename, Iterable<TAPNQuery> queries, TAPNLens lens) {
         try {
             ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
             NameMapping mapping = composer.transformModel(network).value2();
@@ -147,7 +147,7 @@ public class Export {
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(network);
         TimedArcPetriNet model = transformedModel.value1();
 
-        PetriNetTab.TAPNLens lens = new PetriNetTab.TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions(), model.isColored());
+        TAPNLens lens = new TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions(), model.isColored());
 
         RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
         int i = 0;
@@ -158,7 +158,7 @@ public class Export {
             if (lens.isGame() && isDTAPN) {
                 exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null, lens, transformedModel.value2(), composer.getGuiModel());
             } else {
-                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null ,new PetriNetTab.TAPNLens(true, false, lens.isColored()), transformedModel.value2(), composer.getGuiModel());
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null ,new TAPNLens(true, false, lens.isColored()), transformedModel.value2(), composer.getGuiModel());
             }
         }
     }
@@ -213,7 +213,7 @@ public class Export {
 		}
 	}
 
-	public static void exportGuiView(DrawingSurfaceImpl g, int format, DataLayer model, PetriNetTab.TAPNLens lens) {
+	public static void exportGuiView(DrawingSurfaceImpl g, int format, DataLayer model, TAPNLens lens) {
 		if (g.getComponentCount() == 0) {
 			return;
 		}

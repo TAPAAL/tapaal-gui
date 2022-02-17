@@ -17,7 +17,7 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.*;
 
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
@@ -38,7 +38,7 @@ public class TimedTransitionComponent extends Transition {
 	private final dk.aau.cs.model.tapn.event.TimedTransitionListener listener;
 	private GeneralPath dashedOutline;
 
-	public TimedTransitionComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedTransition transition, PetriNetTab.TAPNLens lens) {
+	public TimedTransitionComponent(int positionXInput, int positionYInput, dk.aau.cs.model.tapn.TimedTransition transition, TAPNLens lens) {
 		super(positionXInput, positionYInput);
 		this.transition = transition;
 		listener = timedTransitionListener();
@@ -54,7 +54,7 @@ public class TimedTransitionComponent extends Transition {
         int nameOffsetXInput,
         int nameOffsetYInput,
         int angleInput,
-        PetriNetTab.TAPNLens lens
+        TAPNLens lens
     ) {
 		super(
 		    positionXInput,

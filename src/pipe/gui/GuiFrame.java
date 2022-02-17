@@ -31,6 +31,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.copypaste.CopyPastImportExport;
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
@@ -1550,14 +1551,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // .xml file the Example x counter is not incremented when that file
         // is ignored
         if (nets != null && nets.length > 0) {
-            PetriNetTab.TAPNLens untimedLens = new PetriNetTab.TAPNLens(false, false, false);
-            PetriNetTab.TAPNLens timedLens = new PetriNetTab.TAPNLens(true, false, false);
-            PetriNetTab.TAPNLens untimedGameLens = new PetriNetTab.TAPNLens(false, true, false);
-            PetriNetTab.TAPNLens timedGameLens = new PetriNetTab.TAPNLens(true, true, false);
-            PetriNetTab.TAPNLens untimedColorLens = new PetriNetTab.TAPNLens(false, false, true);
-            PetriNetTab.TAPNLens timedColorLens = new PetriNetTab.TAPNLens(true, false, true);
+            TAPNLens untimedLens = new TAPNLens(false, false, false);
+            TAPNLens timedLens = new TAPNLens(true, false, false);
+            TAPNLens untimedGameLens = new TAPNLens(false, true, false);
+            TAPNLens timedGameLens = new TAPNLens(true, true, false);
+            TAPNLens untimedColorLens = new TAPNLens(false, false, true);
+            TAPNLens timedColorLens = new TAPNLens(true, false, true);
 
-            HashMap<PetriNetTab.TAPNLens, List<String>> netMap = new HashMap<>(){{
+            HashMap<TAPNLens, List<String>> netMap = new HashMap<>(){{
                     put(untimedLens, new ArrayList<>());
                     put(timedLens, new ArrayList<>());
                     put(untimedGameLens, new ArrayList<>());
@@ -1571,13 +1572,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     final String filenameFinal = filename;
 
                     InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filenameFinal);
-                    PetriNetTab.TAPNLens lens;
+                    TAPNLens lens;
                     try {
                         lens = PetriNetTab.getFileLens(file);
                         if (lens == null) {
-                            lens = new PetriNetTab.TAPNLens(true, false, false);
+                            lens = new TAPNLens(true, false, false);
                         }
-                        PetriNetTab.TAPNLens tmp = lens;
+                        TAPNLens tmp = lens;
                         netMap.forEach((v, k) -> {
                             if (v.isTimed() == tmp.isTimed() && v.isGame() == tmp.isGame() && v.isColored() == tmp.isColored()) k.add(filename);
                         });

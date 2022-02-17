@@ -20,6 +20,7 @@ import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.GuiFrameControllerActions;
 import net.tapaal.gui.SafeGuiFrameActions;
 import net.tapaal.gui.TabActions;
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
 import net.tapaal.gui.petrinet.NameGenerator;
@@ -73,9 +74,12 @@ import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import java.awt.event.MouseWheelEvent;
 
-import static pipe.gui.petrinet.PetriNetTab.DrawTool.SELECT;
-
 public class PetriNetTab extends JSplitPane implements TabActions {
+
+    final AbstractDrawingSurfaceManager notingManager = new AbstractDrawingSurfaceManager(){
+        @Override
+        public void registerEvents() {}
+    };
 
     private final MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
 
@@ -85,54 +89,41 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     //Enum for all actions and types of elements
     public enum DrawTool {
-        PLACE, IMMTRANS, TIMEDTRANS, ANNOTATION, ARC, INHIBARC,
-        //TAPN Elements
-        TAPNPLACE, TAPNTRANS, UNCONTROLLABLETRANS, TAPNARC, TRANSPORTARC, TAPNINHIBITOR_ARC,
-        TAPNURGENTTRANS, TAPNURGENTUNCONTROLLABLETRANS,
-        //Others (might refactore)
-        ADDTOKEN, DELTOKEN, SELECT, DRAW, DRAG,
+        ANNOTATION,
+        PLACE,
+        TRANSITION,
+        UNCONTROLLABLE_TRANSITION,
+        ARC,
+        TRANSPORT_ARC,
+        INHIBITOR_ARC,
+        URGENT_TRANSITION,
+        URGENT_UNCONTROLLABLE_TRANSITION,
+        ADD_TOKEN,
+        REMOVE_TOKEN,
+        SELECT,
+        DRAW,
+        DRAG,
     }
 
-    public static final class TAPNLens {
-        public static final TAPNLens Default = new TAPNLens(true, true, true);
-        public boolean isTimed() {
-            return timed;
-        }
-
-        public boolean isGame() {
-            return game;
-        }
-        public boolean isColored(){
-            return colored;
-        }
-
-        private final boolean timed;
-        private final boolean game;
-        private final boolean colored;
-
-        public TAPNLens(boolean timed, boolean game, boolean colored) {
-            this.timed = timed;
-            this.game = game;
-            this.colored = colored;
-        }
-    }
     public final TAPNLens lens;
 
 	//Model and state
 	private final TimedArcPetriNetNetwork tapnNetwork;
 
 	//XXX: Replace with bi-map
-	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<>();
 	public final HashMap<DataLayer, TimedArcPetriNet> guiModelToModel = new HashMap<>();
 
 	//XXX: should be replaced iwth DataLayer->Zoomer, TimedArcPetriNet has nothing to do with zooming
-	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
+	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<>();
 
 
 	final UndoManager undoManager = new UndoManager();
 
+    private final MutableReference<GuiFrameActions> app = new MutableReference<>();
+    private final MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
 
-
+    final MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
 	public final GuiModelManager guiModelManager = new GuiModelManager(this);
 
     /**
@@ -311,7 +302,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 				tab.selectFirstElements();
 
-				tab.setMode(SELECT);
+				tab.setMode(DrawTool.SELECT);
 
                 //appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
                 name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
@@ -365,8 +356,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return undoManager;
 	}
 
-	//GUI
+    final AbstractDrawingSurfaceManager animationModeController;
 
+	//GUI
 	private final HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<TimedArcPetriNet, Boolean>();
 
 	private final JScrollPane drawingSurfaceScroller;
@@ -492,7 +484,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             this.setRightComponent(drawingSurfaceDummy);
         }
         this.queries.setQueries(tapnqueries);
-        tapnNetwork.setConstants(network().constants());
     }
 
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
@@ -659,6 +650,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 		safeApp.ifPresent(tab -> tab.updatedTabName(this));
 	}
+
+    @Override
 	public String getTabTitle() {
 		if (getFile()!=null) {
 			return getFile().getName();
@@ -947,6 +940,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		tapnNetwork.undoSort(oldOrder);
 	}
 
+    @Override
 	public void showComponents(boolean enable) {
 		if (enable != templateExplorer.isVisible()) {
 
@@ -959,6 +953,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+    @Override
 	public void showSharedPT(boolean enable) {
 	    if (enable != sharedPTPanel.isVisible()) {
             editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
@@ -966,6 +961,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
     }
 
+    @Override
 	public void showQueries(boolean enable) {
 		if (enable != queries.isVisible()) {
 			editorSplitPane.getMultiSplitLayout().displayNode(queriesName, enable);
@@ -987,6 +983,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+    @Override
 	public void showEnabledTransitionsList(boolean enable) {
 	    //displayNode fires and relayout, so we check of value is changed
         // else elements will be set to default size.
@@ -995,11 +992,14 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+    @Override
 	public void showDelayEnabledTransitions(boolean enable){
 		transitionFiring.showDelayEnabledTransitions(enable);
 		drawingSurface.repaint();
 
-		TAPAALGUI.getAnimator().updateFireableTransitions();
+        if (getAnimator() != null) {
+		    getAnimator().updateFireableTransitions();
+        }
 	}
 
 	public void selectFirstElements() {
@@ -1059,6 +1059,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+    @Override
 	public void setResizeingDefault(){
 		if(animatorSplitPane != null){
 			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(true);
@@ -1232,7 +1233,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		netChanged = _netChanged;
 	}
 
-    Template currentSelectedTemplate = null; //XXX: Temp while refactoring
     private final NameGenerator nameGenerator = new NameGenerator();
 
     public NameGenerator getNameGenerator() {
@@ -1242,7 +1242,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     public void changeToTemplate(Template tapn) {
 		Require.notNull(tapn, "Can't change to a Template that is null");
 
-		currentSelectedTemplate = tapn;
         nameGenerator.add(tapn.model());
         drawingSurface.setModel(tapn.guiModel(), tapn.zoomer());
 
@@ -1328,7 +1327,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             setManager(notingManager);
 
 			drawingSurface().setBackground(Constants.ELEMENT_FILL_COLOUR);
-			setMode(SELECT);
+			setMode(DrawTool.SELECT);
 
 			restoreSelectedTemplate();
 
@@ -1354,7 +1353,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         updateMode(mode);
 
         switch (mode) {
-            case ADDTOKEN:
+            case ADD_TOKEN:
                 setManager(new AbstractDrawingSurfaceManager() {
                     @Override
                     public void registerEvents() {
@@ -1369,7 +1368,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     }
                 });
                 break;
-            case DELTOKEN:
+            case REMOVE_TOKEN:
                 setManager(new AbstractDrawingSurfaceManager() {
                     @Override
                     public void registerEvents() {
@@ -1384,42 +1383,42 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     }
                 });
                 break;
-            case TAPNPLACE:
+            case PLACE:
                 setManager(new CanvasPlaceDrawController());
                 break;
-            case TAPNTRANS:
+            case TRANSITION:
                 setManager(new CanvasTransitionDrawController());
                 break;
-            case TAPNURGENTTRANS:
+            case URGENT_TRANSITION:
                 setManager(new CanvasUrgentTransitionDrawController());
                 break;
-            case UNCONTROLLABLETRANS:
+            case UNCONTROLLABLE_TRANSITION:
                 setManager(new CanvasUncontrollableTransitionDrawController());
                 break;
-            case TAPNURGENTUNCONTROLLABLETRANS:
+            case URGENT_UNCONTROLLABLE_TRANSITION:
                 setManager(new CanvasUncontrollableUrgentTransitionDrawController());
                 break;
             case ANNOTATION:
                 setManager(new CanvasAnnotationNoteDrawController());
                 break;
-            case TAPNARC:
+            case ARC:
                 setManager(new CanvasArcDrawController());
                 break;
-            case TAPNINHIBITOR_ARC:
+            case INHIBITOR_ARC:
                 setManager(new CanvasInhibitorarcDrawController());
                 break;
-            case TRANSPORTARC:
+            case TRANSPORT_ARC:
                 setManager(new CanvasTransportarcDrawController());
                 break;
             case SELECT:
-                setManager(new CanvasGeneralDrawController());
+                setManager(new CanvasGeneralDrawController(lens));
                 break;
             default:
                 setManager(notingManager);
                 break;
         }
 
-		if (mode == SELECT) {
+		if (mode == DrawTool.SELECT) {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		} else if (mode == DrawTool.DRAG) {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
@@ -1430,8 +1429,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	@Override
 	public void showStatistics() {
-        if (currentSelectedTemplate != null) {
-            StatisticsPanel.showStatisticsPanel(currentSelectedTemplate.model().getStatistics());
+        if (currentTemplate() != null) {
+            StatisticsPanel.showStatisticsPanel(currentTemplate().model().getStatistics());
         }
 	}
 
@@ -1536,8 +1535,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     /* GUI Model / Actions */
 
-	private final MutableReference<GuiFrameActions> app = new MutableReference<>();
-	private final MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
 	@Override
 	public void setApp(GuiFrameActions newApp) {
 		app.setReference(newApp);
@@ -1551,7 +1548,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
 		} else {
 			app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
-			app.ifPresent(o->setMode(SELECT));
+			app.ifPresent(o->setMode(DrawTool.SELECT));
 		}
 		app.ifPresent(o->o.registerDrawingActions(getAvailableDrawActions()));
         app.ifPresent(o->o.registerAnimationActions(getAvailableSimActions()));
@@ -1620,14 +1617,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             network().buildConstraints();
         }
     }
-
-    final AbstractDrawingSurfaceManager notingManager = new AbstractDrawingSurfaceManager(){
-        @Override
-        public void registerEvents() {
-            //No-thing manager
-        }
-    };
-	final AbstractDrawingSurfaceManager animationModeController;
 
 	//Writes a tapaal net to a file, with the posibility to overwrite the quires
 	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite, TAPNLens lens) {
@@ -1743,7 +1732,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         return null;
     }
 
-	class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {
+	static final class CanvasPlaceDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
@@ -1753,87 +1742,75 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
-    class CanvasTransitionDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasTransitionDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, false, false);
+            guiModelManager.addNewTimedTransitions(canvas.getGuiModel(), p, false, false);
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
-    class CanvasUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true, false);
+            guiModelManager.addNewTimedTransitions(canvas.getGuiModel(), p, true, false);
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
-    class CanvasUncontrollableTransitionDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasUncontrollableTransitionDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, false, true);
+            guiModelManager.addNewTimedTransitions(canvas.getGuiModel(), p, false, true);
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
-    class CanvasUncontrollableUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasUncontrollableUrgentTransitionDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-            guiModelManager.addNewTimedTransitions(drawingSurface.getGuiModel(), p, true, true);
+            guiModelManager.addNewTimedTransitions(canvas.getGuiModel(), p, true, true);
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
-    class CanvasAnnotationNoteDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasAnnotationNoteDrawController extends AbstractDrawingSurfaceManager {
 
         @Override
         public void drawingSurfaceMousePressed(MouseEvent e) {
             Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
-           guiModelManager.addAnnotationNote(drawingSurface.getGuiModel(), p);
+           guiModelManager.addAnnotationNote(canvas.getGuiModel(), p);
         }
 
         @Override
-        public void registerEvents() {
-
-        }
+        public void registerEvents() {}
     }
 
-    final class CanvasInhibitorarcDrawController extends AbstractCanvasArcDrawController {
+    static final class CanvasInhibitorarcDrawController extends AbstractCanvasArcDrawController {
 
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place;
@@ -1842,7 +1819,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (place != null && transition == null) {
                 transition = pno;
                 TAPAALGUI.getDrawingSurface().clearAllPrototype();
-                var result = guiModelManager.addInhibitorArc(getModel(), place, transition, arc.getArcPath());
+                var result = guiModelManager.addInhibitorArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
             }
@@ -1875,7 +1852,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     }
 
-    abstract class AbstractCanvasArcDrawController extends AbstractDrawingSurfaceManager {
+    static abstract class AbstractCanvasArcDrawController extends AbstractDrawingSurfaceManager {
         protected Arc arc;
         protected int connectsTo = 1; // 0 if nothing, 1 if place, 2 if transition
 
@@ -1957,16 +1934,16 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
 
                     if (connectsTo == 1) { // Place
-                        var r = guiModelManager.addNewTimedPlace(getModel(), p);
+                        var r = guiModelManager.addNewTimedPlace(canvas.getGuiModel(), p);
                         placeClicked(r.result, e);
                     } else { //Transition
-                        var r = guiModelManager.addNewTimedTransitions(getModel(), p, false, false);
+                        var r = guiModelManager.addNewTimedTransitions(canvas.getGuiModel(), p, false, false);
                         transitionClicked(r.result, e);
                     }
                 }
             } else if (e.isControlDown()){ // Quick draw
                 Point p = canvas.adjustPointToGridAndZoom(e.getPoint(), canvas.getZoom());
-                var r = guiModelManager.addNewTimedPlace(getModel(), p);
+                var r = guiModelManager.addNewTimedPlace(canvas.getGuiModel(), p);
 
                 placeClicked(r.result, e);
             }
@@ -2021,7 +1998,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
     }
 
-    final class CanvasArcDrawController extends AbstractCanvasArcDrawController {
+    static final class CanvasArcDrawController extends AbstractCanvasArcDrawController {
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place;
 
@@ -2042,7 +2019,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             } else if (place != null && transition == null) {
                 transition = pno;
                 TAPAALGUI.getDrawingSurface().clearAllPrototype();
-                var result = guiModelManager.addTimedInputArc(getModel(), place, transition, arc.getArcPath());
+                var result = guiModelManager.addTimedInputArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
 
@@ -2078,7 +2055,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             } else if (transition != null && place == null) {
                 place = pno;
                 TAPAALGUI.getDrawingSurface().clearAllPrototype();
-                var result = guiModelManager.addTimedOutputArc(getModel(), transition, place, arc.getArcPath());
+                var result = guiModelManager.addTimedOutputArc(canvas.getGuiModel(), transition, place, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
 
@@ -2109,7 +2086,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     }
 
-	static class CanvasAnimationController extends AbstractDrawingSurfaceManager {
+	static final class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
 
@@ -2177,13 +2154,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
     }
 
-
-    final MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
     private void setManager(AbstractDrawingSurfaceManager newManager) {
         //De-register old manager
 		managerRef.get().deregisterManager();
         managerRef.setReference(newManager);
-		managerRef.get().registerManager(drawingSurface);
+		managerRef.get().registerManager(drawingSurface, guiModelManager);
     }
 
     public void updateFeatureText() {
@@ -2199,7 +2174,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         TabTransformer.removeTimingInformation(tab);
     }
 
-    private final class CanvasTransportarcDrawController extends AbstractCanvasArcDrawController {
+    static final class CanvasTransportarcDrawController extends AbstractCanvasArcDrawController {
 
         private TimedTransitionComponent transition;
         private TimedPlaceComponent place1;
@@ -2232,7 +2207,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (place1 != null && transition == null) {
                 transition = pno;
                 connectsTo = 1;
-                arc2 = arc = new TimedTransportArcComponent(pno, -1, false, lens);
+                arc2 = arc = new TimedTransportArcComponent(pno, -1, false);
 
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
@@ -2249,7 +2224,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (place1 == null && transition == null) {
                 place1 = pno;
                 connectsTo = 2;
-                arc1 = arc = new TimedTransportArcComponent(pno, -1, true, lens);
+                arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
                 //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
@@ -2261,14 +2236,14 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             } else if (transition != null && place2 == null) {
                 place2 = pno;
                 TAPAALGUI.getDrawingSurface().clearAllPrototype();
-                var result = guiModelManager.addTimedTransportArc(getModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
+                var result = guiModelManager.addTimedTransportArc(canvas.getGuiModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
 
                 if (e != null && e.isControlDown()) {
                     place1 = pno;
                     connectsTo = 2;
-                    arc1 = arc = new TimedTransportArcComponent(pno, -1, true, lens);
+                    arc1 = arc = new TimedTransportArcComponent(pno, -1, true);
                     //XXX calling zoomUpdate will set the endpoint to 0,0, drawing the arc from source to 0,0
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
@@ -2292,7 +2267,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     }
 
-    private class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
+    static final class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
+        final TAPNLens lens;
+
+        public CanvasGeneralDrawController(TAPNLens lens) {
+            this.lens = lens;
+        }
+
         @Override
         public void registerEvents() {
 
@@ -2386,10 +2367,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             );
         }
 
-        protected boolean justSelected = false;
+        boolean justSelected = false;
 
-        protected boolean isDragging = false;
-        protected Point dragInit = new Point();
+        boolean isDragging = false;
+        Point dragInit = new Point();
 
         private int totalX = 0;
         private int totalY = 0;
@@ -2411,7 +2392,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
             if (isDragging) {
                 isDragging = false;
-                canvas.translateSelection(canvas.getSelectionObject().getSelection(), totalX, totalY);
+                canvas.translateSelection(totalX, totalY);
                 totalX = 0;
                 totalY = 0;
             } else {
@@ -2514,9 +2495,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if(!lens.isColored()) {
                 if (p.isSelected()) {
                     if (e.getWheelRotation() < 0) {
-                        guiModelManager.addToken(getModel(), p, 1);
+                        guiModelManager.addToken(canvas.getGuiModel(), p, 1);
                     } else {
-                        guiModelManager.removeToken(getModel(), p, 1);
+                        guiModelManager.removeToken(canvas.getGuiModel(), p, 1);
                     }
 
                 } else {
@@ -2577,7 +2558,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(SELECT);
+            setMode(DrawTool.SELECT);
         }
     };
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
@@ -2587,53 +2568,53 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     };
     private final GuiAction inhibarcAction = new GuiAction("Inhibitor arc", "Add an inhibitor arc (I)", "I", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNINHIBITOR_ARC);
+            setMode(DrawTool.INHIBITOR_ARC);
         }
     };
     private final GuiAction transAction = new GuiAction("Transition", "Add a transition (T)", "T", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNTRANS);
+            setMode(DrawTool.TRANSITION);
         }
     };
     private final GuiAction urgentTransAction = new GuiAction("Urgent transition", "Add an urgent transition (Y)", "Y", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNURGENTTRANS);
+            setMode(DrawTool.URGENT_TRANSITION);
         }
     };
     private final GuiAction uncontrollableTransAction = new GuiAction("Uncontrollable transition", "Add an uncontrollable transition (L)", "L", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.UNCONTROLLABLETRANS);
+            setMode(DrawTool.UNCONTROLLABLE_TRANSITION);
         }
     };
     private final GuiAction uncontrollableUrgentTransAction = new GuiAction("Uncontrollable urgent transition", "Add an uncontrollable urgent transition (O)", "O", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNURGENTUNCONTROLLABLETRANS);
+            setMode(DrawTool.URGENT_UNCONTROLLABLE_TRANSITION);
         }
     };
     private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.ADDTOKEN);
+            setMode(DrawTool.ADD_TOKEN);
         }
     };
     private final GuiAction deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.DELTOKEN);
+            setMode(DrawTool.REMOVE_TOKEN);
         }
     };
     private final GuiAction timedPlaceAction = new GuiAction("Place", "Add a place (P)", "P", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNPLACE);
+            setMode(DrawTool.PLACE);
         }
     };
 
     private final GuiAction timedArcAction = new GuiAction("Arc", "Add an arc (A)", "A", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TAPNARC);
+            setMode(DrawTool.ARC);
         }
     };
     private final GuiAction transportArcAction = new GuiAction("Transport arc", "Add a transport arc (R)", "R", true) {
         public void actionPerformed(ActionEvent e) {
-            setMode(DrawTool.TRANSPORTARC);
+            setMode(DrawTool.TRANSPORT_ARC);
         }
     };
     private final GuiAction toggleUncontrollableAction = new GuiAction("Toggle uncontrollable transition", "Toggle between control/environment transition", "E", true) {
@@ -2666,17 +2647,17 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     public void updateMode(DrawTool mode) {
         // deselect other actions
-        selectAction.setSelected(mode == SELECT);
-        transAction.setSelected(mode == DrawTool.TAPNTRANS);
-        urgentTransAction.setSelected(mode == DrawTool.TAPNURGENTTRANS);
-        uncontrollableTransAction.setSelected(mode == DrawTool.UNCONTROLLABLETRANS);
-        uncontrollableUrgentTransAction.setSelected(mode == DrawTool.TAPNURGENTUNCONTROLLABLETRANS);
-        timedPlaceAction.setSelected(mode == DrawTool.TAPNPLACE);
-        timedArcAction.setSelected(mode == DrawTool.TAPNARC);
-        transportArcAction.setSelected(mode == DrawTool.TRANSPORTARC);
-        inhibarcAction.setSelected(mode == DrawTool.TAPNINHIBITOR_ARC);
-        tokenAction.setSelected(mode == DrawTool.ADDTOKEN);
-        deleteTokenAction.setSelected(mode == DrawTool.DELTOKEN);
+        selectAction.setSelected(mode == DrawTool.SELECT);
+        transAction.setSelected(mode == DrawTool.TRANSITION);
+        urgentTransAction.setSelected(mode == DrawTool.URGENT_TRANSITION);
+        uncontrollableTransAction.setSelected(mode == DrawTool.UNCONTROLLABLE_TRANSITION);
+        uncontrollableUrgentTransAction.setSelected(mode == DrawTool.URGENT_UNCONTROLLABLE_TRANSITION);
+        timedPlaceAction.setSelected(mode == DrawTool.PLACE);
+        timedArcAction.setSelected(mode == DrawTool.ARC);
+        transportArcAction.setSelected(mode == DrawTool.TRANSPORT_ARC);
+        inhibarcAction.setSelected(mode == DrawTool.INHIBITOR_ARC);
+        tokenAction.setSelected(mode == DrawTool.ADD_TOKEN);
+        deleteTokenAction.setSelected(mode == DrawTool.REMOVE_TOKEN);
         annotationAction.setSelected(mode == DrawTool.ANNOTATION);
     }
     @Override
@@ -2758,45 +2739,34 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     public void changeStatusbarText(DrawTool type) {
         switch (type) {
-            case UNCONTROLLABLETRANS:
+            case UNCONTROLLABLE_TRANSITION:
                 app.ifPresent(o14 -> o14.setStatusBarText(textforUncontrollableTrans));
 
             case PLACE:
-                app.ifPresent(o13 -> o13.setStatusBarText(textforPlace));
-                break;
-
-            case TAPNPLACE:
                 app.ifPresent(o12 -> o12.setStatusBarText(textforTAPNPlace));
                 break;
 
-            case IMMTRANS:
-            case TAPNTRANS:
+            case TRANSITION:
                 app.ifPresent(o11 -> o11.setStatusBarText(textforTrans));
                 break;
 
-            case TIMEDTRANS:
-                app.ifPresent(o10 -> o10.setStatusBarText(textforTimedTrans));
-                break;
-
             case ARC:
-            case TAPNARC:
                 app.ifPresent(o9 -> o9.setStatusBarText(textforArc));
                 break;
 
-            case TRANSPORTARC:
+            case TRANSPORT_ARC:
                 app.ifPresent(o8 -> o8.setStatusBarText(textforTransportArc));
                 break;
 
-            case TAPNINHIBITOR_ARC:
-            case INHIBARC:
+            case INHIBITOR_ARC:
                 app.ifPresent(o7 -> o7.setStatusBarText(textforInhibArc));
                 break;
 
-            case ADDTOKEN:
+            case ADD_TOKEN:
                 app.ifPresent(o6 -> o6.setStatusBarText(textforAddtoken));
                 break;
 
-            case DELTOKEN:
+            case REMOVE_TOKEN:
                 app.ifPresent(o5 -> o5.setStatusBarText(textforDeltoken));
                 break;
 

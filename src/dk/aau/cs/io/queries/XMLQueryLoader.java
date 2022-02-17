@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import dk.aau.cs.io.LoadedQueries;
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.ExtrapolationOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.HashTableSize;
@@ -31,7 +32,6 @@ import org.xml.sax.SAXParseException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
-import pipe.gui.petrinet.PetriNetTab;
 
 public class XMLQueryLoader extends QueryLoader{
 
@@ -90,7 +90,7 @@ public class XMLQueryLoader extends QueryLoader{
             // Save query for later use in dialog window
             this.faultyQueries.add(queryWrapper);
 
-            PetriNetTab.TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
+            TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
             boolean isTimed = (lens != null && lens.isTimed()) || network.isTimed();
             boolean isKnownGame = (lens != null && lens.isGame()); // XXX: This is a hack, not sure why network does not know if it a game, also control tag should used to check if query is a game
             boolean canBeCTL = isTimed || canBeCTL(prop);

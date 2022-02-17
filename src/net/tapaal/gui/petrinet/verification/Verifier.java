@@ -3,10 +3,10 @@ package net.tapaal.gui.petrinet.verification;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
-import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
@@ -74,7 +74,7 @@ public class Verifier {
         return reducedNetTempFile.getAbsolutePath();
     }
 
-    public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, PetriNetTab.TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k, JSpinner tokensControl) {
+    public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k, JSpinner tokensControl) {
         ModelChecker modelChecker;
 
         if (tapnNetwork.isUntimed()) {
@@ -156,7 +156,7 @@ public class Verifier {
         VerificationCallback callback,
         HashMap<TimedArcPetriNet, DataLayer> guiModels,
         boolean onlyCreateReducedNet,
-        PetriNetTab.TAPNLens lens) {
+        TAPNLens lens) {
         ModelChecker verifytapn = getModelChecker(query);
 
 

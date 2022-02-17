@@ -17,7 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -41,10 +41,10 @@ public class PNMLWriter implements NetWriter {
 	private final TimedArcPetriNetNetwork network;
 	private TimedArcPetriNet composedNetwork;
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
-	private final PetriNetTab.TAPNLens lens;
+	private final TAPNLens lens;
 	private final writeTACPN writeTACPN;
 
-	public PNMLWriter(TimedArcPetriNetNetwork network, HashMap<TimedArcPetriNet, DataLayer> guiModels, PetriNetTab.TAPNLens lens) {
+	public PNMLWriter(TimedArcPetriNetNetwork network, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens) {
 		this.network = network;
 		this.guiModels = guiModels;
 		this.lens = lens;

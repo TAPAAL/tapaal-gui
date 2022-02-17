@@ -1,5 +1,6 @@
 package net.tapaal.gui.DrawingSurfaceManager;
 
+import net.tapaal.gui.petrinet.model.GuiModelManager;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.petrinet.graphicElements.GraphicalElement;
 
@@ -12,7 +13,9 @@ import java.util.function.Predicate;
 
 public abstract class AbstractDrawingSurfaceManager {
 
+    // XXX: Moving away from having access to canvas to having a controller in place
     protected DrawingSurfaceImpl canvas;
+    protected GuiModelManager guiModelManager;
 
     public void drawingSurfaceMouseClicked(MouseEvent e) {}
     public void drawingSurfaceMousePressed(MouseEvent e) {}
@@ -52,13 +55,15 @@ public abstract class AbstractDrawingSurfaceManager {
     private final Map<Predicate<DrawingSurfaceEvent>, Consumer<DrawingSurfaceEvent>> filter = new LinkedHashMap<>();
     private AbstractDrawingSurfaceManager next = null;
 
-    public final void registerManager(DrawingSurfaceImpl canvas){
+    public final void registerManager(DrawingSurfaceImpl canvas, GuiModelManager guiModelManager){
         this.canvas = canvas;
+        this.guiModelManager = guiModelManager;
         setupManager();
     }
 
     public final void deregisterManager(){
         this.canvas = null;
+        this.guiModelManager = null;
         teardownManager();
     }
 

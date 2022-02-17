@@ -2,7 +2,7 @@ package dk.aau.cs.io;
 
 import java.util.Collection;
 
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.Template;
@@ -14,9 +14,9 @@ public class LoadedModel implements LoadedBatchProcessingModel {
 	private final Collection<TAPNQuery> queries;
 	private final TimedArcPetriNetNetwork network;
     private final Collection<String> messages;
-    private final PetriNetTab.TAPNLens lens;
+    private final TAPNLens lens;
 
-    public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages, PetriNetTab.TAPNLens lens){
+    public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries, Collection<String> messages, TAPNLens lens){
         this.templates = templates;
         this.network = network;
         this.queries = queries;
@@ -29,7 +29,7 @@ public class LoadedModel implements LoadedBatchProcessingModel {
 	public TimedArcPetriNetNetwork network(){ return network; }
     public Collection<String> getMessages() { return messages; }
 
-    public PetriNetTab.TAPNLens getLens(){
+    public TAPNLens getLens(){
         if (lens != null) {
             return lens;
         } else {
@@ -37,7 +37,7 @@ public class LoadedModel implements LoadedBatchProcessingModel {
             boolean isNetGame = network().hasUncontrollableTransitions();
             boolean isNetColored = network.isColored();
 
-            return new PetriNetTab.TAPNLens(isNetTimed, isNetGame, isNetColored);
+            return new TAPNLens(isNetTimed, isNetGame, isNetColored);
         }
     }
     public boolean isColored(){

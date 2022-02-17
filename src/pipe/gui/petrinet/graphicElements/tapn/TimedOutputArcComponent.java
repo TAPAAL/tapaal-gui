@@ -6,7 +6,7 @@ import java.util.Hashtable;
 import javax.swing.BoxLayout;
 
 import net.tapaal.gui.petrinet.Context;
-import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.TAPAALGUI;
@@ -56,7 +56,7 @@ public class TimedOutputArcComponent extends Arc {
 	}
 
 
-    public TimedOutputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedOutputArc modelArc, PetriNetTab.TAPNLens lens){
+    public TimedOutputArcComponent(PlaceTransitionObject source, PlaceTransitionObject target, TimedOutputArc modelArc, TAPNLens lens){
         super(source);
         setTarget(target);
         setUnderlyingArc(modelArc);
