@@ -273,18 +273,35 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void openTAPNFile() {
-        final File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
+        final File[] files = FileBrowser.constructor(new String[]{"tapn", "xml", "pnml"}, FileBrowser.userPath).openFiles();
         //show loading cursor
+        openTAPNFile(files);
+    }
+
+    @Override
+    public void importPNMLFile() {
+        final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
+
+        openPNMLFile(files);
+    }
+
+    private void openTAPNFile(File[] files) {
         guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         //Do loading
-        SwingWorker<java.util.List<PetriNetTab>, Void> worker = new SwingWorker<java.util.List<PetriNetTab>, Void>() {
+        SwingWorker<List<PetriNetTab>, Void> worker = new SwingWorker<List<PetriNetTab>, Void>() {
             @Override
-            protected java.util.List<PetriNetTab> doInBackground() throws Exception {
-                java.util.List<PetriNetTab> filesOpened = new ArrayList<>();
+            protected List<PetriNetTab> doInBackground() throws Exception {
+                List<PetriNetTab> filesOpened = new ArrayList<>();
                 for(File f : files){
                     if(f.exists() && f.isFile() && f.canRead()){
                         FileBrowser.userPath = f.getParent();
-                        filesOpened.add(PetriNetTab.createNewTabFromFile(f));
+
+                        if (f.getName().endsWith(".pnml")) {
+                            filesOpened.add(PetriNetTab.createNewTabFromPNMLFile(f));
+                        } else {
+                            filesOpened.add(PetriNetTab.createNewTabFromFile(f));
+                        }
+
                     }
                 }
                 return filesOpened;
@@ -293,7 +310,19 @@ public class GuiFrameController implements GuiFrameControllerActions{
             protected void done() {
                 try {
                     List<PetriNetTab> tabs = get();
-                    openTab(tabs);
+                    for (PetriNetTab tab : tabs) {
+                        openTab(tab);
+
+                        //Don't autolayout on empty net, hotfix for issue #1960000, we assue only pnml file does not have layout and they always only have one component
+                        if(!tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
+                            int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                            if(dialogResult == JOptionPane.YES_OPTION) {
+                                SmartDrawDialog.showSmartDrawDialog();
+                            }
+                        }
+                    }
+
+
                 } catch (Exception e) {
                     String message = e.getMessage();
 
@@ -301,9 +330,9 @@ public class GuiFrameController implements GuiFrameControllerActions{
                         message = message.split(":", 2)[1];
                     }
                     JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
-                            message,
-                            "Error loading file",
-                            JOptionPane.ERROR_MESSAGE);
+                        message,
+                        "Error loading file",
+                        JOptionPane.ERROR_MESSAGE);
                     return;
                 }finally {
                     guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -314,20 +343,17 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         //Sleep redrawing thread (EDT) until worker is done
         //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
-			    while(!worker.isDone()) {
-			    	try {
-			    		Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-			    }
+        while(!worker.isDone()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
-    @Override
-    public void importPNMLFile() {
-        final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
-
+    private void openPNMLFile(File[] files) {
         //Show loading cursor
         guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         //Do loading of net
@@ -359,9 +385,9 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
-                            e.getMessage(),
-                            "Error loading file",
-                            JOptionPane.ERROR_MESSAGE);
+                        e.getMessage(),
+                        "Error loading file",
+                        JOptionPane.ERROR_MESSAGE);
                     return;
                 }finally {
                     guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -372,14 +398,14 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         //Sleep redrawing thread (EDT) until worker is done
         //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
-			    while(!worker.isDone()) {
-			    	try {
-			    		Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-			    }
+        while(!worker.isDone()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
     //XXX 2018-05-23 kyrke, moved from CreateGui, static method
