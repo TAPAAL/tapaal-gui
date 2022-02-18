@@ -5,8 +5,10 @@ import pipe.gui.TAPAALGUI;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class FileBrowser {
@@ -16,29 +18,33 @@ public class FileBrowser {
     public static String userPath = null;
     static String lastSavePath = ".";
     static String lastOpenPath = ".";
+
     protected final FileDialog fileDialog;
-    protected final String ext;
-    protected final String optionalExt;
+    private final String[] fileExtensions;
     protected String specifiedPath;
 
-    private FileBrowser(String filetype, final String ext, final String optionalExt, String path) {
+    private FileBrowser(String filetype, String[] extensions, String path) {
         fileDialog = new FileDialog(TAPAALGUI.getAppGui(), filetype);
-        this.ext = ext;
-        this.optionalExt = optionalExt;
+        this.fileExtensions = extensions;
         this.specifiedPath = path;
 
-        if (filetype == null) {
-            filetype = "file";
-        }
+        // Setup filter if extension specified used on Linux and MacOS
+        if (fileExtensions.length > 0) {
 
-        // Setup filter if extension specified
-        //This is needed for Linux and Mac
-        if (!ext.equals("")) {
-            if (!optionalExt.equals("")) {
-                fileDialog.setFilenameFilter((dir, name) -> name.endsWith(ext) || name.endsWith(optionalExt));
-            } else {
-                fileDialog.setFilenameFilter((dir, name) -> name.endsWith(ext));
-            }
+
+
+            // FilenameFilter is used on Linux and MacOS, but not working on windows
+            fileDialog.setFilenameFilter((dir, name) -> {
+                for (String fileExtension : fileExtensions) {
+                    if (name.endsWith("." + fileExtension)) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+            // Workaround for Windows to filter files in open dialog, overwritten in save menu
+            String filter = Arrays.stream(fileExtensions).map(ext -> "*." + ext).collect(Collectors.joining(";"));
+            fileDialog.setFile(filter);
         }
     }
 
@@ -51,18 +57,18 @@ public class FileBrowser {
     }
 
     public static FileBrowser constructor(String filetype, final String ext, final String optionalExt, String path) {
-        return new FileBrowser(filetype, ext, optionalExt, path);
+        return new FileBrowser(filetype, new String[]{ext, optionalExt}, path);
+    }
+
+    public static FileBrowser constructor(String[] extensions, String path) {
+        return new FileBrowser(null, extensions, path);
     }
 
     public File openFile() {
         if (specifiedPath == null) specifiedPath = lastOpenPath;
         fileDialog.setDirectory(specifiedPath);
         //This is needed for Windows
-        if (optionalExt.equals("")) {
-            fileDialog.setFile(ext.equals("") ? "" : ("*." + ext));
-        } else {
-            fileDialog.setFile(ext.equals("") ? "" : ("*." + ext + ";*." + optionalExt));
-        }
+
         fileDialog.setMode(FileDialog.LOAD);
         fileDialog.setMultipleMode(false);
         fileDialog.setVisible(true);
@@ -77,11 +83,7 @@ public class FileBrowser {
         if (specifiedPath == null) specifiedPath = lastOpenPath;
         fileDialog.setDirectory(specifiedPath);
         //This is needed for Windows
-        if (optionalExt.equals("")) {
-            fileDialog.setFile(ext.equals("") ? "" : ("*." + ext));
-        } else {
-            fileDialog.setFile(ext.equals("") ? "" : ("*." + ext + ";*." + optionalExt));
-        }
+
         fileDialog.setMultipleMode(true);
         fileDialog.setMode(FileDialog.LOAD);
         fileDialog.setVisible(true);
@@ -99,6 +101,7 @@ public class FileBrowser {
     }
 
     public String saveFile(String suggestedName) {
+        String ext = fileExtensions[0];
         if (specifiedPath == null) specifiedPath = lastSavePath;
 
         fileDialog.setDirectory(specifiedPath);
