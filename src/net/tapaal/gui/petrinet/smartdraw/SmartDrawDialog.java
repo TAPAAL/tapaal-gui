@@ -9,23 +9,24 @@ import java.awt.Insets;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.tapaal.gui.petrinet.Template;
 import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.TAPAALGUI;
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
 public class SmartDrawDialog extends JDialog {
 
-	private static String getHelpMessage(){ 
+    private final PetriNetTab tab;
+
+    private static String getHelpMessage(){ 
 		// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("<html>");
@@ -103,26 +104,24 @@ public class SmartDrawDialog extends JDialog {
 			timerLabel.setText("Time elapsed: " + (System.currentTimeMillis() - startTimeMs) / 1000 + " s");
 		}
 	});
-	
-	public static SmartDrawDialog smartDrawDialog;
+
 	public static void showSmartDrawDialog() {
-		
-		if(smartDrawDialog == null){
-			smartDrawDialog = new SmartDrawDialog(TAPAALGUI.getApp(), "Smart Draw", true);
-			smartDrawDialog.pack();
-			smartDrawDialog.setPreferredSize(smartDrawDialog.getSize());
-			smartDrawDialog.setMinimumSize(new Dimension(smartDrawDialog.getWidth(), smartDrawDialog.getHeight()));
-			smartDrawDialog.setLocationRelativeTo(null);
-			smartDrawDialog.setResizable(false);
-		}
-		smartDrawDialog.updateLists();
+        SmartDrawDialog smartDrawDialog;
+        smartDrawDialog = new SmartDrawDialog(TAPAALGUI.getApp(), "Smart Draw", true, TAPAALGUI.getCurrentTab());
+        smartDrawDialog.pack();
+        smartDrawDialog.setPreferredSize(smartDrawDialog.getSize());
+        smartDrawDialog.setMinimumSize(new Dimension(smartDrawDialog.getWidth(), smartDrawDialog.getHeight()));
+        smartDrawDialog.setLocationRelativeTo(null);
+        smartDrawDialog.setResizable(false);
+        smartDrawDialog.updateLists();
 		smartDrawDialog.enableButtons();
 		smartDrawDialog.setEnabled(true);
 		smartDrawDialog.setVisible(true);
 	}
 
-	private SmartDrawDialog(Frame frame, String title, boolean modal) {
+	private SmartDrawDialog(Frame frame, String title, boolean modal, PetriNetTab tab) {
 		super(frame, title, modal);
+        this.tab = tab;
 		initComponents();
 	}
 	
@@ -179,14 +178,14 @@ public class SmartDrawDialog extends JDialog {
 		drawButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-                DataLayer model = TAPAALGUI.getDrawingSurface().getGuiModel();
+                DataLayer model = tab.drawingSurface().getGuiModel();
                 int modelSize = model.getPlaceTransitionObjects().size();
 
 				initLoadingFrame();
 				worker = new SmartDrawWorker(
-                    TAPAALGUI.getDrawingSurface(),
+                    tab.drawingSurface(),
                     model,
-                    TAPAALGUI.getCurrentTab().getUndoManager(),
+                    tab.getUndoManager(),
                     xSpacing,
                     ySpacing,
                     searchOption,
@@ -227,7 +226,7 @@ public class SmartDrawDialog extends JDialog {
 					}
 				});
 				worker.execute();
-				smartDrawDialog.setVisible(false);
+				SmartDrawDialog.this.setVisible(false);
 				loadingDialogFrame.setVisible(true);
 
 			}
@@ -549,12 +548,7 @@ public class SmartDrawDialog extends JDialog {
 		
 		final JSpinner ySpinner = new CustomJSpinner(ySpacing);
 		ySpinner.setToolTipText("Set the distance there should be between objects on the y-axis");
-		ySpinner.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				ySpacing = (Integer)ySpinner.getValue();
-			}
-		});
+		ySpinner.addChangeListener(e -> ySpacing = (Integer)ySpinner.getValue());
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
@@ -578,7 +572,7 @@ public class SmartDrawDialog extends JDialog {
 
     private String[] getObjectNames() {
 		ArrayList<String> names = new ArrayList<String>();
-		for(PetriNetObject object : TAPAALGUI.getDrawingSurface().getGuiModel().getPlaceTransitionObjects()) {
+		for(PetriNetObject object : tab.drawingSurface().getGuiModel().getPlaceTransitionObjects()) {
 			names.add(object.getName());
 		}
 		return Arrays.copyOf(names.toArray(), names.toArray().length, String[].class);
@@ -635,8 +629,8 @@ public class SmartDrawDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cancelWorker();
-				TAPAALGUI.getCurrentTab().getUndoManager().undo();
-				TAPAALGUI.getDrawingSurface().repaintAll();
+				tab.getUndoManager().undo();
+				tab.drawingSurface().repaintAll();
 				loadingDialogFrame.setVisible(false);
 				//smartDrawDialog.setVisible(true);
 				TAPAALGUI.getAppGui().toFront();
@@ -690,7 +684,7 @@ public class SmartDrawDialog extends JDialog {
 	}
 	
 	private void enableButtons() {
-		if(TAPAALGUI.getDrawingSurface().getGuiModel().getPlaceTransitionObjects().size() > 0) {
+		if(tab.drawingSurface().getGuiModel().getPlaceTransitionObjects().size() > 0) {
 			drawButton.setEnabled(true);
 			drawButton.setToolTipText("Smart draw with the current options");
 			if(!(randomStartObjectCheckBox.isSelected()))
