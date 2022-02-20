@@ -26,18 +26,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class GuiFrameController implements GuiFrameControllerActions{
+public final class GuiFrameController implements GuiFrameControllerActions{
 
     final GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
     final GuiFrameActions guiFrame;
+    private final ArrayList<PetriNetTab> tabs = new ArrayList<>();
 
     final MutableReference<TabActions> currentTab = new MutableReference<>();
 
@@ -49,8 +50,6 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         loadPrefrences();
         appGui.registerController(this, currentTab);
-
-
     }
 
     //XXX should be private and should prop. live in controllers not GUI, tmp while refactoring //kyrke 2019-11-05
@@ -64,6 +63,10 @@ public class GuiFrameController implements GuiFrameControllerActions{
     private boolean showToolTips = true;
     private boolean showZeroToInfinityIntervals = true;
     private boolean showTokenAge = true;
+
+    public List<PetriNetTab> getTabs() {
+        return Collections.unmodifiableList(tabs);
+    }
 
     private void loadPrefrences() {
         Preferences prefs = Preferences.getInstance();
@@ -112,7 +115,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void openTab(PetriNetTab tab) {
-        TAPAALGUI.addTab(tab);
+        tabs.add(tab);
         tab.setSafeGuiFrameActions(guiFrameDirectAccess);
         tab.setGuiFrameControllerActions(this);
 
@@ -137,7 +140,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                 tab.setGuiFrameControllerActions(null);
                 //Close the gui part first, else we get an error bug #826578
                 guiFrame.detachTabFromGuiFrame(tab);
-                TAPAALGUI.removeTab(tab);
+                tabs.remove(tab);
             }
         }
 
@@ -583,7 +586,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
      */
     private boolean showSavePendingChangesDialogForAllTabs() {
         // Loop through all tabs and check if they have been saved
-        for (PetriNetTab tab : TAPAALGUI.getTabs()) {
+        for (PetriNetTab tab : getTabs()) {
             if (tab.getNetChanged()) {
                 if (!(showSavePendingChangesDialog(tab))) {
                     return false;
@@ -602,7 +605,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.setShowQueriesSelected(showQueries);
         //currentTab.ifPresent(o->o.showQueries(showQueries));
-        TAPAALGUI.getTabs().forEach(o->o.showQueries(showQueries));
+        getTabs().forEach(o->o.showQueries(showQueries));
 
     }
 
@@ -616,7 +619,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.setShowConstantsSelected(showConstants);
         //currentTab.ifPresent(o->o.showConstantsPanel(showConstants));
-        TAPAALGUI.getTabs().forEach(o->o.showConstantsPanel(showConstants));
+        getTabs().forEach(o->o.showConstantsPanel(showConstants));
 
     }
 
@@ -669,7 +672,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.setShowComponentsSelected(showComponents);
         //currentTab.ifPresent(o->o.showComponents(showComponents));
-        TAPAALGUI.getTabs().forEach(o->o.showComponents(showComponents));
+        getTabs().forEach(o->o.showComponents(showComponents));
     }
 
     @Override
@@ -681,7 +684,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         showSharedPT = b;
 
         guiFrame.setShowSharedPTSelected(showSharedPT);
-        TAPAALGUI.getTabs().forEach(o->o.showSharedPT(showSharedPT));
+        getTabs().forEach(o->o.showSharedPT(showSharedPT));
     }
 
     @Override

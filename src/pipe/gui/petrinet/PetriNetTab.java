@@ -1241,16 +1241,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         nameGenerator.add(tapn.model());
         drawingSurface.setModel(tapn.guiModel(), tapn.zoomer());
 
-		//If the template is currently selected
-		//XXX: kyrke - 2019-07-06, templ solution while refactoring, there is properly a better way
-		if (TAPAALGUI.getCurrentTab() == this) {
+        app.ifPresent(GuiFrameActions::updateZoomCombo);
 
-			app.ifPresent(GuiFrameActions::updateZoomCombo);
+        //XXX: moved from drawingsurface, temp while refactoring, there is a better way
+        drawingSurface.getSelectionObject().clearSelection();
 
-			//XXX: moved from drawingsurface, temp while refactoring, there is a better way
-			drawingSurface.getSelectionObject().clearSelection();
-
-		}
     }
 
 

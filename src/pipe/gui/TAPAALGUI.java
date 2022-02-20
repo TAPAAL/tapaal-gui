@@ -19,8 +19,6 @@ public class TAPAALGUI {
 	private final static GuiFrame appGui = new GuiFrame(TAPAAL.getProgramName());
     private final static GuiFrameController appGuiController = new GuiFrameController(appGui);
 
-	private static final ArrayList<PetriNetTab> tabs = new ArrayList<PetriNetTab>();
-
 	public static void init() {
 
 	    try {
@@ -54,31 +52,8 @@ public class TAPAALGUI {
 	}
 
 	@Deprecated
-	public static void addTab (PetriNetTab tab ) {
-		tabs.add(tab);
-	}
-
-	@Deprecated
-	public static void removeTab(PetriNetTab tab) {
-		tabs.remove(tab);
-	}
-
-	@Deprecated
-	private static PetriNetTab getTab(int index) {
-		if (index < 0) {
-			return null;
-		}
-		return tabs.get(index);
-	}
-
-	@Deprecated
-	public static List<PetriNetTab> getTabs() {
-		return tabs;
-	}
-
-	@Deprecated
 	public static PetriNetTab getCurrentTab() {
-		return getTab(appGui.getSelectedTabIndex());
+		return appGuiController.getTabs().get(appGui.getSelectedTabIndex());
 	}
 
 	/**
@@ -104,11 +79,13 @@ public class TAPAALGUI {
 
 	//XXX The following function should properly not be used and is only used while refactoring, but is better
 	// that the chained access via guiFrame, App or drawingsurface now marked with deprecation.
+    @Deprecated
 	public static PetriNetTab openNewTabFromStream(InputStream file, String name) throws Exception {
 		PetriNetTab tab = PetriNetTab.createNewTabFromInputStream(file, name);
 		appGuiController.openTab(tab);
 		return tab;
 	}
+    @Deprecated
 	public static PetriNetTab openNewTabFromStream(PetriNetTab tab) {
 		appGuiController.openTab(tab);
 		return tab;
