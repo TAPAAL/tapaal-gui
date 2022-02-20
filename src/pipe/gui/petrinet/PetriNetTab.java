@@ -2359,9 +2359,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 e->e.pno instanceof ArcPathPoint && e.a == MouseAction.wheel,
                 e->{
                     if (e.e.isShiftDown()) {
-                        TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
-                            ((ArcPathPoint) e.pno).togglePointType()
-                        );
+                        guiModelManager.toggleArcPathPointType((ArcPathPoint) e.pno);
                     }
                 }
             );
