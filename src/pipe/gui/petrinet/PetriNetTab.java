@@ -13,6 +13,7 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.Preferences;
+import net.tapaal.copypaste.CopyPastImportExport;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.GuiFrameControllerActions;
@@ -67,6 +68,10 @@ import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -1455,6 +1460,34 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             undoManager.addEdit(command);
             ptobject.updateOnMoveOrZoom();
         }
+    }
+
+    @Override
+    public void copy() {
+        String message = CopyPastImportExport.toXML(drawingSurface().getSelectionObject().getSelection());
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+    }
+
+    @Override
+    public void cut() {
+        String message = CopyPastImportExport.toXML(drawingSurface().getSelectionObject().getSelection());
+        deleteSelection();
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+    }
+
+    @Override
+    public void past() {
+        String s = "";
+        //odd: the Object param of getContents is not currently used
+        Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+        if (hasTransferableText) {
+            try {
+                s = (String)contents.getTransferData(DataFlavor.stringFlavor);
+            }
+            catch (UnsupportedFlavorException | IOException ignored){}
+        }
+        CopyPastImportExport.past(s, this);
     }
 
     @Override

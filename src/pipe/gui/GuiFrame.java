@@ -1,10 +1,6 @@
 package pipe.gui;
 
 import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -30,7 +26,6 @@ import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
-import net.tapaal.copypaste.CopyPastImportExport;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
@@ -178,32 +173,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction cutAction = new GuiAction("Cut", "Cut current selection", KeyStroke.getKeyStroke('X', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            String message = CopyPastImportExport.toXML(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
-            getCurrentTab().deleteSelection();
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+            currentTab.ifPresent(TabActions::cut);
         }
     };
     private final GuiAction copyAction = new GuiAction("Copy", "Copy current selection", KeyStroke.getKeyStroke('C', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            String message = CopyPastImportExport.toXML(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+            currentTab.ifPresent(TabActions::copy);
         }
     };
     private final GuiAction pasteAction = new GuiAction("Paste", "Paste", KeyStroke.getKeyStroke('V', shortcutkey)) {
         @Override
         public void actionPerformed(ActionEvent e) {
-
-            String s = "";
-            //odd: the Object param of getContents is not currently used
-            Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-            boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
-            if (hasTransferableText) {
-                try {
-                    s = (String)contents.getTransferData(DataFlavor.stringFlavor);
-                }
-                catch (UnsupportedFlavorException | IOException ignored){}
-            }
-            CopyPastImportExport.past(s, getCurrentTab());
+            currentTab.ifPresent(TabActions::past);
         }
     };
     private final GuiAction undoAction = new GuiAction("Undo", "Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {

@@ -109,4 +109,10 @@ public interface TabActions {
     void showChangeNameVisibility();
 
     void alignToGrid();
+
+    void copy();
+
+    void cut();
+
+    void past();
 }
