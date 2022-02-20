@@ -2153,9 +2153,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         @Override
         public void teardownManager() {
             //Remove all mouse-over menus if we exit animation mode
-            ArrayList<PetriNetObject> selection = TAPAALGUI.getCurrentTab().drawingSurface().getGuiModel().getPNObjects();
+            ArrayList<PetriNetObject> pnObjects = canvas.getGuiModel().getPNObjects();
 
-            for (PetriNetObject pn : selection) {
+            for (PetriNetObject pn : pnObjects) {
                 if (pn instanceof TimedPlaceComponent) {
                     TimedPlaceComponent place = (TimedPlaceComponent) pn;
                     place.showAgeOfTokens(false);
