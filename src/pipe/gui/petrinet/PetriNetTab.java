@@ -126,7 +126,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<>();
 
 
-	final UndoManager undoManager = new UndoManager();
+	final UndoManager undoManager = new UndoManager(this); //warning leaking this, should be ok as it only used after construction
 
     private final MutableReference<GuiFrameActions> app = new MutableReference<>();
     private final MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();

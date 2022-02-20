@@ -214,7 +214,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	private final List<File> files = new ArrayList<File>();
 	private BatchProcessingWorker currentWorker;
-	private final UndoManager undoManager = new UndoManager();
+	private final UndoManager undoManager = new UndoManager(null);
 	
 	private final Timer timer = new Timer(1000, new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
