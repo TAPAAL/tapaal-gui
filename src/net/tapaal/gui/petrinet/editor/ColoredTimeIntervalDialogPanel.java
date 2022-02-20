@@ -1,6 +1,5 @@
 package net.tapaal.gui.petrinet.editor;
 
-import net.tapaal.gui.petrinet.Context;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
@@ -65,8 +64,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         } catch (NumberFormatException e) {
             secondIsNumber = false;
         }
-        SpinnerNumberModel spinnerModelForFirstNumber = new SpinnerNumberModel(
-                first, 0, Integer.MAX_VALUE, 1);
+        SpinnerNumberModel spinnerModelForFirstNumber = new SpinnerNumberModel(first, 0, Integer.MAX_VALUE, 1);
 
         SpinnerNumberModel spinnerModelForSecondNumber;
         boolean isInf = secondNumber.equals("inf");
@@ -74,14 +72,12 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
             inf.setSelected(true);
             secondIntervalNumber.setEnabled(false);
             rightDelimiter.setEnabled(false);
-            spinnerModelForSecondNumber = new SpinnerNumberModel(0, 0,
-                    Integer.MAX_VALUE, 1);
+            spinnerModelForSecondNumber = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
         } else {
             inf.setSelected(false);
             secondIntervalNumber.setEnabled(true);
             rightDelimiter.setEnabled(true);
-            spinnerModelForSecondNumber = new SpinnerNumberModel(second, 0,
-                    Integer.MAX_VALUE, 1);
+            spinnerModelForSecondNumber = new SpinnerNumberModel(second, 0, Integer.MAX_VALUE, 1);
         }
         firstIntervalNumber.setModel(spinnerModelForFirstNumber);
         secondIntervalNumber.setModel(spinnerModelForSecondNumber);
@@ -129,22 +125,24 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         if (useConstantLeft) {
             String constantName = Objects.requireNonNull(leftConstantsComboBox.getSelectedItem()).toString();
             leftInterval = new ConstantBound(TAPAALGUI.getCurrentTab().network().getConstant(constantName));
-        } else
+        } else {
             leftInterval = new IntBound((Integer) firstIntervalNumber.getValue());
+        }
 
         if (useConstantRight) {
             String constantName = Objects.requireNonNull(rightConstantsComboBox.getSelectedItem()).toString();
             rightInterval = new ConstantBound(TAPAALGUI.getCurrentTab().network().getConstant(constantName));
-        } else if (inf.isSelected())
+        } else if (inf.isSelected()) {
             rightInterval = Bound.Infinity;
-        else
+        } else {
             rightInterval = new IntBound((Integer) secondIntervalNumber.getValue());
+        }
 
-        if (rightInterval instanceof Bound.InfBound
-                || leftInterval.value() <= rightInterval.value()) {
+        if (rightInterval instanceof Bound.InfBound || leftInterval.value() <= rightInterval.value()) {
             return new ColoredTimeInterval(
                     (leftDelim.equals("[")), leftInterval,
-                    rightInterval, (rightDelim.equals("]")), coloredTimeInterval.getColor());
+                    rightInterval, (rightDelim.equals("]")), coloredTimeInterval.getColor()
+                );
         } else {
             return oldGuard;
         }
@@ -152,8 +150,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
 
     private void initPanel() {
         guardEditPanel = new JPanel(new GridBagLayout());
-        guardEditPanel
-                .setBorder(BorderFactory.createTitledBorder("Time Guard"));
+        guardEditPanel.setBorder(BorderFactory.createTitledBorder("Time Guard"));
 
         label = new JLabel("Time Interval:");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -239,8 +236,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         gridBagConstraints.gridy = 1;
         guardEditPanel.add(secondIntervalNumber, gridBagConstraints);
 
-        Set<String> constants = TAPAALGUI.getCurrentTab().network()
-                .getConstantNames();
+        Set<String> constants = TAPAALGUI.getCurrentTab().network().getConstantNames();
         String[] constantArray = constants.toArray(new String[0]);
         Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 
