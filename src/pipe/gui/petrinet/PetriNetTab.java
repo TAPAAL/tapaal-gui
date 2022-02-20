@@ -1493,12 +1493,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
-	@Override
-	public void workflowAnalyse() {
-		//XXX prop. should take this as argument, insted of using static accessors //kyrke 2019-11-05
-		WorkflowDialog.showDialog();
-	}
-
 	public boolean isInAnimationMode() {
 		return animationmode;
 	}
@@ -2863,6 +2857,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
     }
 
+
+    @Override
+    public void workflowAnalyse() {
+        //XXX prop. should take this as argument, insted of using static accessors //kyrke 2019-11-05
+        WorkflowDialog.showDialog();
+    }
 
     // Workflow dialog
     public boolean restoreWorkflowDialog(){
