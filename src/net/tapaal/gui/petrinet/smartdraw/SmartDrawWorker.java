@@ -224,7 +224,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		return arcsForObject;
 	}
 	private void moveObject(PlaceTransitionObject object, Point point) {
-		Command command = new MovePlaceTransitionObjectCommand(object, point);
+		Command command = new MovePlaceTransitionObjectCommand(object, point, drawingSurface);
 		undoManager.addEdit(command);
 		command.redo();
 	}

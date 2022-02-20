@@ -3,6 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import java.awt.Point;
 
 import pipe.gui.TAPAALGUI;
+import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
 
 public class MovePlaceTransitionObjectCommand extends Command {
@@ -12,14 +13,17 @@ public class MovePlaceTransitionObjectCommand extends Command {
 	private final PlaceTransitionObject objectToBeMoved;
 	private final int oldY;
 	private final int oldX;
+    // XXX this should not be part of the state, change should be singaled in a better way
+    private final DrawingSurfaceImpl canvas;
 	
 	
-	public MovePlaceTransitionObjectCommand(PlaceTransitionObject object, Point point) {
+	public MovePlaceTransitionObjectCommand(PlaceTransitionObject object, Point point, DrawingSurfaceImpl canvas) {
 		objectToBeMoved = object;
 		this.newX = point.x;
 		this.newY = point.y;
         this.oldY = objectToBeMoved.getOriginalY();
         this.oldX = objectToBeMoved.getOriginalX();
+        this.canvas = canvas;
 	}
 
 	@Override
@@ -29,7 +33,7 @@ public class MovePlaceTransitionObjectCommand extends Command {
 
 		objectToBeMoved.updateOnMoveOrZoom();
 		objectToBeMoved.repaint();
-		TAPAALGUI.getDrawingSurface().updatePreferredSize();
+		canvas.updatePreferredSize();
 	}
 
 	@Override
@@ -39,8 +43,7 @@ public class MovePlaceTransitionObjectCommand extends Command {
 
 		objectToBeMoved.updateOnMoveOrZoom();
 		objectToBeMoved.repaint();
-		TAPAALGUI.getDrawingSurface().updatePreferredSize();
-
+		canvas.updatePreferredSize();
 	}
 
 }

@@ -1455,7 +1455,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             int x = Grid.getModifiedX(ptobject.getPositionX());
             int y = Grid.getModifiedY(ptobject.getPositionY());
             Point point = new Point(x, y);
-            Command command = new MovePlaceTransitionObjectCommand(ptobject, point);
+            Command command = new MovePlaceTransitionObjectCommand(ptobject, point, drawingSurface);
             command.redo();
             undoManager.addEdit(command);
             ptobject.updateOnMoveOrZoom();
