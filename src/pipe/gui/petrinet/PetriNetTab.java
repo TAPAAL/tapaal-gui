@@ -1533,7 +1533,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         try {
             ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 
-            String composedName = "composed-" + TAPAALGUI.getApp().getCurrentTabName();
+            String composedName = "composed-" + getTabTitle();
             composedName = composedName.replace(".tapn", "");
             TAPAALGUI.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
         } catch (Exception e1) {
