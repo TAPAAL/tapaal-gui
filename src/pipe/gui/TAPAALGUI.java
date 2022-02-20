@@ -54,21 +54,6 @@ public class TAPAALGUI {
 	}
 
 	@Deprecated
-	public static DataLayer getModel() {
-        return getModel(appGui.getSelectedTabIndex());
-	}
-
-	@Deprecated
-	private static DataLayer getModel(int index) {
-		if (index < 0) {
-			return null;
-		}
-
-		PetriNetTab tab = (tabs.get(index));
-		return tab.getModel();
-	}
-
-	@Deprecated
 	public static void addTab (PetriNetTab tab ) {
 		tabs.add(tab);
 	}
