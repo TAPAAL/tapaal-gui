@@ -62,9 +62,9 @@ public abstract class AbstractDrawingSurfaceManager {
     }
 
     public final void deregisterManager(){
+        teardownManager(); // Theardown before removing references
         this.canvas = null;
         this.guiModelManager = null;
-        teardownManager();
     }
 
     public void setupManager(){}

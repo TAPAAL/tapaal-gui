@@ -1811,7 +1811,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         protected void transitionClicked(TimedTransitionComponent pno, MouseEvent e) {
             if (place != null && transition == null) {
                 transition = pno;
-                TAPAALGUI.getDrawingSurface().clearAllPrototype();
+                canvas.clearAllPrototype();
                 var result = guiModelManager.addInhibitorArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -1827,7 +1827,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                canvas.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -1837,7 +1837,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            TAPAALGUI.getDrawingSurface().clearAllPrototype();
+            canvas.clearAllPrototype();
             place = null;
             transition = null;
             arc = null;
@@ -1917,8 +1917,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (arc!=null) {
                 if (!e.isControlDown()) {
                     Point p = e.getPoint();
-                    int x = Zoomer.getUnzoomedValue(p.x, TAPAALGUI.getDrawingSurface().getZoom());
-                    int y = Zoomer.getUnzoomedValue(p.y, TAPAALGUI.getDrawingSurface().getZoom());
+                    int x = Zoomer.getUnzoomedValue(p.x, canvas.getZoom());
+                    int y = Zoomer.getUnzoomedValue(p.y, canvas.getZoom());
 
                     boolean shiftDown = e.isShiftDown();
                     //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
@@ -2005,13 +2005,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                canvas.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (place != null && transition == null) {
                 transition = pno;
-                TAPAALGUI.getDrawingSurface().clearAllPrototype();
+                canvas.clearAllPrototype();
                 var result = guiModelManager.addTimedInputArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2024,7 +2024,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                    canvas.addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2041,13 +2041,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                canvas.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place == null) {
                 place = pno;
-                TAPAALGUI.getDrawingSurface().clearAllPrototype();
+                canvas.clearAllPrototype();
                 var result = guiModelManager.addTimedOutputArc(canvas.getGuiModel(), transition, place, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2060,7 +2060,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                    canvas.addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2071,7 +2071,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            TAPAALGUI.getDrawingSurface().clearAllPrototype();
+            canvas.clearAllPrototype();
             place = null;
             transition = null;
             arc = null;
@@ -2206,7 +2206,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                canvas.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2222,13 +2222,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                canvas.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place2 == null) {
                 place2 = pno;
-                TAPAALGUI.getDrawingSurface().clearAllPrototype();
+                canvas.clearAllPrototype();
                 var result = guiModelManager.addTimedTransportArc(canvas.getGuiModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2241,7 +2241,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                    canvas.addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2252,7 +2252,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            TAPAALGUI.getDrawingSurface().clearAllPrototype();
+            canvas.clearAllPrototype();
             place1 = place2 = null;
             transition = null;
             arc = arc1 = arc2 = null;
