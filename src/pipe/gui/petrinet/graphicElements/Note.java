@@ -156,14 +156,11 @@ public abstract class Note extends PetriNetObject {
 				/ Zoomer.getScaleFactor(getZoom()));
 	}
 
-	// 
 	@Override
 	public void addedToGui() {
-		if (TAPAALGUI.getDrawingSurface() != null) {
-			setDeleted(false);
-			updateBounds();
-		}
-	}
+        setDeleted(false);
+        updateBounds();
+    }
 
 	@Override
 	public void removedFromGui() {
