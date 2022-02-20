@@ -393,7 +393,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-
     private final GuiAction selectAllAction = new GuiAction("Select all", "Select all components", KeyStroke.getKeyStroke('A', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabActions::selectAll);
@@ -428,8 +427,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabActions::stepBackwards);
         }
     };
-
-
     private final GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabActions::previousComponent);
@@ -631,7 +628,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         menuBar.add(buildMenuHelp());
 
         setJMenuBar(menuBar);
-
     }
 
 
@@ -894,11 +890,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         getContentPane().add(toolBarPaneltmp, BorderLayout.PAGE_START);
     }
 
-    /**
-     * @param zoomMenu - the menu to add the submenu to
-     * @author Ben Kirby Takes the method of setting up the Zoom menu out of the
-     * main buildMenus method.
-     */
     private void addZoomMenuItems(JMenu zoomMenu) {
         for (int i = 0; i <= zoomLevels.length - 1; i++) {
 
@@ -911,17 +902,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             zoomMenu.add(newZoomAction);
         }
-
-
     }
 
-    /**
-     * @param toolBar the JToolBar to add the button to
-     * @param action  the action that the ZoomComboBox performs
-     * @author Ben Kirby Just takes the long-winded method of setting up the
-     * ComboBox out of the main buildToolbar method. Could be adapted
-     * for generic addition of comboboxes
-     */
     private void addZoomComboBox(JToolBar toolBar, Action action) {
         Dimension zoomComboBoxDimension = new Dimension(100, 28);
 
@@ -931,7 +913,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             zoomExamplesStrings[i] = zoomLevels[i] + "%";
         }
 
-        zoomComboBox = new JComboBox<String>(zoomExamplesStrings);
+        zoomComboBox = new JComboBox<>(zoomExamplesStrings);
         zoomComboBox.setEditable(true);
         zoomComboBox.setSelectedItem("100%");
         zoomComboBox.setMaximumRowCount(zoomLevels.length);
@@ -962,10 +944,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     /**
      * Sets all buttons to enabled or disabled according to the current GUImode.
-     * <p>
-     * Reimplementation of old enableGUIActions(bool status)
-     *
-     * @author Kenneth Yrke Joergensen (kyrke)
+     * Reimplementation of old enableGUIActions(bool status) method.
      */
     private void enableGUIActions(GUIMode mode) {
         switch (mode) {
@@ -1426,6 +1405,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         super.setTitle((title == null) ? frameTitle : frameTitle + ": " + title);
     }
 
+    @Deprecated
     public boolean isEditionAllowed() {
         return !getCurrentTab().isInAnimationMode();
     }
