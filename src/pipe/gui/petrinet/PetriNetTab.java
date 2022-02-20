@@ -1,36 +1,8 @@
 package pipe.gui.petrinet;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
-import java.io.*;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-
-import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.Parsing.ParseException;
+import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
-import net.tapaal.gui.GuiFrameActions;
-import net.tapaal.gui.GuiFrameControllerActions;
-import net.tapaal.gui.SafeGuiFrameActions;
-import net.tapaal.gui.TabActions;
-import net.tapaal.gui.petrinet.TAPNLens;
-import net.tapaal.gui.petrinet.model.ModelViolation;
-import net.tapaal.gui.petrinet.model.Result;
-import net.tapaal.gui.petrinet.NameGenerator;
-import net.tapaal.gui.petrinet.TabTransformer;
-import net.tapaal.gui.petrinet.editor.TemplateExplorer;
-import net.tapaal.gui.petrinet.model.GuiModelManager;
-import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
-import net.tapaal.gui.petrinet.dialog.NameVisibilityPanel;
-import net.tapaal.gui.petrinet.dialog.StatisticsPanel;
-import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
@@ -42,37 +14,68 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.Preferences;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
+import net.tapaal.gui.GuiFrameActions;
+import net.tapaal.gui.GuiFrameControllerActions;
+import net.tapaal.gui.SafeGuiFrameActions;
+import net.tapaal.gui.TabActions;
+import net.tapaal.gui.petrinet.NameGenerator;
+import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.TabTransformer;
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
+import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
+import net.tapaal.gui.petrinet.dialog.NameVisibilityPanel;
+import net.tapaal.gui.petrinet.dialog.StatisticsPanel;
+import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
+import net.tapaal.gui.petrinet.dialog.WorkflowDialog;
+import net.tapaal.gui.petrinet.editor.ConstantsPane;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel;
+import net.tapaal.gui.petrinet.editor.TemplateExplorer;
+import net.tapaal.gui.petrinet.model.GuiModelManager;
+import net.tapaal.gui.petrinet.model.ModelViolation;
+import net.tapaal.gui.petrinet.model.Result;
 import net.tapaal.gui.petrinet.undo.ChangeSpacingEditCommand;
+import net.tapaal.gui.petrinet.undo.Command;
+import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.*;
+import net.tapaal.gui.petrinet.widgets.QueryPane;
+import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.swinghelpers.JSplitPaneFix;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
-import pipe.gui.petrinet.dataLayer.DataLayer;
-import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import net.tapaal.gui.petrinet.Template;
-import pipe.gui.*;
-import pipe.gui.petrinet.action.GuiAction;
+import pipe.gui.Constants;
+import pipe.gui.GuiFrame;
+import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.canvas.Grid;
 import pipe.gui.canvas.Zoomer;
+import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.petrinet.animation.AnimationControlSidePanel;
 import pipe.gui.petrinet.animation.AnimationHistoryList;
 import pipe.gui.petrinet.animation.AnimationHistorySidePanel;
 import pipe.gui.petrinet.animation.Animator;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.*;
 import pipe.gui.petrinet.graphicElements.tapn.*;
 import pipe.gui.petrinet.undo.UndoManager;
-import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
-import net.tapaal.gui.petrinet.editor.ConstantsPane;
-import net.tapaal.gui.petrinet.widgets.QueryPane;
-import net.tapaal.gui.petrinet.dialog.WorkflowDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.*;
 
 public class PetriNetTab extends JSplitPane implements TabActions {
 
@@ -1442,7 +1445,24 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         isSelectedComponentOption = panel.isSelectedComponentOption();
     }
 
-	@Override
+    @Override
+    public void alignToGrid() {
+        ArrayList<PetriNetObject> petriNetObjects = drawingSurface.getGuiModel().getPlaceTransitionObjects();
+        undoManager.newEdit();
+
+        for (PetriNetObject object : petriNetObjects) {
+            PlaceTransitionObject ptobject = (PlaceTransitionObject) object;
+            int x = Grid.getModifiedX(ptobject.getPositionX());
+            int y = Grid.getModifiedY(ptobject.getPositionY());
+            Point point = new Point(x, y);
+            Command command = new MovePlaceTransitionObjectCommand(ptobject, point);
+            command.redo();
+            undoManager.addEdit(command);
+            ptobject.updateOnMoveOrZoom();
+        }
+    }
+
+    @Override
 	public void importSUMOQueries() {
 		File[] files = FileBrowser.constructor("Import SUMO", "txt", FileBrowser.userPath).openFiles();
 		for(File f : files){

@@ -224,7 +224,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction alignToGrid = new GuiAction("Align To Grid", "Align Petri net objects to current grid", KeyStroke.getKeyStroke("shift G")) {
         public void actionPerformed(ActionEvent e) {
-            Grid.alignPNObjectsToGrid();
+            currentTab.ifPresent(TabActions::alignToGrid);
         }
     };
     private final GuiAction netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {

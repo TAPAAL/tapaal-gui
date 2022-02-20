@@ -26,8 +26,7 @@ public class MovePlaceTransitionObjectCommand extends Command {
 	public void undo() {
 		objectToBeMoved.setOriginalX(oldX);
 		objectToBeMoved.setOriginalY(oldY);
-		
-		
+
 		objectToBeMoved.updateOnMoveOrZoom();
 		objectToBeMoved.repaint();
 		TAPAALGUI.getDrawingSurface().updatePreferredSize();
@@ -37,7 +36,6 @@ public class MovePlaceTransitionObjectCommand extends Command {
 	public void redo() {
 		objectToBeMoved.setOriginalX(newX);
 		objectToBeMoved.setOriginalY(newY);
-		
 
 		objectToBeMoved.updateOnMoveOrZoom();
 		objectToBeMoved.repaint();

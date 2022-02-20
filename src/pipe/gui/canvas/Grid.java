@@ -102,23 +102,5 @@ public class Grid {
 		}
 		return (int) (Math.round(y / gridSpacing) * gridSpacing);
 	}
-	
-	public static void alignPNObjectsToGrid() {
-		ArrayList<PetriNetObject> petriNetObjects = TAPAALGUI.getDrawingSurface().getGuiModel().getPlaceTransitionObjects();
-		UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
-		undoManager.newEdit();
-		
-		for(PetriNetObject object : petriNetObjects) {
-			PlaceTransitionObject ptobject = (PlaceTransitionObject)object;
-			int x = Grid.getModifiedX(ptobject.getPositionX());
-			int y = Grid.getModifiedY(ptobject.getPositionY());
-			Point point = new Point(x,y);
-			Command command = new MovePlaceTransitionObjectCommand(ptobject, point);
-			command.redo();
-			undoManager.addEdit(command);
-			ptobject.updateOnMoveOrZoom();
-		}
-		
-	}
 
 }
