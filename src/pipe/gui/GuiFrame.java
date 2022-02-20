@@ -1446,10 +1446,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
      * called from other sources, a duplicate ZoomAction is not called
      */
     @Override
-    public void updateZoomCombo() {
+    public void updateZoomCombo(int zoom) {
         ActionListener zoomComboListener = (zoomComboBox.getActionListeners())[0];
         zoomComboBox.removeActionListener(zoomComboListener);
-        zoomComboBox.setSelectedItem(getCurrentTab().drawingSurface().getZoomController().getPercent() + "%");
+        zoomComboBox.setSelectedItem(zoom + "%");
         zoomComboBox.addActionListener(zoomComboListener);
     }
 

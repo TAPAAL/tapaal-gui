@@ -429,7 +429,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 				} else {
 					view.zoomOut();
 				}
-				TAPAALGUI.getAppGui().updateZoomCombo();
+				TAPAALGUI.getAppGui().updateZoomCombo(TAPAALGUI.getCurrentTab().currentTemplate().zoomer().getPercent());
 			} else {
 				//Dispatch Event to scroll pane to allow scrolling up/down. -- kyrke
 				getParent().dispatchEvent(e);
