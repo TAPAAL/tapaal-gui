@@ -27,8 +27,8 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
     JSpinner secondIntervalNumber;
     JSpinner firstIntervalNumber;
     JCheckBox leftUseConstant;
-    JComboBox leftConstantsComboBox;
-    JComboBox rightConstantsComboBox;
+    JComboBox<String> leftConstantsComboBox;
+    JComboBox<String> rightConstantsComboBox;
     JCheckBox rightUseConstant;
     final int maxNumberOfPlacesToShowAtOnce = 20;
 
@@ -256,7 +256,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         guardEditPanel.add(leftUseConstant, gridBagConstraints);
 
 
-        leftConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
+        leftConstantsComboBox = new WidthAdjustingComboBox<>(maxNumberOfPlacesToShowAtOnce);
         leftConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
 
         leftConstantsComboBox.setMaximumRowCount(20);
@@ -291,7 +291,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
 
         guardEditPanel.add(rightUseConstant, gridBagConstraints);
 
-        rightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
+        rightConstantsComboBox = new WidthAdjustingComboBox<>(maxNumberOfPlacesToShowAtOnce);
         rightConstantsComboBox.setModel(new DefaultComboBoxModel<>(constantArray));
         rightConstantsComboBox.setMaximumRowCount(20);
         rightConstantsComboBox.setVisible(false);
