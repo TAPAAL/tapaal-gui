@@ -229,10 +229,10 @@ public class VerifyTAPN implements ModelChecker {
         ExportedVerifyTAPNModel exportedModel;
         if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
             VerifyTAPNExporter exporter = new VerifyTACPNExporter();
-            exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+            exportedModel = exporter.export(model.value1(), query, lens, model.value2(), guiModel, dataLayerQuery);
         } else {
             VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-            exportedModel = exporter.export(model.value1(), query, TAPAALGUI.getCurrentTab().getLens(),model.value2(), guiModel, dataLayerQuery);
+            exportedModel = exporter.export(model.value1(), query, lens, model.value2(), guiModel, dataLayerQuery);
         }
 
         if (exportedModel == null) {

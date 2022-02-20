@@ -242,7 +242,7 @@ public class VerifyPN implements ModelChecker {
         } else {
             exporter = new VerifyPNExporter();
         }
-        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2(), guiModel, dataLayerQuery);
+        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, lens, model.value2(), guiModel, dataLayerQuery);
 
         if (exportedModel == null) {
             messenger.displayErrorMessage("There was an error exporting the model");
