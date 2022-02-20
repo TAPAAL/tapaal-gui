@@ -134,6 +134,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     final MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
 	public final GuiModelManager guiModelManager = new GuiModelManager(this);
 
+    private final Animator animator = new Animator(this);
     /**
 	 * Creates a new tab with the selected filestream
 	 */
@@ -678,7 +679,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     private void createAnimatorSplitPane() {
 
-        animationHistorySidePanel = new AnimationHistorySidePanel();
+        animationHistorySidePanel = new AnimationHistorySidePanel(animator);
 
         if (animControlerBox == null) {
             createAnimationControlSidePanel();
@@ -1525,9 +1526,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public Animator getAnimator() {
 		return animator;
 	}
-
-	private final Animator animator = new Animator(this);
-
 
     @Override
     public void mergeNetComponents() {

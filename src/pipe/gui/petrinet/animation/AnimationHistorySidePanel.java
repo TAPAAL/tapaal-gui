@@ -10,9 +10,11 @@ import java.awt.event.MouseEvent;
 public class AnimationHistorySidePanel extends JPanel {
 
     private AnimationHistoryList animBox;
+    private Animator animator;
 
-    public AnimationHistorySidePanel() {
+    public AnimationHistorySidePanel(Animator animator) {
         super();
+        this.animator = animator;
 
         initComponents();
     }
@@ -41,18 +43,18 @@ public class AnimationHistorySidePanel extends JPanel {
 
                     if (clicked != -1) {
                         int steps = clicked - selected;
-                        Animator anim = TAPAALGUI.getAnimator();
+
                         if (steps < 0) {
                             for (int i = 0; i < Math.abs(steps); i++) {
-                                anim.stepBack();
+                                animator.stepBack();
                             }
                         } else {
                             for (int i = 0; i < Math.abs(steps); i++) {
-                                anim.stepForward();
+                                animator.stepForward();
                             }
                         }
 
-                        anim.blinkSelected(animBox.getSelectedValue());
+                        animator.blinkSelected(animBox.getSelectedValue());
                     }
                 }
                 // Remove focus
