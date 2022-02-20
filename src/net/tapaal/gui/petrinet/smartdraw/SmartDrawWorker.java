@@ -12,9 +12,9 @@ import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
 import dk.aau.cs.util.Require;
 import pipe.gui.Constants;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.canvas.DrawingSurfaceImpl;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.*;
 import pipe.gui.petrinet.undo.UndoManager;
 import pipe.gui.petrinet.undo.DeleteArcPathPointEditCommand;
@@ -25,7 +25,9 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	PlaceTransitionObject startingObject;
 	final int xSpacing;
 	final int ySpacing;
+    //XXX: refactor to only take DataLayer, drawingSurface should not be needed
 	final DrawingSurfaceImpl drawingSurface;
+    final DataLayer model;
 	final String searchOption;
 	Point rootPoint;
 	Point rightMostPointUsed = new Point(0, 0);
@@ -33,7 +35,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
     ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
 	final ArrayList<Point> pointsReserved = new ArrayList<Point>();
-	final UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
+	final UndoManager undoManager;
 	
 	//weights
     final int diagonalWeight;
@@ -42,7 +44,6 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	final int overlappingArcWeight;
 	final int minimumIterations;
 
-	
 	//For BFS
     final ArrayList<PlaceTransitionObject> newlyPlacedObjects = new ArrayList<PlaceTransitionObject>();
 
@@ -50,26 +51,40 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	ArrayList<PlaceTransitionObject> unfinishedObjects = new ArrayList<PlaceTransitionObject>();
 	ArrayList<Arc> arcsVisited = new ArrayList<Arc>();
 	
-	public SmartDrawWorker(int xSpacing, int ySpacing, DrawingSurfaceImpl drawingSurface, String searchOption, 
-			int straightWeight, int diagonalWeight, int distanceWeight, int overlappingArcWeight, String startingObject, int minimumIterations) {
+	public SmartDrawWorker(
+            DrawingSurfaceImpl drawingSurface,
+            DataLayer model,
+            UndoManager undoManager, //XXX: we should prefer using the guiModelManager Instead
+            int xSpacing,
+            int ySpacing,
+            String searchOption,
+			int straightWeight,
+            int diagonalWeight,
+            int distanceWeight,
+            int overlappingArcWeight,
+            String startingObject,
+            int minimumIterations
+    ) {
+        this.drawingSurface = drawingSurface;
+        this.model = model;
+        this.undoManager = undoManager;
+
 		this.xSpacing = xSpacing;
 		this.ySpacing = ySpacing;
-		this.drawingSurface = drawingSurface;
 		this.searchOption = searchOption;
 		this.straightWeight = straightWeight;
 		this.diagonalWeight = diagonalWeight;
 		this.distanceWeight = distanceWeight;
 		this.overlappingArcWeight = overlappingArcWeight;
 		this.minimumIterations = minimumIterations;
-		
-			
+
 		getPlaceTransitionObjects(); 
 		processStartingObject(startingObject);
 	}
 	
 	private void processStartingObject(String startingObject) {
 		if(!(startingObject.equals("Random")))
-			this.startingObject = drawingSurface.getGuiModel().getPlaceTransitionObjectByName(startingObject);
+			this.startingObject = model.getPlaceTransitionObjectByName(startingObject);
 		else {
 			try {
 				this.startingObject = placeTransitionObjects.get(new Random().nextInt(placeTransitionObjects.size()-1));
@@ -82,14 +97,11 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	@Override
 	public Void doInBackground() throws Exception {
 		undoManager.newEdit();		
-		
-		
+
 		arcsVisited = new ArrayList<Arc>();
 		objectsPlaced = new ArrayList<PlaceTransitionObject>();
 		
 		fireStartDraw();
-		
-		
 
 		//Do for unconnected nets too
 		while(!(objectsPlaced.containsAll(placeTransitionObjects))) {
@@ -304,7 +316,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 				
 				//newObject --- S ---> T
 				else if((distancePointSource + distanceTargetSource) == distanceTargetPoint) {
-					for(PetriNetObject pNetObject : drawingSurface.getGuiModel().getPNObjects()) {
+					for(PetriNetObject pNetObject : model.getPNObjects()) {
 						if(pNetObject instanceof Arc) {
 							Arc arc = (Arc)pNetObject;
 							if((arc.getSource() == objectToPlace && arc.getTarget() == placedArc.getTarget()) 
@@ -317,7 +329,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 				
 				//newObject --- T ---> S
 				else if((distanceTargetSource + distanceTargetPoint == distancePointSource)) {
-					for(PetriNetObject pNetObject : drawingSurface.getGuiModel().getPNObjects()) {
+					for(PetriNetObject pNetObject : model.getPNObjects()) {
 						if(pNetObject instanceof Arc) {
 							Arc arc = (Arc)pNetObject;
 							if((arc.getSource() == objectToPlace && arc.getTarget() == placedArc.getSource()) 
@@ -381,7 +393,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	
 	private void removeArcPathPoints() {
 		ArrayList<ArcPathPoint> toRemove = new ArrayList<ArcPathPoint>();
-		for(PetriNetObject object : TAPAALGUI.getDrawingSurface().getGuiModel().getPNObjects()) {
+		for(PetriNetObject object : model.getPNObjects()) {
 			if(object instanceof ArcPathPoint) {
 				ArcPathPoint arcPathPoint = (ArcPathPoint)object;
 				if(!(arcPathPoint.isEndPoint())) {
@@ -391,7 +403,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 
 		}
 		for(ArcPathPoint p : toRemove) {
-			Command command = new DeleteArcPathPointEditCommand(p.getArcPath().getArc(), p, p.getIndex(), TAPAALGUI.getModel());
+			Command command = new DeleteArcPathPointEditCommand(p.getArcPath().getArc(), p, p.getIndex(), model);
 			command.redo();
 			undoManager.addEdit(command);
 		}
@@ -401,7 +413,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		for(PlaceTransitionObject ptObject : placeTransitionObjects) {
 			if(ptObject instanceof Transition) {
 				Transition transition = (Transition)ptObject;
-				int newAngle = 0 - transition.getAngle();
+				int newAngle = -transition.getAngle();
 				Command command = new TransitionRotationEditCommand(transition, newAngle);
 				command.redo();
 				undoManager.addEdit(command);
@@ -429,11 +441,11 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
     //XXX: out bad handeling of zoom bleads over we need to adjust point relative to zoom
     // midpoint is at current zoom level, but when creaing a new point its coords is at 100% zoom
 	private double unzoom(double pos) {
-	    return Zoomer.getUnzoomedValue(pos, TAPAALGUI.getDrawingSurface().getZoom());
+	    return Zoomer.getUnzoomedValue(pos, drawingSurface.getZoom());
     }
     //XXX: when setting nameoffset the position is unzoomed, so we zoom it first so it gets the value we want
     private double zoom(double pos){
-	    return Zoomer.getZoomedValue(pos, TAPAALGUI.getDrawingSurface().getZoom());
+	    return Zoomer.getZoomedValue(pos, drawingSurface.getZoom());
     }
 	/*
 	 * Add arcPathPoints for arcs where
@@ -463,7 +475,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	
 	private void getPlaceTransitionObjects() {
 		placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
-		for(PetriNetObject object : drawingSurface.getGuiModel().getPlaceTransitionObjects()) {
+		for(PetriNetObject object : model.getPlaceTransitionObjects()) {
 			if(object instanceof PlaceTransitionObject) {
 				PlaceTransitionObject ptObject = (PlaceTransitionObject) object;
 				placeTransitionObjects.add(ptObject);
@@ -471,7 +483,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		}
 	}
 	public void resetLabelsToDefault() {
-		for(PetriNetObject pNetObject : drawingSurface.getGuiModel().getPNObjects()) {
+		for(PetriNetObject pNetObject : model.getPNObjects()) {
 			if(pNetObject instanceof PlaceTransitionObject) {
 				Command cmd = new UpdateNameLabelOffsetCommand((int)zoom(Constants.DEFAULT_OFFSET_X), (int)zoom(Constants.DEFAULT_OFFSET_Y), ((PlaceTransitionObject) pNetObject).getNameOffsetX(),
 																((PlaceTransitionObject) pNetObject).getNameOffsetY(), (PetriNetObjectWithLabel) pNetObject);
@@ -517,11 +529,11 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	
 	@Override
 	protected void done(){
-		if(objectsPlaced.size() == drawingSurface.getGuiModel().getPlaceTransitionObjects().size()) {
+		if(objectsPlaced.size() == model.getPlaceTransitionObjects().size()) {
 			setTransitionsToUpright();
 			doOffsetForLoops();
-			TAPAALGUI.getModel().repaintAll(true);
-			TAPAALGUI.getDrawingSurface().updatePreferredSize();
+			model.repaintAll(true);
+			drawingSurface.updatePreferredSize();
 			fireDone(false);
 		} else {
 			fireDone(true);

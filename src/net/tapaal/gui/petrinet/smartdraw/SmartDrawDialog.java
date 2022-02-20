@@ -20,6 +20,7 @@ import net.tapaal.gui.petrinet.Template;
 import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.TAPAALGUI;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
 public class SmartDrawDialog extends JDialog {
@@ -183,14 +184,29 @@ public class SmartDrawDialog extends JDialog {
 		drawButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+                DataLayer model = TAPAALGUI.getDrawingSurface().getGuiModel();
+                int modelSize = model.getPlaceTransitionObjects().size();
+
 				initLoadingFrame();
-				worker = new SmartDrawWorker(xSpacing, ySpacing, TAPAALGUI.getDrawingSurface(), searchOption,
-						straightWeight, diagonalWeight, distanceWeight, overlappingArcWeight, startingObject, minimumIterations);
+				worker = new SmartDrawWorker(
+                    TAPAALGUI.getDrawingSurface(),
+                    model,
+                    TAPAALGUI.getCurrentTab().getUndoManager(),
+                    xSpacing,
+                    ySpacing,
+                    searchOption,
+                    straightWeight,
+                    diagonalWeight,
+                    distanceWeight,
+                    overlappingArcWeight,
+                    startingObject,
+                    minimumIterations
+                );
 				worker.addSmartDrawListener(new SmartDrawListener() {
 					
 					@Override
 					public void fireStatusChanged(int objectsPlaced) {
-						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + TAPAALGUI.getDrawingSurface().getGuiModel().getPlaceTransitionObjects().size());
+						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + modelSize);
 					}
 					
 					@Override
