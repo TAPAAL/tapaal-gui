@@ -283,7 +283,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent arg0) {
             currentTab.ifPresent(TabActions::deleteSelection);
         }
-
     };
 
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
