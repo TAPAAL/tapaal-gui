@@ -472,7 +472,7 @@ public class QueryPane extends JPanel implements SidePane {
 		try {
 			tempFile = File.createTempFile(TAPAALGUI.getAppGui().getCurrentTabName(), ".xml");
 
-			PetriNetTab tab = TAPAALGUI.getApp().getCurrentTab();
+			PetriNetTab tab = TAPAALGUI.getCurrentTab();
 			tab.writeNetToFile(tempFile, selectedQueries, tab.getLens());
 			BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();

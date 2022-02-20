@@ -1805,7 +1805,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return appTab.getSelectedIndex();
     }
 
-    public PetriNetTab getCurrentTab() {
+    private PetriNetTab getCurrentTab() {
         return TAPAALGUI.getCurrentTab();
     }
 
