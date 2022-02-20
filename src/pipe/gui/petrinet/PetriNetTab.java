@@ -1457,6 +1457,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         List<ColorType> listColorTypes = context.network().colorTypes();
         List<Variable> variableList = context.network().variables();
+        List<Constant> constantsList = new ArrayList<>(context.network().constants());
 
         getColorTypesFormattedString(listColorTypes, buffer);
 
@@ -1465,6 +1466,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
 
         getVariablesFormattedString(variableList, buffer);
+
+        if(!constantsList.isEmpty()) {
+            buffer.append("<br><br>");
+        }
+
+        getConstantsFormattedString(constantsList, buffer);
 
         JLabel label = new JLabel("<html>" + buffer + "</html>");
         label.setFont(new Font(label.getFont().getName(), Font.PLAIN, label.getFont().getSize()));
@@ -1529,6 +1536,19 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             }
         }
         return buffer.toString();
+    }
+
+    private String getConstantsFormattedString(List<Constant> constantsList, StringBuilder buffer){
+        for(int i = 0; i < constantsList.size(); i++) {
+            if(i == 0) {
+                buffer.append("Constants:<br>");
+            }
+            buffer.append(constantsList.get(i).toString());
+            if(i != constantsList.size() - 1) {
+                buffer.append("<br>");
+            }
+        }
+	    return buffer.toString();
     }
 
     @Override

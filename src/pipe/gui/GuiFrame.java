@@ -244,7 +244,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::clearPreferences);
         }
     };
-    private final GuiAction showColorTypesVariables = new GuiAction("Show color types/variables", "Opens a floating window showing the global color types/variables for the net.", KeyStroke.getKeyStroke(KeyEvent.VK_0, shortcutkey)) {
+    private final GuiAction showColorTypesVariables = new GuiAction("Show color types/variables/constants", "Opens a floating window showing the global color types/variables/constants for the net.", KeyStroke.getKeyStroke(KeyEvent.VK_0, shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             currentTab.ifPresent(TabActions::showColorTypesVariables);
         }
