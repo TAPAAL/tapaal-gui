@@ -74,7 +74,7 @@ public class TAPAALGUI {
 	}
 
 	@Deprecated
-	public static DrawingSurfaceImpl getDrawingSurface(int index) {
+	private static DrawingSurfaceImpl getDrawingSurface(int index) {
 
 		if (index < 0) {
 			return null;
