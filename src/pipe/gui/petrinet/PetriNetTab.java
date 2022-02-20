@@ -135,6 +135,21 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public final GuiModelManager guiModelManager = new GuiModelManager(this);
 
     private final Animator animator = new Animator(this);
+    private boolean netChanged = false;
+    @Override
+    public boolean getNetChanged() {
+        return netChanged;
+    }
+
+    public void setNetChanged(boolean _netChanged) {
+        netChanged = _netChanged;
+    }
+    private final NameGenerator nameGenerator = new NameGenerator();
+
+    public NameGenerator getNameGenerator() {
+        return nameGenerator;
+    }
+
     /**
 	 * Creates a new tab with the selected filestream
 	 */
@@ -1205,34 +1220,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public static void setSimulatorModelRoot(Split model){
 		simulatorModelRoot = model;
 	}
-
-	public boolean restoreWorkflowDialog(){
-		return workflowDialog != null && workflowDialog.restoreWindow();
-	}
-
-	public WorkflowDialog getWorkflowDialog() {
-		return workflowDialog;
-	}
-
-	public void setWorkflowDialog(WorkflowDialog dialog) {
-		this.workflowDialog = dialog;
-	}
-
-	private boolean netChanged = false;
-	@Override
-	public boolean getNetChanged() {
-		return netChanged;
-	}
-
-	public void setNetChanged(boolean _netChanged) {
-		netChanged = _netChanged;
-	}
-
-    private final NameGenerator nameGenerator = new NameGenerator();
-
-    public NameGenerator getNameGenerator() {
-        return nameGenerator;
-    }
 
     public void changeToTemplate(Template tapn) {
 		Require.notNull(tapn, "Can't change to a Template that is null");
@@ -2876,4 +2863,15 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
     }
 
+
+    // Workflow dialog
+    public boolean restoreWorkflowDialog(){
+        return workflowDialog != null && workflowDialog.restoreWindow();
+    }
+    public WorkflowDialog getWorkflowDialog() {
+        return workflowDialog;
+    }
+    public void setWorkflowDialog(WorkflowDialog dialog) {
+        this.workflowDialog = dialog;
+    }
 }
