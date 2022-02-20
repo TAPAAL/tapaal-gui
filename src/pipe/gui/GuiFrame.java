@@ -1057,12 +1057,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 gameFeatureOptions.setEnabled(false);
                 colorFeatureOptions.setEnabled(false);
 
-
-                // Remove constant highlight
-                getCurrentTab().removeConstantHighlights();
-
-                getCurrentTab().getAnimationController().requestFocusInWindow();
-
                 //Enable simulator focus traversal policy
                 setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
 
