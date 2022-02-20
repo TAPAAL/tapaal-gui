@@ -59,7 +59,7 @@ public class TAPAALGUI {
 	}
 
 	@Deprecated
-	public static DataLayer getModel(int index) {
+	private static DataLayer getModel(int index) {
 		if (index < 0) {
 			return null;
 		}
@@ -69,30 +69,8 @@ public class TAPAALGUI {
 	}
 
 	@Deprecated
-	public static DrawingSurfaceImpl getDrawingSurface() {
-		return getDrawingSurface(appGui.getSelectedTabIndex());
-	}
-
-	@Deprecated
-	private static DrawingSurfaceImpl getDrawingSurface(int index) {
-
-		if (index < 0) {
-			return null;
-		}
-
-		PetriNetTab tab = (tabs.get(index));
-
-		return tab.drawingSurface();
-	}
-
-	@Deprecated
 	public static void addTab (PetriNetTab tab ) {
 		tabs.add(tab);
-	}
-
-	@Deprecated
-	public static void removeTab(int index) {
-		tabs.remove(index);
 	}
 
 	@Deprecated
@@ -101,7 +79,7 @@ public class TAPAALGUI {
 	}
 
 	@Deprecated
-	public static PetriNetTab getTab(int index) {
+	private static PetriNetTab getTab(int index) {
 		if (index < 0) {
 			return null;
 		}
