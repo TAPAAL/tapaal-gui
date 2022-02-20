@@ -682,10 +682,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         animationHistorySidePanel = new AnimationHistorySidePanel(animator);
 
         if (animControlerBox == null) {
-            createAnimationControlSidePanel();
+            animControlerBox = new AnimationControlSidePanel(animator, lens);
         }
 		if (transitionFiring == null) {
-            createTransitionFiring();
+            transitionFiring = new TransitionFiringComponent(TAPAALGUI.getApp().isShowingDelayEnabledTransitions(), lens, animator);
         }
 
 		boolean floatingDividers = false;
@@ -829,19 +829,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		animatorSplitPane.validate();
 	}
 
-	private void createAnimationControlSidePanel() {
-		animControlerBox = new AnimationControlSidePanel(animator, lens);
-	}
-
-	public AnimationHistoryList getAnimationHistorySidePanel() {
+    public AnimationHistoryList getAnimationHistorySidePanel() {
 		return animationHistorySidePanel.getAnimationHistoryList();
 	}
 
-	private void createTransitionFiring() {
-		transitionFiring = new TransitionFiringComponent(TAPAALGUI.getApp().isShowingDelayEnabledTransitions(), lens);
-	}
-
-	public TransitionFiringComponent getTransitionFiringComponent() {
+    public TransitionFiringComponent getTransitionFiringComponent() {
 		return transitionFiring;
 	}
 

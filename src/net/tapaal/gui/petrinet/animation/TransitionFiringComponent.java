@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import net.tapaal.gui.petrinet.TAPNLens;
+import pipe.gui.petrinet.animation.Animator;
 import pipe.gui.petrinet.animation.EnabledTransitionsList;
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.petrinet.animation.AnimationSettingsDialog;
@@ -25,9 +26,9 @@ public class TransitionFiringComponent extends JPanel {
 	private final JButton settingsButton;
 	private final TAPNLens lens;
 
-	public TransitionFiringComponent(boolean showDelayEnabledTransitions, TAPNLens lens) {
+	public TransitionFiringComponent(boolean showDelayEnabledTransitions, TAPNLens lens, Animator animator) {
 		super(new GridBagLayout());
-		enabledTransitionsList = new EnabledTransitionsList();
+		enabledTransitionsList = new EnabledTransitionsList(animator);
         this.lens = lens;
 		this.setBorder(
 		    BorderFactory.createCompoundBorder(
