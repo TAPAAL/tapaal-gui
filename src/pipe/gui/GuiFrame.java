@@ -56,8 +56,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final String frameTitle;
 
-    private int newNameCounter = 1;
-
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
 
     private final ExtendedJTabbedPane<PetriNetTab> appTab;
@@ -1722,15 +1720,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             e.printStackTrace();
         }
         return nets;
-    }
-
-
-    public int getNameCounter() {
-        return newNameCounter;
-    }
-
-    public void incrementNameCounter() {
-        newNameCounter++;
     }
 
     public String getCurrentTabName() {

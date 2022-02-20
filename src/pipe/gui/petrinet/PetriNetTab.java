@@ -642,14 +642,15 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return this.guiModels;
 	}
 
+    private int newNameCounter = 1;
+
 
     //XXX this is a temp solution while refactoring
 	// to keep the name of the net when the when a file is not set.
 	String initialName = "";
 	public void setInitialName(String name) {
 		if (name == null || name.isEmpty()) {
-			name = "New Petri net " + (TAPAALGUI.getApp().getNameCounter()) + ".tapn";
-			TAPAALGUI.getApp().incrementNameCounter();
+			name = "New Petri net " + (newNameCounter++) + ".tapn";
 		} else if (!name.toLowerCase().endsWith(".tapn")){
 			name = name + ".tapn";
 		}
