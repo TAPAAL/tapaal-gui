@@ -692,7 +692,7 @@ public class Animator {
     public final GuiAction stepbackwardAction = TAPAALGUI.getAppGui().stepbackwardAction;
 
     public void updateAnimationButtonsEnabled() {
-        AnimationHistoryList animationHistory = TAPAALGUI.getCurrentTab().getAnimationHistorySidePanel();
+        AnimationHistoryList animationHistory = tab.getAnimationHistorySidePanel();
 
         setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
         setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
@@ -705,7 +705,7 @@ public class Animator {
      */
     private void updateMouseOverInformation() {
         // update mouseOverView
-        for (Place p : TAPAALGUI.getCurrentTab().getModel().getPlaces()) {
+        for (Place p : tab.getModel().getPlaces()) {
             if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
                 ((TimedPlaceComponent) p).showAgeOfTokens(true);
             }
