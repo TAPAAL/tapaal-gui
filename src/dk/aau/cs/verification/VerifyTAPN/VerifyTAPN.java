@@ -305,7 +305,7 @@ public class VerifyTAPN implements ModelChecker {
                         if (tapnTrace != null) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
-                                newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(TAPAALGUI.getCurrentTab().getLens().isTimed(), TAPAALGUI.getCurrentTab().getLens().isGame(), false));
+                                newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
 
                                 //The query being verified should be the only query
                                 for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
@@ -320,13 +320,7 @@ public class VerifyTAPN implements ModelChecker {
                             }
                         }
 
-                    } catch (FormatException e) {
-                        e.printStackTrace();
-                        return null;
-                    } catch (ThreadDeath d) {
-                        d.printStackTrace();
-                        return null;
-                    } catch (Exception e) {
+                    } catch (ThreadDeath | Exception e) {
                         e.printStackTrace();
                         return null;
                     }
