@@ -43,7 +43,6 @@ import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
-import pipe.gui.petrinet.Export;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.animation.SimulatorFocusTraversalPolicy;
 import pipe.gui.petrinet.editor.EditorFocusTraversalPolicy;
@@ -1722,6 +1721,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return nets;
     }
 
+    /**
+     * @Deprecated Use tab.getTabTitle() instead
+     */
+    @Deprecated
     public String getCurrentTabName() {
         return appTab.getTitleAt(appTab.getSelectedIndex());
     }
@@ -1744,6 +1747,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return Preferences.getInstance().getShowColoredTokens();
     }
 
+    /**
+     * @Deprecated Only to be used in TAPAALGUI
+     */
+    @Deprecated
     public int getSelectedTabIndex() {
         return appTab.getSelectedIndex();
     }
