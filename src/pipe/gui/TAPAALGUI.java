@@ -61,10 +61,11 @@ public class TAPAALGUI {
 	 */
 	@Deprecated
 	public static Animator getAnimator() {
-		if (getCurrentTab() == null) {
+        var tab = getCurrentTab();
+		if (tab == null) {
 			return null;
 		}
-		return getCurrentTab().getAnimator();
+		return tab.getAnimator();
 	}
 	
 	//XXX Two Methodes to access same data (created after auto encapsulate)
