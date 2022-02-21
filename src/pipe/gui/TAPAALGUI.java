@@ -51,6 +51,9 @@ public class TAPAALGUI {
 		appGuiController.checkForUpdate(false);
 	}
 
+    //XXX Please avoid using the function below. It is only used for legacy code, or quick prototyping
+    // instead pass down arguments using the constructor.
+
 	@Deprecated
 	public static PetriNetTab getCurrentTab() {
 		return appGuiController.getTabs().get(appGui.getSelectedTabIndex());
@@ -97,7 +100,7 @@ public class TAPAALGUI {
         return appGuiController;
     }
 
-
+    @Deprecated
     public static boolean useExtendedBounds = false;
 
 }
