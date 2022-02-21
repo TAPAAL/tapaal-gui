@@ -17,6 +17,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 
 public class VerifyCPNExporter extends VerifyTAPNExporter{
+    @Override
     protected void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         modelStream.append("<place ");
         modelStream.append("id=\"" + p.name() + "\" ");
@@ -38,6 +39,8 @@ public class VerifyCPNExporter extends VerifyTAPNExporter{
 
         modelStream.append("</place>\n");
     }
+
+    @Override
     protected void outputTransition(TimedTransition t, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
         modelStream.append("<transition ");
         modelStream.append("player=\"" + (t.isUncontrollable() ? "1" : "0") + "\" ");
@@ -59,6 +62,7 @@ public class VerifyCPNExporter extends VerifyTAPNExporter{
 
         modelStream.append("</transition>\n");
     }
+
     @Override
     protected void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {
         modelStream.append("<inputArc ");
@@ -68,6 +72,7 @@ public class VerifyCPNExporter extends VerifyTAPNExporter{
         modelStream.append(colorInformationToXMLString(inputArc.getArcExpression()));
         modelStream.append("</inputArc>\n");
     }
+
     @Override
     protected void outputOutputArc(TimedOutputArc outputArc, PrintStream modelStream) {
         modelStream.append("<outputArc ");
@@ -77,6 +82,7 @@ public class VerifyCPNExporter extends VerifyTAPNExporter{
         modelStream.append(colorInformationToXMLString(outputArc.getExpression()));
         modelStream.append("</outputArc>\n");
     }
+
     @Override
     protected void outputInhibitorArc(TimedInhibitorArc inhibArc, PrintStream modelStream) {
         modelStream.append("<inhibitorArc ");
@@ -86,6 +92,7 @@ public class VerifyCPNExporter extends VerifyTAPNExporter{
         modelStream.append("</inhibitorArc>\n");
     }
 
+    @Override
     protected void outputDeclarations(PrintStream modelStream) {
         writeTACPN colorWriter = new writeTACPN(model.parentNetwork());
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
