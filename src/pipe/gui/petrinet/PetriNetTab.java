@@ -1039,12 +1039,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	@Override
 	public void exportTrace() {
-		TraceImportExport.exportTrace();
+		TraceImportExport.exportTrace(this);
 	}
 
 	@Override
 	public void importTrace() {
-		TraceImportExport.importTrace(animator);
+		TraceImportExport.importTrace(animator, this);
 	}
 
 	@Override
