@@ -465,7 +465,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         drawingSurface.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                TAPAALGUI.getApp().requestFocus();
+                TAPAALGUI.getAppGui().requestFocus();
             }
         });
 
@@ -701,7 +701,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             animControlerBox = new AnimationControlSidePanel(animator, lens);
         }
 		if (transitionFiring == null) {
-            transitionFiring = new TransitionFiringComponent(TAPAALGUI.getApp().isShowingDelayEnabledTransitions(), lens, animator);
+            transitionFiring = new TransitionFiringComponent(TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions(), lens, animator);
         }
 
 		boolean floatingDividers = false;

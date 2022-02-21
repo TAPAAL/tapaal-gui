@@ -141,7 +141,7 @@ public class EnabledTransitionsList extends JPanel{
 		}
 		
 		public String toString(){
-			if(TAPAALGUI.getApp().isShowingDelayEnabledTransitions()){
+			if(TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions()){
 				return toString(true);
 			} else {
 				return toString(false);

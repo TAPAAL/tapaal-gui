@@ -58,7 +58,7 @@ public class AnimationHistorySidePanel extends JPanel {
                     }
                 }
                 // Remove focus
-                TAPAALGUI.getApp().requestFocus();
+                TAPAALGUI.getAppGui().requestFocus();
             }
         });
 

@@ -72,11 +72,14 @@ public class TAPAALGUI {
 	}
 	
 	//XXX Two Methodes to access same data (created after auto encapsulate)
-	@Deprecated
+	//Used for setting parent in popups
+    @Deprecated
 	public static GuiFrame getApp() { // returns a reference to the application
 		return getAppGui();
 	}
-	@Deprecated
+
+    //Used for aceessing the GuiFrame
+    @Deprecated
 	public static GuiFrame getAppGui() {
 		return appGui;
 	}

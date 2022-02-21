@@ -650,7 +650,7 @@ public class SmartDrawDialog extends JDialog {
 		loadingDialogFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		loadingDialogFrame.setSize(400, 300);
 		loadingDialogFrame.setVisible(false);
-		loadingDialogFrame.setLocationRelativeTo(TAPAALGUI.getAppGui());
+		loadingDialogFrame.setLocationRelativeTo(TAPAALGUI.getApp());
 		loadingDialogFrame.pack();
 		loadingDialogFrame.setAlwaysOnTop(false);
 		loadingDialogFrame.setAutoRequestFocus(false);

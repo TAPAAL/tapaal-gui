@@ -56,7 +56,7 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 
     public JPopupMenu getPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
-        JMenuItem menuItem = new JMenuItem(TAPAALGUI.getApp().deleteAction);
+        JMenuItem menuItem = new JMenuItem(TAPAALGUI.getAppGui().deleteAction);
         menuItem.setText("Delete");
         popup.add(menuItem);
 

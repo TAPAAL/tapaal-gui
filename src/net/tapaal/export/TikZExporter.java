@@ -179,7 +179,7 @@ public class TikZExporter {
 	}
 
 	private String getGuardAsStringIfNotHidden(TimedInputArcComponent arc) {
-        if (!TAPAALGUI.getApp().showZeroToInfinityIntervals() && arc.getGuardAsString().equals("[0,inf)")){
+        if (!TAPAALGUI.getAppGui().showZeroToInfinityIntervals() && arc.getGuardAsString().equals("[0,inf)")){
 			return "";
 		} else {
 			return arc.getGuardAsString();

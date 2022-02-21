@@ -162,7 +162,7 @@ public class Animator {
                 if (t.isTransitionEnabled()) {
                     t.markTransitionEnabled(true);
                     transFireComponent.addTransition(template, t);
-                } else if (TAPAALGUI.getApp().isShowingDelayEnabledTransitions() &&
+                } else if (TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() &&
                     t.isDelayEnabled() && !isUrgentTransitionEnabled
                 ) {
                     t.markTransitionDelayEnabled(true);
@@ -307,7 +307,7 @@ public class Animator {
     }
 
     public void dFireTransition(TimedTransition transition){
-        if(!TAPAALGUI.getApp().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
+        if(!TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
             fireTransition(transition);
             return;
         }

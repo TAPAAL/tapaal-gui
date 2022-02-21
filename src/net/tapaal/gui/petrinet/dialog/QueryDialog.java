@@ -3860,7 +3860,7 @@ public class QueryDialog extends JPanel {
 
 					try {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-						String composedName = "composed-" + TAPAALGUI.getApp().getCurrentTabName();
+						String composedName = "composed-" + TAPAALGUI.getAppGui().getCurrentTabName();
 						composedName = composedName.replace(".tapn", "");
 						TAPAALGUI.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 						exit();
