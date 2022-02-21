@@ -88,7 +88,7 @@ public class Animator {
             updateFireableTransitions();
         } catch (RequireException e) {
             unhighlightDisabledTransitions();
-            TAPAALGUI.getCurrentTab().setAnimationMode(false);
+            tab.setAnimationMode(false);
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "There was an error in the trace. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
