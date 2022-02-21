@@ -5,7 +5,7 @@ import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.IntBound;
-import pipe.gui.TAPAALGUI;
+import net.tapaal.gui.petrinet.Context;
 import pipe.gui.swingcomponents.WidthAdjustingComboBox;
 
 import javax.swing.*;
@@ -18,6 +18,7 @@ import java.util.*;
 public class ColoredTimeIntervalDialogPanel extends JPanel {
 
     ColoredTimeInterval coloredTimeInterval;
+    private final Context context;
 
     JPanel guardEditPanel;
     JLabel label;
@@ -32,8 +33,9 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
     JCheckBox rightUseConstant;
     final int maxNumberOfPlacesToShowAtOnce = 20;
 
-    public ColoredTimeIntervalDialogPanel(ColoredTimeInterval cti) {
+    public ColoredTimeIntervalDialogPanel(ColoredTimeInterval cti, Context context) {
         this.coloredTimeInterval = cti;
+        this.context = context;
         initPanel();
 
         setTimeInterval(cti);
@@ -48,8 +50,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
 
         String[] partedTimeInterval = intervalAsString.split(",");
         String firstNumber = partedTimeInterval[0].substring(1);
-        String secondNumber = partedTimeInterval[1].substring(0,
-                partedTimeInterval[1].length() - 1);
+        String secondNumber = partedTimeInterval[1].substring(0, partedTimeInterval[1].length() - 1);
         int first = 0, second = 0;
         boolean firstIsNumber = true, secondIsNumber = true;
 
@@ -124,14 +125,14 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
 
         if (useConstantLeft) {
             String constantName = Objects.requireNonNull(leftConstantsComboBox.getSelectedItem()).toString();
-            leftInterval = new ConstantBound(TAPAALGUI.getCurrentTab().network().getConstant(constantName));
+            leftInterval = new ConstantBound(context.network().getConstant(constantName));
         } else {
             leftInterval = new IntBound((Integer) firstIntervalNumber.getValue());
         }
 
         if (useConstantRight) {
             String constantName = Objects.requireNonNull(rightConstantsComboBox.getSelectedItem()).toString();
-            rightInterval = new ConstantBound(TAPAALGUI.getCurrentTab().network().getConstant(constantName));
+            rightInterval = new ConstantBound(context.network().getConstant(constantName));
         } else if (inf.isSelected()) {
             rightInterval = Bound.Infinity;
         } else {
@@ -236,7 +237,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         gridBagConstraints.gridy = 1;
         guardEditPanel.add(secondIntervalNumber, gridBagConstraints);
 
-        Set<String> constants = TAPAALGUI.getCurrentTab().network().getConstantNames();
+        Set<String> constants = context.network().getConstantNames();
         String[] constantArray = constants.toArray(new String[0]);
         Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 
@@ -364,10 +365,9 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
             rightUseConstant.setSelected(false);
             updateRightComponents();
         }
-        if (firstValue > TAPAALGUI.getCurrentTab().network()
-                .getLargestConstantValue())
+        if (firstValue > context.network().getLargestConstantValue()) {
             rightUseConstant.setEnabled(false);
-        else {
+        } else {
             rightUseConstant.setEnabled(true);
             updateRightConstantComboBox();
         }
@@ -384,13 +384,11 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
     private int getSecondValue() {
         int secondValue;
         if (rightUseConstant.isSelected()) {
-            secondValue = TAPAALGUI.getCurrentTab().network().getConstantValue(
-                    Objects.requireNonNull(rightConstantsComboBox.getSelectedItem()).toString());
+            secondValue = context.network().getConstantValue(Objects.requireNonNull(rightConstantsComboBox.getSelectedItem()).toString());
         } else if (inf.isSelected()) {
             secondValue = Integer.MAX_VALUE;
         } else {
-            secondValue = Integer.parseInt(String.valueOf(secondIntervalNumber
-                    .getValue()));
+            secondValue = Integer.parseInt(String.valueOf(secondIntervalNumber.getValue()));
         }
         return secondValue;
     }
@@ -398,11 +396,9 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
     private int getFirstValue() {
         int firstValue;
         if (leftUseConstant.isSelected()) {
-            firstValue = TAPAALGUI.getCurrentTab().network().getConstantValue(
-                    Objects.requireNonNull(leftConstantsComboBox.getSelectedItem()).toString());
+            firstValue = context.network().getConstantValue(Objects.requireNonNull(leftConstantsComboBox.getSelectedItem()).toString());
         } else {
-            firstValue = Integer.parseInt(String.valueOf(firstIntervalNumber
-                    .getValue()));
+            firstValue = Integer.parseInt(String.valueOf(firstIntervalNumber.getValue()));
         }
         return firstValue;
     }
@@ -414,8 +410,7 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
                 .getSelectedItem().toString()
                 : null;
         rightConstantsComboBox.removeAllItems();
-        Collection<Constant> constants = TAPAALGUI.getCurrentTab().network()
-                .constants();
+        Collection<Constant> constants = context.network().constants();
 
         //List <Constant> constantList = new ArrayList(constants);
         List<Constant> constantList = new ArrayList<>(constants);
