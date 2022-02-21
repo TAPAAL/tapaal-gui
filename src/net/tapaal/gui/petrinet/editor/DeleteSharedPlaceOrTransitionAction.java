@@ -51,7 +51,7 @@ import net.tapaal.gui.petrinet.undo.DeleteTimedTransitionCommand;
 import net.tapaal.gui.petrinet.undo.DeleteTransportArcCommand;
 import pipe.gui.petrinet.undo.UndoManager;
 
-public class DeleteSharedPlaceOrTransition implements ActionListener{
+public final class DeleteSharedPlaceOrTransitionAction implements ActionListener{
 	
 	private static final String TRANSITION_IS_USED_MESSAGE = "<html>The shared transition is used in one or more components.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in the components.</html>";
 	private static final String PLACE_IS_USED_MESSAGE = "<html>The shared place is used in one or more components.<br/>TAPAAL will unshare all places under this name,<br/>but leave the places in the components.</html>";
@@ -65,8 +65,8 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 	final NameGenerator nameGenerator;
 	boolean messageShown;
 	
-	public DeleteSharedPlaceOrTransition(JList list, SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel, PetriNetTab tab,
-			SharedPlacesListModel sharedPlacesListModel, SharedTransitionsListModel sharedTransitionsListModel, NameGenerator nameGenerator) {
+	public DeleteSharedPlaceOrTransitionAction(JList list, SharedPlacesAndTransitionsPanel sharedPlacesAndTransitionsPanel, PetriNetTab tab,
+                                               SharedPlacesListModel sharedPlacesListModel, SharedTransitionsListModel sharedTransitionsListModel, NameGenerator nameGenerator) {
 		this.list = list;
 		this.sharedPlacesAndTransitionsPanel = sharedPlacesAndTransitionsPanel;
 		this.tab = tab;
