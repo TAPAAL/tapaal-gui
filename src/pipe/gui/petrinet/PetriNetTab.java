@@ -1472,6 +1472,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 
     @Override
+    public void print() {
+        Export.exportGuiView(drawingSurface, Export.PRINTER, null, null, this);
+    }
+
+    @Override
 	public void importSUMOQueries() {
 		File[] files = FileBrowser.constructor("Import SUMO", "txt", FileBrowser.userPath).openFiles();
 		for(File f : files){
@@ -2816,21 +2821,21 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     @Override
     public void exportPNG() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.PNG, null, null);
+            Export.exportGuiView(drawingSurface(), Export.PNG, null, null, this);
         }
     }
 
     @Override
     public void exportPS() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.POSTSCRIPT, null, null);
+            Export.exportGuiView(drawingSurface(), Export.POSTSCRIPT, null, null, this);
         }
     }
 
     @Override
     public void exportTIKZ() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.TIKZ, drawingSurface().getGuiModel(), null);
+            Export.exportGuiView(drawingSurface(), Export.TIKZ, drawingSurface().getGuiModel(), null, this);
         }
     }
 
@@ -2846,14 +2851,14 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     "PNML loss of information", JOptionPane.WARNING_MESSAGE);
                 Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
             }
-            Export.exportGuiView(drawingSurface(), Export.PNML, null, null);
+            Export.exportGuiView(drawingSurface(), Export.PNML, null, null, this);
         }
     }
 
     @Override
     public void exportQueryXML() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.QUERY, null, lens);
+            Export.exportGuiView(drawingSurface(), Export.QUERY, null, lens, this);
         }
     }
 

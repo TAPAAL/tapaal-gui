@@ -115,4 +115,6 @@ public interface TabActions {
     void cut();
 
     void past();
+
+    void print();
 }
