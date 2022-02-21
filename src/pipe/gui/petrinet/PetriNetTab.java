@@ -1477,7 +1477,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		for(File f : files){
 			if(f.exists() && f.isFile() && f.canRead()){
 				FileBrowser.userPath = f.getParent();
-				SUMOQueryLoader.importQueries(f, network());
+				SUMOQueryLoader.importQueries(f, network(), this);
 			}
 		}
 	}
