@@ -9,6 +9,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import pipe.gui.petrinet.dataLayer.DataLayer;
+import pipe.gui.petrinet.graphicElements.Place;
+import pipe.gui.petrinet.graphicElements.Transition;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,7 +20,7 @@ import java.util.Collection;
 
 public class VerifyCPNExporter extends VerifyTAPNExporter{
     @Override
-    protected void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
+    protected void outputPlace(TimedPlace p, PrintStream modelStream, DataLayer guiModel, NameMapping mapping) {
         modelStream.append("<place ");
         modelStream.append("id=\"" + p.name() + "\" ");
         modelStream.append("name=\"" + p.name() + "\" ");
@@ -26,13 +28,11 @@ public class VerifyCPNExporter extends VerifyTAPNExporter{
         modelStream.append(">\n");
         modelStream.append(colorInformationToXMLString(p));
 
-        // This is a hack to export position information for unfolding, we need to refactor what data is passed
-        // We assume that the net only has one guiModels at this point
-        if (guiModels.size() == 1) {
-            var g = guiModels.stream().findFirst().get().getPlaceByName(mapping.map(p.name()).value2());
+        if (guiModel != null) {
+            Place g = guiModel.getPlaceByName(p.name());
             if (g != null) {
                 modelStream.append("<graphics>");
-                modelStream.append("<position x=\""+ g.getOriginalX() + "\" y=\"" + g.getOriginalY() + "\" />");
+                modelStream.append("<position x=\"" + g.getOriginalX() + "\" y=\"" + g.getOriginalY() + "\" />");
                 modelStream.append("</graphics>");
             }
         }
@@ -41,7 +41,7 @@ public class VerifyCPNExporter extends VerifyTAPNExporter{
     }
 
     @Override
-    protected void outputTransition(TimedTransition t, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
+    protected void outputTransition(TimedTransition t, PrintStream modelStream, DataLayer guiModel, NameMapping mapping) {
         modelStream.append("<transition ");
         modelStream.append("player=\"" + (t.isUncontrollable() ? "1" : "0") + "\" ");
         modelStream.append("id=\"" + t.name() + "\" ");
@@ -49,13 +49,11 @@ public class VerifyCPNExporter extends VerifyTAPNExporter{
         modelStream.append(">\n");
         modelStream.append(colorInformationToXMLString(t));
 
-        // This is a hack to export position information for unfolding, we need to refactor what data is passed
-        // We assume that the net only has one guiModels at this point
-        if (guiModels.size() == 1) {
-            var g = guiModels.stream().findFirst().get().getTransitionByName(mapping.map(t.name()).value2());
+        if (guiModel != null) {
+            Transition g = guiModel.getTransitionByName(t.name());
             if (g != null) {
                 modelStream.append("<graphics>");
-                modelStream.append("<position x=\""+ g.getOriginalX() + "\" y=\"" + g.getOriginalY() + "\" />");
+                modelStream.append("<position x=\"" + g.getOriginalX() + "\" y=\"" + g.getOriginalY() + "\" />");
                 modelStream.append("</graphics>");
             }
         }
