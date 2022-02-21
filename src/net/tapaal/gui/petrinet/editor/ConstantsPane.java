@@ -59,7 +59,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
     private static final String titleBorder = "Global constants, Color types and Variables";
     private static final String titleBorderNoColor = "Global constants";
-    private static final String titleBorderToolTip = "<html>Declaration of Colors types, declaration of Variables and declaration of global constants that can be used in intervals and age invariants.<br>To see all color types/variables/constants press " + KeyEvent.getKeyText(KeyEvent.VK_CONTROL) + "+0</html>";
+    private static final String titleBorderToolTip = "<html>Declaration of colors types, color variables and global integer constants.<br>To see a summary list press " + KeyEvent.getKeyText(KeyEvent.VK_CONTROL) + "+0</html>";
     private static final String titleBorderToolTipNoColor = "Declaration of global constants that can be used in intervals and age invariants";
 
     private static final String CONSTANTS = "Constants";
