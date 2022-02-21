@@ -1,6 +1,3 @@
-/*
- * Created on 08-Feb-2004
- */
 package pipe.gui.canvas;
 
 import java.awt.Color;
@@ -9,6 +6,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +18,14 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
+import javax.swing.*;
+
 
 /**
  * @author Peter Kyme, Michael Camacho Class to handle selection rectangle
  *         functionality
  */
-public class SelectionManager extends javax.swing.JComponent implements
-		java.awt.event.MouseListener, java.awt.event.MouseWheelListener,
-		java.awt.event.MouseMotionListener {
+public class SelectionManager extends JComponent {
 
 	private Point startPoint;
 
@@ -38,13 +37,78 @@ public class SelectionManager extends javax.swing.JComponent implements
 	private final DrawingSurfaceImpl drawingSurface;
 
 	public SelectionManager(DrawingSurfaceImpl _view) {
-		addMouseListener(this);
-		addMouseMotionListener(this);
-		//addMouseWheelListener(this);
+		addMouseListener(new MouseListener() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                TAPAALGUI.getCurrentTab().requestFocusInWindow();
+                TAPAALGUI.getCurrentTab().removeConstantHighlights();
+                if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
+                    isSelecting = true;
+                    enableSelection();
+                    drawingSurface.setLayer(SelectionManager.this, Constants.SELECTION_LAYER_OFFSET);
+                    startPoint = e.getPoint();
+                    selectionRectangle.setSize(0, 0);
+                    upperLeftCorner.setLocation(e.getPoint());
+                    // Select anything that intersects with the rectangle.
+                    processSelection(e);
+                    updateBounds();
+                    repaint();
+                } else {
+                    startPoint = e.getPoint();
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (isSelecting) {
+                    // Select anything that intersects with the rectangle.
+                    processSelection(e);
+                    isSelecting = false;
+                    drawingSurface.setLayer(SelectionManager.this, Constants.LOWEST_LAYER_OFFSET);
+                    selectionRectangle.setSize(0, 0);
+                    upperLeftCorner.setLocation(0,0);
+                    updateBounds();
+                    disableSelection();
+                    repaint();
+                }
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {}
+
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+
+            @Override
+            public void mouseExited(MouseEvent e) {}
+
+
+        });
+		addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (isSelecting) {
+                    selectionRectangle.setSize(
+                        (int) Math.abs(e.getX() - startPoint.getX()),
+                        (int) Math.abs(e.getY() - startPoint.getY())
+                    );
+                    upperLeftCorner.setLocation(
+                        (int) Math.min(startPoint.getX(), e.getX()),
+                        (int) Math.min(startPoint.getY(), e.getY())
+                    );
+                    // Select anything that intersects with the rectangle.
+                    processSelection(e);
+                    updateBounds();
+                    repaint();
+                }
+            }
+            @Override
+            public void mouseMoved(MouseEvent e) {}
+        });
 		drawingSurface = _view;
 	}
 
-	public void updateBounds() {
+	private void updateBounds() {
 		setBounds(
 				upperLeftCorner.x,
 				upperLeftCorner.y,
@@ -58,7 +122,6 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	private void disableSelection() {
-		//this.clearSelection();
 		drawingSurface.remove(this);
 	}
 
@@ -173,79 +236,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 		return selection;
 	}
 
-	public void mousePressed(MouseEvent e) {
-		TAPAALGUI.getCurrentTab().requestFocusInWindow();
-		TAPAALGUI.getCurrentTab().removeConstantHighlights();
-		if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
-			isSelecting = true;
-			enableSelection();
-			drawingSurface.setLayer(this, Constants.SELECTION_LAYER_OFFSET);
-			startPoint = e.getPoint();
-			selectionRectangle.setSize(0, 0);
-			upperLeftCorner.setLocation(e.getPoint());
-			// Select anything that intersects with the rectangle.
-			processSelection(e);
-			updateBounds();
-			repaint();
-		} else {
-			startPoint = e.getPoint();
-		}
-	}
 
-	public void mouseReleased(MouseEvent e) {
-		if (isSelecting) {
-			// Select anything that intersects with the rectangle.
-			processSelection(e);
-			isSelecting = false;
-			drawingSurface.setLayer(this, Constants.LOWEST_LAYER_OFFSET);
-			selectionRectangle.setSize(0, 0);
-			upperLeftCorner.setLocation(0,0);
-			updateBounds();
-			disableSelection();
-			repaint();
-		}
-	}
-
-	public void mouseDragged(MouseEvent e) {
-		if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
-		
-		if (isSelecting) {
-			selectionRectangle.setSize(
-					(int) Math.abs(e.getX() - startPoint.getX()),
-					(int) Math.abs(e.getY() - startPoint.getY())
-			);
-			upperLeftCorner.setLocation(
-					(int) Math.min(startPoint.getX(), e.getX()),
-					(int) Math.min(startPoint.getY(), e.getY())
-			);
-			// Select anything that intersects with the rectangle.
-			processSelection(e);
-			updateBounds();
-			repaint();
-		}
-	}
-
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (e.isControlDown()) {
-			if (e.getWheelRotation() > 0) {
-				drawingSurface.zoomIn();
-			} else {
-				drawingSurface.zoomOut();
-			}
-		}
-	}
-
-	public void mouseClicked(MouseEvent e) {
-	}
-
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	public void mouseExited(MouseEvent e) {
-	}
-
-	public void mouseMoved(MouseEvent e) {
-	}
 
 	public void selectAll() {
 		for (PetriNetObject pnObject : drawingSurface.getGuiModel().getPNObjects()) {
