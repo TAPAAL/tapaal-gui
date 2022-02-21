@@ -51,8 +51,7 @@ public class QueryPane extends JPanel implements SidePane {
 
 	private final DefaultListModel<TAPNQuery> listModel;
 	private final JList<TAPNQuery> queryList;
-	private List<TAPNQuery> selectedQueries;
-	private JScrollPane queryScroller;
+    private JScrollPane queryScroller;
 	private final Messenger messenger =  new MessengerImpl();
 
 	private JButton addQueryButton;
@@ -466,15 +465,15 @@ public class QueryPane extends JPanel implements SidePane {
 	}
 	
 	private void saveNetAndRunBatchProcessing() {
-		getSelectedQueriesForProcessing();
-		//Saves the net in a temporary file which is used in batchProcessing
-		//File is deleted on exit
+        List<TAPNQuery> selectedQueries = queryList.getSelectedValuesList();
+        //Saves the net in a temporary file which is used in batchProcessing File is deleted on exit
 		try {
-			tempFile = File.createTempFile(TAPAALGUI.getAppGui().getCurrentTabName(), ".xml");
+			tempFile = File.createTempFile(tabContent.getTabTitle(), ".xml");
 
-			PetriNetTab tab = TAPAALGUI.getCurrentTab();
-			tab.writeNetToFile(tempFile, selectedQueries, tab.getLens());
-			BatchProcessingDialog.showBatchProcessingDialog(queryList);
+            tabContent.writeNetToFile(tempFile, selectedQueries, tabContent.getLens());
+			//XXX is it not an error that the tempFile is not passed down to the batchProcessing?
+            // I would think it runs the query on the unsaved net -- kyrke 2022-02-21
+            BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();
 			if(tempFile == null) {
 				throw new IOException();
@@ -483,12 +482,8 @@ public class QueryPane extends JPanel implements SidePane {
 			messenger.displayErrorMessage("Creation of temporary file needed for verification failed.");
 		}
 	}
-	
-	private void getSelectedQueriesForProcessing() {
-		selectedQueries = queryList.getSelectedValuesList();
-	}
-	
-	public static File getTemporaryFile() {
+
+    public static File getTemporaryFile() {
 		return tempFile;
 	}
 	
