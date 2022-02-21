@@ -116,11 +116,11 @@ public class TikZExporter {
             out.append("% Arc between " + arc.getSource().getName() + " and " + arc.getTarget().getName() + "\n");
 			out.append("\\draw[");
 			out.append(arrowType);
-			out.append(",pos=0] (");
+			out.append(",pos=0.0] (");
 			out.append(arc.getSource().getId());
 			out.append(") ");
 			out.append(arcPoints);
-			out.append("to node[bend right=0,auto]");
+			out.append("to node[bend right=0,auto,align=left]");
 			out.append(" {");
 			out.append(handleNameLabel(arc.getNameLabel().getText()));
             out.append("} ");
