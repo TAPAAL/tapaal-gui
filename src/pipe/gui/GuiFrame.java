@@ -1015,7 +1015,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 colorFeatureOptions.setEnabled(false);
 
                 //Enable simulator focus traversal policy
-                setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
+                setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy(getCurrentTab().getAnimationController().TimeDelayField));
 
                 break;
             case noNet:
