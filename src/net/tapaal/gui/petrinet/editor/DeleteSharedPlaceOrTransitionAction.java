@@ -96,7 +96,7 @@ public final class DeleteSharedPlaceOrTransitionAction implements ActionListener
 			ArrayList<String> affectedComponentsWithDupes = new ArrayList<String>();
 			if(sharedPlacesAndTransitionsPanel.isDisplayingTransitions()){
 				for(Object transition : list.getSelectedValuesList()) {
-					affectedComponentsWithDupes.addAll(((SharedTransition)transition).getComponentsUsingThisTransition());
+					affectedComponentsWithDupes.addAll((getComponentsUsingThisTransition((SharedTransition)transition)));
 				}
 				for(String component : affectedComponentsWithDupes) {
 					if(!(affectedComponents.contains(component))) {
@@ -329,6 +329,17 @@ public final class DeleteSharedPlaceOrTransitionAction implements ActionListener
 			}
 		}
 	}
+
+    public ArrayList<String> getComponentsUsingThisTransition(SharedTransition transition){
+        ArrayList<String> components = new ArrayList<String>();
+        for(Template t : tab.allTemplates()){
+            TimedTransition tt = t.model().getTransitionByName(transition.name());
+            if(tt != null){
+                components.add(t.model().name());
+            }
+        }
+        return components;
+    }
 	
 	private static class DeleteSharedResult{
 		public final int choice;
