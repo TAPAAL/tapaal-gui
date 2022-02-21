@@ -8,13 +8,11 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 import pipe.gui.Constants;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
@@ -40,11 +38,9 @@ public class SelectionManager extends JComponent {
 		addMouseListener(new MouseListener() {
             @Override
             public void mousePressed(MouseEvent e) {
-                TAPAALGUI.getCurrentTab().requestFocusInWindow();
-                TAPAALGUI.getCurrentTab().removeConstantHighlights();
                 if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
                     isSelecting = true;
-                    enableSelection();
+                    drawingSurface.add(SelectionManager.this);
                     drawingSurface.setLayer(SelectionManager.this, Constants.SELECTION_LAYER_OFFSET);
                     startPoint = e.getPoint();
                     selectionRectangle.setSize(0, 0);
@@ -68,7 +64,7 @@ public class SelectionManager extends JComponent {
                     selectionRectangle.setSize(0, 0);
                     upperLeftCorner.setLocation(0,0);
                     updateBounds();
-                    disableSelection();
+                    drawingSurface.remove(SelectionManager.this);
                     repaint();
                 }
             }
@@ -117,15 +113,7 @@ public class SelectionManager extends JComponent {
 		);
 	}
 
-	private void enableSelection() {
-		drawingSurface.add(this);
-	}
-
-	private void disableSelection() {
-		drawingSurface.remove(this);
-	}
-
-	private void processSelection(MouseEvent e) {
+    private void processSelection(MouseEvent e) {
 		if (!e.isShiftDown()) {
 			clearSelection();
 		}
