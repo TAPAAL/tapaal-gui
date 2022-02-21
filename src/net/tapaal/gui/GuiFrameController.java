@@ -376,16 +376,17 @@ public final class GuiFrameController implements GuiFrameControllerActions{
             protected void done() {
                 try {
                     List<PetriNetTab> tabs = get();
-                    openTab(tabs);
 
-                    //Don't autolayout on empty net, hotfix for issue #1960000
-                    if(files.length != 0 && !TAPAALGUI.getCurrentTab().currentTemplate().getHasPositionalInfo() && (TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getPlaces().length + TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getTransitions().length) > 0) {
-                        int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
-                        if(dialogResult == JOptionPane.YES_OPTION) {
-                            SmartDrawDialog.showSmartDrawDialog();
+                    for (PetriNetTab tab : tabs) {
+                        openTab(tab);
+                        //Don't autolayout on empty net, hotfix for issue #1960000. Imported PNML will only have one template.
+                        if(!tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
+                            int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                            if(dialogResult == JOptionPane.YES_OPTION) {
+                                SmartDrawDialog.showSmartDrawDialog();
+                            }
                         }
                     }
-
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                         e.getMessage(),
