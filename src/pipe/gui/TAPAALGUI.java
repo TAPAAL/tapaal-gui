@@ -14,6 +14,8 @@ import pipe.gui.petrinet.animation.Animator;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.petrinet.PetriNetTab;
 
+import javax.swing.*;
+
 public class TAPAALGUI {
 
 	private final static GuiFrame appGui = new GuiFrame(TAPAAL.getProgramName());
@@ -74,7 +76,7 @@ public class TAPAALGUI {
 	//XXX Two Methodes to access same data (created after auto encapsulate)
 	//Used for setting parent in popups
     @Deprecated
-	public static GuiFrame getApp() { // returns a reference to the application
+	public static JFrame getApp() { // returns a reference to the application
 		return getAppGui();
 	}
 
