@@ -1406,9 +1406,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	@Override
 	public void showStatistics() {
-        if (currentTemplate() != null) {
-            StatisticsPanel.showStatisticsPanel(currentTemplate().model().getStatistics());
-        }
+        StatisticsPanel.showStatisticsPanel(currentTemplate().model().getStatistics(), this);
 	}
 
     @Override
