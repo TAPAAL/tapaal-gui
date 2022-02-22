@@ -1314,7 +1314,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             app.ifPresent(o->o.setStatusBarText(textforDrawing));
 
             if (restoreWorkflowDialog()) {
-                WorkflowDialog.showDialog();
+                WorkflowDialog.showDialog(this);
             }
         }
 	}
@@ -2866,7 +2866,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     @Override
     public void workflowAnalyse() {
         //XXX prop. should take this as argument, insted of using static accessors //kyrke 2019-11-05
-        WorkflowDialog.showDialog();
+        WorkflowDialog.showDialog(this);
     }
 
     // Workflow dialog
