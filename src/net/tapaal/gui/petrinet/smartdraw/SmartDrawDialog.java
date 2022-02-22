@@ -161,7 +161,7 @@ public class SmartDrawDialog extends JDialog {
 
 		JButton helpButton = new JButton("Help");
 		helpButton.setToolTipText("Help with the different options");
-		helpButton.addActionListener(e -> JOptionPane.showMessageDialog(TAPAALGUI.getAppGui(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE));
+		helpButton.addActionListener(e -> JOptionPane.showMessageDialog(TAPAALGUI.getApp(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE));
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;

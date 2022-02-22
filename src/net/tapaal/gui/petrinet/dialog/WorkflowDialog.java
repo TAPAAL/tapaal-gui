@@ -402,7 +402,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.NONE;
 		JButton help_button = new JButton("Help");
-		help_button.addActionListener(e -> JOptionPane.showMessageDialog(TAPAALGUI.getAppGui(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE));
+		help_button.addActionListener(e -> JOptionPane.showMessageDialog(TAPAALGUI.getApp(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE));
 
 		panel.add(help_button, gbc);
 
