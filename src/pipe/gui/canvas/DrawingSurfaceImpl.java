@@ -6,7 +6,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import pipe.gui.petrinet.PetriNetTab;
@@ -425,11 +424,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			}
 			if (e.isControlDown()) {
 				if (e.getWheelRotation() > 0) {
-					view.zoomIn();
+					tabContent.zoomIn();
 				} else {
-					view.zoomOut();
+					tabContent.zoomOut();
 				}
-				TAPAALGUI.getAppGui().updateZoomCombo(TAPAALGUI.getCurrentTab().currentTemplate().zoomer().getPercent());
 			} else {
 				//Dispatch Event to scroll pane to allow scrolling up/down. -- kyrke
 				getParent().dispatchEvent(e);
@@ -441,8 +439,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		this.repaint();
 		guiModel.repaintAll(!tabContent.isInAnimationMode());
 	}
-
-
 
 	public void translateSelection(int transX, int transY) {
         var objects = getSelectionObject().getSelection();
