@@ -143,9 +143,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 			}
 		}
-
-		//selection.updateBounds();
-
 	}
 
 	public void updatePreferredSize() {
@@ -191,8 +188,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 
 		return rect;
 	}
-
-
 
 	public SelectionManager getSelectionObject() {
 		return selection;
@@ -253,63 +248,42 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	}
 
 	public void zoomToMidPoint() {
-
 		Point midpoint = midpoint(zoomControl.getPercent());
-		zoomTo(midpoint);
 
-	}
+        int zoomPercent = getZoom();
 
-	public void zoomIn() {
-		int zoom = zoomControl.getPercent();
-		if (zoomControl.zoomIn()) {
-			zoomTo(midpoint(zoom));
-		}
-	}
+        JViewport viewport = (JViewport) getParent();
 
-	public void zoomOut() {
-		int zoom = zoomControl.getPercent();
-		if (zoomControl.zoomOut()) {
-			zoomTo(midpoint(zoom));
-		}
-	}
+        Component[] children = getComponents();
 
-	// This function should always be called after a change in zoom.
-	public void zoomTo(Point point) {
+        //Update elements in the view to zoom, i.e resize graphical elements and reposition them, all done in zoomUpdate.
+        for (Component child : children) {
+            if (child instanceof Zoomable) {
+                ((Zoomable) child).zoomUpdate(zoomPercent);
+            }
+        }
 
-		int zoomPercent = getZoom();
+        // Calculate new position of the Drawing Surface.
+        double newZoomedX = Zoomer.getZoomedValue(midpoint.x, zoomPercent);
+        double newZoomedY = Zoomer.getZoomedValue(midpoint.y, zoomPercent);
 
-		JViewport viewport = (JViewport) getParent();
+        int newViewX = (int) (newZoomedX - (viewport.getWidth() * 0.5));
+        if (newViewX < 0) {
+            newViewX = 0;
+        }
 
-		Component[] children = getComponents();
+        int newViewY = (int) (newZoomedY - (viewport.getHeight() * 0.5));
+        if (newViewY < 0) {
+            newViewY = 0;
+        }
 
-		//Update elements in the view to zoom, i.e resize graphical elements and reposition them, all done in zoomUpdate.
-		for (Component child : children) {
-			if (child instanceof Zoomable) {
-				((Zoomable) child).zoomUpdate(zoomPercent);
-			}
-		}
+        viewport.setViewPosition(new Point(newViewX, newViewY));
 
-		// Calculate new position of the Drawing Surface.
-		double newZoomedX = Zoomer.getZoomedValue(point.x, zoomPercent);
-		double newZoomedY = Zoomer.getZoomedValue(point.y, zoomPercent);
+        updatePreferredSize();
+    }
 
-		int newViewX = (int) (newZoomedX - (viewport.getWidth() * 0.5));
-		if (newViewX < 0) {
-			newViewX = 0;
-		}
-
-		int newViewY = (int) (newZoomedY - (viewport.getHeight() * 0.5));
-		if (newViewY < 0) {
-			newViewY = 0;
-		}
-
-		viewport.setViewPosition(new Point(newViewX, newViewY));
-
-
-		updatePreferredSize();
-	}
-
-	public int getZoom() {
+    // This function should always be called after a change in zoom.
+    public int getZoom() {
 		return zoomControl.getPercent();
 	}
 
