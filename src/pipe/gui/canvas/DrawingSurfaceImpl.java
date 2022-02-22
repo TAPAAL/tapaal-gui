@@ -34,25 +34,24 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	private static final boolean showDebugBounds = false;
 
 	public DrawingSurfaceImpl(DataLayer dataLayer, PetriNetTab tabContent, Reference<AbstractDrawingSurfaceManager> managerRef) {
-		guiModel = dataLayer;
+		this.guiModel = dataLayer;
 		this.tabContent = tabContent;
 		this.managerRef = managerRef;
+        this.zoomControl = new Zoomer(100);
+
+        selection = new SelectionManager(this);
+
 		setLayout(null);
 		setOpaque(true);
 		setDoubleBuffered(true);
 		setAutoscrolls(true);
 		setBackground(Constants.ELEMENT_FILL_COLOUR);
-
-		zoomControl = new Zoomer(100);
-
 		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-        MouseHandler mouseHandler = new MouseHandler(this);
+
+        MouseHandler mouseHandler = new MouseHandler();
 		addMouseListener(mouseHandler);
 		addMouseMotionListener(mouseHandler);
 		addMouseWheelListener(mouseHandler);
-
-		selection = new SelectionManager(this);
-
 	}
 
 	public DataLayer getGuiModel() {
@@ -60,10 +59,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	}
 
 	public void setModel(DataLayer guiModel, Zoomer zoomer) {
-		//Remove the old model from view
-		this.guiModel.removedFromView();
-		//Add the new model to view
-		guiModel.addedToView(this);
+		this.guiModel.removedFromView(); //Remove the old model from view
+		guiModel.addedToView(this); //Add the new model to view
 
 		this.guiModel = guiModel;
 		this.zoomControl = zoomer;
@@ -97,8 +94,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		repaint();
 	}
 
-	//XXX temp solution while refactorting, component removes children them self
-	//migth not be best solution long term.
+	//XXX temp solution while refactorting, component removes children them self migth not be best solution long term.
 	@Override
 	public void removePetriNetObject(GraphicalElement pno) {
 		pno.removedFromGui();
@@ -140,15 +136,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 				g2.fill(c.getBounds());
 				g2.setPaint(Color.black);
 				g2.draw(c.getBounds());
-
 			}
 		}
 	}
 
 	public void updatePreferredSize() {
-		// iterate over net objects
-		// setPreferredSize() accordingly
-
 		Component[] components = getComponents();
 		Dimension d = new Dimension(0, 0);
 		for (Component component : components) {
@@ -182,7 +174,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			if (component.getClass() == SelectionManager.class) {
 				continue; // SelectionObject not included
 			}
-
 			rect.add(component.getBounds());
 		}
 
@@ -212,13 +203,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		}
 
 		if (changed) {
-			//Update client's preferred size because
-			//the area taken up by the graphics has
-			// changed
+			//Update client's preferred size because the area taken up by the graphics has changed
 			setPreferredSize(current);
 
-			//Let the scroll pane know to update itself
-			//and its scrollbars.
+			//Let the scroll pane know to update itself and its scrollbars.
 			revalidate();
 		}
 	}
@@ -332,6 +320,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
         p.setLocation(x, y);
         return p;
     }
+
     public Point adjustPointToGrid(Point p) {
         int x = Grid.getModifiedX(p.x);
         int y = Grid.getModifiedY(p.y);
@@ -346,13 +335,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
         return newP;
     }
 
-    class MouseHandler extends MouseInputAdapter {
+    final class MouseHandler extends MouseInputAdapter {
 
-		private final DrawingSurfaceImpl view;
-
-		public MouseHandler(DrawingSurfaceImpl _view) {
+        public MouseHandler() {
 			super();
-			view = _view;
         }
 
 		@Override
