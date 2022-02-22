@@ -308,7 +308,7 @@ public class QueryPane extends JPanel implements SidePane {
 		addQueryButton.addActionListener(new ActionListener() {
 
 		    public void actionPerformed(ActionEvent e) {
-				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
+				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens(), tabContent);
 
                 if(q == null) return;
 
@@ -347,7 +347,7 @@ public class QueryPane extends JPanel implements SidePane {
 		TAPNQuery newQuery;
 
 		if(q.isActive()) {
-            newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens());
+            newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens(), tabContent);
 
 			if (newQuery != null)
 				updateQuery(q, newQuery);
