@@ -322,6 +322,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         }
     }
 
+    /// This will select the wrong color if the is overlap in naming, eg for IntegerRangeExpr (1,2,3,4) & (1,2)
     private dk.aau.cs.model.CPN.Color getColor(String colorname) throws FormatException {
         for (ColorType ct : colortypes.values()) {
             for (dk.aau.cs.model.CPN.Color c : ct) {

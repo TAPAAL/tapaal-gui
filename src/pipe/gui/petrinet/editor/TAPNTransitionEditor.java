@@ -401,7 +401,7 @@ public class TAPNTransitionEditor extends JPanel {
 				return false;
 			}
 		}else{		
-			if(transition.underlyingTransition().model().isNameUsed(newName) && (wasShared || !transition.underlyingTransition().name().equalsIgnoreCase(newName))){
+			if(transition.underlyingTransition().model().isNameUsed(newName) && (wasShared || !transition.underlyingTransition().name().equals(newName))){
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this,
 						"The specified name is already used by another place or transition.",

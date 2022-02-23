@@ -210,7 +210,8 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		} else {				
 			int val = (Integer) valueSpinner.getValue();
 			if (!oldName.equals("")) {
-				if (!oldName.equalsIgnoreCase(newName) && model.isNameUsedForConstant(newName)) {
+
+				if (!oldName.equals(newName) && model.isNameUsedForConstant(newName)) {
 					JOptionPane.showMessageDialog(
 							TAPAALGUI.getApp(),
 							"There is already another constant with the same name.\n\n"
