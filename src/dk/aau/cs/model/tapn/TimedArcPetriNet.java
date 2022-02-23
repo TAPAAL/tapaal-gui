@@ -259,12 +259,12 @@ public class TimedArcPetriNet {
 		if(parentNetwork != null && parentNetwork.isNameUsedForShared(name)) return true;
 
 		for (TimedPlace place : places){
-			if (place.name().equalsIgnoreCase(name)){
+			if (place.name().equals(name)){
 				return true;
 			}
 		}
 		for (TimedTransition transition : transitions){
-			if (transition.name().equalsIgnoreCase(name)){
+			if (transition.name().equals(name)){
 				return true;
 			}
 		}
@@ -287,7 +287,7 @@ public class TimedArcPetriNet {
 
 	public TimedPlace getPlaceByName(String placeName) {
 		for (TimedPlace p : places) {
-			if (p.name().equalsIgnoreCase(placeName)) {
+			if (p.name().equals(placeName)) {
 				return p;
 			}
 		}
@@ -296,7 +296,7 @@ public class TimedArcPetriNet {
 
 	public TimedTransition getTransitionByName(String transitionName) {
 		for (TimedTransition t : transitions) {
-			if (t.name().equalsIgnoreCase(transitionName)) {
+			if (t.name().equals(transitionName)) {
 				return t;
 			}
 		}

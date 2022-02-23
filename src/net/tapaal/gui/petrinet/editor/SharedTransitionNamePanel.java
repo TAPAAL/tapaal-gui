@@ -140,7 +140,7 @@ public class SharedTransitionNamePanel extends JPanel {
 				
 				String oldName = transitionToEdit.name();
 				
-				if(transitionToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
+				if(transitionToEdit.network().isNameUsed(name) && !oldName.equals(name)) {
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
 					nameField.requestFocusInWindow();
 					return false;
