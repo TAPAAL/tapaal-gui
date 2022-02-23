@@ -228,10 +228,8 @@ public class AnnotationNote extends Note {
 		prova = g2.getTransform();
 
 		g2.setStroke(new BasicStroke(1.0f));
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
-				RenderingHints.VALUE_STROKE_NORMALIZE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
 
 		g2.transform(Zoomer.getTransform(getZoom()));
 		if (selected) {
@@ -270,8 +268,7 @@ public class AnnotationNote extends Note {
 		note.setOpaque(fillNote);
 	}
 
-	private class ResizePointHandler extends
-			javax.swing.event.MouseInputAdapter {
+	private class ResizePointHandler extends javax.swing.event.MouseInputAdapter {
 
 		private final ResizePoint myPoint;
 		private Point start;
@@ -293,8 +290,7 @@ public class AnnotationNote extends Note {
 		public void mouseDragged(MouseEvent e) {
 			if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
 
-			myPoint.drag(Grid.getModifiedX(e.getX() - start.x), Grid
-					.getModifiedY(e.getY() - start.y));
+			myPoint.drag(Grid.getModifiedX(e.getX() - start.x), Grid.getModifiedY(e.getY() - start.y));
 			myPoint.myNote.updateBounds();
 			myPoint.repaint();
 		}
@@ -374,8 +370,7 @@ public class AnnotationNote extends Note {
 				g2.fill(shape);
 
 				g2.setStroke(new BasicStroke(1.0f));
-				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-						RenderingHints.VALUE_ANTIALIAS_ON);
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 				if (isPressed) {
 					g2.setPaint(Constants.RESIZE_POINT_DOWN_COLOUR);
 				} else {

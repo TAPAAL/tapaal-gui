@@ -252,7 +252,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        intervalEditorPanel = new ColoredTimeIntervalDialogPanel(cti);
+        intervalEditorPanel = new ColoredTimeIntervalDialogPanel(cti, context);
         colorIntervalEditPanel.add(intervalEditorPanel, gbc);
 
         gbc = new GridBagConstraints();

@@ -12,7 +12,8 @@ public class Context {
 	private final Template selectedTemplate;
 	
 	private final UndoManager undoManager;
-	private final PetriNetTab currentTab;
+    //XXX Temp solution while refactoring
+	public final PetriNetTab currentTab;
 	
 	public Context(PetriNetTab tab) {
 		Require.that(tab != null, "tab cannot be null");

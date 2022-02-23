@@ -10,17 +10,30 @@ import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
-import java.awt.image.BufferedImage;
-import java.awt.print.PageFormat;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
-import java.awt.Rectangle;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.*;
+import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
+import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
+import dk.aau.cs.io.NetWriter;
+import dk.aau.cs.io.PNMLWriter;
+import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.ITAPNComposer;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
+import net.tapaal.export.TikZExporter;
+import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
+import org.w3c.dom.DOMException;
+import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
+import pipe.gui.canvas.DrawingSurfaceImpl;
+import pipe.gui.canvas.Grid;
+import pipe.gui.petrinet.dataLayer.DataLayer;
+import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
@@ -29,32 +42,16 @@ import javax.print.PrintException;
 import javax.print.SimpleDoc;
 import javax.print.StreamPrintServiceFactory;
 import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
-import dk.aau.cs.TCTL.visitors.*;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
-import net.tapaal.export.TikZExporter;
-import net.tapaal.gui.petrinet.TAPNLens;
-import org.w3c.dom.DOMException;
-
-import dk.aau.cs.io.PNMLWriter;
-import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.verification.ITAPNComposer;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposer;
-import pipe.gui.petrinet.dataLayer.DataLayer;
-import dk.aau.cs.io.NetWriter;
-import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import pipe.gui.MessengerImpl;
-import pipe.gui.TAPAALGUI;
-import pipe.gui.canvas.DrawingSurfaceImpl;
-import pipe.gui.canvas.Grid;
-import pipe.gui.swingcomponents.filebrowser.FileBrowser;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.*;
+import java.util.Iterator;
 
 /**
  * Class for exporting things to other formats, as well as printing.
@@ -69,31 +66,30 @@ public class Export {
     public static final int PNML = 6;
     public static final int QUERY = 7;
 
-    private static void toPnml(DrawingSurfaceImpl g, String filename)
+    private static void toPnml(DrawingSurfaceImpl g, String filename, PetriNetTab tab)
         throws NullPointerException, DOMException,
         IOException, ParserConfigurationException, TransformerException {
-        PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
         NetworkMarking currentMarking = null;
-        if (TAPAALGUI.getCurrentTab().isInAnimationMode()) {
-            currentMarking = currentTab.network().marking();
-            currentTab.network().setMarking(TAPAALGUI.getAnimator().getInitialMarking());
+        if (tab.isInAnimationMode()) {
+            currentMarking = tab.network().marking();
+            tab.network().setMarking(tab.getAnimator().getInitialMarking());
         }
 
         NetWriter tapnWriter = new PNMLWriter(
-            currentTab.network(),
-            currentTab.getGuiModels(),
-            currentTab.getLens()
+            tab.network(),
+            tab.getGuiModels(),
+            tab.getLens()
         );
 
         tapnWriter.savePNML(new File(filename));
 
-        if (TAPAALGUI.getCurrentTab().isInAnimationMode()) {
-            currentTab.network().setMarking(currentMarking);
+        if (tab.isInAnimationMode()) {
+            tab.network().setMarking(currentMarking);
         }
     }
 
-    private static void toQueryXML(String filename, TAPNLens lens) {
-        toQueryXML(TAPAALGUI.getCurrentTab().network(), filename, TAPAALGUI.getCurrentTab().queries(), lens);
+    private static void toQueryXML(String filename, TAPNLens lens, PetriNetTab tab) {
+        toQueryXML(tab.network(), filename, tab.queries(), lens);
 
     }
 
@@ -213,41 +209,39 @@ public class Export {
 		}
 	}
 
-	public static void exportGuiView(DrawingSurfaceImpl g, int format, DataLayer model, TAPNLens lens) {
+	public static void exportGuiView(DrawingSurfaceImpl g, int format, DataLayer model, TAPNLens lens, PetriNetTab tab) {
 		if (g.getComponentCount() == 0) {
 			return;
-		}
+        }
 
-		String filename = null;
-		if (TAPAALGUI.getCurrentTab().getFile() != null) {
-			filename = TAPAALGUI.getCurrentTab().getFile().getAbsolutePath();
-			// change file extension
-			int dotpos = filename.lastIndexOf('.');
-			if (dotpos > filename.lastIndexOf(System.getProperty("file.separator"))) {
-				// dot is for extension
-				filename = filename.substring(0, dotpos + 1);
-				switch (format) {
-                    case PNG:
-                        filename += "png";
-                        break;
-                    case POSTSCRIPT:
-                        filename += "ps";
-                        break;
-                    case TIKZ:
-                        filename += "tex";
-                        break;
-                    case PNML:
-                        filename += "pnml";
-                        break;
-                    case QUERY:
-                        filename = filename.substring(0, dotpos);
-                        filename += "-queries.xml";
-                        break;
-                }
-			}
-		}
+        String filename = null;
+        filename = tab.getTabTitle();
+        // change file extension
+        int dotpos = filename.lastIndexOf('.');
+        if (dotpos > filename.lastIndexOf(System.getProperty("file.separator"))) {
+            // dot is for extension
+            filename = filename.substring(0, dotpos + 1);
+            switch (format) {
+                case PNG:
+                    filename += "png";
+                    break;
+                case POSTSCRIPT:
+                    filename += "ps";
+                    break;
+                case TIKZ:
+                    filename += "tex";
+                    break;
+                case PNML:
+                    filename += "pnml";
+                    break;
+                case QUERY:
+                    filename = filename.substring(0, dotpos);
+                    filename += "-queries.xml";
+                    break;
+            }
+        }
 
-		boolean gridEnabled = Grid.isEnabled();
+        boolean gridEnabled = Grid.isEnabled();
 		setupViewForExport(g, gridEnabled);
 
 		try {
@@ -277,13 +271,16 @@ public class Export {
 						"Export to TikZ", JOptionPane.PLAIN_MESSAGE,
 						null, possibilities, "Only the TikZ figure");
 				TikZExporter.TikZOutputOption tikZOption = TikZExporter.TikZOutputOption.FIGURE_ONLY;
-				if (figureOptions == null)
-					break;
+				if (figureOptions == null) {
+                    break;
+                }
 
-				if (figureOptions == possibilities[0])
-					tikZOption = TikZExporter.TikZOutputOption.FIGURE_ONLY;
-				if (figureOptions == possibilities[1])
-					tikZOption = TikZExporter.TikZOutputOption.FULL_LATEX;
+				if (figureOptions == possibilities[0]) {
+                    tikZOption = TikZExporter.TikZOutputOption.FIGURE_ONLY;
+                }
+				if (figureOptions == possibilities[1]) {
+                    tikZOption = TikZExporter.TikZOutputOption.FULL_LATEX;
+                }
 
 				filename = FileBrowser.constructor("TikZ figure", "tex", filename).saveFile();
 				if (filename != null) {
@@ -295,13 +292,13 @@ public class Export {
 				filename = FileBrowser.constructor("PNML file", "pnml", filename)
 				.saveFile();
 				if (filename != null) {
-					toPnml(g, filename);
+					toPnml(g, filename, tab);
 				}
 				break;
 			case QUERY:
-				filename = FileBrowser.constructor("Query XML file", "xml", filename).saveFile(TAPAALGUI.getAppGui().getCurrentTabName().replaceAll(".tapn", "-queries"));
+				filename = FileBrowser.constructor("Query XML file", "xml", filename).saveFile(filename);
 				if (filename != null) {
-					toQueryXML(filename, lens);
+					toQueryXML(filename, lens, tab);
 				}
 				break;
 			}

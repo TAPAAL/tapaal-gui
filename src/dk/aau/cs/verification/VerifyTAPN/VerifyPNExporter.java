@@ -8,6 +8,7 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TransportArc;
 
 public class VerifyPNExporter extends VerifyTAPNExporter {
+    @Override
 	protected void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {
 		modelStream.append("<inputArc ");
 		modelStream.append("source=\"" + inputArc.source().name() + "\" ");
@@ -16,6 +17,7 @@ public class VerifyPNExporter extends VerifyTAPNExporter {
 		modelStream.append("</inputArc>\n");
 	}
 
+    @Override
 	protected void outputOutputArc(TimedOutputArc outputArc, PrintStream modelStream) {
 		modelStream.append("<outputArc ");
 		modelStream.append("source=\"" + outputArc.source().name() + "\" ");
@@ -24,6 +26,7 @@ public class VerifyPNExporter extends VerifyTAPNExporter {
 		modelStream.append("</outputArc>\n");
 	}
 
+    @Override
 	protected void outputTransportArc(TransportArc transArc, PrintStream modelStream) {
 		modelStream.append("<transportArc ");
 		modelStream.append("source=\"" + transArc.source().name() + "\" ");
@@ -33,7 +36,8 @@ public class VerifyPNExporter extends VerifyTAPNExporter {
 		modelStream.append("</transportArc>\n");
 	}
 
-	protected void outputInhibitorArc(TimedInhibitorArc inhibArc,	PrintStream modelStream) {
+    @Override
+	protected void outputInhibitorArc(TimedInhibitorArc inhibArc, PrintStream modelStream) {
 		modelStream.append("<inhibitorArc ");
 		modelStream.append("source=\"" + inhibArc.source().name() + "\" ");
 		modelStream.append("target=\"" + inhibArc.destination().name() + "\">");

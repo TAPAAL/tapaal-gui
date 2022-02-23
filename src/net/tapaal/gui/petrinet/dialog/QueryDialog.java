@@ -84,7 +84,7 @@ public class QueryDialog extends JPanel {
 	private static final String FASTEST_TRACE_STRING = "Fastest trace       ";
 	private static final String SHARED = "Shared";
 
-	public enum QueryDialogueOption {
+    public enum QueryDialogueOption {
 		VerifyNow, Save, Export
 	}
 
@@ -221,6 +221,7 @@ public class QueryDialog extends JPanel {
 	private final boolean hasInhibitorArcs;
 	private InclusionPlaces inclusionPlaces;
 	private final TAPNLens lens;
+    private final PetriNetTab tab;
 
 	private static final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
 	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
@@ -363,10 +364,11 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_APPROXIMATION_METHOD_UNDER = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
 	private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 
-	public QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens) {
+	private QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
 		this.tapnNetwork = tapnNetwork;
 		this.guiModels = guiModels;
 		this.lens = lens;
+        this.tab = tab;
 		inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
 		newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
@@ -617,8 +619,8 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork,
-                                           HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens) {
-		if(TAPAALGUI.getCurrentTab().network().hasWeights() && !TAPAALGUI.getCurrentTab().network().isNonStrict()){
+                                           HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
+		if(tapnNetwork.hasWeights() && !tapnNetwork.isNonStrict()){
 			JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs",
 					"No reduction option", JOptionPane.ERROR_MESSAGE);
@@ -633,7 +635,7 @@ public class QueryDialog extends JPanel {
 		contentPane.setLayout(new GridBagLayout());
 
 		// 2 Add query editor
-		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, lens);
+		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, lens, tab);
         contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
@@ -3725,7 +3727,7 @@ public class QueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
 						querySaved = true;
 						// Now if a query is saved, the net is marked as modified
-						TAPAALGUI.getCurrentTab().setNetChanged(true);
+						tab.setNetChanged(true);
 						exit();
 					}
 				}
@@ -3735,7 +3737,7 @@ public class QueryDialog extends JPanel {
 					if (checkIfSomeReductionOption()) {
                         querySaved = true;
                         // Now if a query is saved and verified, the net is marked as modified
-                        TAPAALGUI.getCurrentTab().setNetChanged(true);
+                        tab.setNetChanged(true);
                         exit();
                         TAPNQuery query = getQuery();
 
@@ -3860,7 +3862,7 @@ public class QueryDialog extends JPanel {
 
 					try {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-						String composedName = "composed-" + TAPAALGUI.getApp().getCurrentTabName();
+						String composedName = "composed-" + tab.getTabTitle();
 						composedName = composedName.replace(".tapn", "");
 						TAPAALGUI.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
 						exit();
@@ -3875,7 +3877,7 @@ public class QueryDialog extends JPanel {
                     if (checkIfSomeReductionOption()) {
                         querySaved = true;
                         // Now if a query is saved and verified, the net is marked as modified
-                        TAPAALGUI.getCurrentTab().setNetChanged(true);
+                        tab.setNetChanged(true);
 
                         TAPNQuery query = getQuery();
                         if(query.getReductionOption() != ReductionOption.VerifyPN) {
@@ -3897,7 +3899,7 @@ public class QueryDialog extends JPanel {
                                 //Ensure that a net was created by the query reduction
                                 if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
                                     || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
-                                    reducedNetTab.setInitialName("reduced-" + TAPAALGUI.getAppGui().getCurrentTabName());
+                                    reducedNetTab.setInitialName("reduced-" + tab.getTabTitle());
                                     TAPNQuery convertedQuery = query.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
                                     reducedNetTab.addQuery(convertedQuery);
                                     TAPAALGUI.openNewTabFromStream(reducedNetTab);

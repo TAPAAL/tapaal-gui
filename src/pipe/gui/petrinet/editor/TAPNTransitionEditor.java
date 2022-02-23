@@ -16,7 +16,6 @@ import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import net.tapaal.gui.petrinet.editor.ColoredTransitionGuardPanel;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import net.tapaal.gui.petrinet.Context;
@@ -112,7 +111,7 @@ public class TAPNTransitionEditor extends JPanel {
             }else{
                 switchToNameTextField();
                 nameTextField.setText(transition.underlyingTransition().isShared()?
-                TAPAALGUI.getCurrentTab().getNameGenerator().getNewTransitionName(context.activeModel()) : transition.getName());
+                context.nameGenerator().getNewTransitionName(context.activeModel()) : transition.getName());
                 makeSharedButton.setEnabled(true);
             }
         });

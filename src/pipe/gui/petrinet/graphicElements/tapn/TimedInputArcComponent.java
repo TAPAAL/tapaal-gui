@@ -78,10 +78,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	// hacks - I use the weight to display the TimeInterval
 	@Override
 	public void updateLabel(boolean showConstantNames) {
-		//If there is no model we can't set the labels
-		if(TAPAALGUI.getModel() == null) {
-			return;
-		}
         if (inputArc == null)
             getNameLabel().setText("");
         else {
@@ -104,7 +100,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                     }
                 }
                 getNameLabel().setText(arcPrint.toString());
-            } else if (!TAPAALGUI.getApp().showZeroToInfinityIntervals() || (lens != null && !lens.isTimed())) {
+            } else if (!TAPAALGUI.getAppGui().showZeroToInfinityIntervals() || (lens != null && !lens.isTimed())) {
                 if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
                     getNameLabel().setText("");
                 }

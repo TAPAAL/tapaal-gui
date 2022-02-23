@@ -183,14 +183,5 @@ public class SharedTransition {
 		}
 		return true;
 	}
-	public ArrayList<String> getComponentsUsingThisTransition(){
-		ArrayList<String> components = new ArrayList<String>();
-		for(Template t : TAPAALGUI.getCurrentTab().allTemplates()){
-			TimedTransition tt = t.model().getTransitionByName(this.name);
-			if(tt != null){
-				components.add(t.model().name());
-			}
-		}
-		return components;
-	}
+
 }

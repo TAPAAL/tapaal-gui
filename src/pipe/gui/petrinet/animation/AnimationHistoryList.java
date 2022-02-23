@@ -118,7 +118,7 @@ public class AnimationHistoryList extends JList<String> {
 	
 	public void setLastShown(TraceType tracetype){
 		if(lastShown != TraceType.NOT_EG){
-				getListModel().remove(getListModel().size()-1);
+            getListModel().remove(getListModel().size()-1);
 		}
 		lastShown = tracetype;
 		
@@ -139,16 +139,16 @@ public class AnimationHistoryList extends JList<String> {
 
     private void layoutAdjustment() {
         // if the trace ends with "deadlock", "delay for ever" or "goto *" makes sure we don't have to scrool to see it
-        int selectedIndex = TAPAALGUI.getCurrentTab().getAnimationHistorySidePanel().getSelectedIndex();
-        if (selectedIndex == TAPAALGUI.getCurrentTab().getAnimationHistorySidePanel().getListModel().getSize() - 2) {
-            TAPAALGUI.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex + 1);
-            TAPAALGUI.getCurrentTab().getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
+        int selectedIndex = getSelectedIndex();
+        if (selectedIndex == getListModel().getSize() - 2) {
+            setSelectedIndex(selectedIndex + 1);
+            setSelectedIndex(selectedIndex);
         }
     }
 	
 	private void updateAccordingToDeadlock() {
 		
-		if(TAPAALGUI.getApp().getSelectedTabIndex() == -1 || lastShown == TraceType.EG_DELAY_FOREVER){
+		if(lastShown == TraceType.EG_DELAY_FOREVER){
 			return;
 		}
 		for (Template t : TAPAALGUI.getCurrentTab().activeTemplates()){
