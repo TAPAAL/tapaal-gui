@@ -106,9 +106,26 @@ public class writeTACPN { // both export and save share some of the same syntax 
         }
 
         else if(expression instanceof UserOperatorExpression) {
-            Element userOperationElement = document.createElement("useroperator");
-            userOperationElement.setAttribute("declaration", ((UserOperatorExpression) expression).getUserOperator().getColorName());
-            structureElement.appendChild(userOperationElement);
+
+            var color = ((UserOperatorExpression) expression).getUserOperator();
+            var ct = color.getColorType();
+
+            if (!ct.isIntegerRange()) {
+                Element userOperationElement = document.createElement("useroperator");
+                userOperationElement.setAttribute("declaration", ((UserOperatorExpression) expression).getUserOperator().getColorName());
+                structureElement.appendChild(userOperationElement);
+            } else {
+                //TODO: implement int range
+                Element userOperationElement = document.createElement("finiteintrangeconstant");
+                userOperationElement.setAttribute("value", color.getColorName());
+                Element range = document.createElement("finiteintrange");
+                range.setAttribute("start", ""+ ct.getFirstColor());
+                range.setAttribute("end", ""+ ct.getColors().get(ct.size()-1));
+
+                userOperationElement.appendChild(range);
+                structureElement.appendChild(userOperationElement);
+            }
+
         }
         else if(expression instanceof VariableExpression) {
             Element variableElement = document.createElement("variable");
@@ -302,9 +319,24 @@ public class writeTACPN { // both export and save share some of the same syntax 
                 }
                 structureElement.appendChild(tupleElement);
             } else if (expression instanceof UserOperatorExpression) {
-                Element userOperationElement = document.createElement("useroperator");
-                userOperationElement.setAttribute("declaration", ((UserOperatorExpression) expression).getUserOperator().getColorName());
-                structureElement.appendChild(userOperationElement);
+
+                var color = ((UserOperatorExpression) expression).getUserOperator();
+                var ct = color.getColorType();
+                if (!color.getColorType().isIntegerRange()) {
+                    Element userOperationElement = document.createElement("useroperator");
+                    userOperationElement.setAttribute("declaration", color.getColorName());
+                    structureElement.appendChild(userOperationElement);
+                } else {
+                    //TODO: implement int range
+                    Element userOperationElement = document.createElement("finiteintrangeconstant");
+                    userOperationElement.setAttribute("value", color.getColorName());
+                    Element range = document.createElement("finiteintrange");
+                    range.setAttribute("start", ""+ ct.getFirstColor());
+                    range.setAttribute("end", ""+ ct.getColors().get(ct.size()-1));
+
+                    userOperationElement.appendChild(range);
+                    structureElement.appendChild(userOperationElement);
+                }
             } else if (expression instanceof VariableExpression) {
                 Element variableElement = document.createElement("variable");
                 variableElement.setAttribute("refvariable", ((VariableExpression) expression).getVariable().getId());
