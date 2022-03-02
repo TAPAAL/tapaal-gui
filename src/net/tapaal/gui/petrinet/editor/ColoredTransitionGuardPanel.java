@@ -54,7 +54,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     JLabel colorTypeLabel;
     ColorComboboxPanel colorCombobox;
     JLabel colorLabel;
-    JButton addColorButton;
 
     private JTextPane exprField;
 
@@ -148,57 +147,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         colorCombobox = new ColorComboboxPanel((ColorType)colorTypeCombobox.getSelectedItem(),false) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
-
+                addColor();
             }
         };
         colorCombobox.removeScrollPaneBorder();
-        addColorButton = new JButton("Add Color");
-        Dimension addDim = new Dimension(120, 30);
-        addColorButton.setPreferredSize(addDim);
-        addColorButton.setMinimumSize(addDim);
-        addColorButton.setMaximumSize(addDim);
-
-        addColorButton.addActionListener(actionEvent -> {
-            Expression newExpression;
-            if (colorCombobox.getColorTypeComboBoxesArray().length > 1) {
-                Vector<ColorExpression> tempVec = new Vector<>();
-                for (int i = 0; i < colorCombobox.getColorTypeComboBoxesArray().length; i++) {
-                    ColorExpression expr;
-                    Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[i].getSelectedItem();
-                    if ( selectedElement instanceof String) {
-                        expr = new AllExpression(((ProductType)colorCombobox.getColorType()).getColorTypes().get(i));
-                    }else if(selectedElement instanceof Variable){
-                        expr = new VariableExpression((Variable)selectedElement);
-                    } else {
-                        expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
-                    }
-                    expr.setIndex(i);
-                    tempVec.add(expr);
-                }
-                newExpression = new TupleExpression(tempVec);
-            } else {
-                ColorExpression expr;
-                ColorExpression oldExpression = ((ColorExpression)currentSelection.getObject());
-                Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[0].getSelectedItem();
-                if (selectedElement instanceof String) {
-                    expr = new AllExpression(colorCombobox.getColorType());
-                } else if(selectedElement instanceof Variable){
-                    expr = new VariableExpression((Variable)selectedElement);
-                }
-                else {
-                    expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
-                }
-                if(oldExpression.getParent() instanceof TupleExpression){
-                    expr.setParent(oldExpression.getParent());
-                    expr.setIndex(oldExpression.getIndex());
-                }
-                newExpression = expr;
-            }
-            if (currentSelection.getObject() instanceof ColorExpression) {
-                replaceAndAddToUndo(currentSelection.getObject(), newExpression);
-            }
-        });
-
         colorTypeCombobox.addActionListener(actionEvent -> updateColorType());
 
         gbc = new GridBagConstraints();
@@ -218,13 +170,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(3,3,3,3);
         colorExpressionPanel.add(colorCombobox, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(0, 3,0 ,0);
-        colorExpressionPanel.add(addColorButton, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -645,9 +590,47 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         updateSelection(newProperty);
     }
 
+    private void addColor() {
+        Expression newExpression;
+        if (colorCombobox.getColorTypeComboBoxesArray().length > 1) {
+            Vector<ColorExpression> tempVec = new Vector<>();
+            for (int i = 0; i < colorCombobox.getColorTypeComboBoxesArray().length; i++) {
+                ColorExpression expr;
+                Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[i].getSelectedItem();
+                if ( selectedElement instanceof String) {
+                    expr = new AllExpression(((ProductType)colorCombobox.getColorType()).getColorTypes().get(i));
+                } else if (selectedElement instanceof Variable) {
+                    expr = new VariableExpression((Variable)selectedElement);
+                } else {
+                    expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
+                }
+                expr.setIndex(i);
+                tempVec.add(expr);
+            }
+            newExpression = new TupleExpression(tempVec);
+        } else {
+            ColorExpression expr;
+            ColorExpression oldExpression = ((ColorExpression)currentSelection.getObject());
+            Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[0].getSelectedItem();
+            if (selectedElement instanceof String) {
+                expr = new AllExpression(colorCombobox.getColorType());
+            } else if(selectedElement instanceof Variable){
+                expr = new VariableExpression((Variable)selectedElement);
+            } else {
+                expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
+            }
+            if (oldExpression.getParent() instanceof TupleExpression) {
+                expr.setParent(oldExpression.getParent());
+                expr.setIndex(oldExpression.getIndex());
+            }
+            newExpression = expr;
+        }
+        if (currentSelection.getObject() instanceof ColorExpression) {
+            replaceAndAddToUndo(currentSelection.getObject(), newExpression);
+        }
+    }
+
     private void updateEnabledButtons() {
-        colorCombobox.setEnabled(true);
-        colorTypeCombobox.setEnabled(true);
         if(currentSelection == null){
             andButton.setEnabled(false);
             orButton.setEnabled(false);
@@ -660,7 +643,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             lessThanButton.setEnabled(false);
             succButton.setEnabled(false);
             predButton.setEnabled(false);
-            addColorButton.setEnabled(false);
+            colorCombobox.setEnabled(false);
+            colorTypeCombobox.setEnabled(false);
         }
         else if (currentSelection.getObject() instanceof ColorExpression) {
             andButton.setEnabled(false);
@@ -676,7 +660,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 succButton.setEnabled(true);
                 predButton.setEnabled(true);
             }
-            addColorButton.setEnabled(true);
+            colorCombobox.setEnabled(true);
+            colorTypeCombobox.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof GuardExpression) {
             andButton.setEnabled(true);
@@ -690,8 +675,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             lessThanButton.setEnabled(true);
             succButton.setEnabled(false);
             predButton.setEnabled(false);
-            addColorButton.setEnabled(false);
-
+            colorCombobox.setEnabled(false);
+            colorTypeCombobox.setEnabled(false);
         }
         parent.enableOKButton(!newProperty.containsPlaceHolder() || newProperty instanceof PlaceHolderExpression);
     }
@@ -710,7 +695,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         currentSelection = position;
 
         updateEnabledButtons();
-        updateColorOptions();
+        if (colorTypeCombobox.isEnabled()) updateColorOptions();
     }
 
     private void updateSelection() {
@@ -725,11 +710,11 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         currentSelection = position;
 
         updateEnabledButtons();
-        updateColorOptions();
+        if (colorTypeCombobox.isEnabled()) updateColorOptions();
     }
 
-    public void updateColorOptions(){
-        if(currentSelection.getObject() instanceof ColorExpression) {
+    public void updateColorOptions() {
+        if (currentSelection.getObject() instanceof ColorExpression) {
             ColorExpression exprToCheck = ((ColorExpression) currentSelection.getObject()).getBottomColorExpression();
             if (exprToCheck instanceof UserOperatorExpression || exprToCheck instanceof VariableExpression) {
                 if (exprToCheck.getParent() instanceof TupleExpression) {
@@ -737,11 +722,11 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     colorTypeCombobox.setSelectedItem(tupleExpression.getColorTypes().get(exprToCheck.getIndex()));
                     updateColorType();
                     colorTypeCombobox.setEnabled(false);
+                    colorCombobox.setEnabled(false);
                 }
             }
             updateColorTypeCombobox();
-        }else{
-            colorTypeCombobox.setEnabled(true);
+        } else {
             addColorTypesToCombobox(context.network().colorTypes());
         }
     }
@@ -838,7 +823,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         predButton.setEnabled(false);
         colorCombobox.setEnabled(false);
         colorTypeCombobox.setEnabled(false);
-        addColorButton.setEnabled(false);
         resetExprButton.setText("Parse Expression");
         editExprButton.setText("Cancel");
         clearSelection();
