@@ -397,7 +397,6 @@ public class writeTACPN { // both export and save share some of the same syntax 
                     namedsortElement.setAttribute("name", "dot");
                     Element dotElement = document.createElement("dot");
                     namedsortElement.appendChild(dotElement);
-
                 }
                 else {
                     Element namedsortElement = document.createElement("namedsort");
@@ -413,13 +412,20 @@ public class writeTACPN { // both export and save share some of the same syntax 
                             productSortElement.appendChild(usersortElement);
                         }
                     } else {
-                        Element cyclicElement = document.createElement("cyclicenumeration");
-                        namedsortElement.appendChild(cyclicElement);
-                        for (Color color : colorType) {
-                            Element feConstantElement = document.createElement("feconstant");
-                            feConstantElement.setAttribute("id", color.getColorName());
-                            feConstantElement.setAttribute("name", colorType.getName());
-                            cyclicElement.appendChild(feConstantElement);
+                        if (!colorType.isIntegerRange()) {
+                            Element cyclicElement = document.createElement("cyclicenumeration");
+                            namedsortElement.appendChild(cyclicElement);
+                            for (Color color : colorType) {
+                                Element feConstantElement = document.createElement("feconstant");
+                                feConstantElement.setAttribute("id", color.getColorName());
+                                feConstantElement.setAttribute("name", colorType.getName());
+                                cyclicElement.appendChild(feConstantElement);
+                            }
+                        } else {
+                            Element cyclicElement = document.createElement("finiteintrange");
+                            cyclicElement.setAttribute("start", colorType.getFirstColor().getColorName());
+                            cyclicElement.setAttribute("end", colorType.getColors().get(colorType.size()-1).getColorName());
+                            namedsortElement.appendChild(cyclicElement);
                         }
                     }
                 }
