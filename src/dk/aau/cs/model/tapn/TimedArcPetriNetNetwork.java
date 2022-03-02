@@ -95,13 +95,13 @@ public class TimedArcPetriNetNetwork {
 
 	public boolean isNameUsedForShared(String name){
 		for(SharedTransition transition : sharedTransitions){
-			if(transition.name().equalsIgnoreCase(name)) {
+			if(transition.name().equals(name)) {
 				return true;
 			}
 		}
 		
 		for(SharedPlace place : sharedPlaces){
-			if(place.name().equalsIgnoreCase(name)) {
+			if(place.name().equals(name)) {
 				return true;
 			}
 		}
@@ -119,7 +119,7 @@ public class TimedArcPetriNetNetwork {
 	public boolean isNameUsedForPlacesOnly(String name) {
 		for(TimedArcPetriNet net : tapns){
 			for(TimedTransition transition : net.transitions()) {
-				if(name.equalsIgnoreCase(transition.name()))
+				if(name.equals(transition.name()))
 					return false;
 			}
 		}
@@ -128,7 +128,7 @@ public class TimedArcPetriNetNetwork {
 	public boolean isNameUsedForTransitionsOnly(String name) {
 		for(TimedArcPetriNet net : tapns){
 			for(TimedPlace place : net.places()) {
-				if(name.equalsIgnoreCase(place.name()))
+				if(name.equals(place.name()))
 					return false;
 			}
 		}
@@ -366,14 +366,14 @@ public class TimedArcPetriNetNetwork {
 
 	public SharedTransition getSharedTransitionByName(String name) {
 		for(SharedTransition t : sharedTransitions){
-			if(t.name().equalsIgnoreCase(name)) return t;
+			if(t.name().equals(name)) return t;
 		}
 		return null;
 	}
 
 	public TimedPlace getSharedPlaceByName(String name) {
 		for(SharedPlace place : sharedPlaces){
-			if(place.name().equalsIgnoreCase(name)) return place;
+			if(place.name().equals(name)) return place;
 		}
 		return null;
 	}
@@ -660,7 +660,7 @@ public class TimedArcPetriNetNetwork {
 
     public Integer getColorTypeIndex(String name) {
         for (int i = 0; i < colorTypes.size(); i++) {
-            if (colorTypes.get(i).getName().equalsIgnoreCase(name)) {
+            if (colorTypes.get(i).getName().equals(name)) {
                 return i;
             }
         }
@@ -668,7 +668,7 @@ public class TimedArcPetriNetNetwork {
     }
     public ColorType getColorTypeByName(String name) {
         for (ColorType element : colorTypes) {
-            if (element.getName().equalsIgnoreCase(name)) {
+            if (element.getName().equals(name)) {
                 return element;
             }
         }
@@ -677,7 +677,7 @@ public class TimedArcPetriNetNetwork {
 
     public Integer getVariableIndex(String name) {
         for (int i = 0; i < variables.size(); i++) {
-            if (variables.get(i).getName().equalsIgnoreCase(name)) {
+            if (variables.get(i).getName().equals(name)) {
                 return i;
             }
         }
@@ -686,7 +686,7 @@ public class TimedArcPetriNetNetwork {
 
     public boolean isNameUsedForColorType(String name) {
         for (ColorType element : colorTypes) {
-            if (element.getName().equalsIgnoreCase(name)) {
+            if (element.getName().equals(name)) {
                 return true;
             }
         }
@@ -694,7 +694,7 @@ public class TimedArcPetriNetNetwork {
     }
     public boolean isNameUsedForVariable(String name) {
         for (Variable element : variables) {
-            if (element.getName().equalsIgnoreCase(name)) {
+            if (element.getName().equals(name)) {
                 return true;
             }
         }
@@ -704,7 +704,7 @@ public class TimedArcPetriNetNetwork {
         for (ColorType e : colorTypes) {
             if (e != ignored && !e.isIntegerRange() && !e.isProductColorType()){
                 for (Color c : e.getColors()) {
-                    if (c.getName().equalsIgnoreCase(name)) {
+                    if (c.getName().equals(name)) {
                         return true;
                     }
                 }
@@ -718,7 +718,7 @@ public class TimedArcPetriNetNetwork {
 
     public Variable getVariableByName(String name){
         for (Variable variable : variables) {
-            if (variable.getName().equalsIgnoreCase(name)) {
+            if (variable.getName().equals(name)) {
                 return variable;
             }
         }

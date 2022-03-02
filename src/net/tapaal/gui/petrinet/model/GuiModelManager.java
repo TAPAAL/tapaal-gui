@@ -515,4 +515,9 @@ public class GuiModelManager {
     }
 
 
+    public void toggleArcPathPointType(ArcPathPoint pno) {
+        addCommand(
+            pno.togglePointType()
+        );
+    }
 }

@@ -25,7 +25,6 @@ import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.editor.ColorComboboxPanel;
 import net.tapaal.gui.petrinet.editor.ColoredTimeInvariantDialogPanel;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
@@ -249,7 +248,7 @@ public class PlaceEditorPanel extends JPanel {
 				makeSharedButton.setEnabled(false);
 			}else{
 				switchToNameTextField();
-				nameTextField.setText(place.underlyingPlace().isShared()? TAPAALGUI.getCurrentTab().getNameGenerator().getNewPlaceName(context.activeModel()) : place.getName());
+				nameTextField.setText(place.underlyingPlace().isShared()? context.nameGenerator().getNewPlaceName(context.activeModel()) : place.getName());
 				makeSharedButton.setEnabled(true);
 			}
 		});
@@ -318,14 +317,14 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private boolean isUrgencyOK(){
-		for(TransportArc arc : TAPAALGUI.getCurrentTab().currentTemplate().model().transportArcs()){
+		for(TransportArc arc : context.activeModel().transportArcs()){
 			if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent()){
 				JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 		}
 		if(place.underlyingPlace().isShared()){
-			for(Template t : TAPAALGUI.getCurrentTab().allTemplates()){
+			for(Template t : context.tabContent().allTemplates()){
 				for(TransportArc arc : t.model().transportArcs()){
 					if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent()){
 						JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -478,7 +477,7 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private void setRelationModelForConstants() {
-		int value = TAPAALGUI.getCurrentTab().network().getConstantValue(Objects.requireNonNull(invConstantsComboBox.getSelectedItem()).toString());
+		int value = context.network().getConstantValue(Objects.requireNonNull(invConstantsComboBox.getSelectedItem()).toString());
 
 		String selected = Objects.requireNonNull(invRelationConstant.getSelectedItem()).toString();
 		if (value == 0) {
@@ -623,7 +622,7 @@ public class PlaceEditorPanel extends JPanel {
 
 			String newName = nameTextField.getText();
 			String oldName = place.underlyingPlace().name();
-			if(context.activeModel().isNameUsed(newName) && !oldName.equalsIgnoreCase(newName)){
+			if(context.activeModel().isNameUsed(newName) && !oldName.equals(newName)){
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this, "The specified name is already used by another place or transition.", "Error", JOptionPane.ERROR_MESSAGE);
 				return false;

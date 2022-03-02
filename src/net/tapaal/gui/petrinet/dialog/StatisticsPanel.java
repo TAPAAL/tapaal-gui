@@ -41,17 +41,19 @@ public class StatisticsPanel extends JPanel{
 	
 	private static JDialog dialog;
 	private Object[][] contents;
+    private final PetriNetTab tab;
 
-	private StatisticsPanel(Object[][] statistics) {
+    private StatisticsPanel(Object[][] statistics, PetriNetTab tab) {
 		super(new GridBagLayout());
 
 		this.contents = statistics;
+        this.tab = tab;
 
-		init();
+        init();
 	}
 	
-	public static void showStatisticsPanel(Object[][] statistics){
-        StatisticsPanel panel = new StatisticsPanel(statistics);
+	public static void showStatisticsPanel(Object[][] statistics, PetriNetTab tab){
+        StatisticsPanel panel = new StatisticsPanel(statistics, tab);
 
 		JOptionPane optionPane = new JOptionPane(panel, JOptionPane.INFORMATION_MESSAGE);
 		
@@ -176,7 +178,6 @@ public class StatisticsPanel extends JPanel{
     private void addTransitionAction() {
 	    removeOrphanTransitions.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                PetriNetTab tab = TAPAALGUI.getCurrentTab();
                 Iterable<Template> templates = tab.allTemplates();
 
                 UndoManager undoManager = tab.getUndoManager();
@@ -218,7 +219,6 @@ public class StatisticsPanel extends JPanel{
 	private void addPlaceAction() {
         removeOrphanPlaces.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                PetriNetTab tab = TAPAALGUI.getCurrentTab();
                 Iterable<Template> templates = tab.allTemplates();
 
                 UndoManager undoManager = tab.getUndoManager();

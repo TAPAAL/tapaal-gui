@@ -86,7 +86,7 @@ public class TimedTransitionComponent extends Transition {
 
         popup.add(new JPopupMenu.Separator());
 
-        if (TAPAALGUI.getCurrentTab().getLens().isTimed()) {
+        if (lens.isTimed()) {
             final var urgentAction = new JCheckBoxMenuItem();
             urgentAction.setSelected(isUrgent());
             urgentAction.setAction(
@@ -100,7 +100,7 @@ public class TimedTransitionComponent extends Transition {
             popup.add(urgentAction);
         }
 
-        if (TAPAALGUI.getCurrentTab().getLens().isGame()) {
+        if (lens.isGame()) {
             final var uncontrollableAction = new JCheckBoxMenuItem();
             uncontrollableAction.setSelected(isUncontrollable());
             uncontrollableAction.setAction(

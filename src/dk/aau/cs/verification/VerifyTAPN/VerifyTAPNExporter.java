@@ -34,7 +34,7 @@ public class VerifyTAPNExporter {
 		File modelFile = createTempFile(".xml");
 		File queryFile;
 		if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL || (lens != null && !lens.isGame() && lens.isColored())) {
-			queryFile = createTempFile(".xml"); // TODO: Remeber to change this back to XML when verifytapn is updated
+			queryFile = createTempFile(".xml");
 		} else {
 			queryFile = createTempFile(".q");
 		}
@@ -91,27 +91,31 @@ public class VerifyTAPNExporter {
 	protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
         PrintStream modelStream = new PrintStream(modelFile);
 
-	    Collection<DataLayer> guiModels = TAPAALGUI.getCurrentTab().getGuiModels().values();
-
 		modelStream.append("<pnml>\n");
 		modelStream.append("<net id=\"" + model.name() + "\" type=\"P/T net\">\n");
-		for(TimedPlace p : model.places())
-			outputPlace(p, modelStream, guiModels, mapping);
+		for(TimedPlace p : model.places()) {
+            outputPlace(p, modelStream, guiModel, mapping);
+        }
 		
-		for(TimedTransition t : model.transitions())
-			outputTransition(t,modelStream, guiModels, mapping);
+		for(TimedTransition t : model.transitions()) {
+            outputTransition(t,modelStream, guiModel, mapping);
+        }
 		
-		for(TimedInputArc inputArc : model.inputArcs())
-			outputInputArc(inputArc, modelStream);
+		for(TimedInputArc inputArc : model.inputArcs()) {
+            outputInputArc(inputArc, modelStream);
+        }
 		
-		for(TimedOutputArc outputArc : model.outputArcs())
-			outputOutputArc(outputArc, modelStream);
+		for(TimedOutputArc outputArc : model.outputArcs()) {
+            outputOutputArc(outputArc, modelStream);
+        }
 		
-		for(TransportArc transArc : model.transportArcs())
-			outputTransportArc(transArc, modelStream);
+		for(TransportArc transArc : model.transportArcs()) {
+            outputTransportArc(transArc, modelStream);
+        }
 		
-		for(TimedInhibitorArc inhibArc : model.inhibitorArcs())
-			outputInhibitorArc(inhibArc, modelStream);
+		for(TimedInhibitorArc inhibArc : model.inhibitorArcs()) {
+            outputInhibitorArc(inhibArc, modelStream);
+        }
 
 		outputDeclarations(modelStream);
 
@@ -124,16 +128,11 @@ public class VerifyTAPNExporter {
 	    return;
     }
 
-	protected void outputPlace(TimedPlace p, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
-        //remove the net prefix from the place name
-        String placeName = mapping.map(p.name()).value2();
-        Place guiPlace = null;
+	protected void outputPlace(TimedPlace p, PrintStream modelStream, DataLayer guiModel, NameMapping mapping) {
 
-        for (DataLayer guiModel : guiModels ) {
-            guiPlace = guiModel.getPlaceById(placeName);
-            if (guiPlace != null) {
-                break;
-            }
+        Place guiPlace = null;
+        if (guiModel != null) {
+            guiPlace = guiModel.getPlaceByName(p.name());
         }
 
 		modelStream.append("<place ");
@@ -152,19 +151,12 @@ public class VerifyTAPNExporter {
         modelStream.append("</place>\n");
 	}
 
-	protected void outputTransition(TimedTransition t, PrintStream modelStream, Collection<DataLayer> guiModels, NameMapping mapping) {
-        //remove the net prefix from the transition name
-        var m = mapping.map(t.name());
+	protected void outputTransition(TimedTransition t, PrintStream modelStream, DataLayer guiModel, NameMapping mapping) {
 
         Transition guiTransition = null;
-        if (m != null) {
-            String transitionName = m.value2();
-            for(DataLayer guiModel : guiModels){
-                guiTransition = guiModel.getTransitionById(transitionName);
-                if(guiTransition != null){
-                    break;
-                }
-            }
+        if (guiModel != null) {
+            guiTransition = guiModel.getTransitionById(t.name());
+
         }
 
 		modelStream.append("<transition ");

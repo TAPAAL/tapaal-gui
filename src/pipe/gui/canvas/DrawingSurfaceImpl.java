@@ -6,7 +6,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import pipe.gui.petrinet.PetriNetTab;
@@ -35,25 +34,24 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	private static final boolean showDebugBounds = false;
 
 	public DrawingSurfaceImpl(DataLayer dataLayer, PetriNetTab tabContent, Reference<AbstractDrawingSurfaceManager> managerRef) {
-		guiModel = dataLayer;
+		this.guiModel = dataLayer;
 		this.tabContent = tabContent;
 		this.managerRef = managerRef;
+        this.zoomControl = new Zoomer(100);
+
+        selection = new SelectionManager(this);
+
 		setLayout(null);
 		setOpaque(true);
 		setDoubleBuffered(true);
 		setAutoscrolls(true);
 		setBackground(Constants.ELEMENT_FILL_COLOUR);
-
-		zoomControl = new Zoomer(100);
-
 		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-        MouseHandler mouseHandler = new MouseHandler(this);
+
+        MouseHandler mouseHandler = new MouseHandler();
 		addMouseListener(mouseHandler);
 		addMouseMotionListener(mouseHandler);
 		addMouseWheelListener(mouseHandler);
-
-		selection = new SelectionManager(this);
-
 	}
 
 	public DataLayer getGuiModel() {
@@ -61,10 +59,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	}
 
 	public void setModel(DataLayer guiModel, Zoomer zoomer) {
-		//Remove the old model from view
-		this.guiModel.removedFromView();
-		//Add the new model to view
-		guiModel.addedToView(this);
+		this.guiModel.removedFromView(); //Remove the old model from view
+		guiModel.addedToView(this); //Add the new model to view
 
 		this.guiModel = guiModel;
 		this.zoomControl = zoomer;
@@ -98,8 +94,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		repaint();
 	}
 
-	//XXX temp solution while refactorting, component removes children them self
-	//migth not be best solution long term.
+	//XXX temp solution while refactorting, component removes children them self migth not be best solution long term.
 	@Override
 	public void removePetriNetObject(GraphicalElement pno) {
 		pno.removedFromGui();
@@ -141,18 +136,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 				g2.fill(c.getBounds());
 				g2.setPaint(Color.black);
 				g2.draw(c.getBounds());
-
 			}
 		}
-
-		//selection.updateBounds();
-
 	}
 
 	public void updatePreferredSize() {
-		// iterate over net objects
-		// setPreferredSize() accordingly
-
 		Component[] components = getComponents();
 		Dimension d = new Dimension(0, 0);
 		for (Component component : components) {
@@ -186,14 +174,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			if (component.getClass() == SelectionManager.class) {
 				continue; // SelectionObject not included
 			}
-
 			rect.add(component.getBounds());
 		}
 
 		return rect;
 	}
-
-
 
 	public SelectionManager getSelectionObject() {
 		return selection;
@@ -218,13 +203,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		}
 
 		if (changed) {
-			//Update client's preferred size because
-			//the area taken up by the graphics has
-			// changed
+			//Update client's preferred size because the area taken up by the graphics has changed
 			setPreferredSize(current);
 
-			//Let the scroll pane know to update itself
-			//and its scrollbars.
+			//Let the scroll pane know to update itself and its scrollbars.
 			revalidate();
 		}
 	}
@@ -254,63 +236,42 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 	}
 
 	public void zoomToMidPoint() {
-
 		Point midpoint = midpoint(zoomControl.getPercent());
-		zoomTo(midpoint);
 
-	}
+        int zoomPercent = getZoom();
 
-	public void zoomIn() {
-		int zoom = zoomControl.getPercent();
-		if (zoomControl.zoomIn()) {
-			zoomTo(midpoint(zoom));
-		}
-	}
+        JViewport viewport = (JViewport) getParent();
 
-	public void zoomOut() {
-		int zoom = zoomControl.getPercent();
-		if (zoomControl.zoomOut()) {
-			zoomTo(midpoint(zoom));
-		}
-	}
+        Component[] children = getComponents();
 
-	// This function should always be called after a change in zoom.
-	public void zoomTo(Point point) {
+        //Update elements in the view to zoom, i.e resize graphical elements and reposition them, all done in zoomUpdate.
+        for (Component child : children) {
+            if (child instanceof Zoomable) {
+                ((Zoomable) child).zoomUpdate(zoomPercent);
+            }
+        }
 
-		int zoomPercent = getZoom();
+        // Calculate new position of the Drawing Surface.
+        double newZoomedX = Zoomer.getZoomedValue(midpoint.x, zoomPercent);
+        double newZoomedY = Zoomer.getZoomedValue(midpoint.y, zoomPercent);
 
-		JViewport viewport = (JViewport) getParent();
+        int newViewX = (int) (newZoomedX - (viewport.getWidth() * 0.5));
+        if (newViewX < 0) {
+            newViewX = 0;
+        }
 
-		Component[] children = getComponents();
+        int newViewY = (int) (newZoomedY - (viewport.getHeight() * 0.5));
+        if (newViewY < 0) {
+            newViewY = 0;
+        }
 
-		//Update elements in the view to zoom, i.e resize graphical elements and reposition them, all done in zoomUpdate.
-		for (Component child : children) {
-			if (child instanceof Zoomable) {
-				((Zoomable) child).zoomUpdate(zoomPercent);
-			}
-		}
+        viewport.setViewPosition(new Point(newViewX, newViewY));
 
-		// Calculate new position of the Drawing Surface.
-		double newZoomedX = Zoomer.getZoomedValue(point.x, zoomPercent);
-		double newZoomedY = Zoomer.getZoomedValue(point.y, zoomPercent);
+        updatePreferredSize();
+    }
 
-		int newViewX = (int) (newZoomedX - (viewport.getWidth() * 0.5));
-		if (newViewX < 0) {
-			newViewX = 0;
-		}
-
-		int newViewY = (int) (newZoomedY - (viewport.getHeight() * 0.5));
-		if (newViewY < 0) {
-			newViewY = 0;
-		}
-
-		viewport.setViewPosition(new Point(newViewX, newViewY));
-
-
-		updatePreferredSize();
-	}
-
-	public int getZoom() {
+    // This function should always be called after a change in zoom.
+    public int getZoom() {
 		return zoomControl.getPercent();
 	}
 
@@ -359,6 +320,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
         p.setLocation(x, y);
         return p;
     }
+
     public Point adjustPointToGrid(Point p) {
         int x = Grid.getModifiedX(p.x);
         int y = Grid.getModifiedY(p.y);
@@ -373,13 +335,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
         return newP;
     }
 
-    class MouseHandler extends MouseInputAdapter {
+    final class MouseHandler extends MouseInputAdapter {
 
-		private final DrawingSurfaceImpl view;
-
-		public MouseHandler(DrawingSurfaceImpl _view) {
+        public MouseHandler() {
 			super();
-			view = _view;
         }
 
 		@Override
@@ -425,11 +384,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 			}
 			if (e.isControlDown()) {
 				if (e.getWheelRotation() > 0) {
-					view.zoomIn();
+					tabContent.zoomIn();
 				} else {
-					view.zoomOut();
+					tabContent.zoomOut();
 				}
-				TAPAALGUI.getAppGui().updateZoomCombo();
 			} else {
 				//Dispatch Event to scroll pane to allow scrolling up/down. -- kyrke
 				getParent().dispatchEvent(e);
@@ -441,8 +399,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
 		this.repaint();
 		guiModel.repaintAll(!tabContent.isInAnimationMode());
 	}
-
-
 
 	public void translateSelection(int transX, int transY) {
         var objects = getSelectionObject().getSelection();

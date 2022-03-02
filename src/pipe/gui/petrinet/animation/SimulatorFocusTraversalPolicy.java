@@ -3,19 +3,25 @@ package pipe.gui.petrinet.animation;
 import pipe.gui.GuiFrame;
 import pipe.gui.TAPAALGUI;
 
+import javax.swing.*;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FocusTraversalPolicy;
 
-public class SimulatorFocusTraversalPolicy extends FocusTraversalPolicy {
+public final class SimulatorFocusTraversalPolicy extends FocusTraversalPolicy {
 
-	@Override
+    private final JTextField timeDelayField;
+    public SimulatorFocusTraversalPolicy(JTextField timeDelayField) {
+        this.timeDelayField = timeDelayField;
+    }
+
+    @Override
 	public Component getComponentAfter(Container aContainer,
 			Component aComponent) {
 		
 		Component comp = TAPAALGUI.getApp();
 		if(aComponent instanceof GuiFrame){
-			comp = TAPAALGUI.getCurrentTab().getAnimationController().TimeDelayField;
+			comp = timeDelayField;
 		}
 		
 		return comp;
@@ -26,7 +32,7 @@ public class SimulatorFocusTraversalPolicy extends FocusTraversalPolicy {
 			Component aComponent) {
 		Component comp = TAPAALGUI.getApp();
 		if(aComponent instanceof GuiFrame){
-			comp = TAPAALGUI.getCurrentTab().getAnimationController().TimeDelayField;
+			comp = timeDelayField;
 		}
 		return comp;
 	}
@@ -43,7 +49,7 @@ public class SimulatorFocusTraversalPolicy extends FocusTraversalPolicy {
 
 	@Override
 	public Component getLastComponent(Container aContainer) {
-		return TAPAALGUI.getCurrentTab().getAnimationController().TimeDelayField;
+		return timeDelayField;
 	}
 
 }

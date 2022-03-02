@@ -70,7 +70,7 @@ public class Animator {
     }
 
     public void setTrace(TAPNNetworkTrace trace) {
-        TAPAALGUI.getCurrentTab().setAnimationMode(true);
+        tab.setAnimationMode(true);
 
         try {
             if (trace.isConcreteTrace()) {
@@ -88,7 +88,7 @@ public class Animator {
             updateFireableTransitions();
         } catch (RequireException e) {
             unhighlightDisabledTransitions();
-            TAPAALGUI.getCurrentTab().setAnimationMode(false);
+            tab.setAnimationMode(false);
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "There was an error in the trace. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -162,7 +162,7 @@ public class Animator {
                 if (t.isTransitionEnabled()) {
                     t.markTransitionEnabled(true);
                     transFireComponent.addTransition(template, t);
-                } else if (TAPAALGUI.getApp().isShowingDelayEnabledTransitions() &&
+                } else if (TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() &&
                     t.isDelayEnabled() && !isUrgentTransitionEnabled
                 ) {
                     t.markTransitionDelayEnabled(true);
@@ -307,7 +307,7 @@ public class Animator {
     }
 
     public void dFireTransition(TimedTransition transition){
-        if(!TAPAALGUI.getApp().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
+        if(!TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
             fireTransition(transition);
             return;
         }
@@ -692,7 +692,7 @@ public class Animator {
     public final GuiAction stepbackwardAction = TAPAALGUI.getAppGui().stepbackwardAction;
 
     public void updateAnimationButtonsEnabled() {
-        AnimationHistoryList animationHistory = TAPAALGUI.getCurrentTab().getAnimationHistorySidePanel();
+        AnimationHistoryList animationHistory = tab.getAnimationHistorySidePanel();
 
         setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
         setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
@@ -705,7 +705,7 @@ public class Animator {
      */
     private void updateMouseOverInformation() {
         // update mouseOverView
-        for (Place p : TAPAALGUI.getCurrentTab().getModel().getPlaces()) {
+        for (Place p : tab.getModel().getPlaces()) {
             if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
                 ((TimedPlaceComponent) p).showAgeOfTokens(true);
             }

@@ -121,7 +121,7 @@ public abstract class Transition extends PlaceTransitionObject {
 
 		if (highlightedEnabled) {
 			g2.setPaint(Constants.ENABLED_TRANSITION_COLOUR);
-		} else if (highlightedDelayEnabled && TAPAALGUI.getApp().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
+		} else if (highlightedDelayEnabled && TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
 			g2.setPaint(Constants.YELLOW_TRANSITION_COLOR);
 		} else if (selected) {
 			g2.setPaint(Constants.SELECTION_LINE_COLOUR);

@@ -32,6 +32,7 @@ import org.xml.sax.SAXParseException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+import pipe.gui.petrinet.PetriNetTab;
 
 public class XMLQueryLoader extends QueryLoader{
 
@@ -213,7 +214,7 @@ public class XMLQueryLoader extends QueryLoader{
         return allPathsCounter;
     }
 
-    public static void importQueries(File file, TimedArcPetriNetNetwork network){
+    public static void importQueries(File file, TimedArcPetriNetNetwork network, PetriNetTab tab){
         XMLQueryLoader loader = new XMLQueryLoader(file, network);
 
         // Suppress default error message
@@ -222,7 +223,7 @@ public class XMLQueryLoader extends QueryLoader{
         if (loadedQueries == null) return;
 	
         for(TAPNQuery query : loadedQueries.getQueries()){
-            TAPAALGUI.getCurrentTab().addQuery(query);
+            tab.addQuery(query);
 
             // Remove successfully parsed queries from list
             for(QueryWrapper q : loader.faultyQueries){

@@ -163,8 +163,8 @@ public class SimulationControl extends JPanel {
 		dialog.setResizable(false);
 		
 		//Calculate location
-		int x = TAPAALGUI.getApp().getLocation().x + TAPAALGUI.getApp().getWidth() - dialog.getWidth() - 30;
-		int y = TAPAALGUI.getApp().getLocation().y + 30;
+		int x = TAPAALGUI.getAppGui().getLocation().x + TAPAALGUI.getAppGui().getWidth() - dialog.getWidth() - 30;
+		int y = TAPAALGUI.getAppGui().getLocation().y + 30;
 		
 		dialog.setLocation(x, y);
 		dialog.setVisible(true);

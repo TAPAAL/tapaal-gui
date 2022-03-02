@@ -106,9 +106,26 @@ public class writeTACPN { // both export and save share some of the same syntax 
         }
 
         else if(expression instanceof UserOperatorExpression) {
-            Element userOperationElement = document.createElement("useroperator");
-            userOperationElement.setAttribute("declaration", ((UserOperatorExpression) expression).getUserOperator().getColorName());
-            structureElement.appendChild(userOperationElement);
+
+            var color = ((UserOperatorExpression) expression).getUserOperator();
+            var ct = color.getColorType();
+
+            if (!ct.isIntegerRange()) {
+                Element userOperationElement = document.createElement("useroperator");
+                userOperationElement.setAttribute("declaration", ((UserOperatorExpression) expression).getUserOperator().getColorName());
+                structureElement.appendChild(userOperationElement);
+            } else {
+                //TODO: implement int range
+                Element userOperationElement = document.createElement("finiteintrangeconstant");
+                userOperationElement.setAttribute("value", color.getColorName());
+                Element range = document.createElement("finiteintrange");
+                range.setAttribute("start", ""+ ct.getFirstColor());
+                range.setAttribute("end", ""+ ct.getColors().get(ct.size()-1));
+
+                userOperationElement.appendChild(range);
+                structureElement.appendChild(userOperationElement);
+            }
+
         }
         else if(expression instanceof VariableExpression) {
             Element variableElement = document.createElement("variable");
@@ -302,9 +319,24 @@ public class writeTACPN { // both export and save share some of the same syntax 
                 }
                 structureElement.appendChild(tupleElement);
             } else if (expression instanceof UserOperatorExpression) {
-                Element userOperationElement = document.createElement("useroperator");
-                userOperationElement.setAttribute("declaration", ((UserOperatorExpression) expression).getUserOperator().getColorName());
-                structureElement.appendChild(userOperationElement);
+
+                var color = ((UserOperatorExpression) expression).getUserOperator();
+                var ct = color.getColorType();
+                if (!color.getColorType().isIntegerRange()) {
+                    Element userOperationElement = document.createElement("useroperator");
+                    userOperationElement.setAttribute("declaration", color.getColorName());
+                    structureElement.appendChild(userOperationElement);
+                } else {
+                    //TODO: implement int range
+                    Element userOperationElement = document.createElement("finiteintrangeconstant");
+                    userOperationElement.setAttribute("value", color.getColorName());
+                    Element range = document.createElement("finiteintrange");
+                    range.setAttribute("start", ""+ ct.getFirstColor());
+                    range.setAttribute("end", ""+ ct.getColors().get(ct.size()-1));
+
+                    userOperationElement.appendChild(range);
+                    structureElement.appendChild(userOperationElement);
+                }
             } else if (expression instanceof VariableExpression) {
                 Element variableElement = document.createElement("variable");
                 variableElement.setAttribute("refvariable", ((VariableExpression) expression).getVariable().getId());
@@ -365,7 +397,6 @@ public class writeTACPN { // both export and save share some of the same syntax 
                     namedsortElement.setAttribute("name", "dot");
                     Element dotElement = document.createElement("dot");
                     namedsortElement.appendChild(dotElement);
-
                 }
                 else {
                     Element namedsortElement = document.createElement("namedsort");
@@ -381,13 +412,20 @@ public class writeTACPN { // both export and save share some of the same syntax 
                             productSortElement.appendChild(usersortElement);
                         }
                     } else {
-                        Element cyclicElement = document.createElement("cyclicenumeration");
-                        namedsortElement.appendChild(cyclicElement);
-                        for (Color color : colorType) {
-                            Element feConstantElement = document.createElement("feconstant");
-                            feConstantElement.setAttribute("id", color.getColorName());
-                            feConstantElement.setAttribute("name", colorType.getName());
-                            cyclicElement.appendChild(feConstantElement);
+                        if (!colorType.isIntegerRange()) {
+                            Element cyclicElement = document.createElement("cyclicenumeration");
+                            namedsortElement.appendChild(cyclicElement);
+                            for (Color color : colorType) {
+                                Element feConstantElement = document.createElement("feconstant");
+                                feConstantElement.setAttribute("id", color.getColorName());
+                                feConstantElement.setAttribute("name", colorType.getName());
+                                cyclicElement.appendChild(feConstantElement);
+                            }
+                        } else {
+                            Element cyclicElement = document.createElement("finiteintrange");
+                            cyclicElement.setAttribute("start", colorType.getFirstColor().getColorName());
+                            cyclicElement.setAttribute("end", colorType.getColors().get(colorType.size()-1).getColorName());
+                            namedsortElement.appendChild(cyclicElement);
                         }
                     }
                 }

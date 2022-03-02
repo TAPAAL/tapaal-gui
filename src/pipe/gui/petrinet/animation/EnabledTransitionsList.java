@@ -25,9 +25,12 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 //TODO clean up!!! 
 public class EnabledTransitionsList extends JPanel{
 
-	public EnabledTransitionsList() {
+    private Animator animator;
+
+    public EnabledTransitionsList(Animator animator) {
 		super(new BorderLayout());
-		this.setPreferredSize(new Dimension(0, 300));
+        this.animator = animator;
+        this.setPreferredSize(new Dimension(0, 300));
 		initPanel();
 	}
 
@@ -107,7 +110,7 @@ public class EnabledTransitionsList extends JPanel{
 		TransitionListItem item = transitionsList.getSelectedValue();
 
 		if(item != null) {
-			TAPAALGUI.getAnimator().dFireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
+			animator.dFireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
 		}
 	}
 
@@ -138,7 +141,7 @@ public class EnabledTransitionsList extends JPanel{
 		}
 		
 		public String toString(){
-			if(TAPAALGUI.getApp().isShowingDelayEnabledTransitions()){
+			if(TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions()){
 				return toString(true);
 			} else {
 				return toString(false);

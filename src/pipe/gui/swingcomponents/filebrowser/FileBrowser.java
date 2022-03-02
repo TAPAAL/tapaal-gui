@@ -24,7 +24,7 @@ public class FileBrowser {
     protected String specifiedPath;
 
     private FileBrowser(String filetype, String[] extensions, String path) {
-        fileDialog = new FileDialog(TAPAALGUI.getAppGui(), filetype);
+        fileDialog = new FileDialog(TAPAALGUI.getApp(), filetype);
         this.fileExtensions = extensions;
         this.specifiedPath = path;
 
@@ -137,7 +137,7 @@ public class FileBrowser {
 
             // Overwrite dialog is already shown, but since we changed the named file, we need to show it again
             if (destination.exists()) {
-                int overRide = JOptionPane.showConfirmDialog(TAPAALGUI.getAppGui(), newName + "\nDo you want to overwrite this file?");
+                int overRide = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), newName + "\nDo you want to overwrite this file?");
                 switch (overRide) {
                     case JOptionPane.NO_OPTION:
                         return saveFile(suggestedName); // Reopen dialog to select new name

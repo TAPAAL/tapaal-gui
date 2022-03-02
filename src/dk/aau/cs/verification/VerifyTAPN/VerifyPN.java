@@ -242,7 +242,7 @@ public class VerifyPN implements ModelChecker {
         } else {
             exporter = new VerifyPNExporter();
         }
-        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, null, model.value2(), guiModel, dataLayerQuery);
+        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, lens, model.value2(), guiModel, dataLayerQuery);
 
         if (exportedModel == null) {
             messenger.displayErrorMessage("There was an error exporting the model");
@@ -317,7 +317,7 @@ public class VerifyPN implements ModelChecker {
                         if (!(tapnTrace == null)) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
-                                newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(TAPAALGUI.getCurrentTab().getLens().isTimed(), TAPAALGUI.getCurrentTab().getLens().isGame(), false));
+                                newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
 
                                 //The query being verified should be the only query
                                 for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {

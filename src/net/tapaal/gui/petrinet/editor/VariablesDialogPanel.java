@@ -258,7 +258,7 @@ public class VariablesDialogPanel extends JPanel {
             return;
         }
         //If we are editing a variable it is allowed to have the same name
-        if ((variable == null || !variable.getName().equalsIgnoreCase(newName)) && network.isNameUsedForVariable(newName) ) {
+        if ((variable == null || !variable.getName().equals(newName)) && network.isNameUsedForVariable(newName) ) {
             JOptionPane
                     .showMessageDialog(
                             TAPAALGUI.getApp(),
@@ -268,7 +268,7 @@ public class VariablesDialogPanel extends JPanel {
             nameTextField.requestFocusInWindow();
             return;
         }
-        if (!oldName.equals("") && !oldName.equalsIgnoreCase(newName) && network.isNameUsedForVariable(newName)) {
+        if (!oldName.equals("") && !oldName.equals(newName) && network.isNameUsedForVariable(newName)) {
             JOptionPane
                     .showMessageDialog(
                             TAPAALGUI.getApp(),

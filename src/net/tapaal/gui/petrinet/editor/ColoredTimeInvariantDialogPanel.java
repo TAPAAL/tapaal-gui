@@ -5,7 +5,6 @@ import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.gui.petrinet.Template;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.swingcomponents.WidthAdjustingComboBox;
 
@@ -63,7 +62,7 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
     }
 
     private void setRelationModelForConstants() {
-        int value = TAPAALGUI.getCurrentTab().network().getConstantValue(Objects.requireNonNull(invConstantsComboBox.getSelectedItem()).toString());
+        int value = context.network().getConstantValue(Objects.requireNonNull(invConstantsComboBox.getSelectedItem()).toString());
 
         String selected = Objects.requireNonNull(invRelationConstant.getSelectedItem()).toString();
         if (value == 0) {
@@ -97,14 +96,14 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
     }
 
     protected boolean isUrgencyOK(){
-        for(TransportArc arc : TAPAALGUI.getCurrentTab().currentTemplate().model().transportArcs()){
+        for(TransportArc arc : context.activeModel().transportArcs()){
             if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent()){
                 JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         }
         if(place.underlyingPlace().isShared()){
-            for(Template t : TAPAALGUI.getCurrentTab().allTemplates()){
+            for(Template t : context.tabContent().allTemplates()){
                 for(TransportArc arc : t.model().transportArcs()){
                     if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent()){
                         JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);

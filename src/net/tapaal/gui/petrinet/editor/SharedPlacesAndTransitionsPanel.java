@@ -333,7 +333,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 		else {
 			removeButton.setToolTipText(toolTipRemovePlace);
 		}
-		removeButton.addActionListener(new DeleteSharedPlaceOrTransition(list, this, tab, sharedPlacesListModel, sharedTransitionsListModel,nameGenerator));
+		removeButton.addActionListener(new DeleteSharedPlaceOrTransitionAction(list, this, tab, sharedPlacesListModel, sharedTransitionsListModel,nameGenerator));
 
 		if (isDisplayingTransitions()){
 			addButton.setToolTipText(toolTipNewTransition);
