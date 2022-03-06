@@ -116,7 +116,7 @@ public class TikZExporter {
             out.append("% Arc between " + arc.getSource().getName() + " and " + arc.getTarget().getName() + "\n");
 			out.append("\\draw[");
 			out.append(arrowType);
-			out.append(",pos=0.0] (");
+			out.append(",pos=0.5] (");
 			out.append(arc.getSource().getId());
 			out.append(") ");
 			out.append(arcPoints);
