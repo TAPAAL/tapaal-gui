@@ -14,12 +14,12 @@ import pipe.gui.petrinet.animation.Animator;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.petrinet.PetriNetTab;
 
+import javax.swing.*;
+
 public class TAPAALGUI {
 
 	private final static GuiFrame appGui = new GuiFrame(TAPAAL.getProgramName());
     private final static GuiFrameController appGuiController = new GuiFrameController(appGui);
-
-	private static final ArrayList<PetriNetTab> tabs = new ArrayList<PetriNetTab>();
 
 	public static void init() {
 
@@ -53,69 +53,12 @@ public class TAPAALGUI {
 		appGuiController.checkForUpdate(false);
 	}
 
-	@Deprecated
-	public static DataLayer getModel() {
-        return getModel(appGui.getSelectedTabIndex());
-	}
-
-	@Deprecated
-	public static DataLayer getModel(int index) {
-		if (index < 0) {
-			return null;
-		}
-
-		PetriNetTab tab = (tabs.get(index));
-		return tab.getModel();
-	}
-
-	@Deprecated
-	public static DrawingSurfaceImpl getDrawingSurface() {
-		return getDrawingSurface(appGui.getSelectedTabIndex());
-	}
-
-	@Deprecated
-	public static DrawingSurfaceImpl getDrawingSurface(int index) {
-
-		if (index < 0) {
-			return null;
-		}
-
-		PetriNetTab tab = (tabs.get(index));
-
-		return tab.drawingSurface();
-	}
-
-	@Deprecated
-	public static void addTab (PetriNetTab tab ) {
-		tabs.add(tab);
-	}
-
-	@Deprecated
-	public static void removeTab(int index) {
-		tabs.remove(index);
-	}
-
-	@Deprecated
-	public static void removeTab(PetriNetTab tab) {
-		tabs.remove(tab);
-	}
-
-	@Deprecated
-	public static PetriNetTab getTab(int index) {
-		if (index < 0) {
-			return null;
-		}
-		return tabs.get(index);
-	}
-
-	@Deprecated
-	public static List<PetriNetTab> getTabs() {
-		return tabs;
-	}
+    //XXX Please avoid using the function below. It is only used for legacy code, or quick prototyping
+    // instead pass down arguments using the constructor.
 
 	@Deprecated
 	public static PetriNetTab getCurrentTab() {
-		return getTab(appGui.getSelectedTabIndex());
+		return appGuiController.getTabs().get(appGui.getSelectedTabIndex());
 	}
 
 	/**
@@ -123,29 +66,35 @@ public class TAPAALGUI {
 	 */
 	@Deprecated
 	public static Animator getAnimator() {
-		if (getCurrentTab() == null) {
+        var tab = getCurrentTab();
+		if (tab == null) {
 			return null;
 		}
-		return getCurrentTab().getAnimator();
+		return tab.getAnimator();
 	}
 	
 	//XXX Two Methodes to access same data (created after auto encapsulate)
-	@Deprecated
-	public static GuiFrame getApp() { // returns a reference to the application
+	//Used for setting parent in popups
+    @Deprecated
+	public static JFrame getApp() { // returns a reference to the application
 		return getAppGui();
 	}
-	@Deprecated
+
+    //Used for aceessing the GuiFrame
+    @Deprecated
 	public static GuiFrame getAppGui() {
 		return appGui;
 	}
 
 	//XXX The following function should properly not be used and is only used while refactoring, but is better
 	// that the chained access via guiFrame, App or drawingsurface now marked with deprecation.
+    @Deprecated
 	public static PetriNetTab openNewTabFromStream(InputStream file, String name) throws Exception {
 		PetriNetTab tab = PetriNetTab.createNewTabFromInputStream(file, name);
 		appGuiController.openTab(tab);
 		return tab;
 	}
+    @Deprecated
 	public static PetriNetTab openNewTabFromStream(PetriNetTab tab) {
 		appGuiController.openTab(tab);
 		return tab;
@@ -156,7 +105,7 @@ public class TAPAALGUI {
         return appGuiController;
     }
 
-
+    @Deprecated
     public static boolean useExtendedBounds = false;
 
 }

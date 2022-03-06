@@ -1,36 +1,8 @@
 package pipe.gui.petrinet;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
-import java.io.*;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-
-import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.Parsing.ParseException;
+import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
-import net.tapaal.gui.GuiFrameActions;
-import net.tapaal.gui.GuiFrameControllerActions;
-import net.tapaal.gui.SafeGuiFrameActions;
-import net.tapaal.gui.TabActions;
-import net.tapaal.gui.petrinet.TAPNLens;
-import net.tapaal.gui.petrinet.model.ModelViolation;
-import net.tapaal.gui.petrinet.model.Result;
-import net.tapaal.gui.petrinet.NameGenerator;
-import net.tapaal.gui.petrinet.TabTransformer;
-import net.tapaal.gui.petrinet.editor.TemplateExplorer;
-import net.tapaal.gui.petrinet.model.GuiModelManager;
-import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
-import net.tapaal.gui.petrinet.dialog.NameVisibilityPanel;
-import net.tapaal.gui.petrinet.dialog.StatisticsPanel;
-import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
@@ -41,38 +13,74 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.Preferences;
+import net.tapaal.copypaste.CopyPastImportExport;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
+import net.tapaal.gui.GuiFrameActions;
+import net.tapaal.gui.GuiFrameControllerActions;
+import net.tapaal.gui.SafeGuiFrameActions;
+import net.tapaal.gui.TabActions;
+import net.tapaal.gui.petrinet.NameGenerator;
+import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.TabTransformer;
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
+import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
+import net.tapaal.gui.petrinet.dialog.NameVisibilityPanel;
+import net.tapaal.gui.petrinet.dialog.StatisticsPanel;
+import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
+import net.tapaal.gui.petrinet.dialog.WorkflowDialog;
+import net.tapaal.gui.petrinet.editor.ConstantsPane;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel;
+import net.tapaal.gui.petrinet.editor.TemplateExplorer;
+import net.tapaal.gui.petrinet.model.GuiModelManager;
+import net.tapaal.gui.petrinet.model.ModelViolation;
+import net.tapaal.gui.petrinet.model.Result;
 import net.tapaal.gui.petrinet.undo.ChangeSpacingEditCommand;
+import net.tapaal.gui.petrinet.undo.Command;
+import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.*;
+import net.tapaal.gui.petrinet.widgets.QueryPane;
+import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.swinghelpers.JSplitPaneFix;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
-import pipe.gui.petrinet.dataLayer.DataLayer;
-import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import net.tapaal.gui.petrinet.Template;
-import pipe.gui.*;
-import pipe.gui.petrinet.action.GuiAction;
+import pipe.gui.Constants;
+import pipe.gui.GuiFrame;
+import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.canvas.Grid;
 import pipe.gui.canvas.Zoomer;
+import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.petrinet.animation.AnimationControlSidePanel;
 import pipe.gui.petrinet.animation.AnimationHistoryList;
 import pipe.gui.petrinet.animation.AnimationHistorySidePanel;
 import pipe.gui.petrinet.animation.Animator;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.*;
 import pipe.gui.petrinet.graphicElements.tapn.*;
 import pipe.gui.petrinet.undo.UndoManager;
-import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
-import net.tapaal.gui.petrinet.editor.ConstantsPane;
-import net.tapaal.gui.petrinet.widgets.QueryPane;
-import net.tapaal.gui.petrinet.dialog.WorkflowDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.*;
 
 public class PetriNetTab extends JSplitPane implements TabActions {
 
@@ -118,13 +126,29 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<>();
 
 
-	final UndoManager undoManager = new UndoManager();
+	final UndoManager undoManager = new UndoManager(this); //warning leaking this, should be ok as it only used after construction
 
     private final MutableReference<GuiFrameActions> app = new MutableReference<>();
     private final MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
 
     final MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
 	public final GuiModelManager guiModelManager = new GuiModelManager(this);
+
+    private final Animator animator = new Animator(this);
+    private boolean netChanged = false;
+    @Override
+    public boolean getNetChanged() {
+        return netChanged;
+    }
+
+    public void setNetChanged(boolean _netChanged) {
+        netChanged = _netChanged;
+    }
+    private final NameGenerator nameGenerator = new NameGenerator();
+
+    public NameGenerator getNameGenerator() {
+        return nameGenerator;
+    }
 
     /**
 	 * Creates a new tab with the selected filestream
@@ -142,12 +166,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			if (loadedModel.getMessages().size() != 0) {
                 new Thread(() -> {
                     TAPAALGUI.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                    String message = "While loading the net we found one or more warnings: \n\n";
+                    StringBuilder message = new StringBuilder("While loading the net we found one or more warnings: \n\n");
                     for (String s : loadedModel.getMessages()) {
-                        message += s + "\n\n";
+                        message.append(s).append("\n\n");
                     }
 
-                    new MessengerImpl().displayInfoMessage(message, "Warning");
+                    new MessengerImpl().displayInfoMessage(message.toString(), "Warning");
                 }).start();
             }
 
@@ -170,11 +194,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     public static TAPNLens getFileLens(InputStream file) throws Exception {
         ModelLoader loader = new ModelLoader();
         return loader.loadLens(file);
-
     }
 
 	private static void checkQueries(PetriNetTab tab) {
-        List<TAPNQuery> queriesToRemove = new ArrayList<TAPNQuery>();
+        List<TAPNQuery> queriesToRemove = new ArrayList<>();
         EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
         boolean gameChanged = false;
 
@@ -244,19 +267,19 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 }
             }
         }
-        String message = "";
+        StringBuilder message = new StringBuilder();
         if (!queriesToRemove.isEmpty()) {
-            message = "The following queries will be removed in the conversion:";
+            message = new StringBuilder("The following queries will be removed in the conversion:");
             for (TAPNQuery q : queriesToRemove) {
-                message += "\n" + q.getName();
+                message.append("\n").append(q.getName());
             }
         }
         if (gameChanged) {
-            message += (message.length() == 0 ? "" : "\n\n");
-            message += "Some options may have been changed to make the query compatible with the net features.";
+            message.append(message.length() == 0 ? "" : "\n\n");
+            message.append("Some options may have been changed to make the query compatible with the net features.");
         }
         if(message.length() > 0){
-            final String fmessage = message;
+            final String fmessage = message.toString();
             //XXX: we should not do pop-up form there! I think these check should be part of loading a net.
             new Thread(() -> {
                 TAPAALGUI.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -295,17 +318,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
                 PetriNetTab tab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
-                String name = null;
-
-                name = file.getName().replaceAll(".pnml", ".tapn");
+                String name = file.getName().replaceAll(".pnml", ".tapn");
                 tab.setInitialName(name);
 
 				tab.selectFirstElements();
 
 				tab.setMode(DrawTool.SELECT);
-
-                //appView.updatePreferredSize(); //XXX 2018-05-23 kyrke seems not to be needed
-                name = name.replace(".pnml",".tapn"); // rename .pnml input file to .tapn
                 return tab;
 
 			} catch (Exception e) {
@@ -331,7 +349,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 			InputStream stream = new FileInputStream(file);
 			PetriNetTab tab = createNewTabFromInputStream(stream, name);
-			if (tab != null && !showFileEndingChangedMessage) tab.setFile(file);
+			if (!showFileEndingChangedMessage) tab.setFile(file);
 
 			showFileEndingChangedMessage(showFileEndingChangedMessage);
 
@@ -359,12 +377,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     final AbstractDrawingSurfaceManager animationModeController;
 
 	//GUI
-	private final HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<TimedArcPetriNet, Boolean>();
+	private final HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<>();
 
 	private final JScrollPane drawingSurfaceScroller;
 	private JScrollPane editorSplitPaneScroller;
 	private JScrollPane animatorSplitPaneScroller;
-	private DrawingSurfaceImpl drawingSurface;
+	private final DrawingSurfaceImpl drawingSurface;
 	private File appFile;
 	private final JPanel drawingSurfaceDummy;
 
@@ -422,7 +440,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         guiModels.clear();
         for (Template template : templates) {
-            addGuiModel(template.model(), template.guiModel());
+            TimedArcPetriNet net = template.model();
+            DataLayer guiModel = template.guiModel();
+
+            guiModels.put(net, guiModel);
+            guiModelToModel.put(guiModel, net);
             zoomLevels.put(template.model(), template.zoomer());
             hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
 
@@ -443,7 +465,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         drawingSurface.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                TAPAALGUI.getApp().requestFocus();
+                TAPAALGUI.getAppGui().requestFocus();
             }
         });
 
@@ -635,14 +657,15 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return this.guiModels;
 	}
 
+    private int newNameCounter = 1;
+
 
     //XXX this is a temp solution while refactoring
 	// to keep the name of the net when the when a file is not set.
 	String initialName = "";
 	public void setInitialName(String name) {
 		if (name == null || name.isEmpty()) {
-			name = "New Petri net " + (TAPAALGUI.getApp().getNameCounter()) + ".tapn";
-			TAPAALGUI.getApp().incrementNameCounter();
+			name = "New Petri net " + (newNameCounter++) + ".tapn";
 		} else if (!name.toLowerCase().endsWith(".tapn")){
 			name = name + ".tapn";
 		}
@@ -672,13 +695,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     private void createAnimatorSplitPane() {
 
-        animationHistorySidePanel = new AnimationHistorySidePanel();
+        animationHistorySidePanel = new AnimationHistorySidePanel(animator);
 
         if (animControlerBox == null) {
-            createAnimationControlSidePanel();
+            animControlerBox = new AnimationControlSidePanel(animator, lens);
         }
 		if (transitionFiring == null) {
-            createTransitionFiring();
+            transitionFiring = new TransitionFiringComponent(TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions(), lens, animator);
         }
 
 		boolean floatingDividers = false;
@@ -822,19 +845,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		animatorSplitPane.validate();
 	}
 
-	private void createAnimationControlSidePanel() {
-		animControlerBox = new AnimationControlSidePanel(animator, lens);
-	}
-
-	public AnimationHistoryList getAnimationHistorySidePanel() {
+    public AnimationHistoryList getAnimationHistorySidePanel() {
 		return animationHistorySidePanel.getAnimationHistoryList();
 	}
 
-	private void createTransitionFiring() {
-		transitionFiring = new TransitionFiringComponent(TAPAALGUI.getApp().isShowingDelayEnabledTransitions(), lens);
-	}
-
-	public TransitionFiringComponent getTransitionFiringComponent() {
+    public TransitionFiringComponent getTransitionFiringComponent() {
 		return transitionFiring;
 	}
 
@@ -847,7 +862,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public Iterable<Template> allTemplates() {
-		ArrayList<Template> list = new ArrayList<Template>();
+		ArrayList<Template> list = new ArrayList<>();
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
 			Template template = new Template(net, guiModels.get(net), zoomLevels.get(net));
 			template.setHasPositionalInfo(hasPositionalInfos.get(net));
@@ -857,7 +872,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public Iterable<Template> activeTemplates() {
-		ArrayList<Template> list = new ArrayList<Template>();
+		ArrayList<Template> list = new ArrayList<>();
 		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
 			Template template = new Template(net, guiModels.get(net), zoomLevels.get(net));
 			template.setHasPositionalInfo(hasPositionalInfos.get(net));
@@ -885,12 +900,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		templateExplorer.updateTemplateList();
 	}
 
-	public void addGuiModel(TimedArcPetriNet net, DataLayer guiModel) {
-		guiModels.put(net, guiModel);
-		guiModelToModel.put(guiModel, net);
-	}
-
-	public void removeTemplate(Template template) {
+    public void removeTemplate(Template template) {
 		tapnNetwork.remove(template.model());
 		guiModels.remove(template.model());
 		guiModelToModel.remove(template.guiModel());
@@ -1029,19 +1039,19 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	@Override
 	public void exportTrace() {
-		TraceImportExport.exportTrace();
+		TraceImportExport.exportTrace(this);
 	}
 
 	@Override
 	public void importTrace() {
-		TraceImportExport.importTrace(animator);
+		TraceImportExport.importTrace(animator, this);
 	}
 
 	@Override
 	public void zoomTo(int newZoomLevel) {
 		boolean didZoom = drawingSurface().getZoomController().setZoom(newZoomLevel);
 		if (didZoom) {
-			app.ifPresent(GuiFrameActions::updateZoomCombo);
+			app.ifPresent(gfa -> gfa.updateZoomCombo(newZoomLevel));
 			drawingSurface().zoomToMidPoint(); //Do Zoom
 		}
 	}
@@ -1211,50 +1221,17 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		simulatorModelRoot = model;
 	}
 
-	public boolean restoreWorkflowDialog(){
-		return workflowDialog != null && workflowDialog.restoreWindow();
-	}
-
-	public WorkflowDialog getWorkflowDialog() {
-		return workflowDialog;
-	}
-
-	public void setWorkflowDialog(WorkflowDialog dialog) {
-		this.workflowDialog = dialog;
-	}
-
-	private boolean netChanged = false;
-	@Override
-	public boolean getNetChanged() {
-		return netChanged;
-	}
-
-	public void setNetChanged(boolean _netChanged) {
-		netChanged = _netChanged;
-	}
-
-    private final NameGenerator nameGenerator = new NameGenerator();
-
-    public NameGenerator getNameGenerator() {
-        return nameGenerator;
-    }
-
     public void changeToTemplate(Template tapn) {
 		Require.notNull(tapn, "Can't change to a Template that is null");
 
         nameGenerator.add(tapn.model());
         drawingSurface.setModel(tapn.guiModel(), tapn.zoomer());
 
-		//If the template is currently selected
-		//XXX: kyrke - 2019-07-06, templ solution while refactoring, there is properly a better way
-		if (TAPAALGUI.getCurrentTab() == this) {
+        app.ifPresent(gfa -> gfa.updateZoomCombo(tapn.zoomer().getPercent()));
 
-			app.ifPresent(GuiFrameActions::updateZoomCombo);
+        //XXX: moved from drawingsurface, temp while refactoring, there is a better way
+        drawingSurface.getSelectionObject().clearSelection();
 
-			//XXX: moved from drawingsurface, temp while refactoring, there is a better way
-			drawingSurface.getSelectionObject().clearSelection();
-
-		}
     }
 
 
@@ -1337,7 +1314,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             app.ifPresent(o->o.setStatusBarText(textforDrawing));
 
             if (restoreWorkflowDialog()) {
-                WorkflowDialog.showDialog();
+                WorkflowDialog.showDialog(this);
             }
         }
 	}
@@ -1429,9 +1406,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	@Override
 	public void showStatistics() {
-        if (currentTemplate() != null) {
-            StatisticsPanel.showStatisticsPanel(currentTemplate().model().getStatistics());
-        }
+        StatisticsPanel.showStatisticsPanel(currentTemplate().model().getStatistics(), this);
 	}
 
     @Override
@@ -1449,13 +1424,63 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         isSelectedComponentOption = panel.isSelectedComponentOption();
     }
 
-	@Override
+    @Override
+    public void alignToGrid() {
+        ArrayList<PetriNetObject> petriNetObjects = drawingSurface.getGuiModel().getPlaceTransitionObjects();
+        undoManager.newEdit();
+
+        for (PetriNetObject object : petriNetObjects) {
+            PlaceTransitionObject ptobject = (PlaceTransitionObject) object;
+            int x = Grid.getModifiedX(ptobject.getPositionX());
+            int y = Grid.getModifiedY(ptobject.getPositionY());
+            Point point = new Point(x, y);
+            Command command = new MovePlaceTransitionObjectCommand(ptobject, point, drawingSurface);
+            command.redo();
+            undoManager.addEdit(command);
+            ptobject.updateOnMoveOrZoom();
+        }
+    }
+
+    @Override
+    public void copy() {
+        String message = CopyPastImportExport.toXML(drawingSurface().getSelectionObject().getSelection());
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+    }
+
+    @Override
+    public void cut() {
+        String message = CopyPastImportExport.toXML(drawingSurface().getSelectionObject().getSelection());
+        deleteSelection();
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+    }
+
+    @Override
+    public void past() {
+        String s = "";
+        //odd: the Object param of getContents is not currently used
+        Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+        if (hasTransferableText) {
+            try {
+                s = (String)contents.getTransferData(DataFlavor.stringFlavor);
+            }
+            catch (UnsupportedFlavorException | IOException ignored){}
+        }
+        CopyPastImportExport.past(s, this);
+    }
+
+    @Override
+    public void print() {
+        Export.exportGuiView(drawingSurface, Export.PRINTER, null, null, this);
+    }
+
+    @Override
 	public void importSUMOQueries() {
 		File[] files = FileBrowser.constructor("Import SUMO", "txt", FileBrowser.userPath).openFiles();
 		for(File f : files){
 			if(f.exists() && f.isFile() && f.canRead()){
 				FileBrowser.userPath = f.getParent();
-				SUMOQueryLoader.importQueries(f, network());
+				SUMOQueryLoader.importQueries(f, network(), this);
 			}
 		}
 	}
@@ -1466,15 +1491,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		for(File f : files){
 			if(f.exists() && f.isFile() && f.canRead()){
 				FileBrowser.userPath = f.getParent();
-				XMLQueryLoader.importQueries(f, network());
+				XMLQueryLoader.importQueries(f, network(), this);
 			}
 		}
-	}
-
-	@Override
-	public void workflowAnalyse() {
-		//XXX prop. should take this as argument, insted of using static accessors //kyrke 2019-11-05
-		WorkflowDialog.showDialog();
 	}
 
 	public boolean isInAnimationMode() {
@@ -1485,14 +1504,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return animator;
 	}
 
-	private final Animator animator = new Animator(this);
-
-
     @Override
     public void mergeNetComponents() {
         TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 
-        int openCTLDialog = JOptionPane.YES_OPTION;
+        int openCTLDialog;
         boolean inlineConstants = false;
 
         if (!tapnNetwork.constants().isEmpty()) {
@@ -1515,17 +1531,17 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, inlineConstants);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 
-        ArrayList<Template> templates = new ArrayList<Template>(1);
+        ArrayList<Template> templates = new ArrayList<>(1);
 
         templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
         network.add(transformedModel.value1());
 
-        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<TAPNQuery>(0), network.constants(), lens);
+        NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<>(0), network.constants(), lens);
 
         try {
             ByteArrayOutputStream outputStream = tapnWriter.savePNML();
 
-            String composedName = "composed-" + TAPAALGUI.getApp().getCurrentTabName();
+            String composedName = "composed-" + getTabTitle();
             composedName = composedName.replace(".tapn", "");
             TAPAALGUI.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
         } catch (Exception e1) {
@@ -1568,7 +1584,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public void zoomOut() {
 		boolean didZoom = drawingSurface().getZoomController().zoomOut();
 		if (didZoom) {
-			app.ifPresent(GuiFrameActions::updateZoomCombo);
+			app.ifPresent(e -> e.updateZoomCombo(drawingSurface().getZoomController().getPercent()));
 			drawingSurface().zoomToMidPoint(); //Do Zoom
 		}
 	}
@@ -1577,7 +1593,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public void zoomIn() {
 		boolean didZoom = drawingSurface().getZoomController().zoomIn();
 		if (didZoom) {
-			app.ifPresent(GuiFrameActions::updateZoomCombo);
+			app.ifPresent(e -> e.updateZoomCombo(drawingSurface().getZoomController().getPercent()));
 			drawingSurface().zoomToMidPoint(); //Do Zoom
 		}
 	}
@@ -1818,7 +1834,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         protected void transitionClicked(TimedTransitionComponent pno, MouseEvent e) {
             if (place != null && transition == null) {
                 transition = pno;
-                TAPAALGUI.getDrawingSurface().clearAllPrototype();
+                canvas.clearAllPrototype();
                 var result = guiModelManager.addInhibitorArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -1834,7 +1850,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                canvas.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -1844,7 +1860,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            TAPAALGUI.getDrawingSurface().clearAllPrototype();
+            canvas.clearAllPrototype();
             place = null;
             transition = null;
             arc = null;
@@ -1924,8 +1940,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (arc!=null) {
                 if (!e.isControlDown()) {
                     Point p = e.getPoint();
-                    int x = Zoomer.getUnzoomedValue(p.x, TAPAALGUI.getDrawingSurface().getZoom());
-                    int y = Zoomer.getUnzoomedValue(p.y, TAPAALGUI.getDrawingSurface().getZoom());
+                    int x = Zoomer.getUnzoomedValue(p.x, canvas.getZoom());
+                    int y = Zoomer.getUnzoomedValue(p.y, canvas.getZoom());
 
                     boolean shiftDown = e.isShiftDown();
                     //XXX: x,y is ignored is overwritten when mouse is moved, this just add a new point to the end of list
@@ -2012,13 +2028,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                canvas.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (place != null && transition == null) {
                 transition = pno;
-                TAPAALGUI.getDrawingSurface().clearAllPrototype();
+                canvas.clearAllPrototype();
                 var result = guiModelManager.addTimedInputArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2031,7 +2047,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                    canvas.addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2048,13 +2064,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                canvas.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place == null) {
                 place = pno;
-                TAPAALGUI.getDrawingSurface().clearAllPrototype();
+                canvas.clearAllPrototype();
                 var result = guiModelManager.addTimedOutputArc(canvas.getGuiModel(), transition, place, arc.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2067,7 +2083,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                    canvas.addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2078,7 +2094,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            TAPAALGUI.getDrawingSurface().clearAllPrototype();
+            canvas.clearAllPrototype();
             place = null;
             transition = null;
             arc = null;
@@ -2140,9 +2156,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         @Override
         public void teardownManager() {
             //Remove all mouse-over menus if we exit animation mode
-            ArrayList<PetriNetObject> selection = TAPAALGUI.getCurrentTab().drawingSurface().getGuiModel().getPNObjects();
+            ArrayList<PetriNetObject> pnObjects = canvas.getGuiModel().getPNObjects();
 
-            for (PetriNetObject pn : selection) {
+            for (PetriNetObject pn : pnObjects) {
                 if (pn instanceof TimedPlaceComponent) {
                     TimedPlaceComponent place = (TimedPlaceComponent) pn;
                     place.showAgeOfTokens(false);
@@ -2213,7 +2229,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                canvas.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2229,13 +2245,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 //to avoid this we change the endpoint to set the end point to the same as the end point
                 //needs further refactorings //kyrke 2019-09-05
                 arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                canvas.addPrototype(arc);
                 arc.requestFocusInWindow();
                 arc.setSelectable(false);
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place2 == null) {
                 place2 = pno;
-                TAPAALGUI.getDrawingSurface().clearAllPrototype();
+                canvas.clearAllPrototype();
                 var result = guiModelManager.addTimedTransportArc(canvas.getGuiModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
                 showPopupIfFailed(result);
                 clearPendingArc();
@@ -2248,7 +2264,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     //to avoid this we change the endpoint to set the end point to the same as the end point
                     //needs further refactorings //kyrke 2019-09-05
                     arc.setEndPoint(pno.getPositionX(), pno.getPositionY(), false);
-                    TAPAALGUI.getDrawingSurface().addPrototype(arc);
+                    canvas.addPrototype(arc);
                     arc.requestFocusInWindow();
                     arc.setSelectable(false);
                     arc.enableDrawingKeyBindings(this::clearPendingArc);
@@ -2259,7 +2275,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
-            TAPAALGUI.getDrawingSurface().clearAllPrototype();
+            canvas.clearAllPrototype();
             place1 = place2 = null;
             transition = null;
             arc = arc1 = arc2 = null;
@@ -2351,9 +2367,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 e->e.pno instanceof ArcPathPoint && e.a == MouseAction.wheel,
                 e->{
                     if (e.e.isShiftDown()) {
-                        TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
-                            ((ArcPathPoint) e.pno).togglePointType()
-                        );
+                        guiModelManager.toggleArcPathPointType((ArcPathPoint) e.pno);
                     }
                 }
             );
@@ -2477,7 +2491,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         private void timedTranstionMouseWheelWithShift(TimedTransitionComponent p, MouseWheelEvent e) {
             if (p.isSelected()) {
-                int rotation = 0;
+                int rotation;
                 if (e.getWheelRotation() < 0) {
                     rotation = -e.getWheelRotation() * 135;
                 } else {
@@ -2722,10 +2736,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 
     public static final String textforDrawing = "Drawing Mode: Click on a button to start adding components to the Editor";
-    public static final String textforPlace = "Place Mode: Right click on a place to see menu options ";
     public static final String textforTAPNPlace = "Place Mode: Right click on a place to see menu options ";
-    public static final String textforTrans = "Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
-    public static final String textforTimedTrans = "Timed Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+    public static final String textforTransition = "Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
     public static final String textforUncontrollableTrans = "Uncontrollable Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
     public static final String textforAddtoken = "Add Token Mode: Click on a place to add a token";
     public static final String textforDeltoken = "Delete Token Mode: Click on a place to delete a token ";
@@ -2747,7 +2759,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 break;
 
             case TRANSITION:
-                app.ifPresent(o11 -> o11.setStatusBarText(textforTrans));
+                app.ifPresent(o11 -> o11.setStatusBarText(textforTransition));
                 break;
 
             case ARC:
@@ -2807,21 +2819,21 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     @Override
     public void exportPNG() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.PNG, null, null);
+            Export.exportGuiView(drawingSurface(), Export.PNG, null, null, this);
         }
     }
 
     @Override
     public void exportPS() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.POSTSCRIPT, null, null);
+            Export.exportGuiView(drawingSurface(), Export.POSTSCRIPT, null, null, this);
         }
     }
 
     @Override
     public void exportTIKZ() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.TIKZ, drawingSurface().getGuiModel(), null);
+            Export.exportGuiView(drawingSurface(), Export.TIKZ, drawingSurface().getGuiModel(), null, this);
         }
     }
 
@@ -2837,15 +2849,32 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     "PNML loss of information", JOptionPane.WARNING_MESSAGE);
                 Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
             }
-            Export.exportGuiView(drawingSurface(), Export.PNML, null, null);
+            Export.exportGuiView(drawingSurface(), Export.PNML, null, null, this);
         }
     }
 
     @Override
     public void exportQueryXML() {
         if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.QUERY, null, lens);
+            Export.exportGuiView(drawingSurface(), Export.QUERY, null, lens, this);
         }
     }
 
+
+    @Override
+    public void workflowAnalyse() {
+        //XXX prop. should take this as argument, insted of using static accessors //kyrke 2019-11-05
+        WorkflowDialog.showDialog(this);
+    }
+
+    // Workflow dialog
+    public boolean restoreWorkflowDialog(){
+        return workflowDialog != null && workflowDialog.restoreWindow();
+    }
+    public WorkflowDialog getWorkflowDialog() {
+        return workflowDialog;
+    }
+    public void setWorkflowDialog(WorkflowDialog dialog) {
+        this.workflowDialog = dialog;
+    }
 }

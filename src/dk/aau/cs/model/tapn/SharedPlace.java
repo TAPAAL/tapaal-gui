@@ -52,7 +52,7 @@ public class SharedPlace extends TimedPlace{
 		return true;
 	}
 
-	
+	//XXX Model should not depend on GUI
 	public ArrayList<String> getComponentsUsingThisPlace(){
 		ArrayList<String> components = new ArrayList<String>();
 		for(Template t : TAPAALGUI.getCurrentTab().allTemplates()){
@@ -101,7 +101,8 @@ public class SharedPlace extends TimedPlace{
 		int cmax = -1;
 		
 		extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
-		
+
+        //XXX Model should not depend on GUI
 		for(Template t : TAPAALGUI.getCurrentTab().activeTemplates()){
 			TimedPlace tp = t.model().getPlaceByName(SharedPlace.this.name);
 			if(tp != null){

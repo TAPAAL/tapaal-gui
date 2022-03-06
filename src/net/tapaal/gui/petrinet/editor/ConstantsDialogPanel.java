@@ -183,8 +183,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName)) {
 			System.err
 			.println("Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
-			JOptionPane
-			.showMessageDialog(
+			JOptionPane.showMessageDialog(
 					TAPAALGUI.getApp(),
 					"Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
 					"Error", JOptionPane.ERROR_MESSAGE);
@@ -193,8 +192,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		}
 
         if (model.isNameUsedForColorType(newName) || model.isNameUsedForVariable(newName) || model.isNameUsedForColor(newName, null)) {
-            JOptionPane
-                .showMessageDialog(
+            JOptionPane.showMessageDialog(
                     TAPAALGUI.getApp(),
                     "There is already another Color, Color Type or Variable with the same name.\n\n"
                         + "Choose a different name for the constant.",
@@ -212,10 +210,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		} else {				
 			int val = (Integer) valueSpinner.getValue();
 			if (!oldName.equals("")) {
-				if (!oldName.equalsIgnoreCase(newName)
-						&& model.isNameUsedForConstant(newName)) {
-					JOptionPane
-					.showMessageDialog(
+
+				if (!oldName.equals(newName) && model.isNameUsedForConstant(newName)) {
+					JOptionPane.showMessageDialog(
 							TAPAALGUI.getApp(),
 							"There is already another constant with the same name.\n\n"
 							+ "Choose a different name for the constant.",
@@ -237,8 +234,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					valueSpinner.requestFocusInWindow();
 					return;
 				}
-				Command edit = model.updateConstant(oldName, new Constant(
-						newName, val));
+				Command edit = model.updateConstant(oldName, new Constant(newName, val));
 				if (edit == null) {
 					JOptionPane
 					.showMessageDialog(
@@ -251,8 +247,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					valueSpinner.requestFocusInWindow();
 					return;
 				} else {
-					TAPAALGUI.getCurrentTab().getUndoManager()
-					.addNewEdit(edit);
+					TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
 					TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
 					exit();
 				}
@@ -260,16 +255,16 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 				Command edit = model.addConstant(newName, val);
 				
 				if (edit==null) {
-					JOptionPane
-					.showMessageDialog(
+					JOptionPane.showMessageDialog(
 							TAPAALGUI.getApp(),
 							"A constant with the specified name already exists.",
 							"Constant exists",
 							JOptionPane.ERROR_MESSAGE);
 					nameTextField.requestFocusInWindow();
 					return;
-				} else
-					TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
+				} else {
+                    TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
+                }
 				exit();
 			}
 			model.buildConstraints();

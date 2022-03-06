@@ -26,18 +26,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class GuiFrameController implements GuiFrameControllerActions{
+public final class GuiFrameController implements GuiFrameControllerActions{
 
     final GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
     final GuiFrameActions guiFrame;
+    private final ArrayList<PetriNetTab> tabs = new ArrayList<>();
 
     final MutableReference<TabActions> currentTab = new MutableReference<>();
 
@@ -49,8 +50,6 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         loadPrefrences();
         appGui.registerController(this, currentTab);
-
-
     }
 
     //XXX should be private and should prop. live in controllers not GUI, tmp while refactoring //kyrke 2019-11-05
@@ -64,6 +63,10 @@ public class GuiFrameController implements GuiFrameControllerActions{
     private boolean showToolTips = true;
     private boolean showZeroToInfinityIntervals = true;
     private boolean showTokenAge = true;
+
+    public List<PetriNetTab> getTabs() {
+        return Collections.unmodifiableList(tabs);
+    }
 
     private void loadPrefrences() {
         Preferences prefs = Preferences.getInstance();
@@ -112,7 +115,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void openTab(PetriNetTab tab) {
-        TAPAALGUI.addTab(tab);
+        tabs.add(tab);
         tab.setSafeGuiFrameActions(guiFrameDirectAccess);
         tab.setGuiFrameControllerActions(this);
 
@@ -137,7 +140,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
                 tab.setGuiFrameControllerActions(null);
                 //Close the gui part first, else we get an error bug #826578
                 guiFrame.detachTabFromGuiFrame(tab);
-                TAPAALGUI.removeTab(tab);
+                tabs.remove(tab);
             }
         }
 
@@ -273,18 +276,35 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void openTAPNFile() {
-        final File[] files = FileBrowser.constructor("Timed-Arc Petri Net","tapn", "xml", FileBrowser.userPath).openFiles();
+        final File[] files = FileBrowser.constructor(new String[]{"tapn", "xml", "pnml"}, FileBrowser.userPath).openFiles();
         //show loading cursor
+        openTAPNFile(files);
+    }
+
+    @Override
+    public void importPNMLFile() {
+        final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
+
+        openPNMLFile(files);
+    }
+
+    private void openTAPNFile(File[] files) {
         guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         //Do loading
-        SwingWorker<java.util.List<PetriNetTab>, Void> worker = new SwingWorker<java.util.List<PetriNetTab>, Void>() {
+        SwingWorker<List<PetriNetTab>, Void> worker = new SwingWorker<List<PetriNetTab>, Void>() {
             @Override
-            protected java.util.List<PetriNetTab> doInBackground() throws Exception {
-                java.util.List<PetriNetTab> filesOpened = new ArrayList<>();
+            protected List<PetriNetTab> doInBackground() throws Exception {
+                List<PetriNetTab> filesOpened = new ArrayList<>();
                 for(File f : files){
                     if(f.exists() && f.isFile() && f.canRead()){
                         FileBrowser.userPath = f.getParent();
-                        filesOpened.add(PetriNetTab.createNewTabFromFile(f));
+
+                        if (f.getName().toLowerCase().endsWith(".pnml")) {
+                            filesOpened.add(PetriNetTab.createNewTabFromPNMLFile(f));
+                        } else {
+                            filesOpened.add(PetriNetTab.createNewTabFromFile(f));
+                        }
+
                     }
                 }
                 return filesOpened;
@@ -293,7 +313,19 @@ public class GuiFrameController implements GuiFrameControllerActions{
             protected void done() {
                 try {
                     List<PetriNetTab> tabs = get();
-                    openTab(tabs);
+                    for (PetriNetTab tab : tabs) {
+                        openTab(tab);
+
+                        //Don't autolayout on empty net, hotfix for issue #1960000, we assue only pnml file does not have layout and they always only have one component
+                        if(!tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
+                            int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                            if(dialogResult == JOptionPane.YES_OPTION) {
+                                SmartDrawDialog.showSmartDrawDialog();
+                            }
+                        }
+                    }
+
+
                 } catch (Exception e) {
                     String message = e.getMessage();
 
@@ -301,9 +333,9 @@ public class GuiFrameController implements GuiFrameControllerActions{
                         message = message.split(":", 2)[1];
                     }
                     JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
-                            message,
-                            "Error loading file",
-                            JOptionPane.ERROR_MESSAGE);
+                        message,
+                        "Error loading file",
+                        JOptionPane.ERROR_MESSAGE);
                     return;
                 }finally {
                     guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -314,20 +346,17 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         //Sleep redrawing thread (EDT) until worker is done
         //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
-			    while(!worker.isDone()) {
-			    	try {
-			    		Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-			    }
+        while(!worker.isDone()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
-    @Override
-    public void importPNMLFile() {
-        final File[] files = FileBrowser.constructor("Import PNML", "pnml", FileBrowser.userPath).openFiles();
-
+    private void openPNMLFile(File[] files) {
         //Show loading cursor
         guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         //Do loading of net
@@ -347,21 +376,22 @@ public class GuiFrameController implements GuiFrameControllerActions{
             protected void done() {
                 try {
                     List<PetriNetTab> tabs = get();
-                    openTab(tabs);
 
-                    //Don't autolayout on empty net, hotfix for issue #1960000
-                    if(files.length != 0 && !TAPAALGUI.getCurrentTab().currentTemplate().getHasPositionalInfo() && (TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getPlaces().length + TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getTransitions().length) > 0) {
-                        int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
-                        if(dialogResult == JOptionPane.YES_OPTION) {
-                            SmartDrawDialog.showSmartDrawDialog();
+                    for (PetriNetTab tab : tabs) {
+                        openTab(tab);
+                        //Don't autolayout on empty net, hotfix for issue #1960000. Imported PNML will only have one template.
+                        if(!tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
+                            int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                            if(dialogResult == JOptionPane.YES_OPTION) {
+                                SmartDrawDialog.showSmartDrawDialog();
+                            }
                         }
                     }
-
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
-                            e.getMessage(),
-                            "Error loading file",
-                            JOptionPane.ERROR_MESSAGE);
+                        e.getMessage(),
+                        "Error loading file",
+                        JOptionPane.ERROR_MESSAGE);
                     return;
                 }finally {
                     guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -372,14 +402,14 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         //Sleep redrawing thread (EDT) until worker is done
         //This enables the EDT to schedule the many redraws called in createNewTabFromPNMLFile(f); much better
-			    while(!worker.isDone()) {
-			    	try {
-			    		Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-			    }
+        while(!worker.isDone()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
     //XXX 2018-05-23 kyrke, moved from CreateGui, static method
@@ -557,7 +587,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
      */
     private boolean showSavePendingChangesDialogForAllTabs() {
         // Loop through all tabs and check if they have been saved
-        for (PetriNetTab tab : TAPAALGUI.getTabs()) {
+        for (PetriNetTab tab : getTabs()) {
             if (tab.getNetChanged()) {
                 if (!(showSavePendingChangesDialog(tab))) {
                     return false;
@@ -576,7 +606,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.setShowQueriesSelected(showQueries);
         //currentTab.ifPresent(o->o.showQueries(showQueries));
-        TAPAALGUI.getTabs().forEach(o->o.showQueries(showQueries));
+        getTabs().forEach(o->o.showQueries(showQueries));
 
     }
 
@@ -590,7 +620,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.setShowConstantsSelected(showConstants);
         //currentTab.ifPresent(o->o.showConstantsPanel(showConstants));
-        TAPAALGUI.getTabs().forEach(o->o.showConstantsPanel(showConstants));
+        getTabs().forEach(o->o.showConstantsPanel(showConstants));
 
     }
 
@@ -643,7 +673,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
 
         guiFrame.setShowComponentsSelected(showComponents);
         //currentTab.ifPresent(o->o.showComponents(showComponents));
-        TAPAALGUI.getTabs().forEach(o->o.showComponents(showComponents));
+        getTabs().forEach(o->o.showComponents(showComponents));
     }
 
     @Override
@@ -655,7 +685,7 @@ public class GuiFrameController implements GuiFrameControllerActions{
         showSharedPT = b;
 
         guiFrame.setShowSharedPTSelected(showSharedPT);
-        TAPAALGUI.getTabs().forEach(o->o.showSharedPT(showSharedPT));
+        getTabs().forEach(o->o.showSharedPT(showSharedPT));
     }
 
     @Override

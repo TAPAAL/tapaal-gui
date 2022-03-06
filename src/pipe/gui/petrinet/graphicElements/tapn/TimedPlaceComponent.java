@@ -204,7 +204,7 @@ public class TimedPlaceComponent extends Place {
 
         // Decide whether or not to draw tokens as dots
         boolean drawDots = false;
-        if(!TAPAALGUI.getApp().showTokenAge()) {
+        if(!TAPAALGUI.getAppGui().showTokenAge()) {
             // only draw dots if there're 1-5 tokens.
             drawDots = (marking > 0 && marking < 6);
 
@@ -451,7 +451,7 @@ public class TimedPlaceComponent extends Place {
                         }
                     }
                 }
-                if (TAPAALGUI.getApp().showColoredTokens()) {
+                if (TAPAALGUI.getAppGui().showColoredTokens()) {
                     if (underlyingPlace().getTokensAsExpression() != null) {
                         buffer.append("\n");
                         buffer.append(((AddExpression)underlyingPlace().getTokensAsExpression()).toTokenString());

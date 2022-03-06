@@ -80,7 +80,7 @@ public class ExportBatchDialog extends JDialog {
 	private JDialog progressBarContainer;
 	static boolean noOrphanTransitions = false;
 
-    private final UndoManager undoManager = new UndoManager();
+    private final UndoManager undoManager = new UndoManager(null);
 
     static ExportBatchDialog exportBatchDialog;
 	final ModelLoader loader = new ModelLoader();

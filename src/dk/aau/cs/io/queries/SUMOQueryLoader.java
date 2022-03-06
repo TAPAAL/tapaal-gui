@@ -13,7 +13,6 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.ExtrapolationOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.HashTableSize;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
@@ -24,6 +23,7 @@ import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.translations.ReductionOption;
+import pipe.gui.petrinet.PetriNetTab;
 
 public class SUMOQueryLoader extends QueryLoader{
 
@@ -73,7 +73,7 @@ public class SUMOQueryLoader extends QueryLoader{
 
 	}
 
-	public static void importQueries(File file, TimedArcPetriNetNetwork network){
+	public static void importQueries(File file, TimedArcPetriNetNetwork network, PetriNetTab tab){
 		SUMOQueryLoader loader = new SUMOQueryLoader(file, network);
 		LoadedQueries loadedQueries = loader.parseQueries();
         if (loadedQueries.getMessages().size() != 0) {
@@ -86,7 +86,7 @@ public class SUMOQueryLoader extends QueryLoader{
         }
 
 		for(TAPNQuery query : loadedQueries.getQueries()){
-			TAPAALGUI.getCurrentTab().addQuery(query);
+			tab.addQuery(query);
 		}
 	}
 }

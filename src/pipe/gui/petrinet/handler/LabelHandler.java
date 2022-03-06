@@ -40,7 +40,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 				return;
 			}
 	
-			if (TAPAALGUI.getApp().isEditionAllowed()) {
+			if (TAPAALGUI.getAppGui().isEditionAllowed()) {
 				if (e.getClickCount() == 2) {
 					Arc arc = (Arc) obj;
 					((TimedOutputArcComponent) arc).showTimeIntervalEditor();

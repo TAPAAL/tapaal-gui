@@ -52,7 +52,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	private JButton removeBtn;
 	private JButton addConstantButton;
 
-	private final PetriNetTab parent;
+	private final PetriNetTab tab;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;
@@ -96,14 +96,14 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 
 	public ConstantsPane(PetriNetTab currentTab) {
-		parent = currentTab;
+		tab = currentTab;
         list = new NonsearchableJList<>();
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		constantsPanel = new JPanel(new GridBagLayout());
 		buttonsPanel = new JPanel(new GridBagLayout());
-        colorTypesListModel = new ColorTypesListModel(parent.network());
-        variablesListModel = new VariablesListModel(parent.network());
-		constantsListModel = new ConstantsListModel(parent.network());
+        colorTypesListModel = new ColorTypesListModel(tab.network());
+        variablesListModel = new VariablesListModel(tab.network());
+		constantsListModel = new ConstantsListModel(tab.network());
 		constantsListModel.addListDataListener(new ListDataListener() {
 			public void contentsChanged(ListDataEvent arg0) {				
 			}
@@ -148,7 +148,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                         } else if(isDisplayingVariables()){
                             Variable v = (Variable) dlm.getElementAt(index);
                             ArrayList<String> messages = new ArrayList<>();
-                            if(parent.network().canVariableBeRemoved(v,messages)) {
+                            if(tab.network().canVariableBeRemoved(v,messages)) {
                                 showEditVariableDialog(v);
                             }else{
                                 String message = "Variable cannot be edited for the following reasons: \n\n";
@@ -177,18 +177,16 @@ public class ConstantsPane extends JPanel implements SidePane {
 					if (c != null) {
 						if (arg0.getKeyCode() == KeyEvent.VK_LEFT) {										
 							if (!(c.lowerBound() == c.value())){
-								Command edit = parent.network().updateConstant(c.name(), new Constant(
-										c.name(), c.value()-1));
-								TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
-								parent.network().buildConstraints();
+								Command edit = tab.network().updateConstant(c.name(), new Constant(c.name(), c.value()-1));
+								currentTab.getUndoManager().addNewEdit(edit);
+								tab.network().buildConstraints();
 							}
 						}
 						else if (arg0.getKeyCode() == KeyEvent.VK_RIGHT) {
 							if (!(c.upperBound() == c.value())){
-								Command edit = parent.network().updateConstant(c.name(), new Constant(
-										c.name(), c.value()+1));
-								TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
-								parent.network().buildConstraints();
+								Command edit = tab.network().updateConstant(c.name(), new Constant(c.name(), c.value()+1));
+								currentTab.getUndoManager().addNewEdit(edit);
+								tab.network().buildConstraints();
 							}
 						} 
 						else if (arg0.getKeyCode() == KeyEvent.VK_UP) {
@@ -252,7 +250,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	}
 
 	private void hideIrrelevantInformation(){
-	    if(!parent.getLens().isColored()){
+	    if(!tab.getLens().isColored()){
 	        constantsColorTypesVariablesComboBox.setVisible(false);
             setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(titleBorderNoColor),
@@ -308,7 +306,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 				((Constant) model.getElementAt(i)).setVisible(true);
 			}
 			c.setFocused(true);
-			TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
+			tab.drawingSurface().repaintAll();
 			blinkConstant(c);
 		}
 	}
@@ -323,7 +321,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 			((Constant) model.getElementAt(i)).setFocused(false);
 		}
 		try{
-			TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
+			tab.drawingSurface().repaintAll();
 		}catch(Exception e){
 			// It is okay, the tab has just been closed
 		}
@@ -337,10 +335,10 @@ public class ConstantsPane extends JPanel implements SidePane {
 				if(System.currentTimeMillis() - startTime < 2100) {
 					if(!c.getVisible()) {
 						c.setVisible(true);
-						TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
+						tab.drawingSurface().repaintAll();
 					} else {
 						c.setVisible(false);
-						TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
+						tab.drawingSurface().repaintAll();
 					}
 				} else {
 					((Timer) e.getSource()).stop();
@@ -362,7 +360,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             if (isDisplayingVariables()){
                 Variable v = (Variable)  list.getSelectedValue();
                 ArrayList<String> messages = new ArrayList<>();
-                if(parent.network().canVariableBeRemoved(v,messages)) {
+                if(tab.network().canVariableBeRemoved(v,messages)) {
                     showEditVariableDialog(v);
                 }else{
                     String message = "Variable cannot be edited for the following reasons: \n\n";
@@ -463,7 +461,7 @@ public class ConstantsPane extends JPanel implements SidePane {
     }
 
 	public void showConstants() {
-		TimedArcPetriNetNetwork model = parent.network();
+		TimedArcPetriNetNetwork model = tab.network();
 		if (model == null)
 			return;
 
@@ -544,16 +542,16 @@ public class ConstantsPane extends JPanel implements SidePane {
         moveUpButton.addActionListener(e -> {
             int index = list.getSelectedIndex();
             if (isDisplayingVariables() && index > 0) {
-                parent.network().swapVariables(index, index-1);
+                tab.network().swapVariables(index, index-1);
                 variablesListModel.updateName();
                 list.setSelectedIndex(index-1);}
             else if(isDisplayingGlobalConstants() && index > 0) {
-                parent.swapConstants(index, index-1);
+                tab.swapConstants(index, index-1);
                 showConstants();
                 list.setSelectedIndex(index-1);
             }
             else if (isDisplayingColorTypes() && index > 0) {
-                parent.network().swapColorTypes(index, index-1);
+                tab.network().swapColorTypes(index, index-1);
                 colorTypesListModel.updateName();
                 list.setSelectedIndex(index-1);
             }
@@ -571,18 +569,18 @@ public class ConstantsPane extends JPanel implements SidePane {
         moveDownButton.setToolTipText(toolTipMoveDownColorType);
         moveDownButton.addActionListener(e -> {
             int index = list.getSelectedIndex();
-            if (isDisplayingVariables() && index < parent.network().numberOfVariables() - 1) {
-                parent.network().swapVariables(index, index + 1);
+            if (isDisplayingVariables() && index < tab.network().numberOfVariables() - 1) {
+                tab.network().swapVariables(index, index + 1);
                 variablesListModel.updateName();
                 list.setSelectedIndex(index + 1);
             }
-            else if(isDisplayingGlobalConstants() && index < parent.network().constants().size() - 1) {
-                parent.swapConstants(index, index+1);
+            else if(isDisplayingGlobalConstants() && index < tab.network().constants().size() - 1) {
+                tab.swapConstants(index, index+1);
                 showConstants();
                 list.setSelectedIndex(index + 1);
             }
-            else if (isDisplayingColorTypes() && index < parent.network().numberOfColorTypes() - 1) {
-                parent.network().swapColorTypes(index, index+1);
+            else if (isDisplayingColorTypes() && index < tab.network().numberOfColorTypes() - 1) {
+                tab.network().swapColorTypes(index, index+1);
                 colorTypesListModel.updateName();
                 list.setSelectedIndex(index + 1);
             }
@@ -601,8 +599,8 @@ public class ConstantsPane extends JPanel implements SidePane {
         sortButton.setEnabled(false);
         sortButton.addActionListener(e -> {
             if (isDisplayingGlobalConstants()) {
-                Command sortConstantsCommand = new SortConstantsCommand(parent, ConstantsPane.this);
-                parent.getUndoManager().addNewEdit(sortConstantsCommand);
+                Command sortConstantsCommand = new SortConstantsCommand(tab, ConstantsPane.this);
+                tab.getUndoManager().addNewEdit(sortConstantsCommand);
                 sortConstantsCommand.redo();
             }
             else if (isDisplayingVariables()) {
@@ -623,7 +621,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	}
 
 	private void showEditConstantDialog(Constant constant) {
-		ConstantsDialogPanel panel = new ConstantsDialogPanel(parent.network(), constant);
+		ConstantsDialogPanel panel = new ConstantsDialogPanel(tab.network(), constant);
 
 		panel.showDialog();
 		showConstants();
@@ -632,14 +630,14 @@ public class ConstantsPane extends JPanel implements SidePane {
         VariablesDialogPanel panel = null;
         if (variable != null) {
             try {
-                panel = new VariablesDialogPanel(new JRootPane(), variablesListModel, parent.network(), variable, parent.getUndoManager());
+                panel = new VariablesDialogPanel(new JRootPane(), variablesListModel, tab.network(), variable, tab.getUndoManager());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         else {
             try {
-                panel = new VariablesDialogPanel(new JRootPane(), variablesListModel, parent.network(), parent.getUndoManager());
+                panel = new VariablesDialogPanel(new JRootPane(), variablesListModel, tab.network(), tab.getUndoManager());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -650,19 +648,19 @@ public class ConstantsPane extends JPanel implements SidePane {
     }
     private void showEditColorTypeDialog(ColorType colorType) {
         ColorTypeDialogPanel panel;
-        UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
+        UndoManager undoManager = tab.getUndoManager();
         if (colorType != null) {
-            panel = new ColorTypeDialogPanel(colorTypesListModel, parent.network(), colorType, undoManager);
+            panel = new ColorTypeDialogPanel(colorTypesListModel, tab.network(), colorType, undoManager);
         } else {
-            panel = new ColorTypeDialogPanel(colorTypesListModel, parent.network(), undoManager);
+            panel = new ColorTypeDialogPanel(colorTypesListModel, tab.network(), undoManager);
         }
         panel.showDialog();
     }
 
 	protected void removeConstants() {
-        TimedArcPetriNetNetwork model = parent.network();
+        TimedArcPetriNetNetwork model = tab.network();
         java.util.List<String> unremovableConstants = new ArrayList<>();
-        parent.getUndoManager().newEdit();
+        tab.getUndoManager().newEdit();
 
         for (Object o : list.getSelectedValuesList()) {
             String name = ((Constant)o).name();
@@ -670,7 +668,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             if (command == null) {
                 unremovableConstants.add(name);
             } else {
-                parent.getUndoManager().addEdit(command);
+                tab.getUndoManager().addEdit(command);
             }
         }
         if (unremovableConstants.size() > 0) {
@@ -732,13 +730,13 @@ public class ConstantsPane extends JPanel implements SidePane {
 
     @Override
     public void moveUp(int index) {
-        parent.swapConstants(index, index-1);
+        tab.swapConstants(index, index-1);
         showConstants();
     }
 
     @Override
     public void moveDown(int index) {
-        parent.swapConstants(index, index+1);
+        tab.swapConstants(index, index+1);
         showConstants();
     }
 
@@ -796,7 +794,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         }
 
         public void removeElement(Variable variable) {
-            UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
+            UndoManager undoManager = tab.getUndoManager();
             undoManager.newEdit();
             ArrayList<String> messages = new ArrayList<>();
             network.remove(variable, variablesListModel, undoManager, messages);
@@ -813,7 +811,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
         public void updateName() {
             fireContentsChanged(this, 0, getSize());
-            for (Template activeTemplate : parent.activeTemplates()) {
+            for (Template activeTemplate : tab.activeTemplates()) {
                 activeTemplate.guiModel().repaintAll(true);
             }
         }
@@ -874,7 +872,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         }
 
         public void removeElement(ColorType colorType) {
-            UndoManager undoManager = TAPAALGUI.getCurrentTab().getUndoManager();
+            UndoManager undoManager = tab.getUndoManager();
             undoManager.newEdit();
             ArrayList<String> messages = new ArrayList<>();
             network.remove(colorType, colorTypesListModel, undoManager, messages);
@@ -892,7 +890,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
         public void updateName() {
             fireContentsChanged(this, 0, getSize());
-            for (Template activeTemplate : parent.activeTemplates()) {
+            for (Template activeTemplate : tab.activeTemplates()) {
                 activeTemplate.guiModel().repaintAll(true);
             }
         }

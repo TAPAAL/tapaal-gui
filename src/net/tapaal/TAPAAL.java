@@ -117,7 +117,7 @@ public class TAPAAL {
 	private static void batchProcessing(File batchFolder) throws Exception {
 		//Sadly needs to create the gui
 		TAPAALGUI.init();
-		TAPAALGUI.getApp().setVisible(false);
+		TAPAALGUI.getAppGui().setVisible(false);
 
 		System.out.println("=============================================================");
 		System.out.println("Batch Processing");

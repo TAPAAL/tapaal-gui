@@ -15,7 +15,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class VerifyTACPNExporter extends  VerifyTAPNExporter {
+public class VerifyTACPNExporter extends VerifyTAPNExporter {
+    @Override
     protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
         ArrayList<Template> templates = new ArrayList<>(1);
         ArrayList<TAPNQuery> queries = new ArrayList<>(1);

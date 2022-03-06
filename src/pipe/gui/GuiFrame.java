@@ -1,10 +1,6 @@
 package pipe.gui;
 
 import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -30,7 +26,6 @@ import dk.aau.cs.util.JavaUtil;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
-import net.tapaal.copypaste.CopyPastImportExport;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
@@ -48,7 +43,6 @@ import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
-import pipe.gui.petrinet.Export;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.animation.SimulatorFocusTraversalPolicy;
 import pipe.gui.petrinet.editor.EditorFocusTraversalPolicy;
@@ -60,8 +54,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final int[] zoomLevels = {40, 60, 80, 100, 120, 140, 160, 180, 200, 300};
 
     private final String frameTitle;
-
-    private int newNameCounter = 1;
 
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
 
@@ -117,7 +109,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction printAction = new GuiAction("Print", "Print", KeyStroke.getKeyStroke('P', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            Export.exportGuiView(getCurrentTab().drawingSurface(), Export.PRINTER, null, null);
+            currentTab.ifPresent(TabActions::print);
         }
     };
     private final GuiAction importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format") {
@@ -178,32 +170,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction cutAction = new GuiAction("Cut", "Cut current selection", KeyStroke.getKeyStroke('X', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            String message = CopyPastImportExport.toXML(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
-            getCurrentTab().deleteSelection();
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+            currentTab.ifPresent(TabActions::cut);
         }
     };
     private final GuiAction copyAction = new GuiAction("Copy", "Copy current selection", KeyStroke.getKeyStroke('C', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            String message = CopyPastImportExport.toXML(getCurrentTab().drawingSurface().getSelectionObject().getSelection());
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+            currentTab.ifPresent(TabActions::copy);
         }
     };
     private final GuiAction pasteAction = new GuiAction("Paste", "Paste", KeyStroke.getKeyStroke('V', shortcutkey)) {
         @Override
         public void actionPerformed(ActionEvent e) {
-
-            String s = "";
-            //odd: the Object param of getContents is not currently used
-            Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-            boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
-            if (hasTransferableText) {
-                try {
-                    s = (String)contents.getTransferData(DataFlavor.stringFlavor);
-                }
-                catch (UnsupportedFlavorException | IOException ignored){}
-            }
-            CopyPastImportExport.past(s, getCurrentTab());
+            currentTab.ifPresent(TabActions::past);
         }
     };
     private final GuiAction undoAction = new GuiAction("Undo", "Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
@@ -224,7 +202,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction alignToGrid = new GuiAction("Align To Grid", "Align Petri net objects to current grid", KeyStroke.getKeyStroke("shift G")) {
         public void actionPerformed(ActionEvent e) {
-            Grid.alignPNObjectsToGrid();
+            currentTab.ifPresent(TabActions::alignToGrid);
         }
     };
     private final GuiAction netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
@@ -302,7 +280,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent arg0) {
             currentTab.ifPresent(TabActions::deleteSelection);
         }
-
     };
 
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
@@ -412,7 +389,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-
     private final GuiAction selectAllAction = new GuiAction("Select all", "Select all components", KeyStroke.getKeyStroke('A', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabActions::selectAll);
@@ -447,8 +423,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabActions::stepBackwards);
         }
     };
-
-
     private final GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabActions::previousComponent);
@@ -650,7 +624,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         menuBar.add(buildMenuHelp());
 
         setJMenuBar(menuBar);
-
     }
 
 
@@ -913,11 +886,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         getContentPane().add(toolBarPaneltmp, BorderLayout.PAGE_START);
     }
 
-    /**
-     * @param zoomMenu - the menu to add the submenu to
-     * @author Ben Kirby Takes the method of setting up the Zoom menu out of the
-     * main buildMenus method.
-     */
     private void addZoomMenuItems(JMenu zoomMenu) {
         for (int i = 0; i <= zoomLevels.length - 1; i++) {
 
@@ -930,17 +898,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             zoomMenu.add(newZoomAction);
         }
-
-
     }
 
-    /**
-     * @param toolBar the JToolBar to add the button to
-     * @param action  the action that the ZoomComboBox performs
-     * @author Ben Kirby Just takes the long-winded method of setting up the
-     * ComboBox out of the main buildToolbar method. Could be adapted
-     * for generic addition of comboboxes
-     */
     private void addZoomComboBox(JToolBar toolBar, Action action) {
         Dimension zoomComboBoxDimension = new Dimension(100, 28);
 
@@ -950,7 +909,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             zoomExamplesStrings[i] = zoomLevels[i] + "%";
         }
 
-        zoomComboBox = new JComboBox<String>(zoomExamplesStrings);
+        zoomComboBox = new JComboBox<>(zoomExamplesStrings);
         zoomComboBox.setEditable(true);
         zoomComboBox.setSelectedItem("100%");
         zoomComboBox.setMaximumRowCount(zoomLevels.length);
@@ -981,10 +940,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     /**
      * Sets all buttons to enabled or disabled according to the current GUImode.
-     * <p>
-     * Reimplementation of old enableGUIActions(bool status)
-     *
-     * @author Kenneth Yrke Joergensen (kyrke)
+     * Reimplementation of old enableGUIActions(bool status) method.
      */
     private void enableGUIActions(GUIMode mode) {
         switch (mode) {
@@ -1057,14 +1013,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 gameFeatureOptions.setEnabled(false);
                 colorFeatureOptions.setEnabled(false);
 
-
-                // Remove constant highlight
-                getCurrentTab().removeConstantHighlights();
-
-                getCurrentTab().getAnimationController().requestFocusInWindow();
-
                 //Enable simulator focus traversal policy
-                setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
+                setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy(getCurrentTab().getAnimationController().TimeDelayField));
 
                 break;
             case noNet:
@@ -1451,6 +1401,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         super.setTitle((title == null) ? frameTitle : frameTitle + ": " + title);
     }
 
+    @Deprecated
     public boolean isEditionAllowed() {
         return !getCurrentTab().isInAnimationMode();
     }
@@ -1471,10 +1422,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
      * called from other sources, a duplicate ZoomAction is not called
      */
     @Override
-    public void updateZoomCombo() {
+    public void updateZoomCombo(int zoom) {
         ActionListener zoomComboListener = (zoomComboBox.getActionListeners())[0];
         zoomComboBox.removeActionListener(zoomComboListener);
-        zoomComboBox.setSelectedItem(getCurrentTab().drawingSurface().getZoomController().getPercent() + "%");
+        zoomComboBox.setSelectedItem(zoom + "%");
         zoomComboBox.addActionListener(zoomComboListener);
     }
 
@@ -1770,15 +1721,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return nets;
     }
 
-
-    public int getNameCounter() {
-        return newNameCounter;
-    }
-
-    public void incrementNameCounter() {
-        newNameCounter++;
-    }
-
+    /**
+     * @Deprecated Use tab.getTabTitle() instead
+     */
+    @Deprecated
     public String getCurrentTabName() {
         return appTab.getTitleAt(appTab.getSelectedIndex());
     }
@@ -1801,11 +1747,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return Preferences.getInstance().getShowColoredTokens();
     }
 
+    /**
+     * @Deprecated Only to be used in TAPAALGUI
+     */
+    @Deprecated
     public int getSelectedTabIndex() {
         return appTab.getSelectedIndex();
     }
 
-    public PetriNetTab getCurrentTab() {
+    //XXX usage of this function should be replaces by currentTab and not assuem PetriNetTab
+    @Deprecated
+    private PetriNetTab getCurrentTab() {
         return TAPAALGUI.getCurrentTab();
     }
 

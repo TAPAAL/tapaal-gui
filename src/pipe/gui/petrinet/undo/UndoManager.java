@@ -11,6 +11,7 @@ import net.tapaal.helpers.Reference.Reference;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.GuiFrameActions;
 import pipe.gui.Constants;
+import pipe.gui.petrinet.PetriNetTab;
 
 /**
  * Class to handle undo & redo functionality
@@ -20,8 +21,9 @@ import pipe.gui.Constants;
 public class UndoManager {
 
 	private static final int UNDO_BUFFER_CAPACITY = Constants.DEFAULT_BUFFER_CAPACITY;
+    private final PetriNetTab tab;
 
-	private int indexOfNextAdd = 0;
+    private int indexOfNextAdd = 0;
 	private int sizeOfBuffer = 0;
 	private int startOfBuffer = 0;
 	private int undoneEdits = 0;
@@ -39,9 +41,10 @@ public class UndoManager {
 	/**
 	 * Creates a new instance of UndoManager
 	 */
-	public UndoManager() {
+	public UndoManager(PetriNetTab tab) {
+        this.tab = tab;
 
-	    // Initialize the buffer
+        // Initialize the buffer
 		for (int i = 0; i < UNDO_BUFFER_CAPACITY; i++) {
 			edits.add(null);
 		}
@@ -116,8 +119,10 @@ public class UndoManager {
 		undoneEdits = 0;
 		app.ifPresent(a -> a.setUndoActionEnabled(true));
 		app.ifPresent(a -> a.setRedoActionEnabled(false));
-		if(TAPAALGUI.getCurrentTab() != null) {
-            TAPAALGUI.getCurrentTab().setNetChanged(true);
+
+        //XXX this is properly not the place to set net changed, can be null as also used in batch processor undo/redo
+        if (tab != null) {
+            tab.setNetChanged(true);
         }
 
 		ArrayList<Command> compoundEdit = new ArrayList<Command>();

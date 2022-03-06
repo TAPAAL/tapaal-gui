@@ -46,7 +46,7 @@ public class UpdateColorTypeCommand extends Command {
                 var.setColorType(oldColorType);
             }
         }
-        TAPAALGUI.getModel().repaintPlaces();
+
         colorTypesListModel.updateName();
     }
 
@@ -71,7 +71,7 @@ public class UpdateColorTypeCommand extends Command {
                 var.setColorType(newColorType);
             }
         }
-        TAPAALGUI.getModel().repaintPlaces();
+
         colorTypesListModel.updateName();
     }
 }

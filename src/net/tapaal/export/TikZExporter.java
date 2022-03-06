@@ -261,7 +261,7 @@ public class TikZExporter {
         final double tTopY = 7;
         final double tBotY = 7;
 
-        boolean isTimed = TAPAALGUI.getApp().getCurrentTab().getLens().isTimed();
+        boolean isTimed = TAPAALGUI.getCurrentTab().getLens().isTimed();
 
         double placeXpos = (place.getPositionX());
         double placeYpos = (place.getPositionY() * (-1));

@@ -60,10 +60,12 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
 import pipe.gui.*;
 import net.tapaal.gui.petrinet.verification.Verifier;
+import pipe.gui.petrinet.PetriNetTab;
 
 public class WorkflowDialog extends JDialog {
 
     private final TAPNLens lens;
+    private final PetriNetTab tab;
 
     private static String getHelpMessage(){
 		// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
@@ -143,17 +145,15 @@ public class WorkflowDialog extends JDialog {
 	private static final String ERROR_INCREASE_BOUND = "Try to increase the number of extra tokens.";
 
 	/* Soundness */
-	
 	private static final String RESULT_ERROR_NONFINAL_REACHED = "A non-final marking with a token in the output place is reachable.";
 	private static final String RESULT_ERROR_NO_TRACE_TO_FINAL = "A marking is reachable from which a final marking cannot be reached.";
 	private static final String LABEL_UNUSED_TRANSITIONS = "The workflow contains the following redundant transitions that are never enabled:";
 	
 	/* Strong Soundness */
-	
 	private static final String RESULT_ERROR_CYCLE = "The workflow has an infinite time-divergent execution.";
 	private static final String RESULT_ERROR_TIME = "A time divergent marking is reachable.";
-	/* Syntax */
-	
+
+    /* Syntax */
 	private static final String ERROR_MULTIPLE_IN = "Multiple input places found";
 	private static final String ERROR_MULTIPLE_OUT = "Multiple output places found";
 
@@ -218,13 +218,13 @@ public class WorkflowDialog extends JDialog {
 
 	TAWFNTypes netType;
 
-	public static void showDialog() {
-		if(TAPAALGUI.getCurrentTab().getWorkflowDialog() == null){
-			TAPAALGUI.getCurrentTab().setWorkflowDialog(new WorkflowDialog(TAPAALGUI.getApp(), "Workflow Analysis", true));
-		}else if(!TAPAALGUI.getCurrentTab().getWorkflowDialog().isInTraceMode){
-			WorkflowDialog oldDialog = TAPAALGUI.getCurrentTab().getWorkflowDialog();
-			TAPAALGUI.getCurrentTab().setWorkflowDialog(new WorkflowDialog(TAPAALGUI.getApp(), "Workflow Analysis", true));
-			WorkflowDialog newDialog = TAPAALGUI.getCurrentTab().getWorkflowDialog();
+	public static void showDialog(PetriNetTab tab) {
+		if(tab.getWorkflowDialog() == null){
+			tab.setWorkflowDialog(new WorkflowDialog(TAPAALGUI.getApp(), "Workflow Analysis", true, tab));
+		}else if(!tab.getWorkflowDialog().isInTraceMode){
+			WorkflowDialog oldDialog = tab.getWorkflowDialog();
+			tab.setWorkflowDialog(new WorkflowDialog(TAPAALGUI.getApp(), "Workflow Analysis", true, tab));
+			WorkflowDialog newDialog = tab.getWorkflowDialog();
 			newDialog.soundness.setSelected(oldDialog.soundness.isSelected());
 			newDialog.min.setSelected(oldDialog.min.isSelected());
 			newDialog.strongSoundness.setSelected(oldDialog.strongSoundness.isSelected());
@@ -232,8 +232,8 @@ public class WorkflowDialog extends JDialog {
 			newDialog.max.setEnabled(oldDialog.max.isEnabled());
 		}
 
-		TAPAALGUI.getCurrentTab().getWorkflowDialog().isInTraceMode = false;
-		TAPAALGUI.getCurrentTab().getWorkflowDialog().setVisible(true);
+		tab.getWorkflowDialog().isInTraceMode = false;
+		tab.getWorkflowDialog().setVisible(true);
 	}
 
 	public boolean restoreWindow(){
@@ -243,16 +243,17 @@ public class WorkflowDialog extends JDialog {
 	private void switchToTrace(TAPNNetworkTrace trace){
 		isInTraceMode = true;
 		setVisible(false);
-		TAPAALGUI.getAnimator().setTrace(trace);
+		tab.getAnimator().setTrace(trace);
 	}
 
-	private WorkflowDialog(Frame frame, String title, boolean modal) {
+	private WorkflowDialog(Frame frame, String title, boolean modal, PetriNetTab tab) {
 		super(frame, title, modal);
 
-		/* Copy model */
+        this.tab = tab;
 
-		model = TAPAALGUI.getCurrentTab().network().copy();
-        lens = TAPAALGUI.getCurrentTab().lens;
+		/* Copy model */
+		model = tab.network().copy();
+        lens = tab.lens;
 		
 		// Fix - remove unused shared places
 		unusedSharedPlaces.clear();
@@ -266,7 +267,6 @@ public class WorkflowDialog extends JDialog {
 		}
 
 		/* Make dialog */
-
 		initComponents();
 		setContentPane(panel);
 
@@ -402,7 +402,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.NONE;
 		JButton help_button = new JButton("Help");
-		help_button.addActionListener(e -> JOptionPane.showMessageDialog(TAPAALGUI.getAppGui(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE));
+		help_button.addActionListener(e -> JOptionPane.showMessageDialog(TAPAALGUI.getApp(), getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE));
 
 		panel.add(help_button, gbc);
 
@@ -658,8 +658,8 @@ public class WorkflowDialog extends JDialog {
 
 		numberOfExtraTokensInNet.addChangeListener(e -> {
 			model.setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
-			TAPAALGUI.getCurrentTab().network().setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
-			TAPAALGUI.getCurrentTab().setNetChanged(true);
+			tab.network().setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
+			tab.setNetChanged(true);
 		});
 
 		gbc.gridwidth = 1;
@@ -1297,13 +1297,11 @@ public class WorkflowDialog extends JDialog {
 	}
 
 	private void checkBound() {
-		Verifier.analyzeKBound(model, lens, TAPAALGUI.getCurrentTab().getGuiModels(),
-				(Integer) numberOfExtraTokensInNet.getValue(),
-				numberOfExtraTokensInNet);
+		Verifier.analyzeKBound(model, lens, tab.getGuiModels(), (Integer) numberOfExtraTokensInNet.getValue(), numberOfExtraTokensInNet);
 	}
 
 	private TAPNNetworkTrace mapTraceToRealModel(TAPNNetworkTrace tapnNetworkTrace){
-		TraceConverter converter = new TraceConverter(tapnNetworkTrace, TAPAALGUI.getCurrentTab().network());
+		TraceConverter converter = new TraceConverter(tapnNetworkTrace, tab.network());
 		return converter.convert();
 	}
 }
