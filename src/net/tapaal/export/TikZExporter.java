@@ -232,15 +232,13 @@ public class TikZExporter {
 	    String nameLabelsString = "";
         String[] labelsInName = nameLabel.split("\n");
         for(int i = 0; i < labelsInName.length; i++) {
-
             if(labelsInName[i].contains("[")) {
                 nameLabelsString += escapeSpacesInAndOrNot(replaceWithMathLatex(labelsInName[i]));
-                nameLabelsString += "\\\\";
             }
             else if(!labelsInName[i].isEmpty()){
                 nameLabelsString += escapeSpacesInAndOrNot(replaceWithMathLatex(labelsInName[i]));
-                nameLabelsString += "\\\\";
-            } else {
+            }
+            if(i != labelsInName.length - 1) {
                 nameLabelsString += "\\\\";
             }
         }
@@ -275,14 +273,14 @@ public class TikZExporter {
                     out.append(",");
                     out.append(placeYpos + 4);
                     out.append(")");
-                    out.append("{0,0};\n");
+                    out.append("{0.0};\n");
 
                     out.append("\\node at ("); // Bottom
                     out.append(placeXpos);
                     out.append(",");
                     out.append(placeYpos - 5);
                     out.append(")");
-                    out.append("{0,0};\n");
+                    out.append("{0.0};\n");
                     return;
                 case 1:
                     out.append("\\node at ("); // Top
@@ -290,7 +288,7 @@ public class TikZExporter {
                     out.append(",");
                     out.append(placeYpos);
                     out.append(")");
-                    out.append("{0,0};\n");
+                    out.append("{0.0};\n");
                     return;
                 default:
                     out.append("\\node at (");
