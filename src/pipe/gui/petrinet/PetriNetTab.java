@@ -3,6 +3,21 @@ package pipe.gui.petrinet;
 import dk.aau.cs.TCTL.Parsing.ParseException;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Variable;
+import net.tapaal.gui.GuiFrameActions;
+import net.tapaal.gui.GuiFrameControllerActions;
+import net.tapaal.gui.SafeGuiFrameActions;
+import net.tapaal.gui.TabActions;
+import net.tapaal.gui.petrinet.*;
+import net.tapaal.gui.petrinet.model.ModelViolation;
+import net.tapaal.gui.petrinet.model.Result;
+import net.tapaal.gui.petrinet.editor.TemplateExplorer;
+import net.tapaal.gui.petrinet.model.GuiModelManager;
+import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
+import net.tapaal.gui.petrinet.dialog.NameVisibilityPanel;
+import net.tapaal.gui.petrinet.dialog.StatisticsPanel;
+import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
@@ -43,10 +58,13 @@ import net.tapaal.gui.petrinet.verification.*;
 import net.tapaal.gui.petrinet.widgets.QueryPane;
 import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
 import net.tapaal.helpers.Reference.MutableReference;
+import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.swinghelpers.JSplitPaneFix;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
+import pipe.gui.petrinet.dataLayer.DataLayer;
+import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.Constants;
 import pipe.gui.GuiFrame;
 import pipe.gui.MessengerImpl;
@@ -54,12 +72,10 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.canvas.Grid;
 import pipe.gui.canvas.Zoomer;
-import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.petrinet.animation.AnimationControlSidePanel;
 import pipe.gui.petrinet.animation.AnimationHistoryList;
 import pipe.gui.petrinet.animation.AnimationHistorySidePanel;
 import pipe.gui.petrinet.animation.Animator;
-import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.*;
 import pipe.gui.petrinet.graphicElements.tapn.*;
 import pipe.gui.petrinet.undo.UndoManager;
@@ -1425,6 +1441,106 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 
     @Override
+    public void showColorTypesVariables() {
+        StringBuilder buffer = new StringBuilder();
+        Context context = new Context(TAPAALGUI.getCurrentTab());
+
+        List<ColorType> listColorTypes = context.network().colorTypes();
+        List<Variable> variableList = context.network().variables();
+        List<Constant> constantsList = new ArrayList<>(context.network().constants());
+
+        getColorTypesFormattedString(listColorTypes, buffer);
+
+        if(!variableList.isEmpty()) {
+            buffer.append("<br>");
+        }
+
+        getVariablesFormattedString(variableList, buffer);
+
+        if(!constantsList.isEmpty()) {
+            buffer.append("<br><br>");
+        }
+
+        getConstantsFormattedString(constantsList, buffer);
+
+        JLabel label = new JLabel("<html>" + buffer + "</html>");
+        label.setFont(new Font(label.getFont().getName(), Font.PLAIN, label.getFont().getSize()));
+
+        JOptionPane.showMessageDialog(null, label, "Global color types/variables", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private String getColorTypesFormattedString(List<ColorType> listColorTypes, StringBuilder buffer) {
+        String stringColorList = "";
+        for(int i = 0; i < listColorTypes.size(); i++) {
+            if(i == 0) {
+                buffer.append("Color Types:<br>");
+            }
+            buffer.append(listColorTypes.get(i).getName() + " <b>is</b> ");
+
+            if(listColorTypes.get(i).isProductColorType()) {
+                buffer.append("&lt;");
+                for(int x = 0; x < listColorTypes.get(i).getProductColorTypes().size(); x++) {
+                    stringColorList += listColorTypes.get(i).getProductColorTypes().get(x).getName();
+
+                    if(x != listColorTypes.get(i).getProductColorTypes().size() - 1){
+                        stringColorList += ", ";
+                    }
+                }
+                buffer.append(stringColorList + "&gt;<br>");
+                stringColorList = "";
+
+            } else if(listColorTypes.get(i).isIntegerRange()) {
+                if(listColorTypes.get(i).size() > 1) {
+                    int listSize = listColorTypes.get(i).size();
+                    buffer.append("[" + listColorTypes.get(i).getColors().get(0).getColorName() + ".." + listColorTypes.get(i).getColors().get(listSize - 1).getColorName() + "]");
+                } else {
+                    buffer.append("[" + listColorTypes.get(i).getFirstColor().getColorName() + "]");
+                }
+                buffer.append("<br>");
+
+            } else {
+                buffer.append("[");
+                for(int x = 0; x < listColorTypes.get(i).getColors().size(); x++) {
+                    stringColorList += listColorTypes.get(i).getColors().get(x).getName();
+
+                    if(x != listColorTypes.get(i).getColors().size() - 1){
+                        stringColorList += ", ";
+                    }
+                }
+                buffer.append(stringColorList + "]<br>");
+                stringColorList = "";
+            }
+        }
+
+        return buffer.toString();
+    }
+
+    private String getVariablesFormattedString(List<Variable> variableList, StringBuilder buffer) {
+        for(int i = 0; i < variableList.size(); i++) {
+            if (i == 0) {
+                buffer.append("Variables:<br>");
+            }
+            buffer.append(variableList.get(i).getName() + " <b>in</b> " + variableList.get(i).getColorType().getName());
+            if(i != variableList.size() - 1) {
+                buffer.append("<br>");
+            }
+        }
+        return buffer.toString();
+    }
+
+    private String getConstantsFormattedString(List<Constant> constantsList, StringBuilder buffer) {
+        for (int i = 0; i < constantsList.size(); i++) {
+            if (i == 0) {
+                buffer.append("Constants:<br>");
+            }
+            buffer.append(constantsList.get(i).toString());
+            if (i != constantsList.size() - 1) {
+                buffer.append("<br>");
+            }
+        }
+        return buffer.toString();
+    }
+
     public void alignToGrid() {
         ArrayList<PetriNetObject> petriNetObjects = drawingSurface.getGuiModel().getPlaceTransitionObjects();
         undoManager.newEdit();
