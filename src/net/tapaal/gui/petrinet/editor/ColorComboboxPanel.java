@@ -108,6 +108,11 @@ public abstract class ColorComboboxPanel extends JPanel {
                 var currentComboBox = colorTypeComboBoxesArray[i];
                 currentComboBox.setRenderer(new ColorComboBoxRenderer(currentComboBox));
                 currentComboBox.setPreferredSize(new Dimension(200,25));
+
+                if (i == 0) {
+                    currentComboBox.addItem(new PlaceHolderColorExpression());
+                    currentComboBox.addItem(new JSeparator());
+                }
                 if (context != null) {
                     boolean variableFound = false;
                     for (Variable variable : context.network().variables()) {
@@ -151,6 +156,10 @@ public abstract class ColorComboboxPanel extends JPanel {
             colorTypeComboBoxesArray[0] = currentComboBox;
             currentComboBox.setRenderer(new ColorComboBoxRenderer(currentComboBox));
             currentComboBox.setPreferredSize(new Dimension(200,25));
+
+            currentComboBox.addItem(new PlaceHolderColorExpression());
+            currentComboBox.addItem(new JSeparator());
+
             if(context != null){
                 boolean variableFound = false;
                 for (Variable element : context.network().variables()) {
@@ -190,6 +199,7 @@ public abstract class ColorComboboxPanel extends JPanel {
                 currentComboBox.addItem(new JSeparator());
                 currentComboBox.addItem("<html><b>.all</b>");
             }
+            currentComboBox.setEnabled(false);
         }
         revalidate();
     }
@@ -200,7 +210,7 @@ public abstract class ColorComboboxPanel extends JPanel {
     @Override
     public void setEnabled(boolean enabled){
         colorcomboBoxPanel.setEnabled(enabled);
-        for(var combobox : colorTypeComboBoxesArray){
+        for (var combobox : colorTypeComboBoxesArray) {
             combobox.setEnabled(enabled);
         }
     }
