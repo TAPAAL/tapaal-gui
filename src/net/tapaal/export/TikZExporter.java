@@ -122,7 +122,13 @@ public class TikZExporter {
 			out.append(arcPoints);
 			out.append("to node[bend right=0,auto,align=left]");
 			out.append(" {");
-			out.append(handleNameLabel(arc.getNameLabel().getText()));
+
+			if(arrowType.equals("inhibArc")) {
+                out.append(handleNameLabel(arc.getNameLabel().getText().replace("x","\\times")));
+            } else {
+                out.append(handleNameLabel(arc.getNameLabel().getText()));
+            }
+
             out.append("} ");
 			out.append("(" + arc.getTarget().getId() + ");\n");
 		}
