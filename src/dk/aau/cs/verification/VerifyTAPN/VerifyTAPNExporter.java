@@ -93,7 +93,10 @@ public class VerifyTAPNExporter {
 
 		modelStream.append("<pnml>\n");
 		modelStream.append("<net id=\"" + model.name() + "\" type=\"P/T net\">\n");
-		for(TimedPlace p : model.places()) {
+
+        outputDeclarations(modelStream);
+
+        for(TimedPlace p : model.places()) {
             outputPlace(p, modelStream, guiModel, mapping);
         }
 		
@@ -116,8 +119,6 @@ public class VerifyTAPNExporter {
 		for(TimedInhibitorArc inhibArc : model.inhibitorArcs()) {
             outputInhibitorArc(inhibArc, modelStream);
         }
-
-		outputDeclarations(modelStream);
 
         modelStream.append("</net>\n");
 		modelStream.append("</pnml>");

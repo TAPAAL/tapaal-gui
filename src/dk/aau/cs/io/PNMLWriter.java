@@ -81,10 +81,6 @@ public class PNMLWriter implements NetWriter {
 		Element nameText = document.createElement("text");
 		nameNode.appendChild(nameText);
 		nameText.setTextContent(composedNetwork.name());
-		
-		appendPlaces(document, composer.getGuiModel(), pageNode);
-		appendTransitions(document, composer.getGuiModel(), pageNode);
-		appendArcs(document, composer.getGuiModel(), pageNode);
 
         if(lens.isColored()) {
             Element nameElement = document.createElement("name");
@@ -94,6 +90,10 @@ public class PNMLWriter implements NetWriter {
             nameElement.appendChild(nameTextElement);
             writeTACPN.appendDeclarations(document, netNode);
         }
+
+		appendPlaces(document, composer.getGuiModel(), pageNode);
+		appendTransitions(document, composer.getGuiModel(), pageNode);
+		appendArcs(document, composer.getGuiModel(), pageNode);
 
 		document.normalize();
 		// Create Transformer with XSL Source File
