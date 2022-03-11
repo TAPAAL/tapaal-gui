@@ -108,6 +108,8 @@ public interface TabActions {
 
     void showChangeNameVisibility();
 
+    void showColorTypesVariables();
+
     void alignToGrid();
 
     void copy();

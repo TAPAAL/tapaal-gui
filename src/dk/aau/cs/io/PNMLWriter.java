@@ -71,29 +71,24 @@ public class PNMLWriter implements NetWriter {
 		pnmlRootNode.appendChild(netNode);
 		netNode.setAttribute("id", composedNetwork.name());
 		netNode.setAttribute("type", "http://www.pnml.org/version-2009/grammar/ptnet");
-		
+
+        Element nameNode = document.createElement("name"); //Name of the net
+        netNode.appendChild(nameNode);
+        Element nameText = document.createElement("text");
+        nameNode.appendChild(nameText);
+        nameText.setTextContent(composedNetwork.name());
+
+        if(lens.isColored()) {
+            writeTACPN.appendDeclarations(document, netNode);
+        }
+
 		Element pageNode = document.createElement("page"); //Page node
 		netNode.appendChild(pageNode);
 		pageNode.setAttribute("id", "page0");
-		
-		Element nameNode = document.createElement("name"); //Name of the net
-		netNode.appendChild(nameNode);
-		Element nameText = document.createElement("text");
-		nameNode.appendChild(nameText);
-		nameText.setTextContent(composedNetwork.name());
-		
+
 		appendPlaces(document, composer.getGuiModel(), pageNode);
 		appendTransitions(document, composer.getGuiModel(), pageNode);
 		appendArcs(document, composer.getGuiModel(), pageNode);
-
-        if(lens.isColored()) {
-            Element nameElement = document.createElement("name");
-            netNode.appendChild(nameElement);
-            Element nameTextElement = document.createElement("text");
-            nameTextElement.setTextContent(composedNetwork.name());
-            nameElement.appendChild(nameTextElement);
-            writeTACPN.appendDeclarations(document, netNode);
-        }
 
 		document.normalize();
 		// Create Transformer with XSL Source File

@@ -735,6 +735,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     public void showSimpleWorkspace() {
         showAdvancedWorkspace(false);
     }
+
     private void showAdvancedWorkspace(boolean advanced){
         QueryDialog.setAdvancedView(advanced);
         setComponents(advanced);

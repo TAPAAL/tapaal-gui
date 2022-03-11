@@ -1082,6 +1082,7 @@ public class ColorTypeDialogPanel extends JPanel {
                         availableColorTypes.add(type);
                     }
                 }
+
                 int size = productColorTypeList.getModel().getSize();
                 for (int i = 0; i < size; i++) {
                     String colorTypeName = productColorTypeList.getModel().getElementAt(i).toString();
@@ -1092,6 +1093,15 @@ public class ColorTypeDialogPanel extends JPanel {
                         }
                     }
                 }
+
+                if (productType.size() <= 0) {
+                    JOptionPane.showMessageDialog(
+                        TAPAALGUI.getApp(),
+                        "An product type must contain at least one component",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 if (oldColorType != null) {
                     if (oldColorType.equals(productType)) {
                         exit();

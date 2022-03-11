@@ -106,12 +106,13 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		pnmlAttr.setValue("http://www.informatik.hu-berlin.de/top/pnml/ptNetb");
 		pnmlRootNode.setAttributeNode(pnmlAttr);
 
-		appendSharedPlaces(document, pnmlRootNode);
+        writeTACPN.appendDeclarations(document, pnmlRootNode);
+
+        appendSharedPlaces(document, pnmlRootNode);
 		appendSharedTransitions(document, pnmlRootNode);
 		appendConstants(document, pnmlRootNode);
 		appendTemplates(document, pnmlRootNode);
 
-        writeTACPN.appendDeclarations(document, pnmlRootNode);
         appendQueries(document, pnmlRootNode);
 		appendDefaultBound(document, pnmlRootNode);
 		appendFeature(document, pnmlRootNode);
