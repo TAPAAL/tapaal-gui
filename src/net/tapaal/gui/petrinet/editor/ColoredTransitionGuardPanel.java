@@ -65,6 +65,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     final ExpressionConstructionUndoManager undoManager;
     final UndoableEditSupport undoSupport;
 
+    private boolean doColorTypeUndo = true;
+
     private ExprStringPosition currentSelection = null;
     public ColoredTransitionGuardPanel(TimedTransitionComponent transition, Context context, TAPNTransitionEditor parent){
         this.setLayout(new GridBagLayout());
@@ -746,8 +748,20 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         }
     }
 
-    private void updateColorTypeSelection() {
-        List<Expression> children = getPropertyChildren(newProperty.getChildren());
+    private ColorType getColorType(Expression property) {
+        List<Expression> children = getPropertyChildren(property.getChildren());
+        ColorType colorType = getColorType(children);
+        if (colorType != null) return colorType;
+
+        // Checks string positions if the above fails to find a color
+        ExprStringPosition[] childrenPositions = property.getChildren();
+        for (ExprStringPosition child : childrenPositions) {
+            children.add(child.getObject());
+        }
+        return getColorType(children);
+    }
+
+    private ColorType getColorType(List<Expression> children) {
         List<ColorType> colorTypes = context.network().colorTypes();
         List<ColorType> types = new ArrayList<>();
         for (Expression child : children) {
@@ -755,12 +769,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 types.add(((ColorExpression) child).getColorType(colorTypes));
             }
         }
-        if (types.size() == 1) {
-            colorTypeCombobox.setSelectedItem(types.get(0));
-        } else {
-            colorTypeCombobox.setSelectedItem(colorTypes.get(0));
-        }
-        updateColorType();
+        if (types.size() > 0) return types.get(0);
+        return null;
     }
 
     private List<Expression> getPropertyChildren(ExprStringPosition[] children) {
@@ -842,7 +852,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private void clearSelection() {
         exprField.select(0, 0);
         currentSelection = null;
-
     }
 
     public GuardExpression getExpression(){
@@ -886,15 +895,20 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     private void updateExpression() {
         ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
-        List<Expression> children = getPropertyChildren(newProperty.getChildren());
-        GuardExpression oldProperty = newProperty;
-        for (Expression child : children) {
-            if (child instanceof ColorExpression && !(child instanceof PlaceHolderColorExpression) && !((ColorExpression) child).getColorTypes().contains(ct)) {
+        ExprStringPosition[] children = newProperty.getChildren();
+        GuardExpression oldProperty = newProperty.copy();
+        for (ExprStringPosition child : children) {
+            if (child.getObject() instanceof ColorExpression && !(child.getObject() instanceof PlaceHolderColorExpression) && !((ColorExpression) child.getObject()).getColorTypes().contains(ct)) {
                 PlaceHolderColorExpression ph = new PlaceHolderColorExpression();
-                newProperty = newProperty.replace(child, ph);
+                newProperty = newProperty.replace(child.getObject(), ph);
             }
         }
-        replaceAndAddToUndo(oldProperty, newProperty);
+        if (doColorTypeUndo) {
+            replaceAndAddToUndo(oldProperty, newProperty);
+        } else {
+            newProperty = newProperty.replace(oldProperty, newProperty);
+            updateSelection(newProperty);
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -925,7 +939,9 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     public class ExpressionConstructionEdit extends AbstractUndoableEdit {
         private final Expression original;
+        private final ColorType originalColorType;
         private final Expression replacement;
+        private final ColorType replacementColorType;
 
         public Expression getOriginal() {
             return original;
@@ -938,19 +954,29 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         public ExpressionConstructionEdit(Expression original,
                                           Expression replacement) {
             this.original = original;
+            this.originalColorType = getColorType(original);
             this.replacement = replacement;
+            this.replacementColorType = colorCombobox.getColorType();
         }
 
         @Override
         public void undo() throws CannotUndoException {
             newProperty = newProperty.replace(replacement, original);
-            updateColorTypeSelection();
+            if (originalColorType != null) {
+                doColorTypeUndo = false;
+                colorTypeCombobox.setSelectedItem(originalColorType);
+                doColorTypeUndo = true;
+            }
         }
 
         @Override
         public void redo() throws CannotRedoException {
             newProperty = newProperty.replace(original, replacement);
-            updateColorTypeSelection();
+            if (replacementColorType != null) {
+                doColorTypeUndo = false;
+                colorTypeCombobox.setSelectedItem(replacementColorType);
+                doColorTypeUndo = true;
+            }
         }
 
         @Override
