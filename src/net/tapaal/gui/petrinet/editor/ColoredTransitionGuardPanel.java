@@ -66,6 +66,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     final UndoableEditSupport undoSupport;
 
     private boolean doColorTypeUndo = true;
+    private boolean updatingColorSelection = false;
 
     private ExprStringPosition currentSelection = null;
     public ColoredTransitionGuardPanel(TimedTransitionComponent transition, Context context, TAPNTransitionEditor parent){
@@ -79,7 +80,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         initLogicPanel();
         initColorExpressionPanel();
         initExprEditPanel();
-        //updateColorType();
 
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
@@ -138,7 +138,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         colorCombobox = new ColorComboboxPanel((ColorType)colorTypeCombobox.getSelectedItem(),false) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
-                addColor();
+                if (!updatingColorSelection) addColor();
             }
         };
         colorCombobox.removeScrollPaneBorder();
@@ -694,6 +694,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         currentSelection = position;
 
         updateEnabledButtons();
+        updateColorSelection();
     }
 
     private void updateSelection() {
@@ -708,44 +709,16 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         currentSelection = position;
 
         updateEnabledButtons();
+        updateColorSelection();
     }
 
-    public void updateColorOptions() {
+    private void updateColorSelection() {
+        updatingColorSelection = true;
         if (currentSelection.getObject() instanceof ColorExpression) {
             ColorExpression exprToCheck = ((ColorExpression) currentSelection.getObject()).getBottomColorExpression();
-            if (exprToCheck instanceof UserOperatorExpression || exprToCheck instanceof VariableExpression) {
-                if (exprToCheck.getParent() instanceof TupleExpression) {
-                    TupleExpression tupleExpression = (TupleExpression) exprToCheck.getParent();
-                    colorTypeCombobox.setSelectedItem(tupleExpression.getColorTypes().get(exprToCheck.getIndex()));
-                    updateColorType();
-                    colorTypeCombobox.setEnabled(false);
-                    colorCombobox.setEnabled(false);
-                }
-            }
-            //updateColorTypeCombobox();
+            colorCombobox.updateSelection(exprToCheck);
         }
-    }
-
-    private void updateColorTypeCombobox() {
-        List<Expression> possibleExpressions = getPropertyChildren(newProperty.getChildren());
-        List<ColorType> colorTypes = context.network().colorTypes();
-        ColorType type = null;
-
-        int lastIndex = possibleExpressions.size() - 1;
-
-        if (lastIndex == 0 && possibleExpressions.get(lastIndex) instanceof ColorExpression) {
-            type = ((ColorExpression) possibleExpressions.get(lastIndex)).getColorType(colorTypes);
-            addColorTypesToCombobox(Collections.singletonList(type));
-        } else if (lastIndex > 0) {
-            if (possibleExpressions.get(lastIndex) instanceof TupleExpression) {
-                type = ((ColorExpression) possibleExpressions.get(lastIndex)).getColorType(colorTypes);
-            } else if (possibleExpressions.get(lastIndex - 1) instanceof ColorExpression) {
-                type = ((ColorExpression) possibleExpressions.get(lastIndex - 1)).getColorType(colorTypes);
-            }
-            if (type != null) addColorTypesToCombobox(Collections.singletonList(type));
-        } else {
-            addColorTypesToCombobox(colorTypes);
-        }
+        updatingColorSelection = false;
     }
 
     private ColorType getColorType(Expression property) {

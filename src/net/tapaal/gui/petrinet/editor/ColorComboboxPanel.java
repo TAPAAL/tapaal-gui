@@ -90,8 +90,10 @@ public abstract class ColorComboboxPanel extends JPanel {
             colorTypeComboBoxesArray[index].setSelectedIndex(colorTypeComboBoxesArray[index].getItemCount()-1);
         } else if(expr instanceof VariableExpression){
             colorTypeComboBoxesArray[index].setSelectedItem(((VariableExpression)expr).getVariable());
-        } else {
+        } else if(expr instanceof UserOperatorExpression){
             colorTypeComboBoxesArray[index].setSelectedItem(((UserOperatorExpression)expr).getUserOperator());
+        } else {
+            colorTypeComboBoxesArray[index].setSelectedItem(expr);
         }
     }
     public void updateColorType(ColorType ct){
