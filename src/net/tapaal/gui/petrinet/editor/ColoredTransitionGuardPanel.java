@@ -35,6 +35,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private JButton undoButton;
     private JButton redoButton;
 
+    JComboBox<ColorType> colorTypeCombobox;
+    JPanel comparisonButtonsPanel;
     private JButton andButton;
     private JButton orButton;
     private JButton notButton;
@@ -50,7 +52,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     JPanel colorExpressionButtons;
     JButton predButton;
     JButton succButton;
-    JComboBox<ColorType> colorTypeCombobox;
     JLabel colorTypeLabel;
     ColorComboboxPanel colorCombobox;
     JLabel colorLabel;
@@ -186,8 +187,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         logicButtonGroup.add(orButton);
         logicButtonGroup.add(notButton);
 
-
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -245,15 +244,13 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         colorTypeLabel = new JLabel("Color Type: ");
         colorTypeCombobox = new JComboBox();
-        colorTypeCombobox.setPreferredSize(new Dimension(200,25));
+        colorTypeCombobox.setPreferredSize(new Dimension(300,25));
         colorTypeCombobox.setRenderer(new ColorComboBoxRenderer(colorTypeCombobox));
 
         addColorTypesToCombobox(context.network().colorTypes());
-
         if (colorTypeCombobox.getItemCount() != 0) {
             colorTypeCombobox.setSelectedIndex(0);
         }
-
         colorTypeCombobox.addActionListener(actionEvent -> updateColorType());
 
         ButtonGroup comparisonButtons = new ButtonGroup();
@@ -280,64 +277,50 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         lessThanEqButton.setPreferredSize(comparisonButtonsSize);
         lessThanButton.setPreferredSize(comparisonButtonsSize);
 
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(3,3,3,3);
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(0, 0, 5, 0);
         comparisonPanel.add(colorTypeCombobox, gbc);
 
-        gbc = new GridBagConstraints();
-        gbc.gridy = 1;
-        gbc.gridx = 0;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        comparisonPanel.add(equalityButton, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        comparisonPanel.add(inequalityButton, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        comparisonPanel.add(greaterThanEqButton, gbc);
+        comparisonButtonsPanel = new JPanel(new GridBagLayout());
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        comparisonPanel.add(greaterThanButton, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        comparisonPanel.add(lessThanEqButton, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        comparisonPanel.add(lessThanButton, gbc);
-
-        JSeparator seperator = new JSeparator(SwingConstants.HORIZONTAL);
-        seperator.setEnabled(true);
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 3;
+        gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
-        comparisonPanel.add(seperator, gbc);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        comparisonButtonsPanel.add(equalityButton, gbc);
+
+        gbc.gridx = 1;
+        comparisonButtonsPanel.add(inequalityButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        comparisonButtonsPanel.add(greaterThanButton, gbc);
+
+        gbc.gridx = 1;
+        comparisonButtonsPanel.add(greaterThanEqButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        comparisonButtonsPanel.add(lessThanButton, gbc);
+
+        gbc.gridx = 1;
+        comparisonButtonsPanel.add(lessThanEqButton, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        comparisonPanel.add(comparisonButtonsPanel, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
