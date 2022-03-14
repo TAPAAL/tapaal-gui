@@ -103,7 +103,7 @@ public abstract class ColorComboboxPanel extends JPanel {
         removeOldComboBoxes();
         colorType = ct;
         if (colorType instanceof ProductType) {
-            colorTypeComboBoxesArray = new JComboBox[((ProductType) colorType).getColorTypes().size()];
+            colorTypeComboBoxesArray = new JComboBox[1];
 
             for (int i = 0; i < colorTypeComboBoxesArray.length; i++) {
                 colorTypeComboBoxesArray[i] = new JComboBox();
@@ -111,10 +111,8 @@ public abstract class ColorComboboxPanel extends JPanel {
                 currentComboBox.setRenderer(new ColorComboBoxRenderer(currentComboBox));
                 currentComboBox.setPreferredSize(new Dimension(200,25));
 
-                if (i == 0) {
-                    currentComboBox.addItem(new PlaceHolderColorExpression());
-                    currentComboBox.addItem(new JSeparator());
-                }
+                currentComboBox.addItem(new PlaceHolderColorExpression());
+                currentComboBox.addItem(new JSeparator());
                 if (context != null) {
                     boolean variableFound = false;
                     for (Variable variable : context.network().variables()) {

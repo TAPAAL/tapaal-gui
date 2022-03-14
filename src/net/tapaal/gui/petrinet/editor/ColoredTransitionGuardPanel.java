@@ -277,7 +277,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         lessThanEqButton.setPreferredSize(comparisonButtonsSize);
         lessThanButton.setPreferredSize(comparisonButtonsSize);
 
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -363,11 +362,19 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     }
 
-    private Pair<ColorExpression,ColorExpression> getLeftRightExpression(Expression currentSelection){
+    private Vector<ColorExpression> createColorVectors(List<ColorExpression> elements) {
+        return new Vector<>(elements);
+    }
+
+    private Pair<ColorExpression, ColorExpression> getLeftRightExpression(Expression currentSelection) {
         if (currentSelection instanceof PlaceHolderGuardExpression) {
-            return new Pair<>(new PlaceHolderColorExpression(),
-                new PlaceHolderColorExpression());
-        }else{
+            if (colorCombobox.getColorType() instanceof ProductType) {
+                Vector<ColorExpression> tempVec1 = createColorVectors(Arrays.asList(new PlaceHolderColorExpression(), new PlaceHolderColorExpression()));
+                Vector<ColorExpression> tempVec2 = createColorVectors(Arrays.asList(new PlaceHolderColorExpression(), new PlaceHolderColorExpression()));
+                return new Pair<>(new TupleExpression(createColorVectors(tempVec1)), new TupleExpression(tempVec2));
+            }
+            return new Pair<>(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
+        } else {
             return new Pair<>(((LeftRightGuardExpression) currentSelection).getLeftExpression(),
                 ((LeftRightGuardExpression) currentSelection).getRightExpression());
         }
@@ -504,11 +511,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         doc.setParagraphAttributes(0,0, standard,true);
 
         exprField.setBackground(java.awt.Color.white);
-
-
         exprField.setEditable(false);
         exprField.setToolTipText("Tooltip missing");
-
 
         JScrollPane exprScrollPane = new JScrollPane(exprField);
         exprScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -572,22 +576,17 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     private void addColor() {
         Expression newExpression;
-        if (colorCombobox.getColorTypeComboBoxesArray().length > 1) {
-            Vector<ColorExpression> tempVec = new Vector<>();
-            for (int i = 0; i < colorCombobox.getColorTypeComboBoxesArray().length; i++) {
-                ColorExpression expr;
-                Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[i].getSelectedItem();
-                if ( selectedElement instanceof String) {
-                    expr = new AllExpression(((ProductType)colorCombobox.getColorType()).getColorTypes().get(i));
-                } else if (selectedElement instanceof Variable) {
-                    expr = new VariableExpression((Variable)selectedElement);
-                } else {
-                    expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
-                }
-                expr.setIndex(i);
-                tempVec.add(expr);
+        if (colorCombobox.getColorType() instanceof ProductType) {
+            Object selectedElement = colorCombobox.getColorTypeComboBoxesArray()[0].getSelectedItem();
+            if (selectedElement instanceof String) {
+                newExpression = new AllExpression(((ProductType)colorCombobox.getColorType()).getColorTypes().get(0));
+            } else if (selectedElement instanceof Variable) {
+                newExpression = new VariableExpression((Variable)selectedElement);
+            } else if (selectedElement instanceof PlaceHolderColorExpression) {
+                newExpression = new PlaceHolderColorExpression();
+            } else {
+                newExpression = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
             }
-            newExpression = new TupleExpression(tempVec);
         } else {
             ColorExpression expr;
             ColorExpression oldExpression = ((ColorExpression)currentSelection.getObject());
@@ -854,9 +853,14 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         ExprStringPosition[] children = newProperty.getChildren();
         GuardExpression oldProperty = newProperty.copy();
         for (ExprStringPosition child : children) {
-            if (child.getObject() instanceof ColorExpression && !(child.getObject() instanceof PlaceHolderColorExpression) && !((ColorExpression) child.getObject()).getColorTypes().contains(ct)) {
-                PlaceHolderColorExpression ph = new PlaceHolderColorExpression();
-                newProperty = newProperty.replace(child.getObject(), ph);
+            if (child.getObject() instanceof ColorExpression) {
+                Expression expr;
+                if (ct instanceof ProductType) {
+                    expr = new TupleExpression(createColorVectors(Arrays.asList(new PlaceHolderColorExpression(), new PlaceHolderColorExpression())));
+                } else {
+                    expr = new PlaceHolderColorExpression();
+                }
+                newProperty = newProperty.replace(child.getObject(), expr);
             }
         }
         if (doColorTypeUndo) {
