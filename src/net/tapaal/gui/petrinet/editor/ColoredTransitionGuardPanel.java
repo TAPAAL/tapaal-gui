@@ -845,13 +845,14 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             colorCombobox.updateColorType(ct, context);
         }
         updateEnabledButtons();
-        updateExpression();
+        if (doColorTypeUndo) updateExpression();
     }
 
     private void updateExpression() {
         ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
         ExprStringPosition[] children = newProperty.getChildren();
         GuardExpression oldProperty = newProperty.copy();
+
         for (ExprStringPosition child : children) {
             if (child.getObject() instanceof ColorExpression) {
                 Expression expr;
