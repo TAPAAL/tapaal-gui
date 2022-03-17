@@ -362,16 +362,21 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     }
 
-    private Vector<ColorExpression> createColorVectors(List<ColorExpression> elements) {
-        return new Vector<>(elements);
+    private Vector<ColorExpression> createPlaceholderVectors(int size) {
+        Vector<ColorExpression> colorExpressions = new Vector<>();
+        for (int i = 0; i < size; i++) {
+            colorExpressions.add(new PlaceHolderColorExpression());
+        }
+        return colorExpressions;
     }
 
     private Pair<ColorExpression, ColorExpression> getLeftRightExpression(Expression currentSelection) {
         if (currentSelection instanceof PlaceHolderGuardExpression) {
-            if (colorCombobox.getColorType() instanceof ProductType) {
-                Vector<ColorExpression> tempVec1 = createColorVectors(Arrays.asList(new PlaceHolderColorExpression(), new PlaceHolderColorExpression()));
-                Vector<ColorExpression> tempVec2 = createColorVectors(Arrays.asList(new PlaceHolderColorExpression(), new PlaceHolderColorExpression()));
-                return new Pair<>(new TupleExpression(createColorVectors(tempVec1)), new TupleExpression(tempVec2));
+            if (colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex()) instanceof ProductType) {
+                int size = colorCombobox.getColorType().size();
+                Vector<ColorExpression> tempVec1 = createPlaceholderVectors(size);
+                Vector<ColorExpression> tempVec2 = createPlaceholderVectors(size);
+                return new Pair<>(new TupleExpression(tempVec1), new TupleExpression(tempVec2));
             }
             return new Pair<>(new PlaceHolderColorExpression(), new PlaceHolderColorExpression());
         } else {
@@ -697,6 +702,11 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private void updateColorSelection() {
         updatingColorSelection = true;
         if (currentSelection.getObject() instanceof ColorExpression) {
+            ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
+            if (ct instanceof ProductType) {
+                ColorType newColorType = ((ProductType) ct).getConstituents().get(((ColorExpression) currentSelection.getObject()).getIndex());
+                colorCombobox.updateColorType(newColorType);
+            }
             ColorExpression exprToCheck = ((ColorExpression) currentSelection.getObject()).getBottomColorExpression();
             colorCombobox.updateSelection(exprToCheck);
         }
@@ -857,7 +867,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             if (child.getObject() instanceof ColorExpression) {
                 Expression expr;
                 if (ct instanceof ProductType) {
-                    expr = new TupleExpression(createColorVectors(Arrays.asList(new PlaceHolderColorExpression(), new PlaceHolderColorExpression())));
+                    expr = new TupleExpression(createPlaceholderVectors(ct.size()));
                 } else {
                     expr = new PlaceHolderColorExpression();
                 }
@@ -917,7 +927,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             this.original = original;
             this.originalColorType = getColorType(original);
             this.replacement = replacement;
-            this.replacementColorType = colorCombobox.getColorType();
+            this.replacementColorType = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
         }
 
         @Override
