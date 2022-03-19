@@ -778,6 +778,7 @@ public class TimedArcPetriNetNetwork {
 
     public boolean canColorTypeBeRemoved(ColorType colorType, ArrayList<String> messages){
 	    isColorTypeUsedInProduct(colorType, messages);
+        isColorTypeUsedInVaraible(colorType, messages);
 	    for(TimedArcPetriNet tapn : allTemplates()){
             for(TimedPlace p : tapn.places()){
                 if(p.getColorType().equals(colorType)){
@@ -793,6 +794,14 @@ public class TimedArcPetriNetNetwork {
             }
         }
         return messages.isEmpty();
+    }
+
+    private void isColorTypeUsedInVaraible(ColorType colorType, ArrayList<String> messages) {
+        for (Variable variable : variables) {
+            if (variable.getColorType().equals(colorType)) {
+                messages.add("Color type is used in variable " + variable.getName() + "\n");
+            }
+        }
     }
 
     public boolean canColorBeRemoved(Color color, ArrayList<String> messages){
@@ -834,6 +843,7 @@ public class TimedArcPetriNetNetwork {
         }
         return messages.isEmpty();
     }
+
     private void isColorTypeUsedInProduct(ColorType colorType, ArrayList<String> messages){
         for(ColorType ct : colorTypes){
             if(ct instanceof ProductType && ((ProductType) ct).contains(colorType)){
