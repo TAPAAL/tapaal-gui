@@ -575,7 +575,13 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         if (guard != null) {
             newProperty = guard.copy();
         }
-
+        ColorType ct = getColorType(newProperty);
+        doColorTypeUndo = false;
+        if (ct != null)
+            colorTypeCombobox.setSelectedItem(ct);
+        else
+            colorTypeCombobox.setSelectedIndex(0);
+        doColorTypeUndo = true;
         updateSelection(newProperty);
     }
 
@@ -664,6 +670,12 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             predButton.setEnabled(false);
             colorCombobox.setEnabled(false);
         }
+        if (colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex()) instanceof ProductType) {
+            greaterThanButton.setEnabled(false);
+            greaterThanEqButton.setEnabled(false);
+            lessThanEqButton.setEnabled(false);
+            lessThanButton.setEnabled(false);
+        }
         parent.enableOKButton(!newProperty.containsPlaceHolder() || newProperty instanceof PlaceHolderExpression);
     }
 
@@ -744,7 +756,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             if (child.getObject().getChildren().length > 0) {
                 possibleExpressions.addAll(getPropertyChildren(child.getObject().getChildren()));
             }
-            if (child.getEnd() < currentSelection.getStart()) {
+            if (currentSelection != null && child.getEnd() < currentSelection.getStart()) {
                 possibleExpressions.add(child.getObject());
             }
         }
@@ -862,6 +874,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
         ExprStringPosition[] children = newProperty.getChildren();
         GuardExpression oldProperty = newProperty.copy();
+
+        if (ct == getColorType(newProperty)) return;
 
         for (ExprStringPosition child : children) {
             if (child.getObject() instanceof ColorExpression) {
