@@ -778,21 +778,30 @@ public class TimedArcPetriNetNetwork {
 
     public boolean canColorTypeBeRemoved(ColorType colorType, ArrayList<String> messages){
 	    isColorTypeUsedInProduct(colorType, messages);
+        isColorTypeUsedInVaraible(colorType, messages);
 	    for(TimedArcPetriNet tapn : allTemplates()){
             for(TimedPlace p : tapn.places()){
                 if(p.getColorType().equals(colorType)){
-                    messages.add("Color type is used in place " + p.name() + " \n");
+                    messages.add("Color type " + p.getColorType().getName() + " is used in place " + p.name() + " \n");
                 }
             }
             for(TimedTransition t : tapn.transitions()){
                 for(Color c : colorType.getColors()){
                     if(t.getGuard() != null && t.getGuard().containsColor(c)){
-                        messages.add("Colors of color type is used in transition " + t.name() + "\n");
+                        messages.add("Colors of color type " + colorType.getName() + " are used in transition " + t.name() + "\n");
                     }
                 }
             }
         }
         return messages.isEmpty();
+    }
+
+    private void isColorTypeUsedInVaraible(ColorType colorType, ArrayList<String> messages) {
+        for (Variable variable : variables) {
+            if (variable.getColorType().equals(colorType)) {
+                messages.add("Color type " + variable.getColorType().getName() + " is used in variable " + variable.getName() + "\n");
+            }
+        }
     }
 
     public boolean canColorBeRemoved(Color color, ArrayList<String> messages){
@@ -834,10 +843,11 @@ public class TimedArcPetriNetNetwork {
         }
         return messages.isEmpty();
     }
+
     private void isColorTypeUsedInProduct(ColorType colorType, ArrayList<String> messages){
         for(ColorType ct : colorTypes){
             if(ct instanceof ProductType && ((ProductType) ct).contains(colorType)){
-                messages.add("Color type is used in product type " + ct.getName() + " \n");
+                messages.add("Color type " + colorType.getName() + " is used in product type " + ct.getName() + " \n");
             }
         }
     }
