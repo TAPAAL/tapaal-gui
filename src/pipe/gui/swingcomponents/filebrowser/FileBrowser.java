@@ -30,13 +30,12 @@ public class FileBrowser {
 
         // Setup filter if extension specified used on Linux and MacOS
         if (fileExtensions.length > 0) {
-
-
-
             // FilenameFilter is used on Linux and MacOS, but not working on windows
             fileDialog.setFilenameFilter((dir, name) -> {
                 for (String fileExtension : fileExtensions) {
                     if (name.endsWith("." + fileExtension)) {
+                        return true;
+                    } else if (fileExtension.isBlank()) {
                         return true;
                     }
                 }
