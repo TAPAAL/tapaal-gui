@@ -216,8 +216,6 @@ public class TAPNTransitionEditor extends JPanel {
 		gridBagConstraints = GridBagHelper.as(0,1, Anchor.EAST, new Insets(3, 3, 3, 3));
 		buttonPanel.add(cancelButton, gridBagConstraints);
 
-		
-
 		gridBagConstraints = GridBagHelper.as(1,1, Anchor.WEST, new Insets(3, 3, 3, 3));
 		buttonPanel.add(okButton, gridBagConstraints);
 
@@ -241,7 +239,6 @@ public class TAPNTransitionEditor extends JPanel {
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		add(scrollPane, BorderLayout.CENTER);
-
 	}	
 	
 	private void setupInitialState(){

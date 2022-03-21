@@ -31,7 +31,7 @@ public class EqualityExpression extends GuardExpression implements LeftRightGuar
         return replace(object1,object2,false);
     }
     @Override
-    public GuardExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
+    public GuardExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
         if (this == object1 && object2 instanceof GuardExpression) {
             GuardExpression obj2 = (GuardExpression)object2;
             obj2.setParent(parent);

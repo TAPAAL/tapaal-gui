@@ -4,13 +4,10 @@ import net.tapaal.gui.petrinet.Context;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.Expressions.*;
-
 import javax.swing.*;
 import java.awt.*;
 
-
 public abstract class ColorComboboxPanel extends JPanel {
-
     private ColorType colorType;
     private JPanel colorcomboBoxPanel;
     private JComboBox[] colorTypeComboBoxesArray;
@@ -28,7 +25,6 @@ public abstract class ColorComboboxPanel extends JPanel {
         initPanel();
     }
 
-
     public ColorType getColorType() {
         return colorType;
     }
@@ -40,7 +36,6 @@ public abstract class ColorComboboxPanel extends JPanel {
     private void initPanel() {
         colorcomboBoxPanel = new JPanel();
         colorcomboBoxPanel.setLayout(new GridBagLayout());
-
 
         //This panel contains all comboboxes, there can be more than one with ProductTypes
         comboBoxPanel = new JPanel(new GridBagLayout());
@@ -66,11 +61,11 @@ public abstract class ColorComboboxPanel extends JPanel {
                 colorTypeComboBoxesArray[i].setSelectedItem(element);
                 i++;
             }
-        }
-        else if (colorType != null){
+        } else if (colorType != null){
             colorTypeComboBoxesArray[0].setSelectedItem(color);
         }
     }
+
     //This assumes no nested producttypes
     public void updateSelection(ColorExpression expr){
         if(expr instanceof TupleExpression){
@@ -90,67 +85,29 @@ public abstract class ColorComboboxPanel extends JPanel {
             colorTypeComboBoxesArray[index].setSelectedIndex(colorTypeComboBoxesArray[index].getItemCount()-1);
         } else if(expr instanceof VariableExpression){
             colorTypeComboBoxesArray[index].setSelectedItem(((VariableExpression)expr).getVariable());
-        } else {
+        } else if(expr instanceof UserOperatorExpression){
             colorTypeComboBoxesArray[index].setSelectedItem(((UserOperatorExpression)expr).getUserOperator());
+        } else {
+            colorTypeComboBoxesArray[index].setSelectedItem(expr);
         }
     }
+
     public void updateColorType(ColorType ct){
         updateColorType(ct, null);
     }
+
     public void updateColorType(ColorType ct, Context context){
         removeOldComboBoxes();
         colorType = ct;
-        if (colorType instanceof ProductType) {
-            colorTypeComboBoxesArray = new JComboBox[((ProductType) colorType).getColorTypes().size()];
+        colorTypeComboBoxesArray = new JComboBox[1];
+        colorTypeComboBoxesArray[0] = new JComboBox();
+        var currentComboBox = colorTypeComboBoxesArray[0];
+        currentComboBox.setRenderer(new ColorComboBoxRenderer(currentComboBox));
+        currentComboBox.setPreferredSize(new Dimension(200,25));
+        currentComboBox.addItem(new PlaceHolderColorExpression());
+        currentComboBox.addItem(new JSeparator());
 
-            for (int i = 0; i < colorTypeComboBoxesArray.length; i++) {
-                colorTypeComboBoxesArray[i] = new JComboBox();
-                var currentComboBox = colorTypeComboBoxesArray[i];
-                currentComboBox.setRenderer(new ColorComboBoxRenderer(currentComboBox));
-                currentComboBox.setPreferredSize(new Dimension(200,25));
-                if (context != null) {
-                    boolean variableFound = false;
-                    for (Variable variable : context.network().variables()) {
-                        if (variable.getColorType().getName().equals(((ProductType) colorType).getColorTypes().get(i).getName())) {
-                            variableFound = true;
-                            currentComboBox.addItem(variable);
-                        }
-                    }
-                    if(variableFound){
-                        currentComboBox.addItem(new JSeparator());
-                    }
-                }
-                for (Color element : ((ProductType) colorType).getColorTypes().get(i)) {
-                    currentComboBox.addItem(element);
-                }
-
-                currentComboBox.addActionListener(e -> {
-                    if(currentComboBox.getSelectedItem() instanceof JSeparator){
-                        currentComboBox.setSelectedIndex(currentComboBox.getSelectedIndex() +1);
-                    }
-                    changedColor(colorTypeComboBoxesArray);
-                });
-                ((JLabel)currentComboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
-                GridBagConstraints gbc = new GridBagConstraints();
-                gbc.gridx = 0;
-                gbc.gridy = i;
-                gbc.anchor = GridBagConstraints.WEST;
-                gbc.weightx = 1.0;
-                gbc.insets = new Insets(0 , 0,5,0);
-                gbc.fill =GridBagConstraints.HORIZONTAL;
-                comboBoxPanel.add(currentComboBox, gbc);
-                if(showAllElement){
-                    currentComboBox.addItem(new JSeparator());
-                    currentComboBox.addItem("<html><b>.all</b>");
-                }
-            }
-        }
-        else if (colorType != null){
-            colorTypeComboBoxesArray = new JComboBox[1];
-            var currentComboBox = new JComboBox();
-            colorTypeComboBoxesArray[0] = currentComboBox;
-            currentComboBox.setRenderer(new ColorComboBoxRenderer(currentComboBox));
-            currentComboBox.setPreferredSize(new Dimension(200,25));
+        if (colorType != null){
             if(context != null){
                 boolean variableFound = false;
                 for (Variable element : context.network().variables()) {
@@ -169,30 +126,29 @@ public abstract class ColorComboboxPanel extends JPanel {
                 }
                 currentComboBox.addItem(element);
             }
-
             currentComboBox.addActionListener(e -> {
                 if(currentComboBox.getSelectedItem() instanceof JSeparator){
                     currentComboBox.setSelectedIndex(currentComboBox.getSelectedIndex() +1);
                 }
                 changedColor(colorTypeComboBoxesArray);
             });
-            ((JLabel)currentComboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
-
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            gbc.fill =GridBagConstraints.HORIZONTAL;
-            gbc.weightx = 1.0;
-            gbc.anchor = GridBagConstraints.WEST;
-            gbc.insets = new Insets(0 , 0,5,0);
-            comboBoxPanel.add(currentComboBox, gbc);
-            if(showAllElement){
-                currentComboBox.addItem(new JSeparator());
-                currentComboBox.addItem("<html><b>.all</b>");
-            }
+        }
+        ((JLabel)currentComboBox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(0 , 0,5,0);
+        comboBoxPanel.add(currentComboBox, gbc);
+        if(showAllElement){
+            currentComboBox.addItem(new JSeparator());
+            currentComboBox.addItem("<html><b>.all</b>");
         }
         revalidate();
     }
+
     private void removeOldComboBoxes(){
         comboBoxPanel.removeAll();
     }
@@ -200,7 +156,7 @@ public abstract class ColorComboboxPanel extends JPanel {
     @Override
     public void setEnabled(boolean enabled){
         colorcomboBoxPanel.setEnabled(enabled);
-        for(var combobox : colorTypeComboBoxesArray){
+        for (var combobox : colorTypeComboBoxesArray) {
             combobox.setEnabled(enabled);
         }
     }

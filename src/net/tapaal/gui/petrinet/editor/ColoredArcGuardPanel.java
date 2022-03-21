@@ -1,5 +1,6 @@
 package net.tapaal.gui.petrinet.editor;
 
+import dk.aau.cs.util.Tuple;
 import net.tapaal.gui.petrinet.Context;
 import net.tapaal.gui.petrinet.undo.Colored.SetArcExpressionCommand;
 import net.tapaal.gui.petrinet.undo.Colored.SetColoredArcIntervalsCommand;
@@ -908,12 +909,12 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         Expression current = currentSelection.getObject();
         colorExpressionComboBoxPanel.updateColorType(selectedColorType,context);
         numberExpressionJSpinner.setVisible(!(current instanceof ColorExpression));
-        if(current instanceof NumberOfExpression) {
+        if (current instanceof NumberOfExpression) {
             var numberOfExpression = ((NumberOfExpression) current);
             numberExpressionJSpinner.setValue(numberOfExpression.getNumber());
             var colorExpression = numberOfExpression.getNumberOfExpression().get(0).getBottomColorExpression();
             colorExpressionComboBoxPanel.updateSelection(colorExpression);
-        } else if(current instanceof ColorExpression){
+        } else if (current instanceof ColorExpression) {
             colorExpressionComboBoxPanel.updateSelection(((ColorExpression) current).getBottomColorExpression());
         }
     }
