@@ -7,6 +7,7 @@ import dk.aau.cs.model.tapn.*;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UpdateColorTypeCommand extends Command {
@@ -30,7 +31,7 @@ public class UpdateColorTypeCommand extends Command {
         for(TimedArcPetriNet tapn : network.allTemplates()){
             for(TimedPlace place : tapn.places()){
                 if(place.getColorType().equals(newColorType)){
-                    List<TimedToken> oldTokens = place.tokens();
+                    List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
                     place.setColorType(oldColorType);
                     for(TimedToken token : oldTokens){
                         if(oldColorType.contains(token.getColor())){
@@ -56,7 +57,7 @@ public class UpdateColorTypeCommand extends Command {
         for(TimedArcPetriNet tapn : network.allTemplates()){
             for(TimedPlace place : tapn.places()){
                 if(place.getColorType().equals(oldColorType)){
-                    List<TimedToken> oldTokens = place.tokens();
+                    List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
                     place.setColorType(newColorType);
                     for(TimedToken token : oldTokens){
                         if(newColorType.contains(token.getColor())){
