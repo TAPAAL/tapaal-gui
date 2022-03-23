@@ -68,13 +68,13 @@ public abstract class ColorComboboxPanel extends JPanel {
 
     //This assumes no nested producttypes
     public void updateSelection(ColorExpression expr){
-        if(expr instanceof TupleExpression){
+        if (expr instanceof TupleExpression) {
             int i = 0;
-            for(ColorExpression c : ((TupleExpression)expr).getColors()){
+            for (ColorExpression c : ((TupleExpression)expr).getColors()) {
                 setIndex(c, i);
                 i++;
             }
-        } else{
+        } else {
             setIndex(expr, 0);
         }
     }
@@ -82,11 +82,13 @@ public abstract class ColorComboboxPanel extends JPanel {
     private void setIndex(ColorExpression expr, int index){
         if(expr instanceof AllExpression){
             //.all is always last so we just select the last item
-            colorTypeComboBoxesArray[index].setSelectedIndex(colorTypeComboBoxesArray[index].getItemCount()-1);
+            colorTypeComboBoxesArray[index].setSelectedIndex(colorTypeComboBoxesArray[index].getItemCount());
         } else if(expr instanceof VariableExpression){
             colorTypeComboBoxesArray[index].setSelectedItem(((VariableExpression)expr).getVariable());
         } else if(expr instanceof UserOperatorExpression){
             colorTypeComboBoxesArray[index].setSelectedItem(((UserOperatorExpression)expr).getUserOperator());
+        } else if(expr instanceof TupleExpression){
+            colorTypeComboBoxesArray[index].setSelectedItem(((TupleExpression)expr).getColors().get(0));
         } else {
             colorTypeComboBoxesArray[index].setSelectedItem(expr);
         }

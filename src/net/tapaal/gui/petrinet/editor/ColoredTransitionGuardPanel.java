@@ -1,5 +1,6 @@
 package net.tapaal.gui.petrinet.editor;
 
+import dk.aau.cs.util.Tuple;
 import net.tapaal.gui.petrinet.Context;
 import net.tapaal.gui.petrinet.undo.Colored.SetTransitionExpressionCommand;
 import net.tapaal.gui.petrinet.undo.Command;
@@ -703,6 +704,9 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         if (position == null) {
             return;
         }
+        if (position.getObject() instanceof TupleExpression) {
+            position = newProperty.objectAt(index-1);
+        }
 
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
@@ -715,7 +719,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         updatingColorSelection = true;
         if (currentSelection.getObject() instanceof ColorExpression) {
             ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
-            if (ct instanceof ProductType) {
+            if (ct instanceof ProductType && !(currentSelection.getObject() instanceof TupleExpression)) {
                 ColorType newColorType = ((ProductType) ct).getConstituents().get(((ColorExpression) currentSelection.getObject()).getIndex());
                 colorCombobox.updateColorType(newColorType, context, true);
             }
