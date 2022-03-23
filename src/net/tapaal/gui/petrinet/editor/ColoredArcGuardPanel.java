@@ -705,7 +705,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         Expression current = currentSelection.getObject();
         if (current instanceof ArcExpression && exprVec.size() > 0) {
             NumberOfExpression numbExpr = new NumberOfExpression(value, exprVec);
-            if (!numbExpr.toString().equals(current.toString())) {
+            if (!numbExpr.toString().equals(current.toString()) && undoSupport != null) {
                 UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(current, numbExpr);
                 arcExpression = arcExpression.replace(current, numbExpr);
                 updateSelection(numbExpr);

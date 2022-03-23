@@ -717,7 +717,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
             if (ct instanceof ProductType) {
                 ColorType newColorType = ((ProductType) ct).getConstituents().get(((ColorExpression) currentSelection.getObject()).getIndex());
-                colorCombobox.updateColorType(newColorType, context);
+                colorCombobox.updateColorType(newColorType, context, true);
             }
             ColorExpression exprToCheck = ((ColorExpression) currentSelection.getObject()).getBottomColorExpression();
             colorCombobox.updateSelection(exprToCheck);
@@ -864,7 +864,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private void updateColorType() {
         ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
         if (ct != null) {
-            colorCombobox.updateColorType(ct, context);
+            colorCombobox.updateColorType(ct, context, true);
         }
         updateEnabledButtons();
         if (doColorTypeUndo) updateExpression();
