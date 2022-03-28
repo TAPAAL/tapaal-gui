@@ -100,7 +100,6 @@ public abstract class ColorComboboxPanel extends JPanel {
     public void updateColorType(ColorType ct, Context context){
         updateColorType(ct, context, false);
     }
-
     public void updateColorType(ColorType ct, Context context, boolean includePlaceHolder) {
         removeOldComboBoxes();
         colorType = ct;

@@ -41,6 +41,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     boolean isInputTransportArc = false;
     boolean isInputArc = false;
     boolean isInhibitorArc = false;
+    private boolean updatingSelection = false;
     final Context context;
     final ColoredArcGuardPanel.ExpressionConstructionUndoManager undoManager;
     final UndoableEditSupport undoSupport;
@@ -549,7 +550,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         colorExpressionComboBoxPanel = new ColorComboboxPanel(colorType, !isTransportArc) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
-                addNumberExpression((Integer)numberExpressionJSpinner.getValue(), getColorExpression());
+                if (!updatingSelection) addNumberExpression((Integer)numberExpressionJSpinner.getValue(), getColorExpression());
             }
         };
         colorExpressionComboBoxPanel.removeScrollPaneBorder();
@@ -909,6 +910,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         Expression current = currentSelection.getObject();
         colorExpressionComboBoxPanel.updateColorType(selectedColorType,context);
         numberExpressionJSpinner.setVisible(!(current instanceof ColorExpression));
+        updatingSelection = true;
         if (current instanceof NumberOfExpression) {
             var numberOfExpression = ((NumberOfExpression) current);
             numberExpressionJSpinner.setValue(numberOfExpression.getNumber());
@@ -917,6 +919,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         } else if (current instanceof ColorExpression) {
             colorExpressionComboBoxPanel.updateSelection(((ColorExpression) current).getBottomColorExpression());
         }
+        updatingSelection = false;
     }
 
     private void toggleEnabledButtons() {
@@ -1114,12 +1117,12 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     ColorComboboxPanel colorIntervalComboboxPanel;
     ColoredTimeIntervalDialogPanel intervalEditorPanel;
 
-
     JPanel colorExpressionButtons;
     JButton predButton;
     JButton succButton;
     ColorComboboxPanel colorExpressionComboBoxPanel;
     JPanel numberExprPanel;
+
     private void refreshUndoRedo() {
         undoButton.setEnabled(undoManager.canUndo());
         redoButton.setEnabled(undoManager.canRedo());
