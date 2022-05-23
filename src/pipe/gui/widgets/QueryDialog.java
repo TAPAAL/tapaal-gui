@@ -2461,7 +2461,11 @@ public class QueryDialog extends JPanel {
 						// new placeholder disjunct to it
 						orListNode = new TCTLOrListNode((TCTLOrListNode) parentNode);
 						orListNode.addDisjunct(new TCTLStatePlaceHolder());
-                        addPropertyToQuery(orListNode);
+                        UndoableEdit edit = new QueryConstructionEdit(parentNode, orListNode);
+                        newProperty = newProperty.replace(parentNode, orListNode);
+                        updateSelection(orListNode);
+                        undoSupport.postEdit(edit);
+                        queryChanged();
                     } else {
 						TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
 						orListNode = new TCTLOrListNode(getStateProperty(currentSelection.getObject()),	ph);
