@@ -2424,9 +2424,13 @@ public class QueryDialog extends JPanel {
 					if (parentNode instanceof TCTLAndListNode) {
 						// current selection is child of an andList node => add
 						// new placeholder conjunct to it
-						andListNode = new TCTLAndListNode((TCTLAndListNode) parentNode);
-						andListNode.addConjunct(new TCTLStatePlaceHolder());
-						addPropertyToQuery(andListNode);
+                        andListNode = new TCTLAndListNode((TCTLAndListNode) parentNode);
+                        andListNode.addConjunct(new TCTLStatePlaceHolder());
+                        UndoableEdit edit = new QueryConstructionEdit(parentNode, andListNode);
+                        newProperty = newProperty.replace(parentNode, andListNode);
+                        updateSelection(andListNode);
+                        undoSupport.postEdit(edit);
+                        queryChanged();
 					} else {
 						TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
 						andListNode = new TCTLAndListNode(getStateProperty(currentSelection.getObject()),	ph);
@@ -2436,7 +2440,6 @@ public class QueryDialog extends JPanel {
                     checkUntimedAndNode();
                 }
 			}
-
 		});
 
 		disjunctionButton.addActionListener(new ActionListener() {
