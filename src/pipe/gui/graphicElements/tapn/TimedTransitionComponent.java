@@ -227,6 +227,7 @@ public class TimedTransitionComponent extends Transition {
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn) {
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), true, false, getAngle(), 0, lens);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
+        transitionComponent.setUncontrollable(isUncontrollable());
 
 		return transitionComponent;
 	}
