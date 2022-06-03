@@ -135,8 +135,9 @@ TCTLAbstractPathProperty QuantifierExpr() :
 {
     <F> child = OrExpr() {return new LTLFNode(child); }
     | <G> child = OrExpr() {return new LTLGNode(child); }
-    | child = OrExpr() <U> child2 = OrExpr() {return new LTLUNode(child, child2); }
     | <X> child = OrExpr() {return new LTLXNode(child); }
+    | child = OrExpr() [LOOKAHEAD(2) <U> child2 = OrExpr()] { return (child2 == null ? new TCTLStateToPathConverter(child) : new LTLUNode(child, child2)); }
+
 }
 
 TCTLAbstractStateProperty OrExpr() :
@@ -198,7 +199,6 @@ TCTLAbstractStateProperty AndExpr() :
     | "(" thisProp = OrExpr() ")"
     | LOOKAHEAD(ParanthesesExpr()) {
     thisProp = new TCTLPathToStateConverter(QuantifierExpr()); }
-
     )
     { return thisProp; }
     }
