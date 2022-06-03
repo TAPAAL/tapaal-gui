@@ -2917,15 +2917,7 @@ public class QueryDialog extends JPanel {
 					}
 				} else { // we are not in edit mode so the button should reset
 					// the query
-
-                    if (queryType.getSelectedIndex() == 1) {
-                        TCTLAbstractProperty oldProperty = newProperty;
-                        addAllPathsToProperty(new TCTLPathPlaceHolder(), oldProperty);
-                        resetQuantifierSelectionButtons();
-                        return;
-                    }
-
-					TCTLPathPlaceHolder ph = new TCTLPathPlaceHolder();
+                    TCTLPathPlaceHolder ph = new TCTLPathPlaceHolder();
 					UndoableEdit edit = new QueryConstructionEdit(newProperty, ph);
 					newProperty = ph;
 					resetQuantifierSelectionButtons();
