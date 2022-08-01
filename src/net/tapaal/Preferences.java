@@ -341,6 +341,6 @@ public class Preferences {
     }
 
     public String getFileBrowserLocation() {
-        return pref.get("file.location", "");
+        return pref.get("file.location", null);
     }
 }
