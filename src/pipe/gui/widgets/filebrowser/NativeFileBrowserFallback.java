@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import net.tapaal.Preferences;
 import pipe.gui.CreateGui;
 
 class NativeFileBrowserFallback extends FileBrowser {
@@ -75,7 +77,7 @@ class NativeFileBrowserFallback extends FileBrowser {
 	}
 
 	public File openFile() {
-		if(specifiedPath == null) specifiedPath = lastOpenPath;
+		if(specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
 		fc.setDirectory(specifiedPath);
                 //This is needed for windows
 		if(optionalExt.equals("")) fc.setFile(ext.equals("")? "":("*."+ext));
@@ -84,13 +86,13 @@ class NativeFileBrowserFallback extends FileBrowser {
 		fc.setVisible(true);
 		String selectedFile = fc.getFile();
 		String selectedDir = fc.getDirectory();
-		lastOpenPath = selectedDir;
+		Preferences.getInstance().setFileBrowserLocation(selectedDir);
 		File file = selectedFile == null? null:new File(selectedDir + selectedFile);
 		return file;
 	}
 
 	public File[] openFiles() {
-		if(specifiedPath == null) specifiedPath = lastOpenPath;
+		if(specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
 		if(new File(specifiedPath).exists()) fileChooser.setCurrentDirectory(new File(specifiedPath));
 		/*if (lastPath != null) {
 			File path = new File(lastPath);
@@ -104,20 +106,20 @@ class NativeFileBrowserFallback extends FileBrowser {
 			filesArray = fileChooser.getSelectedFiles();
 		}
 		//They should all come from the same directory so we just take one
-		lastOpenPath = filesArray[0].getAbsolutePath();
+        Preferences.getInstance().setFileBrowserLocation(filesArray[0].getAbsolutePath());
 		return filesArray;
 	}
 
 
 	public String saveFile(String suggestedName) {
-		if(specifiedPath == null) specifiedPath = lastSavePath;
+		if(specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
 		fc.setDirectory(specifiedPath);
 		fc.setFile(suggestedName + (suggestedName.endsWith("."+ext)? "":"."+ext));
 		fc.setMode(FileDialog.SAVE);
 		fc.setVisible(true);
 
 		String file = fc.getFile() == null? null: fc.getDirectory() + fc.getFile();
-		lastSavePath = fc.getDirectory();
+        Preferences.getInstance().setFileBrowserLocation(fc.getDirectory());
 
 		if(file == null){
 			return file;
@@ -163,14 +165,14 @@ class NativeFileBrowserFallback extends FileBrowser {
         //So we make a JFileChooser in which we can control it
         if(System.getProperty("os.name").startsWith("Windows")) {
             File selectedDir = null;
-            if (specifiedPath == null) specifiedPath = lastSavePath;
+            if (specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
             JFileChooser c = new JFileChooser(specifiedPath);
             c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             c.setDialogTitle("Choose target directory for export");
             int rVal = c.showSaveDialog(c);
             if (rVal == JFileChooser.APPROVE_OPTION) {
                 selectedDir = c.getSelectedFile();
-                lastSavePath = selectedDir.getPath();
+                Preferences.getInstance().setFileBrowserLocation(selectedDir.getPath());
             }
 
             return selectedDir;

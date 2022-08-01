@@ -24,9 +24,7 @@ public abstract class FileBrowser  {
 		return constructor(filetype, ext, "", path);
 	}
 	public static FileBrowser constructor(String filetype, final String ext, final String optionalExt, String path) {
-        Preferences.getInstance().setFileBrowserLocation(path);
-
-		if (JavaUtil.getJREMajorVersion() >= 7) {
+	    if (JavaUtil.getJREMajorVersion() >= 7) {
             return new NativeFileBrowser(filetype, ext, optionalExt, path);
 		} else {
 			/*if(path != null) {
@@ -49,5 +47,7 @@ public abstract class FileBrowser  {
 
 	public abstract String saveFile(String suggestedName);
 	public abstract File saveFileToDir();
+
+
 
 }

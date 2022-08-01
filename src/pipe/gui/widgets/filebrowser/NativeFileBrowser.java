@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.*;
 import pipe.gui.CreateGui;
+import net.tapaal.Preferences;
 
 class NativeFileBrowser extends FileBrowser {
 	private final FileDialog fc;
@@ -56,7 +57,7 @@ class NativeFileBrowser extends FileBrowser {
 	
 
 	public File openFile() {
-            if(specifiedPath == null) specifiedPath = lastOpenPath;
+            if(specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
             fc.setDirectory(specifiedPath);
             //This is needed for Windows
             if(optionalExt.equals("")) fc.setFile(ext.equals("")? "":("*."+ext));
@@ -66,13 +67,13 @@ class NativeFileBrowser extends FileBrowser {
             fc.setVisible(true);
             String selectedFile = fc.getFile();
             String selectedDir = fc.getDirectory();
-            lastOpenPath = selectedDir;
+            Preferences.getInstance().setFileBrowserLocation(selectedDir);
             File file = selectedFile == null? null:new File(selectedDir + selectedFile);
             return file;
 	}
 	
 	public File[] openFiles() {
-            if(specifiedPath == null) specifiedPath = lastOpenPath;
+            if(specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
             fc.setDirectory(specifiedPath);
             //This is needed for Windows
             if(optionalExt.equals("")) fc.setFile(ext.equals("")? "":("*."+ext));
@@ -81,12 +82,12 @@ class NativeFileBrowser extends FileBrowser {
             fc.setMode(FileDialog.LOAD);
             fc.setVisible(true);
             File[] selectedFiles = fc.getFiles();
-        lastOpenPath = fc.getDirectory();
+            Preferences.getInstance().setFileBrowserLocation(fc.getDirectory());
             return selectedFiles;
 	}
 
 	public String saveFile(String suggestedName) {
-		if(specifiedPath == null) specifiedPath = lastSavePath;
+		if(specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
 		fc.setDirectory(specifiedPath);
 		fc.setFile(suggestedName + (suggestedName.endsWith("."+ext)? "":"."+ext));
 		fc.setMode(FileDialog.SAVE);
@@ -103,7 +104,7 @@ class NativeFileBrowser extends FileBrowser {
 		}
 
 		String file = fc.getFile() == null? null: fc.getDirectory() + fc.getFile();
-		lastSavePath = fc.getDirectory();
+        Preferences.getInstance().setFileBrowserLocation(fc.getDirectory());
 		
 		if(file == null){
 			return file;
@@ -150,14 +151,14 @@ class NativeFileBrowser extends FileBrowser {
         //So we make a JFileChooser in which we can control it
 	    if(System.getProperty("os.name").startsWith("Windows")) {
             File selectedDir = null;
-            if (specifiedPath == null) specifiedPath = lastSavePath;
+            if (specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
             JFileChooser c = new JFileChooser(specifiedPath);
             c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             c.setDialogTitle("Choose target directory for export");
             int rVal = c.showSaveDialog(c);
             if (rVal == JFileChooser.APPROVE_OPTION) {
                 selectedDir = c.getSelectedFile();
-                lastSavePath = selectedDir.getPath();
+                Preferences.getInstance().setFileBrowserLocation(selectedDir.getPath());
             }
 
             return selectedDir;

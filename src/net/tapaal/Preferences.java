@@ -333,7 +333,7 @@ public class Preferences {
     public void setFileBrowserLocation(String location) {
         final String key = "file.location";
 
-        if (location == null || location.equals("")){
+        if (location == null || location.equals("")) {
             pref.remove(key);
         } else {
             pref.put(key, location);
