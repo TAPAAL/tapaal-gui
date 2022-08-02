@@ -337,4 +337,18 @@ public class Preferences {
 
 		return object;
 	}
+
+    public void setFileBrowserLocation(String location) {
+        final String key = "file.location";
+
+        if (location == null || location.equals("")){
+            pref.remove(key);
+        } else {
+            pref.put(key, location);
+        }
+    }
+
+    public String getFileBrowserLocation() {
+        return pref.get("file.location", null);
+    }
 }

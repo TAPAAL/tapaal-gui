@@ -10,12 +10,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import net.tapaal.Preferences;
 
 public class FileBrowser {
     //Used for latest open dialog path
     //Default value null makes the open dialog open default folder, For Windows, My Documents, For *nix  ~ , etc
     //XXX 2018-05-23 moved from CreateGUI, refactor with regards to usage with lastPath local var in this class
-    public static String userPath = null;
+    public static String userPath = Preferences.getInstance().getFileBrowserLocation();
     static String lastSavePath = ".";
     static String lastOpenPath = ".";
 
@@ -64,7 +65,7 @@ public class FileBrowser {
     }
 
     public File openFile() {
-        if (specifiedPath == null) specifiedPath = lastOpenPath;
+        if (specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
         fileDialog.setDirectory(specifiedPath);
         //This is needed for Windows
 
@@ -73,13 +74,13 @@ public class FileBrowser {
         fileDialog.setVisible(true);
         String selectedFile = fileDialog.getFile();
         String selectedDir = fileDialog.getDirectory();
-        lastOpenPath = selectedDir;
+        Preferences.getInstance().setFileBrowserLocation(selectedDir);
         File file = selectedFile == null ? null : new File(selectedDir + selectedFile);
         return file;
     }
 
     public File[] openFiles() {
-        if (specifiedPath == null) specifiedPath = lastOpenPath;
+        if (specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
         fileDialog.setDirectory(specifiedPath);
         //This is needed for Windows
 
@@ -87,7 +88,7 @@ public class FileBrowser {
         fileDialog.setMode(FileDialog.LOAD);
         fileDialog.setVisible(true);
         File[] selectedFiles = fileDialog.getFiles();
-        lastOpenPath = fileDialog.getDirectory();
+        Preferences.getInstance().setFileBrowserLocation(fileDialog.getDirectory());
         return selectedFiles;
     }
 
@@ -101,7 +102,7 @@ public class FileBrowser {
 
     public String saveFile(String suggestedName) {
         String ext = fileExtensions[0];
-        if (specifiedPath == null) specifiedPath = lastSavePath;
+        if (specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();;
 
         fileDialog.setDirectory(specifiedPath);
         fileDialog.setFile(suggestedName + (suggestedName.endsWith("." + ext) ? "" : "." + ext));
@@ -119,7 +120,7 @@ public class FileBrowser {
         }
 
         String file = fileDialog.getDirectory() + fileDialog.getFile();
-        lastSavePath = fileDialog.getDirectory();
+        Preferences.getInstance().setFileBrowserLocation(fileDialog.getDirectory());
 
         // Windows does not enforce file ending on save
         if (!file.endsWith("." + ext)) {
@@ -158,14 +159,14 @@ public class FileBrowser {
         //So we make a JFileChooser in which we can control it
         if (System.getProperty("os.name").startsWith("Windows")) {
             File selectedDir = null;
-            if (specifiedPath == null) specifiedPath = lastSavePath;
+            if (specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();;
             JFileChooser c = new JFileChooser(specifiedPath);
             c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             c.setDialogTitle("Choose target directory for export");
             int rVal = c.showSaveDialog(c);
             if (rVal == JFileChooser.APPROVE_OPTION) {
                 selectedDir = c.getSelectedFile();
-                lastSavePath = selectedDir.getPath();
+                Preferences.getInstance().setFileBrowserLocation(selectedDir.getPath());
             }
 
             return selectedDir;
