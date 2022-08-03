@@ -706,16 +706,16 @@ public class BatchProcessingDialog extends JDialog {
             checkboxTAPN.setSelected(false);
             checkboxPN.setSelected(false);
             checkboxDTAPN.setSelected(false);
+            helpTAPN.setEnabled(false);
+            helpPN.setEnabled(false);
+            helpDTAPN.setEnabled(false);
+            optionsTAPN.setEnabled(false);
+            optionsPN.setEnabled(false);
+            optionsDTAPN.setEnabled(false);
         }
         checkboxTAPN.setEnabled(defaultNo.isSelected());
         checkboxPN.setEnabled(defaultNo.isSelected());
         checkboxDTAPN.setEnabled(defaultNo.isSelected());
-        optionsTAPN.setEnabled(defaultNo.isSelected());
-        optionsPN.setEnabled(defaultNo.isSelected());
-        optionsDTAPN.setEnabled(defaultNo.isSelected());
-        helpTAPN.setEnabled(defaultNo.isSelected());
-        helpPN.setEnabled(defaultNo.isSelected());
-        helpDTAPN.setEnabled(defaultNo.isSelected());
     }
 
     private void initTAPNOptionsComponents() {
