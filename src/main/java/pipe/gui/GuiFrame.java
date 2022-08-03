@@ -384,6 +384,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(o -> o.openURL("https://answers.launchpad.net/tapaal/+faqs"));
         }
     };
+    private final GuiAction showWiki = new GuiAction("Visit wiki page", "Visit the TAPAAL wiki page") {
+        public void actionPerformed(ActionEvent arg0) {
+            guiFrameController.ifPresent(o -> o.openURL("https://github.com/TAPAAL/TAPAAL/wiki"));
+        }
+    };
     private final GuiAction showShortcuts = new GuiAction("Show shortcuts", "Visit the TAPAAL wiki page to find a list of shortcuts") {
         public void actionPerformed(ActionEvent arg0) {
             guiFrameController.ifPresent(o -> o.openURL("https://github.com/TAPAAL/TAPAAL/wiki/Shortcut-keys"));
@@ -782,8 +787,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         helpMenu.add(showFAQAction);
         helpMenu.add(showAskQuestionAction);
-        helpMenu.add(showShortcuts);
         helpMenu.add(showReportBugAction);
+
+        helpMenu.addSeparator();
+
+        helpMenu.add(showWiki);
+        helpMenu.add(showShortcuts);
 
         helpMenu.addSeparator();
 
