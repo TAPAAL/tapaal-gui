@@ -24,12 +24,14 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import dk.aau.cs.verification.ProcessRunner;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.gui.petrinet.undo.AddFileBatchProcessingCommand;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.RemoveFileBatchProcessingCommand;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
+import pipe.gui.FileFinder;
+import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.petrinet.undo.UndoManager;
@@ -203,7 +205,8 @@ public class BatchProcessingDialog extends JDialog {
     private JRadioButton defaultNo;
 	private ButtonGroup defaultOptions;
     private JTextField optionsTAPN;
-    private JCheckBox verifyTAPN;
+    private JCheckBox checkboxTAPN;
+    private JButton helpTAPN;
     private JTextField optionsPN;
     private JCheckBox verifyPN;
     private JTextField optionsDTAPN;
@@ -792,38 +795,41 @@ public class BatchProcessingDialog extends JDialog {
 
     private void toggleDefault() {
         if (defaultYes.isSelected()) {
-            verifyTAPN.setSelected(false);
+            checkboxTAPN.setSelected(false);
             verifyPN.setSelected(false);
             verifyDTAPN.setSelected(false);
         }
-        verifyTAPN.setEnabled(defaultNo.isSelected());
+        checkboxTAPN.setEnabled(defaultNo.isSelected());
         verifyPN.setEnabled(defaultNo.isSelected());
         verifyDTAPN.setEnabled(defaultNo.isSelected());
     }
 
     private void initReductionOptionsComponents() {
-        JLabel reductionLabel = new JLabel("VerifyTAPN:");
-        reductionLabel.setToolTipText(TOOL_TIP_ReductionLabel);
+        checkboxTAPN = new JCheckBox("VerifyTAPN");
+        checkboxTAPN.setHorizontalTextPosition(SwingConstants.LEFT);
+        checkboxTAPN.setEnabled(false);
+        checkboxTAPN.addActionListener(e -> {
+            optionsTAPN.setEnabled(checkboxTAPN.isSelected());
+            helpTAPN.setEnabled(checkboxTAPN.isSelected());
+        });
+        checkboxTAPN.setToolTipText(TOOL_TIP_ReductionLabel);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(0, 0, 5, 0);
-        verificationOptionsPanel.add(reductionLabel, gbc);
+        verificationOptionsPanel.add(checkboxTAPN, gbc);
 
         optionsTAPN = new JTextField();
         optionsTAPN.setEnabled(false);
         optionsTAPN.setPreferredSize(new java.awt.Dimension(200,30));
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         verificationOptionsPanel.add(optionsTAPN, gbc);
 
-        verifyTAPN = new JCheckBox();
-        verifyTAPN.setEnabled(false);
-        verifyTAPN.addActionListener(e -> optionsTAPN.setEnabled(verifyTAPN.isSelected()));
-        gbc.gridx = 1;
-        verificationOptionsPanel.add(verifyTAPN, gbc);
+        helpTAPN = new JButton("Help");
+        helpTAPN.setEnabled(false);
 
-        reductionLabel = new JLabel("VerifyPN:");
+        JLabel reductionLabel = new JLabel("VerifyPN:");
         gbc.gridx = 0;
         gbc.gridy = 3;
         verificationOptionsPanel.add(reductionLabel, gbc);
@@ -857,12 +863,7 @@ public class BatchProcessingDialog extends JDialog {
         gbc.gridx = 1;
         verificationOptionsPanel.add(verifyDTAPN, gbc);
 
-        /*ProcessRunner runner = new ProcessRunner(verifypnpath, "--help");
-        runner.run();
-
-        if (!runner.error()) {
-            runner.standardOutput();
-        }*/
+        String help = new VerifyPN(new FileFinder(), new MessengerImpl()).getHelpOptions();
     }
 
     private void initSymmetryOptionsComponents() {

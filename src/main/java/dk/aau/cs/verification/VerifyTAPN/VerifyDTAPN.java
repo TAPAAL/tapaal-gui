@@ -426,6 +426,16 @@ public class VerifyDTAPN implements ModelChecker{
 		trySetup();
 	}
 
+    public String getHelpOptions() {
+        runner = new ProcessRunner(verifydtapnpath, "--help");
+        runner.run();
+
+        if (!runner.error()) {
+            return readOutput(runner.standardOutput());
+        }
+        return null;
+    }
+
 	@Override
 	public String toString() {
 		return "verifydtapn";

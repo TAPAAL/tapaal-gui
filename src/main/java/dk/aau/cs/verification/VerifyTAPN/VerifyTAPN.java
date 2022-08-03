@@ -407,6 +407,16 @@ public class VerifyTAPN implements ModelChecker {
 		trySetup();
 	}
 
+    public String getHelpOptions() {
+        runner = new ProcessRunner(verifytapnpath, "--help");
+        runner.run();
+
+        if (!runner.error()) {
+            return readOutput(runner.standardOutput());
+        }
+        return null;
+    }
+
 	@Override
 	public String toString() {
 		return "verifytapn";
