@@ -24,6 +24,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import dk.aau.cs.verification.ProcessRunner;
 import net.tapaal.gui.petrinet.undo.AddFileBatchProcessingCommand;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.RemoveFileBatchProcessingCommand;
@@ -200,7 +201,13 @@ public class BatchProcessingDialog extends JDialog {
 	private JComboBox<String> stubbornReductionOption;
     private JRadioButton defaultYes;
     private JRadioButton defaultNo;
-	private ButtonGroup reductionOption;
+	private ButtonGroup defaultOptions;
+    private JTextField optionsTAPN;
+    private JCheckBox verifyTAPN;
+    private JTextField optionsPN;
+    private JCheckBox verifyPN;
+    private JTextField optionsDTAPN;
+    private JCheckBox verifyDTAPN;
 	private JCheckBox noTimeoutCheckbox;
 	private JCheckBox noOOMCheckbox;
 	private CustomJSpinner timeoutValue;
@@ -486,8 +493,8 @@ public class BatchProcessingDialog extends JDialog {
 		initQueryPropertyOptionsComponents();
 		/*initSearchOptionsComponents();
 		initSymmetryOptionsComponents();
-		initStubbornReductionOptionsComponents();
-		initReductionOptionsComponents();*/
+		initStubbornReductionOptionsComponents();*/
+        initDefaultOptionsComponents();
         initReductionOptionsComponents();
 		initCapacityComponents();
 		initTimeoutComponents();
@@ -757,29 +764,7 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.add(noOOMCheckbox, gbc);
 	}
 
-	/*private void initReductionOptionsComponents() {
-		JLabel reductionLabel = new JLabel("Verification method:");
-		reductionLabel.setToolTipText(TOOL_TIP_ReductionLabel);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 4;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		verificationOptionsPanel.add(reductionLabel, gbc);
-		
-		reductionOptionChooser = new ReductionOptionChooser();
-		
-		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 1;
-		gbc.gridy = 4;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.gridwidth = 2;
-		verificationOptionsPanel.add(reductionOptionChooser, gbc);
-	}*/
-
-    private void initReductionOptionsComponents() {
+    private void initDefaultOptionsComponents() {
         JLabel reductionLabel = new JLabel("Default verification method:");
         reductionLabel.setToolTipText(TOOL_TIP_ReductionLabel);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -789,48 +774,98 @@ public class BatchProcessingDialog extends JDialog {
         gbc.insets = new Insets(0, 0, 5, 0);
         verificationOptionsPanel.add(reductionLabel, gbc);
 
-        defaultYes = new JRadioButton("Yes");
-        defaultNo = new JRadioButton("No");
+        defaultYes = new JRadioButton("Yes", true);
+        defaultNo = new JRadioButton("No", false);
 
-        reductionOption = new ButtonGroup();
-        reductionOption.add(defaultYes);
-        reductionOption.add(defaultNo);
+        defaultOptions = new ButtonGroup();
+        defaultOptions.add(defaultYes);
+        defaultOptions.add(defaultNo);
 
-        defaultYes.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                defaultYes.setSelected(true);
-                defaultNo.setSelected(false);
-            }
-        });
-        defaultNo.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                defaultYes.setSelected(false);
-                defaultNo.setSelected(true);
-            }
-        });
+        defaultYes.addChangeListener(e -> toggleDefault());
+        defaultNo.addChangeListener(e -> toggleDefault());
 
-        gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        gbc.gridwidth = 2;
         verificationOptionsPanel.add(defaultYes, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 2;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        gbc.gridwidth = 2;
         verificationOptionsPanel.add(defaultNo, gbc);
     }
-	
-	private void initSymmetryOptionsComponents() {
+
+    private void toggleDefault() {
+        if (defaultYes.isSelected()) {
+            verifyTAPN.setSelected(false);
+            verifyPN.setSelected(false);
+            verifyDTAPN.setSelected(false);
+        }
+        verifyTAPN.setEnabled(defaultNo.isSelected());
+        verifyPN.setEnabled(defaultNo.isSelected());
+        verifyDTAPN.setEnabled(defaultNo.isSelected());
+    }
+
+    private void initReductionOptionsComponents() {
+        JLabel reductionLabel = new JLabel("VerifyTAPN:");
+        reductionLabel.setToolTipText(TOOL_TIP_ReductionLabel);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        verificationOptionsPanel.add(reductionLabel, gbc);
+
+        optionsTAPN = new JTextField();
+        optionsTAPN.setEnabled(false);
+        optionsTAPN.setPreferredSize(new java.awt.Dimension(200,30));
+        gbc.gridx = 2;
+        verificationOptionsPanel.add(optionsTAPN, gbc);
+
+        verifyTAPN = new JCheckBox();
+        verifyTAPN.setEnabled(false);
+        verifyTAPN.addActionListener(e -> optionsTAPN.setEnabled(verifyTAPN.isSelected()));
+        gbc.gridx = 1;
+        verificationOptionsPanel.add(verifyTAPN, gbc);
+
+        reductionLabel = new JLabel("VerifyPN:");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        verificationOptionsPanel.add(reductionLabel, gbc);
+
+        optionsPN = new JTextField();
+        optionsPN.setEnabled(false);
+        optionsPN.setPreferredSize(new java.awt.Dimension(200,30));
+        gbc.gridx = 2;
+        verificationOptionsPanel.add(optionsPN, gbc);
+
+        verifyPN = new JCheckBox();
+        verifyPN.setEnabled(false);
+        verifyPN.addActionListener(e -> optionsPN.setEnabled(verifyPN.isSelected()));
+        gbc.gridx = 1;
+        verificationOptionsPanel.add(verifyPN, gbc);
+
+        reductionLabel = new JLabel("VerifyDTAPN:");
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        verificationOptionsPanel.add(reductionLabel, gbc);
+
+        optionsDTAPN = new JTextField();
+        optionsDTAPN.setEnabled(false);
+        optionsDTAPN.setPreferredSize(new java.awt.Dimension(200,30));
+        gbc.gridx = 2;
+        verificationOptionsPanel.add(optionsDTAPN, gbc);
+
+        verifyDTAPN = new JCheckBox();
+        verifyDTAPN.setEnabled(false);
+        verifyDTAPN.addActionListener(e -> optionsDTAPN.setEnabled(verifyDTAPN.isSelected()));
+        gbc.gridx = 1;
+        verificationOptionsPanel.add(verifyDTAPN, gbc);
+
+        /*ProcessRunner runner = new ProcessRunner(verifypnpath, "--help");
+        runner.run();
+
+        if (!runner.error()) {
+            runner.standardOutput();
+        }*/
+    }
+
+    private void initSymmetryOptionsComponents() {
 		JLabel symmetryLabel = new JLabel("Symmetry:");
 		symmetryLabel.setToolTipText(TOOL_TIP_SymmetryLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
