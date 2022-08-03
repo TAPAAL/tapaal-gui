@@ -24,7 +24,9 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import net.tapaal.gui.petrinet.undo.AddFileBatchProcessingCommand;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.RemoveFileBatchProcessingCommand;
@@ -121,28 +123,17 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_CapacityLabel = null;
 	private final static String TOOL_TIP_Number_Of_Extra_Tokens = "Enter the number of extra tokens in the nets";
 	private final static String TOOL_TIP_KeepQueryCapacity = "Override the number of extra tokens in the nets";
-	private final static String TOOL_TIP_SearchLabel = null;
-	private final static String TOOL_TIP_SearchOption = "Choose to override the search options in the nets";
-	private final static String TOOL_TIP_SymmetryLabel = null;
-	private final static String TOOL_TIP_SymmetryOption = "Choose to override the symmetry reduction in the nets";
-	private final static String TOOL_TIP_StubbornReductionLabel = null;
-	private final static String TOOL_TIP_StubbornReductionOption = "Apply partial order reduction (only for EF and AG queries and when Time Darts are disabled)";
-	private final static String TOOL_TIP_ReductionLabel = null;
-	private final static String TOOL_TIP_ReductionOption = "Choose to override the verification methods in the nets";
+	private final static String TOOL_TIP_Help = "See the options available for the specific engine";
+    private final static String TOOL_TIP_DefaultOption = "Choose to keep the same verification methods as in the nets";
+    private final static String TOOL_TIP_VerifyTAPNOption = "Choose to override the verification methods in the nets to verifyTAPN";
+    private final static String TOOL_TIP_VerifyPNOption = "Choose to override the verification methods in the nets to verifyPN";
+    private final static String TOOL_TIP_VerifyDTAPNOption = "Choose to override the verification methods in the nets to verifyDTAPN";
 	private final static String TOOL_TIP_TimeoutLabel = null;
 	private final static String TOOL_TIP_TimeoutValue = "Enter the timeout in seconds";
 	private final static String TOOL_TIP_NoTimeoutCheckBox = "Choose whether to use timeout";
 	private final static String TOOL_TIP_OOMLabel = null;
 	private final static String TOOL_TIP_OOMValue = "<html>Enter the maximum amount of available memory to the verification.<br>Verification is skipped as soon as it is detected that this amount of memory is exceeded.</html>";
 	private final static String TOOL_TIP_NoOOMCheckBox = "Choose whether to use memory restrictions";
-	private final static String TOOL_TIP_Approximation_method = null;
-	private final static String TOOL_TIP_Approximation_Method_Option_Keep = "Do not override the default approximation method.";
-	private final static String TOOL_TIP_Approximation_Method_Option_None = "No approximation method is used.";
-	private final static String TOOL_TIP_Approximation_Method_Option_Over = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
-	private final static String TOOL_TIP_Approximation_Method_Option_Under = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
-	private final static String TOOL_TIP_ApproximationDenominatorLabel = null;
-	private final static String TOOL_TIP_ApproximationDenominator = "Choose the approximation constant.";
-	private final static String TOOL_TIP_ApproximationDenominatorCheckbox = "Check to override the default approximation constant.";
 	
 	//Tool tips for monitor panel
 	private final static String TOOL_TIP_FileLabel = "Currently verified net";
@@ -169,7 +160,10 @@ public class BatchProcessingDialog extends JDialog {
 	private static String lastPath = null;
 	
 	ReductionOptionChooser reductionOptionChooser;
-	
+    HelpDialog helpDialogTAPN;
+    HelpDialog helpDialogPN;
+    HelpDialog helpDialogDTAPN;
+
 	private JSplitPane splitpane;
 	private JPanel topPanel;
 	private JPanel bottomPanel;
@@ -208,10 +202,12 @@ public class BatchProcessingDialog extends JDialog {
     private JCheckBox checkboxTAPN;
     private JButton helpTAPN;
     private JTextField optionsPN;
-    private JCheckBox verifyPN;
+    private JCheckBox checkboxPN;
+    private JButton helpPN;
     private JTextField optionsDTAPN;
-    private JCheckBox verifyDTAPN;
-	private JCheckBox noTimeoutCheckbox;
+    private JCheckBox checkboxDTAPN;
+    private JButton helpDTAPN;
+    private JCheckBox noTimeoutCheckbox;
 	private JCheckBox noOOMCheckbox;
 	private CustomJSpinner timeoutValue;
 	private CustomJSpinner oomValue;
@@ -494,15 +490,13 @@ public class BatchProcessingDialog extends JDialog {
 				.createTitledBorder("Override Verification Options for the Batch"));
 		
 		initQueryPropertyOptionsComponents();
-		/*initSearchOptionsComponents();
-		initSymmetryOptionsComponents();
-		initStubbornReductionOptionsComponents();*/
         initDefaultOptionsComponents();
-        initReductionOptionsComponents();
+        initTAPNOptionsComponents();
+        initPNOptionsComponents();
+        initDTAPNOptionsComponents();
 		initCapacityComponents();
 		initTimeoutComponents();
 		initOOMComponents();
-		//initApproximationMethodOptionsComponents();
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -543,93 +537,6 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridwidth = 2;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(queryPropertyOption, gbc);
-	}
-	
-	private void initApproximationMethodOptionsComponents() {
-		JLabel approximationLabel = new JLabel("Approximation method:");
-		approximationLabel.setToolTipText(TOOL_TIP_Approximation_method);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.VERTICAL;
-		gbc.gridx = 0;
-		gbc.gridy = 8;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.anchor = GridBagConstraints.WEST;
-		verificationOptionsPanel.add(approximationLabel, gbc);
-
-		String[] options = new String[] { 
-				name_KeepQueryOption,
-				name_NONE_APPROXIMATION,
-				name_OVER_APPROXIMATION,
-				name_UNDER_APPROXIMATION
-				};
-		approximationMethodOption = new JComboBox<>(options);
-		approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Keep);
-		approximationMethodOption.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				if (approximationMethodOption.getSelectedItem() == name_NONE_APPROXIMATION) {
-					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_None);
-				} else if (approximationMethodOption.getSelectedItem() == name_OVER_APPROXIMATION) {
-					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Over);
-				} else if (approximationMethodOption.getSelectedItem() == name_UNDER_APPROXIMATION) {
-					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Under);
-				} else {
-					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Keep);
-				}
-			}
-		});
-		
-		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 1;
-		gbc.gridy = 8;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.gridwidth = 2;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		verificationOptionsPanel.add(approximationMethodOption, gbc);
-		
-		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");
-		approximationDenominatorLabel.setToolTipText(TOOL_TIP_ApproximationDenominatorLabel);
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 9;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		verificationOptionsPanel.add(approximationDenominatorLabel, gbc);
-
-		approximationDenominator = new CustomJSpinner(2, 1,Integer.MAX_VALUE);
-		approximationDenominator.setToolTipText(TOOL_TIP_ApproximationDenominator);
-		approximationDenominator.setMaximumSize(new Dimension(70, 30));
-		approximationDenominator.setMinimumSize(new Dimension(70, 30));
-		approximationDenominator.setPreferredSize(new Dimension(70, 30));
-		approximationDenominator.setEnabled(false);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 9;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 10);
-		verificationOptionsPanel.add(approximationDenominator, gbc);
-		
-		approximationDenominatorCheckbox = new JCheckBox("Do not override");
-		approximationDenominatorCheckbox.setToolTipText(TOOL_TIP_ApproximationDenominatorCheckbox);
-		approximationDenominatorCheckbox.setSelected(true);
-		approximationDenominatorCheckbox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (approximationDenominatorCheckbox.isSelected()) {
-                    approximationDenominator.setEnabled(false);
-                } else {
-                    approximationDenominator.setEnabled(true);
-                }
-			}
-		});
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 9;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		verificationOptionsPanel.add(approximationDenominatorCheckbox, gbc);
 	}
 
 	private void initCapacityComponents() {
@@ -769,7 +676,6 @@ public class BatchProcessingDialog extends JDialog {
 
     private void initDefaultOptionsComponents() {
         JLabel reductionLabel = new JLabel("Default verification method:");
-        reductionLabel.setToolTipText(TOOL_TIP_ReductionLabel);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -778,7 +684,9 @@ public class BatchProcessingDialog extends JDialog {
         verificationOptionsPanel.add(reductionLabel, gbc);
 
         defaultYes = new JRadioButton("Yes", true);
+        defaultYes.setToolTipText(TOOL_TIP_DefaultOption);
         defaultNo = new JRadioButton("No", false);
+        defaultNo.setToolTipText(TOOL_TIP_DefaultOption);
 
         defaultOptions = new ButtonGroup();
         defaultOptions.add(defaultYes);
@@ -796,23 +704,29 @@ public class BatchProcessingDialog extends JDialog {
     private void toggleDefault() {
         if (defaultYes.isSelected()) {
             checkboxTAPN.setSelected(false);
-            verifyPN.setSelected(false);
-            verifyDTAPN.setSelected(false);
+            checkboxPN.setSelected(false);
+            checkboxDTAPN.setSelected(false);
         }
         checkboxTAPN.setEnabled(defaultNo.isSelected());
-        verifyPN.setEnabled(defaultNo.isSelected());
-        verifyDTAPN.setEnabled(defaultNo.isSelected());
+        checkboxPN.setEnabled(defaultNo.isSelected());
+        checkboxDTAPN.setEnabled(defaultNo.isSelected());
+        optionsTAPN.setEnabled(defaultNo.isSelected());
+        optionsPN.setEnabled(defaultNo.isSelected());
+        optionsDTAPN.setEnabled(defaultNo.isSelected());
+        helpTAPN.setEnabled(defaultNo.isSelected());
+        helpPN.setEnabled(defaultNo.isSelected());
+        helpDTAPN.setEnabled(defaultNo.isSelected());
     }
 
-    private void initReductionOptionsComponents() {
+    private void initTAPNOptionsComponents() {
         checkboxTAPN = new JCheckBox("VerifyTAPN");
-        checkboxTAPN.setHorizontalTextPosition(SwingConstants.LEFT);
         checkboxTAPN.setEnabled(false);
         checkboxTAPN.addActionListener(e -> {
             optionsTAPN.setEnabled(checkboxTAPN.isSelected());
             helpTAPN.setEnabled(checkboxTAPN.isSelected());
         });
-        checkboxTAPN.setToolTipText(TOOL_TIP_ReductionLabel);
+        checkboxTAPN.setToolTipText(TOOL_TIP_VerifyTAPNOption);
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -826,93 +740,91 @@ public class BatchProcessingDialog extends JDialog {
         gbc.gridx = 1;
         verificationOptionsPanel.add(optionsTAPN, gbc);
 
-        helpTAPN = new JButton("Help");
-        helpTAPN.setEnabled(false);
+        helpDialogTAPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyTAPN", true, new VerifyTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
+        helpDialogTAPN.setLocationRelativeTo(BatchProcessingDialog.this);
+        helpDialogTAPN.setResizable(false);
+        helpDialogTAPN.pack();
 
-        JLabel reductionLabel = new JLabel("VerifyPN:");
+        helpTAPN = new JButton("Help");
+        helpTAPN.setToolTipText(TOOL_TIP_Help);
+        helpTAPN.setEnabled(false);
+        helpTAPN.addActionListener(e -> helpDialogTAPN.setVisible(true));
+
+        gbc.gridx = 2;
+        verificationOptionsPanel.add(helpTAPN, gbc);
+    }
+
+    private void initPNOptionsComponents() {
+        checkboxPN = new JCheckBox("VerifyPN");
+        checkboxPN.setEnabled(false);
+        checkboxPN.addActionListener(e -> {
+            optionsTAPN.setEnabled(checkboxPN.isSelected());
+            helpPN.setEnabled(checkboxPN.isSelected());
+        });
+        checkboxPN.setToolTipText(TOOL_TIP_VerifyPNOption);
+
+        GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 3;
-        verificationOptionsPanel.add(reductionLabel, gbc);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        verificationOptionsPanel.add(checkboxPN, gbc);
 
         optionsPN = new JTextField();
         optionsPN.setEnabled(false);
         optionsPN.setPreferredSize(new java.awt.Dimension(200,30));
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         verificationOptionsPanel.add(optionsPN, gbc);
 
-        verifyPN = new JCheckBox();
-        verifyPN.setEnabled(false);
-        verifyPN.addActionListener(e -> optionsPN.setEnabled(verifyPN.isSelected()));
-        gbc.gridx = 1;
-        verificationOptionsPanel.add(verifyPN, gbc);
+        helpDialogPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyPN", true, new VerifyPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
+        helpDialogPN.setLocationRelativeTo(BatchProcessingDialog.this);
+        helpDialogPN.setResizable(false);
+        helpDialogPN.pack();
 
-        reductionLabel = new JLabel("VerifyDTAPN:");
+        helpPN = new JButton("Help");
+        helpPN.setToolTipText(TOOL_TIP_Help);
+        helpPN.setEnabled(false);
+        helpPN.addActionListener(e -> helpDialogPN.setVisible(true));
+
+        gbc.gridx = 2;
+        verificationOptionsPanel.add(helpPN, gbc);
+    }
+
+    private void initDTAPNOptionsComponents() {
+        checkboxDTAPN = new JCheckBox("VerifyDTAPN");
+        checkboxDTAPN.setEnabled(false);
+        checkboxDTAPN.addActionListener(e -> {
+            optionsTAPN.setEnabled(checkboxDTAPN.isSelected());
+            helpDTAPN.setEnabled(checkboxDTAPN.isSelected());
+        });
+        checkboxDTAPN.setToolTipText(TOOL_TIP_VerifyDTAPNOption);
+
+        GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 4;
-        verificationOptionsPanel.add(reductionLabel, gbc);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        verificationOptionsPanel.add(checkboxDTAPN, gbc);
 
         optionsDTAPN = new JTextField();
         optionsDTAPN.setEnabled(false);
         optionsDTAPN.setPreferredSize(new java.awt.Dimension(200,30));
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         verificationOptionsPanel.add(optionsDTAPN, gbc);
 
-        verifyDTAPN = new JCheckBox();
-        verifyDTAPN.setEnabled(false);
-        verifyDTAPN.addActionListener(e -> optionsDTAPN.setEnabled(verifyDTAPN.isSelected()));
-        gbc.gridx = 1;
-        verificationOptionsPanel.add(verifyDTAPN, gbc);
+        helpDialogDTAPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyDTAPN", true, new VerifyDTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
+        helpDialogDTAPN.setLocationRelativeTo(BatchProcessingDialog.this);
+        helpDialogDTAPN.setResizable(false);
+        helpDialogDTAPN.pack();
 
-        String help = new VerifyPN(new FileFinder(), new MessengerImpl()).getHelpOptions();
+        helpDTAPN = new JButton("Help");
+        helpDTAPN.setToolTipText(TOOL_TIP_Help);
+        helpDTAPN.setEnabled(false);
+        helpDTAPN.addActionListener(e -> helpDialogDTAPN.setVisible(true));
+
+        gbc.gridx = 2;
+        verificationOptionsPanel.add(helpDTAPN, gbc);
     }
-
-    private void initSymmetryOptionsComponents() {
-		JLabel symmetryLabel = new JLabel("Symmetry:");
-		symmetryLabel.setToolTipText(TOOL_TIP_SymmetryLabel);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.anchor = GridBagConstraints.WEST;
-		verificationOptionsPanel.add(symmetryLabel, gbc);
-
-		String[] options = new String[] { name_KeepQueryOption, name_SYMMETRY, name_NOSYMMETRY };
-		symmetryOption = new JComboBox<>(options);
-		symmetryOption.setToolTipText(TOOL_TIP_SymmetryOption);
-
-		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 1;
-		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.gridwidth = 2;
-		verificationOptionsPanel.add(symmetryOption, gbc);
-	}
-        
-	private void initStubbornReductionOptionsComponents() {
-		JLabel stubbornReductionLabel = new JLabel("Stubborn Reduction:");
-		stubbornReductionLabel.setToolTipText(TOOL_TIP_StubbornReductionLabel);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 3;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.anchor = GridBagConstraints.WEST;
-		verificationOptionsPanel.add(stubbornReductionLabel, gbc);
-
-		String[] options = new String[] { name_KeepQueryOption, name_STUBBORNREUDCTION, name_NOSTUBBORNREDUCTION };
-		stubbornReductionOption = new JComboBox<>(options);
-		stubbornReductionOption.setToolTipText(TOOL_TIP_StubbornReductionOption);
-
-		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 1;
-		gbc.gridy = 3;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.gridwidth = 2;
-		verificationOptionsPanel.add(stubbornReductionOption, gbc);
-	}
 
 	private SearchOption getSearchOption() {
 		if (searchOption.getSelectedItem().equals(name_DFS)) {
@@ -1012,30 +924,6 @@ public class BatchProcessingDialog extends JDialog {
 	
 	private int getApproximationDenominator() {
 		return (approximationDenominatorCheckbox.isSelected()) ? 0 : (Integer) approximationDenominator.getValue();
-	}
-
-	private void initSearchOptionsComponents() {
-		JLabel searchLabel = new JLabel("Search order:");
-		searchLabel.setToolTipText(TOOL_TIP_SearchLabel);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		verificationOptionsPanel.add(searchLabel, gbc);
-
-		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC, name_BFS, name_DFS, name_Random };
-		searchOption = new JComboBox<>(options);
-		searchOption.setToolTipText(TOOL_TIP_SearchOption);
-
-		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.gridwidth = 2;
-		verificationOptionsPanel.add(searchOption, gbc);
 	}
 	
 	private void exit() {
@@ -1776,7 +1664,7 @@ public class BatchProcessingDialog extends JDialog {
 			reductionOptionDialog.pack();
 			
 			chooseReductionOptions = new JButton(STATUS_TEXT_DONT_OVERRIDE);
-			chooseReductionOptions.setToolTipText(TOOL_TIP_ReductionOption);
+			//chooseReductionOptions.setToolTipText(TOOL_TIP_ReductionOption);
 			chooseReductionOptions.addActionListener(arg0 -> {
 				//reductionOptionDialog.setOverride(true);
 				reductionOptionDialog.setVisible(true);
@@ -1816,6 +1704,42 @@ public class BatchProcessingDialog extends JDialog {
 			}
 		}
 	}
+
+	public class HelpDialog extends EscapableDialog {
+        private JPanel content;
+
+        private JTextPane pane;
+        private String helpInfo;
+
+        public HelpDialog(JDialog dialog, String string, boolean modal, String helpInfo) {
+            super(dialog, string, modal);
+
+            this.helpInfo = helpInfo;
+
+            initComponents();
+            this.transferFocus();
+        }
+
+        private void initComponents(){
+            content = new JPanel(new GridBagLayout());
+
+            pane = new JTextPane();
+            pane.setText(helpInfo);
+
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            content.add(pane, gbc);
+
+            this.getContentPane().setLayout(new GridBagLayout());
+
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            this.getContentPane().add(content, gbc);
+        }
+    }
 	
 	public class ReductionOptionDialog extends EscapableDialog{
 
