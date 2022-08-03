@@ -82,7 +82,7 @@ public abstract class ColorComboboxPanel extends JPanel {
     private void setIndex(ColorExpression expr, int index){
         if(expr instanceof AllExpression){
             //.all is always last so we just select the last item
-            colorTypeComboBoxesArray[index].setSelectedIndex(colorTypeComboBoxesArray[index].getItemCount());
+            colorTypeComboBoxesArray[index].setSelectedIndex(colorTypeComboBoxesArray[index].getItemCount() - 1);
         } else if(expr instanceof VariableExpression){
             colorTypeComboBoxesArray[index].setSelectedItem(((VariableExpression)expr).getVariable());
         } else if(expr instanceof UserOperatorExpression){

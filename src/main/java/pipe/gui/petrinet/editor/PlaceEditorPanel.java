@@ -856,7 +856,7 @@ public class PlaceEditorPanel extends JPanel {
             }
 
         });
-        removeColoredTokenButton.setEnabled(false);
+        removeColoredTokenButton.setEnabled(tokenList.getSelectedIndex() > 0);
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
