@@ -201,31 +201,31 @@ public class XMLQueryLoader extends QueryLoader{
 
     public static boolean canBeLTL(Node prop) {
         NodeList children = prop.getChildNodes();
-        int allPathsCounter = 0;
+        int counter = 0;
 
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if (child.getNodeName().equals("formula")) {
-                allPathsCounter += countAllPaths(child);
+                counter += countSupportedPaths(child);
             }
         }
-        return allPathsCounter == 1;
+        return counter == 1;
     }
 
-    private static int countAllPaths(Node prop) {
+    private static int countSupportedPaths(Node prop) {
         NodeList children = prop.getChildNodes();
-        int allPathsCounter = 0;
+        int counter = 0;
 
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (child.getNodeName().equals("all-paths")) {
-                allPathsCounter++;
-            } else if (child.getNodeName().equals("exists-path") || child.getNodeName().equals("deadlock")){
+            if (child.getNodeName().equals("all-paths") || child.getNodeName().equals("exists-path")) {
+                counter++;
+            } else if (child.getNodeName().equals("deadlock")){
                 return 100;
             }
-            allPathsCounter += countAllPaths(child);
+            counter += countSupportedPaths(child);
         }
-        return allPathsCounter;
+        return counter;
     }
 
     public static void importQueries(File file, TimedArcPetriNetNetwork network, PetriNetTab tab){
