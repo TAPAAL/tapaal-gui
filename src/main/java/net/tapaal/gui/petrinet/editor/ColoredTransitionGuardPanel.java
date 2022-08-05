@@ -679,8 +679,16 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             greaterThanEqButton.setEnabled(false);
             lessThanEqButton.setEnabled(false);
             lessThanButton.setEnabled(false);
+            checkSelectionComparison();
         }
         parent.enableOKButton(!newProperty.containsPlaceHolder() || newProperty instanceof PlaceHolderExpression);
+    }
+
+    private void checkSelectionComparison() {
+        if (currentSelection.getObject() instanceof GreaterThanEqExpression || currentSelection.getObject() instanceof GreaterThanExpression ||
+            currentSelection.getObject() instanceof LessThanEqExpression || currentSelection.getObject() instanceof LessThanExpression) {
+            deleteSelection();
+        }
     }
 
     private void updateSelection(Expression newSelection) {
