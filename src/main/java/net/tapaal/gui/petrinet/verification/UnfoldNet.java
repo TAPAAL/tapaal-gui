@@ -65,9 +65,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         symmetricVars = useSymmetricVars;
     }
 
-    public void execute(TimedArcPetriNetNetwork model, Iterable<TAPNQuery> queries, PetriNetTab oldTab) {
+    public void execute(TimedArcPetriNetNetwork model, PetriNetTab oldTab) {
         this.model = model;
-        this.queries = queries;
         this.oldTab = oldTab;
         execute();
     }
@@ -77,7 +76,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         TAPNLens lens = oldTab.getLens();
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
-        boolean dummyQuery = false;
         StringBuilder error = new StringBuilder();
 
         File modelFile = null;
@@ -126,27 +124,13 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             return error.toString();
         }
 
-        // This list is a workarround for issue #1968474
-        // Should be removed when a better solution can be found when further refactoring is possible
-        List<TAPNQuery.QueryCategory> queryCategories = new ArrayList<>();
+        // XXX It seems this exists only to make sure that there is at least one query? -- kyrke 2022-05-08
+        //  was firstTemplate,fistPlace=1 changed to just be E<>true, to fix issue #1971420
         List<TAPNQuery> clonedQueries = new Vector<>();
-        if (queries.iterator().hasNext()) {
-            for (TAPNQuery query : queries) {
-                TAPNQuery clonedQuery = query.copy();
-                mapQueryToNewNames(clonedQuery, transformedModel.value2());
-                clonedQueries.add(clonedQuery);
-                queryCategories.add(query.getCategory());
-            }
-        }
-        else {
-            // XXX It seems this exists only to make sure that there is at least one query? -- kyrke 2022-05-08
-            //  was firstTemplate,fistPlace=1 changed to just be E<>true, to fix issue #1971420
-            TCTLEFNode efNode = new TCTLEFNode(new TCTLTrueNode());
-            TAPNQuery test = new TAPNQuery("placeholder", 1000, efNode, null, null, null, false, false, false, false, null, null, lens.isColored());
-            mapQueryToNewNames(test, transformedModel.value2());
-            clonedQueries.add(test);
-            dummyQuery = true;
-        }
+        TCTLEFNode efNode = new TCTLEFNode(new TCTLTrueNode());
+        TAPNQuery test = new TAPNQuery("placeholder", 1000, efNode, null, null, null, false, false, false, false, null, null, lens.isColored());
+        mapQueryToNewNames(test, transformedModel.value2());
+        clonedQueries.add(test);
 
         ProcessRunner runner;
         try{
@@ -170,7 +154,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         } else{
             unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), clonedQueries.size(), partition, computeColorFixpoint, symmetricVars);
         }
-
 
         runner = new ProcessRunner(modelChecker.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
@@ -197,18 +180,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             // addLocation(loadedModel, composer); // We can not get coords from server
             newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
-            if(!dummyQuery){
-                for(TAPNQuery query : getQueries(queryOut, loadedModel.network(), queryCategories)){
-                    if (query == null) return null;
-                    for(TAPNQuery oldQuery : queries){
-                        if(query.getName().equals(oldQuery.getName())){
-                            query.copyOptions(oldQuery);
-                            newTab.addQuery(query);
-                            break;
-                        }
-                    }
-                }
-            }
 
             Thread thread = new Thread(() -> TAPAALGUI.getAppGuiController().openTab(newTab));
             thread.start();
