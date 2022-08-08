@@ -1,12 +1,7 @@
 package net.tapaal.gui.petrinet.dialog;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -736,14 +731,11 @@ public class BatchProcessingDialog extends JDialog {
 
         optionsTAPN = new JTextField();
         optionsTAPN.setEnabled(false);
-        optionsTAPN.setPreferredSize(new java.awt.Dimension(200,30));
+        optionsTAPN.setPreferredSize(new Dimension(200,30));
         gbc.gridx = 1;
         verificationOptionsPanel.add(optionsTAPN, gbc);
 
-        helpDialogTAPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyTAPN", true, new VerifyTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
-        helpDialogTAPN.setLocationRelativeTo(BatchProcessingDialog.this);
-        helpDialogTAPN.setResizable(false);
-        helpDialogTAPN.pack();
+        helpDialogTAPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyTAPN", ModalityType.MODELESS, new VerifyTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
 
         helpTAPN = new JButton("Help");
         helpTAPN.setToolTipText(TOOL_TIP_Help);
@@ -772,14 +764,11 @@ public class BatchProcessingDialog extends JDialog {
 
         optionsPN = new JTextField();
         optionsPN.setEnabled(false);
-        optionsPN.setPreferredSize(new java.awt.Dimension(200,30));
+        optionsPN.setPreferredSize(new Dimension(200,30));
         gbc.gridx = 1;
         verificationOptionsPanel.add(optionsPN, gbc);
 
-        helpDialogPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyPN", true, new VerifyPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
-        helpDialogPN.setLocationRelativeTo(BatchProcessingDialog.this);
-        helpDialogPN.setResizable(false);
-        helpDialogPN.pack();
+        helpDialogPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyPN", ModalityType.MODELESS, new VerifyPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
 
         helpPN = new JButton("Help");
         helpPN.setToolTipText(TOOL_TIP_Help);
@@ -808,14 +797,11 @@ public class BatchProcessingDialog extends JDialog {
 
         optionsDTAPN = new JTextField();
         optionsDTAPN.setEnabled(false);
-        optionsDTAPN.setPreferredSize(new java.awt.Dimension(200,30));
+        optionsDTAPN.setPreferredSize(new Dimension(200,30));
         gbc.gridx = 1;
         verificationOptionsPanel.add(optionsDTAPN, gbc);
 
-        helpDialogDTAPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyDTAPN", true, new VerifyDTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
-        helpDialogDTAPN.setLocationRelativeTo(BatchProcessingDialog.this);
-        helpDialogDTAPN.setResizable(false);
-        helpDialogDTAPN.pack();
+        helpDialogDTAPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyDTAPN", ModalityType.MODELESS, new VerifyDTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
 
         helpDTAPN = new JButton("Help");
         helpDTAPN.setToolTipText(TOOL_TIP_Help);
@@ -1158,9 +1144,9 @@ public class BatchProcessingDialog extends JDialog {
 
 		startButton = new JButton("Start");
 		startButton.setToolTipText(TOOL_TIP_StartButton);
-		startButton.setMaximumSize(new java.awt.Dimension(85, 25));
-		startButton.setMinimumSize(new java.awt.Dimension(85, 25));
-		startButton.setPreferredSize(new java.awt.Dimension(85, 25));
+		startButton.setMaximumSize(new Dimension(85, 25));
+		startButton.setMinimumSize(new Dimension(85, 25));
+		startButton.setPreferredSize(new Dimension(85, 25));
 
 		startButton.setEnabled(false);
 		startButton.addActionListener(new ActionListener() {
@@ -1177,9 +1163,9 @@ public class BatchProcessingDialog extends JDialog {
 
 		cancelButton = new JButton("Cancel");
 		cancelButton.setToolTipText(TOOL_TIP_CancelButton);
-		cancelButton.setMaximumSize(new java.awt.Dimension(85, 25));
-		cancelButton.setMinimumSize(new java.awt.Dimension(85, 25));
-		cancelButton.setPreferredSize(new java.awt.Dimension(85, 25));
+		cancelButton.setMaximumSize(new Dimension(85, 25));
+		cancelButton.setMinimumSize(new Dimension(85, 25));
+		cancelButton.setPreferredSize(new Dimension(85, 25));
 		
 		cancelButton.setEnabled(false);
 		cancelButton.addActionListener(e -> {
@@ -1198,9 +1184,9 @@ public class BatchProcessingDialog extends JDialog {
 
 		skipFileButton = new JButton("Skip");
 		skipFileButton.setToolTipText(TOOL_TIP_SkipFileButton);
-		skipFileButton.setMaximumSize(new java.awt.Dimension(85, 25));
-		skipFileButton.setMinimumSize(new java.awt.Dimension(85, 25));
-		skipFileButton.setPreferredSize(new java.awt.Dimension(85, 25));
+		skipFileButton.setMaximumSize(new Dimension(85, 25));
+		skipFileButton.setMinimumSize(new Dimension(85, 25));
+		skipFileButton.setPreferredSize(new Dimension(85, 25));
 		
 		skipFileButton.setEnabled(false);
 		skipFileButton.addActionListener(e -> skipCurrentFile());
@@ -1705,38 +1691,50 @@ public class BatchProcessingDialog extends JDialog {
 		}
 	}
 
-	public class HelpDialog extends EscapableDialog {
+	public class HelpDialog extends JDialog {
         private JPanel content;
+        private JScrollPane scroll;
+        private JTextArea helpInfo;
 
-        private JTextPane pane;
-        private String helpInfo;
-
-        public HelpDialog(JDialog dialog, String string, boolean modal, String helpInfo) {
+        public HelpDialog(JDialog dialog, String string, ModalityType modal, String text) {
             super(dialog, string, modal);
 
-            this.helpInfo = helpInfo;
+            initComponents(text);
 
-            initComponents();
-            this.transferFocus();
+            this.setLocationRelativeTo(BatchProcessingDialog.this);
+            this.setResizable(true);
+            this.pack();
+            this.setLocationByPlatform(true);
         }
 
-        private void initComponents(){
+        private void initComponents(String text){
             content = new JPanel(new GridBagLayout());
 
-            pane = new JTextPane();
-            pane.setText(helpInfo);
+            helpInfo = new JTextArea(text);
+            helpInfo.setEditable(false); // set textArea non-editable
+            scroll = new JScrollPane(helpInfo);
+            scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+            scroll.setMinimumSize(new Dimension(640,400));
+            scroll.setPreferredSize(new Dimension(640,400));
 
             GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.BOTH;
             gbc.gridx = 0;
             gbc.gridy = 0;
-            gbc.anchor = GridBagConstraints.NORTHWEST;
-            content.add(pane, gbc);
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.weightx = 1;
+            gbc.weighty = 1;
+            content.add(scroll, gbc);
 
             this.getContentPane().setLayout(new GridBagLayout());
 
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 0;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.weightx = 1;
+            gbc.weighty = 1;
             this.getContentPane().add(content, gbc);
         }
     }
