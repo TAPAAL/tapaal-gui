@@ -294,7 +294,6 @@ public class TabTransformer {
     }
 
     public static void unfoldTab(PetriNetTab oldTab, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
-
         ModelChecker engine;
         if(oldTab.getLens().isTimed()){
             engine = new VerifyDTAPN(new FileFinder(), new MessengerImpl());
@@ -312,7 +311,7 @@ public class TabTransformer {
         UnfoldNet thread = new UnfoldNet(engine, new MessengerImpl(), oldTab.getGuiModels(), partition, computeColorFixpoint, useSymmetricVars);
         RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread, "Unfolding");
         SmartDrawDialog.setupWorkerListener(thread);
-        thread.execute(oldTab.network(), oldTab.queries(), oldTab);
+        thread.execute(oldTab.network(), oldTab);
         dialog.setVisible(true);
     }
 
