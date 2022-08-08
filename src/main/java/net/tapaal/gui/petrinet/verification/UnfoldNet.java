@@ -232,8 +232,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         return null;
     }
 
-    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network) {
-        return getQueries(queryFile, network, null);
+    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, TAPNQuery.QueryCategory queryCategory) {
+        return getQueries(queryFile, network, List.of(queryCategory));
     }
     public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories) {
         XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network, queryCategories);

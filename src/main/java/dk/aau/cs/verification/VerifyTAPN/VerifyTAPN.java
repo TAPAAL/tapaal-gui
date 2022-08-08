@@ -308,7 +308,7 @@ public class VerifyTAPN implements ModelChecker {
                                 newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
 
                                 //The query being verified should be the only query
-                                for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
+                                for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network(), query.getCategory())) {
                                     newTab.setInitialName(loadedQuery.getName() + " - unfolded");
                                     loadedQuery.copyOptions(dataLayerQuery);
                                     newTab.addQuery(loadedQuery);
