@@ -331,7 +331,7 @@ public class VerifyPN implements ModelChecker {
                         }
                     } catch (FormatException e) {
                         e.printStackTrace();
-                    } catch (ThreadDeath d) {
+                    } catch (NullPointerException | ThreadDeath n) {
                         return null;
                     }
                 }

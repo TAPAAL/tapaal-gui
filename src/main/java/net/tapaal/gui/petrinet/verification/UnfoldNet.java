@@ -199,6 +199,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
             if(!dummyQuery){
                 for(TAPNQuery query : getQueries(queryOut, loadedModel.network(), queryCategories)){
+                    if (query == null) return null;
                     for(TAPNQuery oldQuery : queries){
                         if(query.getName().equals(oldQuery.getName())){
                             query.copyOptions(oldQuery);
@@ -237,7 +238,11 @@ public class UnfoldNet extends SwingWorker<String, Void> {
     }
     public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories) {
         XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network, queryCategories);
-        return new ArrayList<>(queryLoader.parseQueries().getQueries());
+        try {
+            return new ArrayList<>(queryLoader.parseQueries().getQueries());
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     //XXX: old function to layout the model (before engine supported it)
