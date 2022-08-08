@@ -313,7 +313,7 @@ public class VerifyPN implements ModelChecker {
                             tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
                         }
 
-                        if (!(tapnTrace == null)) {
+                        if (tapnTrace != null) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
                                 newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
@@ -353,7 +353,7 @@ public class VerifyPN implements ModelChecker {
     private TimedArcPetriNetTrace trace(String errorOutput, String standardOutput, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, Tuple<QueryResult, Stats> queryResult) {
         TimedArcPetriNetTrace tapnTrace;
 
-
+        if(!errorOutput.toLowerCase().contains("trace") && !standardOutput.contains("<trace>")) return null;
         if (!errorOutput.contains("Trace") && standardOutput.contains("<trace>")) {
             // Trace is on stdout
             String trace = "Trace:\n";
