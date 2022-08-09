@@ -691,7 +691,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
                 }
             } else {
                 Vector<ColorExpression> currentColor = getColorOfSelection();
-                if (currentColor.size() > 0 && currentColor.get(0).toString().contains(selectedElement.toString())) {
+                if (currentColor.size() > 0 && currentColor.get(0).toString().contains(selectedElement.toString()) && !(currentColor.get(0) instanceof AllExpression)) {
                     expr = currentColor.get(0);
                 } else {
                     expr = new UserOperatorExpression((dk.aau.cs.model.CPN.Color) selectedElement);
