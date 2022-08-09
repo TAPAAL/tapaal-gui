@@ -63,7 +63,8 @@ public class ApproximationWorker {
 
 		result = modelChecker.verify(options, transformedModel, clonedQuery, guiModel, dataLayerQuery, lens);
 
-		if (result.error()) {
+		if (result == null) return null;
+        if (result.error()) {
 			options.setTraceOption(oldTraceOption);
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}

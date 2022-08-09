@@ -76,7 +76,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         TAPNLens lens = oldTab.getLens();
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
-        boolean dummyQuery = false;
         StringBuilder error = new StringBuilder();
 
         File modelFile = null;
@@ -156,7 +155,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), clonedQueries.size(), partition, computeColorFixpoint, symmetricVars);
         }
 
-
         runner = new ProcessRunner(modelChecker.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
 
@@ -206,12 +204,16 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         return null;
     }
 
-    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network) {
-        return getQueries(queryFile, network, null);
+    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, TAPNQuery.QueryCategory queryCategory) {
+        return getQueries(queryFile, network, List.of(queryCategory));
     }
     public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories) {
         XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network, queryCategories);
-        return new ArrayList<>(queryLoader.parseQueries().getQueries());
+        try {
+            return new ArrayList<>(queryLoader.parseQueries().getQueries());
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     //XXX: old function to layout the model (before engine supported it)
