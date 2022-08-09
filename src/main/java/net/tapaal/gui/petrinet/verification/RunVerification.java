@@ -1,17 +1,20 @@
 package net.tapaal.gui.petrinet.verification;
 
 import dk.aau.cs.Messenger;
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.*;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.PNMLoader;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.swinghelpers.GridBagHelper;
+import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -74,8 +77,7 @@ public class RunVerification extends RunVerificationBase {
 						iconSelector.getIconFor(result)
 				);
 
-                if (options.traceOption() != TAPNQuery.TraceOption.NONE) {
-
+                if (options.traceOption() != TAPNQuery.TraceOption.NONE && !modelChecker.getUnfoldCancelled()) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
                         TAPAALGUI.getAnimator().setTrace(result.getTrace());
                     } else {

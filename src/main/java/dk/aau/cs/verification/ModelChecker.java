@@ -30,4 +30,6 @@ public interface ModelChecker {
 
 	String[] getStatsExplanations();
 
+	boolean getUnfoldCancelled();
+
 }

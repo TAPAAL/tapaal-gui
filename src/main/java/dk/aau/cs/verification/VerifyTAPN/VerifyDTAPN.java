@@ -54,6 +54,7 @@ public class VerifyDTAPN implements ModelChecker{
 	protected final Messenger messenger;
 
 	protected ProcessRunner runner;
+	private boolean unfoldCancelled = false;
 
 	public VerifyDTAPN(FileFinder fileFinder, Messenger messenger) {
 		this.fileFinder = fileFinder;
@@ -306,6 +307,7 @@ public class VerifyDTAPN implements ModelChecker{
                         if (tapnTrace != null) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
+                                unfoldCancelled = false;
                                 newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
 
                                 //The query being verified should be the only query
@@ -318,6 +320,7 @@ public class VerifyDTAPN implements ModelChecker{
                                 TAPAALGUI.openNewTabFromStream(newTab);
                             } else {
                                 options.setTraceOption(TraceOption.NONE);
+                                unfoldCancelled = true;
                             }
                         }
 
@@ -341,6 +344,11 @@ public class VerifyDTAPN implements ModelChecker{
 			}
 		}
 	}
+
+    @Override
+    public boolean getUnfoldCancelled() {
+        return unfoldCancelled;
+    }
 
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
 		if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;

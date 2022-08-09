@@ -55,6 +55,7 @@ public class VerifyPN implements ModelChecker {
 
     private ProcessRunner runner;
     private boolean ctlOutput = false;
+    private boolean unfoldCancelled = false;
 
     public VerifyPN(FileFinder fileFinder, Messenger messenger) {
         this.fileFinder = fileFinder;
@@ -289,7 +290,6 @@ public class VerifyPN implements ModelChecker {
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
             } else {
-
                 boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
                 boolean showTrace = ((query.getProperty() instanceof TCTLEFNode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAGNode && !queryResult.value1().isQuerySatisfied()) ||
@@ -316,6 +316,7 @@ public class VerifyPN implements ModelChecker {
                         if (tapnTrace != null) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
+                                unfoldCancelled = false;
                                 newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
 
                                 //The query being verified should be the only query
@@ -327,6 +328,7 @@ public class VerifyPN implements ModelChecker {
                                 TAPAALGUI.openNewTabFromStream(newTab);
                             } else {
                                 options.setTraceOption(TraceOption.NONE);
+                                unfoldCancelled = true;
                             }
                         }
                     } catch (FormatException e) {
@@ -347,6 +349,11 @@ public class VerifyPN implements ModelChecker {
                 return result;
             }
         }
+    }
+
+    @Override
+    public boolean getUnfoldCancelled() {
+        return unfoldCancelled;
     }
 
     @Nullable
