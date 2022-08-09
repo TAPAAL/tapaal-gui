@@ -679,7 +679,9 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         } else {
             ColorExpression expr;
             Object selectedElement = colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedItem();
-            if (selectedElement instanceof String) {
+            if (selectedElement instanceof PlaceHolderColorExpression) {
+                    expr = new PlaceHolderColorExpression();
+            } else if (selectedElement instanceof String) {
                 expr = new AllExpression(colorExpressionComboBoxPanel.getColorType());
             } else if (selectedElement instanceof Variable) {
                 Vector<ColorExpression> currentColor = getColorOfSelection();
@@ -908,7 +910,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
 
     private void updateNumberExpressionsPanel() {
         Expression current = currentSelection.getObject();
-        colorExpressionComboBoxPanel.updateColorType(selectedColorType,context);
+        colorExpressionComboBoxPanel.updateColorType(selectedColorType, context, true);
         numberExpressionJSpinner.setVisible(!(current instanceof ColorExpression));
         updatingSelection = true;
         if (current instanceof NumberOfExpression) {
