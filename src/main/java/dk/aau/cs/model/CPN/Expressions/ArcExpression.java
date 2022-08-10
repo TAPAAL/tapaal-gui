@@ -28,7 +28,7 @@ public abstract class ArcExpression extends Expression {
     public abstract ArcExpression deepCopy();
 
     @Override
-    public abstract ArcExpression findFirstPlaceHolder();
+    public abstract Expression findFirstPlaceHolder();
 
 
     public abstract ColorMultiset eval(ExpressionContext context);
