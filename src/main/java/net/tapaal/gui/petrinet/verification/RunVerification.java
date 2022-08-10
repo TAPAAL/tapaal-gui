@@ -106,19 +106,18 @@ public class RunVerification extends RunVerificationBase {
                 if (result != null && result.errorMessage().contains("Only weight=1")) {
                     String[] split1 = result.errorMessage().split("between ", 2);
                     String[] names;
-                    String message = "The unfolding of this net created weights.\n" +
-                        "This is not supported by this engine and the query could therefore not be verified.";
+                    String message = "The unfolding of this colored net created an unfolded P/T that contains weights on arcs.\n" +
+                        "The verification of such a net is not supported by the continuous timed engine verifytapn.";
                     if (split1.length > 1) {
                         names = split1[1].split(" and | ", 2);
                         if (names != null && names.length > 1) {
                             String place = names[0];
                             String transition = names[1].strip();
-
-                            message = "The unfolding of this net created weights between " + place + " and " + transition +
-                                ".\nThis is not supported by this engine and the query could therefore not be verified.";
+                            message += "\nThe arc between" + place + " and " + transition + " is causing that the unfolded net is weighted.";
                         }
                     }
-                    messenger.displayInfoMessage(message, "Could not verify query");
+                    message += "\n\nThe problem can be also caused by the presence of an inhibitor arc.";
+                    messenger.displayInfoMessage(message, "Could not verify the query");
                     return false;
                 }
             }
