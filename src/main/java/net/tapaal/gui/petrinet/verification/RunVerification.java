@@ -101,14 +101,31 @@ public class RunVerification extends RunVerificationBase {
 			//version GLIB_2.0 not defined in file libc.so.6 with
 			//link time reference
 			//is the error as this (often) means the possibility for a uppaal licence key error
+
+            if (((lens != null && lens.isColored()) || model.isColored())) {
+                if (result != null && result.errorMessage().contains("Only weight=1")) {
+                    String[] split1 = result.errorMessage().split("between ", 2);
+                    String[] names;
+                    String message = "The unfolding of this colored net created an unfolded P/T that contains weights on arcs.\n" +
+                        "The verification of such a net is not supported by the continuous timed engine verifytapn.";
+                    if (split1.length > 1) {
+                        names = split1[1].split(" and | ", 2);
+                        if (names != null && names.length > 1) {
+                            String place = names[0];
+                            String transition = names[1].strip();
+                            message += "\nThe arc between" + place + " and " + transition + " is causing that the unfolded net is weighted.";
+                        }
+                    }
+                    message += "\n\nThe problem can be also caused by the presence of an inhibitor arc.";
+                    messenger.displayInfoMessage(message, "Could not verify the query");
+                    return false;
+                }
+            }
 			
 			String extraInformation = "";
-			
 			if (result != null && (result.errorMessage().contains("relocation") || result.errorMessage().toLowerCase().contains("internet connection is required for activation"))){
-				
 				extraInformation = "We detected an error that often arises when UPPAAL is missing a valid Licence file.\n" +
 						"Open the UPPAAL GUI while connected to the internet to correct this problem.";
-				
 			}
 			
 			String message = "An error occured during the verification." +
@@ -120,9 +137,8 @@ public class RunVerification extends RunVerificationBase {
 				System.getProperty("line.separator") + 	
 				System.getProperty("line.separator");
 			}
-			
 			message += "Model checker output:\n" + result.errorMessage();
-			
+
 			messenger.displayWrappedErrorMessage(message,"Error during verification");
 
 		}
