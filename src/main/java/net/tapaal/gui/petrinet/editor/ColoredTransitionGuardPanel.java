@@ -649,10 +649,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             lessThanEqButton.setEnabled(false);
             lessThanButton.setEnabled(false);
             colorTypeCombobox.setEnabled(false);
-            if(!(currentSelection.getObject() instanceof PlaceHolderExpression)){
-                succButton.setEnabled(true);
-                predButton.setEnabled(true);
-            }
+            succButton.setEnabled(true);
+            predButton.setEnabled(true);
             colorCombobox.setEnabled(true);
         }
         else if (currentSelection.getObject() instanceof GuardExpression) {
