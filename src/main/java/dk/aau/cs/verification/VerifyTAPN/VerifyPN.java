@@ -55,7 +55,6 @@ public class VerifyPN implements ModelChecker {
 
     private ProcessRunner runner;
     private boolean ctlOutput = false;
-    private boolean unfoldCancelled = false;
 
     public VerifyPN(FileFinder fileFinder, Messenger messenger) {
         this.fileFinder = fileFinder;
@@ -281,6 +280,7 @@ public class VerifyPN implements ModelChecker {
         if (runner.error()) {
             return null;
         } else {
+            PetriNetTab newTab = null;
             TimedArcPetriNetTrace tapnTrace = null;
             String errorOutput = readOutput(runner.errorOutput());
             String standardOutput = readOutput(runner.standardOutput());
@@ -302,10 +302,8 @@ public class VerifyPN implements ModelChecker {
                     PNMLoader tapnLoader = new PNMLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
-                    PetriNetTab newTab;
-                    LoadedModel loadedModel = null;
                     try {
-                        loadedModel = tapnLoader.load(fileOut);
+                        LoadedModel loadedModel = tapnLoader.load(fileOut);
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
                         model = newComposer.transformModel(loadedModel.network());
 
@@ -314,21 +312,13 @@ public class VerifyPN implements ModelChecker {
                         }
 
                         if (tapnTrace != null) {
-                            int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
-                            if (dialogResult == JOptionPane.OK_OPTION) {
-                                unfoldCancelled = false;
-                                newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
+                            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
 
-                                //The query being verified should be the only query
-                                for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network(), query.getCategory())) {
-                                    newTab.setInitialName(loadedQuery.getName() + " - unfolded");
-                                    loadedQuery.copyOptions(dataLayerQuery);
-                                    newTab.addQuery(loadedQuery);
-                                }
-                                TAPAALGUI.openNewTabFromStream(newTab);
-                            } else {
-                                options.setTraceOption(TraceOption.NONE);
-                                unfoldCancelled = true;
+                            //The query being verified should be the only query
+                            for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network(), query.getCategory())) {
+                                newTab.setInitialName(loadedQuery.getName() + " - unfolded");
+                                loadedQuery.copyOptions(dataLayerQuery);
+                                newTab.addQuery(loadedQuery);
                             }
                         }
                     } catch (FormatException e) {
@@ -344,16 +334,11 @@ public class VerifyPN implements ModelChecker {
                     tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
                 }
 
-                var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
+                var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
 
                 return result;
             }
         }
-    }
-
-    @Override
-    public boolean getUnfoldCancelled() {
-        return unfoldCancelled;
     }
 
     @Nullable

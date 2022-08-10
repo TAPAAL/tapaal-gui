@@ -53,8 +53,7 @@ public class VerifyTAPN implements ModelChecker {
 	protected final Messenger messenger;
 
 	protected ProcessRunner runner;
-	private boolean unfoldCancelled = false;
-	
+
 	public VerifyTAPN(FileFinder fileFinder, Messenger messenger) {
 		this.fileFinder = fileFinder;
 		this.messenger = messenger;
@@ -272,7 +271,8 @@ public class VerifyTAPN implements ModelChecker {
 		if (runner.error()) {
 			return null;
 		} else {
-			String errorOutput = readOutput(runner.errorOutput());
+            PetriNetTab newTab = null;
+            String errorOutput = readOutput(runner.errorOutput());
 			String standardOutput = readOutput(runner.standardOutput());
 
 			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
@@ -280,7 +280,6 @@ public class VerifyTAPN implements ModelChecker {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
                 TimedArcPetriNetTrace tapnTrace = null;
-
 
                 boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
                 boolean showTrace = ((query.getProperty() instanceof TCTLEFNode && queryResult.value1().isQuerySatisfied()) ||
@@ -292,10 +291,8 @@ public class VerifyTAPN implements ModelChecker {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
-                    PetriNetTab newTab;
-                    LoadedModel loadedModel = null;
                     try {
-                        loadedModel = tapnLoader.load(fileOut);
+                        LoadedModel loadedModel = tapnLoader.load(fileOut);
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
                         model = newComposer.transformModel(loadedModel.network());
 
@@ -304,22 +301,13 @@ public class VerifyTAPN implements ModelChecker {
                         }
 
                         if (tapnTrace != null) {
-                            int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
-                            if (dialogResult == JOptionPane.OK_OPTION) {
-                                unfoldCancelled = false;
-                                newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
+                            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
 
-                                //The query being verified should be the only query
-                                for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network(), query.getCategory())) {
-                                    newTab.setInitialName(loadedQuery.getName() + " - unfolded");
-                                    loadedQuery.copyOptions(dataLayerQuery);
-                                    newTab.addQuery(loadedQuery);
-                                }
-
-                                TAPAALGUI.openNewTabFromStream(newTab);
-                            } else {
-                                options.setTraceOption(TraceOption.NONE);
-                                unfoldCancelled = true;
+                            //The query being verified should be the only query
+                            for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network(), query.getCategory())) {
+                                newTab.setInitialName(loadedQuery.getName() + " - unfolded");
+                                loadedQuery.copyOptions(dataLayerQuery);
+                                newTab.addQuery(loadedQuery);
                             }
                         }
 
@@ -333,15 +321,10 @@ public class VerifyTAPN implements ModelChecker {
                     tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
                 }
 				//return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), standardOutput);
-                return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
+                return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
 			}
 		}
 	}
-
-    @Override
-    public boolean getUnfoldCancelled() {
-        return unfoldCancelled;
-    }
 
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
 		if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;

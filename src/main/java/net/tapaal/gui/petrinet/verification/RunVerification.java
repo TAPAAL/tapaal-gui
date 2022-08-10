@@ -77,8 +77,14 @@ public class RunVerification extends RunVerificationBase {
 						iconSelector.getIconFor(result)
 				);
 
-                if (options.traceOption() != TAPNQuery.TraceOption.NONE && !modelChecker.getUnfoldCancelled()) {
+                if (options.traceOption() != TAPNQuery.TraceOption.NONE) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
+                        if ((lens != null && lens.isColored()) || model.isColored()) {
+                            int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
+                            if (dialogResult == JOptionPane.OK_OPTION) {
+                                TAPAALGUI.openNewTabFromStream(result.getUnfoldedTab());
+                            } else return false;
+                        }
                         TAPAALGUI.getAnimator().setTrace(result.getTrace());
                     } else {
                         if ((

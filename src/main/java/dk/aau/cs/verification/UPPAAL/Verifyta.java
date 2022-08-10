@@ -211,11 +211,6 @@ public class Verifyta implements ModelChecker {
        }
 
     @Override
-    public boolean getUnfoldCancelled() {
-        return false;
-    }
-
-    @Override
 	public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
 		//The combi translation supports all models.
 		return true;
