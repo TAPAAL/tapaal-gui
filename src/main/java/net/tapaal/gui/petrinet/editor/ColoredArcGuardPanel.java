@@ -472,12 +472,14 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         additionButton.addActionListener(actionEvent -> {
             AddExpression addExpr;
             if (currentSelection.getObject() instanceof ArcExpression) {
-                Vector<ArcExpression> vExpr = new Vector<>();
-                ArcExpression newExpr = new NumberOfExpression((Integer) numberExpressionJSpinner.getValue(), getColorExpression());
+                Vector<ArcExpression> exprArc = new Vector<>();
+                Vector<ColorExpression> exprCol = new Vector<>();
+                exprCol.add(new PlaceHolderColorExpression());
+                ArcExpression newExpr = new NumberOfExpression(1, exprCol);
 
-                vExpr.add((ArcExpression) currentSelection.getObject());
-                vExpr.add(newExpr);
-                addExpr = new AddExpression(vExpr);
+                exprArc.add((ArcExpression) currentSelection.getObject());
+                exprArc.add(newExpr);
+                addExpr = new AddExpression(exprArc);
 
                 UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), addExpr);
                 arcExpression = arcExpression.replace(currentSelection.getObject(), addExpr);
@@ -489,7 +491,9 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         subtractionButton.addActionListener(actionEvent -> {
             SubtractExpression subExpr;
             if (currentSelection.getObject() instanceof ArcExpression) {
-                ArcExpression rightExpr = new NumberOfExpression((Integer) numberExpressionJSpinner.getValue(), getColorExpression());
+                Vector<ColorExpression> exprCol = new Vector<>();
+                exprCol.add(new PlaceHolderColorExpression());
+                ArcExpression rightExpr = new NumberOfExpression(1, exprCol);
                 subExpr = new SubtractExpression((ArcExpression) currentSelection.getObject(), rightExpr);
 
                 UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), subExpr);
@@ -873,7 +877,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         currentSelection = position;
 
         updateSelectedColorType();
-        updateNumberExpressionsPanel();
+        updateNumberExpressionsPanel(currentSelection.getObject());
 
         toggleEnabledButtons();
     }
@@ -883,7 +887,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
 
         ExprStringPosition position;
         if (arcExpression.containsPlaceHolder()) {
-            Expression ae = arcExpression.findFirstPlaceHolder();
+            Expression ae = findParent(arcExpression.findFirstPlaceHolder(), arcExpression);
             position = arcExpression.indexOf(ae);
         }
         else {
@@ -893,10 +897,22 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         currentSelection = position;
 
         updateSelectedColorType();
-        updateNumberExpressionsPanel();
+        updateNumberExpressionsPanel(currentSelection.getObject());
 
         toggleEnabledButtons();
 
+    }
+
+    private Expression findParent (Expression child, Expression parent) {
+        for (ExprStringPosition childCheck : parent.getChildren()) {
+            if (child == childCheck.getObject()) {
+                return parent;
+            } else if (!(childCheck.getObject() instanceof PlaceHolderExpression)) {
+                Expression foundParent = findParent(child, childCheck.getObject());
+                if (foundParent != child) return foundParent;
+            }
+        }
+        return child;
     }
 
     private void updateSelectedColorType(){
@@ -908,8 +924,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         }
     }
 
-    private void updateNumberExpressionsPanel() {
-        Expression current = currentSelection.getObject();
+    private void updateNumberExpressionsPanel(Expression current) {
         colorExpressionComboBoxPanel.updateColorType(selectedColorType, context, true);
         numberExpressionJSpinner.setVisible(!(current instanceof ColorExpression));
         updatingSelection = true;
@@ -920,6 +935,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             colorExpressionComboBoxPanel.updateSelection(colorExpression);
         } else if (current instanceof ColorExpression) {
             colorExpressionComboBoxPanel.updateSelection(((ColorExpression) current).getBottomColorExpression());
+        } else if (current instanceof ArcExpression) {
+            updateNumberExpressionsPanel(getSpecificChildOfProperty(1, current));
         }
         updatingSelection = false;
     }
