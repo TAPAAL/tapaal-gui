@@ -67,9 +67,6 @@ public class VerifyTAPNExporter {
 			PrintStream queryStream = new PrintStream(queryFile);
             if (query == null) {
                 throw new FileNotFoundException(null);
-            } else if (query.getCategory() == QueryCategory.CTL && (lens == null || !lens.isGame())) {
-                CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
-                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery == null? model.name() : dataLayerQuery.getName(), false));
             } else if (query.getCategory() == QueryCategory.LTL) {
                 LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
@@ -77,7 +74,8 @@ public class VerifyTAPNExporter {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null, true));
             } else {
-                queryStream.append(query.getProperty().toString());
+                CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery == null? model.name() : dataLayerQuery.getName(), false));
             }
 			queryStream.close();
 		} catch(FileNotFoundException e) {
