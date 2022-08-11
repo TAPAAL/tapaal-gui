@@ -613,7 +613,7 @@ public class ColorTypeDialogPanel extends JPanel {
         }
 
         if (!messages.isEmpty()) {
-            String message = "Color type cannot be modified for the following reasons: \n\n";
+            String message = "The color type cannot be modified for the following reasons: \n\n";
             for (String m : messages) {
                 if (!message.contains(m)) message += m;
             }
@@ -822,7 +822,7 @@ public class ColorTypeDialogPanel extends JPanel {
                 productColorTypeList.setModel(productModel);
                 productRemoveButton.setEnabled(true);
             }else{
-                String message = "Color type cannot be modified for the following reasons: \n\n";
+                String message = "The color type cannot be modified for the following reasons: \n\n";
                 message += String.join("", messages);
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not add color from color type", JOptionPane.WARNING_MESSAGE);
             }
@@ -955,7 +955,7 @@ public class ColorTypeDialogPanel extends JPanel {
             }
 
             if(!messages.isEmpty()) {
-                String message = "Color type cannot be modified for the following reasons: \n\n";
+                String message = "The color type cannot be modified for the following reasons: \n\n";
                 message += String.join("", messages);
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
                 return;
