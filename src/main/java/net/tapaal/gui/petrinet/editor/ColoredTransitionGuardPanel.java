@@ -683,8 +683,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     private void checkSelectionComparison() {
-        if (currentSelection.getObject() instanceof GreaterThanEqExpression || currentSelection.getObject() instanceof GreaterThanExpression ||
-            currentSelection.getObject() instanceof LessThanEqExpression || currentSelection.getObject() instanceof LessThanExpression) {
+        if (currentSelection != null && (currentSelection.getObject() instanceof GreaterThanEqExpression || currentSelection.getObject() instanceof GreaterThanExpression ||
+            currentSelection.getObject() instanceof LessThanEqExpression || currentSelection.getObject() instanceof LessThanExpression)) {
             deleteSelection();
         }
     }
