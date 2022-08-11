@@ -32,14 +32,8 @@ public class VerifyTAPNExporter {
     protected TimedArcPetriNet model;
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TAPNLens lens, NameMapping mapping, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) {
 		File modelFile = createTempFile(".xml");
-		File queryFile;
-		if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL || (lens != null && !lens.isGame() && lens.isColored())) {
-			queryFile = createTempFile(".xml");
-		} else {
-			queryFile = createTempFile(".q");
-		}
+		File queryFile = createTempFile(".xml");
 		this.model = model;
-
 		return export(model, query, modelFile, queryFile, dataLayerQuery, lens, mapping, guiModel);
 	}
 
