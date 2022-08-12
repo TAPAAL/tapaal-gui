@@ -395,7 +395,7 @@ public class ColorTypeDialogPanel extends JPanel {
         JPanel firstRow = new JPanel();
         firstRow.setLayout(new GridBagLayout());
 
-        JLabel enumNameLabel = new JLabel("Name: ");
+        JLabel enumNameLabel = new JLabel("Element name: ");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
