@@ -1,6 +1,5 @@
 package net.tapaal.gui.petrinet.editor;
 
-import dk.aau.cs.util.Tuple;
 import net.tapaal.gui.petrinet.Context;
 import net.tapaal.gui.petrinet.undo.Colored.SetArcExpressionCommand;
 import net.tapaal.gui.petrinet.undo.Colored.SetColoredArcIntervalsCommand;
@@ -473,9 +472,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             AddExpression addExpr;
             if (currentSelection.getObject() instanceof ArcExpression) {
                 Vector<ArcExpression> exprArc = new Vector<>();
-                Vector<ColorExpression> exprCol = new Vector<>();
-                exprCol.add(new PlaceHolderColorExpression());
-                ArcExpression newExpr = new NumberOfExpression(1, exprCol);
+                ArcExpression newExpr = new NumberOfExpression(1, getPlaceholderVec());
 
                 exprArc.add((ArcExpression) currentSelection.getObject());
                 exprArc.add(newExpr);
@@ -491,9 +488,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         subtractionButton.addActionListener(actionEvent -> {
             SubtractExpression subExpr;
             if (currentSelection.getObject() instanceof ArcExpression) {
-                Vector<ColorExpression> exprCol = new Vector<>();
-                exprCol.add(new PlaceHolderColorExpression());
-                ArcExpression rightExpr = new NumberOfExpression(1, exprCol);
+                ArcExpression rightExpr = new NumberOfExpression(1, getPlaceholderVec());
                 subExpr = new SubtractExpression((ArcExpression) currentSelection.getObject(), rightExpr);
 
                 UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), subExpr);
@@ -545,6 +540,26 @@ public abstract class ColoredArcGuardPanel extends JPanel {
 
         regularArcExprPanel.add(arithmeticPanel,gbc);
 
+    }
+
+    private Vector<ColorExpression> getPlaceholderVec() {
+        Vector<ColorExpression> vec = new Vector<>();
+        ColorExpression c = getColorExpression().get(0);
+        if (c instanceof TupleExpression) {
+            int size = ((TupleExpression) c).getColors().size();
+            vec.add(createPlaceholderTuple(size));
+        } else {
+            vec.add(new PlaceHolderColorExpression());
+        }
+        return vec;
+    }
+
+    private TupleExpression createPlaceholderTuple(int size) {
+        Vector<ColorExpression> placeholders = new Vector<>();
+        for (int i = 0; i < size; i++) {
+            placeholders.add(new PlaceHolderColorExpression());
+        }
+        return new TupleExpression(placeholders);
     }
 
     private void initNumberExpressionsPanel() {
@@ -669,7 +684,9 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             for (int i = 0; i < colorExpressionComboBoxPanel.getColorTypeComboBoxesArray().length; i++) {
                 ColorExpression expr;
                 Object selectedElement = colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[i].getSelectedItem();
-                if (selectedElement instanceof String) {
+                if (selectedElement instanceof PlaceHolderColorExpression) {
+                    expr = new PlaceHolderColorExpression();
+                } else if (selectedElement instanceof String) {
                     expr = new AllExpression(((ProductType) colorExpressionComboBoxPanel.getColorType()).getColorTypes().get(i));
                 } else if (selectedElement instanceof Variable) {
                     expr = new VariableExpression((Variable) selectedElement);
@@ -925,7 +942,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     }
 
     private void updateNumberExpressionsPanel(Expression current) {
-        colorExpressionComboBoxPanel.updateColorType(selectedColorType, context, true);
+        colorExpressionComboBoxPanel.updateColorType(selectedColorType, context, true, false);
         numberExpressionJSpinner.setVisible(!(current instanceof ColorExpression));
         updatingSelection = true;
         if (current instanceof NumberOfExpression) {
