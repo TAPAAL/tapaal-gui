@@ -238,13 +238,13 @@ public class QueryDialog extends JPanel {
 	private final static EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
     private final static EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
     private final static EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
-    private final static EngineSupportOptions UPPAAALStandardOptions = new UPPAAALStandardOptions();
+    private final static EngineSupportOptions UPPAALStandardOptions = new UPPAALStandardOptions();
     private final static EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
     private final static EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options();
     private final static EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNEngineOptions();
     private final static EngineSupportOptions verifyPNOptions = new VerifyPNEngineOptions();
 
-    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
+    private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions, UPPAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
 
     private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
