@@ -353,14 +353,15 @@ public class ApproximationWorker {
             NameMapping nameMapping = isColored? result.getUnfoldedModel().value2(): transformedModel.value2();
             TimedArcPetriNetNetwork netNetwork = isColored? result.getUnfoldedModel().value1().parentNetwork(): model;
 			toReturn =  new VerificationResult<TAPNNetworkTrace>(
-					result.getQueryResult(),
-					decomposeTrace(result.getTrace(), nameMapping, netNetwork),
-					decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
-					result.verificationTime(),
-					result.stats(),
-					false,
-                    result.getRawOutput(),
-                    result.getUnfoldedModel());
+			    result.getQueryResult(),
+                decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+                decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                result.verificationTime(),
+                result.stats(),
+                false,
+                result.getRawOutput(),
+                result.getUnfoldedModel(),
+                result.getUnfoldedTab());
 			toReturn.setNameMapping(nameMapping);
 		}
 		
