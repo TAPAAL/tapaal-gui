@@ -95,17 +95,17 @@ public abstract class ColorComboboxPanel extends JPanel {
     }
 
     public void updateColorType(ColorType ct){
-        updateColorType(ct, null);
+        updateColorType(ct, null, false, false);
     }
-    public void updateColorType(ColorType ct, Context context){
-        updateColorType(ct, context, false);
+    public void updateColorType(ColorType ct, boolean transitionDialog){
+        updateColorType(ct, null, false, transitionDialog);
     }
-    public void updateColorType(ColorType ct, Context context, boolean includePlaceHolder) {
+    public void updateColorType(ColorType ct, Context context, boolean includePlaceHolder, boolean transitionDialog) {
         removeOldComboBoxes();
         colorType = ct;
 
         if (colorType instanceof ProductType) {
-            int numberOfComBoboxes = includePlaceHolder ? 1 : ((ProductType) colorType).getColorTypes().size();
+            int numberOfComBoboxes =  transitionDialog ? 1 : ((ProductType) colorType).getColorTypes().size();
             colorTypeComboBoxesArray = new JComboBox[numberOfComBoboxes];
 
             for (int i = 0; i < colorTypeComboBoxesArray.length; i++) {

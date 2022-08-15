@@ -117,11 +117,10 @@ public class NumberOfExpression extends ArcExpression {
     }
 
     @Override
-    public ArcExpression findFirstPlaceHolder() {
+    public Expression findFirstPlaceHolder() {
         for (ColorExpression expr : color) {
             if (expr.containsPlaceHolder()) {
-                return null;
-            //  return expr.findFirstPlaceHolder();
+                return expr.findFirstPlaceHolder();
             }
         }
         return null;
