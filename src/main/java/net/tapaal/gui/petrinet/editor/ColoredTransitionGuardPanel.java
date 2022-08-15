@@ -583,6 +583,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             colorTypeCombobox.setSelectedIndex(0);
         doColorTypeUndo = true;
         updateSelection(newProperty);
+        colorTypeCombobox.setEnabled(newProperty instanceof PlaceHolderGuardExpression);
     }
 
     private void addColor() {
@@ -745,11 +746,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         if (colorType != null) return colorType;
 
         // Checks string positions if the above fails to find a color
-        ExprStringPosition[] childrenPositions = property.getChildren();
-        for (ExprStringPosition child : childrenPositions) {
-            children.add(child.getObject());
-        }
-        return getColorType(children);
+        return getColorType(getChildrenExpressions(property.getChildren()));
     }
 
     private ColorType getColorType(List<Expression> children) {
@@ -758,10 +755,20 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         for (Expression child : children) {
             if (child instanceof ColorExpression) {
                 types.add(((ColorExpression) child).getColorType(colorTypes));
+            } else if (child instanceof GuardExpression) {
+                return getColorType(getChildrenExpressions(child.getChildren()));
             }
         }
         if (types.size() > 0) return types.get(0);
         return null;
+    }
+
+    private List<Expression> getChildrenExpressions(ExprStringPosition[] childrenPosition) {
+        List<Expression> children = new ArrayList<>();
+        for (ExprStringPosition child : childrenPosition) {
+            children.add(child.getObject());
+        }
+        return children;
     }
 
     private List<Expression> getPropertyChildren(ExprStringPosition[] children) {
@@ -770,7 +777,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             if (child.getObject().getChildren().length > 0) {
                 possibleExpressions.addAll(getPropertyChildren(child.getObject().getChildren()));
             }
-            if (currentSelection != null && child.getEnd() < currentSelection.getStart()) {
+            if (currentSelection != null && child.getEnd() >= 0 && child.getEnd() < currentSelection.getStart()) {
                 possibleExpressions.add(child.getObject());
             }
         }
@@ -911,7 +918,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     expr = new PlaceHolderColorExpression();
                 }
                 newProperty = newProperty.replace(child.getObject(), expr);
-            } else if (parent instanceof NotExpression && child.getObject() instanceof LeftRightGuardExpression) {
+            } else if (parent instanceof GuardExpression && child.getObject() instanceof LeftRightGuardExpression) {
                 updateChildren(ct, child.getObject(), child.getObject().getChildren());
             }
         }
