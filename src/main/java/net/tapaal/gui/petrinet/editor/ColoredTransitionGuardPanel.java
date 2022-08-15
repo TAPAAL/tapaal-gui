@@ -683,8 +683,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     private void checkSelectionComparison() {
-        if (currentSelection.getObject() instanceof GreaterThanEqExpression || currentSelection.getObject() instanceof GreaterThanExpression ||
-            currentSelection.getObject() instanceof LessThanEqExpression || currentSelection.getObject() instanceof LessThanExpression) {
+        if (currentSelection != null && (currentSelection.getObject() instanceof GreaterThanEqExpression || currentSelection.getObject() instanceof GreaterThanExpression ||
+            currentSelection.getObject() instanceof LessThanEqExpression || currentSelection.getObject() instanceof LessThanExpression)) {
             deleteSelection();
         }
     }
@@ -735,7 +735,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     newColorType = ((ProductType) ct).getConstituents().firstElement();
                 else
                     newColorType = ((ProductType) ct).getConstituents().get(((ColorExpression) currentSelection.getObject()).getIndex());
-                colorCombobox.updateColorType(newColorType, context, true);
+                colorCombobox.updateColorType(newColorType, context, true, true);
             }
             ColorExpression exprToCheck = ((ColorExpression) currentSelection.getObject()).getBottomColorExpression();
             colorCombobox.updateSelection(exprToCheck);
@@ -882,7 +882,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private void updateColorType() {
         ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
         if (ct != null) {
-            colorCombobox.updateColorType(ct, context, true);
+            colorCombobox.updateColorType(ct, context, true, true);
         }
         updateEnabledButtons();
         if (doColorTypeUndo) updateExpression();
