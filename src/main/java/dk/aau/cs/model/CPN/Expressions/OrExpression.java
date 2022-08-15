@@ -64,7 +64,7 @@ public class OrExpression extends GuardExpression {
 
     @Override
     public GuardExpression copy() {
-        return new AndExpression(left, right);
+        return new AndExpression(left.copy(), right.copy());
     }
 
     @Override

@@ -40,7 +40,7 @@ public class NotExpression extends GuardExpression {
 
     @Override
     public GuardExpression copy() {
-        return new NotExpression(expr);
+        return new NotExpression(expr.copy());
     }
 
     @Override
