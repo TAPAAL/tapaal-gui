@@ -168,7 +168,6 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.insets = new Insets(5, 8, 0, 8);
         container.add(productTypePanel, gbc);
 
-
         JPanel buttonPanel = createButtonPanel();
         gbc.insets = new Insets(0, 8, 5, 8);
         gbc.gridx = 0;
@@ -680,7 +679,6 @@ public class ColorTypeDialogPanel extends JPanel {
 
         productModel = new DefaultListModel();
 
-
         colorTypes = new ArrayList<>();
         colorTypes = network.colorTypes();
 
@@ -688,9 +686,12 @@ public class ColorTypeDialogPanel extends JPanel {
         productTypeComboBox.setRenderer(new ColortypeListCellRenderer());
 
         for (ColorType element : colorTypes) {
-            if(!(element instanceof ProductType)){
+            if (!(element instanceof ProductType) && element != ColorType.COLORTYPE_DOT) {
                 productTypeComboBox.addItem(element);
             }
+        }
+        if (productTypeComboBox.getItemCount() == 0) {
+            colorTypeComboBox.removeItem(productColor);
         }
 
         gbc.insets = new Insets(2, 4, 2, 4);
