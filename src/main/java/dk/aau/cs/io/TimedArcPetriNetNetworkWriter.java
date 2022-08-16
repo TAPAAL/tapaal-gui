@@ -114,7 +114,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		appendTemplates(document, pnmlRootNode);
 
         appendQueries(document, pnmlRootNode);
-		appendDefaultBound(document, pnmlRootNode);
 		appendFeature(document, pnmlRootNode);
 
 		document.normalize();
@@ -160,12 +159,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 							+ file.getCanonicalPath()
 							+ "\"" + e);
 		}
-	}
-	
-	private void appendDefaultBound(Document document, Element root) {
-		Element element = document.createElement("k-bound");
-		element.setAttribute("bound", network.getDefaultBound() + "");
-		root.appendChild(element);
 	}
 
     private void appendFeature(Document document, Element root) {

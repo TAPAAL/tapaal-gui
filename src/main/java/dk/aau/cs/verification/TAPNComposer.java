@@ -116,7 +116,7 @@ public class TAPNComposer implements ITAPNComposer {
 	}
 
 	private boolean isComponentEmpty(DataLayer guiModel) {
-		return guiModel.getPlaces().length == 0 && guiModel.getTransitions().length == 0;
+		return guiModel == null || guiModel.getPlaces().length == 0 && guiModel.getTransitions().length == 0;
 	}
         
 	private PlaceTransitionObject getRightmostObject(DataLayer guiModel) {

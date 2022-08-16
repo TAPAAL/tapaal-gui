@@ -115,23 +115,14 @@ public class TapnEngineXmlLoader {
             }
         }
 		network.buildConstraints();
-		
-		parseBound(doc, network);
-
 		parseFeature(doc, network);
+		network.setDefaultBound(3); // Ignores k-bounds in .tapn files
 
         if (hasFeatureTag) {
             return new LoadedModel(network, templates, loadedQueries.getQueries(), messages, lens);
         } else {
             return new LoadedModel(network, templates, loadedQueries.getQueries(), messages, null);
         }
-	}
-
-	private void parseBound(Document doc, TimedArcPetriNetNetwork network){
-		if(doc.getElementsByTagName("k-bound").getLength() > 0){
-			int i = Integer.parseInt(doc.getElementsByTagName("k-bound").item(0).getAttributes().getNamedItem("bound").getNodeValue());
-			network.setDefaultBound(i);
-		}
 	}
 
     private void parseFeature(Document doc, TimedArcPetriNetNetwork network) {
