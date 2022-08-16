@@ -352,7 +352,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 		Element queryElement = document.createElement("query");
 
-		Node queryFormula = XMLQueryStringToElement(new CTLQueryVisitor().getXMLQueryFor(query.getProperty(), query.getName(), false));
+		CTLQueryVisitor ctlQueryVisitor = new CTLQueryVisitor();
+		ctlQueryVisitor.buildXMLQuery(query.getProperty(), query.getName(), false);
+
+		Node queryFormula = XMLQueryStringToElement(ctlQueryVisitor.getXMLQuery().toString());
 		queryElement.appendChild(document.importNode(queryFormula, true));
 		
 		queryElement.setAttribute("name", query.getName());
