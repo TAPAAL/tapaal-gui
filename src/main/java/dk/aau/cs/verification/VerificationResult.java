@@ -8,6 +8,7 @@ import java.util.List;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.util.Tuple;
+import pipe.gui.petrinet.PetriNetTab;
 
 public class VerificationResult<TTrace> {
 	private QueryResult queryResult;
@@ -20,6 +21,7 @@ public class VerificationResult<TTrace> {
 	private TTrace secondaryTrace;
 
 	private Tuple<TimedArcPetriNet, NameMapping> unfoldedModel;
+	private PetriNetTab unfoldedTab;
     private boolean resolvedUsingSkeletonPreprocessor = false;
 
     public boolean isSolvedUsingQuerySimplification() {
@@ -45,12 +47,13 @@ public class VerificationResult<TTrace> {
 		this.stats = stats;
 		this.rawOutput = rawOutput;
 	}
-	
-	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel){
-		this(queryResult, trace, verificationTime, stats, rawOutput);
-		//this.solvedUsingStateEquation = isSolvedUsingStateEquation; // This was the old value using for both state equation and untimed skeleton check
-		this.unfoldedModel = unfoldedModel;
-	}
+
+    public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel, PetriNetTab unfoldedTab){
+        this(queryResult, trace, verificationTime, stats, rawOutput);
+        //this.solvedUsingStateEquation = isSolvedUsingStateEquation; // This was the old value using for both state equation and untimed skeleton check
+        this.unfoldedModel = unfoldedModel;
+        this.unfoldedTab = unfoldedTab;
+    }
 
 	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, String rawOutput) {
 		this(queryResult, trace, verificationTime, new NullStats(), rawOutput);
@@ -67,7 +70,7 @@ public class VerificationResult<TTrace> {
 			Stats value2,
 			boolean isSolvedUsingStateEquation,
             Tuple<TimedArcPetriNet, NameMapping> unfoldedModel) {
-		this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, null, unfoldedModel);
+		this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, null, unfoldedModel, null);
 		this.secondaryTrace = secondaryTrace2;
 	}
 
@@ -76,7 +79,16 @@ public class VerificationResult<TTrace> {
                               TTrace secondaryTrace2, long runningTime,
                               Stats value2,
                               boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel) {
-        this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, rawOutput, unfoldedModel);
+        this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, rawOutput, unfoldedModel, null);
+        this.secondaryTrace = secondaryTrace2;
+    }
+
+    public VerificationResult(QueryResult value1,
+                              TTrace tapnTrace,
+                              TTrace secondaryTrace2, long runningTime,
+                              Stats value2,
+                              boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel, PetriNetTab unfoldedTab) {
+        this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, rawOutput, unfoldedModel, unfoldedTab);
         this.secondaryTrace = secondaryTrace2;
     }
 
@@ -154,7 +166,9 @@ public class VerificationResult<TTrace> {
 		return secondaryTrace;
 	}
 
-	public Tuple<TimedArcPetriNet, NameMapping> getUnfoldedModel() { return unfoldedModel;}
+    public Tuple<TimedArcPetriNet, NameMapping> getUnfoldedModel() { return unfoldedModel;}
+
+    public PetriNetTab getUnfoldedTab() { return unfoldedTab;}
 
 	public String errorMessage() {
 		return errorMessage;
