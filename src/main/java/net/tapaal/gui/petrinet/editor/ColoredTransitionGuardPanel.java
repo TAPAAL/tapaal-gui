@@ -888,7 +888,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             colorCombobox.updateColorType(ct, context, true, true);
         }
         updateEnabledButtons();
-        if (doColorTypeUndo) updateExpression();
+        if (doColorTypeUndo && !(currentSelection.getObject() instanceof PlaceHolderGuardExpression)) updateExpression();
     }
 
     private void updateExpression() {
