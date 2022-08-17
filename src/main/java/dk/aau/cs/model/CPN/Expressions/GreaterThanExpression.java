@@ -84,7 +84,7 @@ public class GreaterThanExpression extends GuardExpression implements LeftRightG
 
     @Override
     public GuardExpression copy() {
-        return new GreaterThanExpression(left.copy(), right.copy());
+        return new GreaterThanExpression(left, right);
     }
 
     @Override

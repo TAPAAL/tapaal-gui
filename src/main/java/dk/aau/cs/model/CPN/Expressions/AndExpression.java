@@ -118,7 +118,7 @@ public class AndExpression extends GuardExpression {
 
     @Override
     public GuardExpression copy() {
-       return new AndExpression(left.copy(), right.copy());
+       return new AndExpression(left, right);
     }
 
 }
