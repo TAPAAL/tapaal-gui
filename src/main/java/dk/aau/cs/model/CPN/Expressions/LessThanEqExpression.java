@@ -46,7 +46,7 @@ public class LessThanEqExpression extends GuardExpression implements LeftRightGu
 
     @Override
     public GuardExpression copy() {
-        return new LessThanEqExpression(left.copy(), right.copy());
+        return new LessThanEqExpression(left, right);
     }
 
     @Override
