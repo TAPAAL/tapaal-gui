@@ -902,15 +902,14 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             colorCombobox.updateColorType(ct, context, true, true);
         }
         updateEnabledButtons();
-        if (doColorTypeUndo) updateExpression();
+        if (doColorTypeUndo && !(currentSelection.getObject() instanceof PlaceHolderGuardExpression)) updateExpression();
     }
 
     private void updateExpression() {
         ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
-        Expression oldProperty = currentSelection.getObject();
-
         if (ct == getColorType(newProperty)) return;
 
+        Expression oldProperty = currentSelection.getObject();
         if (doColorTypeUndo) {
             replaceAndAddToUndo(oldProperty, getTypeReplacement(ct));
         } else {
@@ -919,21 +918,22 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         }
     }
 
-    private GuardExpression getTypeReplacement(ColorType ct) {
-        GuardExpression replacement = newProperty.copy();
+    private Expression getTypeReplacement(ColorType ct) {
+        Expression replacement = newProperty.copy();
         if (replacement.indexOf(replacement).getStart() == currentSelection.getStart() && replacement.indexOf(replacement).getEnd() == currentSelection.getEnd()) {
             return updateChildren(replacement, ct, replacement, replacement.getChildren());
         }
 
         for (ExprStringPosition exprStr : replacement.getChildren()) {
             if (exprStr.getStart() == currentSelection.getStart() && exprStr.getEnd() == currentSelection.getEnd()) {
-                return updateChildren(replacement, ct, exprStr.getObject(), exprStr.getObject().getChildren());
+                replacement = exprStr.getObject().copy();
+                return updateChildren(replacement, ct, replacement, replacement.getChildren());
             }
         }
         return null;
     }
 
-    private GuardExpression updateChildren(GuardExpression replaceProperty, ColorType ct, Expression parent, ExprStringPosition[] children) {
+    private Expression updateChildren(Expression replaceProperty, ColorType ct, Expression parent, ExprStringPosition[] children) {
         for (ExprStringPosition child : children) {
             if (child.getObject() instanceof ColorExpression) {
                 Expression expr;
