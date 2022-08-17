@@ -722,6 +722,7 @@ public class ColorTypeDialogPanel extends JPanel {
         JPanel scrollPanePanel = new JPanel();
         scrollPanePanel.setLayout(new GridBagLayout());
         productColorTypeList = new JList();
+        productColorTypeList.setCellRenderer(new ColortypeListCellRenderer());
         productColorTypeList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 JList source = (JList) e.getSource();
