@@ -162,8 +162,9 @@ public class TapnXmlLoader {
         }
 		parseSharedPlaces(doc, network, constants);
 		parseSharedTransitions(doc, network);
-		
-		Collection<Template> templates = parseTemplates(doc, network, constants);
+        parseFeature(doc, network);
+
+        Collection<Template> templates = parseTemplates(doc, network, constants);
 		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network).parseQueries();
 
 		if (loadedQueries != null) {
@@ -172,7 +173,6 @@ public class TapnXmlLoader {
             }
         }
 		network.buildConstraints();
-		parseFeature(doc, network);
         network.setDefaultBound(3); // Ignores k-bounds in .tapn files
 
         if (hasFeatureTag) {
@@ -559,7 +559,9 @@ public class TapnXmlLoader {
 		}else{
 		    p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), parsePlaceColorType(place));
 		    tapn.add(p);
-		    addColoredDependencies(p,place, network, constants);
+		    if (lens == null || lens.isColored()) {
+                addColoredDependencies(p, place, network, constants);
+            }
 
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
