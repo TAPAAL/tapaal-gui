@@ -111,16 +111,18 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         predButton.addActionListener(actionEvent -> {
             PredecessorExpression predExpr;
             if (currentSelection.getObject() instanceof ColorExpression) {
-                predExpr = new PredecessorExpression((ColorExpression) currentSelection.getObject());
-                replaceAndAddToUndo(currentSelection.getObject(), predExpr);
+                Expression oldExpr = getOldExpression(newProperty);
+                predExpr = new PredecessorExpression((ColorExpression) oldExpr);
+                replaceAndAddToUndo(oldExpr, predExpr);
             }
         });
 
         succButton.addActionListener(actionEvent -> {
             SuccessorExpression succExpr;
             if (currentSelection.getObject() instanceof  ColorExpression) {
-                succExpr = new SuccessorExpression((ColorExpression) currentSelection.getObject());
-                replaceAndAddToUndo(currentSelection.getObject(), succExpr);
+                Expression oldExpr = getOldExpression(newProperty);
+                succExpr = new SuccessorExpression((ColorExpression) oldExpr);
+                replaceAndAddToUndo(oldExpr, succExpr);
             }
         });
 
@@ -168,6 +170,18 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         add(colorExpressionPanel, gbc);
+    }
+
+    private Expression getOldExpression(Expression parent) {
+        for (ExprStringPosition child : parent.getChildren()) {
+            if (child.getObject() == currentSelection.getObject()) {
+                return (parent instanceof GuardExpression) ? child.getObject() : parent;
+            } else {
+                Expression possibleExpr = getOldExpression(child.getObject());
+                if (possibleExpr != null) return possibleExpr;
+            }
+        }
+        return currentSelection.getObject();
     }
 
     private void initLogicPanel() {
