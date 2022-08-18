@@ -1075,8 +1075,9 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             ColorType ct = ((ColorExpression) currentSelection.getObject()).getColorType();
             if (ct == null && currentSelection.getObject() instanceof TupleExpression)
                 return ((TupleExpression) currentSelection.getObject()).getColorType(context.network().colorTypes());
+            else
+                return ct;
         }
-
         return null;
     }
 
