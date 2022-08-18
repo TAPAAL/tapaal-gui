@@ -97,6 +97,6 @@ public class DotConstantExpression extends UserOperatorExpression {
 
     @Override
     public Vector<ColorType> getColorTypes() {
-        return new Vector<>(Collections.singletonList(ColorType.COLORTYPE_DOT));
+        return new Vector<>(Collections.singletonList(colorType));
     }
 }
