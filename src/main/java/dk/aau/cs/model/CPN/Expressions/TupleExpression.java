@@ -149,7 +149,9 @@ public class TupleExpression extends ColorExpression {
 
     @Override
     public ColorExpression copy() {
-        return new TupleExpression(new Vector<>(colors), colorType.copy());
+        return (colorType == null) ?
+            new TupleExpression(new Vector<>(colors)) :
+            new TupleExpression(new Vector<>(colors), colorType.copy());
     }
 
     @Override
@@ -160,7 +162,9 @@ public class TupleExpression extends ColorExpression {
             colorsCopy.add(expr.deepCopy());
         }
 
-        return new TupleExpression(colorsCopy, colorType.copy());
+        return (colorType == null) ?
+            new TupleExpression(colorsCopy) :
+            new TupleExpression(colorsCopy, colorType.copy());
     }
 
     @Override
@@ -241,9 +245,9 @@ public class TupleExpression extends ColorExpression {
     }
 
     @Override
-    public Vector<ColorType> getColorTypes(){
+    public Vector<ColorType> getColorTypes() {
         Vector<ColorType> constituentColorTypes = new Vector<>();
-        //assumes single level producttypes
+        //assumes single level productTypes
         for(ColorExpression uexpr : getColors()){
             constituentColorTypes.addAll(uexpr.getColorTypes());
         }

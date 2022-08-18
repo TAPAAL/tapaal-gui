@@ -115,7 +115,7 @@ public class SuccessorExpression extends ColorExpression {
     }
 
     @Override
-    public Vector<ColorType> getColorTypes(){
+    public Vector<ColorType> getColorTypes() {
         return color.getColorTypes();
     }
 }
