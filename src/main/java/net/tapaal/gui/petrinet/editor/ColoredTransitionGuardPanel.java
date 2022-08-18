@@ -583,6 +583,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             colorTypeCombobox.setSelectedIndex(0);
         doColorTypeUndo = true;
         updateSelection(newProperty);
+        colorTypeCombobox.setEnabled(newProperty instanceof PlaceHolderGuardExpression);
     }
 
     private void addColor() {
@@ -666,11 +667,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             succButton.setEnabled(false);
             predButton.setEnabled(false);
             colorCombobox.setEnabled(false);
-            if (currentSelection.getObject() instanceof PlaceHolderGuardExpression) {
-                colorTypeCombobox.setEnabled(false);
-            } else {
-                colorTypeCombobox.setEnabled(true);
-            }
+            colorTypeCombobox.setEnabled(true);
         }
         if (colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex()) instanceof ProductType) {
             greaterThanButton.setEnabled(false);
@@ -749,11 +746,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         if (colorType != null) return colorType;
 
         // Checks string positions if the above fails to find a color
-        ExprStringPosition[] childrenPositions = property.getChildren();
-        for (ExprStringPosition child : childrenPositions) {
-            children.add(child.getObject());
-        }
-        return getColorType(children);
+        return getColorType(getChildrenExpressions(property.getChildren()));
     }
 
     private ColorType getColorType(List<Expression> children) {
@@ -762,10 +755,20 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         for (Expression child : children) {
             if (child instanceof ColorExpression) {
                 types.add(((ColorExpression) child).getColorType(colorTypes));
+            } else if (child instanceof GuardExpression) {
+                return getColorType(getChildrenExpressions(child.getChildren()));
             }
         }
         if (types.size() > 0) return types.get(0);
         return null;
+    }
+
+    private List<Expression> getChildrenExpressions(ExprStringPosition[] childrenPosition) {
+        List<Expression> children = new ArrayList<>();
+        for (ExprStringPosition child : childrenPosition) {
+            children.add(child.getObject());
+        }
+        return children;
     }
 
     private List<Expression> getPropertyChildren(ExprStringPosition[] children) {
@@ -774,7 +777,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             if (child.getObject().getChildren().length > 0) {
                 possibleExpressions.addAll(getPropertyChildren(child.getObject().getChildren()));
             }
-            if (currentSelection != null && child.getEnd() < currentSelection.getStart()) {
+            if (currentSelection != null && child.getEnd() >= 0 && child.getEnd() < currentSelection.getStart()) {
                 possibleExpressions.add(child.getObject());
             }
         }
@@ -885,27 +888,38 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             colorCombobox.updateColorType(ct, context, true, true);
         }
         updateEnabledButtons();
-        if (doColorTypeUndo) updateExpression();
+        if (doColorTypeUndo && !(currentSelection.getObject() instanceof PlaceHolderGuardExpression)) updateExpression();
     }
 
     private void updateExpression() {
         ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
-        ExprStringPosition[] children = currentSelection.getObject().getChildren();
-        Expression oldProperty = currentSelection.getObject().copy();
-
         if (ct == getColorType(newProperty)) return;
 
-        updateChildren(ct, currentSelection.getObject(), children);
-
+        Expression oldProperty = currentSelection.getObject();
         if (doColorTypeUndo) {
-            replaceAndAddToUndo(oldProperty, newProperty);
+            replaceAndAddToUndo(oldProperty, getTypeReplacement(ct));
         } else {
-            newProperty = newProperty.replace(oldProperty, newProperty);
+            newProperty = newProperty.replace(oldProperty, updateChildren(newProperty, ct, currentSelection.getObject(), currentSelection.getObject().getChildren()));
             updateSelection(newProperty);
         }
     }
 
-    private void updateChildren(ColorType ct, Expression parent, ExprStringPosition[] children) {
+    private Expression getTypeReplacement(ColorType ct) {
+        Expression replacement = newProperty.copy();
+        if (replacement.indexOf(replacement).getStart() == currentSelection.getStart() && replacement.indexOf(replacement).getEnd() == currentSelection.getEnd()) {
+            return updateChildren(replacement, ct, replacement, replacement.getChildren());
+        }
+
+        for (ExprStringPosition exprStr : replacement.getChildren()) {
+            if (exprStr.getStart() == currentSelection.getStart() && exprStr.getEnd() == currentSelection.getEnd()) {
+                replacement = exprStr.getObject().copy();
+                return updateChildren(replacement, ct, replacement, replacement.getChildren());
+            }
+        }
+        return null;
+    }
+
+    private Expression updateChildren(Expression replaceProperty, ColorType ct, Expression parent, ExprStringPosition[] children) {
         for (ExprStringPosition child : children) {
             if (child.getObject() instanceof ColorExpression) {
                 Expression expr;
@@ -914,11 +928,12 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 } else {
                     expr = new PlaceHolderColorExpression();
                 }
-                newProperty = newProperty.replace(child.getObject(), expr);
-            } else if (parent instanceof NotExpression && child.getObject() instanceof LeftRightGuardExpression) {
-                updateChildren(ct, child.getObject(), child.getObject().getChildren());
+                replaceProperty = replaceProperty.replace(child.getObject(), expr);
+            } else if (parent instanceof GuardExpression && child.getObject() instanceof LeftRightGuardExpression) {
+                replaceProperty = updateChildren(replaceProperty, ct, child.getObject(), child.getObject().getChildren());
             }
         }
+        return replaceProperty;
     }
 
     // /////////////////////////////////////////////////////////////////////
