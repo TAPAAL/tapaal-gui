@@ -35,11 +35,6 @@ public class DotConstantExpression extends UserOperatorExpression {
         return false;
     }
 
-    @Override
-    public ColorType getColorType(List<ColorType> colorTypes) {
-        return getColorType();
-    }
-
     public ColorType getColorType() {
         return ColorType.COLORTYPE_DOT;
     }

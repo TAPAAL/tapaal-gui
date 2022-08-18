@@ -25,6 +25,7 @@ public class AllExpression extends ColorExpression {
     }
 
     public AllExpression(ColorType sort) {
+        super(sort);
         this.sort = sort;
     }
 

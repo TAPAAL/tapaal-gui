@@ -12,9 +12,10 @@ public abstract class ColorExpression extends Expression {
 
     protected ColorExpression parent;
     protected int index = -1;
+    protected ColorType colorType;
 
-    public ColorExpression() {
-
+    public ColorExpression(ColorType colorType) {
+        this.colorType = colorType;
     }
 
     @Override
@@ -41,7 +42,7 @@ public abstract class ColorExpression extends Expression {
 
     public abstract boolean hasVariable(List<Variable> variables);
 
-    public abstract ColorType getColorType(List<ColorType> colortypes);
+    public ColorType getColorType() { return colorType; }
 
     public abstract boolean isComparable(ColorExpression otherExpr);
 

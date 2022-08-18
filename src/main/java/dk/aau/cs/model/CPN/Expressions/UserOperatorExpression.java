@@ -19,6 +19,10 @@ public class UserOperatorExpression extends ColorExpression {
     }
 
     public UserOperatorExpression(Color userOperator) {
+        this(userOperator, userOperator.getColorType());
+    }
+    public UserOperatorExpression(Color userOperator, ColorType colorType) {
+        super(colorType);
         this.userOperator = userOperator;
     }
 
@@ -42,11 +46,6 @@ public class UserOperatorExpression extends ColorExpression {
     @Override
     public boolean hasVariable(List<Variable> variables) {
         return false;
-    }
-
-    @Override
-    public ColorType getColorType(List<ColorType> colorTypes) {
-        return userOperator.getColorType();
     }
 
     @Override

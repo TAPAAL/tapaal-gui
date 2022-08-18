@@ -17,6 +17,11 @@ public class TupleExpression extends ColorExpression {
     }
 
     public TupleExpression(Vector<ColorExpression> colors) {
+        this(colors, null);
+    }
+    // Important to set ColorType if used in ColoredTransitionGuardPanel dialog
+    public TupleExpression(Vector<ColorExpression> colors, ColorType colorType) {
+        super(colorType);
         this.colors = colors;
         int i = 0;
         for(ColorExpression color : colors){
@@ -81,14 +86,12 @@ public class TupleExpression extends ColorExpression {
         return false;
     }
 
-    @Override
     public ColorType getColorType(List<ColorType> colorTypes) {
         Vector<ColorType> expressionColorTypes = new Vector<>();
 
         for (ColorExpression ce : this.colors) {
-            expressionColorTypes.add(ce.getColorType(colorTypes));
+            expressionColorTypes.add(ce.getColorType());
         }
-
         for (ColorType ct : colorTypes) {
             if (ct instanceof ProductType) {
                 ProductType pt = (ProductType) ct;
@@ -100,6 +103,7 @@ public class TupleExpression extends ColorExpression {
 
         return  null;
     }
+
     @Override
     public boolean isComparable(ColorExpression otherExpr){
         otherExpr = otherExpr.getBottomColorExpression();
@@ -145,7 +149,7 @@ public class TupleExpression extends ColorExpression {
 
     @Override
     public ColorExpression copy() {
-        return new TupleExpression(new Vector<>(colors));
+        return new TupleExpression(new Vector<>(colors), colorType.copy());
     }
 
     @Override
@@ -156,7 +160,7 @@ public class TupleExpression extends ColorExpression {
             colorsCopy.add(expr.deepCopy());
         }
 
-        return new TupleExpression(colorsCopy);
+        return new TupleExpression(colorsCopy, colorType.copy());
     }
 
     @Override

@@ -183,6 +183,6 @@ public class ProductType extends ColorType {
         for(ColorType colorType : getColorTypes()){
             tempVec.add(colorType.createColorExpressionForFirstColor());
         }
-        return new TupleExpression(tempVec);
+        return new TupleExpression(tempVec, this);
     }
 }

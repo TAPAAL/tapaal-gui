@@ -12,6 +12,7 @@ public class NotExpression extends GuardExpression {
 
     public NotExpression(GuardExpression expr) {
         this.expr = expr;
+        this.colorType = expr.getColorType();
     }
 
     public GuardExpression getExpression() {
@@ -30,6 +31,7 @@ public class NotExpression extends GuardExpression {
         }
         else {
             expr = expr.replace(object1, object2,replaceAllInstances);
+            colorType = expr.getColorType();
             return this;
         }
     }
