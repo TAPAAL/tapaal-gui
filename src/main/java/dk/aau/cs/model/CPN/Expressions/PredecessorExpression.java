@@ -95,8 +95,7 @@ public class PredecessorExpression extends ColorExpression {
 
     @Override
     public ExprStringPosition[] getChildren() {
-
-        ExprStringPosition pos = new ExprStringPosition(0, color.toString().length() - 2, color);
+        ExprStringPosition pos = new ExprStringPosition(0, color.toString().length(), color);
         return new ExprStringPosition[]{pos};
     }
 
