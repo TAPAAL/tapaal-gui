@@ -1,19 +1,24 @@
 package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
 import java.util.Set;
 
-public class EqualityExpression extends GuardExpression implements LeftRightGuardExpression{
+public class EqualityExpression extends GuardExpression implements LeftRightGuardExpression {
     private ColorExpression left;
     private ColorExpression right;
 
     public EqualityExpression(ColorExpression left, ColorExpression right) {
+        this(left, right, null);
+    }
+    public EqualityExpression(ColorExpression left, ColorExpression right, ColorType colorType) {
         this.left = left;
         this.right = right;
+        this.colorType = colorType;
     }
     public ColorExpression getLeftExpression() {
         return this.left;
@@ -40,6 +45,7 @@ public class EqualityExpression extends GuardExpression implements LeftRightGuar
         else {
             left = left.replace( object1, object2, replaceAllInstances);
             right = right.replace(object1, object2, replaceAllInstances);
+            colorType = left.getColorType();
             return this;
         }
     }

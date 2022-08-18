@@ -16,6 +16,7 @@ public class PredecessorExpression extends ColorExpression {
     }
 
     public  PredecessorExpression(ColorExpression color) {
+        super(color.colorType);
         this.color = color;
     }
 
@@ -42,11 +43,6 @@ public class PredecessorExpression extends ColorExpression {
     @Override
     public boolean hasVariable(List<Variable> variables) {
         return this.color.hasVariable(variables);
-    }
-
-    @Override
-    public ColorType getColorType(List<ColorType> colorTypes) {
-        return color.getColorType(colorTypes);
     }
 
     @Override
@@ -120,7 +116,7 @@ public class PredecessorExpression extends ColorExpression {
     }
 
     @Override
-    public Vector<ColorType> getColorTypes(){
+    public Vector<ColorType> getColorTypes() {
         return color.getColorTypes();
     }
 

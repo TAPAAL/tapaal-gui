@@ -25,6 +25,7 @@ public class AllExpression extends ColorExpression {
     }
 
     public AllExpression(ColorType sort) {
+        super(sort);
         this.sort = sort;
     }
 
@@ -131,7 +132,7 @@ public class AllExpression extends ColorExpression {
     }
 
     @Override
-    public Vector<ColorType> getColorTypes(){
+    public Vector<ColorType> getColorTypes() {
         return new Vector<>(Collections.singletonList(sort));
     }
 }

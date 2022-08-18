@@ -17,6 +17,10 @@ public class VariableExpression extends ColorExpression {
     }
 
     public VariableExpression(Variable variable) {
+        this(variable, variable.getColorType());
+    }
+    public VariableExpression(Variable variable, ColorType colorType) {
+        super(colorType);
         this.variable = variable;
     }
 
@@ -43,11 +47,6 @@ public class VariableExpression extends ColorExpression {
             }
         }
         return false;
-    }
-
-    @Override
-    public ColorType getColorType(List<ColorType> colorTypes) {
-        return variable.getColorType();
     }
 
     @Override
@@ -172,8 +171,7 @@ public class VariableExpression extends ColorExpression {
     }
 
     @Override
-    public Vector<ColorType> getColorTypes(){
-
+    public Vector<ColorType> getColorTypes() {
         return new Vector<>(Collections.singletonList(variable.getColorType()));
     }
 

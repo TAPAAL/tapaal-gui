@@ -89,6 +89,10 @@ public abstract class ColorComboboxPanel extends JPanel {
             colorTypeComboBoxesArray[index].setSelectedItem(((UserOperatorExpression)expr).getUserOperator());
         } else if(expr instanceof TupleExpression){
             colorTypeComboBoxesArray[index].setSelectedItem(((TupleExpression)expr).getColors().get(0));
+        } else if (expr instanceof PredecessorExpression) {
+            setIndex(((PredecessorExpression)expr).getPredecessorExpression(), index);
+        } else if (expr instanceof SuccessorExpression) {
+            setIndex(((SuccessorExpression)expr).getSuccessorExpression(), index);
         } else {
             colorTypeComboBoxesArray[index].setSelectedItem(expr);
         }
@@ -96,9 +100,6 @@ public abstract class ColorComboboxPanel extends JPanel {
 
     public void updateColorType(ColorType ct){
         updateColorType(ct, null, false, false);
-    }
-    public void updateColorType(ColorType ct, boolean transitionDialog){
-        updateColorType(ct, null, false, transitionDialog);
     }
     public void updateColorType(ColorType ct, Context context, boolean includePlaceHolder, boolean transitionDialog) {
         removeOldComboBoxes();
