@@ -76,7 +76,7 @@ public class NotExpression extends GuardExpression {
     @Override
     public ExprStringPosition[] getChildren() {
         int start = 2;
-        int end = start + expr.toString().length()-1;
+        int end = start + expr.toString().length();
         ExprStringPosition pos = new ExprStringPosition(start, end, expr);
         return new ExprStringPosition[]{pos};
     }
