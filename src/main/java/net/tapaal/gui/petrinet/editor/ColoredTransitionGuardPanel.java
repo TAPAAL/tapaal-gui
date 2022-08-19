@@ -885,7 +885,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     private void updateExpression() {
         ColorType ct = colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex());
-        if (ct == newProperty.getColorType()) return;
+        if (ct == getColorType(currentSelection.getObject())) return;
 
         Expression oldProperty = currentSelection.getObject();
         if (doColorTypeUndo) {
