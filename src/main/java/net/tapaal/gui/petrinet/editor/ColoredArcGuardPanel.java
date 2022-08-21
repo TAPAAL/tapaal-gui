@@ -701,7 +701,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             ColorExpression expr;
             Object selectedElement = colorExpressionComboBoxPanel.getColorTypeComboBoxesArray()[0].getSelectedItem();
             if (selectedElement instanceof PlaceHolderColorExpression) {
-                    expr = new PlaceHolderColorExpression();
+                expr = new PlaceHolderColorExpression();
             } else if (selectedElement instanceof String) {
                 expr = new AllExpression(colorExpressionComboBoxPanel.getColorType());
             } else if (selectedElement instanceof Variable) {
@@ -902,14 +902,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private void updateSelection(Expression newSelection) {
         exprField.setText(arcExpression.toString());
 
-        ExprStringPosition position;
-        if (arcExpression.containsPlaceHolder()) {
-            Expression ae = findParent(arcExpression.findFirstPlaceHolder(), arcExpression);
-            position = arcExpression.indexOf(ae);
-        }
-        else {
-            position = arcExpression.indexOf(newSelection);
-        }
+        ExprStringPosition position = arcExpression.indexOf(newSelection);
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
 
@@ -1072,11 +1065,21 @@ public abstract class ColoredArcGuardPanel extends JPanel {
 
     private ColorType getCurrentSelectionColorType() {
         if (currentSelection.getObject() instanceof ColorExpression) {
-            ColorType ct = ((ColorExpression) currentSelection.getObject()).getColorType();
-            if (ct == null && currentSelection.getObject() instanceof TupleExpression)
+            ColorExpression current = (ColorExpression) currentSelection.getObject();
+            ColorType ct = current.getColorType();
+
+            if (ct != null) return ct;
+
+            if (current instanceof TupleExpression) {
                 return ((TupleExpression) currentSelection.getObject()).getColorType(context.network().colorTypes());
-            else
-                return ct;
+            } else if (current.getParent() instanceof TupleExpression) {
+                ExprStringPosition[] children = current.getParent().getChildren();
+                for (int i = 0; i < children.length; i++) {
+                    if (((ColorExpression) children[i].getObject()).getBottomColorExpression().equals(current.getBottomColorExpression())) {
+                        return colorType.getProductColorTypes().get(i);
+                    }
+                }
+            }
         }
         return null;
     }
