@@ -691,7 +691,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             succButton.setEnabled(false);
             predButton.setEnabled(false);
             colorCombobox.setEnabled(false);
-            colorTypeCombobox.setEnabled(true);
+            colorTypeCombobox.setEnabled(
+                currentSelection.getObject() instanceof LeftRightGuardExpression ||
+                currentSelection.getObject() instanceof PlaceHolderGuardExpression
+            );
         }
         if (colorTypeCombobox.getItemAt(colorTypeCombobox.getSelectedIndex()) instanceof ProductType) {
             greaterThanButton.setEnabled(false);
@@ -898,14 +901,23 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     private Expression getTypeReplacement(ColorType ct) {
         Expression replacement = newProperty.copy();
-        if (replacement.indexOf(replacement).getStart() == currentSelection.getStart() && replacement.indexOf(replacement).getEnd() == currentSelection.getEnd()) {
+        replacement = findCurrentProperty(replacement, replacement);
+        if (replacement != null) {
             return updateChildren(replacement, ct, replacement, replacement.getChildren());
         }
+        return null;
+    }
 
+    private Expression findCurrentProperty(Expression original, Expression replacement) {
         for (ExprStringPosition exprStr : replacement.getChildren()) {
-            if (exprStr.getStart() == currentSelection.getStart() && exprStr.getEnd() == currentSelection.getEnd()) {
-                replacement = exprStr.getObject().copy();
-                return updateChildren(replacement, ct, replacement, replacement.getChildren());
+            if (exprStr.getObject() instanceof LeftRightGuardExpression) {
+                if (original.indexOf(exprStr.getObject()).getStart() == currentSelection.getStart() &&
+                    original.indexOf(exprStr.getObject()).getEnd() == currentSelection.getEnd()) {
+                    return exprStr.getObject().copy();
+                }
+            } else {
+                Expression expr = findCurrentProperty(original, exprStr.getObject());
+                if (expr != null) return expr;
             }
         }
         return null;
