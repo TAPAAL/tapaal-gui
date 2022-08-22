@@ -21,6 +21,8 @@ public interface ModelChecker {
 
 	VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception;
 
+	// Uses a manually written string of arguments for verification
+	// VerificationResult<TimedArcPetriNetTrace> verifyManually(String options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception;
 
     void kill();
 
@@ -29,5 +31,4 @@ public interface ModelChecker {
 	boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options);
 
 	String[] getStatsExplanations();
-
 }

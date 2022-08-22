@@ -222,6 +222,45 @@ public class VerifyPN implements ModelChecker {
         return false;
     }
 
+    public VerificationResult<TimedArcPetriNetTrace> verifyManually(String options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception {
+        VerifyTAPNExporter exporter;
+        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+            exporter = new VerifyCPNExporter();
+        } else {
+            exporter = new VerifyPNExporter();
+        }
+        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, lens, model.value2(), null, dataLayerQuery);
+
+        if (exportedModel == null) {
+            messenger.displayErrorMessage("There was an error exporting the model");
+        }
+
+        return verifyManually(options, model, exportedModel, query);
+    }
+
+    private VerificationResult<TimedArcPetriNetTrace> verifyManually(String options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
+        if (exportedModel == null) return null;
+
+        runner = new ProcessRunner(verifypnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
+        runner.run();
+
+        if (runner.error()) {
+            return null;
+        } else {
+            String errorOutput = readOutput(runner.errorOutput());
+            String standardOutput = readOutput(runner.standardOutput());
+
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+
+            if (queryResult == null || queryResult.value1() == null) {
+                return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
+            } else {
+                ctlOutput = queryResult.value1().isCTL;
+                return new VerificationResult<>(queryResult.value1(), null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
+            }
+        }
+    }
+
     public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception {
         if (!supportsModel(model.value1(), options)) {
             throw new UnsupportedModelException("Verifypn does not support the given model.");
@@ -396,6 +435,16 @@ public class VerifyPN implements ModelChecker {
     }
 
     private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
+        StringBuilder buffer = new StringBuilder(options.toString());
+        buffer.append(' ');
+        buffer.append(modelFile);
+        buffer.append(' ');
+        buffer.append(queryFile);
+
+        return buffer.toString();
+    }
+
+    private String createArgumentString(String modelFile, String queryFile, String options) {
         StringBuilder buffer = new StringBuilder(options.toString());
         buffer.append(' ');
         buffer.append(modelFile);

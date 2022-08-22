@@ -150,8 +150,6 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String SATISFIED_SOUNDNESS_STRING = "Sound";
 	private final static String SATISFIED_STRONG_SOUNDNESS_STRING = "Strongly Sound";
 
-
-	
 	private static String lastPath = null;
 	
 	ReductionOptionChooser reductionOptionChooser;
@@ -843,7 +841,7 @@ public class BatchProcessingDialog extends JDialog {
 		approximationDenominator.setEnabled(!approximationDenominatorCheckbox.isSelected());
 		timeoutValue.setEnabled(useTimeout());
 	}
-	
+
 	private BatchProcessingVerificationOptions getVerificationOptions() {
 		ReductionOption reductionOption = reductionOptionChooser.isOverwriten() ? ReductionOption.BatchProcessingUserDefinedReductions : ReductionOption.BatchProcessingKeepQueryOption;
 		
