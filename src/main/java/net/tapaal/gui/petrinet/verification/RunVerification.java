@@ -359,7 +359,7 @@ public class RunVerification extends RunVerificationBase {
 			if(!result.getReductionResultAsString().isEmpty()){
 
                 JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
-				gbc = GridBagHelper.as(0,6, WEST, new Insets(0,0,20,-90));
+				gbc = GridBagHelper.as(0,6, WEST, new Insets(0,0,10,-90));
 				panel.add(reductionStatsLabel, gbc);
 
 				if(result.reductionRulesApplied()){
