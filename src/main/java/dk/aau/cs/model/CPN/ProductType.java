@@ -50,7 +50,7 @@ public class ProductType extends ColorType {
         }
         return false;
     }
-    public Vector<ColorType> getColorTypes() {return constituents; }
+    public Vector<ColorType> getColorTypes() { return constituents; }
 
     public void addType(ColorType colortype) {
         constituents.add(colortype);
@@ -183,6 +183,6 @@ public class ProductType extends ColorType {
         for(ColorType colorType : getColorTypes()){
             tempVec.add(colorType.createColorExpressionForFirstColor());
         }
-        return new TupleExpression(tempVec);
+        return new TupleExpression(tempVec, this);
     }
 }

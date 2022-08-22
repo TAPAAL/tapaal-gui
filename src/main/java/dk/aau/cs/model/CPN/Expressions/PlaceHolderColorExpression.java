@@ -9,6 +9,14 @@ import java.util.*;
 
 public class PlaceHolderColorExpression extends ColorExpression implements PlaceHolderExpression {
 
+    public PlaceHolderColorExpression() {
+        super(null);
+    }
+    // Important to set ColorType if used in ColoredTransitionGuardPanel dialog
+    public PlaceHolderColorExpression(ColorType colorType) {
+        super(colorType);
+    }
+
     @Override
     public List<Color> eval(ExpressionContext context) {
         return List.of();
@@ -27,11 +35,6 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
     @Override
     public boolean hasVariable(List<Variable> variables) {
         return false;
-    }
-
-    @Override
-    public ColorType getColorType(List<ColorType> colorTypes) {
-        return null;
     }
 
     @Override

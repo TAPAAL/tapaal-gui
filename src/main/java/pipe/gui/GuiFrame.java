@@ -109,7 +109,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabActions::print);
         }
     };
-    private final GuiAction importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format") {
+    private final GuiAction importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', InputEvent.SHIFT_MASK)) {
         public void actionPerformed(ActionEvent arg0) {
             guiFrameController.ifPresent(GuiFrameControllerActions::importPNMLFile);
         }
@@ -382,6 +382,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction showFAQAction = new GuiAction("Show FAQ", "See TAPAAL frequently asked questions") {
         public void actionPerformed(ActionEvent arg0) {
             guiFrameController.ifPresent(o -> o.openURL("https://answers.launchpad.net/tapaal/+faqs"));
+        }
+    };
+    private final GuiAction showWiki = new GuiAction("Visit wiki page", "Visit the TAPAAL wiki page") {
+        public void actionPerformed(ActionEvent arg0) {
+            guiFrameController.ifPresent(o -> o.openURL("https://github.com/TAPAAL/TAPAAL/wiki"));
+        }
+    };
+    private final GuiAction showShortcuts = new GuiAction("Show shortcuts", "Visit the TAPAAL wiki page to find a list of shortcuts") {
+        public void actionPerformed(ActionEvent arg0) {
+            guiFrameController.ifPresent(o -> o.openURL("https://github.com/TAPAAL/TAPAAL/wiki/Shortcut-keys"));
         }
     };
     private final GuiAction checkUpdate = new GuiAction("Check for updates", "Check if there is a new version of TAPAAL") {
@@ -778,6 +788,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         helpMenu.add(showFAQAction);
         helpMenu.add(showAskQuestionAction);
         helpMenu.add(showReportBugAction);
+
+        helpMenu.addSeparator();
+
+        helpMenu.add(showWiki);
+        helpMenu.add(showShortcuts);
 
         helpMenu.addSeparator();
 

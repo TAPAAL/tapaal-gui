@@ -5,7 +5,6 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
-import net.tapaal.gui.*;
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
@@ -200,23 +199,22 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         return loader.loadLens(file);
     }
 
-	private static void checkQueries(PetriNetTab tab) {
+    public static void checkQueries(PetriNetTab tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<>();
-        EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
         boolean gameChanged = false;
 
-        EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
+        EngineSupportOptions verifyTAPNOptions = new VerifyTAPNEngineOptions();
+        EngineSupportOptions UPPAALCombiOptions = new UPPAALCombiOptions();
         EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
-        EngineSupportOptions UPPAAALStandardOptions = new UPPAAALStandardOptions();
+        EngineSupportOptions UPPAALStandardOptions = new UPPAALStandardOptions();
         EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
         EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options();
-        EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNEngineOptions();
+        EngineSupportOptions verifyDTAPNOptions = new VerifyDTAPNEngineOptions();
         EngineSupportOptions verifyPNOptions = new VerifyPNEngineOptions();
+        EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
 
-        EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
         TimedArcPetriNetNetwork net = tab.network();
         for (TAPNQuery q : tab.queries()) {
-            boolean hasEngine = false;
             boolean[] queryOptions = new boolean[]{
                 q.getTraceOption() == TAPNQuery.TraceOption.FASTEST,
                 (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && net.getHighestNetDegree() <= 2),
@@ -234,10 +232,15 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 q.hasUntimedOnlyProperties(),
                 tab.lens.isColored()
             };
-            for(EngineSupportOptions engine : engineSupportOptions){
-                if(engine.areOptionsSupported(queryOptions)){
-                    hasEngine = true;
-                    break;
+
+            boolean hasEngine = tab.checkCurrentEngine(q.getReductionOption(), queryOptions);
+            if (!hasEngine) {
+                for(EngineSupportOptions engine : engineSupportOptions){
+                    if(engine.areOptionsSupported(queryOptions)){
+                        q = tab.setQueryEngine(q, engine);
+                        hasEngine = true;
+                        break;
+                    }
                 }
             }
             if (!hasEngine) {
@@ -290,9 +293,62 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
                 new MessengerImpl().displayInfoMessage(fmessage, "Information");
             }).start();
-
         }
 	}
+
+	private boolean checkCurrentEngine(ReductionOption reductionOption, boolean[] queryOptions) {
+        EngineSupportOptions engine;
+        switch (reductionOption) {
+            case VerifyDTAPN:
+                engine = new VerifyDTAPNEngineOptions(); 
+                break;
+            case VerifyPN:
+                engine = new VerifyPNEngineOptions();
+                break;
+            case VerifyTAPN:
+                engine = new VerifyTAPNEngineOptions();
+                break;
+            case BROADCAST:
+                engine = new UPPAALBroadcastOptions();
+                break;
+            case DEGREE2BROADCAST:
+                engine = new UPPAALBroadcastDegree2Options();
+                break;
+            case COMBI:
+                engine = new UPPAALCombiOptions();
+                break;
+            case STANDARD:
+                engine = new UPPAALStandardOptions();
+                break;
+            case OPTIMIZEDSTANDARD:
+                engine = new UPPAALOptimizedStandardOptions();
+                break;
+            default:
+                return false;
+        }
+        return engine.areOptionsSupported(queryOptions);
+    }
+
+    private TAPNQuery setQueryEngine(TAPNQuery query, EngineSupportOptions engine) {
+	    if (engine instanceof VerifyDTAPNEngineOptions) {
+	        query.setReductionOption(ReductionOption.VerifyDTAPN);
+        } else if (engine instanceof VerifyPNEngineOptions) {
+            query.setReductionOption(ReductionOption.VerifyPN);
+        } else if (engine instanceof VerifyTAPNEngineOptions) {
+            query.setReductionOption(ReductionOption.VerifyTAPN);
+        } else if (engine instanceof UPPAALBroadcastDegree2Options) {
+            query.setReductionOption(ReductionOption.DEGREE2BROADCAST);
+        } else if (engine instanceof UPPAALBroadcastOptions) {
+            query.setReductionOption(ReductionOption.BROADCAST);
+        } else if (engine instanceof UPPAALCombiOptions) {
+            query.setReductionOption(ReductionOption.COMBI);
+        } else if (engine instanceof UPPAALOptimizedStandardOptions) {
+            query.setReductionOption(ReductionOption.OPTIMIZEDSTANDARD);
+        } else if (engine instanceof UPPAALStandardOptions) {
+            query.setReductionOption(ReductionOption.STANDARD);
+        }
+	    return query;
+    }
 
 	public static PetriNetTab createNewEmptyTab(String name, boolean isTimed, boolean isGame, boolean isColored){
         PetriNetTab tab = new PetriNetTab(isTimed, isGame, isColored);

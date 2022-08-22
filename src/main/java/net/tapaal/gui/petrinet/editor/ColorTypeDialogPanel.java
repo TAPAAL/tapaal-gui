@@ -168,7 +168,6 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.insets = new Insets(5, 8, 0, 8);
         container.add(productTypePanel, gbc);
 
-
         JPanel buttonPanel = createButtonPanel();
         gbc.insets = new Insets(0, 8, 5, 8);
         gbc.gridx = 0;
@@ -395,7 +394,7 @@ public class ColorTypeDialogPanel extends JPanel {
         JPanel firstRow = new JPanel();
         firstRow.setLayout(new GridBagLayout());
 
-        JLabel enumNameLabel = new JLabel("Name: ");
+        JLabel enumNameLabel = new JLabel("Element name: ");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -613,7 +612,7 @@ public class ColorTypeDialogPanel extends JPanel {
         }
 
         if (!messages.isEmpty()) {
-            String message = "Colortype cannot have colors removed for the following reasons: \n\n";
+            String message = "The color type cannot be modified for the following reasons: \n\n";
             for (String m : messages) {
                 if (!message.contains(m)) message += m;
             }
@@ -680,7 +679,6 @@ public class ColorTypeDialogPanel extends JPanel {
 
         productModel = new DefaultListModel();
 
-
         colorTypes = new ArrayList<>();
         colorTypes = network.colorTypes();
 
@@ -688,9 +686,12 @@ public class ColorTypeDialogPanel extends JPanel {
         productTypeComboBox.setRenderer(new ColortypeListCellRenderer());
 
         for (ColorType element : colorTypes) {
-            if(!(element instanceof ProductType)){
+            if (!(element instanceof ProductType) && element != ColorType.COLORTYPE_DOT) {
                 productTypeComboBox.addItem(element);
             }
+        }
+        if (productTypeComboBox.getItemCount() == 0) {
+            colorTypeComboBox.removeItem(productColor);
         }
 
         gbc.insets = new Insets(2, 4, 2, 4);
@@ -722,6 +723,7 @@ public class ColorTypeDialogPanel extends JPanel {
         JPanel scrollPanePanel = new JPanel();
         scrollPanePanel.setLayout(new GridBagLayout());
         productColorTypeList = new JList();
+        productColorTypeList.setCellRenderer(new ColortypeListCellRenderer());
         productColorTypeList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 JList source = (JList) e.getSource();
@@ -822,9 +824,9 @@ public class ColorTypeDialogPanel extends JPanel {
                 productColorTypeList.setModel(productModel);
                 productRemoveButton.setEnabled(true);
             }else{
-                String message = "Colortype cannot have colors removed for the following reasons: \n\n";
+                String message = "The color type cannot be modified for the following reasons: \n\n";
                 message += String.join("", messages);
-                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not add color from color type", JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -955,7 +957,7 @@ public class ColorTypeDialogPanel extends JPanel {
             }
 
             if(!messages.isEmpty()) {
-                String message = "Colortype cannot have the following colors removed for the following reasons: \n\n";
+                String message = "The color type cannot be modified for the following reasons: \n\n";
                 message += String.join("", messages);
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
                 return;

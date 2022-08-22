@@ -70,6 +70,10 @@ public class LTLQueryVisitor extends VisitorBase {
         return formatter.format(getStartTag() + xmlQuery.toString() + getEndTag());
     }
 
+    public StringBuffer getXMLQuery() {
+        return xmlQuery;
+    }
+
     public String getStartTag(){
         return startTag(XML_PROPSET + " " + XML_NS) + "\n";
     }

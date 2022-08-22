@@ -152,9 +152,9 @@ public class Export {
             i++;
 
             if (lens.isGame() && isDTAPN) {
-                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null, lens, transformedModel.value2(), composer.getGuiModel());
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".xml"), null, lens, transformedModel.value2(), composer.getGuiModel());
             } else {
-                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".q"), null ,new TAPNLens(true, false, lens.isColored()), transformedModel.value2(), composer.getGuiModel());
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".xml"), null, new TAPNLens(true, false, lens.isColored()), transformedModel.value2(), composer.getGuiModel());
             }
         }
     }

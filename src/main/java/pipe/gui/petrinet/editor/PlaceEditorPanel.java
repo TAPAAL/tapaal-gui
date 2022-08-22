@@ -850,13 +850,13 @@ public class PlaceEditorPanel extends JPanel {
 
         removeColoredTokenButton.addActionListener(actionEvent -> {
             if(tokenList.getSelectedIndex() > -1){
+                int index = tokenList.getSelectedIndex();
                 coloredTokenListModel.remove(tokenList.getSelectedIndex());
-                addColoredTokenButton.setText("Add");
-                removeColoredTokenButton.setEnabled(false);
+                updateTokenSelection(index);
             }
 
         });
-        removeColoredTokenButton.setEnabled(false);
+        removeColoredTokenButton.setEnabled(tokenList.getSelectedIndex() > 0);
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -879,6 +879,18 @@ public class PlaceEditorPanel extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(3, 3, 3, 3);
         mainPanel.add(tokenPanel, gbc);
+    }
+
+    private void updateTokenSelection(int index) {
+	    int currentSize = tokenList.getModel().getSize();
+	    if (currentSize > index)
+	        tokenList.setSelectedIndex(index);
+	    else if (currentSize != 0)
+	        tokenList.setSelectedIndex(currentSize-1);
+	    else {
+            addColoredTokenButton.setText("Add");
+            removeColoredTokenButton.setEnabled(false);
+        }
     }
 
     public void initColorInvariantPanel(){

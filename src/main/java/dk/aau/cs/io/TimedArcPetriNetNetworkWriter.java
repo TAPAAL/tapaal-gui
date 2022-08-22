@@ -114,7 +114,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		appendTemplates(document, pnmlRootNode);
 
         appendQueries(document, pnmlRootNode);
-		appendDefaultBound(document, pnmlRootNode);
 		appendFeature(document, pnmlRootNode);
 
 		document.normalize();
@@ -160,12 +159,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 							+ file.getCanonicalPath()
 							+ "\"" + e);
 		}
-	}
-	
-	private void appendDefaultBound(Document document, Element root) {
-		Element element = document.createElement("k-bound");
-		element.setAttribute("bound", network.getDefaultBound() + "");
-		root.appendChild(element);
 	}
 
     private void appendFeature(Document document, Element root) {
@@ -302,12 +295,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private void appendQueries(Document document, Element root) {
 		for (TAPNQuery query : queries) {
 			Element newQuery;
-			if (query.getCategory() == QueryCategory.CTL){
-				newQuery = createCTLQueryElement(query, document);
-			} else if (query.getCategory() == QueryCategory.LTL){
+			if (query.getCategory() == QueryCategory.LTL){
 			    newQuery = createLTLQueryElement(query, document);
-            }else {
-				newQuery = createQueryElement(query, document);
+            } else {
+                newQuery = createCTLQueryElement(query, document);
 			}
 			root.appendChild(newQuery);
 		}
@@ -354,7 +345,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 		Element queryElement = document.createElement("query");
 
-		Node queryFormula = XMLQueryStringToElement(new CTLQueryVisitor().getXMLQueryFor(query.getProperty(), query.getName(), false));
+		CTLQueryVisitor ctlQueryVisitor = new CTLQueryVisitor();
+		ctlQueryVisitor.buildXMLQuery(query.getProperty(), query.getName(), false);
+
+		Node queryFormula = XMLQueryStringToElement(ctlQueryVisitor.getXMLQuery().toString());
 		queryElement.appendChild(document.importNode(queryFormula, true));
 		
 		queryElement.setAttribute("name", query.getName());
@@ -396,7 +390,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
         Element queryElement = document.createElement("query");
 
-        Node queryFormula = XMLQueryStringToElement(new LTLQueryVisitor().getXMLQueryFor(query.getProperty(), query.getName()));
+        LTLQueryVisitor ltlQueryVisitor = new LTLQueryVisitor();
+        ltlQueryVisitor.buildXMLQuery(query.getProperty(), query.getName());
+
+        Node queryFormula = XMLQueryStringToElement(ltlQueryVisitor.getXMLQuery().toString());
         queryElement.appendChild(document.importNode(queryFormula, true));
 
         queryElement.setAttribute("name", query.getName());

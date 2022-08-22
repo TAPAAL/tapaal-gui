@@ -1,8 +1,8 @@
 package net.tapaal.gui.petrinet.verification;
 
-public class UPPAAALStandardOptions extends EngineSupportOptions {
+public class UPPAALStandardOptions extends EngineSupportOptions {
 
-    public UPPAAALStandardOptions() {
+    public UPPAALStandardOptions() {
         super (
             "UPPAAL: Standard Reduction",//name of engine
             false,//  support fastest trace
