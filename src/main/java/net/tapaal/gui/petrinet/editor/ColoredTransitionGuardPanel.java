@@ -870,11 +870,13 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         undoManager.addEdit(cmd);
     }
 
-    private void replaceAndAddToUndo(Expression currentSelection, Expression newExpression){
-        UndoableEdit edit = new ExpressionConstructionEdit(currentSelection, newExpression);
-        newProperty = newProperty.replace(currentSelection, newExpression);
-        updateSelection(newExpression);
-        undoSupport.postEdit(edit);
+    private void replaceAndAddToUndo(Expression currentSelection, Expression newExpression) {
+        if (currentSelection != null && newExpression != null) {
+            UndoableEdit edit = new ExpressionConstructionEdit(currentSelection, newExpression);
+            newProperty = newProperty.replace(currentSelection, newExpression);
+            updateSelection(newExpression);
+            undoSupport.postEdit(edit);
+        }
     }
 
     private void updateColorType() {
@@ -909,6 +911,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     private Expression findCurrentProperty(Expression original, Expression replacement) {
+        if (original == replacement && replacement instanceof LeftRightGuardExpression) {
+            return replacement;
+        }
+
         for (ExprStringPosition exprStr : replacement.getChildren()) {
             if (exprStr.getObject() instanceof LeftRightGuardExpression) {
                 if (original.indexOf(exprStr.getObject()).getStart() == currentSelection.getStart() &&
