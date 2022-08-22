@@ -26,18 +26,7 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 	private static final Pattern reductionsUsedPattern = Pattern.compile("\\s*Net reduction is enabled.\\s*");
 	private static final Pattern removedTransitionsPattern = Pattern.compile("\\s*Removed transitions:\\s*(\\d+)\\s*");
 	private static final Pattern removedPlacesPattern = Pattern.compile("\\s*Removed places:\\s*(\\d+)\\s*");
-	private static final Pattern ruleAApplicationPattern = Pattern.compile("\\s*Applications of rule A:\\s*(\\d+)\\s*");
-	private static final Pattern ruleBApplicationPattern = Pattern.compile("\\s*Applications of rule B:\\s*(\\d+)\\s*");
-	private static final Pattern ruleCApplicationPattern = Pattern.compile("\\s*Applications of rule C:\\s*(\\d+)\\s*");
-	private static final Pattern ruleDApplicationPattern = Pattern.compile("\\s*Applications of rule D:\\s*(\\d+)\\s*");
-	private static final Pattern ruleEApplicationPattern = Pattern.compile("\\s*Applications of rule E:\\s*(\\d+)\\s*");
-	private static final Pattern ruleFApplicationPattern = Pattern.compile("\\s*Applications of rule F:\\s*(\\d+)\\s*");
-	private static final Pattern ruleGApplicationPattern = Pattern.compile("\\s*Applications of rule G:\\s*(\\d+)\\s*");
-	private static final Pattern ruleHApplicationPattern = Pattern.compile("\\s*Applications of rule H:\\s*(\\d+)\\s*");
-	private static final Pattern ruleIApplicationPattern = Pattern.compile("\\s*Applications of rule I:\\s*(\\d+)\\s*");
 
-	
-	
 	public VerifyPNOutputParser(int totalTokens, int extraTokens, TAPNQuery queryType) {
 		super(totalTokens, extraTokens, queryType);
 	}
@@ -48,15 +37,6 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 		int maxUsedTokens = 0;
 		int removedTransitions = 0;
 		int removedPlaces = 0;
-		int ruleA = 0;
-		int ruleB = 0;
-		int ruleC = 0;
-		int ruleD = 0;
-		int ruleE = 0;
-		int ruleF = 0;
-		int ruleG = 0;
-		int ruleH = 0;
-		int ruleI = 0;
 
 		boolean reductionUsed = false;
 		boolean result = false;
@@ -65,121 +45,77 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
             try {
                 Matcher matcher = transitionStatsPattern.matcher(output);
                 while (matcher.find()) {
-                    transitionStats.add(new Tuple<String, Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
+                    transitionStats.add(new Tuple<>(matcher.group(1), Integer.parseInt(matcher.group(2))));
                 }
 
                 matcher = transitionStatsPatternUnknown.matcher(output);
                 while (matcher.find()) {
-                    transitionStats.add(new Tuple<String, Integer>(matcher.group(1), -1));
+                    transitionStats.add(new Tuple<>(matcher.group(1), -1));
                 }
                 matcher = placeBoundPattern.matcher(output);
                 while (matcher.find()) {
-                    placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
+                    placeBoundStats.add(new Tuple<>(matcher.group(1), Integer.parseInt(matcher.group(2))));
                 }
                 matcher = placeBoundPatternUnknown.matcher(output);
                 while (matcher.find()) {
-                    placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), -1));
+                    placeBoundStats.add(new Tuple<>(matcher.group(1), -1));
                 }
 
 			for (int i = 0; i < lines.length; i++) {
-				String line = lines[i];
-				if (line.contains(Query_IS_SATISFIED_STRING)) {
-					result = true;
-					foundResult = true;
-				} else if (line.contains(Query_IS_NOT_SATISFIED_STRING)) {
-					result = false;
-					foundResult = true;
-				} else {
+                String line = lines[i];
+                if (line.contains(Query_IS_SATISFIED_STRING)) {
+                    result = true;
+                    foundResult = true;
+                } else if (line.contains(Query_IS_NOT_SATISFIED_STRING)) {
+                    result = false;
+                    foundResult = true;
+                } else {
                     parseSolvedMethod(line);
 
-					matcher = discoveredPattern.matcher(line);
-					if(matcher.find()){
-						discovered = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = exploredPattern.matcher(line);
-					if(matcher.find()){
-						explored = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = maxUsedTokensPattern.matcher(line);
-					if(matcher.find()){
-						maxUsedTokens = Integer.parseInt(matcher.group(1));
-						String operator = matcher.group(1) == null ? "" : matcher.group(1);
-						if(operator.equals(">")) maxUsedTokens += 1; // Indicate non-k-boundedness by encoding that an extra token was used.
-					}
-					
-					matcher = reductionsUsedPattern.matcher(line);
-					if(matcher.find()){
-						reductionUsed = true;
-					}
-					
-					matcher = removedTransitionsPattern.matcher(line);
-					if(matcher.find()){
-						removedTransitions = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = removedPlacesPattern.matcher(line);
-					if(matcher.find()){
-						removedPlaces = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = ruleAApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleA = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = ruleBApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleB = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = ruleCApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleC = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = ruleDApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleD = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = ruleEApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleE = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = ruleFApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleF = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = ruleGApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleG = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = ruleHApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleH = Integer.parseInt(matcher.group(1));
-					}
-					
-					matcher = ruleIApplicationPattern.matcher(line);
-					if(matcher.find()){
-						ruleI = Integer.parseInt(matcher.group(1));
-					}
-				}
-			}
+                    matcher = discoveredPattern.matcher(line);
+                    if (matcher.find()) {
+                        discovered = Integer.parseInt(matcher.group(1));
+                    }
+
+                    matcher = exploredPattern.matcher(line);
+                    if (matcher.find()) {
+                        explored = Integer.parseInt(matcher.group(1));
+                    }
+
+                    matcher = maxUsedTokensPattern.matcher(line);
+                    if (matcher.find()) {
+                        maxUsedTokens = Integer.parseInt(matcher.group(1));
+                        String operator = matcher.group(1) == null ? "" : matcher.group(1);
+                        if (operator.equals(">"))
+                            maxUsedTokens += 1; // Indicate non-k-boundedness by encoding that an extra token was used.
+                    }
+
+                    matcher = reductionsUsedPattern.matcher(line);
+                    if (matcher.find()) {
+                        reductionUsed = true;
+                    }
+
+                    matcher = removedTransitionsPattern.matcher(line);
+                    if (matcher.find()) {
+                        removedTransitions = Integer.parseInt(matcher.group(1));
+                    }
+
+                    matcher = removedPlacesPattern.matcher(line);
+                    if (matcher.find()) {
+                        removedPlaces = Integer.parseInt(matcher.group(1));
+                    }
+                }
+            }
 			
 			if(!foundResult) return null;
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-			ReductionStats reductionStats = reductionUsed? new ReductionStats(removedTransitions, removedPlaces, ruleA, ruleB, ruleC, ruleD, ruleE, ruleF, ruleG, ruleH, ruleI) : null;
+			ReductionStats reductionStats = reductionUsed? new ReductionStats(removedTransitions, removedPlaces) : null;
 
             var qr = new QueryResult(result, boundedAnalysis, query, false);
             qr.setSolvedUsingQuerySimplification(solvedUsingQuerySimplification);
             qr.setSolvedUsingTraceAbstractRefinement(solvedUsingTraceAbstractRefinement);
             qr.setSolvedUsingSiphonTrap(solvedUsingSiphonTrap);
-			return new Tuple<QueryResult, Stats>(qr, new Stats(discovered, explored, explored, transitionStats, placeBoundStats, reductionStats));
+			return new Tuple<>(qr, new Stats(discovered, explored, explored, transitionStats, placeBoundStats, reductionStats));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

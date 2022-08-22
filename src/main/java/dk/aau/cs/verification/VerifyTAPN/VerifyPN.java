@@ -419,7 +419,7 @@ public class VerifyPN implements ModelChecker {
     }
 
     private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query) {
-        Tuple<QueryResult, Stats> result = null;
+        Tuple<QueryResult, Stats> result;
         if (output.contains("Processed N. Edges:")) {
             VerifyPNCTLOutputParser outputParser = new VerifyPNCTLOutputParser(totalTokens, extraTokens, query);
             result = outputParser.parseOutput(output);
