@@ -49,7 +49,9 @@ public class VariablesDialogPanel extends JPanel {
         this.network = network;
         this.listModel = listModel;
         initComponents();
-        nameTextField.setText(oldName);
+        if (nameTextField != null) {
+            nameTextField.setText(oldName);
+        }
         this.undoManager = undoManager;
     }
 
@@ -60,11 +62,14 @@ public class VariablesDialogPanel extends JPanel {
         this.network = network;
         this.listModel = listModel;
         initComponents();
-        nameTextField.setText(oldName);
+        if (nameTextField != null) {
+            nameTextField.setText(oldName);
+        }
         this.undoManager = undoManager;
     }
 
     public void showDialog() {
+        if (scrollPane == null || okButton == null) return;
         String panelHeader = variable != null? "Edit Variable" : "Create Variable";
 
         dialog = new EscapableDialog(TAPAALGUI.getApp(),
@@ -83,28 +88,34 @@ public class VariablesDialogPanel extends JPanel {
         container.setLayout(new GridBagLayout());
         size = new Dimension(330, 30);
 
-        createCancelButton();
-        createColorTypeLabel();
-        createcolorTypesComboBox();
-        createNameLabel();
-        createNameTextField();
-        createOKButton();
+        try {
+            createCancelButton();
+            createColorTypeLabel();
+            createColorTypesComboBox();
+            createNameLabel();
+            createNameTextField();
+            createOKButton();
 
-        okButton.addActionListener(e -> onOK());
+            okButton.addActionListener(e -> onOK());
 
-        cancelButton.addActionListener(e -> exit());
+            cancelButton.addActionListener(e -> exit());
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 8, 5, 8);
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        container.add(buttonContainer,gbc);
-        scrollPane = new JScrollPane();
-        scrollPane.setViewportView(container);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(0, 8, 5, 8);
+            gbc.gridx = 1;
+            gbc.gridy = 2;
+            gbc.gridwidth = 1;
+            gbc.anchor = GridBagConstraints.EAST;
+            container.add(buttonContainer, gbc);
+            scrollPane = new JScrollPane();
+            scrollPane.setViewportView(container);
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     private void createNameTextField() {
@@ -166,8 +177,7 @@ public class VariablesDialogPanel extends JPanel {
         container.add(colorTypeLabel,gbc);
     }
 
-
-    private void createcolorTypesComboBox() {
+    private void createColorTypesComboBox() throws Exception {
         colorTypes = new ArrayList<>();
         colorTypes = network.colorTypes();
 
@@ -183,6 +193,10 @@ public class VariablesDialogPanel extends JPanel {
                     }
                 }
             }
+        }
+        colorTypeComboBox.removeItem(ColorType.COLORTYPE_DOT);
+        if (colorTypeComboBox.getItemCount() <= 0) {
+            throw new Exception("No valid color types available for variables");
         }
         colorTypeComboBox.setSelectedIndex(variableIndex);
 
