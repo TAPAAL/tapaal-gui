@@ -952,7 +952,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             colorExpressionComboBoxPanel.updateSelection(colorExpression);
         } else if (current instanceof ColorExpression) {
             colorExpressionComboBoxPanel.updateSelection(((ColorExpression) current).getBottomColorExpression());
-        } else if (current instanceof ArcExpression) {
+        } else if (current instanceof ArcExpression && !(current instanceof PlaceHolderArcExpression)) {
             updateNumberExpressionsPanel(getSpecificChildOfProperty(1, current));
         }
         updatingSelection = false;
