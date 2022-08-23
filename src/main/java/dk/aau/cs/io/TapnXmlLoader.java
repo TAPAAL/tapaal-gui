@@ -609,7 +609,9 @@ public class TapnXmlLoader {
         if (hlInitialMarkingNode instanceof Element) {
             try {
                 colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
-            } catch (FormatException e) { }
+            } catch (FormatException e) { 
+                e.printStackTrace();
+            }
         }
 
 	    p.setCtiList(ctiList);
