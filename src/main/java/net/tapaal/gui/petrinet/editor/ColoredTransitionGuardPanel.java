@@ -175,7 +175,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private Expression getOldExpression(Expression parent) {
         for (ExprStringPosition child : parent.getChildren()) {
             if (child.getObject() == currentSelection.getObject()) {
-                return (parent instanceof GuardExpression) ? child.getObject() : parent;
+                if (parent instanceof GuardExpression || parent instanceof TupleExpression) return child.getObject();
+                return parent;
             } else {
                 Expression possibleExpr = getOldExpression(child.getObject());
                 if (possibleExpr != null) return possibleExpr;
@@ -738,9 +739,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         if (position == null) {
             return;
         }
-        if (position.getObject() instanceof TupleExpression) {
-            position = newProperty.objectAt(index-1);
-        }
+        position = checkSelectionForTuple(position, index);
 
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
@@ -748,6 +747,20 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         updateEnabledButtons();
         updateColorTypeSelection();
         updateColorSelection();
+    }
+
+    private ExprStringPosition checkSelectionForTuple(ExprStringPosition position, int index) {
+        Expression selection = position.getObject();
+        if (selection instanceof SuccessorExpression && ((SuccessorExpression) selection).getSuccessorExpression() instanceof TupleExpression) {
+            return newProperty.objectAt(newProperty.indexOf(((SuccessorExpression) selection).getSuccessorExpression()).getEnd() - 1);
+        }
+        if (selection instanceof PredecessorExpression && ((PredecessorExpression) selection).getPredecessorExpression() instanceof TupleExpression) {
+            return newProperty.objectAt(newProperty.indexOf(((PredecessorExpression) selection).getPredecessorExpression()).getEnd() - 1);
+        }
+        if (selection instanceof TupleExpression) {
+            return newProperty.objectAt(index - 1);
+        }
+        return position;
     }
 
     private void updateColorTypeSelection() {
