@@ -600,10 +600,12 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         }
         ColorType ct = newProperty.getColorType();
         doColorTypeUndo = false;
-        if (ct != null)
-            colorTypeCombobox.setSelectedItem(ct);
-        else
-            colorTypeCombobox.setSelectedIndex(0);
+        if (colorTypeCombobox.getItemCount() > 0) {
+            if (ct != null)
+                colorTypeCombobox.setSelectedItem(ct);
+            else
+                colorTypeCombobox.setSelectedIndex(0);
+        }
         doColorTypeUndo = true;
         updateSelection(newProperty);
         colorTypeCombobox.setEnabled(newProperty instanceof PlaceHolderGuardExpression);
@@ -784,6 +786,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         for (ColorType type : types) {
             colorTypeCombobox.addItem(type);
         }
+        colorTypeCombobox.removeItem(ColorType.COLORTYPE_DOT);
     }
 
     private void deleteSelection() {
@@ -954,6 +957,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             return ((GuardExpression) expr).getColorType();
         }
         return null;
+    }
+
+    public boolean showGuardPanel() {
+        return colorTypeCombobox.getItemCount() > 0;
     }
 
     // /////////////////////////////////////////////////////////////////////

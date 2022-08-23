@@ -65,6 +65,7 @@ public class VariablesDialogPanel extends JPanel {
     }
 
     public void showDialog() {
+        if (colorTypeComboBox.getItemCount() <= 0) return;
         String panelHeader = variable != null? "Edit Variable" : "Create Variable";
 
         dialog = new EscapableDialog(TAPAALGUI.getApp(),
@@ -77,7 +78,7 @@ public class VariablesDialogPanel extends JPanel {
         dialog.setVisible(true);
     }
 
-    private void initComponents() throws IOException {
+    private void initComponents() {
         container = new JPanel();
         buttonContainer = new JPanel();
         container.setLayout(new GridBagLayout());
@@ -85,13 +86,12 @@ public class VariablesDialogPanel extends JPanel {
 
         createCancelButton();
         createColorTypeLabel();
-        createcolorTypesComboBox();
+        createColorTypesComboBox();
         createNameLabel();
         createNameTextField();
         createOKButton();
 
         okButton.addActionListener(e -> onOK());
-
         cancelButton.addActionListener(e -> exit());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -100,7 +100,7 @@ public class VariablesDialogPanel extends JPanel {
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        container.add(buttonContainer,gbc);
+        container.add(buttonContainer, gbc);
         scrollPane = new JScrollPane();
         scrollPane.setViewportView(container);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -166,8 +166,7 @@ public class VariablesDialogPanel extends JPanel {
         container.add(colorTypeLabel,gbc);
     }
 
-
-    private void createcolorTypesComboBox() {
+    private void createColorTypesComboBox() {
         colorTypes = new ArrayList<>();
         colorTypes = network.colorTypes();
 
@@ -183,6 +182,11 @@ public class VariablesDialogPanel extends JPanel {
                     }
                 }
             }
+        }
+        colorTypeComboBox.removeItem(ColorType.COLORTYPE_DOT);
+        if (colorTypeComboBox.getItemCount() <= 0) {
+            JOptionPane.showMessageDialog(this, "No valid color types available for variables", "", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
         colorTypeComboBox.setSelectedIndex(variableIndex);
 
