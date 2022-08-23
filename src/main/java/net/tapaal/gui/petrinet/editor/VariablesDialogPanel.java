@@ -49,9 +49,7 @@ public class VariablesDialogPanel extends JPanel {
         this.network = network;
         this.listModel = listModel;
         initComponents();
-        if (nameTextField != null) {
-            nameTextField.setText(oldName);
-        }
+        nameTextField.setText(oldName);
         this.undoManager = undoManager;
     }
 
@@ -62,14 +60,12 @@ public class VariablesDialogPanel extends JPanel {
         this.network = network;
         this.listModel = listModel;
         initComponents();
-        if (nameTextField != null) {
-            nameTextField.setText(oldName);
-        }
+        nameTextField.setText(oldName);
         this.undoManager = undoManager;
     }
 
     public void showDialog() {
-        if (scrollPane == null || okButton == null) return;
+        if (colorTypeComboBox.getItemCount() <= 0) return;
         String panelHeader = variable != null? "Edit Variable" : "Create Variable";
 
         dialog = new EscapableDialog(TAPAALGUI.getApp(),
@@ -82,40 +78,34 @@ public class VariablesDialogPanel extends JPanel {
         dialog.setVisible(true);
     }
 
-    private void initComponents() throws IOException {
+    private void initComponents() {
         container = new JPanel();
         buttonContainer = new JPanel();
         container.setLayout(new GridBagLayout());
         size = new Dimension(330, 30);
 
-        try {
-            createCancelButton();
-            createColorTypeLabel();
-            createColorTypesComboBox();
-            createNameLabel();
-            createNameTextField();
-            createOKButton();
 
-            okButton.addActionListener(e -> onOK());
+        createCancelButton();
+        createColorTypeLabel();
+        createColorTypesComboBox();
+        createNameLabel();
+        createNameTextField();
+        createOKButton();
 
-            cancelButton.addActionListener(e -> exit());
+        okButton.addActionListener(e -> onOK());
+        cancelButton.addActionListener(e -> exit());
 
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.insets = new Insets(0, 8, 5, 8);
-            gbc.gridx = 1;
-            gbc.gridy = 2;
-            gbc.gridwidth = 1;
-            gbc.anchor = GridBagConstraints.EAST;
-            container.add(buttonContainer, gbc);
-            scrollPane = new JScrollPane();
-            scrollPane.setViewportView(container);
-            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        } catch (IOException e) {
-            throw e;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "", JOptionPane.INFORMATION_MESSAGE);
-        }
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0, 8, 5, 8);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        container.add(buttonContainer, gbc);
+        scrollPane = new JScrollPane();
+        scrollPane.setViewportView(container);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     }
 
     private void createNameTextField() {
@@ -177,7 +167,7 @@ public class VariablesDialogPanel extends JPanel {
         container.add(colorTypeLabel,gbc);
     }
 
-    private void createColorTypesComboBox() throws Exception {
+    private void createColorTypesComboBox() {
         colorTypes = new ArrayList<>();
         colorTypes = network.colorTypes();
 
@@ -196,7 +186,8 @@ public class VariablesDialogPanel extends JPanel {
         }
         colorTypeComboBox.removeItem(ColorType.COLORTYPE_DOT);
         if (colorTypeComboBox.getItemCount() <= 0) {
-            throw new Exception("No valid color types available for variables");
+            JOptionPane.showMessageDialog(this, "No valid color types available for variables", "", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
         colorTypeComboBox.setSelectedIndex(variableIndex);
 
