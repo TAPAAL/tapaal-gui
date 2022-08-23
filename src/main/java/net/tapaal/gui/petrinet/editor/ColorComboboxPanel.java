@@ -186,8 +186,10 @@ public abstract class ColorComboboxPanel extends JPanel {
     @Override
     public void setEnabled(boolean enabled){
         colorcomboBoxPanel.setEnabled(enabled);
-        for (var combobox : colorTypeComboBoxesArray) {
-            combobox.setEnabled(enabled);
+        if (colorTypeComboBoxesArray != null) {
+            for (var combobox : colorTypeComboBoxesArray) {
+                combobox.setEnabled(enabled);
+            }
         }
     }
 }

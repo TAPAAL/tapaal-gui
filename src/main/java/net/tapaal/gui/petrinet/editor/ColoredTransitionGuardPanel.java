@@ -111,18 +111,18 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         predButton.addActionListener(actionEvent -> {
             PredecessorExpression predExpr;
             if (currentSelection.getObject() instanceof ColorExpression) {
-                Expression oldExpr = getOldExpression(newProperty);
-                predExpr = new PredecessorExpression((ColorExpression) oldExpr);
-                replaceAndAddToUndo(oldExpr, predExpr);
+                Expression bottomExpression = getBottomExpression(newProperty);
+                predExpr = new PredecessorExpression((ColorExpression) bottomExpression);
+                replaceAndAddToUndo(bottomExpression, predExpr);
             }
         });
 
         succButton.addActionListener(actionEvent -> {
             SuccessorExpression succExpr;
             if (currentSelection.getObject() instanceof  ColorExpression) {
-                Expression oldExpr = getOldExpression(newProperty);
-                succExpr = new SuccessorExpression((ColorExpression) oldExpr);
-                replaceAndAddToUndo(oldExpr, succExpr);
+                Expression bottomExpression = getBottomExpression(newProperty);
+                succExpr = new SuccessorExpression((ColorExpression) bottomExpression);
+                replaceAndAddToUndo(bottomExpression, succExpr);
             }
         });
 
@@ -172,12 +172,13 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         add(colorExpressionPanel, gbc);
     }
 
-    private Expression getOldExpression(Expression parent) {
+    private Expression getBottomExpression(Expression parent) {
         for (ExprStringPosition child : parent.getChildren()) {
             if (child.getObject() == currentSelection.getObject()) {
-                return (parent instanceof GuardExpression) ? child.getObject() : parent;
+                if (parent instanceof GuardExpression || parent instanceof TupleExpression) return child.getObject();
+                return parent;
             } else {
-                Expression possibleExpr = getOldExpression(child.getObject());
+                Expression possibleExpr = getBottomExpression(child.getObject());
                 if (possibleExpr != null) return possibleExpr;
             }
         }
@@ -600,10 +601,12 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         }
         ColorType ct = newProperty.getColorType();
         doColorTypeUndo = false;
-        if (ct != null)
-            colorTypeCombobox.setSelectedItem(ct);
-        else
-            colorTypeCombobox.setSelectedIndex(0);
+        if (colorTypeCombobox.getItemCount() > 0) {
+            if (ct != null)
+                colorTypeCombobox.setSelectedItem(ct);
+            else
+                colorTypeCombobox.setSelectedIndex(0);
+        }
         doColorTypeUndo = true;
         updateSelection(newProperty);
         colorTypeCombobox.setEnabled(newProperty instanceof PlaceHolderGuardExpression);
@@ -738,9 +741,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         if (position == null) {
             return;
         }
-        if (position.getObject() instanceof TupleExpression) {
-            position = newProperty.objectAt(index-1);
-        }
+        position = getNonTuplePosition(position, index);
 
         exprField.select(position.getStart(), position.getEnd());
         currentSelection = position;
@@ -748,6 +749,20 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         updateEnabledButtons();
         updateColorTypeSelection();
         updateColorSelection();
+    }
+
+    private ExprStringPosition getNonTuplePosition(ExprStringPosition position, int index) {
+        Expression selection = position.getObject();
+        if (selection instanceof SuccessorExpression && ((SuccessorExpression) selection).getSuccessorExpression() instanceof TupleExpression) {
+            return newProperty.objectAt(newProperty.indexOf(((SuccessorExpression) selection).getSuccessorExpression()).getEnd() - 1);
+        }
+        if (selection instanceof PredecessorExpression && ((PredecessorExpression) selection).getPredecessorExpression() instanceof TupleExpression) {
+            return newProperty.objectAt(newProperty.indexOf(((PredecessorExpression) selection).getPredecessorExpression()).getEnd() - 1);
+        }
+        if (selection instanceof TupleExpression) {
+            return newProperty.objectAt(index - 1);
+        }
+        return position;
     }
 
     private void updateColorTypeSelection() {
@@ -784,6 +799,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         for (ColorType type : types) {
             colorTypeCombobox.addItem(type);
         }
+        colorTypeCombobox.removeItem(ColorType.COLORTYPE_DOT);
     }
 
     private void deleteSelection() {
@@ -954,6 +970,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             return ((GuardExpression) expr).getColorType();
         }
         return null;
+    }
+
+    public boolean showGuardPanel() {
+        return colorTypeCombobox.getItemCount() > 0;
     }
 
     // /////////////////////////////////////////////////////////////////////

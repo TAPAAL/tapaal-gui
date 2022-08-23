@@ -59,7 +59,7 @@ public class TAPNTransitionEditor extends JPanel {
 	    if(!transition.isTimed()) {
             urgentCheckBox.setVisible(false);
         }
-	    if(!transition.isColored()){
+	    if(!transition.isColored() || !coloredTransitionGuardPanel.showGuardPanel()){
 	        coloredTransitionGuardPanel.setVisible(false);
         }
     }

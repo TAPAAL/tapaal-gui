@@ -1095,7 +1095,7 @@ public class PlaceEditorPanel extends JPanel {
         colorTypeComboBox.setRenderer(new ColorComboBoxRenderer(colorTypeComboBox));
 
         colorTypeComboBox.addActionListener(actionEvent -> {
-            if(colorTypeComboBox.getSelectedItem() != null && colorTypeComboBox.getSelectedItem().equals( place.underlyingPlace().getColorType())){
+            if (colorTypeComboBox.getSelectedItem() != null && colorTypeComboBox.getSelectedItem().equals(tokenColorComboboxPanel.getColorType())) {
                 return;
             }
             if (!(coloredTokenListModel.getSize() < 1) || !timeConstraintListModel.isEmpty()){
