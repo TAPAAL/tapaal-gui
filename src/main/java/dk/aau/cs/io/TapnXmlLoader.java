@@ -616,20 +616,17 @@ public class TapnXmlLoader {
             }
         }
 
-
 	    p.setCtiList(ctiList);
         ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
         if(colorMarking!= null){
             ColorMultiset cm = colorMarking.eval(context);
 
-            p.setTokenExpression(loadTACPN.constructCleanAddExpression(p.getColorType(),cm));
-
+            p.setTokenExpression(colorMarking, loadTACPN.constructCleanAddExpression(p.getColorType(),cm));
 
             for (TimedToken ctElement : cm.getTokens(p)) {
                 network.marking().add(ctElement);
                 //p.addToken(ctElement);
             }
-
         } else {
             for (int i = 0; i < initialMarkingInput; i++) {
                 //Regular tokens will just be dotconstant
