@@ -84,7 +84,6 @@ public class VariablesDialogPanel extends JPanel {
         container.setLayout(new GridBagLayout());
         size = new Dimension(330, 30);
 
-
         createCancelButton();
         createColorTypeLabel();
         createColorTypesComboBox();
