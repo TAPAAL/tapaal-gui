@@ -559,9 +559,7 @@ public class TapnXmlLoader {
 		}else{
 		    p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), parsePlaceColorType(place));
 		    tapn.add(p);
-		    if (lens == null || lens.isColored()) {
-                addColoredDependencies(p, place, network, constants);
-            }
+            addColoredDependencies(p, place, network, constants);
 
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
@@ -611,7 +609,7 @@ public class TapnXmlLoader {
         if (hlInitialMarkingNode instanceof Element) {
             try {
                 colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
-            } catch (FormatException e) {
+            } catch (FormatException e) { 
                 e.printStackTrace();
             }
         }
