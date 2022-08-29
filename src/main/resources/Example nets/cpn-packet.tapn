@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="TAPN1" type="P/T net">
+    <place displayName="true" id="P0" initialMarking="1" invariant="&lt; inf" name="P0" nameOffsetX="0" nameOffsetY="0" positionX="90" positionY="345">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+      <hlinitialMarking>
+        <text>(1'dot)</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="dot"/>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinitialMarking>
+      <colorinvariant>
+        <inscription inscription="&lt;= 50"/>
+        <colortype name="dot">
+          <color value="dot"/>
+        </colortype>
+      </colorinvariant>
+    </place>
+    <place displayName="true" id="P1" initialMarking="0" invariant="&lt;= 25" name="P1" nameOffsetX="53" nameOffsetY="-26" positionX="390" positionY="345">
+      <type>
+        <text>packetType</text>
+        <structure>
+          <usersort declaration="packetType"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="P2" initialMarking="0" invariant="&lt;= 22" name="P2" nameOffsetX="65" nameOffsetY="-25" positionX="690" positionY="345">
+      <type>
+        <text>packetType</text>
+        <structure>
+          <usersort declaration="packetType"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="P3" initialMarking="0" invariant="&lt; inf" name="P3" nameOffsetX="44" nameOffsetY="-33" positionX="990" positionY="270">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="P4" initialMarking="0" invariant="&lt; inf" name="P4" nameOffsetX="47" nameOffsetY="46" positionX="990" positionY="405">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+    <transition angle="0" displayName="true" id="Enter" infiniteServer="false" name="Enter" nameOffsetX="31" nameOffsetY="-16" player="0" positionX="240" positionY="345" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="External" infiniteServer="false" name="External" nameOffsetX="36" nameOffsetY="-17" player="0" positionX="840" positionY="270" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="Internal" infiniteServer="false" name="Internal" nameOffsetX="35" nameOffsetY="66" player="0" positionX="840" positionY="405" priority="0" urgent="false"/>
+    <transition angle="90" displayName="true" id="Drop" infiniteServer="false" name="Drop" nameOffsetX="31" nameOffsetY="41" player="0" positionX="390" positionY="465" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="Forward" infiniteServer="false" name="Forward" nameOffsetX="40" nameOffsetY="-10" player="0" positionX="525" positionY="345" priority="0" urgent="false"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="11" nameOffsetY="-16" source="P0" target="Enter" type="timed" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="119" yCoord="355"/>
+      <arcpath arcPointType="false" id="1" xCoord="188" yCoord="337"/>
+      <arcpath arcPointType="false" id="2" xCoord="249" yCoord="360"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="8" nameOffsetY="5" source="Enter" target="P0" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="249" yCoord="365"/>
+      <arcpath arcPointType="false" id="1" xCoord="184" yCoord="397"/>
+      <arcpath arcPointType="false" id="2" xCoord="118" yCoord="366"/>
+    </arc>
+    <arc id="A2" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Enter" target="P1" type="normal" weight="1">
+      <hlinscription>
+        <text>2'pck</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="2">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="Varpck"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="259" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="390" yCoord="360"/>
+    </arc>
+    <arc id="A6" inscription="[0,inf)" nameOffsetX="64" nameOffsetY="11" source="P2" target="External" type="timed" weight="1">
+      <colorinterval>
+        <inscription inscription="[20,22]"/>
+        <colortype name="packetType">
+          <color value="web"/>
+        </colortype>
+      </colorinterval>
+      <hlinscription>
+        <text>1'web</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="web"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="718" yCoord="353"/>
+      <arcpath arcPointType="false" id="1" xCoord="849" yCoord="285"/>
+    </arc>
+    <arc id="A7" inscription="[0,inf)" nameOffsetX="15" nameOffsetY="22" source="P2" target="Internal" type="timed" weight="1">
+      <colorinterval>
+        <inscription inscription="[15,22]"/>
+        <colortype name="packetType">
+          <color value="ssh"/>
+        </colortype>
+      </colorinterval>
+      <colorinterval>
+        <inscription inscription="[18,22]"/>
+        <colortype name="packetType">
+          <color value="vpn"/>
+        </colortype>
+      </colorinterval>
+      <hlinscription>
+        <text>(1'ssh + 2'vpn)</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="ssh"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="2">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="vpn"/>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="718" yCoord="365"/>
+      <arcpath arcPointType="false" id="1" xCoord="849" yCoord="420"/>
+    </arc>
+    <arc id="A8" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Internal" target="P4" type="normal" weight="1">
+      <hlinscription>
+        <text>3'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="3">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="859" yCoord="420"/>
+      <arcpath arcPointType="false" id="1" xCoord="990" yCoord="420"/>
+    </arc>
+    <arc id="A9" inscription="1" nameOffsetX="0" nameOffsetY="0" source="External" target="P3" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="859" yCoord="285"/>
+      <arcpath arcPointType="false" id="1" xCoord="990" yCoord="285"/>
+    </arc>
+    <arc id="A10" inscription="[25,25]" nameOffsetX="0" nameOffsetY="0" source="P1" target="Drop" type="timed" weight="1">
+      <hlinscription>
+        <text>1'pck</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="Varpck"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="404" yCoord="374"/>
+      <arcpath arcPointType="false" id="1" xCoord="404" yCoord="474"/>
+    </arc>
+    <arc id="A3" inscription="[4,6]" nameOffsetX="47" nameOffsetY="12" source="P1" target="Forward" type="timed" weight="1">
+      <colorinterval>
+        <inscription inscription="[10,25]"/>
+        <colortype name="packetType">
+          <color value="web"/>
+        </colortype>
+      </colorinterval>
+      <hlinscription>
+        <text>1'pck</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="Varpck"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="420" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="534" yCoord="360"/>
+    </arc>
+    <arc id="A4" inscription="1" nameOffsetX="18" nameOffsetY="-20" source="Forward" target="P2" type="normal" weight="1">
+      <hlinscription>
+        <text>1'pck</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="Varpck"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="545" yCoord="355"/>
+      <arcpath arcPointType="false" id="1" xCoord="690" yCoord="359"/>
+    </arc>
+    <arc id="I10" inscription="[0,inf)" nameOffsetX="15" nameOffsetY="18" source="P2" target="Forward" type="tapnInhibitor" weight="10">
+      <hlinscription>
+        <text>1'packetType.all</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <all>
+                <usersort declaration="packetType"/>
+              </all>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="691" yCoord="366"/>
+      <arcpath arcPointType="false" id="1" xCoord="622" yCoord="397"/>
+      <arcpath arcPointType="false" id="2" xCoord="544" yCoord="360"/>
+    </arc>
+  </net>
+  <declaration>
+    <structure>
+      <declarations>
+        <namedsort id="dot" name="dot">
+          <dot/>
+        </namedsort>
+        <namedsort id="packetType" name="packetType">
+          <cyclicenumeration>
+            <feconstant id="ssh" name="packetType"/>
+            <feconstant id="web" name="packetType"/>
+            <feconstant id="vpn" name="packetType"/>
+          </cyclicenumeration>
+        </namedsort>
+        <variabledecl id="Varpck" name="pck">
+          <usersort declaration="packetType"/>
+        </variabledecl>
+      </declarations>
+    </structure>
+  </declaration>
+  <query active="true" approximationDenominator="2" capacity="10" colorFixpoint="false" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Query" overApproximation="true" pTrie="true" partitioning="false" query="EF (TAPN1.P3 &gt; 0 and TAPN1.P4 &gt; 0)" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetricVars="false" symmetry="true" timeDarts="false" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
+  <k-bound bound="3"/>
+  <feature isColored="true" isGame="false" isTimed="true"/>
+</pnml>
