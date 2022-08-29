@@ -7,7 +7,10 @@ import java.io.PrintStream;
 import java.util.Collection;
 
 import dk.aau.cs.TCTL.*;
+<<<<<<< HEAD
 import dk.aau.cs.TCTL.visitors.HyperLTLQueryVisitor;
+=======
+>>>>>>> origin/cpn
 import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import net.tapaal.gui.petrinet.TAPNLens;
@@ -33,6 +36,7 @@ public class VerifyTAPNExporter {
     protected TimedArcPetriNet model;
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, TAPNLens lens, NameMapping mapping, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) {
 		File modelFile = createTempFile(".xml");
+<<<<<<< HEAD
 		File queryFile;
 		if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL || query.getCategory() == QueryCategory.HyperLTL || (lens != null && !lens.isGame() && lens.isColored())) {
 			queryFile = createTempFile(".xml");
@@ -41,6 +45,10 @@ public class VerifyTAPNExporter {
 		}
 		this.model = model;
 
+=======
+		File queryFile = createTempFile(".xml");
+		this.model = model;
+>>>>>>> origin/cpn
 		return export(model, query, modelFile, queryFile, dataLayerQuery, lens, mapping, guiModel);
 	}
 
@@ -68,6 +76,7 @@ public class VerifyTAPNExporter {
 			PrintStream queryStream = new PrintStream(queryFile);
             if (query == null) {
                 throw new FileNotFoundException(null);
+<<<<<<< HEAD
             } else if (query.getCategory() == QueryCategory.CTL || (lens != null && !lens.isGame() && lens.isColored())) {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery == null? model.name() : dataLayerQuery.getName(), false));
@@ -77,11 +86,21 @@ public class VerifyTAPNExporter {
             } else if (query.getCategory() == QueryCategory.HyperLTL){
                 HyperLTLQueryVisitor XMLVisitor = new HyperLTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
+=======
+            } else if (query.getCategory() == QueryCategory.LTL) {
+                LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
+>>>>>>> origin/cpn
             } else if (lens != null && lens.isGame()) {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null, true));
             } else {
+<<<<<<< HEAD
                 queryStream.append(query.getProperty().toString());
+=======
+                CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery == null? model.name() : dataLayerQuery.getName(), false));
+>>>>>>> origin/cpn
             }
 			queryStream.close();
 		} catch(FileNotFoundException e) {

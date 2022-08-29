@@ -5,9 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
-
-import dk.aau.cs.TCTL.LTLANode;
-import dk.aau.cs.TCTL.LTLENode;
 import dk.aau.cs.TCTL.XMLParsing.XMLHyperLTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import dk.aau.cs.io.LoadedQueries;
@@ -212,7 +209,6 @@ public class XMLQueryLoader extends QueryLoader{
         }
         return true;
     }
-
 
     public static boolean canBeHyperLTL(Node prop) {
         NodeList children = prop.getChildNodes();

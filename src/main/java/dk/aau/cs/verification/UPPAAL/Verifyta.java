@@ -210,7 +210,11 @@ public class Verifyta implements ModelChecker {
                 return EMPTY_STRING_ARRAY;
        }
 
+<<<<<<< HEAD
 	@Override
+=======
+    @Override
+>>>>>>> origin/cpn
 	public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
 		//The combi translation supports all models.
 		return true;

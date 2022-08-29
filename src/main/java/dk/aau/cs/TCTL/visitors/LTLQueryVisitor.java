@@ -43,7 +43,6 @@ public class LTLQueryVisitor extends VisitorBase {
     private static final String XML_INTEGERDIFFERENCE   = "integer-difference";
 
 
-
     private final StringBuffer xmlQuery = new StringBuffer();
 
     public LTLQueryVisitor() {

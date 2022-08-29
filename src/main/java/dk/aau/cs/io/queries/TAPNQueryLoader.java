@@ -3,7 +3,6 @@ package dk.aau.cs.io.queries;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.XMLParsing.XMLHyperLTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
@@ -77,6 +76,7 @@ public class TAPNQueryLoader extends QueryLoader{
         boolean isCTL = isTypeQuery(queryElement, "CTL");
         boolean isLTL = isTypeQuery(queryElement, "LTL");
         boolean isHyperLTL = isTypeQuery(queryElement, "HyperLTL");
+
 		boolean siphontrap = getReductionOption(queryElement, "useSiphonTrapAnalysis", false);
 		boolean queryReduction = getReductionOption(queryElement, "useQueryReduction", true);
 		boolean stubborn = getReductionOption(queryElement, "useStubbornReduction", true);
@@ -116,12 +116,11 @@ public class TAPNQueryLoader extends QueryLoader{
 			} else if(parsedQuery.getCategory() == QueryCategory.HyperLTL) {
                 parsedQuery.setTraceList(tracesArr);
             }
-
 			return parsedQuery;
 		} else
 			return null;
 	}
-	
+
 	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query, boolean isCTL, boolean isLTL, boolean isHyperLTL){
         if (isCTL) return TAPNQuery.QueryCategory.CTL;
         if (isLTL) return QueryCategory.LTL;

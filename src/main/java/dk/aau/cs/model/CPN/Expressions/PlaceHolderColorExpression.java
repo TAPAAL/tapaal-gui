@@ -9,6 +9,17 @@ import java.util.*;
 
 public class PlaceHolderColorExpression extends ColorExpression implements PlaceHolderExpression {
 
+<<<<<<< HEAD
+=======
+    public PlaceHolderColorExpression() {
+        super(null);
+    }
+    // Important to set ColorType if used in ColoredTransitionGuardPanel dialog
+    public PlaceHolderColorExpression(ColorType colorType) {
+        super(colorType);
+    }
+
+>>>>>>> origin/cpn
     @Override
     public List<Color> eval(ExpressionContext context) {
         return List.of();
@@ -30,11 +41,14 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
     }
 
     @Override
+<<<<<<< HEAD
     public ColorType getColorType(List<ColorType> colorTypes) {
         return null;
     }
 
     @Override
+=======
+>>>>>>> origin/cpn
     public ColorExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
         if (this == object1 && object2 instanceof ColorExpression) {
             ColorExpression obj2 = (ColorExpression) object2;

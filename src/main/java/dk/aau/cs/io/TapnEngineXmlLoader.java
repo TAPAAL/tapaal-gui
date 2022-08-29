@@ -115,10 +115,15 @@ public class TapnEngineXmlLoader {
             }
         }
 		network.buildConstraints();
+<<<<<<< HEAD
 		
 		parseBound(doc, network);
 
 		parseFeature(doc, network);
+=======
+		parseFeature(doc, network);
+		network.setDefaultBound(3); // Ignores k-bounds in .tapn files
+>>>>>>> origin/cpn
 
         if (hasFeatureTag) {
             return new LoadedModel(network, templates, loadedQueries.getQueries(), messages, lens);
@@ -127,6 +132,7 @@ public class TapnEngineXmlLoader {
         }
 	}
 
+<<<<<<< HEAD
 	private void parseBound(Document doc, TimedArcPetriNetNetwork network){
 		if(doc.getElementsByTagName("k-bound").getLength() > 0){
 			int i = Integer.parseInt(doc.getElementsByTagName("k-bound").item(0).getAttributes().getNamedItem("bound").getNodeValue());
@@ -134,6 +140,8 @@ public class TapnEngineXmlLoader {
 		}
 	}
 
+=======
+>>>>>>> origin/cpn
     private void parseFeature(Document doc, TimedArcPetriNetNetwork network) {
         if (doc.getElementsByTagName("feature").getLength() > 0) {
 	        NodeList nodeList = doc.getElementsByTagName("feature");

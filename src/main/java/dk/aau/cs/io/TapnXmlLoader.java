@@ -141,7 +141,10 @@ public class TapnXmlLoader {
 	private LoadedModel parse(Document doc) throws FormatException {
 		idResolver.clear();
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/cpn
 		ConstantStore constants = new ConstantStore(parseConstants(doc));
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, new ArrayList<>());
         NodeList declarations = doc.getElementsByTagName("declaration");
@@ -163,8 +166,14 @@ public class TapnXmlLoader {
         }
 		parseSharedPlaces(doc, network, constants);
 		parseSharedTransitions(doc, network);
+<<<<<<< HEAD
 		
 		Collection<Template> templates = parseTemplates(doc, network, constants);
+=======
+        parseFeature(doc, network);
+
+        Collection<Template> templates = parseTemplates(doc, network, constants);
+>>>>>>> origin/cpn
 		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network).parseQueries();
 
 		if (loadedQueries != null) {
@@ -173,10 +182,14 @@ public class TapnXmlLoader {
             }
         }
 		network.buildConstraints();
+<<<<<<< HEAD
 		
 		parseBound(doc, network);
 
 		parseFeature(doc, network);
+=======
+        network.setDefaultBound(3); // Ignores k-bounds in .tapn files
+>>>>>>> origin/cpn
 
         if (hasFeatureTag) {
             return new LoadedModel(network, templates, loadedQueries.getQueries(), messages, lens);
@@ -185,6 +198,7 @@ public class TapnXmlLoader {
         }
 	}
 
+<<<<<<< HEAD
 	private void parseBound(Document doc, TimedArcPetriNetNetwork network){
 		if(doc.getElementsByTagName("k-bound").getLength() > 0){
 			int i = Integer.parseInt(doc.getElementsByTagName("k-bound").item(0).getAttributes().getNamedItem("bound").getNodeValue());
@@ -192,6 +206,8 @@ public class TapnXmlLoader {
 		}
 	}
 
+=======
+>>>>>>> origin/cpn
     private void parseFeature(Document doc, TimedArcPetriNetNetwork network) {
         if (doc.getElementsByTagName("feature").getLength() > 0) {
 	        NodeList nodeList = doc.getElementsByTagName("feature");
@@ -569,7 +585,11 @@ public class TapnXmlLoader {
 		}else{
 		    p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), parsePlaceColorType(place));
 		    tapn.add(p);
+<<<<<<< HEAD
 		    addColoredDependencies(p,place, network, constants);
+=======
+            addColoredDependencies(p, place, network, constants);
+>>>>>>> origin/cpn
 
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
@@ -619,25 +639,39 @@ public class TapnXmlLoader {
         if (hlInitialMarkingNode instanceof Element) {
             try {
                 colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
+<<<<<<< HEAD
             } catch (FormatException e) {
+=======
+            } catch (FormatException e) { 
+>>>>>>> origin/cpn
                 e.printStackTrace();
             }
         }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/cpn
 	    p.setCtiList(ctiList);
         ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
         if(colorMarking!= null){
             ColorMultiset cm = colorMarking.eval(context);
 
+<<<<<<< HEAD
             p.setTokenExpression(loadTACPN.constructCleanAddExpression(p.getColorType(),cm));
 
+=======
+            p.setTokenExpression(colorMarking, loadTACPN.constructCleanAddExpression(p.getColorType(),cm));
+>>>>>>> origin/cpn
 
             for (TimedToken ctElement : cm.getTokens(p)) {
                 network.marking().add(ctElement);
                 //p.addToken(ctElement);
             }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/cpn
         } else {
             for (int i = 0; i < initialMarkingInput; i++) {
                 //Regular tokens will just be dotconstant

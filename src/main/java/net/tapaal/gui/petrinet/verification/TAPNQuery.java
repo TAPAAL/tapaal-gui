@@ -374,9 +374,9 @@ public class TAPNQuery {
 	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
-                     TraceOption traceOption, SearchOption searchOption,
-                     ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, boolean reduction, HashTableSize hashTabelSize,
-                     ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces, boolean isColored) {
+             TraceOption traceOption, SearchOption searchOption,
+             ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, boolean reduction, HashTableSize hashTabelSize,
+             ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces, boolean isColored) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, reduction, hashTabelSize, extrapolationOption, new InclusionPlaces(), false, false, 0, true, true, true, isColored);
 	}
 	

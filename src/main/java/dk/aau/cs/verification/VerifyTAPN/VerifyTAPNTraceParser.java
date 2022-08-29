@@ -11,7 +11,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.model.CPN.ColorType;
+<<<<<<< HEAD
 import org.w3c.dom.*;
+=======
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+>>>>>>> origin/cpn
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -30,7 +37,10 @@ import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 public class VerifyTAPNTraceParser {
 
 	private final TimedArcPetriNet tapn;
+<<<<<<< HEAD
 	private String traceNameToParse;
+=======
+>>>>>>> origin/cpn
 	
 	public VerifyTAPNTraceParser(TimedArcPetriNet tapn) {
 		this.tapn = tapn;
@@ -42,6 +52,7 @@ public class VerifyTAPNTraceParser {
 		Document document = loadDocument(reader);
 		
 		if(document == null) return null;
+<<<<<<< HEAD
 
         NodeList nodeList = null;
 
@@ -62,6 +73,10 @@ public class VerifyTAPNTraceParser {
             nodeList = document.getElementsByTagName("trace").item(0).getChildNodes();
         }
 
+=======
+		
+		NodeList nodeList = document.getElementsByTagName("trace").item(0).getChildNodes();
+>>>>>>> origin/cpn
 		for(int i = 0; i < nodeList.getLength(); i++){
 			Node node = nodeList.item(i);
 			if(node instanceof Element){
@@ -87,6 +102,7 @@ public class VerifyTAPNTraceParser {
 		return trace;
 	}
 
+<<<<<<< HEAD
 	public void setTraceToParse(String traceName) {
 	    this.traceNameToParse = traceName;
     }
@@ -94,6 +110,8 @@ public class VerifyTAPNTraceParser {
 	    return this.traceNameToParse;
     }
 
+=======
+>>>>>>> origin/cpn
 	private TimedTransitionStep parseTransitionStep(Element element) {
 		TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
 		
@@ -120,7 +138,11 @@ public class VerifyTAPNTraceParser {
 
 	private Document loadDocument(BufferedReader reader) {
 		try {
+<<<<<<< HEAD
 			//reader.readLine(); // first line is "Trace:", so ignore it
+=======
+			reader.readLine(); // first line is "Trace:", so ignore it
+>>>>>>> origin/cpn
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			builder.setErrorHandler(new ErrorHandler() {
 				

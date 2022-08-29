@@ -116,7 +116,11 @@ public class TAPNComposer implements ITAPNComposer {
 	}
 
 	private boolean isComponentEmpty(DataLayer guiModel) {
+<<<<<<< HEAD
 		return guiModel.getPlaces().length == 0 && guiModel.getTransitions().length == 0;
+=======
+		return guiModel == null || guiModel.getPlaces().length == 0 && guiModel.getTransitions().length == 0;
+>>>>>>> origin/cpn
 	}
         
 	private PlaceTransitionObject getRightmostObject(DataLayer guiModel) {
@@ -282,12 +286,22 @@ public class TAPNComposer implements ITAPNComposer {
 					if (!timedTransition.isOrphan()) {
                         String uniqueTransitionName = "";
                         if (!singleComponentNoPrefix || model.activeTemplates().size() > 1) {
+<<<<<<< HEAD
                             uniqueTransitionName = timedTransition.isShared() ?
                                 "Shared_" + timedTransition.name() :
                                 timedTransition.model().name() + "_" + timedTransition.name();
 
                         } else {
                             uniqueTransitionName = timedTransition.name();
+=======
+                            uniqueTransitionName = timedTransition.isShared()
+                                ? "Shared_" + timedTransition.name()
+                                : timedTransition.model().name() + "_" + timedTransition.name();
+                        } else {
+                            uniqueTransitionName = timedTransition.isShared()
+                                ? "Shared_" + timedTransition.name()
+                                : timedTransition.name();
+>>>>>>> origin/cpn
                         }
 
 						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent(), timedTransition.getGuard());

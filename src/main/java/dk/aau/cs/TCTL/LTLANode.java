@@ -69,6 +69,7 @@ public class LTLANode extends TCTLAbstractPathProperty {
         int start = property.isSimpleProperty() ? 0 : 1;
         start = start + 2 + offset;
         int end = start + property.toString().length() + offset;
+
         StringPosition position = new StringPosition(start, end, property);
 
         StringPosition[] children = { position };

@@ -12,6 +12,10 @@ public class NotExpression extends GuardExpression {
 
     public NotExpression(GuardExpression expr) {
         this.expr = expr;
+<<<<<<< HEAD
+=======
+        this.colorType = expr.getColorType();
+>>>>>>> origin/cpn
     }
 
     public GuardExpression getExpression() {
@@ -30,6 +34,10 @@ public class NotExpression extends GuardExpression {
         }
         else {
             expr = expr.replace(object1, object2,replaceAllInstances);
+<<<<<<< HEAD
+=======
+            colorType = expr.getColorType();
+>>>>>>> origin/cpn
             return this;
         }
     }
@@ -74,7 +82,11 @@ public class NotExpression extends GuardExpression {
     @Override
     public ExprStringPosition[] getChildren() {
         int start = 2;
+<<<<<<< HEAD
         int end = start + expr.toString().length()-1;
+=======
+        int end = start + expr.toString().length();
+>>>>>>> origin/cpn
         ExprStringPosition pos = new ExprStringPosition(start, end, expr);
         return new ExprStringPosition[]{pos};
     }

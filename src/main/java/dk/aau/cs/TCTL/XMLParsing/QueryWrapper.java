@@ -1,7 +1,6 @@
 package dk.aau.cs.TCTL.XMLParsing;
 
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
-
 import java.util.ArrayList;
 
 public class QueryWrapper{

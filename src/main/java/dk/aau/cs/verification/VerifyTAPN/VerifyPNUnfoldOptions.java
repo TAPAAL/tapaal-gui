@@ -25,8 +25,11 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
         symmetricVars = useSymmetricVars;
     }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> origin/cpn
     @Override
     public boolean enabledOverApproximation() {
         return false;
@@ -79,10 +82,17 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
         if(!computeColorFixpoint){
             result.append(" --disable-cfp");
         }
+<<<<<<< HEAD
 
         if(!symmetricVars){
             result.append(" --disable-symmetry-vars");
         }
+=======
+        if(!symmetricVars){
+            result.append(" --disable-symmetry-vars");
+        }
+        result.append(" --col-reduction 0");
+>>>>>>> origin/cpn
 
         return result.toString();
     }

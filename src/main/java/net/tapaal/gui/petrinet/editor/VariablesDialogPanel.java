@@ -65,6 +65,10 @@ public class VariablesDialogPanel extends JPanel {
     }
 
     public void showDialog() {
+<<<<<<< HEAD
+=======
+        if (colorTypeComboBox.getItemCount() <= 0) return;
+>>>>>>> origin/cpn
         String panelHeader = variable != null? "Edit Variable" : "Create Variable";
 
         dialog = new EscapableDialog(TAPAALGUI.getApp(),
@@ -77,7 +81,11 @@ public class VariablesDialogPanel extends JPanel {
         dialog.setVisible(true);
     }
 
+<<<<<<< HEAD
     private void initComponents() throws IOException {
+=======
+    private void initComponents() {
+>>>>>>> origin/cpn
         container = new JPanel();
         buttonContainer = new JPanel();
         container.setLayout(new GridBagLayout());
@@ -85,13 +93,20 @@ public class VariablesDialogPanel extends JPanel {
 
         createCancelButton();
         createColorTypeLabel();
+<<<<<<< HEAD
         createcolorTypesComboBox();
+=======
+        createColorTypesComboBox();
+>>>>>>> origin/cpn
         createNameLabel();
         createNameTextField();
         createOKButton();
 
         okButton.addActionListener(e -> onOK());
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/cpn
         cancelButton.addActionListener(e -> exit());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -100,7 +115,11 @@ public class VariablesDialogPanel extends JPanel {
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
+<<<<<<< HEAD
         container.add(buttonContainer,gbc);
+=======
+        container.add(buttonContainer, gbc);
+>>>>>>> origin/cpn
         scrollPane = new JScrollPane();
         scrollPane.setViewportView(container);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -166,8 +185,12 @@ public class VariablesDialogPanel extends JPanel {
         container.add(colorTypeLabel,gbc);
     }
 
+<<<<<<< HEAD
 
     private void createcolorTypesComboBox() {
+=======
+    private void createColorTypesComboBox() {
+>>>>>>> origin/cpn
         colorTypes = new ArrayList<>();
         colorTypes = network.colorTypes();
 
@@ -184,6 +207,14 @@ public class VariablesDialogPanel extends JPanel {
                 }
             }
         }
+<<<<<<< HEAD
+=======
+        colorTypeComboBox.removeItem(ColorType.COLORTYPE_DOT);
+        if (colorTypeComboBox.getItemCount() <= 0) {
+            JOptionPane.showMessageDialog(this, "No valid color types available for variables", "", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+>>>>>>> origin/cpn
         colorTypeComboBox.setSelectedIndex(variableIndex);
 
         GridBagConstraints gbc = new GridBagConstraints();

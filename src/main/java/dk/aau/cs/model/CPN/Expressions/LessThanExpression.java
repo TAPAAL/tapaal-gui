@@ -1,6 +1,10 @@
 package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
+<<<<<<< HEAD
+=======
+import dk.aau.cs.model.CPN.ColorType;
+>>>>>>> origin/cpn
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
@@ -13,8 +17,17 @@ public class LessThanExpression extends GuardExpression implements LeftRightGuar
     private ColorExpression right;
 
     public LessThanExpression(ColorExpression left, ColorExpression right) {
+<<<<<<< HEAD
         this.left = left;
         this.right = right;
+=======
+        this(left, right, null);
+    }
+    public LessThanExpression(ColorExpression left, ColorExpression right, ColorType colorType) {
+        this.left = left;
+        this.right = right;
+        this.colorType = colorType;
+>>>>>>> origin/cpn
     }
     public ColorExpression getLeftExpression() {
         return this.left;
@@ -36,6 +49,10 @@ public class LessThanExpression extends GuardExpression implements LeftRightGuar
         else {
             left = left.replace(object1, object2,replaceAllInstances);
             right = right.replace(object1, object2,replaceAllInstances);
+<<<<<<< HEAD
+=======
+            colorType = left.getColorType();
+>>>>>>> origin/cpn
             return this;
         }
     }

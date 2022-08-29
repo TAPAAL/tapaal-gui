@@ -850,6 +850,7 @@ public class PlaceEditorPanel extends JPanel {
 
         removeColoredTokenButton.addActionListener(actionEvent -> {
             if(tokenList.getSelectedIndex() > -1){
+<<<<<<< HEAD
                 coloredTokenListModel.remove(tokenList.getSelectedIndex());
                 addColoredTokenButton.setText("Add");
                 removeColoredTokenButton.setEnabled(false);
@@ -857,6 +858,15 @@ public class PlaceEditorPanel extends JPanel {
 
         });
         removeColoredTokenButton.setEnabled(false);
+=======
+                int index = tokenList.getSelectedIndex();
+                coloredTokenListModel.remove(tokenList.getSelectedIndex());
+                updateTokenSelection(index);
+            }
+
+        });
+        removeColoredTokenButton.setEnabled(tokenList.getSelectedIndex() > 0);
+>>>>>>> origin/cpn
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -881,6 +891,21 @@ public class PlaceEditorPanel extends JPanel {
         mainPanel.add(tokenPanel, gbc);
     }
 
+<<<<<<< HEAD
+=======
+    private void updateTokenSelection(int index) {
+	    int currentSize = tokenList.getModel().getSize();
+	    if (currentSize > index)
+	        tokenList.setSelectedIndex(index);
+	    else if (currentSize != 0)
+	        tokenList.setSelectedIndex(currentSize-1);
+	    else {
+            addColoredTokenButton.setText("Add");
+            removeColoredTokenButton.setEnabled(false);
+        }
+    }
+
+>>>>>>> origin/cpn
     public void initColorInvariantPanel(){
 	    timeInvariantColorPanel = new JPanel(new GridBagLayout());
 
@@ -1083,7 +1108,11 @@ public class PlaceEditorPanel extends JPanel {
         colorTypeComboBox.setRenderer(new ColorComboBoxRenderer(colorTypeComboBox));
 
         colorTypeComboBox.addActionListener(actionEvent -> {
+<<<<<<< HEAD
             if(colorTypeComboBox.getSelectedItem() != null && colorTypeComboBox.getSelectedItem().equals( place.underlyingPlace().getColorType())){
+=======
+            if (colorTypeComboBox.getSelectedItem() != null && colorTypeComboBox.getSelectedItem().equals(tokenColorComboboxPanel.getColorType())) {
+>>>>>>> origin/cpn
                 return;
             }
             if (!(coloredTokenListModel.getSize() < 1) || !timeConstraintListModel.isEmpty()){

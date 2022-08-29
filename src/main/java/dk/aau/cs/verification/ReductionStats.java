@@ -3,6 +3,7 @@ package dk.aau.cs.verification;
 public class ReductionStats {
 	private final int removedTrantitions;
 	private final int removedPlaces;
+<<<<<<< HEAD
 	private final int ruleA;
 	private final int ruleB;
 	private final int ruleC;
@@ -27,6 +28,12 @@ public class ReductionStats {
 		this.ruleH = ruleH;
 		this.ruleI = ruleI;
 
+=======
+	
+	public ReductionStats(int removedTransitions, int removedPlaces) {
+		this.removedTrantitions = removedTransitions;
+		this.removedPlaces = removedPlaces;
+>>>>>>> origin/cpn
 	}
 	
 	public int getRemovedTransitions() {
@@ -37,6 +44,7 @@ public class ReductionStats {
 		return removedPlaces;
 	}
 
+<<<<<<< HEAD
 	public int getRuleA() {
 		return ruleA;
 	}
@@ -74,6 +82,9 @@ public class ReductionStats {
 	}
 	
 	@Override
+=======
+    @Override
+>>>>>>> origin/cpn
 	public String toString() {
 
         return
@@ -81,6 +92,7 @@ public class ReductionStats {
             removedPlaces +
             System.getProperty("line.separator") +
             "Removed transitions: " +
+<<<<<<< HEAD
             removedTrantitions +
             System.getProperty("line.separator") +
             "Applications of rules A, B, C, D, E, F, G, H, I: (" +
@@ -102,5 +114,8 @@ public class ReductionStats {
             ", " +
             ruleI +
             ")";
+=======
+            removedTrantitions;
+>>>>>>> origin/cpn
 	}
 }

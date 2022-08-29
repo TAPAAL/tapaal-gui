@@ -5,10 +5,13 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
+<<<<<<< HEAD
 import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.GuiFrameControllerActions;
 import net.tapaal.gui.SafeGuiFrameActions;
 import net.tapaal.gui.TabActions;
+=======
+>>>>>>> origin/cpn
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
@@ -39,26 +42,36 @@ import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.TabTransformer;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
+<<<<<<< HEAD
 import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import net.tapaal.gui.petrinet.dialog.NameVisibilityPanel;
 import net.tapaal.gui.petrinet.dialog.StatisticsPanel;
+=======
+>>>>>>> origin/cpn
 import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
 import net.tapaal.gui.petrinet.dialog.WorkflowDialog;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel;
+<<<<<<< HEAD
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import net.tapaal.gui.petrinet.model.GuiModelManager;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
+=======
+>>>>>>> origin/cpn
 import net.tapaal.gui.petrinet.undo.ChangeSpacingEditCommand;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.*;
 import net.tapaal.gui.petrinet.widgets.QueryPane;
+<<<<<<< HEAD
 import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.resourcemanager.ResourceManager;
+=======
+import net.tapaal.helpers.Reference.MutableReference;
+>>>>>>> origin/cpn
 import net.tapaal.swinghelpers.JSplitPaneFix;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
@@ -212,6 +225,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         return loader.loadLens(file);
     }
 
+<<<<<<< HEAD
 	private static void checkQueries(PetriNetTab tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<>();
         EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
@@ -229,6 +243,24 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         TimedArcPetriNetNetwork net = tab.network();
         for (TAPNQuery q : tab.queries()) {
             boolean hasEngine = false;
+=======
+    public static void checkQueries(PetriNetTab tab) {
+        List<TAPNQuery> queriesToRemove = new ArrayList<>();
+        boolean gameChanged = false;
+
+        EngineSupportOptions verifyTAPNOptions = new VerifyTAPNEngineOptions();
+        EngineSupportOptions UPPAALCombiOptions = new UPPAALCombiOptions();
+        EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
+        EngineSupportOptions UPPAALStandardOptions = new UPPAALStandardOptions();
+        EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
+        EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options();
+        EngineSupportOptions verifyDTAPNOptions = new VerifyDTAPNEngineOptions();
+        EngineSupportOptions verifyPNOptions = new VerifyPNEngineOptions();
+        EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
+
+        TimedArcPetriNetNetwork net = tab.network();
+        for (TAPNQuery q : tab.queries()) {
+>>>>>>> origin/cpn
             boolean[] queryOptions = new boolean[]{
                 q.getTraceOption() == TAPNQuery.TraceOption.FASTEST,
                 (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && net.getHighestNetDegree() <= 2),
@@ -246,10 +278,22 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 q.hasUntimedOnlyProperties(),
                 tab.lens.isColored()
             };
+<<<<<<< HEAD
             for(EngineSupportOptions engine : engineSupportOptions){
                 if(engine.areOptionsSupported(queryOptions)){
                     hasEngine = true;
                     break;
+=======
+
+            boolean hasEngine = tab.checkCurrentEngine(q.getReductionOption(), queryOptions);
+            if (!hasEngine) {
+                for(EngineSupportOptions engine : engineSupportOptions){
+                    if(engine.areOptionsSupported(queryOptions)){
+                        q = tab.setQueryEngine(q, engine);
+                        hasEngine = true;
+                        break;
+                    }
+>>>>>>> origin/cpn
                 }
             }
             if (!hasEngine) {
@@ -302,10 +346,70 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
                 new MessengerImpl().displayInfoMessage(fmessage, "Information");
             }).start();
+<<<<<<< HEAD
 
         }
 	}
 
+=======
+        }
+	}
+
+	private boolean checkCurrentEngine(ReductionOption reductionOption, boolean[] queryOptions) {
+        EngineSupportOptions engine;
+        switch (reductionOption) {
+            case VerifyDTAPN:
+                engine = new VerifyDTAPNEngineOptions(); 
+                break;
+            case VerifyPN:
+                engine = new VerifyPNEngineOptions();
+                break;
+            case VerifyTAPN:
+                engine = new VerifyTAPNEngineOptions();
+                break;
+            case BROADCAST:
+                engine = new UPPAALBroadcastOptions();
+                break;
+            case DEGREE2BROADCAST:
+                engine = new UPPAALBroadcastDegree2Options();
+                break;
+            case COMBI:
+                engine = new UPPAALCombiOptions();
+                break;
+            case STANDARD:
+                engine = new UPPAALStandardOptions();
+                break;
+            case OPTIMIZEDSTANDARD:
+                engine = new UPPAALOptimizedStandardOptions();
+                break;
+            default:
+                return false;
+        }
+        return engine.areOptionsSupported(queryOptions);
+    }
+
+    private TAPNQuery setQueryEngine(TAPNQuery query, EngineSupportOptions engine) {
+	    if (engine instanceof VerifyDTAPNEngineOptions) {
+	        query.setReductionOption(ReductionOption.VerifyDTAPN);
+        } else if (engine instanceof VerifyPNEngineOptions) {
+            query.setReductionOption(ReductionOption.VerifyPN);
+        } else if (engine instanceof VerifyTAPNEngineOptions) {
+            query.setReductionOption(ReductionOption.VerifyTAPN);
+        } else if (engine instanceof UPPAALBroadcastDegree2Options) {
+            query.setReductionOption(ReductionOption.DEGREE2BROADCAST);
+        } else if (engine instanceof UPPAALBroadcastOptions) {
+            query.setReductionOption(ReductionOption.BROADCAST);
+        } else if (engine instanceof UPPAALCombiOptions) {
+            query.setReductionOption(ReductionOption.COMBI);
+        } else if (engine instanceof UPPAALOptimizedStandardOptions) {
+            query.setReductionOption(ReductionOption.OPTIMIZEDSTANDARD);
+        } else if (engine instanceof UPPAALStandardOptions) {
+            query.setReductionOption(ReductionOption.STANDARD);
+        }
+	    return query;
+    }
+
+>>>>>>> origin/cpn
 	public static PetriNetTab createNewEmptyTab(String name, boolean isTimed, boolean isGame, boolean isColored){
         PetriNetTab tab = new PetriNetTab(isTimed, isGame, isColored);
 		tab.setInitialName(name);
@@ -418,7 +522,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
+<<<<<<< HEAD
 	private AnimationControlSidePanel animControllerBox;
+=======
+	private AnimationControlSidePanel animControlerBox;
+>>>>>>> origin/cpn
     private AnimationHistorySidePanel animationHistorySidePanel;
 
 	private AnimationHistoryList abstractAnimationPane = null;
@@ -522,6 +630,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             this.setRightComponent(drawingSurfaceDummy);
         }
         this.queries.setQueries(tapnqueries);
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/cpn
     }
 
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
@@ -713,8 +825,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         animationHistorySidePanel = new AnimationHistorySidePanel(animator);
 
+<<<<<<< HEAD
         if (animControllerBox == null) {
             animControllerBox = new AnimationControlSidePanel(animator, lens);
+=======
+        if (animControlerBox == null) {
+            animControlerBox = new AnimationControlSidePanel(animator, lens);
+>>>>>>> origin/cpn
         }
 		if (transitionFiring == null) {
             transitionFiring = new TransitionFiringComponent(TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions(), lens, animator);
@@ -754,8 +871,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
+<<<<<<< HEAD
 		gbc.weighty = 0.2;
 		animationControlsPanel.add(animControllerBox, gbc);
+=======
+		gbc.weighty = 0.0;
+		animationControlsPanel.add(animControlerBox, gbc);
+>>>>>>> origin/cpn
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -808,7 +930,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public AnimationControlSidePanel getAnimationController() {
+<<<<<<< HEAD
 		return animControllerBox;
+=======
+		return animControlerBox;
+>>>>>>> origin/cpn
 	}
 
 	public DelayEnabledTransitionControl getDelayEnabledTransitionControl(){
@@ -1261,6 +1387,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 	@Override
 	public void toggleAnimationMode() {
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/cpn
 		if (!animationmode) {
 			if (numberOfActiveTemplates() > 0) {
 
@@ -1276,6 +1406,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 					setSelectedTemplateWasActive();
 				}
 
+<<<<<<< HEAD
 				getAnimator().resetTraceBox();
 
 				getAnimator().reset(false);
@@ -1283,6 +1414,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     animControllerBox.resetPlacementOfAnimationToolBar();
 
                 }
+=======
+				getAnimator().reset(false);
+>>>>>>> origin/cpn
 				getAnimator().storeModel();
                 getAnimator().updateFireableTransitions();
                 getAnimator().reportBlockingPlaces();

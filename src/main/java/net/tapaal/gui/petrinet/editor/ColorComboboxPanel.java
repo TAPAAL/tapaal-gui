@@ -82,30 +82,51 @@ public abstract class ColorComboboxPanel extends JPanel {
     private void setIndex(ColorExpression expr, int index){
         if(expr instanceof AllExpression){
             //.all is always last so we just select the last item
+<<<<<<< HEAD
             colorTypeComboBoxesArray[index].setSelectedIndex(colorTypeComboBoxesArray[index].getItemCount());
+=======
+            colorTypeComboBoxesArray[index].setSelectedIndex(colorTypeComboBoxesArray[index].getItemCount() - 1);
+>>>>>>> origin/cpn
         } else if(expr instanceof VariableExpression){
             colorTypeComboBoxesArray[index].setSelectedItem(((VariableExpression)expr).getVariable());
         } else if(expr instanceof UserOperatorExpression){
             colorTypeComboBoxesArray[index].setSelectedItem(((UserOperatorExpression)expr).getUserOperator());
         } else if(expr instanceof TupleExpression){
             colorTypeComboBoxesArray[index].setSelectedItem(((TupleExpression)expr).getColors().get(0));
+<<<<<<< HEAD
+=======
+        } else if (expr instanceof PredecessorExpression) {
+            setIndex(((PredecessorExpression)expr).getPredecessorExpression(), index);
+        } else if (expr instanceof SuccessorExpression) {
+            setIndex(((SuccessorExpression)expr).getSuccessorExpression(), index);
+>>>>>>> origin/cpn
         } else {
             colorTypeComboBoxesArray[index].setSelectedItem(expr);
         }
     }
 
     public void updateColorType(ColorType ct){
+<<<<<<< HEAD
         updateColorType(ct, null);
     }
     public void updateColorType(ColorType ct, Context context){
         updateColorType(ct, context, false);
     }
     public void updateColorType(ColorType ct, Context context, boolean includePlaceHolder) {
+=======
+        updateColorType(ct, null, false, false);
+    }
+    public void updateColorType(ColorType ct, Context context, boolean includePlaceHolder, boolean transitionDialog) {
+>>>>>>> origin/cpn
         removeOldComboBoxes();
         colorType = ct;
 
         if (colorType instanceof ProductType) {
+<<<<<<< HEAD
             int numberOfComBoboxes = includePlaceHolder ? 1 : ((ProductType) colorType).getColorTypes().size();
+=======
+            int numberOfComBoboxes =  transitionDialog ? 1 : ((ProductType) colorType).getColorTypes().size();
+>>>>>>> origin/cpn
             colorTypeComboBoxesArray = new JComboBox[numberOfComBoboxes];
 
             for (int i = 0; i < colorTypeComboBoxesArray.length; i++) {
@@ -185,8 +206,15 @@ public abstract class ColorComboboxPanel extends JPanel {
     @Override
     public void setEnabled(boolean enabled){
         colorcomboBoxPanel.setEnabled(enabled);
+<<<<<<< HEAD
         for (var combobox : colorTypeComboBoxesArray) {
             combobox.setEnabled(enabled);
+=======
+        if (colorTypeComboBoxesArray != null) {
+            for (var combobox : colorTypeComboBoxesArray) {
+                combobox.setEnabled(enabled);
+            }
+>>>>>>> origin/cpn
         }
     }
 }

@@ -13,22 +13,31 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 	private boolean nextIsLoop;	
 	private int loopToIndex = -1;
 	private TraceType traceType;
+<<<<<<< HEAD
 	private String traceName;
+=======
+>>>>>>> origin/cpn
 	
 	
 	private final List<TimedArcPetriNetStep> steps = new ArrayList<TimedArcPetriNetStep>();
 	private final boolean isTimedTrace;
+<<<<<<< HEAD
 
     public TimedArcPetriNetTrace(boolean isTimedTrace, String traceName) {
         this.isTimedTrace = isTimedTrace;
         traceType = TraceType.NOT_EG;
         this.traceName = traceName;
     }
+=======
+>>>>>>> origin/cpn
 	
 	public TimedArcPetriNetTrace(boolean isTimedTrace) {
 		this.isTimedTrace = isTimedTrace;
 		traceType = TraceType.NOT_EG;
+<<<<<<< HEAD
 		this.traceName = "";
+=======
+>>>>>>> origin/cpn
 	}
 
 	public void add(TimedArcPetriNetStep step) {
@@ -40,6 +49,7 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 		steps.add(step);
 	}
 
+<<<<<<< HEAD
 	public String getTraceName() {
         return this.traceName;
     }
@@ -47,6 +57,8 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
     public void setTraceName(String traceName) {
         this.traceName = traceName;
     }
+=======
+>>>>>>> origin/cpn
 	public @NotNull Iterator<TimedArcPetriNetStep> iterator() {
 		return steps.iterator();
 	}

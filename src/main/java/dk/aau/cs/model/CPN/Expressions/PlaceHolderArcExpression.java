@@ -56,7 +56,11 @@ public class PlaceHolderArcExpression extends ArcExpression implements PlaceHold
     }
 
     @Override
+<<<<<<< HEAD
     public ArcExpression findFirstPlaceHolder() {
+=======
+    public Expression findFirstPlaceHolder() {
+>>>>>>> origin/cpn
         return this;
     }
 

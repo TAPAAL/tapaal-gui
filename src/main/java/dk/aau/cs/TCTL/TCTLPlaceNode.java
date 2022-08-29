@@ -7,7 +7,11 @@ public class TCTLPlaceNode extends TCTLAbstractStateProperty {
 
 	String template;
 	String place;
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> origin/cpn
 	public TCTLPlaceNode(String template, String place) {
 		this.template = NamePurifier.purify(template);
 		this.place = NamePurifier.purify(place);
