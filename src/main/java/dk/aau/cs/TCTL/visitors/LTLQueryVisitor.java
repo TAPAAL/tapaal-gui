@@ -42,6 +42,7 @@ public class LTLQueryVisitor extends VisitorBase {
     private static final String XML_INTEGERPRODUCT      = "integer-product";
     private static final String XML_INTEGERDIFFERENCE   = "integer-difference";
 
+
     private final StringBuffer xmlQuery = new StringBuffer();
 
     public LTLQueryVisitor() {
@@ -51,6 +52,10 @@ public class LTLQueryVisitor extends VisitorBase {
     public String getXMLQueryFor(TCTLAbstractProperty property, String queryName) {
         buildXMLQuery(property, queryName);
         return getFormatted();
+    }
+
+    public StringBuffer getXMLQuery() {
+        return xmlQuery;
     }
 
     public void buildXMLQuery(TCTLAbstractProperty property, String queryName) {
@@ -68,10 +73,6 @@ public class LTLQueryVisitor extends VisitorBase {
         XMLFormatter formatter = new XMLFormatter();
         xmlQuery.append(CTLQueries);
         return formatter.format(getStartTag() + xmlQuery.toString() + getEndTag());
-    }
-
-    public StringBuffer getXMLQuery() {
-        return xmlQuery;
     }
 
     public String getStartTag(){

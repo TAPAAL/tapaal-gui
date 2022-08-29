@@ -1,6 +1,14 @@
 package net.tapaal.gui.petrinet.verification;
 
 import dk.aau.cs.Messenger;
+<<<<<<< HEAD
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+=======
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.PNMLoader;
@@ -8,13 +16,19 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.FormatException;
+>>>>>>> origin/cpn
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
+<<<<<<< HEAD
+import net.tapaal.TAPAAL;
+import net.tapaal.swinghelpers.GridBagHelper;
+=======
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.MessengerImpl;
+>>>>>>> origin/cpn
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -78,6 +92,11 @@ public class RunVerification extends RunVerificationBase {
 				);
 
                 if (options.traceOption() != TAPNQuery.TraceOption.NONE) {
+<<<<<<< HEAD
+
+                    if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
+                        TAPAALGUI.getAnimator().setTrace(result.getTrace(), result.getTraceMap());
+=======
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
                         if ((lens != null && lens.isColored()) || model.isColored()) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
@@ -86,6 +105,7 @@ public class RunVerification extends RunVerificationBase {
                             } else return false;
                         }
                         TAPAALGUI.getAnimator().setTrace(result.getTrace());
+>>>>>>> origin/cpn
                     } else {
                         if ((
                             //XXX: this is not complete, we need a better way to signal the engine could not create a trace
@@ -109,6 +129,16 @@ public class RunVerification extends RunVerificationBase {
 			//version GLIB_2.0 not defined in file libc.so.6 with
 			//link time reference
 			//is the error as this (often) means the possibility for a uppaal licence key error
+<<<<<<< HEAD
+			
+			String extraInformation = "";
+			
+			if (result != null && (result.errorMessage().contains("relocation") || result.errorMessage().toLowerCase().contains("internet connection is required for activation"))){
+				
+				extraInformation = "We detected an error that often arises when UPPAAL is missing a valid Licence file.\n" +
+						"Open the UPPAAL GUI while connected to the internet to correct this problem.";
+				
+=======
 
             if (((lens != null && lens.isColored()) || model.isColored())) {
                 if (result != null && result.errorMessage().contains("Only weight=1")) {
@@ -134,6 +164,7 @@ public class RunVerification extends RunVerificationBase {
 			if (result != null && (result.errorMessage().contains("relocation") || result.errorMessage().toLowerCase().contains("internet connection is required for activation"))){
 				extraInformation = "We detected an error that often arises when UPPAAL is missing a valid Licence file.\n" +
 						"Open the UPPAAL GUI while connected to the internet to correct this problem.";
+>>>>>>> origin/cpn
 			}
 			
 			String message = "An error occured during the verification." +
@@ -145,8 +176,14 @@ public class RunVerification extends RunVerificationBase {
 				System.getProperty("line.separator") + 	
 				System.getProperty("line.separator");
 			}
+<<<<<<< HEAD
+			
+			message += "Model checker output:\n" + result.errorMessage();
+			
+=======
 			message += "Model checker output:\n" + result.errorMessage();
 
+>>>>>>> origin/cpn
 			messenger.displayWrappedErrorMessage(message,"Error during verification");
 
 		}
@@ -359,7 +396,11 @@ public class RunVerification extends RunVerificationBase {
 			if(!result.getReductionResultAsString().isEmpty()){
 
                 JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
+<<<<<<< HEAD
+				gbc = GridBagHelper.as(0,6, WEST, new Insets(0,0,20,-90));
+=======
 				gbc = GridBagHelper.as(0,6, WEST, new Insets(0,0,10,-90));
+>>>>>>> origin/cpn
 				panel.add(reductionStatsLabel, gbc);
 
 				if(result.reductionRulesApplied()){

@@ -17,10 +17,13 @@ public class VariableExpression extends ColorExpression {
     }
 
     public VariableExpression(Variable variable) {
+<<<<<<< HEAD
+=======
         this(variable, variable.getColorType());
     }
     public VariableExpression(Variable variable, ColorType colorType) {
         super(colorType);
+>>>>>>> origin/cpn
         this.variable = variable;
     }
 
@@ -50,6 +53,14 @@ public class VariableExpression extends ColorExpression {
     }
 
     @Override
+<<<<<<< HEAD
+    public ColorType getColorType(List<ColorType> colorTypes) {
+        return variable.getColorType();
+    }
+
+    @Override
+=======
+>>>>>>> origin/cpn
     public ColorExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
         if(replaceAllInstances) {
             if (this.equals(object1) && object2 instanceof ColorExpression) {
@@ -171,7 +182,12 @@ public class VariableExpression extends ColorExpression {
     }
 
     @Override
+<<<<<<< HEAD
+    public Vector<ColorType> getColorTypes(){
+
+=======
     public Vector<ColorType> getColorTypes() {
+>>>>>>> origin/cpn
         return new Vector<>(Collections.singletonList(variable.getColorType()));
     }
 

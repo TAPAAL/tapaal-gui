@@ -37,7 +37,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+<<<<<<< HEAD
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+=======
+import java.util.List;
+>>>>>>> origin/cpn
 
 public class VerifyPN implements ModelChecker {
 
@@ -280,7 +286,10 @@ public class VerifyPN implements ModelChecker {
         if (runner.error()) {
             return null;
         } else {
+<<<<<<< HEAD
+=======
             PetriNetTab newTab = null;
+>>>>>>> origin/cpn
             TimedArcPetriNetTrace tapnTrace = null;
             String errorOutput = readOutput(runner.errorOutput());
             String standardOutput = readOutput(runner.standardOutput());
@@ -290,20 +299,35 @@ public class VerifyPN implements ModelChecker {
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
             } else {
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/cpn
                 boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
                 boolean showTrace = ((query.getProperty() instanceof TCTLEFNode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAGNode && !queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
+<<<<<<< HEAD
+                    (query.getProperty() instanceof TCTLAFNode && !queryResult.value1().isQuerySatisfied()));
+=======
                     (query.getProperty() instanceof TCTLAFNode && !queryResult.value1().isQuerySatisfied())) ||
                     (query.getProperty() instanceof LTLENode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof LTLANode && !queryResult.value1().isQuerySatisfied());
+>>>>>>> origin/cpn
 
                 if (options.traceOption() != TraceOption.NONE && isColored && showTrace) {
                     PNMLoader tapnLoader = new PNMLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
+<<<<<<< HEAD
+                    PetriNetTab newTab;
+                    LoadedModel loadedModel = null;
+                    try {
+                        loadedModel = tapnLoader.load(fileOut);
+=======
                     try {
                         LoadedModel loadedModel = tapnLoader.load(fileOut);
+>>>>>>> origin/cpn
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
                         model = newComposer.transformModel(loadedModel.network());
 
@@ -311,6 +335,22 @@ public class VerifyPN implements ModelChecker {
                             tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
                         }
 
+<<<<<<< HEAD
+                        if (!(tapnTrace == null)) {
+                            int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
+                            if (dialogResult == JOptionPane.OK_OPTION) {
+                                newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
+
+                                //The query being verified should be the only query
+                                for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network())) {
+                                    newTab.setInitialName(loadedQuery.getName() + " - unfolded");
+                                    loadedQuery.copyOptions(dataLayerQuery);
+                                    newTab.addQuery(loadedQuery);
+                                }
+                                TAPAALGUI.openNewTabFromStream(newTab);
+                            } else {
+                                options.setTraceOption(TraceOption.NONE);
+=======
                         if (tapnTrace != null) {
                             newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
 
@@ -319,22 +359,41 @@ public class VerifyPN implements ModelChecker {
                                 newTab.setInitialName(loadedQuery.getName() + " - unfolded");
                                 loadedQuery.copyOptions(dataLayerQuery);
                                 newTab.addQuery(loadedQuery);
+>>>>>>> origin/cpn
                             }
                         }
                     } catch (FormatException e) {
                         e.printStackTrace();
+<<<<<<< HEAD
+                    } catch (ThreadDeath d) {
+=======
                     } catch (NullPointerException | ThreadDeath n) {
+>>>>>>> origin/cpn
                         return null;
                     }
                 }
 
                 ctlOutput = queryResult.value1().isCTL;
 
+<<<<<<< HEAD
+                if(query.getCategory() == QueryCategory.HyperLTL && options.traceOption() != TraceOption.NONE) {
+                    Map<String, TimedArcPetriNetTrace> parsedTraceMap = traceMap(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
+                    var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
+
+                    return result;
+                }
+
+=======
+>>>>>>> origin/cpn
                 if (tapnTrace == null) {
                     tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
                 }
 
+<<<<<<< HEAD
+                var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
+=======
                 var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
+>>>>>>> origin/cpn
 
                 return result;
             }
@@ -344,8 +403,11 @@ public class VerifyPN implements ModelChecker {
     @Nullable
     private TimedArcPetriNetTrace trace(String errorOutput, String standardOutput, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, Tuple<QueryResult, Stats> queryResult) {
         TimedArcPetriNetTrace tapnTrace;
+<<<<<<< HEAD
+=======
 
         if(!errorOutput.toLowerCase().contains("trace") && !standardOutput.contains("<trace>")) return null;
+>>>>>>> origin/cpn
         if (!errorOutput.contains("Trace") && standardOutput.contains("<trace>")) {
             // Trace is on stdout
             String trace = "Trace:\n";
@@ -373,6 +435,39 @@ public class VerifyPN implements ModelChecker {
         return tapnTrace;
     }
 
+<<<<<<< HEAD
+    @Nullable
+    private Map<String, TimedArcPetriNetTrace> traceMap(String errorOutput, String standardOutput, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, Tuple<QueryResult, Stats> queryResult) {
+        Map<String, TimedArcPetriNetTrace> tapnTracesMap;
+
+        if (!errorOutput.contains("Trace") && standardOutput.contains("<trace>")) {
+            // Trace is on stdout
+            String trace = "Trace:\n";
+            trace += (standardOutput.split("(?=<trace>)")[1]);
+            trace = trace.split("(?<=</trace>)")[0];
+            tapnTracesMap = parseMultipleTraces(trace, options, model, exportedModel, query, queryResult.value1());
+        } else {
+            // Trace is on stderr
+            // Verifypn will with some options output (at lest TAR) some extra information in the error output, therefor we need to find the trace tag
+            if (errorOutput.contains("<trace>")) {
+                var split = errorOutput.split("(?=<trace>)");
+                if (split.length > 1 ) {
+                    String trace = "Trace\n";
+                    trace += split[1];
+                    trace = trace.split("(?<=</trace>)")[0];
+                    tapnTracesMap = parseMultipleTraces(trace, options, model, exportedModel, query, queryResult.value1());
+                } else {
+                    tapnTracesMap = parseMultipleTraces(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                }
+            } else {
+                tapnTracesMap = parseMultipleTraces(errorOutput, options, model, exportedModel, query, queryResult.value1());
+            }
+        }
+        return tapnTracesMap;
+    }
+
+=======
+>>>>>>> origin/cpn
     private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
         if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
         if ((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) ||
@@ -387,6 +482,33 @@ public class VerifyPN implements ModelChecker {
         return traceParser.parseTrace(new BufferedReader(new StringReader(output)));
     }
 
+<<<<<<< HEAD
+    private Map<String, TimedArcPetriNetTrace> parseMultipleTraces(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
+        if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
+        if ((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) ||
+            (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) ||
+            (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) ||
+            (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())) {
+            return null;
+        }
+
+        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
+        Map<String, TimedArcPetriNetTrace> parsedTracesMap = new LinkedHashMap<>();
+
+        if(query.getCategory() == QueryCategory.HyperLTL) {
+            for(int i = 0; i < query.getTraceList().size(); i++) {
+                traceParser.setTraceToParse(query.getTraceList().get(i));
+                TimedArcPetriNetTrace result = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
+                parsedTracesMap.put(query.getTraceList().get(i), result);
+
+            }
+            return parsedTracesMap;
+        }
+        return null;
+    }
+
+=======
+>>>>>>> origin/cpn
     private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
         StringBuilder buffer = new StringBuilder(options.toString());
         buffer.append(' ');
@@ -419,7 +541,11 @@ public class VerifyPN implements ModelChecker {
     }
 
     private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query) {
+<<<<<<< HEAD
+        Tuple<QueryResult, Stats> result = null;
+=======
         Tuple<QueryResult, Stats> result;
+>>>>>>> origin/cpn
         if (output.contains("Processed N. Edges:")) {
             VerifyPNCTLOutputParser outputParser = new VerifyPNCTLOutputParser(totalTokens, extraTokens, query);
             result = outputParser.parseOutput(output);
@@ -437,7 +563,11 @@ public class VerifyPN implements ModelChecker {
     }
 
     public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
+<<<<<<< HEAD
+        if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL || query.getCategory() == QueryCategory.HyperLTL) {
+=======
         if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL) {
+>>>>>>> origin/cpn
             return true;
         }
         if (query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {

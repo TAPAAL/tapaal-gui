@@ -23,6 +23,10 @@ import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
+<<<<<<< HEAD
+import dk.aau.cs.TCTL.visitors.HyperLTLQueryVisitor;
+=======
+>>>>>>> origin/cpn
 import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
@@ -114,6 +118,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		appendTemplates(document, pnmlRootNode);
 
         appendQueries(document, pnmlRootNode);
+<<<<<<< HEAD
+		appendDefaultBound(document, pnmlRootNode);
+=======
+>>>>>>> origin/cpn
 		appendFeature(document, pnmlRootNode);
 
 		document.normalize();
@@ -160,6 +168,15 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 							+ "\"" + e);
 		}
 	}
+<<<<<<< HEAD
+	
+	private void appendDefaultBound(Document document, Element root) {
+		Element element = document.createElement("k-bound");
+		element.setAttribute("bound", network.getDefaultBound() + "");
+		root.appendChild(element);
+	}
+=======
+>>>>>>> origin/cpn
 
     private void appendFeature(Document document, Element root) {
         String isTimed = "true";
@@ -295,10 +312,21 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private void appendQueries(Document document, Element root) {
 		for (TAPNQuery query : queries) {
 			Element newQuery;
+<<<<<<< HEAD
+			if (query.getCategory() == QueryCategory.CTL){
+				newQuery = createCTLQueryElement(query, document);
+			} else if (query.getCategory() == QueryCategory.LTL) {
+                newQuery = createLTLQueryElement(query, document);
+            } else if(query.getCategory() == QueryCategory.HyperLTL) {
+			    newQuery = createHyperLTLQueryElement(query, document);
+            }else {
+				newQuery = createQueryElement(query, document);
+=======
 			if (query.getCategory() == QueryCategory.LTL){
 			    newQuery = createLTLQueryElement(query, document);
             } else {
                 newQuery = createCTLQueryElement(query, document);
+>>>>>>> origin/cpn
 			}
 			root.appendChild(newQuery);
 		}
@@ -345,10 +373,14 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 		Element queryElement = document.createElement("query");
 
+<<<<<<< HEAD
+		Node queryFormula = XMLQueryStringToElement(new CTLQueryVisitor().getXMLQueryFor(query.getProperty(), query.getName(), false));
+=======
 		CTLQueryVisitor ctlQueryVisitor = new CTLQueryVisitor();
 		ctlQueryVisitor.buildXMLQuery(query.getProperty(), query.getName(), false);
 
 		Node queryFormula = XMLQueryStringToElement(ctlQueryVisitor.getXMLQuery().toString());
+>>>>>>> origin/cpn
 		queryElement.appendChild(document.importNode(queryFormula, true));
 		
 		queryElement.setAttribute("name", query.getName());
@@ -384,16 +416,65 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         return queryElement;
 	}
 
+<<<<<<< HEAD
+    private Element createHyperLTLQueryElement(TAPNQuery query, Document document) {
+        Require.that(query != null, "Error: query was null");
+        Require.that(document != null, "Error: document was null");
+
+        Element queryElement = document.createElement("query");
+
+        Node queryFormula = XMLQueryStringToElement(new HyperLTLQueryVisitor().getXMLQueryFor(query.getProperty(), query.getName()));
+        queryElement.appendChild(document.importNode(queryFormula, true));
+
+        String traces = String.join(",", query.getTraceList());
+
+        queryElement.setAttribute("name", query.getName());
+        queryElement.setAttribute("type", query.getCategory().toString());
+        queryElement.setAttribute("traces", traces);
+        queryElement.setAttribute("capacity", "" + query.getCapacity());
+        queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
+        queryElement.setAttribute("searchOption", "" + query.getSearchOption());
+        queryElement.setAttribute("hashTableSize", "" + query.getHashTableSize());
+        queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
+        queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
+        queryElement.setAttribute("symmetry", "" + query.useSymmetry());
+        queryElement.setAttribute("gcd", "" + query.useGCD());
+        queryElement.setAttribute("timeDarts", "" + query.useTimeDarts());
+        queryElement.setAttribute("pTrie", "" + query.usePTrie());
+        queryElement.setAttribute("discreteInclusion", String.valueOf(query.discreteInclusion()));
+        queryElement.setAttribute("active", "" + query.isActive());
+        queryElement.setAttribute("inclusionPlaces", getInclusionPlacesString(query));
+        queryElement.setAttribute("overApproximation", "" + query.useOverApproximation());
+        queryElement.setAttribute("reduction", "" + query.useReduction());
+        queryElement.setAttribute("enableOverApproximation", "" + query.isOverApproximationEnabled());
+        queryElement.setAttribute("enableUnderApproximation", "" + query.isUnderApproximationEnabled());
+        queryElement.setAttribute("approximationDenominator", "" + query.approximationDenominator());
+        queryElement.setAttribute("algorithmOption", "" + query.getAlgorithmOption());
+        queryElement.setAttribute("useSiphonTrapAnalysis", "" + query.isSiphontrapEnabled());
+        queryElement.setAttribute("useQueryReduction", "" + query.isQueryReductionEnabled());
+        queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
+        queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
+        queryElement.setAttribute("useTarjan", "" + query.isTarjan());
+
+        return queryElement;
+    }
+
+=======
+>>>>>>> origin/cpn
     private Element createLTLQueryElement(TAPNQuery query, Document document) {
         Require.that(query != null, "Error: query was null");
         Require.that(document != null, "Error: document was null");
 
         Element queryElement = document.createElement("query");
 
+<<<<<<< HEAD
+        Node queryFormula = XMLQueryStringToElement(new LTLQueryVisitor().getXMLQueryFor(query.getProperty(), query.getName()));
+=======
         LTLQueryVisitor ltlQueryVisitor = new LTLQueryVisitor();
         ltlQueryVisitor.buildXMLQuery(query.getProperty(), query.getName());
 
         Node queryFormula = XMLQueryStringToElement(ltlQueryVisitor.getXMLQuery().toString());
+>>>>>>> origin/cpn
         queryElement.appendChild(document.importNode(queryFormula, true));
 
         queryElement.setAttribute("name", query.getName());

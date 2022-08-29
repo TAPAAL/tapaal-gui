@@ -23,11 +23,16 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+<<<<<<< HEAD
+import net.tapaal.gui.petrinet.undo.MoveElementDownCommand;
+import net.tapaal.gui.petrinet.undo.MoveElementUpCommand;
+=======
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.undo.MoveElementDownCommand;
 import net.tapaal.gui.petrinet.undo.MoveElementUpCommand;
 import net.tapaal.gui.petrinet.verification.EngineSupportOptions;
+>>>>>>> origin/cpn
 import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.gui.MessengerImpl;
@@ -453,7 +458,12 @@ public class QueryPane extends JPanel implements SidePane {
 	private void verifyQuery() {
 		TAPNQuery query = queryList.getSelectedValue();
 		int NumberOfSelectedElements = queryList.getSelectedIndices().length;
+<<<<<<< HEAD
+		
+		
+=======
 
+>>>>>>> origin/cpn
 		if(NumberOfSelectedElements == 1) {
 			if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN)
 				Verifier.runVerifyTAPNVerification(tabContent.network(), query, null, tabContent.getGuiModels(), false, tabContent.lens);

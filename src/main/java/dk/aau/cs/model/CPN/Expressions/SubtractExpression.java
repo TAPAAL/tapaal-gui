@@ -79,7 +79,11 @@ public class SubtractExpression extends ArcExpression {
     }
 
     @Override
+<<<<<<< HEAD
+    public ArcExpression findFirstPlaceHolder() {
+=======
     public Expression findFirstPlaceHolder() {
+>>>>>>> origin/cpn
         if (left.containsPlaceHolder()) {
             return left.findFirstPlaceHolder();
         }

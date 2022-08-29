@@ -91,7 +91,11 @@ public class AddExpression extends ArcExpression {
     }
 
     @Override
+<<<<<<< HEAD
+    public ArcExpression findFirstPlaceHolder() {
+=======
     public Expression findFirstPlaceHolder() {
+>>>>>>> origin/cpn
         for (ArcExpression constituent : constituents) {
             if (constituent.containsPlaceHolder()) {
                 return constituent.findFirstPlaceHolder();

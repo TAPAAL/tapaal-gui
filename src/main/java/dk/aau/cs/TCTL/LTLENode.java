@@ -4,6 +4,7 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
 public class LTLENode extends TCTLAbstractPathProperty {
     TCTLAbstractStateProperty property;
+    String trace;
 
     public void setProperty(TCTLAbstractStateProperty property) {
         this.property = property;
@@ -14,21 +15,45 @@ public class LTLENode extends TCTLAbstractPathProperty {
         return property;
     }
 
+    public LTLENode(TCTLAbstractStateProperty property, String trace) {
+        this.property = property;
+        this.property.setParent(this);
+        this.trace = trace;
+    }
+
     public LTLENode(TCTLAbstractStateProperty property) {
         this.property = property;
         this.property.setParent(this);
+        this.trace = "";
+    }
+
+    public LTLENode(String trace) {
+        this.property = new TCTLStatePlaceHolder();
+        this.property.setParent(this);
+        this.trace = trace;
     }
 
     public LTLENode() {
         this.property = new TCTLStatePlaceHolder();
         this.property.setParent(this);
+        this.trace = "";
+    }
+
+    public String getTrace() {
+        return trace;
     }
 
     @Override
     public String toString() {
+        if(trace.equals("")) {
+            String s = property.isSimpleProperty() ? property.toString() : "("
+                + property.toString() + ")";
+            return "E " + s;
+        }
+
         String s = property.isSimpleProperty() ? property.toString() : "("
             + property.toString() + ")";
-        return "E " + s;
+        return "E " + trace + " " + s;
     }
 
     @Override
@@ -38,9 +63,14 @@ public class LTLENode extends TCTLAbstractPathProperty {
 
     @Override
     public StringPosition[] getChildren() {
+        int offset = 0;
+        if(!trace.equals("")) {
+            offset = trace.length() + 1;
+        }
+
         int start = property.isSimpleProperty() ? 0 : 1;
-        start = start + 2;
-        int end = start + property.toString().length();
+        start = start + 2 + offset;
+        int end = start + property.toString().length() + offset;
         StringPosition position = new StringPosition(start, end, property);
 
         StringPosition[] children = { position };
@@ -48,8 +78,7 @@ public class LTLENode extends TCTLAbstractPathProperty {
     }
 
     @Override
-    public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1,
-                                            TCTLAbstractProperty object2) {
+    public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
         if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
             return (TCTLAbstractPathProperty) object2;
         } else {
@@ -72,14 +101,14 @@ public class LTLENode extends TCTLAbstractPathProperty {
     public boolean equals(Object o) {
         if (o instanceof LTLENode) {
             LTLENode node = (LTLENode) o;
-            return property.equals(node.getProperty());
+            return property.equals(node.getProperty()) && trace.equals(node.getTrace());
         }
         return false;
     }
 
     @Override
     public TCTLAbstractPathProperty copy() {
-        return new LTLENode(property.copy());
+        return new LTLENode(property.copy(), trace);
     }
 
     @Override

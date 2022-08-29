@@ -4,23 +4,38 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+<<<<<<< HEAD
+import java.awt.event.*;
+=======
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+>>>>>>> origin/cpn
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
+<<<<<<< HEAD
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Vector;
+=======
+>>>>>>> origin/cpn
 import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
+<<<<<<< HEAD
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+=======
+>>>>>>> origin/cpn
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.util.Require;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
@@ -52,6 +67,11 @@ public class AnimationControlSidePanel extends JPanel {
 	private JPanel sliderPanel;
 	private JPanel timedelayPanel;
     JPanel firemode;
+<<<<<<< HEAD
+    private JComboBox traceBox;
+    private JToolBar animationToolBar;
+=======
+>>>>>>> origin/cpn
 
 
 
@@ -65,14 +85,22 @@ public class AnimationControlSidePanel extends JPanel {
         this.animator = animator;
 
 		setLayout(new GridBagLayout());
+<<<<<<< HEAD
+
+=======
 		GridBagConstraints c = new GridBagConstraints();
+>>>>>>> origin/cpn
 
 		firermodebox = new NonsearchableJComboBox<>(Animator.FIRINGMODES);
 		updateFiringModeComboBox();
 
 		firermodebox.addActionListener(evt -> animator.setFiringmode((String) firermodebox.getSelectedItem()));
 
+<<<<<<< HEAD
+		animationToolBar = new JToolBar();
+=======
 		JToolBar animationToolBar = new JToolBar();
+>>>>>>> origin/cpn
 		animationToolBar.setFloatable(false);
 		animationToolBar.setBorder(new EmptyBorder(0, 0, 0, 0));
 		animationToolBar.add(animator.stepbackwardAction);
@@ -80,6 +108,21 @@ public class AnimationControlSidePanel extends JPanel {
 
 		animationToolBar.setVisible(true);
 
+<<<<<<< HEAD
+        traceBox = new JComboBox<>(new DefaultComboBoxModel<>());
+        Dimension dim = new Dimension(197, 27);
+        traceBox.setMaximumSize(dim);
+        traceBox.setMinimumSize(dim);
+        traceBox.setPreferredSize(dim);
+        showTraceBox(false);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(traceBox, gbc);
+
+        GridBagConstraints c = new GridBagConstraints();
+=======
+>>>>>>> origin/cpn
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 0.5;
 		c.gridx = 0;
@@ -102,7 +145,11 @@ public class AnimationControlSidePanel extends JPanel {
 
         initDelaySlider();
 
+<<<<<<< HEAD
+
+=======
                 
+>>>>>>> origin/cpn
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createTitledBorder("Simulation Control"), BorderFactory
 				.createEmptyBorder(3, 3, 3, 3)));
@@ -113,7 +160,67 @@ public class AnimationControlSidePanel extends JPanel {
 		hideIrrelevantInformation(lens);
 	}
 
+<<<<<<< HEAD
+    public void updateTraceBox(Map<String, TAPNNetworkTrace> traceMap) {
+        Vector<Object> tracesVector = new Vector<Object>();
+
+        for(var entry : traceMap.entrySet()) {
+            tracesVector.add(entry.getKey());
+        }
+
+        traceBox.setModel(new DefaultComboBoxModel<>(tracesVector));
+
+        traceBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent event) {
+                if(traceBox.getSelectedItem() != null) {
+                    animator.changeTrace(traceMap.get(traceBox.getSelectedItem().toString()));
+                }
+            }
+        });
+
+        showTraceBox(true);
+
+        remove(animationToolBar);
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.5;
+        c.gridx = 0;
+        c.gridy = 1;
+        add(animationToolBar, c);
+
+    }
+
+    public void resetPlacementOfAnimationToolBar() {
+        remove(animationToolBar);
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.5;
+        c.gridx = 0;
+        c.gridy = 2;
+        add(animationToolBar, c);
+
+    }
+
+    private void showTraceBox(boolean shouldShow) {
+	    traceBox.setEnabled(shouldShow);
+	    traceBox.setVisible(shouldShow);
+    }
+
+    public void resetTraceBox(boolean shouldHideTraceBox) {
+	    if(shouldHideTraceBox) showTraceBox(false);
+	    traceBox.removeAllItems();
+    }
+
+    public JComboBox getTraceBox() {
+	    return traceBox;
+    }
+
+
+    private void hideIrrelevantInformation(TAPNLens lens){
+=======
 	private void hideIrrelevantInformation(TAPNLens lens){
+>>>>>>> origin/cpn
         sliderPanel.setVisible(lens.isTimed());
         timedelayPanel.setVisible(lens.isTimed());
         firemode.setVisible(lens.isTimed());

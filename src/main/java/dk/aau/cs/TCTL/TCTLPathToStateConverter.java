@@ -98,7 +98,10 @@ public class TCTLPathToStateConverter extends TCTLAbstractStateProperty{
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return property.findFirstPlaceHolder();
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/cpn
 	}
 	
 }

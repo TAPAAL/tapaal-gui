@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
-
+import dk.aau.cs.TCTL.XMLParsing.XMLHyperLTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import dk.aau.cs.io.LoadedQueries;
 import net.tapaal.gui.petrinet.TAPNLens;
@@ -103,33 +103,32 @@ public class XMLQueryLoader extends QueryLoader{
             boolean isKnownGame = (lens != null && lens.isGame()); // XXX: This is a hack, not sure why network does not know if it a game, also control tag should used to check if query is a game
             boolean canBeCTL = isTimed || canBeCTL(prop);
             boolean canBeLTL = !isTimed && !isKnownGame && canBeLTL(prop);
+            boolean canBeHyperLTL = !isTimed && !isKnownGame && canBeHyperLTL(prop);
 
-            if ((canBeCTL && canBeLTL && choice == -1) && queryCategories == null) {
+            int counter = 0;
+            if (canBeCTL) counter += 1;
+            if (canBeLTL) counter += 1;
+            if(canBeHyperLTL) counter += 1;
+
+            if (counter >=2 && choice == -1) {
                 choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(),
-                    "There were some queries that can be classified both as LTL and CTL. \nHow do you want to import them?",
+                    "There were some queries that can be classified as CTL, LTL or HyperLTL. \nHow do you want to import them?",
                     "Choose query category",
                     JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
                     null,
-                    new Object[]{"Import all as CTL", "Import all as LTL", "Cancel"},
+                    new Object[]{"Import all as CTL", "Import all as LTL", "Import all as HyperLTL", "Cancel"},
                     0);
-            } else if (!canBeCTL && !canBeLTL) {
+            } else if (!canBeCTL && !canBeLTL && !canBeHyperLTL) {
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                     "One or more queries do not have the correct format.");
             }
-            if (choice == 2) return null;
+            if (choice == 3) return null;
 
 
-            boolean isCTL = (canBeCTL && !canBeLTL) || (canBeCTL && canBeLTL && choice == 0);
-            boolean isLTL = (!canBeCTL && canBeLTL) || (canBeCTL && canBeLTL && choice == 1 );
-
-            if (queryCategories != null && queryCategories.size() > i) {
-                if (queryCategories.get(i) == TAPNQuery.QueryCategory.CTL) {
-                    isCTL = true;
-                } else if (queryCategories.get(i) == TAPNQuery.QueryCategory.LTL) {
-                    isLTL = true;
-                }
-            }
+            boolean isCTL = (canBeCTL && (!canBeLTL && !canBeHyperLTL)) || (counter >=2 && choice == 0);
+            boolean isLTL = ((!canBeCTL && canBeHyperLTL) && canBeLTL) || (counter >=2  && choice == 1);
+            boolean isHyperLTL = ((!canBeCTL && !canBeLTL) && canBeHyperLTL) || (counter >=2  && choice == 2);
 
             // Update queryWrapper name and property
             if (isCTL) {
@@ -142,23 +141,35 @@ public class XMLQueryLoader extends QueryLoader{
                     queries.add(null);
                     continue;
                 }
+            } else if (isHyperLTL) {
+                if (!XMLHyperLTLQueryParser.parse(prop, queryWrapper)) {
+                    queries.add(null);
+                    continue;
+                }
             }
 
             // The number 9999 is the number of extra tokens allowed,
             // this is set high s.t. we don't have to change it manually
             TAPNQuery query = new TAPNQuery(queryWrapper.getName(), 9999,
-                queryWrapper.getProp(),TraceOption.NONE, SearchOption.HEURISTIC, 
+                queryWrapper.getProp(),TraceOption.NONE, SearchOption.HEURISTIC,
                 ReductionOption.VerifyPN, true, false, true, true, true, true, 
                 HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces(), network.isColored());
 
             RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
                 network.activeTemplates().get(0).name());
 
-            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), isCTL, isLTL));
+            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), isCTL, isLTL, isHyperLTL));
             
             if(query.getCategory() == TAPNQuery.QueryCategory.CTL || query.getCategory() == TAPNQuery.QueryCategory.LTL){
             	query.setSearchOption(SearchOption.DFS);
             	query.setUseReduction(true);
+            }
+
+            if(query.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
+                query.setSearchOption(SearchOption.DFS);
+                query.setTraceList(queryWrapper.getTraceList());
+                query.setUseStubbornReduction(false);
+                query.setUseReduction(false);
             }
             
             query.getProperty().accept(rt, null);
@@ -199,33 +210,68 @@ public class XMLQueryLoader extends QueryLoader{
         return true;
     }
 
+    public static boolean canBeHyperLTL(Node prop) {
+        NodeList children = prop.getChildNodes();
+        int hyperLTLNodesCount = 0;
+
+        for(int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            hyperLTLNodesCount += countHyperLTLNodes(child);
+
+            if (hyperLTLNodesCount > 0){
+                return true;
+            }
+        }
+
+        return hyperLTLNodesCount > 0;
+    }
+
+    public static int countHyperLTLNodes(Node prop) {
+        NodeList children = prop.getChildNodes();
+        int count = 0;
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if(child.getNodeName().equals("path-scope")) {
+                return 1;
+            }
+
+            if(child.getNodeName().equals("exists-path") || child.getNodeName().equals("all-paths")) {
+                if(child.getAttributes().getLength() > 0) {
+                    return 1;
+                }
+            }
+            count += countHyperLTLNodes(child);
+        }
+        return count;
+    }
+
     public static boolean canBeLTL(Node prop) {
         NodeList children = prop.getChildNodes();
-        int counter = 0;
+        int allPathsCounter = 0;
 
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if (child.getNodeName().equals("formula")) {
-                counter += countSupportedPaths(child);
+                allPathsCounter += countAllPaths(child);
             }
         }
-        return counter == 1;
+        return allPathsCounter == 1;
     }
 
-    private static int countSupportedPaths(Node prop) {
+    private static int countAllPaths(Node prop) {
         NodeList children = prop.getChildNodes();
-        int counter = 0;
+        int allPathsCounter = 0;
 
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (child.getNodeName().equals("all-paths") || child.getNodeName().equals("exists-path")) {
-                counter++;
-            } else if (child.getNodeName().equals("deadlock")){
+            if (child.getNodeName().equals("all-paths")) {
+                allPathsCounter++;
+            } else if (child.getNodeName().equals("exists-path") || child.getNodeName().equals("deadlock")){
                 return 100;
             }
-            counter += countSupportedPaths(child);
+            allPathsCounter += countAllPaths(child);
         }
-        return counter;
+        return allPathsCounter;
     }
 
     public static void importQueries(File file, TimedArcPetriNetNetwork network, PetriNetTab tab){

@@ -3,10 +3,37 @@ package dk.aau.cs.verification;
 public class ReductionStats {
 	private final int removedTrantitions;
 	private final int removedPlaces;
+<<<<<<< HEAD
+	private final int ruleA;
+	private final int ruleB;
+	private final int ruleC;
+	private final int ruleD;
+	private final int ruleE;
+	private final int ruleF;
+	private final int ruleG;
+	private final int ruleH;
+	private final int ruleI;
+
+	
+	public ReductionStats(int removedTransitions, int removedPlaces, int ruleA, int ruleB, int ruleC, int ruleD, int ruleE, int ruleF, int ruleG, int ruleH, int ruleI) {
+		this.removedTrantitions = removedTransitions;
+		this.removedPlaces = removedPlaces;
+		this.ruleA = ruleA;
+		this.ruleB = ruleB;
+		this.ruleC = ruleC;
+		this.ruleD = ruleD;
+		this.ruleE = ruleE;
+		this.ruleF = ruleF;
+		this.ruleG = ruleG;
+		this.ruleH = ruleH;
+		this.ruleI = ruleI;
+
+=======
 	
 	public ReductionStats(int removedTransitions, int removedPlaces) {
 		this.removedTrantitions = removedTransitions;
 		this.removedPlaces = removedPlaces;
+>>>>>>> origin/cpn
 	}
 	
 	public int getRemovedTransitions() {
@@ -17,7 +44,47 @@ public class ReductionStats {
 		return removedPlaces;
 	}
 
+<<<<<<< HEAD
+	public int getRuleA() {
+		return ruleA;
+	}
+
+	public int getRuleB() {
+		return ruleB;
+	}
+
+	public int getRuleC() {
+		return ruleC;
+	}
+
+	public int getRuleD() {
+		return ruleD;
+	}
+	
+	public int getRuleE() {
+		return ruleE;
+	}
+	
+	public int getRuleF() {
+		return ruleE;
+	}
+	
+	public int getRuleG() {
+		return ruleE;
+	}
+	
+	public int getRuleH() {
+		return ruleE;
+	}
+	
+	public int getRuleI() {
+		return ruleE;
+	}
+	
+	@Override
+=======
     @Override
+>>>>>>> origin/cpn
 	public String toString() {
 
         return
@@ -25,6 +92,30 @@ public class ReductionStats {
             removedPlaces +
             System.getProperty("line.separator") +
             "Removed transitions: " +
+<<<<<<< HEAD
+            removedTrantitions +
+            System.getProperty("line.separator") +
+            "Applications of rules A, B, C, D, E, F, G, H, I: (" +
+            ruleA +
+            ", " +
+            ruleB +
+            ", " +
+            ruleC +
+            ", " +
+            ruleD +
+            ", " +
+            ruleE +
+            ", " +
+            ruleF +
+            ", " +
+            ruleG +
+            ", " +
+            ruleH +
+            ", " +
+            ruleI +
+            ")";
+=======
             removedTrantitions;
+>>>>>>> origin/cpn
 	}
 }

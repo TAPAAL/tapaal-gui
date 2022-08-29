@@ -120,7 +120,11 @@ TCTLAbstractPathProperty AbstractPathProperty() :
 TCTLAbstractPathProperty ParanthesesExpr() :
 {
     TCTLAbstractPathProperty pathChild = null;
+<<<<<<< HEAD
+    TCTLAbstractStateProperty stateChild = null;
+=======
             TCTLAbstractStateProperty stateChild = null;
+>>>>>>> origin/cpn
 }
 {
     "(" pathChild = QuantifierExpr() ")" {return pathChild;}
@@ -208,13 +212,23 @@ TCTLAbstractStateProperty AndExpr() :
     TCTLAbstractStateProperty left;
     TCTLAbstractStateProperty right;
     Token op;
+<<<<<<< HEAD
+    String operator;
+=======
+>>>>>>> origin/cpn
     }
     {
     (
     left = AritmeticExpr() op = <OP> right = AritmeticExpr()
     )
     {
+<<<<<<< HEAD
+        operator = op.image;
+        if(operator.equals("==")) operator = "=";
+        return new TCTLAtomicPropositionNode(left, operator, right);
+=======
     return new TCTLAtomicPropositionNode(left, op.image, right);
+>>>>>>> origin/cpn
     }
     }
 

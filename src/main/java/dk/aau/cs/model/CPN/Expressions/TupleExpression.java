@@ -17,11 +17,14 @@ public class TupleExpression extends ColorExpression {
     }
 
     public TupleExpression(Vector<ColorExpression> colors) {
+<<<<<<< HEAD
+=======
         this(colors, null);
     }
     // Important to set ColorType if used in ColoredTransitionGuardPanel dialog
     public TupleExpression(Vector<ColorExpression> colors, ColorType colorType) {
         super(colorType);
+>>>>>>> origin/cpn
         this.colors = colors;
         int i = 0;
         for(ColorExpression color : colors){
@@ -47,6 +50,9 @@ public class TupleExpression extends ColorExpression {
 
     @Override
     public boolean containsColor(Color color) {
+<<<<<<< HEAD
+        return equals(color);
+=======
         boolean containsColor = false;
         Vector<Color> tuple = color.getTuple();
         if (tuple != null && tuple.size() == colors.size()) {
@@ -58,6 +64,7 @@ public class TupleExpression extends ColorExpression {
             }
         }
         return containsColor || equals(color);
+>>>>>>> origin/cpn
     }
 
     @Override
@@ -86,12 +93,22 @@ public class TupleExpression extends ColorExpression {
         return false;
     }
 
+<<<<<<< HEAD
+    @Override
+=======
+>>>>>>> origin/cpn
     public ColorType getColorType(List<ColorType> colorTypes) {
         Vector<ColorType> expressionColorTypes = new Vector<>();
 
         for (ColorExpression ce : this.colors) {
+<<<<<<< HEAD
+            expressionColorTypes.add(ce.getColorType(colorTypes));
+        }
+
+=======
             expressionColorTypes.add(ce.getColorType());
         }
+>>>>>>> origin/cpn
         for (ColorType ct : colorTypes) {
             if (ct instanceof ProductType) {
                 ProductType pt = (ProductType) ct;
@@ -103,7 +120,10 @@ public class TupleExpression extends ColorExpression {
 
         return  null;
     }
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/cpn
     @Override
     public boolean isComparable(ColorExpression otherExpr){
         otherExpr = otherExpr.getBottomColorExpression();
@@ -149,9 +169,13 @@ public class TupleExpression extends ColorExpression {
 
     @Override
     public ColorExpression copy() {
+<<<<<<< HEAD
+        return new TupleExpression(new Vector<>(colors));
+=======
         return (colorType == null) ?
             new TupleExpression(new Vector<>(colors)) :
             new TupleExpression(new Vector<>(colors), colorType.copy());
+>>>>>>> origin/cpn
     }
 
     @Override
@@ -162,9 +186,13 @@ public class TupleExpression extends ColorExpression {
             colorsCopy.add(expr.deepCopy());
         }
 
+<<<<<<< HEAD
+        return new TupleExpression(colorsCopy);
+=======
         return (colorType == null) ?
             new TupleExpression(colorsCopy) :
             new TupleExpression(colorsCopy, colorType.copy());
+>>>>>>> origin/cpn
     }
 
     @Override
@@ -245,9 +273,15 @@ public class TupleExpression extends ColorExpression {
     }
 
     @Override
+<<<<<<< HEAD
+    public Vector<ColorType> getColorTypes(){
+        Vector<ColorType> constituentColorTypes = new Vector<>();
+        //assumes single level producttypes
+=======
     public Vector<ColorType> getColorTypes() {
         Vector<ColorType> constituentColorTypes = new Vector<>();
         //assumes single level productTypes
+>>>>>>> origin/cpn
         for(ColorExpression uexpr : getColors()){
             constituentColorTypes.addAll(uexpr.getColorTypes());
         }

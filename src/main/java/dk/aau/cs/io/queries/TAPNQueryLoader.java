@@ -1,9 +1,10 @@
 package dk.aau.cs.io.queries;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
 import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.XMLParsing.XMLHyperLTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -74,6 +75,8 @@ public class TAPNQueryLoader extends QueryLoader{
 		String algorithmOption = queryElement.getAttribute("algorithmOption");
         boolean isCTL = isTypeQuery(queryElement, "CTL");
         boolean isLTL = isTypeQuery(queryElement, "LTL");
+        boolean isHyperLTL = isTypeQuery(queryElement, "HyperLTL");
+
 		boolean siphontrap = getReductionOption(queryElement, "useSiphonTrapAnalysis", false);
 		boolean queryReduction = getReductionOption(queryElement, "useQueryReduction", true);
 		boolean stubborn = getReductionOption(queryElement, "useStubbornReduction", true);
@@ -84,10 +87,15 @@ public class TAPNQueryLoader extends QueryLoader{
         boolean symmetricVars = getUnfoldingOption(queryElement, "symmetricVars", true);
 
 		TCTLAbstractProperty query;
+        ArrayList<String> tracesArr = new ArrayList<String>();
 		if (queryElement.hasAttribute("type") && queryElement.getAttribute("type").equals("LTL")) {
-		    query = parseLTLQueryProperty(queryElement);
-        }
-		else if (queryElement.getElementsByTagName("formula").item(0) != null){
+            query = parseLTLQueryProperty(queryElement);
+        } else if (queryElement.hasAttribute("type") && queryElement.getAttribute("type").equals("HyperLTL")){
+		    query = parseHyperLTLQueryProperty(queryElement);
+            if(queryElement.hasAttribute("traces")) {
+                tracesArr.addAll(getTraces(queryElement));
+            }
+        } else if (queryElement.getElementsByTagName("formula").item(0) != null){
 			query = parseCTLQueryProperty(queryElement);
 		} else {
 			query = parseQueryProperty(queryElement.getAttribute("query"));
@@ -97,7 +105,7 @@ public class TAPNQueryLoader extends QueryLoader{
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator, partitioning, colorFixpoint, symmetricVars, network.isColored());
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
-			parsedQuery.setCategory(detectCategory(query, isCTL, isLTL));
+			parsedQuery.setCategory(detectCategory(query, isCTL, isLTL, isHyperLTL));
 			parsedQuery.setUseSiphontrap(siphontrap);
 			parsedQuery.setUseQueryReduction(queryReduction);
 			parsedQuery.setUseStubbornReduction(stubborn);
@@ -105,15 +113,18 @@ public class TAPNQueryLoader extends QueryLoader{
             parsedQuery.setUseTarjan(useTarjan);
 			if (parsedQuery.getCategory() == QueryCategory.CTL){
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
-			}
+			} else if(parsedQuery.getCategory() == QueryCategory.HyperLTL) {
+                parsedQuery.setTraceList(tracesArr);
+            }
 			return parsedQuery;
 		} else
 			return null;
 	}
-	
-	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query, boolean isCTL, boolean isLTL){
+
+	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query, boolean isCTL, boolean isLTL, boolean isHyperLTL){
         if (isCTL) return TAPNQuery.QueryCategory.CTL;
         if (isLTL) return QueryCategory.LTL;
+        if (isHyperLTL) return QueryCategory.HyperLTL;
 
         StringPosition[] children = query.getChildren();
 
@@ -141,6 +152,8 @@ public class TAPNQueryLoader extends QueryLoader{
 				query instanceof TCTLAUNode ||
 				query instanceof TCTLAXNode) {
             return TAPNQuery.QueryCategory.CTL;
+        } else if(query instanceof HyperLTLPathScopeNode){
+		    return QueryCategory.HyperLTL;
         }
 
         // If query is a fireability query
@@ -149,7 +162,7 @@ public class TAPNQueryLoader extends QueryLoader{
         }
         if(query instanceof TCTLPlusListNode){
                 for(TCTLAbstractStateProperty sp : ((TCTLPlusListNode)query).getProperties()) {
-                        if(TAPNQueryLoader.detectCategory(sp, isCTL, isLTL) == TAPNQuery.QueryCategory.CTL){
+                        if(TAPNQueryLoader.detectCategory(sp, isCTL, isLTL, isHyperLTL) == TAPNQuery.QueryCategory.CTL){
                             return TAPNQuery.QueryCategory.CTL;
                         }
                 }
@@ -157,7 +170,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		
                 // If any property has been converted
 		for (StringPosition child : children) {
-			if(TAPNQueryLoader.detectCategory(child.getObject(), isCTL, isLTL) == TAPNQuery.QueryCategory.CTL){
+			if(TAPNQueryLoader.detectCategory(child.getObject(), isCTL, isLTL, isHyperLTL) == TAPNQuery.QueryCategory.CTL){
 				return TAPNQuery.QueryCategory.CTL;
 			} 
 		}
@@ -322,6 +335,17 @@ public class TAPNQueryLoader extends QueryLoader{
         return query;
     }
 
+    private TCTLAbstractProperty parseHyperLTLQueryProperty(Node queryElement){
+        TCTLAbstractProperty query = null;
+        try {
+            query = XMLHyperLTLQueryParser.parse(queryElement);
+        } catch (XMLQueryParseException e) {
+            messages.add(ERROR_PARSING_QUERY_MESSAGE);
+        }
+
+        return query;
+    }
+
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {
 		TCTLAbstractProperty query = null;
 		try {
@@ -410,4 +434,19 @@ public class TAPNQueryLoader extends QueryLoader{
 		else
 			return activeString.equals("true");
 	}
+
+	private List<String> getTraces(Element element) {
+        List<String> traces = new ArrayList<String>();
+
+
+        try {
+            String[] tracesArr = element.getAttribute("traces").split(",");
+            traces = Arrays.asList(tracesArr);
+
+        } catch (Exception e) {
+            traces.add("T1");
+        }
+
+	    return traces;
+    }
 }

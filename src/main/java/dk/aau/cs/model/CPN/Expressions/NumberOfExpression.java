@@ -7,7 +7,13 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
+<<<<<<< HEAD
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+=======
 import java.util.*;
+>>>>>>> origin/cpn
 
 public class NumberOfExpression extends ArcExpression {
     private Integer number;
@@ -58,7 +64,11 @@ public class NumberOfExpression extends ArcExpression {
         Vector<Color> colors = new Vector<>();
         ColorType ct = null;
         for (ColorExpression ce : color) {
+<<<<<<< HEAD
+            if(ce instanceof AllExpression){
+=======
             if (ce instanceof AllExpression) {
+>>>>>>> origin/cpn
                 if (ct == null) {
                     ct = ((AllExpression) ce).getSort();
                 } else {
@@ -115,10 +125,18 @@ public class NumberOfExpression extends ArcExpression {
     }
 
     @Override
+<<<<<<< HEAD
+    public ArcExpression findFirstPlaceHolder() {
+        for (ColorExpression expr : color) {
+            if (expr.containsPlaceHolder()) {
+                return null;
+            //  return expr.findFirstPlaceHolder();
+=======
     public Expression findFirstPlaceHolder() {
         for (ColorExpression expr : color) {
             if (expr.containsPlaceHolder()) {
                 return expr.findFirstPlaceHolder();
+>>>>>>> origin/cpn
             }
         }
         return null;
