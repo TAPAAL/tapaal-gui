@@ -23,10 +23,7 @@ import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
-<<<<<<< HEAD
 import dk.aau.cs.TCTL.visitors.HyperLTLQueryVisitor;
-=======
->>>>>>> origin/cpn
 import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
@@ -118,10 +115,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		appendTemplates(document, pnmlRootNode);
 
         appendQueries(document, pnmlRootNode);
-<<<<<<< HEAD
-		appendDefaultBound(document, pnmlRootNode);
-=======
->>>>>>> origin/cpn
 		appendFeature(document, pnmlRootNode);
 
 		document.normalize();
@@ -168,15 +161,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 							+ "\"" + e);
 		}
 	}
-<<<<<<< HEAD
-	
-	private void appendDefaultBound(Document document, Element root) {
-		Element element = document.createElement("k-bound");
-		element.setAttribute("bound", network.getDefaultBound() + "");
-		root.appendChild(element);
-	}
-=======
->>>>>>> origin/cpn
 
     private void appendFeature(Document document, Element root) {
         String isTimed = "true";
@@ -312,7 +296,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private void appendQueries(Document document, Element root) {
 		for (TAPNQuery query : queries) {
 			Element newQuery;
-<<<<<<< HEAD
 			if (query.getCategory() == QueryCategory.CTL){
 				newQuery = createCTLQueryElement(query, document);
 			} else if (query.getCategory() == QueryCategory.LTL) {
@@ -321,12 +304,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			    newQuery = createHyperLTLQueryElement(query, document);
             }else {
 				newQuery = createQueryElement(query, document);
-=======
-			if (query.getCategory() == QueryCategory.LTL){
-			    newQuery = createLTLQueryElement(query, document);
-            } else {
-                newQuery = createCTLQueryElement(query, document);
->>>>>>> origin/cpn
 			}
 			root.appendChild(newQuery);
 		}
@@ -373,14 +350,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 		Element queryElement = document.createElement("query");
 
-<<<<<<< HEAD
-		Node queryFormula = XMLQueryStringToElement(new CTLQueryVisitor().getXMLQueryFor(query.getProperty(), query.getName(), false));
-=======
 		CTLQueryVisitor ctlQueryVisitor = new CTLQueryVisitor();
 		ctlQueryVisitor.buildXMLQuery(query.getProperty(), query.getName(), false);
 
 		Node queryFormula = XMLQueryStringToElement(ctlQueryVisitor.getXMLQuery().toString());
->>>>>>> origin/cpn
 		queryElement.appendChild(document.importNode(queryFormula, true));
 		
 		queryElement.setAttribute("name", query.getName());
@@ -416,7 +389,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         return queryElement;
 	}
 
-<<<<<<< HEAD
     private Element createHyperLTLQueryElement(TAPNQuery query, Document document) {
         Require.that(query != null, "Error: query was null");
         Require.that(document != null, "Error: document was null");
@@ -459,22 +431,16 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         return queryElement;
     }
 
-=======
->>>>>>> origin/cpn
     private Element createLTLQueryElement(TAPNQuery query, Document document) {
         Require.that(query != null, "Error: query was null");
         Require.that(document != null, "Error: document was null");
 
         Element queryElement = document.createElement("query");
 
-<<<<<<< HEAD
-        Node queryFormula = XMLQueryStringToElement(new LTLQueryVisitor().getXMLQueryFor(query.getProperty(), query.getName()));
-=======
         LTLQueryVisitor ltlQueryVisitor = new LTLQueryVisitor();
         ltlQueryVisitor.buildXMLQuery(query.getProperty(), query.getName());
 
         Node queryFormula = XMLQueryStringToElement(ltlQueryVisitor.getXMLQuery().toString());
->>>>>>> origin/cpn
         queryElement.appendChild(document.importNode(queryFormula, true));
 
         queryElement.setAttribute("name", query.getName());

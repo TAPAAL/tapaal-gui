@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 package pipe.gui.petrinet.undo;
 
 import net.tapaal.gui.petrinet.undo.Command;
@@ -26,32 +25,3 @@ public class DeleteAnnotationNoteCommand extends Command {
         model.removePetriNetObject(note);
     }
 }
-=======
-package pipe.gui.petrinet.undo;
-
-import net.tapaal.gui.petrinet.undo.Command;
-import pipe.gui.petrinet.dataLayer.DataLayer;
-import pipe.gui.petrinet.graphicElements.AnnotationNote;
-
-public class DeleteAnnotationNoteCommand extends Command {
-
-    private final AnnotationNote note;
-    private final DataLayer model;
-
-    public DeleteAnnotationNoteCommand(AnnotationNote note, DataLayer model){
-        this.note = note;
-        this.model = model;
-    }
-
-    @Override
-    public void undo() {
-        model.addPetriNetObject(note);
-    }
-
-    @Override
-    public void redo() {
-        note.deselect();
-        model.removePetriNetObject(note);
-    }
-}
->>>>>>> origin/cpn
