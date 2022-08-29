@@ -4,38 +4,30 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-<<<<<<< HEAD
-import java.awt.event.*;
-=======
+
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
->>>>>>> origin/cpn
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
-=======
->>>>>>> origin/cpn
 import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
-<<<<<<< HEAD
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-=======
->>>>>>> origin/cpn
+
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.util.Require;
 import net.tapaal.swinghelpers.DecimalOnlyDocumentFilter;
@@ -67,13 +59,8 @@ public class AnimationControlSidePanel extends JPanel {
 	private JPanel sliderPanel;
 	private JPanel timedelayPanel;
     JPanel firemode;
-<<<<<<< HEAD
     private JComboBox traceBox;
     private JToolBar animationToolBar;
-=======
->>>>>>> origin/cpn
-
-
 
     public final JTextField TimeDelayField = new JTextField();
 	final JComboBox<String> firermodebox;
@@ -85,22 +72,14 @@ public class AnimationControlSidePanel extends JPanel {
         this.animator = animator;
 
 		setLayout(new GridBagLayout());
-<<<<<<< HEAD
-
-=======
-		GridBagConstraints c = new GridBagConstraints();
->>>>>>> origin/cpn
 
 		firermodebox = new NonsearchableJComboBox<>(Animator.FIRINGMODES);
 		updateFiringModeComboBox();
 
 		firermodebox.addActionListener(evt -> animator.setFiringmode((String) firermodebox.getSelectedItem()));
 
-<<<<<<< HEAD
 		animationToolBar = new JToolBar();
-=======
-		JToolBar animationToolBar = new JToolBar();
->>>>>>> origin/cpn
+
 		animationToolBar.setFloatable(false);
 		animationToolBar.setBorder(new EmptyBorder(0, 0, 0, 0));
 		animationToolBar.add(animator.stepbackwardAction);
@@ -108,7 +87,6 @@ public class AnimationControlSidePanel extends JPanel {
 
 		animationToolBar.setVisible(true);
 
-<<<<<<< HEAD
         traceBox = new JComboBox<>(new DefaultComboBoxModel<>());
         Dimension dim = new Dimension(197, 27);
         traceBox.setMaximumSize(dim);
@@ -121,8 +99,6 @@ public class AnimationControlSidePanel extends JPanel {
         add(traceBox, gbc);
 
         GridBagConstraints c = new GridBagConstraints();
-=======
->>>>>>> origin/cpn
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 0.5;
 		c.gridx = 0;
@@ -145,11 +121,6 @@ public class AnimationControlSidePanel extends JPanel {
 
         initDelaySlider();
 
-<<<<<<< HEAD
-
-=======
-                
->>>>>>> origin/cpn
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createTitledBorder("Simulation Control"), BorderFactory
 				.createEmptyBorder(3, 3, 3, 3)));
@@ -160,7 +131,6 @@ public class AnimationControlSidePanel extends JPanel {
 		hideIrrelevantInformation(lens);
 	}
 
-<<<<<<< HEAD
     public void updateTraceBox(Map<String, TAPNNetworkTrace> traceMap) {
         Vector<Object> tracesVector = new Vector<Object>();
 
@@ -218,9 +188,6 @@ public class AnimationControlSidePanel extends JPanel {
 
 
     private void hideIrrelevantInformation(TAPNLens lens){
-=======
-	private void hideIrrelevantInformation(TAPNLens lens){
->>>>>>> origin/cpn
         sliderPanel.setVisible(lens.isTimed());
         timedelayPanel.setVisible(lens.isTimed());
         firemode.setVisible(lens.isTimed());
@@ -461,8 +428,6 @@ public class AnimationControlSidePanel extends JPanel {
 		return new BigDecimal(parseTime.toString(), new MathContext(Constants.AGE_PRECISION));
 	}
 
-
-	
 	private void initializeDocumentFilterForDelayInput() {
 		javax.swing.text.Document doc = TimeDelayField.getDocument();
 		((AbstractDocument)doc).setDocumentFilter(new DecimalOnlyDocumentFilter(5));
