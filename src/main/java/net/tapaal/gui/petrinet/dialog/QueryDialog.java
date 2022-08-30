@@ -3115,7 +3115,19 @@ public class QueryDialog extends JPanel {
         //size of range of integers panel
         traceDialog.setMinimumSize(new Dimension(447, 231));
         traceDialog.setLocationRelativeTo(null);
+
+        UpdateTempTraceList();
+
         traceDialog.setVisible(true);
+    }
+
+    private void UpdateTempTraceList() {
+        tempTraceModel.removeAllElements();
+
+        for (int i = 0; i < traceList.getModel().getSize(); i++) {
+            tempTraceModel.addElement(traceList.getModel().getElementAt(i));
+        }
+        tempTraceList.setModel(tempTraceModel);
     }
 
     private void addNewTrace(String traceName, boolean isFromTraceDialogBox) {
@@ -3152,8 +3164,7 @@ public class QueryDialog extends JPanel {
             } else {
                 traceModel.addElement(traceName);
                 traceList.setModel(traceModel);
-                if(isFromTraceDialogBox) tempTraceModel.addElement(traceName);
-                if(isFromTraceDialogBox) tempTraceList.setModel(tempTraceModel);
+
                 if(isFromTraceDialogBox) traceTextField.setText("");
                 if(isFromTraceDialogBox) traceRemoveButton.setEnabled(true);
             }
@@ -3203,25 +3214,15 @@ public class QueryDialog extends JPanel {
         return buttonPanel;
     }
 
-
     private void cancelTraceChanges() {
         int tempListSize = tempTraceList.getModel().getSize();
 
-        // If we have removed some traces, but press cancel, we add them back
-        // Otherwise, the added traces will be removed
-        if(tempListSize > traceList.getModel().getSize()) {
-            traceModel.removeAllElements();
-            for(int i = 0; i < tempListSize; i++) {
-                traceModel.removeElement(tempTraceList.getModel().getElementAt(i));
-            }
-            traceList.setModel(traceModel);
-
-        } else if(tempListSize > 0) {
-            for(int i = 0; i < tempListSize; i++) {
-                traceModel.removeElement(tempTraceList.getModel().getElementAt(i));
-            }
-            traceList.setModel(traceModel);
+        traceModel.removeAllElements();
+        for(int i = 0; i < tempListSize; i++) {
+            traceModel.addElement(tempTraceList.getModel().getElementAt(i));
         }
+        traceList.setModel(traceModel);
+
     }
 
     private void exitTraceDialog() {
