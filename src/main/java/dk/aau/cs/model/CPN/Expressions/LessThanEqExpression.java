@@ -40,7 +40,7 @@ public class LessThanEqExpression extends GuardExpression implements LeftRightGu
         }
         else {
             left = left.replace(object1, object2,replaceAllInstances);
-            right = right.replace(object1, object2,replaceAllInstances);=
+            right = right.replace(object1, object2,replaceAllInstances);
             colorType = left.getColorType();
             return this;
         }
