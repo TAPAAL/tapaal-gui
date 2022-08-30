@@ -3232,6 +3232,7 @@ public class QueryDialog extends JPanel {
 
     private void exitTraceDialog() {
         updateTraceBox();
+        traceBox.setSelectedIndex(traceList.getModel().getSize() - 1);
         traceDialog.setVisible(false);
     }
 
