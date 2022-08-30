@@ -335,7 +335,7 @@ public class VerifyPN implements ModelChecker {
 
                 if(query.getCategory() == QueryCategory.HyperLTL && options.traceOption() != TraceOption.NONE) {
                     Map<String, TimedArcPetriNetTrace> parsedTraceMap = traceMap(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
-                    var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
+                    var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
 
                     return result;
                 }

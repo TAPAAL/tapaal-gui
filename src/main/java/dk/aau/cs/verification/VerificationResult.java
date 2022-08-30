@@ -99,8 +99,8 @@ public class VerificationResult<TTrace> {
                               TTrace tapnTrace,
                               TTrace secondaryTrace2, long runningTime,
                               Stats value2,
-                              boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel) {
-        this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, rawOutput, unfoldedModel, null);
+                              boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel, PetriNetTab unfoldedTab) {
+        this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, rawOutput, unfoldedModel, unfoldedTab);
         this.secondaryTrace = secondaryTrace2;
     }
 
