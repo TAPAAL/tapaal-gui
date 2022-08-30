@@ -9,6 +9,7 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 
 import org.w3c.dom.NodeList;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class XMLHyperLTLQueryParser {
@@ -443,7 +444,10 @@ public class XMLHyperLTLQueryParser {
             return new TCTLTermListNode(intExpList);
         } else if(nodeName.equals("path-scope")) {
             children = getAllChildren(integerExpression);
-            return parseIntegerExpression(children.get(0));
+            String trace = integerExpression.getAttributes().item(0).getNodeValue();
+
+            TCTLAbstractProperty pathScopeChild = parseIntegerExpression(children.get(0));
+            return new HyperLTLPathScopeNode((TCTLAbstractStateProperty) pathScopeChild, trace);
         }
 
         throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
