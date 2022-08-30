@@ -16,10 +16,7 @@ public class PredecessorExpression extends ColorExpression {
     }
 
     public  PredecessorExpression(ColorExpression color) {
-<<<<<<< HEAD
-=======
         super(color.colorType);
->>>>>>> origin/cpn
         this.color = color;
     }
 
@@ -49,14 +46,6 @@ public class PredecessorExpression extends ColorExpression {
     }
 
     @Override
-<<<<<<< HEAD
-    public ColorType getColorType(List<ColorType> colorTypes) {
-        return color.getColorType(colorTypes);
-    }
-
-    @Override
-=======
->>>>>>> origin/cpn
     public ColorExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
         if (object1.toString().equals(this.toString()) && object2 instanceof ColorExpression) {
             ColorExpression obj2 = (ColorExpression)object2;
@@ -106,12 +95,7 @@ public class PredecessorExpression extends ColorExpression {
 
     @Override
     public ExprStringPosition[] getChildren() {
-<<<<<<< HEAD
-
-        ExprStringPosition pos = new ExprStringPosition(0, color.toString().length() - 2, color);
-=======
         ExprStringPosition pos = new ExprStringPosition(0, color.toString().length(), color);
->>>>>>> origin/cpn
         return new ExprStringPosition[]{pos};
     }
 
@@ -131,11 +115,7 @@ public class PredecessorExpression extends ColorExpression {
     }
 
     @Override
-<<<<<<< HEAD
-    public Vector<ColorType> getColorTypes(){
-=======
     public Vector<ColorType> getColorTypes() {
->>>>>>> origin/cpn
         return color.getColorTypes();
     }
 

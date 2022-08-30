@@ -227,26 +227,14 @@ TCTLAbstractStateProperty AtomicProposition() :
 	TCTLAbstractStateProperty left; 
 	TCTLAbstractStateProperty right; 
 	Token op;
-<<<<<<< HEAD
-	String operator;
-=======
->>>>>>> origin/cpn
 }
 {
 	( 
 		left = AritmeticExpr() op = <OP> right = AritmeticExpr()
 	)
-<<<<<<< HEAD
-    {
-        operator = op.image;
-        if(operator.equals("==")) operator = "=";
-        return new TCTLAtomicPropositionNode(left, operator, right);
-    }
-=======
 	{
-                return new TCTLAtomicPropositionNode(left, op.image, right);
-        }
->>>>>>> origin/cpn
+         return new TCTLAtomicPropositionNode(left, op.image, right);
+     }
 }
 
 TCTLAbstractStateProperty AritmeticExpr() : 

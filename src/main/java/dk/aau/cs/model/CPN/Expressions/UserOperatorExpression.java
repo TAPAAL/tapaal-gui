@@ -19,13 +19,10 @@ public class UserOperatorExpression extends ColorExpression {
     }
 
     public UserOperatorExpression(Color userOperator) {
-<<<<<<< HEAD
-=======
         this(userOperator, userOperator.getColorType());
     }
     public UserOperatorExpression(Color userOperator, ColorType colorType) {
         super(colorType);
->>>>>>> origin/cpn
         this.userOperator = userOperator;
     }
 
@@ -52,14 +49,6 @@ public class UserOperatorExpression extends ColorExpression {
     }
 
     @Override
-<<<<<<< HEAD
-    public ColorType getColorType(List<ColorType> colorTypes) {
-        return userOperator.getColorType();
-    }
-
-    @Override
-=======
->>>>>>> origin/cpn
     public String toString() {
         return userOperator.toString();
     }
@@ -142,11 +131,7 @@ public class UserOperatorExpression extends ColorExpression {
     }
 
     @Override
-<<<<<<< HEAD
-    public Vector<ColorType> getColorTypes(){
-=======
     public Vector<ColorType> getColorTypes() {
->>>>>>> origin/cpn
         return new Vector<>(Collections.singletonList(userOperator.getColorType()));
     }
 

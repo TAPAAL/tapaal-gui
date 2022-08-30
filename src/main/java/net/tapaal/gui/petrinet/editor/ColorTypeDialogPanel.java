@@ -168,10 +168,6 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.insets = new Insets(5, 8, 0, 8);
         container.add(productTypePanel, gbc);
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/cpn
         JPanel buttonPanel = createButtonPanel();
         gbc.insets = new Insets(0, 8, 5, 8);
         gbc.gridx = 0;
@@ -398,11 +394,8 @@ public class ColorTypeDialogPanel extends JPanel {
         JPanel firstRow = new JPanel();
         firstRow.setLayout(new GridBagLayout());
 
-<<<<<<< HEAD
-        JLabel enumNameLabel = new JLabel("Name: ");
-=======
         JLabel enumNameLabel = new JLabel("Element name: ");
->>>>>>> origin/cpn
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -620,11 +613,8 @@ public class ColorTypeDialogPanel extends JPanel {
         }
 
         if (!messages.isEmpty()) {
-<<<<<<< HEAD
-            String message = "Colortype cannot have colors removed for the following reasons: \n\n";
-=======
             String message = "The color type cannot be modified for the following reasons: \n\n";
->>>>>>> origin/cpn
+
             for (String m : messages) {
                 if (!message.contains(m)) message += m;
             }
@@ -691,10 +681,6 @@ public class ColorTypeDialogPanel extends JPanel {
 
         productModel = new DefaultListModel();
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/cpn
         colorTypes = new ArrayList<>();
         colorTypes = network.colorTypes();
 
@@ -702,12 +688,6 @@ public class ColorTypeDialogPanel extends JPanel {
         productTypeComboBox.setRenderer(new ColortypeListCellRenderer());
 
         for (ColorType element : colorTypes) {
-<<<<<<< HEAD
-            if(!(element instanceof ProductType)){
-                productTypeComboBox.addItem(element);
-            }
-        }
-=======
             if (!(element instanceof ProductType) && element != ColorType.COLORTYPE_DOT) {
                 productTypeComboBox.addItem(element);
             }
@@ -715,7 +695,6 @@ public class ColorTypeDialogPanel extends JPanel {
         if (productTypeComboBox.getItemCount() == 0) {
             colorTypeComboBox.removeItem(productColor);
         }
->>>>>>> origin/cpn
 
         gbc.insets = new Insets(2, 4, 2, 4);
         gbc.gridx = 1;
@@ -746,10 +725,7 @@ public class ColorTypeDialogPanel extends JPanel {
         JPanel scrollPanePanel = new JPanel();
         scrollPanePanel.setLayout(new GridBagLayout());
         productColorTypeList = new JList();
-<<<<<<< HEAD
-=======
         productColorTypeList.setCellRenderer(new ColortypeListCellRenderer());
->>>>>>> origin/cpn
         productColorTypeList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 JList source = (JList) e.getSource();
@@ -850,15 +826,9 @@ public class ColorTypeDialogPanel extends JPanel {
                 productColorTypeList.setModel(productModel);
                 productRemoveButton.setEnabled(true);
             }else{
-<<<<<<< HEAD
-                String message = "Colortype cannot have colors removed for the following reasons: \n\n";
-                message += String.join("", messages);
-                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
-=======
                 String message = "The color type cannot be modified for the following reasons: \n\n";
                 message += String.join("", messages);
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not add color from color type", JOptionPane.WARNING_MESSAGE);
->>>>>>> origin/cpn
             }
         });
 
@@ -989,11 +959,7 @@ public class ColorTypeDialogPanel extends JPanel {
             }
 
             if(!messages.isEmpty()) {
-<<<<<<< HEAD
-                String message = "Colortype cannot have the following colors removed for the following reasons: \n\n";
-=======
                 String message = "The color type cannot be modified for the following reasons: \n\n";
->>>>>>> origin/cpn
                 message += String.join("", messages);
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
                 return;

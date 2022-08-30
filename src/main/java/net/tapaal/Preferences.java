@@ -337,9 +337,6 @@ public class Preferences {
 
 		return object;
 	}
-<<<<<<< HEAD
-=======
-
     public void setFileBrowserLocation(String location) {
         final String key = "file.location";
 
@@ -353,5 +350,4 @@ public class Preferences {
     public String getFileBrowserLocation() {
         return pref.get("file.location", null);
     }
->>>>>>> origin/cpn
 }

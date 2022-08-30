@@ -73,11 +73,7 @@ public class ScalarProductExpression extends ArcExpression {
     }
 
     @Override
-<<<<<<< HEAD
-    public ArcExpression findFirstPlaceHolder() {
-=======
     public Expression findFirstPlaceHolder() {
->>>>>>> origin/cpn
         return expr.findFirstPlaceHolder();
     }
 

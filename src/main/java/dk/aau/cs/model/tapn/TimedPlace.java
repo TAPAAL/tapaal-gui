@@ -260,16 +260,13 @@ public abstract class TimedPlace {
     public void setTokenExpression(ArcExpression newExpression){
         tokensAsExpression = newExpression;
     }
-<<<<<<< HEAD
-=======
-    
+
     public void setTokenExpression(ArcExpression colorMarking, ArcExpression newExpression){
 	    if (colorMarking != null && colorMarking.toString().contains(".all"))
 	        tokensAsExpression = colorMarking;
 	    else
             tokensAsExpression = newExpression;
     }
->>>>>>> origin/cpn
 
     public ArcExpression getTokensAsExpression(){
         return tokensAsExpression;

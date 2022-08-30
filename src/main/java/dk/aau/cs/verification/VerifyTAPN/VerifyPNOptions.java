@@ -161,11 +161,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		if (this.queryCategory == QueryCategory.CTL){
 			result.append(" --ctl-algorithm " + (getAlgorithmOption() == AlgorithmOption.CERTAIN_ZERO ? "czero" : "local"));
 			result.append(" --xml-queries 1");
-<<<<<<< HEAD
 		} else if (this.queryCategory == QueryCategory.LTL || this.queryCategory == QueryCategory.HyperLTL) {
-=======
-		} else if (this.queryCategory == QueryCategory.LTL) {
->>>>>>> origin/cpn
             result.append(" --ltl-algorithm");
             if (!this.useTarjan) {
                 result.append(" ndfs");

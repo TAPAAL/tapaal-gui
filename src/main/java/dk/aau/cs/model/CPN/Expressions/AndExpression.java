@@ -102,12 +102,7 @@ public class AndExpression extends GuardExpression {
         children[1] = pos;
 
         return children;
-<<<<<<< HEAD
 
-
-
-=======
->>>>>>> origin/cpn
     }
 
     @Override

@@ -850,15 +850,6 @@ public class PlaceEditorPanel extends JPanel {
 
         removeColoredTokenButton.addActionListener(actionEvent -> {
             if(tokenList.getSelectedIndex() > -1){
-<<<<<<< HEAD
-                coloredTokenListModel.remove(tokenList.getSelectedIndex());
-                addColoredTokenButton.setText("Add");
-                removeColoredTokenButton.setEnabled(false);
-            }
-
-        });
-        removeColoredTokenButton.setEnabled(false);
-=======
                 int index = tokenList.getSelectedIndex();
                 coloredTokenListModel.remove(tokenList.getSelectedIndex());
                 updateTokenSelection(index);
@@ -866,7 +857,6 @@ public class PlaceEditorPanel extends JPanel {
 
         });
         removeColoredTokenButton.setEnabled(tokenList.getSelectedIndex() > 0);
->>>>>>> origin/cpn
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -891,8 +881,6 @@ public class PlaceEditorPanel extends JPanel {
         mainPanel.add(tokenPanel, gbc);
     }
 
-<<<<<<< HEAD
-=======
     private void updateTokenSelection(int index) {
 	    int currentSize = tokenList.getModel().getSize();
 	    if (currentSize > index)
@@ -905,7 +893,6 @@ public class PlaceEditorPanel extends JPanel {
         }
     }
 
->>>>>>> origin/cpn
     public void initColorInvariantPanel(){
 	    timeInvariantColorPanel = new JPanel(new GridBagLayout());
 
@@ -1108,11 +1095,7 @@ public class PlaceEditorPanel extends JPanel {
         colorTypeComboBox.setRenderer(new ColorComboBoxRenderer(colorTypeComboBox));
 
         colorTypeComboBox.addActionListener(actionEvent -> {
-<<<<<<< HEAD
-            if(colorTypeComboBox.getSelectedItem() != null && colorTypeComboBox.getSelectedItem().equals( place.underlyingPlace().getColorType())){
-=======
             if (colorTypeComboBox.getSelectedItem() != null && colorTypeComboBox.getSelectedItem().equals(tokenColorComboboxPanel.getColorType())) {
->>>>>>> origin/cpn
                 return;
             }
             if (!(coloredTokenListModel.getSize() < 1) || !timeConstraintListModel.isEmpty()){

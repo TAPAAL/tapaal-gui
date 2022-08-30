@@ -35,14 +35,6 @@ public class DotConstantExpression extends UserOperatorExpression {
         return false;
     }
 
-<<<<<<< HEAD
-    @Override
-    public ColorType getColorType(List<ColorType> colorTypes) {
-        return getColorType();
-    }
-
-=======
->>>>>>> origin/cpn
     public ColorType getColorType() {
         return ColorType.COLORTYPE_DOT;
     }
@@ -105,10 +97,6 @@ public class DotConstantExpression extends UserOperatorExpression {
 
     @Override
     public Vector<ColorType> getColorTypes() {
-<<<<<<< HEAD
-        return new Vector<>(Collections.singletonList(ColorType.COLORTYPE_DOT));
-=======
         return new Vector<>(Collections.singletonList(colorType));
->>>>>>> origin/cpn
     }
 }

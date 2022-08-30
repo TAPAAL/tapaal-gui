@@ -65,14 +65,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         symmetricVars = useSymmetricVars;
     }
 
-<<<<<<< HEAD
-    public void execute(TimedArcPetriNetNetwork model, Iterable<TAPNQuery> queries, PetriNetTab oldTab) {
-        this.model = model;
-        this.queries = queries;
-=======
     public void execute(TimedArcPetriNetNetwork model, PetriNetTab oldTab) {
         this.model = model;
->>>>>>> origin/cpn
         this.oldTab = oldTab;
         execute();
     }
@@ -82,10 +76,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         TAPNLens lens = oldTab.getLens();
         TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
-<<<<<<< HEAD
-        boolean dummyQuery = false;
-=======
->>>>>>> origin/cpn
         StringBuilder error = new StringBuilder();
 
         File modelFile = null;
@@ -134,29 +124,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             return error.toString();
         }
 
-<<<<<<< HEAD
-        // This list is a workarround for issue #1968474
-        // Should be removed when a better solution can be found when further refactoring is possible
-        List<TAPNQuery.QueryCategory> queryCategories = new ArrayList<>();
-        List<TAPNQuery> clonedQueries = new Vector<>();
-        if (queries.iterator().hasNext()) {
-            for (TAPNQuery query : queries) {
-                TAPNQuery clonedQuery = query.copy();
-                mapQueryToNewNames(clonedQuery, transformedModel.value2());
-                clonedQueries.add(clonedQuery);
-                queryCategories.add(query.getCategory());
-            }
-        }
-        else {
-            // XXX It seems this exists only to make sure that there is at least one query? -- kyrke 2022-05-08
-            //  was firstTemplate,fistPlace=1 changed to just be E<>true, to fix issue #1971420
-            TCTLEFNode efNode = new TCTLEFNode(new TCTLTrueNode());
-            TAPNQuery test = new TAPNQuery("placeholder", 1000, efNode, null, null, null, false, false, false, false, null, null, lens.isColored());
-            mapQueryToNewNames(test, transformedModel.value2());
-            clonedQueries.add(test);
-            dummyQuery = true;
-        }
-=======
         // XXX It seems this exists only to make sure that there is at least one query? -- kyrke 2022-05-08
         //  was firstTemplate,fistPlace=1 changed to just be E<>true, to fix issue #1971420
         List<TAPNQuery> clonedQueries = new Vector<>();
@@ -164,7 +131,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         TAPNQuery test = new TAPNQuery("placeholder", 1000, efNode, null, null, null, false, false, false, false, null, null, lens.isColored());
         mapQueryToNewNames(test, transformedModel.value2());
         clonedQueries.add(test);
->>>>>>> origin/cpn
 
         ProcessRunner runner;
         try{
@@ -189,10 +155,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), clonedQueries.size(), partition, computeColorFixpoint, symmetricVars);
         }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/cpn
         runner = new ProcessRunner(modelChecker.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
 
@@ -218,20 +181,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             // addLocation(loadedModel, composer); // We can not get coords from server
             newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
-<<<<<<< HEAD
-            if(!dummyQuery){
-                for(TAPNQuery query : getQueries(queryOut, loadedModel.network(), queryCategories)){
-                    for(TAPNQuery oldQuery : queries){
-                        if(query.getName().equals(oldQuery.getName())){
-                            query.copyOptions(oldQuery);
-                            newTab.addQuery(query);
-                            break;
-                        }
-                    }
-                }
-            }
-=======
->>>>>>> origin/cpn
 
             Thread thread = new Thread(() -> TAPAALGUI.getAppGuiController().openTab(newTab));
             thread.start();
@@ -256,14 +205,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         return null;
     }
 
-<<<<<<< HEAD
-    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network) {
-        return getQueries(queryFile, network, null);
-    }
-    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories) {
-        XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network, queryCategories);
-        return new ArrayList<>(queryLoader.parseQueries().getQueries());
-=======
+
     public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, TAPNQuery.QueryCategory queryCategory) {
         return getQueries(queryFile, network, List.of(queryCategory));
     }
@@ -274,7 +216,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         } catch (NullPointerException e) {
             return null;
         }
->>>>>>> origin/cpn
     }
 
     //XXX: old function to layout the model (before engine supported it)
