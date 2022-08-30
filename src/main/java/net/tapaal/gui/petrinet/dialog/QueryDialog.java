@@ -3107,7 +3107,7 @@ public class QueryDialog extends JPanel {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         traceDialog = new EscapableDialog(TAPAALGUI.getApp(),
-            "Add new traces", true);
+            "Traces", true);
         traceDialog.add(scrollPane, BorderLayout.CENTER);
         traceDialog.getRootPane().setDefaultButton(okButton);
         traceDialog.setResizable(true);
@@ -3236,10 +3236,8 @@ public class QueryDialog extends JPanel {
     }
 
     private void removeTraces() {
-        for(int i = 0; i < traceList.getSelectedValuesList().size(); i++) {
-            traceModel.remove(i);
-            traceList.setModel(traceModel);
-        }
+        traceModel.remove(traceList.getSelectedIndex());
+        traceList.setModel(traceModel);
     }
 
     private void initPredicationConstructionPanel() {
