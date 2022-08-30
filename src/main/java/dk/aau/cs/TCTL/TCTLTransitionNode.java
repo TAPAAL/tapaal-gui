@@ -54,7 +54,7 @@ public class TCTLTransitionNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public void accept(ITCTLVisitor visitor, Object context) {
-		visitor.visit(this, context);n
+		visitor.visit(this, context);
 	}
 
 	@Override
