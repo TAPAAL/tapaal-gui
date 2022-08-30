@@ -277,6 +277,7 @@ public class QueryDialog extends JPanel {
     private boolean wasCTLType = true;
     private boolean wasLTLType = true;
     private boolean wasHyperLTLType = true;
+    private boolean isAllPath = false;
 
     //Strings for tool tips
     //Tool tips for top panel
@@ -2508,8 +2509,10 @@ public class QueryDialog extends JPanel {
                             TAPAALGUI.getApp(),
                             "An all-path with trace \"" + selectedTrace + "\" already exists. Please chose a different trace.",
                             "Error", JOptionPane.ERROR_MESSAGE);
+                        isAllPath = true;
                     } else {
                         addAllPathsToProperty(newProperty, oldProperty);
+                        isAllPath = true;
                     }
                 }
 
@@ -2535,8 +2538,10 @@ public class QueryDialog extends JPanel {
                             TAPAALGUI.getApp(),
                             "An exists-path with trace \"" + selectedTrace + "\" already exists. Please chose a different trace.",
                             "Error", JOptionPane.ERROR_MESSAGE);
+                        isAllPath = false;
                     } else {
                         addExistsPathsToProperty(newProperty, oldProperty);
+                        isAllPath = false;
                     }
                 }
 
@@ -4408,8 +4413,13 @@ public class QueryDialog extends JPanel {
                 eButton.setEnabled(true);
             }
         } else {
-            aButton.setEnabled(false);
-            eButton.setEnabled(false);
+            if(isAllPath) {
+                aButton.setEnabled(true);
+                eButton.setEnabled(false);
+            } else {
+                aButton.setEnabled(false);
+                eButton.setEnabled(true);
+            }
             globallyButton.setEnabled(true);
             finallyButton.setEnabled(true);
             nextButton.setEnabled(true);
