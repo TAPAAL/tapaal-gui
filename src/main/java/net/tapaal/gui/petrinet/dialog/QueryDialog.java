@@ -2845,7 +2845,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void initTracePanels() {
-        addTraceButton = new JButton("Add trace");
+        addTraceButton = new JButton("Traces");
         addTraceButton.setPreferredSize(new Dimension(90,27));
 
         addTraceButton.setToolTipText(TOOL_TIP_ADDTRACEBUTTON);
@@ -4393,7 +4393,6 @@ public class QueryDialog extends JPanel {
     }
 
     private void updateHyperLTLButtons() {
-        int selectedType = queryType.getSelectedIndex();
         boolean isSelectionNull = currentSelection == null;
         showHyperLTL(true);
 
