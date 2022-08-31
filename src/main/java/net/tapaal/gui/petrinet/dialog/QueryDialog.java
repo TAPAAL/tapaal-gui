@@ -2172,8 +2172,9 @@ public class QueryDialog extends JPanel {
         } else {
             LTLENode parent = null;
             TCTLAbstractProperty property = null;
+            TCTLAbstractProperty originalProperty = selection.copy();
 
-            parent = (LTLENode) getParentForHyperLTLExistsPath(oldProperty);
+            parent = (LTLENode) getParentForHyperLTLExistsPath(oldProperty.copy());
 
 
             TCTLPathPlaceHolder placeHolder = new TCTLPathPlaceHolder();
@@ -2183,9 +2184,9 @@ public class QueryDialog extends JPanel {
                 parent.setProperty(ConvertToStateProperty((TCTLAbstractPathProperty)property));
             }
 
-            UndoableEdit edit = new QueryConstructionEdit(selection, parent);
+            UndoableEdit edit = new QueryConstructionEdit(originalProperty, selection);
             newProperty = selection;
-            updateSelection(property);
+            updateSelection(selection);
             undoSupport.postEdit(edit);
             queryChanged();
         }
@@ -2661,10 +2662,12 @@ public class QueryDialog extends JPanel {
                     }
                 }
 
-                UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
-                undoSupport.postEdit(edit);
+                if (oldProperty == null) {
+                    UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
+                    undoSupport.postEdit(edit);
 
-                queryChanged();
+                    queryChanged();
+                }
             }
         });
     }
