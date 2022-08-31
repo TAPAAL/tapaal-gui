@@ -7,4 +7,5 @@ class TestTest {
     fun `test of kotlin using Junit`() {
         Assertions.assertTrue(true)
     }
+
 }

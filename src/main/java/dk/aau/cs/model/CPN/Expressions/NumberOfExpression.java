@@ -6,6 +6,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
+
 import java.util.*;
 
 public class NumberOfExpression extends ArcExpression {

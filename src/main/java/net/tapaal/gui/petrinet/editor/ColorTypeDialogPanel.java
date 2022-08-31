@@ -395,7 +395,6 @@ public class ColorTypeDialogPanel extends JPanel {
         firstRow.setLayout(new GridBagLayout());
 
         JLabel enumNameLabel = new JLabel("Element name: ");
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -614,7 +613,6 @@ public class ColorTypeDialogPanel extends JPanel {
 
         if (!messages.isEmpty()) {
             String message = "The color type cannot be modified for the following reasons: \n\n";
-
             for (String m : messages) {
                 if (!message.contains(m)) message += m;
             }

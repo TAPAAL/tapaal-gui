@@ -55,3 +55,4 @@ public class ColortypeListCellRenderer extends JLabel implements ListCellRendere
         return this;
     }
 }
+

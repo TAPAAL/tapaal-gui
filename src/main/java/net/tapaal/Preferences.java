@@ -337,6 +337,7 @@ public class Preferences {
 
 		return object;
 	}
+
     public void setFileBrowserLocation(String location) {
         final String key = "file.location";
 

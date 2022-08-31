@@ -794,7 +794,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         updatingColorSelection = false;
     }
 
-
     private void addColorTypesToCombobox(List<ColorType> types) {
         colorTypeCombobox.removeAllItems();
         for (ColorType type : types) {

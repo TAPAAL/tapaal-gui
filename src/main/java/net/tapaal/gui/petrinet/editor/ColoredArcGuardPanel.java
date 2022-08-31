@@ -934,7 +934,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         }
     }
 
-
     private void updateNumberExpressionsPanel(Expression current) {
         colorExpressionComboBoxPanel.updateColorType(selectedColorType, context, true, false);
         numberExpressionJSpinner.setVisible(!(current instanceof ColorExpression));

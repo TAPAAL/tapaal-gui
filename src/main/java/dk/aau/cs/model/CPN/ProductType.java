@@ -50,7 +50,6 @@ public class ProductType extends ColorType {
         }
         return false;
     }
-
     public Vector<ColorType> getColorTypes() { return constituents; }
 
     public void addType(ColorType colortype) {

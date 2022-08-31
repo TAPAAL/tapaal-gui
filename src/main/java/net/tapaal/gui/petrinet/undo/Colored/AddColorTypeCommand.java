@@ -27,3 +27,4 @@ public class AddColorTypeCommand extends Command {
         new RemoveColorTypeFromNetworkCommand(colorType, network, colorTypesListModel, index).undo();
     }
 }
+
