@@ -12,7 +12,6 @@ public class AnimationHistorySidePanel extends JPanel {
     private AnimationHistoryList animBox;
     private Animator animator;
 
-
     public AnimationHistorySidePanel(Animator animator) {
         super();
         this.animator = animator;
@@ -33,7 +32,6 @@ public class AnimationHistorySidePanel extends JPanel {
 
         //BorderLayout.Center fill the parent components size
         setLayout(new BorderLayout());
-
 
         animBox = new AnimationHistoryList();
         animBox.addMouseListener(new MouseAdapter() {
@@ -81,7 +79,7 @@ public class AnimationHistorySidePanel extends JPanel {
                 BorderFactory.createEmptyBorder(3, 3, 3, 3)
             )
         );
-
+        
     }
 
 }

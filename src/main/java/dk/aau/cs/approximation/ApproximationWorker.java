@@ -67,7 +67,7 @@ public class ApproximationWorker {
 		result = modelChecker.verify(options, transformedModel, clonedQuery, guiModel, dataLayerQuery, lens);
 
 		if (result == null) return null;
-		if (result.error()) {
+        if (result.error()) {
 			options.setTraceOption(oldTraceOption);
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
@@ -110,6 +110,7 @@ public class ApproximationWorker {
                             false,
                             approxResult.getUnfoldedModel());
                         toReturn.setNameMapping(nameMapping);
+						
 						OverApproximation overaprx = new OverApproximation();
 			
 						//Create trace TAPN from the trace
@@ -706,7 +707,7 @@ public class ApproximationWorker {
         }
         return decomposedTracesMap;
     }
-	
+
 	private void renameTraceTransitions(TimedArcPetriNetTrace trace) {
 		if (trace != null){
 			trace.reduceTraceForOriginalNet("_traceNet_", "PTRACE");

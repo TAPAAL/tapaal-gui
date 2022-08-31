@@ -152,7 +152,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                                 showEditVariableDialog(v);
                             }else{
                                 String message = "Variable cannot be edited for the following reasons: \n\n";
-                                message += String.join("", messages);
+                                message += String.join("\n", messages);
                                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not edit variable", JOptionPane.WARNING_MESSAGE);
                             }
                         } else{
@@ -408,7 +408,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                     showEditVariableDialog(v);
                 }else{
                     String message = "Variable cannot be edited for the following reasons: \n\n";
-                    message += String.join("", messages);
+                    message += String.join("\n", messages);
                     JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not edit variable", JOptionPane.WARNING_MESSAGE);
                 }
             }
