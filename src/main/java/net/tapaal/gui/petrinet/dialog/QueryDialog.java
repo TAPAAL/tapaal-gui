@@ -1364,7 +1364,28 @@ public class QueryDialog extends JPanel {
             }
             queryChanged();
         }
-        // Implement prompt for A and E quantifiers here? (HyperLTL)
+
+        if(currentSelection != null &&
+            ((currentSelection.getObject() instanceof LTLANode) || currentSelection.getObject() instanceof LTLENode)
+            && queryType.getSelectedIndex() == 2) {
+            TCTLAbstractPathProperty property;
+            TCTLAbstractPathProperty currentProp = (TCTLAbstractPathProperty) currentSelection.getObject();
+
+            if(currentSelection.getObject() instanceof LTLANode) {
+                property = new LTLANode(((LTLANode)currentProp).getProperty(), selectedTrace);
+            } else {
+                property = new LTLENode(((LTLENode)currentProp).getProperty(), selectedTrace);
+            }
+
+            if (!property.equals(currentSelection.getObject())) {
+                UndoableEdit edit = new QueryConstructionEdit(currentProp, property);
+                newProperty = newProperty.replace(currentProp,	property);
+                updateSelection(property);
+                updateTraceBox(property);
+                undoSupport.postEdit(edit);
+            }
+            queryChanged();
+        }
 
     }
 
