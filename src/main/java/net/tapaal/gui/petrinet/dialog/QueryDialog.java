@@ -4556,6 +4556,9 @@ public class QueryDialog extends JPanel {
             if(isAllPath) {
                 aButton.setEnabled(true);
                 eButton.setEnabled(false);
+            } else if (newProperty.toString().equals("<*>")){
+                aButton.setEnabled(true);
+                eButton.setEnabled(true);
             } else {
                 aButton.setEnabled(false);
                 eButton.setEnabled(true);
