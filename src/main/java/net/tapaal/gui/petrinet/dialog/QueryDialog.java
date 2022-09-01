@@ -2033,36 +2033,26 @@ public class QueryDialog extends JPanel {
     }
 
     private void addAllPathsHyperLTL(TCTLAbstractProperty oldProperty, TCTLAbstractProperty selection, String trace) {
-        if(!(oldProperty instanceof TCTLStatePlaceHolder) && !(oldProperty instanceof TCTLPathPlaceHolder)) {
-            if(oldProperty instanceof TCTLPathToStateConverter) {
-                TCTLAbstractProperty child = ((TCTLPathToStateConverter) oldProperty).getProperty();
-                addAllPathsHyperLTL(child, selection, trace);
+        if(!(selection instanceof TCTLStatePlaceHolder) && !(selection instanceof TCTLPathPlaceHolder)) {
+            if(selection instanceof TCTLPathToStateConverter) {
+                TCTLAbstractProperty child = ((TCTLPathToStateConverter) selection).getProperty();
+                addAllPathsHyperLTL(oldProperty, child, trace);
             } else{
-                addAllPathsHyperLTL(((LTLANode) oldProperty).getProperty(), selection, trace);
+                addAllPathsHyperLTL(oldProperty, ((LTLANode) selection).getProperty(), trace);
             }
 
         } else {
             LTLANode parent = null;
-            TCTLAbstractProperty property = null;
-            TCTLAbstractProperty originalProperty = selection.copy();
+            TCTLAbstractProperty child = null;
 
-            parent = (LTLANode) getParentForHyperLTLAllPath(oldProperty);
-
+            parent = (LTLANode) getParentForHyperLTLAllPath(selection);
 
             TCTLPathPlaceHolder placeHolder = new TCTLPathPlaceHolder();
-            property = new LTLANode(ConvertToStateProperty(placeHolder), trace);
+            child = new LTLANode(ConvertToStateProperty(placeHolder), trace);
 
             if(parent != null) {
-                parent.setProperty(ConvertToStateProperty((TCTLAbstractPathProperty)property));
+                parent.setProperty(ConvertToStateProperty((TCTLAbstractPathProperty)child));
             }
-
-            oldProperty = originalProperty;
-
-            UndoableEdit edit = new QueryConstructionEdit(originalProperty, selection);
-            newProperty = selection;
-            updateSelection(selection);
-            undoSupport.postEdit(edit);
-            queryChanged();
         }
     }
 
@@ -2077,7 +2067,14 @@ public class QueryDialog extends JPanel {
                 property = oldProperty;
             } else {
                 if(currentSelection.getObject().toString().equals("<*>") && isHyperLTL){
+                    // We copy the objects, otherwise it bugs out the undo-manager as it uses the references to the objects
+                    oldProperty = oldProperty.copy();
+                    selection = selection.copy();
                     addAllPathsHyperLTL(oldProperty, selection, trace);
+
+                    newProperty = selection;
+                    updateSelection(selection);
+
                     return;
                 } else {
                     property = isHyperLTL ? new LTLANode(ConvertToStateProperty((TCTLAbstractPathProperty) selection), trace) : new LTLANode();
@@ -2125,8 +2122,16 @@ public class QueryDialog extends JPanel {
                 property = oldProperty;
             } else {
                 if(currentSelection.getObject().toString().equals("<*>") && isHyperLTL){
+                    // We copy the objects, otherwise it bugs out the undo-manager as it uses the references to the objects
+                    oldProperty = oldProperty.copy();
+                    selection = selection.copy();
                     addExistsPathsHyperLTL(oldProperty, selection, trace);
+
+                    newProperty = selection;
+                    updateSelection(selection);
+
                     return;
+
                 } else {
                     property = isHyperLTL ? new LTLENode(ConvertToStateProperty((TCTLAbstractPathProperty) oldProperty), trace) : new LTLENode();
                 }
@@ -2161,34 +2166,28 @@ public class QueryDialog extends JPanel {
     }
 
     private void addExistsPathsHyperLTL(TCTLAbstractProperty oldProperty, TCTLAbstractProperty selection, String trace) {
-        if(!(oldProperty instanceof TCTLStatePlaceHolder) && !(oldProperty instanceof TCTLPathPlaceHolder)) {
-            if(oldProperty instanceof TCTLPathToStateConverter) {
-                TCTLAbstractProperty child = ((TCTLPathToStateConverter) oldProperty).getProperty();
-                addExistsPathsHyperLTL(child, selection, trace);
+        if(!(selection instanceof TCTLStatePlaceHolder) && !(selection instanceof TCTLPathPlaceHolder)) {
+            if(selection instanceof TCTLPathToStateConverter) {
+                TCTLAbstractProperty child = ((TCTLPathToStateConverter) selection).getProperty();
+                addExistsPathsHyperLTL(oldProperty, child, trace);
             } else{
-                addExistsPathsHyperLTL(((LTLENode) oldProperty).getProperty(), selection, trace);
+                addExistsPathsHyperLTL(oldProperty, ((LTLENode) selection).getProperty(), trace);
             }
 
         } else {
             LTLENode parent = null;
-            TCTLAbstractProperty property = null;
-            TCTLAbstractProperty originalProperty = selection.copy();
+            TCTLAbstractProperty child = null;
 
-            parent = (LTLENode) getParentForHyperLTLExistsPath(oldProperty.copy());
+            parent = (LTLENode) getParentForHyperLTLExistsPath(selection);
 
 
             TCTLPathPlaceHolder placeHolder = new TCTLPathPlaceHolder();
-            property = new LTLENode(ConvertToStateProperty(placeHolder), trace);
+            child = new LTLENode(ConvertToStateProperty(placeHolder), trace);
 
             if(parent != null) {
-                parent.setProperty(ConvertToStateProperty((TCTLAbstractPathProperty)property));
+                parent.setProperty(ConvertToStateProperty((TCTLAbstractPathProperty)child));
             }
 
-            UndoableEdit edit = new QueryConstructionEdit(originalProperty, selection);
-            newProperty = selection;
-            updateSelection(selection);
-            undoSupport.postEdit(edit);
-            queryChanged();
         }
     }
 
@@ -2662,12 +2661,12 @@ public class QueryDialog extends JPanel {
                     }
                 }
 
-                if (oldProperty == null) {
-                    UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
-                    undoSupport.postEdit(edit);
 
-                    queryChanged();
-                }
+                UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
+                undoSupport.postEdit(edit);
+
+                queryChanged();
+
             }
         });
     }
