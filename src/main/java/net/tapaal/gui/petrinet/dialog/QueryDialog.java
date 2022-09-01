@@ -258,7 +258,7 @@ public class QueryDialog extends JPanel {
     private final static EngineSupportOptions verifyTAPNOptions= new VerifyTAPNEngineOptions();
     private final static EngineSupportOptions UPPAALCombiOptions= new UPPAALCombiOptions();
     private final static EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
-    private final static EngineSupportOptions UPPAALStandardOptions = new UPPAAALStandardOptions();
+    private final static EngineSupportOptions UPPAALStandardOptions = new UPPAALStandardOptions();
     private final static EngineSupportOptions UPPAALBroadcastOptions = new UPPAALBroadcastOptions();
     private final static EngineSupportOptions UPPAALBroadcastDegree2Options = new UPPAALBroadcastDegree2Options();
     private final static EngineSupportOptions verifyDTAPNOptions= new VerifyDTAPNEngineOptions();
