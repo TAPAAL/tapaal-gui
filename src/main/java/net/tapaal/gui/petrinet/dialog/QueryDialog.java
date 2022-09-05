@@ -327,7 +327,7 @@ public class QueryDialog extends JPanel {
 
     // Tool tips for trace panel
     private static final String TOOL_TIP_TRACEBOX = "Choose a trace for this predicate.";
-    private static final String TOOL_TIP_ADDTRACEBUTTON = "Add a new trace.";
+    private static final String TOOL_TIP_ADDTRACEBUTTON = "Add or remove new traces";
 
     //Tool tips for editing panel
     private static final String TOOL_TIP_DELETEBUTTON = "Delete the currently selected part of the query.";
@@ -1108,13 +1108,6 @@ public class QueryDialog extends JPanel {
         }
     }
 
-    private void disableTracebox() {
-        traceBox.setVisible(false);
-        traceBox.setEnabled(false);
-        addTraceButton.setVisible(false);
-        addTraceButton.setEnabled(false);
-    }
-
     private void disableAllQueryButtons() {
         existsBox.setEnabled(false);
         existsDiamond.setEnabled(false);
@@ -1413,7 +1406,6 @@ public class QueryDialog extends JPanel {
 
         // temporary!!
         traceBox.setEnabled(false);
-        addTraceButton.setEnabled(false);
 
         if(queryToCreateFrom != null) {
             setupFromQuery(queryToCreateFrom);
@@ -1827,7 +1819,6 @@ public class QueryDialog extends JPanel {
             showLTLButtons(true);
             updateShiphonTrap(true);
             showHyperLTL(false);
-            disableTracebox();
             queryChanged();
             wasHyperLTLType = false;
             wasCTLType = false;
@@ -1847,7 +1838,6 @@ public class QueryDialog extends JPanel {
 
             showLTLButtons(false);
             showHyperLTL(false);
-            disableTracebox();
             updateShiphonTrap(false);
             wasCTLType = true;
             wasLTLType = false;
@@ -2416,6 +2406,7 @@ public class QueryDialog extends JPanel {
         untilButton = new JButton("U");
         aButton = new JButton("A");
         eButton = new JButton("E");
+        addTraceButton = new JButton("Traces");
 
         // Add tool-tips
         existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
@@ -2432,6 +2423,7 @@ public class QueryDialog extends JPanel {
         untilButton.setToolTipText(TOOL_TIP_U);
         aButton.setToolTipText(TOOL_TIP_A);
         eButton.setToolTipText(TOOL_TIP_E);
+        addTraceButton.setToolTipText(TOOL_TIP_ADDTRACEBUTTON);
 
         // Add buttons to panel
         quantificationButtonGroup.add(existsDiamond);
@@ -2448,6 +2440,7 @@ public class QueryDialog extends JPanel {
         quantificationButtonGroup.add(untilButton);
         quantificationButtonGroup.add(aButton);
         quantificationButtonGroup.add(eButton);
+        quantificationButtonGroup.add(addTraceButton);
 
         // Place buttons in GUI
         GridBagConstraints gbc = new GridBagConstraints();
@@ -2485,6 +2478,13 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 4;
         quantificationPanel.add(eButton, gbc);
 
+        // Traces button at the bottom of the panel
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 3;
+        gbc.anchor = GridBagConstraints.CENTER;
+        quantificationPanel.add(addTraceButton, gbc);
+
         // Add quantification panel to query panel
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -2496,9 +2496,11 @@ public class QueryDialog extends JPanel {
         if (lens.isTimed()|| lens.isGame()) {
             addTimedQuantificationListeners();
             showLTLButtons(false);
+            showHyperLTLButtons(false);
         } else {
             addUntimedQuantificationListeners();
             showLTLButtons(false);
+            showHyperLTLButtons(false);
         }
     }
 
@@ -2692,6 +2694,13 @@ public class QueryDialog extends JPanel {
 
             }
         });
+
+        addTraceButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                initTraceBoxDialogComponents();
+            }
+        });
     }
 
     private void showLTLButtons(boolean isVisible) {
@@ -2706,10 +2715,13 @@ public class QueryDialog extends JPanel {
     }
 
     private void showHyperLTL(boolean isVisble) {
-        //traceBox.setVisible(isVisble);
-        //addTraceButton.setVisible(isVisble);
-        traceBox.setEnabled(isVisble);
-        addTraceButton.setEnabled(isVisble);
+        traceRow.setVisible(isVisble);
+        traceBox.setEnabled(isVisble);  // <--- is needed due to line 1416
+        addTraceButton.setVisible(isVisble);
+    }
+
+    private void showHyperLTLButtons(boolean isVisble) {
+        addTraceButton.setVisible(isVisble);
     }
 
     private void showCTLButtons(boolean isVisible) {
@@ -2991,11 +3003,6 @@ public class QueryDialog extends JPanel {
     }
 
     private void initTracePanels() {
-        addTraceButton = new JButton("Traces");
-        addTraceButton.setPreferredSize(new Dimension(90,27));
-
-        addTraceButton.setToolTipText(TOOL_TIP_ADDTRACEBUTTON);
-
         traceList = new JList();
         traceModel = new DefaultListModel();
         traceModel.addElement("T1");
@@ -3015,13 +3022,6 @@ public class QueryDialog extends JPanel {
         traceNameTextField = new JTextField();
         traceNameTextField.setText("");
 
-        addTraceButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                initTraceBoxDialogComponents();
-            }
-        });
-
         // Drop down menu for traces
         Vector<Object> tracesVector = new Vector<Object>();
         for(int i = 0; i < traceModel.getSize(); i++) {
@@ -3037,7 +3037,7 @@ public class QueryDialog extends JPanel {
 
         traceBox.setToolTipText(TOOL_TIP_TRACEBOX);
 
-        Dimension dim = new Dimension(198, 27);
+        Dimension dim = new Dimension(292, 27);
         traceBox.setMaximumSize(dim);
         traceBox.setMinimumSize(dim);
         traceBox.setPreferredSize(dim);
@@ -3045,15 +3045,12 @@ public class QueryDialog extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridwidth = 3;
-        gbc.insets = new Insets(2, 0, 2, 0);
+        gbc.insets = new Insets(1, 0, 1, 0);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
 
         traceRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        dim = new Dimension(235, 32);
-        traceRow.setPreferredSize(dim);
         traceRow.add(traceBox);
-        traceRow.add(addTraceButton);
         gbc.gridy = 0;
         predicatePanel.add(traceRow, gbc);
 
