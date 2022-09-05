@@ -680,6 +680,15 @@ public class QueryDialog extends JPanel {
         // Make window fit contents' preferred size
         guiDialog.pack();
 
+        // 'hack' for hiding the trace drop-down menu for HyperLTL on intial launch of the query dialogue panel
+        if(queryToRepresent != null && queryToRepresent.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
+            queryDialogue.showHyperLTL(true);
+            guiDialog.pack();
+        } else {
+            queryDialogue.showHyperLTL(false);
+            guiDialog.pack();
+        }
+
         // Move window to the middle of the screen
         guiDialog.setLocationRelativeTo(null);
         guiDialog.setVisible(true);
@@ -1403,9 +1412,6 @@ public class QueryDialog extends JPanel {
         initVerificationPanel();
         initOverApproximationPanel();
         initButtonPanel(option);
-
-        // temporary!!
-        traceBox.setEnabled(false);
 
         if(queryToCreateFrom != null) {
             setupFromQuery(queryToCreateFrom);
@@ -2406,7 +2412,7 @@ public class QueryDialog extends JPanel {
         untilButton = new JButton("U");
         aButton = new JButton("A");
         eButton = new JButton("E");
-        addTraceButton = new JButton("Traces");
+        addTraceButton = new JButton("Trace names");
 
         // Add tool-tips
         existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
@@ -2463,7 +2469,7 @@ public class QueryDialog extends JPanel {
         quantificationPanel.add(aButton, gbc);
 
         // Second column of buttons
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 5, 0);
         quantificationPanel.add(forAllDiamond, gbc);
@@ -2481,8 +2487,9 @@ public class QueryDialog extends JPanel {
         // Traces button at the bottom of the panel
         gbc.gridx = 0;
         gbc.gridy = 5;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
+        addTraceButton.setPreferredSize(new Dimension(78, 27));
         quantificationPanel.add(addTraceButton, gbc);
 
         // Add quantification panel to query panel
@@ -2716,8 +2723,8 @@ public class QueryDialog extends JPanel {
 
     private void showHyperLTL(boolean isVisble) {
         traceRow.setVisible(isVisble);
-        traceBox.setEnabled(isVisble);  // <--- is needed due to line 1416
         addTraceButton.setVisible(isVisble);
+        guiDialog.pack();
     }
 
     private void showHyperLTLButtons(boolean isVisble) {
