@@ -296,14 +296,12 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private void appendQueries(Document document, Element root) {
 		for (TAPNQuery query : queries) {
 			Element newQuery;
-			if (query.getCategory() == QueryCategory.CTL){
-				newQuery = createCTLQueryElement(query, document);
-			} else if (query.getCategory() == QueryCategory.LTL) {
+			if (query.getCategory() == QueryCategory.LTL){
                 newQuery = createLTLQueryElement(query, document);
             } else if(query.getCategory() == QueryCategory.HyperLTL) {
 			    newQuery = createHyperLTLQueryElement(query, document);
             }else {
-				newQuery = createQueryElement(query, document);
+				newQuery = createCTLQueryElement(query, document);
 			}
 			root.appendChild(newQuery);
 		}

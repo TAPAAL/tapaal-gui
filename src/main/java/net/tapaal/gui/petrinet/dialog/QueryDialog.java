@@ -1827,6 +1827,7 @@ public class QueryDialog extends JPanel {
             showLTLButtons(true);
             updateShiphonTrap(true);
             showHyperLTL(false);
+            disableTracebox();
             queryChanged();
             wasHyperLTLType = false;
             wasCTLType = false;
@@ -1846,6 +1847,7 @@ public class QueryDialog extends JPanel {
 
             showLTLButtons(false);
             showHyperLTL(false);
+            disableTracebox();
             updateShiphonTrap(false);
             wasCTLType = true;
             wasLTLType = false;
