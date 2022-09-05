@@ -101,7 +101,7 @@ public class AllExpression extends ColorExpression {
     }
 
     public String toString() {
-        return sort.getId() + ".all";
+        return sort.getName() + ".all";
     }
 
     @Override
