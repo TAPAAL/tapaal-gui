@@ -2412,7 +2412,7 @@ public class QueryDialog extends JPanel {
         untilButton = new JButton("U");
         aButton = new JButton("A");
         eButton = new JButton("E");
-        addTraceButton = new JButton("Trace names");
+        addTraceButton = new JButton("Traces");
 
         // Add tool-tips
         existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
