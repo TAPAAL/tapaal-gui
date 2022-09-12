@@ -341,6 +341,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
                         message,
                         "Error loading file",
                         JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
                     return;
                 }finally {
                     guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -397,6 +398,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
                         e.getMessage(),
                         "Error loading file",
                         JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
                     return;
                 }finally {
                     guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
