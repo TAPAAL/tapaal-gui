@@ -3334,8 +3334,8 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(reductionOption, gbc);
 
-        useReduction = new JCheckBox("Apply net reductions");
-        useColoredReduction = new JCheckBox("Use colored structural reductions");
+        useReduction = new JCheckBox("Use net reductions");
+        useColoredReduction = new JCheckBox("Use colored net reductions");
         useSiphonTrap = new JCheckBox("Use siphon-trap analysis");
         useQueryReduction = new JCheckBox("Use query reduction");
         useStubbornReduction = new JCheckBox("Use stubborn reduction");
@@ -3350,7 +3350,7 @@ public class QueryDialog extends JPanel {
         useTarjan = new JCheckBox("Use Tarjan");
 
         useReduction.setSelected(true);
-        useColoredReduction.setSelected(false);
+        useColoredReduction.setSelected(true);
         useSiphonTrap.setSelected(false);
         useQueryReduction.setSelected(true);
         useStubbornReduction.setSelected(true);
@@ -3446,7 +3446,7 @@ public class QueryDialog extends JPanel {
         reductionOptionsPanel.add(useReduction, gbc);
         gbc.gridx = 0;
         gbc.gridy = 2;
-        reductionOptionsPanel.add(useSiphonTrap, gbc);
+        reductionOptionsPanel.add(useColoredReduction, gbc);
         gbc.gridx = 0;
         gbc.gridy = 3;
         reductionOptionsPanel.add(useQueryReduction, gbc);
@@ -3458,7 +3458,7 @@ public class QueryDialog extends JPanel {
         reductionOptionsPanel.add(useTraceRefinement, gbc);
         gbc.gridx = 1;
         gbc.gridy = 3;
-        reductionOptionsPanel.add(useColoredReduction, gbc);
+        reductionOptionsPanel.add(useSiphonTrap, gbc);
         gbc.gridx = 3;
         gbc.gridy = 1;
         reductionOptionsPanel.add(useTarjan, gbc);
@@ -3503,7 +3503,7 @@ public class QueryDialog extends JPanel {
 
     private void refreshColoredReduction() {
 	    useColoredReduction.setEnabled(someTraceRadioButton.isSelected());
-	    if (someTraceRadioButton.isSelected()) {
+	    if (someTraceRadioButton.isSelected() || lens.isGame()) {
 	        useColoredReduction.setEnabled(false);
 	        useColoredReduction.setSelected(false);
         } else {
