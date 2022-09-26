@@ -3485,7 +3485,7 @@ public class QueryDialog extends JPanel {
 	private void refreshTraceRefinement() {
 	    ReductionOption reduction = getReductionOption();
 
-        if (queryType.getSelectedIndex() != 1 && (!lens.isColored() || !lens.isGame()) &&
+        if (queryType.getSelectedIndex() != 1 && !lens.isGame() &&
             reduction != null && reduction.equals(ReductionOption.VerifyPN) &&
             (newProperty.toString().startsWith("AG") || newProperty.toString().startsWith("EF")) &&
             !hasInhibitorArcs && !newProperty.hasNestedPathQuantifiers()) {
