@@ -28,6 +28,8 @@ public abstract class TimedPlace {
     private final List<TransportArc> transportArcs = new ArrayList<TransportArc>();
     private final List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 
+    protected int numberOfTokens = -1;
+
     public enum PlaceType{
 		Standard, Invariant, Dead
 	}
@@ -69,7 +71,11 @@ public abstract class TimedPlace {
     }
 
     public int numberOfTokens() {
-        return tokens().size();
+        return numberOfTokens >= 0 ? numberOfTokens : tokens().size();
+    }
+
+    public void setNumberOfTokens(int numberOfTokens) {
+        this.numberOfTokens = numberOfTokens;
     }
 
 
@@ -127,7 +133,7 @@ public abstract class TimedPlace {
 
     public void removeToken() {
         Require.that(getColorType().equals(ColorType.COLORTYPE_DOT), "Cannot remove tokens of unspecified color from a place which does not have the dot colortype");
-        if (numberOfTokens() > 0) {
+        if (tokens().size() > 0) {
             currentMarking.remove(tokens().get(0));
             updateNonColoredTokenExpr();
             fireMarkingChanged();

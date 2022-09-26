@@ -1,5 +1,7 @@
 package dk.aau.cs.model.CPN;
 
+import dk.aau.cs.model.CPN.Expressions.AllExpression;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 
@@ -9,14 +11,16 @@ public class ColorMultiset implements Map<Color, Integer> {
 
     private final HashMap<Color, Integer> map = new HashMap<>();
     private final ColorType colorType;
+    private int numberOfTokens = 0;
 
-    public ColorMultiset(ColorType colorType, int numberOf, Iterable<Color> colors) {
+    public ColorMultiset(ColorType colorType, int numberOf, Iterable<Color> colors, Vector<ColorExpression> colorExpression) {
         this.colorType = colorType;
         if (numberOf > 0) {
             for (Color c : colors) {
                 //Direct put is fine here, since constructor ensures colorType and positive number
                 map.put(c, numberOf);
             }
+            updateTokenNumber(colorExpression);
         }
     }
 
@@ -84,6 +88,7 @@ public class ColorMultiset implements Map<Color, Integer> {
     @Override
     public void clear() {
         map.clear();
+        numberOfTokens = 0;
     }
 
     @Override
@@ -101,8 +106,9 @@ public class ColorMultiset implements Map<Color, Integer> {
         return map.entrySet();
     }
 
-    public void add(Color color, int count) {
+    public void add(Color color, int count, ColorExpression colorExpression) {
         Integer result = get(color) + count;
+        updateTokenNumber(new Vector<>(){{ add(colorExpression); }});
         put(color, result);
     }
 
@@ -111,9 +117,9 @@ public class ColorMultiset implements Map<Color, Integer> {
         put(color, result);
     }
 
-    public void addAll(Map<? extends Color, ? extends Integer> map) {
+    public void addAll(Map<? extends Color, ? extends Integer> map, ColorExpression colorExpression) {
         for (Entry<? extends Color, ? extends Integer> kv : map.entrySet()) {
-            add(kv.getKey(), kv.getValue());
+            add(kv.getKey(), kv.getValue(), colorExpression);
         }
     }
 
@@ -131,8 +137,19 @@ public class ColorMultiset implements Map<Color, Integer> {
         }
     }
 
+    private void updateTokenNumber(Vector<ColorExpression> colorExpression) {
+        for (ColorExpression ce : colorExpression) {
+            if (ce instanceof AllExpression) {
+                numberOfTokens += ((AllExpression) ce).size();
+            } else {
+                numberOfTokens++;
+            }
+        }
+    }
+
     public Vector<TimedToken> getTokens(TimedPlace place) {
         Vector<TimedToken> result = new Vector<>();
+        place.setNumberOfTokens(numberOfTokens);
 
         for (Entry<Color, Integer> entry : entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
