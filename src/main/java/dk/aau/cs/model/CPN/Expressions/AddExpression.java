@@ -33,7 +33,11 @@ public class AddExpression extends ArcExpression {
                 result = constituent.eval(context);
             } else {
                 ColorMultiset cm = constituent.eval(context);
-                result.addAll(cm, null);
+                if (constituent instanceof NumberOfExpression) {
+                    result.addAll(cm, ((NumberOfExpression) constituent).getColor(), ((NumberOfExpression) constituent).getNumber());
+                } else {
+                    result.addAll(cm, null, 1);
+                }
             }
         }
         assert(result != null);

@@ -71,14 +71,17 @@ public abstract class TimedPlace {
     }
 
     public int numberOfTokens() {
-        return numberOfTokens >= 0 ? numberOfTokens : tokens().size();
+        return numberOfTokens > 0 ? numberOfTokens : tokens().size();
     }
 
     public void setNumberOfTokens(int numberOfTokens) {
         this.numberOfTokens = numberOfTokens;
     }
 
-
+    public void resetNumberOfTokens() {
+        numberOfTokens = 0;
+    }
+    
     /**
      * This is a wrapper function to serve as a fix for the original
      * color implementation breaking the agreed abstraction.
@@ -133,7 +136,7 @@ public abstract class TimedPlace {
 
     public void removeToken() {
         Require.that(getColorType().equals(ColorType.COLORTYPE_DOT), "Cannot remove tokens of unspecified color from a place which does not have the dot colortype");
-        if (tokens().size() > 0) {
+        if (numberOfTokens() > 0) {
             currentMarking.remove(tokens().get(0));
             updateNonColoredTokenExpr();
             fireMarkingChanged();

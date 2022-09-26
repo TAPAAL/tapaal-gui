@@ -2,6 +2,7 @@ package dk.aau.cs.model.CPN;
 
 import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.TupleExpression;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 
@@ -20,7 +21,7 @@ public class ColorMultiset implements Map<Color, Integer> {
                 //Direct put is fine here, since constructor ensures colorType and positive number
                 map.put(c, numberOf);
             }
-            updateTokenNumber(colorExpression);
+            updateTokenNumber(colorExpression, numberOf);
         }
     }
 
@@ -106,9 +107,8 @@ public class ColorMultiset implements Map<Color, Integer> {
         return map.entrySet();
     }
 
-    public void add(Color color, int count, ColorExpression colorExpression) {
+    public void add(Color color, int count) {
         Integer result = get(color) + count;
-        updateTokenNumber(new Vector<>(){{ add(colorExpression); }});
         put(color, result);
     }
 
@@ -117,9 +117,10 @@ public class ColorMultiset implements Map<Color, Integer> {
         put(color, result);
     }
 
-    public void addAll(Map<? extends Color, ? extends Integer> map, ColorExpression colorExpression) {
+    public void addAll(Map<? extends Color, ? extends Integer> map, Vector<ColorExpression> colorExpressions, int numberOf) {
+        updateTokenNumber(colorExpressions, numberOf);
         for (Entry<? extends Color, ? extends Integer> kv : map.entrySet()) {
-            add(kv.getKey(), kv.getValue(), colorExpression);
+            add(kv.getKey(), kv.getValue());
         }
     }
 
@@ -137,14 +138,27 @@ public class ColorMultiset implements Map<Color, Integer> {
         }
     }
 
-    private void updateTokenNumber(Vector<ColorExpression> colorExpression) {
+    private void updateTokenNumber(Vector<ColorExpression> colorExpression, int numberOf) {
         for (ColorExpression ce : colorExpression) {
-            if (ce instanceof AllExpression) {
-                numberOfTokens += ((AllExpression) ce).size();
+            if (ce instanceof TupleExpression) {
+                updateTupleTokenNumber(((TupleExpression) ce).getColors(), numberOf);
+            } else if (ce instanceof AllExpression) {
+                numberOfTokens += ((AllExpression) ce).size() * numberOf;
             } else {
-                numberOfTokens++;
+                numberOfTokens += numberOf;
             }
         }
+    }
+
+    private void updateTupleTokenNumber(Vector<ColorExpression> colorExpression, int numberOf) {
+        boolean numberChanged = false;
+        for (ColorExpression ce : colorExpression) {
+            if (ce instanceof AllExpression) {
+                numberOfTokens += ((AllExpression) ce).size() * numberOf;
+                numberChanged = true;
+            }
+        }
+        if (!numberChanged) numberOfTokens += numberOf;
     }
 
     public Vector<TimedToken> getTokens(TimedPlace place) {
