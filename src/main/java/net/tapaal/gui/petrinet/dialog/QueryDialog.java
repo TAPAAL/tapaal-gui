@@ -3484,12 +3484,14 @@ public class QueryDialog extends JPanel {
 
 	private void refreshTraceRefinement() {
 	    ReductionOption reduction = getReductionOption();
-	    useTraceRefinement.setEnabled(false);
 
-	    if (queryType.getSelectedIndex() != 1 && reduction != null && reduction.equals(ReductionOption.VerifyPN) &&
+        if (queryType.getSelectedIndex() != 1 && (!lens.isColored() || !lens.isGame()) &&
+            reduction != null && reduction.equals(ReductionOption.VerifyPN) &&
             (newProperty.toString().startsWith("AG") || newProperty.toString().startsWith("EF")) &&
             !hasInhibitorArcs && !newProperty.hasNestedPathQuantifiers()) {
 	        useTraceRefinement.setEnabled(true);
+        } else {
+            useTraceRefinement.setEnabled(false);
         }
     }
 
