@@ -368,7 +368,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					approximationDenominator = batchProcessingVerificationOptions.approximationDenominator();
 				}
 				
-				net.tapaal.gui.petrinet.verification.TAPNQuery changedQuery = new net.tapaal.gui.petrinet.verification.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator, query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars(), model.isColored());
+				net.tapaal.gui.petrinet.verification.TAPNQuery changedQuery = new net.tapaal.gui.petrinet.verification.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.useReduction(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator, query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars(), model.isColored(), query.useColoredReduction());
 				
 				if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 					changedQuery.setActive(query.isActive());
