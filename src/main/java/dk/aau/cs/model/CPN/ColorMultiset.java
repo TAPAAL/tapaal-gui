@@ -151,14 +151,16 @@ public class ColorMultiset implements Map<Color, Integer> {
     }
 
     private void updateTupleTokenNumber(Vector<ColorExpression> colorExpression, int numberOf) {
-        boolean numberChanged = false;
+        int numberOfTupleTokens = 1;
         for (ColorExpression ce : colorExpression) {
             if (ce instanceof AllExpression) {
-                numberOfTokens += ((AllExpression) ce).size() * numberOf;
-                numberChanged = true;
+                if (numberOfTupleTokens < numberOf)
+                    numberOfTupleTokens *= ((AllExpression) ce).size() * numberOf;
+                else
+                    numberOfTupleTokens *= ((AllExpression) ce).size();
             }
         }
-        if (!numberChanged) numberOfTokens += numberOf;
+        numberOfTokens += Math.max(numberOfTupleTokens, numberOf);
     }
 
     public Vector<TimedToken> getTokens(TimedPlace place) {
