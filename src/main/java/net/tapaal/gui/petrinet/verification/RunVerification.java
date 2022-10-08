@@ -1,6 +1,12 @@
 package net.tapaal.gui.petrinet.verification;
 
 import dk.aau.cs.Messenger;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.PNMLoader;
@@ -85,7 +91,7 @@ public class RunVerification extends RunVerificationBase {
                                 TAPAALGUI.openNewTabFromStream(result.getUnfoldedTab());
                             } else return false;
                         }
-                        TAPAALGUI.getAnimator().setTrace(result.getTrace());
+                        TAPAALGUI.getAnimator().setTrace(result.getTrace(), result.getTraceMap());
                     } else {
                         if ((
                             //XXX: this is not complete, we need a better way to signal the engine could not create a trace
@@ -145,6 +151,7 @@ public class RunVerification extends RunVerificationBase {
 				System.getProperty("line.separator") + 	
 				System.getProperty("line.separator");
 			}
+
 			message += "Model checker output:\n" + result.errorMessage();
 
 			messenger.displayWrappedErrorMessage(message,"Error during verification");
@@ -359,7 +366,9 @@ public class RunVerification extends RunVerificationBase {
 			if(!result.getReductionResultAsString().isEmpty()){
 
                 JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
+
 				gbc = GridBagHelper.as(0,6, WEST, new Insets(0,0,10,-90));
+
 				panel.add(reductionStatsLabel, gbc);
 
 				if(result.reductionRulesApplied()){

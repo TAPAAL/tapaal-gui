@@ -1,6 +1,9 @@
 package dk.aau.cs.approximation;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -352,17 +355,32 @@ public class ApproximationWorker {
             boolean isColored = (lens != null && lens.isColored() || model.isColored());
             NameMapping nameMapping = isColored? result.getUnfoldedModel().value2(): transformedModel.value2();
             TimedArcPetriNetNetwork netNetwork = isColored? result.getUnfoldedModel().value1().parentNetwork(): model;
-			toReturn =  new VerificationResult<TAPNNetworkTrace>(
-			    result.getQueryResult(),
-                decomposeTrace(result.getTrace(), nameMapping, netNetwork),
-                decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
-                result.verificationTime(),
-                result.stats(),
-                false,
-                result.getRawOutput(),
-                result.getUnfoldedModel(),
-                result.getUnfoldedTab());
-			toReturn.setNameMapping(nameMapping);
+            if(dataLayerQuery != null && dataLayerQuery.getCategory() == net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.HyperLTL) {
+                toReturn =  new VerificationResult<TAPNNetworkTrace>(
+                    result.getQueryResult(),
+                    decomposeTrace(result.getTraceMap(), nameMapping, netNetwork),
+                    decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+                    decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                    result.verificationTime(),
+                    result.stats(),
+                    false,
+                    result.getRawOutput(),
+                    result.getUnfoldedModel(),
+                    result.getUnfoldedTab());
+                toReturn.setNameMapping(nameMapping);
+            } else {
+                toReturn =  new VerificationResult<TAPNNetworkTrace>(
+                    result.getQueryResult(),
+                    decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+                    decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                    result.verificationTime(),
+                    result.stats(),
+                    false,
+                    result.getRawOutput(),
+                    result.getUnfoldedModel(),
+                    result.getUnfoldedTab());
+                toReturn.setNameMapping(nameMapping);
+            }
 		}
 		
 		options.setTraceOption(oldTraceOption);
@@ -676,7 +694,20 @@ public class ApproximationWorker {
 		TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(trace, model, mapping);
 		return decomposer.decompose();
 	}
-	
+
+    private Map<String, TAPNNetworkTrace> decomposeTrace(Map<String, TimedArcPetriNetTrace> traceMap, NameMapping mapping, TimedArcPetriNetNetwork model) {
+        if (traceMap == null || traceMap.size() == 0 || traceMap.values().toArray()[0] == null) {
+            return null;
+        }
+
+        Map<String, TAPNNetworkTrace> decomposedTracesMap = new LinkedHashMap<>();
+        for(var entry : traceMap.entrySet()) {
+            TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(entry.getValue(), model, mapping);
+            decomposedTracesMap.put(entry.getKey(), decomposer.decompose());
+        }
+        return decomposedTracesMap;
+    }
+
 	private void renameTraceTransitions(TimedArcPetriNetTrace trace) {
 		if (trace != null){
 			trace.reduceTraceForOriginalNet("_traceNet_", "PTRACE");

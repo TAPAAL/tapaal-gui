@@ -5,10 +5,12 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.model.tapn.simulation.*;
 import net.tapaal.gui.petrinet.animation.AnimationTokenSelectDialog;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.Template;
@@ -27,15 +29,6 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.model.tapn.simulation.FiringMode;
-import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
-import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
-import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
 import dk.aau.cs.util.Tuple;
@@ -55,6 +48,8 @@ public class Animator {
     private boolean isDisplayingUntimedTrace = false;
     private static boolean isUrgentTransitionEnabled = false;
 
+    private Map<String, TAPNNetworkTrace> traceMap;
+
     public static boolean isUrgentTransitionEnabled(){
         return isUrgentTransitionEnabled;
     }
@@ -67,6 +62,24 @@ public class Animator {
 
     private NetworkMarking currentMarking() {
         return markings.get(currentMarkingIndex);
+    }
+
+    public void setTrace(TAPNNetworkTrace trace, Map<String, TAPNNetworkTrace> traceMap) {
+        this.traceMap = traceMap;
+        setTrace(trace);
+        tab.getAnimationController().updateTraceBox(traceMap);
+    }
+
+    public Map<String, TAPNNetworkTrace> getTraceMap() {
+        return this.traceMap;
+    }
+    public void setTraceMap(Map<String, TAPNNetworkTrace> traceMap) {
+        this.traceMap = traceMap;
+    }
+
+    public void changeTrace(TAPNNetworkTrace trace) {
+        resetForTraceChange();
+        setTrace(trace);
     }
 
     public void setTrace(TAPNNetworkTrace trace) {
@@ -489,6 +502,16 @@ public class Animator {
         }
     }
 
+    private void resetHistoryForTracechange() {
+        actionHistory.clear();
+        currentAction = -1;
+        currentMarkingIndex = 0;
+        tab.getAnimationHistorySidePanel().reset();
+        if(tab.getUntimedAnimationHistory() != null){
+            tab.getUntimedAnimationHistory().reset();
+        }
+    }
+
     public FiringMode getFiringmode() {
         return firingmode;
     }
@@ -630,6 +653,14 @@ public class Animator {
         return animationSelectmodeDialog.getTokens();
     }
 
+    public void resetForTraceChange() {
+        resetHistoryForTracechange();
+        removeSetTrace(false);
+        markings.clear();
+        markings.add(initialMarking);
+        currentAction = -1;
+    }
+
     public void reset(boolean keepInitial){
         resethistory();
         removeSetTrace(false);
@@ -638,6 +669,17 @@ public class Animator {
             tab.network().setMarking(initialMarking);
             currentAction = -1;
             updateFireableTransitions();
+        }
+
+        if(traceMap != null) {
+            tab.getAnimationController().resetTraceBox(true);
+        }
+
+    }
+
+    public void resetTraceBox() {
+        if(tab.getAnimationController().getTraceBox().getModel().getSize() > 0) {
+            tab.getAnimationController().resetTraceBox(true);
         }
     }
 

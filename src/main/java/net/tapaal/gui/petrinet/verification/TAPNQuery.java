@@ -4,6 +4,8 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.QueryType;
 
+import java.util.ArrayList;
+
 public class TAPNQuery {
     
 	public enum TraceOption {
@@ -31,7 +33,7 @@ public class TAPNQuery {
 	}
 	
 	public enum QueryCategory{
-		Default, CTL, LTL
+		Default, CTL, LTL, HyperLTL
 	}
 	
 	public enum AlgorithmOption{
@@ -58,6 +60,8 @@ public class TAPNQuery {
     private boolean useColoredReduction;
 	private QueryCategory queryCategory = QueryCategory.Default;             // Used by the CTL engine
 	private AlgorithmOption algorithmOption = AlgorithmOption.CERTAIN_ZERO;  // Used by the CTL engine
+
+    private ArrayList<String> traceList;
 
     //Used for unfolding
     private boolean partitioning;
@@ -90,6 +94,14 @@ public class TAPNQuery {
 	/**
 	 * @return the name
 	 */
+
+	public void setTraceList(ArrayList<String> traces) {
+        this.traceList = traces;
+    }
+    public ArrayList<String> getTraceList() {
+        return this.traceList;
+    }
+
 	public String getName() {
 		return name;
 	}

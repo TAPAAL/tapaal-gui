@@ -5,6 +5,7 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
+import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
@@ -35,10 +36,12 @@ import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.TabTransformer;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
+
 import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
 import net.tapaal.gui.petrinet.dialog.WorkflowDialog;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel;
+
 import net.tapaal.gui.petrinet.undo.ChangeSpacingEditCommand;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
@@ -462,7 +465,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
-	private AnimationControlSidePanel animControlerBox;
+	private AnimationControlSidePanel animControllerBox;
+
     private AnimationHistorySidePanel animationHistorySidePanel;
 
 	private AnimationHistoryList abstractAnimationPane = null;
@@ -566,7 +570,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             this.setRightComponent(drawingSurfaceDummy);
         }
         this.queries.setQueries(tapnqueries);
-
     }
 
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
@@ -758,8 +761,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         animationHistorySidePanel = new AnimationHistorySidePanel(animator);
 
-        if (animControlerBox == null) {
-            animControlerBox = new AnimationControlSidePanel(animator, lens);
+        if (animControllerBox == null) {
+            animControllerBox = new AnimationControlSidePanel(animator, lens);
+
         }
 		if (transitionFiring == null) {
             transitionFiring = new TransitionFiringComponent(TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions(), lens, animator);
@@ -799,8 +803,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 0.0;
-		animationControlsPanel.add(animControlerBox, gbc);
+		gbc.weighty = 0.2;
+		animationControlsPanel.add(animControllerBox, gbc);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -853,7 +857,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public AnimationControlSidePanel getAnimationController() {
-		return animControlerBox;
+		return animControllerBox;
 	}
 
 	public DelayEnabledTransitionControl getDelayEnabledTransitionControl(){
@@ -1306,7 +1310,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 	@Override
 	public void toggleAnimationMode() {
-
 		if (!animationmode) {
 			if (numberOfActiveTemplates() > 0) {
 
@@ -1322,7 +1325,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 					setSelectedTemplateWasActive();
 				}
 
+				getAnimator().resetTraceBox();
+
 				getAnimator().reset(false);
+				if(animControllerBox != null) {
+                    animControllerBox.resetPlacementOfAnimationToolBar();
+
+                }
 				getAnimator().storeModel();
                 getAnimator().updateFireableTransitions();
                 getAnimator().reportBlockingPlaces();

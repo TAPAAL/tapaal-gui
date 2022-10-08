@@ -23,6 +23,7 @@ import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
+import dk.aau.cs.TCTL.visitors.HyperLTLQueryVisitor;
 import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
@@ -296,9 +297,11 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		for (TAPNQuery query : queries) {
 			Element newQuery;
 			if (query.getCategory() == QueryCategory.LTL){
-			    newQuery = createLTLQueryElement(query, document);
-            } else {
-                newQuery = createCTLQueryElement(query, document);
+                newQuery = createLTLQueryElement(query, document);
+            } else if(query.getCategory() == QueryCategory.HyperLTL) {
+			    newQuery = createHyperLTLQueryElement(query, document);
+            }else {
+				newQuery = createCTLQueryElement(query, document);
 			}
 			root.appendChild(newQuery);
 		}
@@ -384,6 +387,48 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
         return queryElement;
 	}
+
+    private Element createHyperLTLQueryElement(TAPNQuery query, Document document) {
+        Require.that(query != null, "Error: query was null");
+        Require.that(document != null, "Error: document was null");
+
+        Element queryElement = document.createElement("query");
+
+        Node queryFormula = XMLQueryStringToElement(new HyperLTLQueryVisitor().getXMLQueryFor(query.getProperty(), query.getName()));
+        queryElement.appendChild(document.importNode(queryFormula, true));
+
+        String traces = String.join(",", query.getTraceList());
+
+        queryElement.setAttribute("name", query.getName());
+        queryElement.setAttribute("type", query.getCategory().toString());
+        queryElement.setAttribute("traces", traces);
+        queryElement.setAttribute("capacity", "" + query.getCapacity());
+        queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
+        queryElement.setAttribute("searchOption", "" + query.getSearchOption());
+        queryElement.setAttribute("hashTableSize", "" + query.getHashTableSize());
+        queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
+        queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
+        queryElement.setAttribute("symmetry", "" + query.useSymmetry());
+        queryElement.setAttribute("gcd", "" + query.useGCD());
+        queryElement.setAttribute("timeDarts", "" + query.useTimeDarts());
+        queryElement.setAttribute("pTrie", "" + query.usePTrie());
+        queryElement.setAttribute("discreteInclusion", String.valueOf(query.discreteInclusion()));
+        queryElement.setAttribute("active", "" + query.isActive());
+        queryElement.setAttribute("inclusionPlaces", getInclusionPlacesString(query));
+        queryElement.setAttribute("overApproximation", "" + query.useOverApproximation());
+        queryElement.setAttribute("reduction", "" + query.useReduction());
+        queryElement.setAttribute("enableOverApproximation", "" + query.isOverApproximationEnabled());
+        queryElement.setAttribute("enableUnderApproximation", "" + query.isUnderApproximationEnabled());
+        queryElement.setAttribute("approximationDenominator", "" + query.approximationDenominator());
+        queryElement.setAttribute("algorithmOption", "" + query.getAlgorithmOption());
+        queryElement.setAttribute("useSiphonTrapAnalysis", "" + query.isSiphontrapEnabled());
+        queryElement.setAttribute("useQueryReduction", "" + query.isQueryReductionEnabled());
+        queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
+        queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
+        queryElement.setAttribute("useTarjan", "" + query.isTarjan());
+
+        return queryElement;
+    }
 
     private Element createLTLQueryElement(TAPNQuery query, Document document) {
         Require.that(query != null, "Error: query was null");
