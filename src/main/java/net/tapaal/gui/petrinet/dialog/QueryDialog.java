@@ -3079,7 +3079,8 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 5;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        traceBoxQuantification.setPreferredSize(new Dimension(77,27));
+        gbc.insets = new Insets(2,2,4,2);
+        traceBoxQuantification.setPreferredSize(new Dimension(76,27));
         quantificationPanel.add(traceBoxQuantification, gbc);
 
         Dimension dim = new Dimension(292, 27);
