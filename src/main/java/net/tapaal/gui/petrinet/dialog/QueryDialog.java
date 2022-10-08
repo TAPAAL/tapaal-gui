@@ -492,14 +492,6 @@ public class QueryDialog extends JPanel {
             false
 		);
 
-		query.setUseStubbornReduction(useStubbornReduction.isSelected());
-
-		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
-			query.setDiscreteInclusion(discreteInclusion.isSelected());
-		}
-		return query;
-	}
-
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
 
         if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
@@ -1389,7 +1381,7 @@ public class QueryDialog extends JPanel {
         boolean isHyperLTL = false;
         if(queryType.getSelectedIndex() == 2) {
             isHyperLTL = true;
-            selectedTrace = traceBox.getSelectedItem().toString();
+            selectedTrace = traceBoxQuantification.getSelectedItem().toString();
         }
 
         if(currentSelection != null &&
@@ -1418,9 +1410,9 @@ public class QueryDialog extends JPanel {
 
     private void updateTraceBox(TCTLAbstractPathProperty node) {
         if(node instanceof LTLANode) {
-            traceBox.setSelectedItem(((LTLANode)node).getTrace());
+            traceBoxQuantification.setSelectedItem(((LTLANode)node).getTrace());
         } else {
-            traceBox.setSelectedItem(((LTLENode)node).getTrace());
+            traceBoxQuantification.setSelectedItem(((LTLENode)node).getTrace());
         }
     }
 
@@ -2477,7 +2469,7 @@ public class QueryDialog extends JPanel {
         // Place buttons in GUI
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.anchor = GridBagConstraints.CENTER;
 
         // First column of buttons
         gbc.gridy = 0;
@@ -3087,7 +3079,7 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 5;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        traceBoxQuantification.setPreferredSize(new Dimension(100,27));
+        traceBoxQuantification.setPreferredSize(new Dimension(77,27));
         quantificationPanel.add(traceBoxQuantification, gbc);
 
         Dimension dim = new Dimension(292, 27);
