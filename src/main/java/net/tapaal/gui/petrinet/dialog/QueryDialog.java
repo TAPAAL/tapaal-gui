@@ -148,6 +148,7 @@ public class QueryDialog extends JPanel {
     private JButton addPredicateButton;
     private JComboBox templateBox;
     private JComboBox traceBox;
+    private JComboBox traceBoxQuantification;
     private JComboBox<String> placeTransitionBox;
     private JComboBox<String> relationalOperatorBox;
     private JLabel transitionIsEnabledLabel;
@@ -327,6 +328,7 @@ public class QueryDialog extends JPanel {
 
     // Tool tips for trace panel
     private static final String TOOL_TIP_TRACEBOX = "Choose a trace for this predicate.";
+    private static final String TOOL_TIP_TRACEBOX_QUANTIFICATION = "Choose a trace for quantification.";
     private static final String TOOL_TIP_ADDTRACEBUTTON = "Add or remove new traces";
 
     //Tool tips for editing panel
@@ -1365,6 +1367,17 @@ public class QueryDialog extends JPanel {
                 undoSupport.postEdit(edit);
             }
             queryChanged();
+        }
+    }
+
+    // Used in HyperLTL to update queries with the 'A' or 'E' quantifier
+    private void updateQueryOnQuantificationChange() {
+        // trace for HyperLTL
+        String selectedTrace = "";
+        boolean isHyperLTL = false;
+        if(queryType.getSelectedIndex() == 2) {
+            isHyperLTL = true;
+            selectedTrace = traceBox.getSelectedItem().toString();
         }
 
         if(currentSelection != null &&
@@ -2486,7 +2499,7 @@ public class QueryDialog extends JPanel {
 
         // Traces button at the bottom of the panel
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         addTraceButton.setPreferredSize(new Dimension(78, 27));
@@ -2724,6 +2737,7 @@ public class QueryDialog extends JPanel {
     private void showHyperLTL(boolean isVisble) {
         traceRow.setVisible(isVisble);
         addTraceButton.setVisible(isVisble);
+        traceBoxQuantification.setVisible(isVisble);
         guiDialog.pack();
     }
 
@@ -3007,6 +3021,7 @@ public class QueryDialog extends JPanel {
             tracesVector.add(traceModel.get(i));
         }
         traceBox.setModel(new DefaultComboBoxModel<>(tracesVector));
+        traceBoxQuantification.setModel(new DefaultComboBoxModel<>(tracesVector));
     }
 
     private void initTracePanels() {
@@ -3036,20 +3051,38 @@ public class QueryDialog extends JPanel {
         }
 
         traceBox = new JComboBox<>(new DefaultComboBoxModel<>(tracesVector));
+        traceBoxQuantification = new JComboBox<>(new DefaultComboBoxModel<>(tracesVector));
+
         traceBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 updateQueryOnAtomicPropositionChange();
             }
         });
 
+        traceBoxQuantification.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateQueryOnQuantificationChange();
+            }
+        });
+
         traceBox.setToolTipText(TOOL_TIP_TRACEBOX);
+        traceBoxQuantification.setToolTipText(TOOL_TIP_TRACEBOX_QUANTIFICATION);
+
+        // Add to the quantification panel
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        traceBoxQuantification.setPreferredSize(new Dimension(100,27));
+        quantificationPanel.add(traceBoxQuantification, gbc);
 
         Dimension dim = new Dimension(292, 27);
         traceBox.setMaximumSize(dim);
         traceBox.setMinimumSize(dim);
         traceBox.setPreferredSize(dim);
 
-        GridBagConstraints gbc = new GridBagConstraints();
+        gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridwidth = 3;
         gbc.insets = new Insets(1, 0, 1, 0);
@@ -3378,6 +3411,7 @@ public class QueryDialog extends JPanel {
     private void exitTraceDialog() {
         updateTraceBox();
         traceBox.setSelectedIndex(traceList.getModel().getSize() - 1);
+        traceBoxQuantification.setSelectedIndex(traceList.getModel().getSize() - 1);
         traceDialog.setVisible(false);
     }
 
