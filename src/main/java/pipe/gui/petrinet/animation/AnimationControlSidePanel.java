@@ -51,6 +51,7 @@ public class AnimationControlSidePanel extends JPanel {
 	private int delayScale = 10;
 	private static final String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
 	private static final String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded";
+	private static final String TRACEBOX_DROPDOWN_TOOL_TIP = "Select a trace.";
 	private JPanel sliderPanel;
 	private JPanel timedelayPanel;
     JPanel firemode;
@@ -83,15 +84,10 @@ public class AnimationControlSidePanel extends JPanel {
 		animationToolBar.setVisible(true);
 
         traceBox = new JComboBox<>(new DefaultComboBoxModel<>());
-        Dimension dim = new Dimension(197, 27);
-        traceBox.setMaximumSize(dim);
-        traceBox.setMinimumSize(dim);
-        traceBox.setPreferredSize(dim);
+        traceBox.setPreferredSize(new Dimension(200, 27));
+        traceBox.setToolTipText(TRACEBOX_DROPDOWN_TOOL_TIP);
         showTraceBox(false);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(traceBox, gbc);
+        animationToolBar.add(traceBox);
 
         GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -151,7 +147,7 @@ public class AnimationControlSidePanel extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
         c.gridx = 0;
-        c.gridy = 1;
+        c.gridy = 0;
         add(animationToolBar, c);
 
     }
