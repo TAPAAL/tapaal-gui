@@ -39,15 +39,22 @@ public class VerifyTAPNTraceParser {
 
 	public TimedArcPetriNetTrace parseTrace(BufferedReader reader) {
 		TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
-		
-		Document document = loadDocument(reader);
-		
-		if(document == null) return null;
+
+        Document document = loadDocument(reader);
+
+        if(document == null) return null;
 
         NodeList nodeList = null;
 
 		if(traceNameToParse != null) {
-		    NodeList childNodes = document.getElementsByTagName("trace-list").item(0).getChildNodes();
+            NodeList childNodes = null;
+		    try {
+		        childNodes = document.getElementsByTagName("trace-list").item(0).getChildNodes();
+            } catch (NullPointerException ex) {
+                // This just means the trace list is empty, i.e., there is no trace except the initial marking
+                // So we send this back
+                return trace;
+            }
 		    for(int i = 0; i < childNodes.getLength(); i++) {
 		        NamedNodeMap nodeAttribute = childNodes.item(i).getAttributes();
 
@@ -121,7 +128,15 @@ public class VerifyTAPNTraceParser {
 
 	private Document loadDocument(BufferedReader reader) {
 		try {
-			//reader.readLine(); // first line is "Trace:", so ignore it
+		    boolean shouldSkip = false;
+            // We need to reset the buffer if we a trace-list:
+            reader.mark(10000);
+            String line = reader.readLine();
+
+            if(line.equals("Trace")) shouldSkip = true;
+            reader.reset();
+
+            if(shouldSkip) reader.readLine(); // first line is "Trace:"
 
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			builder.setErrorHandler(new ErrorHandler() {
