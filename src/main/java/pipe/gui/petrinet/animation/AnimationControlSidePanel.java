@@ -1,9 +1,6 @@
 package pipe.gui.petrinet.animation;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 
 import java.awt.event.*;
 import java.math.BigDecimal;
@@ -84,9 +81,10 @@ public class AnimationControlSidePanel extends JPanel {
 		animationToolBar.setVisible(true);
 
         traceBox = new JComboBox<>(new DefaultComboBoxModel<>());
-        traceBox.setPreferredSize(new Dimension(200, 27));
+        traceBox.setPreferredSize(new Dimension(100, 27));
         traceBox.setToolTipText(TRACEBOX_DROPDOWN_TOOL_TIP);
         showTraceBox(false);
+        animationToolBar.add(Box.createHorizontalStrut(10));
         animationToolBar.add(traceBox);
 
         GridBagConstraints c = new GridBagConstraints();
@@ -134,8 +132,8 @@ public class AnimationControlSidePanel extends JPanel {
         traceBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent event) {
-                if(traceBox.getSelectedItem() != null) {
-                    animator.changeTrace(traceMap.get(traceBox.getSelectedItem().toString()));
+                if(traceBox.getSelectedItem() != null && event.getStateChange() == ItemEvent.SELECTED) {
+                    animator.changeTrace(animator.getTraceMap().get(traceBox.getSelectedItem().toString()));
                 }
             }
         });
@@ -149,7 +147,6 @@ public class AnimationControlSidePanel extends JPanel {
         c.gridx = 0;
         c.gridy = 0;
         add(animationToolBar, c);
-
     }
 
     public void resetPlacementOfAnimationToolBar() {
@@ -160,7 +157,6 @@ public class AnimationControlSidePanel extends JPanel {
         c.gridx = 0;
         c.gridy = 2;
         add(animationToolBar, c);
-
     }
 
     private void showTraceBox(boolean shouldShow) {

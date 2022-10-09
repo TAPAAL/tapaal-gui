@@ -53,6 +53,7 @@ public class VerifyTAPNTraceParser {
             } catch (NullPointerException ex) {
                 // This just means the trace list is empty, i.e., there is no trace except the initial marking
                 // So we send this back
+                trace.setTraceName(traceNameToParse);
                 return trace;
             }
 		    for(int i = 0; i < childNodes.getLength(); i++) {
