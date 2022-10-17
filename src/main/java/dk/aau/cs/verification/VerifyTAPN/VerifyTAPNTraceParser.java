@@ -133,9 +133,13 @@ public class VerifyTAPNTraceParser {
             // We need to reset the buffer if we a trace-list:
             reader.mark(10000);
             String line = reader.readLine();
+            try {
+                if(line.equals("Trace")) shouldSkip = true;
+                reader.reset();
+            } catch (NullPointerException e) {
+                return null;
+            }
 
-            if(line.equals("Trace")) shouldSkip = true;
-            reader.reset();
 
             if(shouldSkip) reader.readLine(); // first line is "Trace:"
 
