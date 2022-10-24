@@ -119,4 +119,8 @@ public class PredecessorExpression extends ColorExpression {
         return color.getColorTypes();
     }
 
+    @Override
+    public ColorExpression getExprWithNewColorType(ColorType ct) {
+        return new PredecessorExpression(color.getExprWithNewColorType(ct));
+    }
 }

@@ -135,5 +135,8 @@ public class UserOperatorExpression extends ColorExpression {
         return new Vector<>(Collections.singletonList(userOperator.getColorType()));
     }
 
-
+    @Override
+    public ColorExpression getExprWithNewColorType(ColorType ct) {
+        return new UserOperatorExpression(userOperator.getExprWithNewColorType(ct));
+    }
 }

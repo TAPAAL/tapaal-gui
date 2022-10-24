@@ -99,4 +99,9 @@ public class DotConstantExpression extends UserOperatorExpression {
     public Vector<ColorType> getColorTypes() {
         return new Vector<>(Collections.singletonList(colorType));
     }
+
+    @Override
+    public ColorExpression getExprWithNewColorType(ColorType ct) {
+        return deepCopy();
+    }
 }

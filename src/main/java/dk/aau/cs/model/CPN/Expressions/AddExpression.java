@@ -2,6 +2,7 @@ package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
@@ -21,7 +22,6 @@ public class AddExpression extends ArcExpression {
         super(otherExpr);
         this.constituents = new Vector<>(otherExpr.constituents);
     }
-
 
     public Vector<ArcExpression> getAddExpression (){return constituents;}
 
@@ -52,6 +52,7 @@ public class AddExpression extends ArcExpression {
     public ArcExpression replace(Expression object1, Expression object2){
         return replace(object1,object2,false);
     }
+
     @Override
     public ArcExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
         if (object1 == this && object2 instanceof ArcExpression) {
@@ -181,5 +182,13 @@ public class AddExpression extends ArcExpression {
             res.append(constituent.toString()).append("\n");
         }
         return res.toString();
+    }
+
+    public AddExpression getExprWithNewColorType(ColorType ct) {
+        Vector<ArcExpression> arcExpressions = new Vector<>();
+        for (ArcExpression expr : constituents) {
+            arcExpressions.add(expr.getExprWithNewColorType(ct));
+        }
+        return new AddExpression(arcExpressions);
     }
 }

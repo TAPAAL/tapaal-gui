@@ -106,4 +106,9 @@ public class PlaceHolderColorExpression extends ColorExpression implements Place
     public Vector<ColorType> getColorTypes() {
         return new Vector<>();
     }
+
+    @Override
+    public ColorExpression getExprWithNewColorType(ColorType ct) {
+        return deepCopy();
+    }
 }
