@@ -720,6 +720,8 @@ public class PlaceEditorPanel extends JPanel {
                 if (cm != null) {
                     tokensToAdd.addAll(cm.getTokens(place.underlyingPlace()));
                 }
+            } else {
+                place.underlyingPlace().resetNumberOfTokens();
             }
 
             for (int i = 0; i < timeConstraintListModel.size(); i++) {
