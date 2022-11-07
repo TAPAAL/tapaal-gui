@@ -200,6 +200,8 @@ public class TabTransformer {
                     Vector<ArcExpression> numbOfExpression = new Vector<>();
                     numbOfExpression.add(new NumberOfExpression(place.numberOfTokens(), v));
                     place.setTokenExpression(new AddExpression(numbOfExpression));
+                } else if (place.numberOfTokens() > 0) {
+                    place.resetNumberOfTokens();
                 }
             }
 

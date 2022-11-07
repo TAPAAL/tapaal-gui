@@ -205,7 +205,6 @@ public class Verifier {
                 isColored // Unfold net
             );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
-
             verifytapnOptions = new VerifyPNOptions(
                 bound,
                 query.getTraceOption(),
@@ -227,7 +226,8 @@ public class Verifier {
                 isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE,
                 query.usePartitioning(),
                 query.useColorFixpoint(),
-                query.useSymmetricVars()
+                query.useSymmetricVars(),
+                query.useColoredReduction()
             );
         } else {
             verifytapnOptions = new VerifyTAPNOptions(

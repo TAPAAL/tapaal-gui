@@ -73,7 +73,7 @@ public class NumberOfExpression extends ArcExpression {
             }
             colors.addAll(c);
         }
-        return new ColorMultiset(ct, number, colors);
+        return new ColorMultiset(ct, number, colors, color);
     }
 
     public Integer weight() {
