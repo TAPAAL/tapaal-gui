@@ -211,7 +211,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="760" yCoord="265"/>
-      <arcpath arcPointType="false" id="1" xCoord="620" yCoord="233"/>
+      <arcpath arcPointType="false" id="1" xCoord="624" yCoord="237"/>
       <arcpath arcPointType="false" id="2" xCoord="479" yCoord="266"/>
     </arc>
     <arc id="state2mainproc" inscription="[0,inf)" nameOffsetX="123" nameOffsetY="23" source="state" target="mainprocess" type="timed" weight="1">
@@ -261,7 +261,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="479" yCoord="273"/>
-      <arcpath arcPointType="false" id="1" xCoord="626" yCoord="303"/>
+      <arcpath arcPointType="false" id="1" xCoord="630" yCoord="307"/>
       <arcpath arcPointType="false" id="2" xCoord="759" yCoord="275"/>
     </arc>
     <arc id="otherproc2state" inscription="1" nameOffsetX="52" nameOffsetY="-25" source="otherprocess" target="state" type="normal" weight="1">
@@ -315,7 +315,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="185" yCoord="265"/>
-      <arcpath arcPointType="false" id="1" xCoord="320" yCoord="233"/>
+      <arcpath arcPointType="false" id="1" xCoord="324" yCoord="237"/>
       <arcpath arcPointType="false" id="2" xCoord="450" yCoord="266"/>
     </arc>
     <arc id="state2otherproc" inscription="[0,inf)" nameOffsetX="38" nameOffsetY="20" source="state" target="otherprocess" type="timed" weight="1">
@@ -369,7 +369,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="450" yCoord="273"/>
-      <arcpath arcPointType="false" id="1" xCoord="320" yCoord="302"/>
+      <arcpath arcPointType="false" id="1" xCoord="324" yCoord="306"/>
       <arcpath arcPointType="false" id="2" xCoord="184" yCoord="275"/>
     </arc>
   </net>
