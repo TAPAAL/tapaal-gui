@@ -53,12 +53,10 @@ The query asks about violation of the synchronization between sender and receive
       <arcpath arcPointType="false" id="1" xCoord="499" yCoord="615"/>
     </arc>
     <arc id="Receiver_A to Receive_0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Receiver_A" target="Receive_0" type="timed" weight="1">
-      <arcpath arcPointType="false" id="0" xCoord="629" yCoord="796"/>
-      <arcpath arcPointType="false" id="1" xCoord="676" yCoord="801"/>
-      <arcpath arcPointType="false" id="2" xCoord="725" yCoord="800"/>
-      <arcpath arcPointType="false" id="3" xCoord="725" yCoord="140"/>
-      <arcpath arcPointType="false" id="4" xCoord="651" yCoord="139"/>
-      <arcpath arcPointType="false" id="5" xCoord="615" yCoord="160"/>
+      <arcpath arcPointType="false" id="0" xCoord="630" yCoord="795"/>
+      <arcpath arcPointType="false" id="2" xCoord="735" yCoord="795"/>
+      <arcpath arcPointType="false" id="3" xCoord="735" yCoord="165"/>
+      <arcpath arcPointType="false" id="5" xCoord="630" yCoord="165"/>
     </arc>
     <arc id="Sender_A to Send_0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Sender_A" target="Send_0" type="timed" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="165" yCoord="90"/>
@@ -169,11 +167,11 @@ The query asks about violation of the synchronization between sender and receive
     </arc>
     <arc id="Ack_rec_1 to Sender_A" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Ack_rec_1" target="Sender_A" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="165" yCoord="740"/>
-      <arcpath arcPointType="false" id="1" xCoord="140" yCoord="785"/>
+      <arcpath arcPointType="false" id="1" xCoord="165" yCoord="785"/>
       <arcpath arcPointType="false" id="2" xCoord="80" yCoord="785"/>
-      <arcpath arcPointType="false" id="3" xCoord="80" yCoord="50"/>
-      <arcpath arcPointType="false" id="4" xCoord="155" yCoord="50"/>
-      <arcpath arcPointType="false" id="5" xCoord="159" yCoord="61"/>
+      <arcpath arcPointType="false" id="3" xCoord="80" yCoord="40"/>
+      <arcpath arcPointType="false" id="4" xCoord="165" yCoord="40"/>
+      <arcpath arcPointType="false" id="5" xCoord="165" yCoord="60"/>
     </arc>
     <arc id="Send_0 to Medium_A" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Send_0" target="Medium_A" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="180" yCoord="164"/>

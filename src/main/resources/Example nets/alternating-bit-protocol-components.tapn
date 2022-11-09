@@ -73,7 +73,7 @@
     </arc>
     <arc id="Ack_rec_1 to Sender_A" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Ack_rec_1" target="Sender_A" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="165" yCoord="740"/>
-      <arcpath arcPointType="false" id="1" xCoord="146" yCoord="791"/>
+      <arcpath arcPointType="false" id="1" xCoord="165" yCoord="791"/>
       <arcpath arcPointType="false" id="2" xCoord="86" yCoord="791"/>
       <arcpath arcPointType="false" id="3" xCoord="86" yCoord="56"/>
       <arcpath arcPointType="false" id="4" xCoord="161" yCoord="56"/>

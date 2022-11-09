@@ -968,8 +968,8 @@ public class TapnXmlLoader {
 						String arcTempType = element.getAttribute("arcPointType");
 						double arcPointX = Double.parseDouble(arcTempX);
 						double arcPointY = Double.parseDouble(arcTempY);
-						arcPointX += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
-						arcPointY += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
+						//arcPointX += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
+						//arcPointY += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
 						boolean arcPointType = Boolean.parseBoolean(arcTempType);
 						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	arcPointType);
 					}
