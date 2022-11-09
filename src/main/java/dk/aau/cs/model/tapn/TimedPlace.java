@@ -281,4 +281,10 @@ public abstract class TimedPlace {
         return tokensAsExpression;
     }
 
+    public ArcExpression getExprWithNewColorType(ColorType colorType) {
+	    if (tokensAsExpression != null)
+	        return tokensAsExpression.getExprWithNewColorType(colorType);
+	    else
+	        return tokensAsExpression;
+    }
 }

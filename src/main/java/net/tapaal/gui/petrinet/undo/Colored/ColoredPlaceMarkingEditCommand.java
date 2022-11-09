@@ -48,7 +48,6 @@ public class ColoredPlaceMarkingEditCommand extends Command {
 
     @Override
     public void undo() {
-
         for (TimedToken token : newTokenList) {
             context.activeModel().marking().remove(token);
         }

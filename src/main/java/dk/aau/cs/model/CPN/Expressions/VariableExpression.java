@@ -175,4 +175,8 @@ public class VariableExpression extends ColorExpression {
         return new Vector<>(Collections.singletonList(variable.getColorType()));
     }
 
+    @Override
+    public ColorExpression getExprWithNewColorType(ColorType ct) {
+        return new VariableExpression(variable.getExprWithNewColorType(ct));
+    }
 }

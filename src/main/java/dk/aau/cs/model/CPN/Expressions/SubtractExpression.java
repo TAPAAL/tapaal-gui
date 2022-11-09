@@ -2,6 +2,7 @@ package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
@@ -135,4 +136,8 @@ public class SubtractExpression extends ArcExpression {
         return false;
     }
 
+    @Override
+    public ArcExpression getExprWithNewColorType(ColorType ct) {
+        return new SubtractExpression(left.getExprWithNewColorType(ct), right.getExprWithNewColorType(ct));
+    }
 }

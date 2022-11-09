@@ -1,10 +1,11 @@
 package net.tapaal.gui.petrinet.undo.Colored;
 
+import dk.aau.cs.model.CPN.ColorMultiset;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
-import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
 import java.util.ArrayList;
@@ -42,6 +43,8 @@ public class UpdateColorTypeCommand extends Command {
             }
         }
 
+        eval(oldColorType);
+
         for(Variable var : network.variables()){
             if (var.getColorType().equals(newColorType)){
                 var.setColorType(oldColorType);
@@ -67,6 +70,9 @@ public class UpdateColorTypeCommand extends Command {
                 }
             }
         }
+
+        eval(newColorType);
+
         for(Variable var : network.variables()){
             if (var.getColorType().equals(oldColorType)){
                 var.setColorType(newColorType);
@@ -74,5 +80,30 @@ public class UpdateColorTypeCommand extends Command {
         }
 
         colorTypesListModel.updateName();
+    }
+
+    private void eval(ColorType colorType) {
+        for (TimedArcPetriNet tapn : network.allTemplates()) {
+            for (TimedPlace place : tapn.places()) {
+                ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
+                ArcExpression expression = place.getExprWithNewColorType(colorType);
+
+                if (expression != place.getTokensAsExpression()) {
+                    ColorMultiset cm = expression.eval(network.getContext());
+                    if (cm != null) {
+                        tokensToAdd.addAll(cm.getTokens(place));
+
+                        for (TimedToken token : tokensToAdd) {
+                            tapn.marking().remove(token);
+                        }
+
+                        if (place.getColorType().getName().equals(colorType.getName())) {
+                            place.setColorType(colorType);
+                        }
+                        place.updateTokens(tokensToAdd, expression);
+                    }
+                }
+            }
+        }
     }
 }

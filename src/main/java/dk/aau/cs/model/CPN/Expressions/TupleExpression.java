@@ -254,4 +254,16 @@ public class TupleExpression extends ColorExpression {
         }
         return constituentColorTypes;
     }
+
+    public TupleExpression getExprWithNewColorType(ColorType ct) {
+        Vector<ColorExpression> colorExpressions = new Vector<>();
+        for (ColorExpression colorExpression : colors) {
+            if (colorExpression.colorType.getName().equals(ct.getName())) {
+                colorExpressions.add(colorExpression.getExprWithNewColorType(ct));
+            } else {
+                colorExpressions.add(colorExpression);
+            }
+        }
+        return new TupleExpression(colorExpressions, ct);
+    }
 }

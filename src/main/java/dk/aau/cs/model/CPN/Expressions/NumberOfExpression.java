@@ -176,4 +176,17 @@ public class NumberOfExpression extends ArcExpression {
     public void setNumber(int newNumber){
         number = newNumber;
     }
+
+    @Override
+    public ArcExpression getExprWithNewColorType(ColorType ct) {
+        Vector<ColorExpression> colorExpressions = new Vector<>();
+        ColorExpression colorExpression = color.get(0);
+
+        if (colorExpression.colorType == null || colorExpression.colorType.getName().equals(ct.getName())) {
+            colorExpressions.add(colorExpression.getExprWithNewColorType(ct));
+        } else {
+            colorExpressions.add(colorExpression);
+        }
+        return new NumberOfExpression(number, colorExpressions);
+    }
 }
