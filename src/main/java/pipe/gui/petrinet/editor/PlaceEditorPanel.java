@@ -668,7 +668,6 @@ public class PlaceEditorPanel extends JPanel {
 		}
         doOkColors(newMarking);
 
-
 		TimeInvariant newInvariant = constructInvariant();
 		TimeInvariant oldInvariant = place.underlyingPlace().invariant();
 		if(!newInvariant.equals(oldInvariant)){
@@ -704,6 +703,7 @@ public class PlaceEditorPanel extends JPanel {
                 return;
             }
         } else {
+            int oldTokenCount = place.underlyingPlace().numberOfTokens();
             ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
             ArrayList<TimedToken> oldTokenList = new ArrayList(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
             List<ColoredTimeInvariant> ctiList = new ArrayList<>();
@@ -730,7 +730,7 @@ public class PlaceEditorPanel extends JPanel {
             if (!colorType.equals(place.underlyingPlace().getColorType())) {
                 updateArcsAccordingToColorType();
             }
-            Command command = new ColoredPlaceMarkingEditCommand(oldTokenList, tokensToAdd, originalExpression, newExpression, context, place, ctiList, colorType);
+            Command command = new ColoredPlaceMarkingEditCommand(oldTokenList, tokensToAdd, originalExpression, newExpression, context, place, ctiList, colorType, oldTokenCount, place.underlyingPlace().numberOfTokens());
             command.redo();
             context.undoManager().addEdit(command);
         }

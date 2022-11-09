@@ -23,6 +23,8 @@ public class ColoredPlaceMarkingEditCommand extends Command {
     private final List<ColoredTimeInvariant> oldCtiList;
     private final ArcExpression oldExpression;
     private final ArcExpression newExpression;
+    private final int oldTokenCount;
+    private final int newTokenCount;
 
     public ColoredPlaceMarkingEditCommand(
         ArrayList<TimedToken> tokenList,
@@ -32,7 +34,9 @@ public class ColoredPlaceMarkingEditCommand extends Command {
         Context context,
         TimedPlaceComponent place,
         List<ColoredTimeInvariant> ctiList,
-        ColorType colorType1
+        ColorType colorType1,
+        int oldTokenCount,
+        int newTokenCount
     ){
         this.tokenList = tokenList;
         this.newTokenList = newTokenList;
@@ -44,6 +48,8 @@ public class ColoredPlaceMarkingEditCommand extends Command {
         this.newExpression = newExpression;
         this.oldColorType = place.underlyingPlace().getColorType();
         this.oldCtiList = place.underlyingPlace().getCtiList();
+        this.oldTokenCount = oldTokenCount;
+        this.newTokenCount = newTokenCount;
     }
 
     @Override
@@ -55,7 +61,7 @@ public class ColoredPlaceMarkingEditCommand extends Command {
         place.underlyingPlace().setColorType(oldColorType);
         place.underlyingPlace().setCtiList(oldCtiList);
         place.underlyingPlace().updateTokens(tokenList, oldExpression);
-
+        place.underlyingPlace().setNumberOfTokens(oldTokenCount);
 
         place.update(true);
         place.repaint();
@@ -70,6 +76,7 @@ public class ColoredPlaceMarkingEditCommand extends Command {
         place.underlyingPlace().setCtiList(ctiList);
         place.underlyingPlace().setColorType(colorType);
         place.underlyingPlace().updateTokens(newTokenList, newExpression);
+        place.underlyingPlace().setNumberOfTokens(newTokenCount);
 
         place.update(true);
         place.repaint();
