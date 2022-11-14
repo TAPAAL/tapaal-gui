@@ -256,7 +256,7 @@ public class VerifyPN implements ModelChecker {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
             } else {
                 ctlOutput = queryResult.value1().isCTL;
-                return new VerificationResult<>(queryResult.value1(), null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
+                return new VerificationResult<>(queryResult.value1(), null, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
             }
         }
     }

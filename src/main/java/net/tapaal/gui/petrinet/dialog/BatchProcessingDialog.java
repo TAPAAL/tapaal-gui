@@ -748,7 +748,7 @@ public class BatchProcessingDialog extends JDialog {
         checkboxPN = new JCheckBox("VerifyPN");
         checkboxPN.setEnabled(false);
         checkboxPN.addActionListener(e -> {
-            optionsTAPN.setEnabled(checkboxPN.isSelected());
+            optionsPN.setEnabled(checkboxPN.isSelected());
             helpPN.setEnabled(checkboxPN.isSelected());
         });
         checkboxPN.setToolTipText(TOOL_TIP_VerifyPNOption);
@@ -781,7 +781,7 @@ public class BatchProcessingDialog extends JDialog {
         checkboxDTAPN = new JCheckBox("VerifyDTAPN");
         checkboxDTAPN.setEnabled(false);
         checkboxDTAPN.addActionListener(e -> {
-            optionsTAPN.setEnabled(checkboxDTAPN.isSelected());
+            optionsDTAPN.setEnabled(checkboxDTAPN.isSelected());
             helpDTAPN.setEnabled(checkboxDTAPN.isSelected());
         });
         checkboxDTAPN.setToolTipText(TOOL_TIP_VerifyDTAPNOption);
