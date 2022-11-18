@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 
 import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.visitors.HyperLTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import net.tapaal.gui.petrinet.TAPNLens;
@@ -63,6 +64,9 @@ public class VerifyTAPNExporter {
                 throw new FileNotFoundException(null);
             } else if (query.getCategory() == QueryCategory.LTL) {
                 LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
+            } else if (query.getCategory() == QueryCategory.HyperLTL){
+                HyperLTLQueryVisitor XMLVisitor = new HyperLTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
             } else if (lens != null && lens.isGame()) {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();

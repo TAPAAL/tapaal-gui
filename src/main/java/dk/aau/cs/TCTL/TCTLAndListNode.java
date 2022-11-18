@@ -29,8 +29,7 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		}
 	}
 
-	public TCTLAndListNode(TCTLAbstractStateProperty property1,
-			TCTLAbstractStateProperty property2) {
+	public TCTLAndListNode(TCTLAbstractStateProperty property1, TCTLAbstractStateProperty property2) {
 		properties = new ArrayList<TCTLAbstractStateProperty>();
 
 		addConjunct(property1);
@@ -149,8 +148,7 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 	}
 
 	@Override
-	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1,
-			TCTLAbstractProperty object2) {
+	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
 			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty) object2;
 			obj2.setParent(parent);

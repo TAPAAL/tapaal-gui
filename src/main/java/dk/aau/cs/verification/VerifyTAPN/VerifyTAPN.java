@@ -291,6 +291,7 @@ public class VerifyTAPN implements ModelChecker {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
+
                     try {
                         LoadedModel loadedModel = tapnLoader.load(fileOut);
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
@@ -321,6 +322,7 @@ public class VerifyTAPN implements ModelChecker {
                     tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
                 }
 				//return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), standardOutput);
+
                 return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
 			}
 		}

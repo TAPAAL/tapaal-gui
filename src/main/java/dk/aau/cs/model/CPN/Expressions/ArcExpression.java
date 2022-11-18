@@ -31,7 +31,7 @@ public abstract class ArcExpression extends Expression {
     @Override
     public abstract Expression findFirstPlaceHolder();
 
-
+    
     public abstract ColorMultiset eval(ExpressionContext context);
 
     public abstract Integer weight();

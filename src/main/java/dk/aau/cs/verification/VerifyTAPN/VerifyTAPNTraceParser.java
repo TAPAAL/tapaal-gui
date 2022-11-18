@@ -11,10 +11,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.model.CPN.ColorType;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+
+import org.w3c.dom.*;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -33,6 +31,7 @@ import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 public class VerifyTAPNTraceParser {
 
 	private final TimedArcPetriNet tapn;
+	private String traceNameToParse;
 	
 	public VerifyTAPNTraceParser(TimedArcPetriNet tapn) {
 		this.tapn = tapn;
@@ -40,12 +39,38 @@ public class VerifyTAPNTraceParser {
 
 	public TimedArcPetriNetTrace parseTrace(BufferedReader reader) {
 		TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
+
+        Document document = loadDocument(reader);
+
+        if(document == null) return null;
+
+        NodeList nodeList = null;
+
+		if(traceNameToParse != null) {
+            NodeList childNodes = null;
+		    try {
+		        childNodes = document.getElementsByTagName("trace-list").item(0).getChildNodes();
+            } catch (NullPointerException ex) {
+                // This just means the trace list is empty, i.e., there is no trace except the initial marking
+                // So we send this back
+                trace.setTraceName(traceNameToParse);
+                return trace;
+            }
+		    for(int i = 0; i < childNodes.getLength(); i++) {
+		        NamedNodeMap nodeAttribute = childNodes.item(i).getAttributes();
+
+                if(nodeAttribute != null && nodeAttribute.item(0).getNodeValue().equals(traceNameToParse)) {
+                    nodeList = childNodes.item(i).getChildNodes();
+                    trace.setTraceName(traceNameToParse);
+                    break;
+                }
+            }
+        }
 		
-		Document document = loadDocument(reader);
-		
-		if(document == null) return null;
-		
-		NodeList nodeList = document.getElementsByTagName("trace").item(0).getChildNodes();
+		if(nodeList == null) {
+            nodeList = document.getElementsByTagName("trace").item(0).getChildNodes();
+        }
+
 		for(int i = 0; i < nodeList.getLength(); i++){
 			Node node = nodeList.item(i);
 			if(node instanceof Element){
@@ -70,6 +95,13 @@ public class VerifyTAPNTraceParser {
 	
 		return trace;
 	}
+
+	public void setTraceToParse(String traceName) {
+	    this.traceNameToParse = traceName;
+    }
+    public String getTraceNameToParse() {
+	    return this.traceNameToParse;
+    }
 
 	private TimedTransitionStep parseTransitionStep(Element element) {
 		TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
@@ -97,7 +129,20 @@ public class VerifyTAPNTraceParser {
 
 	private Document loadDocument(BufferedReader reader) {
 		try {
-			reader.readLine(); // first line is "Trace:", so ignore it
+		    boolean shouldSkip = false;
+            // We need to reset the buffer if we a trace-list:
+            reader.mark(10000);
+            String line = reader.readLine();
+            try {
+                if(line.equals("Trace")) shouldSkip = true;
+                reader.reset();
+            } catch (NullPointerException e) {
+                return null;
+            }
+
+
+            if(shouldSkip) reader.readLine(); // first line is "Trace:"
+
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			builder.setErrorHandler(new ErrorHandler() {
 				

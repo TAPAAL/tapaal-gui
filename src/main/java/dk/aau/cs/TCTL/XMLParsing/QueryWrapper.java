@@ -1,14 +1,24 @@
 package dk.aau.cs.TCTL.XMLParsing;
 
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import java.util.ArrayList;
 
 public class QueryWrapper{
 
     private String name = null;
     private XMLQueryParseException exception = null;
     private TCTLAbstractProperty property;
+    private ArrayList<String> traceList;
 
     public QueryWrapper(){}
+
+    public void setTraceList(ArrayList<String> traceList) {
+        this.traceList = traceList;
+    }
+
+    public ArrayList<String> getTraceList() {
+        return this.traceList;
+    }
 
     public String getName(){
         return this.name;
