@@ -2097,7 +2097,7 @@ public class QueryDialog extends JPanel {
         TCTLAbstractProperty property = null;
         int selectedIndex = queryType.getSelectedIndex();
         boolean isHyperLTL = selectedIndex == 2;
-        String trace = isHyperLTL ? traceBox.getSelectedItem().toString() : "";
+        String trace = isHyperLTL ? traceBoxQuantification.getSelectedItem().toString() : "";
 
         if (oldProperty instanceof LTLANode) {
             if(!(selectedIndex == 2)) {
@@ -2152,7 +2152,7 @@ public class QueryDialog extends JPanel {
         TCTLAbstractProperty property = null;
         int selectedIndex = queryType.getSelectedIndex();
         boolean isHyperLTL = selectedIndex == 2;
-        String trace = isHyperLTL ? traceBox.getSelectedItem().toString() : "";
+        String trace = isHyperLTL ? traceBoxQuantification.getSelectedItem().toString() : "";
 
         if (oldProperty instanceof LTLENode) {
             if(!(selectedIndex == 2)) {
@@ -2430,7 +2430,7 @@ public class QueryDialog extends JPanel {
         untilButton = new JButton("U");
         aButton = new JButton("A");
         eButton = new JButton("E");
-        addTraceButton = new JButton("Traces");
+        addTraceButton = new JButton("Edit traces");
 
         // Add tool-tips
         existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
@@ -2669,7 +2669,7 @@ public class QueryDialog extends JPanel {
                     addAllPathsToProperty(newProperty, null);
                 } else {
                     // Check if there already exists an all-path with the current trace
-                    String selectedTrace = traceBox.getSelectedItem().toString();
+                    String selectedTrace = traceBoxQuantification.getSelectedItem().toString();
                     if(oldProperty.toString().contains("A " + selectedTrace)) {
                         JOptionPane.showMessageDialog(
                             TAPAALGUI.getApp(),
@@ -2698,7 +2698,7 @@ public class QueryDialog extends JPanel {
                     addExistsPathsToProperty(newProperty, null);
                 } else {
                     // Check if there already exists an exists-path with the current trace
-                    String selectedTrace = traceBox.getSelectedItem().toString();
+                    String selectedTrace = traceBoxQuantification.getSelectedItem().toString();
                     if(oldProperty.toString().contains("E " + selectedTrace)) {
                         JOptionPane.showMessageDialog(
                             TAPAALGUI.getApp(),
