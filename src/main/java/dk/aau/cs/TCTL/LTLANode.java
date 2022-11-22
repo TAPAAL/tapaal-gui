@@ -5,6 +5,7 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 public class LTLANode extends TCTLAbstractPathProperty {
     TCTLAbstractStateProperty property;
     String trace;
+    boolean propertyIsAbstractPath = false;
 
     public void setProperty(TCTLAbstractStateProperty property) {
         this.property = property;
@@ -45,13 +46,23 @@ public class LTLANode extends TCTLAbstractPathProperty {
 
     @Override
     public String toString() {
+        String s = "";
+
         if(trace.equals("")) {
-            String s = property.isSimpleProperty() ? property.toString() : "("  + property.toString() + ")";
+            s = property.isSimpleProperty() ? property.toString() : "("  + property.toString() + ")";
             return "A " + s;
         }
 
-        String s = property.isSimpleProperty() ? property.toString() : "(" + property.toString() + ")";
-        return "A " + trace + " " + s;
+        String subString = property.toString().substring(0,1);
+        if(subString.equals("A"))  {
+            s = property.toString();
+            propertyIsAbstractPath = true;
+        } else {
+            s = property.isSimpleProperty() ? property.toString() : "(" + property.toString() + ")";
+            propertyIsAbstractPath = false;
+        }
+
+        return "A " + trace + " (" + s + ")";
     }
 
     @Override
@@ -63,10 +74,12 @@ public class LTLANode extends TCTLAbstractPathProperty {
     public StringPosition[] getChildren() {
         int offset = 0;
         if(!trace.equals("")) {
-            offset = trace.length() + 1;
+            offset = trace.length() + 2;
         }
 
         int start = property.isSimpleProperty() ? 0 : 1;
+        if(propertyIsAbstractPath) start -= 1;
+
         start = start + 2 + offset;
         int end = start + property.toString().length() + offset;
 
