@@ -5,12 +5,12 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
 import javax.swing.SwingWorker.StateValue;
+import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -45,10 +45,6 @@ import dk.aau.cs.util.StringComparator;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
-import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.ApproximationMethodOption;
-import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
-import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
-import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.StubbornReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 import dk.aau.cs.verification.batchProcessing.FileChangedEvent;
@@ -204,9 +200,9 @@ public class BatchProcessingDialog extends JDialog {
 	private JCheckBox noOOMCheckbox;
 	private CustomJSpinner timeoutValue;
 	private CustomJSpinner oomValue;
-	private JComboBox<String> approximationMethodOption;
-	private CustomJSpinner approximationDenominator;
-	private JCheckBox approximationDenominatorCheckbox;
+	//private JComboBox<String> approximationMethodOption;
+	//private CustomJSpinner approximationDenominator;
+	//private JCheckBox approximationDenominatorCheckbox;
 	private final JList<TAPNQuery> ListOfQueries;
 	
 	private final Timer timeoutTimer = new Timer(30000, e -> timeoutCurrentVerificationTask());
@@ -294,6 +290,7 @@ public class BatchProcessingDialog extends JDialog {
 			batchProcessingDialog.setLocationRelativeTo(null);
 			batchProcessingDialog.setResizable(true);
 		}
+        batchProcessingDialog.toggleDefault();
 		batchProcessingDialog.setVisible(true);
 	}
 
@@ -464,6 +461,7 @@ public class BatchProcessingDialog extends JDialog {
                     undoManager.addEdit(c);
 				}
 			}
+            toggleDefault();
 		}
 	}
 
@@ -838,76 +836,26 @@ public class BatchProcessingDialog extends JDialog {
         }
 
 		numberOfExtraTokensInNet.setEnabled(!keepQueryCapacity.isSelected());
-		approximationDenominator.setEnabled(!approximationDenominatorCheckbox.isSelected());
+		//approximationDenominator.setEnabled(!approximationDenominatorCheckbox.isSelected());
 		timeoutValue.setEnabled(useTimeout());
 	}
 
 	private BatchProcessingVerificationOptions getVerificationOptions() {
-		ReductionOption reductionOption = reductionOptionChooser.isOverwriten() ? ReductionOption.BatchProcessingUserDefinedReductions : ReductionOption.BatchProcessingKeepQueryOption;
-		
-		return new BatchProcessingVerificationOptions(getQueryPropertyOption(),
-				keepQueryCapacity.isSelected(), getNumberOfExtraTokens(),
-				getSearchOption(), getSymmetryOption(), getStubbornReductionOption(), reductionOption,
-				reductionOptionChooser.isDiscreteInclusion(), reductionOptionChooser.useTimeDartsPTrie(), reductionOptionChooser.useTimeDarts(), 
-				reductionOptionChooser.usePTrie(), getApproximationMethodOption(), getApproximationDenominator(), reductionOptionChooser.getChoosenOptions());
-	}
+		return new BatchProcessingVerificationOptions(
+		    (Integer) numberOfExtraTokensInNet.getValue(),
+            SearchOption.BatchProcessingKeepQueryOption,
+            ReductionOption.BatchProcessingKeepQueryOption,
+            reductionOptionChooser.isDiscreteInclusion(),
+            reductionOptionChooser.useTimeDartsPTrie(),
+            reductionOptionChooser.useTimeDarts(),
+            reductionOptionChooser.usePTrie(),
+            0,
+            reductionOptionChooser.getChoosenOptions()
+        );
+    }
 
 	private int getNumberOfExtraTokens() {
 		return (Integer) numberOfExtraTokensInNet.getValue();
-	}
-
-	private SymmetryOption getSymmetryOption() {
-		String symmetryString = (String) symmetryOption.getSelectedItem();
-		if (symmetryString.equals(name_SYMMETRY))
-			return SymmetryOption.Yes;
-		else if (symmetryString.equals(name_NOSYMMETRY))
-			return SymmetryOption.No;
-		else
-			return SymmetryOption.KeepQueryOption;
-	}
-	
-	private StubbornReductionOption getStubbornReductionOption(){
-		String stubbornReductionString = (String) stubbornReductionOption.getSelectedItem();
-		if (stubbornReductionString.equals(name_STUBBORNREUDCTION))
-			return StubbornReductionOption.Yes;
-		else if (stubbornReductionString.equals(name_NOSTUBBORNREDUCTION))
-			return StubbornReductionOption.No;
-		else
-			return StubbornReductionOption.KeepQueryOption;
-	}
-
-	private QueryPropertyOption getQueryPropertyOption() {
-		String propertyOptionString = (String) queryPropertyOption.getSelectedItem();
-		switch (propertyOptionString) {
-			case name_SEARCHWHOLESTATESPACE:
-				return QueryPropertyOption.SearchWholeStateSpace;
-			case name_EXISTDEADLOCK:
-				return QueryPropertyOption.ExistDeadlock;
-			case name_STRONGSOUNDNESS:
-				return QueryPropertyOption.StrongSoundness;
-			case name_SOUNDNESS:
-				return QueryPropertyOption.Soundness;
-			default:
-				return QueryPropertyOption.KeepQueryOption;
-		}
-	}
-	
-	private ApproximationMethodOption getApproximationMethodOption() {
-		String ApproximationMethodOptionString = (String) approximationMethodOption.getSelectedItem();
-		switch (ApproximationMethodOptionString) {
-			case name_OVER_APPROXIMATION:
-				return ApproximationMethodOption.OverApproximation;
-			case name_UNDER_APPROXIMATION:
-				return ApproximationMethodOption.UnderApproximation;
-			case name_NONE_APPROXIMATION:
-				return ApproximationMethodOption.None;
-			default:
-				return ApproximationMethodOption.KeepQueryOption;
-		}
-	}
-	
-	private int getApproximationDenominator() {
-		return (approximationDenominatorCheckbox.isSelected()) ? 0 : (Integer) approximationDenominator.getValue();
 	}
 	
 	private void exit() {
@@ -1211,7 +1159,16 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void process() {
 		tableModel.clear();
-		currentWorker = new BatchProcessingWorker(files, tableModel, getVerificationOptions());
+		if (defaultYes.isSelected()) {
+            currentWorker = new BatchProcessingWorker(files, tableModel, getVerificationOptions());
+        } else {
+            Map<ReductionOption, String> verificationOptions = Map.of(
+                ReductionOption.VerifyTAPN, optionsTAPN.getText(),
+                ReductionOption.VerifyPN, optionsPN.getText(),
+                ReductionOption.VerifyDTAPN, optionsDTAPN.getText()
+            );
+            currentWorker = new BatchProcessingWorker(files, tableModel, verificationOptions);
+        }
 		currentWorker.addPropertyChangeListener(new PropertyChangeListener() {
 
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -1605,7 +1562,7 @@ public class BatchProcessingDialog extends JDialog {
 				
 				VerificationOptions options = currentWorker.getVerificationOptionsFromQuery(query);
 				s.append("\n\nEngine flags: \n");
-				s.append(options.toString());	
+				s.append(options.toString() + "PAS PÅ"); // TODO LENA OBS
 			}
 			return s.toString();
 		}
@@ -1631,7 +1588,7 @@ public class BatchProcessingDialog extends JDialog {
 		}
 	}
 	
-	public class ReductionOptionChooser extends JPanel{
+	public class ReductionOptionChooser extends JPanel {
 
 		private final JButton chooseReductionOptions;
 		final ReductionOptionDialog reductionOptionDialog;

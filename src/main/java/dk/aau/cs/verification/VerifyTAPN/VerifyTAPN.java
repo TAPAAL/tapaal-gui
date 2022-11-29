@@ -242,6 +242,11 @@ public class VerifyTAPN implements ModelChecker {
 		return verify(options, model, exportedModel, query, dataLayerQuery, lens);
 	}
 
+    @Override
+    public VerificationResult<TimedArcPetriNetTrace> verifyManually(String options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception {
+        return null;
+    }
+
     protected void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
 		VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions)options;
 		

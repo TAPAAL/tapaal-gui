@@ -1,69 +1,45 @@
 package dk.aau.cs.verification.batchProcessing;
 
 import java.util.List;
-
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 
 public class BatchProcessingVerificationOptions {
-	
-	public enum QueryPropertyOption {
-		KeepQueryOption, SearchWholeStateSpace, ExistDeadlock, Soundness, StrongSoundness
-	}
-
-	public enum SymmetryOption {
-		KeepQueryOption, Yes, No
-	}
-
-    public enum StubbornReductionOption{
-		KeepQueryOption, Yes, No
-	}
-
-    public enum ApproximationMethodOption {
-		KeepQueryOption, None, OverApproximation, UnderApproximation
-	}
-	
 	private final List<ReductionOption> reductionOptions;
 	private final ReductionOption reductionOption;
 	private final SearchOption searchOption;
-	private final QueryPropertyOption queryPropertyOption;
-	private final SymmetryOption symmetryOption;
-	private final StubbornReductionOption stubbornReductionOption;
-	private final ApproximationMethodOption approximationMethodOption;
 	private int approximationDenominator = 0;
-	private final boolean keepQueryCapacity;
 	private final int capacity;
 	private boolean discreteInclusion = false; // only for VerifyTAPN
 	private boolean useTimeDartPTrie = false;
 	private boolean useTimeDart = false;
 	private boolean usePTrie = false;
 	
-	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, StubbornReductionOption stubbornReductionOption, ReductionOption reductionOption, boolean discreteInclusion,
-			boolean useTimeDartPTrie, boolean useTimeDart, boolean usePTrie, ApproximationMethodOption approximationMethodOption, int approximationDenominator, List<ReductionOption> reductionOptions) {
+	public BatchProcessingVerificationOptions(
+        int capacity,
+        SearchOption searchOption,
+        ReductionOption reductionOption,
+        boolean discreteInclusion,
+        boolean useTimeDartPTrie,
+        boolean useTimeDart,
+        boolean usePTrie,
+        int approximationDenominator,
+        List<ReductionOption> reductionOptions
+    ) {
 		Require.that(!(reductionOptions == null && reductionOption == ReductionOption.BatchProcessingUserDefinedReductions), "ReductionOption was given as userdefined but a list of reductionoptions was not given");
 		this.searchOption = searchOption;
 		this.reductionOption = reductionOption;
-		this.queryPropertyOption = queryPropertyOption;
-		this.symmetryOption = symmetryOption;
-		this.stubbornReductionOption = stubbornReductionOption;
-		this.keepQueryCapacity = keepQueryCapacity;
 		this.capacity = capacity;
 		this.discreteInclusion = discreteInclusion;
 		this.useTimeDartPTrie = useTimeDartPTrie;
 		this.useTimeDart = useTimeDart;
 		this.usePTrie = usePTrie;
 		this.reductionOptions = reductionOptions;
-		this.approximationMethodOption = approximationMethodOption;
 		this.approximationDenominator = approximationDenominator;
 	}
 
-    public boolean isReductionOptionUserdefined(){
-		return reductionOption == ReductionOption.BatchProcessingUserDefinedReductions;
-	}
-	
 	public List<ReductionOption> reductionOptions() {
-		Require.that(reductionOption == ReductionOption.BatchProcessingUserDefinedReductions, "Tried to get the userdefined reductionoptions, but the reductionoption is not userdefined");
 		return reductionOptions;
 	}
 	
@@ -87,28 +63,8 @@ public class BatchProcessingVerificationOptions {
 		return usePTrie;
 	}
 	
-	public QueryPropertyOption queryPropertyOption() {
-		return queryPropertyOption;
-	}
-	
-	public SymmetryOption symmetry() {
-		return symmetryOption;
-	}
-    
-	public StubbornReductionOption stubbornReductionOption(){
-		return stubbornReductionOption;
-	}
-	
-	public boolean KeepCapacityFromQuery() {
-		return keepQueryCapacity;
-	}
-	
 	public int capacity() {
 		return capacity;
-	}
-	
-	public ApproximationMethodOption approximationMethodOption() {
-		return approximationMethodOption;
 	}
 	
 	public int approximationDenominator() {
