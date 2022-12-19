@@ -261,4 +261,9 @@ public class VerificationResult<TTrace> {
 	public String getRawOutput() {
 	    return rawOutput;
     }
+
+    public int getBound() {
+        String split = rawOutput.split("-k ")[1];
+        return Integer.parseInt(split.split(" ")[0]);
+    }
 }

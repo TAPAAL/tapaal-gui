@@ -5,6 +5,7 @@ import javax.swing.ImageIcon;
 import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.IconSelector;
 import dk.aau.cs.verification.VerificationResult;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
 
 public class VerifyTAPNIconSelector extends IconSelector {
 
@@ -22,8 +23,8 @@ public class VerifyTAPNIconSelector extends IconSelector {
 			}
 			break;
 		case AG:
-			if(!result.isQuerySatisfied()) return notSatisfiedIcon;
-			else if(result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) return satisfiedIcon;
+            if(!result.isQuerySatisfied() && result.getQueryResult().getQuery().getCategory() != TAPNQuery.QueryCategory.LTL) return notSatisfiedIcon;
+            else if(result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) return satisfiedIcon;
 			break;
 		case AF:
 			if(!result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)){

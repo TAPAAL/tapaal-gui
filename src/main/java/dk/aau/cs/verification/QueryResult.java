@@ -107,4 +107,7 @@ public class QueryResult {
 		return boundednessAnalysis;
 	}
 
+    public TAPNQuery getQuery() {
+        return query;
+    }
 }
