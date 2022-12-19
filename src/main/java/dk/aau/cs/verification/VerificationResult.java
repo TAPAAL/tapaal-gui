@@ -263,7 +263,7 @@ public class VerificationResult<TTrace> {
     }
 
     public int getBound() {
-        String split = rawOutput.split("-k ")[1];
+        String split = rawOutput.split("--k-bound ")[1];
         return Integer.parseInt(split.split(" ")[0]);
     }
 }
