@@ -21,7 +21,7 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
     private static final Pattern processedNEdgesPattern = Pattern.compile("\\s*Processed N. Edges:\\s*(\\d+)\\s*");
     private static final Pattern exploredConfigurationsPattern = Pattern.compile("\\s*Explored Configs:\\s*(\\d+)\\s*");
 
-    private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
+    private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*max tokens:\\s*(:)?\\s*(\\d+)\\s*");
 
 	public VerifyPNCTLOutputParser(int totalTokens, int extraTokens, TAPNQuery queryType) {
         super(totalTokens, extraTokens, queryType);
@@ -78,8 +78,8 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
 
                     matcher = maxUsedTokensPattern.matcher(line);
                     if(matcher.find()){
-                        maxUsedTokens = Integer.parseInt(matcher.group(1));
-                        String operator = matcher.group(1) == null ? "" : matcher.group(1);
+                        maxUsedTokens = Integer.parseInt(matcher.group(2));
+                        String operator = matcher.group(2) == null ? "" : matcher.group(2);
                         if(operator.equals(">")) maxUsedTokens += 1; // Indicate non-k-boundedness by encoding that an extra token was used.
                     }
                 }
