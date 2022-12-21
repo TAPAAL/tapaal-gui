@@ -25,7 +25,8 @@ public class VerifyTAPNIconSelector extends IconSelector {
 		case AG:
             if(!result.isQuerySatisfied() && result.getBound() >= result.getQueryResult().boundednessAnalysis().usedTokens())
                 return notSatisfiedIcon;
-            else if(result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded))
+            else if(result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded) &&
+                (result.getQueryResult().getQuery().getCategory() == TAPNQuery.QueryCategory.CTL || result.getTrace() != null))
                 return satisfiedIcon;
 			break;
 		case AF:
