@@ -16,35 +16,44 @@ public class VerifyTAPNIconSelector extends IconSelector {
 		switch(result.getQueryResult().queryType())
 		{
 		case EF:
-			if(result.isQuerySatisfied()){
+			if (result.isQuerySatisfied()) {
 				return satisfiedIcon;
-			}else if(!result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)){
+			} else if (!result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) {
 				return notSatisfiedIcon;
 			}
 			break;
 		case AG:
-            if(!result.isQuerySatisfied() && result.getBound() >= result.getQueryResult().boundednessAnalysis().usedTokens())
+            if (!result.isQuerySatisfied() && result.getBound() >= result.getQueryResult().boundednessAnalysis().usedTokens()) {
                 return notSatisfiedIcon;
-            else if(result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded) &&
-                (result.getQueryResult().getQuery().getCategory() == TAPNQuery.QueryCategory.CTL || result.getTrace() != null))
+            } else if (result.isQuerySatisfied() &&
+                (result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded) ||
+                result.getQueryResult().getQuery().getCategory() == TAPNQuery.QueryCategory.LTL) &&
+                (result.getQueryResult().getQuery().getCategory() == TAPNQuery.QueryCategory.CTL || result.getTrace() != null)) {
                 return satisfiedIcon;
+            }
 			break;
 		case AF:
-			if(!result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)){
+			if (!result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) {
 				return notSatisfiedIcon;
-			} else if(result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)){
+			} else if (result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) {
 				return satisfiedIcon;
 			}
 			break;
 		case EG:
-			if(result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) return satisfiedIcon;
-			else if(!result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) return notSatisfiedIcon;
+			if (result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) {
+			    return satisfiedIcon;
+            } else if (!result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) {
+			    return notSatisfiedIcon;
+            }
 			break;
 		default:
 			return null;
 		}
 		
-		if (result.getQueryResult().isDiscreteIncludion()) {return rerunIcon;} 
-		else { return inconclusiveIcon;}
+		if (result.getQueryResult().isDiscreteIncludion()) {
+		    return rerunIcon;
+		} else {
+		    return inconclusiveIcon;
+		}
 	}
 }
