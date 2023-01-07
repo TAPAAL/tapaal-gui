@@ -23,13 +23,14 @@ public class TAPNQuery {
 		return extraTokens;
 	}
 	
-	public QueryType queryType(){
+	public QueryType queryType() {
 		if (property instanceof TCTLEFNode) return QueryType.EF;
 		else if (property instanceof TCTLEGNode) return QueryType.EG;
 		else if (property instanceof TCTLAFNode) return QueryType.AF;
 		else if (property instanceof LTLENode) return  QueryType.E;
 		else if (property instanceof LTLANode) return QueryType.A;
-		else return QueryType.AG;
+		else if (property instanceof TCTLAGNode) return QueryType.AG;
+		else return null;
 	}
 	
 	public boolean hasDeadlock(){
