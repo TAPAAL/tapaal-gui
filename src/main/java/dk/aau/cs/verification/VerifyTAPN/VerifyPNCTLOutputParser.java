@@ -13,13 +13,13 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
 	private static final String Query_IS_NOT_SATISFIED_STRING = "Query is NOT satisfied";
 	private static final String Query_IS_SATISFIED_STRING = "Query is satisfied";
 
-    private static final Pattern configurationsPattern = Pattern.compile("\\s*Configurations:\\s*(\\d+)\\s*");
-    private static final Pattern markingsPattern = Pattern.compile("\\s*Markings:\\s*(\\d+)\\s*");
-    private static final Pattern edgesPattern = Pattern.compile("\\t+Edges:\\s*(\\d+)\\s*");
+    private static final Pattern configurationsPattern = Pattern.compile("\\s*Configurations\\s*:\\s*(\\d+)\\s*");
+    private static final Pattern markingsPattern = Pattern.compile("\\s*Markings\\s*:\\s*(\\d+)\\s*");
+    private static final Pattern edgesPattern = Pattern.compile("\\t+Edges\\s*:\\s*(\\d+)\\s*");
 
-    private static final Pattern processedEdgesPattern = Pattern.compile("\\s*Processed Edges:\\s*(\\d+)\\s*");
-    private static final Pattern processedNEdgesPattern = Pattern.compile("\\s*Processed N. Edges:\\s*(\\d+)\\s*");
-    private static final Pattern exploredConfigurationsPattern = Pattern.compile("\\s*Explored Configs:\\s*(\\d+)\\s*");
+    private static final Pattern processedEdgesPattern = Pattern.compile("\\s*Processed Edges\\s*:\\s*(\\d+)\\s*");
+    private static final Pattern processedNEdgesPattern = Pattern.compile("\\s*Processed N. Edges\\s*:\\s*(\\d+)\\s*");
+    private static final Pattern exploredConfigurationsPattern = Pattern.compile("\\s*Explored Configs\\s*:\\s*(\\d+)\\s*");
 
     private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*max tokens:\\s*(:)?\\s*(\\d+)\\s*");
 
