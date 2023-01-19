@@ -97,7 +97,7 @@ public class VerifyTAPNTraceParser {
 
 	private Document loadDocument(BufferedReader reader) {
 		try {
-			reader.readLine(); // first line is "Trace:", so ignore it
+			reader.readLine(); // first line is "Trace", so ignore it
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			builder.setErrorHandler(new ErrorHandler() {
 				

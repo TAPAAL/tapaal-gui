@@ -14,20 +14,24 @@ public class TimedPlaceMarkingEditCommand extends Command {
 
 	@Override
 	public void redo() {
-		if (numberOfTokens > 0) {
+	    int oldNumberOfTokens = timedPlaceComponent.underlyingPlace().numberOfTokens();
+        timedPlaceComponent.underlyingPlace().setNumberOfTokens(oldNumberOfTokens+numberOfTokens);
+        if (numberOfTokens > 0) {
 			timedPlaceComponent.underlyingPlace().addTokens(Math.abs(numberOfTokens));
 		} else {
-			timedPlaceComponent.underlyingPlace().removeTokens(Math.abs(numberOfTokens));
+            timedPlaceComponent.underlyingPlace().removeTokens(Math.abs(numberOfTokens));
 		}
 		timedPlaceComponent.repaint();
 	}
 
 	@Override
 	public void undo() {
-		if (numberOfTokens > 0) {
-			timedPlaceComponent.underlyingPlace().removeTokens(Math.abs(numberOfTokens));
+        int oldNumberOfTokens = timedPlaceComponent.underlyingPlace().numberOfTokens();
+        timedPlaceComponent.underlyingPlace().setNumberOfTokens(oldNumberOfTokens-numberOfTokens);
+        if (numberOfTokens > 0) {
+            timedPlaceComponent.underlyingPlace().removeTokens(Math.abs(numberOfTokens));
 		} else {
-			timedPlaceComponent.underlyingPlace().addTokens(Math.abs(numberOfTokens));
+            timedPlaceComponent.underlyingPlace().addTokens(Math.abs(numberOfTokens));
 		}
 		timedPlaceComponent.repaint();
 	}

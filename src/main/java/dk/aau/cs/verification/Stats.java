@@ -126,13 +126,13 @@ public class Stats {
 	
 	@Override
 	public String toString() {
-        return "Discovered markings: " +
+        return "Discovered configurations: " +
             discovered +
             System.getProperty("line.separator") +
-            "Explored markings: " +
+            "Explored configurations: " +
             explored +
             System.getProperty("line.separator") +
-            "Stored markings: " +
+            "Stored configurations: " +
             stored;
 	}
 }
