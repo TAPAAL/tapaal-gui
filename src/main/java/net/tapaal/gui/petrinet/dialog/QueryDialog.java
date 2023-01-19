@@ -533,16 +533,19 @@ public class QueryDialog extends JPanel {
 			return SearchOption.DEFAULT;
 		}
 
-		if(depthFirstSearch.isSelected())
-			return SearchOption.DFS;
-		else if(randomSearch.isSelected())
-			return SearchOption.RANDOM;
-		else if(heuristicSearch.isSelected())
-			return SearchOption.HEURISTIC;
-		else if(breadthFirstSearch.isSelected())
-			return SearchOption.BFS;
-		else
-			return SearchOption.DEFAULT;
+        if (depthFirstSearch.isSelected()) {
+            return SearchOption.DFS;
+        } else if (randomSearch.isSelected()) {
+            return SearchOption.RANDOM;
+        } else if (heuristicSearch.isSelected()) {
+            if (!lens.isTimed() && !lens.isGame())
+                return SearchOption.RANDOMHEURISTIC;
+            return SearchOption.HEURISTIC;
+        } else if (breadthFirstSearch.isSelected()) {
+            return SearchOption.BFS;
+        } else {
+            return SearchOption.DEFAULT;
+        }
 	}
 
 	private ReductionOption getReductionOption() {
@@ -3114,7 +3117,10 @@ public class QueryDialog extends JPanel {
 		breadthFirstSearch = new JRadioButton("Breadth first search    ");
 		depthFirstSearch = new JRadioButton("Depth first search    ");
 		randomSearch = new JRadioButton("Random search    ");
-		heuristicSearch = new JRadioButton("Heuristic search    ");
+        if (!lens.isTimed() && !lens.isGame())
+            heuristicSearch = new JRadioButton("Random heuristic search    ");
+        else
+            heuristicSearch = new JRadioButton("Heuristic search    ");
 
 		breadthFirstSearch.setToolTipText(TOOL_TIP_BREADTH_FIRST_SEARCH);
 		depthFirstSearch.setToolTipText(TOOL_TIP_DEPTH_FIRST_SEARCH);

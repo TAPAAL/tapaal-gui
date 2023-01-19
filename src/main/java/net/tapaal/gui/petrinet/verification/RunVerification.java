@@ -356,6 +356,12 @@ public class RunVerification extends RunVerificationBase {
                     panel.add(placeStatsButton, gbc);
                 }
             }
+            if (result.getRawOutput() != null) {
+                JButton showRawQueryButton = new JButton("Show raw query results");
+                showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
+                gbc = GridBagHelper.as(1, 5, WEST, new Insets(0,0,10,0));
+                panel.add(showRawQueryButton, gbc);
+            }
 			if(!result.getReductionResultAsString().isEmpty()){
 
                 JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
@@ -405,14 +411,13 @@ public class RunVerification extends RunVerificationBase {
 
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingQuerySimplification() && isCTLQuery){
             rowOffset = displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations(), 1);
+            if (result.getRawOutput() != null) {
+                JButton showRawQueryButton = new JButton("Show raw query results");
+                showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
+                gbc = GridBagHelper.as(1, rowOffset+1, WEST, new Insets(0,0,10,0));
+                panel.add(showRawQueryButton, gbc);
+            }
 		}
-
-        if (result.getRawOutput() != null) {
-            JButton showRawQueryButton = new JButton("Show raw query results");
-            showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
-            gbc = GridBagHelper.as(1, rowOffset+1, WEST, new Insets(0,0,10,0));
-            panel.add(showRawQueryButton, gbc);
-        }
 
         if (result.isResolvedUsingSkeletonPreprocessor()) {
             gbc = GridBagHelper.as(0, rowOffset+2, GridBagHelper.Anchor.WEST, new Insets(0,0,15,0));
