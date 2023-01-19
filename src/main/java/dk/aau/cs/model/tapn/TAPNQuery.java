@@ -29,8 +29,7 @@ public class TAPNQuery {
 		else if (property instanceof TCTLAFNode) return QueryType.AF;
 		else if (property instanceof LTLENode) return  QueryType.E;
 		else if (property instanceof LTLANode) return QueryType.A;
-		else if (property instanceof TCTLAGNode) return QueryType.AG;
-		else return null;
+        else return QueryType.AG;
 	}
 	
 	public boolean hasDeadlock(){
