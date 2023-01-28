@@ -114,8 +114,9 @@ public class TCTLAUNode extends TCTLAbstractPathProperty {
 
     @Override
     public boolean hasNestedPathQuantifiers() {
-        return left instanceof TCTLPathToStateConverter || right instanceof TCTLPathToStateConverter
-            || left.hasNestedPathQuantifiers() || right.hasNestedPathQuantifiers();
+        return (left instanceof TCTLPathToStateConverter && !(((TCTLPathToStateConverter) left).getProperty() instanceof TCTLPathPlaceHolder)) ||
+               (right instanceof TCTLPathToStateConverter && !(((TCTLPathToStateConverter) right).getProperty() instanceof TCTLPathPlaceHolder)) ||
+                left.hasNestedPathQuantifiers() || right.hasNestedPathQuantifiers();
     }
 
     public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {

@@ -538,7 +538,7 @@ public class QueryDialog extends JPanel {
         } else if (randomSearch.isSelected()) {
             return SearchOption.RANDOM;
         } else if (heuristicSearch.isSelected()) {
-            if (!lens.isTimed() && !lens.isGame() && queryIsReachability())
+            if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery())
                 return SearchOption.RANDOMHEURISTIC;
             return SearchOption.HEURISTIC;
         } else if (breadthFirstSearch.isSelected()) {
@@ -855,7 +855,7 @@ public class QueryDialog extends JPanel {
 			}
 			if (replacement != null) {
 				UndoableEdit edit = new QueryConstructionEdit(selection, replacement);
-				newProperty = newProperty.replace(selection,	replacement);
+				newProperty = newProperty.replace(selection, replacement);
 
 				if (selection instanceof TCTLAbstractPathProperty)
 					resetQuantifierSelectionButtons();
@@ -994,15 +994,15 @@ public class QueryDialog extends JPanel {
 			return;
 		}
 
-		JRadioButton currentselected;
+		JRadioButton currentSelected;
 		if(heuristicSearch.isSelected()){
-			currentselected = heuristicSearch;
+			currentSelected = heuristicSearch;
 		}else if(breadthFirstSearch.isSelected()){
-			currentselected = breadthFirstSearch;
+			currentSelected = breadthFirstSearch;
 		}else if(depthFirstSearch.isSelected()){
-			currentselected = depthFirstSearch;
+			currentSelected = depthFirstSearch;
 		}else{
-			currentselected = randomSearch;
+			currentSelected = randomSearch;
 		}
 
 		if (fastestTraceRadioButton.isSelected()) {
@@ -1040,14 +1040,28 @@ public class QueryDialog extends JPanel {
 			}
 		}
 
-		if(!currentselected.isEnabled()){
-			if(heuristicSearch.isEnabled()){
+		if (!currentSelected.isEnabled()) {
+			if (heuristicSearch.isEnabled()) {
 				heuristicSearch.setSelected(true);
 			} else {
 				depthFirstSearch.setSelected(true);
 			}
 		}
-	}
+
+		if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery()) {
+		    heuristicSearch.setText("Random heuristic search ");
+        } else {
+            heuristicSearch.setText("Heuristic search    ");
+        }
+        guiDialog.pack();
+    }
+
+	private boolean isReachabilityQuery() {
+	    boolean hasQuanty = newProperty.hasNestedPathQuantifiers();
+        boolean isAGNode = newProperty instanceof TCTLAGNode;
+        boolean isEFNode = newProperty instanceof TCTLEFNode;
+	    return !newProperty.hasNestedPathQuantifiers() && (newProperty instanceof TCTLAGNode || newProperty instanceof TCTLEFNode);
+    }
 
 	private void disableAllQueryButtons() {
 		existsBox.setEnabled(false);
@@ -3117,8 +3131,8 @@ public class QueryDialog extends JPanel {
 		breadthFirstSearch = new JRadioButton("Breadth first search    ");
 		depthFirstSearch = new JRadioButton("Depth first search    ");
 		randomSearch = new JRadioButton("Random search    ");
-        if (!lens.isTimed() && !lens.isGame() && queryIsReachability())
-            heuristicSearch = new JRadioButton("Random heuristic search    ");
+        if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery())
+            heuristicSearch = new JRadioButton("Random heuristic search ");
         else
             heuristicSearch = new JRadioButton("Heuristic search    ");
 
