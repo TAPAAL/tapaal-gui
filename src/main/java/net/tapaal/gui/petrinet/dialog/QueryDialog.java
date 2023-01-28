@@ -538,7 +538,7 @@ public class QueryDialog extends JPanel {
         } else if (randomSearch.isSelected()) {
             return SearchOption.RANDOM;
         } else if (heuristicSearch.isSelected()) {
-            if (!lens.isTimed() && !lens.isGame())
+            if (!lens.isTimed() && !lens.isGame() && queryIsReachability())
                 return SearchOption.RANDOMHEURISTIC;
             return SearchOption.HEURISTIC;
         } else if (breadthFirstSearch.isSelected()) {
@@ -3117,7 +3117,7 @@ public class QueryDialog extends JPanel {
 		breadthFirstSearch = new JRadioButton("Breadth first search    ");
 		depthFirstSearch = new JRadioButton("Depth first search    ");
 		randomSearch = new JRadioButton("Random search    ");
-        if (!lens.isTimed() && !lens.isGame())
+        if (!lens.isTimed() && !lens.isGame() && queryIsReachability())
             heuristicSearch = new JRadioButton("Random heuristic search    ");
         else
             heuristicSearch = new JRadioButton("Heuristic search    ");
