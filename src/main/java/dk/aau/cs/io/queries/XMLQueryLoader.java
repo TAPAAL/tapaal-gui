@@ -108,9 +108,9 @@ public class XMLQueryLoader extends QueryLoader{
             int counter = 0;
             if (canBeCTL) counter += 1;
             if (canBeLTL) counter += 1;
-            if(canBeHyperLTL) counter += 1;
+            if (canBeHyperLTL) counter += 1;
 
-            if (counter >=2 && choice == -1) {
+            if (counter > 1 && choice == -1 && queryCategories == null) {
                 choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(),
                     "There were some queries that can be classified as CTL, LTL or HyperLTL. \nHow do you want to import them?",
                     "Choose query category",
@@ -125,10 +125,19 @@ public class XMLQueryLoader extends QueryLoader{
             }
             if (choice == 3) return null;
 
+            boolean isCTL = (canBeCTL && counter == 1) || (counter > 1 && choice == 0);
+            boolean isLTL = (canBeLTL && counter == 1) || (counter > 1 && choice == 1);
+            boolean isHyperLTL = (canBeHyperLTL && counter == 1) || (counter > 1  && choice == 2);
 
-            boolean isCTL = (canBeCTL && (!canBeLTL && !canBeHyperLTL)) || (counter >=2 && choice == 0);
-            boolean isLTL = ((!canBeCTL && canBeHyperLTL) && canBeLTL) || (counter >=2  && choice == 1);
-            boolean isHyperLTL = ((!canBeCTL && !canBeLTL) && canBeHyperLTL) || (counter >=2  && choice == 2);
+            if (queryCategories != null && queryCategories.size() > i) {
+                if (queryCategories.get(i) == TAPNQuery.QueryCategory.CTL) {
+                    isCTL = true;
+                } else if (queryCategories.get(i) == TAPNQuery.QueryCategory.LTL) {
+                    isLTL = true;
+                } else if (queryCategories.get(i) == TAPNQuery.QueryCategory.HyperLTL) {
+                    isHyperLTL = true;
+                }
+            }
 
             // Update queryWrapper name and property
             if (isCTL) {

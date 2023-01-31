@@ -155,7 +155,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             unfoldTACPNOptions = new VerifyPNUnfoldOptions(modelOut.getAbsolutePath(), queryOut.getAbsolutePath(), clonedQueries.size(), partition, computeColorFixpoint, symmetricVars);
         }
 
-
         runner = new ProcessRunner(modelChecker.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
 
@@ -204,7 +203,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         }
         return null;
     }
-
 
     public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, TAPNQuery.QueryCategory queryCategory) {
         return getQueries(queryFile, network, List.of(queryCategory));
