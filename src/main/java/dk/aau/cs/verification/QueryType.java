@@ -4,5 +4,7 @@ public enum QueryType {
 	EF,
 	EG,
 	AF,
-	AG
+	AG,
+    E,
+    A
 }

@@ -1,9 +1,6 @@
 package dk.aau.cs.model.tapn;
 
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.verification.QueryType;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
@@ -29,11 +26,13 @@ public class TAPNQuery {
 		return extraTokens;
 	}
 	
-	public QueryType queryType(){
-		if(property instanceof TCTLEFNode) return QueryType.EF;
-		else if(property instanceof TCTLEGNode) return QueryType.EG;
-		else if(property instanceof TCTLAFNode) return QueryType.AF;
-		else return QueryType.AG;
+	public QueryType queryType() {
+		if (property instanceof TCTLEFNode) return QueryType.EF;
+		else if (property instanceof TCTLEGNode) return QueryType.EG;
+		else if (property instanceof TCTLAFNode) return QueryType.AF;
+		else if (property instanceof LTLENode) return  QueryType.E;
+		else if (property instanceof LTLANode) return QueryType.A;
+        else return QueryType.AG;
 	}
 	
 	public boolean hasDeadlock(){

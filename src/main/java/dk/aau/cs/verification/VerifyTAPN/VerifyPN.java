@@ -374,7 +374,9 @@ public class VerifyPN implements ModelChecker {
                     trace = trace.split("(?<=</trace>)")[0];
                     tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
                 } else {
-                    tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                    String trace = "Trace\n";
+                    trace += errorOutput;
+                    tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
                 }
             } else {
                 tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());

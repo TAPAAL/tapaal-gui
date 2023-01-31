@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
@@ -22,6 +25,7 @@ public class VerificationResult<TTrace> {
 
 	private TTrace secondaryTrace;
 	private Map<String, TTrace> traceMap;
+	private int bound;
 
 	private Tuple<TimedArcPetriNet, NameMapping> unfoldedModel;
     private PetriNetTab unfoldedTab;
@@ -50,6 +54,15 @@ public class VerificationResult<TTrace> {
 		this.verificationTime = verificationTime;
 		this.stats = stats;
 		this.rawOutput = rawOutput;
+
+        String[] lines = rawOutput.split(System.getProperty("line.separator"));
+        for (String line : lines) {
+            Matcher matcher = Pattern.compile("\\s*--k-bound\\s*(\\d+)\\s*").matcher(line);
+            if (matcher.find()) {
+                this.bound = Integer.parseInt(matcher.group(1));
+                break;
+            }
+        }
 	}
 
     public VerificationResult(QueryResult queryResult, Map<String, TTrace> traceMap, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel, PetriNetTab unfoldedTab){
@@ -291,5 +304,9 @@ public class VerificationResult<TTrace> {
 
 	public String getRawOutput() {
 	    return rawOutput;
+    }
+
+    public int getBound() {
+        return bound;
     }
 }

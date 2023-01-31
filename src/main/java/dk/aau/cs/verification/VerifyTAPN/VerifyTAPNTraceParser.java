@@ -140,7 +140,6 @@ public class VerifyTAPNTraceParser {
                 return null;
             }
 
-
             if(shouldSkip) reader.readLine(); // first line is "Trace:"
 
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

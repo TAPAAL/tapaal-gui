@@ -89,6 +89,8 @@ public class QueryResult {
 		|| (queryType().equals(QueryType.EG)) // && !isQuerySatisfied()) 
 		|| (queryType().equals(QueryType.AF)) // && isQuerySatisfied())
 		|| (queryType().equals(QueryType.AG) && isQuerySatisfied())
+        || (queryType().equals(QueryType.A))
+        || (queryType().equals(QueryType.E))
 		|| (hasDeadlock() && 
 				(!isQuerySatisfied() && queryType().equals(QueryType.EF)) || 
 				(isQuerySatisfied() && queryType().equals(QueryType.AG))
@@ -107,4 +109,7 @@ public class QueryResult {
 		return boundednessAnalysis;
 	}
 
+    public TAPNQuery getQuery() {
+        return query;
+    }
 }
