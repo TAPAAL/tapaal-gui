@@ -11,7 +11,7 @@ public class TAPNQuery {
 	}
 
 	public enum SearchOption {
-		BFS, DFS, RANDOM, BatchProcessingKeepQueryOption, HEURISTIC, OVERAPPROXIMATE, DEFAULT
+		BFS, DFS, RANDOM, BatchProcessingKeepQueryOption, HEURISTIC, OVERAPPROXIMATE, DEFAULT, RANDOMHEURISTIC
 	}
 
 	public enum QueryReductionTime {

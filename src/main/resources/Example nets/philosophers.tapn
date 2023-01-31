@@ -519,7 +519,7 @@
       </declarations>
     </structure>
   </declaration>
-  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" colorFixpoint="true" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Is there a deadlock" overApproximation="false" pTrie="false" partitioning="true" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetricVars="true" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="true" useStubbornReduction="true" useTarOption="true" useTarjan="true">
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" colorFixpoint="true" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Is there a deadlock" overApproximation="false" pTrie="false" partitioning="true" reduction="true" reductionOption="VerifyPN" searchOption="RANDOMHEURISTIC" symmetricVars="true" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="true" useStubbornReduction="true" useTarOption="true" useTarjan="true">
     <formula>
             
       <exists-path>

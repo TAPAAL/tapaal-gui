@@ -19,10 +19,12 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     );
 	private static final Map<SearchOption, String> searchMap = Map.of(
         SearchOption.HEURISTIC, " --search-strategy BestFS",
+        SearchOption.RANDOMHEURISTIC, " --search-strategy RPFS",
         SearchOption.BFS, "--search-strategy BFS",
         SearchOption.DFS, " --search-strategy DFS",
         SearchOption.RANDOM, " --search-strategy RDFS",
         SearchOption.OVERAPPROXIMATE, " --search-strategy OverApprox"
+
     );
 
 	private final ModelReduction modelReduction;

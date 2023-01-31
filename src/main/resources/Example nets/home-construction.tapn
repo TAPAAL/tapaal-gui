@@ -255,7 +255,7 @@
       <arcpath arcPointType="true" id="1" xCoord="555" yCoord="1440"/>
     </arc>
   </net>
-  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="10" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Finish two constructions" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="10" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Finish two constructions" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="RANDOMHEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
     <formula>
             
       <exists-path>
@@ -313,7 +313,7 @@
           
     </formula>
   </query>
-  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="10" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Guaranteed Termination" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="LTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="10" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Guaranteed Termination" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="RANDOMHEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="LTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
     <formula>
             
       <all-paths>
