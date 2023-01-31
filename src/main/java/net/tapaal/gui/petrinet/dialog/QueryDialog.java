@@ -313,8 +313,9 @@ public class QueryDialog extends JPanel {
     private static final String TOOL_TIP_A = "Switch to check if the formula holds for every computation.";
 
     //Tool tips for logic panel
-    private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently selected part of the query with a conjunction.";
-    private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently selected part of the query.";
+	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently selected part of the query with a conjunction.";
+	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";
+	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently selected part of the query.";
 
     //Tool tips for query panel
     private static final String TOOL_TIP_PLACESBOX = "Choose a place for the predicate.";
@@ -368,11 +369,12 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_SYMMETRIC_VARIABLES = "Finds variables with equivalent behavior and treats them as the same variable";
 
     //Tool tips for search options panel
-    private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuristic method in state space exploration.<br />" +
-        "If heuristic search is not applicable, BFS is used instead.<br/>Click the button <em>Help on the query options</em> to get more info.</html>";
-    private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
-    private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
-    private final static String TOOL_TIP_RANDOM_SEARCH = "Performs a random exploration of the state space.";
+	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuristic method in state space exploration.<br />" +
+			"If heuristic search is not applicable, BFS is used instead.<br/>For reachability queries, uses an improved heuristic search with randomness.<br/>" +
+            "Click the button <em>Help on the query options</em> to get more info.</html>";
+	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
+	private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
+	private final static String TOOL_TIP_RANDOM_SEARCH = "Performs a random exploration of the state space.";
 
     //Tool tips for trace options panel
     private final static String TOOL_TIP_FASTEST_TRACE = "Show a fastest concrete trace if applicable (verification can be slower with this trace option).";
@@ -571,17 +573,20 @@ public class QueryDialog extends JPanel {
             return SearchOption.DEFAULT;
         }
 
-        if(depthFirstSearch.isSelected())
+        if (depthFirstSearch.isSelected()) {
             return SearchOption.DFS;
-        else if(randomSearch.isSelected())
+        } else if (randomSearch.isSelected()) {
             return SearchOption.RANDOM;
-        else if(heuristicSearch.isSelected())
+        } else if (heuristicSearch.isSelected()) {
+            if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery())
+                return SearchOption.RANDOMHEURISTIC;
             return SearchOption.HEURISTIC;
-        else if(breadthFirstSearch.isSelected())
+        } else if (breadthFirstSearch.isSelected()) {
             return SearchOption.BFS;
-        else
+        } else {
             return SearchOption.DEFAULT;
-    }
+        }
+	}
 
     private ReductionOption getReductionOption() {
         String reductionOptionString = (String)reductionOption.getSelectedItem();
@@ -908,9 +913,14 @@ public class QueryDialog extends JPanel {
             TCTLAbstractProperty replacement = null;
             TCTLAbstractProperty selection = currentSelection.getObject();
 
-            if (selection instanceof TCTLAbstractStateProperty) {
-                replacement = new TCTLStatePlaceHolder();
-
+			if (selection instanceof TCTLAbstractStateProperty) {
+				replacement = new TCTLStatePlaceHolder();
+			} else if (selection instanceof TCTLAbstractPathProperty) {
+				replacement = new TCTLPathPlaceHolder();
+			}
+			if (replacement != null) {
+				UndoableEdit edit = new QueryConstructionEdit(selection, replacement);
+				newProperty = newProperty.replace(selection, replacement);
             } else if (selection instanceof TCTLAbstractPathProperty) {
                 replacement = new TCTLPathPlaceHolder();
             }
@@ -1064,16 +1074,16 @@ public class QueryDialog extends JPanel {
             return;
         }
 
-        JRadioButton currentselected;
-        if(heuristicSearch.isSelected()){
-            currentselected = heuristicSearch;
-        }else if(breadthFirstSearch.isSelected()){
-            currentselected = breadthFirstSearch;
-        }else if(depthFirstSearch.isSelected()){
-            currentselected = depthFirstSearch;
-        }else{
-            currentselected = randomSearch;
-        }
+		JRadioButton currentSelected;
+		if(heuristicSearch.isSelected()){
+			currentSelected = heuristicSearch;
+		}else if(breadthFirstSearch.isSelected()){
+			currentSelected = breadthFirstSearch;
+		}else if(depthFirstSearch.isSelected()){
+			currentSelected = depthFirstSearch;
+		}else{
+			currentSelected = randomSearch;
+		}
 
         if(queryType.getSelectedIndex() == 2) {
             breadthFirstSearch.setEnabled(false);
@@ -1114,13 +1124,23 @@ public class QueryDialog extends JPanel {
             }
         }
 
-        if(!currentselected.isEnabled()){
-            if(heuristicSearch.isEnabled()){
-                heuristicSearch.setSelected(true);
-            } else {
-                depthFirstSearch.setSelected(true);
-            }
+		if (!currentSelected.isEnabled()) {
+			if (heuristicSearch.isEnabled()) {
+				heuristicSearch.setSelected(true);
+			} else {
+				depthFirstSearch.setSelected(true);
+			}
+		}
+
+		if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery()) {
+		    heuristicSearch.setText("Random heuristic    ");
+        } else {
+            heuristicSearch.setText("Heuristic    ");
         }
+    }
+
+	private boolean isReachabilityQuery() {
+	    return !newProperty.hasNestedPathQuantifiers() && (newProperty instanceof TCTLAGNode || newProperty instanceof TCTLEFNode);
     }
 
     private void disableAllQueryButtons() {
@@ -4010,12 +4030,12 @@ public class QueryDialog extends JPanel {
         searchOptionsPanel = new JPanel(new GridBagLayout());
         searchOptionsPanel.setVisible(false);
 
-        searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy Options"));
-        searchRadioButtonGroup = new ButtonGroup();
-        breadthFirstSearch = new JRadioButton("Breadth first search    ");
-        depthFirstSearch = new JRadioButton("Depth first search    ");
-        randomSearch = new JRadioButton("Random search    ");
-        heuristicSearch = new JRadioButton("Heuristic search    ");
+		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy Options"));
+		searchRadioButtonGroup = new ButtonGroup();
+		breadthFirstSearch = new JRadioButton("Breadth first    ");
+		depthFirstSearch = new JRadioButton("Depth first    ");
+		randomSearch = new JRadioButton("Random    ");
+        heuristicSearch = new JRadioButton("Heuristic    ");
 
         breadthFirstSearch.setToolTipText(TOOL_TIP_BREADTH_FIRST_SEARCH);
         depthFirstSearch.setToolTipText(TOOL_TIP_DEPTH_FIRST_SEARCH);

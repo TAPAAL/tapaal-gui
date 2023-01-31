@@ -198,7 +198,7 @@
       </declarations>
     </structure>
   </declaration>
-  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="12" colorFixpoint="false" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="false" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Six voted no" overApproximation="false" pTrie="false" partitioning="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetricVars="false" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false">
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="12" colorFixpoint="false" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="false" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Six voted no" overApproximation="false" pTrie="false" partitioning="false" reduction="true" reductionOption="VerifyPN" searchOption="RANDOMHEURISTIC" symmetricVars="false" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false">
     <formula>
             
       <exists-path>
@@ -223,7 +223,7 @@
           
     </formula>
   </query>
-  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" colorFixpoint="true" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Tie vote" overApproximation="false" pTrie="false" partitioning="true" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetricVars="true" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false">
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" colorFixpoint="true" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Tie vote" overApproximation="false" pTrie="false" partitioning="true" reduction="true" reductionOption="VerifyPN" searchOption="RANDOMHEURISTIC" symmetricVars="true" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false">
     <formula>
             
       <exists-path>
