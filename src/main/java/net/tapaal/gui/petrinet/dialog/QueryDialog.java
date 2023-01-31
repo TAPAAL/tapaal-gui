@@ -290,7 +290,8 @@ public class QueryDialog extends JPanel {
 
     //Tool tips for logic panel
 	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently selected part of the query with a conjunction.";
-	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently selected part of the query.";
+	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";
+	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently selected part of the query.";
 
 	//Tool tips for query panel
 	private static final String TOOL_TIP_PLACESBOX = "Choose a place for the predicate.";
@@ -340,7 +341,8 @@ public class QueryDialog extends JPanel {
 
     //Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuristic method in state space exploration.<br />" +
-			"If heuristic search is not applicable, BFS is used instead.<br/>Click the button <em>Help on the query options</em> to get more info.</html>";
+			"If heuristic search is not applicable, BFS is used instead.<br/>For reachability queries, uses an improved heuristic search with randomness.<br/>" +
+            "Click the button <em>Help on the query options</em> to get more info.</html>";
 	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
 	private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
 	private final static String TOOL_TIP_RANDOM_SEARCH = "Performs a random exploration of the state space.";
