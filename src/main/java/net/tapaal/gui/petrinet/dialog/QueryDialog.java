@@ -1053,7 +1053,6 @@ public class QueryDialog extends JPanel {
         } else {
             heuristicSearch.setText("Heuristic search    ");
         }
-        guiDialog.pack();
     }
 
 	private boolean isReachabilityQuery() {
@@ -1644,9 +1643,11 @@ public class QueryDialog extends JPanel {
 		if(advancedView){
 			advancedButton.setText("Simple view");
 			advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
+            guiDialog.setPreferredSize(new Dimension(957,651));
 		} else {
 			advancedButton.setText("Advanced view");
 			advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
+			guiDialog.setPreferredSize(null);
 		}
 
 		guiDialog.pack();
@@ -3131,10 +3132,7 @@ public class QueryDialog extends JPanel {
 		breadthFirstSearch = new JRadioButton("Breadth first search    ");
 		depthFirstSearch = new JRadioButton("Depth first search    ");
 		randomSearch = new JRadioButton("Random search    ");
-        if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery())
-            heuristicSearch = new JRadioButton("Random heuristic search ");
-        else
-            heuristicSearch = new JRadioButton("Heuristic search    ");
+        heuristicSearch = new JRadioButton("Heuristic search ");
 
 		breadthFirstSearch.setToolTipText(TOOL_TIP_BREADTH_FIRST_SEARCH);
 		depthFirstSearch.setToolTipText(TOOL_TIP_DEPTH_FIRST_SEARCH);
