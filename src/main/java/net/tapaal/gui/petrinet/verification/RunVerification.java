@@ -336,6 +336,16 @@ public class RunVerification extends RunVerificationBase {
 		gbc.anchor = GridBagConstraints.WEST;		
 		panel.add(new JLabel(toHTML(result.getResultString())), gbc);
 
+        if (result.getBound() < result.getQueryResult().boundednessAnalysis().usedTokens() &&
+            !result.getQueryResult().toString().toLowerCase().contains("only markings with")) {
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.gridwidth = 2;
+            gbc.anchor = GridBagConstraints.WEST;
+            panel.add(new JLabel("<html><br/><br/>Only markings with at most " + result.getBound() + " tokens were explored<br/><br/></html>"), gbc);
+        }
+
 		// TODO remove this when the engine outputs statistics
 		boolean isCTLQuery = result.getQueryResult().isCTL;
         int rowOffset = 1;

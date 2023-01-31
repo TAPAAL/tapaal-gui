@@ -241,24 +241,24 @@ public final class GuiFrameController implements GuiFrameControllerActions{
             buffer.append("Lasse Jacobsen, Morten Jacobsen,\nThomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
             buffer.append("Mads Johannsen,\nKenneth Y. Joergensen, Mikael H. Moeller, Christoffer Moesgaard, Kristian Morsing Pedersen,\nThomas Pedersen, Lena S. Ernstsen, Niels N. Samuelsen, Jiri Srba, Mathias G. Soerensen,\nJakob H. Taankvist and Peter H. Taankvist\n");
 
-            buffer.append("Aalborg University 2008-2021\n\n");
+            buffer.append("Aalborg University 2008-2023\n\n");
 
         buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
             buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-            buffer.append("Aalborg University 2011-2021\n\n");
+            buffer.append("Aalborg University 2011-2023\n\n");
 
         buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
             buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
             buffer.append("Mathias G. Soerensen and Jakob H. Taankvist\n");
-            buffer.append("Aalborg University 2012-2021\n\n");
+            buffer.append("Aalborg University 2012-2023\n\n");
 
         buffer.append("TAPAAL Untimed Engine (verifypn):\n");
             buffer.append("Alexander Bilgram, Frederik M. Boenneland, Jakob Dyhr, Peter Fogh, ");
-            buffer.append("Jonas F. Jensen,\nLasse S. Jensen, Peter G. Jensen, ");
-            buffer.append("Tobias S. Jepsen, Kenneth Y. Joergensen,\nMads Johannsen, Isabella Kaufmann, ");
-            buffer.append("Andreas H. Klostergaard, Soeren M. Nielsen,\nThomas S. Nielsen, Lars K. Oestergaard, ");
-            buffer.append("Samuel Pastva, Thomas Pedersen, Jiri Srba,\nPeter H. Taankvist, Nikolaj J. Ulrik and Simon M. Virenfeldt\n");
-            buffer.append("Aalborg University 2014-2021\n\n");
+            buffer.append("Jonas F. Jensen,\nLasse S. Jensen, Peter G. Jensen, Nicolaj Ø. Jensen,");
+            buffer.append("Tobias S. Jepsen,\nMads Johannsen, Kenneth Y. Joergensen, Mads Johannsen, Isabella Kaufmann,\n");
+            buffer.append("Andreas H. Klostergaard, Soeren M. Nielsen, Thomas S. Nielsen, ");
+            buffer.append("Samuel Pastva,\nThomas Pedersen, Jiri Srba, Mathias M. Sørensen, Peter H. Taankvist, Rasmus G. Tollund,\nNikolaj J. Ulrik, Simon M. Virenfeldt, Lars K. Oestergaard, Emil G. Henriksen,\nAlan M. Khorsid, Esben Nielsen, Theodor Risager, Adam M. Stück and Andreas S. Sørensen\n");
+            buffer.append("Aalborg University 2014-2023\n\n");
 
 
         buffer.append("\n");
