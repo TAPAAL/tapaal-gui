@@ -1051,16 +1051,13 @@ public class QueryDialog extends JPanel {
 		}
 
 		if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery()) {
-		    heuristicSearch.setText("Random heuristic search ");
+		    heuristicSearch.setText("Random heuristic    ");
         } else {
-            heuristicSearch.setText("Heuristic search    ");
+            heuristicSearch.setText("Heuristic    ");
         }
     }
 
 	private boolean isReachabilityQuery() {
-	    boolean hasQuanty = newProperty.hasNestedPathQuantifiers();
-        boolean isAGNode = newProperty instanceof TCTLAGNode;
-        boolean isEFNode = newProperty instanceof TCTLEFNode;
 	    return !newProperty.hasNestedPathQuantifiers() && (newProperty instanceof TCTLAGNode || newProperty instanceof TCTLEFNode);
     }
 
@@ -1645,11 +1642,9 @@ public class QueryDialog extends JPanel {
 		if(advancedView){
 			advancedButton.setText("Simple view");
 			advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
-            guiDialog.setPreferredSize(new Dimension(957,651));
 		} else {
 			advancedButton.setText("Advanced view");
 			advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
-			guiDialog.setPreferredSize(null);
 		}
 
 		guiDialog.pack();
@@ -3131,10 +3126,10 @@ public class QueryDialog extends JPanel {
 
 		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy Options"));
 		searchRadioButtonGroup = new ButtonGroup();
-		breadthFirstSearch = new JRadioButton("Breadth first search    ");
-		depthFirstSearch = new JRadioButton("Depth first search    ");
-		randomSearch = new JRadioButton("Random search    ");
-        heuristicSearch = new JRadioButton("Heuristic search ");
+		breadthFirstSearch = new JRadioButton("Breadth first    ");
+		depthFirstSearch = new JRadioButton("Depth first    ");
+		randomSearch = new JRadioButton("Random    ");
+        heuristicSearch = new JRadioButton("Heuristic    ");
 
 		breadthFirstSearch.setToolTipText(TOOL_TIP_BREADTH_FIRST_SEARCH);
 		depthFirstSearch.setToolTipText(TOOL_TIP_DEPTH_FIRST_SEARCH);
