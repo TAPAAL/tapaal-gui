@@ -779,7 +779,7 @@ public class QueryDialog extends JPanel {
         if (current instanceof LTLANode || current instanceof LTLENode ||
             (queryType.getSelectedIndex() == 1 && current instanceof TCTLPathPlaceHolder)) {
             negationButton.setEnabled(false);
-        } else {
+        } else if (!lens.isGame()) {
             negationButton.setEnabled(true);
         }
 	}
