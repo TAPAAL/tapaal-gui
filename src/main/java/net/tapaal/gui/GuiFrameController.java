@@ -187,10 +187,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void showNewPNDialog() {
-
         NewTAPNPanel.showNewTapnPanel(guiFrameDirectAccess);
-
-
     }
 
     @Override
