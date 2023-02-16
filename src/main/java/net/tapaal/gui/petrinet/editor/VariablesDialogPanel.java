@@ -172,23 +172,24 @@ public class VariablesDialogPanel extends JPanel {
 
         colorTypeComboBox = new JComboBox();
 
-        int variableIndex = 0;
+        int selectedVariableIndex = 0; int index = 0;
         for (ColorType element : colorTypes) {
-            if(!element.isProductColorType()){
+            if(!element.isProductColorType() && element != ColorType.COLORTYPE_DOT){
                 colorTypeComboBox.addItem(element);
                 if (variable != null) {
                     if (element.getName().equals(variable.getColorType().getName())) {
-                        variableIndex = colorTypeComboBox.getItemCount() - 1;
+                        selectedVariableIndex = index;
                     }
                 }
+                index += 1;
             }
         }
-        colorTypeComboBox.removeItem(ColorType.COLORTYPE_DOT);
+
         if (colorTypeComboBox.getItemCount() <= 0) {
             JOptionPane.showMessageDialog(this, "No valid color types available for variables", "", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        colorTypeComboBox.setSelectedIndex(variableIndex);
+        colorTypeComboBox.setSelectedIndex(selectedVariableIndex);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(2, 4, 2, 4);
