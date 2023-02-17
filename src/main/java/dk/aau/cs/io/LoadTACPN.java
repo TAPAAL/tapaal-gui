@@ -68,6 +68,8 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         Vector<String> variablesForRemoval = new Vector<>();
         HashMap<String, Variable> newVars = new HashMap<>();
         StringBuilder renameWarnings = new StringBuilder();
+
+        // Variables with product values are not supported.
         // Convert product variables into variables for the constituent of the product
         for(String varName : variables.keySet()){
             Variable var = variables.get(varName);
@@ -127,7 +129,11 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             while (typechild != null) {
                 if (typechild.getNodeName().equals("usersort")) {
                     String constituent = getAttribute(typechild, "declaration").getNodeValue();
-                    pt.addType(colortypes.get(constituent));
+
+                    var ct = colortypes.get(constituent);
+                    if (ct == null) throw new RuntimeException("Color type not found, " + constituent);
+
+                    pt.addType(ct);
                 }
                 typechild = skipWS(typechild.getNextSibling());
             }

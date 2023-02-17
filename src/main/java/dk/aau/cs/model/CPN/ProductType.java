@@ -4,6 +4,7 @@ import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.TupleExpression;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Vector;
 
 public class ProductType extends ColorType {
@@ -53,6 +54,7 @@ public class ProductType extends ColorType {
     public Vector<ColorType> getColorTypes() { return constituents; }
 
     public void addType(ColorType colortype) {
+        Objects.requireNonNull(colortype);
         constituents.add(colortype);
     }
 
@@ -177,10 +179,14 @@ public class ProductType extends ColorType {
         return constituents;
     }
     public void setConstituents(Vector<ColorType> constituents) {
+        for (var x : constituents) Objects.requireNonNull(x);
         this.constituents = constituents;
     }
 
     public void replaceColorType(ColorType newColorType, ColorType oldColorType){
+        Objects.requireNonNull(newColorType);
+        Objects.requireNonNull(oldColorType);
+
         for (ColorType ct : constituents){
             if(ct.equals(oldColorType)){
                 int index = constituents.indexOf(ct);
