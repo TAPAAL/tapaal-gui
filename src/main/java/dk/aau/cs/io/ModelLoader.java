@@ -34,26 +34,25 @@ public class ModelLoader {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] buffer = new byte[1024];
 		int len;
-		try {
-			while ((len = file.read(buffer)) > -1 ) {
-			    baos.write(buffer, 0, len);
-			}
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+
+        while ((len = file.read(buffer)) > -1 ) {
+            baos.write(buffer, 0, len);
+        }
+
 		try{
 
             return newFormatLoader.load(new ByteArrayInputStream(baos.toByteArray()));
 
-        }catch(Throwable e1){
-			try {
+        }catch(Exception e1){
+			/*try {
 				TapnLegacyXmlLoader oldFormatLoader = new TapnLegacyXmlLoader();
 
                 return oldFormatLoader.load(new ByteArrayInputStream(baos.toByteArray()));
 
-            } catch(Throwable e2) {
+            } catch(Exception e2) {
 				throw new Exception(e1.getMessage(), e1);
-			}
+			}*/
+            throw e1;
 		}
 	}
 
