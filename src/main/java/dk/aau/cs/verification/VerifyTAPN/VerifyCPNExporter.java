@@ -143,7 +143,6 @@ public class VerifyCPNExporter extends VerifyTAPNExporter{
         str = str.replace("<placeHolder>", "");
         str = str.replace("</placeHolder>", "");
 
-
         return str;
     }
 }
