@@ -2,8 +2,6 @@ package net.tapaal.gui.petrinet.dialog;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.*;
 import java.util.List;
@@ -12,8 +10,6 @@ import javax.swing.*;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.Timer;
 import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -32,7 +28,6 @@ import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.petrinet.undo.UndoManager;
-import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 import net.tapaal.gui.petrinet.widgets.QueryPane;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
@@ -52,9 +47,7 @@ import dk.aau.cs.verification.batchProcessing.StatusChangedEvent;
 import dk.aau.cs.verification.batchProcessing.VerificationTaskCompleteEvent;
 
 public class BatchProcessingDialog extends JDialog {
-
 	private static final String name_verifyTAPN = "TAPAAL Continuous Engine (verifytapn)";
-	private static final String name_verifyTAPNDiscreteInclusion = "TAPAAL Continuous Engine w. Discrete Inclusion";
 	private static final String name_verifyTAPNDiscreteVerificationTimeDartPTrie = "TAPAAL Discrete Engine w. Time Darts and PTrie";
 	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "TAPAAL Discrete Engine w. Time Darts";
 	private static final String name_verifyTAPNDiscreteVerificationPTrie = "TAPAAL Discrete Engine w. PTries";
@@ -65,25 +58,6 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_UNTIMED = "TAPAAL Untimed CTL Engine (verifypn)";
-	private static final String name_verifyTAPNWithLegend = "A: " + name_verifyTAPN;
-	private static final String name_verifyTAPNDiscreteInclusionWithLegend = "B: "
-			+ name_verifyTAPNDiscreteInclusion;
-	
-	private static final String name_verifyTAPNDiscreteVerificationTimeDartPTrieWithLegend  = "C: " 
-			+ name_verifyTAPNDiscreteVerificationTimeDartPTrie;
-	private static final String name_verifyTAPNDiscreteVerificationTimeDartWithLegend  = "D: "
-			+ name_verifyTAPNDiscreteVerificationTimeDart;
-	private static final String name_verifyTAPNDiscreteVerificationPTrieWithLegend  = "E: "
-			+ name_verifyTAPNDiscreteVerificationPTrie;
-	private static final String name_verifyTAPNDiscreteVerificationNoneWithLegend  = "F: "
-			+ name_verifyTAPNDiscreteVerificationNone;
-
-	private static final String name_COMBIWithLegend = "G: " + name_COMBI;
-	private static final String name_STANDARDWithLegend = "H: " + name_STANDARD;
-	private static final String name_OPTIMIZEDSTANDARDWithLegend = "I: " + name_OPTIMIZEDSTANDARD;
-	private static final String name_BROADCASTWithLegend = "J: " + name_BROADCAST;
-	private static final String name_BROADCASTDEG2WithLegend = "K: " + name_BROADCASTDEG2;
-	private static final String name_UNTIMEDWithLegend = "L: " + name_UNTIMED;
 
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
@@ -94,10 +68,6 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_SOUNDNESS = "Soundness";
 	private static final String name_STRONGSOUNDNESS = "Strong Soundness";
 	private static final String name_EXISTDEADLOCK = "Existence of a deadlock";
-	private static final String name_SYMMETRY = "Yes";
-	private static final String name_NOSYMMETRY = "No";
-	private static final String name_STUBBORNREUDCTION = "Yes";
-	private static final String name_NOSTUBBORNREDUCTION = "No";
 	private static final String name_NONE_APPROXIMATION = "None";
 	private static final String name_OVER_APPROXIMATION = "Over-approximation";
 	private static final String name_UNDER_APPROXIMATION = "Under-approximation";
@@ -148,7 +118,6 @@ public class BatchProcessingDialog extends JDialog {
 
 	private static String lastPath = null;
 	
-	ReductionOptionChooser reductionOptionChooser;
     HelpDialog helpDialogTAPN;
     HelpDialog helpDialogPN;
     HelpDialog helpDialogDTAPN;
@@ -175,15 +144,12 @@ public class BatchProcessingDialog extends JDialog {
 	private JLabel memory;
 	private long startTimeMs = 0;
 
-	private JComboBox<String> searchOption;
 	private JButton exportButton;
 	private JButton closeButton;
 	private JComboBox<String> queryPropertyOption;
 	private JPanel verificationOptionsPanel;
 	private CustomJSpinner numberOfExtraTokensInNet;
 	private JCheckBox keepQueryCapacity;
-	private JComboBox<String> symmetryOption;
-	private JComboBox<String> stubbornReductionOption;
     private JRadioButton defaultYes;
     private JRadioButton defaultNo;
 	private ButtonGroup defaultOptions;
@@ -200,9 +166,6 @@ public class BatchProcessingDialog extends JDialog {
 	private JCheckBox noOOMCheckbox;
 	private CustomJSpinner timeoutValue;
 	private CustomJSpinner oomValue;
-	//private JComboBox<String> approximationMethodOption;
-	//private CustomJSpinner approximationDenominator;
-	//private JCheckBox approximationDenominatorCheckbox;
 	private final JList<TAPNQuery> ListOfQueries;
 	
 	private final Timer timeoutTimer = new Timer(30000, e -> timeoutCurrentVerificationTask());
@@ -244,28 +207,27 @@ public class BatchProcessingDialog extends JDialog {
 	
 	private final Timer memoryTimer = new Timer(50, new AbstractAction() {
 	    public void actionPerformed(ActionEvent e) {
-			if(MemoryMonitor.isAttached()){
+			if (MemoryMonitor.isAttached()) {
 				MemoryMonitor.getUsage();
 				peakMemory = MemoryMonitor.getPeakMemoryValue();
 				
-				if(useOOM() && MemoryMonitor.getPeakMemoryValue() > (Integer) oomValue.getValue()){
+				if (useOOM() && MemoryMonitor.getPeakMemoryValue() > (Integer) oomValue.getValue()) {
 					oomCurrentVerificationTask();
 				}
 			}
-			
-			if(memoryTimerMode == 0 && memoryTimerCount == 2){
+			if (memoryTimerMode == 0 && memoryTimerCount == 2) {
 				memoryTimerCount = 0;
 				memoryTimerMode++;
 				memoryTimer.setDelay(100);
-			}else if(memoryTimerMode == 1 && memoryTimerCount == 4){
+			} else if (memoryTimerMode == 1 && memoryTimerCount == 4) {
 				memoryTimerCount = 0;
 				memoryTimerMode++;
 				memoryTimer.setDelay(200);
-			}else if(memoryTimerMode == 2 && memoryTimerCount == 5){
+			} else if (memoryTimerMode == 2 && memoryTimerCount == 5) {
 				memoryTimerCount = 0;
 				memoryTimerMode++;
 				memoryTimer.setDelay(1000);
-			}else if(memoryTimerMode < 3){
+			} else if (memoryTimerMode < 3) {
 				memoryTimerCount++;
 			}
 		}
@@ -273,15 +235,14 @@ public class BatchProcessingDialog extends JDialog {
 	
 	static BatchProcessingDialog batchProcessingDialog;
 	
-	/* ListOfQueries is used throughout the class to check if 
-	BatchProcessing was called from QueryPane
+	/* ListOfQueries is used throughout the class to check if BatchProcessing was called from QueryPane
 	(should maybe be boolean)
 	*/
 	public static void showBatchProcessingDialog(JList<TAPNQuery> ListOfQueries){
-		if(ListOfQueries.getModel().getSize() != 0) {
+		if (ListOfQueries.getModel().getSize() != 0) {
 			batchProcessingDialog = null;
 		}
-		if(batchProcessingDialog == null){
+		if (batchProcessingDialog == null) {
 			batchProcessingDialog = new BatchProcessingDialog(TAPAALGUI.getApp(), "Batch Processing", true, ListOfQueries);
 			batchProcessingDialog.pack();
 			batchProcessingDialog.setPreferredSize(batchProcessingDialog.getSize());
@@ -299,7 +260,7 @@ public class BatchProcessingDialog extends JDialog {
 		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent we) {
-				if(!(isQueryListEmpty())) {
+				if (!(isQueryListEmpty())) {
 					batchProcessingDialog = null;
 				}
 				terminateBatchProcessing();
@@ -310,7 +271,7 @@ public class BatchProcessingDialog extends JDialog {
 		initComponents();
 		makeShortcuts();
 		//Runs the BatchProcessing if it is called from the QueryPane
-		if(!(isQueryListEmpty())) {
+		if (!(isQueryListEmpty())) {
 			process();
 		}
 	}
@@ -335,7 +296,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private void setFileListToTempFile() {
-		if(!(isQueryListEmpty())) {
+		if (!(isQueryListEmpty())) {
 			files.add(QueryPane.getTemporaryFile());
 		}
 	}
@@ -478,8 +439,8 @@ public class BatchProcessingDialog extends JDialog {
 	private void initVerificationOptionsPanel() {
 		verificationOptionsPanel = new JPanel(new GridBagLayout());
 		verificationOptionsPanel.setBorder(BorderFactory
-				.createTitledBorder("Override Verification Options for the Batch"));
-		
+            .createTitledBorder("Override Verification Options for the Batch"));
+
 		initQueryPropertyOptionsComponents();
         initDefaultOptionsComponents();
         initTAPNOptionsComponents();
@@ -515,8 +476,13 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(queryLabel, gbc);
 
-		String[] options = new String[] { name_KeepQueryOption,
-				name_SEARCHWHOLESTATESPACE, name_EXISTDEADLOCK, name_SOUNDNESS, name_STRONGSOUNDNESS};
+		String[] options = new String[] {
+		    name_KeepQueryOption,
+            name_SEARCHWHOLESTATESPACE,
+            name_EXISTDEADLOCK,
+            name_SOUNDNESS,
+            name_STRONGSOUNDNESS
+		};
 		queryPropertyOption = new JComboBox<>(options);
 		queryPropertyOption.setToolTipText(TOOL_TIP_Query_Property_Option);
 		
@@ -557,15 +523,13 @@ public class BatchProcessingDialog extends JDialog {
 		keepQueryCapacity = new JCheckBox(name_KeepQueryOption);
 		keepQueryCapacity.setToolTipText(TOOL_TIP_KeepQueryCapacity);
 		keepQueryCapacity.setSelected(true);
-		keepQueryCapacity.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (keepQueryCapacity.isSelected()) {
-                    numberOfExtraTokensInNet.setEnabled(false);
-                } else {
-                    numberOfExtraTokensInNet.setEnabled(true);
-                }
-			}
-		});
+		keepQueryCapacity.addActionListener(e -> {
+		    if (keepQueryCapacity.isSelected()) {
+		        numberOfExtraTokensInNet.setEnabled(false);
+		    } else {
+		        numberOfExtraTokensInNet.setEnabled(true);
+		    }
+        });
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -808,20 +772,6 @@ public class BatchProcessingDialog extends JDialog {
         verificationOptionsPanel.add(helpDTAPN, gbc);
     }
 
-	private SearchOption getSearchOption() {
-		if (searchOption.getSelectedItem().equals(name_DFS)) {
-            return SearchOption.DFS;
-        } else if (searchOption.getSelectedItem().equals(name_Random)) {
-            return SearchOption.RANDOM;
-        } else if (searchOption.getSelectedItem().equals(name_HEURISTIC)) {
-            return SearchOption.HEURISTIC;
-        } else if (searchOption.getSelectedItem().equals(name_BFS)) {
-            return SearchOption.BFS;
-        } else {
-            return SearchOption.BatchProcessingKeepQueryOption;
-        }
-	}
-
 	private void disableVerificationOptionsButtons() {
 		verificationOptionsPanel.setEnabled(false);
 		for (Component c : verificationOptionsPanel.getComponents()) {
@@ -845,12 +795,9 @@ public class BatchProcessingDialog extends JDialog {
 		    (Integer) numberOfExtraTokensInNet.getValue(),
             SearchOption.BatchProcessingKeepQueryOption,
             ReductionOption.BatchProcessingKeepQueryOption,
-            reductionOptionChooser.isDiscreteInclusion(),
-            reductionOptionChooser.useTimeDartsPTrie(),
-            reductionOptionChooser.useTimeDarts(),
-            reductionOptionChooser.usePTrie(),
+            false, false, false, false,
             0,
-            reductionOptionChooser.getChoosenOptions()
+            new ArrayList<>()
         );
     }
 
@@ -861,9 +808,8 @@ public class BatchProcessingDialog extends JDialog {
 	private void exit() {
 		terminateBatchProcessing();
 		rootPane.getParent().setVisible(false);
-		//resets batch processing when exiting
-		//if batch processing was called from the tab
-		if(!(isQueryListEmpty())){
+		// Resets batch processing when exiting if batch processing was called from the tab
+		if (!(isQueryListEmpty())) {
 			batchProcessingDialog = null;
 		}
 	}
@@ -1095,11 +1041,7 @@ public class BatchProcessingDialog extends JDialog {
 		startButton.setPreferredSize(new Dimension(85, 25));
 
 		startButton.setEnabled(false);
-		startButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				process();
-			}
-		});
+		startButton.addActionListener(e -> process());
 		gbc = new GridBagConstraints();
 		gbc.gridx = 4;
 		gbc.gridy = 0;
@@ -1160,7 +1102,7 @@ public class BatchProcessingDialog extends JDialog {
 	private void process() {
 		tableModel.clear();
 		if (defaultYes.isSelected()) {
-            currentWorker = new BatchProcessingWorker(files, tableModel, getVerificationOptions());
+            currentWorker = new BatchProcessingWorker(files, tableModel, null);
         } else {
             Map<ReductionOption, String> verificationOptions = Map.of(
                 ReductionOption.VerifyTAPN, optionsTAPN.getText(),
@@ -1169,29 +1111,26 @@ public class BatchProcessingDialog extends JDialog {
             );
             currentWorker = new BatchProcessingWorker(files, tableModel, verificationOptions);
         }
-		currentWorker.addPropertyChangeListener(new PropertyChangeListener() {
-
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (evt.getPropertyName().equals("state")) {
-					if (evt.getNewValue() == StateValue.DONE) {
-						enableButtons();
-						cancelButton.setEnabled(false);
-						skipFileButton.setEnabled(false);
-						timerLabel.setText("");
-						timer.stop();
-						stopMemoryTimer();
-						timeoutTimer.stop();
-					} else if (evt.getNewValue() == StateValue.STARTED) {
-						disableButtonsDuringProcessing();
-						cancelButton.setEnabled(true);
-						skipFileButton.setEnabled(true);
-						memory.setText("");
-						timerLabel.setText("");
-						progressLabel.setText("0 verification tasks completed");
-					}
-				}
-			}
-		});
+		currentWorker.addPropertyChangeListener(evt -> {
+            if (evt.getPropertyName().equals("state")) {
+                if (evt.getNewValue() == StateValue.DONE) {
+                    enableButtons();
+                    cancelButton.setEnabled(false);
+                    skipFileButton.setEnabled(false);
+                    timerLabel.setText("");
+                    timer.stop();
+                    stopMemoryTimer();
+                    timeoutTimer.stop();
+                } else if (evt.getNewValue() == StateValue.STARTED) {
+                    disableButtonsDuringProcessing();
+                    cancelButton.setEnabled(true);
+                    skipFileButton.setEnabled(true);
+                    memory.setText("");
+                    timerLabel.setText("");
+                    progressLabel.setText("0 verification tasks completed");
+                }
+            }
+        });
 		currentWorker.addBatchProcessingListener(new BatchProcessingListener() {
 			public void fireVerificationTaskStarted() {
 				if (timer.isRunning()) {
@@ -1587,64 +1526,6 @@ public class BatchProcessingDialog extends JDialog {
 			return s.toString();
 		}
 	}
-	
-	public class ReductionOptionChooser extends JPanel {
-
-		private final JButton chooseReductionOptions;
-		final ReductionOptionDialog reductionOptionDialog;
-		
-		private static final String STATUS_TEXT_USERDEF = "Overridden";
-		private static final String STATUS_TEXT_DONT_OVERRIDE = "From the query";
-		
-		public ReductionOptionChooser() {
-			super(new GridLayout(1, 0));
-			
-			reductionOptionDialog = new ReductionOptionDialog(BatchProcessingDialog.this, "Choose Verification Methods for Batch Processing", true);
-			reductionOptionDialog.setLocationRelativeTo(BatchProcessingDialog.this);
-			reductionOptionDialog.setResizable(false);
-			reductionOptionDialog.pack();
-			
-			chooseReductionOptions = new JButton(STATUS_TEXT_DONT_OVERRIDE);
-			//chooseReductionOptions.setToolTipText(TOOL_TIP_ReductionOption);
-			chooseReductionOptions.addActionListener(arg0 -> {
-				//reductionOptionDialog.setOverride(true);
-				reductionOptionDialog.setVisible(true);
-			});
-			this.add(chooseReductionOptions);
-
-		}
-		
-		public List<ReductionOption> getChoosenOptions(){
-			return reductionOptionDialog.getChoosenOptions();
-		}
-		
-		public boolean isOverwriten(){
-			return reductionOptionDialog.isOverwriten();
-		}
-		
-		public boolean isDiscreteInclusion(){
-			return reductionOptionDialog.isDiscreteInclusion();
-		}
-		
-		public boolean useTimeDartsPTrie(){
-			return reductionOptionDialog.useTimeDartsPTrie();
-		}
-		
-		public boolean useTimeDarts(){
-			return reductionOptionDialog.useTimeDarts();
-		}
-		
-		public boolean usePTrie(){
-			return reductionOptionDialog.usePTrie();
-		}
-		
-		public void setEnabled(boolean enabled) {
-			super.setEnabled(enabled);
-			for(Component c : getComponents()){
-				c.setEnabled(enabled);
-			}
-		}
-	}
 
 	public class HelpDialog extends JDialog {
         private JPanel content;
@@ -1693,364 +1574,7 @@ public class BatchProcessingDialog extends JDialog {
             this.getContentPane().add(content, gbc);
         }
     }
-	
-	public class ReductionOptionDialog extends EscapableDialog{
 
-		private static final String TEXT_DONT_OVERRIDE = "Do not override the verification method";
-		private static final String TEXT_OVERRIDE = "Override the verification method";
-		
-		
-		private JRadioButton dontOverride;
-		private JRadioButton override;
-		private JCheckBox verifyTAPN;
-		private JCheckBox verifyTAPNDiscreteInclusion;
-		private JCheckBox verifyTAPNDiscreteVerificationTimeDartPTrie;
-		private JCheckBox verifyTAPNDiscreteVerificationTimeDart;
-		private JCheckBox verifyTAPNDiscreteVerificationPTrie;
-		private JCheckBox verifyTAPNDiscreteVerificationNone;
-		private JCheckBox COMBI;
-		private JCheckBox STANDARD;
-		private JCheckBox OPTIMIZEDSTANDARD;
-		private JCheckBox BROADCAST;
-		private JCheckBox BROADCASTDEG2;
-		private JCheckBox UNTIMED;
-		
-		JButton selectAll;
-		JButton deselectAll;
-		
-		private JPanel content;
-		
-		private JPanel leftPanel;
-		private JPanel rightPanel;
-		
-		public ReductionOptionDialog(JDialog dialog, String string, boolean modal) {
-			super(dialog, string, modal);
-			
-			initComponents();
-		}
-
-		private void initComponents(){
-			content = new JPanel(new GridBagLayout());
-			
-			initLeftPanel();
-			initRightPanel();
-			
-			GridBagConstraints gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 0;
-			gbc.anchor = GridBagConstraints.NORTHWEST;
-			content.add(leftPanel, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 1;
-			gbc.gridy = 0;
-			gbc.fill = GridBagConstraints.BOTH;
-			gbc.anchor = GridBagConstraints.NORTHWEST;
-			
-			JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
-			//sep.setSize(10, sep.getSize().height);
-			content.add(sep, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 2;
-			gbc.gridy = 0;
-			gbc.anchor = GridBagConstraints.NORTHWEST;
-			content.add(rightPanel);
-			
-			content.setBorder(BorderFactory.createTitledBorder("Verification Method"));
-			
-			JButton closeButton = new JButton("Save");
-			rootPane.setDefaultButton(closeButton);
-			closeButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					ReductionOptionDialog.this.setVisible(false);
-					
-				}
-			});
-			
-			this.getContentPane().setLayout(new GridBagLayout());
-
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 0;
-			this.getContentPane().add(content, gbc);
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 1;
-			gbc.anchor = GridBagConstraints.EAST;
-			this.getContentPane().add(closeButton, gbc);
-			
-		}
-		
-		private void initRightPanel() {
-			rightPanel = new JPanel(new GridBagLayout());
-			
-			verifyTAPN = new JCheckBox(name_verifyTAPNWithLegend);
-			//verifyTAPN.setMnemonic('A');
-			verifyTAPN.setEnabled(false);
-			
-			verifyTAPNDiscreteInclusion = new JCheckBox(name_verifyTAPNDiscreteInclusionWithLegend);
-			//verifyTAPNDiscreteInclusion.setMnemonic('B');
-			verifyTAPNDiscreteInclusion.setEnabled(false);
-			
-			verifyTAPNDiscreteVerificationTimeDartPTrie = new JCheckBox(name_verifyTAPNDiscreteVerificationTimeDartPTrieWithLegend);
-			verifyTAPNDiscreteVerificationTimeDartPTrie.setEnabled(false);
-			
-			verifyTAPNDiscreteVerificationTimeDart = new JCheckBox(name_verifyTAPNDiscreteVerificationTimeDartWithLegend);
-			verifyTAPNDiscreteVerificationTimeDart.setEnabled(false);
-			
-			verifyTAPNDiscreteVerificationPTrie = new JCheckBox(name_verifyTAPNDiscreteVerificationPTrieWithLegend);
-			verifyTAPNDiscreteVerificationPTrie.setEnabled(false);
-			
-			verifyTAPNDiscreteVerificationNone = new JCheckBox(name_verifyTAPNDiscreteVerificationNoneWithLegend);
-			verifyTAPNDiscreteVerificationNone.setEnabled(false);
-			
-			COMBI = new JCheckBox(name_COMBIWithLegend);
-			//STANDARD.setMnemonic('C');
-			COMBI.setEnabled(false);
-			
-			STANDARD = new JCheckBox(name_STANDARDWithLegend);
-			//STANDARD.setMnemonic('C');
-			STANDARD.setEnabled(false);
-			
-			OPTIMIZEDSTANDARD = new JCheckBox(name_OPTIMIZEDSTANDARDWithLegend);
-			//OPTIMIZEDSTANDARD.setMnemonic('D');
-			OPTIMIZEDSTANDARD.setEnabled(false);
-			
-			BROADCAST = new JCheckBox(name_BROADCASTWithLegend);
-			//BROADCAST.setMnemonic('E');
-			BROADCAST.setEnabled(false);
-			
-			BROADCASTDEG2 = new JCheckBox(name_BROADCASTDEG2WithLegend);
-			BROADCASTDEG2.setEnabled(false);
-			
-			UNTIMED = new JCheckBox(name_UNTIMEDWithLegend);
-			UNTIMED.setEnabled(false);
-			
-			GridBagConstraints gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 0;
-			gbc.insets = new Insets(5, 5, 0, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(verifyTAPN, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 1;
-			gbc.insets = new Insets(0, 5, 0, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(verifyTAPNDiscreteInclusion, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 2;
-			gbc.insets = new Insets(0, 5, 0, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(verifyTAPNDiscreteVerificationTimeDartPTrie, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 3;
-			gbc.insets = new Insets(0, 5, 0, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(verifyTAPNDiscreteVerificationTimeDart, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 4;
-			gbc.insets = new Insets(0, 5, 0, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(verifyTAPNDiscreteVerificationPTrie, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 5;
-			gbc.insets = new Insets(0, 5, 0, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(verifyTAPNDiscreteVerificationNone, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 6;
-			gbc.insets = new Insets(0, 5, 0, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(COMBI, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 7;
-			gbc.insets = new Insets(0, 5, 0, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(STANDARD, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 8;
-			gbc.insets = new Insets(0, 5, 0, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 9;
-			gbc.insets = new Insets(0, 5, 0, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(BROADCAST, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 10;
-			gbc.insets = new Insets(0, 5, 0	, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(BROADCASTDEG2, gbc);
-			
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 11;
-			gbc.insets = new Insets(0, 5, 0	, 5);
-			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(UNTIMED, gbc);
-		}
-
-		private void initLeftPanel() {
-			
-			leftPanel = new JPanel(new GridLayout(0, 1));
-			dontOverride = new JRadioButton(TEXT_DONT_OVERRIDE);
-			dontOverride.setSelected(true);
-			
-			override = new JRadioButton(TEXT_OVERRIDE);
-			override.setSelected(false);
-			
-			ButtonGroup group = new ButtonGroup();
-			group.add(dontOverride);
-			group.add(override);
-			
-			dontOverride.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent arg0) {
-					toggle();
-				}
-			});
-			
-			selectAll = new JButton("Select all");
-			selectAll.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					setAll(true);
-				}
-			});
-			
-			deselectAll = new JButton("Select none");
-			deselectAll.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					setAll(false);
-				}
-			});
-			
-			selectAll.setEnabled(false);
-			deselectAll.setEnabled(false);
-			
-			leftPanel.add(dontOverride);
-			leftPanel.add(override);
-			leftPanel.add(selectAll);
-			leftPanel.add(deselectAll);
-		}
-
-		private void toggle(){
-			boolean override = !dontOverride.isSelected();  
-			
-			if(override){
-				reductionOptionChooser.chooseReductionOptions.setText(ReductionOptionChooser.STATUS_TEXT_USERDEF);
-			} else {
-				reductionOptionChooser.chooseReductionOptions.setText(ReductionOptionChooser.STATUS_TEXT_DONT_OVERRIDE);
-			}
-			
-			verifyTAPN.setEnabled(override);
-			verifyTAPNDiscreteInclusion.setEnabled(override);
-			COMBI.setEnabled(override);
-			STANDARD.setEnabled(override);
-			OPTIMIZEDSTANDARD.setEnabled(override);
-			BROADCAST.setEnabled(override);
-			BROADCASTDEG2.setEnabled(override);
-			UNTIMED.setEnabled(override);
-			verifyTAPNDiscreteVerificationTimeDartPTrie.setEnabled(override);
-			verifyTAPNDiscreteVerificationTimeDart.setEnabled(override);
-			verifyTAPNDiscreteVerificationPTrie.setEnabled(override);
-			verifyTAPNDiscreteVerificationNone.setEnabled(override);
-			selectAll.setEnabled(override);
-			deselectAll.setEnabled(override);
-		}
-		
-		private void setAll(boolean selected){
-			verifyTAPN.setSelected(selected);
-			verifyTAPNDiscreteInclusion.setSelected(selected);
-			COMBI.setSelected(selected);
-			STANDARD.setSelected(selected);
-			OPTIMIZEDSTANDARD.setSelected(selected);
-			BROADCAST.setSelected(selected);
-			BROADCASTDEG2.setSelected(selected);
-			UNTIMED.setSelected(selected);
-			verifyTAPNDiscreteVerificationTimeDartPTrie.setSelected(selected);
-			verifyTAPNDiscreteVerificationTimeDart.setSelected(selected);
-			verifyTAPNDiscreteVerificationPTrie.setSelected(selected);
-			verifyTAPNDiscreteVerificationNone.setSelected(selected);
-		}
-		
-		public List<ReductionOption> getChoosenOptions(){
-			ArrayList<ReductionOption> result = new ArrayList<ReductionOption>();
-			if(verifyTAPN.isSelected()){
-				result.add(ReductionOption.VerifyTAPN);
-			}
-			if(verifyTAPNDiscreteVerificationNone.isSelected()){
-				result.add(ReductionOption.VerifyDTAPN);
-			}
-			if(COMBI.isSelected()){
-				result.add(ReductionOption.COMBI);
-			}
-			if(STANDARD.isSelected()){
-				result.add(ReductionOption.STANDARD);
-			}
-			if(OPTIMIZEDSTANDARD.isSelected()){
-				result.add(ReductionOption.OPTIMIZEDSTANDARD);
-			}
-			if(BROADCAST.isSelected()){
-				result.add(ReductionOption.BROADCAST);
-			}
-			if(BROADCASTDEG2.isSelected()){
-				result.add(ReductionOption.DEGREE2BROADCAST);
-			}
-			if(UNTIMED.isSelected()){
-				result.add(ReductionOption.VerifyPNReduce);
-			}
-			return result;
-		}
-		
-		public boolean useTimeDartsPTrie() {
-			return verifyTAPNDiscreteVerificationTimeDartPTrie.isSelected();
-		}
-		
-		public boolean useTimeDarts(){
-			return verifyTAPNDiscreteVerificationTimeDart.isSelected();
-		}
-		
-		public boolean usePTrie(){
-			return verifyTAPNDiscreteVerificationPTrie.isSelected();
-		}
-		
-		public boolean isOverwriten(){
-			return !dontOverride.isSelected();
-		}
-		
-		public boolean isDiscreteInclusion(){
-			return verifyTAPNDiscreteInclusion.isSelected();
-		}
-		
-		public void setOverride(boolean override){
-			if(override){
-				this.override.setSelected(true);
-			} else {
-				this.dontOverride.setSelected(true);			
-			}
-		}
-	}
 	private void makeShortcuts(){
         int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         ActionMap am = splitpane.getActionMap();
