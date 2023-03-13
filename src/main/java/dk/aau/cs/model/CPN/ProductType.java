@@ -10,7 +10,8 @@ public class ProductType extends ColorType {
 
     private Vector<ColorType> constituents = new Vector<>();
     private final String name;
-    private final HashMap<Vector<Color>, Color> colorCache = new HashMap<>();
+    private final HashMap<Vector<Color>, Color> colorCache = new HashMap<>(); // FIXME: why does it have color cache, why not use color from Color Type
+    private boolean colorCacheDiry = true;
 
     @Override
     public Integer size() {
@@ -58,7 +59,7 @@ public class ProductType extends ColorType {
 
     //Adding colors to product-types no longer makes sense.
     public void addColor(String colorName) {
-        assert(false);
+        throw new RuntimeException("Can't add color to ProductColorType");
     }
 
     public String toString() {
@@ -111,7 +112,7 @@ public class ProductType extends ColorType {
         //  generate the cartesian product, but failed to do so properly. This is a quick fix to see
         //  if fixing this would solve the problems. I tried to avoid changing anything else since
         //  there is a lot of caching and update errors thats possible with how it works need  -- kyrke 2023-03-13
-        if (getConstituentCombinationSize() != colorCache.size()) {
+        if (colorCacheDiry) {
 
             colorCache.clear();
 
@@ -140,36 +141,9 @@ public class ProductType extends ColorType {
                 colorCache.putIfAbsent(tupleColor, new Color(this, 0, tupleColor));
             }
 
-        }
+            colorCacheDiry = false;
 
-//        if (getConstituentCombinationSize() != colorCache.size()) {
-//
-//            Vector<Vector<Color>> tupleColors = new Vector<>();
-//            for (ColorType ct : constituents) {
-//                if (tupleColors.isEmpty()) {
-//                    for (Color color : ct.getColors()) {
-//                        Vector<Color> tupleColor = new Vector<>();
-//                        tupleColor.add(color);
-//                        tupleColors.add(tupleColor);
-//                    }
-//                } else {
-//                    Vector<Vector<Color>> newTupleColors = new Vector<>();
-//                    for (Color color : ct.getColors()) {
-//                        Vector<Vector<Color>> tupleColorsClone = (Vector<Vector<Color>>) tupleColors.clone();
-//                        for (Vector<Color> tupleColor : tupleColorsClone) {
-//                            tupleColor.add(color);
-//                        }
-//                        newTupleColors.addAll(tupleColorsClone);
-//                    }
-//                    tupleColors = newTupleColors;
-//                }
-//
-//            }
-//
-//            for (Vector<Color> tupleColor : tupleColors) {
-//                colorCache.putIfAbsent(tupleColor, new Color(this, 0, tupleColor));
-//            }
-//        }
+        }
 
         return new Vector<>(colorCache.values());
     }
@@ -191,15 +165,19 @@ public class ProductType extends ColorType {
     }
 
     public Color getColor(Vector<Color> colors) {
-        if (colorCache.size() == 0) { getColors(); } // FIXME hack to generate colors if not done yet
+        if (colorCacheDiry) { getColors(); } // FIXME hack to generate colors if not done yet
         Color result = colorCache.get(colors);
         if (result == null) {
-            throw new RuntimeException("Looking up unknow color" + colors);
+            //throw new RuntimeException("Looking up unknow color" + colors);
+
+            result = new Color(this, 0, colors); // FIXME, wtf? this just seems wrong, need to support .all tokens
+            colorCache.put(colors, result);
+
         }
         return result;
     }
 
-    @Override
+    @Override // FIXME this is wrong, should get first color from color cache
     public Color getFirstColor() {
         Vector<Color> colors = new Vector<>();
         for (ColorType ct : constituents) {
@@ -212,10 +190,12 @@ public class ProductType extends ColorType {
         return constituents;
     }
     public void setConstituents(Vector<ColorType> constituents) {
+        colorCacheDiry = true;
         this.constituents = constituents;
     }
 
     public void replaceColorType(ColorType newColorType, ColorType oldColorType){
+        colorCacheDiry = true;
         for (ColorType ct : constituents){
             if(ct.equals(oldColorType)){
                 int index = constituents.indexOf(ct);
