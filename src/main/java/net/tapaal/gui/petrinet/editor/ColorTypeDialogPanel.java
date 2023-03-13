@@ -17,6 +17,7 @@ import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -86,8 +87,7 @@ public class ColorTypeDialogPanel extends JPanel {
     }
 
     public void showDialog() {
-        dialog = new EscapableDialog(TAPAALGUI.getApp(),
-            "Edit color type", true);
+        dialog = new EscapableDialog(TAPAALGUI.getApp(), "Edit color type", true);
         dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(true);
@@ -100,7 +100,7 @@ public class ColorTypeDialogPanel extends JPanel {
 
     private void initValues() {
         nameTextField.setText(oldName);
-        if (!(oldColorType instanceof ProductType)) { // colortype is always either ProductType or Cyclic
+        if (!(oldColorType instanceof ProductType)) { // Color type is always either ProductType or Cyclic
             if (oldColorType.isIntegerRange()) {
                 colorTypeComboBox.setSelectedIndex(1);
                 for (dk.aau.cs.model.CPN.Color element : oldColorType) {
@@ -533,7 +533,6 @@ public class ColorTypeDialogPanel extends JPanel {
         cyclicListScrollPane.setViewportView(enumList);
         cyclicListScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridheight = 2;
@@ -545,7 +544,6 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.BOTH;
         thirdRow.add(cyclicListScrollPane, gbc);
-
 
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -737,7 +735,9 @@ public class ColorTypeDialogPanel extends JPanel {
                     } else{
                         moveUpButton.setEnabled(false);
                     }
-                    if(source.getSelectedIndex() < source.getModel().getSize()-1){
+
+                    int selectedLength = source.getSelectedIndices().length - 1;
+                    if (source.getSelectedIndices()[selectedLength] < source.getModel().getSize() - 1) {
                         moveDownButton.setEnabled(true);
                     } else{
                         moveDownButton.setEnabled(false);
@@ -765,30 +765,15 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.insets = new Insets(0,3,3,3);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         scrollPanePanel.add(moveUpButton,gbc);
-        moveUpButton.addActionListener(e -> {
-            int index = productColorTypeList.getSelectedIndex();
-            if (index > 0) {
-                productColorTypeList.setSelectedIndex(index-1);
-                swapColors(productModel,index, index -1);
+        moveUpButton.addActionListener(e -> moveColors(true));
 
-            }
-
-        });
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.insets = new Insets(3,3,3,3);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         scrollPanePanel.add(moveDownButton, gbc);
-
-        moveDownButton.addActionListener(e -> {
-            int index = productColorTypeList.getSelectedIndex();
-            if (index < productModel.getSize()-1) {
-                productColorTypeList.setSelectedIndex(index+1);
-                swapColors(productModel,index, index +1);
-
-            }
-        });
+        moveDownButton.addActionListener(e -> moveColors(false));
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -800,6 +785,40 @@ public class ColorTypeDialogPanel extends JPanel {
         productTypePanel.add(scrollPanePanel, gbc);
 
         return productTypePanel;
+    }
+
+    private void moveColors(boolean moveUp) {
+        ArrayList<String> messages = new ArrayList<>();
+        int selectedIndicesLength = productColorTypeList.getSelectedIndices().length == 1 ? 1 : productColorTypeList.getSelectedIndices().length - 1;
+        int firstIndex = productColorTypeList.getSelectedIndex();
+        for (int index : productColorTypeList.getSelectedIndices()) {
+            ArrayList<String> emptyMessages = new ArrayList<>();
+            if (oldColorType == null || network.canColorTypeBeRemoved(oldColorType, emptyMessages)) {
+                if (moveUp && index > 0) {
+                    swapColors(productModel, index, index - 1);
+                } else if (!moveUp && index < productModel.getSize() - selectedIndicesLength) {
+                    swapColors(productModel, firstIndex, index + selectedIndicesLength);
+                }
+            } else if (!emptyMessages.isEmpty()) {
+                messages.addAll(emptyMessages);
+            }
+        }
+        if (!messages.isEmpty()) {
+            String message = "The color type cannot be modified for the following reasons: \n\n";
+            for (String m : messages) {
+                if (!message.contains(m)) message += m;
+            }
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message,
+                "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
+        } else {
+            int[] indices;
+            if (moveUp) {
+                indices = Arrays.stream(productColorTypeList.getSelectedIndices()).map(i -> i - 1).toArray();
+            } else {
+                indices = Arrays.stream(productColorTypeList.getSelectedIndices()).map(i -> i + selectedIndicesLength).toArray();
+            }
+            productColorTypeList.setSelectedIndices(indices);
+        }
     }
 
     private JPanel createProductButtonsPanel() {
