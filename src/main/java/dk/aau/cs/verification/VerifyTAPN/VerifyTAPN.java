@@ -158,59 +158,56 @@ public class VerifyTAPN implements ModelChecker {
 	}
 	
 	public static boolean trySetup() {
+			String verifytapn;
 
-
-			String verifytapn = null;
-
-			//If env is set, it overwrites the value
+			// If env is set, it overwrites the value
 			verifytapn = System.getenv("verifytapn");
 			if (verifytapn != null && !verifytapn.isEmpty()) {
-				if (new File(verifytapn).exists()){
+				if (new File(verifytapn).exists()) {
 					verifytapnpath = verifytapn;
 					VerifyTAPN v = new VerifyTAPN(new FileFinder(), new MessengerImpl());
-					if(v.isCorrectVersion()){
+					if (v.isCorrectVersion()) {
 						return true;
-					}else{
+					} else {
 						verifytapn = null;
 						verifytapnpath = null;
 					}
 				}
 			}
 
-			//If pref is set
+			// If pref is set
 			verifytapn = Preferences.getInstance().getVerifytapnLocation();
 			if (verifytapn != null && !verifytapn.isEmpty()) {
 				verifytapnpath = verifytapn;
 				VerifyTAPN v = new VerifyTAPN(new FileFinder(), new MessengerImpl());
-				if(v.isCorrectVersion()){
+				if (v.isCorrectVersion()) {
 					return true;
-				}else{
+				} else {
 					verifytapn = null;
 					verifytapnpath = null;
 				}
 			}
 
-			//Search the installdir for verifytapn
+			// Search the installdir for verifytapn
 			File installdir = TAPAAL.getInstallDir();
 
 			String[] paths = {"/bin/verifytapn", "/bin/verifytapn64", "/bin/verifytapn.exe", "/bin/verifytapn64.exe"};
 			for (String s : paths) {
 				File verifytapnfile = new File(installdir + s);
 
-				if (verifytapnfile.exists()){
+				if (verifytapnfile.exists()) {
 
 					verifytapnpath = verifytapnfile.getAbsolutePath();
 					VerifyTAPN v = new VerifyTAPN(new FileFinder(), new MessengerImpl());
-					if(v.isCorrectVersion()){
+					if (v.isCorrectVersion()) {
 						return true;
-					}else{
+					} else {
 						verifytapn = null;
 						verifytapnpath = null;
 					}
 
 				}
 			}
-
 			return false;
 
 	}
