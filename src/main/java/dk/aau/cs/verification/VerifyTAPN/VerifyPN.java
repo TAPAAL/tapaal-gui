@@ -222,6 +222,7 @@ public class VerifyPN implements ModelChecker {
         return false;
     }
 
+    @Override
     public VerificationResult<TimedArcPetriNetTrace> verifyManually(String options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception {
         VerifyTAPNExporter exporter;
         if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
@@ -429,23 +430,11 @@ public class VerifyPN implements ModelChecker {
     }
 
     private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-        StringBuilder buffer = new StringBuilder(options.toString());
-        buffer.append(' ');
-        buffer.append(modelFile);
-        buffer.append(' ');
-        buffer.append(queryFile);
-
-        return buffer.toString();
+        return options.toString() + ' ' + modelFile + ' ' + queryFile;
     }
 
     private String createArgumentString(String modelFile, String queryFile, String options) {
-        StringBuilder buffer = new StringBuilder(options.toString());
-        buffer.append(' ');
-        buffer.append(modelFile);
-        buffer.append(' ');
-        buffer.append(queryFile);
-
-        return buffer.toString();
+        return options + ' ' + modelFile + ' ' + queryFile;
     }
 
     private String readOutput(BufferedReader reader) {

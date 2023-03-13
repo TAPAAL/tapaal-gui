@@ -241,7 +241,41 @@ public class VerifyTAPN implements ModelChecker {
 
     @Override
     public VerificationResult<TimedArcPetriNetTrace> verifyManually(String options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception {
-        return null;
+        VerifyTAPNExporter exporter;
+        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+            exporter = new VerifyTACPNExporter();
+        } else {
+            exporter = new VerifyTAPNExporter();
+        }
+        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, lens, model.value2(), null, dataLayerQuery);
+
+        if (exportedModel == null) {
+            messenger.displayErrorMessage("There was an error exporting the model");
+        }
+
+        return verifyManually(options, model, exportedModel, query);
+    }
+
+    private VerificationResult<TimedArcPetriNetTrace> verifyManually(String options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
+        if (exportedModel == null) return null;
+
+        runner = new ProcessRunner(verifytapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
+        runner.run();
+
+        if (runner.error()) {
+            return null;
+        } else {
+            String errorOutput = readOutput(runner.errorOutput());
+            String standardOutput = readOutput(runner.standardOutput());
+
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+
+            if (queryResult == null || queryResult.value1() == null) {
+                return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
+            } else {
+                return new VerificationResult<>(queryResult.value1(), null, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
+            }
+        }
     }
 
     protected void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
@@ -348,14 +382,12 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-		StringBuilder buffer = new StringBuilder(options.toString());
-		buffer.append(' ');
-		buffer.append(modelFile);
-		buffer.append(' ');
-		buffer.append(queryFile);
-
-		return buffer.toString();
+        return options.toString() + ' ' + modelFile + ' ' + queryFile;
 	}
+
+    private String createArgumentString(String modelFile, String queryFile, String options) {
+	    return options + ' ' + modelFile + ' ' + queryFile;
+    }
 	
 	private String readOutput(BufferedReader reader) {
 		try {
@@ -365,14 +397,13 @@ public class VerifyTAPN implements ModelChecker {
 			return "";
 		}
 		StringBuilder buffer = new StringBuilder();
-		String line = null;
+		String line;
 		try {
 			while ((line = reader.readLine()) != null) {
 				buffer.append(line);
 				buffer.append(System.getProperty("line.separator"));
 			}
-		} catch (IOException e) {
-		}
+		} catch (IOException e) { }
 
 		return buffer.toString();
 	}
