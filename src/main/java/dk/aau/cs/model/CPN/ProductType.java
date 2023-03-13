@@ -107,34 +107,69 @@ public class ProductType extends ColorType {
     @Override
     public Vector<Color> getColors(){
 
+        // This is a quick re-implementation of the orginal code, it seems like it was supposed to
+        //  generate the cartesian product, but failed to do so properly. This is a quick fix to see
+        //  if fixing this would solve the problems. I tried to avoid changing anything else since
+        //  there is a lot of caching and update errors thats possible with how it works need  -- kyrke 2023-03-13
         if (getConstituentCombinationSize() != colorCache.size()) {
 
-            Vector<Vector<Color>> tupleColors = new Vector<>();
-            for (ColorType ct : constituents) {
-                if (tupleColors.isEmpty()) {
-                    for (Color color : ct.getColors()) {
-                        Vector<Color> tupleColor = new Vector<>();
-                        tupleColor.add(color);
-                        tupleColors.add(tupleColor);
-                    }
-                } else {
-                    Vector<Vector<Color>> newTupleColors = new Vector<>();
-                    for (Color color : ct.getColors()) {
-                        Vector<Vector<Color>> tupleColorsClone = (Vector<Vector<Color>>) tupleColors.clone();
-                        for (Vector<Color> tupleColor : tupleColorsClone) {
-                            tupleColor.add(color);
-                        }
-                        newTupleColors.addAll(tupleColorsClone);
-                    }
-                    tupleColors = newTupleColors;
-                }
+            colorCache.clear();
 
+            Vector<Vector<Color>> currentProduct = new Vector<>(new Vector<>());
+            Vector<Vector<Color>> newProduct = new Vector<>(new Vector<>());
+            for (var colorType : constituents) {
+                for (var color : colorType.getColors()) {
+                    if (currentProduct.size() == 0) {
+                        var newColor = new Vector<Color>();
+                        newColor.add(color);
+                        newProduct.add(newColor);
+                    } else {
+                        for (Vector<Color> tmpColor : currentProduct) {
+                            var newColor = new Vector<>(tmpColor);
+                            newColor.add(color);
+                            newProduct.add(newColor);
+                        }
+                    }
+
+                }
+                currentProduct = newProduct;
+                newProduct = new Vector<>(new Vector<>());
             }
 
-            for (Vector<Color> tupleColor : tupleColors) {
+            for (Vector<Color> tupleColor : currentProduct) {
                 colorCache.putIfAbsent(tupleColor, new Color(this, 0, tupleColor));
             }
+
         }
+
+//        if (getConstituentCombinationSize() != colorCache.size()) {
+//
+//            Vector<Vector<Color>> tupleColors = new Vector<>();
+//            for (ColorType ct : constituents) {
+//                if (tupleColors.isEmpty()) {
+//                    for (Color color : ct.getColors()) {
+//                        Vector<Color> tupleColor = new Vector<>();
+//                        tupleColor.add(color);
+//                        tupleColors.add(tupleColor);
+//                    }
+//                } else {
+//                    Vector<Vector<Color>> newTupleColors = new Vector<>();
+//                    for (Color color : ct.getColors()) {
+//                        Vector<Vector<Color>> tupleColorsClone = (Vector<Vector<Color>>) tupleColors.clone();
+//                        for (Vector<Color> tupleColor : tupleColorsClone) {
+//                            tupleColor.add(color);
+//                        }
+//                        newTupleColors.addAll(tupleColorsClone);
+//                    }
+//                    tupleColors = newTupleColors;
+//                }
+//
+//            }
+//
+//            for (Vector<Color> tupleColor : tupleColors) {
+//                colorCache.putIfAbsent(tupleColor, new Color(this, 0, tupleColor));
+//            }
+//        }
 
         return new Vector<>(colorCache.values());
     }
@@ -156,10 +191,10 @@ public class ProductType extends ColorType {
     }
 
     public Color getColor(Vector<Color> colors) {
+        if (colorCache.size() == 0) { getColors(); } // FIXME hack to generate colors if not done yet
         Color result = colorCache.get(colors);
         if (result == null) {
-            result = new Color(this, 0, colors);
-            colorCache.put(colors, result);
+            throw new RuntimeException("Looking up unknow color" + colors);
         }
         return result;
     }
