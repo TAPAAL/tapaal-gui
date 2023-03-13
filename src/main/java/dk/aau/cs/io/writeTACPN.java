@@ -27,7 +27,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
     public void appendColoredArcsDependencies(Arc arc, DataLayer guiModel, Document document, Element arcElement) {
         ArcExpression arcExpr = null;
         if (arc instanceof TimedTransportArcComponent) {
-            Transition trans =guiModel.getTransitionByName(arc.getSource().getName());
+            Transition trans = guiModel.getTransitionByName(arc.getSource().getName());
             if (trans != null) { // we check if the source is a valid transition, if it is we know this is an output transport arc and we have to access the second expression
                 arcExpr = ((TimedTransportArcComponent) arc).underlyingTransportArc().getOutputExpression();
             } else {

@@ -319,7 +319,7 @@ public class VerifyTAPN implements ModelChecker {
                 }
 
                 if (tapnTrace == null) {
-                    tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                    tapnTrace = parseTrace(!errorOutput.contains("Trace:") ? errorOutput : (errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
                 }
 				//return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), standardOutput);
 
