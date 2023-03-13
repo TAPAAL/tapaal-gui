@@ -317,7 +317,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("searchOption", "" + query.getSearchOption());
 		queryElement.setAttribute("hashTableSize", "" + query.getHashTableSize());
 		queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
-		queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
+        queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
 		queryElement.setAttribute("symmetry", "" + query.useSymmetry());
 		queryElement.setAttribute("gcd", "" + query.useGCD());
 		queryElement.setAttribute("timeDarts", "" + query.useTimeDarts());
@@ -358,7 +358,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("searchOption", "" + query.getSearchOption());
 		queryElement.setAttribute("hashTableSize", "" + query.getHashTableSize());
 		queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
-		queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
+        queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
+        queryElement.setAttribute("coloredReduction", ""	+ query.useColoredReduction());
 		queryElement.setAttribute("symmetry", "" + query.useSymmetry());
 		queryElement.setAttribute("gcd", "" + query.useGCD());
 		queryElement.setAttribute("timeDarts", "" + query.useTimeDarts());

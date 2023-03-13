@@ -215,7 +215,7 @@ public class TapnXmlLoader {
         }
     }
 
-	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) {
+	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		NodeList sharedPlaceNodes = doc.getElementsByTagName("shared-place");
 
 		for(int i = 0; i < sharedPlaceNodes.getLength(); i++){
@@ -228,7 +228,7 @@ public class TapnXmlLoader {
 		}
 	}
 
-	private SharedPlace parseSharedPlace(Element element, TimedArcPetriNetNetwork network, ConstantStore constants) {
+	private SharedPlace parseSharedPlace(Element element, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		String name = element.getAttribute("name");
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		//int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
@@ -506,7 +506,7 @@ public class TapnXmlLoader {
 		return transitionComponent;
 	}
 
-	private TimedPlaceComponent parsePlace(Element place, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, ConstantStore constants) {
+	private TimedPlaceComponent parsePlace(Element place, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, ConstantStore constants) throws FormatException {
         String placePosX = place.getAttribute("positionX");
         String placePosY = place.getAttribute("positionY");
         String nameOffsetX = place.getAttribute("nameOffsetX");
@@ -559,9 +559,7 @@ public class TapnXmlLoader {
 		}else{
 		    p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants), parsePlaceColorType(place));
 		    tapn.add(p);
-		    if (lens == null || lens.isColored()) {
-                addColoredDependencies(p, place, network, constants);
-            }
+            addColoredDependencies(p, place, network, constants);
 
 		}
 		nameGenerator.updateIndicesForAllModels(nameInput);
@@ -588,7 +586,7 @@ public class TapnXmlLoader {
         return ct;
     }
 
-	private void addColoredDependencies(TimedPlace p, Element place, TimedArcPetriNetNetwork network, ConstantStore constants){
+	private void addColoredDependencies(TimedPlace p, Element place, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
         List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>();
         int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
 
@@ -611,25 +609,22 @@ public class TapnXmlLoader {
         if (hlInitialMarkingNode instanceof Element) {
             try {
                 colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
-            } catch (FormatException e) {
+            } catch (FormatException e) { 
                 e.printStackTrace();
             }
         }
-
 
 	    p.setCtiList(ctiList);
         ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
         if(colorMarking!= null){
             ColorMultiset cm = colorMarking.eval(context);
 
-            p.setTokenExpression(loadTACPN.constructCleanAddExpression(p.getColorType(),cm));
-
+            p.setTokenExpression(colorMarking, loadTACPN.constructCleanAddExpression(p.getColorType(),cm));
 
             for (TimedToken ctElement : cm.getTokens(p)) {
                 network.marking().add(ctElement);
                 //p.addToken(ctElement);
             }
-
         } else {
             for (int i = 0; i < initialMarkingInput; i++) {
                 //Regular tokens will just be dotconstant
@@ -973,8 +968,8 @@ public class TapnXmlLoader {
 						String arcTempType = element.getAttribute("arcPointType");
 						double arcPointX = Double.parseDouble(arcTempX);
 						double arcPointY = Double.parseDouble(arcTempY);
-						arcPointX += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
-						arcPointY += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
+						//arcPointX += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
+						//arcPointY += Constants.ARC_CONTROL_POINT_CONSTANT + 1;
 						boolean arcPointType = Boolean.parseBoolean(arcTempType);
 						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	arcPointType);
 					}
@@ -990,7 +985,7 @@ public class TapnXmlLoader {
 		return new Constant(name, value);
 	}
 
-    private Pair<String, Vector<Color>> parseColorInvariant(Element colorinvariant, TimedArcPetriNetNetwork network)  {
+    private Pair<String, Vector<Color>> parseColorInvariant(Element colorinvariant, TimedArcPetriNetNetwork network) throws FormatException {
         String inscription, colorTypeName;
         Vector<Color> colors = new Vector<Color>();
         Element colorTypeELe = (Element) colorinvariant.getElementsByTagName("colortype").item(0);
@@ -1005,11 +1000,9 @@ public class TapnXmlLoader {
                 colors.add(new Color(ct, 0, colorName));
             }
         } else {
-            try {
-                throw new FormatException("The color type used for an invariant does not exist");
-            } catch (FormatException e) {
-                e.printStackTrace();
-            }
+
+            throw new FormatException("The color type used for an invariant does not exist");
+
         }
 
         Pair<String, Vector<Color>> pair = new Pair<String, Vector<Color>>(inscription, colors);

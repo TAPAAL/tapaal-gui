@@ -1,6 +1,6 @@
 package dk.aau.cs.util;
 
-public class FormatException extends Exception {
+public class FormatException extends RuntimeException {
 
 	public FormatException(String message) {
 		super(message);

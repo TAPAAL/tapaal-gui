@@ -336,6 +336,16 @@ public class RunVerification extends RunVerificationBase {
 		gbc.anchor = GridBagConstraints.WEST;		
 		panel.add(new JLabel(toHTML(result.getResultString())), gbc);
 
+        if (result.getBound() < result.getQueryResult().boundednessAnalysis().usedTokens() &&
+            !result.getQueryResult().toString().toLowerCase().contains("only markings with")) {
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.gridwidth = 2;
+            gbc.anchor = GridBagConstraints.WEST;
+            panel.add(new JLabel("<html><br/><br/>Only markings with at most " + result.getBound() + " tokens were explored<br/><br/></html>"), gbc);
+        }
+
 		// TODO remove this when the engine outputs statistics
 		boolean isCTLQuery = result.getQueryResult().isCTL;
         int rowOffset = 1;
@@ -356,10 +366,16 @@ public class RunVerification extends RunVerificationBase {
                     panel.add(placeStatsButton, gbc);
                 }
             }
+            if (result.getRawOutput() != null) {
+                JButton showRawQueryButton = new JButton("Show raw query results");
+                showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
+                gbc = GridBagHelper.as(1, 5, WEST, new Insets(0,0,10,0));
+                panel.add(showRawQueryButton, gbc);
+            }
 			if(!result.getReductionResultAsString().isEmpty()){
 
                 JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
-				gbc = GridBagHelper.as(0,6, WEST, new Insets(0,0,20,-90));
+				gbc = GridBagHelper.as(0,6, WEST, new Insets(0,0,10,-90));
 				panel.add(reductionStatsLabel, gbc);
 
 				if(result.reductionRulesApplied()){
@@ -405,14 +421,13 @@ public class RunVerification extends RunVerificationBase {
 
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingQuerySimplification() && isCTLQuery){
             rowOffset = displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations(), 1);
+            if (result.getRawOutput() != null) {
+                JButton showRawQueryButton = new JButton("Show raw query results");
+                showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
+                gbc = GridBagHelper.as(1, rowOffset+1, WEST, new Insets(0,0,10,0));
+                panel.add(showRawQueryButton, gbc);
+            }
 		}
-
-        if (result.getRawOutput() != null) {
-            JButton showRawQueryButton = new JButton("Show raw query results");
-            showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
-            gbc = GridBagHelper.as(1, rowOffset+1, WEST, new Insets(0,0,10,0));
-            panel.add(showRawQueryButton, gbc);
-        }
 
         if (result.isResolvedUsingSkeletonPreprocessor()) {
             gbc = GridBagHelper.as(0, rowOffset+2, GridBagHelper.Anchor.WEST, new Insets(0,0,15,0));

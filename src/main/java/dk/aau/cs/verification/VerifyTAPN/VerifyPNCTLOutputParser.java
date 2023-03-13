@@ -13,15 +13,15 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
 	private static final String Query_IS_NOT_SATISFIED_STRING = "Query is NOT satisfied";
 	private static final String Query_IS_SATISFIED_STRING = "Query is satisfied";
 
-    private static final Pattern configurationsPattern = Pattern.compile("\\s*Configurations:\\s*(\\d+)\\s*");
-    private static final Pattern markingsPattern = Pattern.compile("\\s*Markings:\\s*(\\d+)\\s*");
-    private static final Pattern edgesPattern = Pattern.compile("\\t+Edges:\\s*(\\d+)\\s*");
+    private static final Pattern configurationsPattern = Pattern.compile("\\s*Configurations\\s*:\\s*(\\d+)\\s*");
+    private static final Pattern markingsPattern = Pattern.compile("\\s*Markings\\s*:\\s*(\\d+)\\s*");
+    private static final Pattern edgesPattern = Pattern.compile("\\t+Edges\\s*:\\s*(\\d+)\\s*");
 
-    private static final Pattern processedEdgesPattern = Pattern.compile("\\s*Processed Edges:\\s*(\\d+)\\s*");
-    private static final Pattern processedNEdgesPattern = Pattern.compile("\\s*Processed N. Edges:\\s*(\\d+)\\s*");
-    private static final Pattern exploredConfigurationsPattern = Pattern.compile("\\s*Explored Configs:\\s*(\\d+)\\s*");
+    private static final Pattern processedEdgesPattern = Pattern.compile("\\s*Processed Edges\\s*:\\s*(\\d+)\\s*");
+    private static final Pattern processedNEdgesPattern = Pattern.compile("\\s*Processed N. Edges\\s*:\\s*(\\d+)\\s*");
+    private static final Pattern exploredConfigurationsPattern = Pattern.compile("\\s*Explored Configs\\s*:\\s*(\\d+)\\s*");
 
-    private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
+    private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*max tokens:\\s*(:)?\\s*(\\d+)\\s*");
 
 	public VerifyPNCTLOutputParser(int totalTokens, int extraTokens, TAPNQuery queryType) {
         super(totalTokens, extraTokens, queryType);
@@ -78,8 +78,8 @@ public class VerifyPNCTLOutputParser extends VerifyTAPNOutputParser{
 
                     matcher = maxUsedTokensPattern.matcher(line);
                     if(matcher.find()){
-                        maxUsedTokens = Integer.parseInt(matcher.group(1));
-                        String operator = matcher.group(1) == null ? "" : matcher.group(1);
+                        maxUsedTokens = Integer.parseInt(matcher.group(2));
+                        String operator = matcher.group(2) == null ? "" : matcher.group(2);
                         if(operator.equals(">")) maxUsedTokens += 1; // Indicate non-k-boundedness by encoding that an extra token was used.
                     }
                 }

@@ -188,6 +188,7 @@ public class QueryDialog extends JPanel {
     private JCheckBox useSiphonTrap;
     private JCheckBox useQueryReduction;
     private JCheckBox useReduction;
+    private JCheckBox useColoredReduction;
 	private JCheckBox useStubbornReduction;
     private JCheckBox useTraceRefinement;
     private JCheckBox useTarjan;
@@ -289,7 +290,8 @@ public class QueryDialog extends JPanel {
 
     //Tool tips for logic panel
 	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently selected part of the query with a conjunction.";
-	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently selected part of the query.";
+	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";
+	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently selected part of the query.";
 
 	//Tool tips for query panel
 	private static final String TOOL_TIP_PLACESBOX = "Choose a place for the predicate.";
@@ -326,6 +328,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_GCD = "Calculate greatest common divisor to minimize constants in the model";
 	private final static String TOOL_TIP_OVERAPPROX = "Run linear over-approximation check for EF and AG queries";	// TODO: write tooltip
     private final static String TOOL_TIP_USE_STRUCTURALREDUCTION = "Apply structural reductions to reduce the size of the net.";
+    private final static String TOOL_TIP_USE_COLORED_STRUCTURALREDUCTION = "Apply colored structural reductions to reduce the size of the net.";
     private final static String TOOL_TIP_USE_SIPHONTRAP = "For a deadlock query, attempt to prove deadlock-freedom by using siphon-trap analysis via linear programming.";
     private final static String TOOL_TIP_USE_QUERY_REDUCTION = "Use query rewriting rules and linear programming (state equations) to reduce the size of the query.";
     private final static String TOOL_TIP_USE_TRACE_REFINEMENT = "Enables Trace Abstraction Refinement for reachability properties";
@@ -338,7 +341,8 @@ public class QueryDialog extends JPanel {
 
     //Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuristic method in state space exploration.<br />" +
-			"If heuristic search is not applicable, BFS is used instead.<br/>Click the button <em>Help on the query options</em> to get more info.</html>";
+			"If heuristic search is not applicable, BFS is used instead.<br/>For reachability queries, uses an improved heuristic search with randomness.<br/>" +
+            "Click the button <em>Help on the query options</em> to get more info.</html>";
 	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
 	private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
 	private final static String TOOL_TIP_RANDOM_SEARCH = "Performs a random exploration of the state space.";
@@ -430,28 +434,29 @@ public class QueryDialog extends JPanel {
 		boolean reduction = useReduction.isSelected();
 
 		TAPNQuery query = new TAPNQuery(
-				name,
-				capacity,
-				newProperty.copy(),
-				traceOption,
-				searchOption,
-				reductionOptionToSet,
-				symmetry,
-				gcd,
-				timeDarts,
-				pTrie,
-				overApproximation,
-				reduction,
-				/* hashTableSizeToSet */ null,
-				/* extrapolationOptionToSet */null,
-				inclusionPlaces,
-				overApproximationEnable.isSelected(),
-				underApproximationEnable.isSelected(),
-				(Integer) overApproximationDenominator.getValue(),
-                false,   //usePartitioning.isSelected(),
-                false,   //useColorFixpoint.isSelected(),
-                false,   //useSymmetricVars.isSelected()
-                lens.isColored()
+            name,
+            capacity,
+            newProperty.copy(),
+            traceOption,
+            searchOption,
+            reductionOptionToSet,
+            symmetry,
+            gcd,
+            timeDarts,
+            pTrie,
+            overApproximation,
+            reduction,
+            /* hashTableSizeToSet */ null,
+            /* extrapolationOptionToSet */null,
+            inclusionPlaces,
+            overApproximationEnable.isSelected(),
+            underApproximationEnable.isSelected(),
+            (Integer) overApproximationDenominator.getValue(),
+            false,   //usePartitioning.isSelected(),
+            false,   //useColorFixpoint.isSelected(),
+            false,   //useSymmetricVars.isSelected()
+            lens.isColored(),
+            false
 		);
 
 		query.setUseStubbornReduction(useStubbornReduction.isSelected());
@@ -464,6 +469,7 @@ public class QueryDialog extends JPanel {
 
     private TAPNQuery getUntimedQuery(String name, int capacity, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOptionToSet) {
         boolean reduction = useReduction.isSelected();
+        boolean coloredReduction = useColoredReduction.isSelected();
 
         TAPNQuery query = new TAPNQuery(
             name,
@@ -487,7 +493,8 @@ public class QueryDialog extends JPanel {
             lens.isColored()? usePartitioning.isSelected(): false,
             lens.isColored()? useColorFixpoint.isSelected() : false,
             lens.isColored()? useSymmetricvars.isSelected() : false,
-            lens.isColored()
+            lens.isColored(),
+            coloredReduction
         );
         if (queryType.getSelectedIndex() == 1) {
             query.setCategory(TAPNQuery.QueryCategory.LTL);
@@ -528,16 +535,19 @@ public class QueryDialog extends JPanel {
 			return SearchOption.DEFAULT;
 		}
 
-		if(depthFirstSearch.isSelected())
-			return SearchOption.DFS;
-		else if(randomSearch.isSelected())
-			return SearchOption.RANDOM;
-		else if(heuristicSearch.isSelected())
-			return SearchOption.HEURISTIC;
-		else if(breadthFirstSearch.isSelected())
-			return SearchOption.BFS;
-		else
-			return SearchOption.DEFAULT;
+        if (depthFirstSearch.isSelected()) {
+            return SearchOption.DFS;
+        } else if (randomSearch.isSelected()) {
+            return SearchOption.RANDOM;
+        } else if (heuristicSearch.isSelected()) {
+            if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery())
+                return SearchOption.RANDOMHEURISTIC;
+            return SearchOption.HEURISTIC;
+        } else if (breadthFirstSearch.isSelected()) {
+            return SearchOption.BFS;
+        } else {
+            return SearchOption.DEFAULT;
+        }
 	}
 
 	private ReductionOption getReductionOption() {
@@ -769,7 +779,7 @@ public class QueryDialog extends JPanel {
         if (current instanceof LTLANode || current instanceof LTLENode ||
             (queryType.getSelectedIndex() == 1 && current instanceof TCTLPathPlaceHolder)) {
             negationButton.setEnabled(false);
-        } else {
+        } else if (!lens.isGame()) {
             negationButton.setEnabled(true);
         }
 	}
@@ -847,7 +857,7 @@ public class QueryDialog extends JPanel {
 			}
 			if (replacement != null) {
 				UndoableEdit edit = new QueryConstructionEdit(selection, replacement);
-				newProperty = newProperty.replace(selection,	replacement);
+				newProperty = newProperty.replace(selection, replacement);
 
 				if (selection instanceof TCTLAbstractPathProperty)
 					resetQuantifierSelectionButtons();
@@ -986,15 +996,15 @@ public class QueryDialog extends JPanel {
 			return;
 		}
 
-		JRadioButton currentselected;
+		JRadioButton currentSelected;
 		if(heuristicSearch.isSelected()){
-			currentselected = heuristicSearch;
+			currentSelected = heuristicSearch;
 		}else if(breadthFirstSearch.isSelected()){
-			currentselected = breadthFirstSearch;
+			currentSelected = breadthFirstSearch;
 		}else if(depthFirstSearch.isSelected()){
-			currentselected = depthFirstSearch;
+			currentSelected = depthFirstSearch;
 		}else{
-			currentselected = randomSearch;
+			currentSelected = randomSearch;
 		}
 
 		if (fastestTraceRadioButton.isSelected()) {
@@ -1032,14 +1042,24 @@ public class QueryDialog extends JPanel {
 			}
 		}
 
-		if(!currentselected.isEnabled()){
-			if(heuristicSearch.isEnabled()){
+		if (!currentSelected.isEnabled()) {
+			if (heuristicSearch.isEnabled()) {
 				heuristicSearch.setSelected(true);
 			} else {
 				depthFirstSearch.setSelected(true);
 			}
 		}
-	}
+
+		if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery()) {
+		    heuristicSearch.setText("Random heuristic    ");
+        } else {
+            heuristicSearch.setText("Heuristic    ");
+        }
+    }
+
+	private boolean isReachabilityQuery() {
+	    return !newProperty.hasNestedPathQuantifiers() && (newProperty instanceof TCTLAGNode || newProperty instanceof TCTLEFNode);
+    }
 
 	private void disableAllQueryButtons() {
 		existsBox.setEnabled(false);
@@ -1414,6 +1434,7 @@ public class QueryDialog extends JPanel {
         useReduction.setSelected(queryToCreateFrom.useReduction());
         useTraceRefinement.setSelected(queryToCreateFrom.isTarOptionEnabled());
         useTarjan.setSelected(queryToCreateFrom.isTarjan());
+        useColoredReduction.setSelected(queryToCreateFrom.useColoredReduction());
     }
 
     private void setupUnfoldingOptionsFromQuery(TAPNQuery queryToCreateFrom){
@@ -3083,7 +3104,6 @@ public class QueryDialog extends JPanel {
 	}
 
     private void initVerificationPanel() {
-
         verificationPanel = new JPanel(new GridBagLayout());
 
         initReductionOptionsPanel();
@@ -3098,7 +3118,6 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.insets = new Insets(5,10,5,10);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         add(verificationPanel, gridBagConstraints);
-
     }
 
 	private void initSearchOptionsPanel() {
@@ -3107,10 +3126,10 @@ public class QueryDialog extends JPanel {
 
 		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy Options"));
 		searchRadioButtonGroup = new ButtonGroup();
-		breadthFirstSearch = new JRadioButton("Breadth first search    ");
-		depthFirstSearch = new JRadioButton("Depth first search    ");
-		randomSearch = new JRadioButton("Random search    ");
-		heuristicSearch = new JRadioButton("Heuristic search    ");
+		breadthFirstSearch = new JRadioButton("Breadth first    ");
+		depthFirstSearch = new JRadioButton("Depth first    ");
+		randomSearch = new JRadioButton("Random    ");
+        heuristicSearch = new JRadioButton("Heuristic    ");
 
 		breadthFirstSearch.setToolTipText(TOOL_TIP_BREADTH_FIRST_SEARCH);
 		depthFirstSearch.setToolTipText(TOOL_TIP_DEPTH_FIRST_SEARCH);
@@ -3330,7 +3349,8 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(reductionOption, gbc);
 
-        useReduction = new JCheckBox("Apply net reductions");
+        useReduction = new JCheckBox("Use net reductions");
+        useColoredReduction = new JCheckBox("Use colored net reductions");
         useSiphonTrap = new JCheckBox("Use siphon-trap analysis");
         useQueryReduction = new JCheckBox("Use query reduction");
         useStubbornReduction = new JCheckBox("Use stubborn reduction");
@@ -3345,6 +3365,7 @@ public class QueryDialog extends JPanel {
         useTarjan = new JCheckBox("Use Tarjan");
 
         useReduction.setSelected(true);
+        useColoredReduction.setSelected(true);
         useSiphonTrap.setSelected(false);
         useQueryReduction.setSelected(true);
         useStubbornReduction.setSelected(true);
@@ -3359,6 +3380,7 @@ public class QueryDialog extends JPanel {
         useTarjan.setSelected(true);
 
         useReduction.setToolTipText(TOOL_TIP_USE_STRUCTURALREDUCTION);
+        useColoredReduction.setToolTipText(TOOL_TIP_USE_COLORED_STRUCTURALREDUCTION);
         useSiphonTrap.setToolTipText(TOOL_TIP_USE_SIPHONTRAP);
         useQueryReduction.setToolTipText(TOOL_TIP_USE_QUERY_REDUCTION);
         useStubbornReduction.setToolTipText(TOOL_TIP_STUBBORN_REDUCTION);
@@ -3439,7 +3461,7 @@ public class QueryDialog extends JPanel {
         reductionOptionsPanel.add(useReduction, gbc);
         gbc.gridx = 0;
         gbc.gridy = 2;
-        reductionOptionsPanel.add(useSiphonTrap, gbc);
+        reductionOptionsPanel.add(useColoredReduction, gbc);
         gbc.gridx = 0;
         gbc.gridy = 3;
         reductionOptionsPanel.add(useQueryReduction, gbc);
@@ -3449,6 +3471,9 @@ public class QueryDialog extends JPanel {
         gbc.gridx = 1;
         gbc.gridy = 2;
         reductionOptionsPanel.add(useTraceRefinement, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        reductionOptionsPanel.add(useSiphonTrap, gbc);
         gbc.gridx = 3;
         gbc.gridy = 1;
         reductionOptionsPanel.add(useTarjan, gbc);
@@ -3466,6 +3491,7 @@ public class QueryDialog extends JPanel {
         } else if (!lens.isTimed()) {
             refreshTraceRefinement();
             refreshTarjan();
+            refreshColoredReduction();
         }
 		updateSearchStrategies();
 		refreshExportButtonText();
@@ -3473,12 +3499,14 @@ public class QueryDialog extends JPanel {
 
 	private void refreshTraceRefinement() {
 	    ReductionOption reduction = getReductionOption();
-	    useTraceRefinement.setEnabled(false);
 
-	    if (queryType.getSelectedIndex() != 1 && reduction != null && reduction.equals(ReductionOption.VerifyPN) &&
+        if (queryType.getSelectedIndex() != 1 && !lens.isGame() &&
+            reduction != null && reduction.equals(ReductionOption.VerifyPN) &&
             (newProperty.toString().startsWith("AG") || newProperty.toString().startsWith("EF")) &&
             !hasInhibitorArcs && !newProperty.hasNestedPathQuantifiers()) {
 	        useTraceRefinement.setEnabled(true);
+        } else {
+            useTraceRefinement.setEnabled(false);
         }
     }
 
@@ -3487,6 +3515,16 @@ public class QueryDialog extends JPanel {
             useTarjan.setVisible(true);
         } else {
             useTarjan.setVisible(false);
+        }
+    }
+
+    private void refreshColoredReduction() {
+	    useColoredReduction.setEnabled(someTraceRadioButton.isSelected());
+	    if (someTraceRadioButton.isSelected() || lens.isGame()) {
+	        useColoredReduction.setEnabled(false);
+	        useColoredReduction.setSelected(false);
+        } else {
+	        useColoredReduction.setEnabled(true);
         }
     }
 

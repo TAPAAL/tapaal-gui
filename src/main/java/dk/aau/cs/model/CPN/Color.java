@@ -134,4 +134,11 @@ public class Color {
         }
         return new Color(colorType.copy(), id, colors);
     }
+
+    public Color getExprWithNewColorType(ColorType ct) {
+        if (colorType.getName().equals(ct.getName())) {
+            return new Color(ct, id, tuple, colorName);
+        }
+        return this;
+    }
 }

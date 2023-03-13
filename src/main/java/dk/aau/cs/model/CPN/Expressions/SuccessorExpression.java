@@ -117,4 +117,9 @@ public class SuccessorExpression extends ColorExpression {
     public Vector<ColorType> getColorTypes() {
         return color.getColorTypes();
     }
+
+    @Override
+    public ColorExpression getExprWithNewColorType(ColorType ct) {
+        return new SuccessorExpression(color.getExprWithNewColorType(ct));
+    }
 }

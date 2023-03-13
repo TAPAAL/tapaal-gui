@@ -31,4 +31,10 @@ public class Variable {
         return "<html>" + name + "<b> in </b>" + colorType.getName() + "</html>";
     }
 
+    public Variable getExprWithNewColorType(ColorType ct) {
+        if (colorType.getName().equals(ct.getName())) {
+            return new Variable(name, id, ct);
+        }
+        return this;
+    }
 }

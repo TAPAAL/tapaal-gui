@@ -175,20 +175,25 @@ public class CTLQueryVisitor extends VisitorBase {
     }
 
     public void visit(TCTLTermListNode termListNode, Object context) {
-        assert termListNode.getProperties().get(1) instanceof AritmeticOperator;
-        AritmeticOperator operator = (AritmeticOperator) termListNode.getProperties().get(1);
-        String op = operator.toString();
-        switch (op) {
-            case "+":
-                createList(termListNode.getProperties(), context, XML_INTEGERSUM);
-                break;
-            case "*":
-                createList(termListNode.getProperties(), context, XML_INTEGERPRODUCT);
-                break;
-            case "-":
-                createList(termListNode.getProperties(), context, XML_INTEGERDIFFERENCE);
-                break;
+        if (termListNode.getProperties().size() > 1) {
+            assert termListNode.getProperties().get(1) instanceof AritmeticOperator;
+            AritmeticOperator operator = (AritmeticOperator) termListNode.getProperties().get(1);
+            String op = operator.toString();
+            switch (op) {
+                case "+":
+                    createList(termListNode.getProperties(), context, XML_INTEGERSUM);
+                    break;
+                case "*":
+                    createList(termListNode.getProperties(), context, XML_INTEGERPRODUCT);
+                    break;
+                case "-":
+                    createList(termListNode.getProperties(), context, XML_INTEGERDIFFERENCE);
+                    break;
+            }
+        } else {
+            termListNode.getProperties().get(0).accept(this, context);
         }
+
     }
 
     private void createList(List<TCTLAbstractStateProperty> properties, Object context, String seperator) {

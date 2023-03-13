@@ -7,9 +7,7 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 public class NumberOfExpression extends ArcExpression {
     private Integer number;
@@ -60,7 +58,7 @@ public class NumberOfExpression extends ArcExpression {
         Vector<Color> colors = new Vector<>();
         ColorType ct = null;
         for (ColorExpression ce : color) {
-            if(ce instanceof AllExpression){
+            if (ce instanceof AllExpression) {
                 if (ct == null) {
                     ct = ((AllExpression) ce).getSort();
                 } else {
@@ -75,7 +73,7 @@ public class NumberOfExpression extends ArcExpression {
             }
             colors.addAll(c);
         }
-        return new ColorMultiset(ct, number, colors);
+        return new ColorMultiset(ct, number, colors, color);
     }
 
     public Integer weight() {
@@ -177,5 +175,18 @@ public class NumberOfExpression extends ArcExpression {
 
     public void setNumber(int newNumber){
         number = newNumber;
+    }
+
+    @Override
+    public ArcExpression getExprWithNewColorType(ColorType ct) {
+        Vector<ColorExpression> colorExpressions = new Vector<>();
+        ColorExpression colorExpression = color.get(0);
+
+        if (colorExpression.colorType == null || colorExpression.colorType.getName().equals(ct.getName())) {
+            colorExpressions.add(colorExpression.getExprWithNewColorType(ct));
+        } else {
+            colorExpressions.add(colorExpression);
+        }
+        return new NumberOfExpression(number, colorExpressions);
     }
 }

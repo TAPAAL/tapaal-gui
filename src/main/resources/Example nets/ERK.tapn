@@ -108,9 +108,9 @@
       <arcpath arcPointType="false" id="1" xCoord="469" yCoord="254"/>
     </arc>
     <arc id="A37" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r5" target="Raf1Star" type="normal" weight="1">
-      <arcpath arcPointType="false" id="0" xCoord="459" yCoord="525"/>
-      <arcpath arcPointType="false" id="1" xCoord="395" yCoord="529"/>
-      <arcpath arcPointType="false" id="2" xCoord="390" yCoord="104"/>
+      <arcpath arcPointType="false" id="0" xCoord="460" yCoord="520"/>
+      <arcpath arcPointType="false" id="1" xCoord="390" yCoord="520"/>
+      <arcpath arcPointType="false" id="2" xCoord="390" yCoord="105"/>
     </arc>
     <arc id="A38" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r10" target="RP" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="704" yCoord="424"/>
@@ -130,8 +130,8 @@
     </arc>
     <arc id="A43" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r8" target="MEKPP" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="219" yCoord="330"/>
-      <arcpath arcPointType="false" id="1" xCoord="136" yCoord="334"/>
-      <arcpath arcPointType="false" id="2" xCoord="135" yCoord="600"/>
+      <arcpath arcPointType="false" id="1" xCoord="136" yCoord="330"/>
+      <arcpath arcPointType="false" id="2" xCoord="136" yCoord="600"/>
     </arc>
     <arc id="A44" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="MEKPP_ERK" target="r8" type="timed" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="225" yCoord="405"/>
@@ -147,26 +147,26 @@
     </arc>
     <arc id="A33" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r11" target="RP" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="679" yCoord="240"/>
-      <arcpath arcPointType="false" id="1" xCoord="771" yCoord="242"/>
+      <arcpath arcPointType="false" id="1" xCoord="765" yCoord="240"/>
       <arcpath arcPointType="false" id="2" xCoord="765" yCoord="510"/>
     </arc>
     <arc id="A43" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r11" target="RKIP" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="675" yCoord="225"/>
-      <arcpath arcPointType="false" id="1" xCoord="680" yCoord="92"/>
+      <arcpath arcPointType="false" id="1" xCoord="675" yCoord="90"/>
       <arcpath arcPointType="false" id="2" xCoord="569" yCoord="90"/>
     </arc>
     <arc id="A34" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="ERKPP" target="r3" type="timed" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="237" yCoord="248"/>
-      <arcpath arcPointType="false" id="1" xCoord="365" yCoord="336"/>
+      <arcpath arcPointType="false" id="1" xCoord="365" yCoord="329"/>
       <arcpath arcPointType="false" id="2" xCoord="420" yCoord="329"/>
     </arc>
     <arc id="A44" inscription="1" nameOffsetX="0" nameOffsetY="0" source="r4" target="ERKPP" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="494" yCoord="324"/>
-      <arcpath arcPointType="false" id="1" xCoord="363" yCoord="246"/>
+      <arcpath arcPointType="false" id="1" xCoord="363" yCoord="240"/>
       <arcpath arcPointType="false" id="2" xCoord="239" yCoord="240"/>
     </arc>
   </net>
-  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Absence of deadlock" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="HEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Absence of deadlock" overApproximation="false" pTrie="false" reduction="true" reductionOption="VerifyPN" searchOption="RANDOMHEURISTIC" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="true">
     <formula>
             
       <all-paths>

@@ -402,7 +402,9 @@ public class VerifyPN implements ModelChecker {
                     trace = trace.split("(?<=</trace>)")[0];
                     tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
                 } else {
-                    tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+                    String trace = "Trace\n";
+                    trace += errorOutput;
+                    tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
                 }
             } else {
                 tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
@@ -468,7 +470,7 @@ public class VerifyPN implements ModelChecker {
     }
 
     private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query) {
-        Tuple<QueryResult, Stats> result = null;
+        Tuple<QueryResult, Stats> result;
         if (output.contains("Processed N. Edges:")) {
             VerifyPNCTLOutputParser outputParser = new VerifyPNCTLOutputParser(totalTokens, extraTokens, query);
             result = outputParser.parseOutput(output);

@@ -8,8 +8,10 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class LoadTACPN { //the import feature for CPN and load for TACPN share similarities. These similarities are shared here. Feel free to find a better name for this class
 
@@ -17,6 +19,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
     private final HashMap<String, Variable> variables = new HashMap<>();
     private final HashMap<String, ColorExpression> tupleVarExpressions = new HashMap<>();
     private final Collection<String> messages = new ArrayList<>(10);
+    private final Collection<Node> productTypes = new ArrayList<>();
 
     public HashMap<String, ColorType> getColortypes() {
         return colortypes;
@@ -43,28 +46,71 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         return node.getAttributes().getNamedItem(attribute);
     }
 
-    public void parseDeclarations(Node node, TimedArcPetriNetNetwork network) throws FormatException {
-        if(!(node instanceof Element)){
-            return;
+    private Element expectElementTagOrEmpty(String tag, Node node) throws FormatException {
+        if (node == null) {
+            return null;
         }
-        Node child = skipWS(node.getFirstChild());
-        while(child != null){
-            String childName = child.getNodeName();
-            if (childName.equals("namedsort")){
-                parseNamedSort(child, network);
-            } else if (childName.equals("variabledecl")){
-                String id = getAttribute(child, "id").getNodeValue();
-                String name = getAttribute(child, "name").getNodeValue();
-                ColorType ct = parseUserSort(child);
-                Variable var = new Variable(name, id, ct);
-                Require.that(variables.put(id, var) == null, "the id " + id + ", was already used");
-                network.add(var);
-            } else {
-                parseDeclarations(child, network);
-            }
 
-            child = skipWS(child.getNextSibling());
+        if (!(node instanceof Element) || !node.getNodeName().equals(tag)) {
+            throw new FormatException("Unexpected node, expected " + tag + " got " + node.getNodeName());
         }
+        return (Element)node;
+    }
+
+    private void forEachElementInNodeList(NodeList list, Consumer<Element> function) {
+        for (int i = 0; i < list.getLength(); i++) {
+            var node = list.item(i);
+            if (node instanceof Element) {
+              var el = ((Element) node);
+              function.accept(el);
+            }
+        }
+    }
+
+    public void parseDeclarations(Node node, TimedArcPetriNetNetwork network) throws FormatException {
+        var declaration = expectElementTagOrEmpty("declaration", node);
+        var structure = expectElementTagOrEmpty("structure", skipWS(declaration.getFirstChild()));
+        var declarations = expectElementTagOrEmpty("declarations", skipWS(structure.getFirstChild()));
+
+        var namedSorts = declarations.getElementsByTagName("namedsort");
+
+        forEachElementInNodeList(namedSorts, element -> {
+            parseNamedSort(element, network);
+        });
+
+        // Handle product colors after all other color types are parsed.
+        for (Node n : productTypes) {
+            var type = skipWS(n.getFirstChild());
+            String typeTag = type.getNodeName();
+            if (!typeTag.equals("productsort")) throw new FormatException("Expected productsort type got: " + typeTag);
+            String name = getAttribute(n, "name").getNodeValue();
+            String id = getAttribute(n, "id").getNodeValue();
+
+            ProductType pt = new ProductType(name);
+            Node typechild = skipWS(type.getFirstChild());
+            while (typechild != null) {
+                if (typechild.getNodeName().equals("usersort")) {
+                    String constituent = getAttribute(typechild, "declaration").getNodeValue();
+                    pt.addType(colortypes.get(constituent));
+                }
+                typechild = skipWS(typechild.getNextSibling());
+            }
+            Require.that(colortypes.put(id, pt) == null, "the name " + id + ", was already used");
+            network.add(pt);
+        }
+        productTypes.clear();
+
+        // Variables can only be handled after all color types are parsed
+        var variabledecl = declarations.getElementsByTagName("variabledecl");
+        forEachElementInNodeList(variabledecl, element -> {
+            String id = getAttribute(element, "id").getNodeValue();
+            String name = getAttribute(element, "name").getNodeValue();
+            ColorType ct = parseUserSort(element);
+            Variable var = new Variable(name, id, ct);
+            Require.that(variables.put(id, var) == null, "the id " + id + ", was already used");
+            network.add(var);
+        });
+
         Vector<String> variablesForRemoval = new Vector<>();
         HashMap<String, Variable> newVars = new HashMap<>();
         StringBuilder renameWarnings = new StringBuilder();
@@ -122,17 +168,8 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         String id = getAttribute(node, "id").getNodeValue();
 
         if (typetag.equals("productsort")) {
-            ProductType pt = new ProductType(name);
-            Node typechild = skipWS(type.getFirstChild());
-            while (typechild != null) {
-                if (typechild.getNodeName().equals("usersort")) {
-                    String constituent = getAttribute(typechild, "declaration").getNodeValue();
-                    pt.addType(colortypes.get(constituent));
-                }
-                typechild = skipWS(typechild.getNextSibling());
-            }
-            Require.that(colortypes.put(id, pt) == null, "the name " + id + ", was already used");
-            network.add(pt);
+            // Parse prodcut types last as they can used color types not yet declared
+            productTypes.add(node);
         } else {
             ColorType ct = new ColorType(name, id);
             if (typetag.equals("dot")) {

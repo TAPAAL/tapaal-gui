@@ -243,7 +243,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 			if (result == null) return;
 			if (showResult(result) && spinner != null) {
-			    options = new VerifyPNOptions(options.extraTokens(), net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.Default, net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime.NoTime, false, null, false, false, false, false, false, false, false);
+			    options = new VerifyPNOptions(options.extraTokens(), net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.CTL, net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime.NoTime, false, null, false, false, false, false, false, false, false);
                 // XXX: needs refactoring, will only work if the model verified in the one on top (using getCurrentTab)
                 KBoundAnalyzer optimizer = new KBoundAnalyzer(model, TAPAALGUI.getCurrentTab().lens, guiModels, options.extraTokens(), modelChecker, new MessengerImpl(), spinner);
                 optimizer.analyze((VerifyTAPNOptions) options, true);

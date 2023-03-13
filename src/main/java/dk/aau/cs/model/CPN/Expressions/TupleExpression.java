@@ -52,9 +52,10 @@ public class TupleExpression extends ColorExpression {
         if (tuple != null && tuple.size() == colors.size()) {
             containsColor = true;
             for (int i = 0; i < tuple.size(); i++) {
-                if (!colors.get(i).containsColor(tuple.get(i)))
+                if (!colors.get(i).containsColor(tuple.get(i))) {
                     containsColor = false;
                     break;
+                }
             }
         }
         return containsColor || equals(color);
@@ -252,5 +253,17 @@ public class TupleExpression extends ColorExpression {
             constituentColorTypes.addAll(uexpr.getColorTypes());
         }
         return constituentColorTypes;
+    }
+
+    public TupleExpression getExprWithNewColorType(ColorType ct) {
+        Vector<ColorExpression> colorExpressions = new Vector<>();
+        for (ColorExpression colorExpression : colors) {
+            if (colorExpression.colorType.getName().equals(ct.getName())) {
+                colorExpressions.add(colorExpression.getExprWithNewColorType(ct));
+            } else {
+                colorExpressions.add(colorExpression);
+            }
+        }
+        return new TupleExpression(colorExpressions, ct);
     }
 }

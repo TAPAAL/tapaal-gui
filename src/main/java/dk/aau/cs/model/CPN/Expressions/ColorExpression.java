@@ -60,4 +60,6 @@ public abstract class ColorExpression extends Expression {
     public int getIndex(){
         return index;
     }
+
+    public abstract ColorExpression getExprWithNewColorType(ColorType ct);
 }

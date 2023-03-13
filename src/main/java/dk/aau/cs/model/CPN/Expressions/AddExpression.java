@@ -2,26 +2,36 @@ package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.util.Require;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 public class AddExpression extends ArcExpression {
 
     private final Vector<ArcExpression> constituents;
 
     public AddExpression(Vector<ArcExpression> constituents) {
+        Require.notNull(constituents);
+        Require.that(constituents.size() > 0, "Constituents can't be empty");
+        Require.notNull(constituents, "Constituents can not container null");
         this.constituents = constituents;
     }
 
     public AddExpression(AddExpression otherExpr)  {
         super(otherExpr);
+        var constituents = otherExpr.constituents;
+        Require.notNull(constituents);
+        Require.that(constituents.size() > 0, "Constituents can't be empty");
+        Require.notNull(constituents, "Constituents can not container null");
         this.constituents = new Vector<>(otherExpr.constituents);
     }
-
 
     public Vector<ArcExpression> getAddExpression (){return constituents;}
 
@@ -33,7 +43,11 @@ public class AddExpression extends ArcExpression {
                 result = constituent.eval(context);
             } else {
                 ColorMultiset cm = constituent.eval(context);
-                result.addAll(cm);
+                if (constituent instanceof NumberOfExpression) {
+                    result.addAll(cm, ((NumberOfExpression) constituent).getColor(), ((NumberOfExpression) constituent).getNumber());
+                } else {
+                    result.addAll(cm, null, 1);
+                }
             }
         }
         assert(result != null);
@@ -52,6 +66,7 @@ public class AddExpression extends ArcExpression {
     public ArcExpression replace(Expression object1, Expression object2){
         return replace(object1,object2,false);
     }
+
     @Override
     public ArcExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
         if (object1 == this && object2 instanceof ArcExpression) {
@@ -168,6 +183,7 @@ public class AddExpression extends ArcExpression {
     }
 
     public String toString() {
+
         StringBuilder res = new StringBuilder("(" + constituents.get(0).toString());
         for (int i = 1; i < constituents.size(); ++i) {
             res.append(" + ").append(constituents.get(i).toString());
@@ -181,5 +197,13 @@ public class AddExpression extends ArcExpression {
             res.append(constituent.toString()).append("\n");
         }
         return res.toString();
+    }
+
+    public AddExpression getExprWithNewColorType(ColorType ct) {
+        Vector<ArcExpression> arcExpressions = new Vector<>();
+        for (ArcExpression expr : constituents) {
+            arcExpressions.add(expr.getExprWithNewColorType(ct));
+        }
+        return new AddExpression(arcExpressions);
     }
 }

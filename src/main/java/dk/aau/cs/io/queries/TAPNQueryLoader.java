@@ -57,7 +57,8 @@ public class TAPNQueryLoader extends QueryLoader{
 		SearchOption searchOption = getQuerySearchOption(queryElement);
 		HashTableSize hashTableSize = getQueryHashTableSize(queryElement);
 		ExtrapolationOption extrapolationOption = getQueryExtrapolationOption(queryElement);
-		ReductionOption reductionOption = getQueryReductionOption(queryElement);
+        ReductionOption reductionOption = getQueryReductionOption(queryElement);
+        boolean coloredReduction = getColoredReductionOption(queryElement);
 		int capacity = Integer.parseInt(queryElement.getAttribute("capacity"));
 		boolean symmetry = getReductionOption(queryElement, "symmetry", true);
 		boolean gcd = getReductionOption(queryElement, "gcd", true);
@@ -94,7 +95,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		}
 
 		if (query != null) {
-			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator, partitioning, colorFixpoint, symmetricVars, network.isColored());
+			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator, partitioning, colorFixpoint, symmetricVars, network.isColored(), coloredReduction);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			parsedQuery.setCategory(detectCategory(query, isCTL, isLTL));
@@ -350,6 +351,16 @@ public class TAPNQueryLoader extends QueryLoader{
 		}
 		return reductionOption;
 	}
+
+    private boolean getColoredReductionOption(Element queryElement) {
+        boolean coloredReduction;
+        try {
+            coloredReduction = queryElement.getAttribute("coloredReduction").equals("true");
+        } catch(Exception e) {
+            coloredReduction = false;
+        }
+        return coloredReduction;
+    }
 
 	private ExtrapolationOption getQueryExtrapolationOption(Element queryElement) {
 		ExtrapolationOption extrapolationOption;

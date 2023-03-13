@@ -1,6 +1,7 @@
 package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.ColorMultiset;
+import dk.aau.cs.model.CPN.ColorType;
 
 public abstract class ArcExpression extends Expression {
 
@@ -34,4 +35,6 @@ public abstract class ArcExpression extends Expression {
     public abstract ColorMultiset eval(ExpressionContext context);
 
     public abstract Integer weight();
+
+    public abstract ArcExpression getExprWithNewColorType(ColorType ct);
 }

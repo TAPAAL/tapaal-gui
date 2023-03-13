@@ -19,10 +19,12 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     );
 	private static final Map<SearchOption, String> searchMap = Map.of(
         SearchOption.HEURISTIC, " --search-strategy BestFS",
+        SearchOption.RANDOMHEURISTIC, " --search-strategy RPFS",
         SearchOption.BFS, "--search-strategy BFS",
         SearchOption.DFS, " --search-strategy DFS",
         SearchOption.RANDOM, " --search-strategy RDFS",
         SearchOption.OVERAPPROXIMATE, " --search-strategy OverApprox"
+
     );
 
 	private final ModelReduction modelReduction;
@@ -38,8 +40,61 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private final boolean colorFixpoint;
     private final boolean symmetricVars;
     private final boolean useTarjan;
+    private final boolean useColoredReduction;
 
-	public VerifyPNOptions(
+    public VerifyPNOptions(
+        int extraTokens,
+        TraceOption traceOption,
+        SearchOption search,
+        boolean useOverApproximation,
+        ModelReduction modelReduction,
+        boolean enableOverApproximation,
+        boolean enableUnderApproximation,
+        int approximationDenominator,
+        QueryCategory queryCategory,
+        AlgorithmOption algorithmOption,
+        boolean siphontrap,
+        QueryReductionTime queryReduction,
+        boolean stubbornReduction,
+        String pathToReducedNet,
+        boolean useTarOption,
+        boolean useTarjan,
+        boolean colored,
+        boolean unfold,
+        boolean partition,
+        boolean colorFixpoint,
+        boolean useSymmetricVars,
+        boolean useColoredReduction
+    ) {
+		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator, useTarOption);
+
+        this.modelReduction = modelReduction;
+		this.queryCategory = queryCategory;
+		this.algorithmOption = algorithmOption;
+		this.useSiphontrap = siphontrap;
+		this.queryReductionTime = queryReduction;
+		this.useStubbornReduction = stubbornReduction;
+		this.unfold = unfold;
+		this.colored = colored;
+        this.partition = partition;
+        this.colorFixpoint = colorFixpoint;
+        this.useTarOption = useTarOption;
+        this.useTarjan = useTarjan;
+		this.reducedModelPath = pathToReducedNet;
+		this.symmetricVars = useSymmetricVars;
+		this.useColoredReduction = useColoredReduction;
+
+        if(unfold) {
+            try {
+                unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+                unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+            } catch (IOException e) {
+                new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
+            }
+        }
+	}
+
+    public VerifyPNOptions(
         int extraTokens,
         TraceOption traceOption,
         SearchOption search,
@@ -62,32 +117,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean colorFixpoint,
         boolean useSymmetricVars
     ) {
-		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator, useTarOption);
-
-        this.modelReduction = modelReduction;
-		this.queryCategory = queryCategory;
-		this.algorithmOption = algorithmOption;
-		this.useSiphontrap = siphontrap;
-		this.queryReductionTime = queryReduction;
-		this.useStubbornReduction = stubbornReduction;
-		this.unfold = unfold;
-		this.colored = colored;
-        this.partition = partition;
-        this.colorFixpoint = colorFixpoint;
-        this.useTarOption = useTarOption;
-        this.useTarjan = useTarjan;
-		this.reducedModelPath = pathToReducedNet;
-		this.symmetricVars = useSymmetricVars;
-
-        if(unfold) {
-            try {
-                unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
-                unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
-            } catch (IOException e) {
-                new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
-            }
-        }
-	}
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false);
+    }
 
     public VerifyPNOptions(
         int extraTokens,
@@ -194,6 +225,9 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
             if (!symmetricVars) {
                 result.append(" --disable-symmetry-vars ");
             }
+        }
+		if (this.useColoredReduction) {
+		    result.append(" --col-reduction 1 ");
         }
 
 		return result.toString();

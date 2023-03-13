@@ -28,6 +28,8 @@ public abstract class TimedPlace {
     private final List<TransportArc> transportArcs = new ArrayList<TransportArc>();
     private final List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 
+    protected int numberOfTokens = 0;
+
     public enum PlaceType{
 		Standard, Invariant, Dead
 	}
@@ -69,9 +71,16 @@ public abstract class TimedPlace {
     }
 
     public int numberOfTokens() {
-        return tokens().size();
+        return numberOfTokens > 0 ? numberOfTokens : tokens().size();
     }
 
+    public void setNumberOfTokens(int numberOfTokens) {
+        this.numberOfTokens = numberOfTokens;
+    }
+
+    public void resetNumberOfTokens() {
+        numberOfTokens = 0;
+    }
 
     /**
      * This is a wrapper function to serve as a fix for the original
@@ -260,9 +269,22 @@ public abstract class TimedPlace {
     public void setTokenExpression(ArcExpression newExpression){
         tokensAsExpression = newExpression;
     }
+    
+    public void setTokenExpression(ArcExpression colorMarking, ArcExpression newExpression){
+	    if (colorMarking != null && colorMarking.toString().contains(".all"))
+	        tokensAsExpression = colorMarking;
+	    else
+            tokensAsExpression = newExpression;
+    }
 
     public ArcExpression getTokensAsExpression(){
         return tokensAsExpression;
     }
 
+    public ArcExpression getExprWithNewColorType(ColorType colorType) {
+	    if (tokensAsExpression != null)
+	        return tokensAsExpression.getExprWithNewColorType(colorType);
+	    else
+	        return tokensAsExpression;
+    }
 }

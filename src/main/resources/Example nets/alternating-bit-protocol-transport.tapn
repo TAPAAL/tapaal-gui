@@ -47,12 +47,10 @@ Try to experiment with the values of the constants deadline and delay in order t
       <arcpath arcPointType="false" id="1" xCoord="525" yCoord="645"/>
     </arc>
     <arc id="Receiver_0_A to Receive_0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Receiver_0_A" target="Receive_0" type="timed" weight="1">
-      <arcpath arcPointType="false" id="0" xCoord="629" yCoord="798"/>
-      <arcpath arcPointType="false" id="1" xCoord="685" yCoord="810"/>
-      <arcpath arcPointType="false" id="2" xCoord="734" yCoord="809"/>
-      <arcpath arcPointType="false" id="3" xCoord="734" yCoord="149"/>
-      <arcpath arcPointType="false" id="4" xCoord="660" yCoord="148"/>
-      <arcpath arcPointType="false" id="5" xCoord="630" yCoord="164"/>
+      <arcpath arcPointType="false" id="0" xCoord="630" yCoord="795"/>
+      <arcpath arcPointType="false" id="2" xCoord="735" yCoord="795"/>
+      <arcpath arcPointType="false" id="3" xCoord="735" yCoord="165"/>
+      <arcpath arcPointType="false" id="5" xCoord="630" yCoord="165"/>
     </arc>
     <arc id="Sender_0_A to Send_0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Sender_0_A" target="Send_0" type="timed" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="165" yCoord="90"/>
@@ -163,11 +161,11 @@ Try to experiment with the values of the constants deadline and delay in order t
     </arc>
     <arc id="Ack_rec_1 to Sender_0_A" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Ack_rec_1" target="Sender_0_A" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="165" yCoord="740"/>
-      <arcpath arcPointType="false" id="1" xCoord="148" yCoord="808"/>
+      <arcpath arcPointType="false" id="1" xCoord="165" yCoord="808"/>
       <arcpath arcPointType="false" id="2" xCoord="73" yCoord="808"/>
-      <arcpath arcPointType="false" id="3" xCoord="73" yCoord="43"/>
-      <arcpath arcPointType="false" id="4" xCoord="178" yCoord="43"/>
-      <arcpath arcPointType="false" id="5" xCoord="170" yCoord="61"/>
+      <arcpath arcPointType="false" id="3" xCoord="73" yCoord="40"/>
+      <arcpath arcPointType="false" id="4" xCoord="165" yCoord="40"/>
+      <arcpath arcPointType="false" id="5" xCoord="165" yCoord="60"/>
     </arc>
     <arc id="Send_0 to Medium_A" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Send_0" target="Medium_A" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="180" yCoord="164"/>

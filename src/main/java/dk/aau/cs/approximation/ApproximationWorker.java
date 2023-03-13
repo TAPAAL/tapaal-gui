@@ -590,8 +590,6 @@ public class ApproximationWorker {
                             false,
                             verificationResult.getUnfoldedModel());
                         valueNetwork.setNameMapping(nameMapping);
-
-
 	                    
 	                    OverApproximation overaprx = new OverApproximation();
 	        
@@ -637,8 +635,7 @@ public class ApproximationWorker {
 	        					false,
                                 verificationResult.getUnfoldedModel());
 	                    value.setNameMapping(composedModel.value2());
-	                }
-	                else {
+	                } else {
 	                	QueryResult queryResult = verificationResult.getQueryResult();
 						
 						queryResult.setApproximationInconclusive(true);
@@ -655,8 +652,7 @@ public class ApproximationWorker {
 	                }
 	            }
 	        }
-	    }
-	    else {
+	    } else {
 	        value =  new VerificationResult<TimedArcPetriNetTrace>(
 	                verificationResult.getQueryResult(),
 	                verificationResult.getTrace(),
@@ -667,7 +663,6 @@ public class ApproximationWorker {
                     verificationResult.getUnfoldedModel());
 	        value.setNameMapping(composedModel.value2());
 	    }
-		
 		options.setTraceOption(oldTraceOption);
 		return value;
 	}
@@ -709,9 +704,8 @@ public class ApproximationWorker {
         VerificationResult<TimedArcPetriNetTrace> value = null;
         if (verificationResult.error()) {
             //options.setTraceOption(oldTraceOption);
-            return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
-        }
-        else if (query != null && query.isOverApproximationEnabled()) {
+            return new VerificationResult<>(verificationResult.errorMessage(), verificationResult.verificationTime());
+        } else if (query != null && query.isOverApproximationEnabled()) {
             //Create the verification satisfied result for the approximation
 
             // Over-approximation
@@ -719,7 +713,7 @@ public class ApproximationWorker {
                 // If r = 1
                 // No matter what EF and AG answered -> return that answer
                 QueryResult queryResult = verificationResult.getQueryResult();
-                value =  new VerificationResult<TimedArcPetriNetTrace>(
+                value =  new VerificationResult<>(
                     queryResult,
                     verificationResult.getTrace(),
                     verificationResult.getSecondaryTrace(),
@@ -788,8 +782,7 @@ public class ApproximationWorker {
                         false,
                         verificationResult.getUnfoldedModel());
                     value.setNameMapping(composedModel.value2());
-                }
-                else if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && !verificationResult.getQueryResult().isQuerySatisfied())
+                } else if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && !verificationResult.getQueryResult().isQuerySatisfied())
                     || ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && verificationResult.getQueryResult().isQuerySatisfied())) {
                     // If (EF AND EG not satisfied) OR (AG AND AF satisfied)
 
@@ -808,8 +801,7 @@ public class ApproximationWorker {
                         false,
                         verificationResult.getUnfoldedModel());
                     value.setNameMapping(composedModel.value2());
-                }
-                else {
+                } else {
                     // We cannot use the result directly, and did not get a trace.
 
                     QueryResult queryResult = verificationResult.getQueryResult();
@@ -827,8 +819,7 @@ public class ApproximationWorker {
                     value.setNameMapping(composedModel.value2());
                 }
             }
-        }
-        else if (query != null && query.isUnderApproximationEnabled()) {
+        } else if (query != null && query.isUnderApproximationEnabled()) {
             // Under-approximation
 
             if (query.approximationDenominator() == 1) {
@@ -844,8 +835,7 @@ public class ApproximationWorker {
                     false,
                     verificationResult.getUnfoldedModel());
                 value.setNameMapping(composedModel.value2());
-            }
-            else {
+            } else {
                 // If r > 1
                 if ((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && ! verificationResult.getQueryResult().isQuerySatisfied()
                     || ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && verificationResult.getQueryResult().isQuerySatisfied())) {
@@ -863,12 +853,11 @@ public class ApproximationWorker {
                         verificationResult.getUnfoldedModel());
                     value.setNameMapping(composedModel.value2());
 
-                }
-                else if ((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && verificationResult.getQueryResult().isQuerySatisfied()
+                } else if ((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && verificationResult.getQueryResult().isQuerySatisfied()
                     || ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && ! verificationResult.getQueryResult().isQuerySatisfied())) {
                     // ((EF OR EG) AND satisfied) OR ((AG OR AF) and not satisfied) -> Check for deadlock
 
-                    if(verificationResult.getTrace() != null) {
+                    if (verificationResult.getTrace() != null) {
                         // If query does have deadlock -> create trace TAPN
                         //Create the verification satisfied result for the approximation
                         VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
@@ -884,8 +873,6 @@ public class ApproximationWorker {
                             false,
                             verificationResult.getUnfoldedModel());
                         valueNetwork.setNameMapping(nameMapping);
-
-
 
                         OverApproximation overaprx = new OverApproximation();
 
@@ -922,7 +909,7 @@ public class ApproximationWorker {
 
                         // If satisfied trace -> Return result
                         // This is satisfied for EF and EG and not satisfied for AG and AF
-                        value =  new VerificationResult<TimedArcPetriNetTrace>(
+                        value = new VerificationResult<TimedArcPetriNetTrace>(
                             queryResult,
                             verificationResult.getTrace(),
                             verificationResult.getSecondaryTrace(),
@@ -931,8 +918,7 @@ public class ApproximationWorker {
                             false,
                             verificationResult.getUnfoldedModel());
                         value.setNameMapping(composedModel.value2());
-                    }
-                    else {
+                    } else {
                         QueryResult queryResult = verificationResult.getQueryResult();
 
                         queryResult.setApproximationInconclusive(true);
@@ -949,8 +935,7 @@ public class ApproximationWorker {
                     }
                 }
             }
-        }
-        else {
+        } else {
             value =  new VerificationResult<TimedArcPetriNetTrace>(
                 verificationResult.getQueryResult(),
                 verificationResult.getTrace(),

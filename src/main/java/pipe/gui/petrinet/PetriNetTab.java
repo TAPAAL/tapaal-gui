@@ -1718,6 +1718,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		undoManager.setApp(app);
 
 		updateFeatureText();
+		updateZoom();
 
 		//XXX
 		if (isInAnimationMode()) {
@@ -2336,6 +2337,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		managerRef.get().deregisterManager();
         managerRef.setReference(newManager);
 		managerRef.get().registerManager(drawingSurface, guiModelManager);
+    }
+
+    public void updateZoom() {
+	    int zoom = drawingSurface().getZoom();
+	    zoomTo(zoom);
     }
 
     public void updateFeatureText() {

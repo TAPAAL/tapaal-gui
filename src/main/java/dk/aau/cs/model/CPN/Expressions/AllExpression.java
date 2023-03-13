@@ -135,4 +135,12 @@ public class AllExpression extends ColorExpression {
     public Vector<ColorType> getColorTypes() {
         return new Vector<>(Collections.singletonList(sort));
     }
+
+    @Override
+    public ColorExpression getExprWithNewColorType(ColorType ct) {
+        if (sort.getName().equals(ct.getName())) {
+            return new AllExpression(ct);
+        }
+        return deepCopy();
+    }
 }

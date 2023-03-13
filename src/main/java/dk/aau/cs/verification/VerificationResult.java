@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
@@ -19,6 +21,7 @@ public class VerificationResult<TTrace> {
 	private Stats stats;
 	private NameMapping nameMapping;
 	private TTrace secondaryTrace;
+	private int bound;
 
 	private Tuple<TimedArcPetriNet, NameMapping> unfoldedModel;
 	private PetriNetTab unfoldedTab;
@@ -46,6 +49,17 @@ public class VerificationResult<TTrace> {
 		this.verificationTime = verificationTime;
 		this.stats = stats;
 		this.rawOutput = rawOutput;
+
+		if (rawOutput != null) {
+            String[] lines = rawOutput.split(System.getProperty("line.separator"));
+            for (String line : lines) {
+                Matcher matcher = Pattern.compile("\\s*--k-bound\\s*(\\d+)\\s*").matcher(line);
+                if (matcher.find()) {
+                    this.bound = Integer.parseInt(matcher.group(1));
+                    break;
+                }
+            }
+        }
 	}
 
     public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel, PetriNetTab unfoldedTab){
@@ -260,5 +274,9 @@ public class VerificationResult<TTrace> {
 
 	public String getRawOutput() {
 	    return rawOutput;
+    }
+
+    public int getBound() {
+        return bound;
     }
 }
