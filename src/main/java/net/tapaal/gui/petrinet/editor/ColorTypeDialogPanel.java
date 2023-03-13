@@ -789,7 +789,7 @@ public class ColorTypeDialogPanel extends JPanel {
 
     private void moveColors(boolean moveUp) {
         ArrayList<String> messages = new ArrayList<>();
-        int selectedIndicesLength = productColorTypeList.getSelectedIndices().length - 1;
+        int selectedIndicesLength = productColorTypeList.getSelectedIndices().length == 1 ? 1 : productColorTypeList.getSelectedIndices().length - 1;
         int firstIndex = productColorTypeList.getSelectedIndex();
         for (int index : productColorTypeList.getSelectedIndices()) {
             ArrayList<String> emptyMessages = new ArrayList<>();
