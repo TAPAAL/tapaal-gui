@@ -148,21 +148,25 @@ public class ProductType extends ColorType {
         return new Vector<>(colorCache.values());
     }
 
+    // TODO: fix me
     public boolean containsTypes(Vector<ColorType> colorTypes) {
-        if (constituents.equals(colorTypes)) return true;
-
-        boolean containsType = false;
-        for (ColorType constituent : constituents) {
-            for (ColorType ct : colorTypes) {
-                if (constituent.getName().equals(ct.getName())) {
-                    containsType = true;
-                    break;
-                }
-            }
-            if (!containsType) return false;
-        }
-        return true;
+        return constituents.equals(colorTypes);
     }
+//    public boolean containsTypes(Vector<ColorType> colorTypes) {
+//        if (constituents.equals(colorTypes)) return true;
+//
+//        boolean containsType = false;
+//        for (ColorType constituent : constituents) {
+//            for (ColorType ct : colorTypes) {
+//                if (constituent.getName().equals(ct.getName())) {
+//                    containsType = true;
+//                    break;
+//                }
+//            }
+//            if (!containsType) return false;
+//        }
+//        return true;
+//    }
 
     public Color getColor(Vector<Color> colors) {
         if (colorCacheDiry) { getColors(); } // FIXME hack to generate colors if not done yet
@@ -170,8 +174,9 @@ public class ProductType extends ColorType {
         if (result == null) {
             //throw new RuntimeException("Looking up unknow color" + colors);
 
-            result = new Color(this, 0, colors); // FIXME, wtf? this just seems wrong, need to support .all tokens
-            colorCache.put(colors, result);
+            //result = new Color(this, 0, colors); // FIXME, wtf? this just seems wrong, need to support .all tokens
+            //colorCache.put(colors, result);
+            return null;
 
         }
         return result;

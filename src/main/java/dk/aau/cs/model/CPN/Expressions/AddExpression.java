@@ -6,7 +6,6 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
-import dk.aau.cs.util.Require;
 
 import java.util.Objects;
 import java.util.Set;
@@ -18,18 +17,11 @@ public class AddExpression extends ArcExpression {
     private final Vector<ArcExpression> constituents;
 
     public AddExpression(Vector<ArcExpression> constituents) {
-        Require.notNull(constituents);
-        Require.that(constituents.size() > 0, "Constituents can't be empty");
-        Require.notNull(constituents, "Constituents can not container null");
         this.constituents = constituents;
     }
 
     public AddExpression(AddExpression otherExpr)  {
         super(otherExpr);
-        var constituents = otherExpr.constituents;
-        Require.notNull(constituents);
-        Require.that(constituents.size() > 0, "Constituents can't be empty");
-        Require.notNull(constituents, "Constituents can not container null");
         this.constituents = new Vector<>(otherExpr.constituents);
     }
 
@@ -184,11 +176,12 @@ public class AddExpression extends ArcExpression {
 
     public String toString() {
 
-        StringBuilder res = new StringBuilder("(" + constituents.get(0).toString());
-        for (int i = 1; i < constituents.size(); ++i) {
-            res.append(" + ").append(constituents.get(i).toString());
-        }
-        return res + ")";
+        return "(" + constituents.stream().map(Objects::toString).collect(Collectors.joining(" + ")) + ")";
+//        StringBuilder res = new StringBuilder("(" + constituents.get(0).toString());
+//        for (int i = 1; i < constituents.size(); ++i) {
+//            res.append(" + ").append(constituents.get(i).toString());
+//        }
+//        return res + ")";
     }
 
     public String toTokenString() {
