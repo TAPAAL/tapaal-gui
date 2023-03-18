@@ -174,9 +174,8 @@ public class ProductType extends ColorType {
         if (result == null) {
             //throw new RuntimeException("Looking up unknow color" + colors);
 
-            //result = new Color(this, 0, colors); // FIXME, wtf? this just seems wrong, need to support .all tokens
-            //colorCache.put(colors, result);
-            return null;
+            result = new Color(this, 0, colors); // FIXME, wtf? this just seems wrong, need to support .all tokens
+            colorCache.put(colors, result);
 
         }
         return result;
