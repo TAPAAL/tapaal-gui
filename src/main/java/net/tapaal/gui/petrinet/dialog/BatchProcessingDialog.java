@@ -11,9 +11,7 @@ import javax.swing.SwingWorker.StateValue;
 import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
+import javax.swing.table.*;
 
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
@@ -281,7 +279,7 @@ public class BatchProcessingDialog extends JDialog {
 		
 		topPanel = new JPanel(new GridBagLayout());
 		bottomPanel = new JPanel(new GridBagLayout());
-		
+
 		initFileListPanel();
 		initVerificationOptionsPanel();
 		initMonitorPanel();
@@ -441,7 +439,7 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.setBorder(BorderFactory
             .createTitledBorder("Override Verification Options for the Batch"));
 
-		initQueryPropertyOptionsComponents();
+        initOptionsTable();
         initDefaultOptionsComponents();
         initTAPNOptionsComponents();
         initPNOptionsComponents();
@@ -465,36 +463,87 @@ public class BatchProcessingDialog extends JDialog {
 		}
 	}
 
-	private void initQueryPropertyOptionsComponents() {
-		JLabel queryLabel = new JLabel("Query:");
-		queryLabel.setToolTipText(TOOL_TIP_QueryLabel);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.VERTICAL;
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.anchor = GridBagConstraints.WEST;
-		verificationOptionsPanel.add(queryLabel, gbc);
+    private void initOptionsTable() {
+        JPanel optionsPanel = new JPanel(new GridBagLayout());
 
-		String[] options = new String[] {
-		    name_KeepQueryOption,
-            name_SEARCHWHOLESTATESPACE,
-            name_EXISTDEADLOCK,
-            name_SOUNDNESS,
-            name_STRONGSOUNDNESS
-		};
-		queryPropertyOption = new JComboBox<>(options);
-		queryPropertyOption.setToolTipText(TOOL_TIP_Query_Property_Option);
-		
-		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.gridwidth = 2;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		verificationOptionsPanel.add(queryPropertyOption, gbc);
-	}
+        Object[] columnNames = {"", "Verification options", "Keep k-bound", "Engine"};
+        Object[][] data = {{0, "Default", Boolean.TRUE, "Engine"}};
+
+        DefaultTableModel optionsTable = new DefaultTableModel(data, columnNames) {
+            public Class getColumnClass(int column) {
+                return getValueAt(0, column).getClass();
+            }
+        };
+
+        JTable table = new JTable(optionsTable);
+        table.getTableHeader().setOpaque(true);
+        table.getTableHeader().setBackground(Color.white);
+
+        table.setPreferredScrollableViewportSize(table.getPreferredSize());
+        table.changeSelection(0, 0, false, false);
+
+        optionsTable.addTableModelListener(e -> {
+            if (e.getType() == TableModelEvent.INSERT) {
+                table.scrollRectToVisible(table.getCellRect(e.getLastRow(), e.getLastRow(), true));
+            }
+        });
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        Dimension scrollPanePrefDims = new Dimension(850, 250);
+        //Set the minimum size to 150 lets than the preferred, to be consistat with theh minimum size of the window
+        Dimension scrollPaneMinDims = new Dimension(850, 250-150);
+        scrollPane.setMinimumSize(scrollPaneMinDims);
+        scrollPane.setPreferredSize(scrollPanePrefDims);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        optionsPanel.add(scrollPane, gbc);
+
+        JButton addOptionButton = new JButton("Add");
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        optionsPanel.add(addOptionButton, gbc);
+        addOptionButton.addActionListener(e ->
+            optionsTable.addRow(new Object[]{optionsTable.getRowCount(), "Noget", Boolean.TRUE, "Engine"})
+        );
+
+        JButton removeOptionButton = new JButton("Remove");
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        optionsPanel.add(removeOptionButton, gbc);
+        removeOptionButton.addActionListener(e -> {
+            optionsTable.removeRow(table.getSelectedRow());
+        });
+
+        gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.insets = new Insets(0, 5, 5, 5);
+        verificationOptionsPanel.add(optionsPanel, gbc);
+    }
 
 	private void initCapacityComponents() {
 		JLabel capacityLabel = new JLabel("Extra tokens:");
@@ -1278,7 +1327,6 @@ public class BatchProcessingDialog extends JDialog {
 	// Custom cell renderer for the Query Column of the result table display the
 	// property of the query
 	private class ResultTableCellRenderer extends JLabel implements TableCellRenderer {
-
 		Border unselectedBorder = null;
 		Border selectedBorder = null;
 		boolean isBordered = true;
@@ -1526,6 +1574,32 @@ public class BatchProcessingDialog extends JDialog {
 			return s.toString();
 		}
 	}
+
+    private class OptionsTableCellRenderer extends JLabel implements TableCellRenderer {
+        public OptionsTableCellRenderer(boolean isBordered) {
+        }
+
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            if (isSelected) {
+                setBackground(table.getSelectionBackground());
+                setForeground(table.getSelectionForeground());
+            } else {
+                setBackground(Color.white);
+                setForeground(Color.black);
+            }
+
+            if (table.getColumnName(column).equals("Keep k-bound")) {
+            }
+
+            setText(value.toString());
+
+            setEnabled(table.isEnabled());
+            setFont(table.getFont());
+            setOpaque(true);
+
+            return this;
+        }
+    }
 
 	public class HelpDialog extends JDialog {
         private JPanel content;
