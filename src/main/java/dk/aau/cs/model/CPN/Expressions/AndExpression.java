@@ -15,16 +15,20 @@ public class AndExpression extends GuardExpression {
         this.left = left;
         this.right = right;
     }
+
     public GuardExpression getLeftExpression(){
         return this.left;
     }
+
     public GuardExpression getRightExpression(){
         return this.right;
     }
+
     @Override
     public GuardExpression replace(Expression object1, Expression object2){
         return replace(object1,object2,false);
     }
+
     @Override
     public GuardExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
         if (this == object1 && object2 instanceof GuardExpression) {
@@ -78,7 +82,7 @@ public class AndExpression extends GuardExpression {
 
     @Override
     public String toString() {
-        return left.toString() + " and " + right.toString();
+        return "(" + left.toString() + " and " + right.toString() + ")";
     }
 
     @Override
@@ -87,10 +91,9 @@ public class AndExpression extends GuardExpression {
     @Override
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[2];
-        int endPrev = 0;
-
-        int start = 0;
-        int end = 0;
+        int start = 1;
+        int endPrev;
+        int end;
 
         end = start + left.toString().length();
         endPrev = end;
@@ -117,5 +120,4 @@ public class AndExpression extends GuardExpression {
     public GuardExpression copy() {
        return new AndExpression(left, right);
     }
-
 }
