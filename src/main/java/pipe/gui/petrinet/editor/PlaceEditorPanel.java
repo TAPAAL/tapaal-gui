@@ -298,13 +298,15 @@ public class PlaceEditorPanel extends JPanel {
 			SharedPlace place = (SharedPlace)e.getItem();
 			if (place.getComponentsUsingThisPlace().size() > 0) {
 			    if (currentTab.lens.isColored()) {
-			        colorTypeComboBox.setSelectedItem(place.getColorType());
-			        coloredTokenListModel.clear();
+                    colorTypeComboBox.setSelectedItem(place.getColorType());
+                    coloredTokenListModel.clear();
 
-			        ArcExpression expr = place.getTokensAsExpression();
-			        for (ExprStringPosition child : expr.getChildren()) {
-			            if (child.getObject() instanceof NumberOfExpression) {
-			                coloredTokenListModel.addElement((NumberOfExpression) child.getObject());
+                    ArcExpression expr = place.getTokensAsExpression();
+                    if (expr != null) {
+                        for (ExprStringPosition child : expr.getChildren()) {
+                            if (child.getObject() instanceof NumberOfExpression) {
+                                coloredTokenListModel.addElement((NumberOfExpression) child.getObject());
+                            }
                         }
                     }
                 }
