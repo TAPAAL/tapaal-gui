@@ -1,5 +1,6 @@
 package pipe.gui.petrinet.editor;
 
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import net.tapaal.gui.petrinet.Context;
 //import java.awt.Color;
 import java.awt.event.ItemEvent;
@@ -294,7 +295,18 @@ public class PlaceEditorPanel extends JPanel {
 
 		sharedPlacesComboBox.addItemListener(e -> {
 			SharedPlace place = (SharedPlace)e.getItem();
-			if(place.getComponentsUsingThisPlace().size() > 0){
+			if (place.getComponentsUsingThisPlace().size() > 0) {
+			    if (currentTab.lens.isColored()) {
+			        colorTypeComboBox.setSelectedItem(place.getColorType());
+			        coloredTokenListModel.clear();
+
+			        ArcExpression expr = place.getTokensAsExpression();
+			        for (ExprStringPosition child : expr.getChildren()) {
+			            if (child.getObject() instanceof NumberOfExpression) {
+			                coloredTokenListModel.addElement((NumberOfExpression) child.getObject());
+                        }
+                    }
+                }
 				setMarking(place.numberOfTokens());
 			}
 			setInvariantControlsBasedOn(place);
@@ -1100,7 +1112,8 @@ public class PlaceEditorPanel extends JPanel {
             if (colorTypeComboBox.getSelectedItem() != null && colorTypeComboBox.getSelectedItem().equals(tokenColorComboboxPanel.getColorType())) {
                 return;
             }
-            if (!(coloredTokenListModel.getSize() < 1) || !timeConstraintListModel.isEmpty()){
+            if ((!currentTab.lens.isColored() || ((SharedPlace)sharedPlacesComboBox.getSelectedItem()).getColorType() != colorTypeComboBox.getSelectedItem()) &&
+                !(coloredTokenListModel.getSize() < 1) || !timeConstraintListModel.isEmpty()){
                 int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the color type for this place?\n" +
                     "All tokens and time invariants for colors will be deleted.","alert", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
