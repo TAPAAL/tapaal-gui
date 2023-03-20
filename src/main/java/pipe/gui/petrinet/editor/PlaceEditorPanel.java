@@ -61,7 +61,8 @@ public class PlaceEditorPanel extends JPanel {
 	private final Context context;
 	private boolean makeNewShared = false;
 	private boolean doNewEdit = true;
-	private  boolean doOKChecked = false;
+	private boolean doOKChecked = false;
+	private boolean editSharedPlace = false;
 	private final PetriNetTab currentTab;
 	private final EscapableDialog parent;
 	private final JPanel mainPanel;
@@ -191,14 +192,13 @@ public class PlaceEditorPanel extends JPanel {
 		Collection<TimedPlace> usedPlaces = context.activeModel().places();
 
 		sharedPlaces.removeAll(usedPlaces);
-		if (place.underlyingPlace().isShared()){
+		if (place.underlyingPlace().isShared()) {
 			sharedPlaces.add(place.underlyingPlace());
 		}
 
 		sharedPlaces.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 		sharedPlacesComboBox.setModel(new DefaultComboBoxModel<>(sharedPlaces));
-		if(place.underlyingPlace().isShared()) {
-
+		if (place.underlyingPlace().isShared()) {
 			sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
 		}
 
@@ -294,6 +294,7 @@ public class PlaceEditorPanel extends JPanel {
 		SwingHelper.setPreferredWidth(sharedPlacesComboBox,290);
 
 		sharedPlacesComboBox.addItemListener(e -> {
+		    editSharedPlace = true;
 			SharedPlace place = (SharedPlace)e.getItem();
 			if (place.getComponentsUsingThisPlace().size() > 0) {
 			    if (currentTab.lens.isColored()) {
@@ -310,7 +311,8 @@ public class PlaceEditorPanel extends JPanel {
 				setMarking(place.numberOfTokens());
 			}
 			setInvariantControlsBasedOn(place);
-		});
+            editSharedPlace = false;
+        });
 
 		markingLabel = new javax.swing.JLabel("Marking:");
 		gridBagConstraints = GridBagHelper.as(0,2, EAST, new Insets(3, 3, 3, 3));
@@ -1107,13 +1109,13 @@ public class PlaceEditorPanel extends JPanel {
             colorTypeComboBox.addItem(element);
         }
         colorTypeComboBox.setRenderer(new ColorComboBoxRenderer(colorTypeComboBox));
+        colorTypeComboBox.setSelectedItem(colorType);
 
         colorTypeComboBox.addActionListener(actionEvent -> {
             if (colorTypeComboBox.getSelectedItem() != null && colorTypeComboBox.getSelectedItem().equals(tokenColorComboboxPanel.getColorType())) {
                 return;
             }
-            if ((!currentTab.lens.isColored() || ((SharedPlace)sharedPlacesComboBox.getSelectedItem()).getColorType() != colorTypeComboBox.getSelectedItem()) &&
-                !(coloredTokenListModel.getSize() < 1) || !timeConstraintListModel.isEmpty()){
+            if (!editSharedPlace && (!(coloredTokenListModel.getSize() < 1) || !timeConstraintListModel.isEmpty())){
                 int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the color type for this place?\n" +
                     "All tokens and time invariants for colors will be deleted.","alert", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
