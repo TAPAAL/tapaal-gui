@@ -45,6 +45,7 @@ public abstract class Expression {
     }
 
     public abstract Expression replace(Expression object1, Expression object2,boolean replaceAllInstances);
+
     public abstract Expression replace(Expression object1, Expression object2);
 
     public abstract Expression copy();
@@ -60,5 +61,6 @@ public abstract class Expression {
     public abstract void getValues(ExprValues exprValues);
 
     public abstract void getVariables(Set<Variable> variables);
+
     public abstract boolean containsColor(Color color);
 }

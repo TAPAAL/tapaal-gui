@@ -25,6 +25,7 @@ public class OrExpression extends GuardExpression {
     public GuardExpression getLeftExpression() {
         return this.left;
     }
+
     public GuardExpression getRightExpression() {
         return this.right;
     }
@@ -35,10 +36,9 @@ public class OrExpression extends GuardExpression {
     @Override
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[2];
-
-        int endPrev = 0;
-        int start = 0;
-        int end = 0;
+        int start = 1;
+        int endPrev;
+        int end;
 
         end = start + left.toString().length();
         endPrev = end;
@@ -118,7 +118,6 @@ public class OrExpression extends GuardExpression {
 
     @Override
     public String toString() {
-        return left.toString() + " or " + right.toString();
+        return "(" + left.toString() + " or " + right.toString() + ")";
     }
-
 }
