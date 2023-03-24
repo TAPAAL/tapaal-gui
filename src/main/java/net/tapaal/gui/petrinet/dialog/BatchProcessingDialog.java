@@ -441,9 +441,6 @@ public class BatchProcessingDialog extends JDialog {
 
         initOptionsTable();
         initDefaultOptionsComponents();
-        initTAPNOptionsComponents();
-        initPNOptionsComponents();
-        initDTAPNOptionsComponents();
 		initCapacityComponents();
 		initTimeoutComponents();
 		initOOMComponents();
@@ -492,7 +489,7 @@ public class BatchProcessingDialog extends JDialog {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         Dimension scrollPanePrefDims = new Dimension(850, 250);
-        //Set the minimum size to 150 lets than the preferred, to be consistat with theh minimum size of the window
+        //Set the minimum size to 150 lets than the preferred, to be consistant with the minimum size of the window
         Dimension scrollPaneMinDims = new Dimension(850, 250-150);
         scrollPane.setMinimumSize(scrollPaneMinDims);
         scrollPane.setPreferredSize(scrollPanePrefDims);
@@ -517,7 +514,7 @@ public class BatchProcessingDialog extends JDialog {
         gbc.fill = GridBagConstraints.BOTH;
         optionsPanel.add(addOptionButton, gbc);
         addOptionButton.addActionListener(e ->
-            optionsTable.addRow(new Object[]{optionsTable.getRowCount(), "Noget", Boolean.TRUE, "Engine"})
+            optionsTable.addRow(new Object[]{optionsTable.getRowCount(), "", Boolean.TRUE, "Engine"})
         );
 
         JButton removeOptionButton = new JButton("Remove");
@@ -706,20 +703,6 @@ public class BatchProcessingDialog extends JDialog {
     }
 
     private void toggleDefault() {
-        if (defaultYes.isSelected()) {
-            checkboxTAPN.setSelected(false);
-            checkboxPN.setSelected(false);
-            checkboxDTAPN.setSelected(false);
-            helpTAPN.setEnabled(false);
-            helpPN.setEnabled(false);
-            helpDTAPN.setEnabled(false);
-            optionsTAPN.setEnabled(false);
-            optionsPN.setEnabled(false);
-            optionsDTAPN.setEnabled(false);
-        }
-        checkboxTAPN.setEnabled(defaultNo.isSelected());
-        checkboxPN.setEnabled(defaultNo.isSelected());
-        checkboxDTAPN.setEnabled(defaultNo.isSelected());
     }
 
     private void initTAPNOptionsComponents() {
