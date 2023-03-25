@@ -13,16 +13,11 @@ import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.*;
 
-import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import net.tapaal.gui.petrinet.undo.AddFileBatchProcessingCommand;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.RemoveFileBatchProcessingCommand;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
-import pipe.gui.FileFinder;
-import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.petrinet.undo.UndoManager;
@@ -141,6 +136,7 @@ public class BatchProcessingDialog extends JDialog {
 	private JButton exportButton;
 	private JButton closeButton;
 	private JPanel verificationOptionsPanel;
+	private JComboBox<String> engines;
 	private CustomJSpinner numberOfExtraTokensInNet;
 	private JCheckBox keepQueryCapacity;
     private JCheckBox noTimeoutCheckbox;
@@ -333,7 +329,6 @@ public class BatchProcessingDialog extends JDialog {
 		addFilesButton = new JButton("Add models");
 		addFilesButton.setToolTipText(TOOL_TIP_AddFilesButton);
 		addFilesButton.addActionListener(arg0 -> addFiles());
-
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.gridx = 0;
@@ -360,7 +355,6 @@ public class BatchProcessingDialog extends JDialog {
 			clearFiles();
 			enableButtons();
 		});
-
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 0;
@@ -443,8 +437,11 @@ public class BatchProcessingDialog extends JDialog {
     private void initOptionsTable() {
         JPanel optionsPanel = new JPanel(new GridBagLayout());
 
+        String[] engineNames = {"default", "verifypn", "verifydtapn", "verifytapn"};
+        engines = new JComboBox<>(engineNames);
+
         Object[] columnNames = {"", "Verification options", "Keep k-bound", "Engine"};
-        Object[][] data = {{0, "Default", Boolean.TRUE, "Engine"}};
+        Object[][] data = {{0, "Default", Boolean.TRUE, "default"}};
 
         DefaultTableModel optionsTable = new DefaultTableModel(data, columnNames) {
             public Class<?> getColumnClass(int column) {
@@ -455,7 +452,6 @@ public class BatchProcessingDialog extends JDialog {
         JTable table = new JTable(optionsTable);
         table.getTableHeader().setOpaque(true);
         table.getTableHeader().setBackground(Color.white);
-
         table.setPreferredScrollableViewportSize(table.getPreferredSize());
         table.changeSelection(0, 0, false, false);
 
@@ -465,11 +461,12 @@ public class BatchProcessingDialog extends JDialog {
             }
         });
 
+        table.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(engines));
+
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         Dimension scrollPanePrefDims = new Dimension(850, 250);
-        //Set the minimum size to 150 lets than the preferred, to be consistant with the minimum size of the window
         Dimension scrollPaneMinDims = new Dimension(850, 250-150);
         scrollPane.setMinimumSize(scrollPaneMinDims);
         scrollPane.setPreferredSize(scrollPanePrefDims);
@@ -494,7 +491,7 @@ public class BatchProcessingDialog extends JDialog {
         gbc.fill = GridBagConstraints.BOTH;
         optionsPanel.add(addOptionButton, gbc);
         addOptionButton.addActionListener(e ->
-            optionsTable.addRow(new Object[]{optionsTable.getRowCount(), "", Boolean.TRUE, "Engine"})
+            optionsTable.addRow(new Object[]{optionsTable.getRowCount(), "", Boolean.TRUE, "verifypn"})
         );
 
         JButton removeOptionButton = new JButton("Remove");
