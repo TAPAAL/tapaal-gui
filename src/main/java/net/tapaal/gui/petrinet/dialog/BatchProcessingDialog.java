@@ -115,10 +115,6 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String SATISFIED_STRONG_SOUNDNESS_STRING = "Strongly Sound";
 
 	private static String lastPath = null;
-	
-    HelpDialog helpDialogTAPN;
-    HelpDialog helpDialogPN;
-    HelpDialog helpDialogDTAPN;
 
 	private JSplitPane splitpane;
 	private JPanel topPanel;
@@ -144,22 +140,9 @@ public class BatchProcessingDialog extends JDialog {
 
 	private JButton exportButton;
 	private JButton closeButton;
-	private JComboBox<String> queryPropertyOption;
 	private JPanel verificationOptionsPanel;
 	private CustomJSpinner numberOfExtraTokensInNet;
 	private JCheckBox keepQueryCapacity;
-    private JRadioButton defaultYes;
-    private JRadioButton defaultNo;
-	private ButtonGroup defaultOptions;
-    private JTextField optionsTAPN;
-    private JCheckBox checkboxTAPN;
-    private JButton helpTAPN;
-    private JTextField optionsPN;
-    private JCheckBox checkboxPN;
-    private JButton helpPN;
-    private JTextField optionsDTAPN;
-    private JCheckBox checkboxDTAPN;
-    private JButton helpDTAPN;
     private JCheckBox noTimeoutCheckbox;
 	private JCheckBox noOOMCheckbox;
 	private CustomJSpinner timeoutValue;
@@ -249,7 +232,6 @@ public class BatchProcessingDialog extends JDialog {
 			batchProcessingDialog.setLocationRelativeTo(null);
 			batchProcessingDialog.setResizable(true);
 		}
-        batchProcessingDialog.toggleDefault();
 		batchProcessingDialog.setVisible(true);
 	}
 
@@ -420,7 +402,6 @@ public class BatchProcessingDialog extends JDialog {
                     undoManager.addEdit(c);
 				}
 			}
-            toggleDefault();
 		}
 	}
 
@@ -440,7 +421,6 @@ public class BatchProcessingDialog extends JDialog {
             .createTitledBorder("Override Verification Options for the Batch"));
 
         initOptionsTable();
-        initDefaultOptionsComponents();
 		initCapacityComponents();
 		initTimeoutComponents();
 		initOOMComponents();
@@ -467,7 +447,7 @@ public class BatchProcessingDialog extends JDialog {
         Object[][] data = {{0, "Default", Boolean.TRUE, "Engine"}};
 
         DefaultTableModel optionsTable = new DefaultTableModel(data, columnNames) {
-            public Class getColumnClass(int column) {
+            public Class<?> getColumnClass(int column) {
                 return getValueAt(0, column).getClass();
             }
         };
@@ -657,15 +637,13 @@ public class BatchProcessingDialog extends JDialog {
 		noOOMCheckbox = new JCheckBox("Do not limit memory usage");
 		noOOMCheckbox.setToolTipText(TOOL_TIP_NoOOMCheckBox);
 		noOOMCheckbox.setSelected(false);
-		noOOMCheckbox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (noOOMCheckbox.isSelected()) {
-                    oomValue.setEnabled(false);
-                } else {
-                    oomValue.setEnabled(true);
-                }
-			}
-		});
+		noOOMCheckbox.addActionListener(e -> {
+            if (noOOMCheckbox.isSelected()) {
+                oomValue.setEnabled(false);
+            } else {
+                oomValue.setEnabled(true);
+            }
+        });
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -674,135 +652,6 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noOOMCheckbox, gbc);
 	}
-
-    private void initDefaultOptionsComponents() {
-        JLabel reductionLabel = new JLabel("Default verification method:");
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        verificationOptionsPanel.add(reductionLabel, gbc);
-
-        defaultYes = new JRadioButton("Yes", true);
-        defaultYes.setToolTipText(TOOL_TIP_DefaultOption);
-        defaultNo = new JRadioButton("No", false);
-        defaultNo.setToolTipText(TOOL_TIP_DefaultOption);
-
-        defaultOptions = new ButtonGroup();
-        defaultOptions.add(defaultYes);
-        defaultOptions.add(defaultNo);
-
-        defaultYes.addChangeListener(e -> toggleDefault());
-        defaultNo.addChangeListener(e -> toggleDefault());
-
-        gbc.gridx = 1;
-        verificationOptionsPanel.add(defaultYes, gbc);
-        gbc.gridx = 2;
-        verificationOptionsPanel.add(defaultNo, gbc);
-    }
-
-    private void toggleDefault() {
-    }
-
-    private void initTAPNOptionsComponents() {
-        checkboxTAPN = new JCheckBox("VerifyTAPN");
-        checkboxTAPN.setEnabled(false);
-        checkboxTAPN.addActionListener(e -> {
-            optionsTAPN.setEnabled(checkboxTAPN.isSelected());
-            helpTAPN.setEnabled(checkboxTAPN.isSelected());
-        });
-        checkboxTAPN.setToolTipText(TOOL_TIP_VerifyTAPNOption);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        verificationOptionsPanel.add(checkboxTAPN, gbc);
-
-        optionsTAPN = new JTextField();
-        optionsTAPN.setEnabled(false);
-        optionsTAPN.setPreferredSize(new Dimension(200,30));
-        gbc.gridx = 1;
-        verificationOptionsPanel.add(optionsTAPN, gbc);
-
-        helpDialogTAPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyTAPN", ModalityType.MODELESS, new VerifyTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
-
-        helpTAPN = new JButton("Help");
-        helpTAPN.setToolTipText(TOOL_TIP_Help);
-        helpTAPN.setEnabled(false);
-        helpTAPN.addActionListener(e -> helpDialogTAPN.setVisible(true));
-
-        gbc.gridx = 2;
-        verificationOptionsPanel.add(helpTAPN, gbc);
-    }
-
-    private void initPNOptionsComponents() {
-        checkboxPN = new JCheckBox("VerifyPN");
-        checkboxPN.setEnabled(false);
-        checkboxPN.addActionListener(e -> {
-            optionsPN.setEnabled(checkboxPN.isSelected());
-            helpPN.setEnabled(checkboxPN.isSelected());
-        });
-        checkboxPN.setToolTipText(TOOL_TIP_VerifyPNOption);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        verificationOptionsPanel.add(checkboxPN, gbc);
-
-        optionsPN = new JTextField();
-        optionsPN.setEnabled(false);
-        optionsPN.setPreferredSize(new Dimension(200,30));
-        gbc.gridx = 1;
-        verificationOptionsPanel.add(optionsPN, gbc);
-
-        helpDialogPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyPN", ModalityType.MODELESS, new VerifyPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
-
-        helpPN = new JButton("Help");
-        helpPN.setToolTipText(TOOL_TIP_Help);
-        helpPN.setEnabled(false);
-        helpPN.addActionListener(e -> helpDialogPN.setVisible(true));
-
-        gbc.gridx = 2;
-        verificationOptionsPanel.add(helpPN, gbc);
-    }
-
-    private void initDTAPNOptionsComponents() {
-        checkboxDTAPN = new JCheckBox("VerifyDTAPN");
-        checkboxDTAPN.setEnabled(false);
-        checkboxDTAPN.addActionListener(e -> {
-            optionsDTAPN.setEnabled(checkboxDTAPN.isSelected());
-            helpDTAPN.setEnabled(checkboxDTAPN.isSelected());
-        });
-        checkboxDTAPN.setToolTipText(TOOL_TIP_VerifyDTAPNOption);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        verificationOptionsPanel.add(checkboxDTAPN, gbc);
-
-        optionsDTAPN = new JTextField();
-        optionsDTAPN.setEnabled(false);
-        optionsDTAPN.setPreferredSize(new Dimension(200,30));
-        gbc.gridx = 1;
-        verificationOptionsPanel.add(optionsDTAPN, gbc);
-
-        helpDialogDTAPN = new HelpDialog(BatchProcessingDialog.this, "Options for verifyDTAPN", ModalityType.MODELESS, new VerifyDTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
-
-        helpDTAPN = new JButton("Help");
-        helpDTAPN.setToolTipText(TOOL_TIP_Help);
-        helpDTAPN.setEnabled(false);
-        helpDTAPN.addActionListener(e -> helpDialogDTAPN.setVisible(true));
-
-        gbc.gridx = 2;
-        verificationOptionsPanel.add(helpDTAPN, gbc);
-    }
 
 	private void disableVerificationOptionsButtons() {
 		verificationOptionsPanel.setEnabled(false);
@@ -833,10 +682,6 @@ public class BatchProcessingDialog extends JDialog {
         );
     }
 
-	private int getNumberOfExtraTokens() {
-		return (Integer) numberOfExtraTokensInNet.getValue();
-	}
-	
 	private void exit() {
 		terminateBatchProcessing();
 		rootPane.getParent().setVisible(false);
@@ -1133,7 +978,8 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void process() {
 		tableModel.clear();
-		if (defaultYes.isSelected()) {
+		/*TODO LENA - REPLACE
+		   if (defaultYes.isSelected()) {
             currentWorker = new BatchProcessingWorker(files, tableModel, null);
         } else {
             Map<ReductionOption, String> verificationOptions = Map.of(
@@ -1142,7 +988,7 @@ public class BatchProcessingDialog extends JDialog {
                 ReductionOption.VerifyDTAPN, optionsDTAPN.getText()
             );
             currentWorker = new BatchProcessingWorker(files, tableModel, verificationOptions);
-        }
+        }*/
 		currentWorker.addPropertyChangeListener(evt -> {
             if (evt.getPropertyName().equals("state")) {
                 if (evt.getNewValue() == StateValue.DONE) {
@@ -1520,7 +1366,7 @@ public class BatchProcessingDialog extends JDialog {
 						s.append(name_verifyTAPNDiscreteVerificationNone);
 					}
 				} else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce){
-//					if(query.useReduction())
+//					if(query.useReduction()) TODO LENA
 //						s.append(name_UNTIMED_REDUCE);
 //					else if(query.useOverApproximation())
 //						s.append(name_UNTIMED_APPROX);
@@ -1557,32 +1403,6 @@ public class BatchProcessingDialog extends JDialog {
 			return s.toString();
 		}
 	}
-
-    private class OptionsTableCellRenderer extends JLabel implements TableCellRenderer {
-        public OptionsTableCellRenderer(boolean isBordered) {
-        }
-
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (isSelected) {
-                setBackground(table.getSelectionBackground());
-                setForeground(table.getSelectionForeground());
-            } else {
-                setBackground(Color.white);
-                setForeground(Color.black);
-            }
-
-            if (table.getColumnName(column).equals("Keep k-bound")) {
-            }
-
-            setText(value.toString());
-
-            setEnabled(table.isEnabled());
-            setFont(table.getFont());
-            setOpaque(true);
-
-            return this;
-        }
-    }
 
 	public class HelpDialog extends JDialog {
         private JPanel content;
