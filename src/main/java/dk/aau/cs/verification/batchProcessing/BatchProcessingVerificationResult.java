@@ -10,15 +10,21 @@ public class BatchProcessingVerificationResult {
 	private final long verificationTimeInMs;
 	private final String verificationMemory;
 	private final String verificationResult;
-	private final Stats stats;
-	
-	public BatchProcessingVerificationResult(String file, TAPNQuery query, String verificationResult, long verificationTime, String verificationMemory, Stats stats) {
+    private final Stats stats;
+    private final int optionNumber;
+
+    public BatchProcessingVerificationResult(String file, TAPNQuery query, String verificationResult, long verificationTime, String verificationMemory, Stats stats) {
+        this(file, query, verificationResult, verificationTime, verificationMemory, stats, -1);
+    }
+
+	public BatchProcessingVerificationResult(String file, TAPNQuery query, String verificationResult, long verificationTime, String verificationMemory, Stats stats, int optionNumber) {
 		this.file = file;
 		this.query = query;
 		this.verificationResult = verificationResult;
 		verificationTimeInMs = verificationTime;
 		this.verificationMemory = verificationMemory;
 		this.stats = stats;
+		this.optionNumber = optionNumber;
 	}
 	
 	
@@ -54,6 +60,8 @@ public class BatchProcessingVerificationResult {
 	public boolean hasStats() {
 		return !(stats instanceof NullStats);
 	}
-	
-	
+
+    public int getOptionNumber() {
+        return optionNumber;
+    }
 }

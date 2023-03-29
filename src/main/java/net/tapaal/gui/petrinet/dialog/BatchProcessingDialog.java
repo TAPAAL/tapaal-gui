@@ -5,6 +5,8 @@ import java.awt.event.*;
 import java.io.File;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.SwingWorker.StateValue;
@@ -754,17 +756,17 @@ public class BatchProcessingDialog extends JDialog {
 		tableModel = new BatchProcessingResultsTableModel();
 		final JTable table = new JTable(tableModel) {
 			public javax.swing.JToolTip createToolTip() {
-				ToolTipManager.sharedInstance().setDismissDelay(
-						Integer.MAX_VALUE); // disable tooltips disappearing
+				ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE); // disable tooltips disappearing
 				ToolTipManager.sharedInstance().setInitialDelay(200);
 				return new MultiLineAutoWrappingToolTip();
 			}
 		};
 		ResultTableCellRenderer renderer = new ResultTableCellRenderer(true);
-		table.getColumnModel().getColumn(0).setMinWidth(70);
+        table.getTableHeader().setBackground(Color.white);
+        table.getColumnModel().getColumn(0).setMinWidth(70);
 		table.getColumnModel().getColumn(0).setPreferredWidth(70);
 		table.getColumnModel().getColumn(0).setMaxWidth(85);
-		table.getColumn("Method").setCellRenderer(renderer);
+		table.getColumn("Option").setCellRenderer(renderer);
 		table.getColumn("Model").setCellRenderer(renderer);
 		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
@@ -1178,28 +1180,20 @@ public class BatchProcessingDialog extends JDialog {
 					}
 					setBorder(selectedBorder);
 				} else {
-					boolean isResultColumn = table.getColumnName(column)
-							.equals("Result");
-					boolean isQueryColumn = table.getColumnName(column).equals(
-							"Query");
+					boolean isResultColumn = table.getColumnName(column).equals("Result");
+					boolean isQueryColumn = table.getColumnName(column).equals("Query");
 					if (value != null) {
-						if ((isResultColumn && value.toString().equals(
-								SATISFIED_STRING) || 
-								value.toString().equals(SATISFIED_SOUNDNESS_STRING) || value.toString().equals(SATISFIED_STRONG_SOUNDNESS_STRING))
-								|| (isQueryColumn && value.toString().equals(
-										"TRUE")))
-							setBackground(new Color(91, 255, 91)); // light green
-						else if ((isResultColumn && (value.toString().equals(
-								NOT_SATISFIED_STRING) || 
-								value.toString().equals(NOT_SATISFIED_STRING_STRONG_SOUNDNESS) || value.toString().equals(NOT_SATISFIED_STRING_SOUNDNESS)))
-								|| (isQueryColumn && value.toString().equals(
-										"FALSE")))
-							setBackground(new Color(255, 91, 91)); // light  red
-						else if (isResultColumn && value.toString().equals(
-								"Inconclusive"))
-							setBackground(new Color(255, 255, 120)); // light yellow
-						else
-							setBackground(table.getBackground());
+						if ((isResultColumn && value.toString().equals(SATISFIED_STRING) || value.toString().equals(SATISFIED_SOUNDNESS_STRING) ||
+                            value.toString().equals(SATISFIED_STRONG_SOUNDNESS_STRING)) || (isQueryColumn && value.toString().equals("TRUE"))) {
+                            setBackground(new Color(91, 255, 91)); // light green
+                        } else if ((isResultColumn && (value.toString().equals(NOT_SATISFIED_STRING) || value.toString().equals(NOT_SATISFIED_STRING_STRONG_SOUNDNESS) ||
+                            value.toString().equals(NOT_SATISFIED_STRING_SOUNDNESS))) || (isQueryColumn && value.toString().equals("FALSE"))) {
+                            setBackground(new Color(255, 91, 91)); // light  red
+                        } else if (isResultColumn && value.toString().equals( "Inconclusive")) {
+                            setBackground(new Color(255, 255, 120)); // light yellow
+                        } else {
+                            setBackground(table.getBackground());
+                        }
 					} else {
 						setBackground(table.getBackground());
 					}
@@ -1218,11 +1212,10 @@ public class BatchProcessingDialog extends JDialog {
 			if (value != null) {
 				if (value instanceof TAPNQuery) {
 					TAPNQuery newQuery = (TAPNQuery) value;
-
 					setToolTipText(generateTooltipTextFromQuery(newQuery));
 					setText(newQuery.getName());
 				} else if (table.getColumnName(column).equals("Verification Time")
-						|| table.getColumnName(column).equals("Method")
+						|| table.getColumnName(column).equals("Option")
 						|| table.getColumnName(column).equals("Memory Usage")) {
 					setText(value.toString());
 					Point mousePos = table.getMousePosition();
@@ -1234,13 +1227,11 @@ public class BatchProcessingDialog extends JDialog {
 					}
 
 					if (table.getColumnName(column).equals("Verification Time"))
-						setToolTipText(result != null ? generateStatsToolTipText(result)
-								: value.toString());
+						setToolTipText(result != null ? generateStatsToolTipText(result) : value.toString());
 					else if (table.getColumnName(column).equals("Memory Usage"))
-						setToolTipText(result != null ? generateMemoryToolTipText(result)
-								: value.toString());
+						setToolTipText(result != null ? generateMemoryToolTipText(result) : value.toString());
 					else
-						setToolTipText(result != null ? generateReductionString(result.query()) : value.toString());
+						setToolTipText(result != null ? generateReductionString(result.query(), result.getOptionNumber()) : value.toString());
 				} else {
 					setToolTipText(value.toString());
 					setText(value.toString());
@@ -1254,86 +1245,18 @@ public class BatchProcessingDialog extends JDialog {
 		}
 
 		private String generateStatsToolTipText(BatchProcessingVerificationResult result) {
-			StringBuilder s = new StringBuilder();
-			s.append("Verification Time: ");
-			s.append((result.verificationTimeInMs() / 1000.0));
-			s.append(" s");
-			if (result.hasStats()) {
-				s.append(System.getProperty("line.separator"));
-				s.append(System.getProperty("line.separator"));
-				s.append(result.stats().toString());
-			}
-
-			return s.toString();
+            return "Verification Time: " + (result.verificationTimeInMs() / 1000.0) + " s";
 		}
 		
 		private String generateMemoryToolTipText(BatchProcessingVerificationResult result) {
-			StringBuilder s = new StringBuilder();
-			s.append("Peak memory usage (estimate): ");
-			s.append(result.verificationMemory());
-			if (result.hasStats()) {
-				s.append(System.getProperty("line.separator"));
-				s.append(System.getProperty("line.separator"));
-				s.append(result.stats().toString());
-			}
-			return s.toString();
+            return "Peak memory usage (estimate): " + result.verificationMemory();
 		}
 
 		private String generateTooltipTextFromQuery(TAPNQuery query) {
-			StringBuilder s = new StringBuilder();
-			s.append("Extra Tokens: ");
-			s.append(query.getCapacity());
-			s.append("\n\n");
-
-			s.append("Search Method: \n");
-			if (query.getSearchOption() == SearchOption.DFS)
-				s.append(name_DFS);
-			else if (query.getSearchOption() == SearchOption.RANDOM)
-				s.append(name_Random);
-			else if (query.getSearchOption() == SearchOption.HEURISTIC)
-				s.append(name_HEURISTIC);
-			else
-				s.append(name_BFS);
-			s.append("\n\n");
-
-			s.append(generateReductionString(query));
-
-			s.append("\n\n");
-			s.append("Symmetry: ");
-			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
-			
-			s.append("\n\n");
-			s.append("Stubborn Reduction: ");
-			s.append(query.isStubbornReductionEnabled() ? "Yes\n\n" : "No\n\n");
-
-            s.append("\n\n");
-            s.append("Trace Abstract Refinement: ");
-            s.append(query.isTarOptionEnabled() ? "Yes\n\n" : "No\n\n");
-
-            s.append("\n\n");
-            s.append("USe Tarjan: ");
-            s.append(query.isTarjan() ? "Yes\n\n" : "No\n\n");
-
-			s.append("Query Property:\n");
-                        s.append(query.getProperty().toString());
-			
-			s.append("\n\n");
-			s.append("Approximation method: ");
-			if (query.isOverApproximationEnabled()) {
-				s.append(name_OVER_APPROXIMATION);
-			} else if (query.isUnderApproximationEnabled()) {
-				s.append(name_UNDER_APPROXIMATION);
-			} else {
-				s.append(name_NONE_APPROXIMATION);
-			}
-			s.append("\n");
-			s.append("Approximation Constant: ");
-			s.append(query.approximationDenominator());
-
-			return s.toString();
+            return "Query Property:\n" + query.getProperty().toString();
 		}
 
-		private String generateReductionString(TAPNQuery query) {
+		private String generateReductionString(TAPNQuery query, int optionNumber) {
 			StringBuilder s = new StringBuilder();
 			if (query != null) {
 				s.append("Reduction: \n");
@@ -1367,20 +1290,26 @@ public class BatchProcessingDialog extends JDialog {
 					} else {
 						s.append(name_verifyTAPNDiscreteVerificationNone);
 					}
-				} else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce){
-//					if(query.useReduction()) TODO LENA
-//						s.append(name_UNTIMED_REDUCE);
-//					else if(query.useOverApproximation())
-//						s.append(name_UNTIMED_APPROX);
-//					else
-						s.append(name_UNTIMED);
+				} else if (query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce){
+					s.append(name_UNTIMED);
 				} else {
 					s.append(name_BROADCAST);
 				}
-				
-				VerificationOptions options = currentWorker.getVerificationOptionsFromQuery(query);
+
 				s.append("\n\nEngine flags: \n");
-				s.append(options.toString() + "PAS PÅ"); // TODO LENA OBS
+				String options = (String) verificationTable.getValueAt(optionNumber, 1);
+				if (options.equals("Default")) {
+				    s.append(currentWorker.getVerificationOptionsFromQuery(query).toString());
+                } else {
+				    if ((boolean) verificationTable.getValueAt(optionNumber, 2)) {
+                        Pattern pattern = Pattern.compile("\\s*(-k|--k-bound)\\s*(\\d+)\\s*", Pattern.CASE_INSENSITIVE);
+                        Matcher matcher = pattern.matcher(options);
+                        if (matcher.find()) {
+                            options = options.replaceFirst(matcher.group(), matcher.group(1) + " " + query.getCapacity() + " ");
+                        }
+                    }
+				    s.append(options);
+                }
 			}
 			return s.toString();
 		}

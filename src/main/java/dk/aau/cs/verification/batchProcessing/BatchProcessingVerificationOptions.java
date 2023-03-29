@@ -16,6 +16,10 @@ public class BatchProcessingVerificationOptions {
 		this.engine = engine;
 	}
 
+    public int getNumber() {
+        return number;
+    }
+
     public String getOptions() {
         return options;
     }
