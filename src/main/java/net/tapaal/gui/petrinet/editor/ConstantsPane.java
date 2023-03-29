@@ -275,7 +275,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
     // XXX We have to update functions here, one called manually and one called by callback value changed
     //  I think the they might have overlooked the updateButtons method when adding colors. I think the enabled
-    //  buttons uses a index before its updated. Therefor we can't just merge the functions.
+    //  buttons uses a index before its updated. Therefore, we can't just merge the functions.
     private void updateButtons() {
         int index = list.getSelectedIndex();
         if (index == -1 || list.getSelectedValuesList().isEmpty()) {
@@ -881,6 +881,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         @Override
         public void fireContentsChanged(Object source, int index0, int index1) {
             super.fireContentsChanged(source, index0, index1);
+            if (editBtn != null) updateButtons();
         }
 
         public void removeElement(ColorType colorType) {

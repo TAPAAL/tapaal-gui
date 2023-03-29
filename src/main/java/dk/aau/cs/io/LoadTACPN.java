@@ -471,6 +471,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             coloredTokenList.add(numOf);
 
         }
+        if (coloredTokenList.isEmpty()) return null;
         return new AddExpression(coloredTokenList);
     }
 }

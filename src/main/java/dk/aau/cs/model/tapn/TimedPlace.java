@@ -271,7 +271,7 @@ public abstract class TimedPlace {
     }
 
     public void setTokenExpression(ArcExpression colorMarking, ArcExpression newExpression){
-	    if (colorMarking != null && colorMarking.toString().contains(".all"))
+	    if ((colorMarking != null && colorMarking.toString().contains(".all")) || newExpression == null)
 	        tokensAsExpression = colorMarking;
 	    else
             tokensAsExpression = newExpression;
