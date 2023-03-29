@@ -1298,7 +1298,7 @@ public class BatchProcessingDialog extends JDialog {
 
 				s.append("\n\nEngine flags: \n");
 				String options = (String) verificationTable.getValueAt(optionNumber, 1);
-				if (options.equals("Default")) {
+				if (options.equalsIgnoreCase("default")) {
 				    s.append(currentWorker.getVerificationOptionsFromQuery(query).toString());
                 } else {
 				    if ((boolean) verificationTable.getValueAt(optionNumber, 2)) {

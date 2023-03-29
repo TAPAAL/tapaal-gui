@@ -3,6 +3,7 @@ package dk.aau.cs.verification.batchProcessing;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -242,7 +243,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         fireVerificationTaskStarted();
         ApproximationWorker worker = new ApproximationWorker();
 
-        if (option.getOptions().equals("Default")) {
+        if (option.getOptions().equalsIgnoreCase("default")) {
             modelChecker = getModelChecker(query);
             return worker.batchWorker(composedModel, getVerificationOptionsFromQuery(query), query, model, modelChecker, queryToVerify, clonedQuery);
         } else {
