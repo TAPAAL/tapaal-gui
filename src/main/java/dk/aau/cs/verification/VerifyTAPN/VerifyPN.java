@@ -27,11 +27,9 @@ import org.jetbrains.annotations.Nullable;
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -295,15 +293,14 @@ public class VerifyPN implements ModelChecker {
             return;
         }
 
-        List<TimedPlace> inclusionPlaces = new ArrayList<TimedPlace>();
+        List<TimedPlace> inclusionPlaces = new ArrayList<>();
         for (TimedPlace p : verificationOptions.inclusionPlaces().inclusionPlaces()) {
             if (p instanceof LocalTimedPlace) {
                 LocalTimedPlace local = (LocalTimedPlace) p;
                 if (local.model().isActive()) {
                     inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map(local.model().name(), local.name())));
                 }
-            } else // shared place
-            {
+            } else { // shared place
                 inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map("", p.name())));
             }
         }
@@ -328,7 +325,7 @@ public class VerifyPN implements ModelChecker {
             Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
 
             if (queryResult == null || queryResult.value1() == null) {
-                return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
+                return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
             } else {
                 boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
                 boolean showTrace = ((query.getProperty() instanceof TCTLEFNode && queryResult.value1().isQuerySatisfied()) ||
@@ -347,7 +344,7 @@ public class VerifyPN implements ModelChecker {
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
                         model = newComposer.transformModel(loadedModel.network());
 
-                        if (queryResult != null && queryResult.value1() != null) {
+                        if (queryResult.value1() != null) {
                             tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
                         }
 
@@ -374,7 +371,7 @@ public class VerifyPN implements ModelChecker {
                     tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
                 }
 
-                var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
+                var result = new VerificationResult<>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
 
                 return result;
             }
@@ -446,14 +443,13 @@ public class VerifyPN implements ModelChecker {
             return "";
         }
         StringBuilder buffer = new StringBuilder();
-        String line = null;
+        String line;
         try {
             while ((line = reader.readLine()) != null) {
                 buffer.append(line);
                 buffer.append(System.getProperty("line.separator"));
             }
-        } catch (IOException e) {
-        }
+        } catch (IOException ignored) { }
 
         return buffer.toString();
     }
@@ -480,18 +476,14 @@ public class VerifyPN implements ModelChecker {
         if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL) {
             return true;
         }
-        if (query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
-            return false;
-        }
-
-        return true;
+        return !(query.getProperty() instanceof TCTLEGNode) && !(query.getProperty() instanceof TCTLAFNode);
     }
 
     public static void reset() {
         //Clear value
         verifypnpath = "";
         Preferences.getInstance().setVerifypnLocation(null);
-        //Set the detault
+        //Set the default
         trySetup();
     }
 

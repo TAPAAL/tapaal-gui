@@ -3,49 +3,35 @@ package dk.aau.cs.verification.batchProcessing;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
 import dk.aau.cs.verification.VerifyTAPN.*;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
-import net.tapaal.gui.petrinet.verification.Verifier;
 import net.tapaal.gui.petrinet.widgets.QueryPane;
 import dk.aau.cs.Messenger;
-import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.TCTLTrueNode;
-import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.approximation.ApproximationWorker;
 import net.tapaal.gui.petrinet.dialog.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingModelLoader;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
-import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
-import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
@@ -53,13 +39,10 @@ import dk.aau.cs.verification.NullStats;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.TAPNComposer;
-import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.ExtrapolationOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
 	private final List<File> files;
@@ -165,62 +148,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         }
     }
 
-	/*private net.tapaal.gui.petrinet.verification.TAPNQuery createQueryFromQueryPropertyOption(TimedArcPetriNet model, QueryPropertyOption option, File fileToBeChecked) throws Exception {
-		int capacity = batchProcessingVerificationOptions.capacity();
-		ReductionOption reductionOption = model.isUntimed() ? ReductionOption.VerifyPN : ReductionOption.VerifyTAPN;
-		if(option == QueryPropertyOption.ExistDeadlock) {
-			filesProcessed.add(fileToBeChecked);
-			return new net.tapaal.gui.petrinet.verification.TAPNQuery(
-					"Existence of a deadlock", capacity,
-							generateExistDeadlock(model), TraceOption.NONE,
-							SearchOption.DEFAULT,
-							reductionOption, true, true,
-							false, true, false, null, ExtrapolationOption.AUTOMATIC,
-							WorkflowMode.WORKFLOW_SOUNDNESS, model.isColored());
-		}
-		if(option == QueryPropertyOption.SearchWholeStateSpace) {
-			filesProcessed.add(fileToBeChecked);
-			return new net.tapaal.gui.petrinet.verification.TAPNQuery(
-					"Search whole state space", capacity,
-							generateSearchWholeStateSpaceProperty(model), TraceOption.NONE,
-							SearchOption.DEFAULT,
-							reductionOption, true, true,
-							false, true, false, null, ExtrapolationOption.AUTOMATIC,
-							WorkflowMode.WORKFLOW_SOUNDNESS, model.isColored());
-		}
-		if (option == QueryPropertyOption.Soundness) {
-			isSoundnessCheck = true;
-			filesProcessed.add(fileToBeChecked);
-			return new net.tapaal.gui.petrinet.verification.TAPNQuery(
-				"Workflow soundness check", capacity,
-						new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
-						SearchOption.DEFAULT,
-						ReductionOption.VerifyDTAPN, true, true,
-						false, true, false, null, ExtrapolationOption.AUTOMATIC,
-						WorkflowMode.WORKFLOW_SOUNDNESS, model.isColored());
-		}
-		if(option == QueryPropertyOption.StrongSoundness) {
-			isSoundnessCheck = true;
-			filesProcessed.add(fileToBeChecked);
-        	return new net.tapaal.gui.petrinet.verification.TAPNQuery(
-					"Workflow soundness check", capacity,
-							new TCTLEGNode(new TCTLTrueNode()), TraceOption.SOME,
-							SearchOption.DEFAULT,
-							ReductionOption.VerifyDTAPN, true, true,
-							false, true, false, null, ExtrapolationOption.AUTOMATIC,
-							WorkflowMode.WORKFLOW_STRONG_SOUNDNESS, model.isColored());
-		}
-		return null;
-	}*/
-
-	/*private boolean getSymmetryFromBatchProcessingOptions() {
-		return batchProcessingVerificationOptions.symmetry() == SymmetryOption.Yes;
-	}
-        
-	private boolean getStubbornReductionFromBatchProcessingOptions(){
-		return batchProcessingVerificationOptions.stubbornReductionOption() == StubbornReductionOption.Yes;
-	}*/
-
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
 		ITAPNComposer composer = new TAPNComposer(new Messenger(){
 			public void displayInfoMessage(String message) { }
@@ -310,22 +237,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		publish(result);
 	}
 
-	
-	private void renameTraceTransitions(TimedArcPetriNetTrace trace) {
-		if (trace != null)
-			trace.reduceTraceForOriginalNet("_traceNet_", "PTRACE");
-	}
-
-	private TAPNNetworkTrace decomposeTrace(TimedArcPetriNetTrace trace, NameMapping mapping) {
-		if (trace == null)
-			return null;
-
-		TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(trace, model.network(), mapping);
-		return decomposer.decompose();
-	}
-
     private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query, BatchProcessingVerificationOptions option) throws Exception {
-        TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(), query);
+        TAPNQuery queryToVerify = getTAPNQuery(query);
         queryToVerify.setCategory(query.getCategory());
         MapQueryToNewNames(queryToVerify, composedModel.value2());
 
@@ -338,7 +251,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
         if (option.getOptions().equals("Default")) {
             modelChecker = getModelChecker(query);
-            return worker.batchWorker(composedModel, getVerificationOptionsFromQuery(query), query, model, modelChecker, queryToVerify, clonedQuery, this);
+            return worker.batchWorker(composedModel, getVerificationOptionsFromQuery(query), query, model, modelChecker, queryToVerify, clonedQuery);
         } else {
             String options = option.getOptions();
             if (option.keepKBound()) {
@@ -353,43 +266,14 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
             } else {
                 modelChecker = getModelChecker(option.getEngine());
             }
-            return worker.batchWorker(composedModel, options, query, model, modelChecker, queryToVerify, clonedQuery, this);
+            return worker.batchWorker(composedModel, options, query, model, modelChecker, queryToVerify, clonedQuery);
         }
     }
-	
-	/*private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query) throws Exception {
-		TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(),query);
-		queryToVerify.setCategory(query.getCategory());
-		MapQueryToNewNames(queryToVerify, composedModel.value2());
 
-		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens());
-		clonedQuery.setCategory(query.getCategory());
-		MapQueryToNewNames(clonedQuery, composedModel.value2());
-		
-		VerificationOptions options = getVerificationOptionsFromQuery(query);
-		modelChecker = getModelChecker(query);
-		fireVerificationTaskStarted();
-		
-		ApproximationWorker worker = new ApproximationWorker();
-		return worker.batchWorker(composedModel, options, query, model, modelChecker, queryToVerify, clonedQuery, this);
-	}*/
-
-	private TAPNQuery getTAPNQuery(TimedArcPetriNet model, net.tapaal.gui.petrinet.verification.TAPNQuery query) throws Exception {
+	private TAPNQuery getTAPNQuery(net.tapaal.gui.petrinet.verification.TAPNQuery query) throws Exception {
 		return new TAPNQuery(query.getProperty().copy(), query.getCapacity());
 	}
 
-	private TCTLAbstractProperty generateSearchWholeStateSpaceProperty(TimedArcPetriNet model) throws Exception {
-		TimedPlace p = model.places().iterator().next();
-		if (p == null)
-			throw new Exception("Model contains no places. This may not happen.");
-		
-		return new TCTLAGNode(new TCTLTrueNode());
-	}
-        
-	private TCTLAbstractProperty generateExistDeadlock(TimedArcPetriNet model) throws Exception {
-		return new TCTLEFNode(new TCTLDeadlockNode()); 
-	}
-	
 	private ModelChecker getModelChecker(net.tapaal.gui.petrinet.verification.TAPNQuery query) {
 		if (query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return getVerifyTAPN();
@@ -487,11 +371,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	public void addBatchProcessingListener(BatchProcessingListener listener) {
 		Require.that(listener != null, "Listener cannot be null");
 		listeners.add(listener);
-	}
-
-	public void removeBatchProcessingListener(BatchProcessingListener listener) {
-		Require.that(listener != null, "Listener cannot be null");
-		listeners.remove(listener);
 	}
 	
 	private void fireStatusChanged(String status) {

@@ -13,6 +13,8 @@ import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.*;
 
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import net.tapaal.gui.petrinet.undo.AddFileBatchProcessingCommand;
 import net.tapaal.gui.petrinet.undo.Command;
@@ -59,11 +61,6 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_DFS = "Depth first search";
 	private static final String name_HEURISTIC = "Heuristic search";
 	private static final String name_Random = "Random search";
-	private static final String name_KeepQueryOption = "Do not override";
-	private static final String name_SEARCHWHOLESTATESPACE = "Search whole state space";
-	private static final String name_SOUNDNESS = "Soundness";
-	private static final String name_STRONGSOUNDNESS = "Strong Soundness";
-	private static final String name_EXISTDEADLOCK = "Existence of a deadlock";
 	private static final String name_NONE_APPROXIMATION = "None";
 	private static final String name_OVER_APPROXIMATION = "Over-approximation";
 	private static final String name_UNDER_APPROXIMATION = "Under-approximation";
@@ -75,16 +72,7 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all nets from list";
 	
 	//Tool tips for override verification panel
-	private final static String TOOL_TIP_QueryLabel = null;
-	private final static String TOOL_TIP_Query_Property_Option = "Choose to override the queries in the nets";
-	private final static String TOOL_TIP_CapacityLabel = null;
-	private final static String TOOL_TIP_Number_Of_Extra_Tokens = "Enter the number of extra tokens in the nets";
-	private final static String TOOL_TIP_KeepQueryCapacity = "Override the number of extra tokens in the nets";
 	private final static String TOOL_TIP_Help = "See the options available for the specific engine";
-    private final static String TOOL_TIP_DefaultOption = "Choose to keep the same verification methods as in the nets";
-    private final static String TOOL_TIP_VerifyTAPNOption = "Choose to override the verification methods in the nets to verifyTAPN";
-    private final static String TOOL_TIP_VerifyPNOption = "Choose to override the verification methods in the nets to verifyPN";
-    private final static String TOOL_TIP_VerifyDTAPNOption = "Choose to override the verification methods in the nets to verifyDTAPN";
 	private final static String TOOL_TIP_TimeoutLabel = null;
 	private final static String TOOL_TIP_TimeoutValue = "Enter the timeout in seconds";
 	private final static String TOOL_TIP_NoTimeoutCheckBox = "Choose whether to use timeout";
@@ -157,7 +145,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	private BatchProcessingResultsTableModel tableModel;
 
-	private final List<File> files = new ArrayList<File>();
+	private final List<File> files = new ArrayList<>();
 	private BatchProcessingWorker currentWorker;
 	private final UndoManager undoManager = new UndoManager(null);
 	
@@ -539,7 +527,7 @@ public class BatchProcessingDialog extends JDialog {
             BatchProcessingDialog.this,
             "Options for verifyPN",
             ModalityType.MODELESS,
-            new VerifyTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
+            new VerifyPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
 
         JButton helpPN = new JButton("Help verifypn");
         gbc.gridx = 2;
@@ -551,7 +539,7 @@ public class BatchProcessingDialog extends JDialog {
             BatchProcessingDialog.this,
             "Options for verifyDTAPN",
             ModalityType.MODELESS,
-            new VerifyTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
+            new VerifyDTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
 
         JButton helpDTAPN = new JButton("Help verifyDTAPN");
         gbc.gridx = 3;
@@ -671,7 +659,6 @@ public class BatchProcessingDialog extends JDialog {
             c.setEnabled(true);
         }
 
-		//approximationDenominator.setEnabled(!approximationDenominatorCheckbox.isSelected());
 		timeoutValue.setEnabled(useTimeout());
 	}
 
