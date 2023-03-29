@@ -677,26 +677,7 @@ public class ApproximationWorker {
         TAPNQuery clonedQuery,
         BatchProcessingWorker verificationBase
     ) throws Exception {
-        /*InclusionPlaces oldInclusionPlaces = null;
-        if (options instanceof VerifyTAPNOptions)
-            oldInclusionPlaces = ((VerifyTAPNOptions) options).inclusionPlaces();*/
-
-        Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = new Tuple<TimedArcPetriNet, NameMapping>(composedModel.value1().copy(), composedModel.value2());
-
-        /*TraceOption oldTraceOption = options.traceOption();
-        if (query != null && query.isOverApproximationEnabled()) {
-            // Create a fresh model
-            composedModel = composeModel(model);
-            OverApproximation overaprx = new OverApproximation();
-            overaprx.modifyTAPN(composedModel.value1(), query.approximationDenominator());
-            options.setTraceOption(TraceOption.SOME);
-        } else if (query != null && query.isUnderApproximationEnabled()) {
-            // Create a fresh model
-            composedModel = composeModel(model);
-            UnderApproximation underaprx = new UnderApproximation();
-            underaprx.modifyTAPN(composedModel.value1(), query.approximationDenominator());
-            options.setTraceOption(TraceOption.SOME);
-        }*/
+        Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = new Tuple<>(composedModel.value1().copy(), composedModel.value2());
 
         VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verifyManually(options, composedModel, queryToVerify, query, null);
 

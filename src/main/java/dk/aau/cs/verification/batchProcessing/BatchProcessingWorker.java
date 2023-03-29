@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
@@ -62,7 +64,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
 	private final List<File> files;
 	private final BatchProcessingResultsTableModel tableModel;
-	private final Map<ReductionOption, String> options;
+	private final List<BatchProcessingVerificationOptions> options;
 	private boolean isExiting = false;
 	private ModelChecker modelChecker;
 	final List<BatchProcessingListener> listeners = new ArrayList<>();
@@ -75,7 +77,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private boolean isModelCheckOnly;
 	private ArrayList<File> filesProcessed;
 
-    public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, Map<ReductionOption, String> options) {
+    public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, List<BatchProcessingVerificationOptions> options) {
         super();
         this.files = files;
         this.tableModel = tableModel;
@@ -135,13 +137,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
                     processQuery(file, composedModel, query);
                 }
-                if (model.queries().isEmpty() && options == null) {
-                    /*net.tapaal.gui.petrinet.verification.TAPNQuery queryToVerify = createQueryFromQueryPropertyOption(composedModel.value1(), batchProcessingVerificationOptions.queryPropertyOption(), file);
-                    processQuery(file, composedModel, queryToVerify);
-                    TODO: Lena - måske slet?
-                    */
-                    throw new NullPointerException();
-                }
             }
         }
         fireFileChanged("");
@@ -153,22 +148,18 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
                               net.tapaal.gui.petrinet.verification.TAPNQuery queryToVerify) throws Exception {
         if (!queryToVerify.isActive()) {
             publishResult(file.getName(), queryToVerify, "Skipped - query is disabled because it contains propositions involving places from a deactivated component", 0, new NullStats());
-        } else if (options == null) {
-            processQuery(file, composedModel, queryToVerify, null);
-        } else {
-            for (Map.Entry<ReductionOption, String> optionEntry : options.entrySet()) {
-                if (!optionEntry.getValue().isEmpty()) {
-                    processQuery(file, composedModel, queryToVerify, optionEntry);
-                }
-            }
         }
+        for (BatchProcessingVerificationOptions option : options) {
+            processQuery(file, composedModel, queryToVerify, option);
+        }
+
 		fireVerificationTaskComplete();
 	}
 
 	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel,
                               net.tapaal.gui.petrinet.verification.TAPNQuery queryToVerify,
-                              Map.Entry<ReductionOption, String> optionEntry) throws Exception {
-        VerificationResult<TimedArcPetriNetTrace> verificationResult = verifyQuery(file, composedModel, queryToVerify, optionEntry);
+                              BatchProcessingVerificationOptions option) throws Exception {
+        VerificationResult<TimedArcPetriNetTrace> verificationResult = verifyQuery(file, composedModel, queryToVerify, option);
         if (verificationResult != null) {
             processVerificationResult(file, queryToVerify, verificationResult);
         }
@@ -242,12 +233,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         return composer.transformModel(model.network());
 	}
 
-	private VerificationResult<TimedArcPetriNetTrace> verifyQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query, Map.Entry<ReductionOption, String> optionEntry) throws Exception {
+	private VerificationResult<TimedArcPetriNetTrace> verifyQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query, BatchProcessingVerificationOptions option) throws Exception {
 		fireStatusChanged(query.getName());
 
-		VerificationResult<TimedArcPetriNetTrace> verificationResult = null;
+		VerificationResult<TimedArcPetriNetTrace> verificationResult;
 		try {
-			verificationResult = verify(composedModel, query, optionEntry);
+			verificationResult = verify(composedModel, query, option);
 		} catch (UnsupportedModelException e) {
             publishResult(file.getName(), query, "Skipped - model not supported by the verification method", 0, new NullStats());
 			return null;
@@ -333,7 +324,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return decomposer.decompose();
 	}
 
-    private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query, Map.Entry<ReductionOption, String> optionEntry) throws Exception {
+    private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query, BatchProcessingVerificationOptions option) throws Exception {
         TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(), query);
         queryToVerify.setCategory(query.getCategory());
         MapQueryToNewNames(queryToVerify, composedModel.value2());
@@ -345,13 +336,24 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         fireVerificationTaskStarted();
         ApproximationWorker worker = new ApproximationWorker();
 
-        if (optionEntry == null) {
-            VerificationOptions option = getVerificationOptionsFromQuery(query);
+        if (option.getOptions().equals("Default")) {
             modelChecker = getModelChecker(query);
-            return worker.batchWorker(composedModel, option, query, model, modelChecker, queryToVerify, clonedQuery, this);
+            return worker.batchWorker(composedModel, getVerificationOptionsFromQuery(query), query, model, modelChecker, queryToVerify, clonedQuery, this);
         } else {
-            modelChecker = getModelChecker(optionEntry.getKey());
-            return worker.batchWorker(composedModel, optionEntry.getValue(), query, model, modelChecker, queryToVerify, clonedQuery, this);
+            String options = option.getOptions();
+            if (option.keepKBound()) {
+                Pattern pattern = Pattern.compile("\\s*(-k|--k-bound)\\s*(\\d+)\\s*", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(options);
+                if (matcher.find()) {
+                    options = options.replace(matcher.group(), matcher.group(1) + " " + query.getCapacity() + " ");
+                }
+            }
+            if (option.getEngine() == null) {
+                modelChecker = getModelChecker(query);
+            } else {
+                modelChecker = getModelChecker(option.getEngine());
+            }
+            return worker.batchWorker(composedModel, options, query, model, modelChecker, queryToVerify, clonedQuery, this);
         }
     }
 	
