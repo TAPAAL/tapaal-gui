@@ -435,8 +435,8 @@ public class BatchProcessingDialog extends JDialog {
         String[] engineNames = {"Default", "VerifyPN", "VerifyDTAPN", "VerifyTAPN"};
         engines = new JComboBox<>(engineNames);
 
-        Object[] columnNames = {"", "Verification options", "Keep k-bound", "Engine"};
-        Object[][] data = {{0, "Default", Boolean.TRUE, "Default"}};
+        Object[] columnNames = {"Run", "Option", "Verification options", "Keep k-bound", "Engine"};
+        Object[][] data = {{Boolean.TRUE, 0, "Default", Boolean.TRUE, "Default"}};
 
         optionsTable = new DefaultTableModel(data, columnNames) {
             public Class<?> getColumnClass(int column) {
@@ -445,7 +445,7 @@ public class BatchProcessingDialog extends JDialog {
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column != 0;
+                return column != 1;
             }
         };
 
@@ -453,11 +453,14 @@ public class BatchProcessingDialog extends JDialog {
         verificationTable.getTableHeader().setOpaque(true);
         verificationTable.getTableHeader().setBackground(Color.white);
         verificationTable.setPreferredScrollableViewportSize(verificationTable.getPreferredSize());
-        verificationTable.getColumn(columnNames[0]).setMaxWidth(20);
-        verificationTable.getColumn(columnNames[2]).setMinWidth(100);
-        verificationTable.getColumn(columnNames[2]).setMaxWidth(100);
+        verificationTable.getColumn(columnNames[0]).setMinWidth(30);
+        verificationTable.getColumn(columnNames[0]).setMaxWidth(30);
+        verificationTable.getColumn(columnNames[1]).setMinWidth(50);
+        verificationTable.getColumn(columnNames[1]).setMaxWidth(50);
         verificationTable.getColumn(columnNames[3]).setMinWidth(100);
         verificationTable.getColumn(columnNames[3]).setMaxWidth(100);
+        verificationTable.getColumn(columnNames[4]).setMinWidth(100);
+        verificationTable.getColumn(columnNames[4]).setMaxWidth(100);
         verificationTable.changeSelection(0, 0, false, false);
 
         optionsTable.addTableModelListener(e -> {
@@ -466,7 +469,7 @@ public class BatchProcessingDialog extends JDialog {
             }
         });
 
-        verificationTable.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(engines));
+        verificationTable.getColumnModel().getColumn(4).setCellEditor(new DefaultCellEditor(engines));
 
         JScrollPane scrollPane = new JScrollPane(verificationTable);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -512,7 +515,7 @@ public class BatchProcessingDialog extends JDialog {
         gbc.fill = GridBagConstraints.BOTH;
         optionsPanel.add(addOptionButton, gbc);
         addOptionButton.addActionListener(e ->
-            optionsTable.addRow(new Object[]{optionsTable.getRowCount(), "", Boolean.TRUE, "VerifyPN"})
+            optionsTable.addRow(new Object[]{Boolean.TRUE, optionsTable.getRowCount(), "", Boolean.TRUE, "VerifyPN"})
         );
 
         JButton removeOptionButton = new JButton("Remove");
@@ -521,7 +524,7 @@ public class BatchProcessingDialog extends JDialog {
         removeOptionButton.addActionListener(e -> {
             optionsTable.removeRow(verificationTable.getSelectedRow());
             for (int rowIndex = 0; rowIndex < verificationTable.getRowCount(); rowIndex++) {
-                verificationTable.setValueAt(rowIndex, rowIndex, 0);
+                verificationTable.setValueAt(rowIndex, rowIndex, 1);
             }
         });
 
@@ -667,7 +670,9 @@ public class BatchProcessingDialog extends JDialog {
 	private List<BatchProcessingVerificationOptions> getVerificationOptions() {
         List<BatchProcessingVerificationOptions> data = new ArrayList<>();
         for (int i = 0; i < verificationTable.getRowCount(); i++) {
-            String engine = (String) verificationTable.getValueAt(i, 3);
+            if (verificationTable.getValueAt(i, 0) == Boolean.FALSE) continue;
+
+            String engine = (String) verificationTable.getValueAt(i, 4);
             ReductionOption reductionOption;
             switch (engine) {
                 case "VerifyPN":
@@ -684,9 +689,9 @@ public class BatchProcessingDialog extends JDialog {
             }
 
             data.add(new BatchProcessingVerificationOptions(
-                (int) verificationTable.getValueAt(i, 0),
-                (String) verificationTable.getValueAt(i, 1),
-                (boolean) verificationTable.getValueAt(i, 2),
+                (int) verificationTable.getValueAt(i, 1),
+                (String) verificationTable.getValueAt(i, 2),
+                (boolean) verificationTable.getValueAt(i, 3),
                 reductionOption
             ));
         }
@@ -782,7 +787,7 @@ public class BatchProcessingDialog extends JDialog {
 		// Enable sorting
 		Comparator<Object> comparator = new StringComparator();
 		
-		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
+		TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
 		for(int i = 0; i < table.getColumnCount(); i++){
 			sorter.setComparator(i, comparator);
 		}
@@ -1297,11 +1302,11 @@ public class BatchProcessingDialog extends JDialog {
 				}
 
 				s.append("\n\nEngine flags: \n");
-				String options = (String) verificationTable.getValueAt(optionNumber, 1);
+				String options = (String) verificationTable.getValueAt(optionNumber, 2);
 				if (options.equalsIgnoreCase("default")) {
 				    s.append(currentWorker.getVerificationOptionsFromQuery(query).toString());
                 } else {
-				    if ((boolean) verificationTable.getValueAt(optionNumber, 2)) {
+				    if ((boolean) verificationTable.getValueAt(optionNumber, 3)) {
                         Pattern pattern = Pattern.compile("\\s*(-k|--k-bound)\\s*(\\d+)\\s*", Pattern.CASE_INSENSITIVE);
                         Matcher matcher = pattern.matcher(options);
                         if (matcher.find()) {
