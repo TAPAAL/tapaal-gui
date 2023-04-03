@@ -393,8 +393,8 @@ public class VerifyDTAPN implements ModelChecker{
 
 	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
 		String queryString = "";
-	    if (((VerifyDTAPNOptions) options).getWorkflowMode() == WorkflowMode.NOT_WORKFLOW ||
-            ((VerifyDTAPNOptions) options).getWorkflowMode() == null) {
+	    if (options instanceof VerifyDTAPNOptions && (((VerifyDTAPNOptions) options).getWorkflowMode() == WorkflowMode.NOT_WORKFLOW ||
+            ((VerifyDTAPNOptions) options).getWorkflowMode() == null)) {
 			queryString = ' ' + queryFile;
 		}
         return options.toString() + ' ' + modelFile + queryString;

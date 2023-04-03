@@ -483,7 +483,7 @@ public class BatchProcessingDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 5;
+        gbc.gridwidth = 6;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;

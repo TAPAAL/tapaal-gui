@@ -243,8 +243,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         fireVerificationTaskStarted();
         ApproximationWorker worker = new ApproximationWorker();
 
+        modelChecker = option.getEngine() == null ? getModelChecker(query) : getModelChecker(option.getEngine());
+
         if (option.getOptions().equalsIgnoreCase("default")) {
-            modelChecker = getModelChecker(query);
             return worker.batchWorker(composedModel, getVerificationOptionsFromQuery(query), query, model, modelChecker, queryToVerify, clonedQuery);
         } else {
             String options = option.getOptions();
@@ -254,11 +255,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
                 if (matcher.find()) {
                     options = options.replaceFirst(matcher.group(), matcher.group(1) + " " + query.getCapacity() + " ");
                 }
-            }
-            if (option.getEngine() == null) {
-                modelChecker = getModelChecker(query);
-            } else {
-                modelChecker = getModelChecker(option.getEngine());
             }
             return worker.batchWorker(composedModel, options, query, model, modelChecker, queryToVerify, clonedQuery);
         }

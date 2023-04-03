@@ -386,7 +386,7 @@ public class ApproximationWorker {
 		if (options instanceof VerifyTAPNOptions)
 			oldInclusionPlaces = ((VerifyTAPNOptions) options).inclusionPlaces();
 		
-		Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = new Tuple<TimedArcPetriNet, NameMapping>(composedModel.value1().copy(), composedModel.value2());
+		Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = new Tuple<>(composedModel.value1().copy(), composedModel.value2());
 		
 		TraceOption oldTraceOption = options.traceOption();
 		if (query != null && query.isOverApproximationEnabled()) {
