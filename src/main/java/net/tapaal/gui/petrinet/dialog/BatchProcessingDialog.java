@@ -1158,7 +1158,7 @@ public class BatchProcessingDialog extends JDialog {
 		fileList.setEnabled(true);
 		addFilesButton.setEnabled(true);
 
-		if (listModel.size() > 0) {
+		if (!isQueryListEmpty() || listModel.size() > 0) {
 			clearFilesButton.setEnabled(true);
 			startButton.setEnabled(true);
 		} else {
