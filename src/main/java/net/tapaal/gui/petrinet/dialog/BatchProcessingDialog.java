@@ -47,17 +47,17 @@ import dk.aau.cs.verification.batchProcessing.StatusChangedEvent;
 import dk.aau.cs.verification.batchProcessing.VerificationTaskCompleteEvent;
 
 public class BatchProcessingDialog extends JDialog {
-	private static final String name_verifyTAPN = "TAPAAL Continuous Engine (verifytapn)";
+	private static final String name_verifyTAPN = "TAPAAL Continuous Engine (VerifyTAPN)";
 	private static final String name_verifyTAPNDiscreteVerificationTimeDartPTrie = "TAPAAL Discrete Engine w. Time Darts and PTrie";
 	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "TAPAAL Discrete Engine w. Time Darts";
 	private static final String name_verifyTAPNDiscreteVerificationPTrie = "TAPAAL Discrete Engine w. PTries";
-	private static final String name_verifyTAPNDiscreteVerificationNone = "TAPAAL Discrete Engine (verifydtapn) w. no Optimizations";
+	private static final String name_verifyTAPNDiscreteVerificationNone = "TAPAAL Discrete Engine (VerifyDTAPN) w. no Optimizations";
 	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
-	private static final String name_UNTIMED = "TAPAAL Untimed CTL Engine (verifypn)";
+	private static final String name_UNTIMED = "TAPAAL Untimed CTL Engine (VerifyPN)";
 
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
@@ -544,11 +544,11 @@ public class BatchProcessingDialog extends JDialog {
 
         helpDialogPN = new HelpDialog(
             BatchProcessingDialog.this,
-            "Options for verifyPN",
+            "Options for VerifyPN",
             ModalityType.MODELESS,
             new VerifyPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
 
-        JButton helpPN = new JButton("Help verifypn");
+        JButton helpPN = new JButton("Help VerifyPN");
         gbc.gridx = 3;
         optionsPanel.add(helpPN, gbc);
         helpPN.setToolTipText(TOOL_TIP_Help);
@@ -556,11 +556,11 @@ public class BatchProcessingDialog extends JDialog {
 
         helpDialogDTAPN = new HelpDialog(
             BatchProcessingDialog.this,
-            "Options for verifyDTAPN",
+            "Options for VerifyDTAPN",
             ModalityType.MODELESS,
             new VerifyDTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
 
-        JButton helpDTAPN = new JButton("Help verifyDTAPN");
+        JButton helpDTAPN = new JButton("Help VerifyDTAPN");
         gbc.gridx = 4;
         optionsPanel.add(helpDTAPN, gbc);
         helpDTAPN.setToolTipText(TOOL_TIP_Help);
@@ -568,11 +568,11 @@ public class BatchProcessingDialog extends JDialog {
 
         helpDialogTAPN = new HelpDialog(
             BatchProcessingDialog.this,
-            "Options for verifyTAPN",
+            "Options for VerifyTAPN",
             ModalityType.MODELESS,
             new VerifyTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
 
-        JButton helpTAPN = new JButton("Help verifyTAPN");
+        JButton helpTAPN = new JButton("Help VerifyTAPN");
         gbc.gridx = 5;
         optionsPanel.add(helpTAPN, gbc);
         helpTAPN.setToolTipText(TOOL_TIP_Help);
