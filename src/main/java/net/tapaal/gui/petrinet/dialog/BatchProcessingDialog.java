@@ -515,11 +515,25 @@ public class BatchProcessingDialog extends JDialog {
         gbc.fill = GridBagConstraints.BOTH;
         optionsPanel.add(addOptionButton, gbc);
         addOptionButton.addActionListener(e ->
-            optionsTable.addRow(new Object[]{Boolean.TRUE, optionsTable.getRowCount(), "", Boolean.TRUE, "VerifyPN"})
+            optionsTable.addRow(new Object[]{Boolean.TRUE, optionsTable.getRowCount(), "-x 1", Boolean.TRUE, "VerifyPN"})
         );
 
-        JButton removeOptionButton = new JButton("Remove");
+        JButton copyOptionButton = new JButton("Copy");
         gbc.gridx = 1;
+        optionsPanel.add(copyOptionButton, gbc);
+        copyOptionButton.addActionListener(e -> {
+            int row = verificationTable.getSelectedRow();
+            optionsTable.addRow(new Object[]{
+                verificationTable.getValueAt(row, 0),
+                optionsTable.getRowCount(),
+                verificationTable.getValueAt(row, 2),
+                verificationTable.getValueAt(row, 3),
+                verificationTable.getValueAt(row, 4)
+            });
+        });
+
+        JButton removeOptionButton = new JButton("Remove");
+        gbc.gridx = 2;
         optionsPanel.add(removeOptionButton, gbc);
         removeOptionButton.addActionListener(e -> {
             optionsTable.removeRow(verificationTable.getSelectedRow());
@@ -535,7 +549,7 @@ public class BatchProcessingDialog extends JDialog {
             new VerifyPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
 
         JButton helpPN = new JButton("Help verifypn");
-        gbc.gridx = 2;
+        gbc.gridx = 3;
         optionsPanel.add(helpPN, gbc);
         helpPN.setToolTipText(TOOL_TIP_Help);
         helpPN.addActionListener(e -> helpDialogPN.setVisible(true));
@@ -547,7 +561,7 @@ public class BatchProcessingDialog extends JDialog {
             new VerifyDTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
 
         JButton helpDTAPN = new JButton("Help verifyDTAPN");
-        gbc.gridx = 3;
+        gbc.gridx = 4;
         optionsPanel.add(helpDTAPN, gbc);
         helpDTAPN.setToolTipText(TOOL_TIP_Help);
         helpDTAPN.addActionListener(e -> helpDialogDTAPN.setVisible(true));
@@ -559,7 +573,7 @@ public class BatchProcessingDialog extends JDialog {
             new VerifyTAPN(new FileFinder(), new MessengerImpl()).getHelpOptions());
 
         JButton helpTAPN = new JButton("Help verifyTAPN");
-        gbc.gridx = 4;
+        gbc.gridx = 5;
         optionsPanel.add(helpTAPN, gbc);
         helpTAPN.setToolTipText(TOOL_TIP_Help);
         helpTAPN.addActionListener(e -> helpDialogTAPN.setVisible(true));
