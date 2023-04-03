@@ -1161,17 +1161,13 @@ public class BatchProcessingDialog extends JDialog {
 		if (listModel.size() > 0) {
 			clearFilesButton.setEnabled(true);
 			startButton.setEnabled(true);
-			removeFileButton.setEnabled(true);
 		} else {
 			clearFilesButton.setEnabled(false);
 			startButton.setEnabled(false);
-			removeFileButton.setEnabled(false);
 		}
 
-		if (tableModel.getRowCount() > 0)
-			exportButton.setEnabled(true);
-		else
-			exportButton.setEnabled(false);
+        removeFileButton.setEnabled(fileList.getSelectedIndices().length > 0);
+        exportButton.setEnabled(tableModel.getRowCount() > 0);
 
 		enabledVerificationOptionButtons();
 	}
