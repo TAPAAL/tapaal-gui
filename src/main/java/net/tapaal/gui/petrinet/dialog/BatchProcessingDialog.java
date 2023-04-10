@@ -785,7 +785,11 @@ public class BatchProcessingDialog extends JDialog {
         table.getColumnModel().getColumn(0).setMinWidth(70);
 		table.getColumnModel().getColumn(0).setPreferredWidth(70);
 		table.getColumnModel().getColumn(0).setMaxWidth(85);
-		table.getColumn("Option").setCellRenderer(renderer);
+        table.getColumnModel().getColumn(4).setMinWidth(100);
+        table.getColumnModel().getColumn(4).setMaxWidth(150);
+        table.getColumnModel().getColumn(5).setMinWidth(100);
+        table.getColumnModel().getColumn(5).setMaxWidth(150);
+        table.getColumn("Option").setCellRenderer(renderer);
 		table.getColumn("Model").setCellRenderer(renderer);
 		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
