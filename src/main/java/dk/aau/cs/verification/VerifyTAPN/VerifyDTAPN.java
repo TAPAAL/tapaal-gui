@@ -223,7 +223,8 @@ public class VerifyDTAPN implements ModelChecker{
 			throw new UnsupportedQueryException("Verifydtapn does not support the given query-option combination. ");
 		}
 
-		if (((VerifyTAPNOptions) options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
+		if (options instanceof VerifyTAPNOptions && ((VerifyTAPNOptions) options).discreteInclusion())
+		    mapDiscreteInclusionPlacesToNewNames(options, model);
 
         ExportedVerifyTAPNModel exportedModel;
         if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
@@ -236,6 +237,7 @@ public class VerifyDTAPN implements ModelChecker{
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");
+			return null;
 		}
 
 		return verify(options, model, exportedModel, query, dataLayerQuery, lens);
@@ -301,7 +303,8 @@ public class VerifyDTAPN implements ModelChecker{
 	}
 
 	protected VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) {
-		((VerifyTAPNOptions) options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
+		if (options instanceof VerifyTAPNOptions)
+	        ((VerifyTAPNOptions) options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 
         runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();
@@ -316,9 +319,8 @@ public class VerifyDTAPN implements ModelChecker{
 			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query, model.value1());
 
 			if (queryResult == null || queryResult.value1() == null) {
-				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
+				return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
-
                 TimedArcPetriNetTrace tapnTrace = null;
 
                 boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
@@ -431,8 +433,9 @@ public class VerifyDTAPN implements ModelChecker{
 
 
 	public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
-		if (model.hasUrgentTransitions() && ((VerifyDTAPNOptions) options).timeDarts()) {
-			return false;
+		if (model.hasUrgentTransitions() && options instanceof VerifyTAPNOptions &&
+            ((VerifyDTAPNOptions) options).timeDarts()) {
+		    return false;
 		}
 
 		return model.isNonStrict();
@@ -442,6 +445,7 @@ public class VerifyDTAPN implements ModelChecker{
 		// if liveness, has deadlock proposition and uses timedarts, it is not supported
 		if ((query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode)
 				&& query.hasDeadlock()
+                && options instanceof VerifyDTAPNOptions
 				&& ((VerifyDTAPNOptions) options).timeDarts()) {
 			return false;
 		}

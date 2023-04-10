@@ -409,7 +409,7 @@ public class ApproximationWorker {
 		VerificationResult<TimedArcPetriNetTrace> value = null;
 		if (verificationResult.error()) {
 			options.setTraceOption(oldTraceOption);
-			return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
+			return new VerificationResult<>(verificationResult.errorMessage(), verificationResult.verificationTime());
 		}
 		else if (query != null && query.isOverApproximationEnabled()) {		
 			//Create the verification satisfied result for the approximation
