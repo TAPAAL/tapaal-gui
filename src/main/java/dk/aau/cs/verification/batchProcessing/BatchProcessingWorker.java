@@ -127,7 +127,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel,
                               net.tapaal.gui.petrinet.verification.TAPNQuery queryToVerify) throws Exception {
         if (!queryToVerify.isActive()) {
-            publishResult(file.getName(), queryToVerify, "Skipped - query is disabled because it contains propositions involving places from a deactivated component", 0, new NullStats(), -1);
+            String message = "Skipped - query is disabled because it contains propositions involving places from a deactivated component";
+            publishResult(file.getName(), queryToVerify, message, 0, null, new NullStats(), -1);
         }
         for (BatchProcessingVerificationOptions option : options) {
             processQuery(file, composedModel, queryToVerify, option);
@@ -164,13 +165,16 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		try {
 			verificationResult = verify(composedModel, query, option);
 		} catch (UnsupportedModelException e) {
-            publishResult(file.getName(), query, "Skipped - model not supported by the verification method", 0, new NullStats(), option.getNumber());
+		    String message = "Skipped - model not supported by the verification method";
+            publishResult(file.getName(), query, message, 0, null, new NullStats(), option.getNumber());
 			return null;
 		} catch(UnsupportedQueryException e) {
 			if (e.getMessage().toLowerCase().contains("discrete inclusion")) {
-                publishResult(file.getName(), query, "Skipped - discrete inclusion is enabled and query is not upward closed", 0, new NullStats(), option.getNumber());
+                String message = "Skipped - discrete inclusion is enabled and query is not upward closed";
+                publishResult(file.getName(), query, message, 0, null, new NullStats(), option.getNumber());
             } else {
-                publishResult(file.getName(), query, "Skipped - query not supported by the verification method", 0, new NullStats(), option.getNumber());
+			    String message = "Skipped - query not supported by the verification method";
+                publishResult(file.getName(), query, message, 0, null, new NullStats(), option.getNumber());
             }
 			return null;
 		} 
@@ -179,13 +183,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	private void processVerificationResult(File file, net.tapaal.gui.petrinet.verification.TAPNQuery query, VerificationResult<TimedArcPetriNetTrace> verificationResult, int optionNumber) {
 		if (skippingCurrentVerification) {
-			publishResult(file.getName(), query, "Skipped - by the user", verificationResult.verificationTime(), new NullStats(), optionNumber);
+			publishResult(file.getName(), query, "Skipped - by the user", verificationResult.verificationTime(), verificationResult.getRawOutput(), new NullStats(), optionNumber);
 			skippingCurrentVerification = false;
 		} else if (timeoutCurrentVerification) {
-			publishResult(file.getName(), query, "Skipped - due to timeout", verificationResult.verificationTime(), new NullStats(), optionNumber);
+			publishResult(file.getName(), query, "Skipped - due to timeout", verificationResult.verificationTime(), verificationResult.getRawOutput(), new NullStats(), optionNumber);
 			timeoutCurrentVerification = false;
 		} else if (oomCurrentVerification) {
-			publishResult(file.getName(), query, "Skipped - due to OOM", verificationResult.verificationTime(), new NullStats(), optionNumber);
+			publishResult(file.getName(), query, "Skipped - due to OOM", verificationResult.verificationTime(), verificationResult.getRawOutput(), new NullStats(), optionNumber);
 			oomCurrentVerification = false;
 		} else if (!verificationResult.error()) {
 			String queryResult;
@@ -212,21 +216,22 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						(query.queryType().equals(QueryType.AG) && !verificationResult.getQueryResult().isQuerySatisfied()))) {
 					queryResult = "Inconclusive";
 				}
-			publishResult(file.getName(), query, queryResult,	verificationResult.verificationTime(), verificationResult.stats(), optionNumber);
+			publishResult(file.getName(), query, queryResult, verificationResult.verificationTime(), verificationResult.getRawOutput(), verificationResult.stats(), optionNumber);
 		} else if (isSoundnessCheck && verificationResult.error()) {
-			publishResult(file.getName(), query, "Skipped - model is not a workflow net. Try running workflow analysis from the menu.", verificationResult.verificationTime(), new NullStats(), optionNumber);
+		    String message = "Skipped - model is not a workflow net. Try running workflow analysis from the menu.";
+			publishResult(file.getName(), query, message, verificationResult.verificationTime(), verificationResult.getRawOutput(), new NullStats(), optionNumber);
 		} else {
-			publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime(), new NullStats(), optionNumber);
+			publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime(), verificationResult.getRawOutput(), new NullStats(), optionNumber);
 		}		
 	}
 
-	private void publishResult(String fileName, net.tapaal.gui.petrinet.verification.TAPNQuery query, String verificationResult, long verificationTime, Stats stats, int optionNumber) {
+	private void publishResult(String fileName, net.tapaal.gui.petrinet.verification.TAPNQuery query, String verificationResult, long verificationTime, String rawOutput, Stats stats, int optionNumber) {
 		BatchProcessingVerificationResult result;		
 		if (QueryPane.getTemporaryFile() != null && fileName.equals(QueryPane.getTemporaryFile().getName())) {
 			//removes numbers from tempFile so it looks good
-			result = new BatchProcessingVerificationResult(TAPAALGUI.getAppGui().getCurrentTabName(), query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), stats, optionNumber);
+			result = new BatchProcessingVerificationResult(TAPAALGUI.getAppGui().getCurrentTabName(), query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), rawOutput, stats, optionNumber);
 		} else {
-			result = new BatchProcessingVerificationResult(fileName, query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), stats, optionNumber);
+			result = new BatchProcessingVerificationResult(fileName, query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), rawOutput, stats, optionNumber);
 		}
 		publish(result);
 	}
@@ -337,7 +342,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return loader.load(modelFile);
 		}
 		catch(Exception e) {
-			publishResult(modelFile.getName(), null, "Error loading model",	0, new NullStats(), -1);
+			publishResult(modelFile.getName(), null, "Error loading model", 0, null, new NullStats(), -1);
 			fireVerificationTaskComplete();
 			return null;
 		}

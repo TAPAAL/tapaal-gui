@@ -149,7 +149,7 @@ public class TAPAAL {
 								String resultString = result.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
 								System.out.println("    | Result: " + resultString);
 
-								results.addResult(new BatchProcessingVerificationResult(f.toString(), query,resultString ,result.verificationTime(), MemoryMonitor.getPeakMemory(),result.stats()));
+								results.addResult(new BatchProcessingVerificationResult(f.toString(), query,resultString, result.verificationTime(), MemoryMonitor.getPeakMemory(), result.getRawOutput(), result.stats()));
 							}
 
 						}, tab.getGuiModels(),false, null);

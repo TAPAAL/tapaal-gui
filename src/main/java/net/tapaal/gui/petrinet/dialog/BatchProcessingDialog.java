@@ -1225,32 +1225,35 @@ public class BatchProcessingDialog extends JDialog {
 			setOpaque(true);
 
 			if (value != null) {
-				if (value instanceof TAPNQuery) {
-					TAPNQuery newQuery = (TAPNQuery) value;
-					setToolTipText(generateTooltipTextFromQuery(newQuery));
-					setText(newQuery.getName());
-				} else if (table.getColumnName(column).equals("Verification Time")
-						|| table.getColumnName(column).equals("Option")
-						|| table.getColumnName(column).equals("Memory Usage")) {
-					setText(value.toString());
-					Point mousePos = table.getMousePosition();
-					BatchProcessingVerificationResult result = null;
-					if (mousePos != null) {
-						result = ((BatchProcessingResultsTableModel) table
-								.getModel()).getResult(table
-								.rowAtPoint(mousePos));
-					}
+                if (value instanceof TAPNQuery) {
+                    TAPNQuery newQuery = (TAPNQuery) value;
+                    setToolTipText(generateTooltipTextFromQuery(newQuery));
+                    setText(newQuery.getName());
+                } else if (table.getColumnName(column).equals("Verification Time")
+                        || table.getColumnName(column).equals("Option")
+                        || table.getColumnName(column).equals("Memory Usage")
+                        || table.getColumnName(column).equals("Result")) {
+                    setText(value.toString());
+                    Point mousePos = table.getMousePosition();
+                    BatchProcessingVerificationResult result = null;
+                    if (mousePos != null) {
+                        result = ((BatchProcessingResultsTableModel) table
+                            .getModel()).getResult(table
+                            .rowAtPoint(mousePos));
+                    }
 
-					if (table.getColumnName(column).equals("Verification Time"))
-						setToolTipText(result != null ? generateStatsToolTipText(result) : value.toString());
-					else if (table.getColumnName(column).equals("Memory Usage"))
-						setToolTipText(result != null ? generateMemoryToolTipText(result) : value.toString());
-					else
-						setToolTipText(result != null ? generateReductionString(result.query(), result.getOptionNumber()) : value.toString());
-				} else {
-					setToolTipText(value.toString());
-					setText(value.toString());
-				}
+                    if (table.getColumnName(column).equals("Verification Time"))
+                        setToolTipText(result != null ? generateStatsToolTipText(result) : value.toString());
+                    else if (table.getColumnName(column).equals("Memory Usage"))
+                        setToolTipText(result != null ? generateMemoryToolTipText(result) : value.toString());
+                    else if (table.getColumnName(column).equals("Result"))
+                        setToolTipText(generateResultToolTipText(result, value));
+                    else
+                        setToolTipText(result != null ? generateReductionString(result.query(), result.getOptionNumber()) : value.toString());
+                } else {
+                    setToolTipText(value.toString());
+                    setText(value.toString());
+                }
 			} else {
 				setToolTipText("");
 				setText("");
@@ -1266,6 +1269,11 @@ public class BatchProcessingDialog extends JDialog {
 		private String generateMemoryToolTipText(BatchProcessingVerificationResult result) {
             return "Peak memory usage (estimate): " + result.verificationMemory();
 		}
+
+		private String generateResultToolTipText(BatchProcessingVerificationResult result, Object value) {
+		    if (result == null || result.getRawOutput() == null) return value.toString();
+		    return result.getRawOutput();
+        }
 
 		private String generateTooltipTextFromQuery(TAPNQuery query) {
             return "Query Property:\n" + query.getProperty().toString();
