@@ -1333,6 +1333,9 @@ public class BatchProcessingDialog extends JDialog {
                         Matcher matcher = pattern.matcher(options);
                         if (matcher.find()) {
                             options = options.replaceFirst(matcher.group(), matcher.group(1) + " " + query.getCapacity() + " ");
+                        } else {
+                            options += " -k ";
+                            options += query.getCapacity();
                         }
                     }
 				    s.append(options);
