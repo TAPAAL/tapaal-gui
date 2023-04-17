@@ -91,7 +91,8 @@ public class RunVerification extends RunVerificationBase {
                                 TAPAALGUI.openNewTabFromStream(result.getUnfoldedTab());
                             } else return false;
                         }
-                        TAPAALGUI.getAnimator().setTrace(result.getTrace(), result.getTraceMap());
+                        if (result.getTraceMap() == null) TAPAALGUI.getAnimator().setTrace(result.getTrace());
+                        else TAPAALGUI.getAnimator().setTrace(result.getTrace(), result.getTraceMap());
                     } else {
                         if ((
                             //XXX: this is not complete, we need a better way to signal the engine could not create a trace
