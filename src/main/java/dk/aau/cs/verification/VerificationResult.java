@@ -77,7 +77,7 @@ public class VerificationResult<TTrace> {
         this.unfoldedTab = unfoldedTab;
 
         // Workaround for now
-        if(traceMap != null) {
+        if (traceMap != null) {
             this.trace = traceMap.get(traceMap.keySet().toArray()[0]);
         } else {
             this.trace = null;
