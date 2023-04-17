@@ -796,6 +796,21 @@ public class BatchProcessingDialog extends JDialog {
 		table.getColumn("Verification Time").setCellRenderer(renderer);
 		table.getColumn("Memory Usage").setCellRenderer(renderer);
 
+        table.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent mouseEvent) {
+                JTable source =(JTable) mouseEvent.getSource();
+                Point point = mouseEvent.getPoint();
+                int row = source.rowAtPoint(point);
+                if (mouseEvent.getClickCount() == 2 && source.getSelectedRow() != -1) {
+                    String rawOutput = tableModel.getResult(row).getRawOutput();
+                    if (rawOutput != null && !rawOutput.equals("")) {
+                        final JPanel panel = new JPanel(new GridBagLayout());
+                        JOptionPane.showMessageDialog(panel, createRawQueryPanel(tableModel.getResult(row).getRawOutput()), "Raw results", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+        });
+
 		tableModel.addTableModelListener(e -> {
 			if (e.getType() == TableModelEvent.INSERT) {
 				table.scrollRectToVisible(table.getCellRect(e.getLastRow(), e.getLastRow(), true));
@@ -841,6 +856,44 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 5, 5, 5);
 		bottomPanel.add(resultTablePanel, gbc);
 	}
+
+    private JPanel createRawQueryPanel(final String rawOutput) {
+        final JPanel fullPanel = new JPanel(new GridBagLayout());
+
+        JTextArea rawQueryLabel = new JTextArea(rawOutput);
+        rawQueryLabel.setEditable(false); // set textArea non-editable
+        JScrollPane scroll = new JScrollPane(rawQueryLabel);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll.setPreferredSize(new Dimension(640,400));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        fullPanel.add(scroll, gbc);
+
+        // Make window resizeable
+        fullPanel.addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                //when the hierarchy changes get the ancestor for the message
+                Window window = SwingUtilities.getWindowAncestor(fullPanel);
+                //check to see if the ancestor is an instance of Dialog and isn't resizable
+                if (window instanceof Dialog) {
+                    Dialog dialog = (Dialog) window;
+                    dialog.setMinimumSize(dialog.getPreferredSize());
+                    if (!dialog.isResizable()) {
+                        //set resizable to true
+                        dialog.setResizable(true);
+                    }
+                }
+            }
+        });
+
+        return fullPanel;
+    }
 	
 	private void initMonitorPanel() {
 		monitorPanel = new JPanel(new GridBagLayout());
