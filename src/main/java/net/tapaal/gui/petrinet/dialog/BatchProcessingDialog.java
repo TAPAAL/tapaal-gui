@@ -785,12 +785,31 @@ public class BatchProcessingDialog extends JDialog {
         table.getColumnModel().getColumn(0).setMinWidth(70);
 		table.getColumnModel().getColumn(0).setPreferredWidth(70);
 		table.getColumnModel().getColumn(0).setMaxWidth(85);
-		table.getColumn("Option").setCellRenderer(renderer);
+        table.getColumnModel().getColumn(4).setMinWidth(100);
+        table.getColumnModel().getColumn(4).setMaxWidth(150);
+        table.getColumnModel().getColumn(5).setMinWidth(100);
+        table.getColumnModel().getColumn(5).setMaxWidth(150);
+        table.getColumn("Option").setCellRenderer(renderer);
 		table.getColumn("Model").setCellRenderer(renderer);
 		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
 		table.getColumn("Verification Time").setCellRenderer(renderer);
 		table.getColumn("Memory Usage").setCellRenderer(renderer);
+
+        table.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent mouseEvent) {
+                JTable source =(JTable) mouseEvent.getSource();
+                Point point = mouseEvent.getPoint();
+                int row = source.rowAtPoint(point);
+                if (mouseEvent.getClickCount() == 2 && source.getSelectedRow() != -1) {
+                    String rawOutput = tableModel.getResult(row).getRawOutput();
+                    if (rawOutput != null && !rawOutput.equals("")) {
+                        final JPanel panel = new JPanel(new GridBagLayout());
+                        JOptionPane.showMessageDialog(panel, createRawQueryPanel(tableModel.getResult(row).getRawOutput()), "Raw results", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+        });
 
 		tableModel.addTableModelListener(e -> {
 			if (e.getType() == TableModelEvent.INSERT) {
@@ -837,6 +856,44 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 5, 5, 5);
 		bottomPanel.add(resultTablePanel, gbc);
 	}
+
+    private JPanel createRawQueryPanel(final String rawOutput) {
+        final JPanel fullPanel = new JPanel(new GridBagLayout());
+
+        JTextArea rawQueryLabel = new JTextArea(rawOutput);
+        rawQueryLabel.setEditable(false); // set textArea non-editable
+        JScrollPane scroll = new JScrollPane(rawQueryLabel);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll.setPreferredSize(new Dimension(640,400));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        fullPanel.add(scroll, gbc);
+
+        // Make window resizeable
+        fullPanel.addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                //when the hierarchy changes get the ancestor for the message
+                Window window = SwingUtilities.getWindowAncestor(fullPanel);
+                //check to see if the ancestor is an instance of Dialog and isn't resizable
+                if (window instanceof Dialog) {
+                    Dialog dialog = (Dialog) window;
+                    dialog.setMinimumSize(dialog.getPreferredSize());
+                    if (!dialog.isResizable()) {
+                        //set resizable to true
+                        dialog.setResizable(true);
+                    }
+                }
+            }
+        });
+
+        return fullPanel;
+    }
 	
 	private void initMonitorPanel() {
 		monitorPanel = new JPanel(new GridBagLayout());
@@ -1225,32 +1282,35 @@ public class BatchProcessingDialog extends JDialog {
 			setOpaque(true);
 
 			if (value != null) {
-				if (value instanceof TAPNQuery) {
-					TAPNQuery newQuery = (TAPNQuery) value;
-					setToolTipText(generateTooltipTextFromQuery(newQuery));
-					setText(newQuery.getName());
-				} else if (table.getColumnName(column).equals("Verification Time")
-						|| table.getColumnName(column).equals("Option")
-						|| table.getColumnName(column).equals("Memory Usage")) {
-					setText(value.toString());
-					Point mousePos = table.getMousePosition();
-					BatchProcessingVerificationResult result = null;
-					if (mousePos != null) {
-						result = ((BatchProcessingResultsTableModel) table
-								.getModel()).getResult(table
-								.rowAtPoint(mousePos));
-					}
+                if (value instanceof TAPNQuery) {
+                    TAPNQuery newQuery = (TAPNQuery) value;
+                    setToolTipText(generateTooltipTextFromQuery(newQuery));
+                    setText(newQuery.getName());
+                } else if (table.getColumnName(column).equals("Verification Time")
+                        || table.getColumnName(column).equals("Option")
+                        || table.getColumnName(column).equals("Memory Usage")
+                        || table.getColumnName(column).equals("Result")) {
+                    setText(value.toString());
+                    Point mousePos = table.getMousePosition();
+                    BatchProcessingVerificationResult result = null;
+                    if (mousePos != null) {
+                        result = ((BatchProcessingResultsTableModel) table
+                            .getModel()).getResult(table
+                            .rowAtPoint(mousePos));
+                    }
 
-					if (table.getColumnName(column).equals("Verification Time"))
-						setToolTipText(result != null ? generateStatsToolTipText(result) : value.toString());
-					else if (table.getColumnName(column).equals("Memory Usage"))
-						setToolTipText(result != null ? generateMemoryToolTipText(result) : value.toString());
-					else
-						setToolTipText(result != null ? generateReductionString(result.query(), result.getOptionNumber()) : value.toString());
-				} else {
-					setToolTipText(value.toString());
-					setText(value.toString());
-				}
+                    if (table.getColumnName(column).equals("Verification Time"))
+                        setToolTipText(result != null ? generateStatsToolTipText(result) : value.toString());
+                    else if (table.getColumnName(column).equals("Memory Usage"))
+                        setToolTipText(result != null ? generateMemoryToolTipText(result) : value.toString());
+                    else if (table.getColumnName(column).equals("Result"))
+                        setToolTipText(generateResultToolTipText(result, value));
+                    else
+                        setToolTipText(result != null ? generateReductionString(result.query(), result.getOptionNumber()) : value.toString());
+                } else {
+                    setToolTipText(value.toString());
+                    setText(value.toString());
+                }
 			} else {
 				setToolTipText("");
 				setText("");
@@ -1266,6 +1326,11 @@ public class BatchProcessingDialog extends JDialog {
 		private String generateMemoryToolTipText(BatchProcessingVerificationResult result) {
             return "Peak memory usage (estimate): " + result.verificationMemory();
 		}
+
+		private String generateResultToolTipText(BatchProcessingVerificationResult result, Object value) {
+		    if (result == null || result.getRawOutput() == null) return value.toString();
+		    return result.getRawOutput();
+        }
 
 		private String generateTooltipTextFromQuery(TAPNQuery query) {
             return "Query Property:\n" + query.getProperty().toString();
@@ -1321,6 +1386,9 @@ public class BatchProcessingDialog extends JDialog {
                         Matcher matcher = pattern.matcher(options);
                         if (matcher.find()) {
                             options = options.replaceFirst(matcher.group(), matcher.group(1) + " " + query.getCapacity() + " ");
+                        } else {
+                            options += " -k ";
+                            options += query.getCapacity();
                         }
                     }
 				    s.append(options);
