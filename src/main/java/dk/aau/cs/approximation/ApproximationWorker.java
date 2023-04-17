@@ -1,14 +1,12 @@
 package dk.aau.cs.approximation;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.dataLayer.DataLayer;
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.verification.RunVerificationBase;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import dk.aau.cs.Messenger;
@@ -34,7 +32,6 @@ import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
-import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 
 public class ApproximationWorker {
 	public VerificationResult<TAPNNetworkTrace> normalWorker(
@@ -49,7 +46,7 @@ public class ApproximationWorker {
         net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery,
         TAPNLens lens
     ) throws Exception {
-		
+
 		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them
 		InclusionPlaces oldInclusionPlaces = null;
 		if (options instanceof VerifyTAPNOptions)
@@ -69,7 +66,7 @@ public class ApproximationWorker {
 		if (result == null) return null;
         if (result.error()) {
 			options.setTraceOption(oldTraceOption);
-			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
+			return new VerificationResult<>(result.errorMessage(), result.verificationTime());
 		}
 		else if (options.enabledOverApproximation()) {
 			// Over-approximation
@@ -80,7 +77,7 @@ public class ApproximationWorker {
 				QueryResult queryResult = result.getQueryResult();
                 NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
                 TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
-                toReturn =  new VerificationResult<TAPNNetworkTrace>(
+                toReturn =  new VerificationResult<>(
                     queryResult,
                     decomposeTrace(result.getTrace(),  nameMapping, netNetwork),
                     decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
@@ -89,110 +86,17 @@ public class ApproximationWorker {
                     false,
                     result.getUnfoldedModel());
                 toReturn.setNameMapping(transformedModel.value2());
-
-
 			} else {
-				// If r > 1
-				if (result.getTrace() != null && (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && result.getQueryResult().isQuerySatisfied())
-					|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && !result.getQueryResult().isQuerySatisfied()))) {
-						// If we have a trace AND ((EF OR EG) AND satisfied) OR ((AG OR AF) AND not satisfied)
-						// The results are inconclusive, but we get a trace and can use trace TAPN for verification.
-					
-						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
-                        NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
-                        TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
-                        toReturn = new VerificationResult<TAPNNetworkTrace>(
-                            approxResult.getQueryResult(),
-                            decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
-                            decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
-                            approxResult.verificationTime(),
-                            approxResult.stats(),
-                            false,
-                            approxResult.getUnfoldedModel());
-                        toReturn.setNameMapping(nameMapping);
-						
-						OverApproximation overaprx = new OverApproximation();
-			
-						//Create trace TAPN from the trace
-						Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
-						overaprx.makeTraceTAPN(transformedOriginalModel, toReturn, clonedQuery);
-						
-						// Reset the inclusion places in order to avoid NullPointerExceptions
-						if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
-							((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
-			
-						// run model checker again for trace TAPN
-						MemoryMonitor.cumulateMemory();
-						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery, guiModel, dataLayerQuery, null);
+                // If r > 1
+                if (result.getTrace() != null && (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && result.getQueryResult().isQuerySatisfied())
+                    || ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && !result.getQueryResult().isQuerySatisfied()))) {
+                    // If we have a trace AND ((EF OR EG) AND satisfied) OR ((AG OR AF) AND not satisfied)
+                    // The results are inconclusive, but we get a trace and can use trace TAPN for verification.
 
-						if (result.error()) {
-							options.setTraceOption(oldTraceOption);
-							// if the old trace option was none, we need to set the results traces to null so GUI doesn't try to display the traces later
-							if (oldTraceOption == TraceOption.NONE && toReturn != null){
-								toReturn.setTrace(null);
-								toReturn.setSecondaryTrace(null);
-							}
-							return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), approxResult.verificationTime() + result.verificationTime());
-						}
-						//Create the result from trace TAPN
-						renameTraceTransitions(result.getTrace());
-						renameTraceTransitions(result.getSecondaryTrace());
-						QueryResult queryResult = result.getQueryResult();
-						
-						// If ((EG OR EG) AND not satisfied trace) OR ((AG OR AF) AND satisfied trace) -> inconclusive
-						if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && !queryResult.isQuerySatisfied()) 
-								|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && queryResult.isQuerySatisfied())){
-							queryResult.setApproximationInconclusive(true);
-						}
-						
-						// If satisfied trace -> Return result
-						// This is satisfied for EF and EG and not satisfied for AG and AF
-                        toReturn = new VerificationResult<TAPNNetworkTrace>(
-                            queryResult,
-                            decomposeTrace(result.getTrace(), nameMapping, netNetwork),
-                            decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
-                            approxResult.verificationTime() + result.verificationTime(),
-                            approxResult.stats(),
-                            false,
-                            approxResult.getUnfoldedModel());
-                        toReturn.setNameMapping(nameMapping);
-
-
-					} 
-					else if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && !result.getQueryResult().isQuerySatisfied())
-							|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && result.getQueryResult().isQuerySatisfied())) {
-						// If ((EF OR EG) AND not satisfied) OR ((AG OR AF) AND satisfied)
-						
-						QueryResult queryResult = result.getQueryResult();
-						
-						if(queryResult.hasDeadlock() || result.getQueryResult().queryType() == QueryType.EG || result.getQueryResult().queryType() == QueryType.AF){
-							queryResult.setApproximationInconclusive(true);
-						}
-						
-						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
-                    NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
-                    TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
-                        toReturn = new VerificationResult<TAPNNetworkTrace>(
-                            approxResult.getQueryResult(),
-                            decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
-                            decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
-                            approxResult.verificationTime(),
-                            approxResult.stats(),
-                            false,
-                            approxResult.getUnfoldedModel());
-                        toReturn.setNameMapping(nameMapping);
-
-
-					} else {
-						// We cannot use the result directly, and did not get a trace.
-						
-						QueryResult queryResult = result.getQueryResult();
-						queryResult.setApproximationInconclusive(true);
-						
-						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
-                    NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
-                    TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
-                    toReturn = new VerificationResult<TAPNNetworkTrace>(
+                    VerificationResult<TimedArcPetriNetTrace> approxResult = result;
+                    NameMapping nameMapping = model.isColored() ? result.getUnfoldedModel().value2() : transformedModel.value2();
+                    TimedArcPetriNetNetwork netNetwork = model.isColored() ? result.getUnfoldedModel().value1().parentNetwork() : model;
+                    toReturn = new VerificationResult<>(
                         approxResult.getQueryResult(),
                         decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
                         decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
@@ -202,8 +106,93 @@ public class ApproximationWorker {
                         approxResult.getUnfoldedModel());
                     toReturn.setNameMapping(nameMapping);
 
-					}
-			}
+                    OverApproximation overaprx = new OverApproximation();
+
+                    //Create trace TAPN from the trace
+                    Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
+                    overaprx.makeTraceTAPN(transformedOriginalModel, toReturn, clonedQuery);
+
+                    // Reset the inclusion places in order to avoid NullPointerExceptions
+                    if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
+                        ((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
+
+                    // run model checker again for trace TAPN
+                    MemoryMonitor.cumulateMemory();
+                    result = modelChecker.verify(options, transformedOriginalModel, clonedQuery, guiModel, dataLayerQuery, null);
+
+                    if (result.error()) {
+                        options.setTraceOption(oldTraceOption);
+                        // if the old trace option was none, we need to set the results traces to null so GUI doesn't try to display the traces later
+                        if (oldTraceOption == TraceOption.NONE && toReturn != null) {
+                            toReturn.setTrace(null);
+                            toReturn.setSecondaryTrace(null);
+                        }
+                        return new VerificationResult<>(result.errorMessage(), approxResult.verificationTime() + result.verificationTime());
+                    }
+                    //Create the result from trace TAPN
+                    renameTraceTransitions(result.getTrace());
+                    renameTraceTransitions(result.getSecondaryTrace());
+                    QueryResult queryResult = result.getQueryResult();
+
+                    // If ((EG OR EG) AND not satisfied trace) OR ((AG OR AF) AND satisfied trace) -> inconclusive
+                    if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && !queryResult.isQuerySatisfied())
+                        || ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && queryResult.isQuerySatisfied())) {
+                        queryResult.setApproximationInconclusive(true);
+                    }
+
+                    // If satisfied trace -> Return result
+                    // This is satisfied for EF and EG and not satisfied for AG and AF
+                    toReturn = new VerificationResult<>(
+                        queryResult,
+                        decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+                        decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                        approxResult.verificationTime() + result.verificationTime(),
+                        approxResult.stats(),
+                        false,
+                        approxResult.getUnfoldedModel());
+                    toReturn.setNameMapping(nameMapping);
+
+
+                } else if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && !result.getQueryResult().isQuerySatisfied())
+                    || ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && result.getQueryResult().isQuerySatisfied())) {
+                    // If ((EF OR EG) AND not satisfied) OR ((AG OR AF) AND satisfied)
+
+                    QueryResult queryResult = result.getQueryResult();
+
+                    if (queryResult.hasDeadlock() || result.getQueryResult().queryType() == QueryType.EG || result.getQueryResult().queryType() == QueryType.AF) {
+                        queryResult.setApproximationInconclusive(true);
+                    }
+
+                    NameMapping nameMapping = model.isColored() ? result.getUnfoldedModel().value2() : transformedModel.value2();
+                    TimedArcPetriNetNetwork netNetwork = model.isColored() ? result.getUnfoldedModel().value1().parentNetwork() : model;
+                    toReturn = new VerificationResult<>(
+                        result.getQueryResult(),
+                        decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+                        decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                        result.verificationTime(),
+                        result.stats(),
+                        false,
+                        result.getUnfoldedModel());
+                    toReturn.setNameMapping(nameMapping);
+                } else {
+                    // We cannot use the result directly, and did not get a trace.
+
+                    QueryResult queryResult = result.getQueryResult();
+                    queryResult.setApproximationInconclusive(true);
+
+                    NameMapping nameMapping = model.isColored() ? result.getUnfoldedModel().value2() : transformedModel.value2();
+                    TimedArcPetriNetNetwork netNetwork = model.isColored() ? result.getUnfoldedModel().value1().parentNetwork() : model;
+                    toReturn = new VerificationResult<>(
+                        result.getQueryResult(),
+                        decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+                        decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                        result.verificationTime(),
+                        result.stats(),
+                        false,
+                        result.getUnfoldedModel());
+                    toReturn.setNameMapping(nameMapping);
+                }
+            }
 		} 
 		else if (options.enabledUnderApproximation()) {
 			// Under-approximation
@@ -227,7 +216,7 @@ public class ApproximationWorker {
 				QueryResult queryResult= result.getQueryResult();
                 NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
                 TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
-                toReturn =  new VerificationResult<TAPNNetworkTrace>(
+                toReturn =  new VerificationResult<>(
                     queryResult,
                     decomposeTrace(result.getTrace(), nameMapping, netNetwork),
                     decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
@@ -248,7 +237,7 @@ public class ApproximationWorker {
 					queryResult.setApproximationInconclusive(true);
                     NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
                     TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
-                    toReturn =  new VerificationResult<TAPNNetworkTrace>(
+                    toReturn =  new VerificationResult<>(
                         queryResult,
                         decomposeTrace(result.getTrace(), nameMapping, netNetwork),
                         decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
@@ -261,13 +250,13 @@ public class ApproximationWorker {
 				} else if ((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && result.getQueryResult().isQuerySatisfied()
 						|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && ! result.getQueryResult().isQuerySatisfied())) {
 										
-					if (result.getTrace() != null){
+					if (result.getTrace() != null) {
 						// If query does have deadlock or EG or AF a trace -> create trace TAPN
 						//Create the verification satisfied result for the approximation
 						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
                         NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
                         TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
-                        toReturn = new VerificationResult<TAPNNetworkTrace>(
+                        toReturn = new VerificationResult<>(
                             approxResult.getQueryResult(),
                             decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
                             decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
@@ -276,11 +265,8 @@ public class ApproximationWorker {
                             false,
                             result.getUnfoldedModel());
                         toReturn.setNameMapping(nameMapping);
-
-
 						
 						OverApproximation overaprx = new OverApproximation();
-						
 			
 						//Create trace TAPN from the trace
 						Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
@@ -297,18 +283,17 @@ public class ApproximationWorker {
 						if (result.error()) {
 							options.setTraceOption(oldTraceOption);
 							// if the old trace option was none, we need to set the results traces to null so GUI doesn't try to display the traces later
-							if (oldTraceOption == TraceOption.NONE && toReturn != null){
+							if (oldTraceOption == TraceOption.NONE && toReturn != null) {
 								toReturn.setTrace(null);
 								toReturn.setSecondaryTrace(null);
 							}
-							return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime() + approxResult.verificationTime());
+							return new VerificationResult<>(result.errorMessage(), result.verificationTime() + approxResult.verificationTime());
 						}
 						//Create the result from trace TAPN
 						renameTraceTransitions(result.getTrace());
 						renameTraceTransitions(result.getSecondaryTrace());
 						QueryResult queryResult = result.getQueryResult();
-						
-						
+
 						// If (EF or EG AND not satisfied trace) OR (AG or AF AND satisfied trace) -> inconclusive
 						if ((result.getQueryResult().queryType() == QueryType.EF && !queryResult.isQuerySatisfied())
 							|| (result.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied())
@@ -319,7 +304,7 @@ public class ApproximationWorker {
 
 						// If satisfied trace) -> Return result
 						// This is satisfied for EF and EG and not satisfied for AG and AF
-						toReturn = new VerificationResult<TAPNNetworkTrace>(
+						toReturn = new VerificationResult<>(
 								queryResult,
 								decomposeTrace(result.getTrace(), nameMapping, netNetwork),
 								decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
@@ -328,35 +313,33 @@ public class ApproximationWorker {
 								false,
                                 approxResult.getUnfoldedModel());
 						toReturn.setNameMapping(transformedModel.value2());
-					}
-					else {
+					} else {
 						// the query contains deadlock, but we do not have a trace.
 						QueryResult queryResult = result.getQueryResult();
 						queryResult.setApproximationInconclusive(true);
-						
-						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
+
                         NameMapping nameMapping = model.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
                         TimedArcPetriNetNetwork netNetwork = model.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
 
-						toReturn = new VerificationResult<TAPNNetworkTrace>(
-								approxResult.getQueryResult(),
-								decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
-								decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
-								approxResult.verificationTime(),
-								approxResult.stats(),
+						toReturn = new VerificationResult<>(
+								result.getQueryResult(),
+								decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+								decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+								result.verificationTime(),
+								result.stats(),
 								false,
-                                approxResult.getUnfoldedModel());
+                                result.getUnfoldedModel());
 						toReturn.setNameMapping(nameMapping);
 					}
 				}
 			}
-		} 
-		else {
+		} else {
             boolean isColored = (lens != null && lens.isColored() || model.isColored());
             NameMapping nameMapping = isColored? result.getUnfoldedModel().value2(): transformedModel.value2();
             TimedArcPetriNetNetwork netNetwork = isColored? result.getUnfoldedModel().value1().parentNetwork(): model;
-            if(dataLayerQuery != null && dataLayerQuery.getCategory() == net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.HyperLTL) {
-                toReturn =  new VerificationResult<TAPNNetworkTrace>(
+
+            if (dataLayerQuery != null && dataLayerQuery.getCategory() == net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.HyperLTL) {
+                toReturn =  new VerificationResult<>(
                     result.getQueryResult(),
                     decomposeTrace(result.getTraceMap(), nameMapping, netNetwork),
                     decomposeTrace(result.getTrace(), nameMapping, netNetwork),
@@ -369,7 +352,7 @@ public class ApproximationWorker {
                     result.getUnfoldedTab());
                 toReturn.setNameMapping(nameMapping);
             } else {
-                toReturn =  new VerificationResult<TAPNNetworkTrace>(
+                toReturn = new VerificationResult<>(
                     result.getQueryResult(),
                     decomposeTrace(result.getTrace(), nameMapping, netNetwork),
                     decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
@@ -385,7 +368,7 @@ public class ApproximationWorker {
 		
 		options.setTraceOption(oldTraceOption);
 		// if the old traceoption was none, we need to set the results traces to null so GUI doesn't try to display the traces later
-		if (oldTraceOption == TraceOption.NONE){
+		if (oldTraceOption == TraceOption.NONE && toReturn != null){
 			toReturn.setTrace(null);
 			toReturn.setSecondaryTrace(null);
 		}
@@ -400,14 +383,13 @@ public class ApproximationWorker {
 			LoadedBatchProcessingModel model,
 			ModelChecker modelChecker,
 			TAPNQuery queryToVerify,
-			TAPNQuery clonedQuery,
-			BatchProcessingWorker verificationBase
+			TAPNQuery clonedQuery
 	) throws Exception {
 		InclusionPlaces oldInclusionPlaces = null;
 		if (options instanceof VerifyTAPNOptions)
 			oldInclusionPlaces = ((VerifyTAPNOptions) options).inclusionPlaces();
 		
-		Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = new Tuple<TimedArcPetriNet, NameMapping>(composedModel.value1().copy(), composedModel.value2());
+		Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = new Tuple<>(composedModel.value1().copy(), composedModel.value2());
 		
 		TraceOption oldTraceOption = options.traceOption();
 		if (query != null && query.isOverApproximationEnabled()) {
@@ -426,11 +408,11 @@ public class ApproximationWorker {
 		
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify, null, query, null);
 		
-		VerificationResult<TAPNNetworkTrace> valueNetwork = null;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
+		VerificationResult<TAPNNetworkTrace> valueNetwork;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
 		VerificationResult<TimedArcPetriNetTrace> value = null;
 		if (verificationResult.error()) {
 			options.setTraceOption(oldTraceOption);
-			return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
+			return new VerificationResult<>(verificationResult.errorMessage(), verificationResult.verificationTime());
 		}
 		else if (query != null && query.isOverApproximationEnabled()) {		
 			//Create the verification satisfied result for the approximation
@@ -440,7 +422,7 @@ public class ApproximationWorker {
                 // If r = 1
                 // No matter what EF and AG answered -> return that answer
                QueryResult queryResult = verificationResult.getQueryResult();
-               value =  new VerificationResult<TimedArcPetriNetTrace>(
+               value =  new VerificationResult<>(
 					queryResult,
 					verificationResult.getTrace(),
 					verificationResult.getSecondaryTrace(),
@@ -458,7 +440,7 @@ public class ApproximationWorker {
 	                VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
                     NameMapping nameMapping = model.network().isColored()? verificationResult.getUnfoldedModel().value2(): composedModel.value2();
                     TimedArcPetriNetNetwork netNetwork = model.network().isColored()? verificationResult.getUnfoldedModel().value1().parentNetwork(): model.network();
-	                valueNetwork = new VerificationResult<TAPNNetworkTrace>(
+	                valueNetwork = new VerificationResult<>(
 	                            approxResult.getQueryResult(),
 	                            decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
 	                            decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
@@ -484,7 +466,7 @@ public class ApproximationWorker {
 
 	                if (verificationResult.error()) {
 	                	options.setTraceOption(oldTraceOption);
-	                    return new VerificationResult<TimedArcPetriNetTrace>(
+	                    return new VerificationResult<>(
 	                    		verificationResult.errorMessage(),
 	                    		verificationResult.verificationTime() + approxResult.verificationTime());
 	                }
@@ -500,7 +482,7 @@ public class ApproximationWorker {
 					}
 	                // If satisfied trace -> Return result
 	                // This is satisfied for EF and EG and not satisfied for AG and AF
-	                value = new VerificationResult<TimedArcPetriNetTrace>(
+	                value = new VerificationResult<>(
 	                        queryResult,
 	                        approxResult.getTrace(),
 	                        approxResult.getSecondaryTrace(),
@@ -520,7 +502,7 @@ public class ApproximationWorker {
 						queryResult.setApproximationInconclusive(true);
 					}
 	                
-	                value =  new VerificationResult<TimedArcPetriNetTrace>(
+	                value =  new VerificationResult<>(
 						queryResult,
 						verificationResult.getTrace(),
 						verificationResult.getSecondaryTrace(),
@@ -537,7 +519,7 @@ public class ApproximationWorker {
 					
 					queryResult.setApproximationInconclusive(true);
 	                
-	                value =  new VerificationResult<TimedArcPetriNetTrace>(
+	                value =  new VerificationResult<>(
 						queryResult,
 						verificationResult.getTrace(),
 						verificationResult.getSecondaryTrace(),
@@ -556,7 +538,7 @@ public class ApproximationWorker {
 	            // If r = 1
 	            // No matter what EF and AG answered -> return that answer
 	            QueryResult queryResult= verificationResult.getQueryResult();
-	            value =  new VerificationResult<TimedArcPetriNetTrace>(
+	            value =  new VerificationResult<>(
                     queryResult,
                     verificationResult.getTrace(),
                     verificationResult.getSecondaryTrace(),
@@ -574,7 +556,7 @@ public class ApproximationWorker {
                     
                     QueryResult queryResult = verificationResult.getQueryResult();
                     queryResult.setApproximationInconclusive(true);
-                    value =  new VerificationResult<TimedArcPetriNetTrace>(
+                    value =  new VerificationResult<>(
                             queryResult,
                             verificationResult.getTrace(),
                             verificationResult.getSecondaryTrace(),
@@ -596,7 +578,7 @@ public class ApproximationWorker {
 
                         NameMapping nameMapping = model.network().isColored()? verificationResult.getUnfoldedModel().value2(): composedModel.value2();
                         TimedArcPetriNetNetwork netNetwork = model.network().isColored()? verificationResult.getUnfoldedModel().value1().parentNetwork(): model.network();
-                        valueNetwork = new VerificationResult<TAPNNetworkTrace>(
+                        valueNetwork = new VerificationResult<>(
                             approxResult.getQueryResult(),
                             decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
                             decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
@@ -605,8 +587,6 @@ public class ApproximationWorker {
                             false,
                             verificationResult.getUnfoldedModel());
                         valueNetwork.setNameMapping(nameMapping);
-
-
 	                    
 	                    OverApproximation overaprx = new OverApproximation();
 	        
@@ -623,7 +603,7 @@ public class ApproximationWorker {
 
 	                    if (verificationResult.error()) {
 	                    	options.setTraceOption(oldTraceOption);
-	        				return new VerificationResult<TimedArcPetriNetTrace>(
+	        				return new VerificationResult<>(
 	        						verificationResult.errorMessage(),
 	        						verificationResult.verificationTime() + approxResult.verificationTime());
 	        			}
@@ -643,7 +623,7 @@ public class ApproximationWorker {
 	                    
 	                    // If satisfied trace -> Return result
 	                    // This is satisfied for EF and EG and not satisfied for AG and AF
-	                   value =  new VerificationResult<TimedArcPetriNetTrace>(
+	                   value =  new VerificationResult<>(
 	                		    queryResult,
 	                            verificationResult.getTrace(),
 	                            verificationResult.getSecondaryTrace(),
@@ -652,13 +632,12 @@ public class ApproximationWorker {
 	        					false,
                                 verificationResult.getUnfoldedModel());
 	                    value.setNameMapping(composedModel.value2());
-	                }
-	                else {
+	                } else {
 	                	QueryResult queryResult = verificationResult.getQueryResult();
 						
 						queryResult.setApproximationInconclusive(true);
 		                
-		                value =  new VerificationResult<TimedArcPetriNetTrace>(
+		                value =  new VerificationResult<>(
 							queryResult,
 							verificationResult.getTrace(),
 							verificationResult.getSecondaryTrace(),
@@ -670,9 +649,8 @@ public class ApproximationWorker {
 	                }
 	            }
 	        }
-	    }
-	    else {
-	        value =  new VerificationResult<TimedArcPetriNetTrace>(
+	    } else {
+	        value =  new VerificationResult<>(
 	                verificationResult.getQueryResult(),
 	                verificationResult.getTrace(),
 	                verificationResult.getSecondaryTrace(),
@@ -682,10 +660,257 @@ public class ApproximationWorker {
                     verificationResult.getUnfoldedModel());
 	        value.setNameMapping(composedModel.value2());
 	    }
-		
 		options.setTraceOption(oldTraceOption);
 		return value;
 	}
+
+    public VerificationResult<TimedArcPetriNetTrace> batchWorker(
+        Tuple<TimedArcPetriNet, NameMapping> composedModel,
+        String options,
+        net.tapaal.gui.petrinet.verification.TAPNQuery query,
+        LoadedBatchProcessingModel model,
+        ModelChecker modelChecker,
+        TAPNQuery queryToVerify,
+        TAPNQuery clonedQuery
+    ) throws Exception {
+        Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = new Tuple<>(composedModel.value1().copy(), composedModel.value2());
+
+        VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verifyManually(options, composedModel, queryToVerify, query, null);
+
+        VerificationResult<TAPNNetworkTrace> valueNetwork;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
+        VerificationResult<TimedArcPetriNetTrace> value = null;
+        if (verificationResult.error()) {
+            return new VerificationResult<>(verificationResult.errorMessage(), verificationResult.verificationTime());
+        } else if (query != null && query.isOverApproximationEnabled()) {
+            // Over-approximation
+            if (query.approximationDenominator() == 1) {
+                // If r = 1
+                // No matter what EF and AG answered -> return that answer
+                QueryResult queryResult = verificationResult.getQueryResult();
+                value =  new VerificationResult<>(
+                    queryResult,
+                    verificationResult.getTrace(),
+                    verificationResult.getSecondaryTrace(),
+                    verificationResult.verificationTime(),
+                    verificationResult.stats(),
+                    false,
+                    verificationResult.getUnfoldedModel());
+                value.setNameMapping(composedModel.value2());
+            } else {
+                // If r > 1
+                if (verificationResult.getTrace() != null && (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG ) && verificationResult.getQueryResult().isQuerySatisfied())
+                    || ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && !verificationResult.getQueryResult().isQuerySatisfied()))) {
+                    // If ((EF OR EG) AND satisfied) OR ((AG OR AF) AND not satisfied)
+                    //Create the verification satisfied result for the approximation
+                    VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
+                    NameMapping nameMapping = model.network().isColored()? verificationResult.getUnfoldedModel().value2(): composedModel.value2();
+                    TimedArcPetriNetNetwork netNetwork = model.network().isColored()? verificationResult.getUnfoldedModel().value1().parentNetwork(): model.network();
+                    valueNetwork = new VerificationResult<>(
+                        approxResult.getQueryResult(),
+                        decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
+                        decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
+                        approxResult.verificationTime(),
+                        approxResult.stats(),
+                        false,
+                        verificationResult.getUnfoldedModel());
+                    valueNetwork.setNameMapping(nameMapping);
+
+                    OverApproximation overaprx = new OverApproximation();
+
+                    //Create trace TAPN from the network trace
+                    overaprx.makeTraceTAPN(transformedOriginalModel, valueNetwork, clonedQuery);
+
+                    //run model checker again for trace TAPN
+                    MemoryMonitor.cumulateMemory();
+                    verificationResult = modelChecker.verifyManually(options, transformedOriginalModel, clonedQuery, query, null);
+
+                    if (verificationResult.error()) {
+                        return new VerificationResult<>(
+                            verificationResult.errorMessage(),
+                            verificationResult.verificationTime() + approxResult.verificationTime());
+                    }
+                    //Create the result from trace TAPN
+                    renameTraceTransitions(verificationResult.getTrace());
+                    renameTraceTransitions(verificationResult.getSecondaryTrace());
+                    QueryResult queryResult = verificationResult.getQueryResult();
+
+                    // If ((EF OR EG) AND not satisfied trace) OR ((AG OR AF) AND satisfied trace) -> inconclusive
+                    if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && !queryResult.isQuerySatisfied())
+                        || ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && queryResult.isQuerySatisfied())){
+                        queryResult.setApproximationInconclusive(true);
+                    }
+                    // If satisfied trace -> Return result
+                    // This is satisfied for EF and EG and not satisfied for AG and AF
+                    value = new VerificationResult<>(
+                        queryResult,
+                        approxResult.getTrace(),
+                        approxResult.getSecondaryTrace(),
+                        approxResult.verificationTime() + verificationResult.verificationTime(),
+                        approxResult.stats(),
+                        false,
+                        verificationResult.getUnfoldedModel());
+                    value.setNameMapping(composedModel.value2());
+                } else if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && !verificationResult.getQueryResult().isQuerySatisfied())
+                    || ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && verificationResult.getQueryResult().isQuerySatisfied())) {
+                    // If (EF AND EG not satisfied) OR (AG AND AF satisfied)
+
+                    QueryResult queryResult = verificationResult.getQueryResult();
+
+                    if (queryResult.hasDeadlock() || queryResult.queryType() == QueryType.EG || queryResult.queryType() == QueryType.AF) {
+                        queryResult.setApproximationInconclusive(true);
+                    }
+
+                    value =  new VerificationResult<>(
+                        queryResult,
+                        verificationResult.getTrace(),
+                        verificationResult.getSecondaryTrace(),
+                        verificationResult.verificationTime(),
+                        verificationResult.stats(),
+                        false,
+                        verificationResult.getUnfoldedModel());
+                    value.setNameMapping(composedModel.value2());
+                } else {
+                    // We cannot use the result directly, and did not get a trace.
+                    QueryResult queryResult = verificationResult.getQueryResult();
+
+                    queryResult.setApproximationInconclusive(true);
+
+                    value =  new VerificationResult<>(
+                        queryResult,
+                        verificationResult.getTrace(),
+                        verificationResult.getSecondaryTrace(),
+                        verificationResult.verificationTime(),
+                        verificationResult.stats(),
+                        false,
+                        verificationResult.getUnfoldedModel());
+                    value.setNameMapping(composedModel.value2());
+                }
+            }
+        } else if (query != null && query.isUnderApproximationEnabled()) {
+            // Under-approximation
+
+            if (query.approximationDenominator() == 1) {
+                // If r = 1
+                // No matter what EF and AG answered -> return that answer
+                QueryResult queryResult= verificationResult.getQueryResult();
+                value =  new VerificationResult<>(
+                    queryResult,
+                    verificationResult.getTrace(),
+                    verificationResult.getSecondaryTrace(),
+                    verificationResult.verificationTime(),
+                    verificationResult.stats(),
+                    false,
+                    verificationResult.getUnfoldedModel());
+                value.setNameMapping(composedModel.value2());
+            } else {
+                // If r > 1
+                if ((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && ! verificationResult.getQueryResult().isQuerySatisfied()
+                    || ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && verificationResult.getQueryResult().isQuerySatisfied())) {
+                    // If ((EF OR EG) AND not satisfied) OR ((AG OR AF) and satisfied) -> Inconclusive
+
+                    QueryResult queryResult = verificationResult.getQueryResult();
+                    queryResult.setApproximationInconclusive(true);
+                    value =  new VerificationResult<>(
+                        queryResult,
+                        verificationResult.getTrace(),
+                        verificationResult.getSecondaryTrace(),
+                        verificationResult.verificationTime(),
+                        verificationResult.stats(),
+                        false,
+                        verificationResult.getUnfoldedModel());
+                    value.setNameMapping(composedModel.value2());
+
+                } else if ((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && verificationResult.getQueryResult().isQuerySatisfied()
+                    || ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && ! verificationResult.getQueryResult().isQuerySatisfied())) {
+                    // ((EF OR EG) AND satisfied) OR ((AG OR AF) and not satisfied) -> Check for deadlock
+
+                    if (verificationResult.getTrace() != null) {
+                        // If query does have deadlock -> create trace TAPN
+                        //Create the verification satisfied result for the approximation
+                        VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
+
+                        NameMapping nameMapping = model.network().isColored()? verificationResult.getUnfoldedModel().value2(): composedModel.value2();
+                        TimedArcPetriNetNetwork netNetwork = model.network().isColored()? verificationResult.getUnfoldedModel().value1().parentNetwork(): model.network();
+                        valueNetwork = new VerificationResult<>(
+                            approxResult.getQueryResult(),
+                            decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
+                            decomposeTrace(approxResult.getSecondaryTrace(), nameMapping, netNetwork),
+                            approxResult.verificationTime(),
+                            approxResult.stats(),
+                            false,
+                            verificationResult.getUnfoldedModel());
+                        valueNetwork.setNameMapping(nameMapping);
+
+                        OverApproximation overaprx = new OverApproximation();
+
+                        //Create trace TAPN from the trace
+                        overaprx.makeTraceTAPN(transformedOriginalModel, valueNetwork, clonedQuery);
+
+                        //run model checker again for trace TAPN
+                        MemoryMonitor.cumulateMemory();
+                        verificationResult = modelChecker.verifyManually(options, transformedOriginalModel, clonedQuery, query, null);
+
+                        if (verificationResult.error()) {
+                            return new VerificationResult<>(
+                                verificationResult.errorMessage(),
+                                verificationResult.verificationTime() + approxResult.verificationTime());
+                        }
+
+                        //Create the result from trace TAPN
+                        renameTraceTransitions(verificationResult.getTrace());
+                        renameTraceTransitions(verificationResult.getSecondaryTrace());
+                        QueryResult queryResult = verificationResult.getQueryResult();
+
+                        // If (EF or EG AND not satisfied trace) OR (AG or AF AND satisfied trace) -> inconclusive
+                        if ((verificationResult.getQueryResult().queryType() == QueryType.EF && !queryResult.isQuerySatisfied())
+                            || (verificationResult.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied())
+                            || (verificationResult.getQueryResult().queryType() == QueryType.EG && !queryResult.isQuerySatisfied())
+                            || (verificationResult.getQueryResult().queryType() == QueryType.AF && queryResult.isQuerySatisfied())) {
+                            queryResult.setApproximationInconclusive(true);
+                        }
+
+                        // If satisfied trace -> Return result
+                        // This is satisfied for EF and EG and not satisfied for AG and AF
+                        value = new VerificationResult<>(
+                            queryResult,
+                            verificationResult.getTrace(),
+                            verificationResult.getSecondaryTrace(),
+                            verificationResult.verificationTime() + approxResult.verificationTime(),
+                            verificationResult.stats(),
+                            false,
+                            verificationResult.getUnfoldedModel());
+                        value.setNameMapping(composedModel.value2());
+                    } else {
+                        QueryResult queryResult = verificationResult.getQueryResult();
+
+                        queryResult.setApproximationInconclusive(true);
+
+                        value =  new VerificationResult<>(
+                            queryResult,
+                            verificationResult.getTrace(),
+                            verificationResult.getSecondaryTrace(),
+                            verificationResult.verificationTime(),
+                            verificationResult.stats(),
+                            false,
+                            verificationResult.getUnfoldedModel());
+                        value.setNameMapping(composedModel.value2());
+                    }
+                }
+            }
+        } else {
+            value =  new VerificationResult<>(
+                verificationResult.getQueryResult(),
+                verificationResult.getTrace(),
+                verificationResult.getSecondaryTrace(),
+                verificationResult.verificationTime(),
+                verificationResult.stats(),
+                false,
+                verificationResult.getUnfoldedModel());
+            value.setNameMapping(composedModel.value2());
+        }
+
+        return value;
+    }
 	
 	private TAPNNetworkTrace decomposeTrace(TimedArcPetriNetTrace trace, NameMapping mapping, TimedArcPetriNetNetwork model) {
 		if (trace == null)
@@ -701,13 +926,13 @@ public class ApproximationWorker {
         }
 
         Map<String, TAPNNetworkTrace> decomposedTracesMap = new LinkedHashMap<>();
-        for(var entry : traceMap.entrySet()) {
+        for (var entry : traceMap.entrySet()) {
             TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(entry.getValue(), model, mapping);
             decomposedTracesMap.put(entry.getKey(), decomposer.decompose());
         }
         return decomposedTracesMap;
     }
-
+	
 	private void renameTraceTransitions(TimedArcPetriNetTrace trace) {
 		if (trace != null){
 			trace.reduceTraceForOriginalNet("_traceNet_", "PTRACE");
@@ -724,7 +949,6 @@ public class ApproximationWorker {
 			public void displayWrappedErrorMessage(String message, String title) {}
 			
 		}, false);
-		Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(model.network());
-		return composedModel;
+        return composer.transformModel(model.network());
 	}
 }

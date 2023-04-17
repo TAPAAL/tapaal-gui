@@ -27,11 +27,9 @@ import org.jetbrains.annotations.Nullable;
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -224,6 +222,46 @@ public class VerifyPN implements ModelChecker {
         return false;
     }
 
+    @Override
+    public VerificationResult<TimedArcPetriNetTrace> verifyManually(String options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception {
+        VerifyTAPNExporter exporter;
+        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+            exporter = new VerifyCPNExporter();
+        } else {
+            exporter = new VerifyPNExporter();
+        }
+        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, lens, model.value2(), null, dataLayerQuery);
+
+        if (exportedModel == null) {
+            messenger.displayErrorMessage("There was an error exporting the model");
+        }
+
+        return verifyManually(options, model, exportedModel, query);
+    }
+
+    private VerificationResult<TimedArcPetriNetTrace> verifyManually(String options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
+        if (exportedModel == null) return null;
+
+        runner = new ProcessRunner(verifypnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
+        runner.run();
+
+        if (runner.error()) {
+            return null;
+        } else {
+            String errorOutput = readOutput(runner.errorOutput());
+            String standardOutput = readOutput(runner.standardOutput());
+
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+
+            if (queryResult == null || queryResult.value1() == null) {
+                return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
+            } else {
+                ctlOutput = queryResult.value1().isCTL;
+                return new VerificationResult<>(queryResult.value1(), null, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
+            }
+        }
+    }
+
     public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception {
         if (!supportsModel(model.value1(), options)) {
             throw new UnsupportedModelException("Verifypn does not support the given model.");
@@ -257,15 +295,14 @@ public class VerifyPN implements ModelChecker {
             return;
         }
 
-        List<TimedPlace> inclusionPlaces = new ArrayList<TimedPlace>();
+        List<TimedPlace> inclusionPlaces = new ArrayList<>();
         for (TimedPlace p : verificationOptions.inclusionPlaces().inclusionPlaces()) {
             if (p instanceof LocalTimedPlace) {
                 LocalTimedPlace local = (LocalTimedPlace) p;
                 if (local.model().isActive()) {
                     inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map(local.model().name(), local.name())));
                 }
-            } else // shared place
-            {
+            } else { // shared place
                 inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map("", p.name())));
             }
         }
@@ -290,7 +327,7 @@ public class VerifyPN implements ModelChecker {
             Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
 
             if (queryResult == null || queryResult.value1() == null) {
-                return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
+                return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
             } else {
                 boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
                 boolean showTrace = ((query.getProperty() instanceof TCTLEFNode && queryResult.value1().isQuerySatisfied()) ||
@@ -310,7 +347,7 @@ public class VerifyPN implements ModelChecker {
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
                         model = newComposer.transformModel(loadedModel.network());
 
-                        if (queryResult != null && queryResult.value1() != null) {
+                        if (queryResult.value1() != null) {
                             tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
                         }
 
@@ -344,7 +381,7 @@ public class VerifyPN implements ModelChecker {
                     tapnTrace = trace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
                 }
 
-                var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
+                var result = new VerificationResult<>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
 
                 return result;
             }
@@ -455,13 +492,11 @@ public class VerifyPN implements ModelChecker {
     }
 
     private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-        StringBuilder buffer = new StringBuilder(options.toString());
-        buffer.append(' ');
-        buffer.append(modelFile);
-        buffer.append(' ');
-        buffer.append(queryFile);
+        return options.toString() + ' ' + modelFile + ' ' + queryFile;
+    }
 
-        return buffer.toString();
+    private String createArgumentString(String modelFile, String queryFile, String options) {
+        return options + ' ' + modelFile + ' ' + queryFile;
     }
 
     private String readOutput(BufferedReader reader) {
@@ -473,14 +508,13 @@ public class VerifyPN implements ModelChecker {
             return "";
         }
         StringBuilder buffer = new StringBuilder();
-        String line = null;
+        String line;
         try {
             while ((line = reader.readLine()) != null) {
                 buffer.append(line);
                 buffer.append(System.getProperty("line.separator"));
             }
-        } catch (IOException e) {
-        }
+        } catch (IOException ignored) { }
 
         return buffer.toString();
     }
@@ -507,19 +541,25 @@ public class VerifyPN implements ModelChecker {
         if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL || query.getCategory() == QueryCategory.HyperLTL) {
             return true;
         }
-        if (query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
-            return false;
-        }
-
-        return true;
+        return !(query.getProperty() instanceof TCTLEGNode) && !(query.getProperty() instanceof TCTLAFNode);
     }
 
     public static void reset() {
         //Clear value
         verifypnpath = "";
         Preferences.getInstance().setVerifypnLocation(null);
-        //Set the detault
+        //Set the default
         trySetup();
+    }
+
+    public String getHelpOptions() {
+        runner = new ProcessRunner(verifypnpath, "--help");
+        runner.run();
+
+        if (!runner.error()) {
+            return readOutput(runner.standardOutput());
+        }
+        return null;
     }
 
     @Override
