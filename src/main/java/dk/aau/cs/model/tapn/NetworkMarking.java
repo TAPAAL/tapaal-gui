@@ -30,7 +30,10 @@ public class NetworkMarking implements TimedMarking {
 	public void removeMarkingFor(TimedArcPetriNet tapn) {
 		Require.that(tapn != null, "tapn must be non-null");
 
-		if (markings.containsKey(tapn)){
+		if (markings.containsKey(tapn)) {
+		    for (TimedPlace place : tapn.places()) {
+		        place.resetNumberOfTokens();
+            }
 			LocalTimedMarking marking = markings.remove(tapn);
 			marking.setNetworkMarking(null);
 		}
