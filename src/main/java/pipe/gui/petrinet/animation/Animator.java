@@ -667,6 +667,8 @@ public class Animator {
         }
         if(answer){
             tab.getAnimationHistorySidePanel().clearStepsForward();
+        } else if (SimulationControl.getInstance().isRunning()) {
+            SimulationControl.stopSimulation();
         }
         return answer;
     }
