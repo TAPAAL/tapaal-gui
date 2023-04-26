@@ -197,7 +197,7 @@
   <net active="false" id="MediumNonLossy" type="P/T net">
     <labels border="true" height="357" positionX="740" positionY="56" width="144">Classical Alternating Bit Protocol with timeouts for resending messages.
 
-The query asks about violation of the synchronization between sender and receiver. The extra number of tokens in the query gives a bound on the total number of messages in transit (i.e. in places Medium_*). This means that TAPAAL provides a suitable underapproximation and verifies the correctness of the protocol upto a given number of extra tokens.
+The query asks about violation of the synchronization between sender and receiver. The extra number of tokens in the query gives a bound on the total number of messages in transit (i.e. in places Medium_*). This means that TAPAAL provides a suitable under-approximation and verifies the correctness of the protocol up to a given number of extra tokens.
 
 In the list of components the user can uncheck MediumNonLossy and select instead MediumLossy.</labels>
     <place displayName="true" id="MediumA" initialMarking="0" invariant="&lt; inf" name="MediumA" nameOffsetX="20" nameOffsetY="-14" positionX="390" positionY="150"/>
@@ -208,7 +208,7 @@ In the list of components the user can uncheck MediumNonLossy and select instead
   <net active="true" id="MediumLossy" type="P/T net">
     <labels border="true" height="305" positionX="715" positionY="92" width="144">Classical Alternating Bit Protocol with timeouts for resending messages.
 
-The query asks about violation of the synchronization between sender and receiver. The extra number of tokens in the query gives a bound on the total number of messages in transit (i.e. in places Medium_*). This means that TAPAAL provides a suitable underapproximation and verifies the correctness of the protocol upto a given number of extra tokens.
+The query asks about violation of the synchronization between sender and receiver. The extra number of tokens in the query gives a bound on the total number of messages in transit (i.e. in places Medium_*). This means that TAPAAL provides a suitable under-approximation and verifies the correctness of the protocol up to a given number of extra tokens.
 
 </labels>
     <place displayName="true" id="MediumA" initialMarking="0" invariant="&lt; inf" name="MediumA" nameOffsetX="20" nameOffsetY="-14" positionX="390" positionY="150"/>
@@ -236,7 +236,7 @@ The query asks about violation of the synchronization between sender and receive
       <arcpath arcPointType="false" id="1" xCoord="406" yCoord="806"/>
     </arc>
   </net>
-  <query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Violation  of Behaviour" overApproximation="true" pTrie="true" query="EF ((Sender.Sender_A &gt;= 1 and Receiver.Receiver_B &gt;= 1) or (Sender.Sender_A &gt;= 1 and Receiver.Receiver_C &gt;= 1) or (Sender.Sender_C &gt;= 1 and Receiver.Receiver_A &gt;= 1) or (Sender.Sender_C &gt;= 1 and Receiver.Receiver_D &gt;= 1))" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE" useStubbornReduction="false" useTarOption="false"/>
+  <query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Violation of Behaviour" overApproximation="true" pTrie="true" query="EF ((Sender.Sender_A &gt;= 1 and Receiver.Receiver_B &gt;= 1) or (Sender.Sender_A &gt;= 1 and Receiver.Receiver_C &gt;= 1) or (Sender.Sender_C &gt;= 1 and Receiver.Receiver_A &gt;= 1) or (Sender.Sender_C &gt;= 1 and Receiver.Receiver_D &gt;= 1))" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE" useStubbornReduction="false" useTarOption="false"/>
   <k-bound bound="3"/>
   <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>

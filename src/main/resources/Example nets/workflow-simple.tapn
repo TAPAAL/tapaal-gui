@@ -3,7 +3,7 @@
   <net active="true" id="Workflow" type="P/T net">
     <labels border="true" height="115" positionX="39" positionY="460" width="813">This is an example of workflow modelling capabilities of TAPAAL.
 
-A number of tasks A0 to A7 with dependeces, task duration and a latest  execution deadline are given.
+A number of tasks A0 to A7 with dependencies, task duration and a latest execution deadline are given.
 
 By clicking on "Check Boundedness" in the query dialog, one will realise that the net with three additional tokens is bounded and verification finds the fastest schedule. The age of the token in the place Deadlines then shows the total time needed for execution of all tasks (15 time units in our case).
 
