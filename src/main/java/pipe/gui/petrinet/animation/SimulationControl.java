@@ -161,7 +161,7 @@ public class SimulationControl extends JPanel {
 		dialog.setContentPane(contentPane);
 		dialog.pack();
 		dialog.setResizable(false);
-		
+
 		//Calculate location
 		int x = TAPAALGUI.getAppGui().getLocation().x + TAPAALGUI.getAppGui().getWidth() - dialog.getWidth() - 30;
 		int y = TAPAALGUI.getAppGui().getLocation().y + 30;
@@ -169,6 +169,12 @@ public class SimulationControl extends JPanel {
 		dialog.setLocation(x, y);
 		dialog.setVisible(true);
 	}
+
+    public static void stopSimulation(){
+        if(SimulationControl.getInstance().isRunning() && dialog.isVisible()){
+            dialog.setVisible(false);
+        }
+    }
 
     public boolean isRandomTransitionMode(){
         if(SimulationControl.getInstance().randomSimulation()){
