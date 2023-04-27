@@ -103,7 +103,7 @@ public class WorkflowDialog extends JDialog {
                 buffer.append("the state-space during the verification. This is necessary for extended\n");
                 buffer.append("workflow nets as soundness is otherwise undecidable. For monotonic nets\n");
                 buffer.append("the tool provides conclusive answers also for unbounded nets but increasing\n");
-                buffer.append("the number of extra tokens can speedup the verification and help with trace generation\n");
+                buffer.append("the number of extra tokens can speedup the verification and help with trace generation.\n");
 		buffer.append("<br/><br/>");
 		buffer.append("<b>Typical Reasons for Breaking Soundness</b><br/>");
                 buffer.append("<ul><li>A reachable deadlock marking (no available transition firing after any delay).</li>\n");
@@ -424,11 +424,11 @@ public class WorkflowDialog extends JDialog {
 			pane.removeMouseListener(listener);
 		}
 		Dimension dim = new Dimension(500,400);
-		pane.setPreferredSize(dim);  
-		pane.setMargin(new Insets(5,5,5,5));  
-		JScrollPane scrollPane = new JScrollPane(pane);  
-		scrollPane.setPreferredSize(dim);  
-		return scrollPane;  
+		pane.setPreferredSize(dim);
+		pane.setMargin(new Insets(5,5,5,5));
+		JScrollPane scrollPane = new JScrollPane(pane);
+		scrollPane.setPreferredSize(dim);
+		return scrollPane;
 	}
 
 	private void initValidationPanel() {
@@ -996,7 +996,7 @@ public class WorkflowDialog extends JDialog {
 					}
 				}
                 
-				long c  = m*B+1;
+				long c = m*B+1;
 
 				/* Call engine */
 

@@ -830,7 +830,7 @@ public class BatchProcessingDialog extends JDialog {
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		Dimension scrollPanePrefDims = new Dimension(850, 250);
-		//Set the minimum size to 150 lets than the preferred, to be consistat with theh minimum size of the window
+		//Set the minimum size to 150 lets than the preferred, to be consistent with the minimum size of the window
 		Dimension scrollPaneMinDims = new Dimension(850, 250-150);
 		scrollPane.setMinimumSize(scrollPaneMinDims);
 		scrollPane.setPreferredSize(scrollPanePrefDims);
@@ -1260,7 +1260,7 @@ public class BatchProcessingDialog extends JDialog {
                             setBackground(new Color(91, 255, 91)); // light green
                         } else if ((isResultColumn && (value.toString().equals(NOT_SATISFIED_STRING) || value.toString().equals(NOT_SATISFIED_STRING_STRONG_SOUNDNESS) ||
                             value.toString().equals(NOT_SATISFIED_STRING_SOUNDNESS))) || (isQueryColumn && value.toString().equals("FALSE"))) {
-                            setBackground(new Color(255, 91, 91)); // light  red
+                            setBackground(new Color(255, 91, 91)); // light red
                         } else if (isResultColumn && value.toString().equals( "Inconclusive")) {
                             setBackground(new Color(255, 255, 120)); // light yellow
                         } else {

@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-public class FileNameCellRenderer<T> extends JLabel implements ListCellRenderer<T>  {
+public class FileNameCellRenderer<T> extends JLabel implements ListCellRenderer<T> {
 	// Custom cell renderer for the file list to only display the name of the
 	// file	instead of the whole path.{
 	
