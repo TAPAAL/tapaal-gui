@@ -36,7 +36,7 @@ import java.util.List;
 
 public final class GuiFrameController implements GuiFrameControllerActions{
 
-    final GuiFrame guiFrameDirectAccess; //XXX - while refactoring shold only use guiFrameActions
+    final GuiFrame guiFrameDirectAccess; //XXX - while refactoring should only use guiFrameActions
     final GuiFrameActions guiFrame;
     private final ArrayList<PetriNetTab> tabs = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         guiFrame = appGui;
         guiFrameDirectAccess = appGui;
 
-        loadPrefrences();
+        loadPreferences();
         appGui.registerController(this, currentTab);
     }
 
@@ -68,7 +68,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         return Collections.unmodifiableList(tabs);
     }
 
-    private void loadPrefrences() {
+    private void loadPreferences() {
         Preferences prefs = Preferences.getInstance();
 
         QueryDialog.setAdvancedView(prefs.getAdvancedQueryView());
@@ -230,7 +230,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         buffer.append("\n\n");
         buffer.append("TAPAAL is a tool for editing, simulation and verification of P/T and timed-arc Petri nets.\n");
         buffer.append("The GUI is based on PIPE2: http://pipe2.sourceforge.net/\n\n");
-        buffer.append("License information and more is availabe at: www.tapaal.net\n\n");
+        buffer.append("License information and more is available at: www.tapaal.net\n\n");
 
         buffer.append("Credits\n\n");
         buffer.append("TAPAAL GUI and Translations:\n");
@@ -318,7 +318,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
                     for (PetriNetTab tab : tabs) {
                         openTab(tab);
 
-                        //Don't autolayout on empty net, hotfix for issue #1960000, we assue only pnml file does not have layout and they always only have one component
+                        //Don't auto-layout on empty net, hotfix for issue #1960000, we assume only pnml file does not have layout, and they always only have one component
                         if(!tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
                             int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if(dialogResult == JOptionPane.YES_OPTION) {
@@ -420,7 +420,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     //Needs further refactoring to seperate conserns
     public void checkForUpdate(boolean forcecheck) {
         final VersionChecker versionChecker = new VersionChecker();
-        if (versionChecker.checkForNewVersion(forcecheck))  {
+        if (versionChecker.checkForNewVersion(forcecheck)) {
             StringBuilder message = new StringBuilder("There is a new version of TAPAAL available at www.tapaal.net.");
             message.append("\n\nCurrent version: ");
             message.append(TAPAAL.VERSION);
@@ -476,7 +476,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     }
 
     private static void openBrowser(URI url){
-        //open the default bowser on this page
+        //open the default browser on this page
         try {
             java.awt.Desktop.getDesktop().browse(url);
         } catch (IOException e) {
@@ -500,7 +500,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
             openBrowser(url);
         } catch (URISyntaxException e) {
             // TODO Auto-generated catch block
-            Logger.log("Error convering to URL");
+            Logger.log("Error converting to URL");
             e.printStackTrace();
         }
     }
