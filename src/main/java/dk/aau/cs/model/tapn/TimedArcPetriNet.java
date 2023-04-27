@@ -15,7 +15,7 @@ public class TimedArcPetriNet {
     private boolean isActive;
 
 	//Should the names be checked to see if the name is already used 
-	//This is used when loading big nets as the checking  of names is slow.
+	//This is used when loading big nets as the checking of names is slow.
 	private boolean checkNames = true; 
 
 	private final List<TimedPlace> places = new ArrayList<TimedPlace>();
@@ -476,7 +476,7 @@ public class TimedArcPetriNet {
                             }
                         }
                        
-                        // here we count only the non-shared tranistions; shared transitions are added after the for-loop
+                        // here we count only the non-shared transitions; shared transitions are added after the for-loop
                         int sharedTransitionCount = 0;
                         for (TimedTransition trans : t.transitions()) {
                             if (!trans.isShared()) {
@@ -492,7 +492,7 @@ public class TimedArcPetriNet {
 			numberOfTransportArcs += t.transportArcs.size();
             numberOfOrphanTransitions += t.getOrphanTransitions().size();
             numberOfOrphanPlaces += t.getOrphanPlaces().size();
-			//Test if all inputarcs is untimed and get the number of untimed input arcs
+			//Test if all input arcs is untimed and get the number of untimed input arcs
 			for(TimedInputArc in : t.inputArcs()){
 				if(!(in.interval().lowerBound().value() == 0 && in.interval().isLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity))){
 					networkUntimed = false;
@@ -503,7 +503,7 @@ public class TimedArcPetriNet {
 					networkWeighted = true;
 				}
 			}
-			//Test if all tansportarcs is untimed and get the number of untimed transport arcs
+			//Test if all transport arcs is untimed and get the number of untimed transport arcs
 			for(TransportArc in : t.transportArcs()){
 				if(!(in.interval().lowerBound().value() == 0 && in.interval().isLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity))){
 					networkUntimed = false;
@@ -547,14 +547,13 @@ public class TimedArcPetriNet {
 					}
 				}
 			}
-			
 		}
                 
-                numberOfPlaces +=  sharedPlaces.size();
+                numberOfPlaces += sharedPlaces.size();
                 numberOfTransitions += sharedTransitions.size();
                 for (TimedPlace p: sharedPlaces) {
                     numberOfTokens += p.numberOfTokens();
-                }          
+                }
 		numberOfTotalNumberOfArcs = numberOfInputArcs + numberOfOutputArcs + numberOfInhibitorArcs + numberOfTransportArcs;
 		
 		int rowNumber = 0;
@@ -592,7 +591,7 @@ public class TimedArcPetriNet {
 		result[rowNumber++][columnNumber] = "Total number of arcs: ";
 		result[rowNumber++][columnNumber] = "Number of tokens: ";
 		result[rowNumber++][columnNumber] = "Number of untimed input arcs: ";
-		result[rowNumber++][columnNumber] = "Number of untimed transport arcs";
+		result[rowNumber++][columnNumber] = "Number of untimed transport arcs: ";
 		result[rowNumber++][columnNumber] = "Number of shared places: ";
 		result[rowNumber++][columnNumber] = "Number of shared transitions: ";
 		result[rowNumber++][columnNumber] = "The network is untimed: ";
