@@ -136,7 +136,7 @@ public class RunVerification extends RunVerificationBase {
 						"Open the UPPAAL GUI while connected to the internet to correct this problem.";
 			}
 			
-			String message = "An error occured during the verification." +
+			String message = "An error occurred during the verification." +
 			System.getProperty("line.separator") + 	
 			System.getProperty("line.separator");
 			
@@ -306,15 +306,15 @@ public class RunVerification extends RunVerificationBase {
     }
 
 	private Object[][] extractArrayFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
-		List<Tuple<String, Integer>> transistionStats = result.getTransitionStatistics();
-		Object[][] out = new Object[transistionStats.size()][2];
-		for (int i = 0; i < transistionStats.size(); i++) {
-			Object[] line = {(transistionStats.get(i).value2() == -1 ? "unknown" : transistionStats.get(i).value2()), transistionStats.get(i).value1()};
+		List<Tuple<String, Integer>> transitionStats = result.getTransitionStatistics();
+		Object[][] out = new Object[transitionStats.size()][2];
+		for (int i = 0; i < transitionStats.size(); i++) {
+			Object[] line = {(transitionStats.get(i).value2() == -1 ? "unknown" : transitionStats.get(i).value2()), transitionStats.get(i).value1()};
 			out[i] = line;
 		}
 		return out;
 	}
-        
+
 	private Object[][] extractArrayFromPlaceBoundStatistics(final VerificationResult<TAPNNetworkTrace> result) {
 		List<Tuple<String,Integer>> placeBoundStats = result.getPlaceBoundStatistics();
 		Object[][] out = new Object[placeBoundStats.size()][2];
@@ -390,7 +390,7 @@ public class RunVerification extends RunVerificationBase {
                             try {
                                 PetriNetTab reducedNetTab = PetriNetTab.createNewTabFromPNMLFile(reducedNetFile);
                                 //Ensure that a net was created by the query reduction
-                                if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
+                                if(reducedNetTab.currentTemplate().guiModel().getPlaces().length > 0
                                     || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
                                     reducedNetTab.setInitialName("reduced-" + TAPAALGUI.getAppGui().getCurrentTabName());
                                     TAPNQuery convertedQuery = dataLayerQuery.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());

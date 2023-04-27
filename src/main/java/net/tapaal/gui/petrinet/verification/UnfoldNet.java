@@ -178,7 +178,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 loadedModel = new PNMLoader().load(fileOut);
             }
             // addLocation(loadedModel, composer); // We can not get coords from server
-            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(),loadedModel.queries(),new TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
+            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
 
             Thread thread = new Thread(() -> TAPAALGUI.getAppGuiController().openTab(newTab));

@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Implementes af class for handling integrated Uppaal Verification
+ * Implements of class for handling integrated Uppaal Verification
  * 
  * Copyright 2009 Author Kenneth Yrke Joergensen <kenneth@yrke.dk>
  * 

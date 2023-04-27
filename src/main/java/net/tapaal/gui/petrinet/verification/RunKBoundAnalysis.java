@@ -58,7 +58,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
                 }
 			}
 		} else {						
-			String message = "An error occured during the verification." +
+			String message = "An error occurred during the verification." +
 			System.getProperty("line.separator") + 	
 			System.getProperty("line.separator");
 			message += "Model checker output:\n" + result.errorMessage();
@@ -69,10 +69,10 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 	}
 
 	protected String getAnswerNotBoundedString() {
-		return "The net with the speficied extra number of tokens is either unbounded or\n"
+		return "The net with the specified extra number of tokens is either unbounded or\n"
 				+ "more extra tokens have to be added in order to achieve an exact analysis.\n\n"
 				+ "This means that the analysis using the currently selected number \n"
-				+ "of extra tokens provides only an underapproximation of the net behaviour.\n"
+				+ "of extra tokens provides only an under-approximation of the net behaviour.\n"
 				+ "If you think that the net is bounded, try to add more extra tokens in order\n"
 				+ "to achieve exact verification analysis.\n";
 	}

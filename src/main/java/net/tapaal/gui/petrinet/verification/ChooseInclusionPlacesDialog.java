@@ -219,7 +219,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 
 
 	public static InclusionPlaces showInclusionPlacesDialog(TimedArcPetriNetNetwork tapnNetwork, InclusionPlaces inclusionPlaces) {
-		EscapableDialog guiDialog = new EscapableDialog(TAPAALGUI.getApp(),	"Choose Inclustion Places", true);
+		EscapableDialog guiDialog = new EscapableDialog(TAPAALGUI.getApp(),	"Choose Inclusion Places", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
