@@ -22,14 +22,14 @@ public class EngineSupportOptions {
                                 boolean supportWeights, boolean supportInhibArcs, boolean supportUrgentTransitions, boolean supportEGorAF, boolean supportStrictNets, boolean supportTimedNets,
                                 boolean supportDeadlockNetdegreeGreaterThan2, boolean supportGames, boolean supportEGorAFWithNetDegreeGreaterThan2, boolean supportNestedQuantifications, boolean supportColored){
         this.nameString = nameString;
-        this.supportFastestTrace =  supportFastestTrace;
-        this.supportDeadlockNetdegree2EForAG =  supportDeadlockNetdegree2EForAG;
-        this.supportDeadlockWithInhib =  supportDeadlockWithInhib;
-        this.supportWeights =  supportWeights;
-        this.supportInhibArcs =  supportInhibArcs;
-        this.supportUrgentTransitions =  supportUrgentTransitions;
-        this.supportEGorAF =  supportEGorAF;
-        this.supportStrictNets =  supportStrictNets;
+        this.supportFastestTrace = supportFastestTrace;
+        this.supportDeadlockNetdegree2EForAG = supportDeadlockNetdegree2EForAG;
+        this.supportDeadlockWithInhib = supportDeadlockWithInhib;
+        this.supportWeights = supportWeights;
+        this.supportInhibArcs = supportInhibArcs;
+        this.supportUrgentTransitions = supportUrgentTransitions;
+        this.supportEGorAF = supportEGorAF;
+        this.supportStrictNets = supportStrictNets;
         this.supportTimedNets = supportTimedNets;
         this.supportDeadlockNetdegreeGreaterThan2 = supportDeadlockNetdegreeGreaterThan2;
         this.supportGames = supportGames;

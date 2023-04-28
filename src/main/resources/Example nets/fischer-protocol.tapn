@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
   <net active="true" id="Protocol" type="P/T net">
-    <labels border="true" height="278" positionX="23" positionY="511" width="126">There are four places A, B, C, and CS 
-and their dual places A_, B_, C_, and CS_
-There is always at most one token in
-either of the dual places representing
-the value of the shared variable. If 
-there is a token in the place udf then
-the value of the shared variable is
-undefined. The number of initial tokens
-in place A represents the total number
-of processes.
-</labels>
+    <labels border="true" height="278" positionX="23" positionY="511" width="126">There are four places A, B, C, and CS and their dual places A_, B_, C_, and CS_.
+
+There is always at most one token in either of the dual places representing the value of the shared variable. If there is a token in the place udf then the value of the shared variable is undefined. The number of initial tokens in place A represents the total number of processes.</labels>
     <place displayName="true" id="A_" initialMarking="0" invariant="&lt; inf" name="A_" nameOffsetX="-5" nameOffsetY="33" positionX="150" positionY="120"/>
     <place displayName="true" id="A" initialMarking="0" invariant="&lt; inf" name="A" nameOffsetX="-5" nameOffsetY="35" positionX="270" positionY="120"/>
     <place displayName="true" id="B" initialMarking="0" invariant="&lt; inf" name="B" nameOffsetX="-5" nameOffsetY="35" positionX="540" positionY="120"/>

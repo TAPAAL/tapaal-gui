@@ -265,7 +265,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 							}
 						}
 					}
-					//We try at least minimumiterations times
+					//We try at least minimumIterations times
 					if(!(pointsReserved.contains(bestPoint)) && layer >= minimumIterations) {
 						fireStatusChanged(objectsPlaced.size());
 						moveObject(objectToPlace, bestPoint);
@@ -438,8 +438,8 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	}
 
 
-    //XXX: out bad handeling of zoom bleads over we need to adjust point relative to zoom
-    // midpoint is at current zoom level, but when creaing a new point its coords is at 100% zoom
+    //XXX: out bad handling of zoom bleads over we need to adjust point relative to zoom
+    // midpoint is at current zoom level, but when creating a new point its coords is at 100% zoom
 	private double unzoom(double pos) {
 	    return Zoomer.getUnzoomedValue(pos, drawingSurface.getZoom());
     }

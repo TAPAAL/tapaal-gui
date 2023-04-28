@@ -15,7 +15,7 @@
   <net active="true" id="Workflow" type="P/T net">
     <labels border="true" height="131" positionX="16" positionY="297" width="845">This is an example of advanced workflow modelling capabilities of TAPAAL.
 
-A number of tasks A0 to A7 with dependeces and durations are discribed in the Workflow component. The components Deadlines, Recovery_Times and Limited_Resources provide further constraints on the workflow and are explained in the corresponding components. They can be activated/deactived in the component panel.
+A number of tasks A0 to A7 with dependencies and durations are described in the Workflow component. The components Deadlines, Recovery_Times and Limited_Resources provide further constraints on the workflow and are explained in the corresponding components. They can be activated/deactivated in the component panel.
 
 By clicking on "Check Boundedness" in the query dialog for "Find Schedule" we can check that the net with the extra number of tokens is bounded and the verification returns a feasible schedule.
 
@@ -272,7 +272,7 @@ Try to also use in the menu Tools/Workflow analysis to see that the workflow is 
     </arc>
   </net>
   <net active="true" id="Recovery_Times" type="P/T net">
-    <labels border="true" height="81" positionX="228" positionY="288" width="237">The addition of loop transitions for A7_Done and A5_Done make sure that after these tasks are perfored, there has to be at minimum one time unit delay before the same tasks can be performed again.</labels>
+    <labels border="true" height="81" positionX="228" positionY="288" width="237">The addition of loop transitions for A7_Done and A5_Done make sure that after these tasks are performed, there has to be at minimum one time unit delay before the same tasks can be performed again.</labels>
     <place displayName="true" id="Timer_for_A7_Done" initialMarking="0" invariant="&lt; inf" name="Timer_for_A7_Done" nameOffsetX="-5" nameOffsetY="35" positionX="165" positionY="225"/>
     <place displayName="true" id="Timer_for_A5_Done" initialMarking="0" invariant="&lt; inf" name="Timer_for_A5_Done" nameOffsetX="-5" nameOffsetY="35" positionX="525" positionY="225"/>
     <transition angle="0" displayName="true" id="A7_Done" infiniteServer="false" name="A7_Done" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="165" positionY="105" priority="0" urgent="false"/>
@@ -317,7 +317,7 @@ Try to also use in the menu Tools/Workflow analysis to see that the workflow is 
     </arc>
   </net>
   <net active="true" id="Limited_Resources" type="P/T net">
-    <labels border="true" height="93" positionX="407" positionY="67" width="237">This component models the fact that in order to perform the task A6 there are some resources needed. If all three resources are used, it is not possible to initiate the executin of the task A6 and it has to wait until some of the other parallel activites return the resource back.</labels>
+    <labels border="true" height="93" positionX="407" positionY="67" width="237">This component models the fact that in order to perform the task A6 there are some resources needed. If all three resources are used, it is not possible to initiate the execution of the task A6 and it has to wait until some of the other parallel activities return the resource back.</labels>
     <place displayName="true" id="Resource_for_task_A6" initialMarking="0" invariant="&lt; inf" name="Resource_for_task_A6" nameOffsetX="-14" nameOffsetY="22" positionX="240" positionY="60"/>
     <transition angle="0" displayName="true" id="A5_Done" infiniteServer="false" name="A5_Done" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="165" positionY="135" priority="0" urgent="false"/>
     <transition angle="0" displayName="true" id="A6_Done" infiniteServer="false" name="A6_Done" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="330" positionY="135" priority="0" urgent="false"/>

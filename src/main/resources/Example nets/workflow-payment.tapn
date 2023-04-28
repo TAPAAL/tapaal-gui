@@ -11,14 +11,14 @@ After booking the payment has to be done within 10 minutes since the session (in
 
 Each time the booking is restarted, one attempt is used (the place attempts initially gets 3 tokens as the output arc from the transition start is weighted).
 
-After successful payment or after all three attempts were used, the workflow has to terminate. In case of success, using the urgent transition empty, we will without any delay empty the place attempts and immedialy finish the workflow by firing the transition success.
+After successful payment or after all three attempts were used, the workflow has to terminate. In case of success, using the urgent transition empty, we will without any delay empty the place attempts and immediately finish the workflow by firing the transition success.
 
 The two queries together guarantee strong soundness of the workflow net. Alternatively, open in the menu Tool/Workflow analysis and verify soundness of the workflow while computing shortest and longest duration of the workflow.</labels>
     <place displayName="true" id="in" initialMarking="1" invariant="&lt; inf" name="in" nameOffsetX="27" nameOffsetY="-8" positionX="75" positionY="225"/>
     <place displayName="true" id="out" initialMarking="0" invariant="&lt; inf" name="out" nameOffsetX="39" nameOffsetY="-9" positionX="765" positionY="225"/>
     <place displayName="true" id="booking" initialMarking="0" invariant="&lt;= 5" name="booking" nameOffsetX="50" nameOffsetY="-18" positionX="150" positionY="90"/>
     <place displayName="true" id="payment" initialMarking="0" invariant="&lt;= 10" name="payment" nameOffsetX="61" nameOffsetY="-29" positionX="390" positionY="90"/>
-    <place displayName="true" id="succesful" initialMarking="0" invariant="&lt; inf" name="succesful" nameOffsetX="41" nameOffsetY="-11" positionX="630" positionY="90"/>
+    <place displayName="true" id="successful" initialMarking="0" invariant="&lt; inf" name="successful" nameOffsetX="41" nameOffsetY="-11" positionX="630" positionY="90"/>
     <place displayName="true" id="attempts" initialMarking="0" invariant="&lt; inf" name="attempts" nameOffsetX="-5" nameOffsetY="35" positionX="255" positionY="315"/>
     <transition angle="0" displayName="true" id="start" infiniteServer="false" name="start" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="150" positionY="225" priority="0" urgent="true"/>
     <transition angle="0" displayName="true" id="book" infiniteServer="false" name="book" nameOffsetX="29" nameOffsetY="-12" player="0" positionX="270" positionY="90" priority="0" urgent="false"/>
@@ -53,16 +53,16 @@ The two queries together guarantee strong soundness of the workflow net. Alterna
       <arcpath arcPointType="false" id="0" xCoord="420" yCoord="105"/>
       <arcpath arcPointType="false" id="1" xCoord="504" yCoord="105"/>
     </arc>
-    <arc id="pay to succesful" inscription="1" nameOffsetX="0" nameOffsetY="0" source="pay" target="succesful" type="normal" weight="1">
+    <arc id="pay to successful" inscription="1" nameOffsetX="0" nameOffsetY="0" source="pay" target="successful" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="514" yCoord="105"/>
       <arcpath arcPointType="false" id="1" xCoord="630" yCoord="105"/>
     </arc>
-    <arc id="succesful to empty" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="succesful" target="empty" type="timed" weight="1">
+    <arc id="successful to empty" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="successful" target="empty" type="timed" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="634" yCoord="115"/>
       <arcpath arcPointType="true" id="1" xCoord="556" yCoord="192"/>
       <arcpath arcPointType="false" id="2" xCoord="515" yCoord="235"/>
     </arc>
-    <arc id="empty to succesful" inscription="1" nameOffsetX="0" nameOffsetY="0" source="empty" target="succesful" type="normal" weight="1">
+    <arc id="empty to successful" inscription="1" nameOffsetX="0" nameOffsetY="0" source="empty" target="successful" type="normal" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="514" yCoord="245"/>
       <arcpath arcPointType="true" id="1" xCoord="631" yCoord="177"/>
       <arcpath arcPointType="false" id="2" xCoord="642" yCoord="119"/>
@@ -71,7 +71,7 @@ The two queries together guarantee strong soundness of the workflow net. Alterna
       <arcpath arcPointType="false" id="0" xCoord="284" yCoord="324"/>
       <arcpath arcPointType="false" id="1" xCoord="504" yCoord="240"/>
     </arc>
-    <arc id="succesful to success" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="succesful" target="success" type="timed" weight="1">
+    <arc id="successful to success" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="successful" target="success" type="timed" weight="1">
       <arcpath arcPointType="false" id="0" xCoord="652" yCoord="117"/>
       <arcpath arcPointType="false" id="1" xCoord="720" yCoord="225"/>
     </arc>
@@ -149,7 +149,7 @@ The two queries together guarantee strong soundness of the workflow net. Alterna
     </arc>
   </net>
   <query active="true" approximationDenominator="2" capacity="3" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="false" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Workflow Termination" overApproximation="false" pTrie="true" query="AF out = 1" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
-  <query active="true" approximationDenominator="2" capacity="3" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Unique Final Marking" overApproximation="true" pTrie="true" query="AG (!(out &gt;= 1) or (out = 1 and in = 0 and workflow.booking = 0 and workflow.payment = 0 and workflow.attempts = 0 and workflow.succesful = 0))" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
+  <query active="true" approximationDenominator="2" capacity="3" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Unique Final Marking" overApproximation="true" pTrie="true" query="AG (!(out &gt;= 1) or (out = 1 and in = 0 and workflow.booking = 0 and workflow.payment = 0 and workflow.attempts = 0 and workflow.successful = 0))" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="3"/>
   <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>

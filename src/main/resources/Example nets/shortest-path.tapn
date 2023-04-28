@@ -2,7 +2,7 @@
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
   <constant name="MaxDistance" value="17"/>
   <net active="true" id="InputGraph" type="P/T net">
-    <labels border="true" height="135" positionX="26" positionY="536" width="331">The model implements the shortest path algorithm based on flooding. Simply pour water into the StartNode and measure if the water will arrive to the FinalNode within the given bound in the constant ShortestDistance. The weights of the edges are simly encoded as the intervals in the transport arcs that restrict the delay before tokens can be placed into the output places of the transitions.
+    <labels border="true" height="135" positionX="26" positionY="536" width="331">The model implements the shortest path algorithm based on flooding. Simply pour water into the StartNode and measure if the water will arrive to the FinalNode within the given bound in the constant MaxDistance. The weights of the edges are simply encoded as the intervals in the transport arcs that restrict the delay before tokens can be placed into the output places of the transitions.
 
 If the FinalNode can be reached within the given limit, the simulation shows one such path leading to the final node.</labels>
     <place displayName="true" id="StartNode" initialMarking="1" invariant="&lt;= MaxDistance" name="StartNode" nameOffsetX="32" nameOffsetY="-32" positionX="135" positionY="300"/>

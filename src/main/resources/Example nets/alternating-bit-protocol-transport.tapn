@@ -7,7 +7,7 @@
 
 In this version of the protocol we use transport arcs to track the timestamp of each message from the point it was sent until it returns as an acknowledgement back to the sender.
 
-The query asks about violation of the synchronization between sender and receiver. The extra number of tokens in the query gives a bound on the total number of messages in transit (i.e. in places Medium_*). This means that TAPAAL provides a suitable underapproximation and verifies the correctness of the protocol upto a given number of extra tokens.
+The query asks about violation of the synchronization between sender and receiver. The extra number of tokens in the query gives a bound on the total number of messages in transit (i.e. in places Medium_*). This means that TAPAAL provides a suitable under-approximation and verifies the correctness of the protocol up to a given number of extra tokens.
 
 Try to experiment with the values of the constants deadline and delay in order to check for what retransmission rates the protocol remains safe.</labels>
     <place displayName="true" id="Medium_A" initialMarking="0" invariant="&lt; inf" name="Medium_A" nameOffsetX="50" nameOffsetY="-5" positionX="390" positionY="150"/>

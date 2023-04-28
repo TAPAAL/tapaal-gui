@@ -7,7 +7,7 @@ The circles are called places and rectangles transitions. They are connected eit
 
 Behaviour of the net is given by tokens. Each place can store a number of tokens and each token has its own real-time age. In our example, there is initially one token of age 0 in the place Start.
 
-A transition can fire if in every of its input places there is at least one token of an age that fits into the interval assigned to the corresponding arc. When transition fires a new token of age 0 is produced to any of its output places for the normal arcs. In case of trasport arc, the age of the token remains the same as the age of the consumed token. Also note that arcs can be weigthed, like the one from T2 to P5 with weight 3 (producing three fresh tokens) and the one from P5 to T4 (consuming two tokens). 
+A transition can fire if in every of its input places there is at least one token of an age that fits into the interval assigned to the corresponding arc. When transition fires, a new token of age 0 is produced to any of its output places for the normal arcs. In case of transport arc, the age of the token remains the same as the age of the consumed token. Also note that arcs can be weighted, like the one from T2 to P5 with weight 3 (producing three fresh tokens) and the one from P5 to T4 (consuming two tokens).
 
 The place P2 contains the so-called invariant &lt;=5. This means that tokens in that place cannot be older than 5 time units. A net can perform the so-called time-delays. This means that all tokens in the net grow older by some amount of time, as long as none of the invariants are violated.
 
@@ -17,7 +17,7 @@ Finally, the transition T4 (with a white dot) is an urgent transition, meaning t
 
 In our example we might want to know if it is possible, by doing some time delays and transition firings, to put a token into the place Target.
 
-The query "Target Reachable" expresses this property. It moreover asks for fastest such trace. By clicking on "Verify" the verification will begin and ouput the trace allowing us to place a token into the place Target. By clicking on the symbols &gt; and &lt; one can move back and force in the trace and investigate the intermediate markings.
+The query "Target Reachable" expresses this property. It moreover asks for fastest such trace. By clicking on "Verify" the verification will begin and output the trace allowing us to place a token into the place Target. By clicking on the symbols &gt; and &lt; one can move back and force in the trace and investigate the intermediate markings.
 
 One may observe that 3 extra tokens are needed in the intermediate markings in order to reach the place Target. Indeed, this number of extra tokens is specified in the query dialog and by clicking on "Check Boundedness", one can verify that 3 extra tokens are indeed enough for an exact analysis.
 

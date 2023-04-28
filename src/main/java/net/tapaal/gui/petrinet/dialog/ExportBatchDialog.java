@@ -525,7 +525,7 @@ public class ExportBatchDialog extends JDialog {
         Collection<TAPNQuery> queries;
 
         if (uniqueQueryNames.isSelected()) {
-            queries =  renameQueries(file.getName(), loadedModel.queries());
+            queries = renameQueries(file.getName(), loadedModel.queries());
         } else {
             queries = loadedModel.queries();
         }
@@ -599,7 +599,7 @@ public class ExportBatchDialog extends JDialog {
 							setBackground(new Color(91, 255, 91)); // light green
 						}
 						else if (isResultColumn && value.toString().equals(NAME_FailStringParseError)) {
-							setBackground(new Color(255, 91, 91)); // light  red
+							setBackground(new Color(255, 91, 91)); // light red
 						}
 						else if (isResultColumn && value.toString().equals(NAME_FailStringFolderExists)) {
 							setBackground(new Color(255, 255, 120)); // light yellow

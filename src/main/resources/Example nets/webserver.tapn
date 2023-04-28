@@ -9,7 +9,7 @@
 
 There are two users that generate requests with certain periods. Processing a request takes at least 'min' time units. The webserver will drop a request if its deadline is exceeded. If a processing of a request already started, it has to be finished also latest by its deadline. This is guaranteed by the use of transport arcs that preserve the age of the request tokens and the corresponding invariants.
 
-The user of the tool can now experiments with different values of the periods and deadlines to check whether e.g. five requests can be served without dropping any of them. Note that if the deadline is set e.g. to 4 this query is not satisfiable anymore.</labels>
+The tool user can now experiment with different period and deadline values to check whether e.g. five requests can be served without dropping any of them. Note that if the deadline is set e.g. to 4 this query is not satisfiable anymore.</labels>
     <place displayName="true" id="Requests" initialMarking="0" invariant="&lt;= deadline" name="Requests" nameOffsetX="-17" nameOffsetY="8" positionX="270" positionY="270"/>
     <place displayName="true" id="Dropped" initialMarking="0" invariant="&lt; inf" name="Dropped" nameOffsetX="-5" nameOffsetY="35" positionX="135" positionY="105"/>
     <place displayName="true" id="Processing" initialMarking="0" invariant="&lt;= deadline" name="Processing" nameOffsetX="127" nameOffsetY="17" positionX="735" positionY="180"/>
