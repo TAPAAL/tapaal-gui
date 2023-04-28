@@ -232,17 +232,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabActions::verifySelectedQuery);
         }
     };
-    private final GuiAction workflowDialogAction = new GuiAction("Workflow analysis", "Analyses net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)) {
+    private final GuiAction workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabActions::workflowAnalyse);
         }
     };
-    private final GuiAction smartDrawAction = new GuiAction("Automatic net layout", "Rearranges the Petri net objects", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_DOWN_MASK)) {
+    private final GuiAction smartDrawAction = new GuiAction("Automatic net layout", "Rearrange the Petri net objects", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_DOWN_MASK)) {
         public void actionPerformed(ActionEvent e) {
             SmartDrawDialog.showSmartDrawDialog();
         }
     };
-    private final GuiAction mergeComponentsDialogAction = new GuiAction("Merge net components", "Opens a composed net in a new tab and use approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
+    private final GuiAction mergeComponentsDialogAction = new GuiAction("Merge net components", "Open a composed net in a new tab and use approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabActions::mergeNetComponents);
         }
