@@ -234,7 +234,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
         buffer.append("Credits\n\n");
         buffer.append("TAPAAL GUI and Translations:\n");
-            buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Jakob Dyhr,\nLouise Foshammer, Malte Neve-Gr\u00E6sb\u00F8ll, ");
+            buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Malo Dautry, \nJakob Dyhr, Louise Foshammer, Malte Neve-Gr\u00E6sb\u00F8ll, ");
             buffer.append("Lasse Jacobsen, Morten Jacobsen,\nThomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
             buffer.append("Mads Johannsen,\nKenneth Y. J\u00F8rgensen, Mikael H. M\u00F8ller, Christoffer Moesgaard, Kristian Morsing Pedersen,\nThomas Pedersen, Lena S. Ernstsen, Niels N. Samuelsen, Jiri Srba, Mathias G. S\u00F8rensen,\nJakob H. Taankvist and Peter H. Taankvist\n");
 
