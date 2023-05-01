@@ -651,7 +651,7 @@ public class PlaceEditorPanel extends JPanel {
                     renameCommand.redo();
                 } catch (RequireException e) {
                     context.undoManager().undo();
-                    JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
                     return false;
                 }
                 context.nameGenerator().updateIndices(context.activeModel(), newName);
@@ -1124,7 +1124,7 @@ public class PlaceEditorPanel extends JPanel {
                     setNewColorType(colorTypeComboBox.getItemAt(colorTypeComboBox.getSelectedIndex()));
                 }
                 else { // NO.OPTION - we set the color type to the previous selected one
-                    for (int i = 0; i <  colorTypeComboBox.getItemCount(); i++) {
+                    for (int i = 0; i < colorTypeComboBox.getItemCount(); i++) {
                         if (colorType.getName().equals(colorTypeComboBox.getItemAt(i).getName())) {
                             colorTypeComboBox.setSelectedIndex(i);
                         }
@@ -1352,7 +1352,7 @@ public class PlaceEditorPanel extends JPanel {
     JPanel timeInvariantColorPanel;
     DefaultListModel<ColoredTimeInvariant> timeConstraintListModel;
     JList<ColoredTimeInvariant> timeConstraintList;
-    JComboBox<ColorType>  colorTypeComboBox;
+    JComboBox<ColorType> colorTypeComboBox;
     JPanel colorTypePanel;
     JSpinner addTokenSpinner;
     ColoredTimeInvariantDialogPanel invariantEditorPanel;
@@ -1361,4 +1361,3 @@ public class PlaceEditorPanel extends JPanel {
     ColorComboboxPanel colorInvariantComboboxPanel;
 
 }
-

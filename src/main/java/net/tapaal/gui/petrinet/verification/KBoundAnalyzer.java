@@ -133,9 +133,9 @@ public class KBoundAnalyzer {
 
         // FIXME: Fixed issue #1987383, error due to changes to collection while iterating iteration over it.
         //  however, this code seem way out of place and wrong, the way the the update is done is wired.
-        //  I guess the  update is done due to a de-sync between the tapnNetwork and gui model, but fixing it this way seems
+        //  I guess the update is done due to a de-sync between the tapnNetwork and gui model, but fixing it this way seems
         //  crazy. Better would be to make sure the correct gui model is passed.
-        //  The loop lookes even weirder now, but for the bugfix I just rewrote the loop to keep the same behaviour as before
+        //  The loop looks even weirder now, but for the bugfix I just rewrote the loop to keep the same behaviour as before
         //  -- kyrke 2023-02-09
         for (TimedArcPetriNet net : guiModels.keySet()) {
             if (tapnNetwork.getTAPNByName(net.name()) != null) {

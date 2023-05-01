@@ -41,7 +41,7 @@ public class SmartDrawDialog extends JDialog {
 	        buffer.append("The automatic layout works by choosing a starting object.\n");
 	        buffer.append("From there we try different positions around the starting object and choose the position with lowest <em>penalty</em>.\n");
 	    buffer.append("<br/><br/>");
-	        buffer.append("We try each multiple of x-spacing between <em>parent.x + x-spacing * layer</em> and <em>parent.x - x-spacing * layer</em>\n");
+	        buffer.append("We try each multiple of x-spacing between <em>parent.x + x-spacing * layer</em> and \n");
 	        buffer.append("<em>parent.x - x-spacing * layer</em> with each multiple of y-spacing\n");
 	        buffer.append("between <em>y-spacing * layer</em> and <em>-y-spacing * layer</em>.\n");
 	        buffer.append("The value of <em>layer</em> will increment with each iteration and start with value 1.\n");
@@ -55,16 +55,15 @@ public class SmartDrawDialog extends JDialog {
                 buffer.append("accumulated penalty is where the object will be placed.");
 		buffer.append("<br/><br/>");
 			buffer.append("<em>Straight arc penalty</em> is a penalty punishing going straight\n");
-			buffer.append("i.e. if the candidate position's x or y equals the parent's x or y\n");
+			buffer.append("i.e. if the candidate position's x or y equals the parent's x or y,\n");
 			buffer.append("the <em>straight penalty * layer</em> is added to the total penalty.\n");
-			buffer.append("If not <em>Diagonal arc penalty * layer</em> is added instead.");
+			buffer.append("If not, <em>Diagonal arc penalty * layer</em> is added instead.");
 		buffer.append("<br/><br/>");
 			buffer.append("<em>Distance penalty</em> punishes candidate positions depending on\n");
 			buffer.append("how far away from the starting point they are. As such a higher\n");
 			buffer.append("distance penalty will make more compact nets.");
 		buffer.append("<br/><br/>");
-			buffer.append("<em>Overlapping arc penalty</em> punishes arcs laying directly on top of each other");
-			buffer.append("pointing to the same object.");
+			buffer.append("<em>Overlapping arc penalty</em> punishes arcs laying directly on top of each other.");
 		buffer.append("<br/><br/>");
 			buffer.append("<b>Example:</b><br/>");
 		buffer.append("<br/><br/>");
@@ -72,7 +71,7 @@ public class SmartDrawDialog extends JDialog {
 		buffer.append("<br/><br/>");
 		buffer.append("This layout was created with the default values.\n");
 		buffer.append("On the figure the numbers and boxes describe the layer. Furthermore, the effect of the <em>Overlapping arc penalty</em> can be seen\n");
-		buffer.append("as the objects in layer 2 prefer going diagonal rather than overlap due to the penaltys.");
+		buffer.append("as the objects in layer 2 prefer going diagonal rather than overlap due to the penalties.");
 		buffer.append("</html>");
 		return buffer.toString(); 
 	}
@@ -137,7 +136,7 @@ public class SmartDrawDialog extends JDialog {
                 if (event.getPropertyName().equals("unfolding")) {
                     SwingWorker.StateValue stateValue = (SwingWorker.StateValue) event.getNewValue();
                     if (stateValue.equals(SwingWorker.StateValue.DONE)) {
-                        //Don't autolayout on empty net, hotfix for issue #1960000
+                        //Don't auto-layout on empty net, hotfix for issue #1960000
                         if (!TAPAALGUI.getCurrentTab().currentTemplate().getHasPositionalInfo() && (TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getPlaces().length + TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getTransitions().length) > 0) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if (dialogResult == JOptionPane.YES_OPTION) {
@@ -253,7 +252,7 @@ public class SmartDrawDialog extends JDialog {
 		advancedOptionsPanel.setBorder(new TitledBorder("Advanced Options"));
 		
 		JLabel comboBoxLabel = new JLabel("Choose Initial Object:");
-		comboBoxLabel.setToolTipText("Choose a starting  object");
+		comboBoxLabel.setToolTipText("Choose a starting object");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -666,11 +665,11 @@ public class SmartDrawDialog extends JDialog {
 			pane.removeMouseListener(listener);
 		}
 		Dimension dim = new Dimension(500,400);
-		pane.setPreferredSize(dim);  
-		pane.setMargin(new Insets(5,5,5,5));  
-		JScrollPane scrollPane = new JScrollPane(pane);  
-		scrollPane.setPreferredSize(dim);  
-		return scrollPane;  
+		pane.setPreferredSize(dim);
+		pane.setMargin(new Insets(5,5,5,5));
+		JScrollPane scrollPane = new JScrollPane(pane);
+		scrollPane.setPreferredSize(dim);
+		return scrollPane;
 	}
 
 	

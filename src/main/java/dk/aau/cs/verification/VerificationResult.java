@@ -97,6 +97,7 @@ public class VerificationResult<TTrace> {
 
 	public VerificationResult(String outputMessage, long verificationTime) {
 		errorMessage = outputMessage;
+		rawOutput = errorMessage;
 		this.verificationTime = verificationTime;
 	}
 	

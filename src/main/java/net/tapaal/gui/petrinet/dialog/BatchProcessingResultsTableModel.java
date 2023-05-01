@@ -38,7 +38,7 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 		BatchProcessingVerificationResult result = results.get(row);
 		
 		switch(col){
-		case 0: return result.getOptionNumber() == -1 ? getVerificationAcrynom(result) : result.getOptionNumber();
+		case 0: return result.getOptionNumber() == -1 ? getVerificationAcronym(result) : result.getOptionNumber();
 		case 1: return result.modelFile();
 		case 2: return result.query();
 		case 3: return result.verificationResult();
@@ -48,7 +48,7 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 		}
 	}
 
-	private String getVerificationAcrynom(BatchProcessingVerificationResult result) {
+	private String getVerificationAcronym(BatchProcessingVerificationResult result) {
 		if(result.query() == null) return "";
 		
 		ReductionOption reduction = result.query().getReductionOption();

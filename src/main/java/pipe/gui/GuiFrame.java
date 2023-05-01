@@ -222,7 +222,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::clearPreferences);
         }
     };
-    private final GuiAction showColorTypesVariables = new GuiAction("Show color types/variables/constants", "Opens a floating window showing the global color types/variables/constants for the net.", KeyStroke.getKeyStroke(("shift F"))) {
+    private final GuiAction showColorTypesVariables = new GuiAction("Show color types/variables/constants", "Opens a floating window showing the global color types/variables/constants for the net", KeyStroke.getKeyStroke(("shift F"))) {
         public void actionPerformed(ActionEvent arg0) {
             currentTab.ifPresent(TabActions::showColorTypesVariables);
         }
@@ -314,7 +314,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleConstants);
         }
     };
-    private final GuiAction showColoredTokensAction = new GuiAction("Display colored tokens", "Show/hide the colored tokens in each place.", KeyStroke.getKeyStroke('5', shortcutkey),  true) {
+    private final GuiAction showColoredTokensAction = new GuiAction("Display colored tokens", "Show/hide the colored tokens in each place.", KeyStroke.getKeyStroke('5', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleColorTokens);
         }
@@ -408,7 +408,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction startAction = new GuiAction("Simulation mode", "Toggle simulation mode (M)", "M", true) {
         public void actionPerformed(ActionEvent e) {
-            //XXX: this needs to be refactored, it break the abstraction in a really bad way -- 2022-01-23
+            //XXX: this needs to be refactored, it breaks the abstraction in a really bad way -- 2022-01-23
             if(getCurrentTab().getLens().isColored() && !getCurrentTab().isInAnimationMode()) {
                 PetriNetTab oldTab = getCurrentTab();
                 UnfoldDialog.showSimulationDialog(oldTab);
@@ -548,7 +548,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // Set GUI mode
         setGUIMode(GUIMode.noNet);
 
-        //XXX 2018-05-23 kyrke: Moved from CreatGUI (static), needs further refactoring to seperate conserns
+        //XXX 2018-05-23 kyrke: Moved from CreatGUI (static), needs further refactoring to separate concerns
         Verifyta.trySetup();
         VerifyTAPN.trySetup();
         VerifyDTAPN.trySetup();
@@ -625,7 +625,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     /**
-     * Build the menues and actions
+     * Build the menus and actions
      **/
     private void buildMenus() {
         menuBar = new JMenuBar();
@@ -842,7 +842,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private void buildToolbar() {
 
-        //XXX .setRequestFocusEnabled(false), removed "border" around tollbar buttons when selcted/focus
+        //XXX .setRequestFocusEnabled(false), removed "border" around toolbar buttons when selected/focus
         // https://stackoverflow.com/questions/9361658/disable-jbutton-focus-border and
         //https://stackoverflow.com/questions/20169436/how-to-prevent-toolbar-button-focus-in-java-swing
 
@@ -899,7 +899,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         toolBarPanel.add(toolBar);
         toolBarPanel.add(drawingToolBar);
 
-        // Create a toolBarPaneltmp usign broderlayout and a spacer to get
+        // Create a toolBarPaneltmp using borderLayout and a spacer to get
         // toolbar to fill the screen
         JPanel toolBarPaneltmp = new JPanel();
         toolBarPaneltmp.setLayout(new BorderLayout());
@@ -1088,7 +1088,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     /**
-     * Helperfunction for disabeling/enabeling all actions when we are in noNet GUImode
+     * Helperfunction for disabling/enabling all actions when we are in noNet GUImode
      */
     private void enableAllActions(boolean enable) {
 
@@ -1530,7 +1530,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     private JMenu buildExampleMenu() {
-        // Loads example files, retuns null if not found
+        // Loads example files, returns null if not found
         String[] nets = loadTestNets();
 
         // Oliver Haggarty - fixed code here so that if folder contains non
@@ -1790,7 +1790,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return appTab.getSelectedIndex();
     }
 
-    //XXX usage of this function should be replaces by currentTab and not assuem PetriNetTab
+    //XXX usage of this function should be replaced by currentTab and not assume PetriNetTab
     @Deprecated
     private PetriNetTab getCurrentTab() {
         return TAPAALGUI.getCurrentTab();
@@ -1804,5 +1804,4 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             colorFeatureOptions.setSelectedIndex(features[2] ? 1 : 0);
         }
     }
-
 }

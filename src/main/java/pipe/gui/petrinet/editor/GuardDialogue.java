@@ -163,7 +163,7 @@ public class GuardDialogue extends JPanel
 				UndoManager undoManager = context.undoManager();
 				undoManager.newEdit();
 
-				dk.aau.cs.model.tapn.TimeInterval guard  = null;
+				dk.aau.cs.model.tapn.TimeInterval guard = null;
 				if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
 					guard = composeGuard(((TimedInputArcComponent)arc).getGuard());
 				}
@@ -605,10 +605,10 @@ public class GuardDialogue extends JPanel
 		int firstValue = getFirstValue();
 		int secondValue = getSecondValue();
 
-		DefaultComboBoxModel<String>  modelRightIncludedOnly = new DefaultComboBoxModel<>(new String[] { "]" });
-		DefaultComboBoxModel<String>  modelLeftIncludedOnly = new DefaultComboBoxModel<>(new String[] { "[" });
-		DefaultComboBoxModel<String>  modelRightBoth = new DefaultComboBoxModel<>(new String[] { "]", ")" });
-		DefaultComboBoxModel<String>  modelLeftBoth = new DefaultComboBoxModel<>(new String[] { "[", "(" });
+		DefaultComboBoxModel<String> modelRightIncludedOnly = new DefaultComboBoxModel<>(new String[] { "]" });
+		DefaultComboBoxModel<String> modelLeftIncludedOnly = new DefaultComboBoxModel<>(new String[] { "[" });
+		DefaultComboBoxModel<String> modelRightBoth = new DefaultComboBoxModel<>(new String[] { "]", ")" });
+		DefaultComboBoxModel<String> modelLeftBoth = new DefaultComboBoxModel<>(new String[] { "[", "(" });
 		DefaultComboBoxModel<String> modelRightExcludedOnly = new DefaultComboBoxModel<>(new String[] { ")" });
 
 		if (firstValue > secondValue) {

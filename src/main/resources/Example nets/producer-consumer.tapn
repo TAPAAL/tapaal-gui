@@ -4,8 +4,7 @@
     <labels border="true" height="111" positionX="518" positionY="165" width="185">By firing the transition Transport the produced items are moved to the place Ready. Transport arcs are used for this purpose so that the age of each item is preserved.</labels>
     <labels border="true" height="81" positionX="845" positionY="84" width="170">Consumer is consuming (with certain time restrictions) items that have not yet reached the age of 3.</labels>
     <labels border="true" height="60" positionX="461" positionY="465" width="170">Items that reach the age of 3 have to be Collected into the Garbage place.</labels>
-    <labels border="true" height="81" positionX="157" positionY="75" width="185">Producer is producing items with certain time restrictions
-and these items wait in place In_transit for Transport.</labels>
+    <labels border="true" height="81" positionX="157" positionY="75" width="185">Producer is producing items with certain time restrictions and these items wait in place In_transit for Transport.</labels>
     <place displayName="true" id="Ready_to_produce" initialMarking="1" invariant="&lt;= 2" name="Ready_to_produce" nameOffsetX="-5" nameOffsetY="35" positionX="210" positionY="195"/>
     <place displayName="true" id="Recover" initialMarking="0" invariant="&lt;= 5" name="Recover" nameOffsetX="-5" nameOffsetY="35" positionX="210" positionY="435"/>
     <place displayName="true" id="In_transit" initialMarking="0" invariant="&lt;= 3" name="In_transit" nameOffsetX="-5" nameOffsetY="35" positionX="450" positionY="315"/>

@@ -8,7 +8,7 @@
   <constant name="minInDangerZone" value="3"/>
   <constant name="maxInDangerZone" value="6"/>
   <net active="true" id="Train" type="P/T net">
-    <labels border="true" height="96" positionX="147" positionY="316" width="407">This is a simple train level crossing model consisting of two components, the train model and traffic light controller. Trains may arrive at arbitrary moments and activate a sensor (via the shared transition SensorActivation) that gives signal to the traffic light controller. The model contains different constants and for some of them the crossing is save (train in danger zone implies that the light is red) and some other, for example by decreasing the RedDuration constant by one, may cause collisions.</labels>
+    <labels border="true" height="96" positionX="147" positionY="316" width="407">This is a simple train level crossing model consisting of two components, the train model and traffic light controller. Trains may arrive at arbitrary moments and activate a sensor (via the shared transition SensorActivation) that gives signal to the traffic light controller. The model contains different constants and for some of them the crossing is safe (train in danger zone implies that the light is red) and some other, for example by decreasing the RedDuration constant by one, may cause collisions.</labels>
     <place displayName="true" id="Trains" initialMarking="5" invariant="&lt; inf" name="Trains" nameOffsetX="29" nameOffsetY="5" positionX="285" positionY="45"/>
     <place displayName="true" id="Approaching" initialMarking="0" invariant="&lt;= maxTimeToLeveler" name="Approaching" nameOffsetX="116" nameOffsetY="49" positionX="120" positionY="210"/>
     <place displayName="true" id="DangerZone" initialMarking="0" invariant="&lt;= maxInDangerZone" name="DangerZone" nameOffsetX="131" nameOffsetY="52" positionX="555" positionY="210"/>
@@ -40,7 +40,7 @@
       <arcpath arcPointType="false" id="1" xCoord="315" yCoord="60"/>
     </arc>
   </net>
-  <net active="true" id="TraficLight" type="P/T net">
+  <net active="true" id="TrafficLight" type="P/T net">
     <place displayName="true" id="Green" initialMarking="1" invariant="&lt; inf" name="Green" nameOffsetX="-5" nameOffsetY="35" positionX="105" positionY="480"/>
     <place displayName="true" id="Yellow" initialMarking="0" invariant="&lt;= YellowDuration" name="Yellow" nameOffsetX="130" nameOffsetY="47" positionX="420" positionY="390"/>
     <place displayName="true" id="Red" initialMarking="0" invariant="&lt;= RedDuration" name="Red" nameOffsetX="152" nameOffsetY="25" positionX="720" positionY="150"/>
@@ -112,7 +112,7 @@
       <arcpath arcPointType="false" id="1" xCoord="121" yCoord="151"/>
     </arc>
   </net>
-  <query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Crossing is Safe" overApproximation="true" pTrie="true" query="AG (!(Train.DangerZone &gt; 0) or TraficLight.Red = 1)" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
+  <query active="true" approximationDenominator="2" capacity="5" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Crossing is Safe" overApproximation="true" pTrie="true" query="AG (!(Train.DangerZone &gt; 0) or TrafficLight.Red = 1)" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
   <k-bound bound="3"/>
   <feature isGame="false" isTimed="true" isColored="false"/>
 </pnml>

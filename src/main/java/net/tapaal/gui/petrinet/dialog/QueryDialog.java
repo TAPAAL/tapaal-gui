@@ -77,7 +77,7 @@ public class QueryDialog extends JPanel {
 	private static final String NO_UPPAAL_XML_FILE_SAVED = "No Uppaal XML file saved.";
 	private static final String NO_VERIFYTAPN_XML_FILE_SAVED = "No verifytapn XML file saved.";
 	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported by the chosen reduction.";
-	private static final String UNSUPPPORTED_QUERY_TEXT = "The query is not supported by the chosen reduction.";
+	private static final String UNSUPPORTED_QUERY_TEXT = "The query is not supported by the chosen reduction.";
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export TAPAAL XML";
 	private static final String EXPORT_VERIFYPN_BTN_TEXT = "Export PN XML";
@@ -245,15 +245,15 @@ public class QueryDialog extends JPanel {
     private final TAPNLens lens;
     private final PetriNetTab tab;
 
-    private static final String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
-    private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
-    private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
-    private static final String name_STANDARD = "UPPAAL: Standard Reduction";
-    private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
-    private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
-    private static final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
-    private static final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
-    private boolean userChangedAtomicPropSelection = true;
+	private static final String name_verifyTAPN = "TAPAAL: Continuous Engine (verifytapn)";
+	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
+	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimized Standard Reduction";
+	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
+	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
+	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
+	private static final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
+	private static final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
+	private boolean userChangedAtomicPropSelection = true;
 
     //In order: name of engine, support fastest trace, support deadlock with net degree 2 and (EF or AG), support deadlock with EG or AF, support deadlock with inhibitor arcs
     //support weights, support inhibitor arcs, support urgent transitions, support EG or AF, support strict nets, support timed nets/time intervals, support deadlock with net degree > 2
@@ -294,11 +294,11 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_QUERY_FIELD = "<html>Click on a part of the query you want to edit.<br />" +
         "(Queries can also be edited manually by pressing the \"Edit Query\" button.)</html>";
 
-    //Tool tips for quantification panel
-    private static final String TOOL_TIP_EXISTS_DIAMOND = "Check if the given marking is reachable in the net.";
-    private static final String TOOL_TIP_EXISTS_BOX = "Check if there is a trace on which all markings satisfy the given property. (Only available for some verification engines.)";
-    private static final String TOOL_TIP_FORALL_DIAMOND = "Check if on any maximal trace there is a marking that satisfies the given property. (Only available for some verification engines.)";
-    private static final String TOOL_TIP_FORALL_BOX = "Check if every reachable marking in the net satifies the given property.";
+	//Tool tips for quantification panel
+	private static final String TOOL_TIP_EXISTS_DIAMOND = "Check if the given marking is reachable in the net.";
+	private static final String TOOL_TIP_EXISTS_BOX = "Check if there is a trace on which all markings satisfy the given property. (Only available for some verification engines.)";
+	private static final String TOOL_TIP_FORALL_DIAMOND = "Check if on any maximal trace there is a marking that satisfies the given property. (Only available for some verification engines.)";
+	private static final String TOOL_TIP_FORALL_BOX = "Check if every reachable marking in the net satisfies the given property.";
 
     private static final String TOOL_TIP_EXISTS_UNTIL = "There is a computation where the first formula holds until the second one holds.";
     private static final String TOOL_TIP_EXISTS_NEXT = "There is a transition firing after which the reached marking satisfies the given property.";
@@ -666,15 +666,15 @@ public class QueryDialog extends JPanel {
         return new HasDeadlockVisitor().hasDeadLock(newProperty);
     }
 
-    public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork,
+	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork,
                                               HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
-        if(tapnNetwork.hasWeights() && !tapnNetwork.isNonStrict()){
-            JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
-                "No reduction option supports both strict intervals and weigthed arcs",
-                "No reduction option", JOptionPane.ERROR_MESSAGE);
-            return null;
-        }
-        guiDialog = new EscapableDialog(TAPAALGUI.getApp(),	"Edit Query", true);
+		if (tapnNetwork.hasWeights() && !tapnNetwork.isNonStrict()) {
+			JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
+					"No reduction option supports both strict intervals and weighted arcs",
+					"No reduction option", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+		guiDialog = new EscapableDialog(TAPAALGUI.getApp(),	"Edit Query", true);
 
         Container contentPane = guiDialog.getContentPane();
 
@@ -759,10 +759,10 @@ public class QueryDialog extends JPanel {
 
     }
 
-    // update selection based on some change to the query.
-    // If the query contains place holders we want to select
-    // the first placeholder to speed up query construction
-    private void updateSelection(TCTLAbstractProperty newSelection) {
+	// update selection based on some change to the query.
+	// If the query contains placeholders we want to select
+	// the first placeholder to speed up query construction
+	private void updateSelection(TCTLAbstractProperty newSelection) {
         queryField.setText(newProperty.toString());
 
         StringPosition position;
@@ -1442,7 +1442,6 @@ public class QueryDialog extends JPanel {
 
     private void init(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
         //setPreferredSize(new Dimension(942, 517));
-
         initQueryNamePanel();
         initQueryPanel();
         initUppaalOptionsPanel();
@@ -1742,13 +1741,13 @@ public class QueryDialog extends JPanel {
                     "TAPAAL supports verification via its own included engines verifytapn and verifydtapn or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation). If you work with an untimed net, we recommend that you use the CTL query creation dialog and use the untimed verifypn engine." +
                     "The TAPAAL engine verifytapn supports also the discrete inclusion optimization. " +
                     "On some models this technique gives a considerable speedup. " +
-                    "The user selected set of places that are considered for the discrete inclusion can further finetune the performance of the engine. Try to include places where you expect to see many tokens during the execution. " +
+                    "The user selected set of places that are considered for the discrete inclusion can further fine-tune the performance of the engine. Try to include places where you expect to see many tokens during the execution. " +
                     "The discrete verification engine verifydtapn performs a point-wise exploration of the state space but can be used only for models that do not contain strict intervals as in this situation it is guaranteed to give the same answers as the continuous time engine verifytapn. This discrete engine has options to handle delays in semi-symbolic way (time darts) recommended for models with larger constants and it has a memory optimization option feature (PTrie) that preserves lots of memory at the expense of a slightly longer verification time." +
                     "The different UPPAAL verification methods perform reductions to networks of timed automata. The broadcast reductions supports " +
                     "all query types, while standard and optimized standard support only EF and AG queries but can be sometimes faster." +
                     "<br/>" +
                     "<b>Approximation Options</b><br/>" +
-                    "TAPAAL allows to approximate the time intervals on edges by deviding them by the given approximation constant and either enlarging the resulting intervals (over-approximation) or shrinking them (under-approximation). The larger the constant is, the faster is the verification but the more often the user can get an inconclusive answer." +
+                    "TAPAAL allows to approximate the time intervals on edges by dividing them by the given approximation constant and either enlarging the resulting intervals (over-approximation) or shrinking them (under-approximation). The larger the constant is, the faster is the verification but the more often the user can get an inconclusive answer." +
                     "<br/>" +
                     "</html>";
             }
@@ -1816,7 +1815,7 @@ public class QueryDialog extends JPanel {
     }
 
     private boolean isHyperLTL(TCTLAbstractProperty property) {
-        if(property instanceof LTLENode) {
+        if (property instanceof LTLENode) {
             return !((LTLENode) property).getTrace().equals("");
         } else if(property instanceof LTLANode) {
             return !((LTLANode) property).getTrace().equals("");
@@ -1825,8 +1824,8 @@ public class QueryDialog extends JPanel {
     }
 
     private void toggleDialogType() {
-        if(queryType.getSelectedIndex() == 2 && (wasCTLType || wasLTLType)) {
-            if(!isHyperLTL(newProperty) && !(newProperty instanceof TCTLPathPlaceHolder)) {
+        if (queryType.getSelectedIndex() == 2 && (wasCTLType || wasLTLType)) {
+            if (!isHyperLTL(newProperty) && !(newProperty instanceof TCTLPathPlaceHolder)) {
                 if (showWarningMessage() == JOptionPane.YES_OPTION) {
                     deleteProperty();
                 } else {
@@ -1838,7 +1837,7 @@ public class QueryDialog extends JPanel {
 
             showLTLButtons(true);
             showHyperLTL(true);
-            updateShiphonTrap(true);
+            updateSiphonTrap(true);
             queryChanged();
             wasCTLType = false;
             wasLTLType = false;
@@ -1861,7 +1860,7 @@ public class QueryDialog extends JPanel {
                 addExistsPathsToProperty(newProperty, null);
             }
             showLTLButtons(true);
-            updateShiphonTrap(true);
+            updateSiphonTrap(true);
             showHyperLTL(false);
             queryChanged();
             wasHyperLTLType = false;
@@ -1882,7 +1881,7 @@ public class QueryDialog extends JPanel {
 
             showLTLButtons(false);
             showHyperLTL(false);
-            updateShiphonTrap(false);
+            updateSiphonTrap(false);
             wasCTLType = true;
             wasLTLType = false;
             wasHyperLTLType = false;
@@ -2780,7 +2779,8 @@ public class QueryDialog extends JPanel {
         existsNext.setVisible(isVisible);
         existsUntil.setVisible(isVisible);
     }
-    private void updateShiphonTrap(boolean isLTL) {
+
+    private void updateSiphonTrap(boolean isLTL) {
         useSiphonTrap.setEnabled(!isLTL);
     }
 
@@ -4806,18 +4806,17 @@ public class QueryDialog extends JPanel {
                             VerifyPNExporter exporter = new VerifyPNExporter();
                             exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
 
-                        } else {
-                            UppaalExporter exporter = new UppaalExporter();
-                            try {
-                                exporter.export(transformedModel.value1(), clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile), tapnQuery.useSymmetry());
-                            } catch(Exception exportException) {
-                                StringBuilder s = new StringBuilder();
-                                if(exportException instanceof UnsupportedModelException)
-                                    s.append(UNSUPPORTED_MODEL_TEXT + "\n\n");
-                                else if(exportException instanceof UnsupportedQueryException)
-                                    s.append(UNSUPPPORTED_QUERY_TEXT + "\n\n");
-
-                                if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN || reduction == ReductionOption.VerifyPN)
+						} else {
+							UppaalExporter exporter = new UppaalExporter();
+							try {
+								exporter.export(transformedModel.value1(), clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile), tapnQuery.useSymmetry());
+							} catch (Exception exportException) {
+								StringBuilder s = new StringBuilder();
+								if (exportException instanceof UnsupportedModelException)
+									s.append(UNSUPPORTED_MODEL_TEXT + "\n\n");
+								else if (exportException instanceof UnsupportedQueryException)
+									s.append(UNSUPPORTED_QUERY_TEXT + "\n\n");
+                                if (reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN || reduction == ReductionOption.VerifyPN)
                                     s.append(NO_VERIFYTAPN_XML_FILE_SAVED);
                                 else
                                     s.append(NO_UPPAAL_XML_FILE_SAVED);
@@ -4893,7 +4892,7 @@ public class QueryDialog extends JPanel {
                             try {
                                 PetriNetTab reducedNetTab = PetriNetTab.createNewTabFromPNMLFile(reducedNetFile);
                                 //Ensure that a net was created by the query reduction
-                                if(reducedNetTab.currentTemplate().guiModel().getPlaces().length  > 0
+                                if(reducedNetTab.currentTemplate().guiModel().getPlaces().length > 0
                                     || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
                                     reducedNetTab.setInitialName("reduced-" + tab.getTabTitle());
                                     TAPNQuery convertedQuery = query.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());

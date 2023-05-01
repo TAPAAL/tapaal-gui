@@ -213,15 +213,16 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, DataLayer guiModel, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception {
-		if(!supportsModel(model.value1(), options)) {
+		if (!supportsModel(model.value1(), options)) {
             throw new UnsupportedModelException("Verifytapn does not support the given model.");
         }
 		
-		if(!supportsQuery(model.value1(), query, options)) {
+		if (!supportsQuery(model.value1(), query, options)) {
             throw new UnsupportedQueryException("Verifytapn does not support the given query.");
         }
 		
-		if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
+		if (options instanceof VerifyTAPNOptions && ((VerifyTAPNOptions) options).discreteInclusion())
+		    mapDiscreteInclusionPlacesToNewNames(options, model);
 
         ExportedVerifyTAPNModel exportedModel;
         if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
@@ -234,6 +235,7 @@ public class VerifyTAPN implements ModelChecker {
 
         if (exportedModel == null) {
             messenger.displayErrorMessage("There was an error exporting the model");
+            return null;
         }
 
 		return verify(options, model, exportedModel, query, dataLayerQuery, lens);
@@ -278,29 +280,32 @@ public class VerifyTAPN implements ModelChecker {
     }
 
     protected void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
-		VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions)options;
-		
-		if(verificationOptions.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces) 
-			return;
-		
-		List<TimedPlace> inclusionPlaces = new ArrayList<TimedPlace>();
-		for(TimedPlace p : verificationOptions.inclusionPlaces().inclusionPlaces()) {
-			if(p instanceof LocalTimedPlace) {
-				LocalTimedPlace local = (LocalTimedPlace)p;
-				if(local.model().isActive()){
-					inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map(local.model().name(), local.name())));
-				}
-			}
-			else // shared place
-				inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map("", p.name())));
-		}
-		
-		((VerifyTAPNOptions)options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
-	}
+        if (options instanceof VerifyTAPNOptions) {
+            VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions) options;
+
+            if (verificationOptions.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces)
+                return;
+
+            List<TimedPlace> inclusionPlaces = new ArrayList<>();
+            for (TimedPlace p : verificationOptions.inclusionPlaces().inclusionPlaces()) {
+                if (p instanceof LocalTimedPlace) {
+                    LocalTimedPlace local = (LocalTimedPlace) p;
+                    if (local.model().isActive()) {
+                        inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map(local.model().name(), local.name())));
+                    }
+                } else // shared place
+                    inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map("", p.name())));
+            }
+
+            ((VerifyTAPNOptions) options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
+        }
+    }
 
 	protected VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery,  TAPNLens lens) {
-		((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
-		runner = new ProcessRunner(verifytapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
+		if (options instanceof VerifyTAPNOptions)
+	        ((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
+
+        runner = new ProcessRunner(verifytapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();
 
 		if (runner.error()) {
@@ -312,7 +317,7 @@ public class VerifyTAPN implements ModelChecker {
 
 			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
 			if (queryResult == null || queryResult.value1() == null) {
-				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
+				return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
                 TimedArcPetriNetTrace tapnTrace = null;
 
@@ -357,20 +362,19 @@ public class VerifyTAPN implements ModelChecker {
                     tapnTrace = parseTrace(!errorOutput.contains("Trace:") ? errorOutput : (errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
                 }
 				//return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), standardOutput);
-
-                return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
+                return new VerificationResult<>(queryResult.value1(), tapnTrace, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
 			}
 		}
 	}
 
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
-		if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
+		if (options instanceof VerifyTAPNOptions && ((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
 		
 		VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
 		TimedArcPetriNetTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
 
         if (trace == null) {
-            if (((VerifyTAPNOptions) options).trace() != TraceOption.NONE) {
+            if (options instanceof VerifyTAPNOptions && ((VerifyTAPNOptions) options).trace() != TraceOption.NONE) {
                 if ((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) ||

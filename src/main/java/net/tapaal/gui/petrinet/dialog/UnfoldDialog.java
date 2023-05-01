@@ -61,7 +61,7 @@ public class UnfoldDialog extends JDialog {
         return cancelled;
     }
 
-    private void initComponents()  {
+    private void initComponents() {
         setLayout(new FlowLayout());
         JPanel mainPanel = new JPanel(new GridBagLayout());
 
@@ -174,6 +174,4 @@ public class UnfoldDialog extends JDialog {
             exit();
             currentTab.createNewAndUnfoldColor(usePartition.isSelected(), useColorFixpoint.isSelected(), useSymmetricvars.isSelected());
     }
-
-
 }

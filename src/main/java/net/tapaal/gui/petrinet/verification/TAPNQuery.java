@@ -233,7 +233,7 @@ public class TAPNQuery {
 	
 	public boolean useSymmetry() {
 		return symmetry;
-	}    
+	}
 	
 	public boolean useGCD(){
 		return gcd;
@@ -359,16 +359,16 @@ public class TAPNQuery {
 
     public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
-			ReductionOption reductionOption, boolean symmetry, boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
+			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, WorkflowMode workflow, boolean isColored
     ) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, false, hashTabelSize, extrapolationOption, new InclusionPlaces(), isColored);
 		this.setWorkflowMode(workflow);
 	}
-        
+
     public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
-			ReductionOption reductionOption, boolean symmetry, boolean gcd,  boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
+			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, WorkflowMode workflow, long strongSoundnessBound, boolean isColored
     ) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, hashTabelSize, extrapolationOption, workflow, isColored);
@@ -507,7 +507,7 @@ public class TAPNQuery {
 	public void setWorkflowMode(WorkflowMode workflow) {
 		this.workflow = workflow;
 	}
-        
+
     public long getStrongSoundnessBound(){
         return strongSoundnessBound;
     }
@@ -533,7 +533,7 @@ public class TAPNQuery {
     }
 
     public boolean hasUntimedOnlyProperties(){
-        if(!(property instanceof TCTLAFNode || property instanceof TCTLAGNode || property instanceof TCTLEFNode || property instanceof  TCTLEGNode)){
+        if(!(property instanceof TCTLAFNode || property instanceof TCTLAGNode || property instanceof TCTLEFNode || property instanceof TCTLEGNode)){
             return true;
         } else if(property.hasNestedPathQuantifiers()){
             return true;
@@ -544,6 +544,6 @@ public class TAPNQuery {
     public TAPNQuery convertPropertyForReducedNet(String templateName){
 	    TAPNQuery convertedQuery = copy();
 	    convertedQuery.property.convertForReducedNet(templateName);
-        return  convertedQuery;
+        return convertedQuery;
     }
 }

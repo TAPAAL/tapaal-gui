@@ -323,7 +323,7 @@ public class EngineDialogPanel {
 		gbc.insets = smallPanelInsets;
 		tapaalPanel.add(tapaalInfoPanel,gbc);
 
-		//add TapaalButtonPanel to  tapaalpanel
+		//add TapaalButtonPanel to tapaalpanel
 		JButton tapaalSelectButton = new JButton("Select");
 		tapaalSelectButton.setMnemonic(KeyEvent.VK_E);
 		tapaalSelectButton.setToolTipText(toolTipSelect);
@@ -400,7 +400,7 @@ public class EngineDialogPanel {
 		gbc.insets = smallPanelInsets;
 		tapaalDiscretePanel.add(tapaalDiscreteInfoPanel,gbc);
 
-		//add TapaalButtonPanel to  tapaalpanel
+		//add TapaalButtonPanel to tapaalpanel
 		JButton SelectButton = new JButton("Select");
 		SelectButton.setMnemonic(KeyEvent.VK_E);
 		SelectButton.setToolTipText(toolTipSelect);
@@ -477,7 +477,7 @@ public class EngineDialogPanel {
 		gbc.insets = smallPanelInsets;
 		untimedPanel.add(untimedInfoPanel,gbc);
 
-		//add TapaalButtonPanel to  tapaalpanel
+		//add TapaalButtonPanel to tapaalpanel
 		JButton SelectButton = new JButton("Select");
 		SelectButton.setMnemonic(KeyEvent.VK_E);
 		SelectButton.setToolTipText(toolTipSelect);
@@ -558,7 +558,7 @@ public class EngineDialogPanel {
 		gbc.insets = smallPanelInsets;
 		uppaalPanel.add(uppaalInfoPanel,gbc);	
 
-		//add uppaalButtonPanel to  uppaalPanel
+		//add uppaalButtonPanel to uppaalPanel
 		JButton uppaalSelectButton = new JButton("Select");
 		uppaalSelectButton.setMnemonic(KeyEvent.VK_S);
 		uppaalSelectButton.setToolTipText(toolTipSelect);
