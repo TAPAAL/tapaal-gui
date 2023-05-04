@@ -585,7 +585,7 @@ public class ApproximationWorker {
 						|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && ! verificationResult.getQueryResult().isQuerySatisfied())) {
 					// ((EF OR EG) AND satisfied) OR ((AG OR AF) and not satisfied) -> Check for deadlock
 	                    
-					if(verificationResult.getTrace() != null) {
+					if (verificationResult.getTrace() != null) {
 	                    // If query does have deadlock -> create trace TAPN
 	                    //Create the verification satisfied result for the approximation
 						VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
@@ -605,14 +605,14 @@ public class ApproximationWorker {
 	                    
 	                    OverApproximation overaprx = new OverApproximation();
 	        
-	                    //Create trace TAPN from the trace
+	                    // Create trace TAPN from the trace
 	                    overaprx.makeTraceTAPN(transformedOriginalModel, valueNetwork, clonedQuery);
 	                    
 	                    // Reset the inclusion places in order to avoid NullPointerExceptions
 	                    if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
 	                        ((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
 	        
-	                    //run model checker again for trace TAPN
+	                    // Run model checker again for trace TAPN
 	                    MemoryMonitor.cumulateMemory();
 	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, null, query, null);
 

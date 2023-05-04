@@ -476,10 +476,10 @@ public class QueryPane extends JPanel implements SidePane {
             // I would think it runs the query on the unsaved net -- kyrke 2022-02-21
             BatchProcessingDialog.showBatchProcessingDialog(queryList);
 			tempFile.deleteOnExit();
-			if(tempFile == null) {
+			if (tempFile == null) {
 				throw new IOException();
 			}
-		}catch(IOException e) {
+		} catch(IOException e) {
 			messenger.displayErrorMessage("Creation of temporary file needed for verification failed.");
 		}
 	}
