@@ -449,14 +449,15 @@ public class TimedArcPetriNetNetwork {
 		sharedTransitions.addAll(Arrays.asList(oldOrder));
 	}
 
-	public boolean isColored(){
-	    for (TimedArcPetriNet tapn : tapns){
-	        if(tapn.isColored()){
+	public boolean isColored() {
+	    for (TimedArcPetriNet tapn : tapns) {
+	        if (tapn.isColored()) {
 	            return true;
             }
         }
 	    return colorTypes.size() > 1 || variables.size() > 0;
     }
+
 	public boolean isUntimed(){
 		for(TimedArcPetriNet t : tapns){
 			if(!t.isUntimed()){

@@ -227,7 +227,7 @@ public class VerifyDTAPN implements ModelChecker{
 		    mapDiscreteInclusionPlacesToNewNames(options, model);
 
         ExportedVerifyTAPNModel exportedModel;
-        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+        if ((lens != null && lens.isColored() || (model.value1().parentNetwork() != null && model.value1().parentNetwork().isColored()))) {
             VerifyTAPNExporter exporter = new VerifyTACPNExporter();
             exportedModel = exporter.export(model.value1(), query, lens, model.value2(), guiModel, dataLayerQuery);
         } else {
@@ -323,13 +323,13 @@ public class VerifyDTAPN implements ModelChecker{
 			} else {
                 TimedArcPetriNetTrace tapnTrace = null;
 
-                boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
+                boolean isColored = (lens != null && lens.isColored() || (model.value1().parentNetwork() != null && model.value1().parentNetwork().isColored()));
                 boolean showTrace = ((query.getProperty() instanceof TCTLEFNode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAGNode && !queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAFNode && !queryResult.value1().isQuerySatisfied()));
 
-                if(options.traceOption() != TraceOption.NONE && isColored && showTrace) {
+                if (options.traceOption() != TraceOption.NONE && isColored && showTrace) {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
@@ -369,7 +369,7 @@ public class VerifyDTAPN implements ModelChecker{
 					secondaryTrace = parseTrace((errorOutput.split("Trace:")[2]), options, model, exportedModel, query, queryResult.value1());
 				}
 
-				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
+				return new VerificationResult<>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
 			}
 		}
 	}
