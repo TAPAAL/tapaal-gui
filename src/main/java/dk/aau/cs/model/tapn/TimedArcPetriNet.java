@@ -49,57 +49,57 @@ public class TimedArcPetriNet {
 	}
 	public void add(TimedPlace place, boolean multiRemove) {
 		Require.that(place != null, "Argument must be a non-null place");
-		if(!multiRemove)
+		if (!multiRemove)
 			Require.that(!isNameUsed(place.name()) || (place.isShared() && !places.contains(place)), "A place or transition with the specified name, "+place.name()+", already exists in the petri net.");
-		if(!place.isShared()) ((LocalTimedPlace)place).setModel(this);
+		if (!place.isShared()) ((LocalTimedPlace)place).setModel(this);
 		places.add(place);
 		place.setCurrentMarking(currentMarking);
 	}
 
 	public boolean isColored(){
         ExprValues values = new ExprValues();
-	    for(TimedTransition transition : transitions){
+	    for (TimedTransition transition : transitions) {
 	        if(transition.getGuard() != null){
                 transition.getGuard().getValues(values);
             }
         }
-	    for(TimedInputArc arc : inputArcs){
-	        if(arc.getArcExpression() != null){
+	    for (TimedInputArc arc : inputArcs) {
+	        if (arc.getArcExpression() != null) {
                 arc.getArcExpression().getValues(values);
             }
-	        if(!arc.getColorTimeIntervals().isEmpty()){
+	        if (!arc.getColorTimeIntervals().isEmpty()) {
 	            return true;
             }
         }
-        for(TimedOutputArc arc : outputArcs){
-            if(arc.getExpression() != null){
+        for (TimedOutputArc arc : outputArcs) {
+            if (arc.getExpression() != null) {
                 arc.getExpression().getValues(values);
             }
         }
-        for(TimedInhibitorArc arc : inhibitorArcs){
-            if(arc.getArcExpression() != null){
+        for (TimedInhibitorArc arc : inhibitorArcs) {
+            if (arc.getArcExpression() != null) {
                 arc.getArcExpression().getValues(values);
             }
         }
-        for(TransportArc arc : transportArcs){
-            if(!arc.getColorTimeIntervals().isEmpty()){
+        for (TransportArc arc : transportArcs) {
+            if (!arc.getColorTimeIntervals().isEmpty()) {
                 return true;
             }
-            if(arc.getInputExpression() != null){
+            if (arc.getInputExpression() != null) {
                 arc.getInputExpression().getValues(values);
             }
-            if(arc.getOutputExpression() != null){
+            if (arc.getOutputExpression() != null) {
                 arc.getOutputExpression().getValues(values);
             }
         }
         boolean hasColors = false;
-        for(Color color : values.getColors()){
+        for (Color color : values.getColors()) {
             if (color.getColorType() != ColorType.COLORTYPE_DOT && !color.getColorType().getId().equals("dot")) {
                 hasColors = true;
                 break;
             }
         }
-        if(hasColors || values.getColorTypes().size() > 1 || !values.getVariables().isEmpty()){
+        if (hasColors || values.getColorTypes().size() > 1 || !values.getVariables().isEmpty()) {
             return true;
         }
 
