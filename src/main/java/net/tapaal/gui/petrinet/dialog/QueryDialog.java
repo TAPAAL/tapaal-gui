@@ -2525,6 +2525,7 @@ public class QueryDialog extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
         addTraceButton.setPreferredSize(new Dimension(78, 27));
         quantificationPanel.add(addTraceButton, gbc);
@@ -3078,17 +3079,8 @@ public class QueryDialog extends JPanel {
         traceBox = new JComboBox<>(new DefaultComboBoxModel<>(tracesVector));
         traceBoxQuantification = new JComboBox<>(new DefaultComboBoxModel<>(tracesVector));
 
-        traceBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                updateQueryOnAtomicPropositionChange();
-            }
-        });
-
-        traceBoxQuantification.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                updateQueryOnQuantificationChange();
-            }
-        });
+        traceBox.addActionListener(e -> updateQueryOnAtomicPropositionChange());
+        traceBoxQuantification.addActionListener(e -> updateQueryOnQuantificationChange());
 
         traceBox.setToolTipText(TOOL_TIP_TRACEBOX);
         traceBoxQuantification.setToolTipText(TOOL_TIP_TRACEBOX_QUANTIFICATION);
@@ -3098,8 +3090,10 @@ public class QueryDialog extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(2,2,4,2);
+        ((JLabel)traceBoxQuantification.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         traceBoxQuantification.setPreferredSize(new Dimension(76,27));
         quantificationPanel.add(traceBoxQuantification, gbc);
 
@@ -3114,12 +3108,10 @@ public class QueryDialog extends JPanel {
         gbc.insets = new Insets(1, 0, 1, 0);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-
         traceRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         traceRow.add(traceBox);
         gbc.gridy = 0;
         predicatePanel.add(traceRow, gbc);
-
     }
 
     private void initTraceBoxDialogComponents() {
