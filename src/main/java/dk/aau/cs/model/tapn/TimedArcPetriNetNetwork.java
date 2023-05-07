@@ -805,39 +805,39 @@ public class TimedArcPetriNetNetwork {
         }
     }
 
-    public boolean canColorBeRemoved(Color color, ArrayList<String> messages){
+    public boolean canColorBeRemoved(Color color, ArrayList<String> messages) {
         isColorTypeUsedInProduct(color.getColorType(), messages);
-        for(TimedArcPetriNet tapn : allTemplates()){
-            for(TimedPlace p : tapn.places()){
-                if(p.getTokensAsExpression() != null && p.getTokensAsExpression().containsColor(color)){
+        for (TimedArcPetriNet tapn : allTemplates()) {
+            for (TimedPlace p : tapn.places()) {
+                if (p.getTokensAsExpression() != null && p.getTokensAsExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used in a token in place " + p.name() + " \n");
                 }
-                for(ColoredTimeInvariant invariant : p.getCtiList()){
+                for (ColoredTimeInvariant invariant : p.getCtiList()) {
                     if(invariant.getColor().equals(color)){
                         messages.add(color.getName() + " is used in an invariant in place " + p.name() + " \n");
                     }
                 }
             }
-            for(TimedTransition t : tapn.transitions()){
-                if(t.getGuard() != null && t.getGuard().containsColor(color)){
+            for (TimedTransition t : tapn.transitions()) {
+                if (t.getGuard() != null && t.getGuard().containsColor(color)) {
                     messages.add(color.getName() + " of color type is used in transition " + t.name() + "\n");
                 }
             }
-            for(TransportArc arc : tapn.transportArcs()){
-                if(arc.getInputExpression().containsColor(color)){
+            for (TransportArc arc : tapn.transportArcs()) {
+                if (arc.getInputExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used on transport arc from " + arc.source().name() + " to " + arc.transition() + "\n");
                 }
-                if(arc.getOutputExpression().containsColor(color)){
+                if (arc.getOutputExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used on transport arc from " + arc.transition()+ " to " + arc.destination().name() + "\n");
                 }
             }
-            for(TimedInputArc arc : tapn.inputArcs()){
-                if(arc.getArcExpression().containsColor(color)){
+            for (TimedInputArc arc : tapn.inputArcs()) {
+                if (arc.getArcExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used on arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
                 }
             }
-            for(TimedOutputArc arc : tapn.outputArcs()){
-                if(arc.getExpression().containsColor(color)){
+            for (TimedOutputArc arc : tapn.outputArcs()) {
+                if (arc.getExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used on arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
                 }
             }
@@ -845,53 +845,51 @@ public class TimedArcPetriNetNetwork {
         return messages.isEmpty();
     }
 
-    private void isColorTypeUsedInProduct(ColorType colorType, ArrayList<String> messages){
-        for(ColorType ct : colorTypes){
-            if(ct instanceof ProductType && ((ProductType) ct).contains(colorType)){
+    private void isColorTypeUsedInProduct(ColorType colorType, ArrayList<String> messages) {
+        for (ColorType ct : colorTypes) {
+            if (ct instanceof ProductType && ((ProductType) ct).contains(colorType)) {
                 messages.add("Color type " + colorType.getName() + " is used in product type " + ct.getName() + " \n");
             }
         }
     }
 
     public void remove(Variable variable , ConstantsPane.VariablesListModel variablesListModel, UndoManager undoManager, List<String> messages) {
-	    if(canVariableBeRemoved(variable,messages)){
+	    if (canVariableBeRemoved(variable,messages)) {
             Integer index = getVariableIndex(variable.getName());
             Command command = new RemoveVariableFromNetworkCommand(variable, this, variablesListModel, index);
             command.redo();
             undoManager.addEdit(command);
-
         }
     }
 
     public void remove(Variable variable) {
-	    if(variable != null){
+	    if (variable != null) {
 	        variables.remove(variable);
         }
     }
 
-    public boolean canVariableBeRemoved(Variable variable, List<String> messages){
-        for (TimedArcPetriNet tapn : allTemplates()){
-
-            for(TimedInputArc arc : tapn.inputArcs()){
+    public boolean canVariableBeRemoved(Variable variable, List<String> messages) {
+        for (TimedArcPetriNet tapn : allTemplates()) {
+            for (TimedInputArc arc : tapn.inputArcs()) {
                 Set<Variable> variables = new HashSet<>();
                 arc.getArcExpression().getVariables(variables);
-                if(variables.contains(variable)){
+                if (variables.contains(variable)) {
                     messages.add("Variable contained on input arc " + arc.fromTo());
                 }
             }
-            for(TimedOutputArc arc : tapn.outputArcs()){
+            for (TimedOutputArc arc : tapn.outputArcs()) {
                 Set<Variable> variables = new HashSet<>();
                 arc.getExpression().getVariables(variables);
-                if(variables.contains(variable)){
+                if (variables.contains(variable)) {
                     messages.add("Variable contained on output arc " + arc);
                 }
             }
-            for(TransportArc arc : tapn.transportArcs()){
+            for (TransportArc arc : tapn.transportArcs()) {
                 Set<Variable> variables = new HashSet<>();
                 arc.getInputExpression().getVariables(variables);
                 arc.getOutputExpression().getVariables(variables);
 
-                if(variables.contains(variable)){
+                if (variables.contains(variable)) {
                     messages.add("Variable contained on transport arc " + arc.fromTo());
                 }
             }
