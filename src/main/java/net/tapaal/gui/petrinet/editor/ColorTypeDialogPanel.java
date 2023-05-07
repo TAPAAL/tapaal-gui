@@ -1005,7 +1005,8 @@ public class ColorTypeDialogPanel extends JPanel {
                 ArrayList<String> overlaps = new ArrayList<>();
                 for (int i = 0; i < enumList.getModel().getSize(); i++) {
                     String e = enumList.getModel().getElementAt(i).toString();
-                    if (network.isNameUsedForVariable(e) || network.isNameUsedForColor(e, oldColorType) || network.isNameUsedForColorType(e) || network.isNameUsedForConstant(e) || name.equals(e)) {
+                    if (network.isNameUsedForVariable(e) || network.isNameUsedForColor(e, oldColorType) ||
+                        network.isNameUsedForColorType(e) || network.isNameUsedForConstant(e) || name.equals(e)) {
                         overlaps.add(e);
                     }
                 }
@@ -1092,8 +1093,7 @@ public class ColorTypeDialogPanel extends JPanel {
                         colorTypesListModel.updateName();
                     }
                 } else {
-                    Command cmd = new AddColorTypeCommand(newColorType,
-                        network, colorTypesListModel, network.colorTypes().size());
+                    Command cmd = new AddColorTypeCommand(newColorType, network, colorTypesListModel, network.colorTypes().size());
                     undoManager.addNewEdit(cmd);
                     cmd.redo();
                 }

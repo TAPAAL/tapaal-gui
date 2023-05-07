@@ -29,56 +29,70 @@ public class UpdateColorTypeCommand extends Command {
     @Override
     public void undo() {
         network.colorTypes().set(index, oldColorType);
-        for(TimedArcPetriNet tapn : network.allTemplates()){
-            for(TimedPlace place : tapn.places()){
-                if(place.getColorType().equals(newColorType)){
+        for (TimedArcPetriNet tapn : network.allTemplates()) {
+            for (TimedPlace place : tapn.places()) {
+                if (place.getColorType().equals(newColorType)) {
                     List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
                     place.setColorType(oldColorType);
-                    for(TimedToken token : oldTokens){
-                        if(oldColorType.contains(token.getColor())){
+                    for (TimedToken token : oldTokens) {
+                        if (oldColorType.contains(token.getColor())) {
                             place.addToken(new TimedToken(place, token.age(), oldColorType.getColorByName(token.getColor().getName())));
                         }
                     }
                 }
             }
+            for (TimedInputArc arc : tapn.inputArcs()) {
+                if (arc.getArcExpression() != null && arc.source().getColorType() == oldColorType)
+                    arc.setExpression(arc.getArcExpression().getExprWithNewColorType(oldColorType));
+            }
+            for (TimedOutputArc arc : tapn.outputArcs()) {
+                if (arc.getExpression() != null && arc.destination().getColorType() == oldColorType)
+                    arc.setExpression(arc.getExpression().getExprWithNewColorType(oldColorType));
+            }
         }
 
         eval(oldColorType);
 
-        for(Variable var : network.variables()){
-            if (var.getColorType().equals(newColorType)){
+        for (Variable var : network.variables()) {
+            if (var.getColorType().equals(newColorType)) {
                 var.setColorType(oldColorType);
             }
         }
-
         colorTypesListModel.updateName();
     }
 
     @Override
     public void redo() {
         network.colorTypes().set(index, newColorType);
-        for(TimedArcPetriNet tapn : network.allTemplates()){
-            for(TimedPlace place : tapn.places()){
-                if(place.getColorType().equals(oldColorType)){
+        for (TimedArcPetriNet tapn : network.allTemplates()) {
+            for (TimedPlace place : tapn.places()) {
+                if (place.getColorType().equals(oldColorType)) {
                     List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
                     place.setColorType(newColorType);
-                    for(TimedToken token : oldTokens){
-                        if(newColorType.contains(token.getColor())){
+                    for (TimedToken token : oldTokens) {
+                        if (newColorType.contains(token.getColor())) {
                             place.addToken(new TimedToken(place, token.age(), newColorType.getColorByName(token.getColor().getName())));
                         }
                     }
                 }
             }
+            for (TimedInputArc arc : tapn.inputArcs()) {
+                if (arc.getArcExpression() != null && arc.source().getColorType() == newColorType)
+                    arc.setExpression(arc.getArcExpression().getExprWithNewColorType(newColorType));
+            }
+            for (TimedOutputArc arc : tapn.outputArcs()) {
+                if (arc.getExpression() != null && arc.destination().getColorType() == newColorType)
+                    arc.setExpression(arc.getExpression().getExprWithNewColorType(newColorType));
+            }
         }
 
         eval(newColorType);
 
-        for(Variable var : network.variables()){
-            if (var.getColorType().equals(oldColorType)){
+        for (Variable var : network.variables()) {
+            if (var.getColorType().equals(oldColorType)) {
                 var.setColorType(newColorType);
             }
         }
-
         colorTypesListModel.updateName();
     }
 

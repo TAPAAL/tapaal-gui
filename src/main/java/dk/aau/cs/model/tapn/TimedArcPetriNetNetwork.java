@@ -644,14 +644,13 @@ public class TimedArcPetriNetNetwork {
 
     public void updateColorType(ColorType oldColorType, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager) {
         undoManager.newEdit();
-
-        renameColorType(oldColorType,colorType,colorTypesListModel, undoManager);
+        renameColorType(oldColorType, colorType, colorTypesListModel, undoManager);
     }
 
 
     private void updateProductTypes(ColorType oldColorType, ColorType colorType, UndoManager undoManager){
-        for(ColorType ct : colorTypes){
-            if(ct instanceof ProductType){
+        for (ColorType ct : colorTypes) {
+            if (ct instanceof ProductType) {
                 Command command = new UpdatePTColorTypeCommand(oldColorType, colorType, (ProductType)ct);
                 command.redo();
                 undoManager.addEdit(command);
@@ -813,7 +812,7 @@ public class TimedArcPetriNetNetwork {
                     messages.add(color.getName() + " is used in a token in place " + p.name() + " \n");
                 }
                 for (ColoredTimeInvariant invariant : p.getCtiList()) {
-                    if(invariant.getColor().equals(color)){
+                    if (invariant.getColor().equals(color)) {
                         messages.add(color.getName() + " is used in an invariant in place " + p.name() + " \n");
                     }
                 }

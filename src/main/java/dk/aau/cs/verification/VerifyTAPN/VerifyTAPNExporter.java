@@ -41,14 +41,14 @@ public class VerifyTAPNExporter {
 		if (modelFile == null || queryFile == null)
 			return null;
 
-		try{
+		try {
             this.model = model;
             outputModel(model, modelFile, mapping, guiModel);
 
             RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
 			query.getProperty().accept(placeVisitor, null);
 
-            if(query.getProperty() instanceof TCTLNotNode) {
+            if (query.getProperty() instanceof TCTLNotNode) {
                 TCTLPathToStateConverter innerQuery = (TCTLPathToStateConverter) ((TCTLNotNode) query.getProperty()).getProperty();
                 if (innerQuery.getProperty() instanceof TCTLEFNode) {
                     TCTLAbstractStateProperty queryBody = ((TCTLEFNode) innerQuery.getProperty()).getProperty();
