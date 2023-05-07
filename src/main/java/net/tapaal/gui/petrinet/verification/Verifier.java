@@ -259,7 +259,7 @@ public class Verifier {
             }
 
             RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread);
-            if(tapnNetwork.isColored() && query.getTraceOption() != TAPNQuery.TraceOption.NONE){
+            if (tapnNetwork.isColored() && query.getTraceOption() != TAPNQuery.TraceOption.NONE) {
                 SmartDrawDialog.setupWorkerListener(thread);
             }
             thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query, lens);
