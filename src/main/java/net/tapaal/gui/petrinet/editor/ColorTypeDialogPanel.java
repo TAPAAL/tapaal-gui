@@ -919,10 +919,10 @@ public class ColorTypeDialogPanel extends JPanel {
         }
         if (!oldName.equals("") && !oldName.equals(name) && network.isNameUsedForColorType(name)) {
             JOptionPane.showMessageDialog(
-                            TAPAALGUI.getApp(),
-                            "There is already another color type with the same name.\n\n"
-                                    + "Choose a different name for the color type.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                TAPAALGUI.getApp(),
+                "There is already another color type with the same name.\n\n"
+                        + "Choose a different name for the color type.",
+                "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (!Pattern.matches("[0-9]+", lowerbound) && rangeOfIntegersPanelEnabled ) {
@@ -939,7 +939,7 @@ public class ColorTypeDialogPanel extends JPanel {
                             "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        try{
+        try {
             if (rangeOfIntegersPanelEnabled && (Integer.parseInt(lowerBoundTextField.getText()) > Integer.parseInt(upperBoundTextField.getText()))) {
                 JOptionPane.showMessageDialog(
                     TAPAALGUI.getApp(),
@@ -947,7 +947,7 @@ public class ColorTypeDialogPanel extends JPanel {
                     "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-        } catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(
                 TAPAALGUI.getApp(),
                 "Input could not be parsed as integers",
@@ -955,27 +955,30 @@ public class ColorTypeDialogPanel extends JPanel {
             return;
         }
 
-        if(rangeOfIntegersPanelEnabled && (Integer.parseInt(upperBoundTextField.getText()) - Integer.parseInt(lowerBoundTextField.getText())  > MAXIMUM_INTEGER)){
+        if (rangeOfIntegersPanelEnabled && (Integer.parseInt(upperBoundTextField.getText()) - Integer.parseInt(lowerBoundTextField.getText())  > MAXIMUM_INTEGER)) {
             JOptionPane.showMessageDialog(
                 TAPAALGUI.getApp(),
                 "We do not allow integer ranges with more than " + MAXIMUM_INTEGER + " elements",
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        //If upperbound has been made smaller or lowerbound has been made larger
-        if(rangeOfIntegersPanelEnabled && oldColorType != null && (Integer.parseInt(upperBoundTextField.getText()) < Integer.parseInt(oldColorType.getColors().lastElement().getColorName()) || Integer.parseInt(lowerBoundTextField.getText()) > Integer.parseInt(oldColorType.getColors().firstElement().getColorName()))){
-            //collect removed colors
+        // If upperbound has been made smaller or lowerbound has been made larger
+        if (rangeOfIntegersPanelEnabled && oldColorType != null && (
+                Integer.parseInt(upperBoundTextField.getText()) < Integer.parseInt(oldColorType.getColors().lastElement().getColorName()) ||
+                Integer.parseInt(lowerBoundTextField.getText()) > Integer.parseInt(oldColorType.getColors().firstElement().getColorName()))) {
+            // collect removed colors
             List<dk.aau.cs.model.CPN.Color> removedColors = new ArrayList<>();
             ArrayList<String> messages = new ArrayList<>();
 
-            for(dk.aau.cs.model.CPN.Color c : oldColorType.getColors()){
-                if(Integer.parseInt(c.getName()) > Integer.parseInt(upperBoundTextField.getText()) || Integer.parseInt(c.getName()) < Integer.parseInt(lowerBoundTextField.getText())){
-                    //We need all the messages so we do nothing with the return value
+            for (dk.aau.cs.model.CPN.Color c : oldColorType.getColors()) {
+                if (Integer.parseInt(c.getName()) > Integer.parseInt(upperBoundTextField.getText()) ||
+                    Integer.parseInt(c.getName()) < Integer.parseInt(lowerBoundTextField.getText())) {
+                    // We need all the messages so we do nothing with the return value
                     network.canColorBeRemoved(c, messages);
                 }
             }
 
-            if(!messages.isEmpty()) {
+            if (!messages.isEmpty()) {
                 String message = "The color type cannot be modified for the following reasons: \n\n";
                 message += String.join("", messages);
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
@@ -983,7 +986,7 @@ public class ColorTypeDialogPanel extends JPanel {
             }
         }
 
-        if((lowerbound.trim().isEmpty() || upperbound.trim().isEmpty()) && rangeOfIntegersPanelEnabled) {
+        if ((lowerbound.trim().isEmpty() || upperbound.trim().isEmpty()) && rangeOfIntegersPanelEnabled) {
             JOptionPane.showMessageDialog(
                     TAPAALGUI.getApp(),
                     "You must specify both a lower and upper bound",
@@ -1002,7 +1005,8 @@ public class ColorTypeDialogPanel extends JPanel {
                 ArrayList<String> overlaps = new ArrayList<>();
                 for (int i = 0; i < enumList.getModel().getSize(); i++) {
                     String e = enumList.getModel().getElementAt(i).toString();
-                    if (network.isNameUsedForVariable(e) || network.isNameUsedForColor(e, oldColorType) || network.isNameUsedForColorType(e) || network.isNameUsedForConstant(e) || name.equals(e)) {
+                    if (network.isNameUsedForVariable(e) || network.isNameUsedForColor(e, oldColorType) ||
+                        network.isNameUsedForColorType(e) || network.isNameUsedForConstant(e) || name.equals(e)) {
                         overlaps.add(e);
                     }
                 }
@@ -1089,8 +1093,7 @@ public class ColorTypeDialogPanel extends JPanel {
                         colorTypesListModel.updateName();
                     }
                 } else {
-                    Command cmd = new AddColorTypeCommand(newColorType,
-                        network, colorTypesListModel, network.colorTypes().size());
+                    Command cmd = new AddColorTypeCommand(newColorType, network, colorTypesListModel, network.colorTypes().size());
                     undoManager.addNewEdit(cmd);
                     cmd.redo();
                 }

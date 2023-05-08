@@ -249,8 +249,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                 KBoundAnalyzer optimizer = new KBoundAnalyzer(model, TAPAALGUI.getCurrentTab().lens, guiModels, options.extraTokens(), modelChecker, new MessengerImpl(), spinner);
                 optimizer.analyze((VerifyTAPNOptions) options, true);
             }
-
-            if(result.getQueryResult() != null && result.getQueryResult().isQuerySatisfied() && result.getTrace() != null){
+            if (result.getQueryResult() != null && result.getQueryResult().isQuerySatisfied() && result.getTrace() != null) {
                 firePropertyChange("unfolding", StateValue.PENDING, StateValue.DONE);
             }
 		} else {

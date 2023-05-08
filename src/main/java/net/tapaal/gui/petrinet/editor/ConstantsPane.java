@@ -401,12 +401,12 @@ public class ConstantsPane extends JPanel implements SidePane {
 		editBtn.setToolTipText(toolTipEditColorType);
 
 		editBtn.addActionListener(e -> {
-            if (isDisplayingVariables()){
+            if (isDisplayingVariables()) {
                 Variable v = (Variable)  list.getSelectedValue();
                 ArrayList<String> messages = new ArrayList<>();
-                if(tab.network().canVariableBeRemoved(v,messages)) {
+                if (tab.network().canVariableBeRemoved(v,messages)) {
                     showEditVariableDialog(v);
-                }else{
+                } else {
                     String message = "Variable cannot be edited for the following reasons: \n\n";
                     message += String.join("\n", messages);
                     JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not edit variable", JOptionPane.WARNING_MESSAGE);
@@ -416,11 +416,11 @@ public class ConstantsPane extends JPanel implements SidePane {
                 Constant c = (Constant) list.getSelectedValue();
                 showEditConstantDialog(c);
             }
-            else{
+            else {
                 ColorType ct = (ColorType) list.getSelectedValue();
-                if((ct).equals(ColorType.COLORTYPE_DOT)) {
+                if ((ct).equals(ColorType.COLORTYPE_DOT)) {
                     JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
-                }else {
+                } else {
                     showEditColorTypeDialog(ct);
                 }
             }
