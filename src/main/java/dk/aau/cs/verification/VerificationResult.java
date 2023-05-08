@@ -21,7 +21,7 @@ public class VerificationResult<TTrace> {
 	private Stats stats;
 	private NameMapping nameMapping;
 	private TTrace secondaryTrace;
-	private int bound;
+	private int bound = -1;
 
 	private Tuple<TimedArcPetriNet, NameMapping> unfoldedModel;
 	private PetriNetTab unfoldedTab;
