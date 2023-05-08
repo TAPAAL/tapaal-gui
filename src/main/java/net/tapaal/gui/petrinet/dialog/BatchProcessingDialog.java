@@ -22,22 +22,20 @@ import net.tapaal.gui.petrinet.undo.AddFileBatchProcessingCommand;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.RemoveFileBatchProcessingCommand;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
-import pipe.gui.FileFinder;
-import pipe.gui.MessengerImpl;
-import pipe.gui.TAPAALGUI;
-import net.tapaal.swinghelpers.CustomJSpinner;
-import pipe.gui.petrinet.undo.UndoManager;
-import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 import net.tapaal.gui.petrinet.widgets.QueryPane;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
 import net.tapaal.gui.swingcomponents.MultiLineAutoWrappingToolTip;
+import net.tapaal.swinghelpers.CustomJSpinner;
+import pipe.gui.FileFinder;
+import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
+import pipe.gui.petrinet.undo.UndoManager;
+import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.StringComparator;
-import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
@@ -98,7 +96,7 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String NOT_SATISFIED_STRING_STRONG_SOUNDNESS = "Not Strongly Sound";
 	private final static String NOT_SATISFIED_STRING_SOUNDNESS = "Not Sound";
 	private final static String NOT_SATISFIED_STRING = "Not Satisfied";
-	private final static String SATISFIED_STRING = "Satisfied";
+    private final static String SATISFIED_STRING = "Satisfied";private final static String INCONCLUSIVE_STRING = "Inconclusive";
 	private final static String SATISFIED_SOUNDNESS_STRING = "Sound";
 	private final static String SATISFIED_STRONG_SOUNDNESS_STRING = "Strongly Sound";
 
@@ -1261,7 +1259,11 @@ public class BatchProcessingDialog extends JDialog {
                         } else if ((isResultColumn && (value.toString().equals(NOT_SATISFIED_STRING) || value.toString().equals(NOT_SATISFIED_STRING_STRONG_SOUNDNESS) ||
                             value.toString().equals(NOT_SATISFIED_STRING_SOUNDNESS))) || (isQueryColumn && value.toString().equals("FALSE"))) {
                             setBackground(new Color(255, 91, 91)); // light red
-                        } else if (isResultColumn && value.toString().equals( "Inconclusive")) {
+                        } else if (isResultColumn && value.toString().contains(INCONCLUSIVE_STRING)) {
+						    String[] split = value.toString().split("Inconclusive");
+						    if (split.length > 0) {
+						        value = split[0];
+                            }
                             setBackground(new Color(255, 255, 120)); // light yellow
                         } else {
                             setBackground(table.getBackground());
