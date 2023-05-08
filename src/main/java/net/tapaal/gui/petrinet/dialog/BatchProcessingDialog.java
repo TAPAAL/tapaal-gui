@@ -96,7 +96,8 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String NOT_SATISFIED_STRING_STRONG_SOUNDNESS = "Not Strongly Sound";
 	private final static String NOT_SATISFIED_STRING_SOUNDNESS = "Not Sound";
 	private final static String NOT_SATISFIED_STRING = "Not Satisfied";
-    private final static String SATISFIED_STRING = "Satisfied";private final static String INCONCLUSIVE_STRING = "Inconclusive";
+    private final static String SATISFIED_STRING = "Satisfied";
+    private final static String INCONCLUSIVE_STRING = "Inconclusive";
 	private final static String SATISFIED_SOUNDNESS_STRING = "Sound";
 	private final static String SATISFIED_STRONG_SOUNDNESS_STRING = "Strongly Sound";
 
