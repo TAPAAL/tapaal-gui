@@ -3574,6 +3574,7 @@ public class QueryDialog extends JPanel {
                     enableOnlyForAll();
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                     enableOnlyStateButtons();
+                    negationButton.setEnabled(false);
                 }
             } else if (lens.isTimed()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
