@@ -22,7 +22,7 @@ public class VerifyTAPNIconSelector extends IconSelector {
                 }
                 break;
             case AG:
-                if (!result.isQuerySatisfied() && result.getBound() >= result.getQueryResult().boundednessAnalysis().usedTokens()) {
+                if (!result.isQuerySatisfied() && (result.getBound() == -1 || result.getBound() >= result.getQueryResult().boundednessAnalysis().usedTokens())) {
                     return notSatisfiedIcon;
                 } else if (result.isQuerySatisfied() && result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) {
                     return satisfiedIcon;
@@ -45,12 +45,12 @@ public class VerifyTAPNIconSelector extends IconSelector {
             case A:
                 if (!result.isQuerySatisfied()) {
                     return notSatisfiedIcon;
-                } else if (result.isQuerySatisfied() && result.getBound() >= result.getQueryResult().boundednessAnalysis().usedTokens()) {
+                } else if (result.isQuerySatisfied() && (result.getBound() == -1 || result.getBound() >= result.getQueryResult().boundednessAnalysis().usedTokens())) {
                     return satisfiedIcon;
                 }
                 break;
             case E:
-                if (!result.isQuerySatisfied() && result.getBound() >= result.getQueryResult().boundednessAnalysis().usedTokens()) {
+                if (!result.isQuerySatisfied() && (result.getBound() == -1 || result.getBound() >= result.getQueryResult().boundednessAnalysis().usedTokens())) {
                     return notSatisfiedIcon;
                 } else if (result.isQuerySatisfied()) {
                     return satisfiedIcon;
