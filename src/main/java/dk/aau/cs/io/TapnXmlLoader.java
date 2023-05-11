@@ -987,7 +987,7 @@ public class TapnXmlLoader {
 
     private Pair<String, Vector<Color>> parseColorInvariant(Element colorinvariant, TimedArcPetriNetNetwork network) throws FormatException {
         String inscription, colorTypeName;
-        Vector<Color> colors = new Vector<Color>();
+        Vector<Color> colors = new Vector<>();
         Element colorTypeELe = (Element) colorinvariant.getElementsByTagName("colortype").item(0);
         inscription = colorinvariant.getElementsByTagName("inscription").item(0).getAttributes().getNamedItem("inscription").getNodeValue();
         colorTypeName = colorTypeELe.getAttributes().getNamedItem("name").getNodeValue();
@@ -1000,9 +1000,7 @@ public class TapnXmlLoader {
                 colors.add(new Color(ct, 0, colorName));
             }
         } else {
-
             throw new FormatException("The color type used for an invariant does not exist");
-
         }
 
         Pair<String, Vector<Color>> pair = new Pair<String, Vector<Color>>(inscription, colors);

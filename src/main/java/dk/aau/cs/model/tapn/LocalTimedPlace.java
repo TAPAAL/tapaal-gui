@@ -156,7 +156,7 @@ public class LocalTimedPlace  extends TimedPlace {
     }
 
     public void setCtiList(List<ColoredTimeInvariant> ctiList) {
-        List<ColoredTimeInvariant> found = new ArrayList<ColoredTimeInvariant>();
+        List<ColoredTimeInvariant> found = new ArrayList<>();
         for (ColoredTimeInvariant timeInvariant : ctiList) {
             if (timeInvariant == null)
                 found.add(timeInvariant);
