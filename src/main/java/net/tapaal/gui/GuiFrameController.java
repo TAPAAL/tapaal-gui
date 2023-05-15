@@ -108,10 +108,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         guiFrame.setShowTokenAgeSelected(showTokenAge);
 
         guiFrame.setWindowSize(prefs.getWindowSize());
-
     }
-
-
 
     @Override
     public void openTab(PetriNetTab tab) {

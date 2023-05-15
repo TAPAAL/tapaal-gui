@@ -491,7 +491,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 
 	private PetriNetTab(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
-
         Require.that(network != null, "network cannot be null");
         Require.notNull(lens, "Lens can't be null");
 
