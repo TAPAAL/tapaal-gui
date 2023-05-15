@@ -28,6 +28,7 @@ public interface GuiFrameControllerActions {
     void showNewPNDialog();
 
     void saveWorkspace();
+    void setEnableSidepanel(PetriNetTab tab);
 
     void checkForUpdate();
 
