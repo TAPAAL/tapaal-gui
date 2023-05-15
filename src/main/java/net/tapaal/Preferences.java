@@ -168,7 +168,16 @@ public class Preferences {
 		return pref.getBoolean("componentsPanel", true);
 	}
 
-	public void setShowQueries(boolean show){
+    public void setShowSharedPT(boolean show){
+        pref.putBoolean("sharedPTPanel", show);
+    }
+
+    public boolean getShowSharedPT(){
+        return pref.getBoolean("sharedPTPanel", true);
+    }
+
+
+    public void setShowQueries(boolean show){
 		pref.putBoolean("QueriesPanel", show);
 	}
 

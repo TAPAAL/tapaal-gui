@@ -78,6 +78,9 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         showComponents = prefs.getShowComponents();
         guiFrame.setShowComponentsSelected(showComponents);
 
+        showSharedPT = prefs.getShowSharedPT();
+        guiFrame.setShowSharedPTSelected(showSharedPT);
+
         showQueries = prefs.getShowQueries();
         guiFrame.setShowQueriesSelected(showQueries);
 
@@ -112,9 +115,10 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
     public void setEnableSidepanel(PetriNetTab tab) {
         Preferences prefs = Preferences.getInstance();
+        tab.showComponents(prefs.getShowComponents());
+        tab.showSharedPT(prefs.getShowSharedPT());
         tab.showQueries(prefs.getShowQueries());
         tab.showConstantsPanel(prefs.getShowConstants());
-        tab.showComponents(prefs.getShowConstants());
         tab.showDelayEnabledTransitions(prefs.getShowDelayEnabledTransitions());
     }
 
@@ -205,6 +209,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         prefs.setWindowSize(guiFrameDirectAccess.getSize());
 
         prefs.setShowComponents(showComponents);
+        prefs.setShowSharedPT(showSharedPT);
         prefs.setShowQueries(showQueries);
         prefs.setShowConstants(showConstants);
         prefs.setShowColoredTokens(showColoredTokens);
