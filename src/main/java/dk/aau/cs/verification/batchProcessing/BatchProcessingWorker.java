@@ -3,12 +3,11 @@ package dk.aau.cs.verification.batchProcessing;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.swing.SwingWorker;
 
+import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.*;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
@@ -33,15 +32,6 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
-import dk.aau.cs.verification.ITAPNComposer;
-import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.NullStats;
-import dk.aau.cs.verification.QueryType;
-import dk.aau.cs.verification.Stats;
-import dk.aau.cs.verification.TAPNComposer;
-import dk.aau.cs.verification.VerificationOptions;
-import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 
@@ -206,16 +196,19 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						queryResult = "Sound";
 				}
 			}
-			if (query.discreteInclusion() && !verificationResult.isBounded() && 
-					((query.queryType().equals(QueryType.EF) && !verificationResult.getQueryResult().isQuerySatisfied())
-					||
-					(query.queryType().equals(QueryType.AG) && verificationResult.getQueryResult().isQuerySatisfied())))
-			{queryResult = "Inconclusive";}
-				if (query.getReductionOption().equals(ReductionOption.VerifyPNApprox) &&
-						((query.queryType().equals(QueryType.EF) && verificationResult.getQueryResult().isQuerySatisfied()) ||
-						(query.queryType().equals(QueryType.AG) && !verificationResult.getQueryResult().isQuerySatisfied()))) {
-					queryResult = "Inconclusive";
-				}
+			if (isInconclusive(verificationResult.getQueryResult(), verificationResult.getUnfoldedModel().value1())) {
+			    queryResult += "Inconclusive";
+            }
+			if (query.discreteInclusion() && !verificationResult.isBounded() && ((query.queryType().equals(QueryType.EF) &&
+                    !verificationResult.getQueryResult().isQuerySatisfied()) || (query.queryType().equals(QueryType.AG) &&
+                    verificationResult.getQueryResult().isQuerySatisfied()))) {
+			    queryResult = "Inconclusive";
+			}
+			if (query.getReductionOption().equals(ReductionOption.VerifyPNApprox) && ((query.queryType().equals(QueryType.EF) &&
+                    verificationResult.getQueryResult().isQuerySatisfied()) || (query.queryType().equals(QueryType.AG) &&
+                    !verificationResult.getQueryResult().isQuerySatisfied()))) {
+                queryResult = "Inconclusive";
+            }
 			publishResult(file.getName(), query, queryResult, verificationResult.verificationTime(), verificationResult.getRawOutput(), verificationResult.stats(), optionNumber);
 		} else if (isSoundnessCheck && verificationResult.error()) {
 		    String message = "Skipped - model is not a workflow net. Try running workflow analysis from the menu.";
@@ -224,6 +217,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime(), verificationResult.getRawOutput(), new NullStats(), optionNumber);
 		}		
 	}
+
+	private boolean isInconclusive(QueryResult result, TimedArcPetriNet net) {
+        return (result.getQuery().getExtraTokens() + net.marking().size()) < result.boundednessAnalysis().usedTokens()
+            || result.toString().contains("Only markings with at most");
+    }
 
 	private void publishResult(String fileName, net.tapaal.gui.petrinet.verification.TAPNQuery query, String verificationResult, long verificationTime, String rawOutput, Stats stats, int optionNumber) {
 		BatchProcessingVerificationResult result;		
