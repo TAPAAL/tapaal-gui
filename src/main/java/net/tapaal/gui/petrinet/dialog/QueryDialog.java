@@ -777,12 +777,19 @@ public class QueryDialog extends JPanel {
             negationButton.setEnabled(true);
         }
         if (lens.isGame()) {
-            if (newProperty instanceof TCTLAbstractPathProperty && !(newProperty instanceof TCTLPathPlaceHolder))
+            if (newProperty instanceof TCTLAbstractPathProperty && !(newProperty instanceof TCTLPathPlaceHolder)) {
                 enableOnlyStateButtons();
-            if (current instanceof TCTLAGNode || current instanceof TCTLAFNode)
+                negationButton.setEnabled(false);
+            }
+            if (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
                 disjunctionButton.setEnabled(false);
                 conjunctionButton.setEnabled(false);
-            negationButton.setEnabled(false);
+                negationButton.setEnabled(false);
+            } else {
+                disjunctionButton.setEnabled(true);
+                conjunctionButton.setEnabled(true);
+                negationButton.setEnabled(true);
+            }
         }
 	}
 
@@ -2945,7 +2952,7 @@ public class QueryDialog extends JPanel {
                     boolean isResultFalse;
 
                     if (lens.isGame()) {
-                        isResultFalse = newQuery.hasNestedPathQuantifiers() || containsNegation(newQuery);
+                        isResultFalse = newQuery.hasNestedPathQuantifiers() || newQuery instanceof TCTLNotNode;
                     } else if (lens.isTimed()) {
                         isResultFalse = !placeContext.getResult();
                     } else {
@@ -3062,19 +3069,6 @@ public class QueryDialog extends JPanel {
         FixAbbrivTransitionNames.fixAbbrivTransitionNames(templateTransitionNames, newQuery);
         VerifyTransitionNamesVisitor nameChecker = new VerifyTransitionNamesVisitor(templateTransitionNames);
         return nameChecker.verifyTransitionNames(newQuery);
-    }
-
-    private boolean containsNegation(TCTLAbstractProperty property) {
-        boolean hasNegation;
-	    for (StringPosition child : property.getChildren()) {
-            TCTLAbstractProperty childObject = child.getObject();
-            if (childObject == null)
-                continue;
-
-            hasNegation = childObject instanceof TCTLNotNode || containsNegation(childObject);
-            if (hasNegation) return true;
-        }
-	    return false;
     }
 
     private StringBuilder buildMessage(VerifyPlaceNamesVisitor.Context placeContext,
@@ -3571,14 +3565,13 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void refreshQueryEditingButtons() {
-		if(currentSelection != null) {
+		if (currentSelection != null) {
             if (lens.isGame()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
                     forAllBox.setSelected(false);
                     enableOnlyForAll();
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                     enableOnlyStateButtons();
-                    negationButton.setEnabled(false);
                 }
             } else if (lens.isTimed()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
