@@ -578,41 +578,28 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public void createEditorLeftPane() {
-
 		constantsPanel = new ConstantsPane(this);
 		constantsPanel.setPreferredSize(
-				new Dimension(
-						constantsPanel.getPreferredSize().width,
-						constantsPanel.getMinimumSize().height
-				)
-		);
+		    new Dimension(constantsPanel.getPreferredSize().width, constantsPanel.getMinimumSize().height)
+        );
 
 		queries = new QueryPane(this);
 		queries.setPreferredSize(
-				new Dimension(
-						queries.getPreferredSize().width,
-						queries.getMinimumSize().height
-				)
+            new Dimension(queries.getPreferredSize().width, queries.getMinimumSize().height)
 		);
 
 		templateExplorer = new TemplateExplorer(this);
 		templateExplorer.setPreferredSize(
-				new Dimension(
-						templateExplorer.getPreferredSize().width,
-						templateExplorer.getMinimumSize().height
-				)
+            new Dimension(templateExplorer.getPreferredSize().width, templateExplorer.getMinimumSize().height)
 		);
 
 		sharedPTPanel = new SharedPlacesAndTransitionsPanel(this);
 		sharedPTPanel.setPreferredSize(
-				new Dimension(
-						sharedPTPanel.getPreferredSize().width,
-						sharedPTPanel.getMinimumSize().height
-				)
+            new Dimension(sharedPTPanel.getPreferredSize().width, sharedPTPanel.getMinimumSize().height)
 		);
 
 		boolean floatingDividers = false;
-		if(editorModelroot == null){
+		if (editorModelroot == null) {
 			Leaf constantsLeaf = new Leaf(constantsName);
 			Leaf queriesLeaf = new Leaf(queriesName);
 			Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
@@ -624,13 +611,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			sharedPTLeaf.setWeight(0.25);
 
 			editorModelroot = new Split(
-					templateExplorerLeaf,
-					new Divider(),
-					sharedPTLeaf,
-					new Divider(),
-					queriesLeaf,
-					new Divider(),
-					constantsLeaf
+                templateExplorerLeaf,
+                new Divider(),
+                sharedPTLeaf,
+                new Divider(),
+                queriesLeaf,
+                new Divider(),
+                constantsLeaf
 			);
 			editorModelroot.setRowLayout(false);
 			// The modelroot needs to have a parent when we remove all its children
@@ -644,7 +631,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		editorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
 
 		editorSplitPane.setSize(editorModelroot.getBounds().width, editorModelroot.getBounds().height);
-
 		editorSplitPane.getMultiSplitLayout().setModel(editorModelroot);
 
 		editorSplitPane.add(templateExplorer, templateExplorerName);
