@@ -217,10 +217,9 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         prefs.setDelayEnabledTransitionIsRandomTransition(SimulationControl.isRandomTransition());
 
         JOptionPane.showMessageDialog(guiFrameDirectAccess,
-                "The workspace has now been saved into your preferences.\n"
-                        + "It will be used as the initial workspace next time you run the tool.",
-                "Workspace Saved", JOptionPane.INFORMATION_MESSAGE);
-
+        "The workspace has now been saved into your preferences.\n"
+                + "It will be used as the initial workspace next time you run the tool.",
+        "Workspace Saved", JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override

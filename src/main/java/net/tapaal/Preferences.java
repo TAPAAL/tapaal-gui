@@ -38,7 +38,7 @@ public class Preferences {
 	}
 
 	public static Preferences getInstance() {
-		if(instance == null) {
+		if (instance == null) {
 			instance = new Preferences();
 		}
 		return instance;
@@ -52,7 +52,7 @@ public class Preferences {
 	public void setVerifytaLocation(String location) {
 		final String key = "verifyta.location";
 
-		if (location == null || location.equals("")){
+		if (location == null || location.equals("")) {
 			pref.remove(key);
 		} else {
 			pref.put("verifyta.location", location);
@@ -66,9 +66,9 @@ public class Preferences {
 	public void setVerifytapnLocation(String location) {
 		final String key = "verifytapn.location";
 
-		if (location == null || location.equals("")){
+		if (location == null || location.equals("")) {
 			pref.remove(key);
-		}else {
+		} else {
 			pref.put(key, location);   
 		}
 	}
@@ -80,9 +80,9 @@ public class Preferences {
 	public void setVerifydtapnLocation(String location) {
 		final String key = "dverifytapn.location";
 
-		if (location == null || location.equals("")){
+		if (location == null || location.equals("")) {
 			pref.remove(key);
-		}else {
+		} else {
 			pref.put(key, location);   
 		}
 	}
@@ -94,9 +94,9 @@ public class Preferences {
 	public void setVerifypnLocation(String location) {
 		final String key = "verifypn.location";
 
-		if (location == null || location.equals("")){
+		if (location == null || location.equals("")) {
 			pref.remove(key);
-		}else {
+		} else {
 			pref.put(key, location);   
 		}
 	}
@@ -108,9 +108,9 @@ public class Preferences {
 	public void setLatestVersion(String version) {
 		final String key = "tapaal.latestVersion";
 
-		if (version == null || version.equals("")){
+		if (version == null || version.equals("")) {
 			pref.remove(key);
-		}else {
+		} else {
 			pref.put(key, version);   
 		}
 	}
@@ -134,7 +134,7 @@ public class Preferences {
 	}
 
 	public void setWindowSize(Dimension size) {
-		try{
+		try {
 			saveSerilizableObject("appSize", size);
 		} catch (Exception e){
 			System.err.println("Something went wrong - couldn't save the app size");
@@ -142,7 +142,7 @@ public class Preferences {
 	}
 
 	public Dimension getWindowSize(){
-		try{
+		try {
 			return (Dimension)getSerilizableObject("appSize");
 		} catch (Exception e){
 			System.err.println("Something went wrong - couldn't load the appSize");
@@ -151,7 +151,7 @@ public class Preferences {
 	}
 
 	//Queries
-	public void setAdvancedQueryView(boolean advanced){
+	public void setAdvancedQueryView(boolean advanced) {
 		pref.putBoolean("queryAdvanced", advanced);
 	}
 
@@ -193,18 +193,18 @@ public class Preferences {
     }
 
 	public void setEditorModelRoot(Split modelRoot){
-		try{
+		try {
 			saveSerilizableObject("editorModelRoot", modelRoot);
-		} catch (IOException e){
+		} catch (IOException e) {
 			System.err.println("Something went wrong couldn't save editorResizings");
 		}
 	}
 
 	public Split getEditorModelRoot(){
 		Split result = null;
-		try{
+		try {
 			result =  (Split)getSerilizableObject("editorModelRoot");
-		} catch (Exception e){
+		} catch (Exception e) {
 			System.err.println("Something went wrong didn't load editorResizings");
 		}
 		return result;
@@ -237,11 +237,11 @@ public class Preferences {
 	}
 	
 	public void setDelayEnabledTransitionDelayMode(DelayMode delayMode){
-		if(delayMode instanceof ManualDelayMode){
+		if (delayMode instanceof ManualDelayMode) {
 			pref.putInt("delayEnabledTransitionDelayMode", 0);
-		} else if(delayMode instanceof RandomDelayMode){
+		} else if (delayMode instanceof RandomDelayMode) {
 			pref.putInt("delayEnabledTransitionDelayMode", 1);
-		} else if(delayMode instanceof ShortestDelayMode){
+		} else if (delayMode instanceof ShortestDelayMode) {
 			pref.putInt("delayEnabledTransitionDelayMode", 2);
 		} else {
 			throw new IllegalArgumentException("Can only save ManualDelayMode, RandomDelayMode and ShortestDelayMode");
@@ -267,19 +267,19 @@ public class Preferences {
 	}
 
 	public void setSimulatorModelRoot(Split model){
-		if(model == null) return;
-		try{
+		if (model == null) return;
+		try {
 			saveSerilizableObject("simulatorModelRoot", model);
-		} catch (IOException e){
+		} catch (IOException e) {
 			System.err.println("Something went wrong couldn't save simulatorResizings");
 		}
 	}
 
 	public Split getSimulatorModelRoot(){
 		Split result = null;
-		try{
+		try {
 			result =  (Split)getSerilizableObject("simulatorModelRoot");
-		} catch (Exception e){
+		} catch (Exception e) {
 			System.err.println("Something went wrong didn't load simulatorResizings");
 		}
 		return result;
@@ -299,14 +299,14 @@ public class Preferences {
 		pref.putBoolean("showPNMLWarning", show);
 	}
 	
-	public boolean getShowPNMLWarning() {
+	public boolean getShowPNMLWarning(){
 		return pref.getBoolean("showPNMLWarning", true);
 	}
 
 
 	//Helper functions
 	private void saveSerilizableObject(String key, Serializable o) throws IOException{
-		if(o == null){
+		if (o == null) {
 			throw new NullPointerException();
 		}
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -321,10 +321,10 @@ public class Preferences {
 
 	private Object getSerilizableObject(String key) throws ClassNotFoundException, IOException{
 		byte[] model = pref.getByteArray(key, null);
-		if(model == null){
+		if (model == null) {
 			return null;
 		}
-		Object object = null;
+		Object object;
 
 		ByteArrayInputStream in = new ByteArrayInputStream(model);
 		ObjectInputStream ois = new ObjectInputStream(in);
@@ -336,10 +336,10 @@ public class Preferences {
 		return object;
 	}
 
-    public void setFileBrowserLocation(String location) {
+    public void setFileBrowserLocation(String location){
         final String key = "file.location";
 
-        if (location == null || location.equals("")){
+        if (location == null || location.equals("")) {
             pref.remove(key);
         } else {
             pref.put(key, location);
