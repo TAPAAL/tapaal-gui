@@ -5,6 +5,7 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
+import net.tapaal.gui.*;
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
@@ -26,10 +27,6 @@ import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.Preferences;
 import net.tapaal.copypaste.CopyPastImportExport;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
-import net.tapaal.gui.GuiFrameActions;
-import net.tapaal.gui.GuiFrameControllerActions;
-import net.tapaal.gui.SafeGuiFrameActions;
-import net.tapaal.gui.TabActions;
 import net.tapaal.gui.petrinet.NameGenerator;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.TabTransformer;
@@ -548,7 +545,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         this.setDividerSize(8);
         //XXX must be after the animationcontroller is created
         animationModeController = new CanvasAnimationController(getAnimator());
-
     }
 
     public PetriNetTab(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
@@ -559,13 +555,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         constantsPanel.setNetwork(tapnNetwork);
 
-        if(network.paintNet()){
+        if (network.paintNet()) {
             this.setRightComponent(drawingSurfaceScroller);
         } else {
             this.setRightComponent(drawingSurfaceDummy);
         }
         this.queries.setQueries(tapnqueries);
-
     }
 
 	public SharedPlacesAndTransitionsPanel getSharedPlacesAndTransitionsPanel(){
@@ -597,7 +592,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             new Dimension(sharedPTPanel.getPreferredSize().width, sharedPTPanel.getMinimumSize().height)
 		);
 
-		boolean floatingDividers = false;
+        boolean floatingDividers = false;
 		if (editorModelroot == null) {
 			Leaf constantsLeaf = new Leaf(constantsName);
 			Leaf queriesLeaf = new Leaf(queriesName);

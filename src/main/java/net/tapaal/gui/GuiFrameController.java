@@ -110,6 +110,14 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         guiFrame.setWindowSize(prefs.getWindowSize());
     }
 
+    public void setEnableSidepanel(PetriNetTab tab) {
+        Preferences prefs = Preferences.getInstance();
+        tab.showQueries(prefs.getShowQueries());
+        tab.showConstantsPanel(prefs.getShowConstants());
+        tab.showComponents(prefs.getShowConstants());
+        tab.showDelayEnabledTransitions(prefs.getShowDelayEnabledTransitions());
+    }
+
     @Override
     public void openTab(PetriNetTab tab) {
         tabs.add(tab);
@@ -189,7 +197,6 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void saveWorkspace() {
-
         Preferences prefs = Preferences.getInstance();
 
         prefs.setAdvancedQueryView(QueryDialog.getAdvancedView());
@@ -602,13 +609,13 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     public void toggleQueries(){
         setQueries(!showQueries);
     }
+
     public void setQueries(boolean b){
         showQueries = b;
 
         guiFrame.setShowQueriesSelected(showQueries);
         //currentTab.ifPresent(o->o.showQueries(showQueries));
         getTabs().forEach(o->o.showQueries(showQueries));
-
     }
 
     @Override

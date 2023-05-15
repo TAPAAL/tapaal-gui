@@ -57,8 +57,6 @@ public class Preferences {
 		} else {
 			pref.put("verifyta.location", location);
 		}
-
-
 	}
 
 	public String getVerifytapnLocation() {
