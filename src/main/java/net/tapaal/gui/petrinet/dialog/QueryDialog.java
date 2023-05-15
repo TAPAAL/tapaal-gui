@@ -775,9 +775,13 @@ public class QueryDialog extends JPanel {
             negationButton.setEnabled(false);
         } else if (!lens.isGame()) {
             negationButton.setEnabled(true);
-        } else {
+        }
+        if (lens.isGame()) {
             if (newProperty instanceof TCTLAbstractPathProperty && !(newProperty instanceof TCTLPathPlaceHolder))
                 enableOnlyStateButtons();
+            if (current instanceof TCTLAGNode || current instanceof TCTLAFNode)
+                disjunctionButton.setEnabled(false);
+                conjunctionButton.setEnabled(false);
             negationButton.setEnabled(false);
         }
 	}
