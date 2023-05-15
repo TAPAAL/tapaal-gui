@@ -1,10 +1,8 @@
 package net.tapaal.gui.petrinet.undo.Colored;
 
-import dk.aau.cs.model.CPN.ColorMultiset;
+import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import net.tapaal.gui.petrinet.undo.Command;
-import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
@@ -99,23 +97,31 @@ public class UpdateColorTypeCommand extends Command {
     private void eval(ColorType colorType) {
         for (TimedArcPetriNet tapn : network.allTemplates()) {
             for (TimedPlace place : tapn.places()) {
-                ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
                 ArcExpression expression = place.getExprWithNewColorType(colorType);
 
                 if (expression != place.getTokensAsExpression()) {
                     ColorMultiset cm = expression.eval(network.getContext());
                     if (cm != null) {
-                        tokensToAdd.addAll(cm.getTokens(place));
-
-                        for (TimedToken token : tokensToAdd) {
+                        ArrayList<TimedToken> tokensToAdd = new ArrayList<>(place.tokens());
+                        for (TimedToken token : cm.getTokens(place)) {
                             tapn.marking().remove(token);
-                        }
-
-                        if (place.getColorType().getName().equals(colorType.getName())) {
-                            place.setColorType(colorType);
                         }
                         place.updateTokens(tokensToAdd, expression);
                     }
+                }
+
+                ArrayList<ColoredTimeInvariant> invariantsToAdd = new ArrayList<>();
+                for (ColoredTimeInvariant invariant : place.getCtiList()) {
+                    if (colorType.contains(invariant.getColor())) {
+                        invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), colorType.getColorByName(invariant.getColor().getColorName())));
+                    } else {
+                        invariantsToAdd.add(invariant);
+                    }
+                }
+                place.setCtiList(invariantsToAdd);
+
+                if (place.getColorType().getName().equals(colorType.getName())) {
+                    place.setColorType(colorType);
                 }
             }
         }

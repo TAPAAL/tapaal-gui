@@ -1001,7 +1001,6 @@ public class ColorTypeDialogPanel extends JPanel {
         switch (selectedColorType) {
             case finiteEnumeration: //Fall through
             case cyclicEnumeration:
-
                 ArrayList<String> overlaps = new ArrayList<>();
                 for (int i = 0; i < enumList.getModel().getSize(); i++) {
                     String e = enumList.getModel().getElementAt(i).toString();
