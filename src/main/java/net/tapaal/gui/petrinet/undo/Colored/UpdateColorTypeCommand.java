@@ -106,21 +106,22 @@ public class UpdateColorTypeCommand extends Command {
                         for (TimedToken token : cm.getTokens(place)) {
                             tapn.marking().remove(token);
                         }
-                        ArrayList<ColoredTimeInvariant> invariantsToAdd = new ArrayList<>();
-                        for (ColoredTimeInvariant invariant : place.getCtiList()) {
-                            if (colorType.contains(invariant.getColor())) {
-                                invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), colorType.getColorByName(invariant.getColor().getColorName())));
-                            } else {
-                                invariantsToAdd.add(invariant);
-                            }
-                        }
-                        place.setCtiList(invariantsToAdd);
-
-                        if (place.getColorType().getName().equals(colorType.getName())) {
-                            place.setColorType(colorType);
-                        }
                         place.updateTokens(tokensToAdd, expression);
                     }
+                }
+
+                ArrayList<ColoredTimeInvariant> invariantsToAdd = new ArrayList<>();
+                for (ColoredTimeInvariant invariant : place.getCtiList()) {
+                    if (colorType.contains(invariant.getColor())) {
+                        invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), colorType.getColorByName(invariant.getColor().getColorName())));
+                    } else {
+                        invariantsToAdd.add(invariant);
+                    }
+                }
+                place.setCtiList(invariantsToAdd);
+
+                if (place.getColorType().getName().equals(colorType.getName())) {
+                    place.setColorType(colorType);
                 }
             }
         }
