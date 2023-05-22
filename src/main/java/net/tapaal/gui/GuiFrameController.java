@@ -78,6 +78,9 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         showComponents = prefs.getShowComponents();
         guiFrame.setShowComponentsSelected(showComponents);
 
+        showSharedPT = prefs.getShowSharedPT();
+        guiFrame.setShowSharedPTSelected(showSharedPT);
+
         showQueries = prefs.getShowQueries();
         guiFrame.setShowQueriesSelected(showQueries);
 
@@ -108,10 +111,16 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         guiFrame.setShowTokenAgeSelected(showTokenAge);
 
         guiFrame.setWindowSize(prefs.getWindowSize());
-
     }
 
-
+    public void setEnableSidepanel(PetriNetTab tab) {
+        Preferences prefs = Preferences.getInstance();
+        tab.showComponents(prefs.getShowComponents());
+        tab.showSharedPT(prefs.getShowSharedPT());
+        tab.showQueries(prefs.getShowQueries());
+        tab.showConstantsPanel(prefs.getShowConstants());
+        tab.showDelayEnabledTransitions(prefs.getShowDelayEnabledTransitions());
+    }
 
     @Override
     public void openTab(PetriNetTab tab) {
@@ -192,7 +201,6 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
     @Override
     public void saveWorkspace() {
-
         Preferences prefs = Preferences.getInstance();
 
         prefs.setAdvancedQueryView(QueryDialog.getAdvancedView());
@@ -201,6 +209,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         prefs.setWindowSize(guiFrameDirectAccess.getSize());
 
         prefs.setShowComponents(showComponents);
+        prefs.setShowSharedPT(showSharedPT);
         prefs.setShowQueries(showQueries);
         prefs.setShowConstants(showConstants);
         prefs.setShowColoredTokens(showColoredTokens);
@@ -213,10 +222,9 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         prefs.setDelayEnabledTransitionIsRandomTransition(SimulationControl.isRandomTransition());
 
         JOptionPane.showMessageDialog(guiFrameDirectAccess,
-                "The workspace has now been saved into your preferences.\n"
-                        + "It will be used as the initial workspace next time you run the tool.",
-                "Workspace Saved", JOptionPane.INFORMATION_MESSAGE);
-
+        "The workspace has now been saved into your preferences.\n"
+                + "It will be used as the initial workspace next time you run the tool.",
+        "Workspace Saved", JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override
@@ -225,7 +233,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     }
 
     @Override
-    public void     showAbout() {
+    public void showAbout() {
         StringBuilder buffer = new StringBuilder("About " + TAPAAL.getProgramName());
         buffer.append("\n\n");
         buffer.append("TAPAAL is a tool for editing, simulation and verification of P/T and timed-arc Petri nets.\n");
@@ -605,13 +613,13 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     public void toggleQueries(){
         setQueries(!showQueries);
     }
+
     public void setQueries(boolean b){
         showQueries = b;
 
         guiFrame.setShowQueriesSelected(showQueries);
         //currentTab.ifPresent(o->o.showQueries(showQueries));
         getTabs().forEach(o->o.showQueries(showQueries));
-
     }
 
     @Override

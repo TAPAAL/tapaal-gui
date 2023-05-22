@@ -1619,6 +1619,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                         InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("Example nets/" + filenameFinal);
                         try {
                             PetriNetTab net = PetriNetTab.createNewTabFromInputStream(file, netname);
+                            guiFrameController.ifPresent(o -> o.setEnableSidepanel(net));
                             guiFrameController.ifPresent(o -> o.openTab(net));
                         } catch (Exception e) {
                             // TODO Auto-generated catch block

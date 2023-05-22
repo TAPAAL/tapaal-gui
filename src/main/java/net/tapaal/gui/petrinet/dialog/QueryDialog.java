@@ -747,17 +747,11 @@ public class QueryDialog extends JPanel {
         if (position == null)
             return;
 
-        queryField.select(position.getStart(), position.getEnd());
-        currentSelection = position;
-        if(currentSelection != null) {
-            setEnabledOptionsAccordingToCurrentReduction();
-        } else {
-            disableAllQueryButtons();
-        }
-
+		queryField.select(position.getStart(), position.getEnd());
+		currentSelection = position;
+        setEnabledOptionsAccordingToCurrentReduction();
         updateQueryButtonsAccordingToSelection();
-
-    }
+	}
 
 	// update selection based on some change to the query.
 	// If the query contains placeholders we want to select
@@ -833,7 +827,22 @@ public class QueryDialog extends JPanel {
         } else if (!lens.isGame()) {
             negationButton.setEnabled(true);
         }
-    }
+        if (lens.isGame()) {
+            if (newProperty instanceof TCTLAbstractPathProperty && !(newProperty instanceof TCTLPathPlaceHolder)) {
+                enableOnlyStateButtons();
+                negationButton.setEnabled(false);
+            }
+            if (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
+                disjunctionButton.setEnabled(false);
+                conjunctionButton.setEnabled(false);
+                negationButton.setEnabled(false);
+            } else {
+                disjunctionButton.setEnabled(true);
+                conjunctionButton.setEnabled(true);
+                negationButton.setEnabled(true);
+            }
+        }
+	}
 
     private void updateTimedQueryButtons(TCTLAtomicPropositionNode node) {
         if (!(node.getLeft() instanceof TCTLPlaceNode && node.getRight() instanceof TCTLConstNode) && !(node.getLeft() instanceof HyperLTLPathScopeNode)) {
@@ -3738,42 +3747,16 @@ public class QueryDialog extends JPanel {
         // Add action Listeners
         deleteButton.addActionListener(e -> deleteSelection());
 
-        resetButton.addActionListener(new ActionListener() {
+		resetButton.addActionListener(e -> {
+            if (queryField.isEditable()) { // in edit mode, this button is now the parse query button.
+                // User has potentially altered the query, so try to parse it
+                TCTLAbstractProperty newQuery = null;
 
-            public void actionPerformed(ActionEvent e) {
-                if (queryField.isEditable()) { // in edit mode, this button is now the parse query button.
-                    // User has potentially altered the query, so try to parse it
-                    TCTLAbstractProperty newQuery = null;
-
-                    try {
-                        if (queryField.getText().trim().equals("<*>")) {
-                            int choice = JOptionPane.showConfirmDialog(
-                                TAPAALGUI.getApp(),
-                                "It is not possible to parse an empty query.\nThe specified query has not been saved. Do you want to edit it again?",
-                                "Error Parsing Query",
-                                JOptionPane.YES_NO_OPTION,
-                                JOptionPane.ERROR_MESSAGE);
-                            if (choice == JOptionPane.NO_OPTION)
-                                returnFromManualEdit(null);
-                            else
-                                return;
-                        } else if (lens.isTimed()) {
-                            newQuery = TAPAALQueryParser.parse(queryField.getText());
-                        } else if (queryType.getSelectedIndex() == 0) {
-                            newQuery = TAPAALCTLQueryParser.parse(queryField.getText());
-                        } else if (queryType.getSelectedIndex() == 1) {
-                            newQuery = TAPAALLTLQueryParser.parse(queryField.getText());
-                        } else if (queryType.getSelectedIndex() == 2) {
-                            newQuery = TAPAALHyperLTLQueryParser.parse(queryField.getText());
-                        } else {
-                            throw new Exception();
-                        }
-                    } catch (Throwable ex) {
-                        String message = ex.getMessage() == null ? "TAPAAL encountered an error while trying to parse the specified query\n" :
-                            "TAPAAL encountered the following error while trying to parse the specified query:\n\n"+ex.getMessage();
+                try {
+                    if (queryField.getText().trim().equals("<*>")) {
                         int choice = JOptionPane.showConfirmDialog(
                             TAPAALGUI.getApp(),
-                            message+"\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
+                            "It is not possible to parse an empty query.\nThe specified query has not been saved. Do you want to edit it again?",
                             "Error Parsing Query",
                             JOptionPane.YES_NO_OPTION,
                             JOptionPane.ERROR_MESSAGE);
@@ -3781,73 +3764,85 @@ public class QueryDialog extends JPanel {
                             returnFromManualEdit(null);
                         else
                             return;
-                    }
-
-                    if (newQuery != null) // new query parsed successfully
-                    {
-                        // FOR HYPERLTL
-                        // If there are new traces present in the manually parsed query, they need to be added to the tracebox
-                        // We also have to check we don't do anything illegal, i.e., E T1 (E T1 (...))
-                        if(queryType.getSelectedIndex() == 2) {
-                            checkTraceNamesForManuallyParsedQuery(newQuery);
-                        } else {
-                            checkPlacesAndTransitionsForManuallyParsedQuery(newQuery);
-                        }
-
+                    } else if (lens.isTimed()) {
+                        newQuery = TAPAALQueryParser.parse(queryField.getText());
+                    } else if (queryType.getSelectedIndex() == 0) {
+                        newQuery = TAPAALCTLQueryParser.parse(queryField.getText());
+                    } else if (queryType.getSelectedIndex() == 1) {
+                        newQuery = TAPAALLTLQueryParser.parse(queryField.getText());
+                    } else if (queryType.getSelectedIndex() == 2) {
+                        newQuery = TAPAALHyperLTLQueryParser.parse(queryField.getText());
                     } else {
-                        returnFromManualEdit(null);
+                        throw new Exception();
                     }
-                } else { // we are not in edit mode so the button should reset
-                    // the query
-                    TCTLPathPlaceHolder ph = new TCTLPathPlaceHolder();
-                    UndoableEdit edit = new QueryConstructionEdit(newProperty, ph);
-                    newProperty = ph;
-                    resetQuantifierSelectionButtons();
-                    updateSelection(newProperty);
-                    undoSupport.postEdit(edit);
+                } catch (Throwable ex) {
+                    String message = ex.getMessage() == null ? "TAPAAL encountered an error while trying to parse the specified query\n" :
+                        "TAPAAL encountered the following error while trying to parse the specified query:\n\n"+ex.getMessage();
+                    int choice = JOptionPane.showConfirmDialog(
+                            TAPAALGUI.getApp(),
+                            message + "\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
+                            "Error Parsing Query",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.ERROR_MESSAGE);
+                    if (choice == JOptionPane.NO_OPTION)
+                        returnFromManualEdit(null);
+                    else
+                        return;
                 }
-            }
-        });
 
-        undoButton.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                UndoableEdit edit = undoManager.GetNextEditToUndo();
-
-                if (edit instanceof QueryConstructionEdit) {
-                    TCTLAbstractProperty original = ((QueryConstructionEdit) edit)
-                        .getOriginal();
-                    undoManager.undo();
-                    refreshUndoRedo();
-                    updateSelection(original);
-                    queryChanged();
-                }
-            }
-        });
-
-        redoButton.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                UndoableEdit edit = undoManager.GetNextEditToRedo();
-                if (edit instanceof QueryConstructionEdit) {
-                    TCTLAbstractProperty replacement = ((QueryConstructionEdit) edit)
-                        .getReplacement();
-                    undoManager.redo();
-                    refreshUndoRedo();
-                    updateSelection(replacement);
-                    queryChanged();
-                }
-            }
-        });
-
-        editQueryButton.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent arg0) {
-                if (queryField.isEditable()) { // we are in edit mode so the user pressed cancel
+                if (newQuery != null) // new query parsed successfully
+                {
+                    // FOR HYPERLTL
+                    // If there are new traces present in the manually parsed query, they need to be added to the tracebox
+                    // We also have to check we don't do anything illegal, i.e., E T1 (E T1 (...))
+                    if (queryType.getSelectedIndex() == 2)
+                        checkTraceNamesForManuallyParsedQuery(newQuery);
+                    else
+                        checkPlacesAndTransitionsForManuallyParsedQuery(newQuery);
+                } else {
                     returnFromManualEdit(null);
-                } else { // user wants to edit query manually
-                    changeToEditMode();
                 }
+            } else { // we are not in edit mode so the button should reset
+                // the query
+                TCTLPathPlaceHolder ph = new TCTLPathPlaceHolder();
+                UndoableEdit edit = new QueryConstructionEdit(newProperty, ph);
+                newProperty = ph;
+                resetQuantifierSelectionButtons();
+                updateSelection(newProperty);
+                undoSupport.postEdit(edit);
+            }
+        });
+
+		undoButton.addActionListener(e -> {
+            UndoableEdit edit = undoManager.GetNextEditToUndo();
+
+            if (edit instanceof QueryConstructionEdit) {
+                TCTLAbstractProperty original = ((QueryConstructionEdit) edit)
+                        .getOriginal();
+                undoManager.undo();
+                refreshUndoRedo();
+                updateSelection(original);
+                queryChanged();
+            }
+        });
+
+		redoButton.addActionListener(e -> {
+            UndoableEdit edit = undoManager.GetNextEditToRedo();
+            if (edit instanceof QueryConstructionEdit) {
+                TCTLAbstractProperty replacement = ((QueryConstructionEdit) edit)
+                        .getReplacement();
+                undoManager.redo();
+                refreshUndoRedo();
+                updateSelection(replacement);
+                queryChanged();
+            }
+        });
+
+		editQueryButton.addActionListener(arg0 -> {
+            if (queryField.isEditable()) { // we are in edit mode so the user pressed cancel
+                returnFromManualEdit(null);
+            } else { // user wants to edit query manually
+                changeToEditMode();
             }
         });
 
@@ -3912,24 +3907,27 @@ public class QueryDialog extends JPanel {
         }
 
         if (isResultFalse) {
-            StringBuilder s = new StringBuilder();
+            StringBuilder message = new StringBuilder();
 
-            s.append("The following places" + (lens.isTimed() ? "" : " or transitions") +
-                " were used in the query, but are not present in your model:\n\n");
+            if (lens.isGame()) {
+                message.append("The parsed query does not conform with the syntax supported for games in TAPAAL.\n");
+            } else {
+                message.append("The following places")
+                    .append(lens.isTimed() ? "" : " or transitions")
+                    .append(" were used in the query, but are not present in your model:\n\n");
 
-            for (String placeName : placeContext.getIncorrectPlaceNames()) {
-                s.append(placeName);
-                s.append('\n');
+                for (String placeName : placeContext.getIncorrectPlaceNames()) {
+                    message.append(placeName).append('\n');
+                }
+
+                for (String transitionName : transitionContext.getIncorrectTransitionNames()) {
+                    message.append(transitionName).append('\n');
+                }
             }
 
-            for (String transitionName : transitionContext.getIncorrectTransitionNames()) {
-                s.append(transitionName);
-                s.append('\n');
-            }
-
-            s.append("\nThe specified query has not been saved. Do you want to edit it again?");
+            message.append("\nThe specified query has not been saved. Do you want to edit it again?");
             int choice = JOptionPane.showConfirmDialog(
-                TAPAALGUI.getApp(), s.toString(),
+                TAPAALGUI.getApp(), message.toString(),
                 "Error Parsing Query",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.ERROR_MESSAGE);
@@ -3983,8 +3981,7 @@ public class QueryDialog extends JPanel {
         return nameChecker.verifyTransitionNames(newQuery);
     }
 
-    private void initUppaalOptionsPanel() {
-
+	private void initUppaalOptionsPanel() {
         uppaalOptionsPanel = new JPanel(new GridBagLayout());
 
         initSearchOptionsPanel();
@@ -4464,8 +4461,8 @@ public class QueryDialog extends JPanel {
         }
     }
 
-    private void refreshQueryEditingButtons() {
-        if(currentSelection != null) {
+	private void refreshQueryEditingButtons() {
+		if (currentSelection != null) {
             if (lens.isGame()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
                     forAllBox.setSelected(false);

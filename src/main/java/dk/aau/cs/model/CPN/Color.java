@@ -136,7 +136,7 @@ public class Color {
     }
 
     public Color getExprWithNewColorType(ColorType ct) {
-        if (colorType.getName().equals(ct.getName())) {
+        if (colorType.getName().equals(ct.getName()) || ct.contains(this)) {
             return new Color(ct, id, tuple, colorName);
         }
         return this;

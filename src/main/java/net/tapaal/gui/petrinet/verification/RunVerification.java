@@ -344,8 +344,8 @@ public class RunVerification extends RunVerificationBase {
 		gbc.anchor = GridBagConstraints.WEST;		
 		panel.add(new JLabel(toHTML(result.getResultString())), gbc);
 
-        if (result.getBound() < result.getQueryResult().boundednessAnalysis().usedTokens() &&
-            !result.getQueryResult().toString().toLowerCase().contains("only markings with")) {
+        if (result.getBound() != -1 && result.getBound() < result.getQueryResult().boundednessAnalysis().usedTokens() &&
+                !result.getQueryResult().toString().toLowerCase().contains("only markings with")) {
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 0;
