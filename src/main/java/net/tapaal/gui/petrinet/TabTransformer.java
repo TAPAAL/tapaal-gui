@@ -108,7 +108,6 @@ public class TabTransformer {
                     template.model().add(arc2.underlyingArc());
 
                 }
-
             }
         }
     }
