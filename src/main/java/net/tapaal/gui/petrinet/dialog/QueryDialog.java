@@ -1984,7 +1984,11 @@ public class QueryDialog extends JPanel {
 		// Boundedness button
 		kbounded = new JButton("Check boundedness");
 		kbounded.setToolTipText(TOOL_TIP_KBOUNDED);
-		kbounded.addActionListener(evt -> Verifier.analyzeKBound(tapnNetwork, lens, guiModels, getCapacity(), numberOfExtraTokensInNet));
+		kbounded.addActionListener(evt -> {
+		    querySaved = true;
+		    Verifier.analyzeKBound(tapnNetwork, lens, guiModels, getCapacity(), numberOfExtraTokensInNet, getQuery());
+            querySaved = false;
+        });
 		boundednessCheckPanel.add(kbounded);
 
 		GridBagConstraints gridBagConstraints;
