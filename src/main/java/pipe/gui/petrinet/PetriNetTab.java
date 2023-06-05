@@ -230,7 +230,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 tab.lens.isGame(),
                 (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
                 q.hasUntimedOnlyProperties(),
-                tab.lens.isColored()
+                tab.lens.isColored(),
+                tab.lens.isColored() && !tab.lens.isTimed()
             };
 
             boolean hasEngine = tab.checkCurrentEngine(q.getReductionOption(), queryOptions);
@@ -267,6 +268,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 q.setReductionOption(ReductionOption.VerifyPN);
                 q.setUseOverApproximationEnabled(false);
                 q.setUseUnderApproximationEnabled(false);
+                q.setCategory(TAPNQuery.QueryCategory.CTL);
             } else {
                 if (q.getCategory() == TAPNQuery.QueryCategory.LTL) {
                     queriesToRemove.add(q);

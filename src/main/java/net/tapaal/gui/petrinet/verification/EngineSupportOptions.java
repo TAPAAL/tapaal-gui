@@ -16,11 +16,13 @@ public class EngineSupportOptions {
     public final boolean supportEGorAFWithNetDegreeGreaterThan2;
     public final boolean supportNestedQuantifications;
     public final boolean supportColored;
+    public final boolean supportOnlyUntimed;
 
     public final boolean[] optionsArray;
     public EngineSupportOptions(String nameString, boolean supportFastestTrace, boolean supportDeadlockNetdegree2EForAG, boolean supportDeadlockEGorAF, boolean supportDeadlockWithInhib,
                                 boolean supportWeights, boolean supportInhibArcs, boolean supportUrgentTransitions, boolean supportEGorAF, boolean supportStrictNets, boolean supportTimedNets,
-                                boolean supportDeadlockNetdegreeGreaterThan2, boolean supportGames, boolean supportEGorAFWithNetDegreeGreaterThan2, boolean supportNestedQuantifications, boolean supportColored){
+                                boolean supportDeadlockNetdegreeGreaterThan2, boolean supportGames, boolean supportEGorAFWithNetDegreeGreaterThan2, boolean supportNestedQuantifications,
+                                boolean supportColored, boolean supportOnlyUntimed){
         this.nameString = nameString;
         this.supportFastestTrace = supportFastestTrace;
         this.supportDeadlockNetdegree2EForAG = supportDeadlockNetdegree2EForAG;
@@ -36,9 +38,10 @@ public class EngineSupportOptions {
         this.supportEGorAFWithNetDegreeGreaterThan2 = supportEGorAFWithNetDegreeGreaterThan2;
         this.supportNestedQuantifications = supportNestedQuantifications;
         this.supportColored = supportColored;
+        this.supportOnlyUntimed = supportOnlyUntimed;
         this.optionsArray = new boolean[]{supportFastestTrace, supportDeadlockNetdegree2EForAG, supportDeadlockEGorAF, supportDeadlockWithInhib,
             supportWeights, supportInhibArcs, supportUrgentTransitions, supportEGorAF, supportStrictNets, supportTimedNets, supportDeadlockNetdegreeGreaterThan2,
-            supportGames, supportEGorAFWithNetDegreeGreaterThan2, supportNestedQuantifications,supportColored};
+            supportGames, supportEGorAFWithNetDegreeGreaterThan2, supportNestedQuantifications, supportColored, supportOnlyUntimed};
     }
 
     public boolean areOptionsSupported(boolean[] queryOptions){

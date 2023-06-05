@@ -19,6 +19,7 @@ public class UPPAALCombiOptions extends EngineSupportOptions {
             false, //support games
             true, //support EG or AF with net degree > 2);
             false, //support for nested quantification
+            false,
             false
         );
     }
