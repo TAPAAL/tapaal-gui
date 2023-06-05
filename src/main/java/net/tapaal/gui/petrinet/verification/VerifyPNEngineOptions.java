@@ -19,6 +19,7 @@ public class VerifyPNEngineOptions extends EngineSupportOptions {
             false, //support games
             true, //support EG or AF with net degree > 2
             true,//support for nested quantification
+            true,
             true
         );
     }
