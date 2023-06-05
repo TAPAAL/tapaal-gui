@@ -3412,13 +3412,8 @@ public class QueryDialog extends JPanel {
         if (lens.isTimed()) {
             initTimedReductionOptions();
         } else {
-            useReduction.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                        openReducedNetButton.setEnabled(useReduction.isSelected() && getQueryComment().length() > 0
-                            && !newProperty.containsPlaceHolder());
-                }
-            });
+            useReduction.addActionListener(actionEvent ->
+                openReducedNetButton.setEnabled(useReduction.isSelected() && getQueryComment().length() > 0 && !newProperty.containsPlaceHolder()));
             initUntimedReductionOptions();
         }
 
@@ -3505,6 +3500,12 @@ public class QueryDialog extends JPanel {
             refreshTraceRefinement();
             refreshTarjan();
             refreshColoredReduction();
+        }
+        if (!lens.isColored()) {
+            useColoredReduction.setSelected(false);
+            useColoredReduction.setEnabled(false);
+        } else {
+            useColoredReduction.setEnabled(true);
         }
 		updateSearchStrategies();
 		refreshExportButtonText();
