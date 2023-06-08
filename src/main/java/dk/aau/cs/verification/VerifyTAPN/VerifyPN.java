@@ -322,7 +322,7 @@ public class VerifyPN implements ModelChecker {
             String errorOutput = readOutput(runner.errorOutput());
             String standardOutput = readOutput(runner.standardOutput());
 
-            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().getNumberOfTokensInNet() + query.getExtraTokens(), query.getExtraTokens(), query);
 
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
