@@ -648,6 +648,7 @@ public class TimedArcPetriNet {
     }
 
     private int countTokens(Expression expression, int numberOf) {
+	    if (expression == null) return marking().size();
         if (expression instanceof TupleExpression) return countTupleTokens((TupleExpression) expression, numberOf);
 
 	    int result = 0;
