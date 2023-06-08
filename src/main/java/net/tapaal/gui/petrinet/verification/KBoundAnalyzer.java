@@ -10,6 +10,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption;
@@ -41,9 +42,10 @@ public class KBoundAnalyzer {
 	private final Messenger messenger;
 	private final JSpinner spinner;
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
+	private final net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery;
 
 	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k,
-                          ModelChecker modelChecker, Messenger messenger, JSpinner tokensControl) {
+                          ModelChecker modelChecker, Messenger messenger, JSpinner tokensControl, net.tapaal.gui.petrinet.verification.TAPNQuery query) {
         this.lens = lens;
         this.k = k;
 		this.tapnNetwork = tapnNetwork;
@@ -51,6 +53,7 @@ public class KBoundAnalyzer {
         this.messenger = messenger;
         this.guiModels = guiModels;
 		spinner = tokensControl;
+        dataLayerQuery = query;
 	}
 
 	public void analyze() {
@@ -68,13 +71,17 @@ public class KBoundAnalyzer {
         RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, guiModels, spinner, resultShown);
         RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), analyzer);
 
-        analyzer.execute(options, tapnNetwork, query, null);
+        analyzer.execute(options, tapnNetwork, query, dataLayerQuery);
         dialog.setVisible(true);
     }
 
 	protected VerifyTAPNOptions verificationOptions() {
 		if(modelChecker instanceof VerifyPN){
-			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.CTL, AlgorithmOption.CERTAIN_ZERO, false, net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime.UnlimitedTime,false, null, false, true, tapnNetwork.isColored(), false, true, true, true);
+		    QueryReductionTime reductionTime = QueryReductionTime.UnlimitedTime;
+            if (dataLayerQuery != null) {
+                reductionTime = dataLayerQuery.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime;
+            }
+			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.CTL, AlgorithmOption.CERTAIN_ZERO, false, reductionTime,false, null, false, true, tapnNetwork.isColored(), false, true, true, true);
 		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
 		} else if(modelChecker instanceof VerifyDTAPN){
