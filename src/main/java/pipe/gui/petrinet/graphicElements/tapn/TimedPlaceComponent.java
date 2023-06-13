@@ -419,7 +419,6 @@ public class TimedPlaceComponent extends Place {
 
     @Override
     public void update(boolean displayConstantNames, boolean alignToGrid) {
-
         if (place != null) {
             getNameLabel().setName(place.name());
 
