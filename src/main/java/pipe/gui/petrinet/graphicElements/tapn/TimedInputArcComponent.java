@@ -142,9 +142,9 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                 if(((ConstantWeight) getWeight()).constant().hasFocus()){
                     focusedConstant = true;
                 }
-                if(((ConstantWeight) getWeight()).constant().getVisible()){
+                /*if(((ConstantWeight) getWeight()).constant().getVisible()){
                     focusedConstant = false;
-                }
+                }*/
             }
             if(focusedConstant){
                 getNameLabel().setForeground(Constants.SELECTION_TEXT_COLOUR);
