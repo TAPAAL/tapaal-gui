@@ -3903,12 +3903,14 @@ public class QueryDialog extends JPanel {
         VerifyPlaceNamesVisitor.Context placeContext = getPlaceContext(newQuery);
         VerifyTransitionNamesVisitor.Context transitionContext = getTransitionContext(newQuery);
 
-        boolean isResultFalse;
-
+        boolean isResultFalse = false;
+        if (lens.isGame()) {
+            isResultFalse = newQuery.hasNestedPathQuantifiers() || newQuery instanceof TCTLNotNode;
+        }
         if (lens.isTimed()) {
-            isResultFalse = !placeContext.getResult();
+            isResultFalse = isResultFalse || !placeContext.getResult();
         } else {
-            isResultFalse = !transitionContext.getResult() || !placeContext.getResult();
+            isResultFalse = isResultFalse || !transitionContext.getResult() || !placeContext.getResult();
         }
 
         if (isResultFalse) {
