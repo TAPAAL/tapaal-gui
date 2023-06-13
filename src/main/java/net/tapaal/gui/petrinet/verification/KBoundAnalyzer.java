@@ -77,11 +77,7 @@ public class KBoundAnalyzer {
 
 	protected VerifyTAPNOptions verificationOptions() {
 		if(modelChecker instanceof VerifyPN){
-		    QueryReductionTime reductionTime = QueryReductionTime.UnlimitedTime;
-            if (dataLayerQuery != null) {
-                reductionTime = dataLayerQuery.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime;
-            }
-			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.CTL, AlgorithmOption.CERTAIN_ZERO, false, reductionTime,false, null, false, true, tapnNetwork.isColored(), false, true, true, true);
+			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.CTL, AlgorithmOption.CERTAIN_ZERO, false, QueryReductionTime.NoTime,false, null, false, true, tapnNetwork.isColored(), false, true, true, true);
 		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
 		} else if(modelChecker instanceof VerifyDTAPN){

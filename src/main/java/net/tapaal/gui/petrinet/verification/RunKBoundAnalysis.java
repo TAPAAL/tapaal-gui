@@ -31,7 +31,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 	@Override
 	protected boolean showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if (result != null && !result.error()) {
-		    if ((result.getBound() != -1 && result.getQueryResult().boundednessAnalysis().usedTokens() >= result.getBound()) ||
+		    if ((result.getBound() != -1 && result.getQueryResult().boundednessAnalysis().usedTokens() > result.getBound()) ||
                 !result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) {
 				JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
 						getAnswerNotBoundedString(), "Analysis Result",
