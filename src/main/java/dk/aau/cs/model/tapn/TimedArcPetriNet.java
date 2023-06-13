@@ -4,7 +4,9 @@ import java.util.*;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
+import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
@@ -632,15 +634,49 @@ public class TimedArcPetriNet {
         }
         return orphans;
     }
-	
-	public int getNumberOfTokensInNet(){
-		int result = 0;
-		for(TimedPlace place : places){
-			result += place.numberOfTokens();
-		}
-		
-		return result;
-	}
+
+    public int getNumberOfTokensInNet(){
+        int result = 0;
+        for (TimedPlace place : places) {
+            if (place.numberOfTokens == 0)
+                result += countTokens(place.tokensAsExpression, 0);
+            else
+                result += place.numberOfTokens();
+        }
+
+        return result == 0 ? marking().size() : result;
+    }
+
+    private int countTokens(Expression expression, int numberOf) {
+	    if (expression == null) return 0;
+        if (expression instanceof TupleExpression) return countTupleTokens((TupleExpression) expression, numberOf);
+
+	    int result = 0;
+	    for (ExprStringPosition exprStringPosition : expression.getChildren()) {
+	        Expression child = exprStringPosition.getObject();
+	        if (child instanceof AllExpression) {
+	            result += ((AllExpression) child).size();
+            } else if (child instanceof NumberOfExpression) {
+	            result += (countTokens(child, ((NumberOfExpression) child).getNumber()));
+            } else {
+	            result += countTokens(child, numberOf);
+            }
+        }
+	    return result;
+    }
+
+    private int countTupleTokens(TupleExpression expression, int numberOf) {
+        int result = 1;
+        for (ColorExpression colorExpression : expression.getColors()) {
+            if (colorExpression instanceof AllExpression) {
+                if (result < numberOf)
+                    result *= ((AllExpression) colorExpression).size() * numberOf;
+                else
+                    result *= ((AllExpression) colorExpression).size();
+            }
+        }
+        return result;
+    }
 
 	public boolean hasWeights() {
 		for(TimedInputArc t : inputArcs){
