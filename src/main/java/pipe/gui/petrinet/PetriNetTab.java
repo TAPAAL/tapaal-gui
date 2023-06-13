@@ -268,7 +268,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 q.setReductionOption(ReductionOption.VerifyPN);
                 q.setUseOverApproximationEnabled(false);
                 q.setUseUnderApproximationEnabled(false);
-                q.setCategory(TAPNQuery.QueryCategory.CTL);
+                if (q.getCategory() == TAPNQuery.QueryCategory.Default)
+                    q.setCategory(TAPNQuery.QueryCategory.CTL);
             } else {
                 if (q.getCategory() == TAPNQuery.QueryCategory.LTL) {
                     queriesToRemove.add(q);
@@ -404,7 +405,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			String name = file.getName();
 			boolean showFileEndingChangedMessage = false;
 
-			if(name.toLowerCase().endsWith(".xml")){
+			if (name.toLowerCase().endsWith(".xml")) {
 				name = name.substring(0, name.lastIndexOf('.')) + ".tapn";
 				showFileEndingChangedMessage = true;
 			}
