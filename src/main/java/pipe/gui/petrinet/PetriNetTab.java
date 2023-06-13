@@ -265,7 +265,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 q.setReductionOption(ReductionOption.VerifyPN);
                 q.setUseOverApproximationEnabled(false);
                 q.setUseUnderApproximationEnabled(false);
-                q.setCategory(TAPNQuery.QueryCategory.CTL);
+                if (q.getCategory() == TAPNQuery.QueryCategory.Default)
+                    q.setCategory(TAPNQuery.QueryCategory.CTL);
             } else {
                 if (q.getCategory() == TAPNQuery.QueryCategory.LTL) {
                     queriesToRemove.add(q);
