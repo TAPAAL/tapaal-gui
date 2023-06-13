@@ -10,12 +10,12 @@ public class BoundednessAnalysisResult {
 		this.maxUsedTokens = maxUsedTokens;
 		this.totalTokens = totalTokens;
 		this.extraTokens = extraTokens;
-                this.isUPPAAL = false;
+        this.isUPPAAL = false;
 	}
         
-        public BoundednessAnalysisResult(int totalTokens, int maxUsedTokens, int extraTokens, boolean isUPPAAL){
-                this(totalTokens, maxUsedTokens, extraTokens);
-                this.isUPPAAL = isUPPAAL;
+    public BoundednessAnalysisResult(int totalTokens, int maxUsedTokens, int extraTokens, boolean isUPPAAL){
+        this(totalTokens, maxUsedTokens, extraTokens);
+        this.isUPPAAL = isUPPAAL;
 	}
 	
 	@Override

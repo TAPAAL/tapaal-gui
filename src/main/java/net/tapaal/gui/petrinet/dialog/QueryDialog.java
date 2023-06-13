@@ -2311,11 +2311,15 @@ public class QueryDialog extends JPanel {
 
         boundednessCheckPanel.add(new JLabel("  "));
 
-        // Boundedness button
-        kbounded = new JButton("Check boundedness");
-        kbounded.setToolTipText(TOOL_TIP_KBOUNDED);
-        kbounded.addActionListener(evt -> Verifier.analyzeKBound(tapnNetwork, lens, guiModels, getCapacity(), numberOfExtraTokensInNet));
-        boundednessCheckPanel.add(kbounded);
+		// Boundedness button
+		kbounded = new JButton("Check boundedness");
+		kbounded.setToolTipText(TOOL_TIP_KBOUNDED);
+		kbounded.addActionListener(evt -> {
+		    querySaved = true;
+		    Verifier.analyzeKBound(tapnNetwork, lens, guiModels, getCapacity(), numberOfExtraTokensInNet, getQuery());
+            querySaved = false;
+        });
+		boundednessCheckPanel.add(kbounded);
 
         GridBagConstraints gridBagConstraints;
         gridBagConstraints = new GridBagConstraints();
@@ -4293,13 +4297,8 @@ public class QueryDialog extends JPanel {
         if (lens.isTimed()) {
             initTimedReductionOptions();
         } else {
-            useReduction.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    openReducedNetButton.setEnabled(useReduction.isSelected() && getQueryComment().length() > 0
-                        && !newProperty.containsPlaceHolder());
-                }
-            });
+            useReduction.addActionListener(actionEvent ->
+                openReducedNetButton.setEnabled(useReduction.isSelected() && getQueryComment().length() > 0 && !newProperty.containsPlaceHolder()));
             initUntimedReductionOptions();
         }
 
@@ -4387,10 +4386,16 @@ public class QueryDialog extends JPanel {
             refreshTarjan();
             refreshColoredReduction();
         }
+        if (!lens.isColored()) {
+            useColoredReduction.setSelected(false);
+            useColoredReduction.setEnabled(false);
+        } else {
+            useColoredReduction.setEnabled(true);
+        }
         updateStubbornReduction();
         updateSearchStrategies();
-        refreshExportButtonText();
-    }
+		refreshExportButtonText();
+	}
 
 	private void refreshTraceRefinement() {
 	    ReductionOption reduction = getReductionOption();

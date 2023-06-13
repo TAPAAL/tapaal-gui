@@ -74,7 +74,7 @@ public class Verifier {
         return reducedNetTempFile.getAbsolutePath();
     }
 
-    public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k, JSpinner tokensControl) {
+    public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k, JSpinner tokensControl, TAPNQuery query) {
         ModelChecker modelChecker;
 
         if (tapnNetwork.isUntimed()) {
@@ -94,7 +94,7 @@ public class Verifier {
             return;
         }
 
-        KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, lens, guiModels, k, modelChecker, new MessengerImpl(), tokensControl);
+        KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, lens, guiModels, k, modelChecker, new MessengerImpl(), tokensControl, query);
         optimizer.analyze();
     }
 
