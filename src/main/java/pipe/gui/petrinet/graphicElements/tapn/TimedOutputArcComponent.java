@@ -9,6 +9,7 @@ import net.tapaal.gui.petrinet.Context;
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.*;
+import pipe.gui.Constants;
 import pipe.gui.TAPAALGUI;
 
 import pipe.gui.canvas.Grid;
@@ -85,7 +86,6 @@ public class TimedOutputArcComponent extends Arc {
                         "\n" + underlyingArc().getExpression().toString());
                     setLabelPosition();
                 }
-
             } else {
                 getNameLabel().setText("");
                 getNameLabel().setText(getWeight().toString(displayConstantNames)+" " + getNameLabel().getText());
@@ -96,6 +96,21 @@ public class TimedOutputArcComponent extends Arc {
             getNameLabel().setText(getWeight().toString(displayConstantNames)+" " + getNameLabel().getText());
             setLabelPosition();
         }
+
+        // Handle constant highlighting
+        boolean focusedConstant = false;
+        boolean isvisible = true;
+        if (getWeight() instanceof ConstantWeight) {
+            if(((ConstantWeight) getWeight()).constant().hasFocus()){
+                focusedConstant = true;
+            }
+        }
+        if (focusedConstant) {
+            getNameLabel().setForeground(Constants.SELECTION_TEXT_COLOUR);
+        } else {
+            getNameLabel().setForeground(Constants.ELEMENT_TEXT_COLOUR);
+        }
+        pnName.setVisible(isvisible);
 	}
 
     @Override
