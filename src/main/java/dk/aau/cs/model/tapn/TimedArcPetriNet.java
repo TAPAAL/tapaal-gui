@@ -644,11 +644,11 @@ public class TimedArcPetriNet {
                 result += place.numberOfTokens();
         }
 
-        return result;
+        return result == 0 ? marking().size() : result;
     }
 
     private int countTokens(Expression expression, int numberOf) {
-	    if (expression == null) return marking().size();
+	    if (expression == null) return 0;
         if (expression instanceof TupleExpression) return countTupleTokens((TupleExpression) expression, numberOf);
 
 	    int result = 0;
