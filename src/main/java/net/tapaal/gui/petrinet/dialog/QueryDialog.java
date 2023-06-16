@@ -3375,7 +3375,7 @@ public class QueryDialog extends JPanel {
                 "The trace cannot be named \"" + traceName + "\", as the name is reserved",
                 "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            boolean nameIsInUse =  traceNameTextField.getText().equals(traceName);
+            boolean nameIsInUse = traceNameTextField.getText().equals(traceName);
             for (int i = 0; i < traceModel.getSize(); i++) {
                 String n = traceModel.getElementAt(i).toString();
 
@@ -3882,21 +3882,18 @@ public class QueryDialog extends JPanel {
     }
 
     private void checkTraceNamesForManuallyParsedQuery(TCTLAbstractProperty newQuery) {
-        HyperLTLTraceNameVisitor traceNameVisitor = null;
-        traceNameVisitor = new HyperLTLTraceNameVisitor();
+        HyperLTLTraceNameVisitor traceNameVisitor = new HyperLTLTraceNameVisitor();
         boolean traceResult = traceNameVisitor.getTraceContext(newQuery).getResult();
 
-        if(!traceResult) {
-            StringBuilder s = new StringBuilder();
-
-            s.append("The specified query has duplicate traces in either the E or A quantification nodes.\n" +
+        if (!traceResult) {
+            String message = "The specified query has duplicate traces in either the E or A quantification nodes.\n" +
                 "You may only use different traces for each E or A, i.e.:\n" +
                 "E T1 (E T2 (...)) is legal, whereas \n" +
-                "E T1 (E T1 (...)) is illegal.");
+                "E T1 (E T1 (...)) is illegal.\n" +
+                "The specified query has not been saved. Do you want to edit it again?";
 
-            s.append("\nThe specified query has not been saved. Do you want to edit it again?");
             int choice = JOptionPane.showConfirmDialog(
-                TAPAALGUI.getApp(), s.toString(),
+                TAPAALGUI.getApp(), message,
                 "Error Parsing Query",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.ERROR_MESSAGE);
@@ -3905,7 +3902,7 @@ public class QueryDialog extends JPanel {
             }
         } else {
             ArrayList<String> tracesFromParsedQuery = traceNameVisitor.getTraceContext(newQuery).getTraceNames();
-            ArrayList<String> tracesFromTraceBox = new ArrayList<String>();
+            ArrayList<String> tracesFromTraceBox = new ArrayList<>();
 
             for (int i = 0; i < traceBox.getModel().getSize(); i++) {
                 tracesFromTraceBox.add(traceBox.getItemAt(i).toString());
