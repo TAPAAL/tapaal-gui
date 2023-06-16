@@ -2771,12 +2771,7 @@ public class QueryDialog extends JPanel {
             }
         });
 
-        addTraceButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                initTraceBoxDialogComponents();
-            }
-        });
+        addTraceButton.addActionListener(e -> initTraceBoxDialogComponents());
     }
 
     private void showLTLButtons(boolean isVisible) {
@@ -3473,8 +3468,16 @@ public class QueryDialog extends JPanel {
     }
 
     private void removeTraces() {
-        traceModel.remove(traceList.getSelectedIndex());
-        traceList.setModel(traceModel);
+        if (newProperty.toString().contains(traceList.getSelectedValue().toString())) {
+            JOptionPane.showMessageDialog(
+                TAPAALGUI.getApp(),
+                "The selected trace is used in the query.\n"
+                    + "It is not possible to remove this trace.",
+                "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            traceModel.remove(traceList.getSelectedIndex());
+            traceList.setModel(traceModel);
+        }
     }
 
     private void initPredicationConstructionPanel() {
