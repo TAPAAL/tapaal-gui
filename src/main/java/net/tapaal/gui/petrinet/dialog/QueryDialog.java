@@ -12,7 +12,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -281,6 +280,7 @@ public class QueryDialog extends JPanel {
     private boolean wasLTLType = true;
     private boolean wasHyperLTLType = true;
     private boolean isAllPath = false;
+    private boolean updateTraceBox = true;
 
     //Strings for tool tips
     //Tool tips for top panel
@@ -783,44 +783,12 @@ public class QueryDialog extends JPanel {
         if (current instanceof TCTLStateToPathConverter && !lens.isTimed()) {
             current = ((TCTLStateToPathConverter) current).getProperty();
         }
-        if (current instanceof TCTLAtomicPropositionNode) {
-            TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) current;
-
-            // bit of a hack to prevent posting edits to the undo manager when
-            // we programmatically change the selection in the atomic proposition comboboxes etc.
-            // because a different atomic proposition was selected
-            userChangedAtomicPropSelection = false;
-            if (node.getLeft() instanceof TCTLPlaceNode) {
-                TCTLPlaceNode placeNode = (TCTLPlaceNode) node.getLeft();
-
-                if (placeNode != null && placeNode.getTemplate().equals("")) {
-                    templateBox.setSelectedItem(SHARED);
-                } else {
-                    templateBox.setSelectedItem(tapnNetwork.getTAPNByName(placeNode.getTemplate()));
-                }
-            }
-            if (!lens.isTimed()) {
-                updateUntimedQueryButtons(node);
-            } else {
-                updateTimedQueryButtons(node);
-            }
-        } else if (current instanceof TCTLTransitionNode) {
-            TCTLTransitionNode transitionNode = (TCTLTransitionNode) current;
-            userChangedAtomicPropSelection = false;
-            if (transitionNode.getTemplate().equals("")) {
-                templateBox.setSelectedItem(SHARED);
-            } else {
-                templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
-            }
-            placeTransitionBox.setSelectedItem(transitionNode.getTransition());
-            userChangedAtomicPropSelection = true;
-        }
+        updatePredicatesAccordingToSelection(current);
         if (!lens.isTimed()) {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
 
         int selectedIndex = queryType.getSelectedIndex();
-
         if (current instanceof LTLANode || current instanceof LTLENode ||
             ((selectedIndex == 1 || selectedIndex == 2) && current instanceof TCTLPathPlaceHolder)) {
             negationButton.setEnabled(false);
@@ -843,6 +811,55 @@ public class QueryDialog extends JPanel {
             }
         }
 	}
+
+	private void updateSelectionPlaceNode(TCTLPlaceNode node) {
+        if (node == null) return;
+        if (node.getTemplate().equals("")) {
+            templateBox.setSelectedItem(SHARED);
+        } else {
+            templateBox.setSelectedItem(tapnNetwork.getTAPNByName(node.getTemplate()));
+        }
+    }
+
+    private void updatePredicatesAccordingToSelection(TCTLAbstractProperty current) {
+        if (current instanceof TCTLAtomicPropositionNode) {
+            TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) current;
+
+            // bit of a hack to prevent posting edits to the undo manager when
+            // we programmatically change the selection in the atomic proposition comboboxes etc.
+            // because a different atomic proposition was selected
+            userChangedAtomicPropSelection = false;
+            if (node.getLeft() instanceof TCTLPlaceNode) {
+                updateSelectionPlaceNode((TCTLPlaceNode) node.getLeft());
+            } else if (node.getLeft() instanceof HyperLTLPathScopeNode) {
+                HyperLTLPathScopeNode scopeNode = (HyperLTLPathScopeNode) node.getLeft();
+                updateTraceBox = false;
+                traceBox.setSelectedItem(scopeNode.getTrace());
+                updateTraceBox = true;
+
+                if (scopeNode.getProperty() instanceof TCTLPlaceNode)
+                    updateSelectionPlaceNode((TCTLPlaceNode) scopeNode.getProperty());
+            }
+            if (!lens.isTimed()) {
+                updateUntimedQueryButtons(node);
+            } else {
+                updateTimedQueryButtons(node);
+            }
+        } else if (current instanceof TCTLTransitionNode) {
+            TCTLTransitionNode transitionNode = (TCTLTransitionNode) current;
+            userChangedAtomicPropSelection = false;
+            if (transitionNode.getTemplate().equals("")) {
+                templateBox.setSelectedItem(SHARED);
+            } else {
+                templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
+            }
+            if (!transitionNode.getTrace().equals("")) {
+                traceBox.setSelectedItem(transitionNode.getTrace());
+            }
+            placeTransitionBox.setSelectedItem(transitionNode.getTransition());
+            userChangedAtomicPropSelection = true;
+        }
+    }
 
     private void updateTimedQueryButtons(TCTLAtomicPropositionNode node) {
         if (!(node.getLeft() instanceof TCTLPlaceNode && node.getRight() instanceof TCTLConstNode) && !(node.getLeft() instanceof HyperLTLPathScopeNode)) {
@@ -3093,7 +3110,9 @@ public class QueryDialog extends JPanel {
         traceBox = new JComboBox<>(new DefaultComboBoxModel<>(tracesVector));
         traceBoxQuantification = new JComboBox<>(new DefaultComboBoxModel<>(tracesVector));
 
-        traceBox.addActionListener(e -> updateQueryOnAtomicPropositionChange());
+        traceBox.addActionListener(e -> {
+            if (updateTraceBox) updateQueryOnAtomicPropositionChange();
+        });
         traceBoxQuantification.addActionListener(e -> updateQueryOnQuantificationChange());
 
         traceBox.setToolTipText(TOOL_TIP_TRACEBOX);
@@ -3469,7 +3488,7 @@ public class QueryDialog extends JPanel {
         placeTransitionBox.setMaximumSize(d);
         placeTransitionBox.setPreferredSize(d);
 
-        Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
+        Vector<Object> items = new Vector<>(tapnNetwork.activeTemplates().size()+1);
         items.addAll(tapnNetwork.activeTemplates());
         if(tapnNetwork.numberOfSharedPlaces() > 0) items.add(SHARED);
 

@@ -112,4 +112,8 @@ public class TCTLTransitionNode extends TCTLAbstractStateProperty {
         return trace + "." + template + "." + transition;
 		//return (template == "" ? "" : template + ".") + transition;
 	}
+
+	public String getTrace() {
+        return trace;
+    }
 }
