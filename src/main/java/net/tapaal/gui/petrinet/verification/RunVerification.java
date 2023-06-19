@@ -357,6 +357,7 @@ public class RunVerification extends RunVerificationBase {
 		// TODO remove this when the engine outputs statistics
 		boolean isCTLQuery = result.getQueryResult().isCTL;
         int rowOffset = 1;
+        JButton showRawQueryButton = null;
 		if(modelChecker.supportsStats() && !result.isSolvedUsingQuerySimplification() && !isCTLQuery){
             rowOffset = displayStats(panel, result.getStatsAsString(), modelChecker.getStatsExplanations(), 1);
 
@@ -375,7 +376,7 @@ public class RunVerification extends RunVerificationBase {
                 }
             }
             if (result.getRawOutput() != null) {
-                JButton showRawQueryButton = new JButton("Show raw query results");
+                showRawQueryButton = new JButton("Show raw query results");
                 showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
                 gbc = GridBagHelper.as(1, 5, WEST, new Insets(0,0,10,0));
                 panel.add(showRawQueryButton, gbc);
@@ -432,7 +433,7 @@ public class RunVerification extends RunVerificationBase {
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingQuerySimplification() && isCTLQuery){
             rowOffset = displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations(), 1);
             if (result.getRawOutput() != null) {
-                JButton showRawQueryButton = new JButton("Show raw query results");
+                showRawQueryButton = new JButton("Show raw query results");
                 showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
                 gbc = GridBagHelper.as(1, rowOffset+1, WEST, new Insets(0,0,10,0));
                 panel.add(showRawQueryButton, gbc);
@@ -454,6 +455,14 @@ public class RunVerification extends RunVerificationBase {
             panel.add(new JLabel(toHTML("The query was resolved using Trace Abstraction Refinement.")), gbc);
         } else if (result.isSolvedUsingSiphonTrap()) {
             panel.add(new JLabel(toHTML("The query was resolved using Siphon Trap.")), gbc);
+        }
+
+		if (showRawQueryButton == null && result.getRawOutput() != null) {
+            showRawQueryButton = new JButton("Show raw query results");
+            showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
+            rowOffset++;
+            gbc = GridBagHelper.as(1, rowOffset+3, WEST, new Insets(0,0,10,0));
+            panel.add(showRawQueryButton, gbc);
         }
 		
 		gbc = GridBagHelper.as(0, rowOffset+4, WEST);
