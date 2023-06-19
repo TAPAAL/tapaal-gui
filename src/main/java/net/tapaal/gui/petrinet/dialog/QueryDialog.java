@@ -2258,14 +2258,13 @@ public class QueryDialog extends JPanel {
     }
 
     private void addExistsPathsHyperLTL(TCTLAbstractProperty oldProperty, TCTLAbstractProperty selection, String trace) {
-        if(!(selection instanceof TCTLStatePlaceHolder) && !(selection instanceof TCTLPathPlaceHolder)) {
+        if (!(selection instanceof TCTLStatePlaceHolder) && !(selection instanceof TCTLPathPlaceHolder)) {
             if(selection instanceof TCTLPathToStateConverter) {
                 TCTLAbstractProperty child = ((TCTLPathToStateConverter) selection).getProperty();
                 addExistsPathsHyperLTL(oldProperty, child, trace);
-            } else{
+            } else {
                 addExistsPathsHyperLTL(oldProperty, ((LTLENode) selection).getProperty(), trace);
             }
-
         } else {
             LTLENode parent = null;
             TCTLAbstractProperty child = null;
@@ -4636,10 +4635,9 @@ public class QueryDialog extends JPanel {
     }
 
     private void updateHyperLTLButtons() {
-        boolean isSelectionNull = currentSelection == null;
         showHyperLTL(true);
 
-        if (!isSelectionNull && currentSelection.getObject() == newProperty) {
+        if (currentSelection != null && currentSelection.getObject() == newProperty) {
             String ltlType = checkLTLType();
             disableAllLTLButtons();
             if (ltlType.equals("placeholder")) {
@@ -4665,6 +4663,16 @@ public class QueryDialog extends JPanel {
             finallyButton.setEnabled(true);
             nextButton.setEnabled(true);
             untilButton.setEnabled(true);
+        }
+
+        if (currentSelection != null && (currentSelection.getObject() instanceof LTLENode || currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof TCTLPathPlaceHolder)) {
+            conjunctionButton.setEnabled(false);
+            disjunctionButton.setEnabled(false);
+        } else {
+            conjunctionButton.setEnabled(true);
+            disjunctionButton.setEnabled(true);
+            aButton.setEnabled(false);
+            eButton.setEnabled(false);
         }
     }
 
