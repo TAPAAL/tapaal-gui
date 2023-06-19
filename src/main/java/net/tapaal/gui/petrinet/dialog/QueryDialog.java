@@ -1425,9 +1425,7 @@ public class QueryDialog extends JPanel {
     private void updateQueryOnQuantificationChange() {
         // trace for HyperLTL
         String selectedTrace = "";
-        boolean isHyperLTL = false;
-        if(queryType.getSelectedIndex() == 2) {
-            isHyperLTL = true;
+        if(queryType.getSelectedIndex() == 2 && traceBoxQuantification.getSelectedItem() != null) {
             selectedTrace = traceBoxQuantification.getSelectedItem().toString();
         }
 
@@ -3080,6 +3078,7 @@ public class QueryDialog extends JPanel {
         traceList = new JList();
         traceModel = new DefaultListModel();
         traceModel.addElement("T1");
+        traceModel.addElement("T2");
 
         for(int i = 0; i < traceList.getModel().getSize(); i++) {
             traceModel.addElement(traceList.getModel().getElementAt(i));
