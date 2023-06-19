@@ -41,6 +41,7 @@ import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.HyperLTLParsing.TAPAALHyperLTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
@@ -447,7 +448,7 @@ public class QueryDialog extends JPanel {
         TAPNQuery.SearchOption searchOption = getSearchOption();
         ReductionOption reductionOptionToSet = getReductionOption();
 
-        ArrayList<String> traceList = new ArrayList<String>();
+        ArrayList<String> traceList = new ArrayList<>();
         if(queryType.getSelectedIndex() == 2) {
             for (int i = 0; i < traceModel.getSize(); i++) {
                 traceList.add(traceModel.get(i).toString());
@@ -822,6 +823,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void updatePredicatesAccordingToSelection(TCTLAbstractProperty current) {
+        updateTraceBox();
         if (current instanceof TCTLAtomicPropositionNode) {
             TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) current;
 
@@ -1379,7 +1381,7 @@ public class QueryDialog extends JPanel {
         // trace for HyperLTL
         String selectedTrace = "";
         boolean isHyperLTL = false;
-        if(queryType.getSelectedIndex() == 2) {
+        if (queryType.getSelectedIndex() == 2) {
             isHyperLTL = true;
             selectedTrace = traceBox.getSelectedItem().toString();
         }
@@ -1421,21 +1423,30 @@ public class QueryDialog extends JPanel {
         }
     }
 
+    private void checkTraceBoxSelection() {
+        String selectedTrace = traceBox.getSelectedItem().toString();
+        if (!getQuery().getTraceList().contains(selectedTrace)) {
+            JOptionPane.showMessageDialog(
+                TAPAALGUI.getApp(),
+                "Cannot select a trace that is not declared in ",
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     // Used in HyperLTL to update queries with the 'A' or 'E' quantifier
     private void updateQueryOnQuantificationChange() {
         // trace for HyperLTL
         String selectedTrace = "";
-        if(queryType.getSelectedIndex() == 2 && traceBoxQuantification.getSelectedItem() != null) {
+        if (queryType.getSelectedIndex() == 2 && traceBoxQuantification.getSelectedItem() != null) {
             selectedTrace = traceBoxQuantification.getSelectedItem().toString();
         }
 
-        if(currentSelection != null &&
-            ((currentSelection.getObject() instanceof LTLANode) || currentSelection.getObject() instanceof LTLENode)
-            && queryType.getSelectedIndex() == 2) {
+        if (currentSelection != null && queryType.getSelectedIndex() == 2 &&
+                ((currentSelection.getObject() instanceof LTLANode) || currentSelection.getObject() instanceof LTLENode)) {
             TCTLAbstractPathProperty property;
             TCTLAbstractPathProperty currentProp = (TCTLAbstractPathProperty) currentSelection.getObject();
 
-            if(currentSelection.getObject() instanceof LTLANode) {
+            if (currentSelection.getObject() instanceof LTLANode) {
                 property = new LTLANode(((LTLANode)currentProp).getProperty(), selectedTrace);
             } else {
                 property = new LTLENode(((LTLENode)currentProp).getProperty(), selectedTrace);
@@ -3046,12 +3057,31 @@ public class QueryDialog extends JPanel {
 
     private void updateTraceBox() {
         // Updates the trace box drop down menu
-        Vector<Object> tracesVector = new Vector<Object>();
-        for(int i = 0; i < traceModel.getSize(); i++) {
-            tracesVector.add(traceModel.get(i));
+        ArrayList<String> traceList = getUsedTraces(newProperty);
+        Vector<Object> traceBoxVector = new Vector<>();
+        Vector<Object> traceBoxQuantificationVector = new Vector<>();
+        for (int i = 0; i < traceModel.getSize(); i++) {
+            if (traceList.contains(traceModel.get(i).toString()))
+                traceBoxVector.add(traceModel.get(i));
+            else
+                traceBoxQuantificationVector.add(traceModel.get(i));
         }
-        traceBox.setModel(new DefaultComboBoxModel<>(tracesVector));
-        traceBoxQuantification.setModel(new DefaultComboBoxModel<>(tracesVector));
+
+        traceBox.setModel(new DefaultComboBoxModel<>(traceBoxVector));
+        traceBoxQuantification.setModel(new DefaultComboBoxModel<>(traceBoxQuantificationVector));
+    }
+
+    private ArrayList<String> getUsedTraces(TCTLAbstractProperty current) {
+        ArrayList<String> usedTraces = new ArrayList<>();
+        if (current instanceof LTLANode) {
+            usedTraces.add(((LTLANode) current).getTrace());
+        } else if (current instanceof LTLENode) {
+            usedTraces.add(((LTLENode) current).getTrace());
+        }
+        for (StringPosition child : current.getChildren()) {
+            usedTraces.addAll(getUsedTraces(child.getObject()));
+        }
+        return usedTraces;
     }
 
     private void initTracePanels() {
@@ -3076,12 +3106,12 @@ public class QueryDialog extends JPanel {
         traceNameTextField.setText("");
 
         // Drop down menu for traces
-        Vector<Object> tracesVector = new Vector<Object>();
+        Vector<Object> tracesVector = new Vector<>();
         for(int i = 0; i < traceModel.getSize(); i++) {
             tracesVector.add(traceModel.get(i));
         }
 
-        traceBox = new JComboBox<>(new DefaultComboBoxModel<>(tracesVector));
+        traceBox = new JComboBox<>(new DefaultComboBoxModel<>());
         traceBoxQuantification = new JComboBox<>(new DefaultComboBoxModel<>(tracesVector));
 
         traceBox.addActionListener(e -> {
@@ -3435,8 +3465,8 @@ public class QueryDialog extends JPanel {
 
     private void exitTraceDialog() {
         updateTraceBox();
-        traceBox.setSelectedIndex(traceList.getModel().getSize() - 1);
-        traceBoxQuantification.setSelectedIndex(traceList.getModel().getSize() - 1);
+        traceBox.setSelectedIndex(traceBox.getItemCount() - 1);
+        traceBoxQuantification.setSelectedIndex(traceBoxQuantification.getItemCount() - 1);
         traceDialog.setVisible(false);
     }
 
@@ -4669,6 +4699,7 @@ public class QueryDialog extends JPanel {
             updateLTLButtons();
         } else if (selectedIndex == 2) {
             updateHyperLTLButtons();
+            updateTraceBox();
         }
     }
 
