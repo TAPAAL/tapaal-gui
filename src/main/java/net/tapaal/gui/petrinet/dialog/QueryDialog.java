@@ -2619,30 +2619,26 @@ public class QueryDialog extends JPanel {
     private void addUntimedQuantificationListeners() {
         addTimedQuantificationListeners();
 
-        existsNext.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLAbstractPathProperty property;
-                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    property = new TCTLEXNode((TCTLAbstractStateProperty) currentSelection.getObject());
-                } else {
-                    property = new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-                }
-                addPropertyToQuery(property);
+        existsNext.addActionListener(e -> {
+            TCTLAbstractPathProperty property;
+            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                property = new TCTLEXNode((TCTLAbstractStateProperty) currentSelection.getObject());
+            } else {
+                property = new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             }
+            addPropertyToQuery(property);
         });
 
-        existsUntil.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLAbstractPathProperty property;
-                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    property = new TCTLEUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
-                        new TCTLStatePlaceHolder());
-                } else {
-                    property = new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-                        getSpecificChildOfProperty(2, currentSelection.getObject()));
-                }
-                addPropertyToQuery(property);
+        existsUntil.addActionListener(e -> {
+            TCTLAbstractPathProperty property;
+            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                property = new TCTLEUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
+                    new TCTLStatePlaceHolder());
+            } else {
+                property = new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+                    getSpecificChildOfProperty(2, currentSelection.getObject()));
             }
+            addPropertyToQuery(property);
         });
 
         globallyButton.addActionListener(e -> {
@@ -2657,116 +2653,104 @@ public class QueryDialog extends JPanel {
             unselectButtons();
         });
 
-        forAllNext.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLAbstractPathProperty property;
-                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    property = new TCTLAXNode((TCTLAbstractStateProperty) currentSelection.getObject());
-                } else {
-                    property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-                }
-                addPropertyToQuery(property);
+        forAllNext.addActionListener(e -> {
+            TCTLAbstractPathProperty property;
+            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                property = new TCTLAXNode((TCTLAbstractStateProperty) currentSelection.getObject());
+            } else {
+                property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             }
+            addPropertyToQuery(property);
         });
 
-        forAllUntil.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLAbstractPathProperty property;
-                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    property = new TCTLAUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
-                        new TCTLStatePlaceHolder());
-                } else {
-                    property = new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-                        getSpecificChildOfProperty(2, currentSelection.getObject()));
-                }
-                addPropertyToQuery(property);
+        forAllUntil.addActionListener(e -> {
+            TCTLAbstractPathProperty property;
+            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                property = new TCTLAUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
+                    new TCTLStatePlaceHolder());
+            } else {
+                property = new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+                    getSpecificChildOfProperty(2, currentSelection.getObject()));
             }
+            addPropertyToQuery(property);
         });
 
-        nextButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLAbstractPathProperty property;
-                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    property = new LTLXNode((TCTLAbstractStateProperty) currentSelection.getObject());
-                } else {
-                    property = new LTLXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-                }
-                addPropertyToQuery(property);
+        nextButton.addActionListener(e -> {
+            TCTLAbstractPathProperty property;
+            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                property = new LTLXNode((TCTLAbstractStateProperty) currentSelection.getObject());
+            } else {
+                property = new LTLXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             }
+            addPropertyToQuery(property);
         });
 
-        untilButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLAbstractPathProperty property;
-                if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    property = new LTLUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
-                        new TCTLStatePlaceHolder());
-                } else {
-                    property = new LTLUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-                        getSpecificChildOfProperty(2, currentSelection.getObject()));
-                }
-                addPropertyToQuery(property);
+        untilButton.addActionListener(e -> {
+            TCTLAbstractPathProperty property;
+            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                property = new LTLUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
+                    new TCTLStatePlaceHolder());
+            } else {
+                property = new LTLUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
+                    getSpecificChildOfProperty(2, currentSelection.getObject()));
             }
+            addPropertyToQuery(property);
         });
 
-        aButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLAbstractProperty oldProperty = newProperty;
+        aButton.addActionListener(e -> {
+            TCTLAbstractProperty oldProperty = newProperty;
 
-                if (!(queryType.getSelectedIndex() == 2)) {
-                    newProperty = removeExistsAllPathsFromProperty(newProperty);
-                    addAllPathsToProperty(newProperty, null);
+            if (!(queryType.getSelectedIndex() == 2)) {
+                newProperty = removeExistsAllPathsFromProperty(newProperty);
+                addAllPathsToProperty(newProperty, null);
+            } else {
+                // Check if there already exists an all-path with the current trace
+                String selectedTrace = traceBoxQuantification.getSelectedItem().toString();
+                if(oldProperty.toString().contains("A " + selectedTrace)) {
+                    JOptionPane.showMessageDialog(
+                        TAPAALGUI.getApp(),
+                        "An all-path with trace \"" + selectedTrace + "\" already exists. Please chose a different trace.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                    isAllPath = true;
                 } else {
-                    // Check if there already exists an all-path with the current trace
-                    String selectedTrace = traceBoxQuantification.getSelectedItem().toString();
-                    if(oldProperty.toString().contains("A " + selectedTrace)) {
-                        JOptionPane.showMessageDialog(
-                            TAPAALGUI.getApp(),
-                            "An all-path with trace \"" + selectedTrace + "\" already exists. Please chose a different trace.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                        isAllPath = true;
-                    } else {
-                        addAllPathsToProperty(newProperty, oldProperty);
-                        isAllPath = true;
-                    }
+                    addAllPathsToProperty(newProperty, oldProperty);
+                    isAllPath = true;
                 }
-
-                UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
-                undoSupport.postEdit(edit);
-
-                queryChanged();
             }
+
+            UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
+            undoSupport.postEdit(edit);
+
+            queryChanged();
         });
 
-        eButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLAbstractProperty oldProperty = newProperty;
+        eButton.addActionListener(e -> {
+            TCTLAbstractProperty oldProperty = newProperty;
 
-                if(!(queryType.getSelectedIndex() == 2)) {
-                    newProperty = removeExistsAllPathsFromProperty(newProperty);
-                    addExistsPathsToProperty(newProperty, null);
+            if (!(queryType.getSelectedIndex() == 2)) {
+                newProperty = removeExistsAllPathsFromProperty(newProperty);
+                addExistsPathsToProperty(newProperty, null);
+            } else {
+                // Check if there already exists an exists-path with the current trace
+                String selectedTrace = traceBoxQuantification.getSelectedItem().toString();
+                if (oldProperty.toString().contains("E " + selectedTrace)) {
+                    JOptionPane.showMessageDialog(
+                        TAPAALGUI.getApp(),
+                        "An exists-path with trace \"" + selectedTrace + "\" already exists. Please chose a different trace.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                    isAllPath = false;
                 } else {
-                    // Check if there already exists an exists-path with the current trace
-                    String selectedTrace = traceBoxQuantification.getSelectedItem().toString();
-                    if(oldProperty.toString().contains("E " + selectedTrace)) {
-                        JOptionPane.showMessageDialog(
-                            TAPAALGUI.getApp(),
-                            "An exists-path with trace \"" + selectedTrace + "\" already exists. Please chose a different trace.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                        isAllPath = false;
-                    } else {
-                        addExistsPathsToProperty(newProperty, oldProperty);
-                        isAllPath = false;
-                    }
+                    addExistsPathsToProperty(newProperty, oldProperty);
+                    isAllPath = false;
                 }
-
-
-                UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
-                undoSupport.postEdit(edit);
-
-                queryChanged();
-
             }
+
+
+            UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
+            undoSupport.postEdit(edit);
+
+            queryChanged();
+
         });
 
         addTraceButton.addActionListener(e -> initTraceBoxDialogComponents());
@@ -2915,74 +2899,70 @@ public class QueryDialog extends JPanel {
         queryPanel.add(logicButtonPanel, gbc);
 
         // Add Action listener for logic buttons
-        conjunctionButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                TCTLAndListNode andListNode = null;
-                if (currentSelection.getObject() instanceof TCTLAndListNode) {
-                    andListNode = new TCTLAndListNode((TCTLAndListNode) currentSelection.getObject());
-                    andListNode.addConjunct(new TCTLStatePlaceHolder());
-                    addPropertyToQuery(andListNode);
-                } else if (currentSelection.getObject() instanceof TCTLOrListNode) {
-                    andListNode = new TCTLAndListNode(((TCTLOrListNode) currentSelection.getObject()).getProperties());
-                    addPropertyToQuery(andListNode);
-                } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection
-                        .getObject();
-                    TCTLAbstractProperty parentNode = prop.getParent();
+        conjunctionButton.addActionListener(evt -> {
+            TCTLAndListNode andListNode = null;
+            if (currentSelection.getObject() instanceof TCTLAndListNode) {
+                andListNode = new TCTLAndListNode((TCTLAndListNode) currentSelection.getObject());
+                andListNode.addConjunct(new TCTLStatePlaceHolder());
+                addPropertyToQuery(andListNode);
+            } else if (currentSelection.getObject() instanceof TCTLOrListNode) {
+                andListNode = new TCTLAndListNode(((TCTLOrListNode) currentSelection.getObject()).getProperties());
+                addPropertyToQuery(andListNode);
+            } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection
+                    .getObject();
+                TCTLAbstractProperty parentNode = prop.getParent();
 
-                    if (parentNode instanceof TCTLAndListNode) {
-                        // current selection is child of an andList node => add
-                        // new placeholder conjunct to it
-                        andListNode = new TCTLAndListNode((TCTLAndListNode) parentNode);
-                        andListNode.addConjunct(new TCTLStatePlaceHolder());
-                        UndoableEdit edit = new QueryConstructionEdit(parentNode, andListNode);
-                        newProperty = newProperty.replace(parentNode, andListNode);
-                        updateSelection(andListNode);
-                        undoSupport.postEdit(edit);
-                        queryChanged();
-                    } else {
-                        TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-                        andListNode = new TCTLAndListNode(getStateProperty(currentSelection.getObject()), ph);
-                        addPropertyToQuery(andListNode);
-                    }
-                } else if (!lens.isTimed()) {
-                    checkUntimedAndNode();
+                if (parentNode instanceof TCTLAndListNode) {
+                    // current selection is child of an andList node => add
+                    // new placeholder conjunct to it
+                    andListNode = new TCTLAndListNode((TCTLAndListNode) parentNode);
+                    andListNode.addConjunct(new TCTLStatePlaceHolder());
+                    UndoableEdit edit = new QueryConstructionEdit(parentNode, andListNode);
+                    newProperty = newProperty.replace(parentNode, andListNode);
+                    updateSelection(andListNode);
+                    undoSupport.postEdit(edit);
+                    queryChanged();
+                } else {
+                    TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+                    andListNode = new TCTLAndListNode(getStateProperty(currentSelection.getObject()), ph);
+                    addPropertyToQuery(andListNode);
                 }
+            } else if (!lens.isTimed()) {
+                checkUntimedAndNode();
             }
         });
 
-        disjunctionButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLOrListNode orListNode;
-                if (currentSelection.getObject() instanceof TCTLOrListNode) {
-                    orListNode = new TCTLOrListNode((TCTLOrListNode) currentSelection.getObject());
-                    orListNode.addDisjunct(new TCTLStatePlaceHolder());
-                    addPropertyToQuery(orListNode);
-                } else if (currentSelection.getObject() instanceof TCTLAndListNode) {
-                    orListNode = new TCTLOrListNode(((TCTLAndListNode) currentSelection.getObject()).getProperties());
-                    addPropertyToQuery(orListNode);
-                } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                    TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection.getObject();
-                    TCTLAbstractProperty parentNode = prop.getParent();
+        disjunctionButton.addActionListener(e -> {
+            TCTLOrListNode orListNode;
+            if (currentSelection.getObject() instanceof TCTLOrListNode) {
+                orListNode = new TCTLOrListNode((TCTLOrListNode) currentSelection.getObject());
+                orListNode.addDisjunct(new TCTLStatePlaceHolder());
+                addPropertyToQuery(orListNode);
+            } else if (currentSelection.getObject() instanceof TCTLAndListNode) {
+                orListNode = new TCTLOrListNode(((TCTLAndListNode) currentSelection.getObject()).getProperties());
+                addPropertyToQuery(orListNode);
+            } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection.getObject();
+                TCTLAbstractProperty parentNode = prop.getParent();
 
-                    if (parentNode instanceof TCTLOrListNode) {
-                        // current selection is child of an orList node => add
-                        // new placeholder disjunct to it
-                        orListNode = new TCTLOrListNode((TCTLOrListNode) parentNode);
-                        orListNode.addDisjunct(new TCTLStatePlaceHolder());
-                        UndoableEdit edit = new QueryConstructionEdit(parentNode, orListNode);
-                        newProperty = newProperty.replace(parentNode, orListNode);
-                        updateSelection(orListNode);
-                        undoSupport.postEdit(edit);
-                        queryChanged();
-                    } else {
-                        TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-                        orListNode = new TCTLOrListNode(getStateProperty(currentSelection.getObject()), ph);
-                        addPropertyToQuery(orListNode);
-                    }
-                } else if (!lens.isTimed()) {
-                    checkUntimedOrNode();
+                if (parentNode instanceof TCTLOrListNode) {
+                    // current selection is child of an orList node => add
+                    // new placeholder disjunct to it
+                    orListNode = new TCTLOrListNode((TCTLOrListNode) parentNode);
+                    orListNode.addDisjunct(new TCTLStatePlaceHolder());
+                    UndoableEdit edit = new QueryConstructionEdit(parentNode, orListNode);
+                    newProperty = newProperty.replace(parentNode, orListNode);
+                    updateSelection(orListNode);
+                    undoSupport.postEdit(edit);
+                    queryChanged();
+                } else {
+                    TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+                    orListNode = new TCTLOrListNode(getStateProperty(currentSelection.getObject()), ph);
+                    addPropertyToQuery(orListNode);
                 }
+            } else if (!lens.isTimed()) {
+                checkUntimedOrNode();
             }
         });
 
@@ -3638,63 +3618,54 @@ public class QueryDialog extends JPanel {
         deadLockPredicateButton.setToolTipText(TOOL_TIP_DEADLOCKPREDICATEBUTTON);
 
         // Action listeners for predicate panel
-        addPredicateButton.addActionListener(new ActionListener() {
+        addPredicateButton.addActionListener(e -> {
+            String template = templateBox.getSelectedItem().toString();
+            if (template.equals(SHARED)) template = "";
 
-            public void actionPerformed(ActionEvent e) {
-                String template = templateBox.getSelectedItem().toString();
-                if(template.equals(SHARED)) template = "";
-
-                if ((!lens.isTimed()) && transitionIsSelected()) {
-                    if(queryType.getSelectedIndex() == 2) {
-                        String trace = traceBox.getSelectedItem().toString();
-                        addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem(), trace));
-                    } else {
-                        addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem()));
-                    }
+            if ((!lens.isTimed()) && transitionIsSelected()) {
+                if (queryType.getSelectedIndex() == 2) {
+                    String trace = traceBox.getSelectedItem().toString();
+                    addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem(), trace));
                 } else {
-                    if(queryType.getSelectedIndex() == 2) {
-                        TCTLAtomicPropositionNode property =
-                            new TCTLAtomicPropositionNode (
-                                new HyperLTLPathScopeNode (
-                                    new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()),
-                                    traceBox.getSelectedItem().toString())
-                                ,
-                                (String) relationalOperatorBox.getSelectedItem(),
-                                new TCTLConstNode((Integer) placeMarking.getValue())
-                            );
-                        addPropertyToQuery(property);
-                    } else {
-                        TCTLAtomicPropositionNode property =
-                            new TCTLAtomicPropositionNode (
+                    addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem()));
+                }
+            } else {
+                if (queryType.getSelectedIndex() == 2) {
+                    TCTLAtomicPropositionNode property =
+                        new TCTLAtomicPropositionNode (
+                            new HyperLTLPathScopeNode (
                                 new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()),
-                                (String) relationalOperatorBox.getSelectedItem(),
-                                new TCTLConstNode((Integer) placeMarking.getValue())
-                            );
-                        addPropertyToQuery(property);
-                    }
+                                traceBox.getSelectedItem().toString()
+                            ),
+                            (String) relationalOperatorBox.getSelectedItem(),
+                            new TCTLConstNode((Integer) placeMarking.getValue())
+                        );
+                    addPropertyToQuery(property);
+                } else {
+                    TCTLAtomicPropositionNode property =
+                        new TCTLAtomicPropositionNode (
+                            new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()),
+                            (String) relationalOperatorBox.getSelectedItem(),
+                            new TCTLConstNode((Integer) placeMarking.getValue())
+                        );
+                    addPropertyToQuery(property);
                 }
             }
         });
 
-        truePredicateButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLTrueNode trueNode = new TCTLTrueNode();
-                addPropertyToQuery(trueNode);
-            }
+        truePredicateButton.addActionListener(e -> {
+            TCTLTrueNode trueNode = new TCTLTrueNode();
+            addPropertyToQuery(trueNode);
         });
 
-        falsePredicateButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLFalseNode falseNode = new TCTLFalseNode();
-                addPropertyToQuery(falseNode);
-            }
+        falsePredicateButton.addActionListener(e -> {
+            TCTLFalseNode falseNode = new TCTLFalseNode();
+            addPropertyToQuery(falseNode);
         });
 
-        deadLockPredicateButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                TCTLDeadlockNode deadLockNode = new TCTLDeadlockNode();
-                addPropertyToQuery(deadLockNode);
-            }
+        deadLockPredicateButton.addActionListener(e -> {
+            TCTLDeadlockNode deadLockNode = new TCTLDeadlockNode();
+            addPropertyToQuery(deadLockNode);
         });
 
         placeTransitionBox.addActionListener(e -> {
@@ -4744,188 +4715,173 @@ public class QueryDialog extends JPanel {
                     }
                 }
             });
-            saveAndVerifyButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    if (checkIfSomeReductionOption()) {
-                        querySaved = true;
-                        // Now if a query is saved and verified, the net is marked as modified
-                        tab.setNetChanged(true);
-                        exit();
-                        TAPNQuery query = getQuery();
+            saveAndVerifyButton.addActionListener(evt -> {
+                if (checkIfSomeReductionOption()) {
+                    querySaved = true;
+                    // Now if a query is saved and verified, the net is marked as modified
+                    tab.setNetChanged(true);
+                    exit();
+                    TAPNQuery query = getQuery();
 
-                        if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN) {
-                            Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false, lens);
-                        } else{
-                            Verifier.runUppaalVerification(tapnNetwork, query);
-                        }
-                    }}
-            });
+                    if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN) {
+                        Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false, lens);
+                    } else {
+                        Verifier.runUppaalVerification(tapnNetwork, query);
+                    }
+                }});
             cancelButton.addActionListener(evt -> cancelAndExit());
 
-            saveUppaalXMLButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    querySaved = true;
+            saveUppaalXMLButton.addActionListener(e -> {
+                querySaved = true;
 
-                    String xmlFile = null, queryFile = null;
-                    ReductionOption reduction = getReductionOption();
-                    try {
-                        FileBrowser browser = FileBrowser.constructor(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN || reduction == ReductionOption.VerifyPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
-                        xmlFile = browser.saveFile();
-                        if (xmlFile != null) {
-                            String[] a = xmlFile.split(".xml");
-                            queryFile = a[0] + ".q";
-                        }
-
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
-                            "There were errors performing the requested action:\n"
-                                + e, "Error",
-                            JOptionPane.ERROR_MESSAGE);
+                String xmlFile = null, queryFile = null;
+                ReductionOption reduction = getReductionOption();
+                try {
+                    FileBrowser browser = FileBrowser.constructor(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN || reduction == ReductionOption.VerifyPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
+                    xmlFile = browser.saveFile();
+                    if (xmlFile != null) {
+                        String[] a = xmlFile.split(".xml");
+                        queryFile = a[0] + ".q";
                     }
-
-                    if (xmlFile != null && queryFile != null) {
-                        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
-                        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
-
-                        if (overApproximationEnable.isSelected())
-                        {
-                            OverApproximation overaprx = new OverApproximation();
-                            overaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
-                        }
-                        else if (underApproximationEnable.isSelected())
-                        {
-                            UnderApproximation underaprx = new UnderApproximation();
-                            underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
-                        }
-
-                        TAPNQuery tapnQuery = getQuery();
-                        dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity());
-
-                        RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
-                        clonedQuery.getProperty().accept(visitor, null);
-                        if (!lens.isTimed()) {
-                            RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(transformedModel.value2());
-                            clonedQuery.getProperty().accept(transitionVisitor, null);
-                        }
-                        if (lens.isColored() && lens.isTimed()) {
-                            exportTACPN(transformedModel, xmlFile);
-                        } else if (lens.isColored()) {
-                            VerifyCPNExporter exporter = new VerifyCPNExporter();
-                            exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
-
-                        } else if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN) {
-                            VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-                            exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
-
-                        } else if(reduction == ReductionOption.VerifyPN){
-                            VerifyPNExporter exporter = new VerifyPNExporter();
-                            exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
-
-						} else {
-							UppaalExporter exporter = new UppaalExporter();
-							try {
-								exporter.export(transformedModel.value1(), clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile), tapnQuery.useSymmetry());
-							} catch (Exception exportException) {
-								StringBuilder s = new StringBuilder();
-								if (exportException instanceof UnsupportedModelException)
-									s.append(UNSUPPORTED_MODEL_TEXT + "\n\n");
-								else if (exportException instanceof UnsupportedQueryException)
-									s.append(UNSUPPORTED_QUERY_TEXT + "\n\n");
-                                if (reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN || reduction == ReductionOption.VerifyPN)
-                                    s.append(NO_VERIFYTAPN_XML_FILE_SAVED);
-                                else
-                                    s.append(NO_UPPAAL_XML_FILE_SAVED);
-
-                                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), s.toString());
-                            }
-                        }
-                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
+                        "There were errors performing the requested action:\n"
+                            + e, "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 }
-            });
 
-            mergeNetComponentsButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
-                    Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
+                if (xmlFile != null && queryFile != null) {
+                    ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+                    Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 
-                    ArrayList<Template> templates = new ArrayList<Template>(1);
-                    querySaved = true;	//Setting this to true will make sure that new values will be used.
-                    if (overApproximationEnable.isSelected())
-                    {
+                    if (overApproximationEnable.isSelected()) {
                         OverApproximation overaprx = new OverApproximation();
                         overaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
                     }
-                    else if (underApproximationEnable.isSelected())
-                    {
+                    else if (underApproximationEnable.isSelected()) {
                         UnderApproximation underaprx = new UnderApproximation();
-                        underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), composer.getGuiModel());
+                        underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
                     }
-                    templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
 
-                    TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+                    TAPNQuery tapnQuery = getQuery();
+                    dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity());
 
-                    network.add(transformedModel.value1());
-                    network.setColorTypes(tapnNetwork.colorTypes());
-                    network.setConstants(tapnNetwork.constants());
-                    network.setVariables(tapnNetwork.variables());
+                    RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
+                    clonedQuery.getProperty().accept(visitor, null);
+                    if (!lens.isTimed()) {
+                        RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(transformedModel.value2());
+                        clonedQuery.getProperty().accept(transitionVisitor, null);
+                    }
+                    if (lens.isColored() && lens.isTimed()) {
+                        exportTACPN(transformedModel, xmlFile);
+                    } else if (lens.isColored()) {
+                        VerifyCPNExporter exporter = new VerifyCPNExporter();
+                        exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
 
-                    NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<TAPNQuery>(0), new ArrayList<Constant>(0), lens);
+                    } else if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN) {
+                        VerifyTAPNExporter exporter = new VerifyTAPNExporter();
+                        exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
 
-                    try {
-                        ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-                        String composedName = "composed-" + tab.getTabTitle();
-                        composedName = composedName.replace(".tapn", "");
-                        TAPAALGUI.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
-                        exit();
-                    } catch (Exception e1) {
-                        System.console().printf(e1.getMessage());
+                    } else if(reduction == ReductionOption.VerifyPN){
+                        VerifyPNExporter exporter = new VerifyPNExporter();
+                        exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery, lens, transformedModel.value2(), composer.getGuiModel());
+
+                    } else {
+                        UppaalExporter exporter = new UppaalExporter();
+                        try {
+                            exporter.export(transformedModel.value1(), clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile), tapnQuery.useSymmetry());
+                        } catch (Exception exportException) {
+                            StringBuilder s = new StringBuilder();
+                            if (exportException instanceof UnsupportedModelException)
+                                s.append(UNSUPPORTED_MODEL_TEXT + "\n\n");
+                            else if (exportException instanceof UnsupportedQueryException)
+                                s.append(UNSUPPORTED_QUERY_TEXT + "\n\n");
+                            if (reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyDTAPN || reduction == ReductionOption.VerifyPN)
+                                s.append(NO_VERIFYTAPN_XML_FILE_SAVED);
+                            else
+                                s.append(NO_UPPAAL_XML_FILE_SAVED);
+
+                            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), s.toString());
+                        }
                     }
                 }
             });
-            openReducedNetButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (checkIfSomeReductionOption()) {
-                        querySaved = true;
-                        // Now if a query is saved and verified, the net is marked as modified
-                        tab.setNetChanged(true);
 
-                        TAPNQuery query = getQuery();
-                        if(query.getReductionOption() != ReductionOption.VerifyPN) {
-                            JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
-                                "The selected verification engine does not support application of reduction rules",
-                                "Reduction rules unsupported", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
+            mergeNetComponentsButton.addActionListener(e -> {
+                TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
+                Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 
-                        exit();
+                ArrayList<Template> templates = new ArrayList<Template>(1);
+                querySaved = true;	//Setting this to true will make sure that new values will be used.
+                if (overApproximationEnable.isSelected()) {
+                    OverApproximation overaprx = new OverApproximation();
+                    overaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator());
+                }
+                else if (underApproximationEnable.isSelected()) {
+                    UnderApproximation underaprx = new UnderApproximation();
+                    underaprx.modifyTAPN(transformedModel.value1(), getQuery().approximationDenominator(), composer.getGuiModel());
+                }
+                templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
 
-                        Verifier.runVerifyTAPNVerification(tapnNetwork, query,null, guiModels, true, null);
+                TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 
-                        File reducedNetFile = new File(Verifier.getReducedNetFilePath());
+                network.add(transformedModel.value1());
+                network.setColorTypes(tapnNetwork.colorTypes());
+                network.setConstants(tapnNetwork.constants());
+                network.setVariables(tapnNetwork.variables());
 
-                        if(reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()){
-                            try {
-                                PetriNetTab reducedNetTab = PetriNetTab.createNewTabFromPNMLFile(reducedNetFile);
-                                //Ensure that a net was created by the query reduction
-                                if(reducedNetTab.currentTemplate().guiModel().getPlaces().length > 0
-                                    || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0){
-                                    reducedNetTab.setInitialName("reduced-" + tab.getTabTitle());
-                                    TAPNQuery convertedQuery = query.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
-                                    reducedNetTab.addQuery(convertedQuery);
-                                    TAPAALGUI.openNewTabFromStream(reducedNetTab);
-                                }
-                            } catch (Exception e1){
-                                JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
-                                    e1.getMessage(),
-                                    "Error loading reduced net file",
-                                    JOptionPane.ERROR_MESSAGE);
+                NetWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<TAPNQuery>(0), new ArrayList<Constant>(0), lens);
+
+                try {
+                    ByteArrayOutputStream outputStream = tapnWriter.savePNML();
+                    String composedName = "composed-" + tab.getTabTitle();
+                    composedName = composedName.replace(".tapn", "");
+                    TAPAALGUI.openNewTabFromStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+                    exit();
+                } catch (Exception e1) {
+                    System.console().printf(e1.getMessage());
+                }
+            });
+            openReducedNetButton.addActionListener(e -> {
+                if (checkIfSomeReductionOption()) {
+                    querySaved = true;
+                    // Now if a query is saved and verified, the net is marked as modified
+                    tab.setNetChanged(true);
+
+                    TAPNQuery query = getQuery();
+                    if (query.getReductionOption() != ReductionOption.VerifyPN) {
+                        JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
+                            "The selected verification engine does not support application of reduction rules",
+                            "Reduction rules unsupported", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    exit();
+
+                    Verifier.runVerifyTAPNVerification(tapnNetwork, query,null, guiModels, true, null);
+
+                    File reducedNetFile = new File(Verifier.getReducedNetFilePath());
+
+                    if (reducedNetFile.exists() && reducedNetFile.isFile() && reducedNetFile.canRead()) {
+                        try {
+                            PetriNetTab reducedNetTab = PetriNetTab.createNewTabFromPNMLFile(reducedNetFile);
+                            //Ensure that a net was created by the query reduction
+                            if (reducedNetTab.currentTemplate().guiModel().getPlaces().length > 0
+                                    || reducedNetTab.currentTemplate().guiModel().getTransitions().length > 0) {
+                                reducedNetTab.setInitialName("reduced-" + tab.getTabTitle());
+                                TAPNQuery convertedQuery = query.convertPropertyForReducedNet(reducedNetTab.currentTemplate().toString());
+                                reducedNetTab.addQuery(convertedQuery);
+                                TAPAALGUI.openNewTabFromStream(reducedNetTab);
                             }
+                        } catch (Exception e1) {
+                            JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
+                                e1.getMessage(),
+                                "Error loading reduced net file",
+                                JOptionPane.ERROR_MESSAGE);
                         }
                     }
                 }
             });
-
-
         } else if (option == QueryDialogueOption.Export) {
             saveButton = new JButton("export");
             cancelButton = new JButton("Cancel");
@@ -4944,19 +4900,14 @@ public class QueryDialog extends JPanel {
             leftButtomPanel.add(openReducedNetButton, FlowLayout.LEFT);
             leftButtomPanel.add(saveUppaalXMLButton, FlowLayout.LEFT);
 
-
             rightButtomPanel.add(cancelButton);
-
             rightButtomPanel.add(saveButton);
-
             rightButtomPanel.add(saveAndVerifyButton);
 
             buttonPanel.add(leftButtomPanel, BorderLayout.LINE_START);
             buttonPanel.add(rightButtomPanel, BorderLayout.LINE_END);
-
         } else {
             buttonPanel.add(cancelButton);
-
             buttonPanel.add(saveButton);
         }
 
