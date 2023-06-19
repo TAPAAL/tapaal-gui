@@ -33,8 +33,7 @@ import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.File;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
@@ -91,8 +90,17 @@ public class RunVerification extends RunVerificationBase {
                                 TAPAALGUI.openNewTabFromStream(result.getUnfoldedTab());
                             } else return false;
                         }
-                        if (result.getTraceMap() == null) TAPAALGUI.getAnimator().setTrace(result.getTrace());
-                        else TAPAALGUI.getAnimator().setTrace(result.getTrace(), result.getTraceMap());
+                        if (result.getTraceMap() == null) {
+                            TAPAALGUI.getAnimator().setTrace(result.getTrace());
+                        } else {
+                            Map<String, TAPNNetworkTrace> traceMap = new HashMap<>();
+                            for (String key : result.getTraceMap().keySet()) {
+                                if (query.toString().contains(key)) {
+                                    traceMap.put(key, result.getTraceMap().get(key));
+                                }
+                            }
+                            TAPAALGUI.getAnimator().setTrace(result.getTrace(), traceMap);
+                        }
                     } else {
                         if ((
                             //XXX: this is not complete, we need a better way to signal the engine could not create a trace
