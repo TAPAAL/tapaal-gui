@@ -282,6 +282,7 @@ public class QueryDialog extends JPanel {
     private boolean wasHyperLTLType = true;
     private boolean isAllPath = false;
     private boolean updateTraceBox = true;
+    private boolean updateTraceBoxQuantification = true;
 
     //Strings for tool tips
     //Tool tips for top panel
@@ -3116,7 +3117,9 @@ public class QueryDialog extends JPanel {
         traceBox.addActionListener(e -> {
             if (updateTraceBox) updateQueryOnAtomicPropositionChange();
         });
-        traceBoxQuantification.addActionListener(e -> updateQueryOnQuantificationChange());
+        traceBoxQuantification.addActionListener(e -> {
+            if (updateTraceBoxQuantification) updateQueryOnQuantificationChange();
+        });
 
         traceBox.setToolTipText(TOOL_TIP_TRACEBOX);
         traceBoxQuantification.setToolTipText(TOOL_TIP_TRACEBOX_QUANTIFICATION);
@@ -3465,7 +3468,9 @@ public class QueryDialog extends JPanel {
     private void exitTraceDialog() {
         updateTraceBox();
         traceBox.setSelectedIndex(traceBox.getItemCount() - 1);
+        updateTraceBoxQuantification = false;
         traceBoxQuantification.setSelectedIndex(traceBoxQuantification.getItemCount() - 1);
+        updateTraceBoxQuantification = true;
         traceDialog.setVisible(false);
     }
 
