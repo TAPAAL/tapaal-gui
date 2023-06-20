@@ -3882,17 +3882,32 @@ public class QueryDialog extends JPanel {
 
     private void checkTraceNamesForManuallyParsedQuery(TCTLAbstractProperty newQuery) {
         HyperLTLTraceNameVisitor traceNameVisitor = new HyperLTLTraceNameVisitor();
-        boolean traceResult = traceNameVisitor.getTraceContext(newQuery).getResult();
+        HyperLTLTraceNameVisitor.Context traceContext = traceNameVisitor.getTraceContext(newQuery);
 
-        if (!traceResult) {
-            String message = "The specified query has duplicate traces in either the E or A quantification nodes.\n" +
-                "You may only use different traces for each E or A, i.e.:\n" +
-                "E T1 (E T2 (...)) is legal, whereas \n" +
-                "E T1 (E T1 (...)) is illegal.\n" +
-                "The specified query has not been saved. Do you want to edit it again?";
+        if (!traceContext.getResult()) {
+            StringBuilder message = new StringBuilder("The parsed query does not conform with the syntax supported for Hyper-LTL in TAPAAL.\n\n");
 
+            ArrayList<String> traceList = getUsedTraces(newQuery);
+            for (String traceName : traceContext.getTraceNames()) {
+                if (!traceList.contains(traceName)) {
+                    message.append("The specified query contains a trace that is not in either E or A quantification nodes.\n")
+                        .append("You may only use traces that are present in E or A, i.e.:\n")
+                        .append("E T1 (T1...)) is legal, whereas \n")
+                        .append("E T1 (T2...)) is illegal.\n\n");
+                    break;
+                }
+            }
+
+            if (message.toString().endsWith("TAPAAL.\n\n")) {
+                message.append("The specified query has duplicate traces in either the E or A quantification nodes.\n")
+                    .append("You may only use different traces for each E or A, i.e.:\n")
+                    .append("E T1 (E T2 (...)) is legal, whereas \n")
+                    .append("E T1 (E T1 (...)) is illegal.\n\n");
+            }
+
+            message.append("The specified query has not been saved. Do you want to edit it again?");
             int choice = JOptionPane.showConfirmDialog(
-                TAPAALGUI.getApp(), message,
+                TAPAALGUI.getApp(), message.toString(),
                 "Error Parsing Query",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.ERROR_MESSAGE);

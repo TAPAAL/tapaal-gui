@@ -24,6 +24,7 @@ public class HyperLTLTraceNameVisitor extends VisitorBase {
         Context c = (Context) context;
         if(!c.getTraceNames().contains(pathScopeNode.getTrace())) {
             c.getTraceNames().add(pathScopeNode.getTrace());
+            c.setResult(false);
         }
 
         pathScopeNode.getProperty().accept(this, context);
@@ -125,9 +126,7 @@ public class HyperLTLTraceNameVisitor extends VisitorBase {
     }
 
     @Override
-    public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
-                      Object context) {
-
+    public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
         atomicPropositionNode.getLeft().accept(this, context);
         atomicPropositionNode.getRight().accept(this, context);
     }
