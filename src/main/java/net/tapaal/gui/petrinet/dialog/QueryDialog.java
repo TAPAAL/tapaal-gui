@@ -3118,7 +3118,7 @@ public class QueryDialog extends JPanel {
             if (updateTraceBox) updateQueryOnAtomicPropositionChange();
         });
         traceBoxQuantification.addActionListener(e -> {
-            if (updateTraceBoxQuantification) updateQueryOnQuantificationChange();
+            if (checkTraceBoxQuantification() && updateTraceBoxQuantification) updateQueryOnQuantificationChange();
         });
 
         traceBox.setToolTipText(TOOL_TIP_TRACEBOX);
@@ -3151,6 +3151,18 @@ public class QueryDialog extends JPanel {
         traceRow.add(traceBox);
         gbc.gridy = 0;
         predicatePanel.add(traceRow, gbc);
+    }
+
+    private boolean checkTraceBoxQuantification() {
+        if (currentSelection == null || currentSelection.getObject() != newProperty || traceBoxQuantification.getSelectedItem() == null) return false;
+
+        String traceName = traceBoxQuantification.getSelectedItem().toString();
+        for (int i = 0; i < traceBox.getModel().getSize(); i++) {
+            if (traceName.equals(traceBox.getModel().getElementAt(i).toString())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void initTraceBoxDialogComponents() {
