@@ -2738,10 +2738,10 @@ public class QueryDialog extends JPanel {
         eButton.addActionListener(e -> {
             TCTLAbstractProperty oldProperty = newProperty;
 
-            if (!(queryType.getSelectedIndex() == 2)) {
+            if (queryType.getSelectedIndex() != 2) {
                 newProperty = removeExistsAllPathsFromProperty(newProperty);
                 addExistsPathsToProperty(newProperty, null);
-            } else {
+            } else if (traceBoxQuantification.getSelectedItem() != null) {
                 // Check if there already exists an exists-path with the current trace
                 String selectedTrace = traceBoxQuantification.getSelectedItem().toString();
                 if (oldProperty.toString().contains("E " + selectedTrace)) {
@@ -3067,8 +3067,9 @@ public class QueryDialog extends JPanel {
                 traceBoxQuantificationVector.add(traceModel.get(i));
         }
 
-        traceBox.setModel(new DefaultComboBoxModel<>(traceBoxVector));
         traceBoxQuantification.setModel(new DefaultComboBoxModel<>(traceBoxQuantificationVector));
+        traceBox.setModel(new DefaultComboBoxModel<>(traceBoxVector));
+        traceBox.setEnabled(!traceBoxVector.isEmpty());
     }
 
     private ArrayList<String> getUsedTraces(TCTLAbstractProperty current) {
@@ -4667,29 +4668,30 @@ public class QueryDialog extends JPanel {
     }
 
     private void updateHyperLTLButtons() {
+        boolean enable = traceBoxQuantification.getModel().getSize() > 0;
         showHyperLTL(true);
 
         if (currentSelection != null && currentSelection.getObject() == newProperty) {
             String ltlType = checkLTLType();
             disableAllLTLButtons();
             if (ltlType.equals("placeholder")) {
-                aButton.setEnabled(true);
-                eButton.setEnabled(true);
+                aButton.setEnabled(enable);
+                eButton.setEnabled(enable);
             } else if (ltlType.equals("A")) {
-                aButton.setEnabled(true);
+                aButton.setEnabled(enable);
             } else {
-                eButton.setEnabled(true);
+                eButton.setEnabled(enable);
             }
         } else {
-            if(isAllPath) {
-                aButton.setEnabled(true);
+            if (isAllPath) {
+                aButton.setEnabled(enable);
                 eButton.setEnabled(false);
             } else if (newProperty.toString().equals("<*>")){
-                aButton.setEnabled(true);
-                eButton.setEnabled(true);
+                aButton.setEnabled(enable);
+                eButton.setEnabled(enable);
             } else {
                 aButton.setEnabled(false);
-                eButton.setEnabled(true);
+                eButton.setEnabled(enable);
             }
             globallyButton.setEnabled(true);
             finallyButton.setEnabled(true);
