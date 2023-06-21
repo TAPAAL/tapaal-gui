@@ -2653,13 +2653,23 @@ public class QueryDialog extends JPanel {
         });
 
         globallyButton.addActionListener(e -> {
-            LTLGNode property = new LTLGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            LTLGNode property;
+            if (currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode) {
+                property = new LTLGNode();
+            } else {
+                property = new LTLGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            }
             addPropertyToQuery(property);
             unselectButtons();
         });
 
         finallyButton.addActionListener(e -> {
-            LTLFNode property = new LTLFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            LTLFNode property;
+            if (currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode) {
+                property = new LTLFNode();
+            } else {
+                property = new LTLFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            }
             addPropertyToQuery(property);
             unselectButtons();
         });
@@ -2688,7 +2698,9 @@ public class QueryDialog extends JPanel {
 
         nextButton.addActionListener(e -> {
             TCTLAbstractPathProperty property;
-            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+            if (currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode) {
+                property = new LTLXNode();
+            } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                 property = new LTLXNode((TCTLAbstractStateProperty) currentSelection.getObject());
             } else {
                 property = new LTLXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
@@ -2698,7 +2710,9 @@ public class QueryDialog extends JPanel {
 
         untilButton.addActionListener(e -> {
             TCTLAbstractPathProperty property;
-            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+            if (currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode) {
+                property = new LTLUNode();
+            } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                 property = new LTLUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
                     new TCTLStatePlaceHolder());
             } else {
@@ -2822,21 +2836,29 @@ public class QueryDialog extends JPanel {
         }
 
         if (selection instanceof LTLANode) {
-            if(queryType.getSelectedIndex() == 2) {
+            if (queryType.getSelectedIndex() == 2 && property instanceof LTLANode) {
                 addAllPathsToProperty(newProperty, selection);
                 return;
             }
             newProperty = newProperty.replace(selection, property);
-            addAllPathsToProperty(newProperty, selection);
+            if (property instanceof LTLANode) addAllPathsToProperty(newProperty, selection);
             return;
         } else if (selection instanceof LTLENode) {
-            if(queryType.getSelectedIndex() == 2) {
+            if (queryType.getSelectedIndex() == 2 && property instanceof LTLENode) {
                 addExistsPathsToProperty(newProperty, selection);
                 return;
             }
 
             newProperty = newProperty.replace(selection, property);
-            addExistsPathsToProperty(newProperty, selection);
+            if (property instanceof LTLENode)
+                addExistsPathsToProperty(newProperty, selection);
+            else {
+                UndoableEdit edit = new QueryConstructionEdit(selection, property);
+                updateSelection(property);
+                undoSupport.postEdit(edit);
+                queryChanged();
+            }
+
             return;
         }
 
