@@ -773,7 +773,7 @@ public class QueryDialog extends JPanel {
 
         queryField.select(position.getStart(), position.getEnd());
         currentSelection = position;
-        if(currentSelection != null) {
+        if (currentSelection != null) {
             setEnabledOptionsAccordingToCurrentReduction();
         } else {
             disableAllQueryButtons();
@@ -1223,6 +1223,7 @@ public class QueryDialog extends JPanel {
         addPredicateButton.setEnabled(false);
         truePredicateButton.setEnabled(false);
         falsePredicateButton.setEnabled(false);
+        if (queryType.getSelectedIndex() == 2) traceBox.setEnabled(false);
     }
 
     private void enableOnlyPathButtons() {
@@ -1248,6 +1249,7 @@ public class QueryDialog extends JPanel {
         truePredicateButton.setEnabled(false);
         falsePredicateButton.setEnabled(false);
         deadLockPredicateButton.setEnabled(false);
+        if (queryType.getSelectedIndex() == 2) traceBox.setEnabled(false);
     }
 
     private void enableOnlyStateButtons() {
@@ -1271,6 +1273,7 @@ public class QueryDialog extends JPanel {
         falsePredicateButton.setEnabled(true);
         deadLockPredicateButton.setEnabled(true);
         setEnablednessOfAddPredicateButton();
+        if (queryType.getSelectedIndex() == 2) traceBox.setEnabled(traceBox.getModel().getSize() > 0);
     }
 
     private void enableOnlyUntimedStateButtons() {
@@ -1297,6 +1300,7 @@ public class QueryDialog extends JPanel {
         if (queryType.getSelectedIndex() == 1) {
             updateLTLButtons();
         } else if(queryType.getSelectedIndex() == 2) {
+            traceBox.setEnabled(traceBox.getModel().getSize() > 0);
             updateHyperLTLButtons();
         }
 
@@ -2409,7 +2413,6 @@ public class QueryDialog extends JPanel {
             public void mouseReleased(MouseEvent e) {
                 if (!queryField.isEditable())
                     updateSelection();
-
             }
         });
 
@@ -3096,9 +3099,9 @@ public class QueryDialog extends JPanel {
                 traceBoxQuantificationVector.add(traceModel.get(i));
         }
 
-        traceBoxQuantification.setModel(new DefaultComboBoxModel<>(traceBoxQuantificationVector));
         traceBox.setModel(new DefaultComboBoxModel<>(traceBoxVector));
-        traceBox.setEnabled(!traceBoxVector.isEmpty());
+        traceBoxQuantification.setModel(new DefaultComboBoxModel<>(traceBoxQuantificationVector));
+        updateHyperLTLButtons();
     }
 
     private ArrayList<String> getUsedTraces(TCTLAbstractProperty current) {
@@ -4704,7 +4707,7 @@ public class QueryDialog extends JPanel {
         boolean enable = traceBoxQuantification.getModel().getSize() > 0;
         showHyperLTL(true);
 
-        if (currentSelection != null && currentSelection.getObject() == newProperty) {
+        if (currentSelection == null || currentSelection.getObject() == newProperty) {
             String ltlType = checkLTLType();
             disableAllLTLButtons();
             if (ltlType.equals("placeholder")) {
@@ -4716,23 +4719,25 @@ public class QueryDialog extends JPanel {
                 eButton.setEnabled(enable);
             }
         } else {
-            if (isAllPath) {
+            if (currentSelection.getObject() instanceof LTLANode) {
                 aButton.setEnabled(enable);
-                eButton.setEnabled(false);
-            } else if (isExistsPath) {
-                aButton.setEnabled(false);
+            } else if (currentSelection.getObject() instanceof LTLENode) {
                 eButton.setEnabled(enable);
             } else if (containsOnlyPathProperties(newProperty)) {
-                aButton.setEnabled(enable);
-                eButton.setEnabled(enable);
+                aButton.setEnabled(enable && newProperty instanceof LTLANode);
+                eButton.setEnabled(enable && newProperty instanceof LTLENode);
+                globallyButton.setEnabled(true);
+                finallyButton.setEnabled(true);
+                nextButton.setEnabled(true);
+                untilButton.setEnabled(true);
             } else {
                 aButton.setEnabled(false);
                 eButton.setEnabled(false);
+                globallyButton.setEnabled(true);
+                finallyButton.setEnabled(true);
+                nextButton.setEnabled(true);
+                untilButton.setEnabled(true);
             }
-            globallyButton.setEnabled(true);
-            finallyButton.setEnabled(true);
-            nextButton.setEnabled(true);
-            untilButton.setEnabled(true);
         }
 
         if (currentSelection != null && (currentSelection.getObject() instanceof LTLENode || currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof TCTLPathPlaceHolder)) {
@@ -4749,6 +4754,8 @@ public class QueryDialog extends JPanel {
             return containsOnlyPathProperties(((LTLANode) property).getProperty());
         } else if (property instanceof LTLENode) {
             return containsOnlyPathProperties(((LTLENode) property).getProperty());
+        } else if (property instanceof TCTLPathToStateConverter) {
+            return containsOnlyPathProperties(((TCTLPathToStateConverter) property).getProperty());
         } else if (property instanceof TCTLPathPlaceHolder || property instanceof TCTLStatePlaceHolder) {
             return true;
         }
