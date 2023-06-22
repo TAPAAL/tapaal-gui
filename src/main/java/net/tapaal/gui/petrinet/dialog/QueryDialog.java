@@ -617,7 +617,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshTraceOptions() {
-        if(reductionOption.getSelectedItem() == null){
+        if (reductionOption.getSelectedItem() == null) {
             return;
         }
 
@@ -641,8 +641,8 @@ public class QueryDialog extends JPanel {
             noTraceRadioButton.setSelected(true);
         }
 
-		if(getTraceOption() == TraceOption.FASTEST) {
-			if(fastestTraceRadioButton.isEnabled()){
+		if (getTraceOption() == TraceOption.FASTEST) {
+			if (fastestTraceRadioButton.isEnabled()) {
 				fastestTraceRadioButton.setSelected(true);
 			} else if (someTraceRadioButton.isEnabled()) {
                 someTraceRadioButton.setSelected(true);
@@ -1200,6 +1200,8 @@ public class QueryDialog extends JPanel {
         truePredicateButton.setEnabled(false);
         falsePredicateButton.setEnabled(false);
         deadLockPredicateButton.setEnabled(false);
+        traceBox.setEnabled(false);
+        traceBoxQuantification.setEnabled(false);
     }
 
     private void disableAllLTLButtons() {
@@ -3144,6 +3146,7 @@ public class QueryDialog extends JPanel {
             if (checkTraceBoxQuantification() && updateTraceBoxQuantification) updateQueryOnQuantificationChange();
         });
 
+        traceBox.setEnabled(false);
         traceBox.setToolTipText(TOOL_TIP_TRACEBOX);
         traceBoxQuantification.setToolTipText(TOOL_TIP_TRACEBOX_QUANTIFICATION);
 
@@ -4460,6 +4463,9 @@ public class QueryDialog extends JPanel {
             refreshTraceRefinement();
             refreshTarjan();
             refreshColoredReduction();
+            if (queryType.getSelectedIndex() == 2 && currentSelection != null) {
+                traceBoxQuantification.setEnabled(traceBoxQuantification.getModel().getSize() > 0);
+            }
         }
         if (!lens.isColored()) {
             useColoredReduction.setSelected(false);
