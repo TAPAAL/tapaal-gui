@@ -281,6 +281,7 @@ public class QueryDialog extends JPanel {
     private boolean wasLTLType = true;
     private boolean wasHyperLTLType = true;
     private boolean isAllPath = false;
+    private boolean isExistsPath = false;
     private boolean updateTraceBox = true;
     private boolean updateTraceBoxQuantification = true;
 
@@ -2739,9 +2740,11 @@ public class QueryDialog extends JPanel {
                         "An all-path with trace \"" + selectedTrace + "\" already exists. Please chose a different trace.",
                         "Error", JOptionPane.ERROR_MESSAGE);
                     isAllPath = true;
+                    isExistsPath = false;
                 } else {
                     addAllPathsToProperty(newProperty, oldProperty);
                     isAllPath = true;
+                    isExistsPath = false;
                 }
             }
 
@@ -2766,9 +2769,11 @@ public class QueryDialog extends JPanel {
                         "An exists-path with trace \"" + selectedTrace + "\" already exists. Please chose a different trace.",
                         "Error", JOptionPane.ERROR_MESSAGE);
                     isAllPath = false;
+                    isExistsPath = true;
                 } else {
                     addExistsPathsToProperty(newProperty, oldProperty);
                     isAllPath = false;
+                    isExistsPath = true;
                 }
             }
 
@@ -4714,12 +4719,15 @@ public class QueryDialog extends JPanel {
             if (isAllPath) {
                 aButton.setEnabled(enable);
                 eButton.setEnabled(false);
-            } else if (newProperty.toString().equals("<*>")){
+            } else if (isExistsPath) {
+                aButton.setEnabled(false);
+                eButton.setEnabled(enable);
+            } else if (containsOnlyPathProperties(newProperty)) {
                 aButton.setEnabled(enable);
                 eButton.setEnabled(enable);
             } else {
                 aButton.setEnabled(false);
-                eButton.setEnabled(enable);
+                eButton.setEnabled(false);
             }
             globallyButton.setEnabled(true);
             finallyButton.setEnabled(true);
@@ -4733,9 +4741,18 @@ public class QueryDialog extends JPanel {
         } else {
             conjunctionButton.setEnabled(true);
             disjunctionButton.setEnabled(true);
-            aButton.setEnabled(false);
-            eButton.setEnabled(false);
         }
+    }
+
+    private boolean containsOnlyPathProperties(TCTLAbstractProperty property) {
+        if (property instanceof LTLANode) {
+            return containsOnlyPathProperties(((LTLANode) property).getProperty());
+        } else if (property instanceof LTLENode) {
+            return containsOnlyPathProperties(((LTLENode) property).getProperty());
+        } else if (property instanceof TCTLPathPlaceHolder || property instanceof TCTLStatePlaceHolder) {
+            return true;
+        }
+        return false;
     }
 
     private void updateLTLButtons() {
