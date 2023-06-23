@@ -1101,24 +1101,25 @@ public class QueryDialog extends JPanel {
     }
 
     private void updateSearchStrategies(){
-        if(reductionOption.getSelectedItem() == null){
+        if (reductionOption.getSelectedItem() == null) {
             return;
         }
 
 		JRadioButton currentSelected;
-		if(heuristicSearch.isSelected()){
+		if (heuristicSearch.isSelected()) {
 			currentSelected = heuristicSearch;
-		}else if(breadthFirstSearch.isSelected()){
+		} else if(breadthFirstSearch.isSelected()) {
 			currentSelected = breadthFirstSearch;
-		}else if(depthFirstSearch.isSelected()){
+		} else if(depthFirstSearch.isSelected()) {
 			currentSelected = depthFirstSearch;
-		}else{
+		} else {
 			currentSelected = randomSearch;
 		}
 
-        if(queryType.getSelectedIndex() == 2) {
+        if (queryType.getSelectedIndex() == 2) {
             breadthFirstSearch.setEnabled(false);
             heuristicSearch.setEnabled(false);
+            randomSearch.setEnabled(false);
         }
         else if (fastestTraceRadioButton.isSelected()) {
             breadthFirstSearch.setEnabled(false);
@@ -1148,9 +1149,9 @@ public class QueryDialog extends JPanel {
         String reductionOptionString = getReductionOptionAsString();
         if (lens.isGame()) {
             heuristicSearch.setEnabled(false);
-        } else if (lens.isTimed() && (newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))){
+        } else if (lens.isTimed() && (newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))) {
             breadthFirstSearch.setEnabled(false);
-            if(!(reductionOptionString.equals(name_verifyTAPN) || reductionOptionString.equals(name_DISCRETE))){
+            if (!(reductionOptionString.equals(name_verifyTAPN) || reductionOptionString.equals(name_DISCRETE))) {
                 heuristicSearch.setEnabled(false);
             }
         }
