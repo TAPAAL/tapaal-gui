@@ -1896,7 +1896,7 @@ public class QueryDialog extends JPanel {
                     deleteProperty();
                 } else {
                     int changeTo = wasCTLType ? 0 : 2;
-                    queryType.setSelectedIndex(0);
+                    queryType.setSelectedIndex(changeTo);
                     return;
                 }
             } else if (isA) {
@@ -4757,10 +4757,8 @@ public class QueryDialog extends JPanel {
             return containsOnlyPathProperties(((LTLENode) property).getProperty());
         } else if (property instanceof TCTLPathToStateConverter) {
             return containsOnlyPathProperties(((TCTLPathToStateConverter) property).getProperty());
-        } else if (property instanceof TCTLPathPlaceHolder || property instanceof TCTLStatePlaceHolder) {
-            return true;
         }
-        return false;
+        return property instanceof TCTLPathPlaceHolder || property instanceof TCTLStatePlaceHolder;
     }
 
     private void updateLTLButtons() {
