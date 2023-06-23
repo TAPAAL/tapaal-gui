@@ -233,8 +233,8 @@ TCTLAbstractStateProperty AtomicProposition() :
 		left = AritmeticExpr() op = <OP> right = AritmeticExpr()
 	)
 	{
-                return new TCTLAtomicPropositionNode(left, op.image, right);
-        }
+         return new TCTLAtomicPropositionNode(left, op.image, right);
+     }
 }
 
 TCTLAbstractStateProperty AritmeticExpr() : 

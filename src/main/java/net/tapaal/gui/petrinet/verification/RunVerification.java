@@ -1,6 +1,12 @@
 package net.tapaal.gui.petrinet.verification;
 
 import dk.aau.cs.Messenger;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.PNMLoader;
@@ -27,8 +33,7 @@ import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.File;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
@@ -85,7 +90,17 @@ public class RunVerification extends RunVerificationBase {
                                 TAPAALGUI.openNewTabFromStream(result.getUnfoldedTab());
                             } else return false;
                         }
-                        TAPAALGUI.getAnimator().setTrace(result.getTrace());
+                        if (result.getTraceMap() == null) {
+                            TAPAALGUI.getAnimator().setTrace(result.getTrace());
+                        } else {
+                            Map<String, TAPNNetworkTrace> traceMap = new HashMap<>();
+                            for (String key : result.getTraceMap().keySet()) {
+                                if (query.toString().contains(key)) {
+                                    traceMap.put(key, result.getTraceMap().get(key));
+                                }
+                            }
+                            TAPAALGUI.getAnimator().setTrace(result.getTrace(), traceMap);
+                        }
                     } else {
                         if ((
                             //XXX: this is not complete, we need a better way to signal the engine could not create a trace
@@ -145,6 +160,7 @@ public class RunVerification extends RunVerificationBase {
 				System.getProperty("line.separator") + 	
 				System.getProperty("line.separator");
 			}
+
 			message += "Model checker output:\n" + result.errorMessage();
 
 			messenger.displayWrappedErrorMessage(message,"Error during verification");
@@ -349,6 +365,7 @@ public class RunVerification extends RunVerificationBase {
 		// TODO remove this when the engine outputs statistics
 		boolean isCTLQuery = result.getQueryResult().isCTL;
         int rowOffset = 1;
+        JButton showRawQueryButton = null;
 		if(modelChecker.supportsStats() && !result.isSolvedUsingQuerySimplification() && !isCTLQuery){
             rowOffset = displayStats(panel, result.getStatsAsString(), modelChecker.getStatsExplanations(), 1);
 
@@ -367,7 +384,7 @@ public class RunVerification extends RunVerificationBase {
                 }
             }
             if (result.getRawOutput() != null) {
-                JButton showRawQueryButton = new JButton("Show raw query results");
+                showRawQueryButton = new JButton("Show raw query results");
                 showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
                 gbc = GridBagHelper.as(1, 5, WEST, new Insets(0,0,10,0));
                 panel.add(showRawQueryButton, gbc);
@@ -375,7 +392,9 @@ public class RunVerification extends RunVerificationBase {
 			if(!result.getReductionResultAsString().isEmpty()){
 
                 JLabel reductionStatsLabel = new JLabel(toHTML(result.getReductionResultAsString()));
+
 				gbc = GridBagHelper.as(0,6, WEST, new Insets(0,0,10,-90));
+
 				panel.add(reductionStatsLabel, gbc);
 
 				if(result.reductionRulesApplied()){
@@ -422,7 +441,7 @@ public class RunVerification extends RunVerificationBase {
 		} else if (modelChecker.supportsStats() && !result.isSolvedUsingQuerySimplification() && isCTLQuery){
             rowOffset = displayStats(panel, result.getCTLStatsAsString(), modelChecker.getStatsExplanations(), 1);
             if (result.getRawOutput() != null) {
-                JButton showRawQueryButton = new JButton("Show raw query results");
+                showRawQueryButton = new JButton("Show raw query results");
                 showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
                 gbc = GridBagHelper.as(1, rowOffset+1, WEST, new Insets(0,0,10,0));
                 panel.add(showRawQueryButton, gbc);
@@ -444,6 +463,14 @@ public class RunVerification extends RunVerificationBase {
             panel.add(new JLabel(toHTML("The query was resolved using Trace Abstraction Refinement.")), gbc);
         } else if (result.isSolvedUsingSiphonTrap()) {
             panel.add(new JLabel(toHTML("The query was resolved using Siphon Trap.")), gbc);
+        }
+
+		if (showRawQueryButton == null && result.getRawOutput() != null) {
+            showRawQueryButton = new JButton("Show raw query results");
+            showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
+            rowOffset++;
+            gbc = GridBagHelper.as(1, rowOffset+3, WEST, new Insets(0,0,10,0));
+            panel.add(showRawQueryButton, gbc);
         }
 		
 		gbc = GridBagHelper.as(0, rowOffset+4, WEST);

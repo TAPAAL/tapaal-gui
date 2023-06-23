@@ -5,10 +5,13 @@ import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.verification.QueryType;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 
+import java.util.ArrayList;
+
 public class TAPNQuery {
 	private TCTLAbstractProperty property;
 	private int extraTokens = 0;
 	private QueryCategory queryCategory = QueryCategory.Default;
+	private ArrayList<String> traceList;
 
 	public TCTLAbstractProperty getProperty() {
 		return property;
@@ -52,4 +55,13 @@ public class TAPNQuery {
     public QueryCategory getCategory(){
     	return this.queryCategory;
     }
+
+    public void setTraceList(ArrayList<String> traces) {
+	    this.traceList = traces;
+    }
+
+    public ArrayList<String> getTraceList() {
+	    return this.traceList;
+    }
 }
+

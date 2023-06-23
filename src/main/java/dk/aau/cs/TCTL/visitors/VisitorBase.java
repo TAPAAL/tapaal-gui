@@ -9,6 +9,9 @@ public abstract class VisitorBase implements ITCTLVisitor {
 		atomicPropositionNode.getRight().accept(this, context);
 	}
 
+	// Hyper LTL
+    public void visit(HyperLTLPathScopeNode hyperLTLPathScopeNode, Object context) {hyperLTLPathScopeNode.getProperty().accept(this, context);}
+
     public void visit(LTLANode aNode, Object context) { aNode.getProperty().accept(this, context); }
     public void visit(LTLENode eNode, Object context) { eNode.getProperty().accept(this, context); }
     public void visit(LTLFNode afNode, Object context) { afNode.getProperty().accept(this, context); }

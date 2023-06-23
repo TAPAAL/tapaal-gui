@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 import pipe.gui.petrinet.PetriNetTab;
 
@@ -20,11 +22,14 @@ public class VerificationResult<TTrace> {
 	private long verificationTime = 0;
 	private Stats stats;
 	private NameMapping nameMapping;
+
 	private TTrace secondaryTrace;
+	private Map<String, TTrace> traceMap;
 	private int bound = -1;
 
 	private Tuple<TimedArcPetriNet, NameMapping> unfoldedModel;
-	private PetriNetTab unfoldedTab;
+    private PetriNetTab unfoldedTab;
+
     private boolean resolvedUsingSkeletonPreprocessor = false;
 
     public boolean isSolvedUsingQuerySimplification() {
@@ -62,12 +67,29 @@ public class VerificationResult<TTrace> {
         }
 	}
 
-    public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel, PetriNetTab unfoldedTab){
-        this(queryResult, trace, verificationTime, stats, rawOutput);
-        //this.solvedUsingStateEquation = isSolvedUsingStateEquation; // This was the old value using for both state equation and untimed skeleton check
+    public VerificationResult(QueryResult queryResult, Map<String, TTrace> traceMap, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel, PetriNetTab unfoldedTab){
+        this.queryResult = queryResult;
+        this.stats = stats;
+        this.rawOutput = rawOutput;
+        this.verificationTime = verificationTime;
+        this.traceMap = traceMap;
         this.unfoldedModel = unfoldedModel;
         this.unfoldedTab = unfoldedTab;
+
+        // Workaround for now
+        if (traceMap != null) {
+            this.trace = traceMap.get(traceMap.keySet().toArray()[0]);
+        } else {
+            this.trace = null;
+        }
     }
+
+	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel, PetriNetTab unfoldedTab){
+		this(queryResult, trace, verificationTime, stats, rawOutput);
+		//this.solvedUsingStateEquation = isSolvedUsingStateEquation; // This was the old value using for both state equation and untimed skeleton check
+		this.unfoldedModel = unfoldedModel;
+        this.unfoldedTab = unfoldedTab;
+	}
 
 	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, String rawOutput) {
 		this(queryResult, trace, verificationTime, new NullStats(), rawOutput);
@@ -93,18 +115,28 @@ public class VerificationResult<TTrace> {
                               TTrace tapnTrace,
                               TTrace secondaryTrace2, long runningTime,
                               Stats value2,
-                              boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel) {
-        this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, rawOutput, unfoldedModel, null);
+                              boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel, PetriNetTab unfoldedTab) {
+        this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, rawOutput, unfoldedModel, unfoldedTab);
         this.secondaryTrace = secondaryTrace2;
     }
 
     public VerificationResult(QueryResult value1,
+                              Map<String, TTrace> traceMap,
                               TTrace tapnTrace,
                               TTrace secondaryTrace2, long runningTime,
                               Stats value2,
                               boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel, PetriNetTab unfoldedTab) {
         this(value1, tapnTrace, runningTime, value2, isSolvedUsingStateEquation, rawOutput, unfoldedModel, unfoldedTab);
+        this.traceMap = traceMap;
         this.secondaryTrace = secondaryTrace2;
+    }
+
+    public Map<String, TTrace> getTraceMap() {
+        return this.traceMap;
+    }
+
+    public void setTraceMap(Map<String, TTrace> traceMap) {
+        this.traceMap = traceMap;
     }
 
 	public NameMapping getNameMapping() {

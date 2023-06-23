@@ -7,14 +7,23 @@ public class TCTLTransitionNode extends TCTLAbstractStateProperty {
 
 	String template;
 	String transition;
-	
+	String trace;
+
+    public TCTLTransitionNode(String template, String transition, String trace) {
+        this.template = NamePurifier.purify(template);
+        this.transition = NamePurifier.purify(transition);
+        this.trace = trace;
+    }
+
 	public TCTLTransitionNode(String template, String transition) {
 		this.template = NamePurifier.purify(template);
 		this.transition = NamePurifier.purify(transition);
+		this.trace = "";
 	}
 
 	public TCTLTransitionNode(String transition) {
 		this("", transition);
+		this.trace = "";
 	}
 
 	@Override
@@ -37,13 +46,15 @@ public class TCTLTransitionNode extends TCTLAbstractStateProperty {
 
     @Override
 	public TCTLAbstractStateProperty copy() {
+        if(!trace.equals("")) {
+            return new TCTLTransitionNode(template, transition, trace);
+        }
 		return new TCTLTransitionNode(template, transition);
 	}
 
 	@Override
 	public void accept(ITCTLVisitor visitor, Object context) {
 		visitor.visit(this, context);
-
 	}
 
 	@Override
@@ -91,6 +102,18 @@ public class TCTLTransitionNode extends TCTLAbstractStateProperty {
 	
 	@Override
 	public String toString() {
-		return (template == "" ? "" : template + ".") + transition;
+        if(template.equals("")) {
+            return transition;
+        }
+        if (trace.equals("")) {
+            return template + "." + transition;
+        }
+
+        return trace + "." + template + "." + transition;
+		//return (template == "" ? "" : template + ".") + transition;
 	}
+
+	public String getTrace() {
+        return trace;
+    }
 }

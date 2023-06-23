@@ -5,25 +5,25 @@ import java.util.List;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.io.XMLFormatter;
 
-public class LTLQueryVisitor extends VisitorBase {
+public class HyperLTLQueryVisitor extends VisitorBase {
 
     private static final String XML_NS 			        = "xmlns=\"http://tapaal.net/\"";
     private static final String XML_PROPSET 		    = "property-set";
     private static final String XML_PROP			    = "property";
     private static final String XML_PROPID			    = "id";
     private static final String XML_PROPDESC		    = "description";
-    private static final String XML_FORMULA		    	= "formula";
-    private static final String XML_ALLPATHS	    	= "all-paths";
-    private static final String XML_EXISTSPATH	    	= "exists-path";
-    private static final String XML_NEGATION	    	= "negation";
+    private static final String XML_FORMULA			    = "formula";
+    private static final String XML_ALLPATHS		    = "all-paths";
+    private static final String XML_EXISTSPATH	 	    = "exists-path";
+    private static final String XML_NEGATION		    = "negation";
     private static final String XML_CONJUNCTION 		= "conjunction";
     private static final String XML_DISJUNCTION 		= "disjunction";
     private static final String XML_GLOBALLY		    = "globally";
     private static final String XML_FINALLY			    = "finally";
     private static final String XML_NEXT			    = "next";
-    private static final String XML_UNTIL 		    	= "until";
+    private static final String XML_UNTIL 			    = "until";
     private static final String XML_BEFORE 			    = "before";
-    private static final String XML_REACH 		    	= "reach";
+    private static final String XML_REACH 			    = "reach";
     private static final String XML_DEADLOCK 		    = "deadlock";
     private static final String XML_TRUE 			    = "true";
     private static final String XML_FALSE 			    = "false";
@@ -41,12 +41,13 @@ public class LTLQueryVisitor extends VisitorBase {
     private static final String XML_INTEGERSUM          = "integer-sum";
     private static final String XML_INTEGERPRODUCT      = "integer-product";
     private static final String XML_INTEGERDIFFERENCE   = "integer-difference";
+    private static final String XML_PATHSCOPE           = "path-scope";
+    private static final String XML_NAME                = "name=";
 
+    private final StringBuffer XMLQuery;
 
-    private final StringBuffer xmlQuery = new StringBuffer();
-
-    public LTLQueryVisitor() {
-        super();
+    public HyperLTLQueryVisitor() {
+        this.XMLQuery = new StringBuffer();
     }
 
     public String getXMLQueryFor(TCTLAbstractProperty property, String queryName) {
@@ -55,24 +56,25 @@ public class LTLQueryVisitor extends VisitorBase {
     }
 
     public StringBuffer getXMLQuery() {
-        return xmlQuery;
+        return XMLQuery;
     }
 
     public void buildXMLQuery(TCTLAbstractProperty property, String queryName) {
-        xmlQuery.append(startTag(XML_PROP) + queryInfo(queryName) + startTag(XML_FORMULA));
+        XMLQuery.append(startTag(XML_PROP) + queryInfo(queryName) + startTag(XML_FORMULA));
         property.accept(this, null);
-        xmlQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP));
+        XMLQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP));
     }
 
     public String getFormatted() {
         XMLFormatter formatter = new XMLFormatter();
-        return formatter.format(getStartTag() + xmlQuery.toString() + getEndTag());
+        return formatter.format(getStartTag() + XMLQuery.toString() + getEndTag());
     }
 
-    public String getFormatted(StringBuffer CTLQueries) {
+    public String getFormatted(StringBuffer LTLQueries, StringBuffer CTLQueries) {
         XMLFormatter formatter = new XMLFormatter();
-        xmlQuery.append(CTLQueries);
-        return formatter.format(getStartTag() + xmlQuery.toString() + getEndTag());
+        XMLQuery.append(LTLQueries);
+        XMLQuery.append(CTLQueries);
+        return formatter.format(getStartTag() + XMLQuery.toString() + getEndTag());
     }
 
     public String getStartTag(){
@@ -88,42 +90,48 @@ public class LTLQueryVisitor extends VisitorBase {
         return wrapInTag(nameToPrint, XML_PROPID) + wrapInTag(nameToPrint, XML_PROPDESC);
     }
 
+    public void visit(HyperLTLPathScopeNode pathScopeNode, Object context) {
+        XMLQuery.append(insertNameAttributeInStartTag(XML_PATHSCOPE, pathScopeNode.getTrace()));
+        pathScopeNode.getProperty().accept(this, context);
+        XMLQuery.append(endTag(XML_PATHSCOPE));
+    }
+
     public void visit(LTLANode aNode, Object context) {
-        xmlQuery.append(startTag(XML_ALLPATHS));
+        XMLQuery.append(insertNameAttributeInStartTag(XML_ALLPATHS, aNode.getTrace()));
         aNode.getProperty().accept(this, context);
-        xmlQuery.append(endTag(XML_ALLPATHS));
+        XMLQuery.append(endTag(XML_ALLPATHS));
     }
 
     public void visit(LTLENode eNode, Object context) {
-        xmlQuery.append(startTag(XML_EXISTSPATH));
+        XMLQuery.append(insertNameAttributeInStartTag(XML_EXISTSPATH, eNode.getTrace()));
         eNode.getProperty().accept(this, context);
-        xmlQuery.append(endTag(XML_EXISTSPATH));
+        XMLQuery.append(endTag(XML_EXISTSPATH));
     }
 
     public void visit(LTLFNode afNode, Object context) {
-        xmlQuery.append(startTag(XML_FINALLY));
+        XMLQuery.append(startTag(XML_FINALLY));
         afNode.getProperty().accept(this, context);
-        xmlQuery.append(endTag(XML_FINALLY));
+        XMLQuery.append(endTag(XML_FINALLY));
     }
 
     public void visit(LTLGNode agNode, Object context) {
-        xmlQuery.append(startTag(XML_GLOBALLY));
+        XMLQuery.append(startTag(XML_GLOBALLY));
         agNode.getProperty().accept(this, context);
-        xmlQuery.append(endTag(XML_GLOBALLY));
+        XMLQuery.append(endTag(XML_GLOBALLY));
     }
 
     public void visit(LTLXNode axNode, Object context) {
-        xmlQuery.append(startTag(XML_NEXT));
+        XMLQuery.append(startTag(XML_NEXT));
         axNode.getProperty().accept(this, context);
-        xmlQuery.append(endTag(XML_NEXT));
+        XMLQuery.append(endTag(XML_NEXT));
     }
 
     public void visit(LTLUNode auNode, Object context) {
-        xmlQuery.append(startTag(XML_UNTIL) + startTag(XML_BEFORE));
+        XMLQuery.append(startTag(XML_UNTIL) + startTag(XML_BEFORE));
         auNode.getLeft().accept(this, context);
-        xmlQuery.append(endTag(XML_BEFORE) + startTag(XML_REACH));
+        XMLQuery.append(endTag(XML_BEFORE) + startTag(XML_REACH));
         auNode.getRight().accept(this, context);
-        xmlQuery.append(endTag(XML_REACH) + endTag(XML_UNTIL));
+        XMLQuery.append(endTag(XML_REACH) + endTag(XML_UNTIL));
     }
 
     public void visit(TCTLPathToStateConverter pathConverter, Object context) {
@@ -156,51 +164,52 @@ public class LTLQueryVisitor extends VisitorBase {
     }
 
     private void createList(List<TCTLAbstractStateProperty> properties, Object context, String seperator) {
-        xmlQuery.append(startTag(seperator));
+        XMLQuery.append(startTag(seperator));
 
         for (TCTLAbstractStateProperty p : properties) {
             p.accept(this, context);
         }
 
-        xmlQuery.append(endTag(seperator));
+        XMLQuery.append(endTag(seperator));
     }
 
     public void visit(TCTLNotNode notNode, Object context) {
-        xmlQuery.append(startTag(XML_NEGATION));
+        XMLQuery.append(startTag(XML_NEGATION));
         notNode.getProperty().accept(this, context);
-        xmlQuery.append(endTag(XML_NEGATION));
+        XMLQuery.append(endTag(XML_NEGATION));
     }
 
     public void visit(TCTLTrueNode tctlTrueNode, Object context) {
-        xmlQuery.append(emptyElement(XML_TRUE));
+        XMLQuery.append(emptyElement(XML_TRUE));
     }
 
     public void visit(TCTLFalseNode tctlFalseNode, Object context) {
-        xmlQuery.append(emptyElement(XML_FALSE));
+        XMLQuery.append(emptyElement(XML_FALSE));
     }
 
     public void visit(TCTLDeadlockNode tctlDeadLockNode, Object context) {
-        xmlQuery.append(emptyElement(XML_DEADLOCK));
+        XMLQuery.append(emptyElement(XML_DEADLOCK));
     }
 
     public void visit(TCTLConstNode tctlConstNode, Object context){
-        xmlQuery.append(wrapInTag(tctlConstNode.getConstant() + "", XML_INTEGERCONSTANT));
+        XMLQuery.append(wrapInTag(tctlConstNode.getConstant() + "", XML_INTEGERCONSTANT));
     }
 
     public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
-        xmlQuery.append(startTag(XML_TOKENSCOUNT));
-        xmlQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
-        xmlQuery.append(endTag(XML_TOKENSCOUNT));
+        XMLQuery.append(startTag(XML_TOKENSCOUNT));
+        XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
+        XMLQuery.append(endTag(XML_TOKENSCOUNT));
     }
 
     public void visit(TCTLTransitionNode tctlTransitionNode, Object context){
-        xmlQuery.append(startTag(XML_ISFIREABLE));
-        xmlQuery.append(wrapInTag(tctlTransitionNode.toString() + "", XML_TRANSITION));
-        xmlQuery.append(endTag(XML_ISFIREABLE));
+        XMLQuery.append(startTag(XML_ISFIREABLE));
+        XMLQuery.append(wrapInTag(tctlTransitionNode.toString() + "", XML_TRANSITION));
+        XMLQuery.append(endTag(XML_ISFIREABLE));
     }
 
     @Override
-    public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
+    public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
+                      Object context) {
         String opTest = atomicPropositionNode.getOp();
         String op;
 
@@ -228,15 +237,17 @@ public class LTLQueryVisitor extends VisitorBase {
                 break;
         }
 
-        xmlQuery.append(startTag(op));
+        XMLQuery.append(startTag(op));
         atomicPropositionNode.getLeft().accept(this, context);
         atomicPropositionNode.getRight().accept(this, context);
-        xmlQuery.append(endTag(op));
+        XMLQuery.append(endTag(op));
     }
+
 
     private String wrapInTag(String str, String tag){
         return startTag(tag) + str + endTag(tag);
     }
+    private String insertNameAttributeInStartTag(String tag, String traceName) {return "<" + tag + " " + XML_NAME + "\"" + traceName + "\"" + ">";}
     private String startTag(String tag){
         return "<" + tag + ">";
     }

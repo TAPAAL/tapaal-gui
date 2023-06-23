@@ -275,7 +275,7 @@ public class VerifyTAPN implements ModelChecker {
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
             }
-            return new VerificationResult<>(queryResult.value1(), null, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model);
+            return new VerificationResult<>(queryResult.value1(), null, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, null);
         }
     }
 
@@ -331,6 +331,7 @@ public class VerifyTAPN implements ModelChecker {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
+
                     try {
                         LoadedModel loadedModel = tapnLoader.load(fileOut);
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);

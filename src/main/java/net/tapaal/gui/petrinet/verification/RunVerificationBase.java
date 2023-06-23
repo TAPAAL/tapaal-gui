@@ -74,7 +74,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
     public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) {
         execute(options, model, query, dataLayerQuery, null);
     }
-    
+
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
         ITAPNComposer composer = new TAPNComposer(messenger, guiModels, lens, false, true);
@@ -93,6 +93,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
         if (dataLayerQuery != null) {
             clonedQuery.setCategory(dataLayerQuery.getCategory()); // Used by the CTL engine
+            clonedQuery.setTraceList(dataLayerQuery.getTraceList());
         }
 
         if (options.enabledStateequationsCheck()) {

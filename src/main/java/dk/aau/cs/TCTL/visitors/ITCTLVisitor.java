@@ -62,4 +62,6 @@ public interface ITCTLVisitor {
     void visit(LTLANode ltlaNode, Object context);
 
     void visit(LTLENode ltleNode, Object context);
+
+    void visit(HyperLTLPathScopeNode hyperLTLPathScopeNode, Object context);
 }
