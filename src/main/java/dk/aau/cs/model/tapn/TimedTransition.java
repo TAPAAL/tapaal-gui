@@ -92,32 +92,31 @@ public class TimedTransition extends TAPNElement {
 		return hasUntimedPreset(true);
 	}
 
-	private boolean hasUntimedPreset(boolean cascade){
-		for(TimedInputArc arc : preset){
-			if(!arc.interval().equals(TimeInterval.ZERO_INF)){
+	private boolean hasUntimedPreset(boolean cascade) {
+		for (TimedInputArc arc : preset) {
+			if (!arc.interval().equals(TimeInterval.ZERO_INF)) {
 				return false;
 			}
-			for(ColoredTimeInterval interval : arc.getColorTimeIntervals()){
-                interval.getInterval().equals(TimeInterval.ZERO_INF);
+			for (ColoredTimeInterval interval : arc.getColorTimeIntervals()) {
+                if (!interval.getInterval().equals(TimeInterval.ZERO_INF.toString()))
+                    return false;
             }
 		}
-		for (TransportArc arc : transportArcsGoingThrough){
-			if(!arc.interval().equals(TimeInterval.ZERO_INF)){
+		for (TransportArc arc : transportArcsGoingThrough) {
+			if (!arc.interval().equals(TimeInterval.ZERO_INF))
 				return false;
-			}
-            for(ColoredTimeInterval interval : arc.getColorTimeIntervals()){
-                interval.getInterval().equals(TimeInterval.ZERO_INF);
+            for (ColoredTimeInterval interval : arc.getColorTimeIntervals()) {
+                if (interval.getInterval().equals(TimeInterval.ZERO_INF.toString()))
+                    return false;
             }
 		}
 		
-		if(cascade && isShared()){
-			for(TimedTransition trans : sharedTransition.transitions()){
-				if(!trans.hasUntimedPreset(false)){
+		if (cascade && isShared()) {
+			for (TimedTransition trans : sharedTransition.transitions()) {
+				if (!trans.hasUntimedPreset(false))
 					return false;
-				}
 			}
 		}
-		
 		return true;
 	}
 

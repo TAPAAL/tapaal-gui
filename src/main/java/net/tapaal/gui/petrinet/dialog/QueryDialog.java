@@ -825,7 +825,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void updatePredicatesAccordingToSelection(TCTLAbstractProperty current) {
-        updateTraceBox();
+        if (queryType.getSelectedIndex() == 2) updateTraceBox();
         if (current instanceof TCTLAtomicPropositionNode) {
             TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) current;
 
