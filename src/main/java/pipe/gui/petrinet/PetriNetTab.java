@@ -1056,7 +1056,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		transitionFiring.showDelayEnabledTransitions(enable);
 		drawingSurface.repaint();
 
-        if (getAnimator() != null) {
+        if (getAnimator() != null && animationmode) {
 		    getAnimator().updateFireableTransitions();
         }
 	}
@@ -1296,7 +1296,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public void toggleAnimationMode() {
 		if (!animationmode) {
 			if (numberOfActiveTemplates() > 0) {
-
 				app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
                 switchToAnimationComponents();
 

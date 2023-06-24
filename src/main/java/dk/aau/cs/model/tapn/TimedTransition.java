@@ -236,8 +236,8 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public TimeInterval calculateDInterval(){
-		ArrayList<TimeInterval> result = new ArrayList<TimeInterval>();
-		if(this.isShared()){
+		ArrayList<TimeInterval> result;
+		if (this.isShared()) {
 			result = sharedTransition.calculateDInterval();
 		} else {
 			result = this.calculateDIntervalAlone();
@@ -271,7 +271,7 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public ArrayList<TimeInterval> calculateDIntervalAlone(){
-		ArrayList<TimeInterval> result = new ArrayList<TimeInterval>();
+		ArrayList<TimeInterval> result = new ArrayList<>();
 		result.add(TimeInterval.ZERO_INF);
 
 		for(TimedInputArc arc : this.getInputArcs()){

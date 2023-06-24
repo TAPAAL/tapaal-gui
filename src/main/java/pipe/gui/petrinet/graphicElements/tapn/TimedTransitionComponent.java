@@ -249,7 +249,7 @@ public class TimedTransitionComponent extends Transition {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if(transition.isShared()){
+		if (transition.isShared()) {
 			Graphics2D graphics = (Graphics2D)g;
 			Stroke oldStroke = graphics.getStroke();
 
@@ -261,7 +261,7 @@ public class TimedTransitionComponent extends Transition {
 
 			graphics.setStroke(oldStroke);
 		}
-        if(!isUncontrollable()){
+        if (!isUncontrollable()) {
             super.fillTransition(g);
         }
 		if (isUrgent()) {

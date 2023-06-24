@@ -170,7 +170,7 @@ public class Animator {
             }
         }
 
-        for( Template template : tab.activeTemplates()){
+        for (Template template : tab.activeTemplates()) {
             for (Transition t : template.guiModel().transitions()) {
                 if (t.isTransitionEnabled()) {
                     t.markTransitionEnabled(true);
@@ -181,7 +181,6 @@ public class Animator {
                     t.markTransitionDelayEnabled(true);
                     transFireComponent.addTransition(template, t);
                 }
-
             }
         }
 
@@ -193,11 +192,9 @@ public class Animator {
      * unhighlighted
      */
     private void disableTransitions() {
-        for(Template template : tab.allTemplates())
-        {
+        for (Template template : tab.allTemplates()) {
             for (Transition tempTransition : template.guiModel().transitions()) {
                 tempTransition.disableHightlight();
-
                 tempTransition.repaint();
             }
         }
