@@ -662,7 +662,7 @@ public class TimedArcPetriNet {
 	            result += countTokens(child, numberOf);
             }
         }
-	    return result;
+	    return result == 0 ? numberOf : result;
     }
 
     private int countTupleTokens(TupleExpression expression, int numberOf) {

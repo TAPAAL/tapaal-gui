@@ -338,7 +338,7 @@ public class VerifyDTAPN implements ModelChecker{
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
                         model = newComposer.transformModel(loadedModel.network());
 
-                        if (queryResult != null && queryResult.value1() != null) {
+                        if (queryResult.value1() != null) {
                             tapnTrace = parseTrace(!errorOutput.contains("Trace:") ? errorOutput : (errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
                         }
 
