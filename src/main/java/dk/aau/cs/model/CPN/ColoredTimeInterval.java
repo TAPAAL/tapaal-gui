@@ -83,16 +83,17 @@ public class ColoredTimeInterval extends TimeInterval {
         StringBuilder print = new StringBuilder();
         if (color != null) {
             if (color.getTuple() != null) {
+                print.append("[");
                 for (Color color1 : color.getTuple()) {
                     print.append(color1.getColorName()).append(", ");
                 }
-                print.substring(0, print.length()-2);
+                print.delete(print.length() - 2, print.length());
+                print.append("]");
                 print.append(" \u2192 ").append(super.toString());
-                return print.toString();
             } else {
                 print.append(color.getColorName()).append(" \u2192 ").append(super.toString());
-                return print.toString();
             }
+            return print.toString();
         } else {
             print.append(super.toString());
             return print.toString();
