@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import net.tapaal.gui.petrinet.Context;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.SwingHelper;
@@ -163,9 +164,9 @@ public class GuardDialogue extends JPanel
 				UndoManager undoManager = context.undoManager();
 				undoManager.newEdit();
 
-				dk.aau.cs.model.tapn.TimeInterval guard = null;
+                dk.aau.cs.model.tapn.TimeInterval guard = null;
 				if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
-					guard = composeGuard(((TimedInputArcComponent)arc).getGuard());
+                    guard = composeGuard(((TimedInputArcComponent)arc).getGuard());
 				}
 				
 				// Check if target transition is urgent
@@ -174,7 +175,14 @@ public class GuardDialogue extends JPanel
 					if(!guard.equals(TimeInterval.ZERO_INF)){
 						JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0," + '\u221E' + ")", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
-					}
+					} else {
+					    for (Object interval : coloredArcGuardPanel.getTimeConstraintModel().toArray()) {
+					        if (interval instanceof ColoredTimeInterval && !((ColoredTimeInterval) interval).getInterval().equals(TimeInterval.ZERO_INF.toString())) {
+                                JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0," + '\u221E' + ")", "Error", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                        }
+                    }
 				}
 				//Update colors
 				coloredArcGuardPanel.onOkColored(undoManager);
