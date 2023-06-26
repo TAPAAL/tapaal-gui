@@ -1,0 +1,273 @@
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = false;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  DEBUG_TOKEN_MANAGER = false;
+  ERROR_REPORTING = true;
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = false;
+  IGNORE_CASE = false;
+  USER_TOKEN_MANAGER = false;
+  USER_CHAR_STREAM = false;
+  BUILD_PARSER = true;
+  BUILD_TOKEN_MANAGER = true;
+  SANITY_CHECK = true;
+}
+PARSER_BEGIN(ArcExpressionParser)
+package dk.aau.cs.model.CPN.ArcExpressionParser;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Vector;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.ProductType;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.CPN.Color;
+
+
+public class ArcExpressionParser {
+
+	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL countered an error trying to parse the expression";
+    private static ColorType colorType;
+    private static TimedArcPetriNetNetwork network;
+	public static ArcExpression parse(String expression, ColorType inputPlaceColorType, TimedArcPetriNetNetwork inputNetwork) throws ParseException {
+	    colorType = inputPlaceColorType;
+	    network = inputNetwork;
+		ArcExpressionParser parser = new ArcExpressionParser(new StringReader(expression));
+		return parser.StartAddExpression();
+	}
+	public static ArcExpression parseNumberOfExpression(String expression, ColorType inputPlaceColorType, TimedArcPetriNetNetwork inputNetwork) throws ParseException {
+        colorType = inputPlaceColorType;
+        network = inputNetwork;
+        ArcExpressionParser parser = new ArcExpressionParser(new StringReader(expression));
+        return parser.StartNumberOfExpression();
+    }
+}
+PARSER_END(ArcExpressionParser)
+
+TOKEN :
+{
+	<PLUS: "+">
+	|
+	<SUB: "-">
+	|
+	<MULT: "*">
+}
+
+TOKEN :
+{
+	< NUM: ["1"-"9"] (["0"-"9"])* >
+	|
+	<IDENT: ["a"-"z","A"-"Z","_"] ( ["a"-"z","A"-"Z","_","0"-"9"] )* >
+}
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+ArcExpression StartAddExpression() :
+{
+	ArcExpression currentChild;
+	Vector<ArcExpression> constituents = new Vector<ArcExpression>();
+}
+{
+	currentChild = AddExpression() <EOF>
+	{ return currentChild; }
+}
+
+ArcExpression AddExpression() :
+{
+	ArcExpression currentChild;
+	Vector<ArcExpression> constituents = new Vector<ArcExpression>();
+}
+{
+	currentChild = SubExpression()
+	{ constituents.add(currentChild); }
+	(
+		<PLUS> currentChild = SubExpression()
+		{ constituents.add(currentChild); }
+	)*
+	{ return constituents.size() == 1 ? currentChild : new AddExpression(constituents); }
+}
+
+ArcExpression SubExpression() :
+{
+	ArcExpression left = null;
+	ArcExpression right = null;
+}
+{
+	left = ScalarExpression()
+	(
+		<SUB> right = ScalarExpression()
+	)?
+	{ return right == null ? left : new SubtractExpression(left,right); }
+}
+
+ArcExpression ScalarExpression() :
+{
+	ArcExpression currentChild;
+	Token number;
+}
+{
+	LOOKAHEAD(2147483647) number = <NUM> <MULT> currentChild = AddExpression() { return new ScalarProductExpression(Integer.parseInt(number.image),currentChild); }
+    	| currentChild = term() { return currentChild; }
+}
+
+ArcExpression term() : {
+    ArcExpression childExpression;
+}{
+
+        childExpression = NumberOfExpression() {return childExpression;}
+    | "(" childExpression = AddExpression() ")" {return childExpression;}
+}
+
+NumberOfExpression StartNumberOfExpression() : {
+        NumberOfExpression child;
+	}
+	{
+        child = NumberOfExpression() <EOF>
+        {
+            return child;
+        }
+	}
+
+NumberOfExpression NumberOfExpression() : {
+        Token number;
+        ColorExpression expr;
+	}
+	{
+        number = <NUM> "'" expr=ColorExpression()
+        {
+            return new NumberOfExpression(Integer.parseInt(number.image), new Vector<ColorExpression>(Arrays.asList(expr)));
+        }
+	}
+
+ColorExpression ColorExpression() : {
+    ColorExpression subexpression;
+
+    Vector<ColorExpression> expressions = new Vector<ColorExpression>();
+    ArrayList<String> succPreds= new ArrayList<String>();
+    Token name;
+
+}
+{
+
+    "(" subexpression = Element() {expressions.add(subexpression);} ("," subexpression = Element() {expressions.add(subexpression);})+ ")" ("++"{succPreds.add("++");} | "--" {succPreds.add("--");})*
+    {
+      ColorExpression cexpr = new TupleExpression(expressions);
+      //assumes single level producttypes
+      boolean colorTypeExists = false;
+      if(colorType instanceof ProductType){
+          if(((ProductType)colorType).containsTypes(cexpr.getColorTypes())){
+            colorTypeExists = true;
+          }
+      } else{
+          throw new ParseException("This arc can only output colors of the type " + colorType.getName() + " which is not a product type.");
+      }
+
+      if(!colorTypeExists){
+          throw new ParseException("The color type on the input place and the given color " + cexpr.toString() + " does not match.");
+      }
+      for(String s : succPreds){
+           if(s.equals("++")){
+               cexpr = new SuccessorExpression(cexpr);
+           } else{
+               cexpr = new PredecessorExpression(cexpr);
+           }
+      }
+
+      return cexpr;
+    }
+    | LOOKAHEAD(2147483647) name = <IDENT> ".all"
+        {
+            if(name.toString().equals(colorType.getName())){
+                return new AllExpression(colorType);
+            } else{
+              throw new ParseException("The colortype " + name.toString() + " does not match the colortype of the input place");
+            }
+          }
+    | subexpression = Element(){return subexpression;}
+
+}
+
+ColorExpression Element() : {
+    Token name;
+    Vector<String> succPreds= new Vector<String>();
+}{
+     LOOKAHEAD(2147483647) name = <IDENT> ".all"
+              {
+                  ColorType constituentColorType = null;
+                  boolean typeContained = false;
+                  if(colorType instanceof ProductType){
+                      for( ColorType ct : ((ProductType)colorType).getColorTypes()){
+                          if(ct.getName().equals( name.toString())){
+                              constituentColorType = ct;
+                          }
+                      }
+                  }
+                  if(constituentColorType == null){
+                      throw new ParseException("We could not find the colortype: " + name.toString());
+                  }
+                  return new AllExpression(constituentColorType);
+
+              }
+    | (name = <IDENT> | name = <NUM> ) ("++"{succPreds.add("++");} | "--" {succPreds.add("--");})*
+    {
+        ColorExpression cexpr = null;
+
+        Color c = network.getColorByName(name.toString());
+        if(c != null){
+            cexpr = new UserOperatorExpression(c);
+
+            if(!colorType.contains(c)){
+                throw new ParseException("The color \"" + c.getColorName() + "\" is not contained in the color type \"" + colorType.getName() + "\"");
+            }
+        } else if(network.getVariableByName(name.toString()) != null){
+            VariableExpression varexpr = new VariableExpression(network.getVariableByName(name.toString()));
+            ColorType variableColorType = varexpr.getVariable().getColorType();
+            if(colorType instanceof ProductType){
+                if(variableColorType instanceof ProductType && !variableColorType.equals(colorType)){
+                    throw new ParseException("The variable \"" + name.toString() + "\" does not match the colortype \"" + colorType.getName() + "\" and we do not allow nested tuples");
+                }else if(variableColorType instanceof ProductType){
+                    cexpr = varexpr;
+                } else if(!(variableColorType instanceof ProductType)){
+                    for( ColorType ct : ((ProductType)colorType).getColorTypes()){
+                        if(ct.equals(variableColorType)){
+                          cexpr = varexpr;
+                        }
+                    }
+                    if(cexpr == null){
+                        throw new ParseException("The color type of variable \"" + name.toString() + "\" could not be found in the input colortype \"" + colorType.getName() + "\".");
+                    }
+                }
+            }else{
+                if(colorType.equals(variableColorType)){
+                    cexpr = varexpr;
+                } else{
+                    throw new ParseException("The color type of variable \"" + name.toString() + "\" does not match the input colortype \"" + colorType.getName() + "\".");
+                }
+            }
+        } else{
+            throw new ParseException("Could not parse " + name + " as the name could not be found");
+        }
+        for(String s : succPreds){
+            if(s.equals("++")){
+                cexpr = new SuccessorExpression(cexpr);
+            } else{
+                cexpr = new PredecessorExpression(cexpr);
+            }
+        }
+
+        return cexpr;
+    }
+}
+
+

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="Referendum_timed_colored" type="P/T net">
+    <place displayName="true" id="ready" initialMarking="1" invariant="&lt;= 3" name="ready" nameOffsetX="-7" nameOffsetY="-11" positionX="390" positionY="120">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+      <hlinitialMarking>
+        <text>(1'dot)</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="dot"/>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinitialMarking>
+    </place>
+    <place displayName="true" id="voted_no" initialMarking="0" invariant="&lt; inf" name="voted_no" nameOffsetX="33" nameOffsetY="-28" positionX="765" positionY="345">
+      <type>
+        <text>Voters</text>
+        <structure>
+          <usersort declaration="Voters"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="voted_yes" initialMarking="0" invariant="&lt; inf" name="voted_yes" nameOffsetX="34" nameOffsetY="-36" positionX="45" positionY="345">
+      <type>
+        <text>Voters</text>
+        <structure>
+          <usersort declaration="Voters"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="voting" initialMarking="0" invariant="&lt;= 2" name="voting" nameOffsetX="71" nameOffsetY="50" positionX="390" positionY="345">
+      <type>
+        <text>Voters</text>
+        <structure>
+          <usersort declaration="Voters"/>
+        </structure>
+      </type>
+      <colorinvariant>
+        <inscription inscription="&lt;= 4"/>
+        <colortype name="Voters">
+          <color value="Voters1"/>
+        </colortype>
+      </colorinvariant>
+    </place>
+    <transition angle="0" displayName="true" id="start" infiniteServer="false" name="start" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="390" positionY="210" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="no" infiniteServer="false" name="no" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="615" positionY="345" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="yes" infiniteServer="false" name="yes" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="180" positionY="345" priority="0" urgent="false"/>
+    <arc id="arc10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="start" target="voting" type="normal" weight="1">
+      <hlinscription>
+        <text>1'Voters.all</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <all>
+                <usersort declaration="Voters"/>
+              </all>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="405" yCoord="240"/>
+      <arcpath arcPointType="false" id="1" xCoord="405" yCoord="345"/>
+    </arc>
+    <arc id="arc11" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="ready" target="start" type="timed" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <dotconstant/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="405" yCoord="150"/>
+      <arcpath arcPointType="false" id="1" xCoord="405" yCoord="210"/>
+    </arc>
+    <arc id="arc12" inscription="1" nameOffsetX="0" nameOffsetY="0" source="no" target="voted_no" type="normal" weight="1">
+      <hlinscription>
+        <text>1'v</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varv"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="634" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="765" yCoord="360"/>
+    </arc>
+    <arc id="arc13" inscription="[1,2]" nameOffsetX="47" nameOffsetY="14" source="voting" target="no" type="timed" weight="1">
+      <colorinterval>
+        <inscription inscription="[1,4]"/>
+        <colortype name="Voters">
+          <color value="Voters1"/>
+        </colortype>
+      </colorinterval>
+      <hlinscription>
+        <text>1'v</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varv"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="420" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="624" yCoord="360"/>
+    </arc>
+    <arc id="arc14" inscription="1" nameOffsetX="0" nameOffsetY="0" source="yes" target="voted_yes" type="normal" weight="1">
+      <hlinscription>
+        <text>1'v</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varv"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="189" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="75" yCoord="360"/>
+    </arc>
+    <arc id="arc15" inscription="[2,2]" nameOffsetX="41" nameOffsetY="15" source="voting" target="yes" type="timed" weight="1">
+      <colorinterval>
+        <inscription inscription="[0,inf)"/>
+        <colortype name="Voters">
+          <color value="Voters1"/>
+        </colortype>
+      </colorinterval>
+      <hlinscription>
+        <text>1'v</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varv"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="390" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="199" yCoord="360"/>
+    </arc>
+  </net>
+  <declaration>
+    <structure>
+      <declarations>
+        <namedsort id="dot" name="dot">
+          <dot/>
+        </namedsort>
+        <namedsort id="Voters" name="Voters">
+          <cyclicenumeration>
+            <feconstant id="Voters1" name="Voters"/>
+            <feconstant id="Voters2" name="Voters"/>
+            <feconstant id="Voters3" name="Voters"/>
+            <feconstant id="Voters4" name="Voters"/>
+            <feconstant id="Voters5" name="Voters"/>
+            <feconstant id="Voters6" name="Voters"/>
+            <feconstant id="Voters7" name="Voters"/>
+            <feconstant id="Voters8" name="Voters"/>
+            <feconstant id="Voters9" name="Voters"/>
+            <feconstant id="Voters10" name="Voters"/>
+          </cyclicenumeration>
+        </namedsort>
+        <variabledecl id="varv" name="v">
+          <usersort declaration="Voters"/>
+        </variabledecl>
+      </declarations>
+    </structure>
+  </declaration>
+  <query active="true" approximationDenominator="2" capacity="9" colorFixpoint="false" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="false" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Six voted no" overApproximation="false" pTrie="false" partitioning="false" query="EF Referendum_timed_colored.voted_no = 6" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetricVars="false" symmetry="false" timeDarts="false" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
+  <query active="true" approximationDenominator="2" capacity="9" colorFixpoint="false" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Tie vote" overApproximation="true" pTrie="true" partitioning="false" query="EF (Referendum_timed_colored.ready = 0 and Referendum_timed_colored.voting = 0 and Referendum_timed_colored.voted_yes = Referendum_timed_colored.voted_no)" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetricVars="false" symmetry="true" timeDarts="false" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
+  <k-bound bound="3"/>
+  <feature isColored="true" isGame="false" isTimed="true"/>
+</pnml>

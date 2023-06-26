@@ -1,0 +1,223 @@
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = false;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  DEBUG_TOKEN_MANAGER = false;
+  ERROR_REPORTING = true;
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = false;
+  IGNORE_CASE = false;
+  USER_TOKEN_MANAGER = false;
+  USER_CHAR_STREAM = false;
+  BUILD_PARSER = true;
+  BUILD_TOKEN_MANAGER = true;
+  SANITY_CHECK = true;
+}
+PARSER_BEGIN(GuardExpressionParser)
+package dk.aau.cs.model.CPN.GuardExpressionParser;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Vector;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.ProductType;import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.CPN.Color;
+
+
+public class GuardExpressionParser {
+
+	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL countered an error trying to parse the expression";
+    private static TimedArcPetriNetNetwork network;
+	public static GuardExpression parse(String expression, TimedArcPetriNetNetwork inputNetwork) throws ParseException {
+	    network = inputNetwork;
+		GuardExpressionParser parser = new GuardExpressionParser(new StringReader(expression));
+		return parser.StartOrExpr();
+	}
+}
+
+
+PARSER_END(GuardExpressionParser)
+TOKEN :
+{
+	<OR: "or" | "||">
+	|
+	<AND: "and" | "&&">
+	|
+	<NOT: "not" | "!">
+}
+
+TOKEN : {
+<LOGOP : <OR> | <AND> | <NOT> >
+}
+
+TOKEN :
+{
+	<PLUS: "+">
+	|
+	<SUB: "-">
+	|
+	<MULT: "*">
+}
+
+TOKEN :
+{
+	< NUM: ["1"-"9"] (["0"-"9"])* >
+	|
+	<IDENT: ["a"-"z","A"-"Z","_"] ( ["a"-"z","A"-"Z","_","0"-"9"] )* >
+}
+
+TOKEN :
+{
+	<OP: "<" | "<=" | ">" | "=" | "==" | ">=" | ">" | "!=" >
+}
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+GuardExpression StartOrExpr() :
+{
+	GuardExpression child = null;
+}
+{
+    child = OrExpr() <EOF>
+	{ return child; }
+}
+
+GuardExpression OrExpr() :
+{
+	GuardExpression left = null;
+	GuardExpression right = null;
+}
+{
+	left = AndExpr()
+	(
+		<OR> right = AndExpr()
+	)?
+	{ return right == null ? left : new OrExpression(left,right); }
+}
+GuardExpression AndExpr() :
+{
+	GuardExpression left = null;
+	GuardExpression right = null;
+}
+{
+	left = NotExpr()
+	(
+		<AND> right = NotExpr()
+	)?
+	{ return right == null ? left : new AndExpression(left,right); }
+}
+GuardExpression NotExpr() :
+{
+	GuardExpression currentChild;
+}
+{
+	<NOT> "(" currentChild = OrExpr() ")" { return new NotExpression(currentChild); }
+    	| currentChild = term() { return currentChild; }
+}
+GuardExpression term() : {
+    GuardExpression childExpression;
+}{
+    LOOKAHEAD(parseOperatorExpression())
+        childExpression = parseOperatorExpression() {return childExpression;}
+    | "(" childExpression = OrExpr() ")" {return childExpression;}
+}
+
+GuardExpression parseOperatorExpression() :
+{
+	ColorExpression left;
+	ColorExpression right;
+	Token op;
+}
+{
+    left = ColorExpression() op = <OP> right = ColorExpression()
+	{
+       if(!left.isComparable(right)){
+           throw new ParseException(left.toString() + " is not comparable to " + right.toString());
+       }
+       if(op.image.equals("<")) return new LessThanExpression(left,right);
+       else if(op.image.equals("<=")) return new LessThanEqExpression(left,right);
+       else if(op.image.equals(">")) return new GreaterThanExpression(left,right);
+       else if(op.image.equals(">=")) return new GreaterThanEqExpression(left,right);
+       else if(op.image.equals("=")) return new EqualityExpression(left,right);
+       else if(op.image.equals("!=")) return new InequalityExpression(left,right);
+       else return null;
+	}
+}
+
+ColorExpression ColorExpression() : {
+    ColorExpression subexpression;
+
+    Vector<ColorExpression> expressions = new Vector<ColorExpression>();
+    ArrayList<String> succPreds= new ArrayList<String>();
+
+}
+{
+
+    "(" subexpression = Element() {expressions.add(subexpression);} ("," subexpression = Element() {expressions.add(subexpression);})+ ")" ("++"{succPreds.add("++");} | "--" {succPreds.add("--");})*
+    {
+      ColorExpression cexpr = new TupleExpression(expressions);
+      //assumes single level producttypes
+      boolean colorTypeExists = false;
+      for(ColorType ct: network.colorTypes()){
+          if(ct instanceof ProductType){
+              if(((ProductType)ct).containsTypes(cexpr.getColorTypes())){
+                colorTypeExists = true;
+                break;
+              }
+          }
+      }
+      if(!colorTypeExists){
+          throw new ParseException("We could not find an existing colortype for the color " + cexpr.toString());
+      }
+      for(String s : succPreds){
+           if(s.equals("++")){
+               cexpr = new SuccessorExpression(cexpr);
+           } else{
+               cexpr = new PredecessorExpression(cexpr);
+           }
+      }
+
+      return cexpr;
+    }
+    | subexpression = Element(){return subexpression;}
+}
+
+ColorExpression Element() : {
+    Token name;
+    Vector<String> succPreds= new Vector<String>();
+}{
+    (name = <IDENT> | name = <NUM> )("++"{succPreds.add("++");} | "--" {succPreds.add("--");})*
+    {
+        ColorExpression cexpr;
+
+        Color c = network.getColorByName(name.toString());
+        if(c != null){
+            cexpr = new UserOperatorExpression(c);
+        } else if(network.getVariableByName(name.toString()) != null){
+            cexpr = new VariableExpression(network.getVariableByName(name.toString()));
+        } else{
+            throw new ParseException("Could not parse " + name + " as the name could not be found");
+        }
+        for(String s : succPreds){
+            if(s.equals("++")){
+                cexpr = new SuccessorExpression(cexpr);
+            } else{
+                cexpr = new PredecessorExpression(cexpr);
+            }
+        }
+
+        return cexpr;
+    }
+}
+
+

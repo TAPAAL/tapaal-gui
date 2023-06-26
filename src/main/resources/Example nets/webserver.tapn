@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <constant name="deadline" value="5"/>
+  <constant name="min" value="3"/>
+  <constant name="periodA" value="7"/>
+  <constant name="periodB" value="5"/>
+  <net active="true" id="WebServer" type="P/T net">
+    <labels border="true" height="203" positionX="542" positionY="376" width="370">This example represents a simple webserver which can process only one request at a time.
+
+There are two users that generate requests with certain periods. Processing a request takes at least 'min' time units. The webserver will drop a request if its deadline is exceeded. If a processing of a request already started, it has to be finished also latest by its deadline. This is guaranteed by the use of transport arcs that preserve the age of the request tokens and the corresponding invariants.
+
+The tool user can now experiment with different period and deadline values to check whether e.g. five requests can be served without dropping any of them. Note that if the deadline is set e.g. to 4 this query is not satisfiable anymore.</labels>
+    <place displayName="true" id="Requests" initialMarking="0" invariant="&lt;= deadline" name="Requests" nameOffsetX="-17" nameOffsetY="8" positionX="270" positionY="270"/>
+    <place displayName="true" id="Dropped" initialMarking="0" invariant="&lt; inf" name="Dropped" nameOffsetX="-5" nameOffsetY="35" positionX="135" positionY="105"/>
+    <place displayName="true" id="Processing" initialMarking="0" invariant="&lt;= deadline" name="Processing" nameOffsetX="127" nameOffsetY="17" positionX="735" positionY="180"/>
+    <place displayName="true" id="Responses" initialMarking="0" invariant="&lt; inf" name="Responses" nameOffsetX="-5" nameOffsetY="35" positionX="270" positionY="105"/>
+    <place displayName="true" id="Webserver" initialMarking="1" invariant="&lt; inf" name="Webserver" nameOffsetX="-6" nameOffsetY="16" positionX="405" positionY="180"/>
+    <place displayName="true" id="UserA" initialMarking="1" invariant="&lt;= periodA" name="UserA" nameOffsetX="37" nameOffsetY="40" positionX="135" positionY="525"/>
+    <place displayName="true" id="UserB" initialMarking="1" invariant="&lt;= periodB" name="UserB" nameOffsetX="42" nameOffsetY="44" positionX="390" positionY="510"/>
+    <place displayName="true" id="Working" initialMarking="0" invariant="&lt; inf" name="Working" nameOffsetX="81" nameOffsetY="21" positionX="585" positionY="180"/>
+    <transition angle="0" displayName="true" id="Process" infiniteServer="false" name="Process" nameOffsetX="36" nameOffsetY="44" player="0" positionX="495" positionY="270" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="SendReply" infiniteServer="false" name="SendReply" nameOffsetX="42" nameOffsetY="-9" player="0" positionX="495" positionY="105" priority="0" urgent="false"/>
+    <transition angle="270" displayName="true" id="SendRequestA" infiniteServer="false" name="SendRequestA" nameOffsetX="2" nameOffsetY="1" player="0" positionX="135" positionY="390" priority="0" urgent="false"/>
+    <transition angle="90" displayName="true" id="SendRequestB" infiniteServer="false" name="SendRequestB" nameOffsetX="107" nameOffsetY="-2" player="0" positionX="390" positionY="390" priority="0" urgent="false"/>
+    <transition angle="90" displayName="true" id="Drop" infiniteServer="false" name="Drop" nameOffsetX="-13" nameOffsetY="18" player="0" positionX="135" positionY="180" priority="0" urgent="false"/>
+    <arc id="Requests to Drop" inscription="[deadline,deadline]" nameOffsetX="0" nameOffsetY="0" source="Requests" target="Drop" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="272" yCoord="276"/>
+      <arcpath arcPointType="false" id="1" xCoord="149" yCoord="199"/>
+    </arc>
+    <arc id="Webserver to Process" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Webserver" target="Process" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="430" yCoord="205"/>
+      <arcpath arcPointType="false" id="1" xCoord="505" yCoord="280"/>
+    </arc>
+    <arc id="UserA to SendRequestA" inscription="[periodA,periodA]" nameOffsetX="0" nameOffsetY="0" source="UserA" target="SendRequestA" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="150" yCoord="525"/>
+      <arcpath arcPointType="false" id="1" xCoord="150" yCoord="410"/>
+    </arc>
+    <arc id="UserB to SendRequestB" inscription="[periodB,periodB]" nameOffsetX="0" nameOffsetY="0" source="UserB" target="SendRequestB" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="404" yCoord="510"/>
+      <arcpath arcPointType="false" id="1" xCoord="404" yCoord="409"/>
+    </arc>
+    <arc id="Working to SendReply" inscription="[min,inf)" nameOffsetX="0" nameOffsetY="0" source="Working" target="SendReply" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="588" yCoord="185"/>
+      <arcpath arcPointType="false" id="1" xCoord="514" yCoord="125"/>
+    </arc>
+    <arc id="Requests to Process" inscription="[0,deadline):1" nameOffsetX="0" nameOffsetY="0" source="Requests" target="Process" type="transport" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="299" yCoord="285"/>
+      <arcpath arcPointType="false" id="1" xCoord="504" yCoord="290"/>
+    </arc>
+    <arc id="Process to Processing" inscription="[0,deadline):1" nameOffsetX="0" nameOffsetY="0" source="Process" target="Processing" type="transport" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="514" yCoord="285"/>
+      <arcpath arcPointType="false" id="1" xCoord="676" yCoord="297"/>
+      <arcpath arcPointType="false" id="2" xCoord="741" yCoord="207"/>
+    </arc>
+    <arc id="Process to Working" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Process" target="Working" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="514" yCoord="285"/>
+      <arcpath arcPointType="false" id="1" xCoord="589" yCoord="205"/>
+    </arc>
+    <arc id="Processing to SendReply" inscription="[0,deadline]:1" nameOffsetX="0" nameOffsetY="0" source="Processing" target="SendReply" type="transport" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="739" yCoord="184"/>
+      <arcpath arcPointType="false" id="1" xCoord="672" yCoord="122"/>
+      <arcpath arcPointType="false" id="2" xCoord="515" yCoord="115"/>
+    </arc>
+    <arc id="SendReply to Responses" inscription="[0,deadline]:1" nameOffsetX="0" nameOffsetY="0" source="SendReply" target="Responses" type="transport" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="504" yCoord="120"/>
+      <arcpath arcPointType="false" id="1" xCoord="300" yCoord="120"/>
+    </arc>
+    <arc id="SendReply to Webserver" inscription="1" nameOffsetX="0" nameOffsetY="0" source="SendReply" target="Webserver" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="504" yCoord="120"/>
+      <arcpath arcPointType="false" id="1" xCoord="431" yCoord="185"/>
+    </arc>
+    <arc id="SendRequestA to Requests" inscription="1" nameOffsetX="0" nameOffsetY="0" source="SendRequestA" target="Requests" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="150" yCoord="400"/>
+      <arcpath arcPointType="false" id="1" xCoord="273" yCoord="294"/>
+    </arc>
+    <arc id="SendRequestA to UserA" inscription="1" nameOffsetX="0" nameOffsetY="0" source="SendRequestA" target="UserA" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="155" yCoord="410"/>
+      <arcpath arcPointType="false" id="1" xCoord="234" yCoord="474"/>
+      <arcpath arcPointType="false" id="2" xCoord="161" yCoord="530"/>
+    </arc>
+    <arc id="SendRequestB to Requests" inscription="1" nameOffsetX="0" nameOffsetY="0" source="SendRequestB" target="Requests" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="404" yCoord="399"/>
+      <arcpath arcPointType="false" id="1" xCoord="295" yCoord="295"/>
+    </arc>
+    <arc id="SendRequestB to UserB" inscription="1" nameOffsetX="0" nameOffsetY="0" source="SendRequestB" target="UserB" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="409" yCoord="410"/>
+      <arcpath arcPointType="false" id="1" xCoord="489" yCoord="474"/>
+      <arcpath arcPointType="false" id="2" xCoord="417" yCoord="517"/>
+    </arc>
+    <arc id="Drop to Dropped" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Drop" target="Dropped" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="149" yCoord="189"/>
+      <arcpath arcPointType="false" id="1" xCoord="149" yCoord="134"/>
+    </arc>
+  </net>
+  <query active="true" approximationDenominator="2" capacity="6" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="5 responses, no drops" overApproximation="true" pTrie="true" query="EF (WebServer.Responses = 5 and WebServer.Dropped = 0)" reduction="true" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" timeDarts="true" traceOption="SOME" useStubbornReduction="true" useTarOption="false"/>
+  <k-bound bound="3"/>
+  <feature isGame="false" isTimed="true" isColored="false"/>
+</pnml>

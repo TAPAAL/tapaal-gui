@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="Philosophers_dash_COL_dash_000005" type="P/T net">
+    <place displayName="true" id="think" initialMarking="5" invariant="&lt; inf" name="think" nameOffsetX="-5" nameOffsetY="35" positionX="225" positionY="405">
+      <type>
+        <text>Philo</text>
+        <structure>
+          <usersort declaration="philo"/>
+        </structure>
+      </type>
+      <hlinitialMarking>
+        <text>(1'Id1 + 1'Id2 + 1'Id3 + 1'Id4 + 1'Id5)</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="Id1"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="Id2"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="Id3"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="Id4"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="Id5"/>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinitialMarking>
+    </place>
+    <place displayName="true" id="fork" initialMarking="5" invariant="&lt; inf" name="fork" nameOffsetX="5" nameOffsetY="34" positionX="405" positionY="225">
+      <type>
+        <text>Philo</text>
+        <structure>
+          <usersort declaration="philo"/>
+        </structure>
+      </type>
+      <hlinitialMarking>
+        <text>(1'Id1 + 1'Id2 + 1'Id3 + 1'Id4 + 1'Id5)</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="Id1"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="Id2"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="Id3"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="Id4"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="Id5"/>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinitialMarking>
+    </place>
+    <place displayName="true" id="catch1" initialMarking="0" invariant="&lt; inf" name="catch1" nameOffsetX="-5" nameOffsetY="35" positionX="585" positionY="405">
+      <type>
+        <text>Philo</text>
+        <structure>
+          <usersort declaration="philo"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="catch2" initialMarking="0" invariant="&lt; inf" name="catch2" nameOffsetX="-5" nameOffsetY="35" positionX="225" positionY="45">
+      <type>
+        <text>Philo</text>
+        <structure>
+          <usersort declaration="philo"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="eat" initialMarking="0" invariant="&lt; inf" name="eat" nameOffsetX="-5" nameOffsetY="35" positionX="585" positionY="45">
+      <type>
+        <text>Philo</text>
+        <structure>
+          <usersort declaration="philo"/>
+        </structure>
+      </type>
+    </place>
+    <transition angle="0" displayName="true" id="ff1a" infiniteServer="false" name="ff1a" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="405" positionY="405" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="ff1b" infiniteServer="false" name="ff1b" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="225" positionY="225" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="ff2a" infiniteServer="false" name="ff2a" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="585" positionY="225" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="ff2b" infiniteServer="false" name="ff2b" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="405" positionY="45" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="end" infiniteServer="false" name="end" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="600" positionY="540" priority="0" urgent="false"/>
+    <arc id="think2ff1a" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="think" target="ff1a" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="255" yCoord="420"/>
+      <arcpath arcPointType="false" id="1" xCoord="414" yCoord="420"/>
+    </arc>
+    <arc id="think2ff1b" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="think" target="ff1b" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="240" yCoord="405"/>
+      <arcpath arcPointType="false" id="1" xCoord="240" yCoord="255"/>
+    </arc>
+    <arc id="fork2ff1b" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="fork" target="ff1b" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="405" yCoord="240"/>
+      <arcpath arcPointType="false" id="1" xCoord="244" yCoord="240"/>
+    </arc>
+    <arc id="fork2ff1a" inscription="[0,inf)" nameOffsetX="30" nameOffsetY="29" source="fork" target="ff1a" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x--</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <predecessor>
+                <subterm>
+                  <variable refvariable="varx"/>
+                </subterm>
+              </predecessor>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="420" yCoord="255"/>
+      <arcpath arcPointType="false" id="1" xCoord="420" yCoord="405"/>
+    </arc>
+    <arc id="fork2ff2b" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="fork" target="ff2b" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x--</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <predecessor>
+                <subterm>
+                  <variable refvariable="varx"/>
+                </subterm>
+              </predecessor>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="420" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="420" yCoord="75"/>
+    </arc>
+    <arc id="fork2ff2a" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="fork" target="ff2a" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="435" yCoord="240"/>
+      <arcpath arcPointType="false" id="1" xCoord="594" yCoord="240"/>
+    </arc>
+    <arc id="catch12ff2a" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="catch1" target="ff2a" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="600" yCoord="405"/>
+      <arcpath arcPointType="false" id="1" xCoord="600" yCoord="255"/>
+    </arc>
+    <arc id="catch22ff2b" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="-1" source="catch2" target="ff2b" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="255" yCoord="60"/>
+      <arcpath arcPointType="false" id="1" xCoord="414" yCoord="60"/>
+    </arc>
+    <arc id="eat2end" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="eat" target="end" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="614" yCoord="60"/>
+      <arcpath arcPointType="false" id="1" xCoord="719" yCoord="62"/>
+      <arcpath arcPointType="false" id="2" xCoord="719" yCoord="556"/>
+      <arcpath arcPointType="false" id="3" xCoord="619" yCoord="555"/>
+    </arc>
+    <arc id="end2think" inscription="1" nameOffsetX="0" nameOffsetY="0" source="end" target="think" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="609" yCoord="555"/>
+      <arcpath arcPointType="false" id="1" xCoord="239" yCoord="556"/>
+      <arcpath arcPointType="false" id="2" xCoord="239" yCoord="434"/>
+    </arc>
+    <arc id="ff1a2catch1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="ff1a" target="catch1" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="424" yCoord="420"/>
+      <arcpath arcPointType="false" id="1" xCoord="585" yCoord="420"/>
+    </arc>
+    <arc id="ff1b2catch2" inscription="1" nameOffsetX="0" nameOffsetY="0" source="ff1b" target="catch2" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="240" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="240" yCoord="75"/>
+    </arc>
+    <arc id="ff2a2eat" inscription="1" nameOffsetX="0" nameOffsetY="0" source="ff2a" target="eat" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="600" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="600" yCoord="75"/>
+    </arc>
+    <arc id="ff2b2eat" inscription="1" nameOffsetX="7" nameOffsetY="-15" source="ff2b" target="eat" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="varx"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="424" yCoord="60"/>
+      <arcpath arcPointType="false" id="1" xCoord="585" yCoord="60"/>
+    </arc>
+    <arc id="end2fork" inscription="1" nameOffsetX="-70" nameOffsetY="-49" source="end" target="fork" type="normal" weight="1">
+      <hlinscription>
+        <text>(1'x + 1'x--)</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <variable refvariable="varx"/>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <predecessor>
+                    <subterm>
+                      <variable refvariable="varx"/>
+                    </subterm>
+                  </predecessor>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="615" yCoord="540"/>
+      <arcpath arcPointType="true" id="1" xCoord="644" yCoord="389"/>
+      <arcpath arcPointType="false" id="2" xCoord="432" yCoord="248"/>
+    </arc>
+  </net>
+  <declaration>
+    <structure>
+      <declarations>
+        <namedsort id="dot" name="dot">
+          <dot/>
+        </namedsort>
+        <namedsort id="philo" name="Philo">
+          <cyclicenumeration>
+            <feconstant id="Id1" name="Philo"/>
+            <feconstant id="Id2" name="Philo"/>
+            <feconstant id="Id3" name="Philo"/>
+            <feconstant id="Id4" name="Philo"/>
+            <feconstant id="Id5" name="Philo"/>
+          </cyclicenumeration>
+        </namedsort>
+        <variabledecl id="varx" name="x">
+          <usersort declaration="philo"/>
+        </variabledecl>
+      </declarations>
+    </structure>
+  </declaration>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="0" capacity="4" colorFixpoint="true" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Is there a deadlock" overApproximation="false" pTrie="false" partitioning="true" reduction="true" reductionOption="VerifyPN" searchOption="RANDOMHEURISTIC" symmetricVars="true" symmetry="false" timeDarts="false" traceOption="NONE" type="CTL" useQueryReduction="true" useSiphonTrapAnalysis="true" useStubbornReduction="true" useTarOption="true" useTarjan="true">
+    <formula>
+            
+      <exists-path>
+                
+        <finally>
+                    
+          <deadlock/>
+                  
+        </finally>
+              
+      </exists-path>
+          
+    </formula>
+  </query>
+  <k-bound bound="3"/>
+  <feature isColored="true" isGame="false" isTimed="false"/>
+</pnml>
