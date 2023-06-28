@@ -638,10 +638,16 @@ public class TimedArcPetriNet {
     public int getNumberOfTokensInNet(){
         int result = 0;
         for (TimedPlace place : places) {
-            if (place.numberOfTokens == 0)
-                result += countTokens(place.tokensAsExpression, 0);
-            else
+            if (place.numberOfTokens == 0) {
+                int tokens = countTokens(place.tokensAsExpression, 0);
+                result += (
+                    (tokens == 0 && marking().getTokensFor(place).size() > 0) ?
+                        marking().getTokensFor(place).size() :
+                        tokens
+                    );
+            } else {
                 result += place.numberOfTokens();
+            }
         }
 
         return result == 0 ? marking().size() : result;
