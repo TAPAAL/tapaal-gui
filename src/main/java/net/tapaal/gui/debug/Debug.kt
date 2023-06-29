@@ -52,6 +52,10 @@ object DEBUG {
 
                 }
             })
+
+            add(object : AbstractAction("Inspect") {
+                override fun actionPerformed(e: ActionEvent) = InspectSpy().show()
+            })
         }
 
         return debugMenu
