@@ -1,5 +1,6 @@
 package net.tapaal.gui.debug
 
+import dk.aau.cs.model.CPN.ProductType
 import net.tapaal.gui.petrinet.TAPNLens
 import pipe.gui.TAPAALGUI
 import java.awt.event.ActionEvent
@@ -9,6 +10,7 @@ import javax.swing.*
 import javax.swing.JTree.DynamicUtilTreeNode
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
+import kotlin.reflect.KClass
 
 
 /*
@@ -97,8 +99,11 @@ class InspectSpy : JFrame() {
             is ListModelRender -> {
                 val top = DefaultMutableTreeNode(render.displayName)
                 val lm = (obj!!.getPrivateField(render.field)) as AbstractListModel<*>
-                lm.forEach {
-                    handleFieldWithRender(render.render, it, top)
+                lm.forEach {lm ->
+                    render.render.forEach {
+                        handleFieldWithRender(it, lm, top)
+                    }
+
                 }
                 node.add(top)
             }
@@ -113,15 +118,38 @@ class InspectSpy : JFrame() {
             }
 
             is RenderField -> {
-                render.fields.forEach {
-                    handleFieldWithRender(it, obj?.getPrivateField(render.field), node)
+                val o = if (render.field != null) {
+                    obj?.getPrivateField(render.field)
+                } else {
+                    obj
+                }
+                if (render.typeFilter.isInstance(obj)) {
+                    render.fields.forEach {
+                        handleFieldWithRender(it, o, node)
+                    }
                 }
             }
 
             is ObjectRender -> {
-                val top = DefaultMutableTreeNode(render.displayName ?: obj)
-                render.fields.forEach {
-                    handleFieldWithRender(it, obj, top)
+                if (render.typeFilter.isInstance(obj)) {
+                    val top = DefaultMutableTreeNode(render.displayName ?: obj)
+                    render.fields.forEach {
+                        handleFieldWithRender(it, obj, top)
+                    }
+                    node.add(top)
+                }
+            }
+
+            is HashMapRender -> {
+                val top = DefaultMutableTreeNode(render.displayName)
+                val o = if (render.field != null) {
+                    obj?.getPrivateField(render.field)
+                } else {
+                    obj
+                }
+                val map = o as HashMap<*,*>
+                map.forEach { e ->
+                    handleFieldWithRender(render.render, e, top)
                 }
                 node.add(top)
             }
@@ -129,8 +157,6 @@ class InspectSpy : JFrame() {
     }
 
     private fun generateGlobal() {
-        val constantsPane = TAPAALGUI.getCurrentTab()
-
         val render =
             ObjectRender(
                 ToStringRender("lens", render = {
@@ -138,21 +164,29 @@ class InspectSpy : JFrame() {
                     "Timed: ${it.isTimed}, Game: ${it.isGame}, Color: ${it.isColored}"
                 }, displayName = "Lense"),
                 RenderField(
-                    "constantsPanel",
-                    ListModelRender("variablesListModel", ToStringRender(), "Variables"),
-                    ListModelRender("constantsListModel", ToStringRender(), "Constants"),
+                    field = "constantsPanel",
+                    fields = arrayOf(ListModelRender("variablesListModel", ToStringRender(), displayName = "Variables"),
+                    ListModelRender("constantsListModel", displayName = "Constants"),
                     ListModelRender(
-                        "colorTypesListModel", ObjectRender(
+                        "colorTypesListModel",
+                        ObjectRender(
                             ToStringRender("id"),
                             ToStringRender("name"),
-                            VectorRender("colors", ToStringRender())
-                        ), "Color Types"
-                    ),
+                            VectorRender("colors"),
+                            RenderField(
+                                ToStringRender("name"),
+                                VectorRender("constituents"),
+                                HashMapRender("colorCache"),
+                                typeFilter = ProductType::class,
+                            ),
+                        ),
+                        displayName = "Color Types"
+                    ),)
                 ),
                 displayName = "Global"
             )
 
-        handleFieldWithRender(render, constantsPane, treeRoot)
+        handleFieldWithRender(render, TAPAALGUI.getCurrentTab(), treeRoot)
     }
 
     init {
@@ -179,7 +213,8 @@ class ToStringRender(
     val render: ((Any?) -> String) = { a: Any? -> a?.toString() ?: "null" }
 ) : Render()
 
-class RenderField(val field: String, vararg val fields: Render) : Render()
-class ObjectRender(vararg val fields: Render, val displayName: String? = null) : Render()
-class VectorRender(val field: String, val render: Render, val displayName: String? = field) : Render()
-class ListModelRender(val field: String, val render: Render, val displayName: String? = field) : Render()
+class RenderField(vararg val fields: Render, val field: String? = null, val typeFilter: KClass<*> = Any::class) : Render()
+class ObjectRender(vararg val fields: Render, val displayName: String? = null, val typeFilter: KClass<*> = Any::class) : Render()
+class VectorRender(val field: String, val render: Render = ToStringRender(), val displayName: String? = field) : Render()
+class ListModelRender(val field: String, vararg val render: Render, val displayName: String? = field) : Render()
+class HashMapRender(val field: String? = null, val render: Render = ToStringRender(), val displayName: String? = field) : Render()
