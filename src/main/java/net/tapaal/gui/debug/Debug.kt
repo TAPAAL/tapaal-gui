@@ -13,7 +13,6 @@ import javax.swing.KeyStroke
 
 fun noOp() {}
 object DEBUG {
-
     @JvmStatic fun buildMenuDEBUG(): JMenu {
 
         val debugMenu = JMenu("DEBUG")
@@ -52,14 +51,10 @@ object DEBUG {
                         e.printStackTrace();
                         JOptionPane.showMessageDialog(null, "Debug: Save/Load Error","Failure to save/load, please check stack-trace on console.", JOptionPane.ERROR_MESSAGE)
                     }
-
-
                 }
             })
-
         }
 
         return debugMenu
     }
-
 }
