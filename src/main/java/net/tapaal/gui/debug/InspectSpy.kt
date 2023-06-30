@@ -6,8 +6,41 @@ import java.awt.event.ActionEvent
 import java.lang.reflect.Field
 import java.util.*
 import javax.swing.*
+import javax.swing.JTree.DynamicUtilTreeNode
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
+
+
+/*
+Usage:
+//    fun t(): Iterable<DefaultMutableTreeNode> =
+//        listOf(
+//            LazyDefaultMutableTreeNode('a'),
+//            LazyDefaultMutableTreeNode("t", ::t)
+//        )
+//        val lazy = LazyDefaultMutableTreeNode("test", ::t)
+//        treeRoot.add(lazy)
+ */
+class LazyDefaultMutableTreeNode(value: Any?, val genFun: (() -> Iterable<DefaultMutableTreeNode>)? = null) :
+    DynamicUtilTreeNode(value, null) {
+    private var constructed = false; // Delay running loadChildren until fully constructed
+
+    init {
+        if (genFun != null) {
+            allowsChildren = true;
+        }
+        constructed = true;
+    }
+
+    override fun loadChildren() {
+        if (constructed) {
+            loadedChildren = true
+            genFun?.invoke()?.forEach { this.add(it) }
+            println("generated")
+        }
+
+    }
+}
 
 class InspectSpy : JFrame() {
 
@@ -33,8 +66,6 @@ class InspectSpy : JFrame() {
     private fun <T : Any> T.getPrivateField(
         field: String,
     ): Any? {
-        //val ref = this.javaClass.getDeclaredField(field)
-        //val ref = this.javaClass.getField(field)
         var ref: Field? = null;
 
         var clz: Class<*>? = this.javaClass
@@ -133,8 +164,6 @@ class InspectSpy : JFrame() {
 
         reload()
     }
-
-
 }
 
 private fun <E> AbstractListModel<E>.forEach(function: (e: E) -> Unit) {
