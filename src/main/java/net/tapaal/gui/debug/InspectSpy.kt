@@ -99,7 +99,7 @@ class InspectSpy : JFrame() {
             is ListModelRender -> {
                 val top = DefaultMutableTreeNode(render.displayName)
                 val lm = (obj!!.getPrivateField(render.field)) as AbstractListModel<*>
-                lm.forEach {lm ->
+                lm.forEach { lm ->
                     render.render.forEach {
                         handleFieldWithRender(it, lm, top)
                     }
@@ -147,7 +147,7 @@ class InspectSpy : JFrame() {
                 } else {
                     obj
                 }
-                val map = o as HashMap<*,*>
+                val map = o as HashMap<*, *>
                 map.forEach { e ->
                     handleFieldWithRender(render.render, e, top)
                 }
@@ -165,23 +165,29 @@ class InspectSpy : JFrame() {
                 }, displayName = "Lense"),
                 RenderField(
                     field = "constantsPanel",
-                    fields = arrayOf(ListModelRender("variablesListModel", ToStringRender(), displayName = "Variables"),
-                    ListModelRender("constantsListModel", displayName = "Constants"),
-                    ListModelRender(
-                        "colorTypesListModel",
-                        ObjectRender(
-                            ToStringRender("id"),
-                            ToStringRender("name"),
-                            VectorRender("colors"),
-                            RenderField(
+                    fields = arrayOf(
+                        ListModelRender("variablesListModel", ToStringRender(), displayName = "Variables"),
+                        ListModelRender("constantsListModel", ToStringRender(), displayName = "Constants"),
+                        ListModelRender(
+                            "colorTypesListModel",
+                            ObjectRender(
+                                ToStringRender("id"),
                                 ToStringRender("name"),
-                                VectorRender("constituents"),
-                                HashMapRender("colorCache"),
-                                typeFilter = ProductType::class,
+                                VectorRender("colors"),
+                                RenderField(
+                                    ToStringRender("name"),
+                                    VectorRender("constituents"),
+                                    HashMapRender("colorCache"),
+                                    typeFilter = ProductType::class,
+                                ),
                             ),
+                            displayName = "Color Types"
                         ),
-                        displayName = "Color Types"
-                    ),)
+                    )
+                ),
+                RenderField(
+                    field = "queries",
+                    fields = arrayOf(ListModelRender("listModel", ToStringRender(), displayName = "Queries"))
                 ),
                 displayName = "Global"
             )
