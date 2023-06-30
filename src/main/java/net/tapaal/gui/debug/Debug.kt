@@ -28,6 +28,10 @@ object DEBUG {
                 override fun actionPerformed(e: ActionEvent) = throw RuntimeException("Casted Exception from DEBUG")
             })
 
+            add(object : GuiAction("Inspect net", "Inspect net", KeyStroke.getKeyStroke('I'.code, Toolkit.getDefaultToolkit().menuShortcutKeyMask + InputEvent.SHIFT_MASK)) {
+                override fun actionPerformed(e: ActionEvent) = InspectSpy().show()
+            })
+
             add(object : AbstractAction("Show undo/redo stack") {
                 override fun actionPerformed(e: ActionEvent) = UndoRedoSpy().show()
             })
@@ -53,9 +57,6 @@ object DEBUG {
                 }
             })
 
-            add(object : AbstractAction("Inspect") {
-                override fun actionPerformed(e: ActionEvent) = InspectSpy().show()
-            })
         }
 
         return debugMenu

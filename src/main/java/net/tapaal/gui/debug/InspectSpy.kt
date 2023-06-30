@@ -1,8 +1,6 @@
 package net.tapaal.gui.debug
 
-import dk.aau.cs.model.CPN.ColorType
-import dk.aau.cs.model.CPN.ProductType
-import net.tapaal.gui.petrinet.editor.ConstantsPane
+import net.tapaal.gui.petrinet.TAPNLens
 import pipe.gui.TAPAALGUI
 import java.awt.event.ActionEvent
 import java.lang.reflect.Field
@@ -55,55 +53,75 @@ class InspectSpy : JFrame() {
     }
 
     private fun handleFieldWithRender(render: Render, obj: Any?, node: DefaultMutableTreeNode) {
-            when(render) {
-                is ToStringRender -> {
-                    if (render.field != null) {
-                        node.add(DefaultMutableTreeNode("${render.displayName}: ${obj?.getPrivateField(render.field)}"))
-                    } else {
-                        node.add(DefaultMutableTreeNode(obj.toString()))
-                    }
+        when (render) {
+            is ToStringRender -> {
+                val str = if (render.field != null) {
+                    "${render.displayName}: ${render.render(obj?.getPrivateField(render.field))}"
+                } else {
+                    render.render(obj)
                 }
-                is ListModelRender -> {
-                    val top = DefaultMutableTreeNode(render.displayName)
-                    val lm = (obj!!.getPrivateField(render.field)) as AbstractListModel<*>
-                    lm.forEach {
-                        handleFieldWithRender(render.render, it, top)
-                    }
-                    node.add(top)
+                node.add(DefaultMutableTreeNode(str))
+            }
+
+            is ListModelRender -> {
+                val top = DefaultMutableTreeNode(render.displayName)
+                val lm = (obj!!.getPrivateField(render.field)) as AbstractListModel<*>
+                lm.forEach {
+                    handleFieldWithRender(render.render, it, top)
                 }
-                is VectorRender -> {
-                    val top = DefaultMutableTreeNode(render.displayName)
-                    val lm = (obj!!.getPrivateField(render.field)) as Vector<*>
-                    lm.forEach {
-                        handleFieldWithRender(render.render, it, top)
-                    }
-                    node.add(top)
+                node.add(top)
+            }
+
+            is VectorRender -> {
+                val top = DefaultMutableTreeNode(render.displayName)
+                val lm = (obj!!.getPrivateField(render.field)) as Vector<*>
+                lm.forEach {
+                    handleFieldWithRender(render.render, it, top)
                 }
-                is ObjectRender -> {
-                    val top = DefaultMutableTreeNode(render.displayName ?: obj)
-                    render.fields.forEach {
-                        handleFieldWithRender(it, obj, top)
-                    }
-                    node.add(top)
+                node.add(top)
+            }
+
+            is RenderField -> {
+                render.fields.forEach {
+                    handleFieldWithRender(it, obj?.getPrivateField(render.field), node)
                 }
             }
+
+            is ObjectRender -> {
+                val top = DefaultMutableTreeNode(render.displayName ?: obj)
+                render.fields.forEach {
+                    handleFieldWithRender(it, obj, top)
+                }
+                node.add(top)
+            }
+        }
     }
 
     private fun generateGlobal() {
-        val constantsPane = TAPAALGUI.getCurrentTab().getPrivateField("constantsPanel") as ConstantsPane
+        val constantsPane = TAPAALGUI.getCurrentTab()
 
-        val o = ObjectRender(
-            ListModelRender("variablesListModel", ToStringRender(), "Variables"),
-            ListModelRender("constantsListModel", ToStringRender(), "Constants"),
-            ListModelRender("colorTypesListModel", ObjectRender(
-                ToStringRender("id"),
-                ToStringRender("name"),
-                VectorRender("colors", ToStringRender())
-            ), "Color Types"),
-            displayName = "Global"
-        )
+        val render =
+            ObjectRender(
+                ToStringRender("lens", render = {
+                    it as TAPNLens;
+                    "Timed: ${it.isTimed}, Game: ${it.isGame}, Color: ${it.isColored}"
+                }, displayName = "Lense"),
+                RenderField(
+                    "constantsPanel",
+                    ListModelRender("variablesListModel", ToStringRender(), "Variables"),
+                    ListModelRender("constantsListModel", ToStringRender(), "Constants"),
+                    ListModelRender(
+                        "colorTypesListModel", ObjectRender(
+                            ToStringRender("id"),
+                            ToStringRender("name"),
+                            VectorRender("colors", ToStringRender())
+                        ), "Color Types"
+                    ),
+                ),
+                displayName = "Global"
+            )
 
-        handleFieldWithRender(o, constantsPane, treeRoot)
+        handleFieldWithRender(render, constantsPane, treeRoot)
     }
 
     init {
@@ -119,14 +137,20 @@ class InspectSpy : JFrame() {
 
 }
 
-private fun <E> AbstractListModel<E>.forEach(function: (e: E)->Unit) {
+private fun <E> AbstractListModel<E>.forEach(function: (e: E) -> Unit) {
     for (i in 0 until this.size) {
         function(this.getElementAt(i))
     }
 }
 
 sealed class Render()
-class ToStringRender(val field: String? = null, val displayName: String? = field): Render()
-class ObjectRender(vararg val fields: Render, val displayName: String? = null): Render()
-class VectorRender(val field: String, val render: Render, val displayName: String? = field): Render()
-class ListModelRender(val field: String, val render: Render, val displayName: String? = field): Render()
+class ToStringRender(
+    val field: String? = null,
+    val displayName: String? = field,
+    val render: ((Any?) -> String) = { a: Any? -> a?.toString() ?: "null" }
+) : Render()
+
+class RenderField(val field: String, vararg val fields: Render) : Render()
+class ObjectRender(vararg val fields: Render, val displayName: String? = null) : Render()
+class VectorRender(val field: String, val render: Render, val displayName: String? = field) : Render()
+class ListModelRender(val field: String, val render: Render, val displayName: String? = field) : Render()
