@@ -58,6 +58,72 @@ public class Verifier {
         return verifypn;
     }
 
+    private static TAPNQuery convertQuery(TAPNQuery query, TAPNLens lens) {
+        if (lens == null) return query;
+
+        TAPNQuery newQuery = query;
+        if (!lens.isTimed() && query.getReductionOption() != ReductionOption.VerifyPN) {
+            newQuery = new TAPNQuery(
+                query.getName(),
+                query.getCapacity(),
+                query.getProperty().copy(),
+                query.getTraceOption(),
+                query.getSearchOption(),
+                ReductionOption.VerifyPN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                !lens.isGame() && query.useReduction(),
+                null,
+                null,
+                query.inclusionPlaces(),
+                false,
+                false,
+                0,
+                lens.isColored() && query.usePartitioning(),
+                lens.isColored() && query.useColorFixpoint(),
+                lens.isColored() && query.useSymmetricVars(),
+                lens.isColored(),
+                query.useColoredReduction());
+            newQuery.setCategory(TAPNQuery.QueryCategory.CTL);
+            newQuery.setUseSiphontrap(query.isSiphontrapEnabled());
+            newQuery.setUseQueryReduction(query.isQueryReductionEnabled());
+            newQuery.setUseStubbornReduction(query.isStubbornReductionEnabled());
+            newQuery.setUseTarOption(query.isTarOptionEnabled());
+            newQuery.setUseTarjan(query.isTarjan());
+        } else if (lens.isTimed() && query.getReductionOption() == ReductionOption.VerifyPN) {
+            newQuery = new TAPNQuery(
+                query.getName(),
+                query.getCapacity(),
+                query.getProperty().copy(),
+                query.getTraceOption(),
+                query.getSearchOption(),
+                ReductionOption.VerifyDTAPN,
+                query.useSymmetry(),
+                query.useGCD(),
+                query.useTimeDarts(),
+                query.usePTrie(),
+                query.useOverApproximation(),
+                query.useReduction(),
+                null,
+                null,
+                query.inclusionPlaces(),
+                query.isOverApproximationEnabled(),
+                query.isUnderApproximationEnabled(),
+                query.approximationDenominator(),
+                false,
+                false,
+                false,
+                lens.isColored(),
+                false);
+            newQuery.setUseStubbornReduction(query.isStubbornReductionEnabled());
+        }
+
+        return newQuery;
+    }
+
     public static ModelChecker getModelChecker(TAPNQuery query) {
         if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
             return getVerifyTAPN();
@@ -155,6 +221,8 @@ public class Verifier {
         HashMap<TimedArcPetriNet, DataLayer> guiModels,
         boolean onlyCreateReducedNet,
         TAPNLens lens) {
+        query = convertQuery(query, lens);
+
         ModelChecker verifytapn = getModelChecker(query);
 
 
