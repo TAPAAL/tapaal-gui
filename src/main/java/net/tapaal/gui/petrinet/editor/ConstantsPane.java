@@ -39,7 +39,6 @@ import net.tapaal.gui.swingcomponents.NonsearchableJList;
 import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.petrinet.widgets.SidePane;
 
-import static java.lang.Integer.min;
 
 public class ConstantsPane extends JPanel implements SidePane {
 
