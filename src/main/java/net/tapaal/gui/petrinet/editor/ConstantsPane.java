@@ -39,6 +39,7 @@ import net.tapaal.gui.swingcomponents.NonsearchableJList;
 import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.petrinet.widgets.SidePane;
 
+
 public class ConstantsPane extends JPanel implements SidePane {
 
 	private final JPanel constantsPanel;
@@ -816,7 +817,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                 updateName();
             } else{
                 String message = "Variable could not be removed for the following reasons: \n\n";
-                message += String.join("", messages);
+                message += String.join("\n", messages);
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove variable", JOptionPane.WARNING_MESSAGE);
             }
         }

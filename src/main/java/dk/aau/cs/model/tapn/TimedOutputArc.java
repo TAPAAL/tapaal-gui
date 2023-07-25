@@ -79,7 +79,7 @@ public class TimedOutputArc extends TAPNElement {
 	
 	@Override
 	public String toString() {
-		return "From " + source.name() + " to " + destination.name();
+		return "from " + source.name() + " to " + destination.name();
 	}
 
     public void setExpression(ArcExpression expression) {this.expression = expression;}

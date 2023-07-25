@@ -215,11 +215,11 @@ public class TransportArc extends TAPNElement {
 	
 	@Override
 	public String toString() {
-		return "From " + source.name() + " to " + destination.name() + " through " + transition.name() + " with interval " + interval().toString();
+		return "from " + source.name() + " to " + destination.name() + " through " + transition.name() + " with interval " + interval().toString();
 	}
 
 	public String fromTo(){
-        return "From " + source.name() + " to " + destination.name() + " through " + transition.name();
+        return "from " + source.name() + " to " + destination.name() + " through " + transition.name();
     }
     public ArcExpression getOutputExpression() {
         return outputExpression;

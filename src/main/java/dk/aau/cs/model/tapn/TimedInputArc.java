@@ -122,7 +122,7 @@ public class TimedInputArc extends TAPNElement {
 	}
 
     public String fromTo() {
-        return "From " + source.name() + " to " + destination.name();
+        return "from " + source.name() + " to " + destination.name();
     }
 
     //TODO: If we ever want to simulate colored nets we need to add colors to this
