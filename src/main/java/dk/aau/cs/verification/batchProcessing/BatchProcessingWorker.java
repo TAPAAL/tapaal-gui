@@ -255,8 +255,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
             if (option.keepKBound()) {
                 Pattern pattern = Pattern.compile("\\s*(-k|--k-bound)\\s*(\\d+)\\s*", Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(options);
+                int kbound =  query.getCapacity() + model.network().marking().size();
                 if (matcher.find()) {
-                    options = options.replaceFirst(matcher.group(), matcher.group(1) + " " + query.getCapacity() + " ");
+                    options = options.replaceFirst(matcher.group(), " " + matcher.group(1) + " " + kbound + " ");
+                }
+                else {
+                    options = "--k-bound " + kbound + " " + options;
                 }
             }
             return worker.batchWorker(composedModel, options, query, model, modelChecker, queryToVerify, clonedQuery);
