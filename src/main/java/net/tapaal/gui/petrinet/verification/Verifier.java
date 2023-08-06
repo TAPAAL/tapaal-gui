@@ -143,13 +143,14 @@ public class Verifier {
     public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k, JSpinner tokensControl, TAPNQuery query) {
         ModelChecker modelChecker;
 
-        if ((lens == null && tapnNetwork.isUntimed()) || (lens != null && !lens.isTimed()))
+        if ((lens == null && tapnNetwork.isUntimed()) || (lens != null && !lens.isTimed())) {
             modelChecker = getVerifyPN();
-        else if ((lens == null && tapnNetwork.isColored()) || (lens != null && lens.isColored()) || tapnNetwork.hasWeights() ||
-                tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions())
+        } else if ((lens == null && tapnNetwork.isColored()) || (lens != null && lens.isColored()) || tapnNetwork.hasWeights() ||
+                tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions()) {
             modelChecker = getVerifydTAPN();
-        else
+        } else {
             modelChecker = getVerifyTAPN();
+        }
 
         if (!modelChecker.isCorrectVersion()) {
             new MessengerImpl().displayErrorMessage(

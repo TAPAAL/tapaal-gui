@@ -44,14 +44,23 @@ public class KBoundAnalyzer {
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private final net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery;
 
-	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k,
-                          ModelChecker modelChecker, Messenger messenger, JSpinner tokensControl, net.tapaal.gui.petrinet.verification.TAPNQuery query) {
+	public KBoundAnalyzer(
+        TimedArcPetriNetNetwork tapnNetwork,
+        TAPNLens lens,
+        HashMap<TimedArcPetriNet, DataLayer> guiModels,
+        int k,
+        ModelChecker modelChecker,
+        Messenger messenger,
+        JSpinner tokensControl,
+        net.tapaal.gui.petrinet.verification.TAPNQuery query
+    ) {
         this.lens = lens;
         this.k = k;
 		this.tapnNetwork = tapnNetwork;
 		this.modelChecker = modelChecker;
         this.messenger = messenger;
-        this.guiModels = guiModels;
+        this.guiModels = null; // Workarround for bug 2029475, guimodels noes not match input to composer leading
+        // to early abortion and empty nets
 		spinner = tokensControl;
         dataLayerQuery = query;
 	}
