@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class VariablesDialogPanel extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -168,13 +169,13 @@ public class VariablesDialogPanel extends JPanel {
 
     private void createColorTypesComboBox() {
         colorTypes = new ArrayList<>();
-        colorTypes = network.colorTypes();
+        colorTypes = network.colorTypes().stream().filter(f -> !f.isProductColorType() && f != ColorType.COLORTYPE_DOT).collect(Collectors.toList());
+        // We filter out product color types as well as the dot color types because variables cannot be of that type
 
         colorTypeComboBox = new JComboBox();
 
         int selectedVariableIndex = 0; int index = 0;
         for (ColorType element : colorTypes) {
-            if(!element.isProductColorType() && element != ColorType.COLORTYPE_DOT){
                 colorTypeComboBox.addItem(element);
                 if (variable != null) {
                     if (element.getName().equals(variable.getColorType().getName())) {
@@ -182,7 +183,6 @@ public class VariablesDialogPanel extends JPanel {
                     }
                 }
                 index += 1;
-            }
         }
 
         if (colorTypeComboBox.getItemCount() <= 0) {
