@@ -1297,7 +1297,8 @@ public class WorkflowDialog extends JDialog {
 	}
 
 	private void checkBound() {
-		Verifier.analyzeKBound(model, lens, tab.getGuiModels(), (Integer) numberOfExtraTokensInNet.getValue(), numberOfExtraTokensInNet, null);
+		Verifier.analyzeKBound(model, lens, null, (Integer) numberOfExtraTokensInNet.getValue(), numberOfExtraTokensInNet, null);
+		// passing null in the thrid argument instead of tab.getGuiModels() is a workaround the bug lp:2029475
 	}
 
 	private TAPNNetworkTrace mapTraceToRealModel(TAPNNetworkTrace tapnNetworkTrace){
