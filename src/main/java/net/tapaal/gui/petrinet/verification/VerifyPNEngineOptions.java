@@ -16,7 +16,7 @@ public class VerifyPNEngineOptions extends EngineSupportOptions {
             false, //support strict nets
             false, //support timed nets/time intervals
             true, //support deadlock with net degree > 2
-            false, //support games
+            true, //support games
             true, //support EG or AF with net degree > 2
             true,//support for nested quantification
             true,
