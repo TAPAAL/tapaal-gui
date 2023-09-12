@@ -3094,9 +3094,8 @@ public class QueryDialog extends JPanel {
         Vector<Object> traceBoxVector = new Vector<>();
         Vector<Object> traceBoxQuantificationVector = new Vector<>();
         for (int i = 0; i < traceModel.getSize(); i++) {
-            if (traceList.contains(traceModel.get(i).toString()))
-                traceBoxVector.add(traceModel.get(i));
-            else
+            traceBoxVector.add(traceModel.get(i));
+            if (!traceList.contains(traceModel.get(i).toString()))
                 traceBoxQuantificationVector.add(traceModel.get(i));
         }
 
