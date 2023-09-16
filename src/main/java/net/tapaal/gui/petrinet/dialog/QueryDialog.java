@@ -3367,10 +3367,7 @@ public class QueryDialog extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         traceBoxPanel.add(thirdRow, gbc);
 
-        if (traceList.getSelectedIndex() == -1) {
-            moveUpButton.setEnabled(false);
-            moveDownButton.setEnabled(false);
-        }
+        traceList.clearSelection();
 
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -3454,7 +3451,6 @@ public class QueryDialog extends JPanel {
                 traceList.setModel(traceModel);
 
                 if(isFromTraceDialogBox) traceTextField.setText("");
-                if(isFromTraceDialogBox) traceRemoveButton.setEnabled(true);
             }
         }
 
