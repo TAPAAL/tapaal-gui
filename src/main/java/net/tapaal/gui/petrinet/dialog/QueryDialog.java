@@ -3406,6 +3406,7 @@ public class QueryDialog extends JPanel {
         UpdateTempTraceList();
 
         traceDialog.setVisible(true);
+        updateTraceBox();
     }
 
     private void UpdateTempTraceList() {
@@ -3514,7 +3515,9 @@ public class QueryDialog extends JPanel {
 
     private void exitTraceDialog() {
         updateTraceBox();
-        traceBox.setSelectedIndex(traceBox.getItemCount() - 1);
+        if (traceBox.getSelectedItem() != null) {
+            traceBox.setSelectedIndex(traceBox.getItemCount() - 1);
+        }
         updateTraceBoxQuantification = false;
         traceBoxQuantification.setSelectedIndex(traceBoxQuantification.getItemCount() - 1);
         updateTraceBoxQuantification = true;
@@ -4472,7 +4475,7 @@ public class QueryDialog extends JPanel {
             refreshTraceRefinement();
             refreshTarjan();
             refreshColoredReduction();
-            if (queryType.getSelectedIndex() == 2 && currentSelection != null) {
+            if (queryType.getSelectedIndex() == 2) {
                 traceBoxQuantification.setEnabled(traceBoxQuantification.getModel().getSize() > 0);
             }
         }
@@ -4734,6 +4737,7 @@ public class QueryDialog extends JPanel {
             } else {
                 aButton.setEnabled(false);
                 eButton.setEnabled(false);
+                traceBoxQuantification.setEnabled(false);
                 globallyButton.setEnabled(true);
                 finallyButton.setEnabled(true);
                 nextButton.setEnabled(true);
@@ -4741,7 +4745,7 @@ public class QueryDialog extends JPanel {
             }
         }
 
-        if (currentSelection != null && (currentSelection.getObject() instanceof LTLENode || currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof TCTLPathPlaceHolder)) {
+        if (currentSelection == null || (currentSelection != null && (currentSelection.getObject() instanceof LTLENode || currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof TCTLPathPlaceHolder))) {
             conjunctionButton.setEnabled(false);
             disjunctionButton.setEnabled(false);
         } else {
