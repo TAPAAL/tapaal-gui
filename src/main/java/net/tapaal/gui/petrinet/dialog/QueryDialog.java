@@ -3368,6 +3368,8 @@ public class QueryDialog extends JPanel {
         traceBoxPanel.add(thirdRow, gbc);
 
         traceList.clearSelection();
+        moveUpButton.setEnabled(false);
+        moveDownButton.setEnabled(false);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
