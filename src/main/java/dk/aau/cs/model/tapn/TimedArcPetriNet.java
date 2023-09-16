@@ -101,7 +101,7 @@ public class TimedArcPetriNet {
                 break;
             }
         }
-        if (hasColors || values.getColorTypes().size() > 1 || !values.getVariables().isEmpty()) {
+        if (hasColors || values.getColorTypes().stream().distinct().count()  > 1 || !values.getVariables().isEmpty()) {
             return true;
         }
 
