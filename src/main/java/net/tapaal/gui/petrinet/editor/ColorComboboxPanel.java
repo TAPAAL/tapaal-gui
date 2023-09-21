@@ -143,6 +143,8 @@ public abstract class ColorComboboxPanel extends JPanel {
         combobox.setRenderer(new ColorComboBoxRenderer(combobox));
         combobox.setPreferredSize(new Dimension(200,25));
 
+        combobox.setMaximumRowCount(20);
+
         if (includePlaceHolder) {
             combobox.addItem(new PlaceHolderColorExpression());
             combobox.addItem(new JSeparator());
