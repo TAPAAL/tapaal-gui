@@ -1117,10 +1117,10 @@ public class ColorTypeDialogPanel extends JPanel {
                     }
                 }
 
-                if (productType.size() <= 0) {
+                if (productType.size() <= 1) {
                     JOptionPane.showMessageDialog(
                         TAPAALGUI.getApp(),
-                        "An product type must contain at least one component",
+                        "An product type must contain at least two components",
                         "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
