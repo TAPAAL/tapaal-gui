@@ -17,34 +17,54 @@ public class ColorComboBoxRenderer extends JLabel implements ListCellRenderer {
         int index,
         boolean isSelected,
         boolean cellHasFocus) {
-        if(value instanceof JSeparator){
-            return  new JSeparator(JSeparator.HORIZONTAL);
-        }
-        else if(value instanceof Variable){
-            setText(ellipsis(((Variable)value).getName(), comboBox.getWidth() / 7));
 
+        int padding = 2;
+
+        if (value instanceof JSeparator){
+            return new JSeparator(JSeparator.HORIZONTAL);
+        }
+        else if (value instanceof Variable){
+            String text = ((Variable)value).getName();
+
+            setText(ellipsis(text, maxChars(text, list, padding)));
             setFont(list.getFont());
         }
-        else if(value != null) {
-            setText(ellipsis(value.toString(), comboBox.getWidth() / 7));
-
+        else if (value != null) {
+            String text = value.toString();
+    
+            setText(ellipsis(text, maxChars(text, list, padding)));
             setFont(list.getFont());
         }
 
         return this;
     }
-    //From here https://stackoverflow.com/questions/3597550/ideal-method-to-truncate-a-string-with-ellipsis
+    
+    // Calculates max possible chars that can be shown on list - padding
+    private int maxChars(String text, JList list, int padding) {    
+        FontMetrics metrics = list.getFontMetrics(list.getFont());
+        
+        int width = 0;
+        int comboBoxWidth = comboBox.getWidth();
+        
+        for (int i = 0; i < text.length(); ++i) {
+            int cWidth = metrics.charWidth(text.charAt(i));
+            
+            if (width + cWidth > comboBoxWidth) {
+                return i - padding;
+            }
+            
+            width += cWidth;
+        }
+        
+        return text.length();
+    }
 
-
+    
+    // Inspired by: https://stackoverflow.com/questions/3597550/ideal-method-to-truncate-a-string-with-ellipsis
     public static String ellipsis(final String text, int length)
     {
-        if(length > 3) {
-            // The letters [iIl1] are slim enough to only count as half a character.
-            length += Math.ceil(text.replaceAll("[^iIl]", "").length() / 2.0d);
-
-            if (text.length() > length) {
-                return text.substring(0, length - 3) + "...";
-            }
+        if (length > 3 && text.length() > length) {
+            return text.substring(0, length - 3) + "...";
         }
 
         return text;
