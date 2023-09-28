@@ -7,8 +7,15 @@ import java.awt.*;
 
 public class ColorComboBoxRenderer extends JLabel implements ListCellRenderer {
     final JComboBox comboBox;
+    final int adjust;
+
     public ColorComboBoxRenderer(JComboBox comboBox) {
+        this(comboBox, 0);
+    }
+
+    public ColorComboBoxRenderer(JComboBox comboBox, int adjust) {
         this.comboBox = comboBox;
+        this.adjust = adjust;
     }
 
     public Component getListCellRendererComponent(
@@ -18,21 +25,19 @@ public class ColorComboBoxRenderer extends JLabel implements ListCellRenderer {
         boolean isSelected,
         boolean cellHasFocus) {
 
-        int padding = 2;
-
         if (value instanceof JSeparator){
             return new JSeparator(JSeparator.HORIZONTAL);
         }
         else if (value instanceof Variable){
             String text = ((Variable)value).getName();
 
-            setText(ellipsis(text, maxChars(text, list, padding)));
+            setText(ellipsis(text, maxChars(text, list, adjust)));
             setFont(list.getFont());
         }
         else if (value != null) {
             String text = value.toString();
     
-            setText(ellipsis(text, maxChars(text, list, padding)));
+            setText(ellipsis(text, maxChars(text, list, adjust)));
             setFont(list.getFont());
         }
 
@@ -40,7 +45,7 @@ public class ColorComboBoxRenderer extends JLabel implements ListCellRenderer {
     }
     
     // Calculates max possible chars that can be shown on list - padding
-    private int maxChars(String text, JList list, int padding) {    
+    private int maxChars(String text, JList list, int adjust) {    
         FontMetrics metrics = list.getFontMetrics(list.getFont());
         
         int width = 0;
@@ -50,7 +55,7 @@ public class ColorComboBoxRenderer extends JLabel implements ListCellRenderer {
             int cWidth = metrics.charWidth(text.charAt(i));
             
             if (width + cWidth > comboBoxWidth) {
-                return i - padding;
+                return i - adjust;
             }
             
             width += cWidth;

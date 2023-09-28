@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
@@ -551,8 +552,15 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 	private void ShowNewTemplateDialog(String nameToShow) {
 		dialog = new EscapableDialog(TAPAALGUI.getApp(), "Enter Component Name", true);
+
+		// setResizable seems to be platform dependent so use scrolling as a fallback
+        JScrollPane scrollPane = new JScrollPane(container);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
 		initComponentsOfNewTemplateDialog(nameToShow);
-		dialog.add(container);
+		
+		dialog.add(scrollPane);
 		dialog.setResizable(false);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
@@ -635,8 +643,16 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		else {
 			initComponentsOfRenameTemplateDialog(nameToShow);
 		}
-		dialog.add(container);
+
+		// setResizable seems to be platform dependent so use scrolling as a fallback
+        JScrollPane scrollPane = new JScrollPane(container);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+		dialog.add(scrollPane);
+
 		dialog.setResizable(false);
+
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);

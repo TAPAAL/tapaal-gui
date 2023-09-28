@@ -60,6 +60,7 @@ public class ColorTypeDialogPanel extends JPanel {
 
     private JScrollPane scrollPane;
 
+
     private static final int MAXIMUM_INTEGER = 10000;
 
     public ColorTypeDialogPanel(ConstantsPane.ColorTypesListModel colorTypesListModel,
@@ -88,12 +89,14 @@ public class ColorTypeDialogPanel extends JPanel {
 
     public void showDialog() {
         dialog = new EscapableDialog(TAPAALGUI.getApp(), "Edit color type", true);
+
         dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(true);
         dialog.pack();
         //size of range of integers panel
         dialog.setMinimumSize(new Dimension(447, 231));
+
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
@@ -387,6 +390,7 @@ public class ColorTypeDialogPanel extends JPanel {
         final JPanel cyclicAndFiniteEnumeration = new JPanel();
         cyclicAndFiniteEnumeration.setLayout(new GridBagLayout());
         cyclicAndFiniteEnumeration.setBorder(BorderFactory.createTitledBorder("Cyclic and Finite Enumeration"));
+        cyclicAndFiniteEnumeration.setPreferredSize(new Dimension(450, 250));
         //cyclicAndFiniteEnumeration.setSize(550,300);
         JButton moveUpButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("Images/Up.png"))));
         JButton moveDownButton = new JButton(new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("Images/Down.png"))));

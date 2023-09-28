@@ -684,9 +684,10 @@ public class QueryDialog extends JPanel {
         // 2 Add query editor
         QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, lens, tab);
 
-        // Add scrolling when window gets too small for content
+        guiDialog.setResizable(false);
+
+        // setResizable seems to be platform dependent so use scrolling as a fallback
         JScrollPane scrollPane = new JScrollPane(queryDialogue);
-        scrollPane.setViewportView(queryDialogue);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
