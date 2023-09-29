@@ -88,6 +88,7 @@ public class PlaceEditorPanel extends JPanel {
 		scrollPane.setViewportView(mainPanel);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(null);
 		add(scrollPane, BorderLayout.CENTER);
 	}
 

@@ -690,6 +690,7 @@ public class QueryDialog extends JPanel {
         JScrollPane scrollPane = new JScrollPane(queryDialogue);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(null);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weightx = 1.0;

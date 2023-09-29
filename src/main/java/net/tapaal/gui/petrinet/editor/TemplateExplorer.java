@@ -559,7 +559,8 @@ public class TemplateExplorer extends JPanel implements SidePane {
         JScrollPane scrollPane = new JScrollPane(container);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		
+		scrollPane.setBorder(null);
+
 		dialog.add(scrollPane);
 		dialog.setResizable(false);
 		dialog.pack();
@@ -648,6 +649,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
         JScrollPane scrollPane = new JScrollPane(container);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setBorder(null);
 
 		dialog.add(scrollPane);
 		dialog.setResizable(false);
