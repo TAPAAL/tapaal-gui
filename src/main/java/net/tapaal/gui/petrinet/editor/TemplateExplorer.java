@@ -553,12 +553,12 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	private void ShowNewTemplateDialog(String nameToShow) {
 		dialog = new EscapableDialog(TAPAALGUI.getApp(), "Enter Component Name", true);
 
+		initComponentsOfNewTemplateDialog(nameToShow);
+
 		// setResizable seems to be platform dependent so use scrolling as a fallback
         JScrollPane scrollPane = new JScrollPane(container);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-		initComponentsOfNewTemplateDialog(nameToShow);
 		
 		dialog.add(scrollPane);
 		dialog.setResizable(false);
@@ -650,9 +650,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 		dialog.add(scrollPane);
-
 		dialog.setResizable(false);
-
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
