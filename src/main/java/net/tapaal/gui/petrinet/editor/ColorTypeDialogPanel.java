@@ -90,6 +90,8 @@ public class ColorTypeDialogPanel extends JPanel {
     public void showDialog() {
         dialog = new EscapableDialog(TAPAALGUI.getApp(), "Edit color type", true);
 
+        scrollPane.setBorder(null);
+
         dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(true);

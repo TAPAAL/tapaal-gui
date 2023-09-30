@@ -71,6 +71,7 @@ public class VariablesDialogPanel extends JPanel {
 
         dialog = new EscapableDialog(TAPAALGUI.getApp(),
                 panelHeader, true);
+        scrollPane.setBorder(null);
         dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(false);

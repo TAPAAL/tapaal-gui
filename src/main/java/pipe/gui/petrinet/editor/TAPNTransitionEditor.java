@@ -238,6 +238,7 @@ public class TAPNTransitionEditor extends JPanel {
 		scrollPane.setViewportView(mainPanel);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setBorder(null);
 		add(scrollPane, BorderLayout.CENTER);
 	}	
 	
