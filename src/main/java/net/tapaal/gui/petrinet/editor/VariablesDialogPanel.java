@@ -71,6 +71,7 @@ public class VariablesDialogPanel extends JPanel {
 
         dialog = new EscapableDialog(TAPAALGUI.getApp(),
                 panelHeader, true);
+        scrollPane.setBorder(null);
         dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(false);
@@ -174,6 +175,9 @@ public class VariablesDialogPanel extends JPanel {
 
         colorTypeComboBox = new JComboBox();
 
+        colorTypeComboBox.setPreferredSize(new Dimension(330, 30));
+        colorTypeComboBox.setRenderer(new ColorComboBoxRenderer(colorTypeComboBox, -4));
+
         int selectedVariableIndex = 0; int index = 0;
         for (ColorType element : colorTypes) {
                 colorTypeComboBox.addItem(element);
@@ -198,7 +202,7 @@ public class VariablesDialogPanel extends JPanel {
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        container.add(colorTypeComboBox,gbc);
+        container.add(colorTypeComboBox, gbc);
     }
 
     private void createOKButton() {

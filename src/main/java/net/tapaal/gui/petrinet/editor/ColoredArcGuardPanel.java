@@ -624,7 +624,8 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         exprField.setBackground(java.awt.Color.white);
 
         exprField.setEditable(false);
-        exprField.setToolTipText("Tooltip missing");
+        exprField.setToolTipText("<html>Click on a part of the query you want to edit.<br />" +
+        "(Queries can also be edited manually by pressing the \"Edit Query\" button.)</html>");
 
         JScrollPane exprScrollPane = new JScrollPane(exprField);
         exprScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
