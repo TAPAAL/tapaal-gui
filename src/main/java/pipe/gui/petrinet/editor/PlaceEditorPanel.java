@@ -842,15 +842,23 @@ public class PlaceEditorPanel extends JPanel {
         gbc.insets = new Insets(3, 3, 3,3);
         tokenButtonPanel.add(addColoredTokenButton, gbc);
 
-        addColoredTokenButton.addActionListener(actionEvent -> {
-            NumberOfExpression exprToAdd = buildTokenExpression((int) addTokenSpinner.getValue());
+        addColoredTokenButton.addActionListener(actionEvent -> {    
+            int tokenSpinnerValue = (int)addTokenSpinner.getValue();
+
+            if (tokenSpinnerValue > Constants.MAX_NUMBER_OF_TOKENS_ALLOWED) {
+                updateSpinnerValue(false);
+                JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Constants.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            NumberOfExpression exprToAdd = buildTokenExpression(tokenSpinnerValue);
             addTokenExpression(exprToAdd);
             addColoredTokenButton.setText("Modify");
             if(tokenList.isSelectionEmpty()){
                 tokenList.setSelectedIndex(coloredTokenListModel.size()-1);
             }
         });
-        SpinnerModel addTokenSpinnerModel = new SpinnerNumberModel(1,1,999,1);
+        SpinnerModel addTokenSpinnerModel = new SpinnerNumberModel(1,1,Integer.MAX_VALUE,1);
         addTokenSpinner = new JSpinner(addTokenSpinnerModel);
         addTokenSpinner.setPreferredSize(buttonSize);
         gbc = new GridBagConstraints();
