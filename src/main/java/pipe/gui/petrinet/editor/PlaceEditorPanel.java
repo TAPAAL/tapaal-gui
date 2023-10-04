@@ -36,6 +36,8 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.awt.*;
@@ -846,11 +848,10 @@ public class PlaceEditorPanel extends JPanel {
             int tokenSpinnerValue = (int)addTokenSpinner.getValue();
 
             if (tokenSpinnerValue > Constants.MAX_NUMBER_OF_TOKENS_ALLOWED) {
-                updateSpinnerValue(false);
                 JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Constants.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
+
             NumberOfExpression exprToAdd = buildTokenExpression(tokenSpinnerValue);
             addTokenExpression(exprToAdd);
             addColoredTokenButton.setText("Modify");
@@ -858,8 +859,8 @@ public class PlaceEditorPanel extends JPanel {
                 tokenList.setSelectedIndex(coloredTokenListModel.size()-1);
             }
         });
-        SpinnerModel addTokenSpinnerModel = new SpinnerNumberModel(1,1,Integer.MAX_VALUE,1);
-        addTokenSpinner = new JSpinner(addTokenSpinnerModel);
+        addTokenSpinner = new CustomJSpinner(1, 1, Integer.MAX_VALUE);
+
         addTokenSpinner.setPreferredSize(buttonSize);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -869,7 +870,6 @@ public class PlaceEditorPanel extends JPanel {
         tokenPanel.add(addTokenSpinner, gbc);
 
         removeColoredTokenButton = new JButton("Remove");
-
 
         removeColoredTokenButton.setPreferredSize(buttonSize);
         removeColoredTokenButton.setMinimumSize(buttonSize);
