@@ -566,6 +566,9 @@ public class SmartDrawDialog extends JDialog {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = new Insets(10, 20, 10, 0);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
+
+		spacingPanel.setPreferredSize(new Dimension(400, getHeight()));
+
 		mainPanel.add(spacingPanel, gbc);
 	}
 
