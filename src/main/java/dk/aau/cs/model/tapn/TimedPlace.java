@@ -79,7 +79,8 @@ public abstract class TimedPlace {
     }
 
     public void resetNumberOfTokens() {
-        numberOfTokens = 0;
+        this.numberOfTokens = 0;
+        this.tokens().clear();
     }
 
     /**

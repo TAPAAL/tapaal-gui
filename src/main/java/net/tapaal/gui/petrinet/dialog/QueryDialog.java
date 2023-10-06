@@ -17,11 +17,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Vector;
-
 import javax.swing.event.*;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
@@ -414,6 +409,7 @@ public class QueryDialog extends JPanel {
 
         setLayout(new GridBagLayout());
 
+
         init(option, queryToCreateFrom);
         makeShortcuts();
         toggleAdvancedSimpleView(false);
@@ -687,11 +683,25 @@ public class QueryDialog extends JPanel {
 
         // 2 Add query editor
         QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, lens, tab);
-        contentPane.add(queryDialogue);
 
         guiDialog.setResizable(false);
 
-        // Make window fit contents' preferred size
+        // setResizable seems to be platform dependent so use scrolling as a fallback
+        JScrollPane scrollPane = new JScrollPane(queryDialogue);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(null);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+
+        contentPane.add(scrollPane, gbc);
+
+        // Make window fit contents' preferred size 
         guiDialog.pack();
 
         // 'hack' for hiding the trace drop-down menu for HyperLTL on intial launch of the query dialogue panel
@@ -1502,6 +1512,7 @@ public class QueryDialog extends JPanel {
         setEnabledReductionOptions();
 
         rootPane.setDefaultButton(saveAndVerifyButton);
+
         disableAllQueryButtons();
         setSaveButtonsEnabled();
 
