@@ -245,6 +245,16 @@ public class SmartDrawDialog extends JDialog {
 		drawButton.requestFocus();
 		
 		setContentPane(mainPanel);
+
+		int extraWidth = 100;
+
+		Dimension preferredSize = mainPanel.getPreferredSize();
+		int preferredWidth = preferredSize.width + extraWidth;
+		int preferredHeight = preferredSize.height;
+
+		Dimension newPreferredSize = new Dimension(preferredWidth, preferredHeight);
+
+		mainPanel.setPreferredSize(newPreferredSize);
 	}
 	
 	private void initAdvancedOptionsPanel() {
@@ -566,8 +576,6 @@ public class SmartDrawDialog extends JDialog {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = new Insets(10, 20, 10, 0);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-
-		spacingPanel.setPreferredSize(new Dimension(400, getHeight()));
 
 		mainPanel.add(spacingPanel, gbc);
 	}
