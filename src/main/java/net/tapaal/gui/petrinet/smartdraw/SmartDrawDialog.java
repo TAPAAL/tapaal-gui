@@ -244,8 +244,6 @@ public class SmartDrawDialog extends JDialog {
 		this.getRootPane().setDefaultButton(drawButton);
 		drawButton.requestFocus();
 		
-		setContentPane(mainPanel);
-
 		int extraWidth = 100;
 
 		Dimension preferredSize = mainPanel.getPreferredSize();
@@ -255,6 +253,13 @@ public class SmartDrawDialog extends JDialog {
 		Dimension newPreferredSize = new Dimension(preferredWidth, preferredHeight);
 
 		mainPanel.setPreferredSize(newPreferredSize);
+
+		JScrollPane scrollPane = new JScrollPane(mainPanel);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setBorder(null);
+
+		setContentPane(scrollPane);
 	}
 	
 	private void initAdvancedOptionsPanel() {
