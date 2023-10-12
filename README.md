@@ -38,3 +38,4 @@ List of commands (see gradlew tasks --all for all)
   * test - run unit tests
   * jar - make a jar file
   * assemble - make a release build
+  * distZip - make a distribution zip file
