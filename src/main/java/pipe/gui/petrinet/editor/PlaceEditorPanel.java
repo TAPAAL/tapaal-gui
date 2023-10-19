@@ -608,7 +608,12 @@ public class PlaceEditorPanel extends JPanel {
 			return false;
 		}
 
-		int newMarking = (Integer)markingSpinner.getValue();
+        int newMarking = (Integer)markingSpinner.getValue();
+        
+        if (place.isColored()) {
+            newMarking = (int)addTokenSpinner.getValue();
+        }
+
 		if (newMarking > Constants.MAX_NUMBER_OF_TOKENS_ALLOWED) {
 			JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Constants.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
