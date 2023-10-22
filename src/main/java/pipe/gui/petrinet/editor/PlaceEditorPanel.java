@@ -851,13 +851,24 @@ public class PlaceEditorPanel extends JPanel {
 
         addColoredTokenButton.addActionListener(actionEvent -> {    
             int tokenSpinnerValue = (int)addTokenSpinner.getValue();
+            
+            int tokenListSum = 0;
 
-            if (tokenSpinnerValue > Constants.MAX_NUMBER_OF_TOKENS_ALLOWED) {
+            for (int i = 0; i < coloredTokenListModel.size(); ++i) {
+                if (i != tokenList.getSelectedIndex()) {
+                    tokenListSum += Integer.parseInt(coloredTokenListModel.getElementAt(i).toString().split("'")[0]);
+                }
+            }
+
+            tokenListSum += tokenSpinnerValue;
+
+            if (tokenListSum > Constants.MAX_NUMBER_OF_TOKENS_ALLOWED) {
                 JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Constants.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             NumberOfExpression exprToAdd = buildTokenExpression(tokenSpinnerValue);
+
             addTokenExpression(exprToAdd);
             addColoredTokenButton.setText("Modify");
             if(tokenList.isSelectionEmpty()){
