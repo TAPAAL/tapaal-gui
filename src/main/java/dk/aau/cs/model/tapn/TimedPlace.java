@@ -80,6 +80,10 @@ public abstract class TimedPlace {
 
     public void resetNumberOfTokens() {
         this.numberOfTokens = 0;
+    }
+
+    public void resetNumberOfTokensColor() {
+        resetNumberOfTokens();
         this.tokens().clear();
     }
 
