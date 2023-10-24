@@ -331,7 +331,7 @@ public class TimedPlaceComponent extends Place {
                 g.drawString("#" + marking, x, y + 20);
             } else if (marking > 9) {
                 g.drawString("#" + marking, x + 2, y + 20);
-            } else {
+            } else if (marking > 0) {
                 g.drawString("#" + marking, x + 6, y + 20);
             }
         }
