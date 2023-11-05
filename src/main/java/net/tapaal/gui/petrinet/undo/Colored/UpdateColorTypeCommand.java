@@ -40,12 +40,14 @@ public class UpdateColorTypeCommand extends Command {
                 }
             }
             for (TimedInputArc arc : tapn.inputArcs()) {
-                if (arc.getArcExpression() != null && arc.source().getColorType() == oldColorType)
+                if (arc.getArcExpression() != null) {
                     arc.setExpression(arc.getArcExpression().getExprWithNewColorType(oldColorType));
+                }
             }
             for (TimedOutputArc arc : tapn.outputArcs()) {
-                if (arc.getExpression() != null && arc.destination().getColorType() == oldColorType)
+                if (arc.getExpression() != null) {
                     arc.setExpression(arc.getExpression().getExprWithNewColorType(oldColorType));
+                }
             }
         }
 
@@ -75,12 +77,14 @@ public class UpdateColorTypeCommand extends Command {
                 }
             }
             for (TimedInputArc arc : tapn.inputArcs()) {
-                if (arc.getArcExpression() != null && arc.source().getColorType() == newColorType)
+                if (arc.getArcExpression() != null) {
                     arc.setExpression(arc.getArcExpression().getExprWithNewColorType(newColorType));
+                }
             }
             for (TimedOutputArc arc : tapn.outputArcs()) {
-                if (arc.getExpression() != null && arc.destination().getColorType() == newColorType)
+                if (arc.getExpression() != null) {
                     arc.setExpression(arc.getExpression().getExprWithNewColorType(newColorType));
+                }
             }
         }
 
@@ -88,6 +92,7 @@ public class UpdateColorTypeCommand extends Command {
 
         for (Variable var : network.variables()) {
             if (var.getColorType().equals(oldColorType)) {
+                System.out.println();
                 var.setColorType(newColorType);
             }
         }

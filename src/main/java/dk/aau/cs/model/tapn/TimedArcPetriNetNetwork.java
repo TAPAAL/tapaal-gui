@@ -684,6 +684,16 @@ public class TimedArcPetriNetNetwork {
         return null;
     }
 
+	public boolean doesSimilarRangeExist(ColorType newColorType) {
+		for (ColorType ct : colorTypes) {
+			if (ct.getColors().toString().equals(newColorType.getColors().toString())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
     public boolean isNameUsedForColorType(String name) {
         for (ColorType element : colorTypes) {
             if (element.getName().equals(name)) {
