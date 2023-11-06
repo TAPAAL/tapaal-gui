@@ -102,7 +102,6 @@ public class UpdateColorTypeCommand extends Command {
 
         for (Variable var : network.variables()) {
             if (var.getColorType().equals(oldColorType)) {
-                System.out.println();
                 var.setColorType(newColorType);
             }
         }
