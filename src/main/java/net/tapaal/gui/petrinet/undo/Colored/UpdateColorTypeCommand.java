@@ -49,6 +49,11 @@ public class UpdateColorTypeCommand extends Command {
                     arc.setExpression(arc.getExpression().getExprWithNewColorType(oldColorType));
                 }
             }
+            for (TimedTransition transition : tapn.transitions()) {
+                if (transition.getGuard() != null) {
+                    transition.getGuard().setColorType(newColorType);
+                }
+            }
         }
 
         eval(oldColorType);
