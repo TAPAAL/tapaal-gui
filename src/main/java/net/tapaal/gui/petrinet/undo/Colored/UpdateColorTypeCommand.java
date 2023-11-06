@@ -51,7 +51,7 @@ public class UpdateColorTypeCommand extends Command {
             }
             for (TimedTransition transition : tapn.transitions()) {
                 if (transition.getGuard() != null) {
-                    transition.getGuard().setColorType(newColorType);
+                    transition.getGuard().setColorType(oldColorType);
                 }
             }
         }
