@@ -1082,7 +1082,7 @@ public class ColorTypeDialogPanel extends JPanel {
                 if (network.isIndeticalToExisting(newColorType)) {
                     JOptionPane.showMessageDialog(
                         TAPAALGUI.getApp(),
-                        "Color type with similar range already exists!",
+                        "Color type with identical range already exists!",
                         "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }

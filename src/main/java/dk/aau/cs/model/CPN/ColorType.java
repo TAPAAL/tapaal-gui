@@ -40,8 +40,12 @@ public class ColorType implements Iterable<Color> {
         return colors.iterator();
     }
 
-    public Vector<Color> getColors(){
+    public Vector<Color> getColors() {
         return colors;
+    }
+
+    public String getSemanticValue() {
+        return getColors().toString();
     }
 
     @Override
@@ -52,11 +56,11 @@ public class ColorType implements Iterable<Color> {
 
         if (!object.name.equals(this.name))
             return false;
-
-        if(!object.size().equals(size())){
+ 
+        if (!object.size().equals(size())){
             return false;
         }
-        for(int i = 0; i < colors.size(); i++){
+        for (int i = 0; i < colors.size(); i++){
             if(!colors.get(i).equals(object.colors.get(i))){
                 return false;
             }
