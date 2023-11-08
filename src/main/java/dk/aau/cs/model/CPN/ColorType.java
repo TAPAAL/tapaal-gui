@@ -48,6 +48,10 @@ public class ColorType implements Iterable<Color> {
         return getColors().toString();
     }
 
+    public boolean isIdentical(ColorType newColorType) {
+        return getFirstColorName().equals(newColorType.getFirstColorName()) && getLastColorName().equals(newColorType.getLastColorName());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ColorType) || o instanceof ProductType)
@@ -91,6 +95,18 @@ public class ColorType implements Iterable<Color> {
 
     public Color getFirstColor() {
         return colors.firstElement();
+    }
+
+    public Color getLastColor() {
+        return colors.lastElement();
+    }
+
+    private String getFirstColorName() {
+        return getFirstColor().getColorName();
+    }
+
+    private String getLastColorName() {
+        return getLastColor().getColorName();
     }
 
     public boolean isProductColorType(){

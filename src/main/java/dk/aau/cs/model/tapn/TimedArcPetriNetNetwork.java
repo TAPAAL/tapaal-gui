@@ -686,7 +686,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public boolean isIndeticalToExisting(ColorType newColorType) {
 		for (ColorType ct : colorTypes) {
-			if (ct.getSemanticValue().equals(newColorType.getSemanticValue()) && !ct.equals(newColorType)) {
+			if (ct.isIdentical(newColorType) && !ct.equals(newColorType)) {
 				return true;
 			}
 		}
