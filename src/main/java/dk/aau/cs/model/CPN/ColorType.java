@@ -44,7 +44,6 @@ public class ColorType implements Iterable<Color> {
         return colors;
     }
 
-
     public boolean isIdentical(ColorType newColorType) {
         boolean firstColorIdentical = getFirstColor().getColorName().equals(newColorType.getFirstColor().getColorName());
         boolean lastColorIdentical = getColors().lastElement().getColorName().equals(newColorType.getColors().lastElement().getColorName());
