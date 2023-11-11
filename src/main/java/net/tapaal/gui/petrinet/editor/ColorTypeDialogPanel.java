@@ -945,6 +945,7 @@ public class ColorTypeDialogPanel extends JPanel {
                             "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
         try {
             if (rangeOfIntegersPanelEnabled && (Integer.parseInt(lowerBoundTextField.getText()) > Integer.parseInt(upperBoundTextField.getText()))) {
                 JOptionPane.showMessageDialog(
@@ -1076,6 +1077,14 @@ public class ColorTypeDialogPanel extends JPanel {
                 int upperboundNumber = Integer.parseInt(upperbound);
                 for (int i = lowerboundNumber; i < upperboundNumber + 1; i++) {
                     newColorType.addColor(String.valueOf(i));
+                }
+
+                if (network.isIndeticalToExisting(newColorType)) {
+                    JOptionPane.showMessageDialog(
+                        TAPAALGUI.getApp(),
+                        "Color type with identical range already exists!",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
 
                 if (oldColorType != null) {

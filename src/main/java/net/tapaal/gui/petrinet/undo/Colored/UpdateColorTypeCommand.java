@@ -40,12 +40,19 @@ public class UpdateColorTypeCommand extends Command {
                 }
             }
             for (TimedInputArc arc : tapn.inputArcs()) {
-                if (arc.getArcExpression() != null && arc.source().getColorType() == oldColorType)
+                if (arc.getArcExpression() != null) {
                     arc.setExpression(arc.getArcExpression().getExprWithNewColorType(oldColorType));
+                }
             }
             for (TimedOutputArc arc : tapn.outputArcs()) {
-                if (arc.getExpression() != null && arc.destination().getColorType() == oldColorType)
+                if (arc.getExpression() != null) {
                     arc.setExpression(arc.getExpression().getExprWithNewColorType(oldColorType));
+                }
+            }
+            for (TimedTransition transition : tapn.transitions()) {
+                if (transition.getGuard() != null) {
+                    transition.getGuard().setColorType(oldColorType);
+                }
             }
         }
 
@@ -75,12 +82,19 @@ public class UpdateColorTypeCommand extends Command {
                 }
             }
             for (TimedInputArc arc : tapn.inputArcs()) {
-                if (arc.getArcExpression() != null && arc.source().getColorType() == newColorType)
+                if (arc.getArcExpression() != null) {
                     arc.setExpression(arc.getArcExpression().getExprWithNewColorType(newColorType));
+                }
             }
             for (TimedOutputArc arc : tapn.outputArcs()) {
-                if (arc.getExpression() != null && arc.destination().getColorType() == newColorType)
+                if (arc.getExpression() != null) {
                     arc.setExpression(arc.getExpression().getExprWithNewColorType(newColorType));
+                }
+            }
+            for (TimedTransition transition : tapn.transitions()) {
+                if (transition.getGuard() != null) {
+                    transition.getGuard().setColorType(newColorType);
+                }
             }
         }
 
