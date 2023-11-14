@@ -226,8 +226,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
                 result.append(" --disable-symmetry-vars ");
             }
         }
-		if (this.useColoredReduction) {
-		    result.append(" --col-reduction 1 ");
+		if (!this.useColoredReduction) {
+		    result.append(" --col-reduction 0 ");
         }
 
 		return result.toString();
