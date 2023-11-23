@@ -555,9 +555,8 @@ public class PNMLoader {
         if (netSize <= maxNetSize) {
             return true;
         }
-        else {
-            throw new FormatException("The net is too big to be drawn.");
-        }
+
+        throw new FormatException("The net is too big to be drawn.");
     }
 
     Node getFirstDirectChild(Node parent, String tagName){
