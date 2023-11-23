@@ -362,7 +362,9 @@ public class VerifyPN implements ModelChecker {
                             }
                         }
                     } catch (FormatException e) {
+                        messenger.displayErrorMessage(e.getMessage());
                         e.printStackTrace();
+                        return null;
                     } catch (NullPointerException | ThreadDeath n) {
                         return null;
                     }

@@ -551,8 +551,12 @@ public class PNMLoader {
         return tempArc;
     }
 
-    private boolean isNetDrawable(){
-        return netSize <= maxNetSize;
+    private boolean isNetDrawable() throws FormatException {
+        if (netSize <= maxNetSize) {
+            return true;
+        }
+
+        throw new FormatException("The net is too big to be drawn.");
     }
 
     Node getFirstDirectChild(Node parent, String tagName){
@@ -564,5 +568,4 @@ public class PNMLoader {
         }
         return null;
     }
-
 }
