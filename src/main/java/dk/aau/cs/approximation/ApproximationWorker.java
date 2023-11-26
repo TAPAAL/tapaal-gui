@@ -939,7 +939,9 @@ public class ApproximationWorker {
                 verificationResult.verificationTime(),
                 verificationResult.stats(),
                 false,
-                verificationResult.getUnfoldedModel());
+                verificationResult.getRawOutput(),
+                verificationResult.getUnfoldedModel(),
+                null);
             value.setNameMapping(composedModel.value2());
         }
 
