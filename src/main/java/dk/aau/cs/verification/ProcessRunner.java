@@ -7,6 +7,7 @@ import java.io.StringReader;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.util.MemoryMonitor;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 
 public class ProcessRunner {
 
@@ -19,15 +20,23 @@ public class ProcessRunner {
 
 	private boolean error = false;
 
-	public ProcessRunner(String file, String arguments) {
+	public ProcessRunner(String file, String arguments, ModelChecker modelChecker) {
 		// this.setName("verification thread");
 
 		if (file == null || file.isEmpty()) {
-			throw new IllegalArgumentException("file");
+			if (modelChecker == null) {
+				throw new IllegalArgumentException("file");
+			}
+
+			modelChecker.setup(); // Ask user to setup engine
 		}
 
 		this.file = file;
 		this.arguments = arguments;
+	}
+
+	public ProcessRunner(String file, String arguments) {
+		this(file, arguments, null);
 	}
 
 	public long getRunningTime() {
