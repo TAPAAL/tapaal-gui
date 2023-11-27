@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.lang.UnsupportedOperationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -487,7 +488,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         //open the default browser on this page
         try {
             java.awt.Desktop.getDesktop().browse(url);
-        } catch (IOException e) {
+        } catch (IOException | UnsupportedOperationException e) {
             Logger.log("Cannot open the browser.");
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "There was a problem opening the default web browser \n" +
