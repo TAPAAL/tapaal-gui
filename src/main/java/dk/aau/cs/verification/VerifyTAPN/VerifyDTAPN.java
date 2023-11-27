@@ -462,7 +462,7 @@ public class VerifyDTAPN implements ModelChecker{
 	}
 
     public String getHelpOptions() {
-        runner = new ProcessRunner(verifydtapnpath, "--help");
+        runner = new ProcessRunner(verifydtapnpath, "--help", this);
         runner.run();
 
         if (!runner.error()) {

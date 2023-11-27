@@ -437,7 +437,7 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
     public String getHelpOptions() {
-        runner = new ProcessRunner(verifytapnpath, "--help");
+        runner = new ProcessRunner(verifytapnpath, "--help", this);
         runner.run();
 
         if (!runner.error()) {

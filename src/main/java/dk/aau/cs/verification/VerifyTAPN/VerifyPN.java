@@ -555,7 +555,7 @@ public class VerifyPN implements ModelChecker {
     }
 
     public String getHelpOptions() {
-        runner = new ProcessRunner(verifypnpath, "--help");
+        runner = new ProcessRunner(verifypnpath, "--help", this);
         runner.run();
 
         if (!runner.error()) {
