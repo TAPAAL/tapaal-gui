@@ -661,7 +661,7 @@ public class TimedArcPetriNet {
 	    for (ExprStringPosition exprStringPosition : expression.getChildren()) {
 	        Expression child = exprStringPosition.getObject();
 	        if (child instanceof AllExpression) {
-	            result += ((AllExpression) child).size();
+	            result += ((AllExpression) child).size() * numberOf;
             } else if (child instanceof NumberOfExpression) {
 	            result += (countTokens(child, ((NumberOfExpression) child).getNumber()));
             } else {
