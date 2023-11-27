@@ -494,7 +494,6 @@ public final class GuiFrameController implements GuiFrameControllerActions{
             JOptionPane.showMessageDialog(null, "There was a problem opening the default web browser \n" +
                             "Please open the url in your browser by entering " + url.toString(),
                     "Error opening browser", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
     }
 
