@@ -193,7 +193,7 @@ public class TabTransformer {
                 int numberOfTokens = place.tokens().size();
 
                 //kind of hack to convert from coloredTokens to uncolored
-                if (place.numberOfTokens() > 0){
+                if (place.numberOfTokens() > 0) {
                     System.out.println(numberOfTokens);
                     System.out.println(place.numberOfTokens());
                     Vector<ColorExpression> v = new Vector<>();
