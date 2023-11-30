@@ -193,13 +193,13 @@ public class TabTransformer {
                 int numberOfTokens = place.tokens().size();
 
                 //kind of hack to convert from coloredTokens to uncolored
-                if(numberOfTokens > 0){
+                if (place.numberOfTokens() > 0) {
                     Vector<ColorExpression> v = new Vector<>();
                     v.add(new DotConstantExpression());
                     Vector<ArcExpression> numbOfExpression = new Vector<>();
                     numbOfExpression.add(new NumberOfExpression(place.numberOfTokens(), v));
                     place.setTokenExpression(new AddExpression(numbOfExpression));
-                } else if (place.numberOfTokens() > 0) {
+                } else {
                     place.resetNumberOfTokens();
                 }
             }
