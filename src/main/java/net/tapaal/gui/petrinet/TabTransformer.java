@@ -201,7 +201,6 @@ public class TabTransformer {
                     Vector<ArcExpression> numbOfExpression = new Vector<>();
                     numbOfExpression.add(new NumberOfExpression(place.numberOfTokens(), v));
                     place.setTokenExpression(new AddExpression(numbOfExpression));
-                    System.out.println(new AddExpression(numbOfExpression));
                 } else {
                     place.resetNumberOfTokens();
                 }
