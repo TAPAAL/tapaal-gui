@@ -194,8 +194,6 @@ public class TabTransformer {
 
                 //kind of hack to convert from coloredTokens to uncolored
                 if (place.numberOfTokens() > 0) {
-                    System.out.println(numberOfTokens);
-                    System.out.println(place.numberOfTokens());
                     Vector<ColorExpression> v = new Vector<>();
                     v.add(new DotConstantExpression());
                     Vector<ArcExpression> numbOfExpression = new Vector<>();
