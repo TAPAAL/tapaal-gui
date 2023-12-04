@@ -18,6 +18,10 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.*;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -205,9 +209,12 @@ public class QueryDialog extends JPanel {
     private JCheckBox useQueryReduction;
     private JCheckBox useReduction;
     private JCheckBox useColoredReduction;
-	  private JCheckBox useStubbornReduction;
+	private JCheckBox useStubbornReduction;
     private JCheckBox useTraceRefinement;
     private JCheckBox useTarjan;
+    // Raw options panel
+    private JPanel rawOptionsPanel;
+    private JTextArea rawOptionsTextArea;
 
     // Approximation options panel
     private JPanel overApproximationOptionsPanel;
@@ -1857,6 +1864,7 @@ public class QueryDialog extends JPanel {
         }
         mergeNetComponentsButton.setVisible(advancedView);
 
+        rawOptionsPanel.setVisible(advancedView);
 
         if(advancedView){
             advancedButton.setText("Simple view");
@@ -4109,7 +4117,8 @@ public class QueryDialog extends JPanel {
         if(lens.isColored() && !lens.isTimed()){
             initUnfoldingOptionsPanel();
         }
-
+        initRawOptionsPanel();
+        
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -4469,6 +4478,86 @@ public class QueryDialog extends JPanel {
         gbc.gridx = 3;
         gbc.gridy = 1;
         reductionOptionsPanel.add(useTarjan, gbc);
+    }
+
+    private void initRawOptionsPanel() {
+        rawOptionsPanel = new JPanel(new BorderLayout());
+        rawOptionsPanel.setVisible(false);
+        rawOptionsPanel.setBorder(BorderFactory.createTitledBorder("Raw Options"));
+
+        rawOptionsTextArea = new JTextArea();
+        rawOptionsTextArea.setLineWrap(true);
+        rawOptionsTextArea.setWrapStyleWord(true);
+        rawOptionsTextArea.setRows(2);
+
+        rawOptionsPanel.add(rawOptionsTextArea);
+
+        // Sets maximum length of raw options
+        rawOptionsTextArea.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                int maxLen = 250;
+                if (rawOptionsTextArea.getText().length() > maxLen + 1) {
+                    e.consume();
+                    rawOptionsTextArea.setText(rawOptionsTextArea.getText().substring(0, maxLen));
+                } else if (rawOptionsTextArea.getText().length() > maxLen) {
+                    e.consume();
+                }
+            }
+        });
+
+        // Disables reduction options when raw options are used
+        ((AbstractDocument) rawOptionsTextArea.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                super.replace(fb, offset, length, text, attrs);
+                updateOptions();
+            }
+
+            @Override
+            public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
+                super.remove(fb, offset, length);
+                updateOptions();
+            }
+
+            private void updateOptions() {
+                Boolean isEnabled = rawOptionsTextArea.getText().length() == 0;
+                setVerificationOptionsEnabled(isEnabled);
+            }
+        });
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        verificationPanel.add(rawOptionsPanel, gbc);
+    }
+
+    private void setVerificationOptionsEnabled(boolean isEnabled) {
+        reductionOptionsPanel.setEnabled(isEnabled);
+        setAllChildrenEnabled(reductionOptionsPanel, isEnabled);
+
+        if (unfoldingOptionsPanel != null) {
+            unfoldingOptionsPanel.setEnabled(isEnabled);
+            setAllChildrenEnabled(unfoldingOptionsPanel, isEnabled);
+        }
+
+        // Reset to original values
+        if (isEnabled) {
+            setEnabledOptionsAccordingToCurrentReduction();
+        }
+    }
+
+    // Enables or disables all children recursively
+    private void setAllChildrenEnabled(Container container, boolean isEnabled) {
+        for (Component component : container.getComponents()) {
+            component.setEnabled(isEnabled);
+            if (component instanceof Container) {
+                setAllChildrenEnabled((Container) component, isEnabled);
+            }
+        }
     }
 
     protected void setEnabledOptionsAccordingToCurrentReduction() {
