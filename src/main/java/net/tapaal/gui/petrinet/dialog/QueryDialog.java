@@ -3,6 +3,8 @@ package net.tapaal.gui.petrinet.dialog;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -65,6 +67,7 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.ITAPNComposer;
+import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
@@ -212,9 +215,11 @@ public class QueryDialog extends JPanel {
 	private JCheckBox useStubbornReduction;
     private JCheckBox useTraceRefinement;
     private JCheckBox useTarjan;
-    // Raw options panel
-    private JPanel rawOptionsPanel;
-    private JTextArea rawOptionsTextArea;
+    // Raw verification options panel
+    private JPanel rawVerificationOptionsPanel;
+    private JTextField rawVerificationOptionsTextField;
+    private JCheckBox rawVerificationOptionsEnabled;
+    private JButton rawVerificationOptionsHelpButton;
 
     // Approximation options panel
     private JPanel overApproximationOptionsPanel;
@@ -367,6 +372,11 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_USE_QUERY_REDUCTION = "Use query rewriting rules and linear programming (state equations) to reduce the size of the query.";
     private final static String TOOL_TIP_USE_TRACE_REFINEMENT = "Enables Trace Abstraction Refinement for reachability properties";
     private final static String TOOL_TIP_USE_TARJAN= "Uses the Tarjan algorithm when verifying. If not selected it will verify using the nested DFS algorithm.";
+
+    // Tool tips for raw verification options panel
+    private final static String TOOL_TIP_RAW_VERIFICATION_ENABLED_CHECKBOX = "Enable verification options for the engine.";
+    private final static String TOOL_TIP_RAW_VERIFICATION_TEXT_FIELD = "Enter verification options for the engine.";
+    private final static String TOOL_TIP_RAW_VERIFICATION_HELP_BUTTON = "Show engine options.";
 
     //Tool tips for unfolding options panel
     private final static String TOOL_TIP_PARTITIONING = "Partitions the colors into logically equivalent groups before unfolding";
@@ -1864,7 +1874,7 @@ public class QueryDialog extends JPanel {
         }
         mergeNetComponentsButton.setVisible(advancedView);
 
-        rawOptionsPanel.setVisible(advancedView);
+        rawVerificationOptionsPanel.setVisible(advancedView);
 
         if(advancedView){
             advancedButton.setText("Simple view");
@@ -4117,7 +4127,8 @@ public class QueryDialog extends JPanel {
         if(lens.isColored() && !lens.isTimed()){
             initUnfoldingOptionsPanel();
         }
-        initRawOptionsPanel();
+
+        initRawVerificationOptionsPanel();
         
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -4480,51 +4491,51 @@ public class QueryDialog extends JPanel {
         reductionOptionsPanel.add(useTarjan, gbc);
     }
 
-    private void initRawOptionsPanel() {
-        rawOptionsPanel = new JPanel(new BorderLayout());
-        rawOptionsPanel.setVisible(false);
-        rawOptionsPanel.setBorder(BorderFactory.createTitledBorder("Raw Options"));
+    private void initRawVerificationOptionsPanel() {
+        rawVerificationOptionsPanel = new JPanel(new GridBagLayout());
+        rawVerificationOptionsPanel.setVisible(false);
+        rawVerificationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
 
-        rawOptionsTextArea = new JTextArea();
-        rawOptionsTextArea.setLineWrap(true);
-        rawOptionsTextArea.setWrapStyleWord(true);
-        rawOptionsTextArea.setRows(2);
+        rawVerificationOptionsEnabled = new JCheckBox("Use");
+        rawVerificationOptionsEnabled.setToolTipText(TOOL_TIP_RAW_VERIFICATION_ENABLED_CHECKBOX);
 
-        rawOptionsPanel.add(rawOptionsTextArea);
-
-        // Sets maximum length of raw options
-        rawOptionsTextArea.addKeyListener(new KeyAdapter() {
+        rawVerificationOptionsTextField = new JTextField();
+        rawVerificationOptionsTextField.setEnabled(false);
+        rawVerificationOptionsTextField.setToolTipText(TOOL_TIP_RAW_VERIFICATION_TEXT_FIELD);
+        
+        rawVerificationOptionsHelpButton = new JButton("Help on options");
+        rawVerificationOptionsHelpButton.setEnabled(false);
+        rawVerificationOptionsHelpButton.setToolTipText(TOOL_TIP_RAW_VERIFICATION_HELP_BUTTON);
+        rawVerificationOptionsHelpButton.addActionListener(e -> showEngineHelp());
+        rawVerificationOptionsEnabled.addItemListener(new ItemListener() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                int maxLen = 250;
-                if (rawOptionsTextArea.getText().length() > maxLen + 1) {
-                    e.consume();
-                    rawOptionsTextArea.setText(rawOptionsTextArea.getText().substring(0, maxLen));
-                } else if (rawOptionsTextArea.getText().length() > maxLen) {
-                    e.consume();
-                }
+            public void itemStateChanged(ItemEvent e) {
+                setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
+                rawVerificationOptionsTextField.setEnabled(rawVerificationOptionsEnabled.isSelected());
+                rawVerificationOptionsHelpButton.setEnabled(rawVerificationOptionsEnabled.isSelected());
             }
         });
 
-        // Disables reduction options when raw options are used
-        ((AbstractDocument) rawOptionsTextArea.getDocument()).setDocumentFilter(new DocumentFilter() {
-            @Override
-            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-                super.replace(fb, offset, length, text, attrs);
-                updateOptions();
-            }
+        GridBagConstraints checkBoxGbc = new GridBagConstraints();
+        checkBoxGbc.gridx = 0;
+        checkBoxGbc.gridy = 0;
+        checkBoxGbc.insets = new Insets(0, 5, 0, 0);
 
-            @Override
-            public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
-                super.remove(fb, offset, length);
-                updateOptions();
-            }
+        GridBagConstraints textAreaGbc = new GridBagConstraints();
+        textAreaGbc.gridx = 1;
+        textAreaGbc.gridy = 0;
+        textAreaGbc.weightx = 1;
+        textAreaGbc.fill = GridBagConstraints.HORIZONTAL;
+        textAreaGbc.insets = new Insets(0, 10, 0, 10);
 
-            private void updateOptions() {
-                Boolean isEnabled = rawOptionsTextArea.getText().length() == 0;
-                setVerificationOptionsEnabled(isEnabled);
-            }
-        });
+        GridBagConstraints buttonGbc = new GridBagConstraints();
+        buttonGbc.gridx = 2;
+        buttonGbc.gridy = 0;
+        buttonGbc.insets = new Insets(0, 0, 0, 5);
+
+        rawVerificationOptionsPanel.add(rawVerificationOptionsEnabled, checkBoxGbc);
+        rawVerificationOptionsPanel.add(rawVerificationOptionsTextField, textAreaGbc);
+        rawVerificationOptionsPanel.add(rawVerificationOptionsHelpButton, buttonGbc);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -4532,17 +4543,43 @@ public class QueryDialog extends JPanel {
         gbc.weightx = 1;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
-        verificationPanel.add(rawOptionsPanel, gbc);
+        verificationPanel.add(rawVerificationOptionsPanel, gbc);
+    }
+
+    private void showEngineHelp() {
+        querySaved = true;
+        ModelChecker model = Verifier.getModelChecker(getQuery());
+        querySaved = false;
+        
+        JTextArea engineHelp = new JTextArea();
+        if (model instanceof VerifyPN) {
+            engineHelp.setText(((VerifyPN) model).getHelpOptions());
+        } else if (model instanceof VerifyDTAPN) {
+            engineHelp.setText(((VerifyDTAPN) model).getHelpOptions());
+        } else if (model instanceof VerifyTAPN) {
+            engineHelp.setText(((VerifyTAPN) model).getHelpOptions());
+        }
+
+        JScrollPane engineHelpScrollPane = new JScrollPane(engineHelp);
+        engineHelpScrollPane.setPreferredSize(new Dimension(800, 600));
+
+        if (!engineHelp.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(QueryDialog.this, engineHelpScrollPane, "Help", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(QueryDialog.this, "Error getting options for this engine.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void setVerificationOptionsEnabled(boolean isEnabled) {
-        reductionOptionsPanel.setEnabled(isEnabled);
-        setAllChildrenEnabled(reductionOptionsPanel, isEnabled);
+        setAllEnabled(reductionOptionsPanel, isEnabled);
 
         if (unfoldingOptionsPanel != null) {
-            unfoldingOptionsPanel.setEnabled(isEnabled);
-            setAllChildrenEnabled(unfoldingOptionsPanel, isEnabled);
+            setAllEnabled(unfoldingOptionsPanel, isEnabled);
         }
+
+        setAllEnabled(traceOptionsPanel, isEnabled);
+        setAllEnabled(boundednessCheckPanel, isEnabled);
+        setAllEnabled(searchOptionsPanel, isEnabled);
 
         // Reset to original values
         if (isEnabled) {
@@ -4550,14 +4587,16 @@ public class QueryDialog extends JPanel {
         }
     }
 
-    // Enables or disables all children recursively
-    private void setAllChildrenEnabled(Container container, boolean isEnabled) {
+    // Enables or disables the container + all children recursively
+    private void setAllEnabled(Container container, boolean isEnabled) {
         for (Component component : container.getComponents()) {
             component.setEnabled(isEnabled);
             if (component instanceof Container) {
-                setAllChildrenEnabled((Container) component, isEnabled);
+                setAllEnabled((Container) component, isEnabled);
             }
         }
+
+        container.setEnabled(isEnabled);
     }
 
     protected void setEnabledOptionsAccordingToCurrentReduction() {
