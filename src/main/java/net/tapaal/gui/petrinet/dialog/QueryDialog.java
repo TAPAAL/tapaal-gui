@@ -217,8 +217,8 @@ public class QueryDialog extends JPanel {
     private JCheckBox useTarjan;
     // Raw verification options panel
     private JPanel rawVerificationOptionsPanel;
-    private JTextField rawVerificationOptionsTextField;
-    private JCheckBox rawVerificationOptionsEnabled;
+    private static JTextField rawVerificationOptionsTextField;
+    private static JCheckBox rawVerificationOptionsEnabled;
     private JButton rawVerificationOptionsHelpButton;
 
     // Approximation options panel
@@ -4570,6 +4570,14 @@ public class QueryDialog extends JPanel {
         }
     }
 
+    public static boolean isRawVerificationOptionsEnabled() {
+        return rawVerificationOptionsEnabled.isSelected();
+    }
+
+    public static String getRawVerificationOptions() {
+        return rawVerificationOptionsTextField.getText();
+    }
+
     private void setVerificationOptionsEnabled(boolean isEnabled) {
         setAllEnabled(reductionOptionsPanel, isEnabled);
 
@@ -4987,7 +4995,6 @@ public class QueryDialog extends JPanel {
                     tab.setNetChanged(true);
                     exit();
                     TAPNQuery query = getQuery();
-
                     if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN) {
                         Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false, lens);
                     } else {

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -91,6 +92,11 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
+
+		if (QueryDialog.isRawVerificationOptionsEnabled()) {
+            result.append(QueryDialog.getRawVerificationOptions());
+            return result.toString();
+        }
 
         if(unfoldedModelPath != null && unfoldedQueriesPath != null)
         {

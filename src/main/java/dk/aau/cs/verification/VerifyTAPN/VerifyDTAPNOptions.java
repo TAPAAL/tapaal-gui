@@ -4,6 +4,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
 import pipe.gui.MessengerImpl;
+import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 
 import java.io.File;
@@ -92,6 +93,11 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
+
+		if (QueryDialog.isRawVerificationOptionsEnabled()) {
+            result.append(QueryDialog.getRawVerificationOptions());
+            return result.toString();
+        }
 
         result.append(kBoundArg());
         result.append(deadTokenArg());

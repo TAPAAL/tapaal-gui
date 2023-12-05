@@ -10,6 +10,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
+import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 
 public class VerifyPNOptions extends VerifyTAPNOptions{
@@ -148,6 +149,11 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     @Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
+
+        if (QueryDialog.isRawVerificationOptionsEnabled()) {
+            result.append(QueryDialog.getRawVerificationOptions());
+            return result.toString();
+        }
 
 		result.append("--k-bound ");
 		result.append(extraTokens+tokensInModel);
