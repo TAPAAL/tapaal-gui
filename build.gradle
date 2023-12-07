@@ -17,6 +17,8 @@ java {
 }
 
 compileKotlin {
+    dependsOn compileJavacc
+
     sourceCompatibility = targetJavaVersion
     targetCompatibility = targetJavaVersion
 
@@ -51,7 +53,8 @@ jar {
         )
     }
     //The following lines makes libs a part of the build jar file (standalone jar)
-    //from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    //duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    //from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 dependencies {
