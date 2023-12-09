@@ -73,6 +73,8 @@ public class PlaceEditorPanel extends JPanel {
 	private final int maxNumberOfPlacesToShowAtOnce = 20;
 	protected final ArcExpression originalExpression;
 
+    private boolean initSharedState;
+
 	public PlaceEditorPanel(EscapableDialog parent,JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
 		this.rootPane = rootPane;
 		currentTab = context.tabContent();
@@ -127,6 +129,8 @@ public class PlaceEditorPanel extends JPanel {
         initColorInvariantPanel();
         initTokensPanel();
         setInitialComboBoxValue();
+        
+        initSharedState = place.underlyingPlace().isShared();
         writeTokensToList(place.underlyingPlace());
         setColoredTimeInvariants(place.underlyingPlace());
 
@@ -747,7 +751,7 @@ public class PlaceEditorPanel extends JPanel {
             } else {
                 place.underlyingPlace().resetNumberOfTokensColor();
             }
-
+            
             for (int i = 0; i < timeConstraintListModel.size(); i++) {
                 ctiList.add(timeConstraintListModel.get(i));
             }
@@ -1288,6 +1292,9 @@ public class PlaceEditorPanel extends JPanel {
     }
 
     private void setColoredTimeInvariants(TimedPlace tp) {
+        if (place.underlyingPlace().isShared() == initSharedState) {
+            timeConstraintListModel.clear();
+        }
         for (ColoredTimeInvariant timeInvariant : tp.getCtiList()) {
             timeConstraintListModel.addElement(timeInvariant);
         }
