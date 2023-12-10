@@ -268,7 +268,9 @@ public class Verifier {
                 reducedNetTempFile.getAbsolutePath(),
                 query.usePartitioning(),
                 query.useColorFixpoint(),
-                isColored // Unfold net
+                isColored,// Unfold net
+                query.getRawVerification(),
+                query.getRawVerificationPrompt()
             );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             verifytapnOptions = new VerifyPNOptions(
@@ -293,7 +295,9 @@ public class Verifier {
                 query.usePartitioning(),
                 query.useColorFixpoint(),
                 query.useSymmetricVars(),
-                query.useColoredReduction()
+                query.useColoredReduction(),
+                query.getRawVerification(),
+                query.getRawVerificationPrompt()
             );
         } else {
             verifytapnOptions = new VerifyTAPNOptions(
@@ -308,7 +312,9 @@ public class Verifier {
                 query.isUnderApproximationEnabled(),
                 query.approximationDenominator(),
                 false,
-                isColored
+                isColored,
+                query.getRawVerification(),
+                query.getRawVerificationPrompt()
             );
         }
 

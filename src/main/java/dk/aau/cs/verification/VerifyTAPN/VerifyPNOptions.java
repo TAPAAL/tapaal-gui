@@ -10,7 +10,6 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
-import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 
 public class VerifyPNOptions extends VerifyTAPNOptions{
@@ -42,6 +41,40 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     private final boolean symmetricVars;
     private final boolean useTarjan;
     private final boolean useColoredReduction;
+    private boolean useRawVerification;
+    private String rawVerificationOptions;
+
+    public VerifyPNOptions(
+        int extraTokens,
+        TraceOption traceOption,
+        SearchOption search,
+        boolean useOverApproximation,
+        ModelReduction modelReduction,
+        boolean enableOverApproximation,
+        boolean enableUnderApproximation,
+        int approximationDenominator,
+        QueryCategory queryCategory,
+        AlgorithmOption algorithmOption,
+        boolean siphontrap,
+        QueryReductionTime queryReduction,
+        boolean stubbornReduction,
+        String pathToReducedNet,
+        boolean useTarOption,
+        boolean useTarjan,
+        boolean colored,
+        boolean unfold,
+        boolean partition,
+        boolean colorFixpoint,
+        boolean useSymmetricVars,
+        boolean useColoredReduction,
+        boolean useRawVerification,
+        String rawVerificationOptions
+    ) {
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, unfold, partition, colorFixpoint, useSymmetricVars, useColoredReduction);
+
+        this.useRawVerification = useRawVerification;
+        this.rawVerificationOptions = rawVerificationOptions;
+    }
 
     public VerifyPNOptions(
         int extraTokens,
@@ -150,8 +183,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 
-        if (QueryDialog.isRawVerificationOptionsEnabled()) {
-            result.append(QueryDialog.getRawVerificationOptions());
+        if (useRawVerification) {
+            result.append(rawVerificationOptions);
             return result.toString();
         }
 

@@ -82,6 +82,8 @@ public class TAPNQuery {
 	private boolean useStubbornReduction = true;
     private boolean useTarOption = false;
     private boolean useTarjan = false;
+	private boolean useRawVerification = false;
+	private String rawVerificationPrompt;
 
 	/**
 	 * @param name
@@ -357,6 +359,22 @@ public class TAPNQuery {
 		return extrapolationOption;
 	}
 
+	public void setRawVerification(boolean useRawVerification) {
+		this.useRawVerification = useRawVerification;
+	}
+
+	public boolean getRawVerification() {
+		return useRawVerification;
+	}
+
+	public void setRawVerificationPrompt(String rawVerificationPrompt) {
+		this.rawVerificationPrompt = rawVerificationPrompt;
+	}
+
+	public String getRawVerificationPrompt() {
+		return rawVerificationPrompt;
+	}
+
     public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
@@ -394,6 +412,14 @@ public class TAPNQuery {
 			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, boolean reduction, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, 
 			int approximationDenominator, boolean partitioning, boolean colorFixpoint, boolean symmetricVars, boolean isColored, boolean coloredReduction) {
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, reduction, hashTabelSize, extrapolationOption, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator, partitioning, colorFixpoint, symmetricVars, isColored, coloredReduction, false, "-x 1 ");
+	}
+
+	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
+			TraceOption traceOption, SearchOption searchOption,
+			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, boolean reduction, HashTableSize hashTabelSize,
+			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, 
+			int approximationDenominator, boolean partitioning, boolean colorFixpoint, boolean symmetricVars, boolean isColored, boolean coloredReduction, boolean useRawVerification, String rawVerificationPrompt) {
 		this.setName(name);
 		this.setCapacity(capacity);
 		this.property = property;
@@ -417,6 +443,10 @@ public class TAPNQuery {
         this.colorFixpoint = colorFixpoint;
         this.symmetricVars = symmetricVars;
         this.isColored = isColored;
+		this.useRawVerification = useRawVerification;
+		this.rawVerificationPrompt = rawVerificationPrompt;
+		this.useRawVerification = useRawVerification;
+		this.rawVerificationPrompt = rawVerificationPrompt;
 	}
 
 	@Override
@@ -466,6 +496,8 @@ public class TAPNQuery {
         setExtrapolationOption(query.getExtrapolationOption());
         setUseColoredReduction(query.useColoredReduction());
         setUseTarjan(query.isTarjan());
+		setRawVerification(query.getRawVerification());
+		setRawVerificationPrompt(query.getRawVerificationPrompt());
     }
 
 	public InclusionPlaces inclusionPlaces() {

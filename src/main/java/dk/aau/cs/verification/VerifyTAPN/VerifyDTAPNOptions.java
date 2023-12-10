@@ -4,7 +4,6 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
 import pipe.gui.MessengerImpl;
-import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 
 import java.io.File;
@@ -23,6 +22,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private final boolean partition;
 	private final boolean colorFixpoint;
     private final boolean unfold;
+	private boolean useRawVerification;
+	private String rawVerificationOptions;
 
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(
@@ -66,6 +67,35 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             String reducedModelPath,
             boolean partition,
             boolean colorFixpoint,
+            boolean unfoldNet,
+			boolean useRawVerification,
+			String rawVerificationOptions) {
+				this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet);
+
+				this.useRawVerification = useRawVerification;
+				this.rawVerificationOptions = rawVerificationOptions;
+			}
+
+	public VerifyDTAPNOptions(
+			int extraTokens,
+			TraceOption traceOption,
+			SearchOption search,
+			boolean symmetry,
+			boolean gcd,
+			boolean timeDarts,
+			boolean pTrie,
+			boolean useStateequationCheck,
+			boolean discreteInclusion,
+			InclusionPlaces inclusionPlaces,
+			WorkflowMode workflow,
+			long workflowbound,
+			boolean enableOverApproximation,
+			boolean enableUnderApproximation,
+			int approximationDenominator,
+			boolean stubbornReduction,
+            String reducedModelPath,
+            boolean partition,
+            boolean colorFixpoint,
             boolean unfoldNet
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
@@ -79,6 +109,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		this.partition = partition;
 		this.colorFixpoint = colorFixpoint;
         this.unfold = unfoldNet;
+
         if(unfold && trace() != TraceOption.NONE) // we only force unfolding when traces are involved
         {
             try {
@@ -94,8 +125,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 
-		if (QueryDialog.isRawVerificationOptionsEnabled()) {
-            result.append(QueryDialog.getRawVerificationOptions());
+		if (useRawVerification) {
+            result.append(rawVerificationOptions);
             return result.toString();
         }
 

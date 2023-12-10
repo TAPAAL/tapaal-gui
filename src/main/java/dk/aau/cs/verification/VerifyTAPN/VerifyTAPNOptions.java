@@ -7,7 +7,6 @@ import java.util.Map;
 
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -22,6 +21,8 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	private final boolean discreteInclusion;
     private final boolean tarOption;
 	private InclusionPlaces inclusionPlaces;
+	private boolean useRawVerification;
+	private String rawVerificationOptions;
 	
 	//only used for boundedness analysis
 	private final boolean dontUseDeadPlaces = false;
@@ -37,8 +38,11 @@ public class VerifyTAPNOptions extends VerificationOptions{
         this(extraTokens,traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator, false);
     }
 
-    public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateequationCheck, boolean discreteInclusion, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, boolean tarOption, boolean isColor) {
+    public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateequationCheck, boolean discreteInclusion, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, boolean tarOption, boolean isColor, boolean useRawVerification, String rawVerificationOptions) {
         this(extraTokens,traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator, tarOption);
+
+		this.useRawVerification = useRawVerification;
+		this.rawVerificationOptions = rawVerificationOptions;
 
         if(isColor && trace() != TraceOption.NONE) // we only force unfolding when traces are involved
         {
@@ -93,8 +97,8 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 
-		if (QueryDialog.isRawVerificationOptionsEnabled()) {
-            result.append(QueryDialog.getRawVerificationOptions());
+		if (useRawVerification) {
+            result.append(rawVerificationOptions);
             return result.toString();
         }
 

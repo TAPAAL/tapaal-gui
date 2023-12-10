@@ -20,10 +20,6 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.*;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -217,8 +213,8 @@ public class QueryDialog extends JPanel {
     private JCheckBox useTarjan;
     // Raw verification options panel
     private JPanel rawVerificationOptionsPanel;
-    private static JTextField rawVerificationOptionsTextField;
-    private static JCheckBox rawVerificationOptionsEnabled;
+    private JTextField rawVerificationOptionsTextField;
+    private JCheckBox rawVerificationOptionsEnabled;
     private JButton rawVerificationOptionsHelpButton;
 
     // Approximation options panel
@@ -507,7 +503,9 @@ public class QueryDialog extends JPanel {
             false,   //useColorFixpoint.isSelected(),
             false,   //useSymmetricVars.isSelected()
             lens.isColored(),
-            false
+            false,
+            rawVerificationOptionsEnabled.isSelected(),
+            rawVerificationOptionsTextField.getText()
 		);
 
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
@@ -545,7 +543,9 @@ public class QueryDialog extends JPanel {
             lens.isColored()? useColorFixpoint.isSelected() : false,
             lens.isColored()? useSymmetricvars.isSelected() : false,
             lens.isColored(),
-            coloredReduction
+            coloredReduction,
+            rawVerificationOptionsEnabled.isSelected(),
+            rawVerificationOptionsTextField.getText()
         );
         if (queryType.getSelectedIndex() == 1) {
             query.setCategory(TAPNQuery.QueryCategory.LTL);
@@ -631,7 +631,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshTraceOptions() {
-        if (reductionOption.getSelectedItem() == null) {
+        if (reductionOption.getSelectedItem() == null || rawVerificationOptionsEnabled.isSelected()) {
             return;
         }
 
@@ -1025,6 +1025,10 @@ public class QueryDialog extends JPanel {
     }
 
     private void setEnabledReductionOptions(){
+        if (rawVerificationOptionsEnabled.isSelected()) {
+            return;
+        }
+
         String reductionOptionString = getReductionOptionAsString();
 
         ArrayList<String> options = new ArrayList<String>();
@@ -1541,6 +1545,8 @@ public class QueryDialog extends JPanel {
         refreshUndoRedo();
 
         setEnabledOptionsAccordingToCurrentReduction();
+        //setVerificationOptionsEnabled(!queryToCreateFrom.getRawVerification());
+
         makeShortcuts();
 
         if (lens.isGame() && !lens.isTimed()) {
@@ -1573,6 +1579,13 @@ public class QueryDialog extends JPanel {
         if(queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
         }
+
+        setupRawVerificationOptionsFromQuery(queryToCreateFrom);
+    }
+
+    private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
+        rawVerificationOptionsEnabled.setSelected(queryToCreateFrom.getRawVerification());
+        rawVerificationOptionsTextField.setText(queryToCreateFrom.getRawVerificationPrompt());
     }
 
     private void setupTraceListFromQuery(TAPNQuery queryToCreateFrom) {
@@ -4570,14 +4583,6 @@ public class QueryDialog extends JPanel {
         }
     }
 
-    public static boolean isRawVerificationOptionsEnabled() {
-        return rawVerificationOptionsEnabled.isSelected();
-    }
-
-    public static String getRawVerificationOptions() {
-        return rawVerificationOptionsTextField.getText();
-    }
-
     private void setVerificationOptionsEnabled(boolean isEnabled) {
         setAllEnabled(reductionOptionsPanel, isEnabled);
 
@@ -4609,6 +4614,10 @@ public class QueryDialog extends JPanel {
     }
 
     protected void setEnabledOptionsAccordingToCurrentReduction() {
+        if (rawVerificationOptionsEnabled.isSelected()) {
+            return;
+        }
+
         refreshQueryEditingButtons();
         refreshTraceOptions();
         if (lens.isTimed()) {
