@@ -1519,6 +1519,7 @@ public class QueryDialog extends JPanel {
         initUppaalOptionsPanel();
         initVerificationPanel();
         initOverApproximationPanel();
+        initRawVerificationOptionsPanel();
         initButtonPanel(option);
 
         if(queryToCreateFrom != null) {
@@ -4127,8 +4128,6 @@ public class QueryDialog extends JPanel {
         if(lens.isColored() && !lens.isTimed()){
             initUnfoldingOptionsPanel();
         }
-
-        initRawVerificationOptionsPanel();
         
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -4539,11 +4538,12 @@ public class QueryDialog extends JPanel {
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 6;
         gbc.weightx = 1;
         gbc.gridwidth = 2;
+        gbc.insets = new Insets(5,10,5,10);
         gbc.fill = GridBagConstraints.BOTH;
-        verificationPanel.add(rawVerificationOptionsPanel, gbc);
+        add(rawVerificationOptionsPanel, gbc);
     }
 
     private void showEngineHelp() {
@@ -4588,6 +4588,7 @@ public class QueryDialog extends JPanel {
         setAllEnabled(traceOptionsPanel, isEnabled);
         setAllEnabled(boundednessCheckPanel, isEnabled);
         setAllEnabled(searchOptionsPanel, isEnabled);
+        setAllEnabled(overApproximationOptionsPanel, isEnabled);
 
         // Reset to original values
         if (isEnabled) {
@@ -5185,7 +5186,7 @@ public class QueryDialog extends JPanel {
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(0, 10, 5, 10);
