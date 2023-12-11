@@ -1,6 +1,7 @@
 package net.tapaal.gui.petrinet.dialog;
 
 import java.awt.*;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -4577,7 +4578,13 @@ public class QueryDialog extends JPanel {
         engineHelpScrollPane.setPreferredSize(new Dimension(800, 600));
 
         if (!engineHelp.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(QueryDialog.this, engineHelpScrollPane, "Help", JOptionPane.INFORMATION_MESSAGE);
+            Window ownerWindow = SwingUtilities.windowForComponent(QueryDialog.this);
+            JDialog engineHelpDialog = new JDialog(ownerWindow, "Engine Options", ModalityType.MODELESS);
+            engineHelpDialog.add(engineHelpScrollPane);
+            engineHelpDialog.pack();
+            engineHelpDialog.setResizable(true);
+            engineHelpDialog.setLocationByPlatform(true);
+            engineHelpDialog.setVisible(true);
         } else {
             JOptionPane.showMessageDialog(QueryDialog.this, "Error getting options for this engine.", "Error", JOptionPane.ERROR_MESSAGE);
         }
