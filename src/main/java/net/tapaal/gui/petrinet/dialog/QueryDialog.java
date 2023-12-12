@@ -4566,6 +4566,8 @@ public class QueryDialog extends JPanel {
         querySaved = false;
         
         JTextArea engineHelp = new JTextArea();
+        engineHelp.setEditable(false);
+        
         if (model instanceof VerifyPN) {
             engineHelp.setText(((VerifyPN) model).getHelpOptions());
         } else if (model instanceof VerifyDTAPN) {
