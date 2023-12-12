@@ -3925,6 +3925,8 @@ public class QueryDialog extends JPanel {
                 } else {
                     returnFromManualEdit(null);
                 }
+
+                setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
             } else { // we are not in edit mode so the button should reset
                 // the query
                 TCTLPathPlaceHolder ph = new TCTLPathPlaceHolder();
