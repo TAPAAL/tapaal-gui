@@ -1890,7 +1890,6 @@ public class QueryDialog extends JPanel {
         mergeNetComponentsButton.setVisible(advancedView);
 
         updateRawVerificationOptions(advancedView);
-        rawVerificationOptionsPanel.setVisible(advancedView);
 
         if(advancedView){
             advancedButton.setText("Simple view");
@@ -4373,6 +4372,7 @@ public class QueryDialog extends JPanel {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     updateRawVerificationOptions();
+                    guiDialog.pack();
                 }
             }
         });
