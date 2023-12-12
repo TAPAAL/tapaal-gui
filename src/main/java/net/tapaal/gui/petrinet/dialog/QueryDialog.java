@@ -4663,6 +4663,8 @@ public class QueryDialog extends JPanel {
         updateStubbornReduction();
         updateSearchStrategies();
 		refreshExportButtonText();
+
+        guiDialog.pack();
 	}
 
     private void updateRawVerificationOptions() {
