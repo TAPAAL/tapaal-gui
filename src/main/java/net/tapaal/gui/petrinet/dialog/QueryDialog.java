@@ -1889,6 +1889,7 @@ public class QueryDialog extends JPanel {
         }
         mergeNetComponentsButton.setVisible(advancedView);
 
+        updateRawVerificationOptions(advancedView);
         rawVerificationOptionsPanel.setVisible(advancedView);
 
         if(advancedView){
@@ -4367,6 +4368,14 @@ public class QueryDialog extends JPanel {
         reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
 
         reductionOption.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
+        reductionOption.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    updateRawVerificationOptions();
+                }
+            }
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -4655,6 +4664,25 @@ public class QueryDialog extends JPanel {
         updateSearchStrategies();
 		refreshExportButtonText();
 	}
+
+    private void updateRawVerificationOptions() {
+        updateRawVerificationOptions(true);
+    }
+
+    private void updateRawVerificationOptions(boolean advancedView) {
+        querySaved = true;
+        TAPNQuery query = getQuery();
+        querySaved = false;
+
+        if (query.getReductionOption() != ReductionOption.VerifyTAPN && 
+            query.getReductionOption() != ReductionOption.VerifyDTAPN && 
+            query.getReductionOption() != ReductionOption.VerifyPN) {
+
+            rawVerificationOptionsPanel.setVisible(false);
+        } else {
+            rawVerificationOptionsPanel.setVisible(advancedView);
+        }
+    }
 
 	private void refreshTraceRefinement() {
 	    ReductionOption reduction = getReductionOption();
