@@ -101,8 +101,9 @@ GuardExpression OrExpr() :
 	left = AndExpr()
 	(
 		<OR> right = AndExpr()
-	)?
-	{ return right == null ? left : new OrExpression(left,right); }
+        { left = new OrExpression(left, right); }
+	)*
+	{ return left; }
 }
 GuardExpression AndExpr() :
 {
@@ -113,8 +114,9 @@ GuardExpression AndExpr() :
 	left = NotExpr()
 	(
 		<AND> right = NotExpr()
-	)?
-	{ return right == null ? left : new AndExpression(left,right); }
+        { left = new AndExpression(left,right); }
+	)*
+	{ return left; }
 }
 GuardExpression NotExpr() :
 {
