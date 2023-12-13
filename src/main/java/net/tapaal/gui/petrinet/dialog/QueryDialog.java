@@ -1,8 +1,11 @@
 package net.tapaal.gui.petrinet.dialog;
 
 import java.awt.*;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -61,6 +64,7 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.ITAPNComposer;
+import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
@@ -205,9 +209,14 @@ public class QueryDialog extends JPanel {
     private JCheckBox useQueryReduction;
     private JCheckBox useReduction;
     private JCheckBox useColoredReduction;
-	  private JCheckBox useStubbornReduction;
+	private JCheckBox useStubbornReduction;
     private JCheckBox useTraceRefinement;
     private JCheckBox useTarjan;
+    // Raw verification options panel
+    private JPanel rawVerificationOptionsPanel;
+    private JTextField rawVerificationOptionsTextField;
+    private JCheckBox rawVerificationOptionsEnabled;
+    private JButton rawVerificationOptionsHelpButton;
 
     // Approximation options panel
     private JPanel overApproximationOptionsPanel;
@@ -361,6 +370,11 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_USE_TRACE_REFINEMENT = "Enables Trace Abstraction Refinement for reachability properties";
     private final static String TOOL_TIP_USE_TARJAN= "Uses the Tarjan algorithm when verifying. If not selected it will verify using the nested DFS algorithm.";
 
+    // Tool tips for raw verification options panel
+    private final static String TOOL_TIP_RAW_VERIFICATION_ENABLED_CHECKBOX = "Enable verification options for the engine.";
+    private final static String TOOL_TIP_RAW_VERIFICATION_TEXT_FIELD = "Enter verification options for the engine.";
+    private final static String TOOL_TIP_RAW_VERIFICATION_HELP_BUTTON = "Show engine options.";
+
     //Tool tips for unfolding options panel
     private final static String TOOL_TIP_PARTITIONING = "Partitions the colors into logically equivalent groups before unfolding";
     private final static String TOOL_TIP_COLOR_FIXPOINT = "Explores the possible colored markings and only unfolds for those";
@@ -490,7 +504,9 @@ public class QueryDialog extends JPanel {
             false,   //useColorFixpoint.isSelected(),
             false,   //useSymmetricVars.isSelected()
             lens.isColored(),
-            false
+            false,
+            rawVerificationOptionsEnabled.isSelected(),
+            rawVerificationOptionsTextField.getText()
 		);
 
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
@@ -528,7 +544,9 @@ public class QueryDialog extends JPanel {
             lens.isColored()? useColorFixpoint.isSelected() : false,
             lens.isColored()? useSymmetricvars.isSelected() : false,
             lens.isColored(),
-            coloredReduction
+            coloredReduction,
+            rawVerificationOptionsEnabled.isSelected(),
+            rawVerificationOptionsTextField.getText()
         );
         if (queryType.getSelectedIndex() == 1) {
             query.setCategory(TAPNQuery.QueryCategory.LTL);
@@ -614,7 +632,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshTraceOptions() {
-        if (reductionOption.getSelectedItem() == null) {
+        if (reductionOption.getSelectedItem() == null || rawVerificationOptionsEnabled.isSelected()) {
             return;
         }
 
@@ -1008,6 +1026,10 @@ public class QueryDialog extends JPanel {
     }
 
     private void setEnabledReductionOptions(){
+        if (rawVerificationOptionsEnabled.isSelected()) {
+            return;
+        }
+
         String reductionOptionString = getReductionOptionAsString();
 
         ArrayList<String> options = new ArrayList<String>();
@@ -1502,6 +1524,7 @@ public class QueryDialog extends JPanel {
         initUppaalOptionsPanel();
         initVerificationPanel();
         initOverApproximationPanel();
+        initRawVerificationOptionsPanel();
         initButtonPanel(option);
 
         if(queryToCreateFrom != null) {
@@ -1523,6 +1546,8 @@ public class QueryDialog extends JPanel {
         refreshUndoRedo();
 
         setEnabledOptionsAccordingToCurrentReduction();
+        //setVerificationOptionsEnabled(!queryToCreateFrom.getRawVerification());
+
         makeShortcuts();
 
         if (lens.isGame() && !lens.isTimed()) {
@@ -1555,6 +1580,13 @@ public class QueryDialog extends JPanel {
         if(queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
         }
+
+        setupRawVerificationOptionsFromQuery(queryToCreateFrom);
+    }
+
+    private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
+        rawVerificationOptionsEnabled.setSelected(queryToCreateFrom.getRawVerification());
+        rawVerificationOptionsTextField.setText(queryToCreateFrom.getRawVerificationPrompt());
     }
 
     private void setupTraceListFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1857,6 +1889,7 @@ public class QueryDialog extends JPanel {
         }
         mergeNetComponentsButton.setVisible(advancedView);
 
+        updateRawVerificationOptions(advancedView);
 
         if(advancedView){
             advancedButton.setText("Simple view");
@@ -3892,6 +3925,8 @@ public class QueryDialog extends JPanel {
                 } else {
                     returnFromManualEdit(null);
                 }
+
+                setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
             } else { // we are not in edit mode so the button should reset
                 // the query
                 TCTLPathPlaceHolder ph = new TCTLPathPlaceHolder();
@@ -4109,7 +4144,7 @@ public class QueryDialog extends JPanel {
         if(lens.isColored() && !lens.isTimed()){
             initUnfoldingOptionsPanel();
         }
-
+        
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -4332,6 +4367,15 @@ public class QueryDialog extends JPanel {
         reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
 
         reductionOption.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
+        reductionOption.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    updateRawVerificationOptions();
+                    guiDialog.pack();
+                }
+            }
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -4471,7 +4515,129 @@ public class QueryDialog extends JPanel {
         reductionOptionsPanel.add(useTarjan, gbc);
     }
 
+    private void initRawVerificationOptionsPanel() {
+        rawVerificationOptionsPanel = new JPanel(new GridBagLayout());
+        rawVerificationOptionsPanel.setVisible(false);
+        rawVerificationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
+
+        rawVerificationOptionsEnabled = new JCheckBox("Use");
+        rawVerificationOptionsEnabled.setToolTipText(TOOL_TIP_RAW_VERIFICATION_ENABLED_CHECKBOX);
+
+        rawVerificationOptionsTextField = new JTextField();
+        rawVerificationOptionsTextField.setEnabled(false);
+        rawVerificationOptionsTextField.setToolTipText(TOOL_TIP_RAW_VERIFICATION_TEXT_FIELD);
+        
+        rawVerificationOptionsHelpButton = new JButton("Help on options");
+        rawVerificationOptionsHelpButton.setEnabled(false);
+        rawVerificationOptionsHelpButton.setToolTipText(TOOL_TIP_RAW_VERIFICATION_HELP_BUTTON);
+        rawVerificationOptionsHelpButton.addActionListener(e -> showEngineHelp());
+        rawVerificationOptionsEnabled.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
+                rawVerificationOptionsTextField.setEnabled(rawVerificationOptionsEnabled.isSelected());
+                rawVerificationOptionsHelpButton.setEnabled(rawVerificationOptionsEnabled.isSelected());
+            }
+        });
+
+        GridBagConstraints checkBoxGbc = new GridBagConstraints();
+        checkBoxGbc.gridx = 0;
+        checkBoxGbc.gridy = 0;
+        checkBoxGbc.insets = new Insets(0, 5, 0, 0);
+
+        GridBagConstraints textAreaGbc = new GridBagConstraints();
+        textAreaGbc.gridx = 1;
+        textAreaGbc.gridy = 0;
+        textAreaGbc.weightx = 1;
+        textAreaGbc.fill = GridBagConstraints.HORIZONTAL;
+        textAreaGbc.insets = new Insets(0, 10, 0, 10);
+
+        GridBagConstraints buttonGbc = new GridBagConstraints();
+        buttonGbc.gridx = 2;
+        buttonGbc.gridy = 0;
+        buttonGbc.insets = new Insets(0, 0, 0, 5);
+
+        rawVerificationOptionsPanel.add(rawVerificationOptionsEnabled, checkBoxGbc);
+        rawVerificationOptionsPanel.add(rawVerificationOptionsTextField, textAreaGbc);
+        rawVerificationOptionsPanel.add(rawVerificationOptionsHelpButton, buttonGbc);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.weightx = 1;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(5,10,5,10);
+        gbc.fill = GridBagConstraints.BOTH;
+        add(rawVerificationOptionsPanel, gbc);
+    }
+
+    private void showEngineHelp() {
+        querySaved = true;
+        ModelChecker model = Verifier.getModelChecker(getQuery());
+        querySaved = false;
+        
+        JTextArea engineHelp = new JTextArea();
+        engineHelp.setEditable(false);
+        
+        if (model instanceof VerifyPN) {
+            engineHelp.setText(((VerifyPN) model).getHelpOptions());
+        } else if (model instanceof VerifyDTAPN) {
+            engineHelp.setText(((VerifyDTAPN) model).getHelpOptions());
+        } else if (model instanceof VerifyTAPN) {
+            engineHelp.setText(((VerifyTAPN) model).getHelpOptions());
+        }
+
+        JScrollPane engineHelpScrollPane = new JScrollPane(engineHelp);
+        engineHelpScrollPane.setPreferredSize(new Dimension(800, 600));
+
+        if (!engineHelp.getText().isEmpty()) {
+            Window ownerWindow = SwingUtilities.windowForComponent(QueryDialog.this);
+            JDialog engineHelpDialog = new JDialog(ownerWindow, "Engine Options", ModalityType.MODELESS);
+            engineHelpDialog.add(engineHelpScrollPane);
+            engineHelpDialog.pack();
+            engineHelpDialog.setResizable(true);
+            engineHelpDialog.setLocationByPlatform(true);
+            engineHelpDialog.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(QueryDialog.this, "Error getting options for this engine.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void setVerificationOptionsEnabled(boolean isEnabled) {
+        setAllEnabled(reductionOptionsPanel, isEnabled);
+
+        if (unfoldingOptionsPanel != null) {
+            setAllEnabled(unfoldingOptionsPanel, isEnabled);
+        }
+
+        setAllEnabled(traceOptionsPanel, isEnabled);
+        setAllEnabled(boundednessCheckPanel, isEnabled);
+        setAllEnabled(searchOptionsPanel, isEnabled);
+        setAllEnabled(overApproximationOptionsPanel, isEnabled);
+
+        // Reset to original values
+        if (isEnabled) {
+            setEnabledOptionsAccordingToCurrentReduction();
+        }
+    }
+
+    // Enables or disables the container + all children recursively
+    private void setAllEnabled(Container container, boolean isEnabled) {
+        for (Component component : container.getComponents()) {
+            component.setEnabled(isEnabled);
+            if (component instanceof Container) {
+                setAllEnabled((Container) component, isEnabled);
+            }
+        }
+
+        container.setEnabled(isEnabled);
+    }
+
     protected void setEnabledOptionsAccordingToCurrentReduction() {
+        if (rawVerificationOptionsEnabled.isSelected()) {
+            return;
+        }
+
         refreshQueryEditingButtons();
         refreshTraceOptions();
         if (lens.isTimed()) {
@@ -4497,7 +4663,28 @@ public class QueryDialog extends JPanel {
         updateStubbornReduction();
         updateSearchStrategies();
 		refreshExportButtonText();
+
+        guiDialog.pack();
 	}
+
+    private void updateRawVerificationOptions() {
+        updateRawVerificationOptions(true);
+    }
+
+    private void updateRawVerificationOptions(boolean advancedView) {
+        querySaved = true;
+        TAPNQuery query = getQuery();
+        querySaved = false;
+
+        if (query.getReductionOption() != ReductionOption.VerifyTAPN && 
+            query.getReductionOption() != ReductionOption.VerifyDTAPN && 
+            query.getReductionOption() != ReductionOption.VerifyPN) {
+
+            rawVerificationOptionsPanel.setVisible(false);
+        } else {
+            rawVerificationOptionsPanel.setVisible(advancedView);
+        }
+    }
 
 	private void refreshTraceRefinement() {
 	    ReductionOption reduction = getReductionOption();
@@ -4859,7 +5046,6 @@ public class QueryDialog extends JPanel {
                     tab.setNetChanged(true);
                     exit();
                     TAPNQuery query = getQuery();
-
                     if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN) {
                         Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false, lens);
                     } else {
@@ -5050,7 +5236,7 @@ public class QueryDialog extends JPanel {
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(0, 10, 5, 10);
