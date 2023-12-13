@@ -68,6 +68,11 @@ public class ColoredTimeInvariant extends TimeInvariant {
         return super.toString();
     }
 
+    public String getInvariantString(boolean displayConstantNames) {
+        return super.toString(displayConstantNames);
+    }
+    
+
     @Override
     public boolean equals(Object o) {
         ColoredTimeInvariant cti;
