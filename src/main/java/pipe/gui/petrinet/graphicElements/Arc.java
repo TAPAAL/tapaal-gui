@@ -147,8 +147,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	protected void setLabelPosition() {
 
 		getNameLabel().setPosition(
-				Grid.getModifiedX(myPath.midPoint.x + Zoomer.getZoomedValue(getNameOffsetX(), getZoom())),
-				Grid.getModifiedY(myPath.midPoint.y + Zoomer.getZoomedValue(getNameOffsetY(), getZoom()))
+				Grid.align((int)myPath.midPoint.x + Zoomer.getZoomedValue(getNameOffsetX(), getZoom()), getZoom()),
+				Grid.align((int)myPath.midPoint.y + Zoomer.getZoomedValue(getNameOffsetY(), getZoom()), getZoom())
 		);
 
 	}

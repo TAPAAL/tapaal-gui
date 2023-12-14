@@ -290,7 +290,7 @@ public class AnnotationNote extends Note {
 		public void mouseDragged(MouseEvent e) {
 			if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
 
-			myPoint.drag(Grid.getModifiedX(e.getX() - start.x), Grid.getModifiedY(e.getY() - start.y));
+			myPoint.drag(Grid.align(e.getX() - start.x, getZoom()), Grid.align(e.getY() - start.y, getZoom()));
 			myPoint.myNote.updateBounds();
 			myPoint.repaint();
 		}
