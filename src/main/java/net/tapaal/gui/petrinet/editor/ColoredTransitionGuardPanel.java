@@ -230,8 +230,12 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             AndExpression andExpr = null;
             if (currentSelection.getObject() instanceof OrExpression) {
                 andExpr = new AndExpression(((OrExpression) currentSelection.getObject()).getLeftExpression(), ((OrExpression) currentSelection.getObject()).getRightExpression());
+                System.out.println("or");
+                System.out.println(andExpr);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
+                System.out.println("guard");
+                System.out.println(andExpr);
             }
             replaceAndAddToUndo(currentSelection.getObject(), andExpr);
         });
@@ -444,6 +448,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 GuardExpression newExpression = null;
                 try {
                     newExpression = GuardExpressionParser.parse(exprField.getText(),context.network());
+                    removeLastParenthesis(newExpression);
                 } catch (Throwable ex) {
                     int choice = JOptionPane.showConfirmDialog(
                         TAPAALGUI.getApp(),
@@ -526,6 +531,16 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.BOTH;
         add(editPanel, gbc);
+    }
+
+    private void removeLastParenthesis(GuardExpression expr) {
+        String exprStr = expr.toString();
+
+        if (exprStr.startsWith("(") && exprStr.endsWith(")")) {
+            exprStr = exprStr.substring(1, exprStr.length() - 1);
+        }
+
+        expr.setString(exprStr);
     }
 
     private void initExprField() {
@@ -718,6 +733,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     private void updateSelection(Expression newSelection) {
+        removeLastParenthesis(newProperty);
         exprField.setText(newProperty.toString());
 
         ExprStringPosition position;

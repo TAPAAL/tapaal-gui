@@ -14,6 +14,12 @@ public class AndExpression extends GuardExpression {
     public AndExpression(GuardExpression left, GuardExpression right) {
         this.left = left;
         this.right = right;
+
+        setDefaultString();
+    }
+
+    private void setDefaultString() {
+        setString("(" + left.toString() + " and " + right.toString() + ")");
     }
 
     public GuardExpression getLeftExpression(){
@@ -39,6 +45,7 @@ public class AndExpression extends GuardExpression {
         else {
             left = left.replace(object1, object2, replaceAllInstances);
             right = right.replace(object1, object2, replaceAllInstances);
+            setDefaultString();
             return this;
         }
     }
@@ -78,11 +85,6 @@ public class AndExpression extends GuardExpression {
     @Override
     public boolean containsColor(Color color) {
         return left.containsColor(color) || right.containsColor(color);
-    }
-
-    @Override
-    public String toString() {
-        return "(" + left.toString() + " and " + right.toString() + ")";
     }
 
     @Override
