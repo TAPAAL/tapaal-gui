@@ -131,9 +131,9 @@ public abstract class Place extends PlaceTransitionObject {
 					+ (getDiameter() * 0.5));
 			double angle = arc.getArcPath().getStartAngle();
 			arc.setSourceLocation(positionX + centreOffsetLeft()
-					- (0.5 * getDiameter() * (Math.sin(angle))), positionY
+					- (0.5 * getDiameter() * (Math.cos(angle))), positionY
 					+ centreOffsetTop()
-					+ (0.5 * getDiameter() * (Math.cos(angle))));
+					+ (0.5 * getDiameter() * (Math.sin(angle))));
 		} else {
 			// Make it calculate the angle from the centre of the place rather
 			// than the current target point
@@ -141,9 +141,9 @@ public abstract class Place extends PlaceTransitionObject {
 					+ (getDiameter() * 0.5));
 			double angle = arc.getArcPath().getEndAngle();
 			arc.setTargetLocation(positionX + centreOffsetLeft()
-					- (0.5 * getDiameter() * (Math.sin(angle))), positionY
+					- (0.5 * getDiameter() * (Math.cos(angle))), positionY
 					+ centreOffsetTop()
-					+ (0.5 * getDiameter() * (Math.cos(angle))));
+					+ (0.5 * getDiameter() * (Math.sin(angle))));
 		}
 	}
 
