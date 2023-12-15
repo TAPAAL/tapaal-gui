@@ -61,6 +61,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
     private boolean secondTransport = false;
     private int transporCountID = 0;
     private final TAPNLens lens;
+	private boolean saveConstantNames;
 
     public TimedArcPetriNetNetworkWriter(
 			TimedArcPetriNetNetwork network, 
@@ -131,6 +132,12 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	}
 
 	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerException {
+		savePNML(file, true);
+	}
+
+	public void savePNML(File file, boolean saveConstantNames) throws IOException, ParserConfigurationException, DOMException, TransformerException {
+		this.saveConstantNames = saveConstantNames;
+
 		Require.that(file != null, "Error: file to save to was null");
 		
 		try {
@@ -539,7 +546,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
             Element colortype = document.createElement("colortype");
             colortype.setAttribute("name", coloredTimeInvariant.getColor().getColorType().getName());
             if (coloredTimeInvariant.equalsOnlyColor(ColoredTimeInvariant.LESS_THAN_INFINITY_AND_STAR)) {
-                placeElement.setAttribute("inscription", coloredTimeInvariant.getInvariantString(false));
+                placeElement.setAttribute("inscription", coloredTimeInvariant.getInvariantString(saveConstantNames));
             } else {
                 if (coloredTimeInvariant.getColor().getTuple() != null) {
                     for (Color color : coloredTimeInvariant.getColor().getTuple()) {
@@ -553,7 +560,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
                     colortype.appendChild(colorEle);
                 }
 
-                inscription.setAttribute("inscription", coloredTimeInvariant.getInvariantString(false));
+                inscription.setAttribute("inscription", coloredTimeInvariant.getInvariantString(saveConstantNames));
                 invariant.appendChild(inscription);
                 invariant.appendChild(colortype);
                 placeElement.appendChild(invariant);
@@ -657,12 +664,12 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
         for (ColoredTimeInterval cti : ctiList) {
             if (cti.equalsOnlyColor(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR))) {
-                arcElement.setAttribute("inscription", cti.getInterval(false));
+                arcElement.setAttribute("inscription", cti.getInterval(saveConstantNames));
             } else {
                 Element interval = document.createElement("colorinterval");
                 Element inscription = document.createElement("inscription");
                 Element colortype = document.createElement("colortype");
-                inscription.setAttribute("inscription", cti.getInterval(false));
+                inscription.setAttribute("inscription", cti.getInterval(saveConstantNames));
                 colortype.setAttribute("name", cti.getColor().getColorType().getName());
                 if (cti.getColor().getTuple() != null) {
                     for (Color color : cti.getColor().getTuple()) {

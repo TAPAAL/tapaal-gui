@@ -43,7 +43,7 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
         TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(model.parentNetwork(), templates, queries, model.parentNetwork().constants());
 
         try {
-            writerTACPN.savePNML(modelFile);
+            writerTACPN.savePNML(modelFile, false);
         } catch (IOException | ParserConfigurationException | TransformerException e) {
             e.printStackTrace();
         }
