@@ -230,12 +230,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             AndExpression andExpr = null;
             if (currentSelection.getObject() instanceof OrExpression) {
                 andExpr = new AndExpression(((OrExpression) currentSelection.getObject()).getLeftExpression(), ((OrExpression) currentSelection.getObject()).getRightExpression());
-                System.out.println("or");
-                System.out.println(andExpr);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
-                System.out.println("guard");
-                System.out.println(andExpr);
             }
             replaceAndAddToUndo(currentSelection.getObject(), andExpr);
         });
