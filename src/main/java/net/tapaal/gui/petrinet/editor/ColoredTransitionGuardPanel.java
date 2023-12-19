@@ -444,7 +444,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 GuardExpression newExpression = null;
                 try {
                     newExpression = GuardExpressionParser.parse(exprField.getText(),context.network());
-                    removeLastParenthesis(newExpression);
                 } catch (Throwable ex) {
                     int choice = JOptionPane.showConfirmDialog(
                         TAPAALGUI.getApp(),
@@ -527,16 +526,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.BOTH;
         add(editPanel, gbc);
-    }
-
-    private void removeLastParenthesis(GuardExpression expr) {
-        String exprStr = expr.toString();
-
-        if (exprStr.startsWith("(") && exprStr.endsWith(")")) {
-            exprStr = exprStr.substring(1, exprStr.length() - 1);
-        }
-
-        expr.setString(exprStr);
     }
 
     private void initExprField() {
@@ -729,7 +718,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     private void updateSelection(Expression newSelection) {
-        removeLastParenthesis(newProperty);
         exprField.setText(newProperty.toString());
 
         ExprStringPosition position;

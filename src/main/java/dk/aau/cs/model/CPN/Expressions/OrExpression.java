@@ -15,12 +15,6 @@ public class OrExpression extends GuardExpression {
     public OrExpression(GuardExpression left, GuardExpression right) {
         this.left = left;
         this.right = right;
-
-        setDefaultString();
-    }
-
-    private void setDefaultString() {
-        setString("(" + left.toString() + " or " + right.toString() + ")");
     }
 
     @Override
@@ -83,7 +77,6 @@ public class OrExpression extends GuardExpression {
         else  {
             left = left.replace(object1, object2,replaceAllInstances);
             right = right.replace(object1, object2,replaceAllInstances);
-            setDefaultString();
             return this;
         }
     }
@@ -121,5 +114,10 @@ public class OrExpression extends GuardExpression {
     //Missing implementation for evaluation - might not be needed
     public Boolean eval(ExpressionContext context) {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + left.toString() + " or " + right.toString() + ")";
     }
 }
