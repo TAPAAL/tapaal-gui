@@ -3117,7 +3117,6 @@ public class QueryDialog extends JPanel {
         TCTLOrListNode orListNode;
         if (currentSelection.getObject() instanceof TCTLStateToPathConverter) {
             TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-            System.out.println("4.1");
             TCTLAbstractStateProperty prop = ((TCTLStateToPathConverter) currentSelection.getObject()).getProperty();
 
             if (prop instanceof TCTLOrListNode) {
@@ -3134,7 +3133,6 @@ public class QueryDialog extends JPanel {
             TCTLAbstractPathProperty property = new TCTLStateToPathConverter(orListNode);
             addPropertyToQuery(property);
         } else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
-            System.out.println("4.2");
             TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
             TCTLAbstractProperty oldProperty = removeExistsAllPathsFromProperty(currentSelection.getObject());
 
