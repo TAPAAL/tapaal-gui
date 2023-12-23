@@ -8,8 +8,10 @@ import dk.aau.cs.model.CPN.Variable;
 import java.util.Set;
 
 public class AndExpression extends GuardExpression {
-    private  GuardExpression left;
+    private GuardExpression left;
     private GuardExpression right;
+
+    private boolean isSimpleProperty;
 
     public AndExpression(GuardExpression left, GuardExpression right) {
         this.left = left;
@@ -81,12 +83,16 @@ public class AndExpression extends GuardExpression {
     }
 
     @Override
-    public boolean isSimpleProperty() {return false; }
+    public boolean isSimpleProperty() { return false; }
+
+    public void setSimpleProperty(boolean isSimpleProperty) {
+        this.isSimpleProperty = isSimpleProperty;
+    }
 
     @Override
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[2];
-        int start = 1;
+        int start = isSimpleProperty ? 0 : 1;
         int endPrev;
         int end;
 
@@ -113,11 +119,16 @@ public class AndExpression extends GuardExpression {
 
     @Override
     public GuardExpression copy() {
-       return new AndExpression(left, right);
+        AndExpression copy = new AndExpression(left, right);
+        copy.setSimpleProperty(isSimpleProperty());
+
+        return copy;
     }
 
     @Override
     public String toString() {
-        return "(" + left.toString() + " and " + right.toString() + ")";
+        String str = left.toString() + " and " + right.toString();
+
+        return isSimpleProperty ? str : "(" + str + ")";
     }
 }

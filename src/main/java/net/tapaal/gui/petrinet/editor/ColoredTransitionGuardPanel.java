@@ -194,9 +194,9 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         logicPanel.setMinimumSize(d);
 
         ButtonGroup logicButtonGroup = new ButtonGroup();
-        andButton = new JButton("AND");
-        orButton = new JButton("OR");
-        notButton = new JButton("NOT");
+        andButton = new JButton("and");
+        orButton = new JButton("or");
+        notButton = new JButton("not");
 
         logicButtonGroup.add(andButton);
         logicButtonGroup.add(orButton);
@@ -230,9 +230,12 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             AndExpression andExpr = null;
             if (currentSelection.getObject() instanceof OrExpression) {
                 andExpr = new AndExpression(((OrExpression) currentSelection.getObject()).getLeftExpression(), ((OrExpression) currentSelection.getObject()).getRightExpression());
+                andExpr.setSimpleProperty(true);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
+                andExpr.setSimpleProperty(true);
             }
+
             replaceAndAddToUndo(currentSelection.getObject(), andExpr);
         });
 
@@ -240,8 +243,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             OrExpression orExpr = null;
             if (currentSelection.getObject() instanceof AndExpression) {
                 orExpr = new OrExpression(((AndExpression) currentSelection.getObject()).getLeftExpression(), ((AndExpression) currentSelection.getObject()).getRightExpression());
+                orExpr.setSimpleProperty(true);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 orExpr = new OrExpression((GuardExpression) currentSelection.getObject(), new PlaceHolderGuardExpression());
+                orExpr.setSimpleProperty(true);
             }
             replaceAndAddToUndo(currentSelection.getObject(), orExpr);
         });
