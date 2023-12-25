@@ -62,6 +62,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private final TimedTransitionComponent transition;
 
     private GuardExpression newProperty;
+    private GuardExpression previousProp;
     final TAPNTransitionEditor parent;
     final ExpressionConstructionUndoManager undoManager;
     final UndoableEditSupport undoSupport;
@@ -233,8 +234,13 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 andExpr.setSimpleProperty(true);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
+            }
+
+            if (previousProp instanceof AndExpression) {
                 andExpr.setSimpleProperty(true);
             }
+
+            previousProp = andExpr;
 
             replaceAndAddToUndo(currentSelection.getObject(), andExpr);
         });
@@ -246,8 +252,14 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 orExpr.setSimpleProperty(true);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 orExpr = new OrExpression((GuardExpression) currentSelection.getObject(), new PlaceHolderGuardExpression());
+            }
+
+            if (previousProp instanceof OrExpression) {
                 orExpr.setSimpleProperty(true);
             }
+
+            previousProp = orExpr;
+
             replaceAndAddToUndo(currentSelection.getObject(), orExpr);
         });
 

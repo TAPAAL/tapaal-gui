@@ -273,6 +273,7 @@ public class QueryDialog extends JPanel {
     private final static EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
 
     private TCTLAbstractProperty newProperty;
+    private TCTLAbstractProperty previousProp;
     private JTextField queryName;
 
     private static Boolean advancedView = false;
@@ -3007,7 +3008,6 @@ public class QueryDialog extends JPanel {
                     // current selection is child of an andList node => add
                     // new placeholder conjunct to it
                     andListNode = new TCTLAndListNode((TCTLAndListNode) parentNode);
-                    andListNode.setSimpleProperty(true);
                     andListNode.addConjunct(new TCTLStatePlaceHolder());
                     UndoableEdit edit = new QueryConstructionEdit(parentNode, andListNode);
                     newProperty = newProperty.replace(parentNode, andListNode);
@@ -3017,7 +3017,7 @@ public class QueryDialog extends JPanel {
                 } else {
                     TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
                     andListNode = new TCTLAndListNode(getStateProperty(currentSelection.getObject()), ph);
-                    andListNode.setSimpleProperty(true);
+
                     addPropertyToQuery(andListNode);
                 }
             } else if (!lens.isTimed()) {
@@ -3027,6 +3027,7 @@ public class QueryDialog extends JPanel {
 
         disjunctionButton.addActionListener(e -> {
             TCTLOrListNode orListNode;
+
             if (currentSelection.getObject() instanceof TCTLOrListNode) {
                 orListNode = new TCTLOrListNode((TCTLOrListNode) currentSelection.getObject());
                 orListNode.setSimpleProperty(true);
@@ -3034,7 +3035,6 @@ public class QueryDialog extends JPanel {
                 addPropertyToQuery(orListNode);
             } else if (currentSelection.getObject() instanceof TCTLAndListNode) {
                 orListNode = new TCTLOrListNode(((TCTLAndListNode) currentSelection.getObject()).getProperties());
-                orListNode.setSimpleProperty(true);
                 addPropertyToQuery(orListNode);
             } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                 TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection.getObject();
@@ -3044,7 +3044,6 @@ public class QueryDialog extends JPanel {
                     // current selection is child of an orList node => add
                     // new placeholder disjunct to it
                     orListNode = new TCTLOrListNode((TCTLOrListNode) parentNode);
-                    orListNode.setSimpleProperty(true);
                     orListNode.addDisjunct(new TCTLStatePlaceHolder());
                     UndoableEdit edit = new QueryConstructionEdit(parentNode, orListNode);
                     newProperty = newProperty.replace(parentNode, orListNode);
@@ -3054,7 +3053,6 @@ public class QueryDialog extends JPanel {
                 } else {
                     TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
                     orListNode = new TCTLOrListNode(getStateProperty(currentSelection.getObject()), ph);
-                    orListNode.setSimpleProperty(true);
                     addPropertyToQuery(orListNode);
                 }
             } else if (!lens.isTimed()) {
@@ -3106,8 +3104,13 @@ public class QueryDialog extends JPanel {
 
             andListNode = new TCTLAndListNode(getStateProperty(
                 new TCTLPathToStateConverter((TCTLAbstractPathProperty) oldProperty)), ph);
-            andListNode.setSimpleProperty(true);
+            
+            if (previousProp instanceof TCTLAndListNode) {
+                andListNode.setSimpleProperty(true);
+            }
 
+            previousProp = andListNode;
+            
             TCTLAbstractPathProperty property = new TCTLStateToPathConverter(andListNode);
             addPropertyToQuery(property);
         }
@@ -3138,9 +3141,13 @@ public class QueryDialog extends JPanel {
 
             orListNode = new TCTLOrListNode(getStateProperty(
                 new TCTLPathToStateConverter((TCTLAbstractPathProperty) oldProperty)), ph);
+            
+            if (previousProp instanceof TCTLOrListNode) {
+                orListNode.setSimpleProperty(true);
+            }
 
-            orListNode.setSimpleProperty(true);
-                
+            previousProp = orListNode;
+              
             TCTLAbstractPathProperty property = new TCTLStateToPathConverter(orListNode);
             addPropertyToQuery(property);
         }
