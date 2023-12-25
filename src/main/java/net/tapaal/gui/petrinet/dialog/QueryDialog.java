@@ -2991,7 +2991,6 @@ public class QueryDialog extends JPanel {
         conjunctionButton.addActionListener(evt -> {
             TCTLAndListNode andListNode = null;
             if (currentSelection.getObject() instanceof TCTLAndListNode) {
-                System.out.println("here1");
                 andListNode = new TCTLAndListNode((TCTLAndListNode) currentSelection.getObject());
                 andListNode.setSimpleProperty(true);
                 andListNode.addConjunct(new TCTLStatePlaceHolder());
