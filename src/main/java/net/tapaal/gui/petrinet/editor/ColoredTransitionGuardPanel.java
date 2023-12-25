@@ -231,17 +231,16 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             AndExpression andExpr = null;
             if (currentSelection.getObject() instanceof OrExpression) {
                 andExpr = new AndExpression(((OrExpression) currentSelection.getObject()).getLeftExpression(), ((OrExpression) currentSelection.getObject()).getRightExpression());
-                andExpr.setSimpleProperty(true);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
 
                 if (previousProp instanceof AndExpression) {
                     andExpr.setSimpleProperty(true);
                 }
-
-                previousProp = andExpr;
             }
 
+            previousProp = andExpr;
+            
             replaceAndAddToUndo(currentSelection.getObject(), andExpr);
         });
 
@@ -249,16 +248,15 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             OrExpression orExpr = null;
             if (currentSelection.getObject() instanceof AndExpression) {
                 orExpr = new OrExpression(((AndExpression) currentSelection.getObject()).getLeftExpression(), ((AndExpression) currentSelection.getObject()).getRightExpression());
-                orExpr.setSimpleProperty(true);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 orExpr = new OrExpression((GuardExpression) currentSelection.getObject(), new PlaceHolderGuardExpression());
 
                 if (previousProp instanceof OrExpression) {
                     orExpr.setSimpleProperty(true);
                 }
-
-                previousProp = orExpr;
             }
+            
+            previousProp = orExpr;
 
             replaceAndAddToUndo(currentSelection.getObject(), orExpr);
         });
