@@ -13,6 +13,7 @@ public class OrExpression extends GuardExpression {
     private GuardExpression right;
 
     private boolean isSimpleProperty;
+    private String word = "or";
 
     public OrExpression(GuardExpression left, GuardExpression right) {
         this.left = left;
@@ -127,8 +128,12 @@ public class OrExpression extends GuardExpression {
 
     @Override
     public String toString() {  
-        String str = left.toString() + " or " + right.toString();
+        String str = left.toString() + " " + word + " " + right.toString();
 
         return isSimpleProperty ? str : "(" + str + ")";
+    }
+
+    public String getWord() {
+        return word;
     }
 }

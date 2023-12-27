@@ -12,6 +12,7 @@ public class AndExpression extends GuardExpression {
     private GuardExpression right;
 
     private boolean isSimpleProperty;
+    private String word = "and";
 
     public AndExpression(GuardExpression left, GuardExpression right) {
         this.left = left;
@@ -127,8 +128,12 @@ public class AndExpression extends GuardExpression {
 
     @Override
     public String toString() {
-        String str = left.toString() + " and " + right.toString();
+        String str = left.toString() + " " + word + " " + right.toString();
 
         return isSimpleProperty ? str : "(" + str + ")";
+    }
+
+    public String getWord() {
+        return word;
     }
 }

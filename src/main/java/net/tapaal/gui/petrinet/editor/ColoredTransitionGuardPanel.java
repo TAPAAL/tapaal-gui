@@ -62,7 +62,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private final TimedTransitionComponent transition;
 
     private GuardExpression newProperty;
-    private GuardExpression previousProp;
+    private GuardExpression previousExpr;
     final TAPNTransitionEditor parent;
     final ExpressionConstructionUndoManager undoManager;
     final UndoableEditSupport undoSupport;
@@ -229,34 +229,46 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         andButton.addActionListener(actionEvent -> {
             AndExpression andExpr = null;
+
             if (currentSelection.getObject() instanceof OrExpression) {
                 andExpr = new AndExpression(((OrExpression) currentSelection.getObject()).getLeftExpression(), ((OrExpression) currentSelection.getObject()).getRightExpression());
+                andExpr.setSimpleProperty(true);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
 
-                if (previousProp instanceof AndExpression) {
+                updatePreviousExpr();
+  
+                boolean isFirstExpr = (exprField.getText().equals((new PlaceHolderGuardExpression()).toString()));
+
+                if (previousExpr instanceof AndExpression || isFirstExpr) {
                     andExpr.setSimpleProperty(true);
                 }
             }
 
-            previousProp = andExpr;
-            
+            previousExpr = andExpr;
+
             replaceAndAddToUndo(currentSelection.getObject(), andExpr);
         });
 
         orButton.addActionListener(actionEvent -> {
             OrExpression orExpr = null;
+
             if (currentSelection.getObject() instanceof AndExpression) {
                 orExpr = new OrExpression(((AndExpression) currentSelection.getObject()).getLeftExpression(), ((AndExpression) currentSelection.getObject()).getRightExpression());
+                orExpr.setSimpleProperty(true);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 orExpr = new OrExpression((GuardExpression) currentSelection.getObject(), new PlaceHolderGuardExpression());
 
-                if (previousProp instanceof OrExpression) {
+                updatePreviousExpr();
+
+                boolean isFirstExpr = (exprField.getText().equals((new PlaceHolderGuardExpression()).toString()));
+
+                if (previousExpr instanceof OrExpression || isFirstExpr) {
                     orExpr.setSimpleProperty(true);
                 }
             }
-            
-            previousProp = orExpr;
+
+            previousExpr = orExpr;
 
             replaceAndAddToUndo(currentSelection.getObject(), orExpr);
         });
@@ -265,6 +277,28 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             NotExpression notExpr = new NotExpression((GuardExpression)currentSelection.getObject());
             replaceAndAddToUndo(currentSelection.getObject(), notExpr);
         });
+    }
+
+    private void updatePreviousExpr() {
+        String exprText = exprField.getText();
+        int lastSpace = exprText.lastIndexOf(' ', currentSelection.getStart() - 1);
+
+        if (lastSpace != -1) {
+            int secondLastSpace = exprText.lastIndexOf(' ', lastSpace - 1);
+
+            if (secondLastSpace != -1) {
+                String word = exprText.substring(secondLastSpace + 1, lastSpace);
+
+                OrExpression tmpOrExpression = new OrExpression(null, null);
+                AndExpression tmpAndExpression = new AndExpression(null, null);
+
+                if (word.equals(tmpOrExpression.getWord())) {
+                    previousExpr = tmpOrExpression;
+                } else if (word.equals(tmpAndExpression.getWord())) {
+                    previousExpr = tmpAndExpression;
+                }
+            }
+        }
     }
 
     private void initComparisonPanel() {
