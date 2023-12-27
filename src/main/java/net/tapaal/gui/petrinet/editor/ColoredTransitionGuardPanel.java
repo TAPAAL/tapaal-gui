@@ -496,7 +496,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     if (newExpression instanceof OrExpression) {
                         ((OrExpression) newExpression).setSimpleProperty(true);
                     }
-                    //newExpression.setText(exprField.getText());
+                    newExpression.setText(exprField.getText());
                 } catch (Throwable ex) {
                     int choice = JOptionPane.showConfirmDialog(
                         TAPAALGUI.getApp(),
