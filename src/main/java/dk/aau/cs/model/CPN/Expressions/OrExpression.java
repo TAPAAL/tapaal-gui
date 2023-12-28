@@ -34,7 +34,7 @@ public class OrExpression extends GuardExpression {
     }
 
     @Override
-    public boolean isSimpleProperty() { return false; }
+    public boolean isSimpleProperty() { return isSimpleProperty; }
 
     public void setSimpleProperty(boolean isSimpleProperty) {
         this.isSimpleProperty = isSimpleProperty;
@@ -131,7 +131,7 @@ public class OrExpression extends GuardExpression {
         if (!customText) {
             text = left.toString() + " " + word + " " + right.toString();
         }
-        
+
         return isSimpleProperty ? text : "(" + text + ")";
     }
 

@@ -63,6 +63,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
     private GuardExpression newProperty;
     private GuardExpression previousExpr;
+    private GuardExpression nextExpr;
     final TAPNTransitionEditor parent;
     final ExpressionConstructionUndoManager undoManager;
     final UndoableEditSupport undoSupport;
@@ -237,10 +238,11 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
 
                 updatePreviousExpr();
+                updateNextExpr();
   
                 boolean isFirstExpr = (exprField.getText().equals((new PlaceHolderGuardExpression()).toString()));
 
-                if (previousExpr instanceof AndExpression || isFirstExpr) {
+                if (nextExpr instanceof AndExpression || isFirstExpr) {
                     andExpr.setSimpleProperty(true);
                 }
             }
@@ -260,14 +262,16 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 orExpr = new OrExpression((GuardExpression) currentSelection.getObject(), new PlaceHolderGuardExpression());
 
                 updatePreviousExpr();
+                updateNextExpr();
 
                 boolean isFirstExpr = (exprField.getText().equals((new PlaceHolderGuardExpression()).toString()));
 
-                if (previousExpr instanceof OrExpression || isFirstExpr) {
+                if (nextExpr instanceof OrExpression || isFirstExpr) {
                     orExpr.setSimpleProperty(true);
                 }
             }
 
+            System.out.println(orExpr);
             previousExpr = orExpr;
 
             replaceAndAddToUndo(currentSelection.getObject(), orExpr);
@@ -297,6 +301,29 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 } else if (word.equals(tmpAndExpression.getWord())) {
                     previousExpr = tmpAndExpression;
                 }
+            }
+        }
+    }
+
+    private void updateNextExpr() {
+        String exprText = exprField.getText();
+
+        if (exprText.length() > currentSelection.getEnd() && exprText.charAt(currentSelection.getEnd() + 1) == ')') {
+            nextExpr = previousExpr;
+        }
+
+        int nextSpace = exprText.indexOf(' ', currentSelection.getEnd() + 1);
+
+        if (nextSpace != -1) {
+            String word = exprText.substring(currentSelection.getEnd() + 1, nextSpace);
+
+            OrExpression tmpOrExpression = new OrExpression(null, null);
+            AndExpression tmpAndExpression = new AndExpression(null, null);
+
+            if (word.equals(tmpOrExpression.getWord())) {
+                nextExpr = tmpOrExpression;
+            } else if (word.equals(tmpAndExpression.getWord())) {
+                nextExpr = tmpAndExpression;
             }
         }
     }
