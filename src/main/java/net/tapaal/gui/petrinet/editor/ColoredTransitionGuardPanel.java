@@ -307,10 +307,11 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private void updateNextExpr() {
         String exprText = exprField.getText();
 
-        if (exprText.length() > currentSelection.getEnd() && exprText.charAt(currentSelection.getEnd() + 1) == ')') {
+        if (exprText.length() > currentSelection.getEnd() + 1 && exprText.charAt(currentSelection.getEnd() + 1) == ')') {
             nextExpr = previousExpr;
+            return;
         }
-
+        
         int nextSpace = exprText.indexOf(' ', currentSelection.getEnd() + 1);
 
         if (nextSpace != -1) {
