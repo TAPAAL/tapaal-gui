@@ -185,6 +185,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 
         if (useRawVerification) {
             result.append(rawVerificationOptions);
+            result.append(" --write-reduced " +reducedModelPath);
+            
             return result.toString();
         }
 
