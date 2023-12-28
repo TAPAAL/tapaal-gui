@@ -271,7 +271,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 }
             }
 
-            System.out.println(orExpr);
             previousExpr = orExpr;
 
             replaceAndAddToUndo(currentSelection.getObject(), orExpr);
