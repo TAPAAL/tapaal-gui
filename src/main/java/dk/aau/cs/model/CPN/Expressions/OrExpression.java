@@ -12,6 +12,8 @@ public class OrExpression extends GuardExpression {
     private GuardExpression left;
     private GuardExpression right;
 
+    private String text;
+    private boolean customText;
     private boolean isSimpleProperty;
     private String word = "or";
 
@@ -137,5 +139,10 @@ public class OrExpression extends GuardExpression {
 
     public String getWord() {
         return word;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+        this.customText = true;
     }
 }

@@ -10,7 +10,9 @@ import java.util.Set;
 public class AndExpression extends GuardExpression {
     private GuardExpression left;
     private GuardExpression right;
-
+    
+    private String text;
+    private boolean customText;
     private boolean isSimpleProperty;
     private String word = "and";
 
@@ -137,5 +139,10 @@ public class AndExpression extends GuardExpression {
 
     public String getWord() {
         return word;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+        this.customText = true;
     }
 }

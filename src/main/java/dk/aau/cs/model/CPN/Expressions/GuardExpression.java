@@ -8,8 +8,6 @@ import java.util.Set;
 public abstract class GuardExpression extends Expression {
     protected GuardExpression parent;
     protected ColorType colorType;
-    protected String text;
-    protected boolean customText;
 
     public GuardExpression getParent() { return parent; }
 
@@ -34,9 +32,4 @@ public abstract class GuardExpression extends Expression {
     public abstract void getVariables(Set<Variable> variables);
 
     public abstract Boolean eval(ExpressionContext context);
-
-    public void setText(String text) {
-        this.text = text;
-        this.customText = true;
-    }
 }
