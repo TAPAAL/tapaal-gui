@@ -4641,10 +4641,10 @@ public class QueryDialog extends JPanel {
 
     protected void setEnabledOptionsAccordingToCurrentReduction() {
         if (rawVerificationOptionsEnabled.isSelected()) {
+            refreshQueryEditingButtons();
             return;
         }
 
-        refreshQueryEditingButtons();
         refreshTraceOptions();
         if (lens.isTimed()) {
             refreshSymmetryReduction();
