@@ -128,11 +128,11 @@ public class AndExpression extends GuardExpression {
 
     @Override
     public String toString() {
-        if (str == null) {
-            str = left.toString() + " " + word + " " + right.toString();
+        if (!customText) {
+            text = left.toString() + " " + word + " " + right.toString();
         }
-
-        return isSimpleProperty ? str : "(" + str + ")";
+        
+        return isSimpleProperty ? text : "(" + text + ")";
     }
 
     public String getWord() {

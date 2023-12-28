@@ -492,11 +492,18 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             if (exprField.isEditable()) {
                 GuardExpression newExpression = null;
                 try {
-                    newExpression = GuardExpressionParser.parse(exprField.getText(),context.network());
+                    newExpression = GuardExpressionParser.parse(exprField.getText(), context.network());
+
+                    // Set simple to avoid adding parentheses around the entire expression
                     if (newExpression instanceof OrExpression) {
                         ((OrExpression) newExpression).setSimpleProperty(true);
+                    } else if (newExpression instanceof AndExpression) {
+                        ((AndExpression) newExpression).setSimpleProperty(true);
                     }
-                    newExpression.setText(exprField.getText());
+
+                    String expr = exprField.getText();
+                    expr = removeOuterParentheses(expr);
+                    newExpression.setText(expr);
                 } catch (Throwable ex) {
                     int choice = JOptionPane.showConfirmDialog(
                         TAPAALGUI.getApp(),
@@ -579,6 +586,23 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.BOTH;
         add(editPanel, gbc);
+    }
+
+    private String removeOuterParentheses(String str) {
+        while (str.startsWith("(") && str.endsWith(")")) {
+            String innerSubstr = str.substring(1, str.length() - 1);
+
+            long numOpeningParen = innerSubstr.chars().filter(c -> c == '(').count();
+            long numClosingParen = innerSubstr.chars().filter(c -> c == ')').count();
+
+            if (numOpeningParen != numClosingParen) {
+                break;
+            }
+
+            str = innerSubstr;
+        }
+
+        return str;
     }
 
     private void initExprField() {
