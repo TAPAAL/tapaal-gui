@@ -1527,8 +1527,10 @@ public class QueryDialog extends JPanel {
         initRawVerificationOptionsPanel();
         initButtonPanel(option);
 
-        if(queryToCreateFrom != null) {
+        if (queryToCreateFrom != null) {
             setupFromQuery(queryToCreateFrom);
+        } else {
+            setupRawVerificationOptionsFromQuery();
         }
 
         refreshTraceOptions();
@@ -1546,7 +1548,6 @@ public class QueryDialog extends JPanel {
         refreshUndoRedo();
 
         setEnabledOptionsAccordingToCurrentReduction();
-        //setVerificationOptionsEnabled(!queryToCreateFrom.getRawVerification());
 
         makeShortcuts();
 
@@ -1587,6 +1588,11 @@ public class QueryDialog extends JPanel {
     private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
         rawVerificationOptionsEnabled.setSelected(queryToCreateFrom.getRawVerification());
         rawVerificationOptionsTextField.setText(queryToCreateFrom.getRawVerificationPrompt());
+    }
+
+    private void setupRawVerificationOptionsFromQuery() {
+        rawVerificationOptionsEnabled.setSelected(false);
+        rawVerificationOptionsTextField.setText("-x 1 ");
     }
 
     private void setupTraceListFromQuery(TAPNQuery queryToCreateFrom) {
