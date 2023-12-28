@@ -520,16 +520,17 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 try {
                     newExpression = GuardExpressionParser.parse(exprField.getText(), context.network());
 
-                    // Set simple to avoid adding parentheses around the entire expression
-                    if (newExpression instanceof OrExpression) {
-                        ((OrExpression) newExpression).setSimpleProperty(true);
-                    } else if (newExpression instanceof AndExpression) {
-                        ((AndExpression) newExpression).setSimpleProperty(true);
-                    }
-
+                    // Remove outer parentheses
                     String expr = exprField.getText();
                     expr = removeOuterParentheses(expr);
-                    newExpression.setText(expr);
+
+                    if (newExpression instanceof OrExpression) {
+                        ((OrExpression) newExpression).setSimpleProperty(true);
+                        ((OrExpression) newExpression).setText(expr);
+                    } else if (newExpression instanceof AndExpression) {
+                        ((AndExpression) newExpression).setSimpleProperty(true);
+                        ((AndExpression) newExpression).setText(expr);
+                    }
                 } catch (Throwable ex) {
                     int choice = JOptionPane.showConfirmDialog(
                         TAPAALGUI.getApp(),
