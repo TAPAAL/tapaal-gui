@@ -282,6 +282,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         });
     }
 
+    /** Searches for the expression before new one */
     private void updatePreviousExpr() {
         String exprText = exprField.getText();
         int lastSpace = exprText.lastIndexOf(' ', currentSelection.getStart() - 1);
@@ -304,17 +305,17 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         }
     }
 
+    /** Searches for next expression to the right of new one */
     private void updateNextExpr() {
         String exprText = exprField.getText();
 
-        if (exprText.length() >= currentSelection.getEnd()) {
-            nextExpr = previousExpr;
-            return;
-        } else if (exprText.length() >= currentSelection.getEnd() + 1 && exprText.charAt(currentSelection.getEnd() + 1) == ')') {
+        // If there is closing parenthesis to the right of the selection or there is nothing there, use the previous expression
+        if (exprText.length() > currentSelection.getEnd() && exprText.charAt(currentSelection.getEnd()) == ')' || 
+            exprText.length() == currentSelection.getEnd()) {
             nextExpr = previousExpr;
             return;
         }
-        
+
         int nextSpace = exprText.indexOf(' ', currentSelection.getEnd() + 1);
 
         if (nextSpace != -1) {
