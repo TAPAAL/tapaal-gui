@@ -4620,6 +4620,7 @@ public class QueryDialog extends JPanel {
         // Reset to original values
         if (isEnabled) {
             setEnabledOptionsAccordingToCurrentReduction();
+            openReducedNetButton.setEnabled(useReduction.isSelected() && getQueryComment().length() > 0 && !newProperty.containsPlaceHolder());
         }
     }
 
@@ -4636,10 +4637,6 @@ public class QueryDialog extends JPanel {
     }
 
     protected void setEnabledOptionsAccordingToCurrentReduction() {
-        if (rawVerificationOptionsEnabled.isSelected()) {
-            return;
-        }
-
         refreshQueryEditingButtons();
         refreshTraceOptions();
         if (lens.isTimed()) {
