@@ -307,7 +307,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private void updateNextExpr() {
         String exprText = exprField.getText();
 
-        if (exprText.length() > currentSelection.getEnd() + 1 && exprText.charAt(currentSelection.getEnd() + 1) == ')') {
+        if (exprText.length() >= currentSelection.getEnd()) {
+            nextExpr = previousExpr;
+            return;
+        } else if (exprText.length() >= currentSelection.getEnd() + 1 && exprText.charAt(currentSelection.getEnd() + 1) == ')') {
             nextExpr = previousExpr;
             return;
         }
@@ -521,16 +524,10 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                 try {
                     newExpression = GuardExpressionParser.parse(exprField.getText(), context.network());
 
-                    // Remove outer parentheses
-                    String expr = exprField.getText();
-                    expr = removeOuterParentheses(expr);
-
                     if (newExpression instanceof OrExpression) {
                         ((OrExpression) newExpression).setSimpleProperty(true);
-                        ((OrExpression) newExpression).setText(expr);
                     } else if (newExpression instanceof AndExpression) {
                         ((AndExpression) newExpression).setSimpleProperty(true);
-                        ((AndExpression) newExpression).setText(expr);
                     }
                 } catch (Throwable ex) {
                     int choice = JOptionPane.showConfirmDialog(
@@ -614,23 +611,6 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.BOTH;
         add(editPanel, gbc);
-    }
-
-    private String removeOuterParentheses(String str) {
-        while (str.startsWith("(") && str.endsWith(")")) {
-            String innerSubstr = str.substring(1, str.length() - 1);
-
-            long numOpeningParen = innerSubstr.chars().filter(c -> c == '(').count();
-            long numClosingParen = innerSubstr.chars().filter(c -> c == ')').count();
-
-            if (numOpeningParen != numClosingParen) {
-                break;
-            }
-
-            str = innerSubstr;
-        }
-
-        return str;
     }
 
     private void initExprField() {
