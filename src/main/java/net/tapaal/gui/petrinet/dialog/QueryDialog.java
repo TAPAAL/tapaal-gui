@@ -821,9 +821,7 @@ public class QueryDialog extends JPanel {
 
         int selectedIndex = queryType.getSelectedIndex();
         if (current instanceof LTLANode || current instanceof LTLENode ||
-            ((selectedIndex == 1 || selectedIndex == 2) && current instanceof TCTLPathPlaceHolder)) {
-            disjunctionButton.setEnabled(true);
-            conjunctionButton.setEnabled(true);
+            ((selectedIndex == 1 || selectedIndex == 2) && current instanceof TCTLPathPlaceHolder)) {;
             negationButton.setEnabled(false);
         } else if (!lens.isGame()) {
             disjunctionButton.setEnabled(true);
@@ -1570,12 +1568,12 @@ public class QueryDialog extends JPanel {
         numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
 
         if (lens.isTimed()) {
-            setupQuantificationFromQuery(queryToCreateFrom);
             setupApproximationOptionsFromQuery(queryToCreateFrom);
-        }
-        if(lens.isColored() && !lens.isTimed()){
+            setupQuantificationFromQuery(queryToCreateFrom);
+        } else if (lens.isColored()) {
             setupUnfoldingOptionsFromQuery(queryToCreateFrom);
         }
+
         setupQueryCategoryFromQuery(queryToCreateFrom);
         setupSearchOptionsFromQuery(queryToCreateFrom);
         setupReductionOptionsFromQuery(queryToCreateFrom);
@@ -1583,7 +1581,7 @@ public class QueryDialog extends JPanel {
         setupTarOptionsFromQuery(queryToCreateFrom);
         setupTarjanOptionsFromQuery(queryToCreateFrom);
 
-        if(queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
+        if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
         }
 
@@ -4382,7 +4380,7 @@ public class QueryDialog extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    updateRawVerificationOptions();
+                    updateRawVerificationOptions(advancedView);
                     guiDialog.pack();
                 }
             }
@@ -4649,11 +4647,7 @@ public class QueryDialog extends JPanel {
     }
 
     protected void setEnabledOptionsAccordingToCurrentReduction() {
-        if (rawVerificationOptionsEnabled.isSelected()) {
-            refreshQueryEditingButtons();
-            return;
-        }
-
+        refreshQueryEditingButtons();
         refreshTraceOptions();
         if (lens.isTimed()) {
             refreshSymmetryReduction();
@@ -4681,10 +4675,6 @@ public class QueryDialog extends JPanel {
 
         guiDialog.pack();
 	}
-
-    private void updateRawVerificationOptions() {
-        updateRawVerificationOptions(true);
-    }
 
     private void updateRawVerificationOptions(boolean advancedView) {
         querySaved = true;
