@@ -692,7 +692,7 @@ public class QueryDialog extends JPanel {
 			return null;
 		}
 		guiDialog = new EscapableDialog(TAPAALGUI.getApp(),	"Edit Query", true);
-
+        
         Container contentPane = guiDialog.getContentPane();
 
         // 1 Set layout
@@ -822,10 +822,15 @@ public class QueryDialog extends JPanel {
         int selectedIndex = queryType.getSelectedIndex();
         if (current instanceof LTLANode || current instanceof LTLENode ||
             ((selectedIndex == 1 || selectedIndex == 2) && current instanceof TCTLPathPlaceHolder)) {
+            disjunctionButton.setEnabled(true);
+            conjunctionButton.setEnabled(true);
             negationButton.setEnabled(false);
         } else if (!lens.isGame()) {
+            disjunctionButton.setEnabled(true);
+            conjunctionButton.setEnabled(true);
             negationButton.setEnabled(true);
         }
+
         if (lens.isGame()) {
             if (newProperty instanceof TCTLAbstractPathProperty && !(newProperty instanceof TCTLPathPlaceHolder)) {
                 enableOnlyStateButtons();
@@ -4532,7 +4537,11 @@ public class QueryDialog extends JPanel {
         rawVerificationOptionsTextField = new JTextField();
         rawVerificationOptionsTextField.setEnabled(false);
         rawVerificationOptionsTextField.setToolTipText(TOOL_TIP_RAW_VERIFICATION_TEXT_FIELD);
-        
+
+        Dimension dim = new Dimension(200, 20);
+        rawVerificationOptionsTextField.setPreferredSize(dim);
+        rawVerificationOptionsTextField.setMaximumSize(dim);
+
         rawVerificationOptionsHelpButton = new JButton("Help on options");
         rawVerificationOptionsHelpButton.setEnabled(false);
         rawVerificationOptionsHelpButton.setToolTipText(TOOL_TIP_RAW_VERIFICATION_HELP_BUTTON);
