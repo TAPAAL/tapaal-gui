@@ -820,7 +820,7 @@ public class QueryDialog extends JPanel {
 
         int selectedIndex = queryType.getSelectedIndex();
         if (current instanceof LTLANode || current instanceof LTLENode ||
-            ((selectedIndex == 1 || selectedIndex == 2) && current instanceof TCTLPathPlaceHolder)) {;
+            ((selectedIndex == 1 || selectedIndex == 2) && current instanceof TCTLPathPlaceHolder)) {
             negationButton.setEnabled(false);
         } else if (!lens.isGame()) {
             disjunctionButton.setEnabled(true);
