@@ -4628,9 +4628,12 @@ public class QueryDialog extends JPanel {
         setAllEnabled(searchOptionsPanel, isEnabled);
         setAllEnabled(overApproximationOptionsPanel, isEnabled);
 
+        openReducedNetButton.setEnabled(isEnabled);
+
         // Reset to original values
         if (isEnabled) {
             setEnabledOptionsAccordingToCurrentReduction();
+            openReducedNetButton.setEnabled(useReduction.isSelected() && getQueryComment().length() > 0 && !newProperty.containsPlaceHolder());
         }
     }
 
