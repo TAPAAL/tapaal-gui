@@ -39,7 +39,6 @@ import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.HyperLTLParsing.TAPAALHyperLTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
-import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
@@ -1898,7 +1897,7 @@ public class QueryDialog extends JPanel {
         }
         mergeNetComponentsButton.setVisible(advancedView);
 
-        updateRawVerificationOptions(advancedView);
+        showRawVerificationOptions(advancedView);
 
         if(advancedView){
             advancedButton.setText("Simple view");
@@ -4382,7 +4381,7 @@ public class QueryDialog extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    updateRawVerificationOptions(advancedView);
+                    showRawVerificationOptions(advancedView);
                     guiDialog.pack();
                 }
             }
@@ -4681,7 +4680,7 @@ public class QueryDialog extends JPanel {
         guiDialog.pack();
 	}
 
-    private void updateRawVerificationOptions(boolean advancedView) {
+    private void showRawVerificationOptions(boolean advancedView) {
         querySaved = true;
         TAPNQuery query = getQuery();
         querySaved = false;
