@@ -1988,6 +1988,8 @@ public class QueryDialog extends JPanel {
         if (undoButton != null) undoButton.setEnabled(false);
         if (redoButton != null) redoButton.setEnabled(false);
         setEnabledOptionsAccordingToCurrentReduction();
+
+        setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
     }
 
     private String checkLTLType() {
@@ -4628,12 +4630,12 @@ public class QueryDialog extends JPanel {
         setAllEnabled(searchOptionsPanel, isEnabled);
         setAllEnabled(overApproximationOptionsPanel, isEnabled);
 
-        openReducedNetButton.setEnabled(isEnabled);
-
         // Reset to original values
         if (isEnabled) {
             setEnabledOptionsAccordingToCurrentReduction();
             openReducedNetButton.setEnabled(useReduction.isSelected() && getQueryComment().length() > 0 && !newProperty.containsPlaceHolder());
+        } else {
+            openReducedNetButton.setEnabled(true);
         }
     }
 
