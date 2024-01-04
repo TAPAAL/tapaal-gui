@@ -611,6 +611,7 @@ public class QueryDialog extends JPanel {
 
     private ReductionOption getReductionOption() {
         String reductionOptionString = getReductionOptionAsString();
+
         if (reductionOptionString == null)
             return null;
         else if (reductionOptionString.equals(name_STANDARD))
@@ -1638,7 +1639,6 @@ public class QueryDialog extends JPanel {
 
     private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
         String reduction = "";
-        boolean symmetry = queryToCreateFrom.useSymmetry();
 
         if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST) {
             reduction = name_BROADCAST;
@@ -1663,6 +1663,8 @@ public class QueryDialog extends JPanel {
                 reduction = name_OPTIMIZEDSTANDARD;
             }
         }
+
+        System.out.println(reduction);
 
         reductionOption.addItem(reduction);
         reductionOption.setSelectedItem(reduction);
