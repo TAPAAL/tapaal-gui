@@ -182,7 +182,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     @Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-        System.out.println(rawVerificationOptions);
+    
         if (useRawVerification) {
             result.append(rawVerificationOptions);
             return result.toString();
@@ -268,9 +268,6 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		if (!this.useColoredReduction) {
 		    result.append(" --col-reduction 0 ");
         }
-
-        System.out.println(result);
-        System.out.println("tokens in model: " + tokensInModel);
 
 		return result.toString();
 	}

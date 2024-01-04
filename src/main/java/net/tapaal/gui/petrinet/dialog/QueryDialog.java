@@ -1563,7 +1563,7 @@ public class QueryDialog extends JPanel {
         }
 
         if (queryToCreateFrom != null) {
-            setupRawVerificationOptions(queryToCreateFrom.getRawVerification());
+            setupRawVerificationOptionsFromQuery(queryToCreateFrom);
         } else {
             setupRawVerificationOptions();
         }
@@ -1592,6 +1592,11 @@ public class QueryDialog extends JPanel {
         }
     }
 
+    private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
+        rawVerificationOptionsTextField.setText(queryToCreateFrom.getRawVerificationPrompt());
+        setupRawVerificationOptions(queryToCreateFrom.getRawVerification());
+    }
+
     private void setupRawVerificationOptions() {
         setupRawVerificationOptions(false);
     }
@@ -1605,8 +1610,11 @@ public class QueryDialog extends JPanel {
         addItemListeners(reductionOptionsPanel);
 
         numberOfExtraTokensInNet.addChangeListener(e -> updateRawVerificationOptions());
+        reductionOption.addActionListener(e -> updateRawVerificationOptions());
 
-        updateRawVerificationOptions();
+        if (reductionOption.getSelectedItem() != null) {
+            updateRawVerificationOptions();
+        }
     }
 
     private void addItemListeners(JPanel panel) {
@@ -2015,6 +2023,7 @@ public class QueryDialog extends JPanel {
         setEnabledOptionsAccordingToCurrentReduction();
 
         setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
+        updateRawVerificationOptions();
     }
 
     private String checkLTLType() {
@@ -4736,8 +4745,8 @@ public class QueryDialog extends JPanel {
 
         boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
         VerifyTAPNOptions verifytapnOptions = Verifier.getVerificationOptions(query, isColored);
+        verifytapnOptions.setTokensInModel(((TimedArcPetriNet) templateBox.getSelectedItem()).getNumberOfTokensInNet());
 
-        System.out.println(verifytapnOptions.toString());
         rawVerificationOptionsTextField.setText(verifytapnOptions.toString());
         rawVerificationOptionsTextField.setCaretPosition(0);
     }
