@@ -456,10 +456,6 @@ public class QueryDialog extends JPanel {
         String name = getQueryComment();
         int capacity = getCapacity();
 
-        System.out.println(reductionOption);
-        System.out.println(reductionOption.getItemCount());
-        System.out.println(getReductionOption());
-
         TAPNQuery.TraceOption traceOption = getTraceOption();
         TAPNQuery.SearchOption searchOption = getSearchOption();
         ReductionOption reductionOptionToSet = getReductionOption();
@@ -1538,7 +1534,7 @@ public class QueryDialog extends JPanel {
         if (queryToCreateFrom != null) {
             setupFromQuery(queryToCreateFrom);
         } else {
-            setupRawVerificationOptionsFromQuery();
+            setupRawVerificationOptions();
         }
 
         refreshTraceOptions();
@@ -1565,8 +1561,13 @@ public class QueryDialog extends JPanel {
             useSiphonTrap.setSelected(false);
             useSiphonTrap.setEnabled(false);
         }
-    }
 
+        if (queryToCreateFrom != null) {
+            setupRawVerificationOptions(queryToCreateFrom.getRawVerification());
+        } else {
+            setupRawVerificationOptions();
+        }
+    }
 
     private void setupFromQuery(TAPNQuery queryToCreateFrom) {
         queryName.setText(queryToCreateFrom.getName());
@@ -1589,18 +1590,38 @@ public class QueryDialog extends JPanel {
         if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
         }
-
-        setupRawVerificationOptionsFromQuery(queryToCreateFrom);
     }
 
-    private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
-        rawVerificationOptionsEnabled.setSelected(queryToCreateFrom.getRawVerification());
-        rawVerificationOptionsTextField.setText(queryToCreateFrom.getRawVerificationPrompt());
+    private void setupRawVerificationOptions() {
+        setupRawVerificationOptions(false);
     }
 
-    private void setupRawVerificationOptionsFromQuery() {
-        rawVerificationOptionsEnabled.setSelected(false);
-        rawVerificationOptionsTextField.setText("-x 1 ");
+    private void setupRawVerificationOptions(boolean isSelected) {
+        rawVerificationOptionsEnabled.setSelected(isSelected);
+
+        addItemListeners(searchOptionsPanel);
+        addItemListeners(unfoldingOptionsPanel);
+        addItemListeners(traceOptionsPanel);
+        addItemListeners(reductionOptionsPanel);
+
+        numberOfExtraTokensInNet.addChangeListener(e -> updateRawVerificationOptions());
+
+        updateRawVerificationOptions();
+    }
+
+    private void addItemListeners(JPanel panel) {
+        if (panel != null) {
+            for (Component component : panel.getComponents()) {
+                if (component instanceof JRadioButton || component instanceof JCheckBox) {
+                    AbstractButton button = (AbstractButton) component;
+                    button.addItemListener(new ItemListener() {
+                        public void itemStateChanged(ItemEvent e) {
+                            updateRawVerificationOptions();
+                        }
+                    });
+                }
+            }
+        }
     }
 
     private void setupTraceListFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1663,8 +1684,6 @@ public class QueryDialog extends JPanel {
                 reduction = name_OPTIMIZEDSTANDARD;
             }
         }
-
-        System.out.println(reduction);
 
         reductionOption.addItem(reduction);
         reductionOption.setSelectedItem(reduction);
@@ -2423,8 +2442,6 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
-
-        numberOfExtraTokensInNet.addChangeListener(e -> updateRawVerificationOptions());
 
         uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
     }
@@ -4217,17 +4234,6 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.insets = new Insets(0, 5, 0, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
 
-        for (Component component : searchOptionsPanel.getComponents()) {
-            if (component instanceof JRadioButton) {
-                JRadioButton radioButton = (JRadioButton) component;
-                radioButton.addItemListener(new ItemListener() {
-                    public void itemStateChanged(ItemEvent e) {
-                        updateRawVerificationOptions();
-                    }
-                });
-            }
-        }
-
         uppaalOptionsPanel.add(searchOptionsPanel, gridBagConstraints);
     }
 
@@ -4264,17 +4270,6 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.weightx = 1;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(0, 0, 0, 5);
-
-        for (Component component : unfoldingOptionsPanel.getComponents()) {
-            if (component instanceof JCheckBox) {
-                JCheckBox checkbox = (JCheckBox) component;
-                checkbox.addItemListener(new ItemListener() {
-                    public void itemStateChanged(ItemEvent e) {
-                        updateRawVerificationOptions();
-                    }
-                });
-            }
-        }
 
         verificationPanel.add(unfoldingOptionsPanel, gridBagConstraints);
 
@@ -4339,17 +4334,6 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
-
-        for (Component component : traceOptionsPanel.getComponents()) {
-            if (component instanceof JRadioButton) {
-                JRadioButton radioButton = (JRadioButton) component;
-                radioButton.addItemListener(new ItemListener() {
-                    public void itemStateChanged(ItemEvent e) {
-                        updateRawVerificationOptions();
-                    }
-                });
-            }
-        }
 
         uppaalOptionsPanel.add(traceOptionsPanel, gridBagConstraints);
     }
@@ -4505,17 +4489,6 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 0;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.BOTH;
-
-        for (Component component : reductionOptionsPanel.getComponents()) {
-            if (component instanceof JCheckBox) {
-                JCheckBox checkbox = (JCheckBox) component;
-                checkbox.addItemListener(new ItemListener() {
-                    public void itemStateChanged(ItemEvent e) {
-                        updateRawVerificationOptions();
-                    }
-                });
-            }
-        }
 
         verificationPanel.add(reductionOptionsPanel, gbc);
     }
@@ -4766,6 +4739,7 @@ public class QueryDialog extends JPanel {
 
         System.out.println(verifytapnOptions.toString());
         rawVerificationOptionsTextField.setText(verifytapnOptions.toString());
+        rawVerificationOptionsTextField.setCaretPosition(0);
     }
 
 	private void refreshTraceRefinement() {

@@ -96,7 +96,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-
+		System.out.println(rawVerificationOptions);
 		if (useRawVerification) {
             result.append(rawVerificationOptions);
             return result.toString();
