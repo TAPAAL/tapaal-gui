@@ -37,14 +37,13 @@ public abstract class PetriNetObjectWithLabel extends PetriNetObject {
         getNameLabel().addMouseListener(labelHandler);
         getNameLabel().addMouseMotionListener(labelHandler);
         getNameLabel().addMouseWheelListener(labelHandler);
-
     }
 
     protected void updateLabelLocation(boolean alignToGrid) {
         if(alignToGrid) {
             this.getNameLabel().setPosition(
-                    Grid.getModifiedX(positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom())),
-                    Grid.getModifiedY(positionY + Zoomer.getZoomedValue(nameOffsetY, getZoom()))
+                    Grid.align(positionX + Zoomer.getZoomedValue(nameOffsetX, getZoom()), 100),
+                    Grid.align(positionY + Zoomer.getZoomedValue(nameOffsetY, getZoom()), 100)
             );
         } else {
             this.getNameLabel().setPosition(

@@ -322,8 +322,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
     }
 
     public Point adjustPointToGrid(Point p) {
-        int x = Grid.getModifiedX(p.x);
-        int y = Grid.getModifiedY(p.y);
+        int x = Grid.align(p.x, getZoom());
+        int y = Grid.align(p.y, getZoom());
 
         return new Point(x, y);
     }
