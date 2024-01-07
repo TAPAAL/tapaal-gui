@@ -214,7 +214,7 @@ public class QueryDialog extends JPanel {
     private JCheckBox useTarjan;
     // Raw verification options panel
     private JPanel rawVerificationOptionsPanel;
-    private JTextField rawVerificationOptionsTextField;
+    private JTextArea rawVerificationOptionsTextArea;
     private JCheckBox rawVerificationOptionsEnabled;
     private JButton rawVerificationOptionsHelpButton;
 
@@ -506,7 +506,7 @@ public class QueryDialog extends JPanel {
             lens.isColored(),
             false,
             rawVerificationOptionsEnabled.isSelected(),
-            rawVerificationOptionsTextField.getText()
+            rawVerificationOptionsTextArea.getText()
 		);
 
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
@@ -546,7 +546,7 @@ public class QueryDialog extends JPanel {
             lens.isColored(),
             coloredReduction,
             rawVerificationOptionsEnabled.isSelected(),
-            rawVerificationOptionsTextField.getText()
+            rawVerificationOptionsTextArea.getText()
         );
         if (queryType.getSelectedIndex() == 1) {
             query.setCategory(TAPNQuery.QueryCategory.LTL);
@@ -1593,7 +1593,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
-        rawVerificationOptionsTextField.setText(queryToCreateFrom.getRawVerificationPrompt());
+        rawVerificationOptionsTextArea.setText(queryToCreateFrom.getRawVerificationPrompt());
         setupRawVerificationOptions(queryToCreateFrom.getRawVerification());
     }
 
@@ -4572,13 +4572,13 @@ public class QueryDialog extends JPanel {
         rawVerificationOptionsEnabled = new JCheckBox("Use");
         rawVerificationOptionsEnabled.setToolTipText(TOOL_TIP_RAW_VERIFICATION_ENABLED_CHECKBOX);
 
-        rawVerificationOptionsTextField = new JTextField();
-        rawVerificationOptionsTextField.setEnabled(false);
-        rawVerificationOptionsTextField.setToolTipText(TOOL_TIP_RAW_VERIFICATION_TEXT_FIELD);
+        rawVerificationOptionsTextArea = new JTextArea();
+        rawVerificationOptionsTextArea.setEnabled(false);
+        rawVerificationOptionsTextArea.setToolTipText(TOOL_TIP_RAW_VERIFICATION_TEXT_FIELD);
 
-        Dimension dim = new Dimension(200, 20);
-        rawVerificationOptionsTextField.setPreferredSize(dim);
-        rawVerificationOptionsTextField.setMaximumSize(dim);
+        rawVerificationOptionsTextArea.setLineWrap(true);
+        rawVerificationOptionsTextArea.setWrapStyleWord(true);
+        rawVerificationOptionsTextArea.setRows(2);
 
         rawVerificationOptionsHelpButton = new JButton("Help on options");
         rawVerificationOptionsHelpButton.setEnabled(false);
@@ -4588,7 +4588,7 @@ public class QueryDialog extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
-                rawVerificationOptionsTextField.setEnabled(rawVerificationOptionsEnabled.isSelected());
+                rawVerificationOptionsTextArea.setEnabled(rawVerificationOptionsEnabled.isSelected());
                 rawVerificationOptionsHelpButton.setEnabled(rawVerificationOptionsEnabled.isSelected());
             }
         });
@@ -4611,7 +4611,7 @@ public class QueryDialog extends JPanel {
         buttonGbc.insets = new Insets(0, 0, 0, 5);
 
         rawVerificationOptionsPanel.add(rawVerificationOptionsEnabled, checkBoxGbc);
-        rawVerificationOptionsPanel.add(rawVerificationOptionsTextField, textAreaGbc);
+        rawVerificationOptionsPanel.add(rawVerificationOptionsTextArea, textAreaGbc);
         rawVerificationOptionsPanel.add(rawVerificationOptionsHelpButton, buttonGbc);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -4747,8 +4747,8 @@ public class QueryDialog extends JPanel {
         VerifyTAPNOptions verifytapnOptions = Verifier.getVerificationOptions(query, isColored);
         verifytapnOptions.setTokensInModel(((TimedArcPetriNet) templateBox.getSelectedItem()).getNumberOfTokensInNet());
 
-        rawVerificationOptionsTextField.setText(verifytapnOptions.toString());
-        rawVerificationOptionsTextField.setCaretPosition(0);
+        rawVerificationOptionsTextArea.setText(verifytapnOptions.toString());
+        rawVerificationOptionsTextArea.setCaretPosition(0);
     }
 
 	private void refreshTraceRefinement() {
