@@ -4578,7 +4578,6 @@ public class QueryDialog extends JPanel {
 
         rawVerificationOptionsTextArea.setLineWrap(true);
         rawVerificationOptionsTextArea.setWrapStyleWord(true);
-        rawVerificationOptionsTextArea.setRows(2);
 
         rawVerificationOptionsHelpButton = new JButton("Help on options");
         rawVerificationOptionsHelpButton.setEnabled(false);
