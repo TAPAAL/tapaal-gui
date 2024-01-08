@@ -51,7 +51,6 @@ import pipe.gui.petrinet.dataLayer.DataLayer;
 import dk.aau.cs.io.NetWriter;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.Template;
-import net.tapaal.gui.petrinet.dialog.QueryDialog.QueryConstructionEdit;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import pipe.gui.*;
@@ -1522,7 +1521,6 @@ public class QueryDialog extends JPanel {
     // /////////////////////////////////////////////////////////////////////
 
     private void init(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
-        //setPreferredSize(new Dimension(942, 517));
         initQueryNamePanel();
         initQueryPanel();
         initUppaalOptionsPanel();
@@ -1821,6 +1819,7 @@ public class QueryDialog extends JPanel {
 
         advancedButton = new JButton("Advanced view");
         advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
+        advancedView = false;
         advancedButton.addActionListener(arg0 -> toggleAdvancedSimpleView(true));
 
         JButton infoButton = new JButton("Help on the query options");
@@ -1940,7 +1939,7 @@ public class QueryDialog extends JPanel {
             advancedButton.setText("Advanced view");
             advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
         }
-
+        
         guiDialog.pack();
         guiDialog.setLocation(location);
     }
@@ -4575,9 +4574,11 @@ public class QueryDialog extends JPanel {
         rawVerificationOptionsTextArea = new JTextArea();
         rawVerificationOptionsTextArea.setEnabled(false);
         rawVerificationOptionsTextArea.setToolTipText(TOOL_TIP_RAW_VERIFICATION_TEXT_FIELD);
-
         rawVerificationOptionsTextArea.setLineWrap(true);
         rawVerificationOptionsTextArea.setWrapStyleWord(true);
+        rawVerificationOptionsTextArea.setRows(4);
+
+        JScrollPane rawVerificationOptionsScrollPane = new JScrollPane(rawVerificationOptionsTextArea);
 
         rawVerificationOptionsHelpButton = new JButton("Help on options");
         rawVerificationOptionsHelpButton.setEnabled(false);
@@ -4610,7 +4611,7 @@ public class QueryDialog extends JPanel {
         buttonGbc.insets = new Insets(0, 0, 0, 5);
 
         rawVerificationOptionsPanel.add(rawVerificationOptionsEnabled, checkBoxGbc);
-        rawVerificationOptionsPanel.add(rawVerificationOptionsTextArea, textAreaGbc);
+        rawVerificationOptionsPanel.add(rawVerificationOptionsScrollPane, textAreaGbc);
         rawVerificationOptionsPanel.add(rawVerificationOptionsHelpButton, buttonGbc);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -4731,6 +4732,8 @@ public class QueryDialog extends JPanel {
         } else {
             rawVerificationOptionsPanel.setVisible(advancedView);
         }
+
+        guiDialog.pack();
     }
 
     private void updateRawVerificationOptions() {
