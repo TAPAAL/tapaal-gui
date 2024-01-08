@@ -422,7 +422,6 @@ public class QueryDialog extends JPanel {
 
         setLayout(new GridBagLayout());
 
-
         init(option, queryToCreateFrom);
         makeShortcuts();
         toggleAdvancedSimpleView(false);
@@ -1593,6 +1592,10 @@ public class QueryDialog extends JPanel {
     private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
         rawVerificationOptionsTextArea.setText(queryToCreateFrom.getRawVerificationPrompt());
         setupRawVerificationOptions(queryToCreateFrom.getRawVerification());
+
+        if (rawVerificationOptionsEnabled.isSelected() && !advancedView) {
+            toggleAdvancedSimpleView(true);
+        }
     }
 
     private void setupRawVerificationOptions() {
@@ -1819,7 +1822,6 @@ public class QueryDialog extends JPanel {
 
         advancedButton = new JButton("Advanced view");
         advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
-        advancedView = false;
         advancedButton.addActionListener(arg0 -> toggleAdvancedSimpleView(true));
 
         JButton infoButton = new JButton("Help on the query options");
