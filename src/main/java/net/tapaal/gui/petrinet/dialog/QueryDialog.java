@@ -4748,7 +4748,6 @@ public class QueryDialog extends JPanel {
         VerifyTAPNOptions verifytapnOptions = Verifier.getVerificationOptions(query, isColored);
         verifytapnOptions.setTokensInModel(((TimedArcPetriNet) templateBox.getSelectedItem()).getNumberOfTokensInNet());
 
-        System.out.println(verifytapnOptions.toString());
         rawVerificationOptionsTextArea.setText(verifytapnOptions.toString());
     }
 
