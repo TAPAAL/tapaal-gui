@@ -4598,7 +4598,6 @@ public class QueryDialog extends JPanel {
         GridBagConstraints checkBoxGbc = new GridBagConstraints();
         checkBoxGbc.gridx = 0;
         checkBoxGbc.gridy = 0;
-        checkBoxGbc.insets = new Insets(0, 5, 0, 0);
 
         GridBagConstraints textAreaGbc = new GridBagConstraints();
         textAreaGbc.gridx = 1;
