@@ -118,7 +118,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		this.symmetricVars = useSymmetricVars;
 		this.useColoredReduction = useColoredReduction;
 
-        if(unfold) {
+        if(unfold && !useRawVerification) {
             try {
                 unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
                 unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();

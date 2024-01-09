@@ -110,7 +110,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		this.colorFixpoint = colorFixpoint;
         this.unfold = unfoldNet;
 
-        if(unfold && trace() != TraceOption.NONE) // we only force unfolding when traces are involved
+        if(unfold && trace() != TraceOption.NONE && !useRawVerification) // we only force unfolding when traces are involved
         {
             try {
                 unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();

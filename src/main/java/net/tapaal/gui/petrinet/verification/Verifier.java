@@ -287,7 +287,7 @@ public class Verifier {
                 reducedNetTempFile.getAbsolutePath(),
                 query.usePartitioning(),
                 query.useColorFixpoint(),
-                isColored && !query.getRawVerification(),// Unfold net
+                isColored,// Unfold net
                 query.getRawVerification(),
                 query.getRawVerificationPrompt()
         );
@@ -310,7 +310,7 @@ public class Verifier {
                 query.isTarOptionEnabled(),
                 query.isTarjan(),
                 isColored,
-                isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE && !query.getRawVerification(),
+                isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE,
                 query.usePartitioning(),
                 query.useColorFixpoint(),
                 query.useSymmetricVars(),
