@@ -337,7 +337,7 @@ public class VerifyPN implements ModelChecker {
                     (query.getProperty() instanceof LTLENode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof LTLANode && !queryResult.value1().isQuerySatisfied());
 
-                if (options.traceOption() != TraceOption.NONE && isColored && showTrace) {
+                if (options.traceOption() != TraceOption.NONE && isColored && showTrace && options.unfoldedModelPath() != null) {
                     PNMLoader tapnLoader = new PNMLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());

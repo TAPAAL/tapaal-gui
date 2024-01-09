@@ -29,7 +29,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
-	
+
 	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateequationCheck, boolean discreteInclusion, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
 		this(extraTokens,traceOption, search, symmetry, useStateequationCheck, discreteInclusion, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
 	}
@@ -44,7 +44,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		this.useRawVerification = useRawVerification;
 		this.rawVerificationOptions = rawVerificationOptions;
 
-        if(isColor && trace() != TraceOption.NONE) // we only force unfolding when traces are involved
+        if(isColor && trace() != TraceOption.NONE && !useRawVerification) // we only force unfolding when traces are involved
         {
             try {
                 unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
@@ -98,8 +98,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		StringBuilder result = new StringBuilder();
 		
 		if (useRawVerification) {
-            result.append(rawVerificationOptions);
-            return result.toString();
+            return result.append(rawVerificationOptions).toString();
         }
 
         if(unfoldedModelPath != null && unfoldedQueriesPath != null)

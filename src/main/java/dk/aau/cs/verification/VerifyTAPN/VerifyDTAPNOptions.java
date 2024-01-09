@@ -126,8 +126,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		StringBuilder result = new StringBuilder();
 	
 		if (useRawVerification) {
-            result.append(rawVerificationOptions);
-            return result.toString();
+            return result.append(rawVerificationOptions).toString();
         }
 
         result.append(kBoundArg());

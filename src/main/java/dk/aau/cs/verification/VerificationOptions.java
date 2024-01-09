@@ -12,9 +12,10 @@ public abstract class VerificationOptions {
 	protected int approximationDenominator;
 	protected boolean useStateequationCheck;
 	protected int extraTokens;
+
 	protected String reducedModelPath;
-    protected String unfoldedModelPath;
-    protected String unfoldedQueriesPath;
+    protected static String unfoldedModelPath;
+    protected static String unfoldedQueriesPath;
 
 	public abstract String toString();
 
