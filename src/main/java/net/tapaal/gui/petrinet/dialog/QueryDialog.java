@@ -4604,13 +4604,14 @@ public class QueryDialog extends JPanel {
         textAreaGbc.gridx = 1;
         textAreaGbc.gridy = 0;
         textAreaGbc.weightx = 1;
+        textAreaGbc.gridheight = 2;
         textAreaGbc.fill = GridBagConstraints.HORIZONTAL;
         textAreaGbc.insets = new Insets(0, 10, 0, 10);
 
         GridBagConstraints buttonGbc = new GridBagConstraints();
-        buttonGbc.gridx = 2;
-        buttonGbc.gridy = 0;
-        buttonGbc.insets = new Insets(0, 0, 0, 5);
+        buttonGbc.gridx = 0;
+        buttonGbc.gridy = 1;
+        buttonGbc.insets = new Insets(0, 5, 0, 0);
 
         rawVerificationOptionsPanel.add(rawVerificationOptionsEnabled, checkBoxGbc);
         rawVerificationOptionsPanel.add(rawVerificationOptionsScrollPane, textAreaGbc);
@@ -4621,7 +4622,7 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 6;
         gbc.weightx = 1;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(5,10,5,10);
+        gbc.insets = new Insets(5, 10, 5, 10);
         gbc.fill = GridBagConstraints.BOTH;
         add(rawVerificationOptionsPanel, gbc);
     }
@@ -4673,9 +4674,6 @@ public class QueryDialog extends JPanel {
         // Reset to original values
         if (isEnabled) {
             setEnabledOptionsAccordingToCurrentReduction();
-            openReducedNetButton.setEnabled(useReduction.isSelected() && getQueryComment().length() > 0 && !newProperty.containsPlaceHolder());
-        } else {
-            openReducedNetButton.setEnabled(true);
         }
     }
 
