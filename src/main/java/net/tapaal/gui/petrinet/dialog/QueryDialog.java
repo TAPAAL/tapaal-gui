@@ -780,7 +780,6 @@ public class QueryDialog extends JPanel {
 		queryField.select(position.getStart(), position.getEnd());
 		currentSelection = position;
         setEnabledOptionsAccordingToCurrentReduction();
-        updateQueryButtonsAccordingToSelection();
 	}
 
 	// update selection based on some change to the query.
@@ -2018,12 +2017,12 @@ public class QueryDialog extends JPanel {
             wasLTLType = false;
             wasHyperLTLType = false;
         }
+
         if (undoManager != null) undoManager.discardAllEdits();
         if (undoButton != null) undoButton.setEnabled(false);
         if (redoButton != null) redoButton.setEnabled(false);
-        setEnabledOptionsAccordingToCurrentReduction();
 
-        setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
+        setEnabledOptionsAccordingToCurrentReduction();
         updateRawVerificationOptions();
     }
 
@@ -4669,11 +4668,6 @@ public class QueryDialog extends JPanel {
         setAllEnabled(boundednessCheckPanel, isEnabled);
         setAllEnabled(searchOptionsPanel, isEnabled);
         setAllEnabled(overApproximationOptionsPanel, isEnabled);
-
-        // Reset to original values
-        if (isEnabled) {
-            setEnabledOptionsAccordingToCurrentReduction();
-        }
     }
 
     // Enables or disables the container + all children recursively
@@ -4714,6 +4708,8 @@ public class QueryDialog extends JPanel {
         updateStubbornReduction();
         updateSearchStrategies();
 		refreshExportButtonText();
+
+        setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
 
         guiDialog.pack();
 	}
