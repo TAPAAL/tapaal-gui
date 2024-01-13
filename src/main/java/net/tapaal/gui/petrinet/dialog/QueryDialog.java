@@ -1529,8 +1529,6 @@ public class QueryDialog extends JPanel {
 
         if (queryToCreateFrom != null) {
             setupFromQuery(queryToCreateFrom);
-        } else {
-            setupRawVerificationOptions();
         }
 
         refreshTraceOptions();
@@ -1786,9 +1784,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void initQueryNamePanel() {
-
         JPanel splitter = new JPanel(new BorderLayout());
-
 
         namePanel = new JPanel(new FlowLayout());
         namePanel.add(new JLabel("Query name: "));
@@ -1799,22 +1795,19 @@ public class QueryDialog extends JPanel {
         namePanel.add(queryName);
 
         queryName.getDocument().addDocumentListener(new DocumentListener() {
-
             public void removeUpdate(DocumentEvent e) {
                 setSaveButtonsEnabled();
-
             }
 
             public void insertUpdate(DocumentEvent e) {
                 setSaveButtonsEnabled();
-
             }
 
             public void changedUpdate(DocumentEvent e) {
                 setSaveButtonsEnabled();
-
             }
         });
+
         queryType = new JComboBox(new String[]{"CTL/Reachability", "LTL","HyperLTL"});
         queryType.setToolTipText(TOOL_TIP_QUERY_TYPE);
         queryType.addActionListener(arg0 -> toggleDialogType());
@@ -2916,6 +2909,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void updateSiphonTrap(boolean isLTL) {
+        useSiphonTrap.setSelected(!isLTL);
         useSiphonTrap.setEnabled(!isLTL);
     }
 
@@ -4668,6 +4662,8 @@ public class QueryDialog extends JPanel {
         setAllEnabled(boundednessCheckPanel, isEnabled);
         setAllEnabled(searchOptionsPanel, isEnabled);
         setAllEnabled(overApproximationOptionsPanel, isEnabled);
+
+        setEnabledOptionsAccordingToCurrentReduction();
     }
 
     // Enables or disables the container + all children recursively
@@ -4708,8 +4704,6 @@ public class QueryDialog extends JPanel {
         updateStubbornReduction();
         updateSearchStrategies();
 		refreshExportButtonText();
-
-        setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
 
         guiDialog.pack();
 	}
