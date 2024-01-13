@@ -95,11 +95,12 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
     protected void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {
         modelStream.append("<inputArc ");
         modelStream.append("source=\"" + inputArc.source().name() + "\" ");
-        modelStream.append("target=\"" + inputArc.destination().name() + "\">");
-        modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\" ");
+        modelStream.append("target=\"" + inputArc.destination().name() + "\" ");
+        modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\"");
         if (inputArc.getWeight().value() > 1) {
-            modelStream.append("weight=\"" + inputArc.getWeight().nameForSaving(false) + "\"");
+            modelStream.append(" weight=\"" + inputArc.getWeight().nameForSaving(false) + "\"");
         }
+        modelStream.append(">");
         modelStream.append(colorInformationToXMLString(inputArc.getArcExpression()));
         modelStream.append("</inputArc>\n");
     }
@@ -108,11 +109,12 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
     protected void outputOutputArc(TimedOutputArc outputArc, PrintStream modelStream) {
         modelStream.append("<outputArc ");
         modelStream.append("source=\"" + outputArc.source().name() + "\" ");
-        modelStream.append("target=\"" + outputArc.destination().name() + "\">");
-        modelStream.append("inscription=\"" + outputArc.getWeight().nameForSaving(false) + "\" ");
+        modelStream.append("target=\"" + outputArc.destination().name() + "\" ");
+        modelStream.append("inscription=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
         if (outputArc.getWeight().value() > 1) {
-            modelStream.append("weight=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
+            modelStream.append(" weight=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
         }
+        modelStream.append(">");
         modelStream.append(colorInformationToXMLString(outputArc.getExpression()));
         modelStream.append("</outputArc>\n");
     }
