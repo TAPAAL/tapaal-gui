@@ -95,11 +95,32 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
     protected void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {
         modelStream.append("<inputArc ");
         modelStream.append("source=\"" + inputArc.source().name() + "\" ");
-        modelStream.append("target=\"" + inputArc.destination().name() + "\">");
-        modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\" ");
+        modelStream.append("target=\"" + inputArc.destination().name() + "\" ");
+        modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\"");
         if (inputArc.getWeight().value() > 1) {
-            modelStream.append("weight=\"" + inputArc.getWeight().nameForSaving(false) + "\"");
+            modelStream.append(" weight=\"" + inputArc.getWeight().nameForSaving(false) + "\"");
         }
+        modelStream.append(">");
+
+        List<ColoredTimeInterval> ctiList = inputArc.getColorTimeIntervals();
+        for (ColoredTimeInterval cti : ctiList) {
+            if (cti.equalsOnlyColor(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR))) {
+                modelStream.append("inscription=\"" + cti.getInterval().replace("<", "&lt;") + "\" />");
+            } else {
+                modelStream.append("<colorinterval>"); // interval element
+                modelStream.append("<inscription inscription=\"" + cti.getInterval().replace("<", "&lt;") + "\" />");
+                modelStream.append("<colortype name=\"" + cti.getColor().getColorType().getName() + "\">");
+                if (cti.getColor().getTuple() != null) {
+                    for (Color color : cti.getColor().getTuple()) {
+                        modelStream.append("<color value=\"" + color.getColorName() + "\"/>");
+                    }
+                } else {
+                    modelStream.append("<color value=\"" + cti.getColor().getColorName() + "\"/>");
+                }
+                modelStream.append("</colortype></colorinterval>");
+            }
+        }
+
         modelStream.append(colorInformationToXMLString(inputArc.getArcExpression()));
         modelStream.append("</inputArc>\n");
     }
@@ -108,11 +129,13 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
     protected void outputOutputArc(TimedOutputArc outputArc, PrintStream modelStream) {
         modelStream.append("<outputArc ");
         modelStream.append("source=\"" + outputArc.source().name() + "\" ");
-        modelStream.append("target=\"" + outputArc.destination().name() + "\">");
-        modelStream.append("inscription=\"" + outputArc.getWeight().nameForSaving(false) + "\" ");
+        modelStream.append("target=\"" + outputArc.destination().name() + "\" ");
+        modelStream.append("inscription=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
         if (outputArc.getWeight().value() > 1) {
-            modelStream.append("weight=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
+            modelStream.append(" weight=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
         }
+        modelStream.append(">");
+        
         modelStream.append(colorInformationToXMLString(outputArc.getExpression()));
         modelStream.append("</outputArc>\n");
     }
@@ -122,10 +145,11 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
         modelStream.append("inscription=\"" + transArc.interval().toString(false).replace("<", "&lt;") + "\" ");
         modelStream.append("source=\"" + transArc.source().name() + "\" ");
         modelStream.append("transition=\"" + transArc.transition().name() + "\" ");
-        modelStream.append("target=\"" + transArc.destination().name() + "\" ");
+        modelStream.append("target=\"" + transArc.destination().name() + "\"");
         if (transArc.getWeight().value() > 1) {
-            modelStream.append("weight=\"" + transArc.getWeight().nameForSaving(false) + "\"");
+            modelStream.append(" weight=\"" + transArc.getWeight().nameForSaving(false) + "\"");
         }
+        modelStream.append(">");
 
         List<ColoredTimeInterval> ctiList = transArc.getColorTimeIntervals();
         for (ColoredTimeInterval cti : ctiList) {
