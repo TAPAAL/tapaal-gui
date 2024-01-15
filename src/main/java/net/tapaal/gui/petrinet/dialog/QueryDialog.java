@@ -509,7 +509,7 @@ public class QueryDialog extends JPanel {
 
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
 
-        if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
+        if (reductionOptionToSet != null && reductionOptionToSet.equals(ReductionOption.VerifyTAPN)) {
             query.setDiscreteInclusion(discreteInclusion.isSelected());
         }
         return query;
@@ -1609,7 +1609,7 @@ public class QueryDialog extends JPanel {
 
         numberOfExtraTokensInNet.addChangeListener(e -> updateRawVerificationOptions());
         reductionOption.addActionListener(e -> updateRawVerificationOptions());
-
+        
         if (reductionOption.getSelectedItem() != null) {
             updateRawVerificationOptions();
         }
@@ -2909,7 +2909,6 @@ public class QueryDialog extends JPanel {
     }
 
     private void updateSiphonTrap(boolean isLTL) {
-        useSiphonTrap.setSelected(!isLTL);
         useSiphonTrap.setEnabled(!isLTL);
     }
 
