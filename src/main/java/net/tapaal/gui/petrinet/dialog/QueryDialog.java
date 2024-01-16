@@ -779,7 +779,8 @@ public class QueryDialog extends JPanel {
 
 		queryField.select(position.getStart(), position.getEnd());
 		currentSelection = position;
-        setEnabledOptionsAccordingToCurrentReduction();
+
+        refreshQueryEditingButtons();
 	}
 
 	// update selection based on some change to the query.
@@ -4662,7 +4663,7 @@ public class QueryDialog extends JPanel {
         setAllEnabled(searchOptionsPanel, isEnabled);
         setAllEnabled(overApproximationOptionsPanel, isEnabled);
 
-        setEnabledOptionsAccordingToCurrentReduction();
+        //setEnabledOptionsAccordingToCurrentReduction();
     }
 
     // Enables or disables the container + all children recursively
