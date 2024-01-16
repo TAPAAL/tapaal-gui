@@ -4662,6 +4662,10 @@ public class QueryDialog extends JPanel {
         setAllEnabled(boundednessCheckPanel, isEnabled);
         setAllEnabled(searchOptionsPanel, isEnabled);
         setAllEnabled(overApproximationOptionsPanel, isEnabled);
+
+        if (isEnabled) {
+            setEnabledOptionsAccordingToCurrentReduction();
+        }
     }
 
     // Enables or disables the container + all children recursively
