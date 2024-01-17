@@ -397,18 +397,27 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             return new NotExpression(childexp);
         } else if (name.equals("and")) {
             Tuple<GuardExpression, GuardExpression> subexps = parseLRGuardExpressions(node);
-            return new AndExpression(subexps.value1(), subexps.value2());
+            AndExpression andExpr = new AndExpression(subexps.value1(), subexps.value2());
+            Node isSimpleNode = node.getAttributes().getNamedItem("isSimple");
+            if (isSimpleNode != null) {
+                andExpr.setSimpleProperty(Boolean.parseBoolean(isSimpleNode.getNodeValue()));
+            }
+            return andExpr;
         } else if (name.equals("or")) {
             Node left = skipWS(node.getFirstChild());
             Node right = skipWS(left.getNextSibling());
             if(right == null){
                 return parseGuardExpression(left);
             }
-            GuardExpression parentOr = new OrExpression(parseGuardExpression(left), parseGuardExpression(right));
-            for (var it = skipWS(right.getNextSibling()); it != null; it = skipWS(it.getNextSibling())){
-                parentOr = new OrExpression(parentOr, parseGuardExpression(it));
+            OrExpression orExpr = new OrExpression(parseGuardExpression(left), parseGuardExpression(right));
+            Node isSimpleNode = node.getAttributes().getNamedItem("isSimple");
+            if (isSimpleNode != null) {
+                orExpr.setSimpleProperty(Boolean.parseBoolean(isSimpleNode.getNodeValue()));
             }
-            return parentOr;
+            for (var it = skipWS(right.getNextSibling()); it != null; it = skipWS(it.getNextSibling())){
+                orExpr = new OrExpression(orExpr, parseGuardExpression(it));
+            }
+            return orExpr;
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
             return parseGuardExpression(child);

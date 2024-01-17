@@ -222,6 +222,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
                 Element subtermElement = document.createElement("subterm");
                 andElement.appendChild(subtermElement);
                 AndExpression expr = (AndExpression) expression;
+                andElement.setAttribute("isSimple", String.valueOf(expr.isSimpleProperty()));
                 andElement.appendChild(parseGuardExpression(expr.getLeftExpression(), document, subtermElement));
                 Element subtermElement2 = document.createElement("subterm");
                 andElement.appendChild(parseGuardExpression(expr.getRightExpression(), document, subtermElement2));
@@ -231,6 +232,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
                 Element subtermElement = document.createElement("subterm");
                 orElement.appendChild(subtermElement);
                 OrExpression expr = (OrExpression) expression;
+                orElement.setAttribute("isSimple", String.valueOf(expr.isSimpleProperty()));
                 orElement.appendChild(parseGuardExpression(expr.getLeftExpression(), document, subtermElement));
                 Element subtermElement2 = document.createElement("subterm");
                 orElement.appendChild(parseGuardExpression(expr.getRightExpression(), document, subtermElement2));
