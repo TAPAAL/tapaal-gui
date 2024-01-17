@@ -4663,9 +4663,7 @@ public class QueryDialog extends JPanel {
         setAllEnabled(searchOptionsPanel, isEnabled);
         setAllEnabled(overApproximationOptionsPanel, isEnabled);
 
-        if (isEnabled) {
-            setEnabledOptionsAccordingToCurrentReduction();
-        }
+        setEnabledOptionsAccordingToCurrentReduction();
     }
 
     // Enables or disables the container + all children recursively
@@ -4681,6 +4679,10 @@ public class QueryDialog extends JPanel {
     }
 
     protected void setEnabledOptionsAccordingToCurrentReduction() {
+        if (rawVerificationOptionsEnabled.isSelected()) {
+            return;
+        }
+
         refreshQueryEditingButtons();
         refreshTraceOptions();
         if (lens.isTimed()) {
@@ -4866,6 +4868,10 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshOverApproximationOption() {
+        if (rawVerificationOptionsEnabled.isSelected()) {
+            return;
+        }
+
         if (queryHasDeadlock() || newProperty.toString().contains("EG") || newProperty.toString().contains("AF")){
             skeletonAnalysis.setSelected(false);
             skeletonAnalysis.setEnabled(false);
