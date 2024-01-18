@@ -12,6 +12,9 @@ public class OrExpression extends GuardExpression {
     private GuardExpression left;
     private GuardExpression right;
 
+    private boolean isSimpleProperty;
+    private String word = "or";
+
     public OrExpression(GuardExpression left, GuardExpression right) {
         this.left = left;
         this.right = right;
@@ -23,20 +26,24 @@ public class OrExpression extends GuardExpression {
     }
 
     public GuardExpression getLeftExpression() {
-        return this.left;
+        return left;
     }
 
     public GuardExpression getRightExpression() {
-        return this.right;
+        return right;
     }
 
     @Override
-    public boolean isSimpleProperty() {return false; }
+    public boolean isSimpleProperty() { return isSimpleProperty; }
+
+    public void setSimpleProperty(boolean isSimpleProperty) {
+        this.isSimpleProperty = isSimpleProperty;
+    }
 
     @Override
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[2];
-        int start = 1;
+        int start = isSimpleProperty ? 0 : 1;
         int endPrev;
         int end;
 
@@ -64,7 +71,10 @@ public class OrExpression extends GuardExpression {
 
     @Override
     public GuardExpression copy() {
-        return new AndExpression(left, right);
+        OrExpression copy = new OrExpression(left, right);
+        copy.setSimpleProperty(isSimpleProperty());
+
+        return copy;
     }
 
     @Override
@@ -117,7 +127,12 @@ public class OrExpression extends GuardExpression {
     }
 
     @Override
-    public String toString() {
-        return "(" + left.toString() + " or " + right.toString() + ")";
+    public String toString() { 
+        final String text = left.toString() + " " + word + " " + right.toString();
+        return isSimpleProperty ? text : "(" + text + ")";
+    }
+
+    public String getWord() {
+        return word;
     }
 }

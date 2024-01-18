@@ -94,27 +94,39 @@ GuardExpression StartOrExpr() :
 
 GuardExpression OrExpr() :
 {
-	GuardExpression left = null;
-	GuardExpression right = null;
+    GuardExpression left = null;
+    GuardExpression right = null;
 }
 {
-	left = AndExpr()
-	(
-		<OR> right = AndExpr()
-	)?
-	{ return right == null ? left : new OrExpression(left,right); }
+    left = AndExpr()
+    (
+        <OR> right = OrExpr()
+        { 
+            left = new OrExpression(left, right);
+            ((OrExpression) left).setSimpleProperty(true);
+        }
+    )?
+    { return left; }
 }
+
 GuardExpression AndExpr() :
 {
-	GuardExpression left = null;
-	GuardExpression right = null;
+    GuardExpression left = null;
+    GuardExpression right = null;
 }
 {
-	left = NotExpr()
-	(
-		<AND> right = NotExpr()
-	)?
-	{ return right == null ? left : new AndExpression(left,right); }
+    left = NotExpr()
+    (
+        <AND> right = NotExpr()
+        { 
+            if (left instanceof AndExpression) {
+                ((AndExpression) left).setSimpleProperty(true);
+            }
+            
+            left = new AndExpression(left,right); 
+        }
+    )*
+    { return left; }
 }
 GuardExpression NotExpr() :
 {
@@ -128,8 +140,22 @@ GuardExpression term() : {
     GuardExpression childExpression;
 }{
     LOOKAHEAD(parseOperatorExpression())
-        childExpression = parseOperatorExpression() {return childExpression;}
-    | "(" childExpression = OrExpr() ")" {return childExpression;}
+        childExpression = parseOperatorExpression() { 
+            if (childExpression instanceof AndExpression) {
+                ((AndExpression) childExpression).setSimpleProperty(true); 
+            } else if (childExpression instanceof OrExpression) {
+                ((OrExpression) childExpression).setSimpleProperty(true); 
+            }
+            return childExpression; 
+        }
+    | "(" childExpression = OrExpr() ")" { 
+        if (childExpression instanceof AndExpression) {
+            ((AndExpression) childExpression).setSimpleProperty(false); 
+        } else if (childExpression instanceof OrExpression) {
+            ((OrExpression) childExpression).setSimpleProperty(false); 
+        }
+        return childExpression; 
+    }
 }
 
 GuardExpression parseOperatorExpression() :

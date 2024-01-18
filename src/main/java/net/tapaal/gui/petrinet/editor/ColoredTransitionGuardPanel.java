@@ -62,6 +62,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private final TimedTransitionComponent transition;
 
     private GuardExpression newProperty;
+    private GuardExpression previousExpr;
+    private GuardExpression nextExpr;
     final TAPNTransitionEditor parent;
     final ExpressionConstructionUndoManager undoManager;
     final UndoableEditSupport undoSupport;
@@ -194,9 +196,9 @@ public class ColoredTransitionGuardPanel  extends JPanel {
         logicPanel.setMinimumSize(d);
 
         ButtonGroup logicButtonGroup = new ButtonGroup();
-        andButton = new JButton("AND");
-        orButton = new JButton("OR");
-        notButton = new JButton("NOT");
+        andButton = new JButton("and");
+        orButton = new JButton("or");
+        notButton = new JButton("not");
 
         logicButtonGroup.add(andButton);
         logicButtonGroup.add(orButton);
@@ -228,21 +230,49 @@ public class ColoredTransitionGuardPanel  extends JPanel {
 
         andButton.addActionListener(actionEvent -> {
             AndExpression andExpr = null;
+
             if (currentSelection.getObject() instanceof OrExpression) {
                 andExpr = new AndExpression(((OrExpression) currentSelection.getObject()).getLeftExpression(), ((OrExpression) currentSelection.getObject()).getRightExpression());
+                andExpr.setSimpleProperty(true);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 andExpr = new AndExpression((GuardExpression)currentSelection.getObject(), new PlaceHolderGuardExpression());
+
+                updatePreviousExpr();
+                updateNextExpr();
+  
+                boolean isFirstExpr = (exprField.getText().equals((new PlaceHolderGuardExpression()).toString()));
+
+                if (nextExpr instanceof AndExpression || isFirstExpr) {
+                    andExpr.setSimpleProperty(true);
+                }
             }
+
+            previousExpr = andExpr;
+
             replaceAndAddToUndo(currentSelection.getObject(), andExpr);
         });
 
         orButton.addActionListener(actionEvent -> {
             OrExpression orExpr = null;
+
             if (currentSelection.getObject() instanceof AndExpression) {
                 orExpr = new OrExpression(((AndExpression) currentSelection.getObject()).getLeftExpression(), ((AndExpression) currentSelection.getObject()).getRightExpression());
+                orExpr.setSimpleProperty(true);
             } else if (currentSelection.getObject() instanceof GuardExpression) {
                 orExpr = new OrExpression((GuardExpression) currentSelection.getObject(), new PlaceHolderGuardExpression());
+
+                updatePreviousExpr();
+                updateNextExpr();
+
+                boolean isFirstExpr = (exprField.getText().equals((new PlaceHolderGuardExpression()).toString()));
+
+                if (nextExpr instanceof OrExpression || isFirstExpr) {
+                    orExpr.setSimpleProperty(true);
+                }
             }
+
+            previousExpr = orExpr;
+
             replaceAndAddToUndo(currentSelection.getObject(), orExpr);
         });
 
@@ -250,6 +280,56 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             NotExpression notExpr = new NotExpression((GuardExpression)currentSelection.getObject());
             replaceAndAddToUndo(currentSelection.getObject(), notExpr);
         });
+    }
+
+    /** Searches for the expression before new one */
+    private void updatePreviousExpr() {
+        String exprText = exprField.getText();
+        int lastSpace = exprText.lastIndexOf(' ', currentSelection.getStart() - 1);
+
+        if (lastSpace != -1) {
+            int secondLastSpace = exprText.lastIndexOf(' ', lastSpace - 1);
+
+            if (secondLastSpace != -1) {
+                String word = exprText.substring(secondLastSpace + 1, lastSpace);
+
+                OrExpression tmpOrExpression = new OrExpression(null, null);
+                AndExpression tmpAndExpression = new AndExpression(null, null);
+
+                if (word.equals(tmpOrExpression.getWord())) {
+                    previousExpr = tmpOrExpression;
+                } else if (word.equals(tmpAndExpression.getWord())) {
+                    previousExpr = tmpAndExpression;
+                }
+            }
+        }
+    }
+
+    /** Searches for next expression to the right of new one */
+    private void updateNextExpr() {
+        String exprText = exprField.getText();
+
+        // If there is closing parenthesis to the right of the selection or there is nothing there, use the previous expression
+        if (exprText.length() > currentSelection.getEnd() && exprText.charAt(currentSelection.getEnd()) == ')' || 
+            exprText.length() == currentSelection.getEnd()) {
+            nextExpr = previousExpr;
+            return;
+        }
+
+        int nextSpace = exprText.indexOf(' ', currentSelection.getEnd() + 1);
+
+        if (nextSpace != -1) {
+            String word = exprText.substring(currentSelection.getEnd() + 1, nextSpace);
+
+            OrExpression tmpOrExpression = new OrExpression(null, null);
+            AndExpression tmpAndExpression = new AndExpression(null, null);
+
+            if (word.equals(tmpOrExpression.getWord())) {
+                nextExpr = tmpOrExpression;
+            } else if (word.equals(tmpAndExpression.getWord())) {
+                nextExpr = tmpAndExpression;
+            }
+        }
     }
 
     private void initComparisonPanel() {
@@ -443,7 +523,13 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             if (exprField.isEditable()) {
                 GuardExpression newExpression = null;
                 try {
-                    newExpression = GuardExpressionParser.parse(exprField.getText(),context.network());
+                    newExpression = GuardExpressionParser.parse(exprField.getText(), context.network());
+
+                    if (newExpression instanceof OrExpression) {
+                        ((OrExpression) newExpression).setSimpleProperty(true);
+                    } else if (newExpression instanceof AndExpression) {
+                        ((AndExpression) newExpression).setSimpleProperty(true);
+                    }
                 } catch (Throwable ex) {
                     int choice = JOptionPane.showConfirmDialog(
                         TAPAALGUI.getApp(),
