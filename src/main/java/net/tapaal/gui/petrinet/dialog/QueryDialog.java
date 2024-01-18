@@ -4699,12 +4699,15 @@ public class QueryDialog extends JPanel {
                 traceBoxQuantification.setEnabled(traceBoxQuantification.getModel().getSize() > 0);
             }
         }
+
         if (!lens.isColored()) {
             useColoredReduction.setSelected(false);
             useColoredReduction.setEnabled(false);
-        } else {
-            useColoredReduction.setEnabled(true);
         }
+        
+        wasLTLType = queryType.getSelectedIndex() == 1;
+        updateSiphonTrap(wasLTLType);
+        
         updateStubbornReduction();
         updateSearchStrategies();
 		refreshExportButtonText();
