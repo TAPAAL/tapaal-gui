@@ -107,7 +107,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         result.append(kBoundArg());
         result.append(deadTokenArg());
         result.append(traceArg(traceOption));
-        if(trace() != TraceOption.NONE)
+        if(unfold && trace() != TraceOption.NONE)
         {
             result.append(" --write-unfolded-net ");
             result.append(unfoldedModelPath);
