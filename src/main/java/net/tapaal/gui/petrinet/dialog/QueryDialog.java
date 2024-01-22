@@ -4540,9 +4540,13 @@ public class QueryDialog extends JPanel {
         reductionOptionsPanel.add(useReduction, gbc);
         gbc.gridx = 0;
         gbc.gridy = 2;
-        reductionOptionsPanel.add(useColoredReduction, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 3;
+
+        if (lens.isColored()) {
+            reductionOptionsPanel.add(useColoredReduction, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+        }
+
         reductionOptionsPanel.add(useQueryReduction, gbc);
         gbc.gridx = 1;
         gbc.gridy = 1;
