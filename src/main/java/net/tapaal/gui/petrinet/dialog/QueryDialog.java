@@ -2913,16 +2913,6 @@ public class QueryDialog extends JPanel {
         useSiphonTrap.setEnabled(!isLTL);
     }
 
-    private void updateStubbornReduction() {
-        int selectedIndex = queryType.getSelectedIndex();
-        if(selectedIndex == 2) {
-            useStubbornReduction.setEnabled(false);
-            useStubbornReduction.setSelected(false);
-        } else {
-            useStubbornReduction.setEnabled(true);
-        }
-    }
-
     private void addPropertyToQuery(TCTLAbstractPathProperty property) {
         TCTLAbstractProperty selection = currentSelection.getObject();
         if (selection instanceof TCTLAbstractStateProperty) {
@@ -4689,6 +4679,7 @@ public class QueryDialog extends JPanel {
 
         refreshQueryEditingButtons();
         refreshTraceOptions();
+
         if (lens.isTimed()) {
             refreshSymmetryReduction();
             refreshStubbornReduction();
@@ -4711,8 +4702,7 @@ public class QueryDialog extends JPanel {
         
         wasLTLType = queryType.getSelectedIndex() == 1;
         updateSiphonTrap(wasLTLType);
-        
-        updateStubbornReduction();
+    
         updateSearchStrategies();
 		refreshExportButtonText();
 

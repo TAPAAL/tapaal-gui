@@ -1065,7 +1065,6 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void process() {
 		tableModel.clear();
-
         currentWorker = new BatchProcessingWorker(files, tableModel, getVerificationOptions());
 
 		currentWorker.addPropertyChangeListener(evt -> {
