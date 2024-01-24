@@ -2909,8 +2909,8 @@ public class QueryDialog extends JPanel {
         existsUntil.setVisible(isVisible);
     }
 
-    private void updateSiphonTrap(boolean isLTL) {
-        useSiphonTrap.setEnabled(!isLTL);
+    private void updateSiphonTrap(boolean isCTL) {
+        useSiphonTrap.setEnabled(isCTL);
     }
 
     private void addPropertyToQuery(TCTLAbstractPathProperty property) {
@@ -4700,8 +4700,8 @@ public class QueryDialog extends JPanel {
             useColoredReduction.setEnabled(false);
         }
         
-        wasLTLType = queryType.getSelectedIndex() == 1;
-        updateSiphonTrap(wasLTLType);
+        wasCTLType = queryType.getSelectedIndex() == 0;
+        updateSiphonTrap(wasCTLType);
     
         updateSearchStrategies();
 		refreshExportButtonText();
@@ -4745,7 +4745,7 @@ public class QueryDialog extends JPanel {
 	private void refreshTraceRefinement() {
 	    ReductionOption reduction = getReductionOption();
 
-        if (queryType.getSelectedIndex() != 1 && !lens.isGame() &&
+        if (queryType.getSelectedIndex() == 0 && !lens.isGame() &&
             reduction != null && reduction.equals(ReductionOption.VerifyPN) &&
             (newProperty.toString().startsWith("AG") || newProperty.toString().startsWith("EF")) &&
             !hasInhibitorArcs && !newProperty.hasNestedPathQuantifiers()) {
