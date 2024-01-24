@@ -41,9 +41,11 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean stubbornReduction,
             boolean partition,
             boolean colorFixpoint,
-            boolean unfoldNet
+            boolean unfoldNet,
+			boolean useRawVerification,
+			String rawVerificationOptions
 	) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, true, null);
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 

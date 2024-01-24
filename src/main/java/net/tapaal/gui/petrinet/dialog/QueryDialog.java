@@ -4673,11 +4673,12 @@ public class QueryDialog extends JPanel {
     }
 
     protected void setEnabledOptionsAccordingToCurrentReduction() {
+        refreshQueryEditingButtons();
+
         if (rawVerificationOptionsEnabled.isSelected()) {
             return;
         }
 
-        refreshQueryEditingButtons();
         refreshTraceOptions();
 
         if (lens.isTimed()) {
@@ -4813,6 +4814,7 @@ public class QueryDialog extends JPanel {
     }
 
 	private void refreshQueryEditingButtons() {
+        System.out.println("here");
 		if (currentSelection != null) {
             if (lens.isGame()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {

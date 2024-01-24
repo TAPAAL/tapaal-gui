@@ -144,6 +144,34 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean useTarOption,
         boolean useTarjan,
         boolean colored,
+        boolean unfold,
+        boolean partition,
+        boolean colorFixpoint,
+        boolean useSymmetricVars,
+        boolean useRawVerification,
+        String rawVerificationOptions
+    ) {
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false, useRawVerification, rawVerificationOptions);
+    }
+
+    public VerifyPNOptions(
+        int extraTokens,
+        TraceOption traceOption,
+        SearchOption search,
+        boolean useOverApproximation,
+        ModelReduction modelReduction,
+        boolean enableOverApproximation,
+        boolean enableUnderApproximation,
+        int approximationDenominator,
+        QueryCategory queryCategory,
+        AlgorithmOption algorithmOption,
+        boolean siphontrap,
+        QueryReductionTime queryReduction,
+        boolean stubbornReduction,
+        String pathToReducedNet,
+        boolean useTarOption,
+        boolean useTarjan,
+        boolean colored,
         boolean partition,
         boolean colorFixpoint,
         boolean useSymmetricVars
