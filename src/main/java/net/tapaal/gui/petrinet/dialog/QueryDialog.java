@@ -800,12 +800,14 @@ public class QueryDialog extends JPanel {
 
         queryField.select(position.getStart(), position.getEnd());
         currentSelection = position;
+
+        updateQueryButtonsAccordingToSelection();
+
         if (currentSelection != null) {
             setEnabledOptionsAccordingToCurrentReduction();
         } else {
             disableAllQueryButtons();
         }
-        updateQueryButtonsAccordingToSelection();
     }
 
     private void updateQueryButtonsAccordingToSelection() {
