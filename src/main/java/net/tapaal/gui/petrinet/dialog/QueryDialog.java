@@ -835,15 +835,16 @@ public class QueryDialog extends JPanel {
                 enableOnlyStateButtons();
                 negationButton.setEnabled(false);
             }
-            if (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
-                disjunctionButton.setEnabled(false);
-                conjunctionButton.setEnabled(false);
-                negationButton.setEnabled(false);
-            } else {
-                disjunctionButton.setEnabled(true);
-                conjunctionButton.setEnabled(true);
-                negationButton.setEnabled(true);
-            }
+        }
+
+        if (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
+            disjunctionButton.setEnabled(false);
+            conjunctionButton.setEnabled(false);
+            negationButton.setEnabled(false);
+        } else {
+            disjunctionButton.setEnabled(true);
+            conjunctionButton.setEnabled(true);
+            negationButton.setEnabled(true);
         }
 	}
 
@@ -1249,7 +1250,6 @@ public class QueryDialog extends JPanel {
         untilButton.setEnabled(false);
         aButton.setEnabled(false);
         eButton.setEnabled(false);
-
         conjunctionButton.setEnabled(false);
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
