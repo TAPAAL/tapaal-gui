@@ -836,10 +836,16 @@ public class QueryDialog extends JPanel {
                 enableOnlyStateButtons();
         }
 
-        if (lens.isGame() || lens.isTimed()) {
+        if (lens.isGame() || lens.isTimed() || queryType.getSelectedIndex() != 0) {
             if (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
                 disjunctionButton.setEnabled(false);
                 conjunctionButton.setEnabled(false);
+
+                if (!lens.isGame() && lens.isTimed()) {
+                    negationButton.setEnabled(true);
+                    return;
+                }
+
                 negationButton.setEnabled(false);    
                 return;
             } 
