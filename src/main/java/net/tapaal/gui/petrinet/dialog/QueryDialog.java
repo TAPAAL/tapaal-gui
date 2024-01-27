@@ -830,18 +830,20 @@ public class QueryDialog extends JPanel {
             negationButton.setEnabled(true);
         }
 
-        if (lens.isGame()) {
-            if (newProperty instanceof TCTLAbstractPathProperty && !(newProperty instanceof TCTLPathPlaceHolder)) {
+        if (lens.isGame() && 
+            newProperty instanceof TCTLAbstractPathProperty && 
+            !(newProperty instanceof TCTLPathPlaceHolder)) {
                 enableOnlyStateButtons();
-                negationButton.setEnabled(false);
-            }
         }
 
-        if (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
-            disjunctionButton.setEnabled(false);
-            conjunctionButton.setEnabled(false);
-            negationButton.setEnabled(false);
-        } else {
+        if (lens.isGame() || lens.isTimed()) {
+            if (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
+                disjunctionButton.setEnabled(false);
+                conjunctionButton.setEnabled(false);
+                negationButton.setEnabled(false);    
+                return;
+            } 
+
             disjunctionButton.setEnabled(true);
             conjunctionButton.setEnabled(true);
             negationButton.setEnabled(true);
