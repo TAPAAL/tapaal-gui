@@ -139,6 +139,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			result.append(gcd ? " --gcd-lower " : ""); // GCD optimization is not sound for workflow analysis
 		}
 
+		result.append(" --bindings");
 		return result.toString();
 	}
 

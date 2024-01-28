@@ -122,6 +122,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		result.append(' ');
 		result.append(discreteInclusion ? " --inclusion-check 1" : "");
 		result.append(discreteInclusion ? " --inclusion-places " + generateDiscretePlacesList() : "");
+		result.append(" --bindings");
 		return result.toString();
 	}
 

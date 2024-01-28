@@ -827,13 +827,13 @@ public class QueryDialog extends JPanel {
         }
 
         if ((lens.isGame() || lens.isTimed() || queryType.getSelectedIndex() != 0) &&
-             current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
+             (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder)) {
             
             boolean enableBooleanOperators = !(current instanceof LTLANode || current instanceof LTLENode) && queryType.getSelectedIndex() != 0;
             
             disjunctionButton.setEnabled(enableBooleanOperators);
             conjunctionButton.setEnabled(enableBooleanOperators);
-            negationButton.setEnabled(enableBooleanOperators || !lens.isGame() && lens.isTimed()); 
+            negationButton.setEnabled(enableBooleanOperators); 
         }
 	}
 

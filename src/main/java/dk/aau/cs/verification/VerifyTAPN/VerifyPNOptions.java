@@ -268,6 +268,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		    result.append(" --col-reduction 0 ");
         }
 
+        result.append(" --bindings");
 		return result.toString();
 	}
 	
