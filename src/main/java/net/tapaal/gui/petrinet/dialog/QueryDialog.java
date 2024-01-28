@@ -838,15 +838,10 @@ public class QueryDialog extends JPanel {
 
         if (lens.isGame() || lens.isTimed() || queryType.getSelectedIndex() != 0) {
             if (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
-                disjunctionButton.setEnabled(false);
-                conjunctionButton.setEnabled(false);
+                disjunctionButton.setEnabled(current instanceof LTLUNode);
+                conjunctionButton.setEnabled(current instanceof LTLUNode);
+                negationButton.setEnabled(!lens.isGame() && lens.isTimed());
 
-                if (!lens.isGame() && lens.isTimed()) {
-                    negationButton.setEnabled(true);
-                    return;
-                }
-
-                negationButton.setEnabled(false);    
                 return;
             } 
 
