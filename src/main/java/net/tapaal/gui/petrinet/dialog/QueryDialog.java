@@ -820,16 +820,6 @@ public class QueryDialog extends JPanel {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
 
-        int selectedIndex = queryType.getSelectedIndex();
-        if (current instanceof LTLANode || current instanceof LTLENode ||
-            ((selectedIndex == 1 || selectedIndex == 2) && current instanceof TCTLPathPlaceHolder)) {
-            negationButton.setEnabled(false);
-        } else if (!lens.isGame()) {
-            disjunctionButton.setEnabled(true);
-            conjunctionButton.setEnabled(true);
-            negationButton.setEnabled(true);
-        }
-
         if (lens.isGame() && 
             newProperty instanceof TCTLAbstractPathProperty && 
             !(newProperty instanceof TCTLPathPlaceHolder)) {
@@ -838,9 +828,11 @@ public class QueryDialog extends JPanel {
 
         if (lens.isGame() || lens.isTimed() || queryType.getSelectedIndex() != 0) {
             if (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
-                disjunctionButton.setEnabled(current instanceof LTLUNode);
-                conjunctionButton.setEnabled(current instanceof LTLUNode);
-                negationButton.setEnabled(!lens.isGame() && lens.isTimed());
+                boolean enableBooleanOperators = !(current instanceof LTLANode || current instanceof LTLENode) && queryType.getSelectedIndex() != 0;
+                
+                disjunctionButton.setEnabled(enableBooleanOperators);
+                conjunctionButton.setEnabled(enableBooleanOperators);
+                negationButton.setEnabled(enableBooleanOperators || !lens.isGame() && lens.isTimed());
 
                 return;
             } 
