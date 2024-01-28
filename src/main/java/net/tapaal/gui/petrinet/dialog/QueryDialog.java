@@ -826,20 +826,14 @@ public class QueryDialog extends JPanel {
                 enableOnlyStateButtons();
         }
 
-        if (lens.isGame() || lens.isTimed() || queryType.getSelectedIndex() != 0) {
-            if (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
-                boolean enableBooleanOperators = !(current instanceof LTLANode || current instanceof LTLENode) && queryType.getSelectedIndex() != 0;
-                
-                disjunctionButton.setEnabled(enableBooleanOperators);
-                conjunctionButton.setEnabled(enableBooleanOperators);
-                negationButton.setEnabled(enableBooleanOperators || !lens.isGame() && lens.isTimed());
-
-                return;
-            } 
-
-            disjunctionButton.setEnabled(true);
-            conjunctionButton.setEnabled(true);
-            negationButton.setEnabled(true);
+        if ((lens.isGame() || lens.isTimed() || queryType.getSelectedIndex() != 0) &&
+             current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
+            
+            boolean enableBooleanOperators = !(current instanceof LTLANode || current instanceof LTLENode) && queryType.getSelectedIndex() != 0;
+            
+            disjunctionButton.setEnabled(enableBooleanOperators);
+            conjunctionButton.setEnabled(enableBooleanOperators);
+            negationButton.setEnabled(enableBooleanOperators || !lens.isGame() && lens.isTimed()); 
         }
 	}
 
