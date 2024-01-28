@@ -834,6 +834,10 @@ public class QueryDialog extends JPanel {
             disjunctionButton.setEnabled(enableBooleanOperators);
             conjunctionButton.setEnabled(enableBooleanOperators);
             negationButton.setEnabled(enableBooleanOperators); 
+        } else {
+            disjunctionButton.setEnabled(true);
+            conjunctionButton.setEnabled(true);
+            negationButton.setEnabled(true); 
         }
 	}
 
