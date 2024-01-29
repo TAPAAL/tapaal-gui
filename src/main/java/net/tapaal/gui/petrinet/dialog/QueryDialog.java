@@ -2006,7 +2006,7 @@ public class QueryDialog extends JPanel {
                     deleteProperty();
                     newProperty = removeExistsAllPathsFromProperty(newProperty);
                 } else {
-                    int changeTo = wasCTLType ? 1 : 2;
+                    int changeTo = wasLTLType ? 1 : 2;
                     queryType.setSelectedIndex(changeTo);
                     return;
                 }
