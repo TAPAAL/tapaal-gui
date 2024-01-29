@@ -828,16 +828,15 @@ public class QueryDialog extends JPanel {
 
         if ((lens.isGame() || lens.isTimed() || queryType.getSelectedIndex() != 0) &&
              (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder)) {
-            
-            boolean enableBooleanOperators = !(current instanceof LTLANode || current instanceof LTLENode) && queryType.getSelectedIndex() != 0;
-            
+            boolean enableBooleanOperators = !(current instanceof LTLANode || current instanceof LTLENode) && queryType.getSelectedIndex() != 0 && isValidLTL();
+
             disjunctionButton.setEnabled(enableBooleanOperators);
             conjunctionButton.setEnabled(enableBooleanOperators);
             negationButton.setEnabled(enableBooleanOperators); 
-        } else {
+        } else if (queryType.getSelectedIndex() == 0) {
             disjunctionButton.setEnabled(true);
             conjunctionButton.setEnabled(true);
-            negationButton.setEnabled(true); 
+            negationButton.setEnabled(true);
         }
 	}
 
@@ -1945,8 +1944,9 @@ public class QueryDialog extends JPanel {
 
     private void toggleDialogType() {
         if (queryType.getSelectedIndex() == 2 && (wasCTLType || wasLTLType)) {
-            if (!isHyperLTL(newProperty) && !(newProperty instanceof TCTLPathPlaceHolder)) {
+            if (!isHyperLTL(newProperty) && !(newProperty instanceof TCTLPathPlaceHolder) || !isValidLTL() && !queryField.getText().trim().equals((new TCTLPathPlaceHolder()).toString())) {
                 if (showWarningMessage() == JOptionPane.YES_OPTION) {
+                    newProperty = new TCTLPathPlaceHolder();
                     deleteProperty();
                 } else {
                     int changeTo = wasCTLType ? 0 : 1;
@@ -1959,6 +1959,7 @@ public class QueryDialog extends JPanel {
             showHyperLTL(true);
             updateSiphonTrap(true);
             queryChanged();
+
             wasCTLType = false;
             wasLTLType = false;
             wasHyperLTLType = true;
@@ -1979,6 +1980,18 @@ public class QueryDialog extends JPanel {
             } else if (ltlType.equals("E")) {
                 addExistsPathsToProperty(newProperty, null);
             }
+
+            // Check again after conversion
+            if (!isValidLTL() && !queryField.getText().trim().equals((new TCTLPathPlaceHolder()).toString())) {
+                if (showWarningMessage() == JOptionPane.YES_OPTION) {
+                    deleteProperty();
+                } else {
+                    int changeTo = wasCTLType ? 0 : 2;
+                    queryType.setSelectedIndex(changeTo);
+                    return;
+                }
+            }
+
             showLTLButtons(true);
             updateSiphonTrap(true);
             showHyperLTL(false);
@@ -1993,7 +2006,7 @@ public class QueryDialog extends JPanel {
                     deleteProperty();
                     newProperty = removeExistsAllPathsFromProperty(newProperty);
                 } else {
-                    int changeTo = wasLTLType ? 1 : 2;
+                    int changeTo = wasCTLType ? 1 : 2;
                     queryType.setSelectedIndex(changeTo);
                     return;
                 }
@@ -2002,6 +2015,7 @@ public class QueryDialog extends JPanel {
             showLTLButtons(false);
             showHyperLTL(false);
             updateSiphonTrap(false);
+            
             wasCTLType = true;
             wasLTLType = false;
             wasHyperLTLType = false;
@@ -2013,6 +2027,11 @@ public class QueryDialog extends JPanel {
 
         setEnabledOptionsAccordingToCurrentReduction();
         updateRawVerificationOptions();
+    }
+
+    private boolean isValidLTL() {
+        String queryText = queryField.getText().trim();
+        return queryText.startsWith("A") || queryText.startsWith("E");
     }
 
     private String checkLTLType() {
@@ -2240,7 +2259,6 @@ public class QueryDialog extends JPanel {
         int selectedIndex = queryType.getSelectedIndex();
         boolean isHyperLTL = selectedIndex == 2;
         String trace = isHyperLTL ? traceBoxQuantification.getSelectedItem().toString() : "";
-
         if (oldProperty instanceof LTLANode) {
             if(!(selectedIndex == 2)) {
                 property = oldProperty;
@@ -2810,7 +2828,6 @@ public class QueryDialog extends JPanel {
 
         aButton.addActionListener(e -> {
             TCTLAbstractProperty oldProperty = newProperty;
-
             if (!(queryType.getSelectedIndex() == 2)) {
                 newProperty = removeExistsAllPathsFromProperty(newProperty);
                 addAllPathsToProperty(newProperty, null);
@@ -4696,8 +4713,8 @@ public class QueryDialog extends JPanel {
             useColoredReduction.setEnabled(false);
         }
         
-        wasCTLType = queryType.getSelectedIndex() == 0;
-        updateSiphonTrap(wasCTLType);
+        boolean isCTL = queryType.getSelectedIndex() == 0;
+        updateSiphonTrap(isCTL);
     
         updateSearchStrategies();
 		refreshExportButtonText();
