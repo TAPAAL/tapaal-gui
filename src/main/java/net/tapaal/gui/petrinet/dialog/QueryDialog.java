@@ -39,7 +39,6 @@ import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.HyperLTLParsing.TAPAALHyperLTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
-import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
@@ -214,7 +213,7 @@ public class QueryDialog extends JPanel {
     private JCheckBox useTarjan;
     // Raw verification options panel
     private JPanel rawVerificationOptionsPanel;
-    private JTextField rawVerificationOptionsTextField;
+    private JTextArea rawVerificationOptionsTextArea;
     private JCheckBox rawVerificationOptionsEnabled;
     private JButton rawVerificationOptionsHelpButton;
 
@@ -424,7 +423,6 @@ public class QueryDialog extends JPanel {
 
         setLayout(new GridBagLayout());
 
-
         init(option, queryToCreateFrom);
         makeShortcuts();
         toggleAdvancedSimpleView(false);
@@ -507,12 +505,12 @@ public class QueryDialog extends JPanel {
             lens.isColored(),
             false,
             rawVerificationOptionsEnabled.isSelected(),
-            rawVerificationOptionsTextField.getText()
+            rawVerificationOptionsTextArea.getText()
 		);
 
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
 
-        if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
+        if (reductionOptionToSet != null && reductionOptionToSet.equals(ReductionOption.VerifyTAPN)) {
             query.setDiscreteInclusion(discreteInclusion.isSelected());
         }
         return query;
@@ -547,7 +545,7 @@ public class QueryDialog extends JPanel {
             lens.isColored(),
             coloredReduction,
             rawVerificationOptionsEnabled.isSelected(),
-            rawVerificationOptionsTextField.getText()
+            rawVerificationOptionsTextArea.getText()
         );
         if (queryType.getSelectedIndex() == 1) {
             query.setCategory(TAPNQuery.QueryCategory.LTL);
@@ -607,7 +605,8 @@ public class QueryDialog extends JPanel {
 	}
 
     private ReductionOption getReductionOption() {
-        String reductionOptionString = (String)reductionOption.getSelectedItem();
+        String reductionOptionString = getReductionOptionAsString();
+
         if (reductionOptionString == null)
             return null;
         else if (reductionOptionString.equals(name_STANDARD))
@@ -693,7 +692,7 @@ public class QueryDialog extends JPanel {
 			return null;
 		}
 		guiDialog = new EscapableDialog(TAPAALGUI.getApp(),	"Edit Query", true);
-
+        
         Container contentPane = guiDialog.getContentPane();
 
         // 1 Set layout
@@ -781,8 +780,8 @@ public class QueryDialog extends JPanel {
 
 		queryField.select(position.getStart(), position.getEnd());
 		currentSelection = position;
-        setEnabledOptionsAccordingToCurrentReduction();
-        updateQueryButtonsAccordingToSelection();
+
+        refreshQueryEditingButtons();
 	}
 
 	// update selection based on some change to the query.
@@ -802,12 +801,14 @@ public class QueryDialog extends JPanel {
 
         queryField.select(position.getStart(), position.getEnd());
         currentSelection = position;
+
+        updateQueryButtonsAccordingToSelection();
+
         if (currentSelection != null) {
             setEnabledOptionsAccordingToCurrentReduction();
         } else {
             disableAllQueryButtons();
         }
-        updateQueryButtonsAccordingToSelection();
     }
 
     private void updateQueryButtonsAccordingToSelection() {
@@ -820,27 +821,23 @@ public class QueryDialog extends JPanel {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
 
-        int selectedIndex = queryType.getSelectedIndex();
-        if (current instanceof LTLANode || current instanceof LTLENode ||
-            ((selectedIndex == 1 || selectedIndex == 2) && current instanceof TCTLPathPlaceHolder)) {
-            negationButton.setEnabled(false);
-        } else if (!lens.isGame()) {
-            negationButton.setEnabled(true);
-        }
-        if (lens.isGame()) {
-            if (newProperty instanceof TCTLAbstractPathProperty && !(newProperty instanceof TCTLPathPlaceHolder)) {
+        if (lens.isGame() && 
+            newProperty instanceof TCTLAbstractPathProperty && 
+            !(newProperty instanceof TCTLPathPlaceHolder)) {
                 enableOnlyStateButtons();
-                negationButton.setEnabled(false);
-            }
-            if (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder) {
-                disjunctionButton.setEnabled(false);
-                conjunctionButton.setEnabled(false);
-                negationButton.setEnabled(false);
-            } else {
-                disjunctionButton.setEnabled(true);
-                conjunctionButton.setEnabled(true);
-                negationButton.setEnabled(true);
-            }
+        }
+
+        if ((lens.isGame() || lens.isTimed() || queryType.getSelectedIndex() != 0) &&
+             (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder)) {
+            boolean enableBooleanOperators = !(current instanceof LTLANode || current instanceof LTLENode) && queryType.getSelectedIndex() != 0 && isValidLTL();
+
+            disjunctionButton.setEnabled(enableBooleanOperators);
+            conjunctionButton.setEnabled(enableBooleanOperators);
+            negationButton.setEnabled(enableBooleanOperators); 
+        } else if (queryType.getSelectedIndex() == 0) {
+            disjunctionButton.setEnabled(true);
+            conjunctionButton.setEnabled(true);
+            negationButton.setEnabled(true);
         }
 	}
 
@@ -1111,7 +1108,7 @@ public class QueryDialog extends JPanel {
         }
 
         reductionOption.removeAllItems();
-
+        
         boolean selectedOptionStillAvailable = false;
         TraceOption trace = getTraceOption();
         for (String s : options) {
@@ -1246,7 +1243,6 @@ public class QueryDialog extends JPanel {
         untilButton.setEnabled(false);
         aButton.setEnabled(false);
         eButton.setEnabled(false);
-
         conjunctionButton.setEnabled(false);
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
@@ -1519,7 +1515,6 @@ public class QueryDialog extends JPanel {
     // /////////////////////////////////////////////////////////////////////
 
     private void init(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
-        //setPreferredSize(new Dimension(942, 517));
         initQueryNamePanel();
         initQueryPanel();
         initUppaalOptionsPanel();
@@ -1528,7 +1523,7 @@ public class QueryDialog extends JPanel {
         initRawVerificationOptionsPanel();
         initButtonPanel(option);
 
-        if(queryToCreateFrom != null) {
+        if (queryToCreateFrom != null) {
             setupFromQuery(queryToCreateFrom);
         }
 
@@ -1547,7 +1542,6 @@ public class QueryDialog extends JPanel {
         refreshUndoRedo();
 
         setEnabledOptionsAccordingToCurrentReduction();
-        //setVerificationOptionsEnabled(!queryToCreateFrom.getRawVerification());
 
         makeShortcuts();
 
@@ -1557,20 +1551,25 @@ public class QueryDialog extends JPanel {
             useSiphonTrap.setSelected(false);
             useSiphonTrap.setEnabled(false);
         }
-    }
 
+        if (queryToCreateFrom != null) {
+            setupRawVerificationOptionsFromQuery(queryToCreateFrom);
+        } else {
+            setupRawVerificationOptions();
+        }
+    }
 
     private void setupFromQuery(TAPNQuery queryToCreateFrom) {
         queryName.setText(queryToCreateFrom.getName());
         numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
 
         if (lens.isTimed()) {
-            setupQuantificationFromQuery(queryToCreateFrom);
             setupApproximationOptionsFromQuery(queryToCreateFrom);
-        }
-        if(lens.isColored() && !lens.isTimed()){
+            setupQuantificationFromQuery(queryToCreateFrom);
+        } else if (lens.isColored()) {
             setupUnfoldingOptionsFromQuery(queryToCreateFrom);
         }
+
         setupQueryCategoryFromQuery(queryToCreateFrom);
         setupSearchOptionsFromQuery(queryToCreateFrom);
         setupReductionOptionsFromQuery(queryToCreateFrom);
@@ -1578,16 +1577,53 @@ public class QueryDialog extends JPanel {
         setupTarOptionsFromQuery(queryToCreateFrom);
         setupTarjanOptionsFromQuery(queryToCreateFrom);
 
-        if(queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
+        if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
         }
-
-        setupRawVerificationOptionsFromQuery(queryToCreateFrom);
     }
 
     private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
-        rawVerificationOptionsEnabled.setSelected(queryToCreateFrom.getRawVerification());
-        rawVerificationOptionsTextField.setText(queryToCreateFrom.getRawVerificationPrompt());
+        rawVerificationOptionsTextArea.setText(queryToCreateFrom.getRawVerificationPrompt());
+        setupRawVerificationOptions(queryToCreateFrom.getRawVerification());
+
+        if (rawVerificationOptionsEnabled.isSelected() && !advancedView) {
+            toggleAdvancedSimpleView(true);
+        }
+    }
+
+    private void setupRawVerificationOptions() {
+        setupRawVerificationOptions(false);
+    }
+
+    private void setupRawVerificationOptions(boolean isSelected) {
+        rawVerificationOptionsEnabled.setSelected(isSelected);
+
+        addItemListeners(searchOptionsPanel);
+        addItemListeners(unfoldingOptionsPanel);
+        addItemListeners(traceOptionsPanel);
+        addItemListeners(reductionOptionsPanel);
+
+        numberOfExtraTokensInNet.addChangeListener(e -> updateRawVerificationOptions());
+        reductionOption.addActionListener(e -> updateRawVerificationOptions());
+        
+        if (reductionOption.getSelectedItem() != null) {
+            updateRawVerificationOptions();
+        }
+    }
+
+    private void addItemListeners(JPanel panel) {
+        if (panel != null) {
+            for (Component component : panel.getComponents()) {
+                if (component instanceof JRadioButton || component instanceof JCheckBox) {
+                    AbstractButton button = (AbstractButton) component;
+                    button.addItemListener(new ItemListener() {
+                        public void itemStateChanged(ItemEvent e) {
+                            updateRawVerificationOptions();
+                        }
+                    });
+                }
+            }
+        }
     }
 
     private void setupTraceListFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1626,7 +1662,6 @@ public class QueryDialog extends JPanel {
 
     private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
         String reduction = "";
-        boolean symmetry = queryToCreateFrom.useSymmetry();
 
         if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST) {
             reduction = name_BROADCAST;
@@ -1745,9 +1780,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void initQueryNamePanel() {
-
         JPanel splitter = new JPanel(new BorderLayout());
-
 
         namePanel = new JPanel(new FlowLayout());
         namePanel.add(new JLabel("Query name: "));
@@ -1758,22 +1791,19 @@ public class QueryDialog extends JPanel {
         namePanel.add(queryName);
 
         queryName.getDocument().addDocumentListener(new DocumentListener() {
-
             public void removeUpdate(DocumentEvent e) {
                 setSaveButtonsEnabled();
-
             }
 
             public void insertUpdate(DocumentEvent e) {
                 setSaveButtonsEnabled();
-
             }
 
             public void changedUpdate(DocumentEvent e) {
                 setSaveButtonsEnabled();
-
             }
         });
+
         queryType = new JComboBox(new String[]{"CTL/Reachability", "LTL","HyperLTL"});
         queryType.setToolTipText(TOOL_TIP_QUERY_TYPE);
         queryType.addActionListener(arg0 -> toggleDialogType());
@@ -1890,7 +1920,7 @@ public class QueryDialog extends JPanel {
         }
         mergeNetComponentsButton.setVisible(advancedView);
 
-        updateRawVerificationOptions(advancedView);
+        showRawVerificationOptions(advancedView);
 
         if(advancedView){
             advancedButton.setText("Simple view");
@@ -1899,7 +1929,7 @@ public class QueryDialog extends JPanel {
             advancedButton.setText("Advanced view");
             advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
         }
-
+        
         guiDialog.pack();
         guiDialog.setLocation(location);
     }
@@ -1915,8 +1945,9 @@ public class QueryDialog extends JPanel {
 
     private void toggleDialogType() {
         if (queryType.getSelectedIndex() == 2 && (wasCTLType || wasLTLType)) {
-            if (!isHyperLTL(newProperty) && !(newProperty instanceof TCTLPathPlaceHolder)) {
+            if (!isHyperLTL(newProperty) && !(newProperty instanceof TCTLPathPlaceHolder) || !isValidLTL() && !queryField.getText().trim().equals((new TCTLPathPlaceHolder()).toString())) {
                 if (showWarningMessage() == JOptionPane.YES_OPTION) {
+                    newProperty = new TCTLPathPlaceHolder();
                     deleteProperty();
                 } else {
                     int changeTo = wasCTLType ? 0 : 1;
@@ -1929,6 +1960,7 @@ public class QueryDialog extends JPanel {
             showHyperLTL(true);
             updateSiphonTrap(true);
             queryChanged();
+
             wasCTLType = false;
             wasLTLType = false;
             wasHyperLTLType = true;
@@ -1949,6 +1981,18 @@ public class QueryDialog extends JPanel {
             } else if (ltlType.equals("E")) {
                 addExistsPathsToProperty(newProperty, null);
             }
+
+            // Check again after conversion
+            if (!isValidLTL() && !queryField.getText().trim().equals((new TCTLPathPlaceHolder()).toString())) {
+                if (showWarningMessage() == JOptionPane.YES_OPTION) {
+                    deleteProperty();
+                } else {
+                    int changeTo = wasCTLType ? 0 : 2;
+                    queryType.setSelectedIndex(changeTo);
+                    return;
+                }
+            }
+
             showLTLButtons(true);
             updateSiphonTrap(true);
             showHyperLTL(false);
@@ -1972,14 +2016,23 @@ public class QueryDialog extends JPanel {
             showLTLButtons(false);
             showHyperLTL(false);
             updateSiphonTrap(false);
+            
             wasCTLType = true;
             wasLTLType = false;
             wasHyperLTLType = false;
         }
+
         if (undoManager != null) undoManager.discardAllEdits();
         if (undoButton != null) undoButton.setEnabled(false);
         if (redoButton != null) redoButton.setEnabled(false);
+
         setEnabledOptionsAccordingToCurrentReduction();
+        updateRawVerificationOptions();
+    }
+
+    private boolean isValidLTL() {
+        String queryText = queryField.getText().trim();
+        return queryText.startsWith("A") || queryText.startsWith("E");
     }
 
     private String checkLTLType() {
@@ -2207,7 +2260,6 @@ public class QueryDialog extends JPanel {
         int selectedIndex = queryType.getSelectedIndex();
         boolean isHyperLTL = selectedIndex == 2;
         String trace = isHyperLTL ? traceBoxQuantification.getSelectedItem().toString() : "";
-
         if (oldProperty instanceof LTLANode) {
             if(!(selectedIndex == 2)) {
                 property = oldProperty;
@@ -2407,6 +2459,7 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
+
         uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
     }
 
@@ -2776,7 +2829,6 @@ public class QueryDialog extends JPanel {
 
         aButton.addActionListener(e -> {
             TCTLAbstractProperty oldProperty = newProperty;
-
             if (!(queryType.getSelectedIndex() == 2)) {
                 newProperty = removeExistsAllPathsFromProperty(newProperty);
                 addAllPathsToProperty(newProperty, null);
@@ -2870,18 +2922,8 @@ public class QueryDialog extends JPanel {
         existsUntil.setVisible(isVisible);
     }
 
-    private void updateSiphonTrap(boolean isLTL) {
-        useSiphonTrap.setEnabled(!isLTL);
-    }
-
-    private void updateStubbornReduction() {
-        int selectedIndex = queryType.getSelectedIndex();
-        if(selectedIndex == 2) {
-            useStubbornReduction.setEnabled(false);
-            useStubbornReduction.setSelected(false);
-        } else {
-            useStubbornReduction.setEnabled(true);
-        }
+    private void updateSiphonTrap(boolean isCTL) {
+        useSiphonTrap.setEnabled(isCTL);
     }
 
     private void addPropertyToQuery(TCTLAbstractPathProperty property) {
@@ -4216,6 +4258,7 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.weightx = 1;
         gridBagConstraints.insets = new Insets(0, 5, 0, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
+
         uppaalOptionsPanel.add(searchOptionsPanel, gridBagConstraints);
     }
 
@@ -4252,6 +4295,7 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.weightx = 1;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(0, 0, 0, 5);
+
         verificationPanel.add(unfoldingOptionsPanel, gridBagConstraints);
 
     }
@@ -4315,8 +4359,8 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
-        uppaalOptionsPanel.add(traceOptionsPanel, gridBagConstraints);
 
+        uppaalOptionsPanel.add(traceOptionsPanel, gridBagConstraints);
     }
 
     private void initOverApproximationPanel() {
@@ -4391,7 +4435,7 @@ public class QueryDialog extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    updateRawVerificationOptions();
+                    showRawVerificationOptions(advancedView);
                     guiDialog.pack();
                 }
             }
@@ -4470,6 +4514,7 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 0;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.BOTH;
+
         verificationPanel.add(reductionOptionsPanel, gbc);
     }
 
@@ -4517,9 +4562,13 @@ public class QueryDialog extends JPanel {
         reductionOptionsPanel.add(useReduction, gbc);
         gbc.gridx = 0;
         gbc.gridy = 2;
-        reductionOptionsPanel.add(useColoredReduction, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 3;
+
+        if (lens.isColored()) {
+            reductionOptionsPanel.add(useColoredReduction, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+        }
+
         reductionOptionsPanel.add(useQueryReduction, gbc);
         gbc.gridx = 1;
         gbc.gridy = 1;
@@ -4543,10 +4592,15 @@ public class QueryDialog extends JPanel {
         rawVerificationOptionsEnabled = new JCheckBox("Use");
         rawVerificationOptionsEnabled.setToolTipText(TOOL_TIP_RAW_VERIFICATION_ENABLED_CHECKBOX);
 
-        rawVerificationOptionsTextField = new JTextField();
-        rawVerificationOptionsTextField.setEnabled(false);
-        rawVerificationOptionsTextField.setToolTipText(TOOL_TIP_RAW_VERIFICATION_TEXT_FIELD);
-        
+        rawVerificationOptionsTextArea = new JTextArea();
+        rawVerificationOptionsTextArea.setEnabled(false);
+        rawVerificationOptionsTextArea.setToolTipText(TOOL_TIP_RAW_VERIFICATION_TEXT_FIELD);
+        rawVerificationOptionsTextArea.setLineWrap(true);
+        rawVerificationOptionsTextArea.setWrapStyleWord(true);
+        rawVerificationOptionsTextArea.setRows(4);
+
+        JScrollPane rawVerificationOptionsScrollPane = new JScrollPane(rawVerificationOptionsTextArea);
+
         rawVerificationOptionsHelpButton = new JButton("Help on options");
         rawVerificationOptionsHelpButton.setEnabled(false);
         rawVerificationOptionsHelpButton.setToolTipText(TOOL_TIP_RAW_VERIFICATION_HELP_BUTTON);
@@ -4555,7 +4609,7 @@ public class QueryDialog extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
-                rawVerificationOptionsTextField.setEnabled(rawVerificationOptionsEnabled.isSelected());
+                rawVerificationOptionsTextArea.setEnabled(rawVerificationOptionsEnabled.isSelected());
                 rawVerificationOptionsHelpButton.setEnabled(rawVerificationOptionsEnabled.isSelected());
             }
         });
@@ -4563,22 +4617,22 @@ public class QueryDialog extends JPanel {
         GridBagConstraints checkBoxGbc = new GridBagConstraints();
         checkBoxGbc.gridx = 0;
         checkBoxGbc.gridy = 0;
-        checkBoxGbc.insets = new Insets(0, 5, 0, 0);
 
         GridBagConstraints textAreaGbc = new GridBagConstraints();
         textAreaGbc.gridx = 1;
         textAreaGbc.gridy = 0;
         textAreaGbc.weightx = 1;
+        textAreaGbc.gridheight = 2;
         textAreaGbc.fill = GridBagConstraints.HORIZONTAL;
         textAreaGbc.insets = new Insets(0, 10, 0, 10);
 
         GridBagConstraints buttonGbc = new GridBagConstraints();
-        buttonGbc.gridx = 2;
-        buttonGbc.gridy = 0;
-        buttonGbc.insets = new Insets(0, 0, 0, 5);
+        buttonGbc.gridx = 0;
+        buttonGbc.gridy = 1;
+        buttonGbc.insets = new Insets(0, 5, 0, 0);
 
         rawVerificationOptionsPanel.add(rawVerificationOptionsEnabled, checkBoxGbc);
-        rawVerificationOptionsPanel.add(rawVerificationOptionsTextField, textAreaGbc);
+        rawVerificationOptionsPanel.add(rawVerificationOptionsScrollPane, textAreaGbc);
         rawVerificationOptionsPanel.add(rawVerificationOptionsHelpButton, buttonGbc);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -4586,7 +4640,7 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 6;
         gbc.weightx = 1;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(5,10,5,10);
+        gbc.insets = new Insets(5, 10, 5, 10);
         gbc.fill = GridBagConstraints.BOTH;
         add(rawVerificationOptionsPanel, gbc);
     }
@@ -4635,10 +4689,7 @@ public class QueryDialog extends JPanel {
         setAllEnabled(searchOptionsPanel, isEnabled);
         setAllEnabled(overApproximationOptionsPanel, isEnabled);
 
-        // Reset to original values
-        if (isEnabled) {
-            setEnabledOptionsAccordingToCurrentReduction();
-        }
+        setEnabledOptionsAccordingToCurrentReduction();
     }
 
     // Enables or disables the container + all children recursively
@@ -4654,12 +4705,14 @@ public class QueryDialog extends JPanel {
     }
 
     protected void setEnabledOptionsAccordingToCurrentReduction() {
+        refreshQueryEditingButtons();
+
         if (rawVerificationOptionsEnabled.isSelected()) {
             return;
         }
 
-        refreshQueryEditingButtons();
         refreshTraceOptions();
+
         if (lens.isTimed()) {
             refreshSymmetryReduction();
             refreshStubbornReduction();
@@ -4674,24 +4727,22 @@ public class QueryDialog extends JPanel {
                 traceBoxQuantification.setEnabled(traceBoxQuantification.getModel().getSize() > 0);
             }
         }
+
         if (!lens.isColored()) {
             useColoredReduction.setSelected(false);
             useColoredReduction.setEnabled(false);
-        } else {
-            useColoredReduction.setEnabled(true);
         }
-        updateStubbornReduction();
+        
+        boolean isCTL = queryType.getSelectedIndex() == 0;
+        updateSiphonTrap(isCTL);
+    
         updateSearchStrategies();
 		refreshExportButtonText();
 
         guiDialog.pack();
 	}
 
-    private void updateRawVerificationOptions() {
-        updateRawVerificationOptions(true);
-    }
-
-    private void updateRawVerificationOptions(boolean advancedView) {
+    private void showRawVerificationOptions(boolean advancedView) {
         querySaved = true;
         TAPNQuery query = getQuery();
         querySaved = false;
@@ -4704,12 +4755,30 @@ public class QueryDialog extends JPanel {
         } else {
             rawVerificationOptionsPanel.setVisible(advancedView);
         }
+
+        guiDialog.pack();
+    }
+
+    private void updateRawVerificationOptions() {
+        querySaved = true;
+        TAPNQuery query = getQuery();
+        querySaved = false;
+
+        query = Verifier.convertQuery(query, lens);
+
+        Verifier.createTempFile();
+
+        boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
+        VerifyTAPNOptions verifytapnOptions = Verifier.getVerificationOptions(query, isColored);
+        verifytapnOptions.setTokensInModel(((TimedArcPetriNet) templateBox.getSelectedItem()).getNumberOfTokensInNet());
+
+        rawVerificationOptionsTextArea.setText(verifytapnOptions.toString());
     }
 
 	private void refreshTraceRefinement() {
 	    ReductionOption reduction = getReductionOption();
 
-        if (queryType.getSelectedIndex() != 1 && !lens.isGame() &&
+        if (queryType.getSelectedIndex() == 0 && !lens.isGame() &&
             reduction != null && reduction.equals(ReductionOption.VerifyPN) &&
             (newProperty.toString().startsWith("AG") || newProperty.toString().startsWith("EF")) &&
             !hasInhibitorArcs && !newProperty.hasNestedPathQuantifiers()) {
@@ -4829,6 +4898,10 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshOverApproximationOption() {
+        if (rawVerificationOptionsEnabled.isSelected()) {
+            return;
+        }
+
         if (queryHasDeadlock() || newProperty.toString().contains("EG") || newProperty.toString().contains("AF")){
             skeletonAnalysis.setSelected(false);
             skeletonAnalysis.setEnabled(false);

@@ -41,9 +41,11 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean stubbornReduction,
             boolean partition,
             boolean colorFixpoint,
-            boolean unfoldNet
+            boolean unfoldNet,
+			boolean useRawVerification,
+			String rawVerificationOptions
 	) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet);
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
@@ -69,34 +71,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             boolean colorFixpoint,
             boolean unfoldNet,
 			boolean useRawVerification,
-			String rawVerificationOptions) {
-				this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet);
-
-				this.useRawVerification = useRawVerification;
-				this.rawVerificationOptions = rawVerificationOptions;
-			}
-
-	public VerifyDTAPNOptions(
-			int extraTokens,
-			TraceOption traceOption,
-			SearchOption search,
-			boolean symmetry,
-			boolean gcd,
-			boolean timeDarts,
-			boolean pTrie,
-			boolean useStateequationCheck,
-			boolean discreteInclusion,
-			InclusionPlaces inclusionPlaces,
-			WorkflowMode workflow,
-			long workflowbound,
-			boolean enableOverApproximation,
-			boolean enableUnderApproximation,
-			int approximationDenominator,
-			boolean stubbornReduction,
-            String reducedModelPath,
-            boolean partition,
-            boolean colorFixpoint,
-            boolean unfoldNet
+			String rawVerificationOptions
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -109,8 +84,10 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		this.partition = partition;
 		this.colorFixpoint = colorFixpoint;
         this.unfold = unfoldNet;
+		this.useRawVerification = useRawVerification;
+		this.rawVerificationOptions = rawVerificationOptions;
 
-        if(unfold && trace() != TraceOption.NONE) // we only force unfolding when traces are involved
+        if(unfold && trace() != TraceOption.NONE && !useRawVerification) // we only force unfolding when traces are involved
         {
             try {
                 unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
@@ -124,16 +101,15 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-
+	
 		if (useRawVerification) {
-            result.append(rawVerificationOptions);
-            return result.toString();
+            return result.append(rawVerificationOptions).toString();
         }
 
         result.append(kBoundArg());
         result.append(deadTokenArg());
         result.append(traceArg(traceOption));
-        if(trace() != TraceOption.NONE)
+        if(unfold && trace() != TraceOption.NONE)
         {
             result.append(" --write-unfolded-net ");
             result.append(unfoldedModelPath);
