@@ -48,23 +48,23 @@ public class VerifyTAPNTraceParser {
 
 		if(traceNameToParse != null) {
             NodeList childNodes = null;
-		    try {
-		        childNodes = document.getElementsByTagName("trace-list").item(0).getChildNodes();
-            } catch (NullPointerException ex) {
-                // This just means the trace list is empty, i.e., there is no trace except the initial marking
-                // So we send this back
-                trace.setTraceName(traceNameToParse);
-                return trace;
-            }
-		    for(int i = 0; i < childNodes.getLength(); i++) {
-		        NamedNodeMap nodeAttribute = childNodes.item(i).getAttributes();
+		    Node traceListNode = document.getElementsByTagName("trace-list").item(0);
 
-                if(nodeAttribute != null && nodeAttribute.item(0).getNodeValue().equals(traceNameToParse)) {
-                    nodeList = childNodes.item(i).getChildNodes();
-                    trace.setTraceName(traceNameToParse);
-                    break;
-                }
-            }
+			if (traceListNode != null) {
+				childNodes = traceListNode.getChildNodes();
+			}
+
+			if (childNodes != null) {
+				for(int i = 0; i < childNodes.getLength(); i++) {
+					NamedNodeMap nodeAttribute = childNodes.item(i).getAttributes();
+	
+					if(nodeAttribute != null && nodeAttribute.item(0).getNodeValue().equals(traceNameToParse)) {
+						nodeList = childNodes.item(i).getChildNodes();
+						trace.setTraceName(traceNameToParse);
+						break;
+					}
+				}
+			}
         }
 		
 		if(nodeList == null) {
