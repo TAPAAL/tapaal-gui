@@ -70,36 +70,6 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean useRawVerification,
         String rawVerificationOptions
     ) {
-        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, unfold, partition, colorFixpoint, useSymmetricVars, useColoredReduction);
-
-        this.useRawVerification = useRawVerification;
-        this.rawVerificationOptions = rawVerificationOptions;
-    }
-
-    public VerifyPNOptions(
-        int extraTokens,
-        TraceOption traceOption,
-        SearchOption search,
-        boolean useOverApproximation,
-        ModelReduction modelReduction,
-        boolean enableOverApproximation,
-        boolean enableUnderApproximation,
-        int approximationDenominator,
-        QueryCategory queryCategory,
-        AlgorithmOption algorithmOption,
-        boolean siphontrap,
-        QueryReductionTime queryReduction,
-        boolean stubbornReduction,
-        String pathToReducedNet,
-        boolean useTarOption,
-        boolean useTarjan,
-        boolean colored,
-        boolean unfold,
-        boolean partition,
-        boolean colorFixpoint,
-        boolean useSymmetricVars,
-        boolean useColoredReduction
-    ) {
 		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator, useTarOption);
 
         this.modelReduction = modelReduction;
@@ -117,8 +87,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		this.reducedModelPath = pathToReducedNet;
 		this.symmetricVars = useSymmetricVars;
 		this.useColoredReduction = useColoredReduction;
+        this.useRawVerification = useRawVerification;
+        this.rawVerificationOptions = rawVerificationOptions;
 
-        if(unfold) {
+        if(unfold && !useRawVerification) {
             try {
                 unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
                 unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
@@ -151,7 +123,35 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean colorFixpoint,
         boolean useSymmetricVars
     ) {
-        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false);
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false, true, null);
+    }
+
+    public VerifyPNOptions(
+        int extraTokens,
+        TraceOption traceOption,
+        SearchOption search,
+        boolean useOverApproximation,
+        ModelReduction modelReduction,
+        boolean enableOverApproximation,
+        boolean enableUnderApproximation,
+        int approximationDenominator,
+        QueryCategory queryCategory,
+        AlgorithmOption algorithmOption,
+        boolean siphontrap,
+        QueryReductionTime queryReduction,
+        boolean stubbornReduction,
+        String pathToReducedNet,
+        boolean useTarOption,
+        boolean useTarjan,
+        boolean colored,
+        boolean unfold,
+        boolean partition,
+        boolean colorFixpoint,
+        boolean useSymmetricVars,
+        boolean useRawVerification,
+        String rawVerificationOptions
+    ) {
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false, useRawVerification, rawVerificationOptions);
     }
 
     public VerifyPNOptions(
@@ -182,10 +182,9 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     @Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-
+    
         if (useRawVerification) {
-            result.append(rawVerificationOptions);
-            return result.toString();
+            return result.append(rawVerificationOptions).toString();
         }
 
 		result.append("--k-bound ");

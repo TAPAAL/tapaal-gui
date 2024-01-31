@@ -7,7 +7,6 @@ import java.io.StringReader;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.util.MemoryMonitor;
-import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 
 public class ProcessRunner {
 
