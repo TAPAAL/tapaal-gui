@@ -3538,7 +3538,7 @@ public class QueryDialog extends JPanel {
                 TAPAALGUI.getApp(),
                 "The trace cannot be named \"" + traceName + "\", as the name is reserved",
                 "Error", JOptionPane.ERROR_MESSAGE);
-        } else {
+        } else if (isFromTraceDialogBox) {
             boolean nameIsInUse = traceNameTextField.getText().equals(traceName);
             for (int i = 0; i < traceModel.getSize(); i++) {
                 String n = traceModel.getElementAt(i).toString();
