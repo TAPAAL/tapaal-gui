@@ -20,6 +20,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	private final boolean symmetry;
 	private final boolean discreteInclusion;
     private final boolean tarOption;
+	private boolean isColor;
 	private InclusionPlaces inclusionPlaces;
 	private boolean useRawVerification;
 	private String rawVerificationOptions;
@@ -45,6 +46,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 		this.useRawVerification = useRawVerification;
 		this.rawVerificationOptions = rawVerificationOptions;
+		this.isColor = isColor;
 
         if(isColor && trace() != TraceOption.NONE && !useRawVerification) // we only force unfolding when traces are involved
         {
@@ -110,6 +112,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
             result.append(" --write-unfolded-queries ");
             result.append(unfoldedQueriesPath);
             result.append(" ");
+			result.append("--bindings ");
         }
 
 		result.append(kBoundArg());
@@ -122,6 +125,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		result.append(' ');
 		result.append(discreteInclusion ? " --inclusion-check 1" : "");
 		result.append(discreteInclusion ? " --inclusion-places " + generateDiscretePlacesList() : "");
+
 		return result.toString();
 	}
 

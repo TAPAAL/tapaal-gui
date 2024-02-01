@@ -15,6 +15,7 @@ import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.*;
+import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNUnfoldOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNUnfoldOptions;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -97,7 +98,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             ArrayList<Template> templates = new ArrayList<>(1);
             ArrayList<TAPNQuery> queries = new ArrayList<>(1);
 
-
             network.add(transformedModel.value1());
             for (ColorType ct : model.colorTypes()) {
                 network.add(ct);
@@ -115,9 +115,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 PNMLWriter writerTACPN = new PNMLWriter(network,guiModels, lens);
                 writerTACPN.savePNML(modelFile);
             }
-
-
-
         } catch (IOException | ParserConfigurationException | TransformerException e) {
             e.printStackTrace();
             error.append(e.getMessage());
@@ -158,8 +155,16 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         runner = new ProcessRunner(modelChecker.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
 
+        List<String> outputLines = new ArrayList<>();
+        BufferedReader reader = runner.standardOutput();
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            outputLines.add(line);
+        }
+
         //String errorOutput = readOutput(runner.errorOutput());
-        int netSize = readUnfoldedSize(runner.standardOutput());
+        int netSize = readUnfoldedSize(outputLines);
 
         if(netSize > maxNetSize){
             //We make a thread so the workers doesn't cancel itself before showing the dialog
@@ -188,6 +193,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                     thread.stop();
                 }
             }
+
+            ColorBindingParser.addBindings(loadedModel, String.join(System.lineSeparator(), outputLines));
         } catch (FormatException e) {
             e.printStackTrace();
             error.append(e.getMessage());
@@ -266,27 +273,17 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         return max - min + Constants.PLACE_TRANSITION_HEIGHT + 10;
     }
 
-    private int readUnfoldedSize(BufferedReader reader){
-        try {
-            if (!reader.ready())
-                return 0;
-        } catch (IOException e1) {
-            return 0;
-        }
+    private int readUnfoldedSize(List<String> lines){
         int numElements = 0;
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                if(line.startsWith("Size of unfolded net: ")){
-                    Pattern p = Pattern.compile("\\d+");
-                    Matcher m = p.matcher(line);
-                    while (m.find()) {
-                        numElements += Integer.parseInt(m.group());
-                    }
+
+        for (String line : lines) {
+            if (line.startsWith("Size of unfolded net: ")){
+                Pattern p = Pattern.compile("\\d+");
+                Matcher m = p.matcher(line);
+                while (m.find()) {
+                    numElements += Integer.parseInt(m.group());
                 }
             }
-        } catch (IOException e) {
-            System.out.println("Got exception: " + e.getMessage());
         }
 
         return numElements;

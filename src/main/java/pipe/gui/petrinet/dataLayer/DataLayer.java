@@ -638,12 +638,7 @@ public class DataLayer {
 	 * @return An List of all the Transition objects
 	 */
 	public Transition[] getTransitions() {
-		Transition[] returnArray = new Transition[transitionsArray.size()];
-
-		for (int i = 0; i < transitionsArray.size(); i++) {
-			returnArray[i] = transitionsArray.get(i);
-		}
-		return returnArray;
+		return transitionsArray.toArray(new Transition[transitionsArray.size()]);
 	}
 
 	/**

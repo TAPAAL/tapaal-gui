@@ -18,6 +18,7 @@ import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
+import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.MessengerImpl;
@@ -87,7 +88,8 @@ public class RunVerification extends RunVerificationBase {
                         if ((lens != null && lens.isColored()) || model.isColored()) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
-                                TAPAALGUI.openNewTabFromStream(result.getUnfoldedTab());
+                                PetriNetTab tab = result.getUnfoldedTab();
+                                TAPAALGUI.openNewTabFromStream(tab);
                             } else return false;
                         }
                         if (result.getTraceMap() == null) {
@@ -101,6 +103,8 @@ public class RunVerification extends RunVerificationBase {
                             }
                             TAPAALGUI.getAnimator().setTrace(result.getTrace(), traceMap);
                         }
+
+                        ColorBindingParser.addBindings(result.getUnfoldedTab().getModel(), result.getRawOutput());
                     } else {
                         if ((
                             //XXX: this is not complete, we need a better way to signal the engine could not create a trace
