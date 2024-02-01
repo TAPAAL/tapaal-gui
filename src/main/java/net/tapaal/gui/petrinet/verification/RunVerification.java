@@ -88,8 +88,7 @@ public class RunVerification extends RunVerificationBase {
                         if ((lens != null && lens.isColored()) || model.isColored()) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
-                                PetriNetTab tab = result.getUnfoldedTab();
-                                TAPAALGUI.openNewTabFromStream(tab);
+                                TAPAALGUI.openNewTabFromStream(result.getUnfoldedTab());
                             } else return false;
                         }
                         if (result.getTraceMap() == null) {

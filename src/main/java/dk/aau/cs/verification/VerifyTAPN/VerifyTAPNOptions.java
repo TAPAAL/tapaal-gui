@@ -20,7 +20,6 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	private final boolean symmetry;
 	private final boolean discreteInclusion;
     private final boolean tarOption;
-	private boolean isColor;
 	private InclusionPlaces inclusionPlaces;
 	private boolean useRawVerification;
 	private String rawVerificationOptions;
@@ -46,7 +45,6 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 		this.useRawVerification = useRawVerification;
 		this.rawVerificationOptions = rawVerificationOptions;
-		this.isColor = isColor;
 
         if(isColor && trace() != TraceOption.NONE && !useRawVerification) // we only force unfolding when traces are involved
         {

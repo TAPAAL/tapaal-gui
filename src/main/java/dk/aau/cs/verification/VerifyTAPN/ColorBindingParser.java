@@ -22,12 +22,18 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 
 public class ColorBindingParser extends DefaultHandler {
+    private Map<String, String> bindings = new HashMap<>();
+
     private String currentElement = "";
     private String transitionId = "";
     private String variableId = "";
     private String color = "";
-    private Map<String, String> bindings = new HashMap<>();
 
+    /**
+     * Parses output from the verifier and adds the color bindings to the transitions in the loaded model.
+     * @param loadedModel The loaded model to add the bindings to.
+     * @param output The output from the verifier.
+     */
     public static void addBindings(LoadedModel loadedModel, String output) {
         ColorBindingParser parser = new ColorBindingParser();
         Map<String, String> bindings = parser.parseBindings(output);
@@ -39,6 +45,11 @@ public class ColorBindingParser extends DefaultHandler {
         }
     }
 
+    /**
+     * Parses output from the verifier and adds the color bindings to the transitions in the GUI model.
+     * @param guiModel The GUI model to add the bindings to.
+     * @param output The output from the verifier.
+     */
     public static void addBindings(DataLayer guiModel, String output) {
         ColorBindingParser parser = new ColorBindingParser();
         Map<String, String> bindings = parser.parseBindings(output);
