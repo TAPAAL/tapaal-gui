@@ -3538,7 +3538,7 @@ public class QueryDialog extends JPanel {
                 TAPAALGUI.getApp(),
                 "The trace cannot be named \"" + traceName + "\", as the name is reserved",
                 "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (isFromTraceDialogBox) {
+        } else {
             boolean nameIsInUse = traceNameTextField.getText().equals(traceName);
             for (int i = 0; i < traceModel.getSize(); i++) {
                 String n = traceModel.getElementAt(i).toString();
@@ -3549,12 +3549,12 @@ public class QueryDialog extends JPanel {
                 }
             }
 
-            if (nameIsInUse) {
+            if (nameIsInUse && isFromTraceDialogBox) {
                 JOptionPane.showMessageDialog(
                     TAPAALGUI.getApp(),
                     "A trace with the name \"" + traceName + "\" already exists. Please chose another name.",
                     "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
+            } else if (!nameIsInUse) {
                 traceModel.addElement(traceName);
                 traceList.setModel(traceModel);
 
