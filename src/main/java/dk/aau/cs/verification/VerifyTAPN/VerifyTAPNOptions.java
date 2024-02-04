@@ -88,8 +88,12 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	}
 
     public String kBoundArg() {
-        return " --k-bound " + (extraTokens+tokensInModel) + " ";
+        return "--k-bound " + kBound() + " ";
     }
+
+	public int kBound() {
+		return (extraTokens + tokensInModel);
+	}
 
     public String deadTokenArg() {
         return dontUseDeadPlaces ? " --keep-dead-tokens " : "";
@@ -100,6 +104,9 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		StringBuilder result = new StringBuilder();
 		
 		if (useRawVerification) {
+			if (rawVerificationOptions != null) {
+                rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "$1 " + kBound());
+            }
             return result.append(rawVerificationOptions).toString();
         }
 

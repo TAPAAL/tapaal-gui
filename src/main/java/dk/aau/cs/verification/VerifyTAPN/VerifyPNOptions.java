@@ -184,11 +184,13 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		StringBuilder result = new StringBuilder();
     
         if (useRawVerification) {
+            if (rawVerificationOptions != null) {
+                rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "$1 " + kBound());
+            }
             return result.append(rawVerificationOptions).toString();
         }
 
-		result.append("--k-bound ");
-		result.append(extraTokens+tokensInModel);
+		result.append(kBoundArg());
 
         var traceSwitch =traceMap.get(traceOption) ;
         if (traceSwitch != null) {
