@@ -3549,12 +3549,12 @@ public class QueryDialog extends JPanel {
                 }
             }
 
-            if (nameIsInUse) {
+            if (nameIsInUse && isFromTraceDialogBox) {
                 JOptionPane.showMessageDialog(
                     TAPAALGUI.getApp(),
                     "A trace with the name \"" + traceName + "\" already exists. Please chose another name.",
                     "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
+            } else if (!nameIsInUse) {
                 traceModel.addElement(traceName);
                 traceList.setModel(traceModel);
 
