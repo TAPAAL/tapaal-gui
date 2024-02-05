@@ -104,7 +104,8 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		StringBuilder result = new StringBuilder();
 		
 		if (useRawVerification) {
-			if (rawVerificationOptions != null) {
+			// TODO: temporary fix overriding k-bound if using approximation with raw verification
+			if (rawVerificationOptions != null && (enabledOverApproximation || enabledUnderApproximation)) {
                 rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "$1 " + kBound());
             }
             return result.append(rawVerificationOptions).toString();
