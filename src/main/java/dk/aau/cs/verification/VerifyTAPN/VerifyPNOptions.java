@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
@@ -186,8 +188,15 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         if (useRawVerification) {
             // TODO: temporary fix overriding k-bound if using approximation with raw verification
             if (rawVerificationOptions != null && (enabledOverApproximation || enabledUnderApproximation)) {
-                rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "$1 " + kBound());
+                kBoundPresentInRawVerificationOptions = rawVerificationOptions.contains("--k-bound") ||
+														rawVerificationOptions.contains("-k");
+                if (kBoundPresentInRawVerificationOptions) {
+                    rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "$1 " + kBound());
+                } else {
+                    result.append(kBoundArg());
+                }
             }
+            
             return result.append(rawVerificationOptions).toString();
         }
 

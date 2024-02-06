@@ -4377,10 +4377,12 @@ public class QueryDialog extends JPanel {
         overApproximationEnable = new JRadioButton("Over-approximation");
         overApproximationEnable.setVisible(true);
         overApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_OVER);
+        overApproximationEnable.addActionListener(e -> updateRawVerificationOptions());
 
         underApproximationEnable = new JRadioButton("Under-approximation");
         underApproximationEnable.setVisible(true);
         underApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_UNDER);
+        underApproximationEnable.addActionListener(e -> updateRawVerificationOptions());
 
         approximationRadioButtonGroup.add(noApproximationEnable);
         approximationRadioButtonGroup.add(overApproximationEnable);
@@ -4593,6 +4595,7 @@ public class QueryDialog extends JPanel {
         rawVerificationOptionsEnabled.setToolTipText(TOOL_TIP_RAW_VERIFICATION_ENABLED_CHECKBOX);
 
         rawVerificationOptionsTextArea = new JTextArea();
+        
         rawVerificationOptionsTextArea.setEnabled(false);
         rawVerificationOptionsTextArea.setToolTipText(TOOL_TIP_RAW_VERIFICATION_TEXT_FIELD);
         rawVerificationOptionsTextArea.setLineWrap(true);
@@ -4611,6 +4614,7 @@ public class QueryDialog extends JPanel {
                 setVerificationOptionsEnabled(!rawVerificationOptionsEnabled.isSelected());
                 rawVerificationOptionsTextArea.setEnabled(rawVerificationOptionsEnabled.isSelected());
                 rawVerificationOptionsHelpButton.setEnabled(rawVerificationOptionsEnabled.isSelected());
+                updateRawVerificationOptions();
             }
         });
 
@@ -4687,7 +4691,6 @@ public class QueryDialog extends JPanel {
         setAllEnabled(traceOptionsPanel, isEnabled);
         setAllEnabled(boundednessCheckPanel, isEnabled);
         setAllEnabled(searchOptionsPanel, isEnabled);
-        setAllEnabled(overApproximationOptionsPanel, isEnabled);
 
         setEnabledOptionsAccordingToCurrentReduction();
     }
@@ -4775,7 +4778,17 @@ public class QueryDialog extends JPanel {
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
         verifytapnOptions.setTokensInModel(transformedModel.value1().getNumberOfTokensInNet());
 
-        rawVerificationOptionsTextArea.setText(verifytapnOptions.toString());
+        String rawVerificationOptions = verifytapnOptions.toString();
+
+        if (verifytapnOptions.enabledOverApproximation() || verifytapnOptions.enabledUnderApproximation()) {
+            if (verifytapnOptions.kBoundPresentInRawVerificationOptions()) {
+                JOptionPane.showMessageDialog(QueryDialog.this,
+                "Because over/under-approximation is active, the specified k-bound in the custom verification options will be overwritten.", "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+            }
+            rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "");
+        }
+        rawVerificationOptionsTextArea.setText(rawVerificationOptions.trim());
     }
 
 	private void refreshTraceRefinement() {
@@ -5136,6 +5149,7 @@ public class QueryDialog extends JPanel {
                 }
             });
             saveAndVerifyButton.addActionListener(evt -> {
+                updateRawVerificationOptions();
                 if (checkIfSomeReductionOption()) {
                     querySaved = true;
                     // Now if a query is saved and verified, the net is marked as modified
