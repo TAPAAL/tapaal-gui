@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
-
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
