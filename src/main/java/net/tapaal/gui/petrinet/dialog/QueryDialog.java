@@ -4770,7 +4770,10 @@ public class QueryDialog extends JPanel {
 
         boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
         VerifyTAPNOptions verifytapnOptions = Verifier.getVerificationOptions(query, isColored);
-        verifytapnOptions.setTokensInModel(((TimedArcPetriNet) templateBox.getSelectedItem()).getNumberOfTokensInNet());
+
+        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
+        verifytapnOptions.setTokensInModel(transformedModel.value1().getNumberOfTokensInNet());
 
         rawVerificationOptionsTextArea.setText(verifytapnOptions.toString());
     }
