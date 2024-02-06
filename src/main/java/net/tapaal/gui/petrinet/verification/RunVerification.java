@@ -103,7 +103,8 @@ public class RunVerification extends RunVerificationBase {
                             TAPAALGUI.getAnimator().setTrace(result.getTrace(), traceMap);
                         }
 
-                        ColorBindingParser.addBindings(result.getUnfoldedTab().getModel(), result.getRawOutput());
+                        ColorBindingParser parser = new ColorBindingParser();
+                        parser.addBindings(result.getUnfoldedTab().getModel(), result.getRawOutput());
                     } else {
                         if ((
                             //XXX: this is not complete, we need a better way to signal the engine could not create a trace

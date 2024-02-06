@@ -194,7 +194,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 }
             }
 
-            ColorBindingParser.addBindings(loadedModel, String.join(System.lineSeparator(), outputLines));
+            ColorBindingParser parser = new ColorBindingParser();
+            parser.addBindings(loadedModel, String.join(System.lineSeparator(), outputLines));
         } catch (FormatException e) {
             e.printStackTrace();
             error.append(e.getMessage());
