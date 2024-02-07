@@ -4373,6 +4373,7 @@ public class QueryDialog extends JPanel {
         noApproximationEnable.setVisible(true);
         noApproximationEnable.setSelected(true);
         noApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_NONE);
+        noApproximationEnable.addActionListener(e -> updateRawVerificationOptions());
 
         overApproximationEnable = new JRadioButton("Over-approximation");
         overApproximationEnable.setVisible(true);

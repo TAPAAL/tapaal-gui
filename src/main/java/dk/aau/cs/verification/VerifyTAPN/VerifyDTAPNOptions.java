@@ -112,7 +112,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
                 } else {
                     result.append(kBoundArg());
                 }
-            }
+            } else {
+				result.append(kBoundArg());
+			}
             
             return result.append(rawVerificationOptions).toString();
         }
