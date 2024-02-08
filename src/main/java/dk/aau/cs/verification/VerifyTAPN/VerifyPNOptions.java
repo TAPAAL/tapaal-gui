@@ -183,19 +183,15 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	public String toString() {
 		StringBuilder result = new StringBuilder();
     
-        if (useRawVerification) {
-            // TODO: temporary fix overriding k-bound if using approximation with raw verification
-            if (rawVerificationOptions != null && (enabledOverApproximation || enabledUnderApproximation)) {
-                kBoundPresentInRawVerificationOptions = rawVerificationOptions.contains("--k-bound") ||
-														rawVerificationOptions.contains("-k");
-                if (kBoundPresentInRawVerificationOptions) {
-                    rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "$1 " + kBound());
-                } else {
-                    result.append(kBoundArg());
-                }
-            } else {
-                result.append(kBoundArg());
-            }
+        // TODO: temporary fix overriding k-bound if using approximation with raw verification
+		if (useRawVerification && rawVerificationOptions != null) {
+			kBoundPresentInRawVerificationOptions = rawVerificationOptions.contains("--k-bound") ||
+													rawVerificationOptions.contains("-k");
+            if ((enabledOverApproximation || enabledUnderApproximation) && kBoundPresentInRawVerificationOptions) {
+                rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "$1 " + kBound());
+			} else if (!kBoundPresentInRawVerificationOptions) {
+				result.append(kBoundArg());
+			}
             
             return result.append(rawVerificationOptions).toString();
         }
