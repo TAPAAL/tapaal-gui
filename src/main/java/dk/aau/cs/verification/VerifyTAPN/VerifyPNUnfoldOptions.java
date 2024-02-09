@@ -80,7 +80,8 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
         if(!symmetricVars){
             result.append(" --disable-symmetry-vars");
         }
-        result.append(" --col-reduction 0");
+        result.append(" --col-reduction 0 ");
+        result.append("--bindings ");
 
         return result.toString();
     }

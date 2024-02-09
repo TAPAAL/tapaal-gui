@@ -225,6 +225,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         if(unfold){
             String writeUnfoldedCMD = " --write-unfolded-net " +unfoldedModelPath + " --write-unfolded-queries " + unfoldedQueriesPath;
             result.append(writeUnfoldedCMD);
+            result.append(" --bindings ");
         }
 
 		if (this.queryCategory == QueryCategory.CTL){

@@ -110,6 +110,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
             result.append(" --write-unfolded-queries ");
             result.append(unfoldedQueriesPath);
             result.append(" ");
+			result.append("--bindings ");
         }
 
 		result.append(kBoundArg());
@@ -122,6 +123,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		result.append(' ');
 		result.append(discreteInclusion ? " --inclusion-check 1" : "");
 		result.append(discreteInclusion ? " --inclusion-places " + generateDiscretePlacesList() : "");
+
 		return result.toString();
 	}
 
