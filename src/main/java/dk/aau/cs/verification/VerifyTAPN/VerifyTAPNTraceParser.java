@@ -43,9 +43,12 @@ public class VerifyTAPNTraceParser {
 	
 		try {
 			StringBuilder sb = new StringBuilder();
-			int c;
-			while ((c = reader.read()) != -1) {
-				sb.append((char) c);
+			String line;
+			
+			while ((line = reader.readLine()) != null) {
+				if (line.contains("Trace")) continue;
+				sb.append(line);
+				sb.append(System.lineSeparator());
 			}
 
 			String xml = sb.toString();
@@ -151,6 +154,7 @@ public class VerifyTAPNTraceParser {
 			int startTraceList = xml.indexOf("<trace-list>");
 			if (startTrace == -1 && startTraceList == -1) return null;
 
+			System.out.println(xml);
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			return builder.parse(new InputSource(new StringReader(xml)));
 		} catch (ParserConfigurationException | IOException | SAXException e) {
