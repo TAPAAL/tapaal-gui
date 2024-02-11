@@ -18,6 +18,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 	protected int tokensInModel;
 	protected boolean kBoundPresentInRawVerificationOptions;
+	protected boolean tracePresentInRawVerificationOptions;
 	private final boolean symmetry;
 	private final boolean discreteInclusion;
     private final boolean tarOption;
@@ -91,31 +92,52 @@ public class VerifyTAPNOptions extends VerificationOptions{
     public String kBoundArg() {
         return "--k-bound " + kBound() + " ";
     }
-
+	
 	public int kBound() {
 		return (extraTokens + tokensInModel);
 	}
-
+	
     public String deadTokenArg() {
-        return dontUseDeadPlaces ? " --keep-dead-tokens " : "";
+		return dontUseDeadPlaces ? " --keep-dead-tokens " : "";
     }
+	
+	protected String rawVerificationString(String rawVerificationOptions, String traceArg) {
+		StringBuilder sb = new StringBuilder();
 
+		// TODO: temporary fix overriding k-bound and trace if using approximation with raw verification
+		kBoundPresentInRawVerificationOptions = rawVerificationOptions.contains("--k-bound") ||
+												rawVerificationOptions.contains("-k");
+		tracePresentInRawVerificationOptions = rawVerificationOptions.contains("--trace") ||
+												rawVerificationOptions.contains("-t");
+
+		if (enabledOverApproximation || enabledUnderApproximation) {
+			if (kBoundPresentInRawVerificationOptions) {
+				rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "$1 " + kBound());
+			}
+			
+			if (tracePresentInRawVerificationOptions) {
+				rawVerificationOptions = rawVerificationOptions.replaceAll("(--trace|-t) +\\d+", "$1 " + traceArg);
+			}
+		} 
+		
+		if (!kBoundPresentInRawVerificationOptions) {
+			sb.append(kBoundArg());
+		}
+		
+		if (!tracePresentInRawVerificationOptions) {
+			sb.append(traceArg);
+		}
+
+		return sb.append(rawVerificationOptions).toString();
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		
-		// TODO: temporary fix overriding k-bound if using approximation with raw verification
 		if (useRawVerification && rawVerificationOptions != null) {
-			kBoundPresentInRawVerificationOptions = rawVerificationOptions.contains("--k-bound") ||
-													rawVerificationOptions.contains("-k");
-            if ((enabledOverApproximation || enabledUnderApproximation) && kBoundPresentInRawVerificationOptions) {
-                rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "$1 " + kBound());
-			} else if (!kBoundPresentInRawVerificationOptions) {
-				result.append(kBoundArg());
-			}
-            
-            return result.append(rawVerificationOptions).toString();
-        }
+			return rawVerificationString(rawVerificationOptions, traceMap.get(traceOption));
+		}
 
         if(unfoldedModelPath != null && unfoldedQueriesPath != null)
         {
@@ -184,7 +206,11 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		this.inclusionPlaces = inclusionPlaces;
 	}
 
-	public boolean kBoundPresentInRawVerificationOptions() {
+	public boolean kBoundPresentInRawVerification() {
 		return kBoundPresentInRawVerificationOptions;
+	}
+
+	public boolean tracePresentInRawVerification() {
+		return tracePresentInRawVerificationOptions;
 	}
 }

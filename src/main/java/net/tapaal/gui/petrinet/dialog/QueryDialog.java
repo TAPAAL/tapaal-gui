@@ -4782,12 +4782,19 @@ public class QueryDialog extends JPanel {
         String rawVerificationOptions = verifytapnOptions.toString();
 
         if (verifytapnOptions.enabledOverApproximation() || verifytapnOptions.enabledUnderApproximation()) {
-            if (verifytapnOptions.kBoundPresentInRawVerificationOptions()) {
+            if (verifytapnOptions.kBoundPresentInRawVerification() && verifytapnOptions.tracePresentInRawVerification()) {
+                JOptionPane.showMessageDialog(QueryDialog.this, "Because over/under-approximation is active, the specified k-bound and trace in the custom verification options will be overwritten.", "Warning", JOptionPane.WARNING_MESSAGE);
+            } else if (verifytapnOptions.kBoundPresentInRawVerification()) {
                 JOptionPane.showMessageDialog(QueryDialog.this,
                 "Because over/under-approximation is active, the specified k-bound in the custom verification options will be overwritten.", "Warning",
                             JOptionPane.WARNING_MESSAGE);
+            } else if (verifytapnOptions.tracePresentInRawVerification()) {
+                JOptionPane.showMessageDialog(QueryDialog.this,
+                "Because over/under-approximation is active, the specified trace in the custom verification options will be overwritten.", "Warning",
+                            JOptionPane.WARNING_MESSAGE);
             }
-            rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "");
+
+            rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k|--trace|-t) +\\d*", ""); 
         }
         rawVerificationOptionsTextArea.setText(rawVerificationOptions.trim());
     }
