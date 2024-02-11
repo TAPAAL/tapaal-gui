@@ -191,7 +191,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -210,7 +210,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -229,7 +229,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -250,7 +250,7 @@
             <subterm>
               <predecessor>
                 <subterm>
-                  <variable refvariable="varx"/>
+                  <variable refvariable="x"/>
                 </subterm>
               </predecessor>
             </subterm>
@@ -273,7 +273,7 @@
             <subterm>
               <predecessor>
                 <subterm>
-                  <variable refvariable="varx"/>
+                  <variable refvariable="x"/>
                 </subterm>
               </predecessor>
             </subterm>
@@ -294,7 +294,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -313,7 +313,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -332,7 +332,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -351,7 +351,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -372,7 +372,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -392,7 +392,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -411,7 +411,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -430,7 +430,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -449,7 +449,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varx"/>
+              <variable refvariable="x"/>
             </subterm>
           </numberof>
         </structure>
@@ -470,7 +470,7 @@
                   </numberconstant>
                 </subterm>
                 <subterm>
-                  <variable refvariable="varx"/>
+                  <variable refvariable="x"/>
                 </subterm>
               </numberof>
             </subterm>
@@ -484,7 +484,7 @@
                 <subterm>
                   <predecessor>
                     <subterm>
-                      <variable refvariable="varx"/>
+                      <variable refvariable="x"/>
                     </subterm>
                   </predecessor>
                 </subterm>
@@ -513,7 +513,7 @@
             <feconstant id="Id5" name="Philo"/>
           </cyclicenumeration>
         </namedsort>
-        <variabledecl id="varx" name="x">
+        <variabledecl id="x" name="x">
           <usersort declaration="philo"/>
         </variabledecl>
       </declarations>

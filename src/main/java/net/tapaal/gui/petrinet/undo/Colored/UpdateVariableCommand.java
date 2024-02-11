@@ -6,7 +6,6 @@ import dk.aau.cs.model.CPN.Variable;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
 public class UpdateVariableCommand extends Command {
-
     private final Variable variable;
     private final String newName;
     private final String oldName;
@@ -27,6 +26,7 @@ public class UpdateVariableCommand extends Command {
     public void undo() {
         variable.setColorType(oldColorType);
         variable.setName(oldName);
+        variable.setId(oldName);
         listModel.updateName();
     }
 
@@ -34,7 +34,7 @@ public class UpdateVariableCommand extends Command {
     public void redo() {
         variable.setColorType(newColorType);
         variable.setName(newName);
+        variable.setId(newName);
         listModel.updateName();
-
     }
 }

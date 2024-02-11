@@ -116,6 +116,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             result.append(" --write-unfolded-queries ");
             result.append(unfoldedQueriesPath);
             result.append(" ");
+			result.append("--bindings ");
         }
         result.append(searchArg(searchOption));
 		result.append("--verification-method ");
