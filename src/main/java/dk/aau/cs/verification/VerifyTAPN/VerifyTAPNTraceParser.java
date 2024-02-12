@@ -2,6 +2,7 @@ package dk.aau.cs.verification.VerifyTAPN;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +14,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import dk.aau.cs.model.CPN.ColorType;
 
 import org.w3c.dom.*;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -40,7 +39,29 @@ public class VerifyTAPNTraceParser {
 	public TimedArcPetriNetTrace parseTrace(BufferedReader reader) {
 		TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
 
-        Document document = loadDocument(reader);
+		Document document = null;
+	
+		try {
+			StringBuilder sb = new StringBuilder();
+			String line;
+
+			while ((line = reader.readLine()) != null) {
+				if (line.contains("Trace")) continue;
+				sb.append(line);
+				sb.append(System.lineSeparator());
+			}
+
+			String xml = sb.toString();
+			document = loadDocument(xml);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
         if(document == null) return null;
 
@@ -106,7 +127,6 @@ public class VerifyTAPNTraceParser {
 	private TimedTransitionStep parseTransitionStep(Element element) {
 		TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
 		
-		
 		NodeList tokenNodes = element.getChildNodes();
 		List<TimedToken> consumedTokens = new ArrayList<TimedToken>(tokenNodes.getLength());
 		for(int i = 0; i < tokenNodes.getLength(); i++){
@@ -127,42 +147,17 @@ public class VerifyTAPNTraceParser {
 		return new TimeDelayStep(new BigDecimal(element.getTextContent()));
 	}
 
-	private Document loadDocument(BufferedReader reader) {
+	private Document loadDocument(String xml) {
 		try {
-		    boolean shouldSkip = false;
-            // We need to reset the buffer if we a trace-list:
-            reader.mark(10000);
-            String line = reader.readLine();
-            try {
-                if(line.equals("Trace")) shouldSkip = true;
-                reader.reset();
-            } catch (NullPointerException e) {
-                return null;
-            }
-
-            if(shouldSkip) reader.readLine(); // first line is "Trace:"
+			// Check if valid xml
+			int startTrace = xml.indexOf("<trace>");
+			int startTraceList = xml.indexOf("<trace-list>");
+			if (startTrace == -1 && startTraceList == -1) return null;
 
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			builder.setErrorHandler(new ErrorHandler() {
-				
-				@Override
-				public void warning(SAXParseException exception) throws SAXException {
-					throw exception;
-				}
-				
-				@Override
-				public void fatalError(SAXParseException exception) throws SAXException {
-					throw exception;
-				}
-				
-				@Override
-				public void error(SAXParseException exception) throws SAXException {
-					throw exception;
-				}
-			});
-			return builder.parse(new InputSource(reader));
+			return builder.parse(new InputSource(new StringReader(xml)));
 		} catch (ParserConfigurationException | IOException | SAXException e) {
-            e.printStackTrace();
+			e.printStackTrace();
 			return null;
 		}
 	}

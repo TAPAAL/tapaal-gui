@@ -183,12 +183,11 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	public String toString() {
 		StringBuilder result = new StringBuilder();
     
-        if (useRawVerification) {
-            return result.append(rawVerificationOptions).toString();
-        }
+        if (useRawVerification && rawVerificationOptions != null) {
+			return rawVerificationString(rawVerificationOptions, traceMap.get(traceOption));
+		}
 
-		result.append("--k-bound ");
-		result.append(extraTokens+tokensInModel);
+		result.append(kBoundArg());
 
         var traceSwitch =traceMap.get(traceOption) ;
         if (traceSwitch != null) {
