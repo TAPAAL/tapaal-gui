@@ -1757,10 +1757,8 @@ public class QueryDialog extends JPanel {
             existsDiamond.setSelected(true);
         } else if (queryToCreateFrom.getProperty() instanceof TCTLEGNode) {
             existsBox.setSelected(true);
-            noApproximationEnable.setSelected(true);
         } else if (queryToCreateFrom.getProperty() instanceof TCTLAFNode) {
             forAllDiamond.setSelected(true);
-            noApproximationEnable.setSelected(true);
         } else if (queryToCreateFrom.getProperty() instanceof TCTLAGNode) {
             forAllBox.setSelected(true);
         }
