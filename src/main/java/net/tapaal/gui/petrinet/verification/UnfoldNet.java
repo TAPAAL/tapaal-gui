@@ -325,6 +325,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
             if (!netTooBig) {
                 messenger.displayInfoMessage("Unfolding was interrupted by the user", "Unfolding Cancelled");
+            } else {
+                netTooBig = false;
             }
         }
     }
