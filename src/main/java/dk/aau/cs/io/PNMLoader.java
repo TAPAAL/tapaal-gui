@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -39,6 +40,7 @@ import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.Constants;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
@@ -73,11 +75,16 @@ public class PNMLoader {
     }
 
     public LoadedModel load(File file) throws FormatException{
-        try{
+        try {
             return load(new FileInputStream(file));
         } catch (FileNotFoundException e){
             return null;
         } catch (NullPointerException e){
+            if (!isNetDrawable()) {
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The unfolded net is too large to be loaded");
+                return null;
+            }
+
             throw new FormatException("the PNML file cannot be parsed due to syntax errors", e);
         }
     }
@@ -551,12 +558,8 @@ public class PNMLoader {
         return tempArc;
     }
 
-    private boolean isNetDrawable() throws FormatException {
-        if (netSize <= maxNetSize) {
-            return true;
-        }
-
-        throw new FormatException("The net is too big to be drawn.");
+    private boolean isNetDrawable() {
+        return netSize <= maxNetSize;
     }
 
     Node getFirstDirectChild(Node parent, String tagName){
