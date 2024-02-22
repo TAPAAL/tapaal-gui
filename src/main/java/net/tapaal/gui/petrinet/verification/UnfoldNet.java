@@ -52,9 +52,10 @@ public class UnfoldNet extends SwingWorker<String, Void> {
     protected final boolean partition;
     protected final boolean computeColorFixpoint;
     protected final boolean symmetricVars;
-
+    
     //if the unfolded net is too big, do not try to load it
     private final int maxNetSize = 4000;
+    private boolean netTooBig = false;
 
     public UnfoldNet(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
         super();
@@ -169,6 +170,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         if(netSize > maxNetSize){
             //We make a thread so the workers doesn't cancel itself before showing the dialog
             new Thread(() -> JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The unfolded net is too large to be loaded")).start();
+            netTooBig = true;
             cancel(true);
             return null;
         }
@@ -318,8 +320,13 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
         } else {
             modelChecker.kill();
-            messenger.displayInfoMessage("Unfolding was interrupted by the user", "Unfolding Cancelled");
 
+            if (netTooBig) {
+                netTooBig = false;
+                return;
+            }
+
+            messenger.displayInfoMessage("Unfolding was interrupted by the user", "Unfolding Cancelled");
         }
     }
     void showErrorMessage(String error){
