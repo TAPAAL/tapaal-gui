@@ -189,14 +189,8 @@ public class AnnotationNote extends Note {
 
 		guiDialog.add(new AnnotationPanel(this));
 		guiDialog.setMinimumSize(new Dimension(300, 200));
+		
 		// Make window fit contents' preferred size
-		guiDialog.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				if(isFirstEdit) {
-					getParent().getGuiModel().removePetriNetObject(AnnotationNote.this);
-				}
-			}
-		});
 		guiDialog.pack();
 
 		// Move window to the middle of the screen
