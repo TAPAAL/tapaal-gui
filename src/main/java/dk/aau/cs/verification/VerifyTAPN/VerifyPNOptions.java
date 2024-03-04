@@ -92,8 +92,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 
         if(unfold && !useRawVerification) {
             try {
-                unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
-                unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+                unfoldedModelPath = "\"" + File.createTempFile("unfolded-", ".pnml").getAbsolutePath() + "\"";
+                unfoldedQueriesPath = "\"" + File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath() + "\"";
             } catch (IOException e) {
                 new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
             }
@@ -203,7 +203,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		case AGGRESSIVE:
 			result.append(" --reduction 1 ");
 			if(reducedModelPath != null && !reducedModelPath.isEmpty()){
-                result.append(" --write-reduced " +reducedModelPath);
+                result.append(" --write-reduced " + reducedModelPath);
             }
 
 			break;

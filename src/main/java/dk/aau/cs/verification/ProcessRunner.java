@@ -65,7 +65,7 @@ public class ProcessRunner {
 		startTimeMs = System.currentTimeMillis();
 		
 		try {
-			Logger.log("Running: "+ file + " " + arguments);
+			Logger.log("Running: "+ "\"" + file + "\"" + " " + arguments);
 			process = Runtime.getRuntime().exec(getCmdArray());
 			MemoryMonitor.attach(process);
 		} catch (IOException e1) {
