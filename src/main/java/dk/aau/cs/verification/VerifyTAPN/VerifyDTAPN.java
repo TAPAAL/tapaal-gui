@@ -397,13 +397,13 @@ public class VerifyDTAPN implements ModelChecker{
 		String queryString = "";
 	    if (options instanceof VerifyDTAPNOptions && (((VerifyDTAPNOptions) options).getWorkflowMode() == WorkflowMode.NOT_WORKFLOW ||
             ((VerifyDTAPNOptions) options).getWorkflowMode() == null)) {
-			queryString = ' ' + queryFile;
+			queryString = ' ' + "\"" + queryFile + "\"";
 		}
-        return options.toString() + ' ' + modelFile + queryString;
+        return options.toString() + ' ' + "\"" + modelFile + "\"" + queryString;
 	}
 
     private String createArgumentString(String modelFile, String queryFile, String options) {
-        return options + ' ' + modelFile + ' ' + queryFile;
+        return options + ' ' + "\"" + modelFile + "\"" + ' ' + "\"" + queryFile + "\"";
     }
 
 	private String readOutput(BufferedReader reader) {
