@@ -387,11 +387,11 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-        return options.toString() + ' ' + modelFile + ' ' + queryFile;
+        return options.toString() + ' ' + "\"" + modelFile + "\"" + ' ' + "\"" + queryFile + "\"";
 	}
 
     private String createArgumentString(String modelFile, String queryFile, String options) {
-	    return options + ' ' + modelFile + ' ' + queryFile;
+	    return options + ' ' + "\"" + modelFile + "\""  + ' ' + "\"" + queryFile + "\"";
     }
 	
 	private String readOutput(BufferedReader reader) {
