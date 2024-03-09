@@ -112,9 +112,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         if(unfold && trace() != TraceOption.NONE)
         {
             result.append(writeUnfolded());
-			result.append("\"");
-            result.append(unfoldedQueriesPath);
-            result.append("\"");
+
 			result.append(" --bindings ");
         }
         result.append(searchArg(searchOption));

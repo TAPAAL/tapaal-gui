@@ -86,10 +86,10 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
     private String writeUnfolded() {
         String os = System.getProperty("os.name");
         if (os.toLowerCase().contains("win")) {
-            return " --write-unfolded-queries " + "\"" + queryOut + "\"" + " --write-unfolded-net " + "\"" + modelOut + "\"";
+            return "--write-unfolded-queries " + "\"" + queryOut + "\"" + " --write-unfolded-net " + "\"" + modelOut + "\"";
         }
 
-        return " --write-unfolded-queries " + queryOut + " --write-unfolded-net " + modelOut;
+        return "--write-unfolded-queries " + queryOut + " --write-unfolded-net " + modelOut;
     }
 
     private static Map<TAPNQuery.SearchOption, String> createSearchOptionsMap() {

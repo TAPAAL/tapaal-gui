@@ -92,8 +92,15 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 
         if(unfold && !useRawVerification) {
             try {
-                unfoldedModelPath = "\"" + File.createTempFile("unfolded-", ".pnml").getAbsolutePath() + "\"";
-                unfoldedQueriesPath = "\"" + File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath() + "\"";
+                String os = System.getProperty("os.name");
+
+                if (os.toLowerCase().contains("win")) {
+                    unfoldedModelPath = "\"" + File.createTempFile("unfolded-", ".pnml").getAbsolutePath() + "\"";
+                    unfoldedQueriesPath = "\"" + File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath() + "\"";
+                } else {
+                    unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+                    unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+                }
             } catch (IOException e) {
                 new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
             }

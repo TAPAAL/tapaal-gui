@@ -137,7 +137,12 @@ public class Verifier {
     }
 
     public static String getReducedNetFilePath() {
-        return "\"" + reducedNetTempFile.getAbsolutePath() + "\"";
+        String os = System.getProperty("os.name");
+        if (os.toLowerCase().contains("win")) {
+            return "\"" + reducedNetTempFile.getAbsolutePath() + "\"";
+        }
+
+        return reducedNetTempFile.getAbsolutePath();
     }
 
     public static void analyzeKBound(TimedArcPetriNetNetwork tapnNetwork, TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k, JSpinner tokensControl, TAPNQuery query) {
