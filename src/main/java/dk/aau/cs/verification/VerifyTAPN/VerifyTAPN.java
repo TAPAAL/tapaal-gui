@@ -386,12 +386,18 @@ public class VerifyTAPN implements ModelChecker {
 		return trace;
 	}
 
-	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-        return options.toString() + ' ' + "\"" + modelFile + "\"" + ' ' + "\"" + queryFile + "\"";
-	}
+    private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
+        return createArgumentString(modelFile, queryFile, options.toString());
+    }
 
     private String createArgumentString(String modelFile, String queryFile, String options) {
-	    return options + ' ' + "\"" + modelFile + "\""  + ' ' + "\"" + queryFile + "\"";
+        String os = System.getProperty("os.name");
+
+        if (os.toLowerCase().contains("win")) {
+            return options + "\"" + modelFile + "\" \"" + queryFile + "\"";
+        }
+
+        return options + ' ' + modelFile + ' ' + queryFile;
     }
 	
 	private String readOutput(BufferedReader reader) {
