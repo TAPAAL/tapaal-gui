@@ -142,13 +142,9 @@ public class VerifyTAPNOptions extends VerificationOptions{
         if(unfoldedModelPath != null && unfoldedQueriesPath != null)
         {
             result.append(" --write-unfolded-net ");
-			result.append("\"");
             result.append(unfoldedModelPath);
-			result.append("\"");
             result.append(" --write-unfolded-queries ");
-			result.append("\"");
             result.append(unfoldedQueriesPath);
-			result.append("\"");
 			result.append(" --bindings ");
         }
 
