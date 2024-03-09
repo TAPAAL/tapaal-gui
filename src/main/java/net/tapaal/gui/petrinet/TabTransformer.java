@@ -324,12 +324,11 @@ public class TabTransformer {
     }
 
     public static String createUnfoldArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-        return options.toString() +
-            " " +
-            modelFile +
-            " " +
-            queryFile;
+        String os = System.getProperty("os.name");
+        if (os.toLowerCase().contains("win")) {
+            return options.toString() + "\"" + modelFile + "\" \"" + queryFile + "\"";
+        }
+
+        return options.toString() + ' ' + modelFile + ' ' + queryFile;
     }
-
-
 }

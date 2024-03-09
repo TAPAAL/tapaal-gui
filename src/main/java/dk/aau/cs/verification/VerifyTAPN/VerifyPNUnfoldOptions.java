@@ -62,10 +62,7 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
     public String toString() {
         StringBuilder result = new StringBuilder();
         //for now we don't want to do structural or query reductions, could be options later
-        result.append("--write-unfolded-queries ");
-        result.append(queryOut);
-        result.append(" --write-unfolded-net ");
-        result.append(modelOut);
+        result.append(writeUnfolded());
         result.append(" --search-strategy OverApprox --reduction 0 --query-reduction 0 --xml-queries 1");
         for(int i = 2; i <= numQueries; i++){
             result.append("," + i);
@@ -84,6 +81,15 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
         result.append("--bindings ");
 
         return result.toString();
+    }
+
+    private String writeUnfolded() {
+        String os = System.getProperty("os.name");
+        if (os.toLowerCase().contains("win")) {
+            return " --write-unfolded-queries " + "\"" + queryOut + "\"" + " --write-unfolded-net " + "\"" + modelOut + "\"";
+        }
+
+        return " --write-unfolded-queries " + queryOut + " --write-unfolded-net " + modelOut;
     }
 
     private static Map<TAPNQuery.SearchOption, String> createSearchOptionsMap() {

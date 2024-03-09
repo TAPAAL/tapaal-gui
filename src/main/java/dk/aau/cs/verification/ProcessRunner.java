@@ -65,7 +65,13 @@ public class ProcessRunner {
 		startTimeMs = System.currentTimeMillis();
 		
 		try {
-			Logger.log("Running: "+ "\"" + file + "\"" + " " + arguments);
+			String os = System.getProperty("os.name");
+			if (os.toLowerCase().contains("win")) {
+				Logger.log("Running: "+ "\"" + file + "\"" + " " + arguments);
+			} else {
+				Logger.log("Running: "+ file + " " + arguments);
+			}
+
 			process = Runtime.getRuntime().exec(getCmdArray());
 			MemoryMonitor.attach(process);
 		} catch (IOException e1) {

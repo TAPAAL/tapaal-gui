@@ -111,11 +111,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         result.append(traceArg(traceOption));
         if(unfold && trace() != TraceOption.NONE)
         {
-            result.append(" --write-unfolded-net ");
-			result.append("\"");
-            result.append(unfoldedModelPath);
-			result.append("\"");
-            result.append(" --write-unfolded-queries ");
+            result.append(writeUnfolded());
 			result.append("\"");
             result.append(unfoldedQueriesPath);
             result.append("\"");
@@ -144,6 +140,15 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		}
 
 		return result.toString();
+	}
+
+	private String writeUnfolded() {
+		String os = System.getProperty("os.name");
+		if (os.toLowerCase().contains("win")) {
+			return " --write-unfolded-queries " + "\"" + unfoldedQueriesPath + "\"" + " --write-unfolded-net " + "\"" + unfoldedModelPath + "\"";
+		}
+
+		return " --write-unfolded-queries " + unfoldedQueriesPath + " --write-unfolded-net " + unfoldedModelPath + ' ';
 	}
 
 	public boolean timeDarts() {
