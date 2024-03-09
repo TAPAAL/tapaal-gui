@@ -312,8 +312,6 @@ public class VerifyPN implements ModelChecker {
 
     private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws IOException {
         ((VerifyTAPNOptions) options).setTokensInModel(model.value1().getNumberOfTokensInNet()); // TODO: get rid of me
-        System.out.println(exportedModel.modelFile());
-        System.out.println(createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
         runner = new ProcessRunner(verifypnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
         runner.run();
 
