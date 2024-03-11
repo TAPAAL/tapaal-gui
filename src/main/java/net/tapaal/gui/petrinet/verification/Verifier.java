@@ -3,6 +3,8 @@ package net.tapaal.gui.petrinet.verification;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
+import com.sun.jna.Platform;
+
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -137,8 +139,7 @@ public class Verifier {
     }
 
     public static String getReducedNetFilePath() {
-        String os = System.getProperty("os.name");
-        if (os.toLowerCase().contains("win")) {
+        if (Platform.isWindows()) {
             return "\"" + reducedNetTempFile.getAbsolutePath() + "\"";
         }
 

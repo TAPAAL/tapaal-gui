@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 
+import com.sun.jna.Platform;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.util.MemoryMonitor;
 
@@ -65,8 +66,7 @@ public class ProcessRunner {
 		startTimeMs = System.currentTimeMillis();
 		
 		try {
-			String os = System.getProperty("os.name");
-			if (os.toLowerCase().contains("win")) {
+			if (Platform.isWindows()) {
 				Logger.log("Running: "+ "\"" + file + "\"" + " " + arguments);
 			} else {
 				Logger.log("Running: "+ file + " " + arguments);

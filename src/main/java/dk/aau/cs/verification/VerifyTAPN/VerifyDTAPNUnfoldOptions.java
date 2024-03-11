@@ -1,5 +1,6 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import com.sun.jna.Platform;
 import dk.aau.cs.verification.VerificationOptions;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 
@@ -65,8 +66,7 @@ public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
     }
 
     private String writeUnfolded() {
-        String os = System.getProperty("os.name");
-        if (os.toLowerCase().contains("win")) {
+        if (Platform.isWindows()) {
             return " --write-unfolded-queries " + "\"" + queryOut + "\"" + " --write-unfolded-net " + "\"" + modelOut + "\"";
         }
 

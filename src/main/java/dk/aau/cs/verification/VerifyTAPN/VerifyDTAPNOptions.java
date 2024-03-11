@@ -1,5 +1,6 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import com.sun.jna.Platform;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
@@ -141,8 +142,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	}
 
 	private String writeUnfolded() {
-		String os = System.getProperty("os.name");
-		if (os.toLowerCase().contains("win")) {
+		if (Platform.isWindows()) {
 			return " --write-unfolded-queries " + "\"" + unfoldedQueriesPath + "\"" + " --write-unfolded-net " + "\"" + unfoldedModelPath + "\"";
 		}
 

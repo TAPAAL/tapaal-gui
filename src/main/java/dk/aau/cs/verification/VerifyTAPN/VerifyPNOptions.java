@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import com.sun.jna.Platform;
+
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
@@ -90,11 +92,9 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         this.useRawVerification = useRawVerification;
         this.rawVerificationOptions = rawVerificationOptions;
 
-        if(unfold && !useRawVerification) {
+        if (unfold && !useRawVerification) {
             try {
-                String os = System.getProperty("os.name");
-
-                if (os.toLowerCase().contains("win")) {
+                if (Platform.isWindows()) {
                     unfoldedModelPath = "\"" + File.createTempFile("unfolded-", ".pnml").getAbsolutePath() + "\"";
                     unfoldedQueriesPath = "\"" + File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath() + "\"";
                 } else {

@@ -1,5 +1,6 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import com.sun.jna.Platform;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -404,8 +405,7 @@ public class VerifyDTAPN implements ModelChecker{
 	}
 
     private String createArgumentString(String modelFile, String queryFile, String options) {
-        String os = System.getProperty("os.name");
-        if (os.toLowerCase().contains("win")) {
+        if (Platform.isWindows()) {
             return options + "\"" + modelFile + "\" \"" + queryFile + "\"";
         }
 

@@ -24,6 +24,9 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
 import org.jetbrains.annotations.Nullable;
+
+import com.sun.jna.Platform;
+
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -497,9 +500,7 @@ public class VerifyPN implements ModelChecker {
     }
 
     private String createArgumentString(String modelFile, String queryFile, String options) {
-        String os = System.getProperty("os.name");
-
-        if (os.toLowerCase().contains("win")) {
+        if (Platform.isWindows()) {
             return options + "\"" + modelFile + "\" \"" + queryFile + "\"";
         }
 

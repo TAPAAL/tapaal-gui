@@ -40,6 +40,8 @@ import dk.aau.cs.util.UnsupportedQueryException;
 
 import javax.swing.*;
 
+import com.sun.jna.Platform;
+
 public class VerifyTAPN implements ModelChecker {
 	private static final String NEED_TO_LOCATE_VERIFYTAPN_MSG = "TAPAAL needs to know the location of the file verifytapn.\n\n"
 		+ "Verifytapn is a part of the TAPAAL distribution and it is\n"
@@ -391,9 +393,7 @@ public class VerifyTAPN implements ModelChecker {
     }
 
     private String createArgumentString(String modelFile, String queryFile, String options) {
-        String os = System.getProperty("os.name");
-
-        if (os.toLowerCase().contains("win")) {
+        if (Platform.isWindows()) {
             return options + "\"" + modelFile + "\" \"" + queryFile + "\"";
         }
 

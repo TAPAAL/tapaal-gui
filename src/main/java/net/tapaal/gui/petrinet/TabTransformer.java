@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import com.sun.jna.Platform;
+
 public class TabTransformer {
 
     static public void removeTimingInformation(PetriNetTab tab){
@@ -324,8 +326,7 @@ public class TabTransformer {
     }
 
     public static String createUnfoldArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-        String os = System.getProperty("os.name");
-        if (os.toLowerCase().contains("win")) {
+        if (Platform.isWindows()) {
             return options.toString() + "\"" + modelFile + "\" \"" + queryFile + "\"";
         }
 

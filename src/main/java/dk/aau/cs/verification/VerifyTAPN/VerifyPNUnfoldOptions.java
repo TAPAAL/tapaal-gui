@@ -6,6 +6,8 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sun.jna.Platform;
+
 public class VerifyPNUnfoldOptions extends VerificationOptions {
 
     private static final Map<TAPNQuery.SearchOption, String> searchMap = createSearchOptionsMap();
@@ -84,8 +86,7 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
     }
 
     private String writeUnfolded() {
-        String os = System.getProperty("os.name");
-        if (os.toLowerCase().contains("win")) {
+        if (Platform.isWindows()) {
             return "--write-unfolded-queries " + "\"" + queryOut + "\"" + " --write-unfolded-net " + "\"" + modelOut + "\"";
         }
 
