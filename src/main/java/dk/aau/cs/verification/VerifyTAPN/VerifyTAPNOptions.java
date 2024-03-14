@@ -145,8 +145,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
             result.append(unfoldedModelPath);
             result.append(" --write-unfolded-queries ");
             result.append(unfoldedQueriesPath);
-            result.append(" ");
-			result.append("--bindings ");
+			result.append(" --bindings ");
         }
 
 		result.append(kBoundArg());

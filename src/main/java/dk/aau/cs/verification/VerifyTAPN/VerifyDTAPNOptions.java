@@ -1,5 +1,6 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import com.sun.jna.Platform;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
@@ -111,12 +112,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         result.append(traceArg(traceOption));
         if(unfold && trace() != TraceOption.NONE)
         {
-            result.append(" --write-unfolded-net ");
-            result.append(unfoldedModelPath);
-            result.append(" --write-unfolded-queries ");
-            result.append(unfoldedQueriesPath);
-            result.append(" ");
-			result.append("--bindings ");
+            result.append(writeUnfolded());
+
+			result.append(" --bindings ");
         }
         result.append(searchArg(searchOption));
 		result.append("--verification-method ");
@@ -141,6 +139,14 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		}
 
 		return result.toString();
+	}
+
+	private String writeUnfolded() {
+		if (Platform.isWindows()) {
+			return " --write-unfolded-queries " + "\"" + unfoldedQueriesPath + "\"" + " --write-unfolded-net " + "\"" + unfoldedModelPath + "\"";
+		}
+
+		return " --write-unfolded-queries " + unfoldedQueriesPath + " --write-unfolded-net " + unfoldedModelPath + ' ';
 	}
 
 	public boolean timeDarts() {

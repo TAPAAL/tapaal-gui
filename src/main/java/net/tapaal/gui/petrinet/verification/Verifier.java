@@ -3,6 +3,8 @@ package net.tapaal.gui.petrinet.verification;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
+import com.sun.jna.Platform;
+
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -137,6 +139,10 @@ public class Verifier {
     }
 
     public static String getReducedNetFilePath() {
+        if (Platform.isWindows()) {
+            return "\"" + reducedNetTempFile.getAbsolutePath() + "\"";
+        }
+
         return reducedNetTempFile.getAbsolutePath();
     }
 
@@ -245,7 +251,7 @@ public class Verifier {
         if (tapnNetwork != null) {
             RunVerificationBase thread;
             if (reducedNetTempFile != null) {
-                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, reducedNetTempFile.getAbsolutePath(), onlyCreateReducedNet);
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, getReducedNetFilePath(), onlyCreateReducedNet);
             } else {
                 thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
             }
@@ -284,7 +290,7 @@ public class Verifier {
                 query.isUnderApproximationEnabled(),
                 query.approximationDenominator(),
                 query.isStubbornReductionEnabled(),
-                reducedNetTempFile.getAbsolutePath(),
+                getReducedNetFilePath(),
                 query.usePartitioning(),
                 query.useColorFixpoint(),
                 isColored,// Unfold net
@@ -306,7 +312,7 @@ public class Verifier {
                 query.isSiphontrapEnabled(),
                 query.isQueryReductionEnabled() ? TAPNQuery.QueryReductionTime.UnlimitedTime : TAPNQuery.QueryReductionTime.NoTime,
                 query.isStubbornReductionEnabled(),
-                reducedNetTempFile.getAbsolutePath(),
+                getReducedNetFilePath(),
                 query.isTarOptionEnabled(),
                 query.isTarjan(),
                 isColored,
