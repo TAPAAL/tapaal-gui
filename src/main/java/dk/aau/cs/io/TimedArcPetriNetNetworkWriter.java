@@ -24,6 +24,8 @@ import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.HyperLTLQueryVisitor;
+import dk.aau.cs.pddl.Model;
+import dk.aau.cs.pddl.PddlStringifier;
 import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
@@ -89,6 +91,19 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         this.constants = constants;
         writeTACPN = new writeTACPN(network);
         this.lens = lens;
+
+        var planningTask = new Model();
+        planningTask.parse(
+            this.network,
+            this.templates,
+            this.queries,
+            this.constants,
+            this.lens
+        );
+
+        var stringifier = new PddlStringifier(planningTask);
+        var pddl = stringifier.buildModel();
+        System.out.println(pddl);
     }
 	
 	public ByteArrayOutputStream savePNML() throws ParserConfigurationException, DOMException, TransformerException {
