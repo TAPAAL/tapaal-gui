@@ -6,6 +6,7 @@ import java.awt.event.*;
 
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.TAPAAL;
+import pipe.gui.canvas.Grid;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
@@ -198,12 +199,11 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	 *            Double value for X-axis position
 	 */
     public void setOriginalX(int positionXInput) {
-        originalX = positionXInput;
-        positionX = Zoomer.getZoomedValue(positionXInput, getZoom());
+        originalX = Grid.align(positionXInput, 100);
+        positionX = Zoomer.getZoomedValue(originalX, getZoom());
     }
     public void setPositionX(int positionXInput) {
-        positionX = positionXInput;
-        originalX = Zoomer.getUnzoomedValue(positionX, getZoom());
+        setOriginalX(Zoomer.getUnzoomedValue(positionXInput, getZoom()));
     }
 
 	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20
@@ -214,12 +214,11 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	 *            Double value for Y-axis position
 	 */
 	public void setOriginalY(int positionYInput) {
-        originalY = positionYInput;
-        positionY = Zoomer.getZoomedValue(positionYInput, getZoom());
+        originalY = Grid.align(positionYInput, 100);
+        positionY = Zoomer.getZoomedValue(originalY, getZoom());
 	}
     public void setPositionY(int positionYInput) {
-        positionY = positionYInput;
-        originalY = Zoomer.getUnzoomedValue(positionY, getZoom());
+        setOriginalY(Zoomer.getUnzoomedValue(positionYInput, getZoom()));
     }
 
 	//XXX: pushed down from Placetransition object, might be dublicated //kyrke 2019-09-20

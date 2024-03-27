@@ -139,7 +139,7 @@
             <subterm>
               <inequality>
                 <subterm>
-                  <variable refvariable="vari"/>
+                  <variable refvariable="i"/>
                 </subterm>
                 <subterm>
                   <useroperator declaration="process0"/>
@@ -149,10 +149,10 @@
             <subterm>
               <inequality>
                 <subterm>
-                  <variable refvariable="varx"/>
+                  <variable refvariable="x"/>
                 </subterm>
                 <subterm>
-                  <variable refvariable="vary"/>
+                  <variable refvariable="y"/>
                 </subterm>
               </inequality>
             </subterm>
@@ -180,7 +180,7 @@
                     <subterm>
                       <successor>
                         <subterm>
-                          <variable refvariable="varx"/>
+                          <variable refvariable="x"/>
                         </subterm>
                       </successor>
                     </subterm>
@@ -201,7 +201,7 @@
                       <useroperator declaration="process5"/>
                     </subterm>
                     <subterm>
-                      <variable refvariable="varx"/>
+                      <variable refvariable="x"/>
                     </subterm>
                   </tuple>
                 </subterm>
@@ -232,7 +232,7 @@
                       <useroperator declaration="process0"/>
                     </subterm>
                     <subterm>
-                      <variable refvariable="varx"/>
+                      <variable refvariable="x"/>
                     </subterm>
                   </tuple>
                 </subterm>
@@ -251,7 +251,7 @@
                       <useroperator declaration="process5"/>
                     </subterm>
                     <subterm>
-                      <variable refvariable="varx"/>
+                      <variable refvariable="x"/>
                     </subterm>
                   </tuple>
                 </subterm>
@@ -279,10 +279,10 @@
                 <subterm>
                   <tuple>
                     <subterm>
-                      <variable refvariable="vari"/>
+                      <variable refvariable="i"/>
                     </subterm>
                     <subterm>
-                      <variable refvariable="vary"/>
+                      <variable refvariable="y"/>
                     </subterm>
                   </tuple>
                 </subterm>
@@ -300,12 +300,12 @@
                     <subterm>
                       <predecessor>
                         <subterm>
-                          <variable refvariable="vari"/>
+                          <variable refvariable="i"/>
                         </subterm>
                       </predecessor>
                     </subterm>
                     <subterm>
-                      <variable refvariable="vary"/>
+                      <variable refvariable="y"/>
                     </subterm>
                   </tuple>
                 </subterm>
@@ -333,10 +333,10 @@
                 <subterm>
                   <tuple>
                     <subterm>
-                      <variable refvariable="vari"/>
+                      <variable refvariable="i"/>
                     </subterm>
                     <subterm>
-                      <variable refvariable="varx"/>
+                      <variable refvariable="x"/>
                     </subterm>
                   </tuple>
                 </subterm>
@@ -354,12 +354,12 @@
                     <subterm>
                       <predecessor>
                         <subterm>
-                          <variable refvariable="vari"/>
+                          <variable refvariable="i"/>
                         </subterm>
                       </predecessor>
                     </subterm>
                     <subterm>
-                      <variable refvariable="vary"/>
+                      <variable refvariable="y"/>
                     </subterm>
                   </tuple>
                 </subterm>
@@ -395,13 +395,13 @@
             <usersort declaration="process"/>
           </productsort>
         </namedsort>
-        <variabledecl id="vari" name="i">
+        <variabledecl id="i" name="i">
           <usersort declaration="process"/>
         </variabledecl>
-        <variabledecl id="varx" name="x">
+        <variabledecl id="x" name="x">
           <usersort declaration="process"/>
         </variabledecl>
-        <variabledecl id="vary" name="y">
+        <variabledecl id="y" name="y">
           <usersort declaration="process"/>
         </variabledecl>
       </declarations>

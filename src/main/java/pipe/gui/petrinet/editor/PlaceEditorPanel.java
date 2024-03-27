@@ -127,6 +127,7 @@ public class PlaceEditorPanel extends JPanel {
         initColorInvariantPanel();
         initTokensPanel();
         setInitialComboBoxValue();
+        
         writeTokensToList(place.underlyingPlace());
         setColoredTimeInvariants(place.underlyingPlace());
 
@@ -747,7 +748,7 @@ public class PlaceEditorPanel extends JPanel {
             } else {
                 place.underlyingPlace().resetNumberOfTokensColor();
             }
-
+            
             for (int i = 0; i < timeConstraintListModel.size(); i++) {
                 ctiList.add(timeConstraintListModel.get(i));
             }
@@ -1288,6 +1289,7 @@ public class PlaceEditorPanel extends JPanel {
     }
 
     private void setColoredTimeInvariants(TimedPlace tp) {
+        timeConstraintListModel.clear();
         for (ColoredTimeInvariant timeInvariant : tp.getCtiList()) {
             timeConstraintListModel.addElement(timeInvariant);
         }

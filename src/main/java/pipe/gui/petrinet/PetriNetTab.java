@@ -1592,8 +1592,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         for (PetriNetObject object : petriNetObjects) {
             PlaceTransitionObject ptobject = (PlaceTransitionObject) object;
-            int x = Grid.getModifiedX(ptobject.getPositionX());
-            int y = Grid.getModifiedY(ptobject.getPositionY());
+            int x = Grid.align(ptobject.getPositionX(), drawingSurface.getZoom());
+            int y = Grid.align(ptobject.getPositionY(), drawingSurface.getZoom());
             Point point = new Point(x, y);
             Command command = new MovePlaceTransitionObjectCommand(ptobject, point, drawingSurface);
             command.redo();
@@ -2610,8 +2610,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             }
 
             // Calculate translation in mouse
-            int transX = Grid.getModifiedX(e.getX() - dragInit.x);
-            int transY = Grid.getModifiedY(e.getY() - dragInit.y);
+            int transX = Grid.align(e.getX() - dragInit.x, canvas.getZoom());
+            int transY = Grid.align(e.getY() - dragInit.y, canvas.getZoom());
             canvas.getSelectionObject().translateSelection(transX, transY);
 
             //Only register the actual distance and direction moved (in case of dragging past edge)

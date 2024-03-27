@@ -17,29 +17,38 @@ import pipe.gui.MessengerImpl;
 public class VerifyTAPNOptions extends VerificationOptions{
 
 	protected int tokensInModel;
+	protected boolean kBoundPresentInRawVerificationOptions;
+	protected boolean tracePresentInRawVerificationOptions;
 	private final boolean symmetry;
 	private final boolean discreteInclusion;
     private final boolean tarOption;
 	private InclusionPlaces inclusionPlaces;
+	private boolean useRawVerification;
+	private String rawVerificationOptions;
 	
 	//only used for boundedness analysis
 	private final boolean dontUseDeadPlaces = false;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
-	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateequationCheck, boolean discreteInclusion, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
+
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateequationCheck, boolean discreteInclusion, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, boolean useRawVerification, String rawVerificationOptions) {
 		this(extraTokens,traceOption, search, symmetry, useStateequationCheck, discreteInclusion, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator);
+		this.rawVerificationOptions = rawVerificationOptions;
+		this.useRawVerification = useRawVerification;
 	}
 
     public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateequationCheck, boolean discreteInclusion, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
         this(extraTokens,traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator, false);
     }
 
-    public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateequationCheck, boolean discreteInclusion, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, boolean tarOption, boolean isColor) {
+    public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useStateequationCheck, boolean discreteInclusion, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator, boolean tarOption, boolean isColor, boolean useRawVerification, String rawVerificationOptions) {
         this(extraTokens,traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator, tarOption);
 
-        if(isColor && trace() != TraceOption.NONE) // we only force unfolding when traces are involved
+		this.useRawVerification = useRawVerification;
+		this.rawVerificationOptions = rawVerificationOptions;
+
+        if(isColor && trace() != TraceOption.NONE && !useRawVerification) // we only force unfolding when traces are involved
         {
             try {
                 unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
@@ -81,16 +90,54 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	}
 
     public String kBoundArg() {
-        return " --k-bound " + (extraTokens+tokensInModel) + " ";
+        return "--k-bound " + kBound() + " ";
     }
-
+	
+	public int kBound() {
+		return (extraTokens + tokensInModel);
+	}
+	
     public String deadTokenArg() {
-        return dontUseDeadPlaces ? " --keep-dead-tokens " : "";
+		return dontUseDeadPlaces ? " --keep-dead-tokens " : "";
     }
+	
+	protected String rawVerificationString(String rawVerificationOptions, String traceArg) {
+		StringBuilder sb = new StringBuilder();
 
+		// TODO: temporary fix overriding k-bound and trace if using approximation with raw verification
+		kBoundPresentInRawVerificationOptions = rawVerificationOptions.contains("--k-bound") ||
+												rawVerificationOptions.contains("-k");
+		tracePresentInRawVerificationOptions = rawVerificationOptions.contains("--trace") ||
+												rawVerificationOptions.contains("-t");
+
+		if (enabledOverApproximation || enabledUnderApproximation) {
+			if (kBoundPresentInRawVerificationOptions) {
+				rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "$1 " + kBound());
+			}
+			
+			if (tracePresentInRawVerificationOptions) {
+				rawVerificationOptions = rawVerificationOptions.replaceAll("(--trace|-t) +\\d+", "$1 " + traceArg);
+			}
+		} 
+		
+		if (!kBoundPresentInRawVerificationOptions) {
+			sb.append(kBoundArg());
+		}
+		
+		if (!tracePresentInRawVerificationOptions) {
+			sb.append(traceArg);
+		}
+
+		return sb.append(rawVerificationOptions).toString();
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
+		
+		if (useRawVerification && rawVerificationOptions != null) {
+			return rawVerificationString(rawVerificationOptions, traceMap.get(traceOption));
+		}
 
         if(unfoldedModelPath != null && unfoldedQueriesPath != null)
         {
@@ -98,7 +145,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
             result.append(unfoldedModelPath);
             result.append(" --write-unfolded-queries ");
             result.append(unfoldedQueriesPath);
-            result.append(" ");
+			result.append(" --bindings ");
         }
 
 		result.append(kBoundArg());
@@ -111,6 +158,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		result.append(' ');
 		result.append(discreteInclusion ? " --inclusion-check 1" : "");
 		result.append(discreteInclusion ? " --inclusion-places " + generateDiscretePlacesList() : "");
+
 		return result.toString();
 	}
 
@@ -159,4 +207,11 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		this.inclusionPlaces = inclusionPlaces;
 	}
 
+	public boolean kBoundPresentInRawVerification() {
+		return kBoundPresentInRawVerificationOptions;
+	}
+
+	public boolean tracePresentInRawVerification() {
+		return tracePresentInRawVerificationOptions;
+	}
 }

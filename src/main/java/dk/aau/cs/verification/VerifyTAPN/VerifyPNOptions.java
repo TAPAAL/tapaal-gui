@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import com.sun.jna.Platform;
+
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
@@ -41,6 +43,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     private final boolean symmetricVars;
     private final boolean useTarjan;
     private final boolean useColoredReduction;
+    private boolean useRawVerification;
+    private String rawVerificationOptions;
 
     public VerifyPNOptions(
         int extraTokens,
@@ -64,7 +68,9 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean partition,
         boolean colorFixpoint,
         boolean useSymmetricVars,
-        boolean useColoredReduction
+        boolean useColoredReduction,
+        boolean useRawVerification,
+        String rawVerificationOptions
     ) {
 		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces(), enableOverApproximation, enableUnderApproximation, approximationDenominator, useTarOption);
 
@@ -83,11 +89,18 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		this.reducedModelPath = pathToReducedNet;
 		this.symmetricVars = useSymmetricVars;
 		this.useColoredReduction = useColoredReduction;
+        this.useRawVerification = useRawVerification;
+        this.rawVerificationOptions = rawVerificationOptions;
 
-        if(unfold) {
+        if (unfold && !useRawVerification) {
             try {
-                unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
-                unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+                if (Platform.isWindows()) {
+                    unfoldedModelPath = "\"" + File.createTempFile("unfolded-", ".pnml").getAbsolutePath() + "\"";
+                    unfoldedQueriesPath = "\"" + File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath() + "\"";
+                } else {
+                    unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+                    unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+                }
             } catch (IOException e) {
                 new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
             }
@@ -117,7 +130,35 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean colorFixpoint,
         boolean useSymmetricVars
     ) {
-        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false);
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false, true, null);
+    }
+
+    public VerifyPNOptions(
+        int extraTokens,
+        TraceOption traceOption,
+        SearchOption search,
+        boolean useOverApproximation,
+        ModelReduction modelReduction,
+        boolean enableOverApproximation,
+        boolean enableUnderApproximation,
+        int approximationDenominator,
+        QueryCategory queryCategory,
+        AlgorithmOption algorithmOption,
+        boolean siphontrap,
+        QueryReductionTime queryReduction,
+        boolean stubbornReduction,
+        String pathToReducedNet,
+        boolean useTarOption,
+        boolean useTarjan,
+        boolean colored,
+        boolean unfold,
+        boolean partition,
+        boolean colorFixpoint,
+        boolean useSymmetricVars,
+        boolean useRawVerification,
+        String rawVerificationOptions
+    ) {
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false, useRawVerification, rawVerificationOptions);
     }
 
     public VerifyPNOptions(
@@ -148,9 +189,12 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     @Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
+    
+        if (useRawVerification && rawVerificationOptions != null) {
+			return rawVerificationString(rawVerificationOptions, traceMap.get(traceOption));
+		}
 
-		result.append("--k-bound ");
-		result.append(extraTokens+tokensInModel);
+		result.append(kBoundArg());
 
         var traceSwitch =traceMap.get(traceOption) ;
         if (traceSwitch != null) {
@@ -166,7 +210,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		case AGGRESSIVE:
 			result.append(" --reduction 1 ");
 			if(reducedModelPath != null && !reducedModelPath.isEmpty()){
-                result.append(" --write-reduced " +reducedModelPath);
+                result.append(" --write-reduced " + reducedModelPath);
             }
 
 			break;
@@ -184,9 +228,12 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 			break;			
 		}
 
-        if(unfold){
-            String writeUnfoldedCMD = " --write-unfolded-net " +unfoldedModelPath + " --write-unfolded-queries " + unfoldedQueriesPath;
-            result.append(writeUnfoldedCMD);
+        if (unfold) {
+            result.append(" --write-unfolded-net ");
+            result.append(unfoldedModelPath);
+            result.append(" --write-unfolded-queries ");
+            result.append(unfoldedQueriesPath);
+            result.append(" --bindings ");
         }
 
 		if (this.queryCategory == QueryCategory.CTL){

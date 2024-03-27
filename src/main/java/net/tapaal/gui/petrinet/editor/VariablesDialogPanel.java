@@ -324,7 +324,7 @@ public class VariablesDialogPanel extends JPanel {
             cmd = new UpdateVariableCommand(variable, nameTextField.getText(), colorTypes.get(colorTypeComboBox.getSelectedIndex()), listModel);
         }
         else {
-            cmd = new AddVariableCommand(new Variable(nameTextField.getText(), "Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()),
+            cmd = new AddVariableCommand(new Variable(nameTextField.getText(), nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()),
                 network, listModel, network.variables().size());
             //listModel.addElement(new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()));
         }

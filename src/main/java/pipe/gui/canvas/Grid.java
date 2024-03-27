@@ -4,17 +4,9 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.geom.GeneralPath;
-import java.util.ArrayList;
 
-import net.tapaal.gui.petrinet.undo.Command;
-import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
 import pipe.gui.Constants;
-import pipe.gui.TAPAALGUI;
-import pipe.gui.petrinet.graphicElements.PetriNetObject;
-import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
-import pipe.gui.petrinet.undo.UndoManager;
 
 /**
  * @author Peter Kyme
@@ -88,19 +80,12 @@ public class Grid {
 		g2d.draw(gridDisplay);
 	}
 
-	public static int getModifiedX(double x) {
+	public static int align(int x, int zoom) {
 		if (!enabled) {
-			return (int) x;
+			return x;
 		}
-		return (int) (Math.round(x / gridSpacing) * gridSpacing);
-
+        double unzoomed = Zoomer.getUnzoomedValue(x, zoom);
+		double adjusted = Math.round(unzoomed / gridSpacing) * gridSpacing;
+        return Math.round(Zoomer.getZoomedValue(adjusted, zoom));
 	}
-
-	public static int getModifiedY(double y) {
-		if (!enabled) {
-			return (int) y;
-		}
-		return (int) (Math.round(y / gridSpacing) * gridSpacing);
-	}
-
 }

@@ -1,5 +1,6 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import com.sun.jna.Platform;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
@@ -22,6 +23,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private final boolean partition;
 	private final boolean colorFixpoint;
     private final boolean unfold;
+	private boolean useRawVerification;
+	private String rawVerificationOptions;
 
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(
@@ -39,9 +42,11 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean stubbornReduction,
             boolean partition,
             boolean colorFixpoint,
-            boolean unfoldNet
+            boolean unfoldNet,
+			boolean useRawVerification,
+			String rawVerificationOptions
 	) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet);
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
@@ -65,7 +70,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             String reducedModelPath,
             boolean partition,
             boolean colorFixpoint,
-            boolean unfoldNet
+            boolean unfoldNet,
+			boolean useRawVerification,
+			String rawVerificationOptions
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -78,7 +85,10 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		this.partition = partition;
 		this.colorFixpoint = colorFixpoint;
         this.unfold = unfoldNet;
-        if(unfold && trace() != TraceOption.NONE) // we only force unfolding when traces are involved
+		this.useRawVerification = useRawVerification;
+		this.rawVerificationOptions = rawVerificationOptions;
+
+        if(unfold && trace() != TraceOption.NONE && !useRawVerification) // we only force unfolding when traces are involved
         {
             try {
                 unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
@@ -92,17 +102,19 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
+	
+		if (useRawVerification && rawVerificationOptions != null) {
+			return rawVerificationString(rawVerificationOptions, traceArg(traceOption));
+		}
 
         result.append(kBoundArg());
         result.append(deadTokenArg());
         result.append(traceArg(traceOption));
-        if(trace() != TraceOption.NONE)
+        if(unfold && trace() != TraceOption.NONE)
         {
-            result.append(" --write-unfolded-net ");
-            result.append(unfoldedModelPath);
-            result.append(" --write-unfolded-queries ");
-            result.append(unfoldedQueriesPath);
-            result.append(" ");
+            result.append(writeUnfolded());
+
+			result.append(" --bindings ");
         }
         result.append(searchArg(searchOption));
 		result.append("--verification-method ");
@@ -127,6 +139,14 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		}
 
 		return result.toString();
+	}
+
+	private String writeUnfolded() {
+		if (Platform.isWindows()) {
+			return " --write-unfolded-queries " + "\"" + unfoldedQueriesPath + "\"" + " --write-unfolded-net " + "\"" + unfoldedModelPath + "\"";
+		}
+
+		return " --write-unfolded-queries " + unfoldedQueriesPath + " --write-unfolded-net " + unfoldedModelPath + ' ';
 	}
 
 	public boolean timeDarts() {

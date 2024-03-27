@@ -8,6 +8,7 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 public class TCTLAndListNode extends TCTLAbstractStateProperty {
 
 	private List<TCTLAbstractStateProperty> properties;
+	private boolean isSimpleProperty;
 
 	public void setProperties(List<TCTLAbstractStateProperty> properties) {
 		this.properties = properties;
@@ -61,7 +62,7 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public boolean isSimpleProperty() {
-		return false;
+		return isSimpleProperty;
 	}
 
 	@Override
@@ -76,11 +77,19 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 				s.append(" and ");
 			}
 
+			if (prop instanceof TCTLAndListNode) {
+				((TCTLAndListNode) prop).setSimpleProperty(isSimpleProperty);
+			}
+
 			s.append(prop.isSimpleProperty() ? prop.toString() : "(" + prop + ")");
 			firstTime = false;
 		}
 
 		return s.toString();
+	}
+	
+	public void setSimpleProperty(boolean isSimpleProperty) {
+		this.isSimpleProperty = isSimpleProperty;
 	}
 
 	@Override
@@ -138,13 +147,16 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public TCTLAbstractStateProperty copy() {
-		ArrayList<TCTLAbstractStateProperty> copy = new ArrayList<TCTLAbstractStateProperty>();
+		List<TCTLAbstractStateProperty> copy = new ArrayList<>();
 
 		for (TCTLAbstractStateProperty p : properties) {
 			copy.add(p.copy());
 		}
 
-		return new TCTLAndListNode(copy);
+		TCTLAndListNode andListNode = new TCTLAndListNode(copy);
+		andListNode.setSimpleProperty(isSimpleProperty());
+
+		return andListNode;
 	}
 
 	@Override

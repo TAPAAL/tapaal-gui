@@ -18,6 +18,7 @@ import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
+import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.MessengerImpl;
@@ -100,6 +101,11 @@ public class RunVerification extends RunVerificationBase {
                                 }
                             }
                             TAPAALGUI.getAnimator().setTrace(result.getTrace(), traceMap);
+                        }
+
+                        if (result.getUnfoldedTab() != null) {
+                            ColorBindingParser parser = new ColorBindingParser();
+                            parser.addBindings(result.getUnfoldedTab().getModel(), result.getRawOutput());
                         }
                     } else {
                         if ((

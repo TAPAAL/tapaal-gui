@@ -104,6 +104,10 @@ public class ColoredTimeInterval extends TimeInterval {
         return super.toString();
     }
 
+    public String getInterval(boolean displayConstantNames) {
+        return super.toString(displayConstantNames);
+    }
+
     @Override
     public boolean equals(Object o) {
         ColoredTimeInterval cti;
