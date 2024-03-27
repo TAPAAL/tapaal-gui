@@ -280,20 +280,6 @@ public class TabTransformer {
 
             }
         }
-
-        boolean showConvertWarning = false;
-        for (var query: tab.queries()) {
-            if (query.isOverApproximationEnabled() || query.isUnderApproximationEnabled()) {
-                query.setUseOverApproximationEnabled(false);
-                query.setUseUnderApproximationEnabled(false);
-                showConvertWarning = true;
-            }
-        }
-        if (showConvertWarning) {
-            new MessengerImpl().displayInfoMessage(
-                "Colored Petri nets do not support over/under approximation and the affected queries are modified so that this feature is disabled.\n" +
-                "Unsupported Query Option");
-        }
     }
 
     public static void unfoldTab(PetriNetTab oldTab, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
