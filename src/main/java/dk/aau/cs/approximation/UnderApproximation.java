@@ -1,6 +1,7 @@
 package dk.aau.cs.approximation;
 
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.Arc;
@@ -20,99 +21,87 @@ public class UnderApproximation implements ITAPNApproximation {
 		// Fix input arcs
 		List<TimedTransition> transitionsToDelete = new ArrayList<TimedTransition>();
 		
-		if (net.isColored()) {
+		for (TimedInputArc arc : net.inputArcs()) {
 			List<ColoredTimeInterval> newIntervals = new ArrayList<ColoredTimeInterval>();
+			for (ColoredTimeInterval interval : arc.getColorTimeIntervals()) {
+				ColoredTimeInterval newInterval = (ColoredTimeInterval)modifyIntervals(interval, approximationDenominator);
 
-			for (TimedInputArc arc : net.inputArcs()) {
-				for (ColoredTimeInterval interval : arc.getColorTimeIntervals()) {
-					ColoredTimeInterval newInterval = (ColoredTimeInterval)modifyIntervals(interval, approximationDenominator);
-
-					if (newInterval != null) {
-						newIntervals.add(newInterval);
-					} else if (!transitionsToDelete.contains(arc.destination())) {
-						transitionsToDelete.add(arc.destination());
-					}
-				}
-
-				arc.setColorTimeIntervals(newIntervals);
-			}
-		} else {
-			for (TimedInputArc arc : net.inputArcs()) {
-				 //Fix input arcs
-				TimeInterval oldInterval = arc.interval();
-				
-				TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
-				
-				//New interval can be null if lower bound surpassed upper bound in rounding
-				if (newInterval != null){
-					arc.setTimeInterval(newInterval);
-				}
-				else{
-					//If an arcs interval became invalid we need to delete it, as well as the destination transition and any other arcs that transition has
-					//otherwise we could enable behavior which is not allowed for under approximation
-					if(!transitionsToDelete.contains(arc.destination())){
-						transitionsToDelete.add(arc.destination());
-					}
+				if (newInterval != null) {
+					newIntervals.add(newInterval);
+				} else if (!transitionsToDelete.contains(arc.destination())) {
+					transitionsToDelete.add(arc.destination());
 				}
 			}
-		}
+			arc.setColorTimeIntervals(newIntervals);
 
-		if (net.isColored()) {
-			List<ColoredTimeInterval> newIntervals = new ArrayList<ColoredTimeInterval>();
-
-			for (TransportArc arc : net.transportArcs()) {
-				for (ColoredTimeInterval interval : arc.getColorTimeIntervals()) {
-					ColoredTimeInterval newInterval = (ColoredTimeInterval)modifyIntervals(interval, approximationDenominator);
-
-					if (newInterval != null) {
-						newIntervals.add(newInterval);
-					} else if (!transitionsToDelete.contains(arc.transition())) {
-						transitionsToDelete.add(arc.transition());
-					}
-				}
-
-				arc.setColorTimeIntervals(newIntervals);
-			}
-		} else {
-			for (TransportArc arc : net.transportArcs()) {
-				//fix transport arcs
-				TimeInterval oldInterval = arc.interval();
-				
-				TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
-				
-				//New interval can be null if lower bound surpassed upper bound in rounding
-				if (newInterval != null)
-					arc.setTimeInterval(newInterval);
-				else{
-					if(!transitionsToDelete.contains(arc.transition())){
-						transitionsToDelete.add(arc.transition());
-					}
-				}
-			}
-		}
-
-		for(TimedTransition transitionToDelete : transitionsToDelete){
-			if(guiModel != null){
-				deleteTransitionFromGuiModel(transitionToDelete, guiModel);
+			TimeInterval oldInterval = arc.interval();
+			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
+			
+			//New interval can be null if lower bound surpassed upper bound in rounding
+			if (newInterval != null){
+				arc.setTimeInterval(newInterval);
 			}
 			else{
+				//If an arcs interval became invalid we need to delete it, as well as the destination transition and any other arcs that transition has
+				//otherwise we could enable behavior which is not allowed for under approximation
+				if(!transitionsToDelete.contains(arc.destination())){
+					transitionsToDelete.add(arc.destination());
+				}
+			}
+		}
+
+		for (TransportArc arc : net.transportArcs()) {
+			List<ColoredTimeInterval> newIntervals = new ArrayList<ColoredTimeInterval>();
+			for (ColoredTimeInterval interval : arc.getColorTimeIntervals()) {
+				ColoredTimeInterval newInterval = (ColoredTimeInterval)modifyIntervals(interval, approximationDenominator);
+
+				if (newInterval != null) {
+					newIntervals.add(newInterval);
+				} else if (!transitionsToDelete.contains(arc.transition())) {
+					transitionsToDelete.add(arc.transition());
+				}
+			}
+			arc.setColorTimeIntervals(newIntervals);
+
+			TimeInterval oldInterval = arc.interval();
+			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
+			
+			//New interval can be null if lower bound surpassed upper bound in rounding
+			if (newInterval != null)
+				arc.setTimeInterval(newInterval);
+			else {
+				if(!transitionsToDelete.contains(arc.transition())){
+					transitionsToDelete.add(arc.transition());
+				}
+			}
+		}
+
+		for (TimedTransition transitionToDelete : transitionsToDelete) {
+			if (guiModel != null){
+				deleteTransitionFromGuiModel(transitionToDelete, guiModel);
+			} else {
 				deleteArcsFromTransition(transitionToDelete);
 			}
+			
 			transitionToDelete.delete();
 		}	
 		
 		// Fix invariants in places
-		for (TimedPlace place1 : net.places()) {
-			if ( ! (place1.invariant().upperBound() instanceof Bound.InfBound) && place1.invariant().upperBound().value() > 0) {					
-				TimeInvariant oldInvariant = place1.invariant();
-				
-				int newInvariantBound = (int) Math.floor(oldInvariant.upperBound().value() / (double)approximationDenominator);
-				if(newInvariantBound != 0){
-					place1.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound(newInvariantBound)));
+		for (TimedPlace place : net.places()) {
+			List<ColoredTimeInvariant> newInvariants = new ArrayList<ColoredTimeInvariant>();
+			for (ColoredTimeInvariant cti : place.getCtiList()) {
+				if (!(cti.upperBound() instanceof Bound.InfBound) && cti.upperBound().value() > 0) {
+					int newInvariantBound = (int)Math.ceil(cti.upperBound().value() / (double)approximationDenominator);
+					newInvariants.add(new ColoredTimeInvariant(cti.isUpperNonstrict(), new IntBound(newInvariantBound), cti.getColor()));
 				}
-				else{
-					place1.setInvariant(new TimeInvariant(true, new IntBound(0)));
-				}
+			}
+			place.setCtiList(newInvariants);
+
+			// Default age invariants
+			if (!(place.invariant().upperBound() instanceof Bound.InfBound) && place.invariant().upperBound().value() > 0) {					
+				TimeInvariant oldInvariant = place.invariant();
+				int newInvariantBound = (int)Math.floor(oldInvariant.upperBound().value() / (double)approximationDenominator);
+				place.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound(newInvariantBound)));
 			}
 		}
 	}

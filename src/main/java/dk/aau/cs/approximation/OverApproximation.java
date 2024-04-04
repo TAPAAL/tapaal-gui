@@ -27,56 +27,49 @@ import dk.aau.cs.verification.VerificationResult;
 public class OverApproximation implements ITAPNApproximation {
 	@Override
 	public void modifyTAPN(TimedArcPetriNet net, int approximationDenominator) {
-		// Fix input arcs
-		if (net.isColored()) {
+		// Fix input arcs		 
+		for (TimedInputArc arc : net.inputArcs()) {
 			List<ColoredTimeInterval> newIntervals = new ArrayList<ColoredTimeInterval>();
+			for (ColoredTimeInterval cti : arc.getColorTimeIntervals()) {
+				newIntervals.add((ColoredTimeInterval)modifyIntervals(cti, approximationDenominator));
+			}
+			arc.setColorTimeIntervals(newIntervals);
 
-			for (TimedInputArc arc : net.inputArcs()) {
-				for (ColoredTimeInterval interval :  arc.getColorTimeIntervals()) {
-					ColoredTimeInterval newInterval = (ColoredTimeInterval)modifyIntervals(interval, approximationDenominator);
-					newIntervals.add(newInterval);
-				}
-				arc.setColorTimeIntervals(newIntervals);
-			}
-		} else {
-			for (TimedInputArc arc : net.inputArcs()) {
-				TimeInterval oldInterval = arc.interval();
-				TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
-				
-				arc.setTimeInterval(newInterval);
-			}
+			TimeInterval oldInterval = arc.interval();
+			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
+			arc.setTimeInterval(newInterval);
 		}
-		 
+
 		// Fix transport arcs
-		if (net.isColored()) {
-			for (TransportArc arc : net.transportArcs()) {
-				List<ColoredTimeInterval> newIntervals = new ArrayList<ColoredTimeInterval>();
-				for (ColoredTimeInterval interval :  arc.getColorTimeIntervals()) {
-					ColoredTimeInterval newInterval = (ColoredTimeInterval)modifyIntervals(interval, approximationDenominator);
-					newIntervals.add(newInterval);
-				}
-				arc.setColorTimeIntervals(newIntervals);
+		for (TransportArc arc : net.transportArcs()) {
+			List<ColoredTimeInterval> newIntervals = new ArrayList<ColoredTimeInterval>();
+			for (ColoredTimeInterval cti : arc.getColorTimeIntervals()) {
+				newIntervals.add((ColoredTimeInterval)modifyIntervals(cti, approximationDenominator));
 			}
-		} else {
-			for (TransportArc arc : net.transportArcs()) {
-				TimeInterval oldInterval = arc.interval();
-				TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
-				
-				arc.setTimeInterval(newInterval);
-			}
+			arc.setColorTimeIntervals(newIntervals);
+
+			TimeInterval oldInterval = arc.interval();
+			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
+			arc.setTimeInterval(newInterval);
 		}
 
-		 
 		// Fix invariants in places
 		for (TimedPlace place : net.places()) {
-			if ( ! (place.invariant().upperBound() instanceof Bound.InfBound) && place.invariant().upperBound().value() > 0) {					
-				TimeInvariant oldInvariant = place.invariant();
-
-				if (oldInvariant instanceof ColoredTimeInvariant) {
-					place.setInvariant(new ColoredTimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((int) Math.ceil(oldInvariant.upperBound().value() / (double)approximationDenominator)), ((ColoredTimeInvariant) oldInvariant).getColor()));
-				} else {
-					place.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((int) Math.ceil(oldInvariant.upperBound().value() / (double)approximationDenominator))));
+			// Color specific invariants
+			List<ColoredTimeInvariant> newInvariants = new ArrayList<ColoredTimeInvariant>();
+			for (ColoredTimeInvariant cti : place.getCtiList()) {
+				if (!(cti.upperBound() instanceof Bound.InfBound) && cti.upperBound().value() > 0) {
+					int newInvariantBound = (int)Math.ceil(cti.upperBound().value() / (double)approximationDenominator);
+					newInvariants.add(new ColoredTimeInvariant(cti.isUpperNonstrict(), new IntBound(newInvariantBound), cti.getColor()));
 				}
+			}
+			place.setCtiList(newInvariants);
+
+			// Default age invariants
+			if (!(place.invariant().upperBound() instanceof Bound.InfBound) && place.invariant().upperBound().value() > 0) {				
+				TimeInvariant oldInvariant = place.invariant();
+				int newInvariantBound = (int)Math.ceil(oldInvariant.upperBound().value() / (double)approximationDenominator);
+				place.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((newInvariantBound))));
 			}
 		}
 	}
