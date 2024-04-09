@@ -4,7 +4,9 @@ import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 public class ColorType implements Iterable<Color> {
@@ -40,13 +42,17 @@ public class ColorType implements Iterable<Color> {
         return colors.iterator();
     }
 
+    public List<Color> getColorList() {
+        return new ArrayList<>(colors);
+    }
+
     public Vector<Color> getColors() {
         return colors;
     }
 
     public boolean isIdentical(ColorType newColorType) {
         boolean firstColorIdentical = getFirstColor().getColorName().equals(newColorType.getFirstColor().getColorName());
-        boolean lastColorIdentical = getColors().lastElement().getColorName().equals(newColorType.getColors().lastElement().getColorName());
+        boolean lastColorIdentical = getColorList().get(getColorList().size()-1).getColorName().equals(newColorType.getColorList().get(newColorType.getColorList().size()-1).getColorName());
 
         return firstColorIdentical && lastColorIdentical && !equals(newColorType);
     }
