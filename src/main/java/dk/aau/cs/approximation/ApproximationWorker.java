@@ -359,7 +359,7 @@ public class ApproximationWorker {
 						// If satisfied trace) -> Return result
 						// This is satisfied for EF and EG and not satisfied for AG and AF
 						if (unfoldedResult != null) {
-                            unfoldedResult.getUnfoldedTab().setQueries(approxResult.getUnfoldedTab().queries());
+                            unfoldedResult.getUnfoldedTab().getQueryPane().setQueries(approxResult.getUnfoldedTab().queries());
                             toReturn = new VerificationResult<>(
                                 queryResult,
                                 decomposeTrace(result.getTrace(), nameMapping, netNetwork),
