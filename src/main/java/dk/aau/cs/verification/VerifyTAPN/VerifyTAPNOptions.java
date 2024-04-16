@@ -19,6 +19,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	protected int tokensInModel;
 	protected boolean kBoundPresentInRawVerificationOptions;
 	protected boolean tracePresentInRawVerificationOptions;
+	protected boolean unfold;
 	private final boolean symmetry;
 	private final boolean discreteInclusion;
     private final boolean tarOption;
@@ -47,8 +48,9 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 		this.useRawVerification = useRawVerification;
 		this.rawVerificationOptions = rawVerificationOptions;
-
-        if(isColor && trace() != TraceOption.NONE && !useRawVerification) // we only force unfolding when traces are involved
+		this.unfold = isColor;
+		
+        if(isColor && trace() != TraceOption.NONE && !useRawVerification || enableOverApproximation || enableUnderApproximation) // we only force unfolding when traces are involved
         {
             try {
                 unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
@@ -130,6 +132,10 @@ public class VerifyTAPNOptions extends VerificationOptions{
 
 		return sb.append(rawVerificationOptions).toString();
 	}
+
+	public void setUnfold(boolean unfold) {
+		this.unfold = unfold;
+	}
 	
 	@Override
 	public String toString() {
@@ -139,8 +145,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 			return rawVerificationString(rawVerificationOptions, traceMap.get(traceOption));
 		}
 
-        if(unfoldedModelPath != null && unfoldedQueriesPath != null)
-        {
+        if (unfold && trace() != TraceOption.NONE) {
             result.append(" --write-unfolded-net ");
             result.append(unfoldedModelPath);
             result.append(" --write-unfolded-queries ");
