@@ -148,10 +148,6 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		return " --write-unfolded-queries " + unfoldedQueriesPath + " --write-unfolded-net " + unfoldedModelPath + ' ';
 	}
 
-	public void setUnfold(boolean unfold) {
-		this.unfold = unfold;
-	}
-
 	public boolean timeDarts() {
 		return timeDarts;
 	}
