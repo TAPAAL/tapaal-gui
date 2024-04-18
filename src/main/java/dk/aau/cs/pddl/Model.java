@@ -1,19 +1,13 @@
 package dk.aau.cs.pddl;
 
-import dk.aau.cs.io.LoadTACPN;
 import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.writeTACPN;
-import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import pipe.gui.petrinet.dataLayer.DataLayer;
-import pipe.gui.petrinet.graphicElements.Place;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +16,7 @@ public class Model {
     private String name;
     private ArrayList<Extension> extensions = new ArrayList<>();
     private HashMap<String, UserType> types = new HashMap<>();
-    private HashMap<String, Function> functions = new HashMap<>();
+    private HashMap<String, FunctionSignature> functions = new HashMap<>();
     private HashMap<String, Predicate> predicates = new HashMap<>();
     private HashMap<String, ActionSchema> actionSchemas = new HashMap<>();
 
@@ -54,11 +48,11 @@ public class Model {
     }
 
 
-    public HashMap<String, Function> getFunctions() {
+    public HashMap<String, FunctionSignature> getFunctions() {
         return functions;
     }
 
-    public void setFunctions(HashMap<String, Function> functions) {
+    public void setFunctions(HashMap<String, FunctionSignature> functions) {
         this.functions = functions;
     }
 
@@ -155,7 +149,7 @@ public class Model {
             String name = place.name();
 
             // Function
-            this.functions.put(name, new Function(name, parameters));
+            this.functions.put(name, new FunctionSignature(name, parameters));
         }
     }
 

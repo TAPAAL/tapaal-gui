@@ -1,7 +1,5 @@
 package dk.aau.cs.pddl;
 
-import java.util.ArrayList;
-
 public class PddlStringifier {
     private Model model;
 
@@ -22,6 +20,7 @@ public class PddlStringifier {
         sb.append(this.buildTypes());
         sb.append(this.buildFunctions());
         sb.append(this.buildActions());
+        sb.append(")");
 
         return sb;
     }
@@ -54,7 +53,7 @@ public class PddlStringifier {
         StringBuilder sb = new StringBuilder();
 
         sb.append("\t(:functions\n");
-        for(Function function : model.getFunctions().values()) {
+        for(FunctionSignature function : model.getFunctions().values()) {
             sb.append(String.format("\t\t(%s%s)\n",
                 function.getName(),
                 this.buildParameters(function.getParameters()).toString()
@@ -93,9 +92,11 @@ public class PddlStringifier {
 
         sb.append("\t(:action ").append(actionSchema.getName()).append("\n");
 
-        sb.append("\t\t(:parameters ").append(buildParameters(actionSchema.getParameters().values())).append("\n");
+        sb.append("\t\t(:parameters").append(buildParameters(actionSchema.getParameters().values())).append(")\n");
 
         sb.append("\t\t(:precondition ").append(actionSchema.getPrecondition().toString()).append(")\n");
+
+        sb.append("\t\t(:effects ").append(actionSchema.getEffects().toString()).append(")\n");
 
         sb.append("\t)\n");
 

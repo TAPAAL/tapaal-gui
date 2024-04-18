@@ -3,19 +3,17 @@ package dk.aau.cs.pddl;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.pddl.expression.*;
 
-import javax.swing.*;
 import java.util.*;
-
-import static java.util.Map.entry;
 
 public class ActionSchema {
     private String name;
     private HashMap<String, Parameter> parameters = new HashMap<>();
     private Expression_And precondition;
-    private String effect;
+    private Expression_And effects;
 
     public String getName() {
         return name;
@@ -25,12 +23,14 @@ public class ActionSchema {
         return parameters;
     }
 
+
     public IExpression getPrecondition() {
         return precondition;
     }
 
-    public String effect() {
-        return name;
+
+    public IExpression getEffects() {
+        return effects;
     }
 
 
@@ -38,9 +38,12 @@ public class ActionSchema {
         parseTransition(transition);
     }
 
+
     private void parseTransition(TimedTransition transition) {
+        this.name = transition.name();
         parseParameters(transition);
         this.precondition = generatePrecondition(transition);
+        this.effects = generateEffects(transition);
     }
 
     //region parseParameters
@@ -55,6 +58,8 @@ public class ActionSchema {
             parseParameters((TupleExpression) expression);
         } else if (expType.equals(VariableExpression.class)) {
             parseParameters((VariableExpression) expression);
+        } else if (expType.equals(UserOperatorExpression.class)) { // Color Literal
+            return;
         } else {
             throw new RuntimeException("Unhandled expression type: " + expType.getName());
         }
@@ -105,126 +110,186 @@ public class ActionSchema {
 
     //endregion
 
-    //region parsePreconditions
-    private HashMap<Parameter, Integer> parsePreconditions(Expression expression) {
+
+    private Expression_And generatePrecondition(TimedTransition transition) {
+        PlaceWeights placeWeights = parseTransitionPreset(transition);
+
+        Expression_And precondition = new Expression_And();
+
+        for(var e: placeWeights.entrySet()) {
+            var place = e.getKey();
+            var weights = e.getValue();
+            for(var e2: weights.entrySet()) {
+                var value = e2.getKey();
+                var weight = e2.getValue();
+
+                var func = new Expression_FunctionValue(
+                    place.name(),
+                    value
+                );
+
+                var weight_exp = new Expression_IntegerLiteral(weight);
+
+                precondition.addParameter(
+                    new Expresssion_GreaterOrEqual(
+                        func,
+                        weight_exp
+                    )
+                );
+            }
+        }
+
+        return precondition;
+    }
+
+    private Expression_And generateEffects(TimedTransition transition) {
+
+        PlaceWeights postset = parseTransitionPostset(transition);
+        PlaceWeights preset = parseTransitionPreset(transition);
+
+        preset.multiply(-1);
+        postset.add(preset);
+
+        Expression_And effects = new Expression_And();
+
+        for(var e: postset.entrySet()) {
+            var place = e.getKey();
+            var weights = e.getValue();
+            for(var e2: weights.entrySet()) {
+                var value = e2.getKey();
+                var weight = e2.getValue();
+
+                var func = new Expression_FunctionValue(
+                    place.name(),
+                    value
+                );
+
+                if(weight > 0) {
+                    effects.addParameter(
+                        new Expresssion_Increment(
+                            func,
+                            new Expression_IntegerLiteral(weight)
+                        )
+                    );
+                } else if (weight < 0) {
+                    effects.addParameter(
+                        new Expresssion_Decrement(
+                            func,
+                            new Expression_IntegerLiteral(-weight)
+                        )
+                    );
+                }
+
+
+            }
+        }
+
+        return effects;
+    }
+
+
+
+
+    //region parseExpressionToWeights
+
+
+    private Weights parseExpressionToWeights(Expression expression) {
         var expType = expression.getClass();
 
         if (expType.equals(NumberOfExpression.class)) {
-            return parsePreconditions((NumberOfExpression) expression);
+            return parseExpressionToWeights((NumberOfExpression) expression);
         } else if (expType.equals(AddExpression.class)) {
-            return parsePreconditions((AddExpression) expression);
-        } else if (expType.equals(TupleExpression.class)) {
-            return parsePreconditions((TupleExpression) expression);
-        } else if (expType.equals(VariableExpression.class)) {
-            return parsePreconditions((VariableExpression) expression);
+            return parseExpressionToWeights((AddExpression) expression);
+//        } else if (expType.equals(TupleExpression.class)) {
+//            return parseExpressionToWeights((TupleExpression) expression);
+//        } else if (expType.equals(VariableExpression.class)) {
+//            return parseExpressionToWeights((VariableExpression) expression);
+//        } else if (expType.equals(UserOperatorExpression.class)) {
+//            return parseExpressionToWeights((UserOperatorExpression) expression); // Color literal
         } else {
             throw new RuntimeException("Unhandled expression type: " + expType.getName());
         }
     }
 
 
-    private void addHashMap(HashMap<Parameter, Integer> m1, HashMap<Parameter, Integer> m2) {
-//        HashMap<Parameter, Integer> outDict = new HashMap<>();
+    private PlaceWeights parseTransitionPreset(TimedTransition transition) {
+        PlaceWeights placeWeights = new PlaceWeights();
 
-//        for (var k1: m1.keySet())
-//            outDict.put(k1, m1.get(k1));
+        for (TimedInputArc arc : transition.getInputArcs()) {
+            TimedPlace place = arc.source();
+            ArcExpression exp = arc.getArcExpression();
 
-        for (var k2: m2.keySet())
-            m1.put(k2, m1.getOrDefault(k2, 0) + m2.get(k2));
-
-//        return outDict;
-    }
-
-
-    private Expression_And generatePrecondition(TimedTransition transition) {
-        HashMap<Parameter, Integer> weights = parsePreconditions(transition);
-
-        Expression_And precondition = new Expression_And();
-
-        for(var entry: weights.entrySet()) {
-            Parameter param = entry.getKey();
-            int weight = entry.getValue();
-
-            var paramExp = new Expression_Parameter(param);
-            var weightExp = new Expression_IntegerLiteral(weight);
-
-            var greaterOrEqualExp = new Expresssion_GreaterOrEqual(paramExp, weightExp);
-
-            precondition.addParameter(greaterOrEqualExp);
+            var weights = parseExpressionToWeights(exp);
+            placeWeights.put(place, weights);
         }
 
-        return precondition;
+        return placeWeights;
+    }
+    private PlaceWeights parseTransitionPostset(TimedTransition transition) {
+        PlaceWeights placeWeights = new PlaceWeights();
+
+        for (TimedOutputArc arc : transition.getOutputArcs()) {
+            TimedPlace place = arc.destination();
+            ArcExpression exp = arc.getExpression();
+
+            var weights = parseExpressionToWeights(exp);
+            placeWeights.put(place, weights);
+        }
+
+        return placeWeights;
     }
 
-    private HashMap<Parameter, Integer> parsePreconditions(TimedTransition transition) {
-        HashMap<Parameter, Integer> weights = new HashMap<>();
-        List<TimedInputArc> inArcs = transition.getInputArcs();
-        for (TimedInputArc arc : inArcs) {
-            addHashMap(weights, parsePreconditions(arc.getArcExpression()));
+    private Weights parseExpressionToWeights(AddExpression expression) {
+        Weights weights = new Weights();
+
+        for (var subExp : expression.getAddExpression()) {
+            weights.add(this.parseExpressionToWeights(subExp));
         }
 
         return weights;
-
-
-//            precondition.addParameter(parsePreconditions(arc.getArcExpression()));
-//        Expression_And precondition = new Expression_And();
-
-
-
-//        this.precondition = precondition;
-
-//        return outDict;
     }
 
-    private HashMap<Parameter, Integer> parsePreconditions(AddExpression expression) {
-        HashMap<Parameter, Integer> outDict = new HashMap<>();
-
-        for (var subExp : expression.getAddExpression()) {
-            addHashMap(outDict, this.parsePreconditions(subExp));
-        }
-
-        return outDict;
-    }
-
-    private HashMap<Parameter, Integer> parsePreconditions(NumberOfExpression expression) {
+    private Weights parseExpressionToWeights(NumberOfExpression expression) {
         int multiplier = expression.getNumber();
-        HashMap<Parameter, Integer> dict = parsePreconditions(expression.getColor());
+        ArrayList<IExpression_Value> values = parseExpressionToWeights(expression.getColor());
 
-        for(var entry: dict.entrySet()) {
-            Parameter k = entry.getKey();
-            Integer v = entry.getValue();
+        Weights weights = new Weights();
+        weights.put(values, multiplier);
 
-            dict.put(k, v*multiplier);
-        }
-
-        return dict;
+        return weights;
     }
 
-    private HashMap<Parameter, Integer> parsePreconditions(Vector<ColorExpression> expression) {
-        HashMap<Parameter, Integer> dict = new HashMap<>();
+
+    private ArrayList<IExpression_Value> parseExpressionToWeights(Vector<ColorExpression> expression) {
+        ArrayList<IExpression_Value> values = new ArrayList<>();
 
         for(var e: expression) {
-            addHashMap(dict, parsePreconditions(e));
+            var eClass = e.getClass();
+            if(eClass == VariableExpression.class)
+                values.add(parseVariableExpression((VariableExpression)e));
+            else if (eClass == UserOperatorExpression.class)
+                values.add(parseColorLiteral((UserOperatorExpression)e));
+            else if (eClass == TupleExpression.class)
+                values.addAll(parseTupleExpression((TupleExpression)e));
         }
 
-        return dict;
+        return values;
     }
 
-    private HashMap<Parameter, Integer> parsePreconditions(TupleExpression expression) {
-        return parsePreconditions(expression.getColors());
+    private ArrayList<IExpression_Value> parseTupleExpression(TupleExpression expression) {
+        return parseExpressionToWeights(expression.getColors());
     }
 
-    private HashMap<Parameter, Integer> parsePreconditions(VariableExpression expression) {
-        HashMap<Parameter, Integer> dict = new HashMap<>();
-
+    private Parameter parseVariableExpression(VariableExpression expression) {
         var variable = expression.getVariable();
         var name = variable.getName();
 
-        var param = parameters.get(name);
+        return parameters.get(name);
+    }
 
-        dict.put(param, 1);
-
-        return dict;
+    private Expression_ColorLiteral parseColorLiteral(UserOperatorExpression expression) { // Color Literal
+        var color = expression.getUserOperator();
+        return new Expression_ColorLiteral(color);
     }
 
     //endregion

@@ -14,4 +14,8 @@ public class Expresssion_GreaterOrEqual extends BaseExpression implements IExpre
         return ">=";
     }
 
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

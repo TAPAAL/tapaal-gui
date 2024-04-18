@@ -1,17 +1,24 @@
 package dk.aau.cs.pddl;
 
+import dk.aau.cs.model.tapn.TimedPlace;
+
 import java.util.ArrayList;
 
-public class Function {
+public class FunctionSignature {
     private String name;
     private ArrayList<Parameter> parameters;
 
-    public Function(String name, ArrayList<Parameter> parameters) {
+    public FunctionSignature(String name, ArrayList<Parameter> parameters) {
         this.name = name;
         this.parameters = parameters;
     }
 
-    public Function(String name) {
+    public FunctionSignature(TimedPlace place, ArrayList<Parameter> parameters) {
+        this.name = place.name();
+        this.parameters = parameters;
+    }
+
+    public FunctionSignature(String name) {
         this.name = name;
         this.parameters = new ArrayList<Parameter>();
     }
