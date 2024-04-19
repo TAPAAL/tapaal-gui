@@ -521,25 +521,30 @@ public class BatchProcessingDialog extends JDialog {
         gbc.gridx = 1;
         optionsPanel.add(copyOptionButton, gbc);
         copyOptionButton.addActionListener(e -> {
-            int row = verificationTable.getSelectedRow();
-            optionsTable.addRow(new Object[]{
-                verificationTable.getValueAt(row, 0),
-                optionsTable.getRowCount(),
-                verificationTable.getValueAt(row, 2),
-                verificationTable.getValueAt(row, 3),
-                verificationTable.getValueAt(row, 4)
-            });
+            int selectedRow = verificationTable.getSelectedRow();
+			if (selectedRow != -1) {
+				optionsTable.addRow(new Object[]{
+					verificationTable.getValueAt(selectedRow, 0),
+					optionsTable.getRowCount(),
+					verificationTable.getValueAt(selectedRow, 2),
+					verificationTable.getValueAt(selectedRow, 3),
+					verificationTable.getValueAt(selectedRow, 4)
+				});
+			}
         });
 
         JButton removeOptionButton = new JButton("Remove");
         gbc.gridx = 2;
         optionsPanel.add(removeOptionButton, gbc);
         removeOptionButton.addActionListener(e -> {
-            optionsTable.removeRow(verificationTable.getSelectedRow());
-            for (int rowIndex = 0; rowIndex < verificationTable.getRowCount(); rowIndex++) {
-                verificationTable.setValueAt(rowIndex, rowIndex, 1);
-            }
-        });
+			int selectedRow = verificationTable.getSelectedRow();
+			if (selectedRow != -1) {
+				optionsTable.removeRow(selectedRow);
+				for (int rowIndex = 0; rowIndex < verificationTable.getRowCount(); rowIndex++) {
+					verificationTable.setValueAt(rowIndex, rowIndex, 1);
+				}
+			}
+		});
 
         helpDialogPN = new HelpDialog(
             BatchProcessingDialog.this,
