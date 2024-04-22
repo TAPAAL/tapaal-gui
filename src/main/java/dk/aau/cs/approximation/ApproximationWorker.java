@@ -46,7 +46,7 @@ public class ApproximationWorker {
         net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery,
         TAPNLens lens
     ) throws Exception {
-        boolean isColored = (lens != null && lens.isColored() || model.isColored());
+        boolean isColored = lens != null && lens.isColored() || model.isColored();
 
 		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them
 		InclusionPlaces oldInclusionPlaces = null;
@@ -120,12 +120,27 @@ public class ApproximationWorker {
                         unfoldedResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, composer.getGuiModel(), dataLayerQuery, lens);
                         if (unfoldedResult.getTrace() == null) {
                             options.setTraceOption(oldTraceOption);
-                            // if the old traceoption was none, we need to set the results traces to null so GUI doesn't try to display the traces later
-                            if (oldTraceOption == TraceOption.NONE && toReturn != null) {
+                            QueryResult queryResult = unfoldedResult.getQueryResult();
+                            if (((unfoldedResult.getQueryResult().queryType() == QueryType.EF || unfoldedResult.getQueryResult().queryType() == QueryType.EG) && !queryResult.isQuerySatisfied())
+                            || ((unfoldedResult.getQueryResult().queryType() == QueryType.AG || unfoldedResult.getQueryResult().queryType() == QueryType.AF) && queryResult.isQuerySatisfied())) {
+                                queryResult.setApproximationInconclusive(true);
+                            }
+
+                            toReturn = new VerificationResult<>(
+                                queryResult,
+                                decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+                                decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                                result.verificationTime() + unfoldedResult.verificationTime(),
+                                unfoldedResult.stats(),
+                                false,
+                                unfoldedResult.getRawOutput(),
+                                unfoldedResult.getUnfoldedModel(),
+                                null);
+                            if (toReturn != null) {
                                 toReturn.setTrace(null);
                                 toReturn.setSecondaryTrace(null);
                             }
-                                
+
                             return toReturn;
                         }
 
@@ -177,7 +192,7 @@ public class ApproximationWorker {
                             queryResult,
                             decomposeTrace(result.getTrace(), nameMapping, netNetwork),
                             decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
-                            approxResult.verificationTime() + result.verificationTime() + result.verificationTime(),
+                            approxResult.verificationTime() + unfoldedResult.verificationTime() + result.verificationTime(),
                             approxResult.stats(),
                             false,
                             unfoldedResult.getRawOutput(),
@@ -323,12 +338,29 @@ public class ApproximationWorker {
                             options.setTraceOption(oldTraceOption);
                             unfoldedResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery, composer.getGuiModel(), dataLayerQuery, lens);
                             if (unfoldedResult.getTrace() == null) {
-                                // if the old traceoption was none, we need to set the results traces to null so GUI doesn't try to display the traces later
-                                if (oldTraceOption == TraceOption.NONE && toReturn != null){
+                                options.setTraceOption(oldTraceOption);
+    
+                                QueryResult queryResult = unfoldedResult.getQueryResult();
+                                if (((unfoldedResult.getQueryResult().queryType() == QueryType.EF || unfoldedResult.getQueryResult().queryType() == QueryType.EG) && !queryResult.isQuerySatisfied())
+                                || ((unfoldedResult.getQueryResult().queryType() == QueryType.AG || unfoldedResult.getQueryResult().queryType() == QueryType.AF) && queryResult.isQuerySatisfied())) {
+                                    queryResult.setApproximationInconclusive(true);
+                                }
+
+                                toReturn = new VerificationResult<>(
+                                    unfoldedResult.getQueryResult(),
+                                    decomposeTrace(result.getTrace(), nameMapping, netNetwork),
+                                    decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                                    result.verificationTime() + unfoldedResult.verificationTime(),
+                                    unfoldedResult.stats(),
+                                    false,
+                                    unfoldedResult.getRawOutput(),
+                                    unfoldedResult.getUnfoldedModel(),
+                                    null);
+                                if (toReturn != null) {
                                     toReturn.setTrace(null);
                                     toReturn.setSecondaryTrace(null);
                                 }
-                                    
+    
                                 return toReturn;
                             }
                             
@@ -381,7 +413,7 @@ public class ApproximationWorker {
                                 queryResult,
                                 decomposeTrace(result.getTrace(), nameMapping, netNetwork),
                                 decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
-                                approxResult.verificationTime() + result.verificationTime() + result.verificationTime(),
+                                approxResult.verificationTime() + unfoldedResult.verificationTime() + result.verificationTime(),
                                 approxResult.stats(),
                                 false,
                                 unfoldedResult.getRawOutput(),
