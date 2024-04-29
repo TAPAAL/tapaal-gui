@@ -28,6 +28,7 @@ public class TimedTransition extends TAPNElement {
 
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
+    private float rate = -1.0f;
     private GuardExpression guard;
 
 	private SharedTransition sharedTransition;
@@ -47,6 +48,13 @@ public class TimedTransition extends TAPNElement {
 		setUrgent(isUrgent);
 		this.guard = guard;
 	}
+
+    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, float rate) {
+        setName(name);
+        setUrgent(isUrgent);
+        setRate(rate);
+        this.guard = guard;
+    }
 
 	public void addTimedTransitionListener(TimedTransitionListener listener){
 		Require.that(listener != null, "listener cannot be null");
@@ -85,6 +93,21 @@ public class TimedTransition extends TAPNElement {
 	    this.isUncontrollable = isUncontrollable;
 	    if (isShared() && cascade) {
 	        sharedTransition.setUncontrollable(isUncontrollable);
+        }
+    }
+
+    public boolean hasCustomRate() { return rate > 0; }
+
+    public void removeCustomRate() { setRate(-1.0f, true); }
+
+    public float getRate() { return rate; }
+
+    public void setRate(float rate) { setRate(rate, true); }
+
+    public void setRate(float rate, boolean cascade) {
+        this.rate = rate;
+        if(isShared() && cascade) {
+            sharedTransition.setRate(rate);
         }
     }
 	

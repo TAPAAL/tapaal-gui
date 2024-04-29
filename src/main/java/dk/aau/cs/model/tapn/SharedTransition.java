@@ -18,6 +18,7 @@ public class SharedTransition {
 	private final List<TimedTransition> transitions = new ArrayList<TimedTransition>();
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
+    private float rate = 0.5f;
 	private GuardExpression guard = null;
 
 	private TimedArcPetriNetNetwork network;
@@ -53,6 +54,24 @@ public class SharedTransition {
 	    this.isUncontrollable = isUncontrollable;
 	    for (TimedTransition transition : transitions) {
 	        transition.setUncontrollable(isUncontrollable, false);
+        }
+    }
+
+    public boolean hasCustomRate() { return rate > 0; }
+
+    public void removeCustomRate() {
+        this.rate = -1.0f;
+        for (TimedTransition transition : transitions) {
+            transition.setRate(-1.0f, false);
+        }
+    }
+
+    public float getRate() { return rate; }
+
+    public void setRate(float rate) {
+        this.rate = rate;
+        for (TimedTransition transition : transitions) {
+            transition.setRate(rate, false);
         }
     }
 

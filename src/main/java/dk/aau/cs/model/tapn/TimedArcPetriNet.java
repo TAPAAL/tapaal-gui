@@ -108,6 +108,15 @@ public class TimedArcPetriNet {
 	    return false;
     }
 
+    public boolean isStochastic() {
+        for(TimedTransition t : transitions) {
+            if(t.hasCustomRate()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 	public void add(TimedTransition transition) {
 		Require.that(transition != null, "Argument must be a non-null transition");
 		Require.that(!isNameUsed(transition.name()) || transition.isShared(), "A place or transition with the specified name, "+transition.name()+", already exists in the petri net.");

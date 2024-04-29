@@ -35,9 +35,10 @@ public class LoadedModel implements LoadedBatchProcessingModel {
         } else {
             boolean isNetTimed = !network().isUntimed();
             boolean isNetGame = network().hasUncontrollableTransitions();
-            boolean isNetColored = network.isColored();
+            boolean isNetColored = network().isColored();
+            boolean isNetStochastic = network().isStochastic();
 
-            return new TAPNLens(isNetTimed, isNetGame, isNetColored);
+            return new TAPNLens(isNetTimed, isNetGame, isNetColored, isNetStochastic);
         }
     }
     public boolean isColored(){

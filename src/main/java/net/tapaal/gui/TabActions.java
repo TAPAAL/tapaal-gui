@@ -94,6 +94,8 @@ public interface TabActions {
 
     void changeColorFeature(boolean isColor);
 
+    void changeStochasticFeature(boolean isStochastic);
+
     void exportPNG();
 
     void exportPS();

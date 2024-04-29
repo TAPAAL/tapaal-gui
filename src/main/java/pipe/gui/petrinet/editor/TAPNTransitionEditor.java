@@ -62,6 +62,10 @@ public class TAPNTransitionEditor extends JPanel {
 	    if(!transition.isColored() || !coloredTransitionGuardPanel.showGuardPanel()){
 	        coloredTransitionGuardPanel.setVisible(false);
         }
+        if(!transition.isStochastic()) {
+            rateLabel.setVisible(false);
+            rateTextField.setVisible(false);
+        }
     }
 
 	private void initComponents() {
@@ -84,6 +88,9 @@ public class TAPNTransitionEditor extends JPanel {
 		uncontrollableCheckBox = new JCheckBox("Uncontrollable");
 		attributesCheckBox = new JCheckBox("Show transition name");
 
+        rateLabel = new JLabel();
+        rateTextField = new JTextField();
+        SwingHelper.setPreferredWidth(rateTextField, 290);
 
 		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);
 		SwingHelper.setPreferredWidth(sharedTransitionsComboBox,290);
@@ -189,6 +196,13 @@ public class TAPNTransitionEditor extends JPanel {
 		gridBagConstraints = GridBagHelper.as(1,2, Anchor.NORTHWEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
 
+        rateLabel.setText("Rate:");
+        gridBagConstraints = GridBagHelper.as(0, 3, Anchor.NORTH, new Insets(3, 3, 3, 3));
+        transitionEditorPanel.add(rateLabel, gridBagConstraints);
+
+        gridBagConstraints = GridBagHelper.as(1, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+        transitionEditorPanel.add(rateTextField, gridBagConstraints);
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		gridBagConstraints.weightx = 1.0;
@@ -224,7 +238,7 @@ public class TAPNTransitionEditor extends JPanel {
 
 		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-		gridBagConstraints = GridBagHelper.as(1,3, Anchor.WEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = GridBagHelper.as(1,transition.isStochastic() ? 4 : 3, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
 
 		gridBagConstraints = GridBagHelper.as(0,1,Anchor.WEST, new Insets(3, 3, 3, 3));
@@ -266,6 +280,10 @@ public class TAPNTransitionEditor extends JPanel {
 		urgentCheckBox.setSelected(transition.isUrgent());
 		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
 		coloredTransitionGuardPanel.initExpr(transition.getGuardExpression());
+
+        if(transition.underlyingTransition().hasCustomRate()) {
+            rateTextField.setText(String.valueOf(transition.underlyingTransition().getRate()));
+        }
 
 		if(transition.underlyingTransition().isShared()){
 			switchToNameDropDown();
@@ -461,6 +479,17 @@ public class TAPNTransitionEditor extends JPanel {
             transition.setUncontrollable(uncontrollableCheckBox.isSelected());
         }
 
+        try {
+            float rate = Float.parseFloat(rateTextField.getText());
+            if(rate != transition.underlyingTransition().getRate()) {
+                context.undoManager().addEdit(new ChangeTransitionRateCommand(transition.underlyingTransition(), context.tabContent(), rate));
+                transition.underlyingTransition().setRate(rate);
+            }
+        } catch(NumberFormatException ignored) {
+            context.undoManager().addEdit(new ChangeTransitionRateCommand(transition.underlyingTransition(), context.tabContent(), -1.0f));
+            transition.underlyingTransition().removeCustomRate();
+        }
+
 		int rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {
 			int angle = 0;
@@ -529,6 +558,9 @@ public class TAPNTransitionEditor extends JPanel {
 
 	private javax.swing.JCheckBox urgentCheckBox;
     private Vector<SharedTransition> sharedTransitions;
+
+    private JLabel rateLabel;
+    private JTextField rateTextField;
 
     private javax.swing.JCheckBox uncontrollableCheckBox;
 

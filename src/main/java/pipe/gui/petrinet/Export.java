@@ -149,7 +149,7 @@ public class Export {
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(network);
         TimedArcPetriNet model = transformedModel.value1();
 
-        TAPNLens lens = new TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions(), model.isColored());
+        TAPNLens lens = new TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions(), model.isColored(), model.isStochastic());
 
         RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
         int i = 0;
@@ -160,7 +160,7 @@ public class Export {
             if (lens.isGame() && isDTAPN) {
                 exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".xml"), null, lens, transformedModel.value2(), composer.getGuiModel());
             } else {
-                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".xml"), null, new TAPNLens(true, false, lens.isColored()), transformedModel.value2(), composer.getGuiModel());
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".xml"), null, new TAPNLens(true, false, lens.isColored(), lens.isStochastic()), transformedModel.value2(), composer.getGuiModel());
             }
         }
     }

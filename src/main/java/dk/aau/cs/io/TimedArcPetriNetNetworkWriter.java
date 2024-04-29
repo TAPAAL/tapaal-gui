@@ -173,6 +173,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         String isTimed = "true";
         String isGame = "true";
         String isColored = "true";
+        String isStochastic = "true";
         if (!lens.isTimed()) {
             isTimed = "false";
         }
@@ -182,17 +183,20 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         if(!lens.isColored()){
             isColored = "false";
         }
-
-        root.appendChild(createFeatureElement(isTimed, isGame, isColored, document));
+        if(!lens.isStochastic()) {
+            isStochastic = "false";
+        }
+        root.appendChild(createFeatureElement(isTimed, isGame, isColored, isStochastic, document));
     }
 
-    private Element createFeatureElement(String isTimed, String isGame, String isColored, Document document) {
+    private Element createFeatureElement(String isTimed, String isGame, String isColored, String isStochastic, Document document) {
         Require.that(document != null, "Error: document was null");
         Element feature = document.createElement("feature");
 
         feature.setAttribute("isTimed", isTimed);
         feature.setAttribute("isGame", isGame);
         feature.setAttribute("isColored", isColored);
+        feature.setAttribute("isStochastic", isStochastic);
 
         return feature;
     }

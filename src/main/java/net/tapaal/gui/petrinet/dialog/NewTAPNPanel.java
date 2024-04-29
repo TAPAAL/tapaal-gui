@@ -17,8 +17,12 @@ public class NewTAPNPanel extends EscapableDialog {
 	private final GuiFrame frame;
 	private JTextField nameTextBox;
 	private JRadioButton timedNet;
+    private JRadioButton untimedNet;
 	private JRadioButton gameNet;
+    private JRadioButton nonGameNet;
 	private JRadioButton coloredNet;
+    private JRadioButton nonColorNet;
+    private JRadioButton stochasticNet;
 	private static int newNameCounter = 1;
     static NewTAPNPanel newTAPNPanel;
     private final static String COLORED_GAMES_NOT_SUPPORTED = "There exists no verification engine for colored games, we only allow modelling.\n\n Do you wish to continue?";
@@ -84,7 +88,7 @@ public class NewTAPNPanel extends EscapableDialog {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(cancelButton,gbc);		
 
-		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected(), coloredNet.isSelected()));
+		okButton.addActionListener(e -> createNewTAPNBasedOnSelection(nameTextBox.getText(), timedNet.isSelected(), gameNet.isSelected(), coloredNet.isSelected(), stochasticNet.isSelected()));
 
 		rootPane.setDefaultButton(okButton);
 		
@@ -102,7 +106,7 @@ public class NewTAPNPanel extends EscapableDialog {
 		rootPane.getParent().setVisible(false);
 	}
 
-	protected void createNewTAPNBasedOnSelection(String name, boolean isTimed, boolean isGame, boolean isColored) {
+	protected void createNewTAPNBasedOnSelection(String name, boolean isTimed, boolean isGame, boolean isColored, boolean isStochastic) {
 		if (!name.endsWith(".tapn")) {
 			name = name + ".tapn";
 		}
@@ -115,7 +119,7 @@ public class NewTAPNPanel extends EscapableDialog {
 		}
 
 		try {
-			PetriNetTab tab = PetriNetTab.createNewEmptyTab(name, isTimed, isGame, isColored);
+			PetriNetTab tab = PetriNetTab.createNewEmptyTab(name, isTimed, isGame, isColored, isStochastic);
 			TAPAALGUI.openNewTabFromStream(tab);
 		} catch (Exception e) {
 			JOptionPane
@@ -169,6 +173,7 @@ public class NewTAPNPanel extends EscapableDialog {
         initTimeOptions(selectionPanel);
         initGameOptions(selectionPanel);
         initColorOptions(selectionPanel);
+        initStochasticOptions(selectionPanel);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -192,7 +197,7 @@ public class NewTAPNPanel extends EscapableDialog {
         gbc.insets = new Insets(3, 3, 3, 3);
         isTimedPanel.add(timedText, gbc);
 
-        JRadioButton untimedNet = new JRadioButton("No");
+        untimedNet = new JRadioButton("No");
         untimedNet.setSelected(true);
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -235,7 +240,7 @@ public class NewTAPNPanel extends EscapableDialog {
         gbc.insets = new Insets(3, 3, 3, 3);
         isGamePanel.add(gameText, gbc);
 
-        JRadioButton nonGameNet = new JRadioButton("No");
+        nonGameNet = new JRadioButton("No");
         nonGameNet.setSelected(true);
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -276,7 +281,7 @@ public class NewTAPNPanel extends EscapableDialog {
         gbc.insets = new Insets(3, 3, 3, 3);
         isColorPanel.add(colorText, gbc);
 
-        JRadioButton nonColorNet = new JRadioButton("No");
+        nonColorNet = new JRadioButton("No");
         nonColorNet.setSelected(true);
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -303,6 +308,72 @@ public class NewTAPNPanel extends EscapableDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         selectionPanel.add(isColorPanel, gbc);
+    }
+
+    private void initStochasticOptions(JPanel selectionPanel) {
+        JPanel isStochasticPanel = new JPanel(new GridBagLayout());
+        ButtonGroup isStochasticRadioButtonGroup = new ButtonGroup();
+
+        JLabel colorText = new JLabel("Use stochastic semantics :");
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isStochasticPanel.add(colorText, gbc);
+
+        JRadioButton nonStochasticNet = new JRadioButton("No");
+        nonStochasticNet.setSelected(true);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isStochasticPanel.add(nonStochasticNet, gbc);
+        isStochasticRadioButtonGroup.add(nonStochasticNet);
+
+        stochasticNet = new JRadioButton("Yes");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(3, 3, 3, 3);
+        isStochasticPanel.add(stochasticNet, gbc);
+        isStochasticRadioButtonGroup.add(stochasticNet);
+        stochasticNet.setEnabled(false);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        selectionPanel.add(isStochasticPanel, gbc);
+
+        var refreshOthers = new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                gameNet.setEnabled(!stochasticNet.isSelected());
+                coloredNet.setEnabled(!stochasticNet.isSelected());
+                untimedNet.setEnabled(!stochasticNet.isSelected());
+            }
+        };
+        var refreshStochastic = new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                stochasticNet.setEnabled(
+                    timedNet.isSelected() && nonGameNet.isSelected() && nonColorNet.isSelected()
+                );
+            }
+        };
+        stochasticNet.addActionListener(refreshOthers);
+        nonStochasticNet.addActionListener(refreshOthers);
+        timedNet.addActionListener(refreshStochastic);
+        untimedNet.addActionListener(refreshStochastic);
+        gameNet.addActionListener(refreshStochastic);
+        nonGameNet.addActionListener(refreshStochastic);
+        coloredNet.addActionListener(refreshStochastic);
+        nonColorNet.addActionListener(refreshStochastic);
     }
 
     public void setName(String name){
