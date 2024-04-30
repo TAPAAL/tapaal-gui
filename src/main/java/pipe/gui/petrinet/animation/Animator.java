@@ -4,6 +4,7 @@ import java.awt.Container;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.IntervalOperations;
+import dk.aau.cs.util.Require;
 import dk.aau.cs.util.RequireException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
@@ -131,7 +133,45 @@ public class Animator {
     }
 
     private void setTimedTrace(TAPNNetworkTrace trace) {
+        NetworkMarking previousMarking = null;
+        int previousTokensToConsume = 0;
+        TimedTransition previousTransition = null;
         for (TAPNNetworkTraceStep step : trace) {
+            if (step instanceof TAPNNetworkTimedTransitionStep) {
+                TimedTransition transition = ((TAPNNetworkTimedTransitionStep) step).getTransition();
+                List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens();
+
+                System.out.println(transition.name());
+                System.out.println(consumedTokens.size());
+
+                NetworkMarking marking = step.performStepFrom(currentMarking());
+
+                if (previousMarking != null && previousTransition != null) {
+                    int totalTokensRemoved = 0;
+                    for (TimedInputArc arc : previousTransition.getInputArcs()) {
+                        int tokensBefore = previousMarking.getTokensFor(arc.source()).size();
+                        int tokensAfter = currentMarking().getTokensFor(arc.source()).size();
+                        totalTokensRemoved += tokensBefore - tokensAfter;
+
+                        System.out.println(tokensBefore + " -> " + tokensAfter);
+                    }
+                    
+                    Require.that(totalTokensRemoved == previousTokensToConsume, "Mismatch in tokens removed. Expected: " + previousTokensToConsume + ", Actual: " + totalTokensRemoved + ". Transition: " + previousTransition.name());
+                    /*if (totalTokensRemoved != previousTokensToConsume) {
+                        System.out.println("Mismatch in tokens removed. Expected: " + previousTokensToConsume + ", Actual: " + totalTokensRemoved);
+                        System.out.println("Transition: " + previousTransition.name());
+                        JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }*/
+                }
+
+                System.out.println();
+
+                previousMarking = currentMarking();
+                previousTransition = transition;
+                previousTokensToConsume = consumedTokens.size();
+
+            }
+
             addMarking(step, step.performStepFrom(currentMarking()));
         }
         if (getTrace().getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
