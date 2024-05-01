@@ -22,7 +22,7 @@ public abstract class BaseExpression {
         StringBuilder sb = new StringBuilder();
         for(var param: getParameters()) {
             sb.append(" ");
-            sb.append(param.toString());
+            sb.append(param);
         }
 
 

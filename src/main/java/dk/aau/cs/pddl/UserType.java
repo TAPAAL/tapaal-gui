@@ -1,25 +1,37 @@
 package dk.aau.cs.pddl;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
+import java.util.ArrayList;
 
 public class UserType {
-    private String Name;
+    private String name;
 
+    private ArrayList<String> objectNames;
 
-    public UserType(String name) {
-        Name = name;
+    public UserType(String name, ArrayList<String> objectNames) {
+        this.name = name;
+        this.objectNames = objectNames;
     }
 
     public UserType(ColorType type) {
-        Name = type.getName();
+        this.name = type.getName();
+        objectNames = new ArrayList<>() {{
+            for(Color c: type)
+                add(c.getName());
+        }};
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
+    }
+
+    public ArrayList<String> getObjectNames() {
+        return objectNames;
     }
 
 }

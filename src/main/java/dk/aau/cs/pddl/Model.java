@@ -1,16 +1,17 @@
 package dk.aau.cs.pddl;
 
 import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.pddl.expression.*;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Model {
     private String name;
@@ -73,8 +74,11 @@ public class Model {
         this.actionSchemas = actionSchemas;
     }
 
+    private PlaceWeights state;
 
-
+    public PlaceWeights getState() {
+        return state;
+    }
 
     public Model() { }
 
@@ -93,6 +97,7 @@ public class Model {
         this.parseTypes(network);
         this.parseFunctions(network);
         this.parseActionSchemas(network.allTemplates().get(0));
+        state = this.parseInitialState(network.allTemplates().get(0));
     }
 
     public void parse(LoadedModel ptModel) {
@@ -119,7 +124,7 @@ public class Model {
         for (ColorType colorType : colorTypes) {
             if(colorType instanceof ProductType)
                 continue;
-            this.types.put(colorType.getName(), new UserType(colorType.getName()));
+            this.types.put(colorType.getName(), new UserType(colorType));
         }
     }
 
@@ -192,6 +197,62 @@ public class Model {
 //        return actionSchema;
     }
 
+    public PlaceWeights parseInitialState(TimedArcPetriNet petriNet) {
+
+        PlaceWeights placeWeights = new PlaceWeights();
+
+        for (TimedPlace place : petriNet.places()) {
+            Weights weights = new Weights();
+
+            var allPossibleColors = getAllPossibleColors(place);
+            for(ArrayList<Color> colors : allPossibleColors) {
+                var valueList = colors.stream().map(Expression_ColorLiteral::new).collect(Collectors.toCollection(ArrayList<IExpression_Value>::new));
+                weights.put(valueList, 0);
+            }
+
+            Map<TimedToken, Long> marking = place.tokens().stream().collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+            for(var entry: marking.entrySet()) {
+                var colors = entry.getKey().color().getTuple();
+                var weight = entry.getValue().intValue();
+
+                var valueList = colors.stream().map(Expression_ColorLiteral::new).collect(Collectors.toCollection(ArrayList<IExpression_Value>::new));
+                weights.put(valueList, weight);
+            }
+
+
+            placeWeights.put(place, weights);
+        }
+
+        return placeWeights;
+    }
+
+
+
+//    private Color toProductColor(ColorType type, Iterable<Color> colors) {
+//        Vector<Color> colorVector = new Vector<>();
+//        colors.forEach(colorVector::add);
+//
+//        Color color = new Color(type, 0, colorVector);
+//        return color;
+//    }
+
+    private ArrayList<ArrayList<Color>> getAllPossibleColors(TimedPlace place) {
+        return getAllPossibleColors(place.getColorType());
+    }
+    private ArrayList<ArrayList<Color>> getAllPossibleColors(ColorType type) {
+        if(type.isProductColorType()) {
+            ArrayList<Iterable<Color>> subtypes = new ArrayList<>() {{
+                addAll(type.getProductColorTypes());
+            }};
+
+            return util.cartesian(subtypes);
+        }
+        else {
+            return util.cartesian(new ArrayList<Iterable<Color>>() {{
+                add(type);
+            }});
+        }
+    }
 
     //region Parameters
 //    public void

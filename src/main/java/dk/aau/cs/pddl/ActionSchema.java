@@ -60,6 +60,10 @@ public class ActionSchema {
             parseParameters((VariableExpression) expression);
         } else if (expType.equals(UserOperatorExpression.class)) { // Color Literal
             return;
+        } else if (expType.equals(DotConstantExpression.class)) {
+            return;
+        } else if (expType.equals(AllExpression.class)) {
+            return;
         } else {
             throw new RuntimeException("Unhandled expression type: " + expType.getName());
         }
@@ -131,7 +135,7 @@ public class ActionSchema {
                 var weight_exp = new Expression_IntegerLiteral(weight);
 
                 precondition.addParameter(
-                    new Expresssion_GreaterOrEqual(
+                    new Expression_GreaterOrEqual(
                         func,
                         weight_exp
                     )
@@ -166,14 +170,14 @@ public class ActionSchema {
 
                 if(weight > 0) {
                     effects.addParameter(
-                        new Expresssion_Increment(
+                        new Expression_Increment(
                             func,
                             new Expression_IntegerLiteral(weight)
                         )
                     );
                 } else if (weight < 0) {
                     effects.addParameter(
-                        new Expresssion_Decrement(
+                        new Expression_Decrement(
                             func,
                             new Expression_IntegerLiteral(-weight)
                         )
@@ -251,43 +255,95 @@ public class ActionSchema {
 
     private Weights parseExpressionToWeights(NumberOfExpression expression) {
         int multiplier = expression.getNumber();
-        ArrayList<IExpression_Value> values = parseExpressionToWeights(expression.getColor());
+        Vector<ColorExpression> colorExps = expression.getColor();
+
+        ArrayList<ArrayList<IExpression_Value>> valuesSets = parseColorToValues(colorExps);
+
 
         Weights weights = new Weights();
-        weights.put(values, multiplier);
+        for(var valueSet: valuesSets) {
+            weights.put(valueSet, multiplier);
+        }
 
         return weights;
     }
 
 
-    private ArrayList<IExpression_Value> parseExpressionToWeights(Vector<ColorExpression> expression) {
+    private ArrayList<IExpression_Value> parseColorToValues(AllExpression expression) {
         ArrayList<IExpression_Value> values = new ArrayList<>();
+        var colors = expression.getSort().getColors();
 
-        for(var e: expression) {
-            var eClass = e.getClass();
-            if(eClass == VariableExpression.class)
-                values.add(parseVariableExpression((VariableExpression)e));
-            else if (eClass == UserOperatorExpression.class)
-                values.add(parseColorLiteral((UserOperatorExpression)e));
-            else if (eClass == TupleExpression.class)
-                values.addAll(parseTupleExpression((TupleExpression)e));
+        for(var c: colors) {
+            values.add(new Expression_ColorLiteral(c));
         }
 
         return values;
     }
 
-    private ArrayList<IExpression_Value> parseTupleExpression(TupleExpression expression) {
-        return parseExpressionToWeights(expression.getColors());
+
+
+    private ArrayList<ArrayList<IExpression_Value>> parseColorToValues(Vector<ColorExpression> expression) {
+        ArrayList<ArrayList<IExpression_Value>> values = new ArrayList<>();
+
+        for(var e: expression) {
+            var eClass = e.getClass();
+
+            if (eClass.equals(VariableExpression.class)) {
+                values.add(squeeze(parseColorToValues((VariableExpression) e)));
+            } else if (eClass.equals(UserOperatorExpression.class)) {
+                values.add(squeeze(parseColorToValues((UserOperatorExpression) e)));
+            } else if (eClass.equals(DotConstantExpression.class)) {
+                values.add(squeeze(parseColorToValues((DotConstantExpression) e)));
+            } else if (eClass.equals(TupleExpression.class)) {
+                values.addAll(parseColorToValues((TupleExpression) e));
+            } else if (eClass.equals(AllExpression.class)) {
+                values.addAll(squeeze(parseColorToValues(((AllExpression) e))));
+            } else {
+                throw new RuntimeException("Unhandled expression type " + e);
+            }
+        }
+
+        return values;
     }
 
-    private Parameter parseVariableExpression(VariableExpression expression) {
+    private static<T> ArrayList<T> squeeze (T elm) {
+        return new ArrayList<>() {{
+            add(elm);
+        }};
+    }
+
+    private ArrayList<ArrayList<IExpression_Value>> parseColorToValues(ColorExpression expression) {
+        return parseColorToValues(new Vector<>() {{ add(expression); }});
+    }
+
+    private ArrayList<ArrayList<IExpression_Value>> parseColorToValues(TupleExpression expression) {
+
+        var tuple_constituents = expression.getColors();
+
+        ArrayList<Iterable<IExpression_Value>> subColors = new ArrayList<>();
+        for(var sub: tuple_constituents) {
+            subColors.addAll(parseColorToValues(sub));
+        }
+
+        var cartesian = util.cartesian(subColors);
+
+        return cartesian;
+    }
+
+    private Parameter parseColorToValues(VariableExpression expression) {
         var variable = expression.getVariable();
         var name = variable.getName();
 
         return parameters.get(name);
     }
 
-    private Expression_ColorLiteral parseColorLiteral(UserOperatorExpression expression) { // Color Literal
+    private Expression_ColorLiteral parseColorToValues(UserOperatorExpression expression) { // Color Literal
+        var color = expression.getUserOperator();
+        return new Expression_ColorLiteral(color);
+    }
+
+    private Expression_ColorLiteral parseColorToValues(DotConstantExpression expression) { // Color Literal
+
         var color = expression.getUserOperator();
         return new Expression_ColorLiteral(color);
     }

@@ -1,10 +1,8 @@
 package dk.aau.cs.pddl.expression;
 
-import dk.aau.cs.pddl.Parameter;
+public class Expression_GreaterOrEqual extends BaseExpression implements IExpression {
 
-public class Expresssion_GreaterOrEqual extends BaseExpression implements IExpression {
-
-    public Expresssion_GreaterOrEqual(IExpression left, IExpression right) {
+    public Expression_GreaterOrEqual(IExpression left, IExpression right) {
         this.parameters.add(left);
         this.parameters.add(right);
     }

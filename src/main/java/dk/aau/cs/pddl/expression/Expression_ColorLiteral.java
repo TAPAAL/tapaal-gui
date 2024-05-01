@@ -2,6 +2,8 @@ package dk.aau.cs.pddl.expression;
 
 import dk.aau.cs.model.CPN.Color;
 
+import java.util.Objects;
+
 public class Expression_ColorLiteral implements IExpression_Value {
     private Color color;
 
@@ -11,6 +13,19 @@ public class Expression_ColorLiteral implements IExpression_Value {
 
     @Override
     public String toString() {
-        return "?" + color.getName();
+        return color.getName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Expression_ColorLiteral that = (Expression_ColorLiteral) o;
+        return Objects.equals(color, that.color);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(color);
     }
 }

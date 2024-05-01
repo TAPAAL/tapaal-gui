@@ -103,7 +103,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         );
 
         var stringifier = new PddlStringifier(planningTask);
-        var pddl = stringifier.buildModel();
+        var pddl = stringifier.buildDomain();
         System.out.println(pddl);
     }
 	

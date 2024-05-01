@@ -1,5 +1,6 @@
 package dk.aau.cs.pddl;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.pddl.expression.IExpression_Value;
 
 public class ColorLiteral implements IExpression_Value {
@@ -13,6 +14,10 @@ public class ColorLiteral implements IExpression_Value {
         this.userType = userType;
     }
 
+    public ColorLiteral(Color color) {
+        this.name = color.getName();
+        this.userType = new UserType(color.getColorType());
+    }
 
     public String getName() {
         return name;

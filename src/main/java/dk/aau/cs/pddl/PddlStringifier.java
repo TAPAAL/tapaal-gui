@@ -1,5 +1,10 @@
 package dk.aau.cs.pddl;
 
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.pddl.expression.*;
+
+import java.util.ArrayList;
+
 public class PddlStringifier {
     private Model model;
 
@@ -8,20 +13,29 @@ public class PddlStringifier {
     }
 
     public String getString() {
-        return buildModel().toString();
+        return buildDomain().toString();
     }
 
 
-    public StringBuilder buildModel() {
+    public StringBuilder buildDomain() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("(define (domain %s)\n", model.getName()));
-
         sb.append(this.buildExtensions());
         sb.append(this.buildTypes());
         sb.append(this.buildFunctions());
         sb.append(this.buildActions());
         sb.append(")");
+        sb.append("\n").append(buildTask());
+        return sb;
+    }
 
+    public StringBuilder buildTask() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("(define (problem %s_problem)\n", model.getName()));
+        sb.append(String.format("\t(:domain %s)\n", model.getName()));
+        sb.append(this.buildObjects());
+        sb.append(this.buildInitialState());
+        sb.append(")");
         return sb;
     }
 
@@ -80,7 +94,9 @@ public class PddlStringifier {
     public StringBuilder buildActions() {
         StringBuilder sb = new StringBuilder();
 
-        for (ActionSchema action : model.getActionSchemas().values()) {
+        var parsedActionSchema = model.getActionSchemas();
+
+        for (ActionSchema action : parsedActionSchema.values()) {
             sb.append(buildAction(action));
         }
 
@@ -92,11 +108,11 @@ public class PddlStringifier {
 
         sb.append("\t(:action ").append(actionSchema.getName()).append("\n");
 
-        sb.append("\t\t(:parameters").append(buildParameters(actionSchema.getParameters().values())).append(")\n");
+        sb.append("\t\t:parameters").append(buildParameters(actionSchema.getParameters().values())).append("\n");
 
-        sb.append("\t\t(:precondition ").append(actionSchema.getPrecondition().toString()).append(")\n");
+        sb.append("\t\t:precondition ").append(actionSchema.getPrecondition().toString()).append("\n");
 
-        sb.append("\t\t(:effects ").append(actionSchema.getEffects().toString()).append(")\n");
+        sb.append("\t\t:effects ").append(actionSchema.getEffects().toString()).append("\n");
 
         sb.append("\t)\n");
 
@@ -104,6 +120,47 @@ public class PddlStringifier {
     }
 
 
+    public StringBuilder buildInitialState() {
+        return buildInitialState(this.model.getState());
+    }
+    public StringBuilder buildInitialState(PlaceWeights placeWeights) {
+        StringBuilder sb = new StringBuilder();
 
+        sb.append("\t(:init ");
+
+
+        for(var placeWeightEntry : placeWeights.entrySet()) {
+            TimedPlace place = placeWeightEntry.getKey();
+            for(var weightEntry : placeWeightEntry.getValue().entrySet()) {
+                ArrayList<IExpression_Value> colors = weightEntry.getKey();
+                int weight = weightEntry.getValue();
+
+                var funcExp = new Expression_FunctionValue(place.name(), colors);
+                var assignment = new Expression_FunctionEq(funcExp, new Expression_IntegerLiteral(weight));
+
+                sb.append("\n\t\t").append(assignment);
+            }
+        }
+
+        sb.append("\n\t)\n");
+
+        return sb;
+    }
+
+    public StringBuilder buildObjects() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\t(:objects");
+        for(var e: this.model.getTypes().entrySet()) {
+            UserType type = e.getValue();
+            sb.append("\n\t\t");
+            type.getObjectNames().forEach(o -> {
+                sb.append(o).append(" ");
+            });
+            sb.append("- ").append(type.getName());
+        }
+        sb.append("\n\t)\n");
+
+        return sb;
+    }
 
 }
