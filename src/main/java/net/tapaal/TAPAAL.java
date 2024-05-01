@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import dk.aau.cs.pddl.pddlMain;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.dialog.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
@@ -54,6 +55,7 @@ public class TAPAAL {
 		// Create possible commandline options
 		Options options = new Options();
 		options.addOption("d", "debug", false, "enable debug output .");
+		options.addOption("p", "pddl", false, "Translate a petri net to a planning domain and task file in pddl format.");
 
 		CommandLine commandline = null;
 
@@ -83,6 +85,11 @@ public class TAPAAL {
 			batchProcessing(batchFolder);
 			return;
 		}
+
+        if (commandline.hasOption("pddl")) {
+            pddlMain.main(commandline);
+            return;
+        }
 
 		// Create the TAPAAL GUI
 		TAPAALGUI.init();

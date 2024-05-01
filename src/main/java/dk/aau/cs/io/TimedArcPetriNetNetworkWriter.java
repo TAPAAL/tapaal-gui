@@ -92,19 +92,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         this.constants = constants;
         writeTACPN = new writeTACPN(network);
         this.lens = lens;
-
-        var planningTask = new Model();
-        planningTask.parse(
-            this.network,
-            this.templates,
-            this.queries,
-            this.constants,
-            this.lens
-        );
-
-        var stringifier = new PddlStringifier(planningTask);
-        var pddl = stringifier.buildDomain();
-        System.out.println(pddl);
     }
 	
 	public ByteArrayOutputStream savePNML() throws ParserConfigurationException, DOMException, TransformerException {
