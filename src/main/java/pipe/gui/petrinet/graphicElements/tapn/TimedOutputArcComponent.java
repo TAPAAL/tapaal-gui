@@ -104,6 +104,8 @@ public class TimedOutputArcComponent extends Arc {
             if(((ConstantWeight) getWeight()).constant().hasFocus()){
                 focusedConstant = true;
             }
+
+			isvisible = ((ConstantWeight) getWeight()).constant().getVisible();
         }
         if (focusedConstant) {
             getNameLabel().setForeground(Constants.SELECTION_TEXT_COLOUR);

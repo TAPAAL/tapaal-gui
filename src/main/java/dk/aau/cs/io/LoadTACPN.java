@@ -444,8 +444,10 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
 
     Color findColorForIntRange(String value, String start, String end) throws FormatException {
         for(var ct : colortypes.values()){
-            if(ct.getColors().get(0).getColorName().equals(start) && ct.getColors().get(ct.getColors().size()-1).getColorName().equals(end)){
-                for (dk.aau.cs.model.CPN.Color c : ct) {
+            List<Color> colors = ct.getColorList();
+            if (colors.size() == 0) continue;
+            if(colors.get(0).getColorName().equals(start) && colors.get(colors.size()-1).getColorName().equals(end)){
+                for (Color c : ct) {
                     if (c.getName().equals(value)) {
                         return c;
                     }

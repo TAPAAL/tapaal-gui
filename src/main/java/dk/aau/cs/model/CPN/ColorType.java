@@ -4,7 +4,9 @@ import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 public class ColorType implements Iterable<Color> {
@@ -38,6 +40,10 @@ public class ColorType implements Iterable<Color> {
 
     public @NotNull Iterator<Color> iterator() {
         return colors.iterator();
+    }
+
+    public List<Color> getColorList() {
+        return new ArrayList<>(colors);
     }
 
     public Vector<Color> getColors() {
