@@ -197,7 +197,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				}
 			}
 			if (isInconclusive(verificationResult.getQueryResult(), verificationResult.getUnfoldedModel().value1())) {
-			    queryResult += "Inconclusive";
+			    queryResult = "Inconclusive";
             }
 			if (query.discreteInclusion() && !verificationResult.isBounded() && ((query.queryType().equals(QueryType.EF) &&
                     !verificationResult.getQueryResult().isQuerySatisfied()) || (query.queryType().equals(QueryType.AG) &&
