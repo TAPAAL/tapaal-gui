@@ -215,7 +215,7 @@ public class OverApproximation implements ITAPNApproximation {
 				}
 				for (TransportArc arc : originalTransport) {
 					if (arc.transition() == firedTransition) {
-						net.add(new TransportArc(arc.source(), copyTransition, arc.destination(), arc.interval(), arc.getWeight()));
+						net.add(new TransportArc(arc.source(), copyTransition, arc.destination(), arc.interval(), arc.getWeight(), arc.getInputExpression(), arc.getOutputExpression()));
 					}
 				}
 				
