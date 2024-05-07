@@ -5,6 +5,7 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 
 public class QueryResult {
 	private final boolean satisfied;
+    private final String quantitativeResult;
 	private boolean approximationInconclusive = false;
 	private final boolean discreteInclusion;
 	private final TAPNQuery query;
@@ -44,7 +45,16 @@ public class QueryResult {
 		this.boundednessAnalysis = boundednessAnalysis;
 		this.query = query;
 		this.discreteInclusion = discreteInclusion;
+        this.quantitativeResult = "";
 	}
+
+    public QueryResult(String quantitativeResult, BoundednessAnalysisResult boundednessAnalysis, TAPNQuery query, boolean discreteInclusion){
+        this.satisfied = true;
+        this.boundednessAnalysis = boundednessAnalysis;
+        this.query = query;
+        this.discreteInclusion = discreteInclusion;
+        this.quantitativeResult = quantitativeResult;
+    }
 	
 	public boolean isQuerySatisfied() {
 		return satisfied;
@@ -71,10 +81,12 @@ public class QueryResult {
 		StringBuilder buffer = new StringBuilder();
 		if(approximationInconclusive)
 			buffer.append(getInconclusiveString());
-		else {
+		else if(this.quantitativeResult.isEmpty()) {
 			buffer.append("Property is ");
 			buffer.append(satisfied ? "satisfied." : "not satisfied.");
-		}
+		} else {
+            buffer.append("Verification result: ").append(quantitativeResult);
+        }
 		if(shouldAddExplanation())
 			buffer.append(getExplanationString());
 		return buffer.toString();
@@ -91,6 +103,8 @@ public class QueryResult {
 		|| (queryType().equals(QueryType.AG) && isQuerySatisfied())
         || (queryType().equals(QueryType.A))
         || (queryType().equals(QueryType.E))
+        /*|| (queryType().equals(QueryType.PF))
+        || (queryType().equals(QueryType.PG))*/
 		|| (hasDeadlock() && 
 				(!isQuerySatisfied() && queryType().equals(QueryType.EF)) || 
 				(isQuerySatisfied() && queryType().equals(QueryType.AG))
@@ -111,5 +125,13 @@ public class QueryResult {
 
     public TAPNQuery getQuery() {
         return query;
+    }
+
+    public boolean isSMC() {
+        return query.getCategory() == net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.SMC;
+    }
+
+    public boolean isQuantitative() {
+        return !quantitativeResult.isEmpty();
     }
 }

@@ -20,7 +20,8 @@ public class VerifyDTAPNEngineOptions extends EngineSupportOptions {
             true, //support EG or AF with net degree > 2);
             false, //support for nested quantification
             true,
-            false
+            false,
+            true
         );
     }
 }

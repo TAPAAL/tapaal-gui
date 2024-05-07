@@ -215,6 +215,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         TimedArcPetriNetNetwork net = tab.network();
         for (TAPNQuery q : tab.queries()) {
+            boolean smcQuery = q.getCategory() == TAPNQuery.QueryCategory.SMC;
             boolean[] queryOptions = new boolean[]{
                 q.getTraceOption() == TAPNQuery.TraceOption.FASTEST,
                 (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && net.getHighestNetDegree() <= 2),
@@ -231,7 +232,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
                 q.hasUntimedOnlyProperties(),
                 tab.lens.isColored(),
-                tab.lens.isColored() && !tab.lens.isTimed()
+                tab.lens.isColored() && !tab.lens.isTimed(), q.getCategory() == TAPNQuery.QueryCategory.SMC
             };
 
             boolean hasEngine = tab.checkCurrentEngine(q.getReductionOption(), queryOptions);

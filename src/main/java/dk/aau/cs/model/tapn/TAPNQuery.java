@@ -30,6 +30,8 @@ public class TAPNQuery {
 		if (property instanceof TCTLEFNode) return QueryType.EF;
 		else if (property instanceof TCTLEGNode) return QueryType.EG;
 		else if (property instanceof TCTLAFNode) return QueryType.AF;
+        else if(queryCategory == QueryCategory.SMC && property instanceof LTLFNode) return QueryType.PF;
+        else if(queryCategory == QueryCategory.SMC && property instanceof LTLGNode) return QueryType.PG;
 		else if (property instanceof LTLENode) return  QueryType.E;
 		else if (property instanceof LTLANode) return QueryType.A;
         else return QueryType.AG;

@@ -20,7 +20,8 @@ public class VerifyPNEngineOptions extends EngineSupportOptions {
             true, //support EG or AF with net degree > 2
             true,//support for nested quantification
             true,
-            true
+            true,
+            false
         );
     }
 }

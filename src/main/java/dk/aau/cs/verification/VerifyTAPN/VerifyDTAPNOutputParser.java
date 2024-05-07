@@ -6,16 +6,18 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.TCTL.LTLFNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.BoundednessAnalysisResult;
-import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.Stats;
+import dk.aau.cs.verification.*;
 
 public class VerifyDTAPNOutputParser {
 	private static final String Query_IS_NOT_SATISFIED_STRING = "Query is NOT satisfied";
 	private static final String Query_IS_SATISFIED_STRING = "Query is satisfied";
 	private static final String DISCRETE_INCLUSION = "discrete inclusion";
+    private static final String SMC_Verification_INDICATOR_STRING = "SMC Verification";
+    private static final String SMC_Hypothesis_IS_SATISFIED_STRING = "Hypothesis is satisfied";
+    private static final String SMC_Hypothesis_IS_NOT_SATISFIED_STRING = "Hypothesis is NOT satisfied";
 
 	private static final Pattern discoveredPattern = Pattern.compile("\\s*discovered markings:\\s*(\\d+)\\s*");
 	private static final Pattern exploredPattern = Pattern.compile("\\s*explored markings:\\s*(\\d+)\\s*");
@@ -24,6 +26,12 @@ public class VerifyDTAPNOutputParser {
 	private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
 	private static final Pattern placeBoundPattern = Pattern.compile("<([^;\\s]+);(\\d+)>");
     private static final Pattern placeBoundPatternUnknown = Pattern.compile("<([^;\\s]+);\\?>");
+
+    private static final Pattern smcEstimationPattern = Pattern.compile("\\s*P in \\[([^;]+);([^;]+)\\]\\s*");
+    private static final Pattern smcExecutedRunsPattern = Pattern.compile("\\s*runs executed:\\s*(\\d+)\\s*");
+    private static final Pattern smcValidRunsPattern = Pattern.compile("\\s*valid runs:\\s*(\\d+)\\s*");
+    private static final Pattern smcAverageTimePattern = Pattern.compile("\\s*average run time:\\s*([\\d|\\.]+)\\s*");
+    private static final Pattern smcAverageLengthPattern = Pattern.compile("\\s*average run length:\\s*([\\d|\\.]+)\\s*");
         
 	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (-?\\d*)");
 	private static final Pattern wfMaxExecutionPattern = Pattern.compile("Maximum execution time: (-?\\d*)");
@@ -46,11 +54,18 @@ public class VerifyDTAPNOutputParser {
 		int stored = 0;
 		int WFminExecutionTime = -1;
 		int WFmaxExecutionTime = -1;
+        int smcExecutedRuns = -1;
+        int smcValidRuns = -1;
+        float smcAverageTime = -1.0f;
+        float smcAverageLength = -1.0f;
 		ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking = null;
 		boolean result = false;
 		int maxUsedTokens = 0;
 		boolean foundResult = false;
 		boolean discreteInclusion = false;
+        boolean isSmc = false;
+        boolean isQuantitative = false;
+        String quantitativeResult = "";
 		String[] lines = output.split(System.getProperty("line.separator"));
 		try {			
 			Matcher matcher = transitionStatsPattern.matcher(output);
@@ -67,13 +82,14 @@ public class VerifyDTAPNOutputParser {
 			}
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
+                if (line.contains(SMC_Verification_INDICATOR_STRING)) isSmc = true;
 				if (line.contains(DISCRETE_INCLUSION)) { discreteInclusion = true; }
-				if (line.contains(Query_IS_SATISFIED_STRING)) {
+				if (line.contains(Query_IS_SATISFIED_STRING) || line.contains(SMC_Hypothesis_IS_SATISFIED_STRING)) {
 					result = true;
 					foundResult = true;
-				} else if (line.contains(Query_IS_NOT_SATISFIED_STRING)) {
-					result = false;
-					foundResult = true;
+				} else if (line.contains(Query_IS_NOT_SATISFIED_STRING) || line.contains(SMC_Hypothesis_IS_NOT_SATISFIED_STRING)) {
+                    result = false;
+                    foundResult = true;
 				} else {
 					matcher = discoveredPattern.matcher(line);
 					if(matcher.find()){
@@ -120,13 +136,53 @@ public class VerifyDTAPNOutputParser {
 							}
 						}
 					}
+
+                    matcher = smcEstimationPattern.matcher(line);
+                    if(matcher.find()) {
+                        foundResult = true;
+                        result = true;
+                        isQuantitative = true;
+                        float smcEstimationLow = Float.parseFloat(matcher.group(1));
+                        float smcEstimationHigh = Float.parseFloat(matcher.group(2));
+                        quantitativeResult = "Probability is in [" + smcEstimationLow + ";" + smcEstimationHigh + "]";
+                    }
+
+                    matcher = smcExecutedRunsPattern.matcher(line);
+                    if(matcher.find()) {
+                        smcExecutedRuns = Integer.parseInt(matcher.group(1));
+                    }
+
+                    matcher = smcValidRunsPattern.matcher(line);
+                    if(matcher.find()) {
+                        smcValidRuns = Integer.parseInt(matcher.group(1));
+                    }
+
+                    matcher = smcAverageTimePattern.matcher(line);
+                    if(matcher.find()) {
+                        smcAverageTime = Float.parseFloat(matcher.group(1));
+                    }
+
+                    matcher = smcAverageLengthPattern.matcher(line);
+                    if(matcher.find()) {
+                        smcAverageLength = Float.parseFloat(matcher.group(1));
+                    }
 				}
 			}
 			
 			if(!foundResult) return null;
 			
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-            return new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, discreteInclusion), new Stats(discovered, explored, stored, transitionStats, placeBoundStats, WFminExecutionTime, WFmaxExecutionTime, coveredMarking));
+            Stats verifStats;
+            QueryResult queryRes;
+            if(isSmc)
+                verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength);
+            else
+                verifStats = new Stats(discovered, explored, stored, transitionStats, placeBoundStats, WFminExecutionTime, WFmaxExecutionTime, coveredMarking);
+            if(isQuantitative)
+                queryRes = new QueryResult(quantitativeResult, boundedAnalysis, query, discreteInclusion);
+            else
+                queryRes = new QueryResult(result, boundedAnalysis, query, discreteInclusion);
+            return new Tuple<QueryResult, Stats>(queryRes, verifStats);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

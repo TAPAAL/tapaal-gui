@@ -2,19 +2,14 @@ package net.tapaal.gui.petrinet.dialog;
 
 import java.awt.*;
 import java.awt.Dialog.ModalityType;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -39,6 +34,7 @@ import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.HyperLTLParsing.TAPAALHyperLTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
+import dk.aau.cs.verification.*;
 import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
@@ -62,10 +58,6 @@ import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
-import dk.aau.cs.verification.ITAPNComposer;
-import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.swingcomponents.EscapableDialog;
@@ -99,6 +91,7 @@ public class QueryDialog extends JPanel {
 	// Query Name Panel;
 	private JPanel namePanel;
 	private JComboBox queryType;
+    private JComboBox smcSelector;
 	private JButton advancedButton;
 
 	// Boundedness check panel
@@ -224,6 +217,22 @@ public class QueryDialog extends JPanel {
     private JRadioButton overApproximationEnable;
     private JRadioButton underApproximationEnable;
     private CustomJSpinner overApproximationDenominator;
+
+    // SMC options panel
+    private JPanel smcSettingsPanel;
+    private JComboBox<String> smcVerificationType;
+    private JComboBox<String> smcBoundType;
+    private JTextField smcBoundValue;
+    private JTextField smcDefaultRate;
+    private JPanel quantitativePanel;
+    private JTextField smcConfidence;
+    private JTextField smcEstimationIntervalWidth;
+    private JPanel qualitativePanel;
+    private JTextField smcFalsePositives;
+    private JTextField smcFalseNegatives;
+    private JTextField smcIndifference;
+    private JTextField smcComparisonFloat;
+    private SMCSettings smcSettings;
 
     // Buttons in the bottom of the dialogue
     private JPanel buttonPanel;
@@ -513,6 +522,12 @@ public class QueryDialog extends JPanel {
         if (reductionOptionToSet != null && reductionOptionToSet.equals(ReductionOption.VerifyTAPN)) {
             query.setDiscreteInclusion(discreteInclusion.isSelected());
         }
+
+        if(smcSelector.getSelectedIndex() == 1) {
+            query.setCategory(TAPNQuery.QueryCategory.SMC);
+            query.setSmcSettings(getSMCSettings());
+        }
+
         return query;
     }
 
@@ -666,6 +681,75 @@ public class QueryDialog extends JPanel {
             }
 		}
 	}
+
+    private void updateSMCSettings() {
+        smcSettings.compareToFloat = smcVerificationType.getSelectedIndex() == 1;
+        smcSettings.boundType = smcBoundType.getSelectedIndex() == 0 ?
+            SMCSettings.RunBoundType.TIMEBOUND :
+                SMCSettings.RunBoundType.STEPBOUND;
+        try {
+            smcSettings.defaultRate = Float.parseFloat(smcDefaultRate.getText());
+        } catch(NumberFormatException e) {
+            smcDefaultRate.setText(String.valueOf(smcSettings.defaultRate));
+        }
+        try {
+            smcSettings.boundValue = Integer.parseInt(smcBoundValue.getText());
+        } catch(NumberFormatException e) {
+            smcBoundValue.setText(String.valueOf(smcSettings.boundValue));
+        }
+        try {
+            smcSettings.confidence = Float.parseFloat(smcConfidence.getText());
+        } catch(NumberFormatException e) {
+            smcConfidence.setText(String.valueOf(smcSettings.confidence));
+        }
+        try {
+            smcSettings.estimationIntervalWidth = Float.parseFloat(smcEstimationIntervalWidth.getText());
+        } catch(NumberFormatException e) {
+            smcEstimationIntervalWidth.setText(String.valueOf(smcSettings.estimationIntervalWidth));
+        }
+        try {
+            smcSettings.falsePositives = Float.parseFloat(smcFalsePositives.getText());
+        } catch(NumberFormatException e) {
+            smcFalsePositives.setText(String.valueOf(smcSettings.falsePositives));
+        }
+        try {
+            smcSettings.falseNegatives = Float.parseFloat(smcFalseNegatives.getText());
+        } catch(NumberFormatException e) {
+            smcFalseNegatives.setText(String.valueOf(smcSettings.falseNegatives));
+        }
+        try {
+            smcSettings.indifferenceWidth = Float.parseFloat(smcIndifference.getText());
+        } catch(NumberFormatException e) {
+            smcIndifference.setText(String.valueOf(smcSettings.indifferenceWidth));
+        }
+        try {
+            smcSettings.geqThan = Float.parseFloat(smcComparisonFloat.getText());
+        } catch(NumberFormatException e) {
+            smcComparisonFloat.setText(String.valueOf(smcSettings.geqThan));
+        }
+    }
+
+    private SMCSettings getSMCSettings() {
+        updateSMCSettings();
+        return smcSettings;
+    }
+
+    private void setSMCSettings(SMCSettings settings) {
+        smcSettings = settings;
+
+        smcVerificationType.setSelectedIndex(settings.compareToFloat ? 1 : 0);
+        smcBoundType.setSelectedIndex( settings.boundType == SMCSettings.RunBoundType.TIMEBOUND ? 0 : 1 );
+        smcBoundValue.setText(String.valueOf(settings.boundValue));
+        smcDefaultRate.setText(String.valueOf(settings.defaultRate));
+
+        smcConfidence.setText(String.valueOf(settings.confidence));
+        smcEstimationIntervalWidth.setText(String.valueOf(settings.estimationIntervalWidth));
+
+        smcFalsePositives.setText(String.valueOf(settings.falsePositives));
+        smcFalseNegatives.setText(String.valueOf(settings.falseNegatives));
+        smcIndifference.setText(String.valueOf(settings.indifferenceWidth));
+        smcComparisonFloat.setText(String.valueOf(settings.geqThan));
+    }
 
     private boolean queryIsReachability() {
         return new IsReachabilityVisitor().isReachability(newProperty);
@@ -1052,7 +1136,8 @@ public class QueryDialog extends JPanel {
             (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) && highestNetDegree > 2,
             newProperty.hasNestedPathQuantifiers(),
             lens.isColored(),
-            lens.isColored() && !lens.isTimed()
+            lens.isColored() && !lens.isTimed(),
+            smcSelector.getSelectedIndex() == 1
         };
 
 
@@ -1306,6 +1391,14 @@ public class QueryDialog extends JPanel {
         if (queryType.getSelectedIndex() == 2) traceBox.setEnabled(traceBox.getModel().getSize() > 0);
     }
 
+    private void enableOnlySMCButtons() {
+        finallyButton.setEnabled(true);
+        globallyButton.setEnabled(true);
+        if(smcSelector.getSelectedIndex() == 1) {
+            updateSMCButtons();
+        }
+    }
+
     private void enableOnlyUntimedStateButtons() {
         existsBox.setEnabled(true);
         existsDiamond.setEnabled(true);
@@ -1520,6 +1613,7 @@ public class QueryDialog extends JPanel {
         initUppaalOptionsPanel();
         initVerificationPanel();
         initOverApproximationPanel();
+        initSmcSettingsPanel();
         initRawVerificationOptionsPanel();
         initButtonPanel(option);
 
@@ -1556,6 +1650,7 @@ public class QueryDialog extends JPanel {
             setupRawVerificationOptionsFromQuery(queryToCreateFrom);
         } else {
             setupRawVerificationOptions();
+            setSMCSettings(SMCSettings.Default());
         }
     }
 
@@ -1570,6 +1665,12 @@ public class QueryDialog extends JPanel {
             setupUnfoldingOptionsFromQuery(queryToCreateFrom);
         }
 
+        if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.SMC) {
+            setSMCSettings(queryToCreateFrom.getSmcSettings());
+        } else {
+            setSMCSettings(SMCSettings.Default());
+        }
+
         setupQueryCategoryFromQuery(queryToCreateFrom);
         setupSearchOptionsFromQuery(queryToCreateFrom);
         setupReductionOptionsFromQuery(queryToCreateFrom);
@@ -1580,6 +1681,7 @@ public class QueryDialog extends JPanel {
         if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
         }
+
     }
 
     private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1774,6 +1876,11 @@ public class QueryDialog extends JPanel {
             } else if (category.equals(TAPNQuery.QueryCategory.HyperLTL)) {
                 queryType.setSelectedIndex(2);
             }
+        } else if(lens.isStochastic()) {
+            TAPNQuery.QueryCategory category = queryToCreateFrom.getCategory();
+            if (category.equals(TAPNQuery.QueryCategory.SMC)) {
+                smcSelector.setSelectedIndex(1);
+            }
         }
     }
 
@@ -1802,9 +1909,12 @@ public class QueryDialog extends JPanel {
             }
         });
 
-        queryType = new JComboBox(new String[]{"CTL/Reachability", "LTL","HyperLTL"});
+        queryType = new JComboBox(new String[]{"CTL/Reachability", "LTL", "HyperLTL"});
         queryType.setToolTipText(TOOL_TIP_QUERY_TYPE);
         queryType.addActionListener(arg0 -> toggleDialogType());
+
+        smcSelector = new JComboBox(new String[]{"Reachability/Liveness", "SMC"});
+        smcSelector.addActionListener(arg0 -> toggleSmc());
 
         advancedButton = new JButton("Advanced view");
         advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
@@ -1872,6 +1982,7 @@ public class QueryDialog extends JPanel {
         JPanel topButtonPanel = new JPanel(new FlowLayout());
         topButtonPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         if (!lens.isTimed() && !lens.isGame()) topButtonPanel.add(queryType);
+        if (lens.isStochastic()) topButtonPanel.add(smcSelector);
         topButtonPanel.add(advancedButton);
         topButtonPanel.add(infoButton);
 
@@ -1901,18 +2012,20 @@ public class QueryDialog extends JPanel {
             setAdvancedView(!advancedView);
         }
 
+        boolean isSmc = smcSelector.getSelectedIndex() == 1;
+
         Point location = guiDialog.getLocation();
 
-        searchOptionsPanel.setVisible(advancedView);
+        searchOptionsPanel.setVisible(advancedView && !isSmc);
         if(lens.isColored() && !lens.isTimed()){
             unfoldingOptionsPanel.setVisible(advancedView);
         }
 
-        reductionOptionsPanel.setVisible(advancedView);
+        reductionOptionsPanel.setVisible(advancedView && !isSmc);
         if (lens.isTimed()) {
-            saveUppaalXMLButton.setVisible(advancedView);
+            saveUppaalXMLButton.setVisible(advancedView && !isSmc);
             // Disabled approximation options for colored models, because they are not supported yet (will generate error)
-            overApproximationOptionsPanel.setVisible(advancedView && !lens.isColored());
+            overApproximationOptionsPanel.setVisible(advancedView && !lens.isColored() && !isSmc);
         } else if (!lens.isGame()){
             openReducedNetButton.setVisible(advancedView);
         }
@@ -2026,6 +2139,31 @@ public class QueryDialog extends JPanel {
 
         setEnabledOptionsAccordingToCurrentReduction();
         updateRawVerificationOptions();
+    }
+
+    private void toggleSmc() {
+        if(smcSelector.getSelectedIndex() == 1) {
+            showSMCButtons(true);
+            reductionOption.setSelectedItem(name_DISCRETE);
+            reductionOption.setEnabled(false);
+            traceOptionsPanel.setVisible(false);
+            boundednessCheckPanel.setVisible(false);
+            smcSettingsPanel.setVisible(true);
+            toggleAdvancedSimpleView(false);
+            queryChanged();
+        } else {
+            showSMCButtons(false);
+            reductionOption.setEnabled(true);
+            traceOptionsPanel.setVisible(true);
+            boundednessCheckPanel.setVisible(true);
+            smcSettingsPanel.setVisible(false);
+            toggleAdvancedSimpleView(false);
+            queryChanged();
+        }
+
+        if (undoManager != null) undoManager.discardAllEdits();
+        if (undoButton != null) undoButton.setEnabled(false);
+        if (redoButton != null) redoButton.setEnabled(false);
     }
 
     private boolean isValidLTL() {
@@ -2461,6 +2599,123 @@ public class QueryDialog extends JPanel {
         uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
     }
 
+    private void initSmcSettingsPanel() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(0,5,0,5);
+        GridBagConstraints subPanelGbc = new GridBagConstraints();
+        subPanelGbc.anchor = GridBagConstraints.WEST;
+        subPanelGbc.insets = new Insets(0,5,0,5);
+
+        FocusListener updater = new FocusListener() {
+            public void focusGained(FocusEvent focusEvent) { }
+            public void focusLost(FocusEvent focusEvent) {
+                updateSMCSettings();
+            }
+        };
+
+        smcSettingsPanel = new JPanel();
+        smcSettingsPanel.setLayout(new GridBagLayout());
+        smcSettingsPanel.setVisible(false);
+        smcSettingsPanel.setBorder(BorderFactory.createTitledBorder("SMC Options"));
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        smcVerificationType = new JComboBox<>(new String[]{ "Quantitative", "Qualitative" });
+        smcSettingsPanel.add(smcVerificationType, gbc);
+        gbc.gridx = 1;
+        smcSettingsPanel.add(new JLabel("Default rate : "), gbc);
+        gbc.gridx = 2;
+        smcDefaultRate = new JTextField(7);
+        smcDefaultRate.addFocusListener(updater);
+        smcSettingsPanel.add(smcDefaultRate);
+
+        gbc.gridy = 1;
+        gbc.gridx = 0;
+        smcSettingsPanel.add(new JLabel("Run bound : "), gbc);
+        gbc.gridx = 1;
+        smcBoundType = new JComboBox<>(new String[]{ "Time", "Steps" });
+        smcSettingsPanel.add(smcBoundType, gbc);
+        gbc.gridx = 2;
+        smcBoundValue = new JTextField(10);
+        smcBoundValue.addFocusListener(updater);
+        smcSettingsPanel.add(smcBoundValue, gbc);
+
+        gbc.gridy = 2;
+        gbc.gridx = 0;
+        gbc.gridwidth = 3;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(10,0,10,0);
+
+        quantitativePanel = new JPanel();
+        quantitativePanel.setLayout(new GridBagLayout());
+        quantitativePanel.setBorder(BorderFactory.createTitledBorder("Quantitative estimation options"));
+        subPanelGbc.gridy = 0;
+        subPanelGbc.gridx = 0;
+        quantitativePanel.add(new JLabel("Confidence : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcConfidence = new JTextField(7);
+        smcConfidence.addFocusListener(updater);
+        quantitativePanel.add(smcConfidence, subPanelGbc);
+        subPanelGbc.gridy = 1;
+        subPanelGbc.gridx = 0;
+        quantitativePanel.add(new JLabel("Estimation interval width : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcEstimationIntervalWidth = new JTextField(7);
+        smcEstimationIntervalWidth.addFocusListener(updater);
+        quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
+        smcSettingsPanel.add(quantitativePanel, gbc);
+
+        gbc.gridy = 3;
+        qualitativePanel = new JPanel();
+        qualitativePanel.setLayout(new GridBagLayout());
+        qualitativePanel.setBorder(BorderFactory.createTitledBorder("Qualitative estimation options"));
+        qualitativePanel.setVisible(false);
+        subPanelGbc.gridy = 0;
+        subPanelGbc.gridx = 0;
+        qualitativePanel.add(new JLabel("False positives : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcFalsePositives = new JTextField(7);
+        smcFalsePositives.addFocusListener(updater);
+        qualitativePanel.add(smcFalsePositives, subPanelGbc);
+        subPanelGbc.gridy = 1;
+        subPanelGbc.gridx = 0;
+        qualitativePanel.add(new JLabel("False negatives : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcFalseNegatives = new JTextField(7);
+        smcFalseNegatives.addFocusListener(updater);
+        qualitativePanel.add(smcFalseNegatives, subPanelGbc);
+        subPanelGbc.gridy = 2;
+        subPanelGbc.gridx = 0;
+        qualitativePanel.add(new JLabel("Indifference region width : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcIndifference = new JTextField(7);
+        smcIndifference.addFocusListener(updater);
+        qualitativePanel.add(smcIndifference, subPanelGbc);
+        subPanelGbc.gridy = 3;
+        subPanelGbc.gridx = 0;
+        qualitativePanel.add(new JLabel("Test : P(Phi) >= "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcComparisonFloat = new JTextField(7);
+        smcComparisonFloat.addFocusListener(updater);
+        qualitativePanel.add(smcComparisonFloat, subPanelGbc);
+        smcSettingsPanel.add(qualitativePanel, gbc);
+
+        smcVerificationType.addActionListener(evt -> {
+            boolean quantitative = smcVerificationType.getSelectedIndex() == 0;
+            quantitativePanel.setVisible(quantitative);
+            qualitativePanel.setVisible(!quantitative);
+            guiDialog.pack();
+        });
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5,10,5,10);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        add(smcSettingsPanel, gridBagConstraints);
+    }
+
     private void initQueryPanel() {
         queryPanel = new JPanel(new GridBagLayout());
         queryPanel.setBorder(BorderFactory.createTitledBorder("Query (click on the part of the query you want to change)"));
@@ -2683,6 +2938,9 @@ public class QueryDialog extends JPanel {
 
         if (lens.isTimed()|| lens.isGame()) {
             addTimedQuantificationListeners();
+            if(lens.isStochastic()) {
+                addSmcQuantificationListerners();
+            }
             showLTLButtons(false);
             showHyperLTLButtons(false);
         } else {
@@ -2720,6 +2978,18 @@ public class QueryDialog extends JPanel {
             forAllDiamond.setSelected(true);
             addPropertyToQuery(property);
             unselectButtons();
+        });
+    }
+
+    private void addSmcQuantificationListerners() {
+        finallyButton.addActionListener(e -> {
+            LTLFNode property = new LTLFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            addPropertyToQuery(property);
+        });
+
+        globallyButton.addActionListener(e -> {
+            LTLGNode property = new LTLGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            addPropertyToQuery(property);
         });
     }
 
@@ -2918,6 +3188,13 @@ public class QueryDialog extends JPanel {
         existsDiamond.setVisible(isVisible);
         existsNext.setVisible(isVisible);
         existsUntil.setVisible(isVisible);
+    }
+
+    private void showSMCButtons(boolean isVisible) {
+        showCTLButtons(!isVisible);
+        globallyButton.setVisible(isVisible);
+        finallyButton.setVisible(isVisible);
+        if (deadLockPredicateButton != null) deadLockPredicateButton.setVisible(!isVisible);
     }
 
     private void updateSiphonTrap(boolean isCTL) {
@@ -4868,6 +5145,7 @@ public class QueryDialog extends JPanel {
     }
 
 	private void refreshQueryEditingButtons() {
+        boolean isSmc = smcSelector.getSelectedIndex() == 1;
 		if (currentSelection != null) {
             if (lens.isGame()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
@@ -4876,13 +5154,19 @@ public class QueryDialog extends JPanel {
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                     enableOnlyStateButtons();
                 }
-            } else if (lens.isTimed()) {
+            } else if (lens.isTimed() && !isSmc) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
                     enableOnlyPathButtons();
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                     enableOnlyStateButtons();
                 }
                 updateQueryButtonsAccordingToSelection();
+            } else if(isSmc) {
+                if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+                    enableOnlySMCButtons();
+                } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    enableOnlyStateButtons();
+                }
             } else {
                 enableOnlyUntimedStateButtons();
                 updateQueryButtonsAccordingToSelection();
@@ -5098,16 +5382,32 @@ public class QueryDialog extends JPanel {
         }
     }
 
+    private void updateSMCButtons() {
+        if (currentSelection != null && currentSelection.getObject() == newProperty) {
+            String ltlType = checkLTLType();
+            if (ltlType.equals("placeholder")) {
+                finallyButton.setEnabled(true);
+                globallyButton.setEnabled(true);
+            }
+        } else {
+            finallyButton.setEnabled(false);
+            globallyButton.setEnabled(false);
+        }
+    }
+
 
     private void queryChanged(){
         setEnabledReductionOptions();
         if (lens.isTimed()) refreshOverApproximationOption();
         int selectedIndex = queryType.getSelectedIndex();
+        boolean isSmc = smcSelector.getSelectedIndex() == 1;
         if (selectedIndex == 1) {
             updateLTLButtons();
         } else if (selectedIndex == 2) {
             updateHyperLTLButtons();
             updateTraceBox();
+        } else if (isSmc) {
+            updateSMCButtons();
         }
     }
 

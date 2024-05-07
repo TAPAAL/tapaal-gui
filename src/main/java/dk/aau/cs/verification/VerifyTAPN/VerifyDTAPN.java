@@ -56,6 +56,8 @@ public class VerifyDTAPN implements ModelChecker{
 
 	protected ProcessRunner runner;
 
+    private boolean isSMC = false;
+
 	public VerifyDTAPN(FileFinder fileFinder, Messenger messenger) {
 		this.fileFinder = fileFinder;
 		this.messenger = messenger;
@@ -66,10 +68,19 @@ public class VerifyDTAPN implements ModelChecker{
 	}
 
     public String[] getStatsExplanations(){
-        String[] explanations = new String[3];
-        explanations[0] = "The number of found markings (each time a successor is calculated, this number is incremented)";
-        explanations[1] = "The number of markings taken out of the waiting list during the search.";
-        explanations[2] = "The number of markings found in the passed/waiting list at the end of verification.";
+        String[] explanations;
+        if(!isSMC) {
+            explanations = new String[3];
+            explanations[0] = "The number of found markings (each time a successor is calculated, this number is incremented)";
+            explanations[1] = "The number of markings taken out of the waiting list during the search.";
+            explanations[2] = "The number of markings found in the passed/waiting list at the end of verification.";
+        } else {
+            explanations = new String[4];
+            explanations[0] = "The number of random runs executed during statistical verification";
+            explanations[1] = "The number of random runs satisfying the tested propriety";
+            explanations[2] = "The average total time delayed for executed random runs";
+            explanations[3] = "The average number of transitions firing for executed random runs";
+        }
         return explanations;
     }
 
@@ -278,6 +289,7 @@ public class VerifyDTAPN implements ModelChecker{
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
             }
+            isSMC = queryResult.value1().isSMC();
             return new VerificationResult<>(queryResult.value1(), null, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, null);
         }
     }
@@ -322,6 +334,7 @@ public class VerifyDTAPN implements ModelChecker{
 			if (queryResult == null || queryResult.value1() == null) {
 				return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
+                isSMC = queryResult.value1().isSMC();
                 TimedArcPetriNetTrace tapnTrace = null;
 
                 boolean isColored = (lens != null && lens.isColored() || (model.value1().parentNetwork() != null && model.value1().parentNetwork().isColored()));

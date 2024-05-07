@@ -100,10 +100,12 @@ public class Export {
             LTLQueryVisitor LTLXMLVisitor = new LTLQueryVisitor();
             HyperLTLQueryVisitor HyperLTLXMLVisitor = new HyperLTLQueryVisitor();
             CTLQueryVisitor CTLXMLVisitor = new CTLQueryVisitor();
+            SMCQueryVisitor SMCXMLVisitor = new SMCQueryVisitor();
 
             while (queryIterator.hasNext()) {
                 boolean isCTL = false;
                 boolean isHyperLTL = false;
+                boolean isSMC = false;
                 TAPNQuery clonedQuery = queryIterator.next().copy();
 
                 // Attempt to parse and possibly transform the string query using the manual edit parser
@@ -114,6 +116,9 @@ public class Export {
                     } else if (clonedQuery.getCategory().equals((TAPNQuery.QueryCategory.HyperLTL))) {
                         isHyperLTL = true;
                         newProperty = TAPAALHyperLTLQueryParser.parse(clonedQuery.getProperty().toString());
+                    } else if (clonedQuery.getCategory().equals((TAPNQuery.QueryCategory.SMC))) {
+                        isSMC = true;
+                        newProperty = TAPAALLTLQueryParser.parse(clonedQuery.getProperty().toString());
                     } else {
                         newProperty = TAPAALCTLQueryParser.parse(clonedQuery.getProperty().toString());
                         isCTL = true;
@@ -125,6 +130,8 @@ public class Export {
                 newProperty.accept(new RenameAllTransitionsVisitor(mapping), null);
                 if (isHyperLTL) {
                     HyperLTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
+                } else if (isSMC) {
+                    SMCXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName(), clonedQuery.getSmcSettings());
                 } else if (!isCTL) {
                     LTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
                 } else {

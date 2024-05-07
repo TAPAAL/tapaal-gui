@@ -434,12 +434,14 @@ public class TapnXmlLoader {
 		String nameOffsetY = transition.getAttribute("nameOffsetY");
 		String angleStr = transition.getAttribute("angle");
 		String priorityStr = transition.getAttribute("priority");
+        String smcRate = transition.getAttribute("rate");
 	    int positionXInput = 0;
 		int positionYInput = 0;
 		int nameOffsetXInput = 0;
 		int nameOffsetYInput = 0;
 		int angle = 0;
         int priority = 0;
+        float rate = -1.0f;
 		if(!posX.isEmpty()){
 		    positionXInput = (int)Double.parseDouble(posX);
         }
@@ -457,6 +459,9 @@ public class TapnXmlLoader {
         }
 		if(!priorityStr.isEmpty()){
 		    priority = Integer.parseInt(priorityStr);
+        }
+        if(!smcRate.isEmpty()){
+            rate = Float.parseFloat(smcRate);
         }
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
@@ -492,6 +497,7 @@ public class TapnXmlLoader {
 		TimedTransition t = new TimedTransition(nameInput, guardExpr);
 		t.setUrgent(isUrgent);
 		t.setUncontrollable(player.equals("1"));
+        t.setRate(rate);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);

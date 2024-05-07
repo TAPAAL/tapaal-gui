@@ -426,9 +426,9 @@ public class TimedTransition extends TAPNElement {
 
 	public TimedTransition copy() {
 	    if(guard == null){
-            return new TimedTransition(name, isUrgent, null);
+            return new TimedTransition(name, isUrgent, null, rate);
         }
-		return new TimedTransition(name, isUrgent, guard.copy());
+		return new TimedTransition(name, isUrgent, guard.copy(), rate);
 	}
 
 	@Override

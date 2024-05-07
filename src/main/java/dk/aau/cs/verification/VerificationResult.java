@@ -55,7 +55,7 @@ public class VerificationResult<TTrace> {
 		this.stats = stats;
 		this.rawOutput = rawOutput;
 
-		if (rawOutput != null) {
+        if (rawOutput != null) {
             String[] lines = rawOutput.split(System.getProperty("line.separator"));
             for (String line : lines) {
                 Matcher matcher = Pattern.compile("\\s*--k-bound\\s*(\\d+)\\s*").matcher(line);

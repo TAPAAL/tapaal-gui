@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import dk.aau.cs.TCTL.visitors.SMCQueryVisitor;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
@@ -310,7 +311,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			if (query.getCategory() == QueryCategory.LTL){
                 newQuery = createLTLQueryElement(query, document);
             } else if(query.getCategory() == QueryCategory.HyperLTL) {
-			    newQuery = createHyperLTLQueryElement(query, document);
+                newQuery = createHyperLTLQueryElement(query, document);
+            } else if(query.getCategory() == QueryCategory.SMC) {
+                newQuery = createSMCQueryElement(query, document);
             }else {
 				newQuery = createCTLQueryElement(query, document);
 			}
@@ -482,6 +485,41 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
         return queryElement;
     }
+
+    private Element createSMCQueryElement(TAPNQuery query, Document document) {
+        Require.that(query != null, "Error: query was null");
+        Require.that(document != null, "Error: document was null");
+
+        Element queryElement = document.createElement("query");
+        SMCQueryVisitor smcQueryVisitor = new SMCQueryVisitor();
+        smcQueryVisitor.buildXMLQuery(query.getProperty(), query.getName(), query.getSmcSettings());
+
+        try {
+            Element doc = DocumentBuilderFactory
+                .newInstance()
+                .newDocumentBuilder()
+                .parse(new ByteArrayInputStream(smcQueryVisitor.getXMLQuery().toString().getBytes()))
+                .getDocumentElement();
+            Node smcTag = doc.getElementsByTagName("smc").item(0);
+            Node formula = doc.getElementsByTagName("formula").item(0);
+            queryElement.appendChild(document.importNode(smcTag, true));
+            queryElement.appendChild(document.importNode(formula, true));
+        } catch (SAXException | ParserConfigurationException | IOException e) {
+            System.out.println(e + " thrown in savePNML() "
+                + ": dataLayerWriter Class : dataLayer Package: filename=\"");
+            return null;
+        }
+
+        queryElement.setAttribute("name", query.getName());
+        queryElement.setAttribute("type", query.getCategory().toString());
+        queryElement.setAttribute("capacity", "" + query.getCapacity());
+        queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
+        queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
+        queryElement.setAttribute("active", "" + query.isActive());
+        queryElement.setAttribute("algorithmOption", "" + query.getAlgorithmOption());
+
+        return queryElement;
+    }
 	
 	private Node XMLQueryStringToElement(String formulaString){
 		
@@ -609,6 +647,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		transitionElement.setAttribute("priority", "0");
 		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
         transitionElement.setAttribute("player", inputTransition.underlyingTransition().isUncontrollable() ? "1" : "0");
+        if(inputTransition.underlyingTransition().hasCustomRate()) {
+            transitionElement.setAttribute("rate", String.valueOf(inputTransition.underlyingTransition().getRate()));
+        }
         writeTACPN.appendColoredTransitionDependencies(inputTransition.underlyingTransition(), document, transitionElement);
 
         return transitionElement;
