@@ -90,6 +90,7 @@ public class TAPNTransitionEditor extends JPanel {
 
         rateLabel = new JLabel();
         rateTextField = new JTextField();
+        rateTextField.setToolTipText("Floating value, exponential distribution rate used in random run generation");
         SwingHelper.setPreferredWidth(rateTextField, 290);
 
 		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);

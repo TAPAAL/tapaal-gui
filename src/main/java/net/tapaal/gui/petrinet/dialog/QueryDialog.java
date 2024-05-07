@@ -418,6 +418,16 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_APPROXIMATION_METHOD_UNDER = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
     private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 
+    //Tool tips for SMC panel
+    private final static String TOOL_TIP_ANALYSIS_TYPE = "Choose between probability quantitative estimation, or qualitative hypothesis testing against a fixed probability";
+    private final static String TOOL_TIP_DEFAULT_RATE = "The default exponential probability rate to apply to the transitions that do not have a custom one, when there are no invariants";
+    private final static String TOOL_TIP_RUN_BOUND = "Choose to either bound each random run by time, or by number of steps (transition firings)";
+    private final static String TOOL_TIP_CONFIDENCE = "Between 0 and 1, confidence that the probability is indeed in the computed interval";
+    private final static String TOOL_TIP_INTERVAL_WIDTH = "Between 0 and 1, width of the computed interval";
+    private final static String TOOL_TIP_FALSE_POSITIVES = "Probability to accept the hypothesis if it is false";
+    private final static String TOOL_TIP_FALSE_NEGATIVES = "Probability to reject the hypothesis if it is true";
+    private final static String TOOL_TIP_INDIFFERENCE = "Width of the indifference region used as a threshold by the algorithm";
+
     private QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
         this.tapnNetwork = tapnNetwork;
         this.guiModels = guiModels;
@@ -2621,12 +2631,14 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 0;
         gbc.gridx = 0;
         smcVerificationType = new JComboBox<>(new String[]{ "Quantitative", "Qualitative" });
+        smcVerificationType.setToolTipText(TOOL_TIP_ANALYSIS_TYPE);
         smcSettingsPanel.add(smcVerificationType, gbc);
         gbc.gridx = 1;
         smcSettingsPanel.add(new JLabel("Default rate : "), gbc);
         gbc.gridx = 2;
         smcDefaultRate = new JTextField(7);
         smcDefaultRate.addFocusListener(updater);
+        smcDefaultRate.setToolTipText(TOOL_TIP_DEFAULT_RATE);
         smcSettingsPanel.add(smcDefaultRate);
 
         gbc.gridy = 1;
@@ -2634,6 +2646,7 @@ public class QueryDialog extends JPanel {
         smcSettingsPanel.add(new JLabel("Run bound : "), gbc);
         gbc.gridx = 1;
         smcBoundType = new JComboBox<>(new String[]{ "Time", "Steps" });
+        smcBoundType.setToolTipText(TOOL_TIP_RUN_BOUND);
         smcSettingsPanel.add(smcBoundType, gbc);
         gbc.gridx = 2;
         smcBoundValue = new JTextField(10);
@@ -2655,6 +2668,7 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridx = 1;
         smcConfidence = new JTextField(7);
         smcConfidence.addFocusListener(updater);
+        smcConfidence.setToolTipText(TOOL_TIP_CONFIDENCE);
         quantitativePanel.add(smcConfidence, subPanelGbc);
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
@@ -2662,6 +2676,7 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridx = 1;
         smcEstimationIntervalWidth = new JTextField(7);
         smcEstimationIntervalWidth.addFocusListener(updater);
+        smcEstimationIntervalWidth.setToolTipText(TOOL_TIP_INTERVAL_WIDTH);
         quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
         smcSettingsPanel.add(quantitativePanel, gbc);
 
@@ -2676,6 +2691,7 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridx = 1;
         smcFalsePositives = new JTextField(7);
         smcFalsePositives.addFocusListener(updater);
+        smcFalsePositives.setToolTipText(TOOL_TIP_FALSE_POSITIVES);
         qualitativePanel.add(smcFalsePositives, subPanelGbc);
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
@@ -2683,6 +2699,7 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridx = 1;
         smcFalseNegatives = new JTextField(7);
         smcFalseNegatives.addFocusListener(updater);
+        smcFalseNegatives.setToolTipText(TOOL_TIP_FALSE_NEGATIVES);
         qualitativePanel.add(smcFalseNegatives, subPanelGbc);
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
@@ -2690,6 +2707,7 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridx = 1;
         smcIndifference = new JTextField(7);
         smcIndifference.addFocusListener(updater);
+        smcIndifference.setToolTipText(TOOL_TIP_INDIFFERENCE);
         qualitativePanel.add(smcIndifference, subPanelGbc);
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
