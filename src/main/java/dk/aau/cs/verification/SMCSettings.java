@@ -15,6 +15,19 @@ public class SMCSettings {
         }
     }
 
+    public enum SMCSemantics {
+
+        WEAK, STRONG;
+
+        public String toString() {
+            if(this == WEAK) {
+                return "weak";
+            } else {
+                return "strong";
+            }
+        }
+    }
+
     public RunBoundType boundType;
     public int boundValue;
     public float falsePositives;
@@ -25,6 +38,7 @@ public class SMCSettings {
     public float estimationIntervalWidth;
     public boolean compareToFloat;
     public float geqThan;
+    public SMCSemantics semantics;
 
     public static SMCSettings Default() {
         SMCSettings settings = new SMCSettings();
@@ -38,6 +52,7 @@ public class SMCSettings {
         settings.estimationIntervalWidth = 0.05f;
         settings.compareToFloat = false;
         settings.geqThan = 0.5f;
+        settings.semantics = SMCSemantics.WEAK;
         return settings;
     }
 

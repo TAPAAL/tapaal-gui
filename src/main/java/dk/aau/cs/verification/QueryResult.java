@@ -113,7 +113,7 @@ public class QueryResult {
 	protected String getExplanationString(){
         if(isSMC()) {
             return "<br/>SMC Settings : " +
-                ((isQuantitative()) ? 
+                ((isQuantitative()) ?
                     "<br/>Confidence: " + (query.getSMCSettings().confidence * 100) + "%" :
                         "<br/>Probability of false positive: " + query.getSMCSettings().falsePositives +
                         "<br/>Probability of false negative: " + query.getSMCSettings().falseNegatives +

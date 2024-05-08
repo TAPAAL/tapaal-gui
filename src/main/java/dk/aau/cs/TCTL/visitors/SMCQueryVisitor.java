@@ -6,6 +6,7 @@ import dk.aau.cs.verification.SMCSettings;
 public class SMCQueryVisitor extends LTLQueryVisitor {
 
     private static final String XML_SMC		    	        = "smc";
+    private static final String XML_SEMANTICS               = "semantics";
     private static final String XML_BOUND_TYPE_TAG          = "bound-type";
     private static final String XML_BOUND_VALUE_TAG         = "bound";
     private static final String XML_FALSE_POS_TAG           = "false-positives";
@@ -29,6 +30,7 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
 
     private String smcTag(SMCSettings settings) {
         String tagContent = XML_SMC;
+        tagContent += tagAttribute(XML_SEMANTICS, settings.semantics.toString());
         tagContent += tagAttribute(XML_BOUND_TYPE_TAG, settings.boundType.toString());
         tagContent += tagAttribute(XML_BOUND_VALUE_TAG, settings.boundValue);
         tagContent += tagAttribute(XML_DEFAULT_RATE_TAG, settings.defaultRate);

@@ -153,6 +153,9 @@ public class TAPNQueryLoader extends QueryLoader{
         if(smcTag.hasAttribute("bound-type"))
             settings.boundType = smcTag.getAttribute("bound-type").equals(SMCSettings.RunBoundType.TIMEBOUND.toString()) ?
                 SMCSettings.RunBoundType.TIMEBOUND : SMCSettings.RunBoundType.STEPBOUND;
+        if(smcTag.hasAttribute("semantics"))
+            settings.semantics = smcTag.getAttribute("semantics").equals(SMCSettings.SMCSemantics.STRONG.toString()) ?
+                SMCSettings.SMCSemantics.STRONG : SMCSettings.SMCSemantics.WEAK;
         if(smcTag.hasAttribute("bound"))
             settings.boundValue = Integer.parseInt(smcTag.getAttribute("bound"));
         if(smcTag.hasAttribute("compare-to")) {
