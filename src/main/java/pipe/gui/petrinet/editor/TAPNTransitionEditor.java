@@ -10,6 +10,8 @@ import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.CaretListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.tapaal.gui.petrinet.undo.*;
 import net.tapaal.swinghelpers.GridBagHelper;
@@ -65,6 +67,7 @@ public class TAPNTransitionEditor extends JPanel {
         if(!transition.isStochastic()) {
             rateLabel.setVisible(false);
             rateTextField.setVisible(false);
+            rateSlider.setVisible(false);
         }
     }
 
@@ -91,7 +94,15 @@ public class TAPNTransitionEditor extends JPanel {
         rateLabel = new JLabel();
         rateTextField = new JTextField();
         rateTextField.setToolTipText("Floating value, exponential distribution rate used in random run generation");
-        SwingHelper.setPreferredWidth(rateTextField, 290);
+        SwingHelper.setPreferredWidth(rateTextField, 100);
+
+        rateSlider = new JSlider(0, 100);
+        rateSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent changeEvent) {
+                rateTextField.setText(String.valueOf(rateSlider.getValue() / 100.0));
+            }
+        });
 
 		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);
 		SwingHelper.setPreferredWidth(sharedTransitionsComboBox,290);
@@ -202,6 +213,9 @@ public class TAPNTransitionEditor extends JPanel {
         transitionEditorPanel.add(rateLabel, gridBagConstraints);
 
         gridBagConstraints = GridBagHelper.as(1, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+        transitionEditorPanel.add(rateSlider, gridBagConstraints);
+
+        gridBagConstraints = GridBagHelper.as(2, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         transitionEditorPanel.add(rateTextField, gridBagConstraints);
 
 		gridBagConstraints = new GridBagConstraints();
@@ -283,6 +297,7 @@ public class TAPNTransitionEditor extends JPanel {
 		coloredTransitionGuardPanel.initExpr(transition.getGuardExpression());
 
         if(transition.underlyingTransition().hasCustomRate()) {
+            rateSlider.setValue((int) (transition.underlyingTransition().getRate() * 100));
             rateTextField.setText(String.valueOf(transition.underlyingTransition().getRate()));
         }
 
@@ -562,6 +577,7 @@ public class TAPNTransitionEditor extends JPanel {
 
     private JLabel rateLabel;
     private JTextField rateTextField;
+    private JSlider rateSlider;
 
     private javax.swing.JCheckBox uncontrollableCheckBox;
 

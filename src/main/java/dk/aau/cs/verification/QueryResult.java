@@ -103,8 +103,7 @@ public class QueryResult {
 		|| (queryType().equals(QueryType.AG) && isQuerySatisfied())
         || (queryType().equals(QueryType.A))
         || (queryType().equals(QueryType.E))
-        /*|| (queryType().equals(QueryType.PF))
-        || (queryType().equals(QueryType.PG))*/
+        || (isSMC())
 		|| (hasDeadlock() && 
 				(!isQuerySatisfied() && queryType().equals(QueryType.EF)) || 
 				(isQuerySatisfied() && queryType().equals(QueryType.AG))
@@ -112,7 +111,18 @@ public class QueryResult {
 	}
 	
 	protected String getExplanationString(){
-		return boundednessAnalysis.toString();
+        if(isSMC()) {
+            return "<br/>SMC Settings : " +
+                ((isQuantitative()) ? 
+                    "<br/>Confidence: " + (query.getSMCSettings().confidence * 100) + "%" :
+                        "<br/>Probability of false positive: " + query.getSMCSettings().falsePositives +
+                        "<br/>Probability of false negative: " + query.getSMCSettings().falseNegatives +
+                        "<br/>Indifference region: [" + (query.getSMCSettings().geqThan - query.getSMCSettings().indifferenceWidth) +
+                        ";" +  (query.getSMCSettings().geqThan + query.getSMCSettings().indifferenceWidth) + "]"
+                    );
+        } else {
+            return boundednessAnalysis.toString();
+        }
 	}
 	
 	protected String getInconclusiveString(){

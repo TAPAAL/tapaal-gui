@@ -239,7 +239,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         queryToVerify.setCategory(query.getCategory());
         MapQueryToNewNames(queryToVerify, composedModel.value2());
 
-        TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens());
+        TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens(), query.getSmcSettings());
         clonedQuery.setCategory(query.getCategory());
         MapQueryToNewNames(clonedQuery, composedModel.value2());
 
@@ -268,7 +268,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
     }
 
 	private TAPNQuery getTAPNQuery(net.tapaal.gui.petrinet.verification.TAPNQuery query) throws Exception {
-		return new TAPNQuery(query.getProperty().copy(), query.getCapacity());
+		return new TAPNQuery(query.getProperty().copy(), query.getCapacity(), query.getSmcSettings());
 	}
 
 	private ModelChecker getModelChecker(net.tapaal.gui.petrinet.verification.TAPNQuery query) {

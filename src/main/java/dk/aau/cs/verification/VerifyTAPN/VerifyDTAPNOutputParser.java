@@ -30,9 +30,9 @@ public class VerifyDTAPNOutputParser {
     private static final Pattern smcEstimationPattern = Pattern.compile("\\s*P in \\[([^;]+);([^;]+)\\]\\s*");
     private static final Pattern smcExecutedRunsPattern = Pattern.compile("\\s*runs executed:\\s*(\\d+)\\s*");
     private static final Pattern smcValidRunsPattern = Pattern.compile("\\s*valid runs:\\s*(\\d+)\\s*");
-    private static final Pattern smcAverageTimePattern = Pattern.compile("\\s*average run time:\\s*([\\d|\\.]+)\\s*");
-    private static final Pattern smcAverageLengthPattern = Pattern.compile("\\s*average run length:\\s*([\\d|\\.]+)\\s*");
-        
+    private static final Pattern smcAverageTimePattern = Pattern.compile("\\s*average run time:\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcAverageLengthPattern = Pattern.compile("\\s*average run length:\\s*([\\d\\.]+)\\s*");
+
 	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (-?\\d*)");
 	private static final Pattern wfMaxExecutionPattern = Pattern.compile("Maximum execution time: (-?\\d*)");
 	private static final Pattern wfCoveredMarkingPattern = Pattern.compile("Covered marking: (.*)");
