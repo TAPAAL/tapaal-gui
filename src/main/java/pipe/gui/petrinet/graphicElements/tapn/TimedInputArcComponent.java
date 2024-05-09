@@ -142,6 +142,8 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                 if(((ConstantWeight) getWeight()).constant().hasFocus()){
                     focusedConstant = true;
                 }
+                
+                isvisible = ((ConstantWeight) getWeight()).constant().getVisible();
                 /*if(((ConstantWeight) getWeight()).constant().getVisible()){
                     focusedConstant = false;
                 }*/
