@@ -1,9 +1,11 @@
 package dk.aau.cs.pddl;
 
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.pddl.expression.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PddlStringifier {
     private Model model;
@@ -25,18 +27,35 @@ public class PddlStringifier {
         sb.append(this.buildFunctions());
         sb.append(this.buildActions());
         sb.append(")");
-        sb.append("\n").append(buildTask());
+        sb.append("\n");
         return sb;
     }
 
-    public StringBuilder buildTask() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("(define (problem %s_problem)\n", model.getName()));
-        sb.append(String.format("\t(:domain %s)\n", model.getName()));
-        sb.append(this.buildObjects());
-        sb.append(this.buildInitialState());
-        sb.append(")");
-        return sb;
+    public HashMap<String, StringBuilder> buildTasks() {
+
+        StringBuilder commonStartSb = new StringBuilder();
+        commonStartSb.append(String.format("(define (problem %s_problem)\n", model.getName()));
+        commonStartSb.append(String.format("\t(:domain %s)\n", model.getName()));
+        commonStartSb.append(this.buildObjects());
+        commonStartSb.append(this.buildInitialState());
+        commonStartSb.append("\t(:goal \n");
+
+        String commonStart = commonStartSb.toString();
+
+        HashMap<String, StringBuilder> taskStrings = new HashMap<>();
+        for(var entry: this.model.getQueries().entrySet()) {
+            String taskName = entry.getKey();
+            QueryParser parser = entry.getValue();
+
+            var sb = new StringBuilder(commonStart);
+            sb.append("\t\t").append(parser.expression.toString());
+            sb.append("\n\t)\n");
+            sb.append(")");
+
+            taskStrings.put(taskName, sb);
+        }
+
+        return taskStrings;
     }
 
     public StringBuilder buildExtensions() {

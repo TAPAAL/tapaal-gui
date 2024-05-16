@@ -389,12 +389,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 				tab.setMode(DrawTool.SELECT);
 
-//                Model(LoadTACPN model, TimedArcPetriNet ptmodel)
-                var test = new dk.aau.cs.pddl.Model();
-                test.parse(loadedModel);
-                var pddlBuilder = new PddlStringifier(test);
-                var pddlOut = pddlBuilder.getString();
-
                 return tab;
 
 			} catch (Exception e) {

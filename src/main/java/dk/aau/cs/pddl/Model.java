@@ -6,6 +6,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.pddl.expression.*;
+import dk.aau.cs.verification.QueryType;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
@@ -20,7 +21,7 @@ public class Model {
     private HashMap<String, FunctionSignature> functions = new HashMap<>();
     private HashMap<String, Predicate> predicates = new HashMap<>();
     private HashMap<String, ActionSchema> actionSchemas = new HashMap<>();
-
+    private HashMap<String, QueryParser> queries = new HashMap<>();
 
     public String getName() {
         return name;
@@ -74,14 +75,36 @@ public class Model {
         this.actionSchemas = actionSchemas;
     }
 
+    public HashMap<String, QueryParser> getQueries() {
+        return this.queries;
+    }
     private PlaceWeights state;
 
     public PlaceWeights getState() {
         return state;
     }
 
-    public Model() { }
+    public Model() {}
 
+    public Model(LoadedModel petriNet) {
+        parse(
+            petriNet.network(),
+            petriNet.templates(),
+            petriNet.queries(),
+            petriNet.network().constants(),
+            petriNet.getLens()
+        );
+    }
+
+    public Model(LoadedModel petriNet, Iterable<TAPNQuery> queries) {
+        parse(
+            petriNet.network(),
+            petriNet.templates(),
+            queries,
+            petriNet.network().constants(),
+            petriNet.getLens()
+        );
+    }
 
     //region Parse from CPN
 
@@ -98,6 +121,8 @@ public class Model {
         this.parseFunctions(network);
         this.parseActionSchemas(network.allTemplates().get(0));
         state = this.parseInitialState(network.allTemplates().get(0));
+
+        this.parseQueries(queries);
     }
 
     public void parse(LoadedModel ptModel) {
@@ -254,6 +279,28 @@ public class Model {
         }
     }
 
+    private void parseQueries(Iterable<TAPNQuery> queries) {
+        for(var q: queries) {
+            if(q.getCategory().name() != "CTL")
+                continue;
+
+            if(!q.queryType().equals(QueryType.EF))
+                continue;
+
+            try {
+                this.parseQuery(q);
+            }
+            catch(UnhandledExpressionType e) {
+                continue;
+            }
+        }
+    }
+
+    private void parseQuery(TAPNQuery query) throws UnhandledExpressionType {
+        var parser = new QueryParser();
+        parser.parseQuery(query);
+        queries.put(query.getName(), parser);
+    }
     //region Parameters
 //    public void
     //endregion

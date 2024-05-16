@@ -55,7 +55,7 @@ public class TAPAAL {
 		// Create possible commandline options
 		Options options = new Options();
 		options.addOption("d", "debug", false, "enable debug output .");
-		options.addOption("p", "pddl", false, "Translate a petri net to a planning domain and task file in pddl format.");
+		options.addOption("p", "pddl-out", true, "PDDL output directory - Set to translate model to pddl.");
 
 		CommandLine commandline = null;
 
@@ -86,8 +86,14 @@ public class TAPAAL {
 			return;
 		}
 
-        if (commandline.hasOption("pddl")) {
-            pddlMain.main(commandline);
+        if (commandline.hasOption("pddl-out")) {
+            String[] files = commandline.getArgs();
+            String pddlOutPath = commandline.getOptionValue("pddl-out");
+            pddlMain.main(
+                files[0],
+                files[1],
+                pddlOutPath
+            );
             return;
         }
 
