@@ -1,13 +1,9 @@
 package dk.aau.cs.pddl;
 
 import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.LoadedQueries;
-import dk.aau.cs.io.ModelLoader;
+import dk.aau.cs.io.PNMLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
-import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import org.apache.commons.cli.CommandLine;
-import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -29,7 +25,8 @@ public class pddlMain {
     public static void main(File modelFile, File queriesFile, String outPath) throws Exception {
 
         // Load Petri net
-        ModelLoader loader = new ModelLoader();
+//        ModelLoader loader = new ModelLoader();
+        PNMLoader loader = new PNMLoader();
         LoadedModel loadedModel = loader.load(modelFile);
 
         XMLQueryLoader queryLoader = new XMLQueryLoader(queriesFile, loadedModel.network());
