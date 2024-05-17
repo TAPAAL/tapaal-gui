@@ -9,7 +9,7 @@ public class Expression_Increment extends BaseExpression implements IExpression 
 
     @Override
     public String getName() {
-        return "increment";
+        return "increase";
     }
 
 }

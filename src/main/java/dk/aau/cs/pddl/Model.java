@@ -19,7 +19,7 @@ public class Model {
     private ArrayList<Extension> extensions = new ArrayList<>();
     private HashMap<String, UserType> types = new HashMap<>();
     private HashMap<String, FunctionSignature> functions = new HashMap<>();
-    private HashMap<String, Predicate> predicates = new HashMap<>();
+    private ArrayList<Expression_Predicate> predicates = new ArrayList<>();
     private HashMap<String, ActionSchema> actionSchemas = new HashMap<>();
     private HashMap<String, QueryParser> queries = new HashMap<>();
 
@@ -59,11 +59,11 @@ public class Model {
     }
 
 
-    public HashMap<String, Predicate> getPredicates() {
+    public ArrayList<Expression_Predicate> getPredicates() {
         return predicates;
     }
 
-    public void setPredicates(HashMap<String, Predicate> predicates) {
+    public void setPredicates(ArrayList<Expression_Predicate> predicates) {
         this.predicates = predicates;
     }
 
@@ -118,6 +118,7 @@ public class Model {
         this.parseName(network);
         this.parseExtensions();
         this.parseTypes(network);
+        this.setPredicates(this.createSiblingPredicates(network));
         this.parseFunctions(network);
         this.parseActionSchemas(network.allTemplates().get(0));
         state = this.parseInitialState(network.allTemplates().get(0));
@@ -197,29 +198,35 @@ public class Model {
 
 
         return actionSchema;
-        // Place x Color x (out - in)
-//        HashMap<Place, HashMap<Color, Integer>> effects = new HashMap<>();
-//
-//        List<TimedInputArc> inArcs = transition.getInputArcs();
-//        List<TimedOutputArc> outArcs = transition.getOutputArcs();
-//
-//        for(var arc: inArcs) {
-//            var exp = arc.getArcExpression();
-//            System.out.println(exp.toString());
-//        }
-//
-//
-//
-//        // Parameters = distinct places in arcs
-//
-//        // Pre = in arcs
-//
-//        // Effects = outArcs - inArcs
-//
-//        Function func = new Function(transition.name());
-//
-//
-//        return actionSchema;
+    }
+
+    public ArrayList<Expression_Predicate> createSiblingPredicates(TimedArcPetriNetNetwork network) {
+        ArrayList<Expression_Predicate> predicates = new ArrayList<>();
+
+        for (ColorType colorType : network.colorTypes()) {
+            if(colorType instanceof ProductType)
+                continue;
+
+            var colorIter = colorType.iterator();
+            var firstColor = colorIter.next();
+            var prevColor = firstColor;
+
+            while(colorIter.hasNext()) {
+                var nextColor = colorIter.next();
+
+                predicates.add(new Expression_Predicate_IsPredecessor(prevColor, nextColor));
+                predicates.add(new Expression_Predicate_IsSuccessor(nextColor, prevColor));
+
+                prevColor = nextColor;
+            }
+
+            // Link first and last color
+            predicates.add(new Expression_Predicate_IsPredecessor(prevColor, firstColor));
+            predicates.add(new Expression_Predicate_IsSuccessor(firstColor, prevColor));
+
+        }
+
+        return predicates;
     }
 
     public PlaceWeights parseInitialState(TimedArcPetriNet petriNet) {
@@ -237,8 +244,12 @@ public class Model {
 
             Map<TimedToken, Long> marking = place.tokens().stream().collect(Collectors.groupingBy(e -> e, Collectors.counting()));
             for(var entry: marking.entrySet()) {
-                var colors = entry.getKey().color().getTuple();
-                var weight = entry.getValue().intValue();
+                TimedToken token = entry.getKey();
+                var color = token.getColor();
+                int weight = entry.getValue().intValue();
+                var colors = color.getTuple();
+                if(colors == null)
+                    colors = new Vector<>() {{ add(color); }};
 
                 var valueList = colors.stream().map(Expression_ColorLiteral::new).collect(Collectors.toCollection(ArrayList<IExpression_Value>::new));
                 weights.put(valueList, weight);
@@ -251,15 +262,6 @@ public class Model {
         return placeWeights;
     }
 
-
-
-//    private Color toProductColor(ColorType type, Iterable<Color> colors) {
-//        Vector<Color> colorVector = new Vector<>();
-//        colors.forEach(colorVector::add);
-//
-//        Color color = new Color(type, 0, colorVector);
-//        return color;
-//    }
 
     private ArrayList<ArrayList<Color>> getAllPossibleColors(TimedPlace place) {
         return getAllPossibleColors(place.getColorType());

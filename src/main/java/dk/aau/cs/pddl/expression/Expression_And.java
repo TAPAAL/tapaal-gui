@@ -17,13 +17,9 @@ public class Expression_And extends BaseExpression implements IExpression {
         return "and";
     }
 
-//    @Override
-//    public String toString() {
-//        return "Cheesy Expression_And";
-//    }
-
     @Override
     public String toString() {
-        return super.toString();
+        return super.toString("\n\t\t\t");
     }
+
 }

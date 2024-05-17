@@ -1,6 +1,5 @@
 package dk.aau.cs.pddl;
 
-import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.pddl.expression.*;
 
@@ -24,6 +23,8 @@ public class PddlStringifier {
         sb.append(String.format("(define (domain %s)\n", model.getName()));
         sb.append(this.buildExtensions());
         sb.append(this.buildTypes());
+        sb.append(this.buildConstants());
+        sb.append(this.buildPredicateDefinitions());
         sb.append(this.buildFunctions());
         sb.append(this.buildActions());
         sb.append(")");
@@ -75,13 +76,31 @@ public class PddlStringifier {
 
         sb.append("\t(:types\n");
         for(UserType type : model.getTypes().values()) {
-            sb.append(String.format("\t\t:%s\n", type.getName()));
+            sb.append(String.format("\t\t%s\n", type.getName()));
         }
         sb.append("\t)\n");
 
         return sb;
     }
 
+    public StringBuilder buildPredicateDefinitions() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("\t(:predicates\n");
+        sb.append("\t\t(isPredecessor ?x ?xPred)\n");
+        sb.append("\t\t(isSuccessor ?x ?xSucc)\n");
+        sb.append("\t)\n");
+
+        return sb;
+    }
+
+    public StringBuilder buildInitialPredicates() {
+        var sb = new StringBuilder();
+        for(var pred: this.model.getPredicates()) {
+            sb.append("\n\t\t").append(pred);
+        }
+        return sb;
+    }
     public StringBuilder buildFunctions() {
         StringBuilder sb = new StringBuilder();
 
@@ -127,11 +146,11 @@ public class PddlStringifier {
 
         sb.append("\t(:action ").append(actionSchema.getName()).append("\n");
 
-        sb.append("\t\t:parameters").append(buildParameters(actionSchema.getParameters().values())).append("\n");
+        sb.append("\t\t:parameters (").append(buildParameters(actionSchema.getParameters().values())).append(")\n");
 
         sb.append("\t\t:precondition ").append(actionSchema.getPrecondition().toString()).append("\n");
 
-        sb.append("\t\t:effects ").append(actionSchema.getEffects().toString()).append("\n");
+        sb.append("\t\t:effect ").append(actionSchema.getEffects().toString()).append("\n");
 
         sb.append("\t)\n");
 
@@ -146,6 +165,8 @@ public class PddlStringifier {
         StringBuilder sb = new StringBuilder();
 
         sb.append("\t(:init ");
+
+        sb.append(this.buildInitialPredicates());
 
 
         for(var placeWeightEntry : placeWeights.entrySet()) {
@@ -166,17 +187,30 @@ public class PddlStringifier {
         return sb;
     }
 
-    public StringBuilder buildObjects() {
+    public StringBuilder buildConstants() {
         StringBuilder sb = new StringBuilder();
-        sb.append("\t(:objects");
+        sb.append("\t(:constants");
         for(var e: this.model.getTypes().entrySet()) {
             UserType type = e.getValue();
             sb.append("\n\t\t");
             type.getObjectNames().forEach(o -> {
-                sb.append(o).append(" ");
+
+                String objName = o;
+                if(objName == "dot")
+                    objName = "dot_obj";
+
+                sb.append(objName).append(" ");
             });
             sb.append("- ").append(type.getName());
         }
+        sb.append("\n\t)\n");
+
+        return sb;
+    }
+
+    public StringBuilder buildObjects() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\t(:objects");
         sb.append("\n\t)\n");
 
         return sb;

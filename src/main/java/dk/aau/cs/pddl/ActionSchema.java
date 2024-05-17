@@ -12,7 +12,7 @@ import java.util.*;
 public class ActionSchema {
     private String name;
     private HashMap<String, Parameter> parameters = new HashMap<>();
-    private Expression_And precondition;
+    private Expression_And precondition = new Expression_And();
     private Expression_And effects;
 
     public String getName() {
@@ -42,7 +42,9 @@ public class ActionSchema {
     private void parseTransition(TimedTransition transition) {
         this.name = transition.name();
         parseParameters(transition);
-        this.precondition = generatePrecondition(transition);
+        for(var param: generatePrecondition((transition)).getParameters()) {
+            this.precondition.addParameter(param);
+        }
         this.effects = generateEffects(transition);
     }
 
@@ -52,6 +54,10 @@ public class ActionSchema {
 
         if (expType.equals(NumberOfExpression.class)) {
             parseParameters((NumberOfExpression) expression);
+        } else if (expType.equals(PredecessorExpression.class)) {
+            parseParameters((PredecessorExpression) expression);
+        } else if (expType.equals(SuccessorExpression.class)) {
+            parseParameters((SuccessorExpression) expression);
         } else if (expType.equals(AddExpression.class)) {
             parseParameters((AddExpression) expression);
         } else if (expType.equals(TupleExpression.class)) {
@@ -99,6 +105,36 @@ public class ActionSchema {
         for (var subExp : expression.getChildren()) {
             parseParameters(subExp.getObject());
         }
+    }
+
+    private void parseParameters(PredecessorExpression expression) {
+        var param = expression.getBottomColorExpression();
+        var variable = (VariableExpression)param;
+        this.parseParameters(variable);
+
+        var stored_param = this.parameters.get(variable.getVariable().getName());
+        var predecessor_param = new Parameter(Expression_Predecessor.getName(stored_param), stored_param.getType());
+
+        if(!this.parameters.containsKey(predecessor_param.getName())) {
+            this.parameters.put(predecessor_param.getName(), predecessor_param);
+            this.precondition.addParameter(new Expression_Predicate_IsSuccessor(stored_param, predecessor_param));
+        }
+
+    }
+
+    private void parseParameters(SuccessorExpression expression) {
+        var param = expression.getBottomColorExpression();
+        var variable = (VariableExpression)param;
+        this.parseParameters(variable);
+
+        var stored_param = this.parameters.get(variable.getVariable().getName());
+        var successor_param = new Parameter(Expression_Successor.getName(stored_param), stored_param.getType());
+
+        if(!this.parameters.containsKey(successor_param.getName())) {
+            this.parameters.put(successor_param.getName(), successor_param);
+            this.precondition.addParameter(new Expression_Predicate_IsSuccessor(stored_param, successor_param));
+        }
+
     }
 
     private void parseParameters(VariableExpression expression) {
@@ -290,6 +326,10 @@ public class ActionSchema {
 
             if (eClass.equals(VariableExpression.class)) {
                 values.add(squeeze(parseColorToValues((VariableExpression) e)));
+            } else if (eClass.equals(PredecessorExpression.class)) {
+                values.add(squeeze(parseColorToValues((PredecessorExpression) e)));
+            } else if (eClass.equals(SuccessorExpression.class)) {
+                values.add(squeeze(parseColorToValues((SuccessorExpression) e)));
             } else if (eClass.equals(UserOperatorExpression.class)) {
                 values.add(squeeze(parseColorToValues((UserOperatorExpression) e)));
             } else if (eClass.equals(DotConstantExpression.class)) {
@@ -345,7 +385,23 @@ public class ActionSchema {
     private Expression_ColorLiteral parseColorToValues(DotConstantExpression expression) { // Color Literal
 
         var color = expression.getUserOperator();
-        return new Expression_ColorLiteral(color);
+        return new Expression_ColorLiteral(color, "dot_obj");
+    }
+
+    private Expression_Predecessor parseColorToValues(PredecessorExpression expression) {
+        var param = expression.getPredecessorExpression();
+
+        Parameter subExp = parseColorToValues((VariableExpression)param);
+
+        return new Expression_Predecessor(subExp);
+    }
+
+    private Expression_Successor parseColorToValues(SuccessorExpression expression) {
+        var param = expression.getSuccessorExpression();
+
+        Parameter subExp = parseColorToValues((VariableExpression)param);
+
+        return new Expression_Successor(subExp);
     }
 
     //endregion

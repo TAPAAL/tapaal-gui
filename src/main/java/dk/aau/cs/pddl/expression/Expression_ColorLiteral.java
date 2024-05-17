@@ -6,14 +6,25 @@ import java.util.Objects;
 
 public class Expression_ColorLiteral implements IExpression_Value {
     private Color color;
+    private String name;
 
     public Expression_ColorLiteral(Color color) {
         this.color = color;
+
+        String name = color.getName();
+        if(name == "dot")
+            name = "dot_obj";
+        this.name = name;
+    }
+
+    public Expression_ColorLiteral(Color color, String name) {
+        this.color = color;
+        this.name = name;
     }
 
     @Override
     public String toString() {
-        return color.getName();
+        return name;
     }
 
     @Override
