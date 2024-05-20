@@ -24,6 +24,10 @@ public class ActionSchema {
     }
 
 
+    public boolean hasPrecondition() {
+        return this.precondition.getClass() != Expression_And.class
+            || !this.precondition.getParameters().isEmpty();
+    }
     public IExpression getPrecondition() {
         return precondition;
     }
@@ -45,6 +49,11 @@ public class ActionSchema {
         for(var param: generatePrecondition((transition)).getParameters()) {
             this.precondition.addParameter(param);
         }
+
+        GuardExpression guard = transition.getGuard();
+        if(guard != null)
+            this.precondition.addParameter(this.parseGuard(guard));
+
         this.effects = generateEffects(transition);
     }
 
@@ -150,6 +159,98 @@ public class ActionSchema {
 
     //endregion
 
+
+    //region parseGuard
+    public IExpression parseGuard(GuardExpression guardExp) {
+        var type = guardExp.getClass();
+
+        if(type == AndExpression.class) {
+            return parseGuard((AndExpression) guardExp);
+        } else if(type == NotExpression.class) {
+            return parseGuard((NotExpression) guardExp);
+        } else if(type == OrExpression.class) {
+            return parseGuard((OrExpression) guardExp);
+        } else if (type == EqualityExpression.class) {
+            return parseGuard((EqualityExpression) guardExp);
+        } else if (type == GreaterThanEqExpression.class) {
+            return parseGuard((GreaterThanEqExpression) guardExp);
+        } else if (type == GreaterThanExpression.class) {
+            return parseGuard((GreaterThanExpression) guardExp);
+        } else if (type == InequalityExpression.class) {
+            return parseGuard((InequalityExpression) guardExp);
+        } else if (type == LessThanEqExpression.class) {
+            return parseGuard((LessThanEqExpression) guardExp);
+        } else if (type == LessThanExpression.class) {
+            return parseGuard((LessThanExpression) guardExp);
+        } else {
+            throw new RuntimeException("Unhandled guard expression type: " + type + ": `" + guardExp + "`");
+        }
+    }
+
+    public IExpression parseGuard(AndExpression guardExp) {
+        var left = parseGuard(guardExp.getLeftExpression());
+        var right = parseGuard(guardExp.getLeftExpression());
+
+        return new Expression_And(left, right);
+    }
+
+    public IExpression parseGuard(NotExpression guardExp) {
+        var exp = parseGuard(guardExp.getExpression());
+
+        return new Expression_Not(exp);
+    }
+
+    public IExpression parseGuard(OrExpression guardExp) {
+        var left = parseGuard(guardExp.getLeftExpression());
+        var right = parseGuard(guardExp.getLeftExpression());
+
+        return new Expression_Or(left, right);
+    }
+
+    public IExpression parseGuard(EqualityExpression guardExp) {
+        IExpression_Value left = parseColorToValues(guardExp.getLeftExpression()).get(0).get(0);
+        IExpression_Value right = parseColorToValues(guardExp.getRightExpression()).get(0).get(0);
+
+        return new Expression_Compare(left, Expression_Compare.ComparisonTypes.eq, right);
+    }
+
+    public IExpression parseGuard(GreaterThanEqExpression guardExp) {
+        IExpression_Value left = parseColorToValues(guardExp.getLeftExpression()).get(0).get(0);
+        IExpression_Value right = parseColorToValues(guardExp.getRightExpression()).get(0).get(0);
+
+        return new Expression_Compare(left, Expression_Compare.ComparisonTypes.gteq, right);
+    }
+
+    public IExpression parseGuard(GreaterThanExpression guardExp) {
+        IExpression_Value left = parseColorToValues(guardExp.getLeftExpression()).get(0).get(0);
+        IExpression_Value right = parseColorToValues(guardExp.getRightExpression()).get(0).get(0);
+
+        return new Expression_Compare(left, Expression_Compare.ComparisonTypes.gt, right);
+    }
+
+    public IExpression parseGuard(InequalityExpression guardExp) {
+        IExpression_Value left = parseColorToValues(guardExp.getLeftExpression()).get(0).get(0);
+        IExpression_Value right = parseColorToValues(guardExp.getRightExpression()).get(0).get(0);
+
+        return new Expression_Compare(left, Expression_Compare.ComparisonTypes.neq, right);
+    }
+
+    public IExpression parseGuard(LessThanEqExpression guardExp) {
+        IExpression_Value left = parseColorToValues(guardExp.getLeftExpression()).get(0).get(0);
+        IExpression_Value right = parseColorToValues(guardExp.getRightExpression()).get(0).get(0);
+
+        return new Expression_Compare(left, Expression_Compare.ComparisonTypes.lteq, right);
+    }
+
+    public IExpression parseGuard(LessThanExpression guardExp) {
+        IExpression_Value left = parseColorToValues(guardExp.getLeftExpression()).get(0).get(0);
+        IExpression_Value right = parseColorToValues(guardExp.getRightExpression()).get(0).get(0);
+
+        return new Expression_Compare(left, Expression_Compare.ComparisonTypes.lt, right);
+    }
+
+
+    //endregion
 
     private Expression_And generatePrecondition(TimedTransition transition) {
         PlaceWeights placeWeights = parseTransitionPreset(transition);

@@ -1,5 +1,9 @@
 package dk.aau.cs.pddl;
 
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.tapn.TimedPlace;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,4 +60,23 @@ public class util {
         return out;
     }
 
+
+
+    public static ArrayList<ArrayList<Color>> getAllPossibleColors(TimedPlace place) {
+        return getAllPossibleColors(place.getColorType());
+    }
+    public static ArrayList<ArrayList<Color>> getAllPossibleColors(ColorType type) {
+        if(type.isProductColorType()) {
+            ArrayList<Iterable<Color>> subtypes = new ArrayList<>() {{
+                addAll(type.getProductColorTypes());
+            }};
+
+            return util.cartesian(subtypes);
+        }
+        else {
+            return util.cartesian(new ArrayList<Iterable<Color>>() {{
+                add(type);
+            }});
+        }
+    }
 }

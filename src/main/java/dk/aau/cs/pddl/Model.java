@@ -115,15 +115,18 @@ public class Model {
         Iterable<Constant> constants,
         TAPNLens lens
     ) {
-        this.parseName(network);
+        TimedArcPetriNet firstNet = network.allTemplates().get(0);
+
+        this.parseName(firstNet);
         this.parseExtensions();
         this.parseTypes(network);
         this.setPredicates(this.createSiblingPredicates(network));
-        this.parseFunctions(network);
+        this.parseFunctions(firstNet);
         this.parseActionSchemas(network.allTemplates().get(0));
-        state = this.parseInitialState(network.allTemplates().get(0));
+        state = this.parseInitialState(firstNet);
 
-        this.parseQueries(queries);
+
+        this.parseQueries(firstNet, queries);
     }
 
     public void parse(LoadedModel ptModel) {
@@ -136,8 +139,8 @@ public class Model {
         );
     }
 
-    private void parseName(TimedArcPetriNetNetwork network) {
-        this.name = network.allTemplates().get(0).name();
+    private void parseName(TimedArcPetriNet net) {
+        this.name = net.name();
     }
 
     private void parseExtensions() {
@@ -158,8 +161,8 @@ public class Model {
     private void makeParameters() {
 
     }
-    private void parseFunctions(TimedArcPetriNetNetwork network) {
-        for (TimedPlace place : network.allTemplates().get(0).places()) {
+    private void parseFunctions(TimedArcPetriNet net) {
+        for (TimedPlace place : net.places()) {
 
             // Parameters
             ArrayList<Parameter> parameters = new ArrayList<>();
@@ -236,7 +239,7 @@ public class Model {
         for (TimedPlace place : petriNet.places()) {
             Weights weights = new Weights();
 
-            var allPossibleColors = getAllPossibleColors(place);
+            var allPossibleColors = util.getAllPossibleColors(place);
             for(ArrayList<Color> colors : allPossibleColors) {
                 var valueList = colors.stream().map(Expression_ColorLiteral::new).collect(Collectors.toCollection(ArrayList<IExpression_Value>::new));
                 weights.put(valueList, 0);
@@ -263,34 +266,19 @@ public class Model {
     }
 
 
-    private ArrayList<ArrayList<Color>> getAllPossibleColors(TimedPlace place) {
-        return getAllPossibleColors(place.getColorType());
-    }
-    private ArrayList<ArrayList<Color>> getAllPossibleColors(ColorType type) {
-        if(type.isProductColorType()) {
-            ArrayList<Iterable<Color>> subtypes = new ArrayList<>() {{
-                addAll(type.getProductColorTypes());
-            }};
 
-            return util.cartesian(subtypes);
-        }
-        else {
-            return util.cartesian(new ArrayList<Iterable<Color>>() {{
-                add(type);
-            }});
-        }
-    }
-
-    private void parseQueries(Iterable<TAPNQuery> queries) {
-        for(var q: queries) {
-            if(q.getCategory().name() != "CTL")
+    private void parseQueries(TimedArcPetriNet net, Iterable<TAPNQuery> queries) {
+        for(var query: queries) {
+            if(query.getCategory().name() != "CTL")
                 continue;
 
-            if(!q.queryType().equals(QueryType.EF))
+            if(!query.queryType().equals(QueryType.EF))
                 continue;
 
             try {
-                this.parseQuery(q);
+                var parser = new QueryParser(net);
+                parser.parseQuery(query);
+                this.queries.put(query.getName(), parser);
             }
             catch(UnhandledExpressionType e) {
                 continue;
@@ -298,11 +286,6 @@ public class Model {
         }
     }
 
-    private void parseQuery(TAPNQuery query) throws UnhandledExpressionType {
-        var parser = new QueryParser();
-        parser.parseQuery(query);
-        queries.put(query.getName(), parser);
-    }
     //region Parameters
 //    public void
     //endregion

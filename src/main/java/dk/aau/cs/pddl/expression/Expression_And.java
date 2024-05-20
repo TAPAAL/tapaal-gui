@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Expression_And extends BaseExpression implements IExpression {
+public class Expression_And extends BaseExpressionNAry implements IExpression {
 
-    public Expression_And() {
-
+    public Expression_And(IExpression... params) {
+        super(params);
     }
 
     @Override

@@ -1,13 +1,20 @@
 package dk.aau.cs.pddl;
 
 import dk.aau.cs.TCTL.*;
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.pddl.expression.*;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 
 import java.util.ArrayList;
 
 public class QueryParser {
+    private TimedArcPetriNet petriNet;
     public Expression_And expression = new Expression_And();
+
+    public QueryParser(TimedArcPetriNet petriNet) {
+        this.petriNet = petriNet;
+    }
 
     public void parseQuery(TAPNQuery query) throws UnhandledExpressionType {
         TCTLAbstractProperty prop = query.getProperty();
@@ -76,6 +83,9 @@ public class QueryParser {
                 case ">":
                     operator = "<=";
                     break;
+                case "!=":
+                    operator = "!=";
+                    break;
                 default:
                     throw new UnhandledExpressionType();
             }
@@ -84,9 +94,25 @@ public class QueryParser {
             throw new UnhandledExpressionType();
         }
 
-        expression.addParameter(
-            new Expression_FunctionCompare(new Expression_FunctionValue(place.getPlace(), new ArrayList<>()),
-            Expression_FunctionCompare.getType(operator),
+
+        var ptPlace = this.petriNet.getPlaceByName(place.getPlace());
+        var typeValuesIterator = util.getAllPossibleColors(ptPlace).iterator();
+
+        ArrayList<Color> color = typeValuesIterator.next();
+        IExpression_Value exp = new Expression_FunctionValue(ptPlace, color);
+
+        while(typeValuesIterator.hasNext()) {
+            color = typeValuesIterator.next();
+            exp = new Expression_Add(
+                new Expression_FunctionValue(ptPlace, color),
+                exp
+            );
+        }
+
+
+        expression.addParameter(new Expression_Compare(
+            exp,
+            Expression_Compare.getType(operator),
             new Expression_IntegerLiteral(value.getConstant())
         ));
 

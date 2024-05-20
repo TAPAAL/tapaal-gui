@@ -148,7 +148,8 @@ public class PddlStringifier {
 
         sb.append("\t\t:parameters (").append(buildParameters(actionSchema.getParameters().values())).append(")\n");
 
-        sb.append("\t\t:precondition ").append(actionSchema.getPrecondition().toString()).append("\n");
+        if(actionSchema.hasPrecondition())
+            sb.append("\t\t:precondition ").append(actionSchema.getPrecondition().toString()).append("\n");
 
         sb.append("\t\t:effect ").append(actionSchema.getEffects().toString()).append("\n");
 
@@ -176,7 +177,7 @@ public class PddlStringifier {
                 int weight = weightEntry.getValue();
 
                 var funcExp = new Expression_FunctionValue(place.name(), colors);
-                var assignment = new Expression_FunctionEq(funcExp, new Expression_IntegerLiteral(weight));
+                var assignment = new Expression_FunctionAssign(funcExp, new Expression_IntegerLiteral(weight));
 
                 sb.append("\n\t\t").append(assignment);
             }

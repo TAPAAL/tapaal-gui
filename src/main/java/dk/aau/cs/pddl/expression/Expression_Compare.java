@@ -1,13 +1,14 @@
 package dk.aau.cs.pddl.expression;
 
-public class Expression_FunctionCompare extends BaseExpression implements IExpression {
+public class Expression_Compare extends BaseExpression implements IExpression {
 
     public enum ComparisonTypes{
         gt,
         gteq,
         eq,
         lteq,
-        lt
+        lt,
+        neq
     }
     public static ComparisonTypes getType(String str) {
         switch (str) {
@@ -22,16 +23,18 @@ public class Expression_FunctionCompare extends BaseExpression implements IExpre
                 return ComparisonTypes.lteq;
             case "<":
                 return ComparisonTypes.lt;
+            case "!=":
+                return ComparisonTypes.neq;
         }
 
         throw new RuntimeException();
     }
 
     ComparisonTypes type;
-    public Expression_FunctionCompare(Expression_FunctionValue func, ComparisonTypes type, Expression_IntegerLiteral amount) {
-        this.parameters.add(func);
+    public Expression_Compare(IExpression_Value left, ComparisonTypes type, IExpression_Value right) {
+        this.parameters.add(left);
         this.type = type;
-        this.parameters.add(amount);
+        this.parameters.add(right);
     }
 
     @Override
@@ -47,6 +50,8 @@ public class Expression_FunctionCompare extends BaseExpression implements IExpre
                 return "<=";
             case lt:
                 return "<";
+            case neq:
+                return "!=";
         }
 
         throw new RuntimeException("Unhandled type: " + this.type);

@@ -1,6 +1,6 @@
 package dk.aau.cs.pddl.expression;
 
-public class Expression_IntegerLiteral implements IExpression {
+public class Expression_IntegerLiteral implements IExpression_Value {
     private int value;
 
     public int getValue() {

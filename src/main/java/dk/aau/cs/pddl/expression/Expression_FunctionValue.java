@@ -1,10 +1,11 @@
 package dk.aau.cs.pddl.expression;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.tapn.TimedPlace;
 
 import java.util.ArrayList;
 
-public class Expression_FunctionValue extends BaseExpression implements IExpression {
+public class Expression_FunctionValue extends BaseExpression implements IExpression_Value {
     private String name;
 //    private ArrayList<IExpression_Value> parameters;
 
@@ -13,10 +14,12 @@ public class Expression_FunctionValue extends BaseExpression implements IExpress
         this.parameters = new ArrayList<>(parameters);
     }
 
-//    public Expression_FunctionValue(TimedPlace place, ArrayList<IExpression_Value> parameters) {
-//        this.name = place.name();
-//        this.parameters = parameters;
-//    }
+    public Expression_FunctionValue(TimedPlace place, ArrayList<Color> color) {
+        this.name = place.name();
+        for(var atom: color) {
+            this.parameters.add(new Expression_ColorLiteral(atom));
+        }
+    }
 
     public String getName() {
         return name;
