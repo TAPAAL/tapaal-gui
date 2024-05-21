@@ -6,6 +6,8 @@ import dk.aau.cs.io.queries.XMLQueryLoader;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -55,14 +57,14 @@ public class pddlMain {
     }
 
 
-    public static void test(String modelFilePath, String queriesFilePath) {
+    public static void test(String modelFilePath, String queriesFilePath) throws FileNotFoundException {
         test(
             new File(modelFilePath),
             new File(queriesFilePath)
         );
     }
 
-    public static void test(File modelFile, File queriesFile) {
+    public static void test(File modelFile, File queriesFile) throws FileNotFoundException {
         Model planningTask = parseModel(modelFile, queriesFile);
 
         System.out.println("Can parse pnml: " + true);
@@ -72,10 +74,10 @@ public class pddlMain {
         }
     }
 
-    private static Model parseModel(File modelFile, File queriesFile) {
+    private static Model parseModel(File modelFile, File queriesFile) throws FileNotFoundException {
         // Load Petri net
         PNMLoader loader = new PNMLoader();
-        LoadedModel loadedModel = loader.load(modelFile);
+        LoadedModel loadedModel = loader.load(new FileInputStream(modelFile));
 
         XMLQueryLoader queryLoader = new XMLQueryLoader(queriesFile, loadedModel.network());
         ArrayList<TAPNQuery> loadedQueries = queryLoader.getQueries(loadedModel.getLens(), 0);
