@@ -2161,6 +2161,7 @@ public class QueryDialog extends JPanel {
         if(smcSelector.getSelectedIndex() == 1) {
             showSMCButtons(true);
             reductionOption.setSelectedItem(name_DISCRETE);
+            useGCD.setSelected(false);
             reductionOption.setEnabled(false);
             traceOptionsPanel.setVisible(false);
             boundednessCheckPanel.setVisible(false);

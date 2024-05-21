@@ -10,7 +10,7 @@ public class SMCSettings {
             if(this == TIMEBOUND) {
                 return "time";
             } else {
-                return "step";
+                return "steps";
             }
         }
     }

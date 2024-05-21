@@ -90,7 +90,7 @@ public class KBoundAnalyzer {
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1, dataLayerQuery.getRawVerification(), dataLayerQuery.getRawVerificationPrompt());
 		} else if(modelChecker instanceof VerifyDTAPN){
             //gdc and dart can be used together with game
-            boolean gcd = !lens.isGame();
+            boolean gcd = !lens.isGame() && !lens.isStochastic();
             boolean dart = !tapnNetwork.hasUrgentTransitions() && !lens.isGame() && !lens.isStochastic();
 
 			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, gcd, dart, true, false, false, 1, false, true, true, tapnNetwork.isColored(), useRawVerification, rawVerificationPrompt);
