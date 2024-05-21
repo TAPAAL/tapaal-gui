@@ -106,6 +106,7 @@ public class TAPAAL {
                 files[0],
                 files[1]
             );
+            System.exit(0);
             return;
         }
 
