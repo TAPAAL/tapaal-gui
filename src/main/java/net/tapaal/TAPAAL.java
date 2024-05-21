@@ -84,6 +84,7 @@ public class TAPAAL {
 			File batchFolder = new File(files[0]);
 
 			batchProcessing(batchFolder);
+            System.exit(0);
 			return;
 		}
 
@@ -95,6 +96,7 @@ public class TAPAAL {
                 files[1],
                 pddlOutPath
             );
+            System.exit(0);
             return;
         }
 
