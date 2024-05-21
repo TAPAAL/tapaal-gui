@@ -56,6 +56,7 @@ public class TAPAAL {
 		Options options = new Options();
 		options.addOption("d", "debug", false, "enable debug output .");
 		options.addOption("p", "pddl-out", true, "PDDL output directory - Set to translate model to pddl.");
+		options.addOption("t", "pddl-test", false, "Report compatibility of pnml and query file.");
 
 		CommandLine commandline = null;
 
@@ -93,6 +94,15 @@ public class TAPAAL {
                 files[0],
                 files[1],
                 pddlOutPath
+            );
+            return;
+        }
+
+        if (commandline.hasOption("pddl-test")) {
+            String[] files = commandline.getArgs();
+            pddlMain.test(
+                files[0],
+                files[1]
             );
             return;
         }

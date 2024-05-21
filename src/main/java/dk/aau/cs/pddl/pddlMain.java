@@ -23,17 +23,7 @@ public class pddlMain {
     }
 
     public static void main(File modelFile, File queriesFile, String outPath) throws Exception {
-
-        // Load Petri net
-//        ModelLoader loader = new ModelLoader();
-        PNMLoader loader = new PNMLoader();
-        LoadedModel loadedModel = loader.load(modelFile);
-
-        XMLQueryLoader queryLoader = new XMLQueryLoader(queriesFile, loadedModel.network());
-        ArrayList<TAPNQuery> loadedQueries = queryLoader.getQueries(loadedModel.getLens(), 0);
-
-        // Translate to PDDL
-        var planningTask = new Model(loadedModel, loadedQueries);
+        Model planningTask = parseModel(modelFile, queriesFile);
 
         var stringifier = new PddlStringifier(planningTask);
 
@@ -62,6 +52,38 @@ public class pddlMain {
             pddlTaskWriter.close();
         }
 
+    }
+
+
+    public static void test(String modelFilePath, String queriesFilePath) {
+        test(
+            new File(modelFilePath),
+            new File(queriesFilePath)
+        );
+    }
+
+    public static void test(File modelFile, File queriesFile) {
+        Model planningTask = parseModel(modelFile, queriesFile);
+
+        System.out.println("Can parse pnml: " + true);
+        System.out.println("Valid queries:");
+        for(var validQueryName: planningTask.getQueries().keySet()) {
+            System.out.println(validQueryName);
+        }
+    }
+
+    private static Model parseModel(File modelFile, File queriesFile) {
+        // Load Petri net
+        PNMLoader loader = new PNMLoader();
+        LoadedModel loadedModel = loader.load(modelFile);
+
+        XMLQueryLoader queryLoader = new XMLQueryLoader(queriesFile, loadedModel.network());
+        ArrayList<TAPNQuery> loadedQueries = queryLoader.getQueries(loadedModel.getLens(), 0);
+
+        // Translate to PDDL
+        Model planningTask = new Model(loadedModel, loadedQueries);
+
+        return planningTask;
     }
 
 }
