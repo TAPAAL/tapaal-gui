@@ -69,8 +69,10 @@ public class pddlMain {
 
         System.out.println("Can parse pnml: " + true);
         System.out.println("Valid queries:");
-        for(var validQueryName: planningTask.getQueries().keySet()) {
-            System.out.println(validQueryName);
+        for(var entry: planningTask.getQueries().entrySet()) {
+            String queryName = entry.getKey();
+            int queryIndex = entry.getValue().getXmlIndex();
+            System.out.println(queryIndex + "," + queryName);
         }
     }
 

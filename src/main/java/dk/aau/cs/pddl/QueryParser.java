@@ -10,10 +10,19 @@ import java.util.ArrayList;
 
 public class QueryParser {
     private TimedArcPetriNet petriNet;
+    private int xmlIndex = 0;
+    public int getXmlIndex() {
+        return xmlIndex;
+    }
+    public void setXmlIndex(int xmlIndex) {
+        this.xmlIndex = xmlIndex;
+    }
+
     public Expression_And expression = new Expression_And();
 
-    public QueryParser(TimedArcPetriNet petriNet) {
+    public QueryParser(TimedArcPetriNet petriNet, int xmlIndex) {
         this.petriNet = petriNet;
+        setXmlIndex(xmlIndex);
     }
 
     public void parseQuery(TAPNQuery query) throws UnhandledExpressionType {

@@ -268,7 +268,9 @@ public class Model {
 
 
     private void parseQueries(TimedArcPetriNet net, Iterable<TAPNQuery> queries) {
+        int queryIndex = 1;
         for(var query: queries) {
+            queryIndex++;
             if(query.getCategory().name() != "CTL")
                 continue;
 
@@ -276,9 +278,10 @@ public class Model {
                 continue;
 
             try {
-                var parser = new QueryParser(net);
+                var parser = new QueryParser(net, queryIndex);
                 parser.parseQuery(query);
                 this.queries.put(query.getName(), parser);
+
             }
             catch(UnhandledExpressionType e) {
                 continue;
