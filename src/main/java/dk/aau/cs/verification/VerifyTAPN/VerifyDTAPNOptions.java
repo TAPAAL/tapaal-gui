@@ -92,7 +92,6 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         {
             try {
 				unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
-				System.out.println("new path" + unfoldedModelPath);
                 unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
             } catch (IOException e) {
                 new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
