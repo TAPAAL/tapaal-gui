@@ -88,10 +88,11 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		this.rawVerificationOptions = rawVerificationOptions;
 
 		// we only force unfolding when traces are involved
-        if((unfold && trace() != TraceOption.NONE && !useRawVerification) || enableOverApproximation || enableUnderApproximation)
+        if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation) && !useRawVerification)
         {
             try {
-                unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+				unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+				System.out.println("new path" + unfoldedModelPath);
                 unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
             } catch (IOException e) {
                 new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
@@ -110,7 +111,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         result.append(kBoundArg());
         result.append(deadTokenArg());
         result.append(traceArg(traceOption));
-        if(unfold && trace() != TraceOption.NONE)
+        if(unfold && trace() != TraceOption.NONE || enabledOverApproximation || enabledUnderApproximation)
         {
             result.append(writeUnfolded());
 			result.append(" --bindings ");

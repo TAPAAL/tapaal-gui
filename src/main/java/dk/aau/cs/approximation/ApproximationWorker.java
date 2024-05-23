@@ -60,9 +60,7 @@ public class ApproximationWorker {
 		}
 		
 		VerificationResult<TAPNNetworkTrace> toReturn = null;
-		VerificationResult<TimedArcPetriNetTrace> result;
-
-		result = modelChecker.verify(options, transformedModel, clonedQuery, guiModel, dataLayerQuery, lens);
+		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery, guiModel, dataLayerQuery, lens);
 
 		if (result == null) return null;
         if (result.error()) {
