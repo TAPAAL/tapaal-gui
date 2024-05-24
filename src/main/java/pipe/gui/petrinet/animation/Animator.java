@@ -131,11 +131,44 @@ public class Animator {
     }
 
     private void setTimedTrace(TAPNNetworkTrace trace) {
+        NetworkMarking previousMarking = null;
+        TimedTransition previousTransition = null;
         for (TAPNNetworkTraceStep step : trace) {
+            if (step instanceof TAPNNetworkTimedTransitionStep) {
+                TimedTransition transition = ((TAPNNetworkTimedTransitionStep) step).getTransition();
+
+                if (previousMarking != null && previousTransition != null) {
+                    checkTokensRemoved(previousMarking, previousTransition);
+                }
+
+                previousMarking = currentMarking();
+                previousTransition = transition;
+            }
+
             addMarking(step, step.performStepFrom(currentMarking()));
         }
         if (getTrace().getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
             tab.getAnimationHistorySidePanel().setLastShown(getTrace().getTraceType());
+        }
+    }
+
+    /**
+     * Checks if the number of tokens removed from a place is as expected, otherwise shows an error message
+     */
+    private void checkTokensRemoved(NetworkMarking previousMarking, TimedTransition previousTransition) {
+        for (TimedInputArc arc : previousTransition.getInputArcs()) {
+            int tokensBefore = previousMarking.getTokensFor(arc.source()).size();
+            int tokensAfter = currentMarking().getTokensFor(arc.source()).size();
+            int tokensRemoved = tokensBefore - tokensAfter;
+
+            if (tokensRemoved != arc.getWeight().value()) {
+                String errorStr = "Error executing trace: expected to remove " + arc.getWeight().value();
+                errorStr += arc.getWeight().value() == 1 ? " token" : " tokens"; 
+                errorStr += " from place " + arc.source().name() + ", but removed " + tokensRemoved;
+                errorStr += tokensRemoved == 1 ? " token" : " tokens";
+                errorStr += " in step number " + currentMarkingIndex;
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), errorStr, "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
