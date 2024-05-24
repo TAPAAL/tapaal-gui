@@ -36,7 +36,7 @@ public class TimedPlaceComponent extends Place {
     private dk.aau.cs.model.tapn.TimedPlace place;
     private final dk.aau.cs.model.tapn.event.TimedPlaceListener listener = timedPlaceListener();
 
-    private Window ageOfTokensWindow = new Window(new Frame());
+    private Window ageOfTokensWindow = !GraphicsEnvironment.isHeadless() ? new Window(new Frame()) : null;
     private final Shape dashedOutline = createDashedOutline();
 
     public TimedPlaceComponent (
@@ -344,6 +344,8 @@ public class TimedPlaceComponent extends Place {
     }
 
     public void showAgeOfTokens(boolean show) {
+        if(GraphicsEnvironment.isHeadless())
+            return;
 
         if (ageOfTokensWindow != null){
             ageOfTokensWindow.dispose();
@@ -456,7 +458,7 @@ public class TimedPlaceComponent extends Place {
                         }
                     }
                 }
-                if (TAPAALGUI.getAppGui().showColoredTokens()) {
+                if (!GraphicsEnvironment.isHeadless() && TAPAALGUI.getAppGui().showColoredTokens()) {
                     if (underlyingPlace().getTokensAsExpression() != null) {
                         buffer.append("\n");
                         buffer.append(((AddExpression)underlyingPlace().getTokensAsExpression()).toTokenString());
