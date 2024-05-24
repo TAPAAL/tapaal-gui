@@ -22,7 +22,6 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private boolean useStubbornReduction = true;
 	private final boolean partition;
 	private final boolean colorFixpoint;
-    private final boolean unfold;
 	private boolean useRawVerification;
 	private String rawVerificationOptions;
 
@@ -88,10 +87,11 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		this.useRawVerification = useRawVerification;
 		this.rawVerificationOptions = rawVerificationOptions;
 
-        if(unfold && trace() != TraceOption.NONE && !useRawVerification) // we only force unfolding when traces are involved
+		// we only force unfolding when traces are involved
+        if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation) && !useRawVerification)
         {
             try {
-                unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+				unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
                 unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
             } catch (IOException e) {
                 new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
@@ -110,10 +110,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         result.append(kBoundArg());
         result.append(deadTokenArg());
         result.append(traceArg(traceOption));
-        if(unfold && trace() != TraceOption.NONE)
+        if(unfold && trace() != TraceOption.NONE || enabledOverApproximation || enabledUnderApproximation)
         {
             result.append(writeUnfolded());
-
 			result.append(" --bindings ");
         }
         result.append(searchArg(searchOption));

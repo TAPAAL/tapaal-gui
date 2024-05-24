@@ -1,5 +1,7 @@
 package dk.aau.cs.approximation;
 
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.Arc;
@@ -7,6 +9,7 @@ import pipe.gui.petrinet.graphicElements.Place;
 import pipe.gui.petrinet.graphicElements.Transition;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class UnderApproximation implements ITAPNApproximation {
 	@Override
@@ -16,12 +19,22 @@ public class UnderApproximation implements ITAPNApproximation {
 	
 	public void modifyTAPN(TimedArcPetriNet net, int approximationDenominator, DataLayer guiModel) {	
 		// Fix input arcs
-		ArrayList<TimedTransition> transitionsToDelete = new ArrayList<TimedTransition>();
+		List<TimedTransition> transitionsToDelete = new ArrayList<TimedTransition>();
 		
 		for (TimedInputArc arc : net.inputArcs()) {
-			 //Fix input arcs
+			List<ColoredTimeInterval> newIntervals = new ArrayList<ColoredTimeInterval>();
+			for (ColoredTimeInterval interval : arc.getColorTimeIntervals()) {
+				ColoredTimeInterval newInterval = (ColoredTimeInterval)modifyIntervals(interval, approximationDenominator);
+
+				if (newInterval != null) {
+					newIntervals.add(newInterval);
+				} else if (!transitionsToDelete.contains(arc.destination())) {
+					transitionsToDelete.add(arc.destination());
+				}
+			}
+			arc.setColorTimeIntervals(newIntervals);
+
 			TimeInterval oldInterval = arc.interval();
-			
 			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
 			
 			//New interval can be null if lower bound surpassed upper bound in rounding
@@ -38,43 +51,57 @@ public class UnderApproximation implements ITAPNApproximation {
 		}
 
 		for (TransportArc arc : net.transportArcs()) {
-			//fix transport arcs
+			List<ColoredTimeInterval> newIntervals = new ArrayList<ColoredTimeInterval>();
+			for (ColoredTimeInterval interval : arc.getColorTimeIntervals()) {
+				ColoredTimeInterval newInterval = (ColoredTimeInterval)modifyIntervals(interval, approximationDenominator);
+
+				if (newInterval != null) {
+					newIntervals.add(newInterval);
+				} else if (!transitionsToDelete.contains(arc.transition())) {
+					transitionsToDelete.add(arc.transition());
+				}
+			}
+			arc.setColorTimeIntervals(newIntervals);
+
 			TimeInterval oldInterval = arc.interval();
-			
 			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
 			
 			//New interval can be null if lower bound surpassed upper bound in rounding
 			if (newInterval != null)
 				arc.setTimeInterval(newInterval);
-			else{
+			else {
 				if(!transitionsToDelete.contains(arc.transition())){
 					transitionsToDelete.add(arc.transition());
 				}
 			}
 		}
 
-		for(TimedTransition transitionToDelete : transitionsToDelete){
-			if(guiModel != null){
+		for (TimedTransition transitionToDelete : transitionsToDelete) {
+			if (guiModel != null){
 				deleteTransitionFromGuiModel(transitionToDelete, guiModel);
-			}
-			else{
+			} else {
 				deleteArcsFromTransition(transitionToDelete);
 			}
+			
 			transitionToDelete.delete();
 		}	
 		
 		// Fix invariants in places
-		for (TimedPlace place1 : net.places()) {
-			if ( ! (place1.invariant().upperBound() instanceof Bound.InfBound) && place1.invariant().upperBound().value() > 0) {					
-				TimeInvariant oldInvariant = place1.invariant();
-				
-				int newInvariantBound = (int) Math.floor(oldInvariant.upperBound().value() / (double)approximationDenominator);
-				if(newInvariantBound != 0){
-					place1.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound(newInvariantBound)));
+		for (TimedPlace place : net.places()) {
+			List<ColoredTimeInvariant> newInvariants = new ArrayList<ColoredTimeInvariant>();
+			for (ColoredTimeInvariant cti : place.getCtiList()) {
+				if (!(cti.upperBound() instanceof Bound.InfBound) && cti.upperBound().value() > 0) {
+					int newInvariantBound = (int)Math.ceil(cti.upperBound().value() / (double)approximationDenominator);
+					newInvariants.add(new ColoredTimeInvariant(cti.isUpperNonstrict(), new IntBound(newInvariantBound), cti.getColor()));
 				}
-				else{
-					place1.setInvariant(new TimeInvariant(true, new IntBound(0)));
-				}
+			}
+			place.setCtiList(newInvariants);
+
+			// Default age invariants
+			if (!(place.invariant().upperBound() instanceof Bound.InfBound) && place.invariant().upperBound().value() > 0) {					
+				TimeInvariant oldInvariant = place.invariant();
+				int newInvariantBound = (int)Math.floor(oldInvariant.upperBound().value() / (double)approximationDenominator);
+				place.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound(newInvariantBound)));
 			}
 		}
 	}
@@ -96,7 +123,7 @@ public class UnderApproximation implements ITAPNApproximation {
 	}
 	
 	private void deleteArcsFromTransition(TimedTransition transitionToDelete) {
-		ArrayList<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
+		List<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
 		//Add all did not work properly, so we do it manually.
 		for(TimedInputArc arc : transitionToDelete.getInputArcs()){
 			inputArcs.add(arc);
@@ -105,7 +132,7 @@ public class UnderApproximation implements ITAPNApproximation {
 			arc.delete();
 		}
 		
-		ArrayList<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
+		List<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
 		for(TimedOutputArc arc : transitionToDelete.getOutputArcs()){
 			outputArcs.add(arc);
 		}
@@ -113,7 +140,7 @@ public class UnderApproximation implements ITAPNApproximation {
 			arc.delete();
 		}
 		
-		ArrayList<TransportArc> transportArcs = new ArrayList<TransportArc>();
+		List<TransportArc> transportArcs = new ArrayList<TransportArc>();
 		for(TransportArc arc : transitionToDelete.getTransportArcsGoingThrough()){
 			transportArcs.add(arc);
 		}
@@ -121,7 +148,7 @@ public class UnderApproximation implements ITAPNApproximation {
 			arc.delete();
 		}
 		
-		ArrayList<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+		List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 		for(TimedInhibitorArc arc : transitionToDelete.getInhibitorArcs()){
 			inhibitorArcs.add(arc);
 		}
@@ -161,6 +188,15 @@ public class UnderApproximation implements ITAPNApproximation {
             isLowerBoundNonStrict = true;
         }
 
+		if (oldInterval instanceof ColoredTimeInterval) {
+			return new ColoredTimeInterval(
+				isLowerBoundNonStrict,
+				newLowerBound,
+				newUpperBound,
+				isUpperBoundNonStrict,
+				((ColoredTimeInterval) oldInterval).getColor()
+			);
+		}
         return new TimeInterval(
             isLowerBoundNonStrict,
             newLowerBound,
