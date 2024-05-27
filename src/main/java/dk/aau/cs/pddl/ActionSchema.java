@@ -259,7 +259,7 @@ public class ActionSchema {
 
     public IExpression parseGuard(AndExpression guardExp) {
         var left = parseGuard(guardExp.getLeftExpression());
-        var right = parseGuard(guardExp.getLeftExpression());
+        var right = parseGuard(guardExp.getRightExpression());
 
         return new Expression_And(left, right);
     }
@@ -272,7 +272,7 @@ public class ActionSchema {
 
     public IExpression parseGuard(OrExpression guardExp) {
         var left = parseGuard(guardExp.getLeftExpression());
-        var right = parseGuard(guardExp.getLeftExpression());
+        var right = parseGuard(guardExp.getRightExpression());
 
         return new Expression_Or(left, right);
     }
