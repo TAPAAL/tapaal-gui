@@ -967,6 +967,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return queries.getQueries();
 	}
 
+    public QueryPane getQueryPane() {
+        return queries;
+    }
+
     public void removeQuery(TAPNQuery queryToRemove) {
 		queries.removeQuery(queryToRemove);
 	}

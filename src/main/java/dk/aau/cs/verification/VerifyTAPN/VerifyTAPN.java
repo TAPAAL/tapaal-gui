@@ -227,26 +227,28 @@ public class VerifyTAPN implements ModelChecker {
 		    mapDiscreteInclusionPlacesToNewNames(options, model);
 
         ExportedVerifyTAPNModel exportedModel;
-        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+        TimedArcPetriNet net = model.value1();
+        if (lens != null && lens.isColored() || net.parentNetwork() != null && net.parentNetwork().isColored()) {
             VerifyTAPNExporter exporter = new VerifyTACPNExporter();
-            exportedModel = exporter.export(model.value1(), query, lens, model.value2(), guiModel, dataLayerQuery);
+            exportedModel = exporter.export(net, query, lens, model.value2(), guiModel, dataLayerQuery);
         } else {
             VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-            exportedModel = exporter.export(model.value1(), query, lens, model.value2(), guiModel, dataLayerQuery);
+            exportedModel = exporter.export(net, query, lens, model.value2(), guiModel, dataLayerQuery);
         }
 
         if (exportedModel == null) {
             messenger.displayErrorMessage("There was an error exporting the model");
             return null;
         }
-
+       
 		return verify(options, model, exportedModel, query, dataLayerQuery, lens);
 	}
 
     @Override
     public VerificationResult<TimedArcPetriNetTrace> verifyManually(String options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception {
         VerifyTAPNExporter exporter;
-        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+        TimedArcPetriNet net = model.value1();
+        if (lens != null && lens.isColored() || net.parentNetwork() != null && net.parentNetwork().isColored()) {
             exporter = new VerifyTACPNExporter();
         } else {
             exporter = new VerifyTAPNExporter();
@@ -317,13 +319,13 @@ public class VerifyTAPN implements ModelChecker {
             String errorOutput = readOutput(runner.errorOutput());
 			String standardOutput = readOutput(runner.standardOutput());
 
-			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+            TimedArcPetriNet net  = model.value1();
+			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, net.marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
 			if (queryResult == null || queryResult.value1() == null) {
 				return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
                 TimedArcPetriNetTrace tapnTrace = null;
-
-                boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
+                boolean isColored = (lens != null && lens.isColored() || net.parentNetwork() != null && net.parentNetwork().isColored());
                 boolean showTrace = ((query.getProperty() instanceof TCTLEFNode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAGNode && !queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
