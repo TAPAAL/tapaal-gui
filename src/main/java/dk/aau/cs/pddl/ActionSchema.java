@@ -46,13 +46,16 @@ public class ActionSchema {
     private void parseTransition(TimedTransition transition) {
         this.name = transition.name();
         parseParameters(transition);
+
+        GuardExpression guard = transition.getGuard();
+        if(guard != null) {
+            parseParameters(guard);
+            this.precondition.addParameter(this.parseGuard(guard));
+        }
+
         for(var param: generatePrecondition((transition)).getParameters()) {
             this.precondition.addParameter(param);
         }
-
-        GuardExpression guard = transition.getGuard();
-        if(guard != null)
-            this.precondition.addParameter(this.parseGuard(guard));
 
         this.effects = generateEffects(transition);
     }
@@ -79,6 +82,24 @@ public class ActionSchema {
             return;
         } else if (expType.equals(AllExpression.class)) {
             return;
+        } else if(expType == AndExpression.class) { // Guard exps
+            parseParameters((AndExpression) expression);
+        } else if(expType == NotExpression.class) {
+            parseParameters((NotExpression) expression);
+        } else if(expType == OrExpression.class) {
+            parseParameters((OrExpression) expression);
+        } else if (expType == EqualityExpression.class) {
+            parseParameters((EqualityExpression) expression);
+        } else if (expType == GreaterThanEqExpression.class) {
+            parseParameters((GreaterThanEqExpression) expression);
+        } else if (expType == GreaterThanExpression.class) {
+            parseParameters((GreaterThanExpression) expression);
+        } else if (expType == InequalityExpression.class) {
+            parseParameters((InequalityExpression) expression);
+        } else if (expType == LessThanEqExpression.class) {
+            parseParameters((LessThanEqExpression) expression);
+        } else if (expType == LessThanExpression.class) {
+            parseParameters((LessThanExpression) expression);
         } else {
             throw new RuntimeException("Unhandled expression type: " + expType.getName());
         }
@@ -156,6 +177,55 @@ public class ActionSchema {
             parameters.put(name, new Parameter(name, userType));
         }
     }
+
+    //region parse parameters in guard
+
+    public void parseParameters(AndExpression guardExp) {
+        parseParameters(guardExp.getLeftExpression());
+        parseParameters(guardExp.getLeftExpression());
+    }
+
+    public void parseParameters(NotExpression guardExp) {
+        parseParameters(guardExp.getExpression());
+    }
+
+    public void parseParameters(OrExpression guardExp) {
+        parseParameters(guardExp.getLeftExpression());
+        parseParameters(guardExp.getLeftExpression());
+    }
+
+    public void parseParameters(EqualityExpression guardExp) {
+        parseParameters(guardExp.getLeftExpression());
+        parseParameters(guardExp.getRightExpression());
+    }
+
+    public void parseParameters(GreaterThanEqExpression guardExp) {
+        parseParameters(guardExp.getLeftExpression());
+        parseParameters(guardExp.getRightExpression());
+    }
+
+    public void parseParameters(GreaterThanExpression guardExp) {
+        parseParameters(guardExp.getLeftExpression());
+        parseParameters(guardExp.getRightExpression());
+    }
+
+    public void parseParameters(InequalityExpression guardExp) {
+        parseParameters(guardExp.getLeftExpression());
+        parseParameters(guardExp.getRightExpression());
+    }
+
+    public void parseParameters(LessThanEqExpression guardExp) {
+        parseParameters(guardExp.getLeftExpression());
+        parseParameters(guardExp.getRightExpression());
+    }
+
+    public void parseParameters(LessThanExpression guardExp) {
+        parseParameters(guardExp.getLeftExpression());
+        parseParameters(guardExp.getRightExpression());
+    }
+
+
+    //endregion
 
     //endregion
 
