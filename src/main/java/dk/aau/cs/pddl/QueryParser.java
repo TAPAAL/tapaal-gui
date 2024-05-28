@@ -3,6 +3,7 @@ package dk.aau.cs.pddl;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.pddl.expression.*;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 
@@ -56,55 +57,13 @@ public class QueryParser {
         }
     }
 
-    private void parseProperty(TCTLAtomicPropositionNode property) throws UnhandledExpressionType {
-        TCTLAbstractStateProperty leftAbstract = property.getLeft();
-        TCTLAbstractStateProperty rightAbstract = property.getRight();
+    private IExpression_Value parsePlace(TCTLPlaceNode node) {
+        var ptPlace = this.petriNet.getPlaceByName(node.getPlace());
 
-        TCTLPlaceNode place;
-        TCTLConstNode value;
-        String operator;
+        return makePlaceSum(ptPlace);
+    }
 
-        // place op value
-        if(leftAbstract.getClass() == TCTLPlaceNode.class && rightAbstract.getClass() == TCTLConstNode.class) {
-            place = (TCTLPlaceNode)leftAbstract;
-            value = (TCTLConstNode)rightAbstract;
-            operator = property.getOp();
-        }
-        // value op place
-        else if(leftAbstract.getClass() == TCTLConstNode.class && rightAbstract.getClass() == TCTLPlaceNode.class) {
-            value = (TCTLConstNode)leftAbstract;
-            place = (TCTLPlaceNode)rightAbstract;
-
-            switch (property.getOp()) {
-                case "<":
-                    operator = ">=";
-                    break;
-                case "<=":
-                    operator = ">";
-                    break;
-                case "=":
-                case "==":
-                    operator = "=";
-                    break;
-                case ">=":
-                    operator = "<";
-                    break;
-                case ">":
-                    operator = "<=";
-                    break;
-                case "!=":
-                    operator = "!=";
-                    break;
-                default:
-                    throw new UnhandledExpressionType();
-            }
-        }
-        else {
-            throw new UnhandledExpressionType();
-        }
-
-
-        var ptPlace = this.petriNet.getPlaceByName(place.getPlace());
+    private IExpression_Value makePlaceSum(TimedPlace ptPlace) {
         var typeValuesIterator = util.getAllPossibleColors(ptPlace).iterator();
 
         ArrayList<Color> color = typeValuesIterator.next();
@@ -118,11 +77,40 @@ public class QueryParser {
             );
         }
 
+        return exp;
+    }
+
+    private IExpression_Value parseConst(TCTLConstNode node) {
+        return new Expression_IntegerLiteral(node.getConstant());
+    }
+
+    private void parseProperty(TCTLAtomicPropositionNode property) throws UnhandledExpressionType {
+        TCTLAbstractStateProperty leftAbstract = property.getLeft();
+        TCTLAbstractStateProperty rightAbstract = property.getRight();
+
+        IExpression_Value left;
+        String operator = property.getOp();
+        IExpression_Value right;
+
+        if(leftAbstract.getClass() == TCTLPlaceNode.class)
+            left = parsePlace((TCTLPlaceNode)leftAbstract);
+        else if(leftAbstract.getClass() == TCTLConstNode.class)
+            left = parseConst((TCTLConstNode)leftAbstract);
+        else
+            throw new UnhandledExpressionType();
+
+        if(rightAbstract.getClass() == TCTLPlaceNode.class)
+            right = parsePlace((TCTLPlaceNode)rightAbstract);
+        else if(rightAbstract.getClass() == TCTLConstNode.class)
+            right = parseConst((TCTLConstNode)rightAbstract);
+        else
+            throw new UnhandledExpressionType();
+
 
         expression.addParameter(new Expression_Compare(
-            exp,
+            left,
             Expression_Compare.getType(operator),
-            new Expression_IntegerLiteral(value.getConstant())
+            right
         ));
 
     }
