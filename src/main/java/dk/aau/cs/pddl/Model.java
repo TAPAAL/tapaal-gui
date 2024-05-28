@@ -19,7 +19,7 @@ public class Model {
     private ArrayList<Extension> extensions = new ArrayList<>();
     private HashMap<String, UserType> types = new HashMap<>();
     private HashMap<String, FunctionSignature> functions = new HashMap<>();
-    private ArrayList<Expression_Predicate> predicates = new ArrayList<>();
+    private ArrayList<IExpression> predicates = new ArrayList<>();
     private HashMap<String, ActionSchema> actionSchemas = new HashMap<>();
     private HashMap<String, QueryParser> queries = new HashMap<>();
 
@@ -59,11 +59,15 @@ public class Model {
     }
 
 
-    public ArrayList<Expression_Predicate> getPredicates() {
+    public ArrayList<IExpression> getPredicates() {
         return predicates;
     }
 
-    public void setPredicates(ArrayList<Expression_Predicate> predicates) {
+    public void appendPredicates(ArrayList<IExpression> predicates) {
+        this.predicates.addAll(predicates);
+    }
+
+    public void setPredicates(ArrayList<IExpression> predicates) {
         this.predicates = predicates;
     }
 
@@ -120,9 +124,11 @@ public class Model {
         this.parseName(firstNet);
         this.parseExtensions();
         this.parseTypes(network);
-        this.setPredicates(this.createSiblingPredicates(network));
+        this.appendPredicates(this.createGetIntPredicates(network));
+        this.appendPredicates(this.createSiblingPredicates(network));
         this.parseFunctions(firstNet);
         this.parseActionSchemas(network.allTemplates().get(0));
+
         state = this.parseInitialState(firstNet);
 
 
@@ -203,8 +209,29 @@ public class Model {
         return actionSchema;
     }
 
-    public ArrayList<Expression_Predicate> createSiblingPredicates(TimedArcPetriNetNetwork network) {
-        ArrayList<Expression_Predicate> predicates = new ArrayList<>();
+    public ArrayList<IExpression> createGetIntPredicates(TimedArcPetriNetNetwork network) {
+        ArrayList<IExpression> predicates = new ArrayList<>();
+
+        for (ColorType colorType : network.colorTypes()) {
+            if(colorType instanceof ProductType)
+                continue;
+
+            int i=0;
+            for(Color c: colorType) {
+                predicates.add(new Expression_Compare(
+                    new Expression_ToInt(c),
+                    Expression_Compare.ComparisonTypes.eq,
+                    new Expression_IntegerLiteral(i)
+                ));
+                i++;
+            }
+        }
+
+        return predicates;
+    }
+
+    public ArrayList<IExpression> createSiblingPredicates(TimedArcPetriNetNetwork network) {
+        ArrayList<IExpression> predicates = new ArrayList<>();
 
         for (ColorType colorType : network.colorTypes()) {
             if(colorType instanceof ProductType)
