@@ -168,13 +168,13 @@ public class Animator {
             }
 
             int tokensAfter = currentMarking().getTokensFor(inputArc.source()).size() + newTokens;
-            int tokensRemoved = Math.abs(tokensBefore - tokensAfter);
+            int tokenDelta = Math.abs(tokensBefore - tokensAfter);
 
-            if (tokensRemoved != inputArc.getWeight().value()) {
-                String errorStr = "Error executing trace: expected to remove " + inputArc.getWeight().value();
+            if (tokenDelta != inputArc.getWeight().value()) {
+                String errorStr = "Error executing trace: expected to have " + inputArc.getWeight().value();
                 errorStr += inputArc.getWeight().value() == 1 ? " token" : " tokens"; 
-                errorStr += " from place " + inputArc.source().name() + ", but removed " + tokensRemoved;
-                errorStr += tokensRemoved == 1 ? " token" : " tokens";
+                errorStr += " in place " + inputArc.source().name() + ", but had " + tokenDelta;
+                errorStr += tokenDelta == 1 ? " token" : " tokens";
                 errorStr += " in step number " + currentMarkingIndex;
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), errorStr, "Error", JOptionPane.ERROR_MESSAGE);
             }
