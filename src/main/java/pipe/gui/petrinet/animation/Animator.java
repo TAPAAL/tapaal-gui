@@ -25,6 +25,7 @@ import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -156,15 +157,23 @@ public class Animator {
      * Checks if the number of tokens removed from a place is as expected, otherwise shows an error message
      */
     private void checkTokensRemoved(NetworkMarking previousMarking, TimedTransition previousTransition) {
-        for (TimedInputArc arc : previousTransition.getInputArcs()) {
-            int tokensBefore = previousMarking.getTokensFor(arc.source()).size();
-            int tokensAfter = currentMarking().getTokensFor(arc.source()).size();
-            int tokensRemoved = tokensBefore - tokensAfter;
+        for (TimedInputArc inputArc : previousTransition.getInputArcs()) {
+            int tokensBefore = previousMarking.getTokensFor(inputArc.source()).size();
+            
+            int newTokens = 0;
+            for (TimedOutputArc outputArc : previousTransition.getOutputArcs()) {
+                if (outputArc.destination().equals(inputArc.source())) {
+                    newTokens += outputArc.getWeight().value();
+                }
+            }
 
-            if (tokensRemoved != arc.getWeight().value()) {
-                String errorStr = "Error executing trace: expected to remove " + arc.getWeight().value();
-                errorStr += arc.getWeight().value() == 1 ? " token" : " tokens"; 
-                errorStr += " from place " + arc.source().name() + ", but removed " + tokensRemoved;
+            int tokensAfter = currentMarking().getTokensFor(inputArc.source()).size() + newTokens;
+            int tokensRemoved = Math.abs(tokensBefore - tokensAfter);
+
+            if (tokensRemoved != inputArc.getWeight().value()) {
+                String errorStr = "Error executing trace: expected to remove " + inputArc.getWeight().value();
+                errorStr += inputArc.getWeight().value() == 1 ? " token" : " tokens"; 
+                errorStr += " from place " + inputArc.source().name() + ", but removed " + tokensRemoved;
                 errorStr += tokensRemoved == 1 ? " token" : " tokens";
                 errorStr += " in step number " + currentMarkingIndex;
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), errorStr, "Error", JOptionPane.ERROR_MESSAGE);
