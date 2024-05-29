@@ -182,7 +182,7 @@ public class ActionSchema {
 
     public void parseParameters(AndExpression guardExp) {
         parseParameters(guardExp.getLeftExpression());
-        parseParameters(guardExp.getLeftExpression());
+        parseParameters(guardExp.getRightExpression());
     }
 
     public void parseParameters(NotExpression guardExp) {
@@ -191,7 +191,7 @@ public class ActionSchema {
 
     public void parseParameters(OrExpression guardExp) {
         parseParameters(guardExp.getLeftExpression());
-        parseParameters(guardExp.getLeftExpression());
+        parseParameters(guardExp.getRightExpression());
     }
 
     public void parseParameters(EqualityExpression guardExp) {
