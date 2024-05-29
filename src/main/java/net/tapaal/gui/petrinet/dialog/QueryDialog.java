@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
@@ -454,6 +455,20 @@ public class QueryDialog extends JPanel {
 
         String name = getQueryComment();
         int capacity = getCapacity();
+
+        if (rawVerificationOptionsEnabled.isSelected()) {
+            ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+            Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
+            int tokensInModel = transformedModel.value1().getNumberOfTokensInNet();
+
+            String str = rawVerificationOptionsTextArea.getText();
+            Pattern pattern = Pattern.compile("(--k-bound|-k)\\s+(\\d+)");
+            Matcher matcher = pattern.matcher(str);
+    
+            if (matcher.find()) {
+                capacity = Integer.parseInt(matcher.group(2)) - tokensInModel;
+            }
+        }
 
         TAPNQuery.TraceOption traceOption = getTraceOption();
         TAPNQuery.SearchOption searchOption = getSearchOption();
