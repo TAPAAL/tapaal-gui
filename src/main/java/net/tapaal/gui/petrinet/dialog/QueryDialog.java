@@ -461,12 +461,13 @@ public class QueryDialog extends JPanel {
             Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
             int tokensInModel = transformedModel.value1().getNumberOfTokensInNet();
 
-            String str = rawVerificationOptionsTextArea.getText();
+            String rawOptions = rawVerificationOptionsTextArea.getText();
             Pattern pattern = Pattern.compile("(--k-bound|-k)\\s+(\\d+)");
-            Matcher matcher = pattern.matcher(str);
+            Matcher matcher = pattern.matcher(rawOptions);
     
             if (matcher.find()) {
-                capacity = Integer.parseInt(matcher.group(2)) - tokensInModel;
+                int totalTokens = Integer.parseInt(matcher.group(2));
+                capacity = totalTokens - tokensInModel;
             }
         }
 
