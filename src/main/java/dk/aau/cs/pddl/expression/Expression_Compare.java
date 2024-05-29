@@ -37,6 +37,13 @@ public class Expression_Compare extends BaseExpression implements IExpression {
         this.parameters.add(right);
     }
 
+    public static IExpression Make_Comparison(IExpression_Value left, ComparisonTypes type, IExpression_Value right) {
+        if(type == ComparisonTypes.neq) {
+            return new Expression_Not(new Expression_Compare(left, ComparisonTypes.eq, right));
+        }
+        return new Expression_Compare(left, type, right);
+    }
+
     @Override
     public String getName() {
         switch (this.type) {

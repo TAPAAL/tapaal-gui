@@ -297,19 +297,8 @@ public class ActionSchema {
         var left = parseGuard(guardExp.getLeftExpression());
         var right = parseGuard(guardExp.getRightExpression());
 
-        return new Expression_Compare(left, compType, right);
+        return Expression_Compare.Make_Comparison(left, compType, right);
     }
-
-    public IExpression parseGuard(InequalityExpression guardExp) {
-        var left = parseGuard(guardExp.getLeftExpression());
-        var right = parseGuard(guardExp.getRightExpression());
-
-        return new Expression_Not(
-            new Expression_Compare(left, Expression_Compare.ComparisonTypes.eq, right)
-        );
-    }
-
-
     //endregion
 
     //endregion

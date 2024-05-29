@@ -107,7 +107,7 @@ public class QueryParser {
             throw new UnhandledExpressionType();
 
 
-        expression.addParameter(new Expression_Compare(
+        expression.addParameter(Expression_Compare.Make_Comparison(
             left,
             Expression_Compare.getType(operator),
             right
