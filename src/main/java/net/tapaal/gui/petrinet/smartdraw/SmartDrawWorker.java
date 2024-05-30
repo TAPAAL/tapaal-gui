@@ -173,8 +173,8 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 					while(!objectPlaced) {
 						layer += 1;
 						//Try different positions for the objects
-						for(int x = Math.abs(parentPoint.x - (xSpacing*layer)); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
-							for(int y = Math.abs(parentPoint.y - (ySpacing * layer)); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
+						for(int x = parentPoint.x - (xSpacing*layer); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
+							for(int y = parentPoint.y - (ySpacing * layer); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
 								Point possiblePoint = new Point(x, y);
 						
 								if(!(pointsReserved.containsWithin(possiblePoint, range))) {
@@ -232,7 +232,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	}
 	
 	private void breadthFirstDraw(PlaceTransitionObject parentObject) {
-		ArrayList<Arc> arcsForObject = getAllArcsFromObject(parentObject);
+		List<Arc> arcsForObject = getAllArcsFromObject(parentObject);
 		PlaceTransitionObject objectToPlace;
 		boolean objectPlaced = false;
 		Point parentPoint = new Point(parentObject.getOriginalX(), parentObject.getOriginalY());
