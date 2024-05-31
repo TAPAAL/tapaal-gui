@@ -147,7 +147,7 @@ public class ActionSchema {
 
         if(!this.parameters.containsKey(predecessor_param.getName())) {
             this.parameters.put(predecessor_param.getName(), predecessor_param);
-            this.precondition.addParameter(new Expression_Predicate_IsSuccessor(stored_param, predecessor_param));
+            this.precondition.addParameter(new Expression_Predicate_IsPredecessor(stored_param, predecessor_param));
         }
 
     }
