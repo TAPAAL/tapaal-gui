@@ -256,16 +256,18 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 					for(int x = (parentPoint.x - (xSpacing*layer)); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
 						for(int y = (parentPoint.y - (ySpacing * layer)); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
 							Point possiblePoint = new Point(x, y);
-							int weight = calculateWeight(possiblePoint, layer, getObjectPositionAsPoint(parentObject), objectToPlace);
-
-							if(weight < smallestWeight) {
-								smallestWeight = weight;
-								bestPoint = possiblePoint;
+							if (!(pointsReserved.containsWithin(possiblePoint, range))) {
+								int weight = calculateWeight(possiblePoint, layer, getObjectPositionAsPoint(parentObject), objectToPlace);
+								
+								if(weight < smallestWeight) {
+									smallestWeight = weight;
+									bestPoint = possiblePoint;
+								}
 							}
 						}
 					}
 					//We try at least minimumIterations times
-					if(!(pointsReserved.containsWithin(bestPoint, range)) && layer >= minimumIterations) {
+					if(layer >= minimumIterations && bestPoint != null) {
 						fireStatusChanged(objectsPlaced.size());
 						moveObject(objectToPlace, bestPoint);
 						checkIfObjectIsNowRightmost(bestPoint);
