@@ -9,6 +9,8 @@ import dk.aau.cs.pddl.expression.*;
 
 import java.util.*;
 
+import static dk.aau.cs.pddl.util.getAllPossibleColors;
+
 public class ActionSchema {
     private String name;
     private HashMap<String, Parameter> parameters = new HashMap<>();
@@ -457,15 +459,18 @@ public class ActionSchema {
     }
 
 
-    private ArrayList<IExpression_Value> parseColorToValues(AllExpression expression) {
-        ArrayList<IExpression_Value> values = new ArrayList<>();
-        var colors = expression.getSort().getColors();
+    private ArrayList<ArrayList<IExpression_Value>> parseColorToValues(AllExpression expression) {
 
-        for(var c: colors) {
-            values.add(new Expression_ColorLiteral(c));
+        ArrayList<ArrayList<IExpression_Value>> allColors = new ArrayList<>();
+        for(var colorProduct: getAllPossibleColors(expression.getSort())) {
+            ArrayList<IExpression_Value>  returnProduct = new ArrayList<>();
+            for(var atom: colorProduct) {
+                returnProduct.add(new Expression_ColorLiteral(atom));
+            }
+            allColors.add(returnProduct);
         }
 
-        return values;
+        return allColors;
     }
 
 
@@ -489,7 +494,7 @@ public class ActionSchema {
             } else if (eClass.equals(TupleExpression.class)) {
                 values.addAll(parseColorToValues((TupleExpression) e));
             } else if (eClass.equals(AllExpression.class)) {
-                values.addAll(squeeze(parseColorToValues(((AllExpression) e))));
+                values.addAll(parseColorToValues(((AllExpression) e)));
             } else {
                 throw new RuntimeException("Unhandled expression type " + e);
             }
