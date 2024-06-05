@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
@@ -453,7 +454,23 @@ public class QueryDialog extends JPanel {
         }
 
         String name = getQueryComment();
-        int capacity = getCapacity();
+        int oldCapacity = getCapacity();
+        int capacity = oldCapacity;
+
+        if (rawVerificationOptionsEnabled.isSelected()) {
+            ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+            Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
+            int tokensInModel = transformedModel.value1().getNumberOfTokensInNet();
+
+            String rawOptions = rawVerificationOptionsTextArea.getText();
+            Pattern pattern = Pattern.compile("(--k-bound|-k)\\s+(\\d+)");
+            Matcher matcher = pattern.matcher(rawOptions);
+    
+            if (matcher.find()) {
+                int totalTokens = Integer.parseInt(matcher.group(2));
+                capacity = totalTokens - tokensInModel;
+            }
+        }
 
         TAPNQuery.TraceOption traceOption = getTraceOption();
         TAPNQuery.SearchOption searchOption = getSearchOption();
@@ -467,13 +484,13 @@ public class QueryDialog extends JPanel {
         }
 
         if (!lens.isTimed()) {
-            return getUntimedQuery(name, traceList, capacity, traceOption, searchOption, reductionOptionToSet);
+            return getUntimedQuery(name, traceList, capacity, oldCapacity, traceOption, searchOption, reductionOptionToSet);
         } else {
-            return getTimedQuery(name, capacity, traceOption, searchOption, reductionOptionToSet);
+            return getTimedQuery(name, capacity, oldCapacity, traceOption, searchOption, reductionOptionToSet);
         }
     }
 
-    private TAPNQuery getTimedQuery(String name, int capacity, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOptionToSet) {
+    private TAPNQuery getTimedQuery(String name, int capacity, int oldCapacity, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOptionToSet) {
         boolean symmetry = getSymmetry();
 		boolean timeDarts = useTimeDarts.isSelected();
 		boolean pTrie = usePTrie.isSelected();
@@ -508,6 +525,8 @@ public class QueryDialog extends JPanel {
             rawVerificationOptionsTextArea.getText()
 		);
 
+        query.setOldCapacity(oldCapacity);
+
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
 
         if (reductionOptionToSet != null && reductionOptionToSet.equals(ReductionOption.VerifyTAPN)) {
@@ -516,7 +535,7 @@ public class QueryDialog extends JPanel {
         return query;
     }
 
-    private TAPNQuery getUntimedQuery(String name, ArrayList<String> traceList, int capacity, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOptionToSet) {
+    private TAPNQuery getUntimedQuery(String name, ArrayList<String> traceList, int capacity, int oldCapacity, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOptionToSet) {
         boolean reduction = useReduction.isSelected();
         boolean coloredReduction = useColoredReduction.isSelected();
 
@@ -1561,7 +1580,12 @@ public class QueryDialog extends JPanel {
 
     private void setupFromQuery(TAPNQuery queryToCreateFrom) {
         queryName.setText(queryToCreateFrom.getName());
-        numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
+
+        if (queryToCreateFrom.getOldCapacity() == null) {
+            numberOfExtraTokensInNet.setValue(queryToCreateFrom.getCapacity());
+        } else {
+            numberOfExtraTokensInNet.setValue(queryToCreateFrom.getOldCapacity());
+        }
 
         if (lens.isTimed()) {
             setupApproximationOptionsFromQuery(queryToCreateFrom);
