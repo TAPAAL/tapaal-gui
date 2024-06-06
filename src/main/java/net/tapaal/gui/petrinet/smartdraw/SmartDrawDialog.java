@@ -199,7 +199,7 @@ public class SmartDrawDialog extends JDialog {
 					
 					@Override
 					public void fireStatusChanged(int objectsPlaced) {
-						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + modelSize);
+						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + (modelSize - 1));
 					}
 					
 					@Override
