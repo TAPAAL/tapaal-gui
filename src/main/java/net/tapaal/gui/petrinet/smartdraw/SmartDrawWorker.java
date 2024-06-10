@@ -29,12 +29,14 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	final DrawingSurfaceImpl drawingSurface;
     final DataLayer model;
 	final String searchOption;
+	final int halfDimension = 10000;
+	final int range = 45;
 	Point rootPoint;
 	Point rightMostPointUsed = new Point(0, 0);
 
     ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
-	final ArrayList<Point> pointsReserved = new ArrayList<Point>();
+	final QuadTree pointsReserved = new QuadTree(new Boundary(new Point(0,0), halfDimension), true);
 	final UndoManager undoManager;
 	
 	//weights
@@ -81,7 +83,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		getPlaceTransitionObjects(); 
 		processStartingObject(startingObject);
 	}
-	
+
 	private void processStartingObject(String startingObject) {
 		if(!(startingObject.equals("Random")))
 			this.startingObject = model.getPlaceTransitionObjectByName(startingObject);
@@ -138,19 +140,16 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 				}
 			}
 		}
+
 		moveObjectsWithinScreenEdge();
 		removeArcPathPoints();
 		resetLabelsToDefault();
 		
-		
-		
-		
-		
 		return null;
 	}
-	
+
 	private void depthFirstDraw(PlaceTransitionObject parentObject) {
-		ArrayList<Arc> arcsForObject = getAllArcsFromObject(parentObject);
+		List<Arc> arcsForObject = getAllArcsFromObject(parentObject);
 		PlaceTransitionObject objectToPlace;
 		boolean objectPlaced = false;
 		Point parentPoint = new Point(parentObject.getOriginalX(), parentObject.getOriginalY());
@@ -174,13 +173,12 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 					while(!objectPlaced) {
 						layer += 1;
 						//Try different positions for the objects
-						for(int x = (parentPoint.x - (xSpacing*layer)); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
-							for(int y = (parentPoint.y - (ySpacing * layer)); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
+						for(int x = parentPoint.x - (xSpacing*layer); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
+							for(int y = parentPoint.y - (ySpacing * layer); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
 								Point possiblePoint = new Point(x, y);
-								if(!(pointsReserved.contains(possiblePoint))) {
-
+						
+								if(!(pointsReserved.containsWithin(possiblePoint, range))) {
 									int weight = calculateWeight(possiblePoint, layer, getObjectPositionAsPoint(parentObject), objectToPlace);
-
 									if(weight < smallestWeight) {
 										smallestWeight = weight;
 										bestPoint = possiblePoint;
@@ -188,6 +186,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 								}
 							}
 						}
+
 						//We try at least minimumIterations times
 						if(layer >= minimumIterations && bestPoint != null) {
 							fireStatusChanged(objectsPlaced.size());
@@ -229,11 +228,11 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		command.redo();
 	}
 	private void reservePoint(Point point) {
-		pointsReserved.add(point);
+		pointsReserved.insert(point);
 	}
 	
 	private void breadthFirstDraw(PlaceTransitionObject parentObject) {
-		ArrayList<Arc> arcsForObject = getAllArcsFromObject(parentObject);
+		List<Arc> arcsForObject = getAllArcsFromObject(parentObject);
 		PlaceTransitionObject objectToPlace;
 		boolean objectPlaced = false;
 		Point parentPoint = new Point(parentObject.getOriginalX(), parentObject.getOriginalY());
@@ -257,16 +256,18 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 					for(int x = (parentPoint.x - (xSpacing*layer)); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
 						for(int y = (parentPoint.y - (ySpacing * layer)); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
 							Point possiblePoint = new Point(x, y);
-							int weight = calculateWeight(possiblePoint, layer, getObjectPositionAsPoint(parentObject), objectToPlace);
-
-							if(weight < smallestWeight) {
-								smallestWeight = weight;
-								bestPoint = possiblePoint;
+							if (!(pointsReserved.containsWithin(possiblePoint, range))) {
+								int weight = calculateWeight(possiblePoint, layer, getObjectPositionAsPoint(parentObject), objectToPlace);
+								
+								if(weight < smallestWeight) {
+									smallestWeight = weight;
+									bestPoint = possiblePoint;
+								}
 							}
 						}
 					}
 					//We try at least minimumIterations times
-					if(!(pointsReserved.contains(bestPoint)) && layer >= minimumIterations) {
+					if(layer >= minimumIterations && bestPoint != null) {
 						fireStatusChanged(objectsPlaced.size());
 						moveObject(objectToPlace, bestPoint);
 						checkIfObjectIsNowRightmost(bestPoint);
@@ -538,8 +539,6 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		} else {
 			fireDone(true);
 		}
-
-		
 	}
 
 	//For debugging

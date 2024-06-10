@@ -43,6 +43,7 @@ public class TAPNQuery {
 
 	private String name;
 	private int capacity;
+	private Integer oldCapacity = null;
 	private TraceOption traceOption;
 	private SearchOption searchOption;
 	private ReductionOption reductionOption;
@@ -173,11 +174,19 @@ public class TAPNQuery {
 		this.capacity = capacity;
 	}
 
+	public void setOldCapacity(int capacity) {
+		this.oldCapacity = capacity;
+	}
+
 	/**
 	 * @return the capacity
 	 */
 	public int getCapacity() {
 		return capacity;
+	}
+
+	public Integer getOldCapacity() {
+		return oldCapacity;
 	}
 
 	public String getQuery() {
@@ -460,6 +469,7 @@ public class TAPNQuery {
 	public void set(TAPNQuery newQuery) {
 		name = newQuery.getName();
 		capacity = newQuery.getCapacity();
+		oldCapacity = newQuery.getOldCapacity();
 		property = newQuery.getProperty();
 		traceOption = newQuery.getTraceOption();
 		searchOption = newQuery.getSearchOption();
