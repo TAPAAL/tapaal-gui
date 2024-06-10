@@ -34,6 +34,7 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.HyperLTLParsing.TAPAALHyperLTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
+import dk.aau.cs.TCTL.LTLParsing.TAPAALSMCQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.verification.*;
 import net.tapaal.gui.petrinet.TAPNLens;
@@ -4281,6 +4282,8 @@ public class QueryDialog extends JPanel {
                             returnFromManualEdit(null);
                         else
                             return;
+                    } else if(smcSelector.getSelectedIndex() == 1) {
+                        newQuery = TAPAALSMCQueryParser.parse(queryField.getText());
                     } else if (lens.isTimed()) {
                         newQuery = TAPAALQueryParser.parse(queryField.getText());
                     } else if (queryType.getSelectedIndex() == 0) {
