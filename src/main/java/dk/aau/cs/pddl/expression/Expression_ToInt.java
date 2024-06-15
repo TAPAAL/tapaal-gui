@@ -4,12 +4,8 @@ import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.pddl.Parameter;
 
 public class Expression_ToInt extends BaseExpression implements IExpression_Value {
-    public Expression_ToInt(Parameter param) {
-        this.parameters.add(param);
-    }
-
-    public Expression_ToInt(Expression_ColorLiteral color) {
-        this.parameters.add(color);
+    public Expression_ToInt(IExpression_Value value) {
+        this.parameters.add(value);
     }
 
     public Expression_ToInt(Color color) {

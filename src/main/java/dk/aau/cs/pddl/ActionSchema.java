@@ -283,16 +283,7 @@ public class ActionSchema {
     private IExpression_Value parseGuard(ColorExpression value) {
         var parsedValue = parseColorToValues(value).get(0).get(0);
 
-        var valueType = parsedValue.getClass();
-
-        if(valueType == Parameter.class)
-            return new Expression_ToInt((Parameter) parsedValue);
-        else if (valueType == Expression_ColorLiteral.class) {
-            return new Expression_ToInt((Expression_ColorLiteral) parsedValue);
-        }
-        else {
-            throw new RuntimeException("Expected parameter when parsed " + value);
-        }
+        return new Expression_ToInt(parsedValue);
     }
 
     public IExpression parseGuardComparison(LeftRightGuardExpression guardExp, Expression_Compare.ComparisonTypes compType) {
