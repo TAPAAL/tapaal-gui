@@ -182,7 +182,7 @@ public class TimedPlaceComponent extends Place {
             BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] {5.0f}, 0.0f);
             graphics.setStroke(dashed);
 
-            int margin = 10;
+            int margin = 1;
             graphics.setClip(new Rectangle2D.Double(dashedOutline.getBounds().x - margin, dashedOutline.getBounds().y - margin, dashedOutline.getBounds().width + margin * 2, dashedOutline.getBounds().height + margin * 2));
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             
