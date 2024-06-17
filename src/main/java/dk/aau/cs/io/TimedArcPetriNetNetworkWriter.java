@@ -24,6 +24,8 @@ import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
 import dk.aau.cs.TCTL.visitors.HyperLTLQueryVisitor;
+import dk.aau.cs.pddl.Model;
+import dk.aau.cs.pddl.PddlStringifier;
 import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
