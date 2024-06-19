@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.*;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -81,7 +82,9 @@ public class PNMLoader {
             return null;
         } catch (NullPointerException e){
             if (!isNetDrawable()) {
-                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The unfolded net is too large to be loaded");
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The unfolded net is too large to be loaded", "Error", JOptionPane.ERROR_MESSAGE);
+                });
                 return null;
             }
 
@@ -558,7 +561,7 @@ public class PNMLoader {
         return tempArc;
     }
 
-    private boolean isNetDrawable() {
+    public boolean isNetDrawable() {
         return netSize <= maxNetSize;
     }
 

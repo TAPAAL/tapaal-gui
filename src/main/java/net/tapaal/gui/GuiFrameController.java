@@ -325,6 +325,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
                 try {
                     List<PetriNetTab> tabs = get();
                     for (PetriNetTab tab : tabs) {
+                        if (tab == null) continue;
                         openTab(tab);
 
                         //Don't auto-layout on empty net, hotfix for issue #1960000, we assume only pnml file does not have layout, and they always only have one component
