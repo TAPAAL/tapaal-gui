@@ -561,7 +561,7 @@ public class PNMLoader {
         return tempArc;
     }
 
-    public boolean isNetDrawable() {
+    private boolean isNetDrawable() {
         return netSize <= maxNetSize;
     }
 
