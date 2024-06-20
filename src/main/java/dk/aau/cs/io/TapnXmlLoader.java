@@ -456,7 +456,6 @@ public class TapnXmlLoader {
 		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
 
 		String player = transition.getAttribute("player");
-	
 		idResolver.add(tapn.name(), idInput, nameInput);
 
 		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true");
@@ -678,6 +677,7 @@ public class TapnXmlLoader {
 		
 		PlaceTransitionObject sourceIn = template.guiModel().getPlaceTransitionObject(sourceInput);
 		PlaceTransitionObject targetIn = template.guiModel().getPlaceTransitionObject(targetInput);
+		
 		// add the insets and offset
 		int _startx = sourceIn.getX() + sourceIn.centreOffsetLeft();
 		int _starty = sourceIn.getY() + sourceIn.centreOffsetTop();
