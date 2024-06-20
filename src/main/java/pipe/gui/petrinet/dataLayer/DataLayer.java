@@ -684,7 +684,7 @@ public class DataLayer {
 
         if (transitionName != null) {
             for (Transition transition : transitionsArray) {
-                if (transitionName.equalsIgnoreCase(transition.getName())) {
+                if (transitionName.equals(transition.getName())) {
                     returnTransition = transition;
                 }
             }
@@ -724,7 +724,7 @@ public class DataLayer {
 
         if (placeName != null) {
             for (Place place : placesArray) {
-                if (placeName.equalsIgnoreCase(place.getName())) {
+                if (placeName.equals(place.getName())) {
                     returnPlace = place;
                 }
             }
