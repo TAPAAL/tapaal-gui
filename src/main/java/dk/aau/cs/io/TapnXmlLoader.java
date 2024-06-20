@@ -318,7 +318,6 @@ public class TapnXmlLoader {
 
 		NodeList nodeList = tapnNode.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
-
 			Node node = nodeList.item(i);
 			if(node instanceof Element){
 				parseElement((Element)node, template, network, constants);
@@ -457,7 +456,7 @@ public class TapnXmlLoader {
 		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
 
 		String player = transition.getAttribute("player");
-
+	
 		idResolver.add(tapn.name(), idInput, nameInput);
 
 		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true");
@@ -679,7 +678,6 @@ public class TapnXmlLoader {
 		
 		PlaceTransitionObject sourceIn = template.guiModel().getPlaceTransitionObject(sourceInput);
 		PlaceTransitionObject targetIn = template.guiModel().getPlaceTransitionObject(targetInput);
-
 		// add the insets and offset
 		int _startx = sourceIn.getX() + sourceIn.centreOffsetLeft();
 		int _starty = sourceIn.getY() + sourceIn.centreOffsetTop();
@@ -904,15 +902,11 @@ public class TapnXmlLoader {
                                          int _endx, int _endy, Template template, ConstantStore constants, Weight weight,List<ColoredTimeInterval> ctiList, ArcExpression expr ) throws FormatException {
         TimedInputArcComponent tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(sourceIn, targetIn, 1, idInput), lens);
 
-
-
-
 		TimedPlace place = template.model().getPlaceByName(sourceIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(targetIn.getName());
 
 		TimeInterval timeInterval = TimeInterval.parse(inscriptionTempStorage, constants);
         //ctiList.add(ColoredTimeInterval.parse(inscriptionTempStorage, constants, new Vector<Color>(){{add(Color.STAR_COLOR);}}));
-
 
         TimedInputArc inputArc = new TimedInputArc(place, transition, timeInterval, weight, expr);
         inputArc.setColorTimeIntervals(ctiList);

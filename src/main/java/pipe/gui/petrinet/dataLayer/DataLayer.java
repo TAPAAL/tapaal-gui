@@ -663,7 +663,7 @@ public class DataLayer {
 
         if (transitionID != null) {
             for (Transition transition : transitionsArray) {
-                if (transitionID.equalsIgnoreCase(transition.getId())) {
+                if (transitionID.equals(transition.getId())) {
                     returnTransition = transition;
                 }
             }
@@ -704,7 +704,7 @@ public class DataLayer {
 
         if (placeID != null) {
             for (Place place : placesArray) {
-                if (placeID.equalsIgnoreCase(place.getId())) {
+                if (placeID.equals(place.getId())) {
                     returnPlace = place;
                 }
             }

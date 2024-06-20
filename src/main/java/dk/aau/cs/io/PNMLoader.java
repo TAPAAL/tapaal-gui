@@ -83,7 +83,7 @@ public class PNMLoader {
         } catch (NullPointerException e){
             if (!isNetDrawable()) {
                 SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The unfolded net is too large to be loaded", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The net is too large to be loaded and drawn in the GUI", "Error", JOptionPane.ERROR_MESSAGE);
                 });
                 return null;
             }
