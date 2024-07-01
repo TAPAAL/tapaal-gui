@@ -68,6 +68,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final JComboBox<String> timeFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
     private final JComboBox<String> gameFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
     private final JComboBox<String> colorFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
+    private final JComboBox<String> stochasticFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
 
     private JComboBox<String> zoomComboBox;
 
@@ -449,6 +450,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent e) {
             boolean isTime = timeFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeTimeFeature(isTime));
+            refreshLensConstraints();
         }
     };
 
@@ -456,6 +458,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent e) {
             boolean isGame = gameFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeGameFeature(isGame));
+            refreshLensConstraints();
         }
     };
 
@@ -463,6 +466,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent e) {
             boolean isColor = colorFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeColorFeature(isColor));
+            refreshLensConstraints();
+        }
+    };
+
+    private final GuiAction changeStochasticFeatureAction = new GuiAction("Stochastic", "Change stochastic semantics") {
+        public void actionPerformed(ActionEvent actionEvent) {
+            boolean isStochastic = stochasticFeatureOptions.getSelectedIndex() != 0;
+            currentTab.ifPresent(o -> o.changeStochasticFeature(isStochastic));
+            refreshLensConstraints();
         }
     };
 
@@ -523,9 +535,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         featurePanel.add(gameFeatureOptions);
         featurePanel.add(new JLabel("   Color: "));
         featurePanel.add(colorFeatureOptions);
+        featurePanel.add(new JLabel("   Stochastic: "));
+        featurePanel.add(stochasticFeatureOptions);
         timeFeatureOptions.addActionListener(changeTimeFeatureAction);
         gameFeatureOptions.addActionListener(changeGameFeatureAction);
         colorFeatureOptions.addActionListener(changeColorFeatureAction);
+        stochasticFeatureOptions.addActionListener(changeStochasticFeatureAction);
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new GridLayout(1, 2));
@@ -1004,6 +1019,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 timeFeatureOptions.setEnabled(true);
                 gameFeatureOptions.setEnabled(true);
                 colorFeatureOptions.setEnabled(true);
+                stochasticFeatureOptions.setEnabled(true);
+                refreshLensConstraints();
 
                 //Enable editor focus traversal policy
                 setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
@@ -1043,6 +1060,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 timeFeatureOptions.setEnabled(false);
                 gameFeatureOptions.setEnabled(false);
                 colorFeatureOptions.setEnabled(false);
+                stochasticFeatureOptions.setEnabled(false);
 
                 //Enable simulator focus traversal policy
                 setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy(getCurrentTab().getAnimationController().TimeDelayField));
@@ -1074,6 +1092,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 timeFeatureOptions.setEnabled(false);
                 gameFeatureOptions.setEnabled(false);
                 colorFeatureOptions.setEnabled(false);
+                stochasticFeatureOptions.setEnabled(false);
 
 
                 enableAllActions(false);
@@ -1537,12 +1556,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // .xml file the Example x counter is not incremented when that file
         // is ignored
         if (nets != null && nets.length > 0) {
-            TAPNLens untimedLens = new TAPNLens(false, false, false);
-            TAPNLens timedLens = new TAPNLens(true, false, false);
-            TAPNLens untimedGameLens = new TAPNLens(false, true, false);
-            TAPNLens timedGameLens = new TAPNLens(true, true, false);
-            TAPNLens untimedColorLens = new TAPNLens(false, false, true);
-            TAPNLens timedColorLens = new TAPNLens(true, false, true);
+            TAPNLens untimedLens = new TAPNLens(false, false, false, false);
+            TAPNLens timedLens = new TAPNLens(true, false, false, false);
+            TAPNLens untimedGameLens = new TAPNLens(false, true, false, false);
+            TAPNLens timedGameLens = new TAPNLens(true, true, false, false);
+            TAPNLens untimedColorLens = new TAPNLens(false, false, true, false);
+            TAPNLens timedColorLens = new TAPNLens(true, false, true, false);
+            TAPNLens timedStochasticLens = new TAPNLens(true, false, false, true);
 
             HashMap<TAPNLens, List<String>> netMap = new HashMap<>(){{
                     put(untimedLens, new ArrayList<>());
@@ -1551,6 +1571,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     put(timedGameLens, new ArrayList<>());
                     put(untimedColorLens, new ArrayList<>());
                     put(timedColorLens, new ArrayList<>());
+                    put(timedStochasticLens, new ArrayList<>());
             }};
 
             for (String filename : nets) {
@@ -1562,11 +1583,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     try {
                         lens = PetriNetTab.getFileLens(file);
                         if (lens == null) {
-                            lens = new TAPNLens(true, false, false);
+                            lens = new TAPNLens(true, false, false, false);
                         }
                         TAPNLens tmp = lens;
                         netMap.forEach((v, k) -> {
-                            if (v.isTimed() == tmp.isTimed() && v.isGame() == tmp.isGame() && v.isColored() == tmp.isColored()) k.add(filename);
+                            if (v.isTimed() == tmp.isTimed() && v.isGame() == tmp.isGame() && v.isColored() == tmp.isColored() && v.isStochastic() == tmp.isStochastic()) k.add(filename);
                         });
                     } catch (Exception e) {
                         if (netMap.containsKey(timedLens)) netMap.get(timedLens).add(filename);
@@ -1803,6 +1824,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             timeFeatureOptions.setSelectedIndex(features[0] ? 1 : 0);
             gameFeatureOptions.setSelectedIndex(features[1] ? 1 : 0);
             colorFeatureOptions.setSelectedIndex(features[2] ? 1 : 0);
+            stochasticFeatureOptions.setSelectedIndex(features[3] ? 1 : 0);
         }
+        refreshLensConstraints();
+    }
+
+    public void refreshLensConstraints() {
+        boolean stochasticEnabled = stochasticFeatureOptions.getSelectedIndex() != 0;
+        timeFeatureOptions.setEnabled(!stochasticEnabled);
+        gameFeatureOptions.setEnabled(!stochasticEnabled);
+        colorFeatureOptions.setEnabled(!stochasticEnabled);
+        stochasticFeatureOptions.setEnabled(
+            timeFeatureOptions.getSelectedIndex() != 0 &&
+                gameFeatureOptions.getSelectedIndex() == 0 &&
+                colorFeatureOptions.getSelectedIndex() == 0
+        );
     }
 }

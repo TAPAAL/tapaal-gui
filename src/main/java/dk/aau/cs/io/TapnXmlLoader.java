@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.verification.SMCDistribution;
 import kotlin.Pair;
 import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.*;
@@ -197,7 +198,10 @@ public class TapnXmlLoader {
             var isColoredElement = nodeList.item(0).getAttributes().getNamedItem("isColored");
             boolean isColored = isColoredElement == null ? network.isColored() : Boolean.parseBoolean(isColoredElement.getNodeValue());
 
-            lens = new TAPNLens(isTimed, isGame, isColored);
+            var isStochasticElement = nodeList.item(0).getAttributes().getNamedItem("isStochastic");
+            boolean isStochastic = isStochasticElement == null ? network.isStochastic() : Boolean.parseBoolean(isStochasticElement.getNodeValue());
+
+            lens = new TAPNLens(isTimed, isGame, isColored, isStochastic);
         }
     }
 
@@ -211,7 +215,10 @@ public class TapnXmlLoader {
             var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
             var isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
 
-            lens = new TAPNLens(isTimed, isGame, isColored);
+            var stochasticElement = nodeList.item(0).getAttributes().getNamedItem("isStochastic");
+            var isStochastic = stochasticElement != null && Boolean.parseBoolean(stochasticElement.getNodeValue());
+
+            lens = new TAPNLens(isTimed, isGame, isColored, isStochastic);
         }
     }
 
@@ -427,12 +434,15 @@ public class TapnXmlLoader {
 		String nameOffsetY = transition.getAttribute("nameOffsetY");
 		String angleStr = transition.getAttribute("angle");
 		String priorityStr = transition.getAttribute("priority");
+        String distrib = transition.getAttribute("distribution");
 	    int positionXInput = 0;
 		int positionYInput = 0;
 		int nameOffsetXInput = 0;
 		int nameOffsetYInput = 0;
 		int angle = 0;
         int priority = 0;
+        SMCDistribution distribution = SMCDistribution.defaultDistribution();
+
 		if(!posX.isEmpty()){
 		    positionXInput = (int)Double.parseDouble(posX);
         }
@@ -450,6 +460,9 @@ public class TapnXmlLoader {
         }
 		if(!priorityStr.isEmpty()){
 		    priority = Integer.parseInt(priorityStr);
+        }
+        if(!distrib.isEmpty()){
+            distribution = SMCDistribution.parseXml(transition);
         }
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
@@ -484,6 +497,7 @@ public class TapnXmlLoader {
 		TimedTransition t = new TimedTransition(nameInput, guardExpr);
 		t.setUrgent(isUrgent);
 		t.setUncontrollable(player.equals("1"));
+        t.setDistribution(distribution);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);

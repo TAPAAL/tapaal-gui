@@ -260,7 +260,7 @@ public class Verifier {
             if (tapnNetwork.isColored() && query.getTraceOption() != TAPNQuery.TraceOption.NONE) {
                 SmartDrawDialog.setupWorkerListener(thread);
             }
-            thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), query.getCapacity()), query, lens);
+            thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), query.getCapacity(), query.getSmcSettings()), query, lens);
             dialog.setVisible(true);
         } else {
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(),

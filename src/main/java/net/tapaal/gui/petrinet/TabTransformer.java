@@ -185,6 +185,15 @@ public class TabTransformer {
             }
         }
     }
+    static public void removeDistributionInformation(PetriNetTab tab) {
+        for (Template template : tab.allTemplates()) {
+            for (TimedTransition transition : template.model().transitions()) {
+                if (transition.hasCustomDistribution()) {
+                    transition.setDistribution(SMCDistribution.defaultDistribution());
+                }
+            }
+        }
+    }
     static public void removeColorInformation(PetriNetTab tab) {
         tab.network().setColorTypes(List.of(ColorType.COLORTYPE_DOT));
         tab.network().setVariables(new ArrayList<Variable>());

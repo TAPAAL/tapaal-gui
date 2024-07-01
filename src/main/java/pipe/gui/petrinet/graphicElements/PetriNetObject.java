@@ -245,6 +245,10 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	    return lens.isTimed();
     }
 
+    public boolean isStochastic() {
+        return lens.isStochastic();
+    }
+
     public void setLens(TAPNLens lens){
 	    this.lens = lens;
     }

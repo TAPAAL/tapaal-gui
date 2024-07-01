@@ -20,6 +20,7 @@ public class UPPAALBroadcastOptions extends EngineSupportOptions {
             true, //support EG or AF with net degree > 2);
             false, //support for nested quantification
            false,
+           false,
            false
        );
     }

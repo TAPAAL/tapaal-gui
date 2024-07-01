@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import dk.aau.cs.verification.SMCConstantDistribution;
+import dk.aau.cs.verification.SMCDistribution;
 import pipe.gui.petrinet.animation.Animator;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -28,6 +30,7 @@ public class TimedTransition extends TAPNElement {
 
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
+    private SMCDistribution distribution = SMCDistribution.defaultDistribution();
     private GuardExpression guard;
 
 	private SharedTransition sharedTransition;
@@ -47,6 +50,13 @@ public class TimedTransition extends TAPNElement {
 		setUrgent(isUrgent);
 		this.guard = guard;
 	}
+
+    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, SMCDistribution distribution) {
+        setName(name);
+        setUrgent(isUrgent);
+        setDistribution(distribution);
+        this.guard = guard;
+    }
 
 	public void addTimedTransitionListener(TimedTransitionListener listener){
 		Require.that(listener != null, "listener cannot be null");
@@ -86,6 +96,21 @@ public class TimedTransition extends TAPNElement {
 	    if (isShared() && cascade) {
 	        sharedTransition.setUncontrollable(isUncontrollable);
         }
+    }
+
+    public SMCDistribution getDistribution() { return distribution; }
+
+    public void setDistribution(SMCDistribution distrib) { setDistribution(distrib, true); }
+
+    public void setDistribution(SMCDistribution distrib, boolean cascade) {
+        this.distribution = distrib;
+        if(isShared() && cascade) {
+            sharedTransition.setDistribution(distrib);
+        }
+    }
+
+    public boolean hasCustomDistribution() {
+        return !this.distribution.equals(SMCDistribution.defaultDistribution());
     }
 	
 	public boolean hasUntimedPreset(){
@@ -403,9 +428,9 @@ public class TimedTransition extends TAPNElement {
 
 	public TimedTransition copy() {
 	    if(guard == null){
-            return new TimedTransition(name, isUrgent, null);
+            return new TimedTransition(name, isUrgent, null, distribution);
         }
-		return new TimedTransition(name, isUrgent, guard.copy());
+		return new TimedTransition(name, isUrgent, guard.copy(), distribution);
 	}
 
 	@Override

@@ -140,7 +140,10 @@ public class TapnEngineXmlLoader {
             var isColoredElement = nodeList.item(0).getAttributes().getNamedItem("isColored");
             boolean isColored = isColoredElement == null ? network.isColored() : Boolean.parseBoolean(isColoredElement.getNodeValue());
 
-            lens = new TAPNLens(isTimed, isGame, isColored);
+            var isStochasticElement = nodeList.item(0).getAttributes().getNamedItem("isColored");
+            boolean isStochastic = isStochasticElement == null ? network.isStochastic() : Boolean.parseBoolean(isStochasticElement.getNodeValue());
+
+            lens = new TAPNLens(isTimed, isGame, isColored, isStochastic);
         }
     }
 
@@ -154,7 +157,10 @@ public class TapnEngineXmlLoader {
             var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
             var isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
 
-            lens = new TAPNLens(isTimed, isGame, isColored);
+            var stochasticEl = nodeList.item(0).getAttributes().getNamedItem("isStochastic");
+            var isStochastic = stochasticEl != null && Boolean.parseBoolean(stochasticEl.getNodeValue());
+
+            lens = new TAPNLens(isTimed, isGame, isColored, isStochastic);
         }
     }
 

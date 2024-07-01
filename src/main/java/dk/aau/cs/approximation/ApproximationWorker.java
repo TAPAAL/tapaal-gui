@@ -527,8 +527,9 @@ public class ApproximationWorker {
         boolean modelIsColored = composedModel.value1().isColored();
         boolean modelIsTimed = !composedModel.value1().isUntimed();
         boolean modelIsGame = composedModel.value1().hasUncontrollableTransitions();
+        boolean modelIsStochastic = composedModel.value1().isStochastic();
 
-        TAPNLens lens = new TAPNLens(modelIsTimed, modelIsGame, modelIsColored);
+        TAPNLens lens = new TAPNLens(modelIsTimed, modelIsGame, modelIsColored, modelIsStochastic);
 
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify, null, query, lens);
 		

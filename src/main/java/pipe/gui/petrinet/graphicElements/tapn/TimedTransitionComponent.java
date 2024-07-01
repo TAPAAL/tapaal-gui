@@ -208,19 +208,18 @@ public class TimedTransitionComponent extends Transition {
 	
 	@Override
 	public void update(boolean displayConstantNames) {
+        getNameLabel().setText("");
 		if(transition != null) {
 			getNameLabel().setName(transition.name());
 			getNameLabel().setVisible(attributesVisible);
 			getNameLabel().zoomUpdate(getZoom());
+            if(lens.isStochastic()) {
+                getNameLabel().setText(":" + underlyingTransition().getDistribution().distributionName());
+            }
 			if(underlyingTransition().getGuard() != null && lens.isColored()){
-                pnName.setText("");
                 super.update(displayConstantNames);
                 pnName.setText(pnName.getText() + "\n" + buildGuardString(this.underlyingTransition().getGuard().toString()));
-            } else {
-                getNameLabel().setText("");
             }
-		} else {
-			getNameLabel().setText("");
 		}
 
 		repaint();

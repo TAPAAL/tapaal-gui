@@ -215,6 +215,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         TimedArcPetriNetNetwork net = tab.network();
         for (TAPNQuery q : tab.queries()) {
+            boolean smcQuery = q.getCategory() == TAPNQuery.QueryCategory.SMC;
             boolean[] queryOptions = new boolean[]{
                 q.getTraceOption() == TAPNQuery.TraceOption.FASTEST,
                 (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && net.getHighestNetDegree() <= 2),
@@ -231,7 +232,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
                 q.hasUntimedOnlyProperties(),
                 tab.lens.isColored(),
-                tab.lens.isColored() && !tab.lens.isTimed()
+                tab.lens.isColored() && !tab.lens.isTimed(), q.getCategory() == TAPNQuery.QueryCategory.SMC
             };
 
             boolean hasEngine = tab.checkCurrentEngine(q.getReductionOption(), queryOptions);
@@ -353,8 +354,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	    return query;
     }
 
-	public static PetriNetTab createNewEmptyTab(String name, boolean isTimed, boolean isGame, boolean isColored){
-        PetriNetTab tab = new PetriNetTab(isTimed, isGame, isColored);
+	public static PetriNetTab createNewEmptyTab(String name, boolean isTimed, boolean isGame, boolean isColored, boolean isStochastic){
+        PetriNetTab tab = new PetriNetTab(isTimed, isGame, isColored, isStochastic);
 		tab.setInitialName(name);
 
 		//Set Default Template
@@ -491,8 +492,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     private Boolean isPlaceOption = null;
     private Boolean isTransitionOption = null;
 
-    private PetriNetTab(boolean isTimed, boolean isGame, boolean isColored) {
-	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed, isGame, isColored));
+    private PetriNetTab(boolean isTimed, boolean isGame, boolean isColored, boolean isStochastic) {
+	    this(new TimedArcPetriNetNetwork(), new ArrayList<>(), new TAPNLens(isTimed, isGame, isColored, isStochastic));
     }
 
 	private PetriNetTab(TimedArcPetriNetNetwork network, Collection<Template> templates, TAPNLens lens) {
@@ -1138,26 +1139,32 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
     private void createNewAndConvertUntimed() {
-	    PetriNetTab tab = duplicateTab(new TAPNLens(false, lens.isGame(), lens.isColored()), "-untimed");
+	    PetriNetTab tab = duplicateTab(new TAPNLens(false, lens.isGame(), lens.isColored(), lens.isStochastic()), "-untimed");
         convertToUntimedTab(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertNonGame() {
-        PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), false, lens.isColored()), "-nongame");
+        PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), false, lens.isColored(), lens.isStochastic()), "-nongame");
         TabTransformer.removeGameInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertNonColor(){
-        PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), false), "-noncolored");
+        PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), false, lens.isStochastic()), "-noncolored");
         TabTransformer.removeColorInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
     private void createNewAndConvertColor(){
-        PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), true), "-colored");
+        PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), true, lens.isStochastic()), "-colored");
         TabTransformer.addColorInformation(tab);
+        guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
+    }
+
+    private void createNewAndConvertNonStochastic(){
+        PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), lens.isColored(), false), "-nonstochastic");
+        TabTransformer.removeDistributionInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
@@ -1180,7 +1187,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     createNewAndConvertUntimed();
                 }
             } else {
-                PetriNetTab tab = duplicateTab(new TAPNLens(true, lens.isGame(), lens.isColored()), "-timed");
+                PetriNetTab tab = duplicateTab(new TAPNLens(true, lens.isGame(), lens.isColored(), lens.isStochastic()), "-timed");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1202,7 +1209,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     createNewAndConvertNonGame();
                 }
             } else {
-                PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), true, lens.isColored()), "-game");
+                PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), true, lens.isColored(), lens.isStochastic()), "-game");
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1221,6 +1228,24 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 }
             } else {
                 createNewAndConvertColor();
+            }
+            updateFeatureText();
+        }
+    }
+
+    @Override
+    public void changeStochasticFeature(boolean isStochastic) {
+        if(isStochastic != lens.isStochastic()) {
+            if (!isStochastic) {
+                String removeStochasticWarning = "The net contains rate informations, which will be removed. Do you still wish to make to remove the stochastic semantics ?";
+                int choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(), removeStochasticWarning, "Remove stochastic information",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
+                if (choice == 0) {
+                    createNewAndConvertNonStochastic();
+                }
+            } else {
+                PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), lens.isColored(), true), "-stochastic");
+                guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
         }
@@ -2342,7 +2367,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 
     public void updateFeatureText() {
-        boolean[] features = {lens.isTimed(), lens.isGame(), lens.isColored()};
+        boolean[] features = {lens.isTimed(), lens.isGame(), lens.isColored(), lens.isStochastic()};
         app.ifPresent(o->o.setFeatureInfoText(features));
     }
 
@@ -2352,6 +2377,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     private void convertToUntimedTab(PetriNetTab tab) {
         TabTransformer.removeTimingInformation(tab);
+        if(lens.isStochastic()) {
+            TabTransformer.removeDistributionInformation(tab);
+        }
     }
 
     static final class CanvasTransportarcDrawController extends AbstractCanvasArcDrawController {

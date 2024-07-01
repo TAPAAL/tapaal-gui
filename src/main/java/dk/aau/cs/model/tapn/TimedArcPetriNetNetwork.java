@@ -458,6 +458,15 @@ public class TimedArcPetriNetNetwork {
 	    return colorTypes.size() > 1 || variables.size() > 0;
     }
 
+    public boolean isStochastic() {
+        for (TimedArcPetriNet tapn : tapns) {
+            if(tapn.isStochastic()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 	public boolean isUntimed(){
 		for(TimedArcPetriNet t : tapns){
 			if(!t.isUntimed()){
