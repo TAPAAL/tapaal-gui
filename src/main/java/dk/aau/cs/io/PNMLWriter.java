@@ -247,8 +247,8 @@ public class PNMLWriter implements NetWriter {
 		
 		Element transitionElement = document.createElement("transition");
 		transitionElement.setAttribute("id", (inputTransition.getId() != null ? inputTransition.getId()	: "error"));
-        if(inputTransition.underlyingTransition().hasCustomRate()) {
-            transitionElement.setAttribute("rate", String.valueOf(inputTransition.underlyingTransition().getRate()));
+        if(lens.isStochastic()) {
+            inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement);
         }
 
 		Element name = document.createElement("name"); //Name

@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.verification.SMCDistribution;
 import kotlin.Pair;
 import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.*;
@@ -434,14 +435,15 @@ public class TapnXmlLoader {
 		String nameOffsetY = transition.getAttribute("nameOffsetY");
 		String angleStr = transition.getAttribute("angle");
 		String priorityStr = transition.getAttribute("priority");
-        String smcRate = transition.getAttribute("rate");
+        String distrib = transition.getAttribute("distribution");
 	    int positionXInput = 0;
 		int positionYInput = 0;
 		int nameOffsetXInput = 0;
 		int nameOffsetYInput = 0;
 		int angle = 0;
         int priority = 0;
-        float rate = -1.0f;
+        SMCDistribution distribution = SMCDistribution.defaultDistribution();
+
 		if(!posX.isEmpty()){
 		    positionXInput = (int)Double.parseDouble(posX);
         }
@@ -460,8 +462,8 @@ public class TapnXmlLoader {
 		if(!priorityStr.isEmpty()){
 		    priority = Integer.parseInt(priorityStr);
         }
-        if(!smcRate.isEmpty()){
-            rate = Float.parseFloat(smcRate);
+        if(!distrib.isEmpty()){
+            distribution = SMCDistribution.parseXml(transition);
         }
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
@@ -497,7 +499,7 @@ public class TapnXmlLoader {
 		TimedTransition t = new TimedTransition(nameInput, guardExpr);
 		t.setUrgent(isUrgent);
 		t.setUncontrollable(player.equals("1"));
-        t.setRate(rate);
+        t.setDistribution(distribution);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);

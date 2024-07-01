@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import dk.aau.cs.verification.SMCConstantDistribution;
+import dk.aau.cs.verification.SMCDistribution;
 import pipe.gui.petrinet.animation.Animator;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -28,7 +30,7 @@ public class TimedTransition extends TAPNElement {
 
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
-    private float rate = -1.0f;
+    private SMCDistribution distribution = SMCDistribution.defaultDistribution();
     private GuardExpression guard;
 
 	private SharedTransition sharedTransition;
@@ -49,10 +51,10 @@ public class TimedTransition extends TAPNElement {
 		this.guard = guard;
 	}
 
-    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, float rate) {
+    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, SMCDistribution distribution) {
         setName(name);
         setUrgent(isUrgent);
-        setRate(rate);
+        setDistribution(distribution);
         this.guard = guard;
     }
 
@@ -96,19 +98,19 @@ public class TimedTransition extends TAPNElement {
         }
     }
 
-    public boolean hasCustomRate() { return rate > 0; }
+    public SMCDistribution getDistribution() { return distribution; }
 
-    public void removeCustomRate() { setRate(-1.0f, true); }
+    public void setDistribution(SMCDistribution distrib) { setDistribution(distrib, true); }
 
-    public float getRate() { return rate; }
-
-    public void setRate(float rate) { setRate(rate, true); }
-
-    public void setRate(float rate, boolean cascade) {
-        this.rate = rate;
+    public void setDistribution(SMCDistribution distrib, boolean cascade) {
+        this.distribution = distrib;
         if(isShared() && cascade) {
-            sharedTransition.setRate(rate);
+            sharedTransition.setDistribution(distrib);
         }
+    }
+
+    public boolean hasCustomDistribution() {
+        return !this.distribution.equals(SMCDistribution.defaultDistribution());
     }
 	
 	public boolean hasUntimedPreset(){
@@ -426,9 +428,9 @@ public class TimedTransition extends TAPNElement {
 
 	public TimedTransition copy() {
 	    if(guard == null){
-            return new TimedTransition(name, isUrgent, null, rate);
+            return new TimedTransition(name, isUrgent, null, distribution);
         }
-		return new TimedTransition(name, isUrgent, guard.copy(), rate);
+		return new TimedTransition(name, isUrgent, guard.copy(), distribution);
 	}
 
 	@Override

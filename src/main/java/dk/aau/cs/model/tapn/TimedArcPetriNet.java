@@ -110,7 +110,7 @@ public class TimedArcPetriNet {
 
     public boolean isStochastic() {
         for(TimedTransition t : transitions) {
-            if(t.hasCustomRate()) {
+            if(t.hasCustomDistribution()) {
                 return true;
             }
         }

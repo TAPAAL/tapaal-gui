@@ -185,11 +185,11 @@ public class TabTransformer {
             }
         }
     }
-    static public void removeRateInformation(PetriNetTab tab) {
+    static public void removeDistributionInformation(PetriNetTab tab) {
         for (Template template : tab.allTemplates()) {
             for (TimedTransition transition : template.model().transitions()) {
-                if (transition.hasCustomRate()) {
-                    transition.removeCustomRate();
+                if (transition.hasCustomDistribution()) {
+                    transition.setDistribution(SMCDistribution.defaultDistribution());
                 }
             }
         }

@@ -213,8 +213,8 @@ public class TimedTransitionComponent extends Transition {
 			getNameLabel().setName(transition.name());
 			getNameLabel().setVisible(attributesVisible);
 			getNameLabel().zoomUpdate(getZoom());
-            if(underlyingTransition().hasCustomRate()) {
-                getNameLabel().setText(":" + underlyingTransition().getRate());
+            if(lens.isStochastic()) {
+                getNameLabel().setText(":" + underlyingTransition().getDistribution().distributionName());
             }
 			if(underlyingTransition().getGuard() != null && lens.isColored()){
                 super.update(displayConstantNames);

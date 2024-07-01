@@ -1163,7 +1163,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     private void createNewAndConvertNonStochastic(){
         PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), lens.isColored(), false), "-nonstochastic");
-        TabTransformer.removeRateInformation(tab);
+        TabTransformer.removeDistributionInformation(tab);
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
@@ -2377,7 +2377,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     private void convertToUntimedTab(PetriNetTab tab) {
         TabTransformer.removeTimingInformation(tab);
         if(lens.isStochastic()) {
-            TabTransformer.removeRateInformation(tab);
+            TabTransformer.removeDistributionInformation(tab);
         }
     }
 

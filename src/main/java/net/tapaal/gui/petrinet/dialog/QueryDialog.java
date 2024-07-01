@@ -2687,11 +2687,11 @@ public class QueryDialog extends JPanel {
 
         gbc.gridy = 2;
         gbc.gridx = 0;
-        smcSettingsPanel.add(new JLabel("Semantics : "), gbc);
+        //smcSettingsPanel.add(new JLabel("Semantics : "), gbc);
         gbc.gridx = 1;
         smcSemanticsSelector = new JComboBox<>(new String[]{ "Weak", "Strong" });
         smcSemanticsSelector.setToolTipText(TOOL_TIP_SMC_SEMANTICS);
-        smcSettingsPanel.add(smcSemanticsSelector, gbc);
+        //smcSettingsPanel.add(smcSemanticsSelector, gbc);
 
         gbc.gridy = 3;
         gbc.gridx = 0;

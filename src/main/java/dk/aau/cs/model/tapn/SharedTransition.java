@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.verification.SMCConstantDistribution;
+import dk.aau.cs.verification.SMCDistribution;
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
 
@@ -18,7 +20,7 @@ public class SharedTransition {
 	private final List<TimedTransition> transitions = new ArrayList<TimedTransition>();
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
-    private float rate = 0.5f;
+    private SMCDistribution distribution = SMCDistribution.defaultDistribution();
 	private GuardExpression guard = null;
 
 	private TimedArcPetriNetNetwork network;
@@ -57,22 +59,17 @@ public class SharedTransition {
         }
     }
 
-    public boolean hasCustomRate() { return rate > 0; }
+    public SMCDistribution getDistribution() { return distribution; }
 
-    public void removeCustomRate() {
-        this.rate = -1.0f;
+    public void setDistribution(SMCDistribution distribution) {
+        this.distribution = distribution;
         for (TimedTransition transition : transitions) {
-            transition.setRate(-1.0f, false);
+            transition.setDistribution(distribution, false);
         }
     }
 
-    public float getRate() { return rate; }
-
-    public void setRate(float rate) {
-        this.rate = rate;
-        for (TimedTransition transition : transitions) {
-            transition.setRate(rate, false);
-        }
+    public boolean hasCustomDistribution() {
+        return !this.distribution.equals(SMCDistribution.defaultDistribution());
     }
 
     public GuardExpression getGuard() {
