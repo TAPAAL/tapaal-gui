@@ -1,6 +1,7 @@
 package dk.aau.cs.verification;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class SMCUniformDistribution extends SMCDistribution {
 
@@ -17,11 +18,16 @@ public class SMCUniformDistribution extends SMCDistribution {
     }
 
     @Override
-    public HashMap<String, Double> getParameters() {
-        HashMap<String, Double> params = new HashMap<>();
+    public LinkedHashMap<String, Double> getParameters() {
+        LinkedHashMap<String, Double> params = new LinkedHashMap<>();
         params.put("a", a);
         params.put("b", b);
         return params;
+    }
+
+    @Override
+    public String explanation() {
+        return "Will choose a point between A and B, where every number the same probability of being chosen.";
     }
 
     public static SMCUniformDistribution defaultDistribution() {

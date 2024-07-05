@@ -3,12 +3,17 @@ package dk.aau.cs.verification;
 import org.w3c.dom.Element;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 public abstract class SMCDistribution {
 
     public abstract String distributionName();
 
-    public abstract HashMap<String, Double> getParameters();
+    public abstract LinkedHashMap<String, Double> getParameters();
+
+    public abstract String explanation();
 
     public void writeToXml(Element target) {
         target.setAttribute("distribution", distributionName());
@@ -22,6 +27,17 @@ public abstract class SMCDistribution {
         for(HashMap.Entry<String, Double> entry : getParameters().entrySet()) {
             res.append(entry.getKey()).append("=\"").append(entry.getValue().toString()).append("\" ");
         }
+        return res.toString();
+    }
+
+    public String summary() {
+        StringBuilder res = new StringBuilder(distributionName() + "(");
+        LinkedList<String> params = new LinkedList<>();
+        for(HashMap.Entry<String, Double> entry : getParameters().entrySet()) {
+            params.add(entry.getValue().toString());
+        }
+        res.append(String.join(",", params));
+        res.append(")");
         return res.toString();
     }
 

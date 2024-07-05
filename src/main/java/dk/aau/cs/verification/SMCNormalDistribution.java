@@ -1,6 +1,7 @@
 package dk.aau.cs.verification;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class SMCNormalDistribution extends SMCDistribution {
 
@@ -17,11 +18,16 @@ public class SMCNormalDistribution extends SMCDistribution {
     }
 
     @Override
-    public HashMap<String, Double> getParameters() {
-        HashMap<String, Double> params = new HashMap<>();
+    public LinkedHashMap<String, Double> getParameters() {
+        LinkedHashMap<String, Double> params = new LinkedHashMap<>();
         params.put("mean", mean);
         params.put("stddev", stddev);
         return params;
+    }
+
+    @Override
+    public String explanation() {
+        return "Gaussian distribution, centered around a mean, and spread according to a standard deviation.";
     }
 
     public static SMCNormalDistribution defaultDistribution() {

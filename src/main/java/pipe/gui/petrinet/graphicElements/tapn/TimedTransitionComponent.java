@@ -128,7 +128,7 @@ public class TimedTransitionComponent extends Transition {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new TAPNTransitionEditor(guiDialog.getRootPane(), this, new Context(TAPAALGUI.getCurrentTab())));
+		contentPane.add(new TAPNTransitionEditor(guiDialog, this, new Context(TAPAALGUI.getCurrentTab())));
 
 		guiDialog.setResizable(true);
 
@@ -214,7 +214,7 @@ public class TimedTransitionComponent extends Transition {
 			getNameLabel().setVisible(attributesVisible);
 			getNameLabel().zoomUpdate(getZoom());
             if(lens.isStochastic()) {
-                getNameLabel().setText(":" + underlyingTransition().getDistribution().distributionName());
+                getNameLabel().setText("\n" + underlyingTransition().getDistribution().summary());
             }
 			if(underlyingTransition().getGuard() != null && lens.isColored()){
                 super.update(displayConstantNames);

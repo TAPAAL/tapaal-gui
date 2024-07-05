@@ -30,6 +30,7 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.RequireException;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Fill;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor;
@@ -39,6 +40,7 @@ public class TAPNTransitionEditor extends JPanel {
 	private static final String untimed_preset_warning = "Incoming arcs to urgent transitions must have the interval [0,\u221e).";
 	private static final String transport_destination_invariant_warning = "Transport arcs going through urgent transitions cannot have an invariant at the destination.";
 	private final TimedTransitionComponent transition;
+    private final EscapableDialog dialog;
 	private final JRootPane rootPane;
 	private final Context context;
 	private JScrollPane scrollPane;
@@ -49,8 +51,9 @@ public class TAPNTransitionEditor extends JPanel {
 	private final int maxNumberOfTransitionsToShowAtOnce = 20;
 	boolean doNewEdit = true;
 
-	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition, Context context) {
-		rootPane = _rootPane;
+	public TAPNTransitionEditor(EscapableDialog _dialog, TimedTransitionComponent _transition, Context context) {
+		dialog = _dialog;
+        rootPane = _dialog.getRootPane();
 		transition = _transition;
 		this.context = context;
 		initComponents();
@@ -94,6 +97,7 @@ public class TAPNTransitionEditor extends JPanel {
         distributionParam2Label = new JLabel();
         distributionParam1Field = new JTextField();
         distributionParam2Field = new JTextField();
+        distributionExplanation = new JLabel();
         SwingHelper.setPreferredWidth(distributionParam1Field, 100);
         SwingHelper.setPreferredWidth(distributionParam2Field, 100);
 
@@ -233,8 +237,11 @@ public class TAPNTransitionEditor extends JPanel {
         distributionPanel.add(distributionParam2Label, gbc);
         gbc = GridBagHelper.as(1,2, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         distributionPanel.add(distributionParam2Field, gbc);
+        gbc = GridBagHelper.as(0,3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+        gbc.gridwidth = 2;
+        distributionPanel.add(distributionExplanation, gbc);
         gridBagConstraints = GridBagHelper.as(0, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 4;
         transitionEditorPanel.add(distributionPanel, gridBagConstraints);
 
 		gridBagConstraints = new GridBagConstraints();
@@ -638,7 +645,8 @@ public class TAPNTransitionEditor extends JPanel {
             default:
                 break;
         }
-
+        distributionExplanation.setText(distribution.explanation());
+        dialog.pack();
     }
 
 	private JPanel buttonPanel;
@@ -662,6 +670,7 @@ public class TAPNTransitionEditor extends JPanel {
     private JLabel distributionParam2Label;
     private JTextField distributionParam1Field;
     private JTextField distributionParam2Field;
+    private JLabel distributionExplanation;
 
     private javax.swing.JCheckBox uncontrollableCheckBox;
 
