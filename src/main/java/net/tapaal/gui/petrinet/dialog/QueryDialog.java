@@ -34,7 +34,7 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.HyperLTLParsing.TAPAALHyperLTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
-import dk.aau.cs.TCTL.LTLParsing.TAPAALSMCQueryParser;
+import dk.aau.cs.TCTL.SMCParsing.TAPAALSMCQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.verification.*;
 import net.tapaal.gui.petrinet.TAPNLens;

@@ -19,7 +19,7 @@ options {
 
     PARSER_BEGIN(TAPAALSMCQueryParser)
 
-    package dk.aau.cs.TCTL.LTLParsing;
+    package dk.aau.cs.TCTL.SMCParsing;
 
 import java.io.StringReader;
 import java.util.ArrayList;
