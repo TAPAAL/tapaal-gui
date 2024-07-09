@@ -379,6 +379,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 				PNMLoader loader = new PNMLoader();
 				loadedModel = loader.load(file);
+                if (loadedModel == null) return null;
 
                 PetriNetTab tab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
 
