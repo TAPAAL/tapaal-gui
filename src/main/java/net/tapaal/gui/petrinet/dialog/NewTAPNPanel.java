@@ -355,14 +355,13 @@ public class NewTAPNPanel extends EscapableDialog {
         var refreshOthers = new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 gameNet.setEnabled(!stochasticNet.isSelected());
-                coloredNet.setEnabled(!stochasticNet.isSelected());
                 untimedNet.setEnabled(!stochasticNet.isSelected());
             }
         };
         var refreshStochastic = new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 stochasticNet.setEnabled(
-                    timedNet.isSelected() && nonGameNet.isSelected() && nonColorNet.isSelected()
+                    timedNet.isSelected() && nonGameNet.isSelected()
                 );
             }
         };

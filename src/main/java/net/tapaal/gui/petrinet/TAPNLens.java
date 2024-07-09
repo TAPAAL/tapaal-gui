@@ -18,7 +18,7 @@ public final class TAPNLens {
     public boolean isStochastic() { return stochastic; }
 
     public boolean canBeStochastic() {
-        return timed && (!game) && (!colored);
+        return timed && (!game); // && (!colored);
     }
 
     private final boolean timed;

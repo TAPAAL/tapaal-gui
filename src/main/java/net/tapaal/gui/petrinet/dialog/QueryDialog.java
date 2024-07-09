@@ -224,7 +224,6 @@ public class QueryDialog extends JPanel {
     private JPanel smcSettingsPanel;
     private JComboBox<String> smcVerificationType;
     private JComboBox<String> smcBoundType;
-    private JComboBox<String> smcSemanticsSelector;
     private JTextField smcBoundValue;
     private JTextField smcDefaultRate;
     private JPanel quantitativePanel;
@@ -422,7 +421,6 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 
     //Tool tips for SMC panel
-    private final static String TOOL_TIP_SMC_SEMANTICS = "Weak : the system may delay such that a transition never fires, Strong : Transitions will always choose a possible firing date";
     private final static String TOOL_TIP_ANALYSIS_TYPE = "Choose between probability quantitative estimation, or qualitative hypothesis testing against a fixed probability";
     private final static String TOOL_TIP_DEFAULT_RATE = "The default exponential probability rate to apply to the transitions that do not have a custom one, when there are no invariants";
     private final static String TOOL_TIP_RUN_BOUND = "Choose to either bound each random run by time, or by number of steps (transition firings)";
@@ -716,9 +714,6 @@ public class QueryDialog extends JPanel {
 
     private void updateSMCSettings() {
         smcSettings.compareToFloat = smcVerificationType.getSelectedIndex() == 1;
-        smcSettings.semantics = smcSemanticsSelector.getSelectedIndex() == 0 ?
-            SMCSettings.SMCSemantics.WEAK :
-            SMCSettings.SMCSemantics.STRONG;
         smcSettings.boundType = smcBoundType.getSelectedIndex() == 0 ?
             SMCSettings.RunBoundType.TIMEBOUND :
             SMCSettings.RunBoundType.STEPBOUND;
@@ -773,7 +768,6 @@ public class QueryDialog extends JPanel {
         smcSettings = settings;
 
         smcVerificationType.setSelectedIndex(settings.compareToFloat ? 1 : 0);
-        smcSemanticsSelector.setSelectedIndex(settings.semantics == SMCSettings.SMCSemantics.WEAK ? 0 : 1);
         smcBoundType.setSelectedIndex( settings.boundType == SMCSettings.RunBoundType.TIMEBOUND ? 0 : 1 );
         smcBoundValue.setText(String.valueOf(settings.boundValue));
         smcDefaultRate.setText(String.valueOf(settings.defaultRate));
@@ -2687,14 +2681,6 @@ public class QueryDialog extends JPanel {
 
         gbc.gridy = 2;
         gbc.gridx = 0;
-        //smcSettingsPanel.add(new JLabel("Semantics : "), gbc);
-        gbc.gridx = 1;
-        smcSemanticsSelector = new JComboBox<>(new String[]{ "Weak", "Strong" });
-        smcSemanticsSelector.setToolTipText(TOOL_TIP_SMC_SEMANTICS);
-        //smcSettingsPanel.add(smcSemanticsSelector, gbc);
-
-        gbc.gridy = 3;
-        gbc.gridx = 0;
         gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(10,0,10,0);
@@ -2720,7 +2706,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
         smcSettingsPanel.add(quantitativePanel, gbc);
 
-        gbc.gridy = 4;
+        gbc.gridy = 3;
         qualitativePanel = new JPanel();
         qualitativePanel.setLayout(new GridBagLayout());
         qualitativePanel.setBorder(BorderFactory.createTitledBorder("Qualitative estimation options"));

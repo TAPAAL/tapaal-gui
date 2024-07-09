@@ -1833,11 +1833,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         boolean stochasticEnabled = stochasticFeatureOptions.getSelectedIndex() != 0;
         timeFeatureOptions.setEnabled(!stochasticEnabled);
         gameFeatureOptions.setEnabled(!stochasticEnabled);
-        colorFeatureOptions.setEnabled(!stochasticEnabled);
         stochasticFeatureOptions.setEnabled(
             timeFeatureOptions.getSelectedIndex() != 0 &&
-                gameFeatureOptions.getSelectedIndex() == 0 &&
-                colorFeatureOptions.getSelectedIndex() == 0
+                gameFeatureOptions.getSelectedIndex() == 0
         );
     }
 }
