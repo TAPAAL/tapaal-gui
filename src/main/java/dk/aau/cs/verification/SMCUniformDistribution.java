@@ -27,7 +27,7 @@ public class SMCUniformDistribution extends SMCDistribution {
 
     @Override
     public String explanation() {
-        return "Will choose a point between A and B, where every number the same probability of being chosen.";
+        return "Will choose a point between two reals A and B, where every number the same probability of being chosen.";
     }
 
     public static SMCUniformDistribution defaultDistribution() {

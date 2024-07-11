@@ -30,10 +30,8 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
 
     private String smcTag(SMCSettings settings) {
         String tagContent = XML_SMC;
-        tagContent += tagAttribute(XML_SEMANTICS, settings.semantics.toString());
         tagContent += tagAttribute(XML_BOUND_TYPE_TAG, settings.boundType.toString());
         tagContent += tagAttribute(XML_BOUND_VALUE_TAG, settings.boundValue);
-        tagContent += tagAttribute(XML_DEFAULT_RATE_TAG, settings.defaultRate);
         if(settings.compareToFloat) {
             tagContent += tagAttribute(XML_FALSE_POS_TAG, settings.falsePositives);
             tagContent += tagAttribute(XML_FALSE_NEG_TAG, settings.falseNegatives);

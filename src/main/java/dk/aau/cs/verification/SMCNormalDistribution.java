@@ -27,7 +27,7 @@ public class SMCNormalDistribution extends SMCDistribution {
 
     @Override
     public String explanation() {
-        return "Gaussian distribution, centered around a mean, and spread according to a standard deviation.";
+        return "Gaussian distribution, centered around a real MEAN, and spread according to a standard deviation STDDEV.";
     }
 
     public static SMCNormalDistribution defaultDistribution() {

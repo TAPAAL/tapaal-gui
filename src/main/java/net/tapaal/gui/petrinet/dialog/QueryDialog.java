@@ -225,7 +225,6 @@ public class QueryDialog extends JPanel {
     private JComboBox<String> smcVerificationType;
     private JComboBox<String> smcBoundType;
     private JTextField smcBoundValue;
-    private JTextField smcDefaultRate;
     private JPanel quantitativePanel;
     private JTextField smcConfidence;
     private JTextField smcEstimationIntervalWidth;
@@ -422,7 +421,6 @@ public class QueryDialog extends JPanel {
 
     //Tool tips for SMC panel
     private final static String TOOL_TIP_ANALYSIS_TYPE = "Choose between probability quantitative estimation, or qualitative hypothesis testing against a fixed probability";
-    private final static String TOOL_TIP_DEFAULT_RATE = "The default exponential probability rate to apply to the transitions that do not have a custom one, when there are no invariants";
     private final static String TOOL_TIP_RUN_BOUND = "Choose to either bound each random run by time, or by number of steps (transition firings)";
     private final static String TOOL_TIP_CONFIDENCE = "Between 0 and 1, confidence that the probability is indeed in the computed interval";
     private final static String TOOL_TIP_INTERVAL_WIDTH = "Between 0 and 1, width of the computed interval";
@@ -718,11 +716,6 @@ public class QueryDialog extends JPanel {
             SMCSettings.RunBoundType.TIMEBOUND :
             SMCSettings.RunBoundType.STEPBOUND;
         try {
-            smcSettings.defaultRate = Float.parseFloat(smcDefaultRate.getText());
-        } catch(NumberFormatException e) {
-            smcDefaultRate.setText(String.valueOf(smcSettings.defaultRate));
-        }
-        try {
             smcSettings.boundValue = Integer.parseInt(smcBoundValue.getText());
         } catch(NumberFormatException e) {
             smcBoundValue.setText(String.valueOf(smcSettings.boundValue));
@@ -770,7 +763,6 @@ public class QueryDialog extends JPanel {
         smcVerificationType.setSelectedIndex(settings.compareToFloat ? 1 : 0);
         smcBoundType.setSelectedIndex( settings.boundType == SMCSettings.RunBoundType.TIMEBOUND ? 0 : 1 );
         smcBoundValue.setText(String.valueOf(settings.boundValue));
-        smcDefaultRate.setText(String.valueOf(settings.defaultRate));
 
         smcConfidence.setText(String.valueOf(settings.confidence));
         smcEstimationIntervalWidth.setText(String.valueOf(settings.estimationIntervalWidth));
@@ -2659,16 +2651,10 @@ public class QueryDialog extends JPanel {
         smcVerificationType = new JComboBox<>(new String[]{ "Quantitative", "Qualitative" });
         smcVerificationType.setToolTipText(TOOL_TIP_ANALYSIS_TYPE);
         smcSettingsPanel.add(smcVerificationType, gbc);
-        gbc.gridx = 1;
-        smcSettingsPanel.add(new JLabel("Default rate : "), gbc);
-        gbc.gridx = 2;
-        smcDefaultRate = new JTextField(7);
-        smcDefaultRate.addFocusListener(updater);
-        smcDefaultRate.setToolTipText(TOOL_TIP_DEFAULT_RATE);
-        smcSettingsPanel.add(smcDefaultRate, gbc);
 
         gbc.gridy = 1;
         gbc.gridx = 0;
+        gbc.gridwidth = 1;
         smcSettingsPanel.add(new JLabel("Run bound : "), gbc);
         gbc.gridx = 1;
         smcBoundType = new JComboBox<>(new String[]{ "Time", "Steps" });

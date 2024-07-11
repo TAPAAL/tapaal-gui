@@ -113,9 +113,7 @@ public class QueryResult {
 	protected String getExplanationString(){
         if(isSMC()) {
             return  "<br/>SMC Settings : " +
-                    "<br/>Semantics used: " + query.getSMCSettings().semantics.toString() +
                     "<br/>Runs bound: " + query.getSMCSettings().boundType.toString() + " &lt; " + query.getSMCSettings().boundValue +
-                    "<br/>Default rate : " + query.getSMCSettings().defaultRate +
                 ((isQuantitative()) ?
                     "<br/>Confidence: " + (query.getSMCSettings().confidence * 100) + "%" :
                         "<br/>Probability of false positive: " + query.getSMCSettings().falsePositives +
