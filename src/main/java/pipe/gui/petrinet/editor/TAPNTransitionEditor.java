@@ -181,6 +181,7 @@ public class TAPNTransitionEditor extends JPanel {
 				urgentCheckBox.setSelected(false);
 			}
             distributionPanel.setVisible((!urgentCheckBox.isSelected()) && transition.isStochastic());
+            dialog.pack();
 		});
 
         gridBagConstraints = new java.awt.GridBagConstraints();

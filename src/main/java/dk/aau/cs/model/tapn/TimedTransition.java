@@ -78,6 +78,9 @@ public class TimedTransition extends TAPNElement {
 	
 	protected void setUrgent(boolean value, boolean cascade){
 		isUrgent = value;
+        if (isUrgent) {
+            setDistribution(SMCDistribution.urgent());
+        }
 		if(isShared() && cascade){
 			sharedTransition.setUrgent(value);
 		}

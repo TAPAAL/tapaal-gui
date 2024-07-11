@@ -43,6 +43,9 @@ public class SharedTransition {
 	
 	public void setUrgent(boolean value){
 		isUrgent = value;
+        if(isUrgent) {
+            setDistribution(SMCDistribution.urgent());
+        }
 		for(TimedTransition t : transitions){
 			t.setUrgent(value, false);
 		}
@@ -79,9 +82,9 @@ public class SharedTransition {
     public void setGuard(GuardExpression guard) {
         this.guard = guard;
         for (TimedTransition transition : transitions) {
-            if(guard != null){
+            if(guard != null) {
                 transition.setGuard(guard.copy(), false);
-            } else{
+            } else {
                 transition.setGuard(null, false);
             }
         }
@@ -91,7 +94,7 @@ public class SharedTransition {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		name = newName;
-		for(TimedTransition transition : transitions){
+		for(TimedTransition transition : transitions) {
 			transition.setName(newName);
 		}
 	}
