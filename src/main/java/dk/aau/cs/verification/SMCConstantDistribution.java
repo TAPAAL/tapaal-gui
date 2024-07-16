@@ -25,7 +25,10 @@ public class SMCConstantDistribution extends SMCDistribution {
 
     @Override
     public String explanation() {
-        return "Will always choose the same specified value.";
+        return
+            "<html>" +
+            "Will always choose the same specified value." +
+            "</html>";
     }
 
     public static SMCConstantDistribution defaultDistribution() {

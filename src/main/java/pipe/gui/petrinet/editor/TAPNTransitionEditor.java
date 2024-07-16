@@ -7,11 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.function.Consumer;
 
 import javax.swing.*;
-import javax.swing.event.CaretListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.event.*;
 
 import dk.aau.cs.verification.*;
 import net.tapaal.gui.petrinet.undo.*;
@@ -100,6 +99,24 @@ public class TAPNTransitionEditor extends JPanel {
         distributionExplanation = new JLabel();
         SwingHelper.setPreferredWidth(distributionParam1Field, 100);
         SwingHelper.setPreferredWidth(distributionParam2Field, 100);
+
+        DocumentListener updateDistribDisplay = new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                display();
+            }
+            public void removeUpdate(DocumentEvent e) {
+                display();
+            }
+            public void insertUpdate(DocumentEvent e) {
+                display();
+            }
+            public void display() {
+                SMCDistribution distrib = parseDistribution();
+                distributionExplanation.setText(distrib.explanation());
+            }
+        };
+        distributionParam1Field.getDocument().addDocumentListener(updateDistribDisplay);
+        distributionParam2Field.getDocument().addDocumentListener(updateDistribDisplay);
 
 		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);
 		SwingHelper.setPreferredWidth(sharedTransitionsComboBox,290);
@@ -604,7 +621,18 @@ public class TAPNTransitionEditor extends JPanel {
                     return new SMCNormalDistribution(mean, stddev);
             }
         } catch(NumberFormatException ignored) {}
-        return SMCDistribution.defaultDistribution();
+        switch (type) {
+            case SMCConstantDistribution.NAME:
+                return SMCConstantDistribution.defaultDistribution();
+            case SMCUniformDistribution.NAME:
+                return SMCUniformDistribution.defaultDistribution();
+            case SMCExponentialDistribution.NAME:
+                return SMCExponentialDistribution.defaultDistribution();
+            case SMCNormalDistribution.NAME:
+                return SMCNormalDistribution.defaultDistribution();
+            default:
+                return SMCDistribution.defaultDistribution();
+        }
     }
 
     private void displayDistribution() {
