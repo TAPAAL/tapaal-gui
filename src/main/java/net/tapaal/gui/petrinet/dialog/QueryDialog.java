@@ -3224,7 +3224,7 @@ public class QueryDialog extends JPanel {
         showCTLButtons(!isVisible);
         globallyButton.setVisible(isVisible);
         finallyButton.setVisible(isVisible);
-        if (deadLockPredicateButton != null) deadLockPredicateButton.setVisible(!isVisible);
+        deadLockPredicateButton.setVisible(isVisible);
     }
 
     private void updateSiphonTrap(boolean isCTL) {
