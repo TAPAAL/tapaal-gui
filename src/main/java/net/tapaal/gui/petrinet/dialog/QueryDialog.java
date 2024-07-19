@@ -423,7 +423,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_ANALYSIS_TYPE = "Choose between probability quantitative estimation, or qualitative hypothesis testing against a fixed probability";
     private final static String TOOL_TIP_RUN_BOUND = "Choose to either bound each random run by time, or by number of steps (transition firings)";
     private final static String TOOL_TIP_CONFIDENCE = "Between 0 and 1, confidence that the probability is indeed in the computed interval";
-    private final static String TOOL_TIP_INTERVAL_WIDTH = "Between 0 and 1, width of the computed interval";
+    private final static String TOOL_TIP_INTERVAL_WIDTH = "Between 0 and 1, error E of the computed probability (P±E)";
     private final static String TOOL_TIP_FALSE_POSITIVES = "Probability to accept the hypothesis if it is false";
     private final static String TOOL_TIP_FALSE_NEGATIVES = "Probability to reject the hypothesis if it is true";
     private final static String TOOL_TIP_INDIFFERENCE = "Width of the indifference region used as a threshold by the algorithm";
@@ -2684,7 +2684,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(smcConfidence, subPanelGbc);
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
-        quantitativePanel.add(new JLabel("Estimation interval width : "), subPanelGbc);
+        quantitativePanel.add(new JLabel("Estimation interval error : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcEstimationIntervalWidth = new JTextField(7);
         smcEstimationIntervalWidth.addFocusListener(updater);

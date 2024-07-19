@@ -27,7 +27,7 @@ public class VerifyDTAPNOutputParser {
 	private static final Pattern placeBoundPattern = Pattern.compile("<([^;\\s]+);(\\d+)>");
     private static final Pattern placeBoundPatternUnknown = Pattern.compile("<([^;\\s]+);\\?>");
 
-    private static final Pattern smcEstimationPattern = Pattern.compile("\\s*P in \\[([^;]+);([^;]+)\\]\\s*");
+    private static final Pattern smcEstimationPattern = Pattern.compile("\\s*P = ([^±]+) ± (.+)\\s*");
     private static final Pattern smcExecutedRunsPattern = Pattern.compile("\\s*runs executed:\\s*(\\d+)\\s*");
     private static final Pattern smcValidRunsPattern = Pattern.compile("\\s*valid runs:\\s*(\\d+)\\s*");
     private static final Pattern smcAverageTimePattern = Pattern.compile("\\s*average run time:\\s*([\\d\\.]+)\\s*");
@@ -142,9 +142,9 @@ public class VerifyDTAPNOutputParser {
                         foundResult = true;
                         result = true;
                         isQuantitative = true;
-                        float smcEstimationLow = Float.parseFloat(matcher.group(1));
-                        float smcEstimationHigh = Float.parseFloat(matcher.group(2));
-                        quantitativeResult = "Probability is in [" + smcEstimationLow + ";" + smcEstimationHigh + "]";
+                        float smcEstimation = Float.parseFloat(matcher.group(1));
+                        float smcEstimationWidth = Float.parseFloat(matcher.group(2));
+                        quantitativeResult = "P = " + smcEstimation + " ± " + smcEstimationWidth;
                     }
 
                     matcher = smcExecutedRunsPattern.matcher(line);
