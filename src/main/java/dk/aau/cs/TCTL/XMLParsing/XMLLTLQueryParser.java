@@ -333,7 +333,9 @@ public class XMLLTLQueryParser {
                 }
                 return new TCTLOrListNode(transitions);
             }
-        } else{
+        } else if(nodeName.equals("deadlock")) {
+            return new TCTLDeadlockNode();
+        } else {
             parseFormula(property);
         }
 
