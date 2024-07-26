@@ -88,6 +88,9 @@ public class TAPNQuery {
 	private String rawVerificationPrompt;
 
     private SMCSettings smcSettings;
+    private boolean benchmark = false;
+    private int benchmarkRuns = 100;
+    private boolean parallel = false;
 
 	/**
 	 * @param name
@@ -512,6 +515,9 @@ public class TAPNQuery {
 		setRawVerification(query.getRawVerification());
 		setRawVerificationPrompt(query.getRawVerificationPrompt());
         setSmcSettings(query.getSmcSettings());
+        setBenchmarkMode(isBenchmarkMode());
+        setBenchmarkRuns(getBenchmarkRuns());
+        setParallel(isParallel());
     }
 
 	public InclusionPlaces inclusionPlaces() {
@@ -536,6 +542,9 @@ public class TAPNQuery {
 		copy.setUseStubbornReduction(this.isStubbornReductionEnabled());
 		copy.setUseTarOption(this.isTarOptionEnabled());
 		copy.setSmcSettings(this.getSmcSettings());
+        copy.setBenchmarkMode(this.isBenchmarkMode());
+        copy.setBenchmarkRuns(this.getBenchmarkRuns());
+        copy.setParallel(this.isParallel());
 		return copy;
 	}
 	
@@ -583,6 +592,21 @@ public class TAPNQuery {
     public SMCSettings getSmcSettings() { return this.smcSettings; }
 
     public void setSmcSettings(SMCSettings newSettings) { this.smcSettings = newSettings; }
+
+    public boolean isBenchmarkMode() { return benchmark; }
+    public void setBenchmarkMode(boolean mode) {
+        benchmark = mode;
+    }
+
+    public int getBenchmarkRuns() { return benchmarkRuns; }
+    public void setBenchmarkRuns(int runs) {
+        benchmarkRuns = runs;
+    }
+
+    public boolean isParallel() { return parallel; }
+    public void setParallel(boolean value) {
+        parallel = value;
+    }
 
     public boolean hasUntimedOnlyProperties(){
         if(!(

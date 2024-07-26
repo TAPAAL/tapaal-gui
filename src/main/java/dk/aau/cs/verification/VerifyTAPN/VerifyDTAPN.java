@@ -388,6 +388,32 @@ public class VerifyDTAPN implements ModelChecker{
 		}
 	}
 
+    public Stats getStats(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) {
+        VerifyTAPNExporter exporter;
+        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+            exporter = new VerifyTACPNExporter();
+        } else {
+            exporter = new VerifyTAPNExporter();
+        }
+        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, lens, model.value2(), null, dataLayerQuery);
+
+        if (exportedModel == null) {
+            messenger.displayErrorMessage("There was an error exporting the model");
+            return null;
+        }
+
+        runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
+        runner.run();
+
+        if (runner.error()) {
+            return null;
+        } else {
+            String standardOutput = readOutput(runner.standardOutput());
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query, model.value1());
+            return queryResult.value2();
+        }
+    }
+
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
 		if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
 

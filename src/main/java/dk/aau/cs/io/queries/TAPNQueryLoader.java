@@ -89,6 +89,8 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean colorFixpoint = getUnfoldingOption(queryElement, "colorFixpoint", true);
         boolean symmetricVars = getUnfoldingOption(queryElement, "symmetricVars", true);
 
+        boolean parallel = getReductionOption(queryElement, "parallel", false);
+
         SMCSettings smcSettings = SMCSettings.Default();
 
 		TCTLAbstractProperty query;
@@ -131,6 +133,7 @@ public class TAPNQueryLoader extends QueryLoader{
                 parsedQuery.setTraceList(tracesArr);
             } else if(parsedQuery.getCategory() == QueryCategory.SMC) {
                 parsedQuery.setSmcSettings(smcSettings);
+                parsedQuery.setParallel(parallel);
             }
 			return parsedQuery;
 		} else

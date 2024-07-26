@@ -39,4 +39,17 @@ public class SMCSettings {
         return settings;
     }
 
+    // Computes the number of runs needed according to :
+    // https://link.springer.com/content/pdf/10.1007/b94790.pdf p.78-79
+    // ONLY RELEVANT FOR PROBABILITY ESTIMATION !
+    public int chernoffHoeffdingBound() {
+        double bound = Math.log(2.0 / (1 - confidence)) / (2.0 * Math.pow(estimationIntervalWidth, 2));
+        return (int) Math.ceil(bound);
+    }
+
+    // ONLY RELEVANT FOR PROBABILITY ESTIMATION !
+    public double estimateTimeFromBenchmark(int runs, double time) {
+        return time * ( (double) chernoffHoeffdingBound() / (double) runs );
+    }
+
 }

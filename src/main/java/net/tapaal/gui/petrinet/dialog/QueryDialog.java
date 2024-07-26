@@ -36,8 +36,11 @@ import dk.aau.cs.TCTL.HyperLTLParsing.TAPAALHyperLTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.SMCParsing.TAPAALSMCQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
 import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
@@ -226,8 +229,10 @@ public class QueryDialog extends JPanel {
     private JComboBox<String> smcBoundType;
     private JTextField smcBoundValue;
     private JPanel quantitativePanel;
+    private JCheckBox smcParallel;
     private JTextField smcConfidence;
     private JTextField smcEstimationIntervalWidth;
+    private JButton smcTimeEstimationButton;
     private JPanel qualitativePanel;
     private JTextField smcFalsePositives;
     private JTextField smcFalseNegatives;
@@ -554,6 +559,7 @@ public class QueryDialog extends JPanel {
         if(smcSelector.getSelectedIndex() == 1) {
             query.setCategory(TAPNQuery.QueryCategory.SMC);
             query.setSmcSettings(getSMCSettings());
+            query.setParallel(smcParallel.isSelected());
         }
 
         return query;
@@ -1694,6 +1700,7 @@ public class QueryDialog extends JPanel {
 
         if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.SMC) {
             setSMCSettings(queryToCreateFrom.getSmcSettings());
+            smcParallel.setSelected(queryToCreateFrom.isParallel());
         } else {
             setSMCSettings(SMCSettings.Default());
         }
@@ -2651,6 +2658,13 @@ public class QueryDialog extends JPanel {
         smcVerificationType = new JComboBox<>(new String[]{ "Quantitative", "Qualitative" });
         smcVerificationType.setToolTipText(TOOL_TIP_ANALYSIS_TYPE);
         smcSettingsPanel.add(smcVerificationType, gbc);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        smcSettingsPanel.add(new JLabel("Parallel : "), gbc);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 2;
+        smcParallel = new JCheckBox();
+        smcSettingsPanel.add(smcParallel, gbc);
 
         gbc.gridy = 1;
         gbc.gridx = 0;
@@ -2690,6 +2704,16 @@ public class QueryDialog extends JPanel {
         smcEstimationIntervalWidth.addFocusListener(updater);
         smcEstimationIntervalWidth.setToolTipText(TOOL_TIP_INTERVAL_WIDTH);
         quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
+        subPanelGbc.gridy = 2;
+        subPanelGbc.gridx = 0;
+        subPanelGbc.gridwidth = 2;
+        subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
+        smcTimeEstimationButton = new JButton("Estimate time needed");
+        smcTimeEstimationButton.addActionListener(evt -> {
+            runBenchmark();
+        });
+        quantitativePanel.add(smcTimeEstimationButton, subPanelGbc);
+
         smcSettingsPanel.add(quantitativePanel, gbc);
 
         gbc.gridy = 3;
@@ -5798,6 +5822,32 @@ public class QueryDialog extends JPanel {
         InputMap im = this.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
         im.put(KeyStroke.getKeyStroke('Z', shortcutkey), "undo");
         im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
+    }
+
+    private void runBenchmark() {
+        boolean saved = querySaved;
+        querySaved = true;
+        TAPNQuery query = getQuery();
+        querySaved = saved;
+        SMCSettings settings = query.getSmcSettings();
+        query.setBenchmarkMode(true);
+        query.setBenchmarkRuns(100);
+        VerificationCallback callback = new VerificationCallback() {
+            @Override
+            public void run(VerificationResult<TAPNNetworkTrace> result) {
+                SMCStats stats = (SMCStats) result.stats();
+                int runsDone = stats.getExecutedRuns();
+                float time = stats.getVerificationTime();
+                double timeNeeded = settings.estimateTimeFromBenchmark(runsDone, time);
+                JOptionPane.showMessageDialog(
+                    JOptionPane.getRootFrame(),
+                        "Benchmark:\n" +
+                            "  Executed runs: " + runsDone + "\n" +
+                            "  Time estimation: " + String.format("%.2f", timeNeeded) + "s"
+                );
+            }
+        };
+        Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback, guiModels,false, lens);
     }
 
 }

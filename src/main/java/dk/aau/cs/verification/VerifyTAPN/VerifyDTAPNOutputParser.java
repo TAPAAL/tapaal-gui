@@ -32,6 +32,7 @@ public class VerifyDTAPNOutputParser {
     private static final Pattern smcValidRunsPattern = Pattern.compile("\\s*valid runs:\\s*(\\d+)\\s*");
     private static final Pattern smcAverageTimePattern = Pattern.compile("\\s*average run time:\\s*([\\d\\.]+)\\s*");
     private static final Pattern smcAverageLengthPattern = Pattern.compile("\\s*average run length:\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcVerificationTimePattern = Pattern.compile("\\s*verification time:\\s*([\\d\\.]+)\\s*");
 
 	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (-?\\d*)");
 	private static final Pattern wfMaxExecutionPattern = Pattern.compile("Maximum execution time: (-?\\d*)");
@@ -58,6 +59,7 @@ public class VerifyDTAPNOutputParser {
         int smcValidRuns = -1;
         float smcAverageTime = -1.0f;
         float smcAverageLength = -1.0f;
+        float smcVerificationTime = -1.0f;
 		ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking = null;
 		boolean result = false;
 		int maxUsedTokens = 0;
@@ -166,6 +168,12 @@ public class VerifyDTAPNOutputParser {
                     if(matcher.find()) {
                         smcAverageLength = Float.parseFloat(matcher.group(1));
                     }
+
+                    matcher = smcVerificationTimePattern.matcher(line);
+                    if(matcher.find()) {
+                        smcVerificationTime = Float.parseFloat(matcher.group(1));
+                    }
+
 				}
 			}
 			
@@ -175,7 +183,7 @@ public class VerifyDTAPNOutputParser {
             Stats verifStats;
             QueryResult queryRes;
             if(isSmc)
-                verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength);
+                verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength, smcVerificationTime);
             else
                 verifStats = new Stats(discovered, explored, stored, transitionStats, placeBoundStats, WFminExecutionTime, WFmaxExecutionTime, coveredMarking);
             if(isQuantitative)
