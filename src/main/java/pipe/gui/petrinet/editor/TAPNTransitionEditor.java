@@ -192,6 +192,9 @@ public class TAPNTransitionEditor extends JPanel {
 		
 		gridBagConstraints = GridBagHelper.as(2, 2, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(urgentCheckBox, gridBagConstraints);
+        if(transition.isStochastic()) {
+            urgentCheckBox.setToolTipText("Note: for SMC, it is recommended to prefer setting a constant(0) distribution instead of using urgent transitions");
+        }
 		
 		urgentCheckBox.addActionListener(e -> {
 			if(!isUrgencyOK()){

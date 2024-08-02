@@ -146,7 +146,7 @@ public class VerifyDTAPNOutputParser {
                         isQuantitative = true;
                         float smcEstimation = Float.parseFloat(matcher.group(1));
                         float smcEstimationWidth = Float.parseFloat(matcher.group(2));
-                        quantitativeResult = "P = " + smcEstimation + " ± " + smcEstimationWidth;
+                        quantitativeResult = "The estimated probability of the property holding is " + smcEstimation + " ± " + smcEstimationWidth;
                     }
 
                     matcher = smcExecutedRunsPattern.matcher(line);

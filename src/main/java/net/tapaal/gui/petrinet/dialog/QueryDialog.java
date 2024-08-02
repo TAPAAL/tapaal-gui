@@ -2636,7 +2636,8 @@ public class QueryDialog extends JPanel {
 
     private void initSmcSettingsPanel() {
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.fill = GridBagConstraints.VERTICAL;
         gbc.insets = new Insets(0,5,0,5);
         GridBagConstraints subPanelGbc = new GridBagConstraints();
         subPanelGbc.anchor = GridBagConstraints.WEST;
@@ -2655,36 +2656,47 @@ public class QueryDialog extends JPanel {
         smcSettingsPanel.setBorder(BorderFactory.createTitledBorder("SMC Options"));
         gbc.gridy = 0;
         gbc.gridx = 0;
+
+        JPanel smcEngineOptions = new JPanel();
+        smcEngineOptions.setLayout(new GridBagLayout());
+        smcEngineOptions.setBorder(BorderFactory.createTitledBorder("SMC engine options"));
+        subPanelGbc.gridy = 0;
+        subPanelGbc.gridx = 0;
+        smcEngineOptions.add(new JLabel("Verification type : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        subPanelGbc.gridwidth = 2;
+        subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
         smcVerificationType = new JComboBox<>(new String[]{ "Quantitative", "Qualitative" });
         smcVerificationType.setToolTipText(TOOL_TIP_ANALYSIS_TYPE);
-        smcSettingsPanel.add(smcVerificationType, gbc);
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        smcSettingsPanel.add(new JLabel("Parallel : "), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx = 2;
+        smcEngineOptions.add(smcVerificationType, subPanelGbc);
+        subPanelGbc.fill = GridBagConstraints.NONE;
+        subPanelGbc.gridwidth = 1;
+        subPanelGbc.gridy = 1;
+        subPanelGbc.gridx = 0;
+        smcEngineOptions.add(new JLabel("Parallel : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
         smcParallel = new JCheckBox();
-        smcSettingsPanel.add(smcParallel, gbc);
+        smcEngineOptions.add(smcParallel, subPanelGbc);
 
-        gbc.gridy = 1;
-        gbc.gridx = 0;
-        gbc.gridwidth = 1;
-        smcSettingsPanel.add(new JLabel("Run bound : "), gbc);
-        gbc.gridx = 1;
+        subPanelGbc.gridy = 2;
+        subPanelGbc.gridx = 0;
+        subPanelGbc.gridwidth = 1;
+        smcEngineOptions.add(new JLabel("Run bound : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
         smcBoundType = new JComboBox<>(new String[]{ "Time", "Steps" });
         smcBoundType.setToolTipText(TOOL_TIP_RUN_BOUND);
-        smcSettingsPanel.add(smcBoundType, gbc);
-        gbc.gridx = 2;
+        smcEngineOptions.add(smcBoundType, subPanelGbc);
+        subPanelGbc.gridx = 2;
         smcBoundValue = new JTextField(7);
         smcBoundValue.addFocusListener(updater);
-        smcSettingsPanel.add(smcBoundValue, gbc);
+        smcEngineOptions.add(smcBoundValue, subPanelGbc);
 
-        gbc.gridy = 2;
-        gbc.gridx = 0;
-        gbc.gridwidth = 3;
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.insets = new Insets(10,0,10,0);
+        smcSettingsPanel.add(smcEngineOptions, gbc);
+        gbc.gridx = 1;
 
+        subPanelGbc.gridx = 0;
+        subPanelGbc.gridy = 0;
+        subPanelGbc.gridwidth = 1;
         quantitativePanel = new JPanel();
         quantitativePanel.setLayout(new GridBagLayout());
         quantitativePanel.setBorder(BorderFactory.createTitledBorder("Quantitative estimation options"));
@@ -2715,8 +2727,10 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(smcTimeEstimationButton, subPanelGbc);
 
         smcSettingsPanel.add(quantitativePanel, gbc);
+        gbc.gridx = 2;
 
-        gbc.gridy = 3;
+        subPanelGbc.gridwidth = 1;
+        subPanelGbc.anchor = GridBagConstraints.WEST;
         qualitativePanel = new JPanel();
         qualitativePanel.setLayout(new GridBagLayout());
         qualitativePanel.setBorder(BorderFactory.createTitledBorder("Qualitative estimation options"));
@@ -5831,7 +5845,7 @@ public class QueryDialog extends JPanel {
         querySaved = saved;
         SMCSettings settings = query.getSmcSettings();
         query.setBenchmarkMode(true);
-        query.setBenchmarkRuns(100);
+        query.setBenchmarkRuns(300);
         VerificationCallback callback = new VerificationCallback() {
             @Override
             public void run(VerificationResult<TAPNNetworkTrace> result) {

@@ -46,10 +46,10 @@ public class SMCStats extends Stats {
             "Number of valid runs: " +
             validRuns +
             System.getProperty("line.separator") +
-            "Average run time: " +
+            "Average run duration: " +
             averageRunTime +
             System.getProperty("line.separator") +
-            "Average run length: " +
+            "Average transitions fired per run: " +
             averageRunLength;
     }
 

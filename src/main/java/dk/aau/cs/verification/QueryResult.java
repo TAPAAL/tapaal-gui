@@ -85,7 +85,7 @@ public class QueryResult {
 			buffer.append("Property is ");
 			buffer.append(satisfied ? "satisfied." : "not satisfied.");
 		} else {
-            buffer.append("Verification result: ").append(quantitativeResult);
+            buffer.append(quantitativeResult);
         }
 		if(shouldAddExplanation())
 			buffer.append(getExplanationString());
@@ -112,10 +112,10 @@ public class QueryResult {
 	
 	protected String getExplanationString(){
         if(isSMC()) {
-            return  "<br/>SMC Settings : " +
-                    "<br/>Runs bound: " + query.getSMCSettings().boundType.toString() + " &lt; " + query.getSMCSettings().boundValue +
-                ((isQuantitative()) ?
-                    "<br/>Confidence: " + (query.getSMCSettings().confidence * 100) + "%" :
+            return  "<br/>" +
+                    "<br/>The engine explored runs satisfying: " + query.getSMCSettings().boundType.toString() + " &lt; " + query.getSMCSettings().boundValue +
+                    ((isQuantitative()) ?
+                        "<br/>Confidence level: " + (query.getSMCSettings().confidence * 100) + "%" :
                         "<br/>Probability of false positive: " + query.getSMCSettings().falsePositives +
                         "<br/>Probability of false negative: " + query.getSMCSettings().falseNegatives +
                         "<br/>Indifference region: [" + (query.getSMCSettings().geqThan - query.getSMCSettings().indifferenceWidth) +
