@@ -5845,7 +5845,7 @@ public class QueryDialog extends JPanel {
         querySaved = saved;
         SMCSettings settings = query.getSmcSettings();
         query.setBenchmarkMode(true);
-        query.setBenchmarkRuns(300);
+        query.setBenchmarkRuns(500);
         VerificationCallback callback = new VerificationCallback() {
             @Override
             public void run(VerificationResult<TAPNNetworkTrace> result) {
