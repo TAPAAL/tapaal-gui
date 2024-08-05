@@ -52,4 +52,12 @@ public class SMCSettings {
         return time * ( (double) chernoffHoeffdingBound() / (double) runs );
     }
 
+    // ONLY RELEVANT FOR PROBABILITY ESTIMATION !
+    public float estimatePrecisionFromBenchmark(int runs, double time, double timeWanted) {
+        double runsNeeded = Math.ceil( (timeWanted / time) * runs);
+        return (float) Math.sqrt(
+            Math.log(2.0 / (1 - confidence)) / (2.0 * runsNeeded)
+        );
+    }
+
 }

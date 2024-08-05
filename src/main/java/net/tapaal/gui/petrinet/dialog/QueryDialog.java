@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,11 +35,9 @@ import dk.aau.cs.TCTL.HyperLTLParsing.TAPAALHyperLTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
 import dk.aau.cs.TCTL.SMCParsing.TAPAALSMCQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
 import net.tapaal.gui.petrinet.TAPNLens;
-import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
@@ -232,6 +229,7 @@ public class QueryDialog extends JPanel {
     private JCheckBox smcParallel;
     private JTextField smcConfidence;
     private JTextField smcEstimationIntervalWidth;
+    private JTextField smcTimeExpected;
     private JButton smcTimeEstimationButton;
     private JPanel qualitativePanel;
     private JTextField smcFalsePositives;
@@ -239,6 +237,7 @@ public class QueryDialog extends JPanel {
     private JTextField smcIndifference;
     private JTextField smcComparisonFloat;
     private SMCSettings smcSettings;
+    private boolean smcMustUpdateTime = true;
 
     // Buttons in the bottom of the dialogue
     private JPanel buttonPanel;
@@ -2673,14 +2672,6 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridwidth = 1;
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
-        smcEngineOptions.add(new JLabel("Parallel : "), subPanelGbc);
-        subPanelGbc.gridx = 1;
-        smcParallel = new JCheckBox();
-        smcEngineOptions.add(smcParallel, subPanelGbc);
-
-        subPanelGbc.gridy = 2;
-        subPanelGbc.gridx = 0;
-        subPanelGbc.gridwidth = 1;
         smcEngineOptions.add(new JLabel("Run bound : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcBoundType = new JComboBox<>(new String[]{ "Time", "Steps" });
@@ -2690,6 +2681,13 @@ public class QueryDialog extends JPanel {
         smcBoundValue = new JTextField(7);
         smcBoundValue.addFocusListener(updater);
         smcEngineOptions.add(smcBoundValue, subPanelGbc);
+
+        subPanelGbc.gridy = 2;
+        subPanelGbc.gridx = 0;
+        smcEngineOptions.add(new JLabel("Use every available core : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcParallel = new JCheckBox();
+        smcEngineOptions.add(smcParallel, subPanelGbc);
 
         smcSettingsPanel.add(smcEngineOptions, gbc);
         gbc.gridx = 1;
@@ -2710,7 +2708,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(smcConfidence, subPanelGbc);
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
-        quantitativePanel.add(new JLabel("Estimation interval error : "), subPanelGbc);
+        quantitativePanel.add(new JLabel("Precision : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcEstimationIntervalWidth = new JTextField(7);
         smcEstimationIntervalWidth.addFocusListener(updater);
@@ -2718,9 +2716,16 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
+        quantitativePanel.add(new JLabel("Estimated verification time : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcTimeExpected = new JTextField(7);
+        smcTimeExpected.addFocusListener(updater);
+        quantitativePanel.add(smcTimeExpected, subPanelGbc);
+        subPanelGbc.gridy = 3;
+        subPanelGbc.gridx = 0;
         subPanelGbc.gridwidth = 2;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
-        smcTimeEstimationButton = new JButton("Estimate time needed");
+        smcTimeEstimationButton = new JButton("Update verification time");
         smcTimeEstimationButton.addActionListener(evt -> {
             runBenchmark();
         });
@@ -2782,6 +2787,8 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.insets = new Insets(5,10,5,10);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         add(smcSettingsPanel, gridBagConstraints);
+
+        setupEstimationListeners();
     }
 
     private void initQueryPanel() {
@@ -5838,6 +5845,61 @@ public class QueryDialog extends JPanel {
         im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
     }
 
+    private void setupEstimationListeners() {
+        smcEstimationIntervalWidth.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            public void update() {
+                if(!smcEstimationIntervalWidth.hasFocus()) return;
+                smcMustUpdateTime = true;
+                smcTimeExpected.setText("");
+                smcTimeEstimationButton.setText("Update verification time");
+                try {
+                    Float.parseFloat(smcEstimationIntervalWidth.getText());
+                    smcTimeEstimationButton.setEnabled(true);
+                } catch(NumberFormatException e) {
+                    smcTimeEstimationButton.setEnabled(false);
+                }
+            }
+        });
+        smcTimeExpected.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            public void update() {
+                if(!smcTimeExpected.hasFocus()) return;
+                smcMustUpdateTime = false;
+                smcEstimationIntervalWidth.setText("");
+                smcTimeEstimationButton.setText("Update precision");
+                try {
+                    Double.parseDouble(smcTimeExpected.getText());
+                    smcTimeEstimationButton.setEnabled(true);
+                } catch(NumberFormatException e) {
+                    smcTimeEstimationButton.setEnabled(false);
+                }
+            }
+        });
+    }
+
     private void runBenchmark() {
         boolean saved = querySaved;
         querySaved = true;
@@ -5846,19 +5908,24 @@ public class QueryDialog extends JPanel {
         SMCSettings settings = query.getSmcSettings();
         query.setBenchmarkMode(true);
         query.setBenchmarkRuns(500);
-        VerificationCallback callback = new VerificationCallback() {
-            @Override
-            public void run(VerificationResult<TAPNNetworkTrace> result) {
-                SMCStats stats = (SMCStats) result.stats();
-                int runsDone = stats.getExecutedRuns();
-                float time = stats.getVerificationTime();
+        DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
+        decimalFormatSymbols.setDecimalSeparator('.');
+        DecimalFormat decimalFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
+        VerificationCallback callback = result -> {
+            SMCStats stats = (SMCStats) result.stats();
+            int runsDone = stats.getExecutedRuns();
+            float time = stats.getVerificationTime();
+            if(smcMustUpdateTime) {
                 double timeNeeded = settings.estimateTimeFromBenchmark(runsDone, time);
-                JOptionPane.showMessageDialog(
-                    JOptionPane.getRootFrame(),
-                        "Benchmark:\n" +
-                            "  Executed runs: " + runsDone + "\n" +
-                            "  Time estimation: " + String.format("%.2f", timeNeeded) + "s"
-                );
+                smcTimeExpected.setText(decimalFormat.format(timeNeeded));
+            } else {
+                double timeWanted = 10;
+                try {
+                    timeWanted = Double.parseDouble(smcTimeExpected.getText());
+                } catch(NumberFormatException ignored) { }
+                float precision = settings.estimatePrecisionFromBenchmark(runsDone, time, timeWanted);
+                smcEstimationIntervalWidth.setText(decimalFormat.format(precision));
+                updateSMCSettings();
             }
         };
         Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback, guiModels,false, lens);
