@@ -66,7 +66,7 @@ import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 public class QueryDialog extends JPanel {
-	private static final String NO_UPPAAL_XML_FILE_SAVED = "No Uppaal XML file saved.";
+    private static final String NO_UPPAAL_XML_FILE_SAVED = "No Uppaal XML file saved.";
 	private static final String NO_VERIFYTAPN_XML_FILE_SAVED = "No verifytapn XML file saved.";
 	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported by the chosen reduction.";
 	private static final String UNSUPPORTED_QUERY_TEXT = "The query is not supported by the chosen reduction.";
@@ -75,6 +75,8 @@ public class QueryDialog extends JPanel {
 	private static final String EXPORT_VERIFYPN_BTN_TEXT = "Export PN XML";
 	private static final String EXPORT_COMPOSED_BTN_TEXT = "Merge net components";
     private static final String OPEN_REDUCED_BTN_TEXT = "Open reduced net";
+    public static final String UPDATE_VERIFICATION_TIME_BTN_TEXT = "Update verification time";
+    public static final String UPDATE_PRECISION_BTN_TEXT = "Update precision";
 
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
 	private static final String SOME_TRACE_STRING = "Some trace       ";
@@ -2725,7 +2727,7 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridx = 0;
         subPanelGbc.gridwidth = 2;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
-        smcTimeEstimationButton = new JButton("Update verification time");
+        smcTimeEstimationButton = new JButton(UPDATE_VERIFICATION_TIME_BTN_TEXT);
         smcTimeEstimationButton.addActionListener(evt -> {
             runBenchmark();
         });
@@ -5863,7 +5865,7 @@ public class QueryDialog extends JPanel {
                 if(!smcEstimationIntervalWidth.hasFocus()) return;
                 smcMustUpdateTime = true;
                 smcTimeExpected.setText("");
-                smcTimeEstimationButton.setText("Update verification time");
+                smcTimeEstimationButton.setText(UPDATE_VERIFICATION_TIME_BTN_TEXT);
                 try {
                     Float.parseFloat(smcEstimationIntervalWidth.getText());
                     smcTimeEstimationButton.setEnabled(true);
@@ -5889,7 +5891,7 @@ public class QueryDialog extends JPanel {
                 if(!smcTimeExpected.hasFocus()) return;
                 smcMustUpdateTime = false;
                 smcEstimationIntervalWidth.setText("");
-                smcTimeEstimationButton.setText("Update precision");
+                smcTimeEstimationButton.setText(UPDATE_PRECISION_BTN_TEXT);
                 try {
                     Double.parseDouble(smcTimeExpected.getText());
                     smcTimeEstimationButton.setEnabled(true);

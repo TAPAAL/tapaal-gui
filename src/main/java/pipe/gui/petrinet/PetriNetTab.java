@@ -1237,7 +1237,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     public void changeStochasticFeature(boolean isStochastic) {
         if(isStochastic != lens.isStochastic()) {
             if (!isStochastic) {
-                String removeStochasticWarning = "The net contains rate informations, which will be removed. Do you still wish to make to remove the stochastic semantics ?";
+                String removeStochasticWarning = "The net contains distribution informations, which will be removed. Do you still wish to make to remove the stochastic semantics ?";
                 int choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(), removeStochasticWarning, "Remove stochastic information",
                     JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, 0);
                 if (choice == 0) {
