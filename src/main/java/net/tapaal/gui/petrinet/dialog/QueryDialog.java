@@ -75,8 +75,8 @@ public class QueryDialog extends JPanel {
 	private static final String EXPORT_VERIFYPN_BTN_TEXT = "Export PN XML";
 	private static final String EXPORT_COMPOSED_BTN_TEXT = "Merge net components";
     private static final String OPEN_REDUCED_BTN_TEXT = "Open reduced net";
-    public static final String UPDATE_VERIFICATION_TIME_BTN_TEXT = "Update verification time";
-    public static final String UPDATE_PRECISION_BTN_TEXT = "Update precision";
+    public static final String UPDATE_VERIFICATION_TIME_BTN_TEXT = "Compute estimated verification time";
+    public static final String UPDATE_PRECISION_BTN_TEXT = "Compute precision for the given verification time";
 
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
 	private static final String SOME_TRACE_STRING = "Some trace       ";
@@ -225,8 +225,8 @@ public class QueryDialog extends JPanel {
     // SMC options panel
     private JPanel smcSettingsPanel;
     private JComboBox<String> smcVerificationType;
-    private JComboBox<String> smcBoundType;
-    private JTextField smcBoundValue;
+    private JTextField smcTimeBoundValue;
+    private JTextField smcStepBoundValue;
     private JPanel quantitativePanel;
     private JCheckBox smcParallel;
     private JTextField smcConfidence;
@@ -427,12 +427,16 @@ public class QueryDialog extends JPanel {
 
     //Tool tips for SMC panel
     private final static String TOOL_TIP_ANALYSIS_TYPE = "Choose between probability quantitative estimation, or qualitative hypothesis testing against a fixed probability";
-    private final static String TOOL_TIP_RUN_BOUND = "Choose to either bound each random run by time, or by number of steps (transition firings)";
+    private final static String TOOL_TIP_TIME_BOUND = "Bound each run by a maximum accumulated delay";
+    private final static String TOOL_TIP_STEP_BOUND = "Bound each run by a maximum number of transition firings";
     private final static String TOOL_TIP_CONFIDENCE = "Between 0 and 1, confidence that the probability is indeed in the computed interval";
     private final static String TOOL_TIP_INTERVAL_WIDTH = "Between 0 and 1, error E of the computed probability (P±E)";
     private final static String TOOL_TIP_FALSE_POSITIVES = "Probability to accept the hypothesis if it is false";
     private final static String TOOL_TIP_FALSE_NEGATIVES = "Probability to reject the hypothesis if it is true";
     private final static String TOOL_TIP_INDIFFERENCE = "Width of the indifference region used as a threshold by the algorithm";
+    private final static String TOOL_TIP_VERIFICATION_TIME = "Total estimated time to run the verification with the given confidence and precision";
+    private final static String TOOL_TIP_QUALITATIVE_TEST = "Probability threshold to be tested";
+
 
     private QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
         this.tapnNetwork = tapnNetwork;
@@ -719,13 +723,21 @@ public class QueryDialog extends JPanel {
 
     private void updateSMCSettings() {
         smcSettings.compareToFloat = smcVerificationType.getSelectedIndex() == 1;
-        smcSettings.boundType = smcBoundType.getSelectedIndex() == 0 ?
-            SMCSettings.RunBoundType.TIMEBOUND :
-            SMCSettings.RunBoundType.STEPBOUND;
         try {
-            smcSettings.boundValue = Integer.parseInt(smcBoundValue.getText());
+            smcSettings.timeBound = smcTimeBoundValue.getText().isEmpty() ?
+                Integer.MAX_VALUE :
+                Integer.parseInt(smcTimeBoundValue.getText());
         } catch(NumberFormatException e) {
-            smcBoundValue.setText(String.valueOf(smcSettings.boundValue));
+            smcTimeBoundValue.setText(smcSettings.timeBound < Integer.MAX_VALUE ?
+                String.valueOf(smcSettings.timeBound) : "");
+        }
+        try {
+            smcSettings.stepBound = smcStepBoundValue.getText().isEmpty() ?
+                Integer.MAX_VALUE :
+                Integer.parseInt(smcStepBoundValue.getText());
+        } catch(NumberFormatException e) {
+            smcStepBoundValue.setText(smcSettings.stepBound < Integer.MAX_VALUE ?
+                String.valueOf(smcSettings.stepBound) : "");
         }
         try {
             smcSettings.confidence = Float.parseFloat(smcConfidence.getText());
@@ -768,8 +780,10 @@ public class QueryDialog extends JPanel {
         smcSettings = settings;
 
         smcVerificationType.setSelectedIndex(settings.compareToFloat ? 1 : 0);
-        smcBoundType.setSelectedIndex( settings.boundType == SMCSettings.RunBoundType.TIMEBOUND ? 0 : 1 );
-        smcBoundValue.setText(String.valueOf(settings.boundValue));
+        smcTimeBoundValue.setText(smcSettings.timeBound < Integer.MAX_VALUE ?
+            String.valueOf(smcSettings.timeBound) : "");
+        smcStepBoundValue.setText(smcSettings.stepBound < Integer.MAX_VALUE ?
+            String.valueOf(smcSettings.stepBound) : "");
 
         smcConfidence.setText(String.valueOf(settings.confidence));
         smcEstimationIntervalWidth.setText(String.valueOf(settings.estimationIntervalWidth));
@@ -2665,28 +2679,39 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridx = 0;
         smcEngineOptions.add(new JLabel("Verification type : "), subPanelGbc);
         subPanelGbc.gridx = 1;
-        subPanelGbc.gridwidth = 2;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
         smcVerificationType = new JComboBox<>(new String[]{ "Quantitative", "Qualitative" });
         smcVerificationType.setToolTipText(TOOL_TIP_ANALYSIS_TYPE);
         smcEngineOptions.add(smcVerificationType, subPanelGbc);
         subPanelGbc.fill = GridBagConstraints.NONE;
-        subPanelGbc.gridwidth = 1;
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
-        smcEngineOptions.add(new JLabel("Run bound : "), subPanelGbc);
+        JLabel timeBoundLabel = new JLabel("Time bound : ");
+        timeBoundLabel.setToolTipText(TOOL_TIP_TIME_BOUND);
+        smcEngineOptions.add(timeBoundLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
-        smcBoundType = new JComboBox<>(new String[]{ "Time", "Steps" });
-        smcBoundType.setToolTipText(TOOL_TIP_RUN_BOUND);
-        smcEngineOptions.add(smcBoundType, subPanelGbc);
-        subPanelGbc.gridx = 2;
-        smcBoundValue = new JTextField(7);
-        smcBoundValue.addFocusListener(updater);
-        smcEngineOptions.add(smcBoundValue, subPanelGbc);
-
+        subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
+        smcTimeBoundValue = new JTextField();
+        smcTimeBoundValue.setToolTipText(TOOL_TIP_TIME_BOUND);
+        smcEngineOptions.add(smcTimeBoundValue, subPanelGbc);
+        smcTimeBoundValue.addFocusListener(updater);
+        subPanelGbc.fill = GridBagConstraints.NONE;
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
-        smcEngineOptions.add(new JLabel("Use every available core : "), subPanelGbc);
+        JLabel stepBoundLabel = new JLabel("Step bound : ");
+        stepBoundLabel.setToolTipText(TOOL_TIP_STEP_BOUND);
+        smcEngineOptions.add(stepBoundLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
+        smcStepBoundValue = new JTextField();
+        smcStepBoundValue.setToolTipText(TOOL_TIP_STEP_BOUND);
+        smcEngineOptions.add(smcStepBoundValue, subPanelGbc);
+        smcStepBoundValue.addFocusListener(updater);
+        subPanelGbc.fill = GridBagConstraints.NONE;
+
+        subPanelGbc.gridy = 3;
+        subPanelGbc.gridx = 0;
+        smcEngineOptions.add(new JLabel("Use all available cores : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcParallel = new JCheckBox();
         smcEngineOptions.add(smcParallel, subPanelGbc);
@@ -2718,10 +2743,13 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
-        quantitativePanel.add(new JLabel("Estimated verification time : "), subPanelGbc);
+        JLabel verifTimeLabel = new JLabel("Estimated verification time : ");
+        verifTimeLabel.setToolTipText(TOOL_TIP_VERIFICATION_TIME);
+        quantitativePanel.add(verifTimeLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcTimeExpected = new JTextField(7);
         smcTimeExpected.addFocusListener(updater);
+        smcTimeExpected.setToolTipText(TOOL_TIP_VERIFICATION_TIME);
         quantitativePanel.add(smcTimeExpected, subPanelGbc);
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
@@ -2768,9 +2796,12 @@ public class QueryDialog extends JPanel {
         qualitativePanel.add(smcIndifference, subPanelGbc);
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
-        qualitativePanel.add(new JLabel("Test : P(Phi) >= "), subPanelGbc);
+        JLabel testLabel = new JLabel("Property hold with probability >= ");
+        testLabel.setToolTipText(TOOL_TIP_QUALITATIVE_TEST);
+        qualitativePanel.add(testLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcComparisonFloat = new JTextField(7);
+        smcComparisonFloat.setToolTipText(TOOL_TIP_QUALITATIVE_TEST);
         smcComparisonFloat.addFocusListener(updater);
         qualitativePanel.add(smcComparisonFloat, subPanelGbc);
         smcSettingsPanel.add(qualitativePanel, gbc);
@@ -5848,7 +5879,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void setupEstimationListeners() {
-        smcEstimationIntervalWidth.getDocument().addDocumentListener(new DocumentListener() {
+        DocumentListener needUpdateTime = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
                 update();
@@ -5862,7 +5893,7 @@ public class QueryDialog extends JPanel {
                 update();
             }
             public void update() {
-                if(!smcEstimationIntervalWidth.hasFocus()) return;
+                if(!smcEstimationIntervalWidth.hasFocus() && !smcConfidence.hasFocus()) return;
                 smcMustUpdateTime = true;
                 smcTimeExpected.setText("");
                 smcTimeEstimationButton.setText(UPDATE_VERIFICATION_TIME_BTN_TEXT);
@@ -5873,7 +5904,9 @@ public class QueryDialog extends JPanel {
                     smcTimeEstimationButton.setEnabled(false);
                 }
             }
-        });
+        };
+        smcEstimationIntervalWidth.getDocument().addDocumentListener(needUpdateTime);
+        smcConfidence.getDocument().addDocumentListener(needUpdateTime);
         smcTimeExpected.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {

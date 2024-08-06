@@ -112,8 +112,14 @@ public class QueryResult {
 	
 	protected String getExplanationString(){
         if(isSMC()) {
+            String timeBound = query.getSMCSettings().timeBound < Integer.MAX_VALUE ?
+                String.valueOf(query.getSMCSettings().timeBound) : "&infin;";
+            String stepBound = query.getSMCSettings().stepBound < Integer.MAX_VALUE ?
+                String.valueOf(query.getSMCSettings().stepBound) : "&infin;";
             return  "<br/>" +
-                    "<br/>The engine explored runs satisfying: " + query.getSMCSettings().boundType.toString() + " &lt; " + query.getSMCSettings().boundValue +
+                    "<br/>The engine explored runs satisfying: " +
+                    "time " + " &lt; " + timeBound + " and " +
+                    "steps " + "&lt; " + stepBound +
                     ((isQuantitative()) ?
                         "<br/>Confidence level: " + (query.getSMCSettings().confidence * 100) + "%" :
                         "<br/>Probability of false positive: " + query.getSMCSettings().falsePositives +

@@ -151,11 +151,10 @@ public class TAPNQueryLoader extends QueryLoader{
 
     public static SMCSettings parseSmcSettings(Element smcTag) {
         SMCSettings settings = SMCSettings.Default();
-        if(smcTag.hasAttribute("bound-type"))
-            settings.boundType = smcTag.getAttribute("bound-type").equals(SMCSettings.RunBoundType.TIMEBOUND.toString()) ?
-                SMCSettings.RunBoundType.TIMEBOUND : SMCSettings.RunBoundType.STEPBOUND;
-        if(smcTag.hasAttribute("bound"))
-            settings.boundValue = Integer.parseInt(smcTag.getAttribute("bound"));
+        if(smcTag.hasAttribute("time-bound"))
+            settings.timeBound = Integer.parseInt(smcTag.getAttribute("time-bound"));
+        if(smcTag.hasAttribute("step-bound"))
+            settings.stepBound = Integer.parseInt(smcTag.getAttribute("step-bound"));
         if(smcTag.hasAttribute("compare-to")) {
             settings.compareToFloat = true;
             settings.geqThan = Float.parseFloat(smcTag.getAttribute("compare-to"));

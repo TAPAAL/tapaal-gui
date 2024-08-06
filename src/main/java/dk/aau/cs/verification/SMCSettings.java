@@ -2,21 +2,8 @@ package dk.aau.cs.verification;
 
 public class SMCSettings {
 
-    public enum RunBoundType {
-
-        TIMEBOUND, STEPBOUND;
-
-        public String toString() {
-            if(this == TIMEBOUND) {
-                return "time";
-            } else {
-                return "steps";
-            }
-        }
-    }
-
-    public RunBoundType boundType;
-    public int boundValue;
+    public int timeBound;
+    public int stepBound;
     public float falsePositives;
     public float falseNegatives;
     public float indifferenceWidth;
@@ -27,8 +14,8 @@ public class SMCSettings {
 
     public static SMCSettings Default() {
         SMCSettings settings = new SMCSettings();
-        settings.boundType = RunBoundType.TIMEBOUND;
-        settings.boundValue = 1000;
+        settings.timeBound = Integer.MAX_VALUE;
+        settings.stepBound = Integer.MAX_VALUE;
         settings.falsePositives = 0.01f;
         settings.falseNegatives = 0.01f;
         settings.indifferenceWidth = 0.05f;

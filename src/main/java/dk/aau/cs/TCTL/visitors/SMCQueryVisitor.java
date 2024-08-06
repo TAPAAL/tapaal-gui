@@ -6,13 +6,11 @@ import dk.aau.cs.verification.SMCSettings;
 public class SMCQueryVisitor extends LTLQueryVisitor {
 
     private static final String XML_SMC		    	        = "smc";
-    private static final String XML_SEMANTICS               = "semantics";
-    private static final String XML_BOUND_TYPE_TAG          = "bound-type";
-    private static final String XML_BOUND_VALUE_TAG         = "bound";
+    private static final String XML_TIME_BOUND_TAG          = "time-bound";
+    private static final String XML_STEP_BOUND_TAG          = "step-bound";
     private static final String XML_FALSE_POS_TAG           = "false-positives";
     private static final String XML_FALSE_NEG_TAG           = "false-negatives";
     private static final String XML_INDIFFERENCE_TAG        = "indifference";
-    private static final String XML_DEFAULT_RATE_TAG        = "default-rate";
     private static final String XML_CONFIDENCE_TAG          = "confidence";
     private static final String XML_INTERVAL_WIDTH_TAG      = "interval-width";
     private static final String XML_COMPARE_TO_FLOAT_TAG    = "compare-to";
@@ -30,8 +28,10 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
 
     private String smcTag(SMCSettings settings) {
         String tagContent = XML_SMC;
-        tagContent += tagAttribute(XML_BOUND_TYPE_TAG, settings.boundType.toString());
-        tagContent += tagAttribute(XML_BOUND_VALUE_TAG, settings.boundValue);
+        if(settings.timeBound < Integer.MAX_VALUE)
+            tagContent += tagAttribute(XML_TIME_BOUND_TAG, settings.timeBound);
+        if(settings.stepBound < Integer.MAX_VALUE)
+            tagContent += tagAttribute(XML_STEP_BOUND_TAG, settings.stepBound);
         if(settings.compareToFloat) {
             tagContent += tagAttribute(XML_FALSE_POS_TAG, settings.falsePositives);
             tagContent += tagAttribute(XML_FALSE_NEG_TAG, settings.falseNegatives);
