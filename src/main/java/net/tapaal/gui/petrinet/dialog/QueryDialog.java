@@ -436,7 +436,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_FALSE_POSITIVES = "Probability to accept the hypothesis if it is false";
     private final static String TOOL_TIP_FALSE_NEGATIVES = "Probability to reject the hypothesis if it is true";
     private final static String TOOL_TIP_INDIFFERENCE = "Width of the indifference region used as a threshold by the algorithm";
-    private final static String TOOL_TIP_VERIFICATION_TIME = "Total estimated time to run the verification with the given confidence and precision";
+    private final static String TOOL_TIP_VERIFICATION_TIME = "Total estimated time (in seconds) to run the verification with the given confidence and precision";
     private final static String TOOL_TIP_QUALITATIVE_TEST = "Probability threshold to be tested";
 
 
@@ -2766,7 +2766,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
-        JLabel verifTimeLabel = new JLabel("Estimated verification time : ");
+        JLabel verifTimeLabel = new JLabel("Estimated verification time (seconds) : ");
         verifTimeLabel.setToolTipText(TOOL_TIP_VERIFICATION_TIME);
         quantitativePanel.add(verifTimeLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
@@ -5968,7 +5968,8 @@ public class QueryDialog extends JPanel {
         query.setBenchmarkRuns(100);
         DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
         decimalFormatSymbols.setDecimalSeparator('.');
-        DecimalFormat decimalFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
+        DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
+        DecimalFormat timeFormat = new DecimalFormat("#.##", decimalFormatSymbols);
         VerificationCallback callback1 = result1 -> {
             query.setBenchmarkRuns(600);
             SMCStats stats1 = (SMCStats) result1.stats();
@@ -5983,7 +5984,7 @@ public class QueryDialog extends JPanel {
                 if(smcMustUpdateTime) {
                     double runsNeeded = (double) settings.chernoffHoeffdingBound();
                     double estimation = coeff * runsNeeded + stat_err;
-                    smcTimeExpected.setText(decimalFormat.format(estimation));
+                    smcTimeExpected.setText(timeFormat.format(estimation));
                 } else {
                     double timeWanted = 10;
                     try {
@@ -5991,7 +5992,7 @@ public class QueryDialog extends JPanel {
                     } catch(NumberFormatException ignored) { }
                     int runsNeeded = (int) Math.ceil( (timeWanted - stat_err) / coeff );
                     float precision = settings.precisionFromRuns(runsNeeded);
-                    smcEstimationIntervalWidth.setText(decimalFormat.format(precision));
+                    smcEstimationIntervalWidth.setText(precisionFormat.format(precision));
                     updateSMCSettings();
                 }
             };
