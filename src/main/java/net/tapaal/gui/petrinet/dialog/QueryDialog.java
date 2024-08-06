@@ -5965,28 +5965,39 @@ public class QueryDialog extends JPanel {
         querySaved = saved;
         SMCSettings settings = query.getSmcSettings();
         query.setBenchmarkMode(true);
-        query.setBenchmarkRuns(500);
+        query.setBenchmarkRuns(100);
         DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
         decimalFormatSymbols.setDecimalSeparator('.');
         DecimalFormat decimalFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
-        VerificationCallback callback = result -> {
-            SMCStats stats = (SMCStats) result.stats();
-            int runsDone = stats.getExecutedRuns();
-            float time = stats.getVerificationTime();
-            if(smcMustUpdateTime) {
-                double timeNeeded = settings.estimateTimeFromBenchmark(runsDone, time);
-                smcTimeExpected.setText(decimalFormat.format(timeNeeded));
-            } else {
-                double timeWanted = 10;
-                try {
-                    timeWanted = Double.parseDouble(smcTimeExpected.getText());
-                } catch(NumberFormatException ignored) { }
-                float precision = settings.estimatePrecisionFromBenchmark(runsDone, time, timeWanted);
-                smcEstimationIntervalWidth.setText(decimalFormat.format(precision));
-                updateSMCSettings();
-            }
+        VerificationCallback callback1 = result1 -> {
+            query.setBenchmarkRuns(600);
+            SMCStats stats1 = (SMCStats) result1.stats();
+            float runsDone1 = stats1.getExecutedRuns();
+            float time1 = stats1.getVerificationTime();
+            VerificationCallback callback2 = result2 -> {
+                SMCStats stats2 = (SMCStats) result2.stats();
+                float runsDone2 = stats2.getExecutedRuns();
+                float time2 = stats2.getVerificationTime();
+                float coeff = (time2 - time1) / (runsDone2 - runsDone1);
+                float stat_err = time1 - coeff * runsDone1;
+                if(smcMustUpdateTime) {
+                    double runsNeeded = (double) settings.chernoffHoeffdingBound();
+                    double estimation = coeff * runsNeeded + stat_err;
+                    smcTimeExpected.setText(decimalFormat.format(estimation));
+                } else {
+                    double timeWanted = 10;
+                    try {
+                        timeWanted = Double.parseDouble(smcTimeExpected.getText());
+                    } catch(NumberFormatException ignored) { }
+                    int runsNeeded = (int) Math.ceil( (timeWanted - stat_err) / coeff );
+                    float precision = settings.precisionFromRuns(runsNeeded);
+                    smcEstimationIntervalWidth.setText(decimalFormat.format(precision));
+                    updateSMCSettings();
+                }
+            };
+            Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback2, guiModels, false, lens);
         };
-        Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback, guiModels,false, lens);
+        Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback1, guiModels,false, lens);
     }
 
 }
