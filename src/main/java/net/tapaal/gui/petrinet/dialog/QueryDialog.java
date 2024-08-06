@@ -522,8 +522,8 @@ public class QueryDialog extends JPanel {
         boolean symmetry = getSymmetry();
 		boolean timeDarts = useTimeDarts.isSelected();
 		boolean pTrie = usePTrie.isSelected();
-		boolean gcd = useGCD.isSelected();
-		boolean overApproximation = skeletonAnalysis.isSelected();
+		boolean gcd = useGCD.isSelected() && smcSelector.getSelectedIndex() == 0;
+		boolean overApproximation = skeletonAnalysis.isSelected() && smcSelector.getSelectedIndex() == 0;
 		boolean reduction = useReduction.isSelected();
 		TAPNQuery query = new TAPNQuery(
             name,
