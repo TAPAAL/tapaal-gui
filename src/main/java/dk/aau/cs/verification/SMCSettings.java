@@ -14,7 +14,7 @@ public class SMCSettings {
 
     public static SMCSettings Default() {
         SMCSettings settings = new SMCSettings();
-        settings.timeBound = Integer.MAX_VALUE;
+        settings.timeBound = 1000;
         settings.stepBound = Integer.MAX_VALUE;
         settings.falsePositives = 0.01f;
         settings.falseNegatives = 0.01f;

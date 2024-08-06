@@ -226,7 +226,9 @@ public class QueryDialog extends JPanel {
     private JPanel smcSettingsPanel;
     private JComboBox<String> smcVerificationType;
     private JTextField smcTimeBoundValue;
+    private JCheckBox smcTimeBoundInfinite;
     private JTextField smcStepBoundValue;
+    private JCheckBox smcStepBoundInfinite;
     private JPanel quantitativePanel;
     private JCheckBox smcParallel;
     private JTextField smcConfidence;
@@ -724,21 +726,25 @@ public class QueryDialog extends JPanel {
     private void updateSMCSettings() {
         smcSettings.compareToFloat = smcVerificationType.getSelectedIndex() == 1;
         try {
-            smcSettings.timeBound = smcTimeBoundValue.getText().isEmpty() ?
+            smcSettings.timeBound = smcTimeBoundInfinite.isSelected() ?
                 Integer.MAX_VALUE :
                 Integer.parseInt(smcTimeBoundValue.getText());
         } catch(NumberFormatException e) {
-            smcTimeBoundValue.setText(smcSettings.timeBound < Integer.MAX_VALUE ?
-                String.valueOf(smcSettings.timeBound) : "");
+            smcSettings.timeBound = 1000;
+            smcTimeBoundValue.setText("1000");
         }
+        smcTimeBoundValue.setEnabled(!smcTimeBoundInfinite.isSelected());
         try {
-            smcSettings.stepBound = smcStepBoundValue.getText().isEmpty() ?
+            smcSettings.stepBound = smcStepBoundInfinite.isSelected() ?
                 Integer.MAX_VALUE :
                 Integer.parseInt(smcStepBoundValue.getText());
         } catch(NumberFormatException e) {
-            smcStepBoundValue.setText(smcSettings.stepBound < Integer.MAX_VALUE ?
-                String.valueOf(smcSettings.stepBound) : "");
+            smcSettings.stepBound = 1000;
+            smcStepBoundValue.setText("1000");
         }
+        smcStepBoundValue.setEnabled(!smcStepBoundInfinite.isSelected());
+        smcTimeBoundInfinite.setEnabled(!smcStepBoundInfinite.isSelected());
+        smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
         try {
             smcSettings.confidence = Float.parseFloat(smcConfidence.getText());
         } catch(NumberFormatException e) {
@@ -782,8 +788,14 @@ public class QueryDialog extends JPanel {
         smcVerificationType.setSelectedIndex(settings.compareToFloat ? 1 : 0);
         smcTimeBoundValue.setText(smcSettings.timeBound < Integer.MAX_VALUE ?
             String.valueOf(smcSettings.timeBound) : "");
+        smcTimeBoundInfinite.setSelected(smcSettings.timeBound == Integer.MAX_VALUE);
+        smcTimeBoundValue.setEnabled(!smcTimeBoundInfinite.isSelected());
         smcStepBoundValue.setText(smcSettings.stepBound < Integer.MAX_VALUE ?
             String.valueOf(smcSettings.stepBound) : "");
+        smcStepBoundInfinite.setSelected(smcSettings.stepBound == Integer.MAX_VALUE);
+        smcStepBoundValue.setEnabled(!smcStepBoundInfinite.isSelected());
+        smcTimeBoundInfinite.setEnabled(!smcStepBoundInfinite.isSelected());
+        smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
 
         smcConfidence.setText(String.valueOf(settings.confidence));
         smcEstimationIntervalWidth.setText(String.valueOf(settings.estimationIntervalWidth));
@@ -2680,10 +2692,12 @@ public class QueryDialog extends JPanel {
         smcEngineOptions.add(new JLabel("Verification type : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
+        subPanelGbc.gridwidth = 2;
         smcVerificationType = new JComboBox<>(new String[]{ "Quantitative", "Qualitative" });
         smcVerificationType.setToolTipText(TOOL_TIP_ANALYSIS_TYPE);
         smcEngineOptions.add(smcVerificationType, subPanelGbc);
         subPanelGbc.fill = GridBagConstraints.NONE;
+        subPanelGbc.gridwidth = 1;
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
         JLabel timeBoundLabel = new JLabel("Time bound : ");
@@ -2691,11 +2705,16 @@ public class QueryDialog extends JPanel {
         smcEngineOptions.add(timeBoundLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
-        smcTimeBoundValue = new JTextField();
+        smcTimeBoundValue = new JTextField(7);
         smcTimeBoundValue.setToolTipText(TOOL_TIP_TIME_BOUND);
         smcEngineOptions.add(smcTimeBoundValue, subPanelGbc);
         smcTimeBoundValue.addFocusListener(updater);
         subPanelGbc.fill = GridBagConstraints.NONE;
+        subPanelGbc.gridx = 2;
+        smcTimeBoundInfinite = new JCheckBox(Character.toString('∞'));
+        smcTimeBoundInfinite.addActionListener(evt -> updateSMCSettings());
+        smcEngineOptions.add(smcTimeBoundInfinite, subPanelGbc);
+
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
         JLabel stepBoundLabel = new JLabel("Step bound : ");
@@ -2703,11 +2722,15 @@ public class QueryDialog extends JPanel {
         smcEngineOptions.add(stepBoundLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
-        smcStepBoundValue = new JTextField();
+        smcStepBoundValue = new JTextField(7);
         smcStepBoundValue.setToolTipText(TOOL_TIP_STEP_BOUND);
         smcEngineOptions.add(smcStepBoundValue, subPanelGbc);
         smcStepBoundValue.addFocusListener(updater);
         subPanelGbc.fill = GridBagConstraints.NONE;
+        subPanelGbc.gridx = 2;
+        smcStepBoundInfinite = new JCheckBox(Character.toString('∞'));
+        smcStepBoundInfinite.addActionListener(evt -> updateSMCSettings());
+        smcEngineOptions.add(smcStepBoundInfinite, subPanelGbc);
 
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
