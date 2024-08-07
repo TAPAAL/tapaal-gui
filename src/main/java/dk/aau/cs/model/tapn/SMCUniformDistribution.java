@@ -1,6 +1,5 @@
-package dk.aau.cs.verification;
+package dk.aau.cs.model.tapn;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class SMCUniformDistribution extends SMCDistribution {

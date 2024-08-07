@@ -1,11 +1,10 @@
-package dk.aau.cs.verification;
+package dk.aau.cs.model.tapn;
 
 import org.w3c.dom.Element;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.stream.Collectors;
 
 public abstract class SMCDistribution {
 

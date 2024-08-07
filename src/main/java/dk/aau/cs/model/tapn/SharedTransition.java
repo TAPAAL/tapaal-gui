@@ -8,10 +8,6 @@ import java.util.regex.Pattern;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
-import dk.aau.cs.verification.SMCConstantDistribution;
-import dk.aau.cs.verification.SMCDistribution;
-import net.tapaal.gui.petrinet.Template;
-import pipe.gui.TAPAALGUI;
 
 public class SharedTransition {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");

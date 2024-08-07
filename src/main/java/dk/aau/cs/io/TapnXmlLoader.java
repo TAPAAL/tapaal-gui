@@ -11,7 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
-import dk.aau.cs.verification.SMCDistribution;
+import dk.aau.cs.model.tapn.SMCDistribution;
 import kotlin.Pair;
 import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.*;
@@ -19,7 +19,6 @@ import org.xml.sax.SAXException;
 
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.Template;
-import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.graphicElements.AnnotationNote;
 import pipe.gui.petrinet.graphicElements.Arc;

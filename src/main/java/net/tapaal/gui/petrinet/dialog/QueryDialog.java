@@ -5811,7 +5811,7 @@ public class QueryDialog extends JPanel {
         }
         // guimodel not working
         //templates.add(new Template(transformedModel.value1(), null, new Zoomer()));
-        TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(QueryDialog.this.tapnNetwork, templates, queries, QueryDialog.this.tapnNetwork.constants());
+        TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(QueryDialog.this.tapnNetwork, templates, queries, QueryDialog.this.tapnNetwork.constants(), lens);
         try {
             writerTACPN.savePNML(new File(xmlFile));
         } catch (IOException | ParserConfigurationException | TransformerException exception) {

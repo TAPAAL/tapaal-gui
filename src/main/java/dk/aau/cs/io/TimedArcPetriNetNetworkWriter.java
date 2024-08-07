@@ -520,6 +520,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         queryElement.setAttribute("timeDarts", "" + query.useTimeDarts());
         queryElement.setAttribute("gcd", "" + query.useGCD());
         queryElement.setAttribute("parallel", "" + query.isParallel());
+        queryElement.setAttribute("overApproximation", ""	+ false);
 
         return queryElement;
     }
@@ -650,9 +651,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		transitionElement.setAttribute("priority", "0");
 		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
         transitionElement.setAttribute("player", inputTransition.underlyingTransition().isUncontrollable() ? "1" : "0");
-        if(lens.isStochastic()) {
-            inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement);
-        }
+        inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement);
         writeTACPN.appendColoredTransitionDependencies(inputTransition.underlyingTransition(), document, transitionElement);
 
         return transitionElement;
