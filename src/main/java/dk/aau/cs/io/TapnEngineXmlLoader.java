@@ -216,10 +216,22 @@ public class TapnEngineXmlLoader {
 		String name = element.getAttribute("name");
 		boolean urgent = Boolean.parseBoolean(element.getAttribute("urgent"));
         boolean isUncontrollable = element.getAttribute("player").equals("1");
+        String distrib = element.getAttribute("distribution");
+        String weightStr = element.getAttribute("weight");
+        SMCDistribution distribution = SMCDistribution.defaultDistribution();
+        double weight = 1.0;
+        if(!distrib.isEmpty()){
+            distribution = SMCDistribution.parseXml(element);
+        }
+        if(!weightStr.isEmpty()) {
+            weight = Double.parseDouble(weightStr);
+        }
 		
 		SharedTransition st = new SharedTransition(name);
 		st.setUrgent(urgent);
 		st.setUncontrollable(isUncontrollable);
+        st.setDistribution(distribution);
+        st.setWeight(weight);
 		return st;
 	}
 

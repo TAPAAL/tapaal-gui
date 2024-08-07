@@ -273,10 +273,22 @@ public class TapnXmlLoader {
 		String name = element.getAttribute("name");
 		boolean urgent = Boolean.parseBoolean(element.getAttribute("urgent"));
         boolean isUncontrollable = element.getAttribute("player").equals("1");
+        String distrib = element.getAttribute("distribution");
+        String weightStr = element.getAttribute("weight");
+        SMCDistribution distribution = SMCDistribution.defaultDistribution();
+        double weight = 1.0;
+        if(!distrib.isEmpty()){
+            distribution = SMCDistribution.parseXml(element);
+        }
+        if(!weightStr.isEmpty()) {
+            weight = Double.parseDouble(weightStr);
+        }
 		
 		SharedTransition st = new SharedTransition(name);
 		st.setUrgent(urgent);
 		st.setUncontrollable(isUncontrollable);
+        st.setDistribution(distribution);
+        st.setWeight(weight);
 		return st;
 	}
 
@@ -434,6 +446,7 @@ public class TapnXmlLoader {
 		String angleStr = transition.getAttribute("angle");
 		String priorityStr = transition.getAttribute("priority");
         String distrib = transition.getAttribute("distribution");
+        String weightStr = transition.getAttribute("weight");
 	    int positionXInput = 0;
 		int positionYInput = 0;
 		int nameOffsetXInput = 0;
@@ -441,6 +454,7 @@ public class TapnXmlLoader {
 		int angle = 0;
         int priority = 0;
         SMCDistribution distribution = SMCDistribution.defaultDistribution();
+        double weight = 1.0;
 
 		if(!posX.isEmpty()){
 		    positionXInput = (int)Double.parseDouble(posX);
@@ -462,6 +476,9 @@ public class TapnXmlLoader {
         }
         if(!distrib.isEmpty()){
             distribution = SMCDistribution.parseXml(transition);
+        }
+        if(!weightStr.isEmpty()) {
+            weight = Double.parseDouble(weightStr);
         }
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
@@ -497,6 +514,7 @@ public class TapnXmlLoader {
 		t.setUrgent(isUrgent);
 		t.setUncontrollable(player.equals("1"));
         t.setDistribution(distribution);
+        t.setWeight(weight);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);

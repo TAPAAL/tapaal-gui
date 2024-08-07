@@ -118,10 +118,12 @@ public class TAPNTransitionEditor extends JPanel {
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
+                ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setDistribution(parseDistribution());
             }else{
                 urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
                 uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
                 coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
+                displayDistributionFields(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getDistribution());
             }
 		});
 
@@ -221,6 +223,7 @@ public class TAPNTransitionEditor extends JPanel {
 
         distributionType.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
+                if(!distributionType.hasFocus()) return;
                 switch (String.valueOf(distributionType.getSelectedItem())) {
                     case SMCConstantDistribution.NAME:
                         displayDistributionFields(SMCConstantDistribution.defaultDistribution());
@@ -378,6 +381,8 @@ public class TAPNTransitionEditor extends JPanel {
 		gbc.fill = GridBagConstraints.BOTH;
 		urgentCheckBox.setSelected(transition.isUrgent());
 		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
+        displayDistributionFields(transition.underlyingTransition().getDistribution());
+        uncontrollableCheckBox.setSelected(transition.isUncontrollable());
 		transitionEditorPanel.add(nameTextField, gbc);
 		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
@@ -393,10 +398,12 @@ public class TAPNTransitionEditor extends JPanel {
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
+            ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setDistribution(parseDistribution());
         }else{
             urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
             uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
             coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
+            displayDistributionFields(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getDistribution());
 		}
 		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
@@ -481,11 +488,11 @@ public class TAPNTransitionEditor extends JPanel {
 			try{
 				String oldName = transition.underlyingTransition().name();
 				if (!oldName.equals(newName)) {
-				transition.underlyingTransition().setName(newName);
-				Command renameCommand = new RenameTimedTransitionCommand(context.tabContent(), transition.underlyingTransition(), oldName, newName);
-				context.undoManager().addEdit(renameCommand);
-				// set name
-				renameCommand.redo();
+                    transition.underlyingTransition().setName(newName);
+                    Command renameCommand = new RenameTimedTransitionCommand(context.tabContent(), transition.underlyingTransition(), oldName, newName);
+                    context.undoManager().addEdit(renameCommand);
+                    // set name
+                    renameCommand.redo();
 				}
 			}catch(RequireException e){
 				context.undoManager().undo(); 
@@ -521,6 +528,7 @@ public class TAPNTransitionEditor extends JPanel {
 				}
 				transition.setUrgent(urgentCheckBox.isSelected());
 				transition.setUncontrollable(uncontrollableCheckBox.isSelected());
+                transition.underlyingTransition().setDistribution(parseDistribution());
 			}
 		}
 		
@@ -670,6 +678,9 @@ public class TAPNTransitionEditor extends JPanel {
                 break;
         }
         distributionExplanation.setText(distribution.explanation());
+        distributionType.setFocusable(false);
+        distributionType.setSelectedItem(distribution.distributionName());
+        distributionType.setFocusable(true);
         dialog.pack();
     }
 

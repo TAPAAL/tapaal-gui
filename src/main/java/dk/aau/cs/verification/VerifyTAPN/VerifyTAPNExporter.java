@@ -161,6 +161,7 @@ public class VerifyTAPNExporter {
         modelStream.append("player=\"" + (t.isUncontrollable() ? "1" : "0") + "\" ");
         modelStream.append("id=\"" + t.name() + "\" ");
 		modelStream.append("name=\"" + t.name() + "\" ");
+        modelStream.append("weight=\""+ t.getWeight() + "\" ");
         modelStream.append(t.getDistribution().toString());
         modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
         modelStream.append(">\n");
