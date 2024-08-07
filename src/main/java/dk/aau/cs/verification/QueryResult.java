@@ -118,8 +118,8 @@ public class QueryResult {
                 String.valueOf(query.getSMCSettings().stepBound) : "&infin;";
             return  "<br/>" +
                     "<br/>The engine explored runs satisfying: " +
-                    "time " + " &lt; " + timeBound + " and " +
-                    "steps " + "&lt; " + stepBound +
+                    "time " + " &le; " + timeBound + " and " +
+                    "steps " + "&le; " + stepBound +
                     ((isQuantitative()) ?
                         "<br/>Confidence level: " + (query.getSMCSettings().confidence * 100) + "%" :
                         "<br/>Probability of false positive: " + query.getSMCSettings().falsePositives +
