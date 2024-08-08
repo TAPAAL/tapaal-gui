@@ -82,6 +82,8 @@ public class TAPNTransitionEditor extends JPanel {
 		uncontrollableCheckBox = new JCheckBox("Uncontrollable");
 		attributesCheckBox = new JCheckBox("Show transition name");
 
+        weightField = new JTextField();
+        infiniteWeight = new JCheckBox("∞");
         distributionPanel = new JPanel();
         distributionType = new JComboBox<>(new String[]{"constant", "uniform", "exponential", "normal"});
         distributionParam1Label = new JLabel();
@@ -119,11 +121,13 @@ public class TAPNTransitionEditor extends JPanel {
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setDistribution(parseDistribution());
+                ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setWeight(parseWeight());
             }else{
                 urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
                 uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
                 coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
                 displayDistributionFields(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getDistribution());
+                displayWeight(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getWeight());
             }
 		});
 
@@ -221,23 +225,41 @@ public class TAPNTransitionEditor extends JPanel {
 		gridBagConstraints = GridBagHelper.as(1,2, Anchor.NORTHWEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
 
-        distributionType.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
-                if(!distributionType.hasFocus()) return;
-                switch (String.valueOf(distributionType.getSelectedItem())) {
-                    case SMCConstantDistribution.NAME:
-                        displayDistributionFields(SMCConstantDistribution.defaultDistribution());
-                        break;
-                    case SMCUniformDistribution.NAME:
-                        displayDistributionFields(SMCUniformDistribution.defaultDistribution());
-                        break;
-                    case SMCExponentialDistribution.NAME:
-                        displayDistributionFields(SMCExponentialDistribution.defaultDistribution());
-                        break;
-                    case SMCNormalDistribution.NAME:
-                        displayDistributionFields(SMCNormalDistribution.defaultDistribution());
-                        break;
-                }
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        if(context.tabContent().getLens().isStochastic()) {
+            String weightToolTip = "Probability mass of the transition in the event of a firing date collision";
+            JLabel weightLabel = new JLabel("Weight :");
+            weightLabel.setToolTipText(weightToolTip);
+            transitionEditorPanel.add(weightLabel, gridBagConstraints);
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            transitionEditorPanel.add(weightField, gridBagConstraints);
+            weightField.setToolTipText(weightToolTip);
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            transitionEditorPanel.add(infiniteWeight, gridBagConstraints);
+            infiniteWeight.addActionListener(act -> weightField.setEnabled(!infiniteWeight.isSelected()));
+        }
+
+        distributionType.addActionListener(actionEvent -> {
+            if(!distributionType.hasFocus()) return;
+            switch (String.valueOf(distributionType.getSelectedItem())) {
+                case SMCConstantDistribution.NAME:
+                    displayDistributionFields(SMCConstantDistribution.defaultDistribution());
+                    break;
+                case SMCUniformDistribution.NAME:
+                    displayDistributionFields(SMCUniformDistribution.defaultDistribution());
+                    break;
+                case SMCExponentialDistribution.NAME:
+                    displayDistributionFields(SMCExponentialDistribution.defaultDistribution());
+                    break;
+                case SMCNormalDistribution.NAME:
+                    displayDistributionFields(SMCNormalDistribution.defaultDistribution());
+                    break;
             }
         });
         distributionPanel.setLayout(new GridBagLayout());
@@ -256,7 +278,7 @@ public class TAPNTransitionEditor extends JPanel {
         gbc = GridBagHelper.as(0,3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         gbc.gridwidth = 2;
         distributionPanel.add(distributionExplanation, gbc);
-        gridBagConstraints = GridBagHelper.as(0, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+        gridBagConstraints = GridBagHelper.as(0, 4, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         gridBagConstraints.gridwidth = 4;
         transitionEditorPanel.add(distributionPanel, gridBagConstraints);
 
@@ -295,7 +317,7 @@ public class TAPNTransitionEditor extends JPanel {
 
 		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-		gridBagConstraints = GridBagHelper.as(1,transition.isStochastic() ? 4 : 3, Anchor.WEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = GridBagHelper.as(1,transition.isStochastic() ? 5 : 3, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
 
 		gridBagConstraints = GridBagHelper.as(0,1,Anchor.WEST, new Insets(3, 3, 3, 3));
@@ -340,6 +362,7 @@ public class TAPNTransitionEditor extends JPanel {
 
         if(context.tabContent().getLens().isStochastic()) {
             displayDistribution();
+            displayWeight();
         }
 
 		if(transition.underlyingTransition().isShared()){
@@ -382,6 +405,7 @@ public class TAPNTransitionEditor extends JPanel {
 		urgentCheckBox.setSelected(transition.isUrgent());
 		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
         displayDistributionFields(transition.underlyingTransition().getDistribution());
+        displayWeight(transition.underlyingTransition().getWeight());
         uncontrollableCheckBox.setSelected(transition.isUncontrollable());
 		transitionEditorPanel.add(nameTextField, gbc);
 		transitionEditorPanel.validate();
@@ -399,11 +423,13 @@ public class TAPNTransitionEditor extends JPanel {
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setDistribution(parseDistribution());
+            ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setWeight(parseWeight());
         }else{
             urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
             uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
             coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
             displayDistributionFields(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getDistribution());
+            displayWeight(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getWeight());
 		}
 		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
@@ -529,6 +555,7 @@ public class TAPNTransitionEditor extends JPanel {
 				transition.setUrgent(urgentCheckBox.isSelected());
 				transition.setUncontrollable(uncontrollableCheckBox.isSelected());
                 transition.underlyingTransition().setDistribution(parseDistribution());
+                transition.underlyingTransition().setWeight(parseWeight());
 			}
 		}
 		
@@ -545,6 +572,12 @@ public class TAPNTransitionEditor extends JPanel {
         if(!transition.underlyingTransition().getDistribution().equals(distribution)) {
             context.undoManager().addEdit(new ChangeTransitionDistributionCommand(transition.underlyingTransition(), context.tabContent(), distribution));
             transition.underlyingTransition().setDistribution(distribution);
+        }
+
+        double weight = parseWeight();
+        if(transition.underlyingTransition().getWeight() != weight) {
+            //TODO : Undo weight
+            transition.underlyingTransition().setWeight(weight);
         }
 
 		int rotationIndex = rotationComboBox.getSelectedIndex();
@@ -600,6 +633,30 @@ public class TAPNTransitionEditor extends JPanel {
         }
 		exit();
 	}
+
+    private double parseWeight() {
+        if(infiniteWeight.isSelected()) {
+            return Double.POSITIVE_INFINITY;
+        }
+        try {
+            return Double.parseDouble(weightField.getText());
+        } catch(NumberFormatException e) {
+            return 1.0;
+        }
+    }
+
+    private void displayWeight() {
+        displayWeight(transition.underlyingTransition().getWeight());
+    }
+
+    private void displayWeight(double weight) {
+        if(Double.isInfinite(weight)) {
+            infiniteWeight.setSelected(true);
+        } else {
+            weightField.setText(String.valueOf(weight));
+        }
+        weightField.setEnabled(!infiniteWeight.isSelected());
+    }
 
     private SMCDistribution parseDistribution() {
         if(transition.isUrgent()) {
@@ -698,6 +755,9 @@ public class TAPNTransitionEditor extends JPanel {
 
 	private javax.swing.JCheckBox urgentCheckBox;
     private Vector<SharedTransition> sharedTransitions;
+
+    private JTextField weightField;
+    private JCheckBox infiniteWeight;
 
     private JPanel distributionPanel;
     private JComboBox<String> distributionType;
