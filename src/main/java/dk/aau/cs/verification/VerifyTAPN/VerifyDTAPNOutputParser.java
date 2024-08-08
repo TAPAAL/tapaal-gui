@@ -33,6 +33,8 @@ public class VerifyDTAPNOutputParser {
     private static final Pattern smcAverageTimePattern = Pattern.compile("\\s*average run time:\\s*([\\d\\.]+)\\s*");
     private static final Pattern smcAverageLengthPattern = Pattern.compile("\\s*average run length:\\s*([\\d\\.]+)\\s*");
     private static final Pattern smcVerificationTimePattern = Pattern.compile("\\s*verification time:\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcAverageValidTimePattern = Pattern.compile("\\s*average time of a valid run:\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcAverageValidLengthPattern = Pattern.compile("\\s*average length of a valid run:\\s*([\\d\\.]+)\\s*");
 
 	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (-?\\d*)");
 	private static final Pattern wfMaxExecutionPattern = Pattern.compile("Maximum execution time: (-?\\d*)");
@@ -60,6 +62,8 @@ public class VerifyDTAPNOutputParser {
         float smcAverageTime = -1.0f;
         float smcAverageLength = -1.0f;
         float smcVerificationTime = -1.0f;
+        float smcAverageValidTime = -1.0f;
+        float smcAverageValidLength = -1.0f;
 		ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking = null;
 		boolean result = false;
 		int maxUsedTokens = 0;
@@ -174,6 +178,16 @@ public class VerifyDTAPNOutputParser {
                         smcVerificationTime = Float.parseFloat(matcher.group(1));
                     }
 
+                    matcher = smcAverageValidTimePattern.matcher(line);
+                    if(matcher.find()) {
+                        smcAverageValidTime = Float.parseFloat(matcher.group(1));
+                    }
+
+                    matcher = smcAverageValidLengthPattern.matcher(line);
+                    if(matcher.find()) {
+                        smcAverageValidLength = Float.parseFloat(matcher.group(1));
+                    }
+
 				}
 			}
 			
@@ -186,8 +200,11 @@ public class VerifyDTAPNOutputParser {
                 verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength, smcVerificationTime);
             else
                 verifStats = new Stats(discovered, explored, stored, transitionStats, placeBoundStats, WFminExecutionTime, WFmaxExecutionTime, coveredMarking);
-            if(isQuantitative)
+            if(isQuantitative) {
                 queryRes = new QueryResult(quantitativeResult, boundedAnalysis, query, discreteInclusion);
+                ((SMCStats) verifStats).setAverageValidRunTime(smcAverageValidTime);
+                ((SMCStats) verifStats).setAverageValidRunLength(smcAverageValidLength);
+            }
             else
                 queryRes = new QueryResult(result, boundedAnalysis, query, discreteInclusion);
             return new Tuple<QueryResult, Stats>(queryRes, verifStats);

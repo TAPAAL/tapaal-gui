@@ -7,6 +7,8 @@ public class SMCStats extends Stats {
     private float averageRunTime;
     private float averageRunLength;
     private float verificationTime;
+    private float averageValidRunTime = -1.0f;
+    private float averageValidRunLength = -1.0f;
 
     public SMCStats(int executedRuns, int validRuns, float averageTime, float averageLength) {
         super(-1,-1,-1);
@@ -50,7 +52,30 @@ public class SMCStats extends Stats {
             averageRunTime +
             System.getProperty("line.separator") +
             "Average transitions fired per run: " +
-            averageRunLength;
+            averageRunLength +
+            (averageValidRunTime >= 0 ?
+                System.getProperty("line.separator") +
+                "Average valid run duration: " +
+                averageValidRunTime : "") +
+            (averageValidRunLength >= 0 ?
+                System.getProperty("line.separator") +
+                "Average transitions fired per valid run: " +
+                averageValidRunLength : "");
     }
 
+    public float getAverageValidRunTime() {
+        return averageValidRunTime;
+    }
+
+    public void setAverageValidRunTime(float averageValidRunTime) {
+        this.averageValidRunTime = averageValidRunTime;
+    }
+
+    public float getAverageValidRunLength() {
+        return averageValidRunLength;
+    }
+
+    public void setAverageValidRunLength(float averageValidRunLength) {
+        this.averageValidRunLength = averageValidRunLength;
+    }
 }
