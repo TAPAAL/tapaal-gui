@@ -752,7 +752,7 @@ public class QueryDialog extends JPanel {
             smcConfidence.setText(String.valueOf(smcSettings.confidence));
         }
         try {
-            smcSettings.estimationIntervalWidth = doingBenchmark ?
+            smcSettings.estimationIntervalWidth = (doingBenchmark && !smcMustUpdateTime) ?
                 0.01f : Float.parseFloat(smcEstimationIntervalWidth.getText());
         } catch(NumberFormatException e) {
             smcEstimationIntervalWidth.setText(String.valueOf(smcSettings.estimationIntervalWidth));
