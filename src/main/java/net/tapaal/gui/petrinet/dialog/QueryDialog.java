@@ -242,6 +242,7 @@ public class QueryDialog extends JPanel {
     private JTextField smcComparisonFloat;
     private SMCSettings smcSettings;
     private boolean smcMustUpdateTime = true;
+    private boolean doingBenchmark = false;
 
     // Buttons in the bottom of the dialogue
     private JPanel buttonPanel;
@@ -751,7 +752,8 @@ public class QueryDialog extends JPanel {
             smcConfidence.setText(String.valueOf(smcSettings.confidence));
         }
         try {
-            smcSettings.estimationIntervalWidth = Float.parseFloat(smcEstimationIntervalWidth.getText());
+            smcSettings.estimationIntervalWidth = doingBenchmark ?
+                0.01f : Float.parseFloat(smcEstimationIntervalWidth.getText());
         } catch(NumberFormatException e) {
             smcEstimationIntervalWidth.setText(String.valueOf(smcSettings.estimationIntervalWidth));
         }
@@ -798,7 +800,7 @@ public class QueryDialog extends JPanel {
         smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
 
         smcConfidence.setText(String.valueOf(settings.confidence));
-        smcEstimationIntervalWidth.setText(String.valueOf(settings.estimationIntervalWidth));
+        if(!doingBenchmark) smcEstimationIntervalWidth.setText(String.valueOf(settings.estimationIntervalWidth));
 
         smcFalsePositives.setText(String.valueOf(settings.falsePositives));
         smcFalseNegatives.setText(String.valueOf(settings.falseNegatives));
@@ -2771,7 +2773,6 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(verifTimeLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcTimeExpected = new JTextField(7);
-        smcTimeExpected.addFocusListener(updater);
         smcTimeExpected.setToolTipText(TOOL_TIP_VERIFICATION_TIME);
         quantitativePanel.add(smcTimeExpected, subPanelGbc);
         subPanelGbc.gridy = 3;
@@ -5959,23 +5960,28 @@ public class QueryDialog extends JPanel {
     }
 
     private void runBenchmark() {
+        if(doingBenchmark) return;
+        doingBenchmark = true;
+        smcTimeEstimationButton.setEnabled(false);
         boolean saved = querySaved;
         querySaved = true;
         TAPNQuery query = getQuery();
         querySaved = saved;
         SMCSettings settings = query.getSmcSettings();
         query.setBenchmarkMode(true);
-        query.setBenchmarkRuns(100);
+        query.setBenchmarkRuns(32);
         DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
         decimalFormatSymbols.setDecimalSeparator('.');
         DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
         DecimalFormat timeFormat = new DecimalFormat("#.##", decimalFormatSymbols);
         VerificationCallback callback1 = result1 -> {
-            query.setBenchmarkRuns(600);
+            query.setBenchmarkRuns(256);
             SMCStats stats1 = (SMCStats) result1.stats();
             float runsDone1 = stats1.getExecutedRuns();
             float time1 = stats1.getVerificationTime();
             VerificationCallback callback2 = result2 -> {
+                doingBenchmark = false;
+                smcTimeEstimationButton.setEnabled(true);
                 SMCStats stats2 = (SMCStats) result2.stats();
                 float runsDone2 = stats2.getExecutedRuns();
                 float time2 = stats2.getVerificationTime();
