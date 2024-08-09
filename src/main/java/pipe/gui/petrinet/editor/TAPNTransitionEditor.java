@@ -12,6 +12,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import dk.aau.cs.model.tapn.*;
+import net.tapaal.gui.petrinet.editor.DistributionPanel;
 import net.tapaal.gui.petrinet.undo.*;
 import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
@@ -84,42 +85,16 @@ public class TAPNTransitionEditor extends JPanel {
 
         weightField = new JTextField();
         infiniteWeight = new JCheckBox("∞");
-        useConstantWeight = new JCheckBox("Use constant");
+        useConstantWeight = new JCheckBox("Use constant weight");
         ArrayList<String> constants = new ArrayList<>();
         for(Constant c : context.network().constants()) {
             constants.add(c.name());
         }
         constantsComboBox = new JComboBox<>(new DefaultComboBoxModel<>(constants.toArray(new String[0])));
-        useConstantWeight.setEnabled(constants.size() > 0);
+        useConstantWeight.setEnabled(!constants.isEmpty());
         useConstantWeight.addActionListener(act -> displayWeight(parseWeight()));
 
-        distributionPanel = new JPanel();
-        distributionType = new JComboBox<>(new String[]{"constant", "uniform", "exponential", "normal"});
-        distributionParam1Label = new JLabel();
-        distributionParam2Label = new JLabel();
-        distributionParam1Field = new JTextField();
-        distributionParam2Field = new JTextField();
-        distributionExplanation = new JLabel();
-        SwingHelper.setPreferredWidth(distributionParam1Field, 100);
-        SwingHelper.setPreferredWidth(distributionParam2Field, 100);
-
-        DocumentListener updateDistribDisplay = new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) {
-                display();
-            }
-            public void removeUpdate(DocumentEvent e) {
-                display();
-            }
-            public void insertUpdate(DocumentEvent e) {
-                display();
-            }
-            public void display() {
-                SMCDistribution distrib = parseDistribution();
-                distributionExplanation.setText(distrib.explanation());
-            }
-        };
-        distributionParam1Field.getDocument().addDocumentListener(updateDistribDisplay);
-        distributionParam2Field.getDocument().addDocumentListener(updateDistribDisplay);
+        distributionPanel = new DistributionPanel(transition, dialog);
 
 		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);
 		SwingHelper.setPreferredWidth(sharedTransitionsComboBox,290);
@@ -129,13 +104,13 @@ public class TAPNTransitionEditor extends JPanel {
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
-                ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setDistribution(parseDistribution());
+                ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setDistribution(distributionPanel.parseDistribution());
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setWeight(parseWeight());
             }else{
                 urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
                 uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
                 coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
-                displayDistributionFields(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getDistribution());
+                distributionPanel.displayDistributionFields(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getDistribution());
                 displayWeight(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getWeight());
             }
 		});
@@ -235,13 +210,15 @@ public class TAPNTransitionEditor extends JPanel {
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-        transitionEditorPanel.add(useConstantWeight, gridBagConstraints);
-        gridBagConstraints.gridy = 4;
         if(context.tabContent().getLens().isStochastic()) {
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 3;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+            transitionEditorPanel.add(useConstantWeight, gridBagConstraints);
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.gridy = 4;
             String weightToolTip = "Probability mass of the transition in the event of a firing date collision";
             JLabel weightLabel = new JLabel("Weight :");
             weightLabel.setToolTipText(weightToolTip);
@@ -257,40 +234,7 @@ public class TAPNTransitionEditor extends JPanel {
             infiniteWeight.addActionListener(act -> weightField.setEnabled(!infiniteWeight.isSelected()));
         }
 
-        distributionType.addActionListener(actionEvent -> {
-            if(!distributionType.hasFocus()) return;
-            switch (String.valueOf(distributionType.getSelectedItem())) {
-                case SMCConstantDistribution.NAME:
-                    displayDistributionFields(SMCConstantDistribution.defaultDistribution());
-                    break;
-                case SMCUniformDistribution.NAME:
-                    displayDistributionFields(SMCUniformDistribution.defaultDistribution());
-                    break;
-                case SMCExponentialDistribution.NAME:
-                    displayDistributionFields(SMCExponentialDistribution.defaultDistribution());
-                    break;
-                case SMCNormalDistribution.NAME:
-                    displayDistributionFields(SMCNormalDistribution.defaultDistribution());
-                    break;
-            }
-        });
-        distributionPanel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = GridBagHelper.as(0,0, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
-        distributionPanel.add(new JLabel("Distribution :"), gbc);
-        gbc = GridBagHelper.as(1,0, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
-        distributionPanel.add(distributionType, gbc);
-        gbc = GridBagHelper.as(0,1, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
-        distributionPanel.add(distributionParam1Label, gbc);
-        gbc = GridBagHelper.as(1,1, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
-        distributionPanel.add(distributionParam1Field, gbc);
-        gbc = GridBagHelper.as(0,2, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
-        distributionPanel.add(distributionParam2Label, gbc);
-        gbc = GridBagHelper.as(1,2, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
-        distributionPanel.add(distributionParam2Field, gbc);
-        gbc = GridBagHelper.as(0,3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
-        gbc.gridwidth = 2;
-        distributionPanel.add(distributionExplanation, gbc);
-        gridBagConstraints = GridBagHelper.as(0, 5, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+        gridBagConstraints = GridBagHelper.as(0, 5, Anchor.WEST, new Insets(3, 3, 3, 3));
         gridBagConstraints.gridwidth = 4;
         transitionEditorPanel.add(distributionPanel, gridBagConstraints);
 
@@ -373,7 +317,7 @@ public class TAPNTransitionEditor extends JPanel {
 		coloredTransitionGuardPanel.initExpr(transition.getGuardExpression());
 
         if(context.tabContent().getLens().isStochastic()) {
-            displayDistribution();
+            distributionPanel.displayDistribution();
             displayWeight();
         }
 
@@ -416,7 +360,7 @@ public class TAPNTransitionEditor extends JPanel {
 		gbc.fill = GridBagConstraints.BOTH;
 		urgentCheckBox.setSelected(transition.isUrgent());
 		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
-        displayDistributionFields(transition.underlyingTransition().getDistribution());
+        distributionPanel.displayDistributionFields(transition.underlyingTransition().getDistribution());
         displayWeight(transition.underlyingTransition().getWeight());
         uncontrollableCheckBox.setSelected(transition.isUncontrollable());
 		transitionEditorPanel.add(nameTextField, gbc);
@@ -434,13 +378,13 @@ public class TAPNTransitionEditor extends JPanel {
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
-            ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setDistribution(parseDistribution());
+            ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setDistribution(distributionPanel.parseDistribution());
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setWeight(parseWeight());
         }else{
             urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
             uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
             coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
-            displayDistributionFields(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getDistribution());
+            distributionPanel.displayDistributionFields(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getDistribution());
             displayWeight(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getWeight());
 		}
 		transitionEditorPanel.validate();
@@ -566,7 +510,7 @@ public class TAPNTransitionEditor extends JPanel {
 				}
 				transition.setUrgent(urgentCheckBox.isSelected());
 				transition.setUncontrollable(uncontrollableCheckBox.isSelected());
-                transition.underlyingTransition().setDistribution(parseDistribution());
+                transition.underlyingTransition().setDistribution(distributionPanel.parseDistribution());
                 transition.underlyingTransition().setWeight(parseWeight());
 			}
 		}
@@ -580,7 +524,7 @@ public class TAPNTransitionEditor extends JPanel {
             transition.setUncontrollable(uncontrollableCheckBox.isSelected());
         }
 
-        SMCDistribution distribution = parseDistribution();
+        SMCDistribution distribution = distributionPanel.parseDistribution();
         if(!transition.underlyingTransition().getDistribution().equals(distribution)) {
             context.undoManager().addEdit(new ChangeTransitionDistributionCommand(transition.underlyingTransition(), context.tabContent(), distribution));
             transition.underlyingTransition().setDistribution(distribution);
@@ -693,89 +637,6 @@ public class TAPNTransitionEditor extends JPanel {
         weightField.setEnabled(!infiniteWeight.isSelected());
     }
 
-    private SMCDistribution parseDistribution() {
-        if(transition.isUrgent()) {
-            return SMCDistribution.urgent();
-        }
-        String type = String.valueOf(distributionType.getSelectedItem());
-        try {
-            switch (type) {
-                case SMCConstantDistribution.NAME:
-                    double value = Double.parseDouble(distributionParam1Field.getText());
-                    return new SMCConstantDistribution(value);
-                case SMCUniformDistribution.NAME:
-                    double a = Double.parseDouble(distributionParam1Field.getText());
-                    double b = Double.parseDouble(distributionParam2Field.getText());
-                    return new SMCUniformDistribution(a, b);
-                case SMCExponentialDistribution.NAME:
-                    double rate = Double.parseDouble(distributionParam1Field.getText());
-                    return new SMCExponentialDistribution(rate);
-                case SMCNormalDistribution.NAME:
-                    double mean = Double.parseDouble(distributionParam1Field.getText());
-                    double stddev = Double.parseDouble(distributionParam2Field.getText());
-                    return new SMCNormalDistribution(mean, stddev);
-            }
-        } catch(NumberFormatException ignored) {}
-        switch (type) {
-            case SMCConstantDistribution.NAME:
-                return SMCConstantDistribution.defaultDistribution();
-            case SMCUniformDistribution.NAME:
-                return SMCUniformDistribution.defaultDistribution();
-            case SMCExponentialDistribution.NAME:
-                return SMCExponentialDistribution.defaultDistribution();
-            case SMCNormalDistribution.NAME:
-                return SMCNormalDistribution.defaultDistribution();
-            default:
-                return SMCDistribution.defaultDistribution();
-        }
-    }
-
-    private void displayDistribution() {
-        SMCDistribution distribution = transition.underlyingTransition().getDistribution();
-        distributionType.setSelectedItem(distribution.distributionName());
-        displayDistributionFields(distribution);
-    }
-
-    private void displayDistributionFields(SMCDistribution distribution) {
-        switch (distribution.distributionName()) {
-            case SMCConstantDistribution.NAME:
-                distributionParam1Label.setText("Value :");
-                distributionParam1Field.setText(String.valueOf(((SMCConstantDistribution) distribution).value));
-                distributionParam2Label.setVisible(false);
-                distributionParam2Field.setVisible(false);
-                break;
-            case SMCUniformDistribution.NAME:
-                distributionParam1Label.setText("A :");
-                distributionParam2Label.setText("B :");
-                distributionParam1Field.setText(String.valueOf(((SMCUniformDistribution) distribution).a));
-                distributionParam2Field.setText(String.valueOf(((SMCUniformDistribution) distribution).b));
-                distributionParam2Label.setVisible(true);
-                distributionParam2Field.setVisible(true);
-                break;
-            case SMCExponentialDistribution.NAME:
-                distributionParam1Label.setText("Rate :");
-                distributionParam1Field.setText(String.valueOf(((SMCExponentialDistribution) distribution).rate));
-                distributionParam2Label.setVisible(false);
-                distributionParam2Field.setVisible(false);
-                break;
-            case SMCNormalDistribution.NAME:
-                distributionParam1Label.setText("Mean :");
-                distributionParam2Label.setText("Std. Dev. :");
-                distributionParam1Field.setText(String.valueOf(((SMCNormalDistribution) distribution).mean));
-                distributionParam2Field.setText(String.valueOf(((SMCNormalDistribution) distribution).stddev));
-                distributionParam2Label.setVisible(true);
-                distributionParam2Field.setVisible(true);
-                break;
-            default:
-                break;
-        }
-        distributionExplanation.setText(distribution.explanation());
-        distributionType.setFocusable(false);
-        distributionType.setSelectedItem(distribution.distributionName());
-        distributionType.setFocusable(true);
-        dialog.pack();
-    }
-
 	private JPanel buttonPanel;
 	private JButton cancelButton;
 	private JLabel nameLabel;
@@ -796,13 +657,7 @@ public class TAPNTransitionEditor extends JPanel {
     private JCheckBox useConstantWeight;
     private JComboBox<String> constantsComboBox;
 
-    private JPanel distributionPanel;
-    private JComboBox<String> distributionType;
-    private JLabel distributionParam1Label;
-    private JLabel distributionParam2Label;
-    private JTextField distributionParam1Field;
-    private JTextField distributionParam2Field;
-    private JLabel distributionExplanation;
+    private DistributionPanel distributionPanel;
 
     private javax.swing.JCheckBox uncontrollableCheckBox;
 

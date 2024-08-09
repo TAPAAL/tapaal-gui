@@ -44,6 +44,25 @@ public abstract class SMCDistribution {
         return SMCConstantDistribution.defaultDistribution();
     }
 
+    public static SMCDistribution defaultDistributionFor(String name) {
+        switch (name) {
+            case SMCConstantDistribution.NAME:
+                return SMCConstantDistribution.defaultDistribution();
+            case SMCUniformDistribution.NAME:
+                return SMCUniformDistribution.defaultDistribution();
+            case SMCExponentialDistribution.NAME:
+                return SMCExponentialDistribution.defaultDistribution();
+            case SMCNormalDistribution.NAME:
+                return SMCNormalDistribution.defaultDistribution();
+            case SMCGammaDistribution.NAME:
+                return SMCGammaDistribution.defaultDistribution();
+            case SMCDiscreteUniformDistribution.NAME:
+                return SMCDiscreteUniformDistribution.defaultDistribution();
+            default:
+                return SMCDistribution.defaultDistribution();
+        }
+    }
+
     public static SMCDistribution urgent() {
         return new SMCConstantDistribution(0);
     }
@@ -73,6 +92,14 @@ public abstract class SMCDistribution {
                     double mean = Double.parseDouble(elem.getAttribute("mean"));
                     double stddev = Double.parseDouble(elem.getAttribute("stddev"));
                     return new SMCNormalDistribution(mean, stddev);
+                case SMCGammaDistribution.NAME:
+                    double shape = Double.parseDouble(elem.getAttribute("shape"));
+                    double scale = Double.parseDouble(elem.getAttribute("scale"));
+                    return new SMCGammaDistribution(shape, scale);
+                case SMCDiscreteUniformDistribution.NAME:
+                    double da = Double.parseDouble(elem.getAttribute("a"));
+                    double db = Double.parseDouble(elem.getAttribute("b"));
+                    return new SMCDiscreteUniformDistribution(da,db);
             }
         } catch(NumberFormatException ignored) {}
         return SMCDistribution.defaultDistribution();

@@ -12,7 +12,6 @@ public abstract class Probability {
             double weightAsDouble = Double.parseDouble(attribute);
             weight = new DoubleProbability(weightAsDouble);
         } catch (NumberFormatException e){
-            System.out.println(attribute);
             if(constants.containsConstantByName(attribute)){
                 weight = new ConstantProbability(constants.getConstantByName(attribute));
             } else {
