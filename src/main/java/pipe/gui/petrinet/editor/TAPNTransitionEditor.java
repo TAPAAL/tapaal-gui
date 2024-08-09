@@ -18,6 +18,7 @@ import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import net.tapaal.gui.petrinet.editor.ColoredTransitionGuardPanel;
+import pipe.gui.canvas.Grid;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import net.tapaal.gui.petrinet.Context;
@@ -85,7 +86,7 @@ public class TAPNTransitionEditor extends JPanel {
 
         weightField = new JTextField();
         infiniteWeight = new JCheckBox("∞");
-        useConstantWeight = new JCheckBox("Use constant weight");
+        useConstantWeight = new JCheckBox("Use constant");
         ArrayList<String> constants = new ArrayList<>();
         for(Constant c : context.network().constants()) {
             constants.add(c.name());
@@ -209,29 +210,23 @@ public class TAPNTransitionEditor extends JPanel {
 		gridBagConstraints = GridBagHelper.as(1,2, Anchor.NORTHWEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = GridBagHelper.as(0, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));;
         if(context.tabContent().getLens().isStochastic()) {
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 3;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-            transitionEditorPanel.add(useConstantWeight, gridBagConstraints);
-            gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.gridy = 4;
             String weightToolTip = "Probability mass of the transition in the event of a firing date collision";
             JLabel weightLabel = new JLabel("Weight :");
             weightLabel.setToolTipText(weightToolTip);
+            weightField.setToolTipText(weightToolTip);
+            infiniteWeight.setToolTipText("Selecting weight as an infinity gives an absolute priority of the transition firing in case of several transitions scheduled at the same time");
+            infiniteWeight.addActionListener(act -> weightField.setEnabled(!infiniteWeight.isSelected()));
+
             transitionEditorPanel.add(weightLabel, gridBagConstraints);
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.gridx++;
             transitionEditorPanel.add(weightField, gridBagConstraints);
             transitionEditorPanel.add(constantsComboBox, gridBagConstraints);
-            weightField.setToolTipText(weightToolTip);
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.gridx++;
             transitionEditorPanel.add(infiniteWeight, gridBagConstraints);
-            infiniteWeight.addActionListener(act -> weightField.setEnabled(!infiniteWeight.isSelected()));
+            gridBagConstraints.gridx++;
+            transitionEditorPanel.add(useConstantWeight, gridBagConstraints);
         }
 
         gridBagConstraints = GridBagHelper.as(0, 5, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
@@ -617,7 +612,7 @@ public class TAPNTransitionEditor extends JPanel {
 
     private void displayConstantWeight(Probability weight) {
         weightField.setVisible(false);
-        infiniteWeight.setVisible(false);
+        infiniteWeight.setEnabled(false);
         constantsComboBox.setVisible(true);
         useConstantWeight.setSelected(true);
         ConstantProbability constWeight = (ConstantProbability) weight;
@@ -626,7 +621,7 @@ public class TAPNTransitionEditor extends JPanel {
 
     private void displayDoubleWeight(Probability weight) {
         weightField.setVisible(true);
-        infiniteWeight.setVisible(true);
+        infiniteWeight.setEnabled(true);
         constantsComboBox.setVisible(false);
         useConstantWeight.setSelected(false);
         if(Double.isInfinite(weight.value())) {
