@@ -1,7 +1,6 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -28,6 +27,8 @@ public class TimedTransition extends TAPNElement {
 
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
+    private SMCDistribution distribution = SMCDistribution.defaultDistribution();
+    private Probability weight = new DoubleProbability(1.0);
     private GuardExpression guard;
 
 	private SharedTransition sharedTransition;
@@ -47,6 +48,21 @@ public class TimedTransition extends TAPNElement {
 		setUrgent(isUrgent);
 		this.guard = guard;
 	}
+
+    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, SMCDistribution distribution) {
+        setName(name);
+        setUrgent(isUrgent);
+        setDistribution(distribution);
+        this.guard = guard;
+    }
+
+    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, SMCDistribution distribution, Probability weight) {
+        setName(name);
+        setUrgent(isUrgent);
+        setDistribution(distribution);
+        setWeight(weight);
+        this.guard = guard;
+    }
 
 	public void addTimedTransitionListener(TimedTransitionListener listener){
 		Require.that(listener != null, "listener cannot be null");
@@ -68,6 +84,9 @@ public class TimedTransition extends TAPNElement {
 	
 	protected void setUrgent(boolean value, boolean cascade){
 		isUrgent = value;
+        if (isUrgent) {
+            setDistribution(SMCDistribution.urgent());
+        }
 		if(isShared() && cascade){
 			sharedTransition.setUrgent(value);
 		}
@@ -86,6 +105,32 @@ public class TimedTransition extends TAPNElement {
 	    if (isShared() && cascade) {
 	        sharedTransition.setUncontrollable(isUncontrollable);
         }
+    }
+
+    public SMCDistribution getDistribution() { return distribution; }
+
+    public void setDistribution(SMCDistribution distrib) { setDistribution(distrib, true); }
+
+    public void setDistribution(SMCDistribution distrib, boolean cascade) {
+        this.distribution = distrib;
+        if(isShared() && cascade) {
+            sharedTransition.setDistribution(distrib);
+        }
+    }
+
+    public Probability getWeight() { return weight; }
+
+    public void setWeight(Probability weight) { setWeight(weight, true); }
+
+    public void setWeight(Probability weight, boolean cascade) {
+        this.weight = weight;
+        if(isShared() && cascade) {
+            sharedTransition.setWeight(weight);
+        }
+    }
+
+    public boolean hasCustomDistribution() {
+        return !this.distribution.equals(SMCDistribution.defaultDistribution());
     }
 	
 	public boolean hasUntimedPreset(){
@@ -403,9 +448,9 @@ public class TimedTransition extends TAPNElement {
 
 	public TimedTransition copy() {
 	    if(guard == null){
-            return new TimedTransition(name, isUrgent, null);
+            return new TimedTransition(name, isUrgent, null, distribution, weight);
         }
-		return new TimedTransition(name, isUrgent, guard.copy());
+		return new TimedTransition(name, isUrgent, guard.copy(), distribution, weight);
 	}
 
 	@Override

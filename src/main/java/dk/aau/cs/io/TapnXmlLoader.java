@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.tapn.*;
 import kotlin.Pair;
 import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.*;
@@ -18,7 +19,6 @@ import org.xml.sax.SAXException;
 
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.Template;
-import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.graphicElements.AnnotationNote;
 import pipe.gui.petrinet.graphicElements.Arc;
@@ -32,24 +32,6 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import net.tapaal.gui.petrinet.NameGenerator;
 import dk.aau.cs.io.queries.TAPNQueryLoader;
-import dk.aau.cs.model.tapn.Constant;
-import dk.aau.cs.model.tapn.ConstantStore;
-import dk.aau.cs.model.tapn.IntWeight;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
-import dk.aau.cs.model.tapn.SharedPlace;
-import dk.aau.cs.model.tapn.SharedTransition;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimeInvariant;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedOutputArc;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedToken;
-import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.model.tapn.Weight;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
 
@@ -161,7 +143,7 @@ public class TapnXmlLoader {
             network.add(ColorType.COLORTYPE_DOT);
         }
 		parseSharedPlaces(doc, network, constants);
-		parseSharedTransitions(doc, network);
+		parseSharedTransitions(doc, network, constants);
         parseFeature(doc, network);
 
         Collection<Template> templates = parseTemplates(doc, network, constants);
@@ -197,7 +179,10 @@ public class TapnXmlLoader {
             var isColoredElement = nodeList.item(0).getAttributes().getNamedItem("isColored");
             boolean isColored = isColoredElement == null ? network.isColored() : Boolean.parseBoolean(isColoredElement.getNodeValue());
 
-            lens = new TAPNLens(isTimed, isGame, isColored);
+            var isStochasticElement = nodeList.item(0).getAttributes().getNamedItem("isStochastic");
+            boolean isStochastic = isStochasticElement == null ? network.isStochastic() : Boolean.parseBoolean(isStochasticElement.getNodeValue());
+
+            lens = new TAPNLens(isTimed, isGame, isColored, isStochastic);
         }
     }
 
@@ -211,7 +196,10 @@ public class TapnXmlLoader {
             var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
             var isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
 
-            lens = new TAPNLens(isTimed, isGame, isColored);
+            var stochasticElement = nodeList.item(0).getAttributes().getNamedItem("isStochastic");
+            var isStochastic = stochasticElement != null && Boolean.parseBoolean(stochasticElement.getNodeValue());
+
+            lens = new TAPNLens(isTimed, isGame, isColored, isStochastic);
         }
     }
 
@@ -250,27 +238,39 @@ public class TapnXmlLoader {
         return place;
 	}
 
-	private void parseSharedTransitions(Document doc, TimedArcPetriNetNetwork network) {
+	private void parseSharedTransitions(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) {
 		NodeList sharedTransitionNodes = doc.getElementsByTagName("shared-transition");
 
 		for(int i = 0; i < sharedTransitionNodes.getLength(); i++){
 			Node node = sharedTransitionNodes.item(i);
 
 			if(node instanceof Element){
-				SharedTransition transition = parseSharedTransition((Element)node);
+				SharedTransition transition = parseSharedTransition((Element)node, constants);
 				network.add(transition);
 			}
 		}
 	}
 
-	private SharedTransition parseSharedTransition(Element element) {
+	private SharedTransition parseSharedTransition(Element element, ConstantStore constants) {
 		String name = element.getAttribute("name");
 		boolean urgent = Boolean.parseBoolean(element.getAttribute("urgent"));
         boolean isUncontrollable = element.getAttribute("player").equals("1");
+        String distrib = element.getAttribute("distribution");
+        String weightStr = element.getAttribute("weight");
+        SMCDistribution distribution = SMCDistribution.defaultDistribution();
+        Probability weight = new DoubleProbability(1.0);
+        if(!distrib.isEmpty()){
+            distribution = SMCDistribution.parseXml(element);
+        }
+        if(!weightStr.isEmpty()) {
+            weight = Probability.parseProbability(weightStr, constants);
+        }
 		
 		SharedTransition st = new SharedTransition(name);
 		st.setUrgent(urgent);
 		st.setUncontrollable(isUncontrollable);
+        st.setDistribution(distribution);
+        st.setWeight(weight);
 		return st;
 	}
 
@@ -349,7 +349,7 @@ public class TapnXmlLoader {
 			TimedPlaceComponent place = parsePlace(element, network, template.model(), constants);
 			template.guiModel().addPetriNetObject(place);
 		} else if ("transition".equals(element.getNodeName())) {
-			TimedTransitionComponent transition = parseTransition(element, network, template.model());
+			TimedTransitionComponent transition = parseTransition(element, network, template.model(), constants);
 			template.guiModel().addPetriNetObject(transition);
 		} else if (element.getNodeName().matches("arc|outputArc|inputArc|inhibitorArc|transportArc")) {
             parseAndAddArc(element, template, constants, network);
@@ -420,19 +420,24 @@ public class TapnXmlLoader {
         return new AnnotationNote(text, positionXInput, positionYInput, widthInput, heightInput, borderInput);
 	}
 
-	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {
+	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, ConstantStore constants) {
 		String posX = transition.getAttribute("positionX");
 		String posY = transition.getAttribute("positionY");
 		String nameOffsetX = transition.getAttribute("nameOffsetX");
 		String nameOffsetY = transition.getAttribute("nameOffsetY");
 		String angleStr = transition.getAttribute("angle");
 		String priorityStr = transition.getAttribute("priority");
+        String distrib = transition.getAttribute("distribution");
+        String weightStr = transition.getAttribute("weight");
 	    int positionXInput = 0;
 		int positionYInput = 0;
 		int nameOffsetXInput = 0;
 		int nameOffsetYInput = 0;
 		int angle = 0;
         int priority = 0;
+        SMCDistribution distribution = SMCDistribution.defaultDistribution();
+        Probability weight = new DoubleProbability(1.0);
+
 		if(!posX.isEmpty()){
 		    positionXInput = (int)Double.parseDouble(posX);
         }
@@ -450,6 +455,12 @@ public class TapnXmlLoader {
         }
 		if(!priorityStr.isEmpty()){
 		    priority = Integer.parseInt(priorityStr);
+        }
+        if(!distrib.isEmpty()){
+            distribution = SMCDistribution.parseXml(transition);
+        }
+        if(!weightStr.isEmpty()) {
+            weight = Probability.parseProbability(weightStr, constants);
         }
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
@@ -484,6 +495,8 @@ public class TapnXmlLoader {
 		TimedTransition t = new TimedTransition(nameInput, guardExpr);
 		t.setUrgent(isUrgent);
 		t.setUncontrollable(player.equals("1"));
+        t.setDistribution(distribution);
+        t.setWeight(weight);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);

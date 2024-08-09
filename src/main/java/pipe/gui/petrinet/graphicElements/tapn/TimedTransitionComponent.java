@@ -17,6 +17,7 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.*;
 
+import dk.aau.cs.model.tapn.*;
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.TAPAALGUI;
@@ -26,9 +27,6 @@ import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.petrinet.editor.TAPNTransitionEditor;
 import net.tapaal.gui.petrinet.Context;
 import net.tapaal.gui.petrinet.undo.Command;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
 import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 
@@ -128,7 +126,7 @@ public class TimedTransitionComponent extends Transition {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new TAPNTransitionEditor(guiDialog.getRootPane(), this, new Context(TAPAALGUI.getCurrentTab())));
+		contentPane.add(new TAPNTransitionEditor(guiDialog, this, new Context(TAPAALGUI.getCurrentTab())));
 
 		guiDialog.setResizable(true);
 
@@ -208,19 +206,23 @@ public class TimedTransitionComponent extends Transition {
 	
 	@Override
 	public void update(boolean displayConstantNames) {
+        getNameLabel().setText("");
 		if(transition != null) {
 			getNameLabel().setName(transition.name());
 			getNameLabel().setVisible(attributesVisible);
 			getNameLabel().zoomUpdate(getZoom());
+            if(lens.isStochastic()) {
+                getNameLabel().setText("\n" + underlyingTransition().getDistribution().summary() +
+                    (   underlyingTransition().getWeight() instanceof ConstantProbability ||
+                        underlyingTransition().getWeight().value() != 1 ?
+                        "\nW=" + underlyingTransition().getWeight().toString() : ""
+                    )
+                );
+            }
 			if(underlyingTransition().getGuard() != null && lens.isColored()){
-                pnName.setText("");
                 super.update(displayConstantNames);
                 pnName.setText(pnName.getText() + "\n" + buildGuardString(this.underlyingTransition().getGuard().toString()));
-            } else {
-                getNameLabel().setText("");
             }
-		} else {
-			getNameLabel().setText("");
 		}
 
 		repaint();

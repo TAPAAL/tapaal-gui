@@ -7,43 +7,43 @@ import dk.aau.cs.io.XMLFormatter;
 
 public class LTLQueryVisitor extends VisitorBase {
 
-    private static final String XML_NS 			        = "xmlns=\"http://tapaal.net/\"";
-    private static final String XML_PROPSET 		    = "property-set";
-    private static final String XML_PROP			    = "property";
-    private static final String XML_PROPID			    = "id";
-    private static final String XML_PROPDESC		    = "description";
-    private static final String XML_FORMULA		    	= "formula";
-    private static final String XML_ALLPATHS	    	= "all-paths";
-    private static final String XML_EXISTSPATH	    	= "exists-path";
-    private static final String XML_NEGATION	    	= "negation";
-    private static final String XML_CONJUNCTION 		= "conjunction";
-    private static final String XML_DISJUNCTION 		= "disjunction";
-    private static final String XML_GLOBALLY		    = "globally";
-    private static final String XML_FINALLY			    = "finally";
-    private static final String XML_NEXT			    = "next";
-    private static final String XML_UNTIL 		    	= "until";
-    private static final String XML_BEFORE 			    = "before";
-    private static final String XML_REACH 		    	= "reach";
-    private static final String XML_DEADLOCK 		    = "deadlock";
-    private static final String XML_TRUE 			    = "true";
-    private static final String XML_FALSE 			    = "false";
-    private static final String XML_INTEGERLT 		    = "integer-lt";
-    private static final String XML_INTEGERLE 		    = "integer-le";
-    private static final String XML_INTEGEREQ		    = "integer-eq";
-    private static final String XML_INTEGERNE 		    = "integer-ne";
-    private static final String XML_INTEGERGT 		    = "integer-gt";
-    private static final String XML_INTEGERGE           = "integer-ge";
-    private static final String XML_ISFIREABLE		    = "is-fireable";
-    private static final String XML_INTEGERCONSTANT 	= "integer-constant";
-    private static final String XML_TOKENSCOUNT 		= "tokens-count";
-    private static final String XML_PLACE 			    = "place";
-    private static final String XML_TRANSITION		    = "transition";
-    private static final String XML_INTEGERSUM          = "integer-sum";
-    private static final String XML_INTEGERPRODUCT      = "integer-product";
-    private static final String XML_INTEGERDIFFERENCE   = "integer-difference";
+    protected static final String XML_NS 			        = "xmlns=\"http://tapaal.net/\"";
+    protected static final String XML_PROPSET 		    = "property-set";
+    protected static final String XML_PROP			    = "property";
+    protected static final String XML_PROPID			    = "id";
+    protected static final String XML_PROPDESC		    = "description";
+    protected static final String XML_FORMULA		    	= "formula";
+    protected static final String XML_ALLPATHS	    	= "all-paths";
+    protected static final String XML_EXISTSPATH	    	= "exists-path";
+    protected static final String XML_NEGATION	    	= "negation";
+    protected static final String XML_CONJUNCTION 		= "conjunction";
+    protected static final String XML_DISJUNCTION 		= "disjunction";
+    protected static final String XML_GLOBALLY		    = "globally";
+    protected static final String XML_FINALLY			    = "finally";
+    protected static final String XML_NEXT			    = "next";
+    protected static final String XML_UNTIL 		    	= "until";
+    protected static final String XML_BEFORE 			    = "before";
+    protected static final String XML_REACH 		    	= "reach";
+    protected static final String XML_DEADLOCK 		    = "deadlock";
+    protected static final String XML_TRUE 			    = "true";
+    protected static final String XML_FALSE 			    = "false";
+    protected static final String XML_INTEGERLT 		    = "integer-lt";
+    protected static final String XML_INTEGERLE 		    = "integer-le";
+    protected static final String XML_INTEGEREQ		    = "integer-eq";
+    protected static final String XML_INTEGERNE 		    = "integer-ne";
+    protected static final String XML_INTEGERGT 		    = "integer-gt";
+    protected static final String XML_INTEGERGE           = "integer-ge";
+    protected static final String XML_ISFIREABLE		    = "is-fireable";
+    protected static final String XML_INTEGERCONSTANT 	= "integer-constant";
+    protected static final String XML_TOKENSCOUNT 		= "tokens-count";
+    protected static final String XML_PLACE 			    = "place";
+    protected static final String XML_TRANSITION		    = "transition";
+    protected static final String XML_INTEGERSUM          = "integer-sum";
+    protected static final String XML_INTEGERPRODUCT      = "integer-product";
+    protected static final String XML_INTEGERDIFFERENCE   = "integer-difference";
 
 
-    private final StringBuffer xmlQuery = new StringBuffer();
+    protected final StringBuffer xmlQuery = new StringBuffer();
 
     public LTLQueryVisitor() {
         super();
@@ -83,7 +83,7 @@ public class LTLQueryVisitor extends VisitorBase {
         return endTag(XML_PROPSET) + "\n";
     }
 
-    private String queryInfo(String queryName){
+    protected String queryInfo(String queryName){
         String nameToPrint = (queryName == null) ? "Query Comment/Name Here" : queryName;
         return wrapInTag(nameToPrint, XML_PROPID) + wrapInTag(nameToPrint, XML_PROPDESC);
     }
@@ -234,16 +234,16 @@ public class LTLQueryVisitor extends VisitorBase {
         xmlQuery.append(endTag(op));
     }
 
-    private String wrapInTag(String str, String tag){
+    protected String wrapInTag(String str, String tag){
         return startTag(tag) + str + endTag(tag);
     }
-    private String startTag(String tag){
+    protected String startTag(String tag){
         return "<" + tag + ">";
     }
-    private String endTag(String tag){
+    protected String endTag(String tag){
         return "</" + tag + ">";
     }
-    private String emptyElement(String tag){
+    protected String emptyElement(String tag){
         return startTag(tag + "/");
     }
 }

@@ -60,12 +60,15 @@ public class ConstantsPane extends JPanel implements SidePane {
 
     private static final String titleBorder = "Global constants, Color types and Variables";
     private static final String titleBorderNoColor = "Global constants";
+    private static final String titleBorderSMC = "Global constants and SMC Settings";
     private static final String titleBorderToolTip = "<html>Declaration of colors types, color variables and global integer constants.<br>To see a summary list press SHIFT + F</html>";
     private static final String titleBorderToolTipNoColor = "Declaration of global constants that can be used in intervals and age invariants";
+    private static final String titleBorderToolTipSmc = "Declaration of global constants that can be used in intervals and age invariants, and editing of SMC engine settings";
 
     private static final String CONSTANTS = "Constants";
     private static final String COLORTYPES = "Color type";
     private static final String VARIABLES = "Variables";
+    private static final String SMC_SETTINGS = "SMC Settings";
     private final JComboBox<String> constantsColorTypesVariablesComboBox = new JComboBox<>(new String[]{COLORTYPES, VARIABLES, CONSTANTS});
 
 

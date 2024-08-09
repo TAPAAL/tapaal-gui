@@ -3,6 +3,7 @@ package net.tapaal.gui.petrinet.verification;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.QueryType;
+import dk.aau.cs.verification.SMCSettings;
 
 import java.util.ArrayList;
 
@@ -33,7 +34,7 @@ public class TAPNQuery {
 	}
 	
 	public enum QueryCategory{
-		Default, CTL, LTL, HyperLTL
+		Default, CTL, LTL, HyperLTL, SMC
 	}
 	
 	public enum AlgorithmOption{
@@ -85,6 +86,11 @@ public class TAPNQuery {
     private boolean useTarjan = false;
 	private boolean useRawVerification = false;
 	private String rawVerificationPrompt;
+
+    private SMCSettings smcSettings;
+    private boolean benchmark = false;
+    private int benchmarkRuns = 100;
+    private boolean parallel = false;
 
 	/**
 	 * @param name
@@ -508,6 +514,10 @@ public class TAPNQuery {
         setUseTarjan(query.isTarjan());
 		setRawVerification(query.getRawVerification());
 		setRawVerificationPrompt(query.getRawVerificationPrompt());
+        setSmcSettings(query.getSmcSettings());
+        setBenchmarkMode(isBenchmarkMode());
+        setBenchmarkRuns(getBenchmarkRuns());
+        setParallel(isParallel());
     }
 
 	public InclusionPlaces inclusionPlaces() {
@@ -531,7 +541,10 @@ public class TAPNQuery {
 		copy.setUseQueryReduction(this.isQueryReductionEnabled());
 		copy.setUseStubbornReduction(this.isStubbornReductionEnabled());
 		copy.setUseTarOption(this.isTarOptionEnabled());
-		
+		copy.setSmcSettings(this.getSmcSettings());
+        copy.setBenchmarkMode(this.isBenchmarkMode());
+        copy.setBenchmarkRuns(this.getBenchmarkRuns());
+        copy.setParallel(this.isParallel());
 		return copy;
 	}
 	
@@ -539,6 +552,8 @@ public class TAPNQuery {
 		if(property instanceof TCTLEFNode) return QueryType.EF;
 		else if(property instanceof TCTLEGNode) return QueryType.EG;
 		else if(property instanceof TCTLAFNode) return QueryType.AF;
+        else if(queryCategory == QueryCategory.SMC && property instanceof LTLFNode) return QueryType.PF;
+        else if(queryCategory == QueryCategory.SMC && property instanceof LTLGNode) return QueryType.PG;
 		else return QueryType.AG;
 	}
 
@@ -574,8 +589,31 @@ public class TAPNQuery {
     	return this.algorithmOption;
     }
 
+    public SMCSettings getSmcSettings() { return this.smcSettings; }
+
+    public void setSmcSettings(SMCSettings newSettings) { this.smcSettings = newSettings; }
+
+    public boolean isBenchmarkMode() { return benchmark; }
+    public void setBenchmarkMode(boolean mode) {
+        benchmark = mode;
+    }
+
+    public int getBenchmarkRuns() { return benchmarkRuns; }
+    public void setBenchmarkRuns(int runs) {
+        benchmarkRuns = runs;
+    }
+
+    public boolean isParallel() { return parallel; }
+    public void setParallel(boolean value) {
+        parallel = value;
+    }
+
     public boolean hasUntimedOnlyProperties(){
-        if(!(property instanceof TCTLAFNode || property instanceof TCTLAGNode || property instanceof TCTLEFNode || property instanceof TCTLEGNode)){
+        if(!(
+                property instanceof TCTLAFNode || property instanceof TCTLAGNode ||
+                property instanceof TCTLEFNode || property instanceof TCTLEGNode ||
+                queryType() == QueryType.PF || queryType() == QueryType.PG
+        )){
             return true;
         } else if(property.hasNestedPathQuantifiers()){
             return true;

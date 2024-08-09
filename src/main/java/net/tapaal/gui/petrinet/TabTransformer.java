@@ -24,7 +24,6 @@ import net.tapaal.gui.petrinet.verification.RunningVerificationDialog;
 import pipe.gui.petrinet.PetriNetTab;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -181,6 +180,15 @@ public class TabTransformer {
             for (TimedTransition transition : template.model().transitions()) {
                 if (transition.isUncontrollable()) {
                     transition.setUncontrollable(false);
+                }
+            }
+        }
+    }
+    static public void removeDistributionInformation(PetriNetTab tab) {
+        for (Template template : tab.allTemplates()) {
+            for (TimedTransition transition : template.model().transitions()) {
+                if (transition.hasCustomDistribution()) {
+                    transition.setDistribution(SMCDistribution.defaultDistribution());
                 }
             }
         }

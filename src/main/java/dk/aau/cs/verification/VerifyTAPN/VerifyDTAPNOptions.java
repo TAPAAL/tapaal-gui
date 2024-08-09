@@ -24,6 +24,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private final boolean colorFixpoint;
 	private boolean useRawVerification;
 	private String rawVerificationOptions;
+    private boolean parallel = false;
+    private boolean benchmark = false;
+    private int benchmarkRuns = 100;
 
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(
@@ -45,7 +48,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean useRawVerification,
 			String rawVerificationOptions
 	) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions);
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions, false, 0, false);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
@@ -71,7 +74,10 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             boolean colorFixpoint,
             boolean unfoldNet,
 			boolean useRawVerification,
-			String rawVerificationOptions
+			String rawVerificationOptions,
+            boolean benchmark,
+            int benchmarkRuns,
+            boolean parallel
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -86,6 +92,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         this.unfold = unfoldNet;
 		this.useRawVerification = useRawVerification;
 		this.rawVerificationOptions = rawVerificationOptions;
+        this.benchmark = benchmark;
+        this.benchmarkRuns = benchmarkRuns;
+        this.parallel = parallel;
 
 		// we only force unfolding when traces are involved
         if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation) && !useRawVerification)
@@ -136,6 +145,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		if (workflow != WorkflowMode.WORKFLOW_SOUNDNESS && workflow != WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
 			result.append(gcd ? " --gcd-lower " : ""); // GCD optimization is not sound for workflow analysis
 		}
+
+        result.append(parallel ? "--parallel " : "");
+        result.append(benchmark ? "--benchmark " + benchmarkRuns + " " : "");
 
 		return result.toString();
 	}

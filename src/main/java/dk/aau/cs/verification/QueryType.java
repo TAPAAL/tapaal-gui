@@ -6,5 +6,7 @@ public enum QueryType {
 	AF,
 	AG,
     E,
-    A
+    A,
+    PF,
+    PG
 }
