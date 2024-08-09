@@ -234,7 +234,7 @@ public class TAPNTransitionEditor extends JPanel {
             infiniteWeight.addActionListener(act -> weightField.setEnabled(!infiniteWeight.isSelected()));
         }
 
-        gridBagConstraints = GridBagHelper.as(0, 5, Anchor.WEST, new Insets(3, 3, 3, 3));
+        gridBagConstraints = GridBagHelper.as(0, 5, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         gridBagConstraints.gridwidth = 4;
         transitionEditorPanel.add(distributionPanel, gridBagConstraints);
 

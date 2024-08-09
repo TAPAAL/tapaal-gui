@@ -389,12 +389,16 @@ public class TapnEngineXmlLoader {
 		String nameOffsetY = transition.getAttribute("nameOffsetY");
 		String angleStr = transition.getAttribute("angle");
 		String priorityStr = transition.getAttribute("priority");
+        String distrib = transition.getAttribute("distribution");
+        String weightStr = transition.getAttribute("weight");
 	    int positionXInput = 0;
 		int positionYInput = 0;
 		int nameOffsetXInput = 0;
 		int nameOffsetYInput = 0;
 		int angle = 0;
         int priority = 0;
+        SMCDistribution distribution = SMCDistribution.defaultDistribution();
+        Probability weight = new DoubleProbability(1.0);
 		if(!posX.isEmpty()){
 		    positionXInput = (int)Double.parseDouble(posX);
         }
@@ -419,6 +423,12 @@ public class TapnEngineXmlLoader {
         }
 		if(!priorityStr.isEmpty()){
 		    priority = Integer.parseInt(priorityStr);
+        }
+        if(!distrib.isEmpty()){
+            distribution = SMCDistribution.parseXml(transition);
+        }
+        if(!weightStr.isEmpty()) {
+            weight = Probability.parseProbability(weightStr, constants);
         }
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
@@ -454,6 +464,8 @@ public class TapnEngineXmlLoader {
 		TimedTransition t = new TimedTransition(nameInput, guardExpr);
 		t.setUrgent(isUrgent);
 		t.setUncontrollable(player.equals("1"));
+        t.setDistribution(distribution);
+        t.setWeight(weight);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);
