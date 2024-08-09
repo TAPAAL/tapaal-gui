@@ -84,6 +84,15 @@ public class TAPNTransitionEditor extends JPanel {
 
         weightField = new JTextField();
         infiniteWeight = new JCheckBox("∞");
+        useConstantWeight = new JCheckBox("Use constant");
+        ArrayList<String> constants = new ArrayList<>();
+        for(Constant c : context.network().constants()) {
+            constants.add(c.name());
+        }
+        constantsComboBox = new JComboBox<>(new DefaultComboBoxModel<>(constants.toArray(new String[0])));
+        useConstantWeight.setEnabled(constants.size() > 0);
+        useConstantWeight.addActionListener(act -> displayWeight(parseWeight()));
+
         distributionPanel = new JPanel();
         distributionType = new JComboBox<>(new String[]{"constant", "uniform", "exponential", "normal"});
         distributionParam1Label = new JLabel();
@@ -230,6 +239,8 @@ public class TAPNTransitionEditor extends JPanel {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        transitionEditorPanel.add(useConstantWeight, gridBagConstraints);
+        gridBagConstraints.gridy = 4;
         if(context.tabContent().getLens().isStochastic()) {
             String weightToolTip = "Probability mass of the transition in the event of a firing date collision";
             JLabel weightLabel = new JLabel("Weight :");
@@ -238,6 +249,7 @@ public class TAPNTransitionEditor extends JPanel {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             transitionEditorPanel.add(weightField, gridBagConstraints);
+            transitionEditorPanel.add(constantsComboBox, gridBagConstraints);
             weightField.setToolTipText(weightToolTip);
             gridBagConstraints.gridx = 2;
             gridBagConstraints.fill = GridBagConstraints.NONE;
@@ -278,7 +290,7 @@ public class TAPNTransitionEditor extends JPanel {
         gbc = GridBagHelper.as(0,3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         gbc.gridwidth = 2;
         distributionPanel.add(distributionExplanation, gbc);
-        gridBagConstraints = GridBagHelper.as(0, 4, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+        gridBagConstraints = GridBagHelper.as(0, 5, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         gridBagConstraints.gridwidth = 4;
         transitionEditorPanel.add(distributionPanel, gridBagConstraints);
 
@@ -317,7 +329,7 @@ public class TAPNTransitionEditor extends JPanel {
 
 		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-		gridBagConstraints = GridBagHelper.as(1,transition.isStochastic() ? 5 : 3, Anchor.WEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = GridBagHelper.as(1,transition.isStochastic() ? 6 : 3, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
 
 		gridBagConstraints = GridBagHelper.as(0,1,Anchor.WEST, new Insets(3, 3, 3, 3));
@@ -574,11 +586,9 @@ public class TAPNTransitionEditor extends JPanel {
             transition.underlyingTransition().setDistribution(distribution);
         }
 
-        double weight = parseWeight();
-        if(transition.underlyingTransition().getWeight() != weight) {
-            //TODO : Undo weight
-            transition.underlyingTransition().setWeight(weight);
-        }
+        Probability weight = parseWeight();
+        //TODO : Undo weight
+        transition.underlyingTransition().setWeight(weight);
 
 		int rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {
@@ -634,14 +644,18 @@ public class TAPNTransitionEditor extends JPanel {
 		exit();
 	}
 
-    private double parseWeight() {
+    private Probability parseWeight() {
+        if(useConstantWeight.isSelected()) {
+            Constant constant = context.network().getConstant((String) constantsComboBox.getSelectedItem());
+            return new ConstantProbability(constant);
+        }
         if(infiniteWeight.isSelected()) {
-            return Double.POSITIVE_INFINITY;
+            return new DoubleProbability(Double.POSITIVE_INFINITY);
         }
         try {
-            return Double.parseDouble(weightField.getText());
+            return new DoubleProbability(Double.parseDouble(weightField.getText()));
         } catch(NumberFormatException e) {
-            return 1.0;
+            return new DoubleProbability(1.0);
         }
     }
 
@@ -649,11 +663,32 @@ public class TAPNTransitionEditor extends JPanel {
         displayWeight(transition.underlyingTransition().getWeight());
     }
 
-    private void displayWeight(double weight) {
-        if(Double.isInfinite(weight)) {
+    private void displayWeight(Probability weight) {
+        if(weight instanceof ConstantProbability) {
+            displayConstantWeight(weight);
+        } else {
+            displayDoubleWeight(weight);
+        }
+    }
+
+    private void displayConstantWeight(Probability weight) {
+        weightField.setVisible(false);
+        infiniteWeight.setVisible(false);
+        constantsComboBox.setVisible(true);
+        useConstantWeight.setSelected(true);
+        ConstantProbability constWeight = (ConstantProbability) weight;
+        constantsComboBox.setSelectedItem(constWeight.constant().name());
+    }
+
+    private void displayDoubleWeight(Probability weight) {
+        weightField.setVisible(true);
+        infiniteWeight.setVisible(true);
+        constantsComboBox.setVisible(false);
+        useConstantWeight.setSelected(false);
+        if(Double.isInfinite(weight.value())) {
             infiniteWeight.setSelected(true);
         } else {
-            weightField.setText(String.valueOf(weight));
+            weightField.setText(String.valueOf(weight.value()));
         }
         weightField.setEnabled(!infiniteWeight.isSelected());
     }
@@ -758,6 +793,8 @@ public class TAPNTransitionEditor extends JPanel {
 
     private JTextField weightField;
     private JCheckBox infiniteWeight;
+    private JCheckBox useConstantWeight;
+    private JComboBox<String> constantsComboBox;
 
     private JPanel distributionPanel;
     private JComboBox<String> distributionType;

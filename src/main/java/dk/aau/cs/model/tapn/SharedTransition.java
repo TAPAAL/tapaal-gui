@@ -17,7 +17,7 @@ public class SharedTransition {
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
     private SMCDistribution distribution = SMCDistribution.defaultDistribution();
-    private double weight = 1.0;
+    private Probability weight = new DoubleProbability(1.0);
 	private GuardExpression guard = null;
 
 	private TimedArcPetriNetNetwork network;
@@ -68,9 +68,9 @@ public class SharedTransition {
         }
     }
 
-    public double getWeight() { return weight; }
+    public Probability getWeight() { return weight; }
 
-    public void setWeight(double weight) {
+    public void setWeight(Probability weight) {
         this.weight = weight;
         for (TimedTransition transition : transitions) {
             transition.setWeight(weight, false);

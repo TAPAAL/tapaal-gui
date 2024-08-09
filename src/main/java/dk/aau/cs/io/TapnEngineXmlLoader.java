@@ -104,7 +104,7 @@ public class TapnEngineXmlLoader {
             network.add(ColorType.COLORTYPE_DOT);
         }
 		parseSharedPlaces(doc, network, constants);
-		parseSharedTransitions(doc, network);
+		parseSharedTransitions(doc, network, constants);
 		
 		Collection<Template> templates = parseTemplates(doc, network, constants);
 		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network).parseQueries();
@@ -199,32 +199,32 @@ public class TapnEngineXmlLoader {
         return place;
 	}
 
-	private void parseSharedTransitions(Document doc, TimedArcPetriNetNetwork network) {
+	private void parseSharedTransitions(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) {
 		NodeList sharedTransitionNodes = doc.getElementsByTagName("shared-transition");
 
 		for(int i = 0; i < sharedTransitionNodes.getLength(); i++){
 			Node node = sharedTransitionNodes.item(i);
 
 			if(node instanceof Element){
-				SharedTransition transition = parseSharedTransition((Element)node);
+				SharedTransition transition = parseSharedTransition((Element)node, constants);
 				network.add(transition);
 			}
 		}
 	}
 
-	private SharedTransition parseSharedTransition(Element element) {
+	private SharedTransition parseSharedTransition(Element element, ConstantStore constants) {
 		String name = element.getAttribute("name");
 		boolean urgent = Boolean.parseBoolean(element.getAttribute("urgent"));
         boolean isUncontrollable = element.getAttribute("player").equals("1");
         String distrib = element.getAttribute("distribution");
         String weightStr = element.getAttribute("weight");
         SMCDistribution distribution = SMCDistribution.defaultDistribution();
-        double weight = 1.0;
+        Probability weight = new DoubleProbability(1.0);
         if(!distrib.isEmpty()){
             distribution = SMCDistribution.parseXml(element);
         }
         if(!weightStr.isEmpty()) {
-            weight = Double.parseDouble(weightStr);
+            weight = Probability.parseProbability(weightStr, constants);
         }
 		
 		SharedTransition st = new SharedTransition(name);
@@ -311,7 +311,7 @@ public class TapnEngineXmlLoader {
 			TimedPlaceComponent place = parsePlace(element, network, template.model(), constants);
 			template.guiModel().addPetriNetObject(place);
 		} else if ("transition".equals(element.getNodeName())) {
-			TimedTransitionComponent transition = parseTransition(element, network, template.model());
+			TimedTransitionComponent transition = parseTransition(element, network, template.model(), constants);
 			template.guiModel().addPetriNetObject(transition);
 		} else if (element.getNodeName().matches("arc|outputArc|inputArc|inhibitorArc|transportArc")) {
             parseAndAddArc(element, template, constants, network);
@@ -382,7 +382,7 @@ public class TapnEngineXmlLoader {
         return new AnnotationNote(text, positionXInput, positionYInput, widthInput, heightInput, borderInput);
 	}
 
-	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {
+	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, ConstantStore constants) {
 		String posX = transition.getAttribute("positionX");
 		String posY = transition.getAttribute("positionY");
 		String nameOffsetX = transition.getAttribute("nameOffsetX");

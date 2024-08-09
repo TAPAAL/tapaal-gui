@@ -17,6 +17,7 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.*;
 
+import dk.aau.cs.model.tapn.*;
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.TAPAALGUI;
@@ -26,9 +27,6 @@ import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.petrinet.editor.TAPNTransitionEditor;
 import net.tapaal.gui.petrinet.Context;
 import net.tapaal.gui.petrinet.undo.Command;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
 import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 
@@ -215,7 +213,10 @@ public class TimedTransitionComponent extends Transition {
 			getNameLabel().zoomUpdate(getZoom());
             if(lens.isStochastic()) {
                 getNameLabel().setText("\n" + underlyingTransition().getDistribution().summary() +
-                    (underlyingTransition().getWeight() != 1.0 ? ("\nW=" + underlyingTransition().getWeight()) : "")
+                    (   underlyingTransition().getWeight() instanceof ConstantProbability ||
+                        underlyingTransition().getWeight().value() != 1 ?
+                        "\nW=" + underlyingTransition().getWeight().toString() : ""
+                    )
                 );
             }
 			if(underlyingTransition().getGuard() != null && lens.isColored()){

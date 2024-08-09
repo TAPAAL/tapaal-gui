@@ -28,7 +28,7 @@ public class TimedTransition extends TAPNElement {
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
     private SMCDistribution distribution = SMCDistribution.defaultDistribution();
-    private double weight = 1.0;
+    private Probability weight = new DoubleProbability(1.0);
     private GuardExpression guard;
 
 	private SharedTransition sharedTransition;
@@ -56,7 +56,7 @@ public class TimedTransition extends TAPNElement {
         this.guard = guard;
     }
 
-    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, SMCDistribution distribution, double weight) {
+    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, SMCDistribution distribution, Probability weight) {
         setName(name);
         setUrgent(isUrgent);
         setDistribution(distribution);
@@ -118,11 +118,11 @@ public class TimedTransition extends TAPNElement {
         }
     }
 
-    public double getWeight() { return weight; }
+    public Probability getWeight() { return weight; }
 
-    public void setWeight(double weight) { setWeight(weight, true); }
+    public void setWeight(Probability weight) { setWeight(weight, true); }
 
-    public void setWeight(double weight, boolean cascade) {
+    public void setWeight(Probability weight, boolean cascade) {
         this.weight = weight;
         if(isShared() && cascade) {
             sharedTransition.setWeight(weight);
