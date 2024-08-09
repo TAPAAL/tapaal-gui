@@ -358,7 +358,7 @@ public class Verifier {
         }
     }
 
-    public static void runVerifyTAPNSilent(
+    public static RunVerificationBase runVerifyTAPNSilent(
         TimedArcPetriNetNetwork tapnNetwork,
         TAPNQuery query,
         VerificationCallback callback,
@@ -374,7 +374,7 @@ public class Verifier {
             new MessengerImpl().displayErrorMessage(
                 "No " + verifytapn + " specified: The verification is cancelled",
                 "Verification Error");
-            return;
+            return null;
         }
 
         TCTLAbstractProperty inputQuery = query.getProperty();
@@ -383,7 +383,7 @@ public class Verifier {
         VerifyTAPNOptions verifytapnOptions = getVerificationOptions(query, isColored);
 
         if (inputQuery == null) {
-            return;
+            return null;
         }
 
         if (tapnNetwork != null) {
@@ -398,13 +398,14 @@ public class Verifier {
                 SmartDrawDialog.setupWorkerListener(thread);
             }
             thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), query.getCapacity(), query.getSmcSettings()), query, lens);
+            return thread;
         } else {
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                 "There was an error converting the model.",
                 "Conversion error", JOptionPane.ERROR_MESSAGE);
         }
 
-        return;
+        return null;
     }
 
 }

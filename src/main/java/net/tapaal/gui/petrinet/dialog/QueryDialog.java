@@ -243,6 +243,7 @@ public class QueryDialog extends JPanel {
     private SMCSettings smcSettings;
     private boolean smcMustUpdateTime = true;
     private boolean doingBenchmark = false;
+    private RunVerificationBase benchmarkThread = null;
 
     // Buttons in the bottom of the dialogue
     private JPanel buttonPanel;
@@ -734,7 +735,7 @@ public class QueryDialog extends JPanel {
             smcSettings.timeBound = 1000;
             smcTimeBoundValue.setText("1000");
         }
-        smcTimeBoundValue.setEnabled(!smcTimeBoundInfinite.isSelected());
+        smcTimeBoundValue.setEnabled(!smcTimeBoundInfinite.isSelected() && !doingBenchmark);
         try {
             smcSettings.stepBound = smcStepBoundInfinite.isSelected() ?
                 Integer.MAX_VALUE :
@@ -791,7 +792,7 @@ public class QueryDialog extends JPanel {
         smcTimeBoundValue.setText(smcSettings.timeBound < Integer.MAX_VALUE ?
             String.valueOf(smcSettings.timeBound) : "");
         smcTimeBoundInfinite.setSelected(smcSettings.timeBound == Integer.MAX_VALUE);
-        smcTimeBoundValue.setEnabled(!smcTimeBoundInfinite.isSelected());
+        smcTimeBoundValue.setEnabled(!smcTimeBoundInfinite.isSelected() && !doingBenchmark);
         smcStepBoundValue.setText(smcSettings.stepBound < Integer.MAX_VALUE ?
             String.valueOf(smcSettings.stepBound) : "");
         smcStepBoundInfinite.setSelected(smcSettings.stepBound == Integer.MAX_VALUE);
@@ -5960,9 +5961,17 @@ public class QueryDialog extends JPanel {
     }
 
     private void runBenchmark() {
-        if(doingBenchmark) return;
+        if(doingBenchmark) {
+            if(benchmarkThread == null) return;
+            benchmarkThread.cancel(true);
+            doingBenchmark = false;
+            updateFieldsOnBenchmark();
+            smcTimeEstimationButton.setText(smcMustUpdateTime ? UPDATE_VERIFICATION_TIME_BTN_TEXT : UPDATE_PRECISION_BTN_TEXT);
+            return;
+        }
         doingBenchmark = true;
-        smcTimeEstimationButton.setEnabled(false);
+        updateFieldsOnBenchmark();
+        smcTimeEstimationButton.setText("Interrupt estimation");
         boolean saved = querySaved;
         querySaved = true;
         TAPNQuery query = getQuery();
@@ -5970,10 +5979,17 @@ public class QueryDialog extends JPanel {
         SMCSettings settings = query.getSmcSettings();
         query.setBenchmarkMode(true);
         query.setBenchmarkRuns(32);
+        double timeWanted = 10;
+        try {
+            timeWanted = Double.parseDouble(smcTimeExpected.getText());
+        } catch(NumberFormatException ignored) { }
+        smcTimeExpected.setText("");
+        smcEstimationIntervalWidth.setText("");
         DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
         decimalFormatSymbols.setDecimalSeparator('.');
         DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
         DecimalFormat timeFormat = new DecimalFormat("#.##", decimalFormatSymbols);
+        double finalTimeWanted = timeWanted;
         VerificationCallback callback1 = result1 -> {
             query.setBenchmarkRuns(256);
             SMCStats stats1 = (SMCStats) result1.stats();
@@ -5981,7 +5997,7 @@ public class QueryDialog extends JPanel {
             float time1 = stats1.getVerificationTime();
             VerificationCallback callback2 = result2 -> {
                 doingBenchmark = false;
-                smcTimeEstimationButton.setEnabled(true);
+                updateFieldsOnBenchmark();
                 SMCStats stats2 = (SMCStats) result2.stats();
                 float runsDone2 = stats2.getExecutedRuns();
                 float time2 = stats2.getVerificationTime();
@@ -5991,20 +6007,33 @@ public class QueryDialog extends JPanel {
                     double runsNeeded = (double) settings.chernoffHoeffdingBound();
                     double estimation = coeff * runsNeeded + stat_err;
                     smcTimeExpected.setText(timeFormat.format(estimation));
+                    smcEstimationIntervalWidth.setText(String.valueOf(smcSettings.estimationIntervalWidth));
+                    smcTimeEstimationButton.setText(UPDATE_VERIFICATION_TIME_BTN_TEXT);
                 } else {
-                    double timeWanted = 10;
-                    try {
-                        timeWanted = Double.parseDouble(smcTimeExpected.getText());
-                    } catch(NumberFormatException ignored) { }
-                    int runsNeeded = (int) Math.ceil( (timeWanted - stat_err) / coeff );
+                    int runsNeeded = (int) Math.ceil( (finalTimeWanted - stat_err) / coeff );
                     float precision = settings.precisionFromRuns(runsNeeded);
                     smcEstimationIntervalWidth.setText(precisionFormat.format(precision));
+                    smcTimeExpected.setText(String.valueOf(finalTimeWanted));
+                    smcTimeEstimationButton.setText(UPDATE_PRECISION_BTN_TEXT);
                     updateSMCSettings();
                 }
             };
-            Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback2, guiModels, false, lens);
+            benchmarkThread = Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback2, guiModels, false, lens);
         };
-        Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback1, guiModels,false, lens);
+        benchmarkThread = Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback1, guiModels,false, lens);
+    }
+
+    private void updateFieldsOnBenchmark() {
+        smcConfidence.setEnabled(!doingBenchmark);
+        smcEstimationIntervalWidth.setEnabled(!doingBenchmark);
+        smcTimeExpected.setEnabled(!doingBenchmark);
+        smcParallel.setEnabled(!doingBenchmark);
+        smcSelector.setEnabled(!doingBenchmark);
+        smcVerificationType.setEnabled(!doingBenchmark);
+        smcStepBoundValue.setEnabled(!doingBenchmark);
+        smcStepBoundInfinite.setEnabled(!doingBenchmark);
+        smcTimeBoundValue.setEnabled(!doingBenchmark);
+        smcTimeBoundInfinite.setEnabled(!doingBenchmark);
     }
 
 }
