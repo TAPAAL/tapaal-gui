@@ -185,6 +185,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			String queryResult;
 			if (verificationResult.getQueryResult().isApproximationInconclusive()) {
 				queryResult = "Inconclusive";
+			} else if (verificationResult.getQueryResult().isQuantitative()) {
+				queryResult = verificationResult.getQueryResult().getProbabilityString();
 			} else {
 				queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
 				if (isSoundnessCheck && !verificationResult.isQuerySatisfied())

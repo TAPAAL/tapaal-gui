@@ -5,7 +5,7 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 
 public class QueryResult {
 	private final boolean satisfied;
-    private final String quantitativeResult;
+    private final QuantitativeResult quantitativeResult;
 	private boolean approximationInconclusive = false;
 	private final boolean discreteInclusion;
 	private final TAPNQuery query;
@@ -45,10 +45,10 @@ public class QueryResult {
 		this.boundednessAnalysis = boundednessAnalysis;
 		this.query = query;
 		this.discreteInclusion = discreteInclusion;
-        this.quantitativeResult = "";
+        this.quantitativeResult = null;
 	}
 
-    public QueryResult(String quantitativeResult, BoundednessAnalysisResult boundednessAnalysis, TAPNQuery query, boolean discreteInclusion){
+    public QueryResult(QuantitativeResult quantitativeResult, BoundednessAnalysisResult boundednessAnalysis, TAPNQuery query, boolean discreteInclusion){
         this.satisfied = true;
         this.boundednessAnalysis = boundednessAnalysis;
         this.query = query;
@@ -81,7 +81,7 @@ public class QueryResult {
 		StringBuilder buffer = new StringBuilder();
 		if(approximationInconclusive)
 			buffer.append(getInconclusiveString());
-		else if(this.quantitativeResult.isEmpty()) {
+		else if(this.quantitativeResult == null) {
 			buffer.append("Property is ");
 			buffer.append(satisfied ? "satisfied." : "not satisfied.");
 		} else {
@@ -149,6 +149,10 @@ public class QueryResult {
     }
 
     public boolean isQuantitative() {
-        return !quantitativeResult.isEmpty();
+        return quantitativeResult != null;
+    }
+
+    public String getProbabilityString() {
+        return quantitativeResult.getProbabilityString();
     }
 }
