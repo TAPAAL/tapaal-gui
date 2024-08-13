@@ -6,6 +6,8 @@ import net.tapaal.gui.petrinet.undo.AddConstantEditCommand;
 import net.tapaal.gui.petrinet.undo.RemoveConstantEditCommand;
 import net.tapaal.gui.petrinet.undo.UpdateConstantEditCommand;
 import net.tapaal.gui.petrinet.undo.Command;
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.util.StringComparator;
 
 public class ConstantStore {
@@ -70,6 +72,18 @@ public class ConstantStore {
 				throw new RuntimeException("An undefined constant " + cb.name()	+ " was used in an invariant.");
 		}
 
+		for (ColoredTimeInvariant cti : place.getCtiList()) {
+			if (cti.upperBound() instanceof ConstantBound) {
+				ConstantBound ctiCb = (ConstantBound) cti.upperBound();
+				if (containsConstantByName(ctiCb.name())) {
+					Constant ctiConstant = getConstantByName(ctiCb.name());
+					ctiConstant.setIsUsed(true);
+					if (!cti.isUpperNonstrict()) {
+						ctiConstant.setLowerBound(1);
+					}
+				}
+			}
+		}
 	}
 
 	public boolean containsConstantByName(String name) {
@@ -90,11 +104,19 @@ public class ConstantStore {
 	
 	private void buildConstraints(TimedInputArc inputArc) {
 		buildConstraintsFromTimeInterval(inputArc.interval());
+		for (ColoredTimeInterval cti : inputArc.getColorTimeIntervals()) {
+			buildConstraintsFromTimeInterval(cti);
+		}
+
 		buildConstraintsFromWeight(inputArc.getWeight());
 	}
 
 	private void buildConstraints(TransportArc transArc) {
 		buildConstraintsFromTimeInterval(transArc.interval());
+		for (ColoredTimeInterval cti : transArc.getColorTimeIntervals()) {
+			buildConstraintsFromTimeInterval(cti);
+		}
+
 		buildConstraintsFromWeight(transArc.getWeight());
 	}
 
