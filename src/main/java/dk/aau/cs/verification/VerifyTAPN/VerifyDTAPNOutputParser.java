@@ -10,6 +10,7 @@ import dk.aau.cs.TCTL.LTLFNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.*;
+import pipe.gui.graph.GraphPoint;
 
 public class VerifyDTAPNOutputParser {
 	private static final String Query_IS_NOT_SATISFIED_STRING = "Query is NOT satisfied";
@@ -35,6 +36,8 @@ public class VerifyDTAPNOutputParser {
     private static final Pattern smcVerificationTimePattern = Pattern.compile("\\s*verification time:\\s*([\\d\\.]+)\\s*");
     private static final Pattern smcAverageValidTimePattern = Pattern.compile("\\s*average time of a valid run:\\s*([\\d\\.]+)\\s*");
     private static final Pattern smcAverageValidLengthPattern = Pattern.compile("\\s*average length of a valid run:\\s*([\\d\\.]+)\\s*");
+	private static final Pattern smcCumulativeProbabilityStepPattern = Pattern.compile("\\s*cumulative probability / step :");
+	private static final Pattern smcCumulativeProbabilityDelayPattern = Pattern.compile("\\s*cumulative probability / delay :");
 
 	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (-?\\d*)");
 	private static final Pattern wfMaxExecutionPattern = Pattern.compile("Maximum execution time: (-?\\d*)");
@@ -73,6 +76,10 @@ public class VerifyDTAPNOutputParser {
         boolean isQuantitative = false;
         QuantitativeResult quantitativeResult = null;
 		String[] lines = output.split(System.getProperty("line.separator"));
+
+		List<GraphPoint> cumulativeStepPoints = new ArrayList<>();
+		List<GraphPoint> cumulativeDelayPoints = new ArrayList<>();
+
 		try {			
 			Matcher matcher = transitionStatsPattern.matcher(output);
 			while (matcher.find()) {
@@ -188,6 +195,27 @@ public class VerifyDTAPNOutputParser {
                         smcAverageValidLength = Float.parseFloat(matcher.group(1));
                     }
 
+					matcher = smcCumulativeProbabilityStepPattern.matcher(line);
+					if (matcher.find() && i < lines.length - 1) {
+						line = lines[i + 1];
+						String[] pointStrs = line.split(";");
+						for (String pointStr : pointStrs) {
+							String[] coordinates = pointStr.split(":");
+							GraphPoint point = new GraphPoint(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
+							cumulativeStepPoints.add(point);
+						}
+					}
+
+					matcher = smcCumulativeProbabilityDelayPattern.matcher(line);
+					if (matcher.find() && i < lines.length - 1) {
+						line = lines[i + 1];
+						String[] pointStrs = line.split(";");
+						for (String pointStr : pointStrs) {
+							String[] coordinates = pointStr.split(":");
+							GraphPoint point = new GraphPoint(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
+							cumulativeDelayPoints.add(point);
+						}
+					}	
 				}
 			}
 			
@@ -197,7 +225,7 @@ public class VerifyDTAPNOutputParser {
             Stats verifStats;
             QueryResult queryRes;
             if(isSmc)
-                verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength, smcVerificationTime);
+                verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength, smcVerificationTime, cumulativeStepPoints, cumulativeDelayPoints);
             else
                 verifStats = new Stats(discovered, explored, stored, transitionStats, placeBoundStats, WFminExecutionTime, WFmaxExecutionTime, coveredMarking);
             if(isQuantitative) {

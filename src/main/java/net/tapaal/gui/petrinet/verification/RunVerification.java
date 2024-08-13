@@ -23,6 +23,9 @@ import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
+import pipe.gui.graph.Graph;
+import pipe.gui.graph.GraphFrame;
+import pipe.gui.graph.GraphPoint;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
@@ -454,6 +457,31 @@ public class RunVerification extends RunVerificationBase {
                 panel.add(showRawQueryButton, gbc);
             }
 		}
+
+        if (modelChecker.supportsStats() && result.stats() instanceof SMCStats) {
+            SMCStats stats = (SMCStats)result.stats();
+
+            List<Graph> graphs = new ArrayList<>();
+
+            List<GraphPoint> cumulativeStepPoints = stats.getCumulativeStepPoints();
+            if (!cumulativeStepPoints.isEmpty()) {
+                graphs.add(new Graph("Step", cumulativeStepPoints));
+            }
+            
+            List<GraphPoint> cumulativeDelayPoints = stats.getCumulativeDelayPoints();
+            if (!cumulativeDelayPoints.isEmpty()) {
+                graphs.add(new Graph("Delay", cumulativeDelayPoints));
+            }  
+
+            if (!graphs.isEmpty()) {
+                GraphFrame graphFrame = new GraphFrame("SMC Statistics", graphs, "Cumulative Probability");
+    
+                JButton showGraphButton = new JButton("Show graph");
+                gbc = GridBagHelper.as(1, rowOffset+2, WEST, new Insets(0,0,10,0));
+                panel.add(showGraphButton, gbc);
+                showGraphButton.addActionListener(arg0 -> graphFrame.draw());
+            }
+        }
 
         if (result.isResolvedUsingSkeletonPreprocessor()) {
             gbc = GridBagHelper.as(0, rowOffset+2, GridBagHelper.Anchor.WEST, new Insets(0,0,15,0));
