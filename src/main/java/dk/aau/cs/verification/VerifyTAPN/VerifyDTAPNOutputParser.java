@@ -71,7 +71,7 @@ public class VerifyDTAPNOutputParser {
 		boolean discreteInclusion = false;
         boolean isSmc = false;
         boolean isQuantitative = false;
-        String quantitativeResult = "";
+        QuantitativeResult quantitativeResult = null;
 		String[] lines = output.split(System.getProperty("line.separator"));
 		try {			
 			Matcher matcher = transitionStatsPattern.matcher(output);
@@ -150,7 +150,7 @@ public class VerifyDTAPNOutputParser {
                         isQuantitative = true;
                         float smcEstimation = Float.parseFloat(matcher.group(1));
                         float smcEstimationWidth = Float.parseFloat(matcher.group(2));
-                        quantitativeResult = "The estimated probability of the property holding is " + smcEstimation + " ± " + smcEstimationWidth;
+                        quantitativeResult = new QuantitativeResult(smcEstimation, smcEstimationWidth);
                     }
 
                     matcher = smcExecutedRunsPattern.matcher(line);
