@@ -528,6 +528,7 @@ public class TAPNTransitionEditor extends JPanel {
         Probability weight = parseWeight();
         //TODO : Undo weight
         transition.underlyingTransition().setWeight(weight);
+        context.network().buildConstraints();
 
 		int rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {

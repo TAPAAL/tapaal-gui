@@ -726,6 +726,9 @@ public class QueryDialog extends JPanel {
 	}
 
     private void updateSMCSettings() {
+        DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
+        decimalFormatSymbols.setDecimalSeparator('.');
+        DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
         smcSettings.compareToFloat = smcVerificationType.getSelectedIndex() == 1;
         try {
             smcSettings.timeBound = smcTimeBoundInfinite.isSelected() ?
@@ -756,7 +759,7 @@ public class QueryDialog extends JPanel {
             smcSettings.estimationIntervalWidth = (doingBenchmark && !smcMustUpdateTime) ?
                 0.01f : Float.parseFloat(smcEstimationIntervalWidth.getText());
         } catch(NumberFormatException e) {
-            smcEstimationIntervalWidth.setText(String.valueOf(smcSettings.estimationIntervalWidth));
+            smcEstimationIntervalWidth.setText(precisionFormat.format(smcSettings.estimationIntervalWidth));
         }
         try {
             smcSettings.falsePositives = Float.parseFloat(smcFalsePositives.getText());
@@ -788,6 +791,10 @@ public class QueryDialog extends JPanel {
     private void setSMCSettings(SMCSettings settings) {
         smcSettings = settings;
 
+        DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
+        decimalFormatSymbols.setDecimalSeparator('.');
+        DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
+
         smcVerificationType.setSelectedIndex(settings.compareToFloat ? 1 : 0);
         smcTimeBoundValue.setText(smcSettings.timeBound < Integer.MAX_VALUE ?
             String.valueOf(smcSettings.timeBound) : "");
@@ -801,7 +808,7 @@ public class QueryDialog extends JPanel {
         smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
 
         smcConfidence.setText(String.valueOf(settings.confidence));
-        if(!doingBenchmark) smcEstimationIntervalWidth.setText(String.valueOf(settings.estimationIntervalWidth));
+        if(!doingBenchmark) smcEstimationIntervalWidth.setText(precisionFormat.format(settings.estimationIntervalWidth));
 
         smcFalsePositives.setText(String.valueOf(settings.falsePositives));
         smcFalseNegatives.setText(String.valueOf(settings.falseNegatives));
@@ -2046,7 +2053,7 @@ public class QueryDialog extends JPanel {
         JPanel topButtonPanel = new JPanel(new FlowLayout());
         topButtonPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         if (!lens.isTimed() && !lens.isGame()) topButtonPanel.add(queryType);
-        if (lens.isStochastic()) topButtonPanel.add(smcSelector);
+        if (lens.isStochastic() && tapnNetwork.isNonStrict()) topButtonPanel.add(smcSelector);
         topButtonPanel.add(advancedButton);
         topButtonPanel.add(infoButton);
 
@@ -6007,7 +6014,7 @@ public class QueryDialog extends JPanel {
                     double runsNeeded = (double) settings.chernoffHoeffdingBound();
                     double estimation = coeff * runsNeeded + stat_err;
                     smcTimeExpected.setText(timeFormat.format(estimation));
-                    smcEstimationIntervalWidth.setText(String.valueOf(smcSettings.estimationIntervalWidth));
+                    smcEstimationIntervalWidth.setText(precisionFormat.format(smcSettings.estimationIntervalWidth));
                     smcTimeEstimationButton.setText(UPDATE_VERIFICATION_TIME_BTN_TEXT);
                 } else {
                     int runsNeeded = (int) Math.ceil( (finalTimeWanted - stat_err) / coeff );

@@ -36,6 +36,10 @@ public class ConstantStore {
 				buildConstraints(place);
 			}
 
+            for (TimedTransition transition : tapn.transitions()) {
+                buildConstraints(transition);
+            }
+
 			for (TimedInputArc inputArc : tapn.inputArcs()) {
 				buildConstraints(inputArc);
 			}
@@ -85,6 +89,14 @@ public class ConstantStore {
 			}
 		}
 	}
+
+    public void buildConstraints(TimedTransition transition) {
+        Probability weight = transition.getWeight();
+        if(weight instanceof ConstantProbability) {
+            Constant constant = ((ConstantProbability) weight).constant();
+            constant.setIsUsed(true);
+        }
+    }
 
 	public boolean containsConstantByName(String name) {
 		for(Constant c : constants) {
