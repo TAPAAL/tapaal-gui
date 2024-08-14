@@ -24,7 +24,7 @@ import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.graph.Graph;
-import pipe.gui.graph.GraphFrame;
+import pipe.gui.graph.GraphDialog;
 import pipe.gui.graph.GraphPoint;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -37,8 +37,11 @@ import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.File;
-import java.util.*;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import static java.util.Objects.nonNull;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
@@ -474,12 +477,14 @@ public class RunVerification extends RunVerificationBase {
             }  
 
             if (!graphs.isEmpty()) {
-                GraphFrame graphFrame = new GraphFrame("SMC Statistics", graphs, "Cumulative Probability");
+                GraphDialog graphFrame = new GraphDialog(graphs, "SMC Statistics");
     
-                JButton showGraphButton = new JButton("Show graph");
+                String btnText = graphs.size() == 1 ? "Show graph" : "Show graphs";
+
+                JButton showGraphButton = new JButton(btnText);
                 gbc = GridBagHelper.as(1, rowOffset+2, WEST, new Insets(0,0,10,0));
                 panel.add(showGraphButton, gbc);
-                showGraphButton.addActionListener(arg0 -> graphFrame.draw());
+                showGraphButton.addActionListener(arg0 -> graphFrame.display());
             }
         }
 
