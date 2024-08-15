@@ -1,6 +1,7 @@
 package pipe.gui.graph;
 
 import java.util.List;
+import java.util.Collections;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -26,8 +27,9 @@ import pipe.gui.swingcomponents.EscapableDialog;
 public class GraphDialog extends EscapableDialog {
     private final List<Graph> graphs;
     
-    private boolean showLegend = false;
+    private boolean showLegend;
     private boolean piecewise;
+    private boolean pointPlot;
 
     public GraphDialog(List<Graph> graphs, String frameTitle) {
         super(TAPAALGUI.getAppGui(), frameTitle, true);
@@ -42,6 +44,15 @@ public class GraphDialog extends EscapableDialog {
     public GraphDialog(List<Graph> graphs, String frameTitle, boolean showLegend, boolean piecewise) {
         this(graphs, frameTitle, showLegend);
         this.piecewise = piecewise;
+    }
+
+    public GraphDialog(List<Graph> graphs, String frameTitle, boolean showLegend, boolean piecewise, boolean pointPlot) {
+        this(graphs, frameTitle, showLegend, piecewise);
+        this.pointPlot = pointPlot;
+    }
+
+    public GraphDialog(Graph graph, String frameTitle, boolean showLegend, boolean piecewise, boolean pointPlot) {
+        this(List.of(graph), frameTitle, showLegend, piecewise, pointPlot);
     }
 
     public GraphDialog(Graph graph, String frameTitle) {
@@ -61,7 +72,7 @@ public class GraphDialog extends EscapableDialog {
     }
 
     private void displayWithoutButtons() {
-        JFreeChart chart = createChart(graphs.get(0));
+        JFreeChart chart = createChart(graphs);
         ChartPanel chartPanel = createChartPanel(chart);
 
         setLayout(new BorderLayout());
@@ -76,7 +87,7 @@ public class GraphDialog extends EscapableDialog {
         JPanel buttonPanel = new JPanel();
 
         for (Graph graph : graphs) {
-            JFreeChart chart = createChart(graph);
+            JFreeChart chart = createChart(Collections.singletonList(graph));
             ChartPanel chartPanel = createChartPanel(chart);
 
             cardPanel.add(chartPanel, graph.getName());
@@ -115,9 +126,9 @@ public class GraphDialog extends EscapableDialog {
         buttonPanel.setBackground(Color.WHITE);
     }
 
-    private JFreeChart createChart(Graph graph) {
+    private JFreeChart createChart(List<Graph> graphs) {
         XYDataset dataset = constructDataset(graphs);
-        JFreeChart chart = ChartFactory.createXYLineChart(graph.getName(), graph.getXAxisLabel(), graph.getYAxisLabel(), dataset, PlotOrientation.VERTICAL, showLegend, true, false);
+        JFreeChart chart = ChartFactory.createXYLineChart(graphs.get(0).getName(), graphs.get(0).getXAxisLabel(), graphs.get(0).getYAxisLabel(), dataset, PlotOrientation.VERTICAL, showLegend, true, false);
 
         XYPlot plot = chart.getXYPlot();
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
@@ -125,7 +136,8 @@ public class GraphDialog extends EscapableDialog {
         float lineThickness = 3.0f;
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             renderer.setSeriesStroke(i, new BasicStroke(lineThickness));
-            renderer.setSeriesShapesVisible(i, false);
+            renderer.setSeriesShapesVisible(i, pointPlot);
+            renderer.setSeriesLinesVisible(i, !pointPlot);
             renderer.setSeriesPaint(i, lineColor);
         }
 

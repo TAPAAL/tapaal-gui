@@ -245,7 +245,7 @@ public class DistributionPanel extends JPanel {
             return new GraphDialog(graph, frameTitle);
         } else if (distribution instanceof SMCDiscreteUniformDistribution) {
             Graph graph = createGraph((SMCDiscreteUniformDistribution) distribution);
-            return new GraphDialog(graph, frameTitle);
+            return new GraphDialog(graph, frameTitle, false, false, true);
         } else if (distribution instanceof SMCExponentialDistribution) {
             Graph graph = createGraph((SMCExponentialDistribution) distribution);
             return new GraphDialog(graph, frameTitle);
@@ -276,6 +276,17 @@ public class DistributionPanel extends JPanel {
 
     private Graph createGraph(SMCDiscreteUniformDistribution distribution) {
         List<GraphPoint> points = new ArrayList<>();
+
+        LinkedHashMap<String, Double> params = distribution.getParameters();
+        double a = params.get("a");
+        double b = params.get("b");
+
+        double n = b - a + 1;
+
+        for (int x = (int)a; x <= (int)b; ++x) {
+            points.add(new GraphPoint(x, 1 / n));
+        }
+
         return new Graph("Discrete Uniform Distribution", points);
     }
 
@@ -285,8 +296,12 @@ public class DistributionPanel extends JPanel {
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double rate = params.get("rate");
 
-        for (int x = 0; x <= 100; x++) {
-            points.add(new GraphPoint(x, rate * Math.exp(-rate * x)));
+        int x = 0;
+        while (true) {
+            double y = rate * Math.exp(-rate * x);
+            if (y < 0.000001) break;
+            points.add(new GraphPoint(x, y));
+            ++x;
         }
 
         return new Graph("Exponential Distribution", points);
@@ -304,9 +319,12 @@ public class DistributionPanel extends JPanel {
         double gamma = spougeGammaApprox(shape - 1);
         double coefficient = 1 / (gamma * Math.pow(scale, shape));
         double step = 0.1;
-        for (double x = Double.MIN_VALUE; x <= 20; x += step) {
+        double x = 0;
+        while (true) {
             double y = coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
+            if (y < 0.000001) break;
             points.add(new GraphPoint(x, y));
+            x += step;	
         }
 
         return new Graph("Gamma Distribution", points);
