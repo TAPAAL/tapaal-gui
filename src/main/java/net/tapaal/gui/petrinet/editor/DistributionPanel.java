@@ -267,7 +267,7 @@ public class DistributionPanel extends JPanel {
         List<GraphPoint> points = new ArrayList<>();
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double value = params.get("value");
-        
+
         points.add(new GraphPoint(value, 0));
         points.add(new GraphPoint(value, 100));
 
@@ -280,6 +280,7 @@ public class DistributionPanel extends JPanel {
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double a = params.get("a");
         double b = params.get("b");
+        double mean = params.get("mean");
 
         double n = b - a + 1;
 
@@ -287,7 +288,7 @@ public class DistributionPanel extends JPanel {
             points.add(new GraphPoint(x, 1 / n));
         }
 
-        return new Graph("Discrete Uniform Distribution", points);
+        return new Graph("Discrete Uniform Distribution", points, mean);
     }
 
     private Graph createGraph(SMCExponentialDistribution distribution) {
@@ -295,6 +296,7 @@ public class DistributionPanel extends JPanel {
 
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double rate = params.get("rate");
+        double mean = params.get("mean");
 
         int x = 0;
         while (true) {
@@ -304,7 +306,7 @@ public class DistributionPanel extends JPanel {
             ++x;
         }
 
-        return new Graph("Exponential Distribution", points);
+        return new Graph("Exponential Distribution", points, mean);
     }
 
     private Graph createGraph(SMCGammaDistribution distribution) {
@@ -382,7 +384,7 @@ public class DistributionPanel extends JPanel {
             points.add(new GraphPoint(x, y));
         }
 
-        return new Graph("Normal Distribution", points);
+        return new Graph("Normal Distribution", points, mean);
     }
 
     private List<Graph> createGraphs(SMCUniformDistribution distribution) {
@@ -395,6 +397,7 @@ public class DistributionPanel extends JPanel {
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double a = params.get("a");
         double b = params.get("b");
+        double mean = params.get("mean");
 
         pointsG1.add(new GraphPoint(0, 0));
         pointsG1.add(new GraphPoint(a, 0));
@@ -403,7 +406,7 @@ public class DistributionPanel extends JPanel {
         pointsG3.add(new GraphPoint(b, 0));
         pointsG3.add(new GraphPoint(b + a, 0));
 
-        graphs.add(new Graph("Uniform Distribution", pointsG1));
+        graphs.add(new Graph("Uniform Distribution", pointsG1, mean));
         graphs.add(new Graph("piece2", pointsG2));
         graphs.add(new Graph("piece3", pointsG3));
 

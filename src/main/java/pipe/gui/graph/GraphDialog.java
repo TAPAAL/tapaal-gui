@@ -14,6 +14,8 @@ import javax.swing.JPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYLineAnnotation;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -30,6 +32,9 @@ public class GraphDialog extends EscapableDialog {
     private boolean showLegend;
     private boolean piecewise;
     private boolean pointPlot;
+    private boolean isStraight;
+    private double distanceToOrigin;
+    private Double mean;
 
     public GraphDialog(List<Graph> graphs, String frameTitle) {
         super(TAPAALGUI.getAppGui(), frameTitle, true);
@@ -90,7 +95,6 @@ public class GraphDialog extends EscapableDialog {
             JFreeChart chart = createChart(Collections.singletonList(graph));
             ChartPanel chartPanel = createChartPanel(chart);
 
-            
             String buttonText = graph.getButtonText();
             if (buttonText != null) {
                 cardPanel.add(chartPanel, buttonText);
@@ -138,9 +142,27 @@ public class GraphDialog extends EscapableDialog {
         JFreeChart chart = ChartFactory.createXYLineChart(graphs.get(0).getName(), graphs.get(0).getXAxisLabel(), graphs.get(0).getYAxisLabel(), dataset, PlotOrientation.VERTICAL, showLegend, true, false);
 
         XYPlot plot = chart.getXYPlot();
+        float lineThickness = 3.0f;
+
+        if (isStraight) {
+            ValueAxis domainAxis = plot.getDomainAxis();
+            domainAxis.setRange(distanceToOrigin - 1, distanceToOrigin + 1);
+        } else if (mean != null) {
+            ValueAxis rangeAxis = plot.getRangeAxis();
+            float[] dashPattern = { 5.0f, 5.0f };
+            BasicStroke dashed = new BasicStroke(lineThickness, 
+                                                BasicStroke.CAP_BUTT,
+                                                BasicStroke.JOIN_MITER, 
+                                                10.0f, 
+                                                dashPattern,
+                                                0.0f);
+
+            XYLineAnnotation annotation = new XYLineAnnotation(mean, 0, mean, rangeAxis.getUpperBound(), dashed, Color.BLACK);
+            plot.addAnnotation(annotation);
+        }
+
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         Color lineColor = Color.RED;
-        float lineThickness = 3.0f;
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             renderer.setSeriesStroke(i, new BasicStroke(lineThickness));
             renderer.setSeriesShapesVisible(i, pointPlot);
@@ -160,7 +182,21 @@ public class GraphDialog extends EscapableDialog {
         XYSeriesCollection dataset = new XYSeriesCollection();
         for (Graph graph : graphs) {
             XYSeries series = new XYSeries(graph.getName());
-            for (GraphPoint point : graph.getPoints()) {
+            List<GraphPoint> points = graph.getPoints();
+
+            if (!points.isEmpty()) {
+                double first = points.getFirst().getX();
+                double last = points.getLast().getX();
+
+                isStraight = (first - last == 0) && !piecewise;
+                distanceToOrigin = first;
+            }
+
+            if (graph.getMean() != null) {
+                mean = graph.getMean();
+            }
+
+            for (GraphPoint point : points) {
                 series.add(point.getX(), point.getY());
             }
             dataset.addSeries(series);
