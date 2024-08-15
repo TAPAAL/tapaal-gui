@@ -55,7 +55,7 @@ public class DistributionPanel extends JPanel {
         });
 
         distributionType = new JComboBox<>(continuous);
-        distributionShowGraph = new JButton("Show graph");
+        distributionShowGraph = new JButton("Plot density");
         distributionParam1Label = new JLabel();
         distributionParam2Label = new JLabel();
         distributionParam1Field = new JTextField();
@@ -238,7 +238,7 @@ public class DistributionPanel extends JPanel {
     }
 
     private GraphDialog createGraphDialog(SMCDistribution distribution) {
-        String frameTitle = "Distribution graph";
+        String frameTitle = "Probability Density Function";
         
         if (distribution instanceof SMCConstantDistribution) {
             Graph graph = createGraph((SMCConstantDistribution) distribution);
@@ -283,7 +283,7 @@ public class DistributionPanel extends JPanel {
 
         double n = b - a + 1;
 
-        for (int x = (int)a; x <= (int)b; ++x) {
+        for (int x = (int) a; x <= (int) b; ++x) {
             points.add(new GraphPoint(x, 1 / n));
         }
 
@@ -299,7 +299,7 @@ public class DistributionPanel extends JPanel {
         int x = 0;
         while (true) {
             double y = rate * Math.exp(-rate * x);
-            if (y < 0.000001) break;
+            if (y < 1e-6) break;
             points.add(new GraphPoint(x, y));
             ++x;
         }
@@ -319,10 +319,10 @@ public class DistributionPanel extends JPanel {
         double gamma = spougeGammaApprox(shape - 1);
         double coefficient = 1 / (gamma * Math.pow(scale, shape));
         double step = 0.1;
-        double x = 0;
+        double x = 1e-6;
         while (true) {
             double y = coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
-            if (y < 0.000001) break;
+            if (y < 1e-6) break;
             points.add(new GraphPoint(x, y));
             x += step;	
         }
