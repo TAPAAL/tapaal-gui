@@ -319,6 +319,8 @@ public class DistributionPanel extends JPanel {
         double gamma = spougeGammaApprox(shape - 1);
         double coefficient = 1 / (gamma * Math.pow(scale, shape));
         double step = 0.1;
+
+        // Start at some arbitrary small value to avoid division by zero
         double x = 1e-6;
         while (true) {
             double y = coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
