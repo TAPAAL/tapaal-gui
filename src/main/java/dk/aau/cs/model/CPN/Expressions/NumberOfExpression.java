@@ -182,7 +182,7 @@ public class NumberOfExpression extends ArcExpression {
         Vector<ColorExpression> colorExpressions = new Vector<>();
         ColorExpression colorExpression = color.get(0);
 
-        if (colorExpression.colorType == null || colorExpression.colorType.getName().equals(ct.getName()) || colorInColorType(colorExpression, ct)) {
+        if (colorExpression instanceof AllExpression || colorExpression.colorType == null || colorExpression.colorType.getName().equals(ct.getName()) || colorInColorType(colorExpression, ct)) {
             colorExpressions.add(colorExpression.getExprWithNewColorType(ct));
         } else {
             colorExpressions.add(colorExpression);
