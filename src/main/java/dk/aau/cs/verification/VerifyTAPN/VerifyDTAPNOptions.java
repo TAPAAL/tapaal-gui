@@ -146,8 +146,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			result.append(gcd ? " --gcd-lower " : ""); // GCD optimization is not sound for workflow analysis
 		}
 
-        result.append(parallel ? "--parallel " : "");
-        result.append(benchmark ? "--benchmark " + benchmarkRuns + " " : "");
+        result.append(parallel ? "--smc-parallel " : "");
+        result.append(benchmark ? "--smc-benchmark " + benchmarkRuns + " " : "");
 
 		return result.toString();
 	}

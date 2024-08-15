@@ -343,7 +343,6 @@ public class NewTAPNPanel extends EscapableDialog {
         gbc.insets = new Insets(3, 3, 3, 3);
         isStochasticPanel.add(stochasticNet, gbc);
         isStochasticRadioButtonGroup.add(stochasticNet);
-        stochasticNet.setEnabled(false);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -354,25 +353,21 @@ public class NewTAPNPanel extends EscapableDialog {
 
         var refreshOthers = new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                gameNet.setEnabled(!stochasticNet.isSelected());
-                untimedNet.setEnabled(!stochasticNet.isSelected());
+                if(stochasticNet.isSelected()) {
+                    nonGameNet.setSelected(true);
+                    timedNet.setSelected(true);
+                }
             }
         };
         var refreshStochastic = new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                stochasticNet.setEnabled(
-                    timedNet.isSelected() && nonGameNet.isSelected()
-                );
+                if(gameNet.isSelected()) nonStochasticNet.setSelected(true);
+                if(untimedNet.isSelected()) nonStochasticNet.setSelected(true);
             }
         };
         stochasticNet.addActionListener(refreshOthers);
-        nonStochasticNet.addActionListener(refreshOthers);
-        timedNet.addActionListener(refreshStochastic);
         untimedNet.addActionListener(refreshStochastic);
         gameNet.addActionListener(refreshStochastic);
-        nonGameNet.addActionListener(refreshStochastic);
-        coloredNet.addActionListener(refreshStochastic);
-        nonColorNet.addActionListener(refreshStochastic);
     }
 
     public void setName(String name){

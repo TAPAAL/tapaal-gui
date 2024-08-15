@@ -13,6 +13,8 @@ public class SMCStats extends Stats {
     private float verificationTime;
     private float averageValidRunTime = -1.0f;
     private float averageValidRunLength = -1.0f;
+    private float validRunTimeStdDev = -1.0f;
+    private float validRunLengthStdDev = -1.0f;
 
     private List<GraphPoint> cumulativeStepPoints;
     private List<GraphPoint> cumulativeDelayPoints;
@@ -64,12 +66,20 @@ public class SMCStats extends Stats {
             averageRunLength +
             (averageValidRunTime >= 0 ?
                 System.getProperty("line.separator") +
-                "Average valid run duration: " +
+                "Valid run duration (average): " +
                 averageValidRunTime : "") +
+            (validRunTimeStdDev >= 0 ?
+                System.getProperty("line.separator") +
+                    "Valid run duration (standard deviation): " +
+                    validRunTimeStdDev : "") +
             (averageValidRunLength >= 0 ?
                 System.getProperty("line.separator") +
-                "Average transitions fired per valid run: " +
-                averageValidRunLength : "");
+                "Transitions fired per valid run (average): " +
+                averageValidRunLength : "") +
+            (validRunLengthStdDev >= 0 ?
+                System.getProperty("line.separator") +
+                    "Transitions fired per valid run (standard deviation): " +
+                    validRunLengthStdDev : "");
     }
 
     public float getAverageValidRunTime() {
@@ -88,11 +98,28 @@ public class SMCStats extends Stats {
         this.averageValidRunLength = averageValidRunLength;
     }
 
+
     public List<GraphPoint> getCumulativeStepPoints() {
         return cumulativeStepPoints;
     }
 
     public List<GraphPoint> getCumulativeDelayPoints() {
         return cumulativeDelayPoints;
+    }
+
+    public float getValidRunTimeStdDev() {
+        return validRunTimeStdDev;
+    }
+
+    public void setValidRunTimeStdDev(float validRunTimeStdDev) {
+        this.validRunTimeStdDev = validRunTimeStdDev;
+    }
+
+    public float getValidRunLengthStdDev() {
+        return validRunLengthStdDev;
+    }
+
+    public void setValidRunLengthStdDev(float validRunLengthStdDev) {
+        this.validRunLengthStdDev = validRunLengthStdDev;
     }
 }
