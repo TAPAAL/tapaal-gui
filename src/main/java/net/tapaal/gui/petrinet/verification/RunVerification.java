@@ -184,7 +184,7 @@ public class RunVerification extends RunVerificationBase {
         String[] statsStrings = stats.split(System.getProperty("line.separator"));
 
         for (int i = 0; i < statsStrings.length; i++) {
-            GridBagConstraints gbc = GridBagHelper.as(i / 4, (i%4)+startOffset, WEST, new Insets(0,0,0,0));
+            GridBagConstraints gbc = GridBagHelper.as(i / 4, (i%4)+startOffset, WEST, new Insets(0, i >= 4 ? 10 : 0,0,0));
             JLabel statLabel = new JLabel(statsStrings[i]);
             if(explanations.length > i)
                 statLabel.setToolTipText(explanations[i]);

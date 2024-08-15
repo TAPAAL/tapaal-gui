@@ -57,19 +57,19 @@ public class SMCStats extends Stats {
             averageRunLength +
             (averageValidRunTime >= 0 ?
                 System.getProperty("line.separator") +
-                "Average valid run duration: " +
+                "Valid run duration (average): " +
                 averageValidRunTime : "") +
             (validRunTimeStdDev >= 0 ?
                 System.getProperty("line.separator") +
-                    "Valid runs duration standard deviation: " +
+                    "Valid run duration (standard deviation): " +
                     validRunTimeStdDev : "") +
             (averageValidRunLength >= 0 ?
                 System.getProperty("line.separator") +
-                "Average transitions fired per valid run: " +
+                "Transitions fired per valid run (average): " +
                 averageValidRunLength : "") +
             (validRunLengthStdDev >= 0 ?
                 System.getProperty("line.separator") +
-                    "Valid runs transitions fired standard deviation: " +
+                    "Transitions fired per valid run (standard deviation): " +
                     validRunLengthStdDev : "");
     }
 
