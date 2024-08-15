@@ -468,12 +468,12 @@ public class RunVerification extends RunVerificationBase {
 
             List<GraphPoint> cumulativeStepPoints = stats.getCumulativeStepPoints();
             if (!cumulativeStepPoints.isEmpty()) {
-                graphs.add(new Graph("Step", cumulativeStepPoints));
+                graphs.add(new Graph("Cumulative Probability / Step", cumulativeStepPoints));
             }
             
             List<GraphPoint> cumulativeDelayPoints = stats.getCumulativeDelayPoints();
             if (!cumulativeDelayPoints.isEmpty()) {
-                graphs.add(new Graph("Delay", cumulativeDelayPoints));
+                graphs.add(new Graph("Cumulative Probability / Delay", cumulativeDelayPoints));
             }  
 
             if (!graphs.isEmpty()) {
