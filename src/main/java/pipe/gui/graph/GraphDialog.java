@@ -90,8 +90,15 @@ public class GraphDialog extends EscapableDialog {
             JFreeChart chart = createChart(Collections.singletonList(graph));
             ChartPanel chartPanel = createChartPanel(chart);
 
-            cardPanel.add(chartPanel, graph.getName());
-            addButton(buttonPanel, cardLayout, cardPanel, graph.getName());
+            
+            String buttonText = graph.getButtonText();
+            if (buttonText != null) {
+                cardPanel.add(chartPanel, buttonText);
+                addButton(buttonPanel, cardLayout, cardPanel, buttonText);
+            } else {
+                cardPanel.add(chartPanel, graph.getName());
+                addButton(buttonPanel, cardLayout, cardPanel, graph.getName());
+            }
         }
 
         setLayout(new BorderLayout());
@@ -113,12 +120,12 @@ public class GraphDialog extends EscapableDialog {
         return chartPanel;
     }
 
-    private void addButton(JPanel buttonPanel, CardLayout cardLayout, JPanel cardPanel, String graphName) {
-        JButton button = new JButton(graphName);
+    private void addButton(JPanel buttonPanel, CardLayout cardLayout, JPanel cardPanel, String buttonText) {
+        JButton button = new JButton(buttonText);
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cardLayout.show(cardPanel, graphName);
+                cardLayout.show(cardPanel, buttonText);
             }
         });
 
