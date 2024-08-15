@@ -23,6 +23,9 @@ import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
+import pipe.gui.graph.Graph;
+import pipe.gui.graph.GraphDialog;
+import pipe.gui.graph.GraphPoint;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
@@ -34,8 +37,11 @@ import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.File;
-import java.util.*;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import static java.util.Objects.nonNull;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
@@ -454,6 +460,33 @@ public class RunVerification extends RunVerificationBase {
                 panel.add(showRawQueryButton, gbc);
             }
 		}
+
+        if (modelChecker.supportsStats() && result.stats() instanceof SMCStats) {
+            SMCStats stats = (SMCStats)result.stats();
+
+            List<Graph> graphs = new ArrayList<>();
+
+            List<GraphPoint> cumulativeStepPoints = stats.getCumulativeStepPoints();
+            if (!cumulativeStepPoints.isEmpty()) {
+                graphs.add(new Graph("Cumulative Probability / Step", cumulativeStepPoints, "Number of Steps", "Cumulative Probability", "Step"));
+            }
+            
+            List<GraphPoint> cumulativeDelayPoints = stats.getCumulativeDelayPoints();
+            if (!cumulativeDelayPoints.isEmpty()) {
+                graphs.add(new Graph("Cumulative Probability / Delay", cumulativeDelayPoints, "Time", "Cumulative Probability", "Delay"));
+            }  
+
+            if (!graphs.isEmpty()) {
+                GraphDialog graphFrame = new GraphDialog(graphs, "SMC Statistics");
+    
+                String btnText = graphs.size() == 1 ? "Show graph" : "Show graphs";
+
+                JButton showGraphButton = new JButton(btnText);
+                gbc = GridBagHelper.as(1, rowOffset+2, WEST, new Insets(0,0,10,0));
+                panel.add(showGraphButton, gbc);
+                showGraphButton.addActionListener(arg0 -> graphFrame.display());
+            }
+        }
 
         if (result.isResolvedUsingSkeletonPreprocessor()) {
             gbc = GridBagHelper.as(0, rowOffset+2, GridBagHelper.Anchor.WEST, new Insets(0,0,15,0));
