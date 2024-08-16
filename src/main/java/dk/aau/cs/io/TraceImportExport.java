@@ -21,6 +21,7 @@ import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
@@ -41,6 +42,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TraceImportExport {
 
@@ -94,40 +97,61 @@ public class TraceImportExport {
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
         document = builder.newDocument();
 
-        Element traceRootNode = document.createElement("trace"); // Trace Top Level
-        document.appendChild(traceRootNode);
+        Map<String, TAPNNetworkTrace> traces = new HashMap<>();
+        traces.putAll(tab.getAnimator().getTraceMap());
 
+        boolean hasMultipleTraces = traces.size() > 1;
+        
         // Output the trace to XML document
+        Element traceListRootNode = null;
+        Element traceRootNode = null;
+        if (hasMultipleTraces)  {
+            traceListRootNode = document.createElement("trace-list");
+            document.appendChild(traceListRootNode);
+        } else {
+            traceRootNode = document.createElement("trace");
+            document.appendChild(traceRootNode);
+        }
+
         TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), tab.getGuiModels(), tab.getLens(), false, true);
-
-        for (TAPNNetworkTraceStep step : tab.getAnimator().getActionHistory()) {
-            if (step.isLoopStep()) {
-                Element loopElement = document.createElement("loop");
-                traceRootNode.appendChild(loopElement);
+        
+        for (Map.Entry<String, TAPNNetworkTrace> trace : traces.entrySet()) {
+            if (hasMultipleTraces) {
+                traceRootNode = document.createElement("trace");
+                traceListRootNode.appendChild(traceRootNode);
             }
 
-            if (step instanceof TAPNNetworkTimedTransitionStep) {
-                TimedTransition transition = ((TAPNNetworkTimedTransitionStep) step).getTransition();
-                Element transitionElement = document.createElement("transition"); // Create transition
-                transitionElement.setAttribute("id", composer.composedTransitionName(transition));
-                traceRootNode.appendChild(transitionElement);
-
-                List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens();
-                for (TimedToken token : consumedTokens) {
-                    Element tokenElement = document.createElement("token");
-                    tokenElement.setAttribute("place", composer.composedPlaceName(token.place()));
-                    tokenElement.setAttribute("age", token.age().toString());
-                    transitionElement.appendChild(tokenElement);
+            traceRootNode.setAttribute("name", trace.getKey());
+            
+            for (TAPNNetworkTraceStep step : trace.getValue()) {
+                if (step.isLoopStep()) {
+                    Element loopElement = document.createElement("loop");
+                    traceRootNode.appendChild(loopElement);
                 }
+    
+                if (step instanceof TAPNNetworkTimedTransitionStep) {
+                    TimedTransition transition = ((TAPNNetworkTimedTransitionStep) step).getTransition();
+                    Element transitionElement = document.createElement("transition"); // Create transition
+                    transitionElement.setAttribute("id", composer.composedTransitionName(transition));
+                    traceRootNode.appendChild(transitionElement);
+    
+                    List<TimedToken> consumedTokens = ((TAPNNetworkTimedTransitionStep) step).getConsumedTokens();
+                    for (TimedToken token : consumedTokens) {
+                        Element tokenElement = document.createElement("token");
+                        tokenElement.setAttribute("place", composer.composedPlaceName(token.place()));
+                        tokenElement.setAttribute("age", token.age().toString());
+                        transitionElement.appendChild(tokenElement);
+                    }
+                }
+    
+                if (step instanceof TAPNNetworkTimeDelayStep) {
+                    BigDecimal delay = ((TAPNNetworkTimeDelayStep) step).getDelay();
+                    Element delayElement = document.createElement("delay"); // Create delay
+                    traceRootNode.appendChild(delayElement);
+                    delayElement.setTextContent(delay.toString());
+                }
+    
             }
-
-            if (step instanceof TAPNNetworkTimeDelayStep) {
-                BigDecimal delay = ((TAPNNetworkTimeDelayStep) step).getDelay();
-                Element delayElement = document.createElement("delay"); // Create delay
-                traceRootNode.appendChild(delayElement);
-                delayElement.setTextContent(delay.toString());
-            }
-
         }
 
         if (tab.getAnimator().getTrace() != null && tab.getAnimator().getTrace().getTraceType() == EG_DELAY_FOREVER) {
