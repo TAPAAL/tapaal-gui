@@ -237,9 +237,10 @@ public class GraphDialog extends EscapableDialog {
             for (GraphPoint point : points) {
                 series.add(point.getX(), point.getY());
             }
-            
+
             dataset.addSeries(series);
         }
+        
         return dataset;
     }
 }
