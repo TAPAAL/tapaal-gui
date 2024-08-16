@@ -138,9 +138,6 @@ public class AllExpression extends ColorExpression {
 
     @Override
     public ColorExpression getExprWithNewColorType(ColorType ct) {
-        if (sort.getName().equals(ct.getName())) {
-            return new AllExpression(ct);
-        }
-        return deepCopy();
+        return new AllExpression(ct);
     }
 }

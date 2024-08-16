@@ -8,6 +8,7 @@ public class SMCExponentialDistribution extends SMCDistribution {
 
     public SMCExponentialDistribution(double rate) {
         this.rate = rate;
+        this.mean = 1.0 / rate;
     }
 
     @Override
@@ -19,6 +20,7 @@ public class SMCExponentialDistribution extends SMCDistribution {
     public LinkedHashMap<String, Double> getParameters() {
         LinkedHashMap<String, Double> params = new LinkedHashMap<>();
         params.put("rate", rate);
+        params.put("mean", mean);
         return params;
     }
 
@@ -27,7 +29,7 @@ public class SMCExponentialDistribution extends SMCDistribution {
         return "<html>" +
             "Memoryless distribution, <br/>" +
             "probability of the distance between events occurring according to a real rate.<br/>" +
-            "Mean : " + (1.0 / this.rate) +
+            "Mean : " + mean +
             "</html>";
     }
 
@@ -36,5 +38,7 @@ public class SMCExponentialDistribution extends SMCDistribution {
     }
 
     public double rate;
+
+    private final double mean;
 
 }

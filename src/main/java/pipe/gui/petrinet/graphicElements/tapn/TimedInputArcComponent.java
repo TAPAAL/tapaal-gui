@@ -100,7 +100,9 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                     }
                 }
                 getNameLabel().setText(arcPrint.toString());
-            } else if (!TAPAALGUI.getAppGui().showZeroToInfinityIntervals() || (lens != null && !lens.isTimed())) {
+            }
+            
+            if (!TAPAALGUI.getAppGui().showZeroToInfinityIntervals() || (lens != null && !lens.isTimed())) {
                 if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
                     getNameLabel().setText("");
                 }

@@ -5309,6 +5309,7 @@ public class QueryDialog extends JPanel {
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                     enableOnlyStateButtons();
                 }
+                updateQueryButtonsAccordingToSelection();
             } else {
                 enableOnlyUntimedStateButtons();
                 updateQueryButtonsAccordingToSelection();
