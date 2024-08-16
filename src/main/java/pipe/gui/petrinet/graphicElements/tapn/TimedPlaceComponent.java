@@ -448,8 +448,11 @@ public class TimedPlaceComponent extends Place {
 
                 if (isTimed()) {
                     //Add default invariant
-                    buffer.append("\nInv: ");
-                    buffer.append(place.invariant().toString(displayConstantNames));
+                    if (!(place.invariant().upperBound() instanceof InfBound)) {
+                        buffer.append("\nInv: ");
+                        buffer.append(place.invariant().toString(displayConstantNames));
+                    }
+                    
                     if (place.getCtiList() != null) {
                         //Add color specific invariants
                         for (ColoredTimeInvariant cti : place.getCtiList()) {
