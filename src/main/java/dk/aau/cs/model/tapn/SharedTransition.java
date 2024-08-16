@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
@@ -19,7 +20,7 @@ public class SharedTransition {
 	private boolean isUncontrollable = false;
     private SMCDistribution distribution = SMCDistribution.defaultDistribution();
     private Probability weight = new DoubleProbability(1.0);
-	private FiringMode firingMode = null;
+	private FiringMode firingMode = new OldestFiringMode();
 	private GuardExpression guard = null;
 
 	private TimedArcPetriNetNetwork network;
