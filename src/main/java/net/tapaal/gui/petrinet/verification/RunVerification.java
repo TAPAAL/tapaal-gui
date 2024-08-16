@@ -26,6 +26,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.graph.Graph;
 import pipe.gui.graph.GraphDialog;
 import pipe.gui.graph.GraphPoint;
+import pipe.gui.graph.GraphDialog.GraphDialogBuilder;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
@@ -477,7 +478,8 @@ public class RunVerification extends RunVerificationBase {
             }
 
             if (!graphs.isEmpty()) {
-                GraphDialog graphFrame = new GraphDialog(graphs, "SMC Statistics");
+                GraphDialogBuilder builder = new GraphDialogBuilder();
+                GraphDialog graphFrame = builder.addGraphs(graphs).setTitle("SMC Statistics").build();
     
                 String btnText = "Plot cumulative statistics";
 

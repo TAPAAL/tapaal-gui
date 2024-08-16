@@ -9,6 +9,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.graph.Graph;
 import pipe.gui.graph.GraphDialog;
 import pipe.gui.graph.GraphPoint;
+import pipe.gui.graph.GraphDialog.GraphDialogBuilder;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.swingcomponents.EscapableDialog;
 
@@ -238,36 +239,37 @@ public class DistributionPanel extends JPanel {
     }
 
     private GraphDialog createGraphDialog(SMCDistribution distribution) {
-        String frameTitle = "Probability Density Function";
-        
+        String title = "Probability Density Function";
+        GraphDialogBuilder builder = new GraphDialogBuilder();
+
         if (distribution instanceof SMCConstantDistribution) {
             Graph graph = createGraph((SMCConstantDistribution) distribution);
-            return new GraphDialog(graph, frameTitle);
+            builder = builder.addGraph(graph).setTitle(title);
         } else if (distribution instanceof SMCDiscreteUniformDistribution) {
             Graph graph = createGraph((SMCDiscreteUniformDistribution) distribution);
-            return new GraphDialog(graph, frameTitle, false, false, true);
+            builder = builder.addGraph(graph).setPointPlot(true);
         } else if (distribution instanceof SMCExponentialDistribution) {
             Graph graph = createGraph((SMCExponentialDistribution) distribution);
-            return new GraphDialog(graph, frameTitle);
+            builder = builder.addGraph(graph);
         } else if (distribution instanceof SMCGammaDistribution) {
             Graph graph = createGraph((SMCGammaDistribution) distribution);
-            return new GraphDialog(graph, frameTitle);
+            builder = builder.addGraph(graph);
         } else if (distribution instanceof SMCNormalDistribution) {
             Graph graph = createGraph((SMCNormalDistribution) distribution);
-            return new GraphDialog(graph, frameTitle);
+            builder = builder.addGraph(graph).setTitle(title);
         } else if (distribution instanceof SMCUniformDistribution) {
             List<Graph> graphs = createGraphs((SMCUniformDistribution) distribution);
-            return new GraphDialog(graphs, frameTitle, false, true);
+            builder = builder.addGraphs(graphs).setPiecewise(true);
         }
 
-        return null;
+        return builder.setTitle(title).build();
     }
 
     private Graph createGraph(SMCConstantDistribution distribution) {
         List<GraphPoint> points = new ArrayList<>();
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double value = params.get("value");
-        
+
         points.add(new GraphPoint(value, 0));
         points.add(new GraphPoint(value, 100));
 
@@ -280,6 +282,7 @@ public class DistributionPanel extends JPanel {
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double a = params.get("a");
         double b = params.get("b");
+        double mean = params.get("mean");
 
         double n = b - a + 1;
 
@@ -287,7 +290,7 @@ public class DistributionPanel extends JPanel {
             points.add(new GraphPoint(x, 1 / n));
         }
 
-        return new Graph("Discrete Uniform Distribution", points);
+        return new Graph("Discrete Uniform Distribution", points, mean);
     }
 
     private Graph createGraph(SMCExponentialDistribution distribution) {
@@ -295,6 +298,7 @@ public class DistributionPanel extends JPanel {
 
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double rate = params.get("rate");
+        double mean = params.get("mean");
 
         int x = 0;
         while (true) {
@@ -304,7 +308,7 @@ public class DistributionPanel extends JPanel {
             ++x;
         }
 
-        return new Graph("Exponential Distribution", points);
+        return new Graph("Exponential Distribution", points, mean);
     }
 
     private Graph createGraph(SMCGammaDistribution distribution) {
@@ -382,7 +386,7 @@ public class DistributionPanel extends JPanel {
             points.add(new GraphPoint(x, y));
         }
 
-        return new Graph("Normal Distribution", points);
+        return new Graph("Normal Distribution", points, mean);
     }
 
     private List<Graph> createGraphs(SMCUniformDistribution distribution) {
@@ -395,6 +399,7 @@ public class DistributionPanel extends JPanel {
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double a = params.get("a");
         double b = params.get("b");
+        double mean = params.get("mean");
 
         pointsG1.add(new GraphPoint(0, 0));
         pointsG1.add(new GraphPoint(a, 0));
@@ -403,7 +408,7 @@ public class DistributionPanel extends JPanel {
         pointsG3.add(new GraphPoint(b, 0));
         pointsG3.add(new GraphPoint(b + a, 0));
 
-        graphs.add(new Graph("Uniform Distribution", pointsG1));
+        graphs.add(new Graph("Uniform Distribution", pointsG1, mean));
         graphs.add(new Graph("piece2", pointsG2));
         graphs.add(new Graph("piece3", pointsG3));
 

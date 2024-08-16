@@ -9,6 +9,7 @@ public class SMCDiscreteUniformDistribution extends SMCDistribution {
     public SMCDiscreteUniformDistribution(double a, double b) {
         this.a = a;
         this.b = b;
+        this.mean = (a + b) / 2.0;
     }
 
     @Override
@@ -21,6 +22,7 @@ public class SMCDiscreteUniformDistribution extends SMCDistribution {
         LinkedHashMap<String, Double> params = new LinkedHashMap<>();
         params.put("a", a);
         params.put("b", b);
+        params.put("mean", mean);
         return params;
     }
 
@@ -29,7 +31,7 @@ public class SMCDiscreteUniformDistribution extends SMCDistribution {
         return "<html>" +
             "Will choose an integer point between two numbers A and B (B included), <br/>" +
             "where every number the same probability of being chosen.<br/>" +
-            "Mean : " + ((this.b - this.a) / 2.0) +
+            "Mean : " + mean +
             "</html>";
     }
 
@@ -40,4 +42,5 @@ public class SMCDiscreteUniformDistribution extends SMCDistribution {
     public double a;
     public double b;
 
+    private final double mean;
 }
