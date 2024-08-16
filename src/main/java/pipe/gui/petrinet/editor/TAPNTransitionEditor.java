@@ -12,9 +12,15 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
+import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
+import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import net.tapaal.gui.petrinet.editor.DistributionPanel;
 import net.tapaal.gui.petrinet.undo.*;
 import net.tapaal.swinghelpers.GridBagHelper;
+import net.tapaal.swinghelpers.GridBagHelper.Anchor;
+import net.tapaal.swinghelpers.GridBagHelper.Fill;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import net.tapaal.gui.petrinet.editor.ColoredTransitionGuardPanel;
@@ -94,6 +100,8 @@ public class TAPNTransitionEditor extends JPanel {
         constantsComboBox = new JComboBox<>(new DefaultComboBoxModel<>(constants.toArray(new String[0])));
         useConstantWeight.setEnabled(!constants.isEmpty());
         useConstantWeight.addActionListener(act -> displayWeight(parseWeight()));
+		
+		firingModeComboBox = new JComboBox<>(new FiringMode[]{new OldestFiringMode(), new YoungestFiringMode(), new RandomFiringMode()});
 
         distributionPanel = new DistributionPanel(transition, dialog);
 
@@ -219,6 +227,11 @@ public class TAPNTransitionEditor extends JPanel {
             infiniteWeight.setToolTipText("Selecting weight as an infinity gives an absolute priority of the transition firing in case of several transitions scheduled at the same time");
             infiniteWeight.addActionListener(act -> weightField.setEnabled(!infiniteWeight.isSelected()));
 
+			String firingModeTooltip = "The firing mode of the transition";
+			JLabel firingModeLabel = new JLabel("Firing mode :");
+
+
+
             transitionEditorPanel.add(weightLabel, gridBagConstraints);
             gridBagConstraints.gridx++;
             transitionEditorPanel.add(weightField, gridBagConstraints);
@@ -227,6 +240,11 @@ public class TAPNTransitionEditor extends JPanel {
             transitionEditorPanel.add(infiniteWeight, gridBagConstraints);
             gridBagConstraints.gridx++;
             transitionEditorPanel.add(useConstantWeight, gridBagConstraints);
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy++;
+			transitionEditorPanel.add(firingModeLabel, gridBagConstraints);
+			gridBagConstraints.gridx++;
+			transitionEditorPanel.add(firingModeComboBox, gridBagConstraints);
         }
 
         gridBagConstraints = GridBagHelper.as(0, 5, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
@@ -314,6 +332,19 @@ public class TAPNTransitionEditor extends JPanel {
         if(context.tabContent().getLens().isStochastic()) {
             distributionPanel.displayDistribution();
             displayWeight();
+
+			if (transition.underlyingTransition().getFiringMode() == null) {
+				firingModeComboBox.setSelectedIndex(0);
+			} else {
+				FiringMode firingMode = transition.underlyingTransition().getFiringMode();
+
+				for (int i = 0; i < firingModeComboBox.getItemCount(); i++) {
+					if (firingModeComboBox.getItemAt(i).toString().equals(firingMode.toString())) {
+						firingModeComboBox.setSelectedIndex(i);
+						break;
+					}
+				}
+			}
         }
 
 		if(transition.underlyingTransition().isShared()){
@@ -528,6 +559,7 @@ public class TAPNTransitionEditor extends JPanel {
         Probability weight = parseWeight();
         //TODO : Undo weight
         transition.underlyingTransition().setWeight(weight);
+		transition.underlyingTransition().setFiringMode((FiringMode)firingModeComboBox.getSelectedItem());
         context.network().buildConstraints();
 
 		int rotationIndex = rotationComboBox.getSelectedIndex();
@@ -652,6 +684,7 @@ public class TAPNTransitionEditor extends JPanel {
     private JCheckBox infiniteWeight;
     private JCheckBox useConstantWeight;
     private JComboBox<String> constantsComboBox;
+	private JComboBox<FiringMode> firingModeComboBox;
 
     private DistributionPanel distributionPanel;
 

@@ -20,8 +20,11 @@ public class SMCExponentialDistribution extends SMCDistribution {
     public LinkedHashMap<String, Double> getParameters() {
         LinkedHashMap<String, Double> params = new LinkedHashMap<>();
         params.put("rate", rate);
-        params.put("mean", mean);
         return params;
+    }
+
+    public double getMean() {
+        return mean;
     }
 
     @Override

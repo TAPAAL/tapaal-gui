@@ -282,7 +282,7 @@ public class DistributionPanel extends JPanel {
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double a = params.get("a");
         double b = params.get("b");
-        double mean = params.get("mean");
+        double mean = distribution.getMean();
 
         double n = b - a + 1;
 
@@ -298,7 +298,7 @@ public class DistributionPanel extends JPanel {
 
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double rate = params.get("rate");
-        double mean = params.get("mean");
+        double mean = distribution.getMean();
 
         int x = 0;
         while (true) {
@@ -368,7 +368,7 @@ public class DistributionPanel extends JPanel {
         List<GraphPoint> points = new ArrayList<>();
 
         LinkedHashMap<String, Double> params = distribution.getParameters();
-        double mean = params.get("mean");
+        double mean = distribution.getMean();
         double stddev = params.get("stddev");
         double variance = Math.pow(stddev, 2);
         
@@ -399,7 +399,7 @@ public class DistributionPanel extends JPanel {
         LinkedHashMap<String, Double> params = distribution.getParameters();
         double a = params.get("a");
         double b = params.get("b");
-        double mean = params.get("mean");
+        double mean = distribution.getMean();
 
         pointsG1.add(new GraphPoint(0, 0));
         pointsG1.add(new GraphPoint(a, 0));

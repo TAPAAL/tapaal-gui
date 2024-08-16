@@ -22,8 +22,11 @@ public class SMCUniformDistribution extends SMCDistribution {
         LinkedHashMap<String, Double> params = new LinkedHashMap<>();
         params.put("a", a);
         params.put("b", b);
-        params.put("mean", mean);
         return params;
+    }
+
+    public double getMean() {
+        return mean;
     }
 
     @Override
