@@ -1,6 +1,7 @@
 package pipe.gui.graph;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -8,12 +9,16 @@ import java.awt.Color;
 import java.awt.BasicStroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Shape;
+import java.awt.geom.Line2D;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.LegendItem;
+import org.jfree.chart.LegendItemCollection;
 import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
@@ -36,36 +41,56 @@ public class GraphDialog extends EscapableDialog {
     private double distanceToOrigin;
     private Double mean;
 
-    public GraphDialog(List<Graph> graphs, String frameTitle) {
-        super(TAPAALGUI.getAppGui(), frameTitle, true);
+    private GraphDialog(List<Graph> graphs, String title, boolean showLegend, boolean piecewise, boolean pointPlot) {
+        super(TAPAALGUI.getAppGui(), title, true);
         this.graphs = graphs;
-    }
-
-    public GraphDialog(List<Graph> graphs, String frameTitle, boolean showLegend) {
-        this(graphs, frameTitle);
         this.showLegend = showLegend;
-    }
-
-    public GraphDialog(List<Graph> graphs, String frameTitle, boolean showLegend, boolean piecewise) {
-        this(graphs, frameTitle, showLegend);
         this.piecewise = piecewise;
-    }
-
-    public GraphDialog(List<Graph> graphs, String frameTitle, boolean showLegend, boolean piecewise, boolean pointPlot) {
-        this(graphs, frameTitle, showLegend, piecewise);
         this.pointPlot = pointPlot;
     }
 
-    public GraphDialog(Graph graph, String frameTitle, boolean showLegend, boolean piecewise, boolean pointPlot) {
-        this(List.of(graph), frameTitle, showLegend, piecewise, pointPlot);
-    }
+    public static class GraphDialogBuilder {
+        private List<Graph> graphs = new ArrayList<>();
+    
+        private String title;
+        private boolean showLegend;
+        private boolean piecewise;
+        private boolean pointPlot;
 
-    public GraphDialog(Graph graph, String frameTitle) {
-        this(List.of(graph), frameTitle);
-    }
+        public GraphDialogBuilder addGraphs(List<Graph> graphs) {
+            this.graphs.addAll(graphs);
+            return this;
+        }
 
-    public GraphDialog(Graph graph, String frameTitle, boolean showLegend) {
-        this(List.of(graph), frameTitle, showLegend);
+        public GraphDialogBuilder addGraph(Graph graph) {
+            this.graphs.add(graph);
+            return this;
+        }
+
+        public GraphDialogBuilder setTitle(String title) {
+            return this;
+        }
+
+        public GraphDialogBuilder setShowLegend(boolean showLegend) {
+            this.showLegend = showLegend;
+            return this;
+        }
+
+        public GraphDialogBuilder setPiecewise(boolean piecewise) {
+            this.piecewise = piecewise;
+            return this;
+        }
+
+        public GraphDialogBuilder setPointPlot(boolean pointPlot) {
+            this.pointPlot = pointPlot;
+            return this;
+        }
+
+        public GraphDialog build() {
+            GraphDialog dialog = new GraphDialog(graphs, title, showLegend, piecewise, pointPlot);
+            return dialog;
+        }
+
     }
 
     public void display() {
@@ -139,7 +164,13 @@ public class GraphDialog extends EscapableDialog {
 
     private JFreeChart createChart(List<Graph> graphs) {
         XYDataset dataset = constructDataset(graphs);
-        JFreeChart chart = ChartFactory.createXYLineChart(graphs.get(0).getName(), graphs.get(0).getXAxisLabel(), graphs.get(0).getYAxisLabel(), dataset, PlotOrientation.VERTICAL, showLegend, true, false);
+
+        JFreeChart chart;
+        if (graphs.isEmpty()) {
+            chart = ChartFactory.createXYLineChart("", "X", "Y", dataset, PlotOrientation.VERTICAL, false, true, false);
+        } else {
+            chart = ChartFactory.createXYLineChart(graphs.get(0).getName(), graphs.get(0).getXAxisLabel(), graphs.get(0).getYAxisLabel(), dataset, PlotOrientation.VERTICAL, showLegend || mean != null, true, false);
+        }
 
         XYPlot plot = chart.getXYPlot();
         float lineThickness = 3.0f;
@@ -159,6 +190,13 @@ public class GraphDialog extends EscapableDialog {
 
             XYLineAnnotation annotation = new XYLineAnnotation(mean, 0, mean, rangeAxis.getUpperBound(), dashed, Color.BLACK);
             plot.addAnnotation(annotation);
+
+            Shape lineShape = new Line2D.Double(0, 0, 30, 0);
+            LegendItemCollection legendItems;
+            
+            legendItems = showLegend ? plot.getLegendItems() : new LegendItemCollection();
+            legendItems.add(new LegendItem("Mean", null, null, null, lineShape, Color.BLACK, dashed, Color.BLACK));
+            plot.setFixedLegendItems(legendItems);
         }
 
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
@@ -185,8 +223,8 @@ public class GraphDialog extends EscapableDialog {
             List<GraphPoint> points = graph.getPoints();
 
             if (!points.isEmpty()) {
-                double first = points.getFirst().getX();
-                double last = points.getLast().getX();
+                double first = points.get(0).getX();
+                double last = points.get(points.size() - 1).getX();
 
                 isStraight = (first - last == 0) && !piecewise;
                 distanceToOrigin = first;
@@ -199,6 +237,7 @@ public class GraphDialog extends EscapableDialog {
             for (GraphPoint point : points) {
                 series.add(point.getX(), point.getY());
             }
+            
             dataset.addSeries(series);
         }
         return dataset;

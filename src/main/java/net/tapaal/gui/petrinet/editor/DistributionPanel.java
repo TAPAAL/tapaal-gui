@@ -9,6 +9,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.graph.Graph;
 import pipe.gui.graph.GraphDialog;
 import pipe.gui.graph.GraphPoint;
+import pipe.gui.graph.GraphDialog.GraphDialogBuilder;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.swingcomponents.EscapableDialog;
 
@@ -238,29 +239,30 @@ public class DistributionPanel extends JPanel {
     }
 
     private GraphDialog createGraphDialog(SMCDistribution distribution) {
-        String frameTitle = "Probability Density Function";
-        
+        String title = "Probability Density Function";
+        GraphDialogBuilder builder = new GraphDialogBuilder();
+
         if (distribution instanceof SMCConstantDistribution) {
             Graph graph = createGraph((SMCConstantDistribution) distribution);
-            return new GraphDialog(graph, frameTitle);
+            builder = builder.addGraph(graph).setTitle(title);
         } else if (distribution instanceof SMCDiscreteUniformDistribution) {
             Graph graph = createGraph((SMCDiscreteUniformDistribution) distribution);
-            return new GraphDialog(graph, frameTitle, false, false, true);
+            builder = builder.addGraph(graph).setPointPlot(true);
         } else if (distribution instanceof SMCExponentialDistribution) {
             Graph graph = createGraph((SMCExponentialDistribution) distribution);
-            return new GraphDialog(graph, frameTitle);
+            builder = builder.addGraph(graph);
         } else if (distribution instanceof SMCGammaDistribution) {
             Graph graph = createGraph((SMCGammaDistribution) distribution);
-            return new GraphDialog(graph, frameTitle);
+            builder = builder.addGraph(graph);
         } else if (distribution instanceof SMCNormalDistribution) {
             Graph graph = createGraph((SMCNormalDistribution) distribution);
-            return new GraphDialog(graph, frameTitle);
+            builder = builder.addGraph(graph).setTitle(title);
         } else if (distribution instanceof SMCUniformDistribution) {
             List<Graph> graphs = createGraphs((SMCUniformDistribution) distribution);
-            return new GraphDialog(graphs, frameTitle, false, true);
+            builder = builder.addGraphs(graphs).setPiecewise(true);
         }
 
-        return null;
+        return builder.setTitle(title).build();
     }
 
     private Graph createGraph(SMCConstantDistribution distribution) {
