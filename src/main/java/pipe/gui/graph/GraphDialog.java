@@ -125,8 +125,8 @@ public class GraphDialog extends EscapableDialog {
                 cardPanel.add(chartPanel, buttonText);
                 addButton(buttonPanel, cardLayout, cardPanel, buttonText);
             } else {
-                cardPanel.add(chartPanel, graph.getName());
-                addButton(buttonPanel, cardLayout, cardPanel, graph.getName());
+                cardPanel.add(chartPanel, graph.getButtonText());
+                addButton(buttonPanel, cardLayout, cardPanel, graph.getButtonText());
             }
         }
 

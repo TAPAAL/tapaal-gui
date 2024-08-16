@@ -298,7 +298,8 @@ public class Verifier {
                 query.getRawVerificationPrompt(),
                 query.isBenchmarkMode(),
                 query.getBenchmarkRuns(),
-                query.isParallel()
+                query.isParallel(),
+                query.getCategory()
         );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             return new VerifyPNOptions(

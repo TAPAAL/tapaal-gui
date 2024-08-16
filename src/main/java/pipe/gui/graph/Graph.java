@@ -20,7 +20,7 @@ public class Graph {
     }
 
     public Graph(String name, List<GraphPoint> points, String xAxisLabel, String yAxisLabel, String buttonText) {
-        this(name, points, null, xAxisLabel, yAxisLabel, null);
+        this(name, points, null, xAxisLabel, yAxisLabel, buttonText);
     }
 
     public Graph(String name, List<GraphPoint> points, Double mean) {
