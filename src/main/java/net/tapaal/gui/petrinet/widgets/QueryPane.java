@@ -27,6 +27,7 @@ import net.tapaal.gui.petrinet.undo.MoveElementDownCommand;
 import net.tapaal.gui.petrinet.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.Verifier;
@@ -42,6 +43,7 @@ import net.tapaal.gui.petrinet.undo.SortQueriesCommand;
 import net.tapaal.gui.swingcomponents.NonsearchableJList;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
+import javax.swing.JOptionPane;
 
 public class QueryPane extends JPanel implements SidePane {
 
@@ -451,6 +453,13 @@ public class QueryPane extends JPanel implements SidePane {
 		TAPNQuery query = queryList.getSelectedValue();
 		int NumberOfSelectedElements = queryList.getSelectedIndices().length;
 		
+		boolean isSmc = query.getCategory() == QueryCategory.SMC;
+
+		if (isSmc && !tabContent.network().isNonStrict()) {
+			JOptionPane.showMessageDialog(null, "The model has strict intervals and can therefore not be verified", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		if (NumberOfSelectedElements == 1) {
 			if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN)
 				Verifier.runVerifyTAPNVerification(tabContent.network(), query, null, tabContent.getGuiModels(), false, tabContent.lens);

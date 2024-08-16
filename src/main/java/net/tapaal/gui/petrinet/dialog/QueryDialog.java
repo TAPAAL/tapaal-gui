@@ -95,7 +95,6 @@ public class QueryDialog extends JPanel {
 	// Query Name Panel;
 	private JPanel namePanel;
 	private JComboBox queryType;
-    private JComboBox smcSelector;
 	private JButton advancedButton;
 
 	// Boundedness check panel
@@ -459,6 +458,7 @@ public class QueryDialog extends JPanel {
         init(option, queryToCreateFrom);
         makeShortcuts();
         toggleAdvancedSimpleView(false);
+        if (lens.isStochastic()) toggleSmc();
     }
 
     private boolean checkIfSomeReductionOption() {
@@ -526,8 +526,8 @@ public class QueryDialog extends JPanel {
         boolean symmetry = getSymmetry();
 		boolean timeDarts = useTimeDarts.isSelected();
 		boolean pTrie = usePTrie.isSelected();
-		boolean gcd = useGCD.isSelected() && smcSelector.getSelectedIndex() == 0;
-		boolean overApproximation = skeletonAnalysis.isSelected() && smcSelector.getSelectedIndex() == 0;
+		boolean gcd = useGCD.isSelected() && !lens.isStochastic();
+		boolean overApproximation = skeletonAnalysis.isSelected() && !lens.isStochastic();
 		boolean reduction = useReduction.isSelected();
 		TAPNQuery query = new TAPNQuery(
             name,
@@ -565,7 +565,7 @@ public class QueryDialog extends JPanel {
             query.setDiscreteInclusion(discreteInclusion.isSelected());
         }
 
-        if(smcSelector.getSelectedIndex() == 1) {
+        if(lens.isStochastic()) {
             query.setCategory(TAPNQuery.QueryCategory.SMC);
             query.setSmcSettings(getSMCSettings());
             query.setParallel(smcParallel.isSelected());
@@ -1202,7 +1202,7 @@ public class QueryDialog extends JPanel {
             newProperty.hasNestedPathQuantifiers(),
             lens.isColored(),
             lens.isColored() && !lens.isTimed(),
-            smcSelector.getSelectedIndex() == 1
+            lens.isStochastic()
         };
 
 
@@ -1463,7 +1463,7 @@ public class QueryDialog extends JPanel {
     private void enableOnlySMCButtons() {
         finallyButton.setEnabled(true);
         globallyButton.setEnabled(true);
-        if(smcSelector.getSelectedIndex() == 1) {
+        if(lens.isStochastic()) {
             updateSMCButtons();
         }
     }
@@ -1691,6 +1691,11 @@ public class QueryDialog extends JPanel {
         }
 
         refreshTraceOptions();
+
+        if (lens.isStochastic()) {
+            setSMCSettings(SMCSettings.Default());
+        }
+
         setEnabledReductionOptions();
 
         rootPane.setDefaultButton(saveAndVerifyButton);
@@ -1719,7 +1724,6 @@ public class QueryDialog extends JPanel {
             setupRawVerificationOptionsFromQuery(queryToCreateFrom);
         } else {
             setupRawVerificationOptions();
-            setSMCSettings(SMCSettings.Default());
         }
     }
 
@@ -1951,11 +1955,6 @@ public class QueryDialog extends JPanel {
             } else if (category.equals(TAPNQuery.QueryCategory.HyperLTL)) {
                 queryType.setSelectedIndex(2);
             }
-        } else if(lens.isStochastic()) {
-            TAPNQuery.QueryCategory category = queryToCreateFrom.getCategory();
-            if (category.equals(TAPNQuery.QueryCategory.SMC)) {
-                smcSelector.setSelectedIndex(1);
-            }
         }
     }
 
@@ -1987,9 +1986,6 @@ public class QueryDialog extends JPanel {
         queryType = new JComboBox(new String[]{"CTL/Reachability", "LTL", "HyperLTL"});
         queryType.setToolTipText(TOOL_TIP_QUERY_TYPE);
         queryType.addActionListener(arg0 -> toggleDialogType());
-
-        smcSelector = new JComboBox(new String[]{"Reachability/Liveness", "SMC"});
-        smcSelector.addActionListener(arg0 -> toggleSmc());
 
         advancedButton = new JButton("Advanced view");
         advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
@@ -2057,7 +2053,6 @@ public class QueryDialog extends JPanel {
         JPanel topButtonPanel = new JPanel(new FlowLayout());
         topButtonPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         if (!lens.isTimed() && !lens.isGame()) topButtonPanel.add(queryType);
-        if (lens.isStochastic() && tapnNetwork.isNonStrict()) topButtonPanel.add(smcSelector);
         topButtonPanel.add(advancedButton);
         topButtonPanel.add(infoButton);
 
@@ -2087,7 +2082,7 @@ public class QueryDialog extends JPanel {
             setAdvancedView(!advancedView);
         }
 
-        boolean isSmc = smcSelector.getSelectedIndex() == 1;
+        boolean isSmc = lens.isStochastic();
 
         Point location = guiDialog.getLocation();
 
@@ -2217,7 +2212,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void toggleSmc() {
-        if(smcSelector.getSelectedIndex() == 1) {
+        if(lens.isStochastic()) {
             showSMCButtons(true);
             reductionOption.setSelectedItem(name_DISCRETE);
             useGCD.setSelected(false);
@@ -4368,7 +4363,7 @@ public class QueryDialog extends JPanel {
                             returnFromManualEdit(null);
                         else
                             return;
-                    } else if(smcSelector.getSelectedIndex() == 1) {
+                    } else if(lens.isStochastic()) {
                         newQuery = TAPAALSMCQueryParser.parse(queryField.getText());
                     } else if (lens.isTimed()) {
                         newQuery = TAPAALQueryParser.parse(queryField.getText());
@@ -4855,6 +4850,7 @@ public class QueryDialog extends JPanel {
         reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
 
         reductionOption.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
+
         reductionOption.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -5291,7 +5287,7 @@ public class QueryDialog extends JPanel {
     }
 
 	private void refreshQueryEditingButtons() {
-        boolean isSmc = smcSelector.getSelectedIndex() == 1;
+        boolean isSmc = lens.isStochastic();
 		if (currentSelection != null) {
             if (lens.isGame()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
@@ -5312,6 +5308,8 @@ public class QueryDialog extends JPanel {
                     enableOnlySMCButtons();
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                     enableOnlyStateButtons();
+                    finallyButton.setEnabled(false);
+                    globallyButton.setEnabled(false);
                 }
                 updateQueryButtonsAccordingToSelection();
             } else {
@@ -5547,7 +5545,7 @@ public class QueryDialog extends JPanel {
         setEnabledReductionOptions();
         if (lens.isTimed()) refreshOverApproximationOption();
         int selectedIndex = queryType.getSelectedIndex();
-        boolean isSmc = smcSelector.getSelectedIndex() == 1;
+        boolean isSmc = lens.isStochastic();
         if (selectedIndex == 1) {
             updateLTLButtons();
         } else if (selectedIndex == 2) {
@@ -5604,11 +5602,17 @@ public class QueryDialog extends JPanel {
             saveAndVerifyButton.addActionListener(evt -> {
                 updateRawVerificationOptions();
                 if (checkIfSomeReductionOption()) {
+                    if (lens.isStochastic() && !tapnNetwork.isNonStrict()) {
+                        JOptionPane.showMessageDialog(QueryDialog.this, "The model has strict intervals and can therefore not be verified", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
                     querySaved = true;
                     // Now if a query is saved and verified, the net is marked as modified
                     tab.setNetChanged(true);
                     exit();
                     TAPNQuery query = getQuery();
+                    
                     if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN) {
                         Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false, lens);
                     } else {
@@ -5743,7 +5747,7 @@ public class QueryDialog extends JPanel {
                     }
 
                     exit();
-
+                   
                     Verifier.runVerifyTAPNVerification(tapnNetwork, query,null, guiModels, true, null);
 
                     File reducedNetFile = new File(Verifier.getReducedNetFilePath());
@@ -6030,8 +6034,10 @@ public class QueryDialog extends JPanel {
                     updateSMCSettings();
                 }
             };
+            
             benchmarkThread = Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback2, guiModels, false, lens);
         };
+       
         benchmarkThread = Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback1, guiModels,false, lens);
     }
 
@@ -6040,7 +6046,6 @@ public class QueryDialog extends JPanel {
         smcEstimationIntervalWidth.setEnabled(!doingBenchmark);
         smcTimeExpected.setEnabled(!doingBenchmark);
         smcParallel.setEnabled(!doingBenchmark);
-        smcSelector.setEnabled(!doingBenchmark);
         smcVerificationType.setEnabled(!doingBenchmark);
         smcStepBoundValue.setEnabled(!doingBenchmark);
         smcStepBoundInfinite.setEnabled(!doingBenchmark);
