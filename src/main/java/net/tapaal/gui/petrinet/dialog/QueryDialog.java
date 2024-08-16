@@ -5968,6 +5968,10 @@ public class QueryDialog extends JPanel {
     }
 
     private void runBenchmark() {
+        DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
+        decimalFormatSymbols.setDecimalSeparator('.');
+        DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
+        DecimalFormat timeFormat = new DecimalFormat("#.##", decimalFormatSymbols);
         if(doingBenchmark) {
             if(benchmarkThread == null) return;
             benchmarkThread.cancel(true);
@@ -5992,10 +5996,6 @@ public class QueryDialog extends JPanel {
         } catch(NumberFormatException ignored) { }
         smcTimeExpected.setText("");
         smcEstimationIntervalWidth.setText("");
-        DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
-        decimalFormatSymbols.setDecimalSeparator('.');
-        DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
-        DecimalFormat timeFormat = new DecimalFormat("#.##", decimalFormatSymbols);
         double finalTimeWanted = timeWanted;
         VerificationCallback callback1 = result1 -> {
             query.setBenchmarkRuns(256);
@@ -6037,10 +6037,10 @@ public class QueryDialog extends JPanel {
         smcParallel.setEnabled(!doingBenchmark);
         smcSelector.setEnabled(!doingBenchmark);
         smcVerificationType.setEnabled(!doingBenchmark);
-        smcStepBoundValue.setEnabled(!doingBenchmark);
-        smcStepBoundInfinite.setEnabled(!doingBenchmark);
-        smcTimeBoundValue.setEnabled(!doingBenchmark);
-        smcTimeBoundInfinite.setEnabled(!doingBenchmark);
+        smcStepBoundValue.setEnabled(!doingBenchmark && !smcStepBoundInfinite.isSelected());
+        smcStepBoundInfinite.setEnabled(!doingBenchmark && !smcTimeBoundInfinite.isSelected());
+        smcTimeBoundValue.setEnabled(!doingBenchmark && !smcTimeBoundInfinite.isSelected());
+        smcTimeBoundInfinite.setEnabled(!doingBenchmark && !smcStepBoundInfinite.isSelected());
     }
 
 }

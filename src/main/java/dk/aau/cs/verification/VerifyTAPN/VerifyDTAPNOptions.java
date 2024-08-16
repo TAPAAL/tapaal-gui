@@ -113,7 +113,10 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		StringBuilder result = new StringBuilder();
 	
 		if (useRawVerification && rawVerificationOptions != null) {
-			return rawVerificationString(rawVerificationOptions, traceArg(traceOption));
+            String rawOptions = benchmark ?
+                ("--smc-benchmark " + benchmarkRuns + " ") + rawVerificationOptions :
+                rawVerificationOptions;
+			return rawVerificationString(rawOptions, traceArg(traceOption));
 		}
 
         result.append(kBoundArg());
