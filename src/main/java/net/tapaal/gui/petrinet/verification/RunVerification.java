@@ -90,7 +90,7 @@ public class RunVerification extends RunVerificationBase {
 						iconSelector.getIconFor(result)
 				);
 
-                if (options.traceOption() != TAPNQuery.TraceOption.NONE) {
+                if (options.traceOption() != TAPNQuery.TraceOption.NONE || options.isSimulate()) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
                         if ((lens != null && lens.isColored()) || model.isColored()) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
@@ -137,7 +137,6 @@ public class RunVerification extends RunVerificationBase {
 			//version GLIB_2.0 not defined in file libc.so.6 with
 			//link time reference
 			//is the error as this (often) means the possibility for a uppaal licence key error
-
             if (((lens != null && lens.isColored()) || model.isColored())) {
                 if (result != null && result.errorMessage().contains("Only weight=1")) {
                     String[] split1 = result.errorMessage().split("between ", 2);

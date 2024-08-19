@@ -299,7 +299,10 @@ public class Verifier {
                 query.isBenchmarkMode(),
                 query.getBenchmarkRuns(),
                 query.isParallel(),
-                query.getCategory()
+                query.getCategory(),
+                query.getNumberOfTraces(),
+                query.getSmcTraceType(),
+                query.isSimulate()
         );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             return new VerifyPNOptions(

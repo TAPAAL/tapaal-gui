@@ -42,6 +42,7 @@ public class VerifyDTAPNOutputParser {
 
     private static final Pattern smcValidTimeStdDevPattern = Pattern.compile("\\s*valid runs time standard deviation:\\s*([\\d\\.]+)\\s*");
     private static final Pattern smcValidLengthStdDevPattern = Pattern.compile("\\s*valid runs length standard deviation:\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcNumberOfTracesPattern = Pattern.compile("\\s*Generated \\d+ random traces");
 
 
 	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (-?\\d*)");
@@ -235,9 +236,14 @@ public class VerifyDTAPNOutputParser {
                         smcValidLengthStdDev = Float.parseFloat(matcher.group(1));
                     }
 
+                    matcher = smcNumberOfTracesPattern.matcher(line);
+                    if (matcher.find()) {
+                        foundResult = true;
+                        result = true;
+                    }
 				}
 			}
-			
+            
 			if(!foundResult) return null;
 			
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);

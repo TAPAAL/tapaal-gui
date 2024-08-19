@@ -2,6 +2,7 @@ package dk.aau.cs.verification.VerifyTAPN;
 
 import com.sun.jna.Platform;
 
+import dk.aau.cs.verification.SMCTraceType;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
@@ -30,6 +31,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
     private boolean benchmark = false;
     private int benchmarkRuns = 100;
 	private boolean isSmc;
+    private int numberOfTraces;
+    private SMCTraceType smcTraceType;
 
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(
@@ -51,7 +54,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean useRawVerification,
 			String rawVerificationOptions
 	) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions, false, 0, false, QueryCategory.Default);
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions, false, 0, false, QueryCategory.Default, 1, new SMCTraceType(), false);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
@@ -81,7 +84,10 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             boolean benchmark,
             int benchmarkRuns,
             boolean parallel,
-			QueryCategory queryCategory
+			QueryCategory queryCategory,
+            int numberOfTraces,
+            SMCTraceType smcTraceType,
+            boolean isSimulate
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -100,6 +106,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         this.benchmarkRuns = benchmarkRuns;
         this.parallel = parallel;
 		this.isSmc = queryCategory == QueryCategory.SMC;
+        this.numberOfTraces = numberOfTraces;
+        this.smcTraceType = smcTraceType;
+        this.isSimulate = isSimulate;
 
 		// we only force unfolding when traces are involved
         if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation) && !useRawVerification)
@@ -157,7 +166,15 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         result.append(parallel ? "--smc-parallel " : "");
         result.append(benchmark ? "--smc-benchmark " + benchmarkRuns + " " : "");
 
-		result.append(isSmc ? "--smc-print-cumulative-stats 4" : "");
+        if (isSmc) {
+            result.append("--smc-print-cumulative-stats 4");
+            if (isSimulate) {
+                result.append(" --smc-traces ");
+                result.append(numberOfTraces);
+                result.append(" ");
+                result.append(smcTraceType.getArg());
+            }
+        }
 
 		return result.toString();
 	}

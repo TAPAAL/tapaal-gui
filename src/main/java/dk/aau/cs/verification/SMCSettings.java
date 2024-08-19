@@ -40,5 +40,4 @@ public class SMCSettings {
             Math.log(2.0 / (1 - confidence)) / (2.0 * runsNeeded)
         );
     }
-
 }

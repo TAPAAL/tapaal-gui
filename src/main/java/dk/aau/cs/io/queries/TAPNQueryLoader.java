@@ -7,6 +7,8 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.XMLParsing.XMLHyperLTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import dk.aau.cs.verification.SMCSettings;
+import dk.aau.cs.verification.SMCTraceType;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,6 +21,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.HashTableSize;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.VerificationType;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
@@ -90,6 +93,16 @@ public class TAPNQueryLoader extends QueryLoader{
         boolean symmetricVars = getUnfoldingOption(queryElement, "symmetricVars", true);
 
         boolean parallel = getReductionOption(queryElement, "parallel", false);
+        VerificationType verificationType = VerificationType.fromString(queryElement.getAttribute("verificationType"));
+
+        int numberOfTraces;
+        try {
+            numberOfTraces = Integer.parseInt(queryElement.getAttribute("numberOfTraces"));
+        } catch (NumberFormatException e) {
+            numberOfTraces = 1;
+        }
+
+        SMCTraceType smcTraceType = new SMCTraceType(queryElement.getAttribute("smcTraceType"));
 
         SMCSettings smcSettings = SMCSettings.Default();
 
@@ -134,6 +147,9 @@ public class TAPNQueryLoader extends QueryLoader{
             } else if(parsedQuery.getCategory() == QueryCategory.SMC) {
                 parsedQuery.setSmcSettings(smcSettings);
                 parsedQuery.setParallel(parallel);
+                parsedQuery.setVerificationType(verificationType);
+                parsedQuery.setNumberOfTraces(numberOfTraces);
+                parsedQuery.setSmcTraceType(smcTraceType);
             }
 			return parsedQuery;
 		} else

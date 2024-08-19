@@ -524,6 +524,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         queryElement.setAttribute("gcd", "" + query.useGCD());
         queryElement.setAttribute("parallel", "" + query.isParallel());
         queryElement.setAttribute("overApproximation", ""	+ false);
+        queryElement.setAttribute("verificationType", query.getVerificationType().toString());
+        queryElement.setAttribute("numberOfTraces", "" + query.getNumberOfTraces());
+        queryElement.setAttribute("smcTraceType", query.getSmcTraceType().toString());
 
         return queryElement;
     }
