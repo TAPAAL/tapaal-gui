@@ -243,7 +243,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				return;
 			}
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-
+         
 			if (result == null) return;
 			if (showResult(result) && spinner != null) {
                 QueryReductionTime reductionTime = QueryReductionTime.UnlimitedTime;

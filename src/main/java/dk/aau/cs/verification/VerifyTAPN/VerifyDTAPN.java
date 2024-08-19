@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class VerifyDTAPN implements ModelChecker{
 
@@ -342,7 +343,7 @@ public class VerifyDTAPN implements ModelChecker{
                     (query.getProperty() instanceof TCTLAGNode && !queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAFNode && !queryResult.value1().isQuerySatisfied()));
-
+            
                 if (options.traceOption() != TraceOption.NONE && isColored && showTrace) {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
@@ -371,6 +372,15 @@ public class VerifyDTAPN implements ModelChecker{
                         e.printStackTrace();
                         return null;
                     }
+                }
+
+                if (isSMC) {
+                    VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
+                    BufferedReader reader = new BufferedReader(new StringReader(errorOutput));
+                    Map<String, TimedArcPetriNetTrace> parsedTraceMap = traceParser.parseTraces(reader);
+             
+                    var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab); 
+                    return result;
                 }
 
                 if (tapnTrace == null) {
