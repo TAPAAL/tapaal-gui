@@ -13,6 +13,9 @@ import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
 import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
+import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
+import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
@@ -29,6 +32,7 @@ public class TimedTransition extends TAPNElement {
 	private boolean isUncontrollable = false;
     private SMCDistribution distribution = SMCDistribution.defaultDistribution();
     private Probability weight = new DoubleProbability(1.0);
+	private FiringMode firingMode;
     private GuardExpression guard;
 
 	private SharedTransition sharedTransition;
@@ -56,11 +60,12 @@ public class TimedTransition extends TAPNElement {
         this.guard = guard;
     }
 
-    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, SMCDistribution distribution, Probability weight) {
+    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, SMCDistribution distribution, Probability weight, FiringMode firingMode) {
         setName(name);
         setUrgent(isUrgent);
         setDistribution(distribution);
         setWeight(weight);
+		setFiringMode(firingMode);
         this.guard = guard;
     }
 
@@ -128,6 +133,14 @@ public class TimedTransition extends TAPNElement {
             sharedTransition.setWeight(weight);
         }
     }
+
+	public void setFiringMode(FiringMode firingMode) {
+		this.firingMode = firingMode;
+	}
+
+	public FiringMode getFiringMode() {
+		return firingMode;
+	}
 
     public boolean hasCustomDistribution() {
         return !this.distribution.equals(SMCDistribution.defaultDistribution());
@@ -448,9 +461,9 @@ public class TimedTransition extends TAPNElement {
 
 	public TimedTransition copy() {
 	    if(guard == null){
-            return new TimedTransition(name, isUrgent, null, distribution, weight);
+            return new TimedTransition(name, isUrgent, null, distribution, weight, firingMode);
         }
-		return new TimedTransition(name, isUrgent, guard.copy(), distribution, weight);
+		return new TimedTransition(name, isUrgent, guard.copy(), distribution, weight, firingMode);
 	}
 
 	@Override

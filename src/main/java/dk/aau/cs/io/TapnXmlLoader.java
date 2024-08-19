@@ -12,6 +12,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
+import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
+import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import kotlin.Pair;
 import net.tapaal.gui.petrinet.TAPNLens;
 import org.w3c.dom.*;
@@ -257,21 +261,40 @@ public class TapnXmlLoader {
         boolean isUncontrollable = element.getAttribute("player").equals("1");
         String distrib = element.getAttribute("distribution");
         String weightStr = element.getAttribute("weight");
+		String firingModeStr = element.getAttribute("firingMode");
         SMCDistribution distribution = SMCDistribution.defaultDistribution();
         Probability weight = new DoubleProbability(1.0);
+		FiringMode firingMode = new OldestFiringMode();
         if(!distrib.isEmpty()){
             distribution = SMCDistribution.parseXml(element);
         }
         if(!weightStr.isEmpty()) {
             weight = Probability.parseProbability(weightStr, constants);
         }
+		if (!firingModeStr.isEmpty()) {
+			firingMode = getFiringMode(firingModeStr);
+		}
 		
 		SharedTransition st = new SharedTransition(name);
 		st.setUrgent(urgent);
 		st.setUncontrollable(isUncontrollable);
         st.setDistribution(distribution);
         st.setWeight(weight);
+		st.setFiringMode(firingMode);
 		return st;
+	}
+
+	private FiringMode getFiringMode(String firingModeStr) {
+		switch (firingModeStr) {
+			case "Oldest":
+				return new OldestFiringMode();
+			case "Youngest":
+				return new YoungestFiringMode();
+			case "Random":
+				return new RandomFiringMode();
+			default:
+				return null;
+		}
 	}
 
 	private Collection<Template> parseTemplates(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
@@ -429,6 +452,7 @@ public class TapnXmlLoader {
 		String priorityStr = transition.getAttribute("priority");
         String distrib = transition.getAttribute("distribution");
         String weightStr = transition.getAttribute("weight");
+		String firingModeStr = transition.getAttribute("firingMode");
 	    int positionXInput = 0;
 		int positionYInput = 0;
 		int nameOffsetXInput = 0;
@@ -437,6 +461,7 @@ public class TapnXmlLoader {
         int priority = 0;
         SMCDistribution distribution = SMCDistribution.defaultDistribution();
         Probability weight = new DoubleProbability(1.0);
+		FiringMode firingMode = new OldestFiringMode();
 
 		if(!posX.isEmpty()){
 		    positionXInput = (int)Double.parseDouble(posX);
@@ -462,6 +487,9 @@ public class TapnXmlLoader {
         if(!weightStr.isEmpty()) {
             weight = Probability.parseProbability(weightStr, constants);
         }
+		if (!firingModeStr.isEmpty()) {
+			firingMode = getFiringMode(firingModeStr);
+		}
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
 		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
@@ -497,6 +525,7 @@ public class TapnXmlLoader {
 		t.setUncontrollable(player.equals("1"));
         t.setDistribution(distribution);
         t.setWeight(weight);
+		t.setFiringMode(firingMode);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);
