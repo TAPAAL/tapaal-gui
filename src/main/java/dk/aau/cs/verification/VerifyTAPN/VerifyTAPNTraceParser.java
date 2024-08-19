@@ -38,9 +38,6 @@ public class VerifyTAPNTraceParser {
 	
 	public VerifyTAPNTraceParser(TimedArcPetriNet tapn) {
 		this.tapn = tapn;
-        for (TimedTransition transition : tapn.transitions()) {
-            System.out.println("tapn transition: " + transition);
-        }
 	}
 
 	public TimedArcPetriNetTrace parseTrace(BufferedReader reader) {

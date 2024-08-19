@@ -13,7 +13,6 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
@@ -29,11 +28,9 @@ import net.tapaal.gui.petrinet.verification.UnfoldNet;
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -378,7 +375,7 @@ public class VerifyDTAPN implements ModelChecker{
                     VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
                     BufferedReader reader = new BufferedReader(new StringReader(errorOutput));
                     Map<String, TimedArcPetriNetTrace> parsedTraceMap = traceParser.parseTraces(reader);
-             
+
                     var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab); 
                     return result;
                 }
