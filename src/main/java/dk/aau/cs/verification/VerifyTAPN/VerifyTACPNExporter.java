@@ -78,6 +78,7 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
         modelStream.append("name=\"" + t.name() + "\" ");
         modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\" ");
         modelStream.append("weight=\""+ t.getWeight().nameForSaving(false) + "\" ");
+        modelStream.append("firingMode=\"" + t.getFiringMode().toString() + "\" ");
         modelStream.append(t.getDistribution().toString());
         modelStream.append(">\n");
         modelStream.append(colorInformationToXMLString(t));

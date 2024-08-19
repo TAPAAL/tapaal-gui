@@ -162,6 +162,7 @@ public class VerifyTAPNExporter {
         modelStream.append("id=\"" + t.name() + "\" ");
 		modelStream.append("name=\"" + t.name() + "\" ");
         modelStream.append("weight=\""+ t.getWeight().nameForSaving(false) + "\" ");
+        modelStream.append("firingMode=\"" + t.getFiringMode().toString() + "\" ");
         modelStream.append(t.getDistribution().toString());
         modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
         modelStream.append(">\n");
