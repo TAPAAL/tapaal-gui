@@ -42,7 +42,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TraceImportExport {
@@ -97,10 +97,14 @@ public class TraceImportExport {
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
         document = builder.newDocument();
 
-        Map<String, TAPNNetworkTrace> traces = new HashMap<>();
-        traces.putAll(tab.getAnimator().getTraceMap());
+        Map<String, TAPNNetworkTrace> traces = new LinkedHashMap<>();
+        if (tab.getAnimator().getTraceMap() != null) {
+            traces.putAll(tab.getAnimator().getTraceMap());
+        } else {
+            traces.put("T1", tab.getAnimator().getTrace());
+        }
 
-        boolean hasMultipleTraces = traces.size() > 1;
+        boolean hasMultipleTraces = traces.size() > 1; 
         
         // Output the trace to XML document
         Element traceListRootNode = null;
@@ -119,9 +123,8 @@ public class TraceImportExport {
             if (hasMultipleTraces) {
                 traceRootNode = document.createElement("trace");
                 traceListRootNode.appendChild(traceRootNode);
+                traceRootNode.setAttribute("name", trace.getKey());
             }
-
-            traceRootNode.setAttribute("name", trace.getKey());
             
             for (TAPNNetworkTraceStep step : trace.getValue()) {
                 if (step.isLoopStep()) {
@@ -170,7 +173,7 @@ public class TraceImportExport {
 
         StreamResult result = new StreamResult(os);
         transformer.transform(source, result);
-
+       
         return os;
     }
 
@@ -199,11 +202,18 @@ public class TraceImportExport {
             TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), tab.getGuiModels(), tab.getLens(), false, true);
             Tuple<TimedArcPetriNet, NameMapping> model = composer.transformModel(tab.network());
             VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
-            TimedArcPetriNetTrace traceComposed = traceParser.parseTrace(br);
+            Map<String, TimedArcPetriNetTrace> tracesComposed = traceParser.parseTraces(br);
+            TimedArcPetriNetTrace traceComposed = tracesComposed.values().iterator().next();
             TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(traceComposed, tab.network(), model.value2());
 
-            animator.setTrace(decomposer.decompose());
+            Map<String, TAPNNetworkTrace> traces = new LinkedHashMap<>();
+            for (Map.Entry<String, TimedArcPetriNetTrace> entry : tracesComposed.entrySet()) {
+                decomposer = new TAPNTraceDecomposer(entry.getValue(), tab.network(), model.value2());
+                traces.put(entry.getKey(), decomposer.decompose());
+            }
 
+            animator.setTrace(decomposer.decompose(), traces);
+ 
         } catch (FileNotFoundException e) {
             // Will never happen
         } catch (Exception e) { //IOException
