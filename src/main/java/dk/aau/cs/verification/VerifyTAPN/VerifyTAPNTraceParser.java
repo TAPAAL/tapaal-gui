@@ -6,6 +6,8 @@ import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,29 +41,7 @@ public class VerifyTAPNTraceParser {
 	public TimedArcPetriNetTrace parseTrace(BufferedReader reader) {
 		TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
 
-		Document document = null;
-	
-		try {
-			StringBuilder sb = new StringBuilder();
-			String line;
-
-			while ((line = reader.readLine()) != null) {
-				if (line.contains("Trace")) continue;
-				sb.append(line);
-				sb.append(System.lineSeparator());
-			}
-
-			String xml = sb.toString();
-			document = loadDocument(xml);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				reader.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		Document document = readerToDocument(reader);
 
         if(document == null) return null;
 
@@ -116,6 +96,81 @@ public class VerifyTAPNTraceParser {
 	
 		return trace;
 	}
+
+    public Map<String, TimedArcPetriNetTrace> parseTraces(BufferedReader reader) {
+        Map<String, TimedArcPetriNetTrace> traces = new LinkedHashMap<>();
+
+        Document document = readerToDocument(reader);
+
+        if(document == null) return null;
+
+        NodeList nodeList = document.getElementsByTagName("trace");
+
+        for(int i = 0; i < nodeList.getLength(); ++i){
+            Node node = nodeList.item(i);
+            if (node instanceof Element) {
+                Element element = (Element)node;
+
+                String traceName = element.getAttribute("name");
+                TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
+
+                NodeList childNodes = element.getChildNodes();
+                for (int j = 0; j < childNodes.getLength(); ++j){
+                    Node childNode = childNodes.item(j);
+                    if (childNode instanceof Element){
+                        Element childElement = (Element)childNode;
+
+                        if (childElement.getTagName().equals("transition")){
+                            TimedTransitionStep step = parseTransitionStep(childElement);
+                            trace.add(step);
+                        } else if(childElement.getTagName().equals("delay")){
+                            if (childElement.getTextContent().equals("forever")){
+                                trace.setTraceType(TraceType.EG_DELAY_FOREVER);
+                            } else {
+                                TimeDelayStep step = parseTimeDelay(childElement);
+                                trace.add(step);
+                            }
+                        } else if(childElement.getTagName().equals("loop")){
+                            trace.nextIsLoop();
+                            trace.setTraceType(TraceType.EG_LOOP);
+                        }
+                    }
+                }
+
+                traces.put(traceName, trace);
+            }
+        }
+
+        return traces;
+    }
+
+    private Document readerToDocument(BufferedReader reader) {
+        Document document = null;
+
+        try {
+            StringBuilder sb = new StringBuilder();
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("Trace")) continue;
+                sb.append(line);
+                sb.append(System.lineSeparator());
+            }
+
+            String xml = sb.toString();
+            document = loadDocument(xml);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return document;
+    }
 
 	public void setTraceToParse(String traceName) {
 	    this.traceNameToParse = traceName;
