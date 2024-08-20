@@ -371,12 +371,12 @@ public class VerifyDTAPN implements ModelChecker{
                     }
                 }
 
-                if (isSMC) {
+                if (isSMC && options.isSimulate()) {
                     VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
                     BufferedReader reader = new BufferedReader(new StringReader(errorOutput));
                     Map<String, TimedArcPetriNetTrace> parsedTraceMap = traceParser.parseTraces(reader);
                     
-                    if (!parsedTraceMap.isEmpty()) {
+                    if (parsedTraceMap != null && !parsedTraceMap.isEmpty()) {
                         if (parsedTraceMap.size() > 1) {
                             var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab); 
                             return result;

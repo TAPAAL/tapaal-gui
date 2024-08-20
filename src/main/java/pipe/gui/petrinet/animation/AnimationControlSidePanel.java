@@ -82,8 +82,6 @@ public class AnimationControlSidePanel extends JPanel {
         traceBox.setPreferredSize(new Dimension(100, 27));
         traceBox.setToolTipText(TRACEBOX_DROPDOWN_TOOL_TIP);
         showTraceBox(false);
-        animationToolBar.add(Box.createHorizontalStrut(10));
-        animationToolBar.add(traceBox);
 
         GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -134,12 +132,25 @@ public class AnimationControlSidePanel extends JPanel {
 
         showTraceBox(true);
 
+        if (timedelayPanel.isVisible()) {
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.weightx = 0.5;
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            gbc.insets = new Insets(10, 0, 0, 0); 
+            add(traceBox, gbc);
+        } else {
+            animationToolBar.add(Box.createHorizontalStrut(10));
+            animationToolBar.add(traceBox);
+        }
+
         remove(animationToolBar);
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
         c.gridx = 0;
-        c.gridy = 0;
+        c.gridy = 2;
         add(animationToolBar, c);
     }
 
