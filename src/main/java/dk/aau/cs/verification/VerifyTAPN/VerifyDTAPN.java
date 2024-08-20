@@ -341,8 +341,10 @@ public class VerifyDTAPN implements ModelChecker{
                     (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAFNode && !queryResult.value1().isQuerySatisfied()));
             
-                if (options.traceOption() != TraceOption.NONE && isColored && showTrace) {
+                if (options.traceOption() != TraceOption.NONE && isColored && showTrace || isSMC && options.isSimulate() && isColored) {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
+                    System.out.println(options.unfoldedModelPath());
+                    System.out.println(options.unfoldedQueriesPath());
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
                     try {
@@ -376,8 +378,12 @@ public class VerifyDTAPN implements ModelChecker{
                     BufferedReader reader = new BufferedReader(new StringReader(errorOutput));
                     Map<String, TimedArcPetriNetTrace> parsedTraceMap = traceParser.parseTraces(reader);
 
-                    var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab); 
-                    return result;
+                    if (parsedTraceMap.size() > 1) {
+                        var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab); 
+                        return result;
+                    }
+
+                    tapnTrace = parsedTraceMap.values().iterator().next();
                 }
 
                 if (tapnTrace == null) {

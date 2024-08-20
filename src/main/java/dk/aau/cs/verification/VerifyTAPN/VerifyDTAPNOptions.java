@@ -111,7 +111,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         this.isSimulate = isSimulate;
 
 		// we only force unfolding when traces are involved
-        if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation) && !useRawVerification)
+        if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation || isSmc && isSimulate && unfold) && !useRawVerification)
         {
             try {
 				unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
@@ -136,10 +136,10 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         result.append(kBoundArg());
         result.append(deadTokenArg());
         result.append(traceArg(traceOption));
-        if(unfold && trace() != TraceOption.NONE || enabledOverApproximation || enabledUnderApproximation)
+        if(unfold && trace() != TraceOption.NONE || enabledOverApproximation || enabledUnderApproximation || isSmc && isSimulate && unfold)
         {
             result.append(writeUnfolded());
-			result.append(" --bindings ");
+            result.append(" --bindings ");
         }
         result.append(searchArg(searchOption));
 		result.append("--verification-method ");
