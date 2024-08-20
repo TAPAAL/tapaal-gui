@@ -157,6 +157,7 @@ public class Animator {
      * Checks if the number of tokens removed from a place is as expected, otherwise shows an error message
      */
     private void checkTokensRemoved(NetworkMarking previousMarking, TimedTransition previousTransition) {
+        if (tab.getLens().isStochastic()) return;
         for (TimedInputArc inputArc : previousTransition.getInputArcs()) {
             int tokensBefore = previousMarking.getTokensFor(inputArc.source()).size();
             
@@ -346,7 +347,6 @@ public class Animator {
      * Make the selected transition in the animation box blink, based on the
      * list element label
      */
-
     public void blinkSelected(String label){
         if(label.contains(".")){
             label = label.split("\\.")[1];

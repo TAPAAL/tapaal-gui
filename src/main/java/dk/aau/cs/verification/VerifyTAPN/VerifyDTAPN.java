@@ -343,20 +343,18 @@ public class VerifyDTAPN implements ModelChecker{
             
                 if (options.traceOption() != TraceOption.NONE && isColored && showTrace || isSMC && options.isSimulate() && isColored) {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
-                    System.out.println(options.unfoldedModelPath());
-                    System.out.println(options.unfoldedQueriesPath());
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
                     try {
                         LoadedModel loadedModel = tapnLoader.load(fileOut);
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
                         model = newComposer.transformModel(loadedModel.network());
-
+                        
                         if (queryResult.value1() != null) {
                             tapnTrace = parseTrace(!errorOutput.contains("Trace:") ? errorOutput : (errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
                         }
 
-                        if (tapnTrace != null) {
+                        if (tapnTrace != null || options.isSimulate()) {
                             newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false, lens.isStochastic()));
 
                             //The query being verified should be the only query
@@ -377,13 +375,15 @@ public class VerifyDTAPN implements ModelChecker{
                     VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
                     BufferedReader reader = new BufferedReader(new StringReader(errorOutput));
                     Map<String, TimedArcPetriNetTrace> parsedTraceMap = traceParser.parseTraces(reader);
-
-                    if (parsedTraceMap.size() > 1) {
-                        var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab); 
-                        return result;
+                    
+                    if (!parsedTraceMap.isEmpty()) {
+                        if (parsedTraceMap.size() > 1) {
+                            var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab); 
+                            return result;
+                        }
+                        
+                        tapnTrace = parsedTraceMap.values().iterator().next();
                     }
-
-                    tapnTrace = parsedTraceMap.values().iterator().next();
                 }
 
                 if (tapnTrace == null) {
