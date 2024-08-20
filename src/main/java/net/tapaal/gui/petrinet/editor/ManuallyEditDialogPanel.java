@@ -18,6 +18,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
+import dk.aau.cs.model.CPN.ConstantsParser.ConstantsParser;
+import dk.aau.cs.model.CPN.ConstantsParser.ParseException;
 
 public class ManuallyEditDialogPanel extends EscapableDialog {
     private static final int GAP = 10;
@@ -124,6 +126,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         cancelButton.addActionListener(e -> dispose());
     
         JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> save());
 
         actionPanel.add(cancelButton);
         actionPanel.add(saveButton);
@@ -148,5 +151,15 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
 
         setSize(600, 800);
         setLocationRelativeTo(null);
+    }
+
+    private void save() {
+        try {
+            ConstantsParser.parse(colorTypesArea.getText() + variablesArea.getText() + constantsArea.getText(), network);
+            undoManager.newEdit();
+            dispose();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 }

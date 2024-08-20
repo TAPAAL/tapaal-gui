@@ -1,3 +1,6 @@
+options {
+    STATIC = false;
+}
 PARSER_BEGIN(ConstantsParser)
 package dk.aau.cs.model.CPN.ConstantsParser;
 
@@ -22,7 +25,7 @@ public class ConstantsParser {
         colorTypes.clear();
         variables.clear();
 
-        parser.StartParsing();
+        parser.startParsing();
         network.setConstants(constants);
         network.setColorTypes(colorTypes);
         network.setVariables(variables);
@@ -57,15 +60,13 @@ TOKEN :
     |
     <IN: "in">
     |
-    <IDTERM: "\"">
-    |
     <ALPHA: ["a"-"z","A"-"Z"]>
     |
     <ALPHANUM: ["a"-"z","A"-"Z","0"-"9"]>
     |
     <INTEGER: ["1"-"9"] (["0"-"9"])*>
     |
-    <ID: <IDTERM> <ALPHA> ("_" | <ALPHANUM>)* <IDTERM>>
+    <ID: <ALPHA> ("_" | <ALPHANUM>)*>
 }
 
 SKIP :
@@ -76,49 +77,51 @@ SKIP :
   | "\r"
 }
 
-void StartParsing() :
+void startParsing() :
 {}
 {
-    Values() (<SEPARATOR> Values())*
+    values() (<SEPARATOR> values())*
 }
 
-void Values() :
+void values() :
 {}
 {
-    Constants() | ColorTypes() | Variables()
+    (LOOKAHEAD(2) <ID> <EQ> constants() |
+     LOOKAHEAD(2) <ID> <IS> colorTypes() |
+     LOOKAHEAD(2) <ID> <IN> variables())
 }
 
-void Constants() :
+void constants() :
 {
     Token id, value;
 }
 {
-   id = <ID> <EQ> value = <INTEGER> { constants.add(new Constant(id.image.replace("\"", ""), Integer.parseInt(value.image))); }
+   id = <ID> <EQ> value = <INTEGER> { constants.add(new Constant(id.image, Integer.parseInt(value.image))); }
 }
 
-void ColorTypes() :
+void colorTypes() :
 {
     Token id;
     List<String> values = new ArrayList<String>();
 }
 {
-    id = <ID> <IS> <SBRACKET> ColorTypeValues(values) <EBRACKET> { 
-        ColorType ct = new ColorType(id.image.replace("\"", ""));
+    id = <ID> <IS> <SBRACKET> colorTypeValues(values) <EBRACKET> { 
+        ColorType ct = new ColorType(id.image);
         ct.addColors(values);
         colorTypes.add(ct); 
     }
 }
 
-void ColorTypeValues(List<String> values) :
+void colorTypeValues(List<String> values) :
 {
     String value;
 }
 {
-    value = ColorTypeValue() { values.add(value.replace("\"", "")); } 
-    (<COMMA> value = ColorTypeValue())* { values.add(value.replace("\"", "")); }
+    value = colorTypeValue() { values.add(value); } 
+    (<COMMA> value = colorTypeValue())* { values.add(value); }
 }
 
-String ColorTypeValue() :
+String colorTypeValue() :
 {
     Token id;
 }
@@ -126,17 +129,17 @@ String ColorTypeValue() :
     id = <ID> { return id.image; }
 }
 
-void Variables() :
+void variables() :
 {
     Token id, type;
 }
 {
     id = <ID> <IN> type = <ID> {
-        ColorType ct = getColorType(type.image.replace("\"", ""));
+        ColorType ct = getColorType(type.image);
         if (ct == null) {
             throw new ParseException(ERROR_PARSING_CONSTANTS_MESSAGE);
         }
 
-        variables.add(new Variable(id.image.replace("\"", ""), ct));
+        variables.add(new Variable(id.image, ct));
     }
 }
