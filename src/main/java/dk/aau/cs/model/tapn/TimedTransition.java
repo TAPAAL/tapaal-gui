@@ -13,9 +13,6 @@ import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
 import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
-import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
-import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
-import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 

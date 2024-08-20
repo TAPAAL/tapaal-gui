@@ -55,9 +55,10 @@ public class SMCStats extends Stats {
     public String toString() {
         return "Number of runs executed: " +
             executedRuns +
-            System.getProperty("line.separator") +
-            "Number of valid runs: " +
-            validRuns +
+            (validRuns >= 0 ? 
+                System.getProperty("line.separator") +
+                "Number of valid runs: " +
+                validRuns : "") +
             System.getProperty("line.separator") +
             "Average run duration: " +
             averageRunTime +

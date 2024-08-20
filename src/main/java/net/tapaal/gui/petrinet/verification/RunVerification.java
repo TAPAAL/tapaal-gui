@@ -7,21 +7,12 @@ import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.TCTL.*;
-import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.PNMLoader;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
-import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.swinghelpers.GridBagHelper;
-import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.graph.Graph;
 import pipe.gui.graph.GraphDialog;
@@ -90,7 +81,7 @@ public class RunVerification extends RunVerificationBase {
 						iconSelector.getIconFor(result)
 				);
 
-                if (options.traceOption() != TAPNQuery.TraceOption.NONE) {
+                if (options.traceOption() != TAPNQuery.TraceOption.NONE || lens.isStochastic() && options.isSimulate()) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
                         if ((lens != null && lens.isColored()) || model.isColored()) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
@@ -100,6 +91,8 @@ public class RunVerification extends RunVerificationBase {
                         }
                         if (result.getTraceMap() == null) {
                             TAPAALGUI.getAnimator().setTrace(result.getTrace());
+                        } else if (lens.isStochastic() && options.isSimulate()) {
+                            TAPAALGUI.getAnimator().setTrace(result.getTrace(), result.getTraceMap());
                         } else {
                             Map<String, TAPNNetworkTrace> traceMap = new HashMap<>();
                             for (String key : result.getTraceMap().keySet()) {
@@ -137,7 +130,6 @@ public class RunVerification extends RunVerificationBase {
 			//version GLIB_2.0 not defined in file libc.so.6 with
 			//link time reference
 			//is the error as this (often) means the possibility for a uppaal licence key error
-
             if (((lens != null && lens.isColored()) || model.isColored())) {
                 if (result != null && result.errorMessage().contains("Only weight=1")) {
                     String[] split1 = result.errorMessage().split("between ", 2);

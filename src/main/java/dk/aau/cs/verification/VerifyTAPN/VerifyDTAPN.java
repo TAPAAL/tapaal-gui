@@ -13,7 +13,6 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
@@ -29,17 +28,16 @@ import net.tapaal.gui.petrinet.verification.UnfoldNet;
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class VerifyDTAPN implements ModelChecker{
 
@@ -342,8 +340,8 @@ public class VerifyDTAPN implements ModelChecker{
                     (query.getProperty() instanceof TCTLAGNode && !queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAFNode && !queryResult.value1().isQuerySatisfied()));
-
-                if (options.traceOption() != TraceOption.NONE && isColored && showTrace) {
+            
+                if (options.traceOption() != TraceOption.NONE && isColored && showTrace || isSMC && options.isSimulate() && isColored) {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
@@ -351,12 +349,12 @@ public class VerifyDTAPN implements ModelChecker{
                         LoadedModel loadedModel = tapnLoader.load(fileOut);
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
                         model = newComposer.transformModel(loadedModel.network());
-
+                        
                         if (queryResult.value1() != null) {
                             tapnTrace = parseTrace(!errorOutput.contains("Trace:") ? errorOutput : (errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
                         }
 
-                        if (tapnTrace != null) {
+                        if (tapnTrace != null || options.isSimulate()) {
                             newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false, lens.isStochastic()));
 
                             //The query being verified should be the only query
@@ -370,6 +368,21 @@ public class VerifyDTAPN implements ModelChecker{
                     } catch (ThreadDeath | Exception e) {
                         e.printStackTrace();
                         return null;
+                    }
+                }
+
+                if (isSMC && options.isSimulate()) {
+                    VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
+                    BufferedReader reader = new BufferedReader(new StringReader(errorOutput));
+                    Map<String, TimedArcPetriNetTrace> parsedTraceMap = traceParser.parseTraces(reader);
+                    
+                    if (parsedTraceMap != null && !parsedTraceMap.isEmpty()) {
+                        if (parsedTraceMap.size() > 1) {
+                            var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab); 
+                            return result;
+                        }
+                        
+                        tapnTrace = parsedTraceMap.values().iterator().next();
                     }
                 }
 

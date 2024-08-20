@@ -4,6 +4,7 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.SMCSettings;
+import dk.aau.cs.verification.SMCTraceType;
 
 import java.util.ArrayList;
 
@@ -91,6 +92,48 @@ public class TAPNQuery {
     private boolean benchmark = false;
     private int benchmarkRuns = 100;
     private boolean parallel = false;
+    
+    public enum VerificationType {
+        QUANTITATIVE, QUALITATIVE, SIMULATE;
+
+        public static VerificationType fromOrdinal(int ordinal) {
+            switch (ordinal) {
+                case 1:
+                    return QUALITATIVE;
+                case 2:
+                    return SIMULATE;
+                default:
+                    return QUANTITATIVE;
+            }
+        }
+
+        public static VerificationType fromString(String type) {
+            switch (type) {
+                case "Qualitative":
+                    return QUALITATIVE;
+                case "Simulate":
+                    return SIMULATE;
+                default:
+                    return QUANTITATIVE;
+            }
+        }
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case QUALITATIVE:
+                    return "Qualitative";
+                case SIMULATE:
+                    return "Simulate";
+                default:
+                    return "Quantitative";
+            }
+        }
+    }
+
+    private VerificationType verificationType = VerificationType.QUANTITATIVE;
+    private int numberOfTraces = 1;
+    private SMCTraceType smcTraceType = new SMCTraceType();
 
 	/**
 	 * @param name
@@ -607,6 +650,36 @@ public class TAPNQuery {
     public void setParallel(boolean value) {
         parallel = value;
     }
+
+    public void setVerificationType(VerificationType verificationType) {
+        this.verificationType = verificationType;
+    }
+
+    public VerificationType getVerificationType() {
+        return verificationType;
+    }
+
+    public void setNumberOfTraces(int numberOfTraces) {
+        this.numberOfTraces = numberOfTraces;
+    }
+
+    public int getNumberOfTraces() {
+        return numberOfTraces;
+    }
+
+    public void setSmcTraceType(SMCTraceType traceType) {
+        this.smcTraceType = traceType;
+    }
+
+    public SMCTraceType getSmcTraceType() {
+        return smcTraceType;
+    }
+
+    public boolean isSimulate() {
+        return verificationType == VerificationType.SIMULATE;
+    }
+
+
 
     public boolean hasUntimedOnlyProperties(){
         if(!(

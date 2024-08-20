@@ -16,6 +16,7 @@ public abstract class VerificationOptions {
 	protected String reducedModelPath;
     protected static String unfoldedModelPath;
     protected static String unfoldedQueriesPath;
+    protected boolean isSimulate;
 
 	public abstract String toString();
 
@@ -52,5 +53,9 @@ public abstract class VerificationOptions {
     }
     public String unfoldedQueriesPath(){
         return unfoldedQueriesPath;
+    }
+
+    public boolean isSimulate(){
+        return isSimulate;
     }
 }

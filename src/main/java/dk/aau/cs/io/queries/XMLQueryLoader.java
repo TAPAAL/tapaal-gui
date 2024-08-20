@@ -147,7 +147,7 @@ public class XMLQueryLoader extends QueryLoader{
             }
 
             // Update queryWrapper name and property
-            if (isCTL) {
+            if (isCTL && !isSmc) {
                 if (!XMLCTLQueryParser.parse(prop, queryWrapper)) {
                     queries.add(null);
                     continue;

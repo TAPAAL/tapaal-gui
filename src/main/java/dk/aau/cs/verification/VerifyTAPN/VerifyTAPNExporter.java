@@ -67,7 +67,7 @@ public class VerifyTAPNExporter {
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
             } else if (query.getCategory() == QueryCategory.SMC) {
                 SMCQueryVisitor XMLVisitor = new SMCQueryVisitor();
-                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null, dataLayerQuery.getSmcSettings()));
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery.getName(), dataLayerQuery.getSmcSettings()));
             } else if (lens != null && lens.isGame()) {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null, true));

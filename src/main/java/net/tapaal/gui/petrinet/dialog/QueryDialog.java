@@ -51,6 +51,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.VerificationType;
 import pipe.gui.*;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.approximation.OverApproximation;
@@ -224,11 +225,13 @@ public class QueryDialog extends JPanel {
     // SMC options panel
     private JPanel smcSettingsPanel;
     private JComboBox<String> smcVerificationType;
+    private JLabel smcVerificationTypeLabel;
     private JTextField smcTimeBoundValue;
     private JCheckBox smcTimeBoundInfinite;
     private JTextField smcStepBoundValue;
     private JCheckBox smcStepBoundInfinite;
     private JPanel quantitativePanel;
+    private JLabel smcParallelLabel;
     private JCheckBox smcParallel;
     private JTextField smcConfidence;
     private JTextField smcEstimationIntervalWidth;
@@ -239,6 +242,9 @@ public class QueryDialog extends JPanel {
     private JTextField smcFalseNegatives;
     private JTextField smcIndifference;
     private JTextField smcComparisonFloat;
+    private JPanel smcTracePanel;
+    private JTextField smcNumberOfTraces;
+    private JComboBox<SMCTraceType> smcTraceType;
     private SMCSettings smcSettings;
     private boolean smcMustUpdateTime = true;
     private boolean doingBenchmark = false;
@@ -429,7 +435,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 
     //Tool tips for SMC panel
-    private final static String TOOL_TIP_ANALYSIS_TYPE = "Choose between probability quantitative estimation, or qualitative hypothesis testing against a fixed probability";
+    private final static String TOOL_TIP_ANALYSIS_TYPE = "Choose between probability quantitative estimation, qualitative hypothesis testing against a fixed probability, or trace generation.";
     private final static String TOOL_TIP_TIME_BOUND = "Bound each run by a maximum accumulated delay";
     private final static String TOOL_TIP_STEP_BOUND = "Bound each run by a maximum number of transition firings";
     private final static String TOOL_TIP_CONFIDENCE = "Between 0 and 1, confidence that the probability is indeed in the computed interval";
@@ -439,6 +445,8 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_INDIFFERENCE = "Width of the indifference region used as a threshold by the algorithm";
     private final static String TOOL_TIP_VERIFICATION_TIME = "Total estimated time (in seconds) to run the verification with the given confidence and precision";
     private final static String TOOL_TIP_QUALITATIVE_TEST = "Probability threshold to be tested";
+    private final static String TOOL_TIP_N_TRACES = "Number of traces to be shown";
+    private final static String TOOL_TIP_TRACE_TYPE = "Specifies the type of traces to be shown";
 
 
     private QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
@@ -567,8 +575,23 @@ public class QueryDialog extends JPanel {
 
         if(lens.isStochastic()) {
             query.setCategory(TAPNQuery.QueryCategory.SMC);
-            query.setSmcSettings(getSMCSettings());
             query.setParallel(smcParallel.isSelected());
+            VerificationType verificationType = VerificationType.fromOrdinal(smcVerificationType.getSelectedIndex());
+            if (verificationType == VerificationType.SIMULATE) {
+                query.setSmcSettings(SMCSettings.Default());
+            } else {
+                query.setSmcSettings(getSMCSettings());
+            }
+            
+            query.setVerificationType(verificationType);
+
+            try {
+                query.setNumberOfTraces(Integer.parseInt(smcNumberOfTraces.getText()));
+            } catch (NumberFormatException e) {
+                smcNumberOfTraces.setText(String.valueOf(query.getNumberOfTraces()));
+            }
+
+            query.setSmcTraceType((SMCTraceType)smcTraceType.getSelectedItem());
         }
 
         return query;
@@ -1686,15 +1709,16 @@ public class QueryDialog extends JPanel {
         initRawVerificationOptionsPanel();
         initButtonPanel(option);
 
+        if (lens.isStochastic()) {
+            setSMCSettings(SMCSettings.Default());
+        }
+
         if (queryToCreateFrom != null) {
             setupFromQuery(queryToCreateFrom);
         }
 
         refreshTraceOptions();
 
-        if (lens.isStochastic()) {
-            setSMCSettings(SMCSettings.Default());
-        }
 
         setEnabledReductionOptions();
 
@@ -1746,8 +1770,9 @@ public class QueryDialog extends JPanel {
         if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.SMC) {
             setSMCSettings(queryToCreateFrom.getSmcSettings());
             smcParallel.setSelected(queryToCreateFrom.isParallel());
-        } else {
-            setSMCSettings(SMCSettings.Default());
+            smcVerificationType.setSelectedIndex(queryToCreateFrom.getVerificationType().ordinal());
+            smcNumberOfTraces.setText(String.valueOf(queryToCreateFrom.getNumberOfTraces()));
+            smcTraceType.setSelectedItem(queryToCreateFrom.getSmcTraceType());
         }
 
         setupQueryCategoryFromQuery(queryToCreateFrom);
@@ -1786,6 +1811,29 @@ public class QueryDialog extends JPanel {
 
         numberOfExtraTokensInNet.addChangeListener(e -> updateRawVerificationOptions());
         reductionOption.addActionListener(e -> updateRawVerificationOptions());
+        smcVerificationType.addActionListener(e -> updateRawVerificationOptions());
+        smcNumberOfTraces.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                SwingUtilities.invokeLater(() -> updateRawVerificationOptions());
+            }
+        
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                SwingUtilities.invokeLater(() -> {
+                    if (!smcNumberOfTraces.getText().trim().isEmpty()) {
+                        updateRawVerificationOptions();
+                    }
+                });
+            }
+        
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                SwingUtilities.invokeLater(() -> updateRawVerificationOptions());
+            }
+        });
+
+        smcTraceType.addActionListener(e -> updateRawVerificationOptions());
         
         if (reductionOption.getSelectedItem() != null) {
             updateRawVerificationOptions();
@@ -2698,11 +2746,12 @@ public class QueryDialog extends JPanel {
         smcEngineOptions.setBorder(BorderFactory.createTitledBorder("SMC engine options"));
         subPanelGbc.gridy = 0;
         subPanelGbc.gridx = 0;
-        smcEngineOptions.add(new JLabel("Verification type : "), subPanelGbc);
+        smcVerificationTypeLabel = new JLabel("Verification type : ");
+        smcEngineOptions.add(smcVerificationTypeLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
         subPanelGbc.gridwidth = 2;
-        smcVerificationType = new JComboBox<>(new String[]{ "Quantitative", "Qualitative" });
+        smcVerificationType = new JComboBox<>(new String[]{ "Quantitative", "Qualitative", "Simulate" });
         smcVerificationType.setToolTipText(TOOL_TIP_ANALYSIS_TYPE);
         smcEngineOptions.add(smcVerificationType, subPanelGbc);
         subPanelGbc.fill = GridBagConstraints.NONE;
@@ -2743,7 +2792,8 @@ public class QueryDialog extends JPanel {
 
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
-        smcEngineOptions.add(new JLabel("Use all available cores : "), subPanelGbc);
+        smcParallelLabel = new JLabel("Use all available cores : ");
+        smcEngineOptions.add(smcParallelLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcParallel = new JCheckBox();
         smcEngineOptions.add(smcParallel, subPanelGbc);
@@ -2836,11 +2886,43 @@ public class QueryDialog extends JPanel {
         smcComparisonFloat.addFocusListener(updater);
         qualitativePanel.add(smcComparisonFloat, subPanelGbc);
         smcSettingsPanel.add(qualitativePanel, gbc);
+    
+        smcTracePanel = new JPanel();
+        smcTracePanel.setLayout(new GridBagLayout());
+        smcTracePanel.setBorder(BorderFactory.createTitledBorder("Trace options"));
+        smcTracePanel.setVisible(false);
+        subPanelGbc.gridy = 0;
+        subPanelGbc.gridx = 0;
+        JLabel numberOfTracesLabel = new JLabel("Number of traces : ");
+        numberOfTracesLabel.setToolTipText(TOOL_TIP_N_TRACES);
+        smcTracePanel.add(numberOfTracesLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcNumberOfTraces = new JTextField(7);
+        smcNumberOfTraces.addFocusListener(updater);
+        smcNumberOfTraces.setToolTipText(TOOL_TIP_N_TRACES);
+        smcTracePanel.add(smcNumberOfTraces, subPanelGbc);
+        subPanelGbc.gridy = 1;
+        smcTracePanel.add(Box.createVerticalStrut(5), subPanelGbc);
+        JLabel traceTypeLabel = new JLabel("Trace type : ");
+        traceTypeLabel.setToolTipText(TOOL_TIP_TRACE_TYPE);
+        subPanelGbc.gridx = 0;
+        subPanelGbc.gridy = 2;
+        smcTracePanel.add(traceTypeLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcTraceType = new JComboBox<>(new SMCTraceType[]{ new SMCTraceType("Any"), 
+                                                           new SMCTraceType("Satisfied"), 
+                                                           new SMCTraceType("Not satisfied") });
+        smcTraceType.setToolTipText(TOOL_TIP_TRACE_TYPE);
+        smcTracePanel.add(smcTraceType, subPanelGbc);
+        smcSettingsPanel.add(smcTracePanel, gbc);
 
         smcVerificationType.addActionListener(evt -> {
             boolean quantitative = smcVerificationType.getSelectedIndex() == 0;
+            boolean qualitative = smcVerificationType.getSelectedIndex() == 1;
+            boolean simulate = smcVerificationType.getSelectedIndex() == 2;
             quantitativePanel.setVisible(quantitative);
-            qualitativePanel.setVisible(!quantitative);
+            qualitativePanel.setVisible(qualitative);
+            smcTracePanel.setVisible(simulate);
             guiDialog.pack();
         });
 
@@ -5109,6 +5191,12 @@ public class QueryDialog extends JPanel {
         setAllEnabled(traceOptionsPanel, isEnabled);
         setAllEnabled(boundednessCheckPanel, isEnabled);
         setAllEnabled(searchOptionsPanel, isEnabled);
+        setAllEnabled(smcTracePanel, isEnabled);
+
+        smcVerificationTypeLabel.setEnabled(isEnabled);
+        smcVerificationType.setEnabled(isEnabled);
+        smcParallelLabel.setEnabled(isEnabled);
+        smcParallel.setEnabled(isEnabled);
 
         setEnabledOptionsAccordingToCurrentReduction();
     }
