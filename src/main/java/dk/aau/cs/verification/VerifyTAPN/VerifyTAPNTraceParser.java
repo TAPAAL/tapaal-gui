@@ -43,11 +43,11 @@ public class VerifyTAPNTraceParser {
 
 		Document document = readerToDocument(reader);
 
-        if(document == null) return null;
+        if (document == null) return null;
 
         NodeList nodeList = null;
 
-		if(traceNameToParse != null) {
+		if (traceNameToParse != null) {
             NodeList childNodes = null;
 		    Node traceListNode = document.getElementsByTagName("trace-list").item(0);
 
@@ -56,10 +56,10 @@ public class VerifyTAPNTraceParser {
 			}
 
 			if (childNodes != null) {
-				for(int i = 0; i < childNodes.getLength(); i++) {
+				for (int i = 0; i < childNodes.getLength(); i++) {
 					NamedNodeMap nodeAttribute = childNodes.item(i).getAttributes();
 	
-					if(nodeAttribute != null && nodeAttribute.item(0).getNodeValue().equals(traceNameToParse)) {
+					if (nodeAttribute != null && nodeAttribute.item(0).getNodeValue().equals(traceNameToParse)) {
 						nodeList = childNodes.item(i).getChildNodes();
 						trace.setTraceName(traceNameToParse);
 						break;
@@ -68,31 +68,11 @@ public class VerifyTAPNTraceParser {
 			}
         }
 		
-		if(nodeList == null) {
+		if (nodeList == null) {
             nodeList = document.getElementsByTagName("trace").item(0).getChildNodes();
         }
 
-		for(int i = 0; i < nodeList.getLength(); i++){
-			Node node = nodeList.item(i);
-			if(node instanceof Element){
-				Element element = (Element)node;
-
-				if(element.getTagName().equals("transition")){
-					TimedTransitionStep step = parseTransitionStep(element);
-					trace.add(step);
-				}else if(element.getTagName().equals("delay")){
-					if(element.getTextContent().equals("forever")){
-						trace.setTraceType(TraceType.EG_DELAY_FOREVER);
-					} else {
-						TimeDelayStep step = parseTimeDelay(element);
-						trace.add(step);
-					}
-				}else if(element.getTagName().equals("loop")){
-					trace.nextIsLoop();
-					trace.setTraceType(TraceType.EG_LOOP);
-				}
-			}
-		}
+        parseTraceNodes(trace, nodeList);
 	
 		return trace;
 	}
@@ -102,11 +82,11 @@ public class VerifyTAPNTraceParser {
 
         Document document = readerToDocument(reader);
 
-        if(document == null) return null;
+        if (document == null) return null;
 
         NodeList nodeList = document.getElementsByTagName("trace");
 
-        for(int i = 0; i < nodeList.getLength(); ++i){
+        for (int i = 0; i < nodeList.getLength(); ++i){
             Node node = nodeList.item(i);
             if (node instanceof Element) {
                 Element element = (Element)node;
@@ -115,33 +95,37 @@ public class VerifyTAPNTraceParser {
                 TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
 
                 NodeList childNodes = element.getChildNodes();
-                for (int j = 0; j < childNodes.getLength(); ++j){
-                    Node childNode = childNodes.item(j);
-                    if (childNode instanceof Element){
-                        Element childElement = (Element)childNode;
-
-                        if (childElement.getTagName().equals("transition")){
-                            TimedTransitionStep step = parseTransitionStep(childElement);
-                            trace.add(step);
-                        } else if(childElement.getTagName().equals("delay")){
-                            if (childElement.getTextContent().equals("forever")){
-                                trace.setTraceType(TraceType.EG_DELAY_FOREVER);
-                            } else {
-                                TimeDelayStep step = parseTimeDelay(childElement);
-                                trace.add(step);
-                            }
-                        } else if(childElement.getTagName().equals("loop")){
-                            trace.nextIsLoop();
-                            trace.setTraceType(TraceType.EG_LOOP);
-                        }
-                    }
-                }
+                parseTraceNodes(trace, childNodes);
 
                 traces.put(traceName, trace);
             }
         }
 
         return traces;
+    }
+
+    private void parseTraceNodes(TimedArcPetriNetTrace trace, NodeList childNodes) {
+        for (int j = 0; j < childNodes.getLength(); ++j){
+            Node childNode = childNodes.item(j);
+            if (childNode instanceof Element){
+                Element childElement = (Element)childNode;
+
+                if (childElement.getTagName().equals("transition")){
+                    TimedTransitionStep step = parseTransitionStep(childElement);
+                    trace.add(step);
+                } else if (childElement.getTagName().equals("delay")){
+                    if (childElement.getTextContent().equals("forever")){
+                        trace.setTraceType(TraceType.EG_DELAY_FOREVER);
+                    } else {
+                        TimeDelayStep step = parseTimeDelay(childElement);
+                        trace.add(step);
+                    }
+                } else if (childElement.getTagName().equals("loop")){
+                    trace.nextIsLoop();
+                    trace.setTraceType(TraceType.EG_LOOP);
+                }
+            }
+        }
     }
 
     private Document readerToDocument(BufferedReader reader) {
