@@ -575,9 +575,15 @@ public class QueryDialog extends JPanel {
 
         if(lens.isStochastic()) {
             query.setCategory(TAPNQuery.QueryCategory.SMC);
-            query.setSmcSettings(getSMCSettings());
             query.setParallel(smcParallel.isSelected());
-            query.setVerificationType(VerificationType.fromOrdinal(smcVerificationType.getSelectedIndex()));
+            VerificationType verificationType = VerificationType.fromOrdinal(smcVerificationType.getSelectedIndex());
+            if (verificationType == VerificationType.SIMULATE) {
+                query.setSmcSettings(SMCSettings.Default());
+            } else {
+                query.setSmcSettings(getSMCSettings());
+            }
+            
+            query.setVerificationType(verificationType);
 
             try {
                 query.setNumberOfTraces(Integer.parseInt(smcNumberOfTraces.getText()));
