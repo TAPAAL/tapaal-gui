@@ -225,11 +225,13 @@ public class QueryDialog extends JPanel {
     // SMC options panel
     private JPanel smcSettingsPanel;
     private JComboBox<String> smcVerificationType;
+    private JLabel smcVerificationTypeLabel;
     private JTextField smcTimeBoundValue;
     private JCheckBox smcTimeBoundInfinite;
     private JTextField smcStepBoundValue;
     private JCheckBox smcStepBoundInfinite;
     private JPanel quantitativePanel;
+    private JLabel smcParallelLabel;
     private JCheckBox smcParallel;
     private JTextField smcConfidence;
     private JTextField smcEstimationIntervalWidth;
@@ -2738,7 +2740,8 @@ public class QueryDialog extends JPanel {
         smcEngineOptions.setBorder(BorderFactory.createTitledBorder("SMC engine options"));
         subPanelGbc.gridy = 0;
         subPanelGbc.gridx = 0;
-        smcEngineOptions.add(new JLabel("Verification type : "), subPanelGbc);
+        smcVerificationTypeLabel = new JLabel("Verification type : ");
+        smcEngineOptions.add(smcVerificationTypeLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
         subPanelGbc.gridwidth = 2;
@@ -2783,7 +2786,8 @@ public class QueryDialog extends JPanel {
 
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
-        smcEngineOptions.add(new JLabel("Use all available cores : "), subPanelGbc);
+        smcParallelLabel = new JLabel("Use all available cores : ");
+        smcEngineOptions.add(smcParallelLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcParallel = new JCheckBox();
         smcEngineOptions.add(smcParallel, subPanelGbc);
@@ -5181,6 +5185,12 @@ public class QueryDialog extends JPanel {
         setAllEnabled(traceOptionsPanel, isEnabled);
         setAllEnabled(boundednessCheckPanel, isEnabled);
         setAllEnabled(searchOptionsPanel, isEnabled);
+        setAllEnabled(smcTracePanel, isEnabled);
+
+        smcVerificationTypeLabel.setEnabled(isEnabled);
+        smcVerificationType.setEnabled(isEnabled);
+        smcParallelLabel.setEnabled(isEnabled);
+        smcParallel.setEnabled(isEnabled);
 
         setEnabledOptionsAccordingToCurrentReduction();
     }

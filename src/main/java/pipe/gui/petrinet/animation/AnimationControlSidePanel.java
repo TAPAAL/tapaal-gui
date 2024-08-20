@@ -8,7 +8,6 @@ import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -18,7 +17,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.util.Require;
@@ -122,7 +120,6 @@ public class AnimationControlSidePanel extends JPanel {
 
     public void updateTraceBox(Map<String, TAPNNetworkTrace> traceMap) {
         Vector<Object> tracesVector = new Vector<>();
-
         for (var entry : traceMap.entrySet()) {
             tracesVector.add(entry.getKey());
         }
