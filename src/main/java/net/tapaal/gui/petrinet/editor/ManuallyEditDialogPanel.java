@@ -13,16 +13,26 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
 
 public class ManuallyEditDialogPanel extends EscapableDialog {
+    private static final int GAP = 10;
+    private static final int TEXT_TO_BORDER_MARGIN = 10;
+    private static final int FONT_SIZE = 14;
+
     private final ColorTypesListModel colorTypesListModel;
     private final VariablesListModel variablesListModel;
     private final ConstantsListModel constantsListModel;
     private final TimedArcPetriNetNetwork network;
     private final UndoManager undoManager;
-    private static final int GAP = 10;
+
+    private JTextArea constantsArea;
+    private JTextArea variablesArea;
+    private JTextArea colorTypesArea;
 
     public ManuallyEditDialogPanel(ColorTypesListModel colorTypesListModel,
                                   VariablesListModel variablesListModel,
@@ -40,6 +50,20 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
     }
 
     public void showDialog() {
+        String cleanHtml = "</?(html|b)>";
+
+        for (int i = 0; i < constantsListModel.getSize(); ++i) {
+            constantsArea.append(constantsListModel.getElementAt(i) + ";\n");
+        }
+
+        for (int i = 0; i < variablesListModel.getSize(); ++i) {
+            variablesArea.append((variablesListModel.getElementAt(i) + ";\n").replaceAll(cleanHtml, ""));
+        }
+
+        for (int i = 0; i < colorTypesListModel.getSize(); ++i) {
+            colorTypesArea.append((colorTypesListModel.getElementAt(i) + ";\n").replaceAll(cleanHtml, ""));
+        }
+
         setVisible(true);
     }
 
@@ -51,23 +75,41 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         JLabel constantsLabel = new JLabel("Constants");
         constantsLabel.setAlignmentX(CENTER_ALIGNMENT);
 
-        JTextArea constantsArea = new JTextArea();
+        constantsArea = new JTextArea();
         constantsArea.setLineWrap(true);
         constantsArea.setWrapStyleWord(true);
-        
+        constantsArea.setMargin(new Insets(TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN));
+        constantsArea.setFont(new Font(constantsArea.getFont().getName(), Font.PLAIN, FONT_SIZE));
+        JScrollPane constantsScrollPane = new JScrollPane(constantsArea);
+
         JLabel variablesLabel = new JLabel("Variables");
         variablesLabel.setAlignmentX(CENTER_ALIGNMENT);
 
-        JTextArea variablesArea = new JTextArea();
+        variablesArea = new JTextArea();
         variablesArea.setLineWrap(true);
         variablesArea.setWrapStyleWord(true);
+        variablesArea.setMargin(new Insets(TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN));
+        variablesArea.setFont(new Font(variablesArea.getFont().getName(), Font.PLAIN, FONT_SIZE));
+        JScrollPane variablesScrollPane = new JScrollPane(variablesArea);
 
         JLabel colorTypesLabel = new JLabel("Color Types");
         colorTypesLabel.setAlignmentX(CENTER_ALIGNMENT);
 
-        JTextArea colorTypesArea = new JTextArea();
+        colorTypesArea = new JTextArea();
         colorTypesArea.setLineWrap(true);
         colorTypesArea.setWrapStyleWord(true);
+        colorTypesArea.setMargin(new Insets(TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN));
+        colorTypesArea.setFont(new Font(colorTypesArea.getFont().getName(), Font.PLAIN, FONT_SIZE));
+        JScrollPane colorTypesScrollPane = new JScrollPane(colorTypesArea);
 
         JPanel buttonPanel = new JPanel(new BorderLayout());
 
@@ -92,13 +134,13 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, helpButton.getPreferredSize().height));
 
         panel.add(constantsLabel);
-        panel.add(constantsArea);
+        panel.add(constantsScrollPane);
         panel.add(Box.createVerticalStrut(GAP));
         panel.add(variablesLabel);
-        panel.add(variablesArea);
+        panel.add(variablesScrollPane);
         panel.add(Box.createVerticalStrut(GAP));
         panel.add(colorTypesLabel);
-        panel.add(colorTypesArea);
+        panel.add(colorTypesScrollPane);
         panel.add(Box.createVerticalStrut(GAP));
         panel.add(buttonPanel);
 

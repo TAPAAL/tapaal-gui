@@ -26,6 +26,12 @@ public class ColorType implements Iterable<Color> {
         addColor(new Color(this, colors.size(), colorName));
     }
 
+    public void addColors(List<String> colorNames) {
+        for (String c : colorNames) {
+            addColor(c);
+        }
+    }
+
     public String getName() {
         return name;
     }
