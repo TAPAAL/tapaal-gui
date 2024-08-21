@@ -286,6 +286,11 @@ public class ConstantStore {
 		
 	}
 
+    public void clear() {
+        constants.clear();
+        largest = -1;
+    }
+
 	public Constant getConstantByIndex(int index) {
 		return constants.get(index);
 	}

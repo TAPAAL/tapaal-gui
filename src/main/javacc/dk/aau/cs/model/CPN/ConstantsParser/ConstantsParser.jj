@@ -117,6 +117,7 @@ public class ConstantsParser {
             }
         }
 
+        network.getConstantStore().clear();
         network.setConstants(constantsList);
         if (network.isColored()) {
             network.setColorTypes(colorTypesList);

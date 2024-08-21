@@ -3,6 +3,8 @@ package net.tapaal.gui.petrinet.editor;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.editor.ConstantsPane.ColorTypesListModel;
 import net.tapaal.gui.petrinet.editor.ConstantsPane.VariablesListModel;
+import net.tapaal.gui.petrinet.undo.manualEdit.EditConstantsCommand;
+import net.tapaal.gui.petrinet.undo.manualEdit.NetworkState;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.undo.UndoManager;
 import pipe.gui.swingcomponents.EscapableDialog;
@@ -18,6 +20,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
+import net.tapaal.gui.petrinet.undo.Command;
 
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ConstantsParser.ConstantsParser;
@@ -94,7 +97,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        JLabel constantsLabel = new JLabel("Constants");
+        JLabel constantsLabel = new JLabel("Color Types, Variables, and Constants");
         constantsLabel.setAlignmentX(CENTER_ALIGNMENT);
 
         constantsArea = new JTextArea();
@@ -144,14 +147,16 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
 
     private void save() {
         try {
+            NetworkState oldState = new NetworkState(network);
             boolean resultOk = ConstantsParser.parse(constantsArea.getText(), network);
             if (resultOk) {
-                colorTypesListModel.updateName();
-                variablesListModel.updateName();
+                Command command = new EditConstantsCommand(oldState, network, colorTypesListModel, variablesListModel);
+                command.redo();
+                undoManager.addNewEdit(command);
                 dispose();
             }
         } catch (ParseException e) {
-            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.getMessage(), "Error parsing constants", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.getMessage(), "Error during parsing", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -162,7 +167,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
 
         helpTextArea.setEditable(false);
 
-        String helpText = "Syntax for defining constants:\n" +
+        String helpText = "Syntax for defining " + (isColored ? "color types, variables, and " : "") + "constants:\n" +
                           "const {ID} = {INTEGER};\n" +
                           "e.g. const a = 5; is a valid constant\n\n" +
                           (isColored ? "Syntax for defining color types:\n" +
