@@ -294,20 +294,23 @@ void productList(List<String> values, BoolRef isProductList) :
 
 void variables() :
 {
-    Token id, type;
+    Token type;
+    List<String> ids = new ArrayList<String>();
 }
 {
-    <VAR> id = <ID> <IN> type = <ID> {
+    <VAR> idList(ids) <IN> type = <ID> {
         if (!network.isColored()) {
             throw new ParseException("Variables are not allowed in uncolored networks");
         }
 
-        idExists(id.image);
-
-        if (!colorTypes.containsKey(type.image)) {
-            throw new ParseException("Color type with name \"" + type.image + "\" does not exist");
+        for (String id : ids) {
+            idExists(id);
+            
+            if (!colorTypes.containsKey(type.image)) {
+                throw new ParseException("Color type with name \"" + type.image + "\" does not exist");
+            }
+            
+            variables.put(id, new Variable(id, colorTypes.get(type.image)));
         }
-
-        variables.put(id.image, new Variable(id.image, colorTypes.get(type.image)));
     }
 }

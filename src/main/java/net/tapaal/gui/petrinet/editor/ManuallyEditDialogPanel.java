@@ -21,8 +21,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import net.tapaal.gui.petrinet.undo.Command;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.CPN.ConstantsParser.ConstantsParser;
 import dk.aau.cs.model.CPN.ConstantsParser.ParseException;
 
@@ -67,7 +72,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
             if (ct.getName().equals("dot")) continue;
             String colorTypeStr = "type ";
             if (ct.isIntegerRange() && !ct.getColorList().isEmpty()) {
-                colorTypeStr += ct.getName() + " is [" + ct.getLowerBound() + ", " + ct.getUpperBound() + "];\n";
+                colorTypeStr += ct.getName() + " is [" + ct.getLowerBound() + ", " + ct.getUpperBound() + "]";
             } else {
                 colorTypeStr += ct;
             }
@@ -81,8 +86,30 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
             constantsArea.append(colorTypeStr);
         }
         
+        Map<String, List<String>> variableTypeToName = new LinkedHashMap<>();
         for (int i = 0; i < variablesListModel.getSize(); ++i) {
-            constantsArea.append("var " + (variablesListModel.getElementAt(i) + ";\n").replaceAll(cleanHtml, ""));
+            Variable v = (Variable)variablesListModel.getElementAt(i);
+            String ctName = v.getColorType().getName();
+            String varName = v.getName();
+
+            variableTypeToName.putIfAbsent(ctName, new ArrayList<String>());
+            variableTypeToName.get(ctName).add(varName);
+        }
+
+        for (Map.Entry<String, List<String>> entry : variableTypeToName.entrySet()) {
+            String ctName = entry.getKey();
+            List<String> varNames = entry.getValue();
+
+            String varStr = "var ";
+            for (String varName : varNames) {
+                varStr += varName + ", ";
+            }
+
+            varStr = varStr.substring(0, varStr.length() - 2);
+            varStr += " in " + ctName + ";\n";
+            varStr.replaceAll(cleanHtml, "");
+
+            constantsArea.append(varStr);
         }
 
         for (int i = 0; i < constantsListModel.getSize(); ++i) {
