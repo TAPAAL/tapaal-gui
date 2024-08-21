@@ -1563,6 +1563,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             TAPNLens untimedColorLens = new TAPNLens(false, false, true, false);
             TAPNLens timedColorLens = new TAPNLens(true, false, true, false);
             TAPNLens timedStochasticLens = new TAPNLens(true, false, false, true);
+            TAPNLens timedColorStochasticLens = new TAPNLens(true, false, true, true);
 
             HashMap<TAPNLens, List<String>> netMap = new HashMap<>(){{
                     put(untimedLens, new ArrayList<>());
@@ -1572,6 +1573,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     put(untimedColorLens, new ArrayList<>());
                     put(timedColorLens, new ArrayList<>());
                     put(timedStochasticLens, new ArrayList<>());
+                    put(timedColorStochasticLens, new ArrayList<>());
             }};
 
             for (String filename : nets) {
@@ -1621,6 +1623,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             modifier = getModifier(modifier, charKey, netMap.get(untimedColorLens).size());
             charKey = countCharKey(charKey, netMap.get(untimedColorLens).size());
             exampleMenu.add(addExampleNets(netMap.get(timedColorLens), "Timed-Arc Colored Petri nets", charKey, modifier));
+
+            modifier = getModifier(modifier, charKey, netMap.get(timedColorLens).size());
+            charKey = countCharKey(charKey, netMap.get(timedColorLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(timedStochasticLens), "Timed-Arc Stochastic Petri nets", charKey, modifier));
+
+            modifier = getModifier(modifier, charKey, netMap.get(timedStochasticLens).size());
+            charKey = countCharKey(charKey, netMap.get(timedStochasticLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(timedColorStochasticLens), "Timed-Arc Stochastic Colored Petri nets", charKey, modifier));
 
             return exampleMenu;
         }

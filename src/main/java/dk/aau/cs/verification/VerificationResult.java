@@ -236,8 +236,12 @@ public class VerificationResult<TTrace> {
 	public String getVerificationTimeString() {
 		return String.format("Estimated verification time: %1$.2fs", verificationTime() / 1000.0);
 	}
-	
-	public String getStatsAsString(){
+
+    public Stats getStats(){
+        return stats;
+    }
+
+    public String getStatsAsString(){
 		return stats.toString();
 	}
 

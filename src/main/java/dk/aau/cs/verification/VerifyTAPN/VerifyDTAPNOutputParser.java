@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dk.aau.cs.TCTL.LTLFNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.*;
@@ -30,20 +29,26 @@ public class VerifyDTAPNOutputParser {
 
     private static final Pattern smcEstimationPattern = Pattern.compile("\\s*P = ([^±]+) ± (.+)\\s*");
     private static final Pattern smcExecutedRunsPattern = Pattern.compile("\\s*runs executed:\\s*(\\d+)\\s*");
-    private static final Pattern smcValidRunsPattern = Pattern.compile("\\s*valid runs:\\s*(\\d+)\\s*");
-    private static final Pattern smcAverageTimePattern = Pattern.compile("\\s*average run time:\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcValidRunsPattern = Pattern.compile("\\s*number of valid runs:\\s*(\\d+)\\s*");
+    private static final Pattern smcAverageTimePattern = Pattern.compile("\\s*average run duration:\\s*([\\d\\.]+)\\s*");
     private static final Pattern smcAverageLengthPattern = Pattern.compile("\\s*average run length:\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcTimeStdDevPattern = Pattern.compile("\\s*run duration \\(std. dev.\\):\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcLengthStdDevPattern = Pattern.compile("\\s*run length \\(std. dev.\\):\\s*([\\d\\.]+)\\s*");
     private static final Pattern smcVerificationTimePattern = Pattern.compile("\\s*verification time:\\s*([\\d\\.]+)\\s*");
-    private static final Pattern smcAverageValidTimePattern = Pattern.compile("\\s*average time of a valid run:\\s*([\\d\\.]+)\\s*");
-    private static final Pattern smcAverageValidLengthPattern = Pattern.compile("\\s*average length of a valid run:\\s*([\\d\\.]+)\\s*");
 
-	  private static final Pattern smcCumulativeProbabilityStepPattern = Pattern.compile("\\s*cumulative probability / step :");
-	  private static final Pattern smcCumulativeProbabilityDelayPattern = Pattern.compile("\\s*cumulative probability / delay :");
+    private static final Pattern smcCumulativeProbabilityStepPattern = Pattern.compile("\\s*cumulative probability / step :");
+    private static final Pattern smcCumulativeProbabilityDelayPattern = Pattern.compile("\\s*cumulative probability / delay :");
 
-    private static final Pattern smcValidTimeStdDevPattern = Pattern.compile("\\s*valid runs time standard deviation:\\s*([\\d\\.]+)\\s*");
-    private static final Pattern smcValidLengthStdDevPattern = Pattern.compile("\\s*valid runs length standard deviation:\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcAverageValidTimePattern = Pattern.compile("\\s*duration of a valid run \\(average\\):\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcAverageValidLengthPattern = Pattern.compile("\\s*length of a valid run \\(average\\):\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcValidTimeStdDevPattern = Pattern.compile("\\s*duration of a valid run \\(std. dev.\\):\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcValidLengthStdDevPattern = Pattern.compile("\\s*length of a valid run \\(std. dev.\\):\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcAverageViolatingTimePattern = Pattern.compile("\\s*duration of a violating run \\(average\\):\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcAverageViolatingLengthPattern = Pattern.compile("\\s*length of a violating run \\(average\\):\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcViolatingTimeStdDevPattern = Pattern.compile("\\s*duration of a violating run \\(std. dev.\\):\\s*([\\d\\.]+)\\s*");
+    private static final Pattern smcViolatingLengthStdDevPattern = Pattern.compile("\\s*length of a violating run \\(std. dev.\\):\\s*([\\d\\.]+)\\s*");
+
     private static final Pattern smcNumberOfTracesPattern = Pattern.compile("\\s*Generated \\d+ random traces");
-
 
 	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (-?\\d*)");
 	private static final Pattern wfMaxExecutionPattern = Pattern.compile("Maximum execution time: (-?\\d*)");
@@ -67,14 +72,20 @@ public class VerifyDTAPNOutputParser {
 		int WFminExecutionTime = -1;
 		int WFmaxExecutionTime = -1;
         int smcExecutedRuns = -1;
-        int smcValidRuns = -1;
+        int smcValidRuns = 0;
         float smcAverageTime = -1.0f;
         float smcAverageLength = -1.0f;
+        float smcTimeStdDev = -1.0f;
+        float smcLengthStdDev = -1.0f;
         float smcVerificationTime = -1.0f;
         float smcAverageValidTime = -1.0f;
         float smcAverageValidLength = -1.0f;
         float smcValidTimeStdDev = -1.0f;
         float smcValidLengthStdDev = -1.0f;
+        float smcAverageViolatingTime = -1.0f;
+        float smcAverageViolatingLength = -1.0f;
+        float smcViolatingTimeStdDev = -1.0f;
+        float smcViolatingLengthStdDev = -1.0f;
 		ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking = null;
 		boolean result = false;
 		int maxUsedTokens = 0;
@@ -182,10 +193,17 @@ public class VerifyDTAPNOutputParser {
                     if(matcher.find()) {
                         smcAverageTime = Float.parseFloat(matcher.group(1));
                     }
-
                     matcher = smcAverageLengthPattern.matcher(line);
                     if(matcher.find()) {
                         smcAverageLength = Float.parseFloat(matcher.group(1));
+                    }
+                    matcher = smcTimeStdDevPattern.matcher(line);
+                    if(matcher.find()) {
+                        smcTimeStdDev = Float.parseFloat(matcher.group(1));
+                    }
+                    matcher = smcLengthStdDevPattern.matcher(line);
+                    if(matcher.find()) {
+                        smcLengthStdDev = Float.parseFloat(matcher.group(1));
                     }
 
                     matcher = smcVerificationTimePattern.matcher(line);
@@ -197,12 +215,34 @@ public class VerifyDTAPNOutputParser {
                     if(matcher.find()) {
                         smcAverageValidTime = Float.parseFloat(matcher.group(1));
                     }
-
                     matcher = smcAverageValidLengthPattern.matcher(line);
                     if(matcher.find()) {
                         smcAverageValidLength = Float.parseFloat(matcher.group(1));
                     }
-
+                    matcher = smcValidTimeStdDevPattern.matcher(line);
+                    if(matcher.find()) {
+                        smcValidTimeStdDev = Float.parseFloat(matcher.group(1));
+                    }
+                    matcher = smcValidLengthStdDevPattern.matcher(line);
+                    if(matcher.find()) {
+                        smcValidLengthStdDev = Float.parseFloat(matcher.group(1));
+                    }
+                    matcher = smcAverageViolatingTimePattern.matcher(line);
+                    if(matcher.find()) {
+                        smcAverageViolatingTime = Float.parseFloat(matcher.group(1));
+                    }
+                    matcher = smcAverageViolatingLengthPattern.matcher(line);
+                    if(matcher.find()) {
+                        smcAverageViolatingLength = Float.parseFloat(matcher.group(1));
+                    }
+                    matcher = smcViolatingTimeStdDevPattern.matcher(line);
+                    if(matcher.find()) {
+                        smcViolatingTimeStdDev = Float.parseFloat(matcher.group(1));
+                    }
+                    matcher = smcViolatingLengthStdDevPattern.matcher(line);
+                    if(matcher.find()) {
+                        smcViolatingLengthStdDev = Float.parseFloat(matcher.group(1));
+                    }
 
                     matcher = smcCumulativeProbabilityStepPattern.matcher(line);
                     if (matcher.find() && i < lines.length - 1) {
@@ -224,16 +264,6 @@ public class VerifyDTAPNOutputParser {
                             GraphPoint point = new GraphPoint(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
                             cumulativeDelayPoints.add(point);
                         }
-                    }	
-
-                    matcher = smcValidTimeStdDevPattern.matcher(line);
-                    if(matcher.find()) {
-                        smcValidTimeStdDev = Float.parseFloat(matcher.group(1));
-                    }
-
-                    matcher = smcValidLengthStdDevPattern.matcher(line);
-                    if(matcher.find()) {
-                        smcValidLengthStdDev = Float.parseFloat(matcher.group(1));
                     }
 
                     matcher = smcNumberOfTracesPattern.matcher(line);
@@ -250,16 +280,20 @@ public class VerifyDTAPNOutputParser {
             Stats verifStats;
             QueryResult queryRes;
 
-            if(isSmc)
+            if(isSmc) {
                 verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength, smcVerificationTime, cumulativeStepPoints, cumulativeDelayPoints);
-            else
-                verifStats = new Stats(discovered, explored, stored, transitionStats, placeBoundStats, WFminExecutionTime, WFmaxExecutionTime, coveredMarking);      
-            if(isSmc && isQuantitative) {
-                ((SMCStats) verifStats).setAverageValidRunTime(smcAverageValidTime);
-                ((SMCStats) verifStats).setAverageValidRunLength(smcAverageValidLength);
+                ((SMCStats) verifStats).setRunTimeStdDev(smcTimeStdDev);
+                ((SMCStats) verifStats).setRunLengthStdDev(smcLengthStdDev);
+                ((SMCStats) verifStats).setValidRunAverageTime(smcAverageValidTime);
+                ((SMCStats) verifStats).setValidRunAverageLength(smcAverageValidLength);
                 ((SMCStats) verifStats).setValidRunTimeStdDev(smcValidTimeStdDev);
                 ((SMCStats) verifStats).setValidRunLengthStdDev(smcValidLengthStdDev);
-            }
+                ((SMCStats) verifStats).setViolatingRunAverageTime(smcAverageViolatingTime);
+                ((SMCStats) verifStats).setViolatingRunAverageLength(smcAverageViolatingLength);
+                ((SMCStats) verifStats).setViolatingRunTimeStdDev(smcViolatingTimeStdDev);
+                ((SMCStats) verifStats).setViolatingRunLengthStdDev(smcViolatingLengthStdDev);
+            } else
+                verifStats = new Stats(discovered, explored, stored, transitionStats, placeBoundStats, WFminExecutionTime, WFmaxExecutionTime, coveredMarking);
             if(isQuantitative) {
                 queryRes = new QueryResult(quantitativeResult, boundedAnalysis, query, discreteInclusion);
             }

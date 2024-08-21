@@ -1,7 +1,7 @@
 package dk.aau.cs.verification;
 
 import java.util.List;
-import java.util.ArrayList;
+
 import pipe.gui.graph.GraphPoint;
 
 public class SMCStats extends Stats {
@@ -10,11 +10,17 @@ public class SMCStats extends Stats {
     private int validRuns;
     private float averageRunTime;
     private float averageRunLength;
+    private float runTimeStdDev = -1.0f;
+    private float runLengthStdDev = -1.0f;
     private float verificationTime;
-    private float averageValidRunTime = -1.0f;
-    private float averageValidRunLength = -1.0f;
+    private float validRunAverageTime = -1.0f;
+    private float validRunAverageLength = -1.0f;
     private float validRunTimeStdDev = -1.0f;
     private float validRunLengthStdDev = -1.0f;
+    private float violatingRunAverageTime = -1.0f;
+    private float violatingRunAverageLength = -1.0f;
+    private float violatingRunTimeStdDev = -1.0f;
+    private float violatingRunLengthStdDev = -1.0f;
 
     private List<GraphPoint> cumulativeStepPoints;
     private List<GraphPoint> cumulativeDelayPoints;
@@ -51,6 +57,22 @@ public class SMCStats extends Stats {
         this.executedRuns = executedRuns;
     }
 
+    public int getValidRuns() {
+        return this.validRuns;
+    }
+
+    public int getViolatingRuns() {
+        return this.executedRuns - this.validRuns;
+    }
+
+    public float getAverageRunTime() {
+        return averageRunTime;
+    }
+
+    public float getAverageRunLength() {
+        return averageRunLength;
+    }
+
     @Override
     public String toString() {
         return "Number of runs executed: " +
@@ -65,40 +87,55 @@ public class SMCStats extends Stats {
             System.getProperty("line.separator") +
             "Average transitions fired per run: " +
             averageRunLength +
-            (averageValidRunTime >= 0 ?
+            (validRunAverageTime >= 0 ?
                 System.getProperty("line.separator") +
                 "Valid run duration (average): " +
-                averageValidRunTime : "") +
+                    validRunAverageTime : "") +
             (validRunTimeStdDev >= 0 ?
                 System.getProperty("line.separator") +
                     "Valid run duration (standard deviation): " +
                     validRunTimeStdDev : "") +
-            (averageValidRunLength >= 0 ?
+            (validRunAverageLength >= 0 ?
                 System.getProperty("line.separator") +
                 "Transitions fired per valid run (average): " +
-                averageValidRunLength : "") +
+                    validRunAverageLength : "") +
             (validRunLengthStdDev >= 0 ?
                 System.getProperty("line.separator") +
                     "Transitions fired per valid run (standard deviation): " +
                     validRunLengthStdDev : "");
     }
 
-    public float getAverageValidRunTime() {
-        return averageValidRunTime;
+    public float getValidRunAverageTime() {
+        return validRunAverageTime;
     }
 
-    public void setAverageValidRunTime(float averageValidRunTime) {
-        this.averageValidRunTime = averageValidRunTime;
+    public void setValidRunAverageTime(float validRunAverageTime) {
+        this.validRunAverageTime = validRunAverageTime;
     }
 
-    public float getAverageValidRunLength() {
-        return averageValidRunLength;
+    public float getValidRunAverageLength() {
+        return validRunAverageLength;
     }
 
-    public void setAverageValidRunLength(float averageValidRunLength) {
-        this.averageValidRunLength = averageValidRunLength;
+    public void setValidRunAverageLength(float validRunAverageLength) {
+        this.validRunAverageLength = validRunAverageLength;
     }
 
+    public float getViolatingRunAverageTime() {
+        return violatingRunAverageTime;
+    }
+
+    public void setViolatingRunAverageTime(float violatingRunAverageTime) {
+        this.violatingRunAverageTime = violatingRunAverageTime;
+    }
+
+    public float getViolatingRunAverageLength() {
+        return violatingRunAverageLength;
+    }
+
+    public void setViolatingRunAverageLength(float violatingRunAverageLength) {
+        this.violatingRunAverageLength = violatingRunAverageLength;
+    }
 
     public List<GraphPoint> getCumulativeStepPoints() {
         return cumulativeStepPoints;
@@ -122,5 +159,37 @@ public class SMCStats extends Stats {
 
     public void setValidRunLengthStdDev(float validRunLengthStdDev) {
         this.validRunLengthStdDev = validRunLengthStdDev;
+    }
+
+    public float getViolatingRunTimeStdDev() {
+        return violatingRunTimeStdDev;
+    }
+
+    public void setViolatingRunTimeStdDev(float violatingRunTimeStdDev) {
+        this.violatingRunTimeStdDev = violatingRunTimeStdDev;
+    }
+
+    public float getViolatingRunLengthStdDev() {
+        return violatingRunLengthStdDev;
+    }
+
+    public void setViolatingRunLengthStdDev(float violatingRunLengthStdDev) {
+        this.violatingRunLengthStdDev = violatingRunLengthStdDev;
+    }
+
+    public float getRunTimeStdDev() {
+        return runTimeStdDev;
+    }
+
+    public void setRunTimeStdDev(float runTimeStdDev) {
+        this.runTimeStdDev = runTimeStdDev;
+    }
+
+    public float getRunLengthStdDev() {
+        return runLengthStdDev;
+    }
+
+    public void setRunLengthStdDev(float runLengthStdDev) {
+        this.runLengthStdDev = runLengthStdDev;
     }
 }

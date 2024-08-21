@@ -350,6 +350,10 @@ public class RunVerification extends RunVerificationBase {
 	private JPanel createMessagePanel(final VerificationResult<TAPNNetworkTrace> result) {
 		final JPanel panel = new JPanel(new GridBagLayout());
 
+        if(result.getQueryResult().isSMC()) {
+            return new SMCResultPanel(result);
+        }
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -453,34 +457,6 @@ public class RunVerification extends RunVerificationBase {
                 panel.add(showRawQueryButton, gbc);
             }
 		}
-
-        if (modelChecker.supportsStats() && result.stats() instanceof SMCStats) {
-            SMCStats stats = (SMCStats)result.stats();
-
-            List<Graph> graphs = new ArrayList<>();
-
-            List<GraphPoint> cumulativeDelayPoints = stats.getCumulativeDelayPoints();
-            if (!cumulativeDelayPoints.isEmpty()) {
-                graphs.add(new Graph("Cumulative Probability / Delay", cumulativeDelayPoints, "Time", "Cumulative Probability", "Delay"));
-            }
-
-            List<GraphPoint> cumulativeStepPoints = stats.getCumulativeStepPoints();
-            if (!cumulativeStepPoints.isEmpty()) {
-                graphs.add(new Graph("Cumulative Probability / Step", cumulativeStepPoints, "Number of Steps", "Cumulative Probability", "Step"));
-            }
-
-            if (!graphs.isEmpty()) {
-                GraphDialogBuilder builder = new GraphDialogBuilder();
-                GraphDialog graphFrame = builder.addGraphs(graphs).setTitle("SMC Statistics").build();
-    
-                String btnText = "Plot cumulative statistics";
-
-                JButton showGraphButton = new JButton(btnText);
-                gbc = GridBagHelper.as(1, rowOffset+2, WEST, new Insets(0,0,10,0));
-                panel.add(showGraphButton, gbc);
-                showGraphButton.addActionListener(arg0 -> graphFrame.display());
-            }
-        }
 
         if (result.isResolvedUsingSkeletonPreprocessor()) {
             gbc = GridBagHelper.as(0, rowOffset+2, GridBagHelper.Anchor.WEST, new Insets(0,0,15,0));
