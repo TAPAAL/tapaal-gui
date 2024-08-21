@@ -101,7 +101,7 @@ public class SMCResultPanel extends JPanel  {
         addStatIfPositive(generalStatsPanel, "Executed runs: ", stats.getExecutedRuns(), gbc);
         addStatIfPositive(generalStatsPanel, "Verification time / run (s): ", stats.getVerificationTime() / stats.getExecutedRuns(), gbc, verifTimeFormat);
         gbc.gridy = 0;
-        gbc.gridx = 2;
+        gbc.gridx = 3;
         addAvgStdDev(generalStatsPanel, "Average run duration: ", stats.getAverageRunTime(), stats.getRunTimeStdDev(), gbc);
         addAvgStdDev(generalStatsPanel, "Average run length: ", stats.getAverageRunLength(), stats.getRunLengthStdDev(), gbc);
 
@@ -155,13 +155,16 @@ public class SMCResultPanel extends JPanel  {
         DecimalFormat format = new DecimalFormat("#.######", decimalFormatSymbols);
         if(avg < 0) return;
         String toPrint = format.format(avg);
-        if(stdDev >= 0) {
-            toPrint += " (std. dev. " + format.format(stdDev) + ")";
-        }
         int x = gbc.gridx;
         panel.add(new JLabel(label), gbc);
         gbc.gridx++;
         panel.add(new JLabel(toPrint), gbc);
+        gbc.gridx++;
+        if(stdDev >= 0) {
+            JLabel sdLabel = new JLabel(" (S.D. " + format.format(stdDev) + ")");
+            sdLabel.setToolTipText("<html>Standard deviation. <br/>In normal distribution, 68% of all values are one standard deviation from the average, <br/>95% of values within two standard deviations <br/>and 99.99% within three standard deviations from the average.</html>");
+            panel.add(sdLabel, gbc);
+        }
         gbc.gridx = x;
         gbc.gridy++;
     }
