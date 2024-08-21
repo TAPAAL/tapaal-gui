@@ -196,15 +196,15 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
 
         String helpText = "Syntax for defining " + (isColored ? "color types, variables, and " : "") + "constants:\n" +
                           "const {ID} = {INTEGER};\n" +
-                          "e.g. const a = 5; is a valid constant\n\n" +
+                          "e.g. const a = 5; is a valid constant.\n\n" +
                           (isColored ? "Syntax for defining color types:\n" +
                             "type {ID} is [{COLOR}, ..., {COLOR}];\n" +
-                            "type ID is [{LOWER_BOUND}, {UPPER_BOUND}];\n" +
-                            "type ID is <{COLOR}, ..., {COLOR}>;\n" +
-                            "e.g. type Colors is [red, green, blue]; is a valid color type\n\n" : "") +
+                            "type {ID} is [{LOWER_BOUND}, {UPPER_BOUND}];\n" +
+                            "type {ID} is <{COLOR}, ..., {COLOR}>;\n" +
+                            "e.g. type Colors is [red, green, blue]; is a valid color type.\n\n" : "") +
                           (isColored ? "Syntax for defining variables:\n" +
-                            "var {ID} in {COLORTYPE};\n" +
-                            "e.g. var c in Colors;\n\n" : "") + "All statements must end with a semicolon.";
+                            "var {ID}, ..., {ID} in {COLORTYPE};\n" +
+                            "e.g. var a, b, c in Colors; is a valid variable\n\n" : "") + "All statements must end with a semicolon.";
 
         helpTextArea.setText(helpText);
 
@@ -217,8 +217,8 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         helpTextArea.setFont(new Font(constantsArea.getFont().getName(), Font.PLAIN, FONT_SIZE));
 
         helpDialog.add(new JScrollPane(helpTextArea));
-        int height = isColored ? 400 : 210;
-        helpDialog.setSize(550, height);
+        int height = isColored ? 375 : 210;
+        helpDialog.setSize(525, height);
         helpDialog.setLocationRelativeTo(this);
 
         helpDialog.setVisible(true);
