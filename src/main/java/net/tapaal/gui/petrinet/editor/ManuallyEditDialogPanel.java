@@ -39,10 +39,10 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
     private JTextArea constantsArea;
 
     public ManuallyEditDialogPanel(ColorTypesListModel colorTypesListModel,
-                                  VariablesListModel variablesListModel,
-                                  ConstantsListModel constantsListModel,
-                                  TimedArcPetriNetNetwork network,
-                                  UndoManager undoManager) {
+                                   VariablesListModel variablesListModel,
+                                   ConstantsListModel constantsListModel,
+                                   TimedArcPetriNetNetwork network,
+                                   UndoManager undoManager) {
         super(TAPAALGUI.getApp(), "Manually Edit", false);
         this.colorTypesListModel = colorTypesListModel;
         this.variablesListModel = variablesListModel;
@@ -55,18 +55,35 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
 
     public void showDialog() {
         String cleanHtml = "</?(html|b)>";
+        String angleBracketOpen = "&lt;";
+        String angleBracketClose = "&gt; ";
         
         for (int i = 0; i < colorTypesListModel.getSize(); ++i) {
-            if (((ColorType)colorTypesListModel.getElementAt(i)).getName().equals("dot")) continue;
-            constantsArea.append((colorTypesListModel.getElementAt(i) + ";\n").replaceAll(cleanHtml, ""));
+            ColorType ct = (ColorType)colorTypesListModel.getElementAt(i);
+
+            if (ct.getName().equals("dot")) continue;
+            String colorTypeStr = "type ";
+            if (ct.isIntegerRange() && !ct.getColorList().isEmpty()) {
+                colorTypeStr += ct.getName() + " is [" + ct.getLowerBound() + ", " + ct.getUpperBound() + "];\n";
+            } else {
+                colorTypeStr += ct;
+            }
+
+            colorTypeStr += ";\n";
+
+            colorTypeStr = colorTypeStr.replaceAll(cleanHtml, "");
+            colorTypeStr = colorTypeStr.replace(angleBracketOpen, "<");
+            colorTypeStr = colorTypeStr.replace(angleBracketClose, ">");
+
+            constantsArea.append(colorTypeStr);
         }
         
         for (int i = 0; i < variablesListModel.getSize(); ++i) {
-            constantsArea.append((variablesListModel.getElementAt(i) + ";\n").replaceAll(cleanHtml, ""));
+            constantsArea.append("var " + (variablesListModel.getElementAt(i) + ";\n").replaceAll(cleanHtml, ""));
         }
 
         for (int i = 0; i < constantsListModel.getSize(); ++i) {
-            constantsArea.append(constantsListModel.getElementAt(i) + ";\n");
+            constantsArea.append("const " + constantsListModel.getElementAt(i) + ";\n");
         }
 
         setVisible(true);
@@ -127,9 +144,12 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
 
     private void save() {
         try {
-            ConstantsParser.parse(constantsArea.getText(), network);
-            undoManager.newEdit();
-            dispose();
+            boolean resultOk = ConstantsParser.parse(constantsArea.getText(), network);
+            if (resultOk) {
+                colorTypesListModel.updateName();
+                variablesListModel.updateName();
+                dispose();
+            }
         } catch (ParseException e) {
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.getMessage(), "Error parsing constants", JOptionPane.ERROR_MESSAGE);
         }
@@ -143,28 +163,30 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         helpTextArea.setEditable(false);
 
         String helpText = "Syntax for defining constants:\n" +
-                          "<ID> = <INTEGER>;\n" +
-                          "e.g. a = 5; is a valid constant\n\n" +
+                          "const {ID} = {INTEGER};\n" +
+                          "e.g. const a = 5; is a valid constant\n\n" +
                           (isColored ? "Syntax for defining color types:\n" +
-                            "<ID> is [<COLOR>, ..., <COLOR>]\n" +
-                            "e.g. Colors is [red, green, blue]; is a valid color type\n\n" : "") +
+                            "type {ID} is [{COLOR}, ..., {COLOR}];\n" +
+                            "type ID is [{LOWER_BOUND}, {UPPER_BOUND}];\n" +
+                            "type ID is <{COLOR}, ..., {COLOR}>;\n" +
+                            "e.g. type Colors is [red, green, blue]; is a valid color type\n\n" : "") +
                           (isColored ? "Syntax for defining variables:\n" +
-                            "<ID> in <COLORTYPE>\n" +
-                            "e.g. c in Colors\n\n" : "") + "All statements must end with a semicolon.";
+                            "var {ID} in {COLORTYPE};\n" +
+                            "e.g. var c in Colors;\n\n" : "") + "All statements must end with a semicolon.";
 
         helpTextArea.setText(helpText);
 
         helpTextArea.setLineWrap(true);
         helpTextArea.setWrapStyleWord(true);
         helpTextArea.setMargin(new Insets(TEXT_TO_BORDER_MARGIN, 
-                                            TEXT_TO_BORDER_MARGIN, 
-                                            TEXT_TO_BORDER_MARGIN, 
-                                            TEXT_TO_BORDER_MARGIN));
+                                          TEXT_TO_BORDER_MARGIN, 
+                                          TEXT_TO_BORDER_MARGIN, 
+                                          TEXT_TO_BORDER_MARGIN));
         helpTextArea.setFont(new Font(constantsArea.getFont().getName(), Font.PLAIN, FONT_SIZE));
 
         helpDialog.add(new JScrollPane(helpTextArea));
-        int height = isColored ? 350 : 210;
-        helpDialog.setSize(450, height);
+        int height = isColored ? 400 : 210;
+        helpDialog.setSize(550, height);
         helpDialog.setLocationRelativeTo(this);
 
         helpDialog.setVisible(true);

@@ -212,7 +212,7 @@ public class ConstantStore {
 		return null;
 	}
 
-	private boolean isConstantInUse(String name) {
+	public boolean isConstantInUse(String name) {
 		if (containsConstantByName(name)) {
 			return getConstantByName(name).isUsed();
 		}

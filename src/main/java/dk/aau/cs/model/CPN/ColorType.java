@@ -158,4 +158,20 @@ public class ColorType implements Iterable<Color> {
         }
         return true;
     }
+
+    public Integer getLowerBound() {
+        if (isIntegerRange()) {
+            return Integer.parseInt(colors.getFirst().getColorName());
+        }
+        
+        return null;
+    }
+
+    public Integer getUpperBound() {
+        if (isIntegerRange()) {
+            return Integer.parseInt(colors.getLast().getColorName());
+        }
+        
+        return null;
+    }
 }

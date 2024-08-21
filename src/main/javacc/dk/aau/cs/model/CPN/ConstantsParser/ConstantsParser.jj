@@ -13,17 +13,31 @@ import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
+import javax.swing.JOptionPane;
+import pipe.gui.TAPAALGUI;
+import java.util.Set;
+import java.util.HashSet;
+import dk.aau.cs.model.CPN.ProductType;
 
 public class ConstantsParser {
     private static final String ERROR_PARSING_CONSTANTS_MESSAGE = "TAPAAL encountered an error trying to parse the constants";
 
-    private static final Map<String, Constant> constants = new HashMap<String, Constant>();
-    private static final Map<String, ColorType> colorTypes = new HashMap<String, ColorType>();
-    private static final Map<String, Variable> variables = new HashMap<String, Variable>();
+    private static final Map<String, Constant> constants = new LinkedHashMap<String, Constant>();
+    private static final Map<String, ColorType> colorTypes = new LinkedHashMap<String, ColorType>();
+    private static final Map<String, Variable> variables = new LinkedHashMap<String, Variable>();
     private static TimedArcPetriNetNetwork network;
 
-    public static void parse(String constantsToParse, TimedArcPetriNetNetwork network) throws ParseException {
+    private static class BoolRef {
+        public boolean value;
+
+        public BoolRef(boolean value) {
+            this.value = value;
+        }
+    }
+
+    public static boolean parse(String constantsToParse, TimedArcPetriNetNetwork network) throws ParseException {
         ConstantsParser.network = network;
         ConstantsParser parser = new ConstantsParser(new StringReader(constantsToParse));
         constants.clear();
@@ -47,14 +61,76 @@ public class ConstantsParser {
                                                 .stream()
                                                 .collect(Collectors.toList());
 
+        Map<String, Object> constantsMap = new HashMap<String, Object>();
+        Map<String, Boolean> constantsBitMap = new HashMap<String, Boolean>();
+        Map<String, List<String>> messages = new HashMap<String, List<String>>();        
+        
+        for (Constant c : network.constants()) {
+            constantsMap.put(c.name(), c);
+            constantsBitMap.put(c.name(), network.getConstantStore().isConstantInUse(c.name()));
+        }
+
+        for (ColorType ct : network.colorTypes()) {
+            List<String> messagesList = new ArrayList<String>();
+            constantsMap.put(ct.getName(), ct);
+            constantsBitMap.put(ct.getName(), network.canColorTypeBeRemoved(dot, messagesList));
+            messages.put(ct.getName(), messagesList);
+        }
+
+        for (Variable v : network.variables()) {
+            List<String> messagesList = new ArrayList<String>();
+            constantsMap.put(v.getName(), v);
+            constantsBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList));
+            messages.put(v.getName(), messagesList);
+        }
+
+        for (String key : constantsBitMap.keySet()) {
+            if (constants.containsKey(key) || 
+                colorTypes.containsKey(key) || 
+                variables.containsKey(key)) {
+                continue;
+            }
+
+            Object obj = constantsMap.get(key);
+            if (!constantsBitMap.get(key)) {
+                String message = "Could not remove ";
+                if (obj instanceof ColorType) {
+                    message += "color type";
+                } else if (obj instanceof Variable) {
+                    message += "variable"; 
+                } else {
+                    message += "constant";
+                }
+
+                message += " \"" + key + "\"";
+
+                if (!(obj instanceof Constant)) {
+                    message += " for the following reasons:  \n\n";
+                    message += String.join("\n", messages.get(key));
+                } else {
+                    message += " because it is in use";
+                }
+
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove constant", JOptionPane.WARNING_MESSAGE);
+
+                return false;
+            }
+        }
+
         network.setConstants(constantsList);
         if (network.isColored()) {
             network.setColorTypes(colorTypesList);
             network.setVariables(variablesList);
         }
+
+        return true;
     }
 
     private static void idExists(String id) throws ParseException {
+        if (id.equals("dot")) {
+            throw new ParseException("Name \"dot\" is reserved");
+        }
+
         if (constants.containsKey(id)) {
             throw new ParseException("Constant with name \"" + id + "\" already exists");
         }
@@ -83,9 +159,19 @@ TOKEN :
     |
     <EBRACKET: "]">
     |
+    <LT: "<">
+    |
+    <GT: ">">
+    |
     <IS: "is">
     |
     <IN: "in">
+    |
+    <CONST: "const">
+    |
+    <VAR: "var">
+    |
+    <TYPE: "type">
     |
     <#ALPHA: ["a"-"z","A"-"Z"]>
     |
@@ -113,9 +199,9 @@ void startParsing() :
 void values() :
 {}
 {
-    LOOKAHEAD(2) constants() | 
-    LOOKAHEAD(2) colorTypes() | 
-    LOOKAHEAD(2) variables()
+    constants() | 
+    colorTypes() | 
+    variables()
 }
 
 void constants() :
@@ -123,7 +209,7 @@ void constants() :
     Token id, value;
 }
 {
-    id = <ID> <EQ> value = <INTEGER> { 
+    <CONST> id = <ID> <EQ> value = <INTEGER> { 
         idExists(id.image);
         constants.put(id.image, new Constant(id.image, Integer.parseInt(value.image)));
     }
@@ -133,35 +219,76 @@ void colorTypes() :
 {
     Token id;
     List<String> values = new ArrayList<String>();
+    BoolRef isIntList = new BoolRef(false);
+    BoolRef isProductList = new BoolRef(false); 
 }
 {
-    id = <ID> <IS> <SBRACKET> colorTypeValues(values) <EBRACKET> { 
+    <TYPE> id = <ID> <IS> (<SBRACKET> (idList(values) | intList(values, isIntList)) <EBRACKET> | <LT> productList(values, isProductList) <GT>) { 
+        ColorType ct = null;
         if (!network.isColored()) {
             throw new ParseException("Color types are not allowed in uncolored networks");
         }
 
         idExists(id.image);
 
-        ColorType ct = new ColorType(id.image);
-        ct.addColors(values);
+        if (isProductList.value) {
+            ProductType pct = new ProductType(id.image);
+            for (String product : values) {
+                if (!colorTypes.containsKey(product)) {
+                    throw new ParseException("Color type with name \"" + product + "\" does not exist");
+                }
 
-        for (String color : values) {
-            if (color.equals(id.image)) {
-                throw new ParseException("Color with name \"" + id.image + "\" already exists");
+                pct.addType(colorTypes.get(product));
             }
-        }
+
+            ct = pct;
+        } else if (!isProductList.value) {
+            ct = new ColorType(id.image);
+            Set<String> uniqueVals = new HashSet<String>();
+            for (String color : values) {
+                if (!isIntList.value && !uniqueVals.add(color)) {
+                    throw new ParseException("Color type with name \"" + id.image + "\" contains duplicate colors");
+                }
+                
+                if (color.equals(id.image)) {
+                    throw new ParseException("Color type with name \"" + id.image + "\" contains a color with the same name");
+                }
+
+                idExists(color);
+            }
+
+            ct.addColors(values);
+        } 
 
         colorTypes.put(id.image, ct); 
     }
 }
 
-void colorTypeValues(List<String> values) :
+void idList(List<String> values) :
 {
     Token id;
 }
 {
     id = <ID> { values.add(id.image); } 
-    ((<COMMA> id = <ID>) { values.add(id.image); })*
+    (<COMMA> id = <ID> { values.add(id.image); })*
+}
+
+void intList(List<String> values, BoolRef isIntList) :
+{
+    Token val;
+}
+{
+    val = <INTEGER> { values.add(val.image); isIntList.value = true; } 
+    (<COMMA> val = <INTEGER> { values.add(val.image); })
+}
+
+void productList(List<String> values, BoolRef isProductList) :
+{
+    Token type;
+}
+{
+    type = <ID> { values.add(type.image); isProductList.value = true; } 
+    (<COMMA> type = <ID> { values.add(type.image); })*
 }
 
 void variables() :
@@ -169,7 +296,7 @@ void variables() :
     Token id, type;
 }
 {
-    id = <ID> <IN> type = <ID> {
+    <VAR> id = <ID> <IN> type = <ID> {
         if (!network.isColored()) {
             throw new ParseException("Variables are not allowed in uncolored networks");
         }
