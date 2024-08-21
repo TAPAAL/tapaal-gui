@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <declaration>
+    <structure>
+      <declarations>
+        <namedsort id="dot" name="dot">
+          <dot/>
+        </namedsort>
+        <namedsort id="coins" name="coins">
+          <cyclicenumeration>
+            <feconstant id="c1" name="coins"/>
+            <feconstant id="c2" name="coins"/>
+          </cyclicenumeration>
+        </namedsort>
+        <namedsort id="toss" name="toss">
+          <cyclicenumeration>
+            <feconstant id="heads" name="toss"/>
+            <feconstant id="tails" name="toss"/>
+          </cyclicenumeration>
+        </namedsort>
+        <namedsort id="config" name="config">
+          <productsort>
+            <usersort declaration="coins"/>
+            <usersort declaration="toss"/>
+          </productsort>
+        </namedsort>
+        <variabledecl id="t" name="t">
+          <usersort declaration="toss"/>
+        </variabledecl>
+        <variabledecl id="c" name="c">
+          <usersort declaration="coins"/>
+        </variabledecl>
+      </declarations>
+    </structure>
+  </declaration>
+  <constant name="headprob" value="10"/>
+  <constant name="tailprob" value="9"/>
+  <net active="true" id="TAPN1" type="P/T net">
+    <place displayName="true" id="tossed" initialMarking="0" invariant="&lt; inf" name="tossed" nameOffsetX="43" nameOffsetY="44" positionX="540" positionY="345">
+      <type>
+        <text>config</text>
+        <structure>
+          <usersort declaration="config"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="ready_to_toss" initialMarking="2" invariant="&lt; inf" name="ready_to_toss" nameOffsetX="117" nameOffsetY="-9" positionX="540" positionY="30">
+      <type>
+        <text>coins</text>
+        <structure>
+          <usersort declaration="coins"/>
+        </structure>
+      </type>
+      <hlinitialMarking>
+        <text>(1'coins.all)</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <all>
+                    <usersort declaration="coins"/>
+                  </all>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinitialMarking>
+    </place>
+    <place displayName="true" id="heads" initialMarking="0" invariant="&lt; inf" name="heads" nameOffsetX="46" nameOffsetY="61" positionX="300" positionY="495">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="tails" initialMarking="0" invariant="&lt; inf" name="tails" nameOffsetX="50" nameOffsetY="55" positionX="795" positionY="495">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+    <transition angle="0" displayName="true" distribution="constant" id="inconclusive" infiniteServer="false" name="inconclusive" nameOffsetX="0" nameOffsetY="0" player="0" positionX="300" positionY="180" priority="0" urgent="false" value="1.0" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="constant" id="head" infiniteServer="false" name="head" nameOffsetX="3" nameOffsetY="2" player="0" positionX="465" positionY="180" priority="0" urgent="true" value="0.0" weight="headprob"/>
+    <transition angle="0" displayName="true" distribution="constant" id="tail" infiniteServer="false" name="tail" nameOffsetX="8" nameOffsetY="8" player="0" positionX="615" positionY="180" priority="0" urgent="true" value="0.0" weight="tailprob"/>
+    <transition angle="0" displayName="true" distribution="constant" id="choosing_heads" infiniteServer="false" name="choosing_heads" nameOffsetX="-20" nameOffsetY="12" player="0" positionX="300" positionY="345" priority="0" urgent="true" value="0.0" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="constant" id="choosing_tails" infiniteServer="false" name="choosing_tails" nameOffsetX="116" nameOffsetY="11" player="0" positionX="795" positionY="345" priority="0" urgent="true" value="0.0" weight="1.0"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="-37" nameOffsetY="-7" source="tossed" target="inconclusive" type="timed" weight="1">
+      <hlinscription>
+        <text>1'(coins.all, t)</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <tuple>
+                <subterm>
+                  <all>
+                    <usersort declaration="coins"/>
+                  </all>
+                </subterm>
+                <subterm>
+                  <variable refvariable="t"/>
+                </subterm>
+              </tuple>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="542" yCoord="352"/>
+      <arcpath arcPointType="false" id="1" xCoord="320" yCoord="200"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="-49" nameOffsetY="-3" source="inconclusive" target="ready_to_toss" type="normal" weight="1">
+      <hlinscription>
+        <text>1'coins.all</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <all>
+                <usersort declaration="coins"/>
+              </all>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="320" yCoord="190"/>
+      <arcpath arcPointType="false" id="1" xCoord="542" yCoord="53"/>
+    </arc>
+    <arc id="A2" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="ready_to_toss" target="head" type="timed" weight="1">
+      <hlinscription>
+        <text>1'c</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="c"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="548" yCoord="58"/>
+      <arcpath arcPointType="false" id="1" xCoord="480" yCoord="180"/>
+    </arc>
+    <arc id="A3" inscription="1" nameOffsetX="-21" nameOffsetY="-22" source="head" target="tossed" type="normal" weight="1">
+      <hlinscription>
+        <text>1'(c, heads)</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <tuple>
+                <subterm>
+                  <variable refvariable="c"/>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="heads"/>
+                </subterm>
+              </tuple>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="481" yCoord="210"/>
+      <arcpath arcPointType="false" id="1" xCoord="548" yCoord="347"/>
+    </arc>
+    <arc id="A4" inscription="[0,inf)" nameOffsetX="39" nameOffsetY="0" source="ready_to_toss" target="tail" type="timed" weight="1">
+      <hlinscription>
+        <text>1'c</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="c"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="562" yCoord="58"/>
+      <arcpath arcPointType="false" id="1" xCoord="630" yCoord="180"/>
+    </arc>
+    <arc id="A5" inscription="1" nameOffsetX="61" nameOffsetY="-19" source="tail" target="tossed" type="normal" weight="1">
+      <hlinscription>
+        <text>1'(c, tails)</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <tuple>
+                <subterm>
+                  <variable refvariable="c"/>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="tails"/>
+                </subterm>
+              </tuple>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="631" yCoord="210"/>
+      <arcpath arcPointType="false" id="1" xCoord="562" yCoord="347"/>
+    </arc>
+    <arc id="A6" inscription="[0,inf)" nameOffsetX="69" nameOffsetY="10" source="tossed" target="choosing_heads" type="timed" weight="1">
+      <hlinscription>
+        <text>(1'(c1, heads) + 1'(c2, tails))</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="c1"/>
+                    </subterm>
+                    <subterm>
+                      <useroperator declaration="heads"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="c2"/>
+                    </subterm>
+                    <subterm>
+                      <useroperator declaration="tails"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="540" yCoord="361"/>
+      <arcpath arcPointType="false" id="1" xCoord="320" yCoord="361"/>
+    </arc>
+    <arc id="A7" inscription="1" nameOffsetX="0" nameOffsetY="0" source="choosing_heads" target="heads" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="315" yCoord="375"/>
+      <arcpath arcPointType="false" id="1" xCoord="315" yCoord="495"/>
+    </arc>
+    <arc id="A8" inscription="[0,inf)" nameOffsetX="91" nameOffsetY="19" source="tossed" target="choosing_tails" type="timed" weight="1">
+      <hlinscription>
+        <text>(1'(c1, tails) + 1'(c2, heads))</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="c1"/>
+                    </subterm>
+                    <subterm>
+                      <useroperator declaration="tails"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <tuple>
+                    <subterm>
+                      <useroperator declaration="c2"/>
+                    </subterm>
+                    <subterm>
+                      <useroperator declaration="heads"/>
+                    </subterm>
+                  </tuple>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="570" yCoord="361"/>
+      <arcpath arcPointType="false" id="1" xCoord="805" yCoord="361"/>
+    </arc>
+    <arc id="A9" inscription="1" nameOffsetX="0" nameOffsetY="0" source="choosing_tails" target="tails" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="811" yCoord="375"/>
+      <arcpath arcPointType="false" id="1" xCoord="811" yCoord="495"/>
+    </arc>
+  </net>
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Hit heads" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" timeDarts="false" traceOption="NONE" type="SMC">
+    <smc confidence="0.95" interval-width="0.001" time-bound="1000"/>
+    <formula>
+      <finally>
+        <integer-eq>
+          <tokens-count>
+            <place>TAPN1.heads</place>
+          </tokens-count>
+          <integer-constant>1</integer-constant>
+        </integer-eq>
+      </finally>
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Hit tails" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" timeDarts="false" traceOption="NONE" type="SMC">
+    <smc confidence="0.95" interval-width="0.00291" time-bound="1000"/>
+    <formula>
+      <finally>
+        <integer-eq>
+          <tokens-count>
+            <place>TAPN1.tails</place>
+          </tokens-count>
+          <integer-constant>1</integer-constant>
+        </integer-eq>
+      </finally>
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Inconclusive after 6 rounds" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" timeDarts="false" traceOption="NONE" type="SMC">
+    <smc confidence="0.95" interval-width="0.00355" time-bound="3"/>
+    <formula>
+      <globally>
+        <conjunction>
+          <integer-eq>
+            <tokens-count>
+              <place>TAPN1.heads</place>
+            </tokens-count>
+            <integer-constant>0</integer-constant>
+          </integer-eq>
+          <integer-eq>
+            <tokens-count>
+              <place>TAPN1.tails</place>
+            </tokens-count>
+            <integer-constant>0</integer-constant>
+          </integer-eq>
+        </conjunction>
+      </globally>
+    </formula>
+  </query>
+  <feature isColored="true" isGame="false" isStochastic="true" isTimed="true"/>
+</pnml>
