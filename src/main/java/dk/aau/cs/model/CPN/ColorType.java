@@ -161,7 +161,7 @@ public class ColorType implements Iterable<Color> {
 
     public Integer getLowerBound() {
         if (isIntegerRange()) {
-            return Integer.parseInt(colors.getFirst().getColorName());
+            return Integer.parseInt(colors.get(0).getColorName());
         }
         
         return null;
@@ -169,7 +169,7 @@ public class ColorType implements Iterable<Color> {
 
     public Integer getUpperBound() {
         if (isIntegerRange()) {
-            return Integer.parseInt(colors.getLast().getColorName());
+            return Integer.parseInt(colors.get(colors.size() - 1).getColorName());
         }
         
         return null;

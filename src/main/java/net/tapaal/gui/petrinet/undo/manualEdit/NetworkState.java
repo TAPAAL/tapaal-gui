@@ -4,6 +4,7 @@ import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
+import java.util.stream.Collectors;
 
 import java.util.List;
 
@@ -13,9 +14,9 @@ public class NetworkState {
     private final List<Variable> variables;
 
     public NetworkState(TimedArcPetriNetNetwork network) {
-        this.constants = network.constants().stream().toList();
-        this.colorTypes = network.colorTypes().stream().toList();
-        this.variables = network.variables().stream().toList();
+        this.constants = network.constants().stream().collect(Collectors.toList());
+        this.colorTypes = network.colorTypes().stream().collect(Collectors.toList());
+        this.variables = network.variables().stream().collect(Collectors.toList());
     }
 
     public NetworkState(NetworkState state) {
