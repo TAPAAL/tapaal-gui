@@ -11,34 +11,61 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ConstantsParser {
     private static final String ERROR_PARSING_CONSTANTS_MESSAGE = "TAPAAL encountered an error trying to parse the constants";
 
-    private static final List<Constant> constants = new ArrayList<Constant>();
-    private static final List<ColorType> colorTypes = new ArrayList<ColorType>();
-    private static final List<Variable> variables = new ArrayList<Variable>();
+    private static final Map<String, Constant> constants = new HashMap<String, Constant>();
+    private static final Map<String, ColorType> colorTypes = new HashMap<String, ColorType>();
+    private static final Map<String, Variable> variables = new HashMap<String, Variable>();
+    private static TimedArcPetriNetNetwork network;
 
     public static void parse(String constantsToParse, TimedArcPetriNetNetwork network) throws ParseException {
+        ConstantsParser.network = network;
         ConstantsParser parser = new ConstantsParser(new StringReader(constantsToParse));
         constants.clear();
         colorTypes.clear();
         variables.clear();
 
         parser.startParsing();
-        network.setConstants(constants);
-        network.setColorTypes(colorTypes);
-        network.setVariables(variables);
+        ColorType dot = new ColorType("dot");
+        dot.addColor("dot");    
+        colorTypes.put("dot", dot);
+
+        List<Constant> constantsList = constants.values()
+                                                .stream()
+                                                .collect(Collectors.toList());
+
+        List<ColorType> colorTypesList = colorTypes.values()
+                                                   .stream()
+                                                   .collect(Collectors.toList());
+        
+        List<Variable> variablesList = variables.values()
+                                                .stream()
+                                                .collect(Collectors.toList());
+
+        network.setConstants(constantsList);
+        if (network.isColored()) {
+            network.setColorTypes(colorTypesList);
+            network.setVariables(variablesList);
+        }
     }
 
-    private static ColorType getColorType(String type) {
-        for (ColorType ct : colorTypes) {
-            if (ct.getName().equals(type)) {
-                return ct;
-            }
+    private static void idExists(String id) throws ParseException {
+        if (constants.containsKey(id)) {
+            throw new ParseException("Constant with name \"" + id + "\" already exists");
         }
-    
-        return null;
+
+        if (colorTypes.containsKey(id)) {
+            throw new ParseException("Color type with name \"" + id + "\" already exists");
+        }
+
+        if (variables.containsKey(id)) {
+            throw new ParseException("Variable with name \"" + id + "\" already exists");
+        }
     }
 }
 
@@ -60,11 +87,11 @@ TOKEN :
     |
     <IN: "in">
     |
-    <ALPHA: ["a"-"z","A"-"Z"]>
+    <#ALPHA: ["a"-"z","A"-"Z"]>
     |
-    <ALPHANUM: ["a"-"z","A"-"Z","0"-"9"]>
+    <#ALPHANUM: ["a"-"z","A"-"Z","0"-"9"]>
     |
-    <INTEGER: ["1"-"9"] (["0"-"9"])*>
+    <INTEGER: ["0"-"9"] | (["1"-"9"] (["0"-"9"])*)>
     |
     <ID: <ALPHA> ("_" | <ALPHANUM>)*>
 }
@@ -80,15 +107,15 @@ SKIP :
 void startParsing() :
 {}
 {
-    values() (<SEPARATOR> values())*
+    (values() <SEPARATOR>)* <EOF>
 }
 
 void values() :
 {}
 {
-    (LOOKAHEAD(2) <ID> <EQ> constants() |
-     LOOKAHEAD(2) <ID> <IS> colorTypes() |
-     LOOKAHEAD(2) <ID> <IN> variables())
+    LOOKAHEAD(2) constants() | 
+    LOOKAHEAD(2) colorTypes() | 
+    LOOKAHEAD(2) variables()
 }
 
 void constants() :
@@ -96,7 +123,10 @@ void constants() :
     Token id, value;
 }
 {
-   id = <ID> <EQ> value = <INTEGER> { constants.add(new Constant(id.image, Integer.parseInt(value.image))); }
+    id = <ID> <EQ> value = <INTEGER> { 
+        idExists(id.image);
+        constants.put(id.image, new Constant(id.image, Integer.parseInt(value.image)));
+    }
 }
 
 void colorTypes() :
@@ -106,27 +136,32 @@ void colorTypes() :
 }
 {
     id = <ID> <IS> <SBRACKET> colorTypeValues(values) <EBRACKET> { 
+        if (!network.isColored()) {
+            throw new ParseException("Color types are not allowed in uncolored networks");
+        }
+
+        idExists(id.image);
+
         ColorType ct = new ColorType(id.image);
         ct.addColors(values);
-        colorTypes.add(ct); 
+
+        for (String color : values) {
+            if (color.equals(id.image)) {
+                throw new ParseException("Color with name \"" + id.image + "\" already exists");
+            }
+        }
+
+        colorTypes.put(id.image, ct); 
     }
 }
 
 void colorTypeValues(List<String> values) :
 {
-    String value;
-}
-{
-    value = colorTypeValue() { values.add(value); } 
-    (<COMMA> value = colorTypeValue())* { values.add(value); }
-}
-
-String colorTypeValue() :
-{
     Token id;
 }
 {
-    id = <ID> { return id.image; }
+    id = <ID> { values.add(id.image); } 
+    ((<COMMA> id = <ID>) { values.add(id.image); })*
 }
 
 void variables() :
@@ -135,11 +170,16 @@ void variables() :
 }
 {
     id = <ID> <IN> type = <ID> {
-        ColorType ct = getColorType(type.image);
-        if (ct == null) {
-            throw new ParseException(ERROR_PARSING_CONSTANTS_MESSAGE);
+        if (!network.isColored()) {
+            throw new ParseException("Variables are not allowed in uncolored networks");
         }
 
-        variables.add(new Variable(id.image, ct));
+        idExists(id.image);
+
+        if (!colorTypes.containsKey(type.image)) {
+            throw new ParseException("Color type with name \"" + type.image + "\" does not exist");
+        }
+
+        variables.put(id.image, new Variable(id.image, colorTypes.get(type.image)));
     }
 }

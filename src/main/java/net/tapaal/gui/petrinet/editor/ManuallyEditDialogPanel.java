@@ -18,8 +18,12 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
+
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ConstantsParser.ConstantsParser;
 import dk.aau.cs.model.CPN.ConstantsParser.ParseException;
+
+import javax.swing.JOptionPane;
 
 public class ManuallyEditDialogPanel extends EscapableDialog {
     private static final int GAP = 10;
@@ -33,8 +37,6 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
     private final UndoManager undoManager;
 
     private JTextArea constantsArea;
-    private JTextArea variablesArea;
-    private JTextArea colorTypesArea;
 
     public ManuallyEditDialogPanel(ColorTypesListModel colorTypesListModel,
                                   VariablesListModel variablesListModel,
@@ -53,17 +55,18 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
 
     public void showDialog() {
         String cleanHtml = "</?(html|b)>";
+        
+        for (int i = 0; i < colorTypesListModel.getSize(); ++i) {
+            if (((ColorType)colorTypesListModel.getElementAt(i)).getName().equals("dot")) continue;
+            constantsArea.append((colorTypesListModel.getElementAt(i) + ";\n").replaceAll(cleanHtml, ""));
+        }
+        
+        for (int i = 0; i < variablesListModel.getSize(); ++i) {
+            constantsArea.append((variablesListModel.getElementAt(i) + ";\n").replaceAll(cleanHtml, ""));
+        }
 
         for (int i = 0; i < constantsListModel.getSize(); ++i) {
             constantsArea.append(constantsListModel.getElementAt(i) + ";\n");
-        }
-
-        for (int i = 0; i < variablesListModel.getSize(); ++i) {
-            variablesArea.append((variablesListModel.getElementAt(i) + ";\n").replaceAll(cleanHtml, ""));
-        }
-
-        for (int i = 0; i < colorTypesListModel.getSize(); ++i) {
-            colorTypesArea.append((colorTypesListModel.getElementAt(i) + ";\n").replaceAll(cleanHtml, ""));
         }
 
         setVisible(true);
@@ -87,36 +90,11 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         constantsArea.setFont(new Font(constantsArea.getFont().getName(), Font.PLAIN, FONT_SIZE));
         JScrollPane constantsScrollPane = new JScrollPane(constantsArea);
 
-        JLabel variablesLabel = new JLabel("Variables");
-        variablesLabel.setAlignmentX(CENTER_ALIGNMENT);
-
-        variablesArea = new JTextArea();
-        variablesArea.setLineWrap(true);
-        variablesArea.setWrapStyleWord(true);
-        variablesArea.setMargin(new Insets(TEXT_TO_BORDER_MARGIN, 
-                                            TEXT_TO_BORDER_MARGIN, 
-                                            TEXT_TO_BORDER_MARGIN, 
-                                            TEXT_TO_BORDER_MARGIN));
-        variablesArea.setFont(new Font(variablesArea.getFont().getName(), Font.PLAIN, FONT_SIZE));
-        JScrollPane variablesScrollPane = new JScrollPane(variablesArea);
-
-        JLabel colorTypesLabel = new JLabel("Color Types");
-        colorTypesLabel.setAlignmentX(CENTER_ALIGNMENT);
-
-        colorTypesArea = new JTextArea();
-        colorTypesArea.setLineWrap(true);
-        colorTypesArea.setWrapStyleWord(true);
-        colorTypesArea.setMargin(new Insets(TEXT_TO_BORDER_MARGIN, 
-                                            TEXT_TO_BORDER_MARGIN, 
-                                            TEXT_TO_BORDER_MARGIN, 
-                                            TEXT_TO_BORDER_MARGIN));
-        colorTypesArea.setFont(new Font(colorTypesArea.getFont().getName(), Font.PLAIN, FONT_SIZE));
-        JScrollPane colorTypesScrollPane = new JScrollPane(colorTypesArea);
-
         JPanel buttonPanel = new JPanel(new BorderLayout());
 
         JPanel helpPanel = new JPanel();
         JButton helpButton = new JButton("Help");
+        helpButton.addActionListener(e -> showHelpDialog(network.isColored()));
 
         helpPanel.add(helpButton);
 
@@ -137,29 +115,58 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, helpButton.getPreferredSize().height));
 
         panel.add(constantsLabel);
-        panel.add(constantsScrollPane);
-        panel.add(Box.createVerticalStrut(GAP));
-        panel.add(variablesLabel);
-        panel.add(variablesScrollPane);
-        panel.add(Box.createVerticalStrut(GAP));
-        panel.add(colorTypesLabel);
-        panel.add(colorTypesScrollPane);
+        panel.add(constantsScrollPane);;
         panel.add(Box.createVerticalStrut(GAP));
         panel.add(buttonPanel);
 
         add(panel);
 
-        setSize(600, 800);
+        setSize(500, 550);
         setLocationRelativeTo(null);
     }
 
     private void save() {
         try {
-            ConstantsParser.parse(colorTypesArea.getText() + variablesArea.getText() + constantsArea.getText(), network);
+            ConstantsParser.parse(constantsArea.getText(), network);
             undoManager.newEdit();
             dispose();
         } catch (ParseException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.getMessage(), "Error parsing constants", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void showHelpDialog(boolean isColored) {
+        EscapableDialog helpDialog = new EscapableDialog(this, "Help", true);
+
+        JTextArea helpTextArea = new JTextArea();
+
+        helpTextArea.setEditable(false);
+
+        String helpText = "Syntax for defining constants:\n" +
+                          "<ID> = <INTEGER>;\n" +
+                          "e.g. a = 5; is a valid constant\n\n" +
+                          (isColored ? "Syntax for defining color types:\n" +
+                            "<ID> is [<COLOR>, ..., <COLOR>]\n" +
+                            "e.g. color is [red, green, blue]; is a valid color type\n\n" : "") +
+                          (isColored ? "Syntax for defining variables:\n" +
+                            "<ID> in <COLORTYPE>\n" +
+                            "e.g. c in Color\n\n" : "") + "All statements must end with a semicolon.";
+
+        helpTextArea.setText(helpText);
+
+        helpTextArea.setLineWrap(true);
+        helpTextArea.setWrapStyleWord(true);
+        helpTextArea.setMargin(new Insets(TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN, 
+                                            TEXT_TO_BORDER_MARGIN));
+        helpTextArea.setFont(new Font(constantsArea.getFont().getName(), Font.PLAIN, FONT_SIZE));
+
+        helpDialog.add(new JScrollPane(helpTextArea));
+        int height = isColored ? 350 : 210;
+        helpDialog.setSize(450, height);
+        helpDialog.setLocationRelativeTo(this);
+
+        helpDialog.setVisible(true);
     }
 }
