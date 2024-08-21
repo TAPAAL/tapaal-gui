@@ -147,10 +147,10 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
                           "e.g. a = 5; is a valid constant\n\n" +
                           (isColored ? "Syntax for defining color types:\n" +
                             "<ID> is [<COLOR>, ..., <COLOR>]\n" +
-                            "e.g. color is [red, green, blue]; is a valid color type\n\n" : "") +
+                            "e.g. Colors is [red, green, blue]; is a valid color type\n\n" : "") +
                           (isColored ? "Syntax for defining variables:\n" +
                             "<ID> in <COLORTYPE>\n" +
-                            "e.g. c in Color\n\n" : "") + "All statements must end with a semicolon.";
+                            "e.g. c in Colors\n\n" : "") + "All statements must end with a semicolon.";
 
         helpTextArea.setText(helpText);
 
