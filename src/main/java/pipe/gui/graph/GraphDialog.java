@@ -41,6 +41,10 @@ public class GraphDialog extends EscapableDialog {
     private double distanceToOrigin;
     private Double mean;
 
+    private boolean hasZeroPoint;   
+    private boolean hasZeroX;
+    private boolean hasZeroY;
+
     private GraphDialog(List<Graph> graphs, String title, boolean showLegend, boolean piecewise, boolean pointPlot) {
         super(TAPAALGUI.getAppGui(), title, true);
         this.graphs = graphs;
@@ -199,6 +203,21 @@ public class GraphDialog extends EscapableDialog {
             plot.setFixedLegendItems(legendItems);
         }
 
+        final double negativeMargin = -0.5;
+        final int xRatio = 10;
+        if (hasZeroPoint) {
+            ValueAxis domainAxis = plot.getDomainAxis();
+            domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
+            ValueAxis rangeAxis = plot.getRangeAxis();
+            rangeAxis.setRange(negativeMargin / xRatio, rangeAxis.getUpperBound());
+        } else if (hasZeroX) {
+            ValueAxis domainAxis = plot.getDomainAxis();
+            domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
+        } else if (hasZeroY) {
+            ValueAxis rangeAxis = plot.getRangeAxis();
+            rangeAxis.setRange(negativeMargin / xRatio, rangeAxis.getUpperBound());
+        }
+
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         Color lineColor = Color.RED;
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
@@ -218,6 +237,11 @@ public class GraphDialog extends EscapableDialog {
 
     private XYDataset constructDataset(List<Graph> graphs) {
         XYSeriesCollection dataset = new XYSeriesCollection();
+        
+        hasZeroPoint = false;
+        hasZeroX = false;
+        hasZeroY = false;
+        
         for (Graph graph : graphs) {
             XYSeries series = new XYSeries(graph.getName());
             List<GraphPoint> points = graph.getPoints();
@@ -236,8 +260,17 @@ public class GraphDialog extends EscapableDialog {
 
             for (GraphPoint point : points) {
                 series.add(point.getX(), point.getY());
-            }
+                if (point.getX() == 0) {
+                    hasZeroX = true;
+                }
 
+                if (point.getY() == 0) {
+                    hasZeroY = true;
+                }
+
+            }
+            
+            hasZeroPoint = hasZeroX && hasZeroY;
             dataset.addSeries(series);
         }
         

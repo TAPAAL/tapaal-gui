@@ -7,8 +7,8 @@ public class QuerySlider extends JSlider {
     private double desiredMin;
     private double desiredMax;
 
-    public QuerySlider(int min, int max, int value, double desiredMin, double desiredMax) {
-        super(min, max, value);
+    public QuerySlider(int value, double desiredMin, double desiredMax) {
+        super(0, 100, value);
         this.desiredMin = desiredMin;
         this.desiredMax = desiredMax;
     }

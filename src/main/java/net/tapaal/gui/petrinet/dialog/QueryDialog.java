@@ -816,21 +816,24 @@ public class QueryDialog extends JPanel {
     private void setSMCSettings(SMCSettings settings) {
         smcSettings = settings;
 
+        double desiredMinConfidence = smcConfidenceSlider.getDesiredMin();
+        double desiredMaxConfidence = smcConfidenceSlider.getDesiredMax();
+        double initialProportionConfidence = (settings.confidence - desiredMinConfidence) / (desiredMaxConfidence - desiredMinConfidence);
+        int initialValueConfidence = (int) (initialProportionConfidence * smcConfidenceSlider.getMaximum());
         smcConfidenceSlider.setValue(
             Math.max(smcConfidenceSlider.getMinimum(), 
-                                Math.min((int)(settings.confidence * smcConfidenceSlider.getMaximum()),
-                                               smcConfidenceSlider.getMaximum())));
+                    Math.min(initialValueConfidence, smcConfidenceSlider.getMaximum())));
 
-        double desiredMin = smcPrecisionSlider.getDesiredMin();
-        double desiredMax = smcPrecisionSlider.getDesiredMax();
-        double logMin = Math.log(desiredMin);
-        double logMax = Math.log(desiredMax);
-        double initialProportion = (Math.log(settings.estimationIntervalWidth) - logMin) / (logMax - logMin);
-        int initialValue = (int) (initialProportion * 500);
+        double desiredMinPrecision = smcPrecisionSlider.getDesiredMin();
+        double desiredMaxPrecision = smcPrecisionSlider.getDesiredMax();
+        double logMin = Math.log(desiredMinPrecision);
+        double logMax = Math.log(desiredMaxPrecision);
+        double initialProportionPrecision = (Math.log(settings.estimationIntervalWidth) - logMin) / (logMax - logMin);
+        int initialValuePrecision = (int) (initialProportionPrecision * smcPrecisionSlider.getMaximum());
         
         smcPrecisionSlider.setValue(
             Math.max(smcPrecisionSlider.getMinimum(), 
-                    Math.min(initialValue, smcPrecisionSlider.getMaximum())));
+                    Math.min(initialValuePrecision, smcPrecisionSlider.getMaximum())));
         DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
         decimalFormatSymbols.setDecimalSeparator('.');
         DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
@@ -2833,14 +2836,12 @@ public class QueryDialog extends JPanel {
         smcConfidence.setToolTipText(TOOL_TIP_CONFIDENCE);
         quantitativePanel.add(smcConfidence, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcConfidenceSlider = new QuerySlider(0, 100, 95, 0.1, 0.99);
-        smcConfidenceSlider.setMajorTickSpacing(20);
-        smcConfidenceSlider.setMinorTickSpacing(10);
+        smcConfidenceSlider = new QuerySlider(95, 0.80, 0.99);
         smcConfidenceSlider.addChangeListener(e -> {
             int value = smcConfidenceSlider.getValue();
             double desiredMin = smcConfidenceSlider.getDesiredMin();
             double desiredMax = smcConfidenceSlider.getDesiredMax();
-            double proportion = (double) value / 100;
+            double proportion = (double) value / smcConfidenceSlider.getMaximum();
             double interpretedValue = desiredMin + proportion * (desiredMax - desiredMin);
             double roundedValue = Math.round(interpretedValue * 1000.0) / 1000.0;
             smcConfidence.setText(roundedValue + "");
@@ -2858,22 +2859,22 @@ public class QueryDialog extends JPanel {
         smcEstimationIntervalWidth.setToolTipText(TOOL_TIP_INTERVAL_WIDTH);
         quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcPrecisionSlider = new QuerySlider(0, 500, 0, 0.5, 0.001);
-        smcPrecisionSlider.setMajorTickSpacing(100);
-        smcPrecisionSlider.setMinorTickSpacing(50);
+        smcPrecisionSlider = new QuerySlider(0, 0.5, 0.0001);
         smcPrecisionSlider.addChangeListener(e -> {
             int value = smcPrecisionSlider.getValue();
             double desiredMin = smcPrecisionSlider.getDesiredMin();
             double desiredMax = smcPrecisionSlider.getDesiredMax();
             double logMin = Math.log(desiredMin);
             double logMax = Math.log(desiredMax);
-            double proportion = (double) value / 500;
+            double proportion = (double) value / smcPrecisionSlider.getMaximum();
             double logValue = logMin + proportion * (logMax - logMin);
             double interpretedValue = Math.exp(logValue);
             smcPrecisionSlider.setRealValue(interpretedValue);
-            double roundedValue = Math.round(interpretedValue * 1000.0) / 1000.0;
-            smcEstimationIntervalWidth.setText(roundedValue + "");
-            smcPrecisionSlider.setToolTipText(String.format("Value: %.3f", roundedValue));
+            double roundedValue = Math.round(interpretedValue * 10000.0) / 10000.0;
+            DecimalFormat df = new DecimalFormat("#.####");
+            String formattedValue = df.format(roundedValue);
+            smcEstimationIntervalWidth.setText(formattedValue);
+            smcPrecisionSlider.setToolTipText(String.format("Value: %s", formattedValue));
         });
 
         quantitativePanel.add(smcPrecisionSlider, subPanelGbc);
