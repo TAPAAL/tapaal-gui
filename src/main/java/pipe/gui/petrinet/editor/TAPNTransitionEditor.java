@@ -209,10 +209,10 @@ public class TAPNTransitionEditor extends JPanel {
         }
 	
 		rotationLabel.setText("Rotate:");
-		gridBagConstraints = GridBagHelper.as(0,2, Anchor.NORTH, new Insets(3, 3, 3, 3));
+		gridBagConstraints = GridBagHelper.as(0,2, Anchor.EAST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationLabel, gridBagConstraints);
 
-		gridBagConstraints = GridBagHelper.as(1,2, Anchor.NORTHWEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = GridBagHelper.as(1,2, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
 
         gridBagConstraints = GridBagHelper.as(0, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
@@ -227,7 +227,7 @@ public class TAPNTransitionEditor extends JPanel {
 			String firingModeTooltip = "The firing mode of the transition";
 			JLabel firingModeLabel = new JLabel("Firing mode:");
             firingModeLabel.setToolTipText(firingModeTooltip);
-
+            
             transitionEditorPanel.add(weightLabel, gridBagConstraints);
             gridBagConstraints.gridx++;
             transitionEditorPanel.add(weightField, gridBagConstraints);
