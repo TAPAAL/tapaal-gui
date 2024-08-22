@@ -227,8 +227,10 @@ public class TAPNTransitionEditor extends JPanel {
 			String firingModeTooltip = "The firing mode of the transition";
 			JLabel firingModeLabel = new JLabel("Firing mode:");
             firingModeLabel.setToolTipText(firingModeTooltip);
-            
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.EAST;
             transitionEditorPanel.add(weightLabel, gridBagConstraints);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.gridx++;
             transitionEditorPanel.add(weightField, gridBagConstraints);
             transitionEditorPanel.add(constantsComboBox, gridBagConstraints);
