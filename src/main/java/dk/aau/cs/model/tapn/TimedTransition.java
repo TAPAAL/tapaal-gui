@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
 import pipe.gui.petrinet.animation.Animator;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -29,7 +30,7 @@ public class TimedTransition extends TAPNElement {
 	private boolean isUncontrollable = false;
     private SMCDistribution distribution = SMCDistribution.defaultDistribution();
     private Probability weight = new DoubleProbability(1.0);
-	private FiringMode firingMode;
+	private FiringMode firingMode = new OldestFiringMode();
     private GuardExpression guard;
 
 	private SharedTransition sharedTransition;
