@@ -94,7 +94,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="165" yCoord="180"/>
-      <arcpath arcPointType="false" id="1" xCoord="280" yCoord="180"/>
+      <arcpath arcPointType="false" id="1" xCoord="280" yCoord="181"/>
     </arc>
     <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="arrive" target="charging" type="normal" weight="1">
       <hlinscription>
@@ -131,8 +131,8 @@
           </numberof>
         </structure>
       </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="418" yCoord="172"/>
-      <arcpath arcPointType="false" id="1" xCoord="535" yCoord="105"/>
+      <arcpath arcPointType="false" id="0" xCoord="418" yCoord="173"/>
+      <arcpath arcPointType="false" id="1" xCoord="535" yCoord="106"/>
     </arc>
     <arc id="A3" inscription="1" nameOffsetX="0" nameOffsetY="0" source="ready" target="charged" type="normal" weight="1">
       <hlinscription>
@@ -170,7 +170,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="655" yCoord="169"/>
-      <arcpath arcPointType="false" id="1" xCoord="745" yCoord="75"/>
+      <arcpath arcPointType="false" id="1" xCoord="745" yCoord="76"/>
     </arc>
     <arc id="A9" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="charged" target="fire_jointly" type="timed" weight="1">
       <hlinscription>
@@ -208,7 +208,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="755" yCoord="80"/>
-      <arcpath arcPointType="false" id="1" xCoord="873" yCoord="170"/>
+      <arcpath arcPointType="false" id="1" xCoord="873" yCoord="171"/>
     </arc>
     <arc id="A7" inscription="1" nameOffsetX="0" nameOffsetY="0" source="fire_alone" target="charging" type="normal" weight="1">
       <hlinscription>
@@ -268,7 +268,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="650" yCoord="265"/>
-      <arcpath arcPointType="false" id="1" xCoord="870" yCoord="185"/>
+      <arcpath arcPointType="false" id="1" xCoord="871" yCoord="185"/>
     </arc>
     <arc id="A11" inscription="1" nameOffsetX="0" nameOffsetY="0" source="fire_jointly" target="charging" type="normal" weight="1">
       <hlinscription>
@@ -286,7 +286,7 @@
           </numberof>
         </structure>
       </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="640" yCoord="270"/>
+      <arcpath arcPointType="false" id="0" xCoord="640" yCoord="271"/>
       <arcpath arcPointType="false" id="1" xCoord="405" yCoord="270"/>
       <arcpath arcPointType="false" id="2" xCoord="405" yCoord="195"/>
     </arc>
@@ -328,7 +328,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="660" yCoord="180"/>
-      <arcpath arcPointType="false" id="1" xCoord="760" yCoord="180"/>
+      <arcpath arcPointType="false" id="1" xCoord="760" yCoord="181"/>
     </arc>
     <arc id="I13" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="firing" target="fire_alone" type="tapnInhibitor" weight="1">
       <hlinscription>
@@ -353,7 +353,7 @@
       <arcpath arcPointType="false" id="2" xCoord="755" yCoord="70"/>
     </arc>
   </net>
-  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="All fireflies synchronize" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" timeDarts="false" traceOption="NONE" type="SMC">
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="All fireflies synchronize" numberOfTraces="1" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Quantitative">
     <smc confidence="0.95" interval-width="0.01" time-bound="1000"/>
     <formula>
       <finally>
@@ -380,29 +380,27 @@
       </finally>
     </formula>
   </query>
-  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="2" capacity="11" colorFixpoint="false" coloredReduction="false" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="false" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Deadlock free" overApproximation="false" pTrie="true" partitioning="false" reduction="true" reductionOption="VerifyDTAPN" searchOption="HEURISTIC" symmetricVars="false" symmetry="true" timeDarts="false" traceOption="NONE" type="Default" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="false">
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="11" gcd="false" name="Deadlock free" numberOfTraces="1" overApproximation="false" parallel="false" reductionOption="VerifyDTAPN" smcTraceType="Any" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Quantitative">
+    <smc confidence="0.95" interval-width="0.05" time-bound="1000"/>
     <formula>
-      <all-paths>
-        <globally>
-          <negation>
-            <deadlock/>
-          </negation>
-        </globally>
-      </all-paths>
+      <globally>
+        <negation>
+          <deadlock/>
+        </negation>
+      </globally>
     </formula>
   </query>
-  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="2" capacity="11" colorFixpoint="false" coloredReduction="false" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Place firing has at most one token" overApproximation="true" pTrie="true" partitioning="false" reduction="true" reductionOption="VerifyDTAPN" searchOption="HEURISTIC" symmetricVars="false" symmetry="true" timeDarts="false" traceOption="NONE" type="Default" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="false">
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="11" gcd="false" name="Place firing has at most one token" numberOfTraces="1" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="Any" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Quantitative">
+    <smc confidence="0.95" interval-width="0.05" time-bound="1000"/>
     <formula>
-      <all-paths>
-        <globally>
-          <integer-le>
-            <tokens-count>
-              <place>TAPN1.firing</place>
-            </tokens-count>
-            <integer-constant>1</integer-constant>
-          </integer-le>
-        </globally>
-      </all-paths>
+      <globally>
+        <integer-le>
+          <tokens-count>
+            <place>TAPN1.firing</place>
+          </tokens-count>
+          <integer-constant>1</integer-constant>
+        </integer-le>
+      </globally>
     </formula>
   </query>
   <feature isColored="true" isGame="false" isStochastic="true" isTimed="true"/>
