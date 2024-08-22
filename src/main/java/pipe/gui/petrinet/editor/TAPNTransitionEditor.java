@@ -19,12 +19,9 @@ import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import net.tapaal.gui.petrinet.editor.DistributionPanel;
 import net.tapaal.gui.petrinet.undo.*;
 import net.tapaal.swinghelpers.GridBagHelper;
-import net.tapaal.swinghelpers.GridBagHelper.Anchor;
-import net.tapaal.swinghelpers.GridBagHelper.Fill;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import net.tapaal.gui.petrinet.editor.ColoredTransitionGuardPanel;
-import pipe.gui.canvas.Grid;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import net.tapaal.gui.petrinet.Context;
@@ -145,9 +142,9 @@ public class TAPNTransitionEditor extends JPanel {
 		
 		makeSharedButton = new JButton();
 		makeSharedButton.setText("Make shared");
-		makeSharedButton.setMaximumSize(new java.awt.Dimension(110, 25));
+		makeSharedButton.setMaximumSize(new java.awt.Dimension(128, 25));
 		makeSharedButton.setMinimumSize(new java.awt.Dimension(110, 25));
-		makeSharedButton.setPreferredSize(new java.awt.Dimension(110, 25));
+		makeSharedButton.setPreferredSize(new java.awt.Dimension(128, 25));
 		
 		makeSharedButton.addActionListener(evt -> {
             makeNewShared = true;
@@ -218,19 +215,18 @@ public class TAPNTransitionEditor extends JPanel {
 		gridBagConstraints = GridBagHelper.as(1,2, Anchor.NORTHWEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
 
-        gridBagConstraints = GridBagHelper.as(0, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));;
+        gridBagConstraints = GridBagHelper.as(0, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         if(context.tabContent().getLens().isStochastic()) {
             String weightToolTip = "Probability mass of the transition in the event of a firing date collision";
-            JLabel weightLabel = new JLabel("Weight :");
+            JLabel weightLabel = new JLabel("Weight:");
             weightLabel.setToolTipText(weightToolTip);
             weightField.setToolTipText(weightToolTip);
             infiniteWeight.setToolTipText("Selecting weight as an infinity gives an absolute priority of the transition firing in case of several transitions scheduled at the same time");
             infiniteWeight.addActionListener(act -> weightField.setEnabled(!infiniteWeight.isSelected()));
 
 			String firingModeTooltip = "The firing mode of the transition";
-			JLabel firingModeLabel = new JLabel("Firing mode :");
-
-
+			JLabel firingModeLabel = new JLabel("Firing mode:");
+            firingModeLabel.setToolTipText(firingModeTooltip);
 
             transitionEditorPanel.add(weightLabel, gridBagConstraints);
             gridBagConstraints.gridx++;

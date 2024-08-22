@@ -56,7 +56,7 @@ public class DistributionPanel extends JPanel {
         });
 
         distributionType = new JComboBox<>(continuous);
-        distributionShowGraph = new JButton("Plot density");
+        distributionShowGraph = new JButton("Show density function");
         distributionParam1Label = new JLabel();
         distributionParam2Label = new JLabel();
         distributionParam1Field = new JTextField();
