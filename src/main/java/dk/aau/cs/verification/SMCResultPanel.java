@@ -108,24 +108,24 @@ public class SMCResultPanel extends JPanel  {
         gbc = GridBagHelper.as(0,0);
         statsPanel.add(generalStatsPanel, gbc);
 
-        validRunsPanel.setBorder(BorderFactory.createTitledBorder("Valid runs"));
+        validRunsPanel.setBorder(BorderFactory.createTitledBorder("Valid runs satisfying the property"));
         gbc = GridBagHelper.as(0,0, GridBagHelper.Anchor.WEST, new Insets(5, 5, 5, 5));
         if(stats.getValidRuns() == 0) {
             validRunsPanel.add(new JLabel("No valid run"), gbc);
         } else {
-            addStatIfPositive(validRunsPanel, "Number of valid runs: ", stats.getValidRuns(), gbc);
-            addAvgStdDev(validRunsPanel, "Average duration of a valid run: ", stats.getValidRunAverageTime(), stats.getValidRunTimeStdDev(), gbc);
-            addAvgStdDev(validRunsPanel, "Average length of a valid run: ", stats.getValidRunAverageLength(), stats.getValidRunLengthStdDev(), gbc);
+            addStatIfPositive(validRunsPanel, "Number: ", stats.getValidRuns(), gbc);
+            addAvgStdDev(validRunsPanel, "Average duration: ", stats.getValidRunAverageTime(), stats.getValidRunTimeStdDev(), gbc);
+            addAvgStdDev(validRunsPanel, "Average length: ", stats.getValidRunAverageLength(), stats.getValidRunLengthStdDev(), gbc);
         }
 
-        violatingRunsPanel.setBorder(BorderFactory.createTitledBorder("Violating runs"));
+        violatingRunsPanel.setBorder(BorderFactory.createTitledBorder("Violating runs that do not satisfy the property"));
         gbc = GridBagHelper.as(0,0, GridBagHelper.Anchor.WEST, new Insets(5, 5, 5, 5));
         if(stats.getViolatingRuns() == 0) {
             violatingRunsPanel.add(new JLabel("No violating run"), gbc);
         } else {
-            addStatIfPositive(violatingRunsPanel, "Number of violating runs: ", stats.getViolatingRuns(), gbc);
-            addAvgStdDev(violatingRunsPanel, "Average duration of a violating run: ", stats.getViolatingRunAverageTime(), stats.getViolatingRunTimeStdDev(), gbc);
-            addAvgStdDev(violatingRunsPanel, "Average length of a violating run: ", stats.getViolatingRunAverageLength(), stats.getViolatingRunLengthStdDev(), gbc);
+            addStatIfPositive(violatingRunsPanel, "Number: ", stats.getViolatingRuns(), gbc);
+            addAvgStdDev(violatingRunsPanel, "Average duration: ", stats.getViolatingRunAverageTime(), stats.getViolatingRunTimeStdDev(), gbc);
+            addAvgStdDev(violatingRunsPanel, "Average length: ", stats.getViolatingRunAverageLength(), stats.getViolatingRunLengthStdDev(), gbc);
         }
 
         if(printRunsStats) {
@@ -161,7 +161,7 @@ public class SMCResultPanel extends JPanel  {
         panel.add(new JLabel(toPrint), gbc);
         gbc.gridx++;
         if(stdDev >= 0) {
-            JLabel sdLabel = new JLabel(" (S.D. " + format.format(stdDev) + ")");
+            JLabel sdLabel = new JLabel(" (SD: " + format.format(stdDev) + ")");
             sdLabel.setToolTipText("<html>Standard deviation. <br/>In normal distribution, 68% of all values are one standard deviation from the average, <br/>95% of values within two standard deviations <br/>and 99.99% within three standard deviations from the average.</html>");
             panel.add(sdLabel, gbc);
         }
