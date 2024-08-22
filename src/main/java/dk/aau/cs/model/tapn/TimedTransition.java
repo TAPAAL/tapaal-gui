@@ -13,6 +13,7 @@ import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
 import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
@@ -136,7 +137,11 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public FiringMode getFiringMode() {
-		return firingMode;
+        if (firingMode == null) {
+            firingMode = new OldestFiringMode();
+        }
+        
+        return firingMode;
 	}
 
     public boolean hasCustomDistribution() {

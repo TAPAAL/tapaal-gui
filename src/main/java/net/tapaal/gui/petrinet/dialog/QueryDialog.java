@@ -234,6 +234,8 @@ public class QueryDialog extends JPanel {
     private JLabel smcParallelLabel;
     private JCheckBox smcParallel;
     private JTextField smcConfidence;
+    private QuerySlider smcConfidenceSlider;
+    private QuerySlider smcPrecisionSlider;
     private JTextField smcEstimationIntervalWidth;
     private JTextField smcTimeExpected;
     private JButton smcTimeEstimationButton;
@@ -814,6 +816,21 @@ public class QueryDialog extends JPanel {
     private void setSMCSettings(SMCSettings settings) {
         smcSettings = settings;
 
+        smcConfidenceSlider.setValue(
+            Math.max(smcConfidenceSlider.getMinimum(), 
+                                Math.min((int)(settings.confidence * smcConfidenceSlider.getMaximum()),
+                                               smcConfidenceSlider.getMaximum())));
+
+        double desiredMin = smcPrecisionSlider.getDesiredMin();
+        double desiredMax = smcPrecisionSlider.getDesiredMax();
+        double logMin = Math.log(desiredMin);
+        double logMax = Math.log(desiredMax);
+        double initialProportion = (Math.log(settings.estimationIntervalWidth) - logMin) / (logMax - logMin);
+        int initialValue = (int) (initialProportion * 500);
+        
+        smcPrecisionSlider.setValue(
+            Math.max(smcPrecisionSlider.getMinimum(), 
+                    Math.min(initialValue, smcPrecisionSlider.getMaximum())));
         DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
         decimalFormatSymbols.setDecimalSeparator('.');
         DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
@@ -2815,6 +2832,23 @@ public class QueryDialog extends JPanel {
         smcConfidence.addFocusListener(updater);
         smcConfidence.setToolTipText(TOOL_TIP_CONFIDENCE);
         quantitativePanel.add(smcConfidence, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcConfidenceSlider = new QuerySlider(0, 100, 95, 0.1, 0.99);
+        smcConfidenceSlider.setMajorTickSpacing(20);
+        smcConfidenceSlider.setMinorTickSpacing(10);
+        smcConfidenceSlider.addChangeListener(e -> {
+            int value = smcConfidenceSlider.getValue();
+            double desiredMin = smcConfidenceSlider.getDesiredMin();
+            double desiredMax = smcConfidenceSlider.getDesiredMax();
+            double proportion = (double) value / 100;
+            double interpretedValue = desiredMin + proportion * (desiredMax - desiredMin);
+            double roundedValue = Math.round(interpretedValue * 1000.0) / 1000.0;
+            smcConfidence.setText(roundedValue + "");
+            smcConfidenceSlider.setRealValue(roundedValue);
+            smcConfidenceSlider.setToolTipText(String.format("Value: %.1f", roundedValue));
+        });
+
+        quantitativePanel.add(smcConfidenceSlider, subPanelGbc);
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
         quantitativePanel.add(new JLabel("Precision : "), subPanelGbc);
@@ -2823,6 +2857,26 @@ public class QueryDialog extends JPanel {
         smcEstimationIntervalWidth.addFocusListener(updater);
         smcEstimationIntervalWidth.setToolTipText(TOOL_TIP_INTERVAL_WIDTH);
         quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcPrecisionSlider = new QuerySlider(0, 500, 0, 0.5, 0.001);
+        smcPrecisionSlider.setMajorTickSpacing(100);
+        smcPrecisionSlider.setMinorTickSpacing(50);
+        smcPrecisionSlider.addChangeListener(e -> {
+            int value = smcPrecisionSlider.getValue();
+            double desiredMin = smcPrecisionSlider.getDesiredMin();
+            double desiredMax = smcPrecisionSlider.getDesiredMax();
+            double logMin = Math.log(desiredMin);
+            double logMax = Math.log(desiredMax);
+            double proportion = (double) value / 500;
+            double logValue = logMin + proportion * (logMax - logMin);
+            double interpretedValue = Math.exp(logValue);
+            smcPrecisionSlider.setRealValue(interpretedValue);
+            double roundedValue = Math.round(interpretedValue * 1000.0) / 1000.0;
+            smcEstimationIntervalWidth.setText(roundedValue + "");
+            smcPrecisionSlider.setToolTipText(String.format("Value: %.3f", roundedValue));
+        });
+
+        quantitativePanel.add(smcPrecisionSlider, subPanelGbc);
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
         JLabel verifTimeLabel = new JLabel("Estimated verification time (seconds) : ");
