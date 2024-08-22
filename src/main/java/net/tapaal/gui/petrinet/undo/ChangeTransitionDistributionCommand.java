@@ -20,14 +20,12 @@ public class ChangeTransitionDistributionCommand implements Command {
     @Override
     public void redo() {
         transition.setDistribution(newValue);
-        tab.revalidate();
         tab.repaint();
     }
 
     @Override
     public void undo() {
         transition.setDistribution(oldValue);
-        tab.revalidate();
         tab.repaint();
     }
 
