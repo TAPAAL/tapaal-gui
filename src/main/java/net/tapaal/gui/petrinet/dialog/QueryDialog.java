@@ -6140,7 +6140,7 @@ public class QueryDialog extends JPanel {
         querySaved = saved;
         SMCSettings settings = query.getSmcSettings();
         query.setBenchmarkMode(true);
-        query.setBenchmarkRuns(32);
+        query.setBenchmarkRuns(48);
         double timeWanted = 10;
         try {
             timeWanted = Double.parseDouble(smcTimeExpected.getText());
@@ -6149,7 +6149,7 @@ public class QueryDialog extends JPanel {
         smcEstimationIntervalWidth.setText("");
         double finalTimeWanted = timeWanted;
         VerificationCallback callback1 = result1 -> {
-            query.setBenchmarkRuns(256);
+            query.setBenchmarkRuns(128);
             SMCStats stats1 = (SMCStats) result1.stats();
             float runsDone1 = stats1.getExecutedRuns();
             float time1 = stats1.getVerificationTime();
@@ -6164,6 +6164,7 @@ public class QueryDialog extends JPanel {
                 if(smcMustUpdateTime) {
                     double runsNeeded = (double) settings.chernoffHoeffdingBound();
                     double estimation = coeff * runsNeeded + stat_err;
+                    if(estimation < 0) estimation = 0.01;
                     smcTimeExpected.setText(timeFormat.format(estimation));
                     smcEstimationIntervalWidth.setText(precisionFormat.format(smcSettings.estimationIntervalWidth));
                     smcTimeEstimationButton.setText(UPDATE_VERIFICATION_TIME_BTN_TEXT);

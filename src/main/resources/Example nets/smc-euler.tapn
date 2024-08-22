@@ -10,6 +10,7 @@
     </structure>
   </declaration>
   <net active="true" id="TAPN1" type="P/T net">
+    <labels border="true" height="105" positionX="60" positionY="45" width="101">This stochastic net can estimate Euler's constant in the average length of runs statistic</labels>
     <place displayName="true" id="P0" initialMarking="1" invariant="&lt; inf" name="P0" nameOffsetX="0" nameOffsetY="0" positionX="225" positionY="240">
       <type>
         <text>dot</text>
@@ -72,8 +73,8 @@
         </structure>
       </hlinitialMarking>
     </place>
-    <transition a="0.0" angle="0" b="1.0" displayName="true" distribution="uniform" id="T0" infiniteServer="false" name="T0" nameOffsetX="121" nameOffsetY="13" player="0" positionX="375" positionY="240" priority="0" urgent="false" weight="1.0"/>
-    <transition angle="0" displayName="true" distribution="constant" id="T1" infiniteServer="false" name="T1" nameOffsetX="0" nameOffsetY="0" player="0" positionX="285" positionY="345" priority="0" urgent="false" value="0.0" weight="Infinity"/>
+    <transition a="0.0" angle="0" b="1.0" displayName="true" distribution="uniform" firingMode="Oldest" id="T0" infiniteServer="false" name="T0" nameOffsetX="121" nameOffsetY="13" player="0" positionX="375" positionY="240" priority="0" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Oldest" id="T1" infiniteServer="false" name="T1" nameOffsetX="0" nameOffsetY="0" player="0" positionX="285" positionY="345" priority="0" urgent="false" value="0.0" weight="Infinity"/>
     <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P0" target="T0" type="timed" weight="1">
       <hlinscription>
         <text>1'dot</text>
@@ -129,8 +130,8 @@
           </numberof>
         </structure>
       </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="301" yCoord="375"/>
-      <arcpath arcPointType="false" id="1" xCoord="301" yCoord="495"/>
+      <arcpath arcPointType="false" id="0" xCoord="300" yCoord="375"/>
+      <arcpath arcPointType="false" id="1" xCoord="300" yCoord="495"/>
     </arc>
     <arc id="A4" inscription="[1,inf)" nameOffsetX="0" nameOffsetY="0" source="P2" target="T1" type="timed" weight="1">
       <hlinscription>
@@ -148,11 +149,11 @@
           </numberof>
         </structure>
       </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="420" yCoord="361"/>
-      <arcpath arcPointType="false" id="1" xCoord="305" yCoord="361"/>
+      <arcpath arcPointType="false" id="0" xCoord="420" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="305" yCoord="360"/>
     </arc>
   </net>
-  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Query Comment/Name Here" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" timeDarts="false" traceOption="NONE" type="SMC">
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Estimate Euler's constant" numberOfTraces="1" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="Any" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Quantitative">
     <smc confidence="0.95" interval-width="0.001" time-bound="1000"/>
     <formula>
       <finally>
@@ -163,19 +164,6 @@
           <integer-constant>1</integer-constant>
         </integer-eq>
       </finally>
-    </formula>
-  </query>
-  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Query Comment/Name Here" overApproximation="false" parallel="false" reductionOption="VerifyDTAPN" timeDarts="false" traceOption="NONE" type="SMC">
-    <smc confidence="0.95" interval-width="0.05" time-bound="1000"/>
-    <formula>
-      <globally>
-        <integer-eq>
-          <tokens-count>
-            <place>TAPN1.P2</place>
-          </tokens-count>
-          <integer-constant>1</integer-constant>
-        </integer-eq>
-      </globally>
     </formula>
   </query>
   <feature isColored="false" isGame="false" isStochastic="true" isTimed="true"/>

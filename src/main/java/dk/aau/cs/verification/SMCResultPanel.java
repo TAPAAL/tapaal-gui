@@ -51,6 +51,7 @@ public class SMCResultPanel extends JPanel  {
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(30,0,0,0);
         add(estimates, gbc);
     }
 
@@ -99,7 +100,7 @@ public class SMCResultPanel extends JPanel  {
         GridBagConstraints gbc = GridBagHelper.as(0,0, GridBagHelper.Anchor.WEST, new Insets(10, 0, 10, 30));
         JPanel generalStatsPanel = new JPanel(new GridBagLayout());
         addStatIfPositive(generalStatsPanel, "Executed runs: ", stats.getExecutedRuns(), gbc);
-        addStatIfPositive(generalStatsPanel, "Verification time / run (s): ", stats.getVerificationTime() / stats.getExecutedRuns(), gbc, verifTimeFormat);
+        addStatIfPositive(generalStatsPanel, "Verification time / run (ms): ", (1000.0 * stats.getVerificationTime()) / stats.getExecutedRuns(), gbc, verifTimeFormat);
         gbc.gridy = 0;
         gbc.gridx = 3;
         addAvgStdDev(generalStatsPanel, "Average run duration: ", stats.getAverageRunTime(), stats.getRunTimeStdDev(), gbc);
@@ -129,7 +130,7 @@ public class SMCResultPanel extends JPanel  {
         }
 
         if(printRunsStats) {
-            gbc = GridBagHelper.as(0, 1, GridBagHelper.Anchor.WEST, GridBagHelper.Fill.BOTH);
+            gbc = GridBagHelper.as(0, 1, GridBagHelper.Anchor.WEST, GridBagHelper.Fill.BOTH, new Insets(30,0,0,0));
             JPanel specificStats = new JPanel(new GridLayout());
             specificStats.add(validRunsPanel, gbc);
             specificStats.add(violatingRunsPanel, gbc);
