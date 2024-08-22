@@ -31,7 +31,8 @@ public class SMCExponentialDistribution extends SMCDistribution {
     public String explanation() {
         return "<html>" +
             "Memoryless distribution, <br/>" +
-            "probability of the distance between events occurring according to a real rate.<br/>" +
+            "probability of the distance between events <br/>" +
+            "occurring according to a real rate.<br/>" +
             "Mean : " + mean +
             "</html>";
     }
