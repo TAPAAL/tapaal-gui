@@ -118,7 +118,7 @@ public class SMCResultPanel extends JPanel  {
             addAvgStdDev(validRunsPanel, "Average length: ", stats.getValidRunAverageLength(), stats.getValidRunLengthStdDev(), gbc);
         }
 
-        violatingRunsPanel.setBorder(BorderFactory.createTitledBorder("Violating runs that do not satisfy the property"));
+        violatingRunsPanel.setBorder(BorderFactory.createTitledBorder("Violating runs not satisfying the property"));
         gbc = GridBagHelper.as(0,0, GridBagHelper.Anchor.WEST, new Insets(5, 5, 5, 5));
         if(stats.getViolatingRuns() == 0) {
             violatingRunsPanel.add(new JLabel("No violating run"), gbc);
