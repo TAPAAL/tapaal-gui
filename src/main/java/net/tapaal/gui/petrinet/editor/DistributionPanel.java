@@ -27,8 +27,8 @@ public class DistributionPanel extends JPanel {
     private TimedTransitionComponent transition;
     private EscapableDialog dialog;
 
-    private static final String[] continuous =  { "constant", "uniform", "exponential", "normal", "gamma" };
-    private static final String[] discrete =    { "discrete uniform" };
+    private static final String[] continuous =  { "constant", "uniform", "exponential", "normal", "gamma", "erlang" };
+    private static final String[] discrete =    { "discrete uniform", "geometric" };
 
     public DistributionPanel(TimedTransitionComponent transition, EscapableDialog dialog) {
         this.transition = transition;
@@ -153,10 +153,17 @@ public class DistributionPanel extends JPanel {
                     double shape = Double.parseDouble(distributionParam1Field.getText());
                     double scale = Double.parseDouble(distributionParam2Field.getText());
                     return new SMCGammaDistribution(shape, scale);
+                case SMCErlangDistribution.NAME:
+                    double eshape = Integer.parseInt(distributionParam1Field.getText());
+                    double escale = Double.parseDouble(distributionParam2Field.getText());
+                    return new SMCErlangDistribution(eshape, escale);
                 case SMCDiscreteUniformDistribution.NAME:
                     double da = Integer.parseInt(distributionParam1Field.getText());
                     double db = Integer.parseInt(distributionParam2Field.getText());
                     return new SMCDiscreteUniformDistribution(da, db);
+                case SMCGeometricDistribution.NAME:
+                    double p = Double.parseDouble(distributionParam1Field.getText());
+                    return new SMCGeometricDistribution(p);
             }
         } catch(NumberFormatException ignored) {}
         return SMCDistribution.defaultDistributionFor(type);
@@ -195,10 +202,18 @@ public class DistributionPanel extends JPanel {
                     "Shape", ((SMCGammaDistribution) distribution).shape,
                     "Scale", ((SMCGammaDistribution) distribution).scale);
                 break;
+            case SMCErlangDistribution.NAME:
+                displayTwoVariables(
+                    "Shape", ((SMCErlangDistribution) distribution).shape,
+                    "Scale", ((SMCErlangDistribution) distribution).scale);
+                break;
             case SMCDiscreteUniformDistribution.NAME:
                 displayTwoVariables(
                     "A", ((SMCDiscreteUniformDistribution) distribution).a,
                     "B", ((SMCDiscreteUniformDistribution) distribution).b);
+                break;
+            case SMCGeometricDistribution.NAME:
+                displayOneVariable("P", ((SMCGeometricDistribution) distribution).p);
                 break;
             default:
                 break;
@@ -254,12 +269,18 @@ public class DistributionPanel extends JPanel {
         } else if (distribution instanceof SMCGammaDistribution) {
             Graph graph = createGraph((SMCGammaDistribution) distribution);
             builder = builder.addGraph(graph);
+        } else if (distribution instanceof SMCErlangDistribution) {
+            Graph graph = createGraph((SMCErlangDistribution) distribution);
+            builder = builder.addGraph(graph);
         } else if (distribution instanceof SMCNormalDistribution) {
             Graph graph = createGraph((SMCNormalDistribution) distribution);
             builder = builder.addGraph(graph).setTitle(title);
         } else if (distribution instanceof SMCUniformDistribution) {
             List<Graph> graphs = createGraphs((SMCUniformDistribution) distribution);
             builder = builder.addGraphs(graphs).setPiecewise(true);
+        } else if (distribution instanceof SMCGeometricDistribution) {
+            Graph graph = createGraph((SMCGeometricDistribution) distribution);
+            builder = builder.addGraph(graph).setPointPlot(true);
         }
 
         return builder.setTitle(title).build();
@@ -334,6 +355,32 @@ public class DistributionPanel extends JPanel {
         }
 
         return new Graph("Gamma Distribution", points);
+    }
+
+    private Graph createGraph(SMCErlangDistribution distribution) {
+        List<GraphPoint> points = new ArrayList<>();
+
+        LinkedHashMap<String, Double> params = distribution.getParameters();
+        double shape = params.get("shape");
+        double scale = params.get("scale");
+
+        Require.that(shape >= 1 && (shape % 1 == 0), "Shape must be a non-negative integer");
+
+
+        double gamma = spougeGammaApprox(shape - 1);
+        double coefficient = 1 / (gamma * Math.pow(scale, shape));
+        double step = 0.1;
+
+        // Start at some arbitrary small value to avoid division by zero
+        double x = 1e-6;
+        while (true) {
+            double y = coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
+            if (y < 1e-6) break;
+            points.add(new GraphPoint(x, y));
+            x += step;
+        }
+
+        return new Graph("Erlang Distribution", points);
     }
 
     private double spougeGammaApprox(double shape) {
@@ -413,6 +460,24 @@ public class DistributionPanel extends JPanel {
         graphs.add(new Graph("piece3", pointsG3));
 
         return graphs;
+    }
+
+    private Graph createGraph(SMCGeometricDistribution distribution) {
+        List<GraphPoint> points = new ArrayList<>();
+
+        LinkedHashMap<String, Double> params = distribution.getParameters();
+        double p = params.get("p");
+
+        double y = p;
+        int x = 0;
+
+        while(y > 0.01 && x < 100) {
+            points.add(new GraphPoint(x, y));
+            y *= (1 - p);
+            x++;
+        }
+
+        return new Graph("Geometric distribution", points);
     }
 
     private JRadioButton useContinuousDistribution;

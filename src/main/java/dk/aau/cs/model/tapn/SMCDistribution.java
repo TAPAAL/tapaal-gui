@@ -56,8 +56,12 @@ public abstract class SMCDistribution {
                 return SMCNormalDistribution.defaultDistribution();
             case SMCGammaDistribution.NAME:
                 return SMCGammaDistribution.defaultDistribution();
+            case SMCErlangDistribution.NAME:
+                return SMCErlangDistribution.defaultDistribution();
             case SMCDiscreteUniformDistribution.NAME:
                 return SMCDiscreteUniformDistribution.defaultDistribution();
+            case SMCGeometricDistribution.NAME:
+                return SMCGeometricDistribution.defaultDistribution();
             default:
                 return SMCDistribution.defaultDistribution();
         }
@@ -96,10 +100,17 @@ public abstract class SMCDistribution {
                     double shape = Double.parseDouble(elem.getAttribute("shape"));
                     double scale = Double.parseDouble(elem.getAttribute("scale"));
                     return new SMCGammaDistribution(shape, scale);
+                case SMCErlangDistribution.NAME:
+                    double e_shape = Double.parseDouble(elem.getAttribute("shape"));
+                    double e_scale = Double.parseDouble(elem.getAttribute("scale"));
+                    return new SMCErlangDistribution(e_shape, e_scale);
                 case SMCDiscreteUniformDistribution.NAME:
                     double da = Double.parseDouble(elem.getAttribute("a"));
                     double db = Double.parseDouble(elem.getAttribute("b"));
                     return new SMCDiscreteUniformDistribution(da,db);
+                case SMCGeometricDistribution.NAME:
+                    double p = Double.parseDouble(elem.getAttribute("p"));
+                    return new SMCGeometricDistribution(p);
             }
         } catch(NumberFormatException ignored) {}
         return SMCDistribution.defaultDistribution();
