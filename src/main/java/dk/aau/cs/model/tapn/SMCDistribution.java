@@ -14,6 +14,10 @@ public abstract class SMCDistribution {
 
     public abstract String explanation();
 
+    public Double getMean() {
+        return null;
+    }
+
     public void writeToXml(Element target) {
         target.setAttribute("distribution", distributionName());
         for(HashMap.Entry<String, Double> entry : getParameters().entrySet()) {

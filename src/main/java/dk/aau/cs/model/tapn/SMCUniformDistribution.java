@@ -25,7 +25,8 @@ public class SMCUniformDistribution extends SMCDistribution {
         return params;
     }
 
-    public double getMean() {
+    @Override
+    public Double getMean() {
         return mean;
     }
 
@@ -34,8 +35,7 @@ public class SMCUniformDistribution extends SMCDistribution {
         return "<html>" +
             "Will choose a point between two reals <br/>" + 
             "A and B, where every number has the <br/>" + 
-            "same probability of being chosen.<br/>" +
-            "Mean : " + mean +
+            "same probability of being chosen." +
             "</html>";
     }
 

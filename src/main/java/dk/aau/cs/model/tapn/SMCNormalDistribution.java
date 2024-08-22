@@ -24,7 +24,8 @@ public class SMCNormalDistribution extends SMCDistribution {
         return params;
     }
 
-    public double getMean() {
+    @Override
+    public Double getMean() {
         return mean;
     }
 

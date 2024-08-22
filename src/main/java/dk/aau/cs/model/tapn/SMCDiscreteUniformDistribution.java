@@ -25,7 +25,8 @@ public class SMCDiscreteUniformDistribution extends SMCDistribution {
         return params;
     }
 
-    public double getMean() {
+    @Override
+    public Double getMean() {
         return mean;
     }
 
@@ -35,8 +36,7 @@ public class SMCDiscreteUniformDistribution extends SMCDistribution {
             "Will choose an integer point between<br/>" + 
             "two numbers A and B (B included),<br/>" + 
             "where every number has the same<br/>" + 
-            "probability of being chosen.<br/>" +
-            "Mean : " + mean +
+            "probability of being chosen." +
             "</html>";
     }
 

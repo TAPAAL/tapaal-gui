@@ -23,7 +23,8 @@ public class SMCExponentialDistribution extends SMCDistribution {
         return params;
     }
 
-    public double getMean() {
+    @Override
+    public Double getMean() {
         return mean;
     }
 
@@ -32,8 +33,7 @@ public class SMCExponentialDistribution extends SMCDistribution {
         return "<html>" +
             "Memoryless distribution, <br/>" +
             "probability of the distance between events <br/>" +
-            "occurring according to a real rate.<br/>" +
-            "Mean : " + mean +
+            "occurring according to a real rate." +
             "</html>";
     }
 
