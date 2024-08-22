@@ -32,8 +32,10 @@ public class SMCDiscreteUniformDistribution extends SMCDistribution {
     @Override
     public String explanation() {
         return "<html>" +
-            "Will choose an integer point between two numbers A and B (B included), <br/>" +
-            "where every number the same probability of being chosen.<br/>" +
+            "Will choose an integer point between<br/>" + 
+            "two numbers A and B (B included),<br/>" + 
+            "where every number has the same<br/>" + 
+            "probability of being chosen.<br/>" +
             "Mean : " + mean +
             "</html>";
     }
