@@ -26,6 +26,8 @@ public class SMCGeometricDistribution extends SMCDistribution {
     public String explanation() {
         return "<html>" +
             "Geometric distribution <br/>" +
+            "Model the number of trials needed to obtain on success <br/>" +
+            "from successive Bernoulli trials of probability P" +
             "</html>";
     }
 
