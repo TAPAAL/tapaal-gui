@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.TimedTransition;
 
-public class ToggleTransitionUncontrollableCommand extends Command {
+public class ToggleTransitionUncontrollableCommand implements Command {
     private final TimedTransition transition;
     private final boolean oldValue;
     private final PetriNetTab tab;

@@ -6,7 +6,7 @@ import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel.SharedPlac
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.SharedPlace;
 
-public class RenameSharedPlaceCommand extends Command {
+public class RenameSharedPlaceCommand implements Command {
 	private final SharedPlace place;
 	private final String oldName;
 	private final String newName;

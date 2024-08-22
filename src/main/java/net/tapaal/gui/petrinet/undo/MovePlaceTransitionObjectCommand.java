@@ -6,7 +6,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
 
-public class MovePlaceTransitionObjectCommand extends Command {
+public class MovePlaceTransitionObjectCommand implements Command {
 	
 	private final int newY;
 	private final int newX;

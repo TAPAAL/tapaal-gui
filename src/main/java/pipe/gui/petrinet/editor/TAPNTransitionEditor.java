@@ -557,9 +557,17 @@ public class TAPNTransitionEditor extends JPanel {
         }
 
         Probability weight = parseWeight();
-        //TODO : Undo weight
-        transition.underlyingTransition().setWeight(weight);
-		transition.underlyingTransition().setFiringMode((FiringMode)firingModeComboBox.getSelectedItem());
+        if (!transition.underlyingTransition().getWeight().equals(weight)) {
+            context.undoManager().addEdit(new ChangeProbabilityWeightCommand(transition.underlyingTransition(), context.tabContent(), weight));
+            transition.underlyingTransition().setWeight(weight);
+        }
+
+        FiringMode firingMode = (FiringMode)firingModeComboBox.getSelectedItem();
+        if (!transition.underlyingTransition().getFiringMode().equals(firingMode)) {
+            context.undoManager().addEdit(new ChangeFiringModeCommand(transition.underlyingTransition(), firingMode));
+            transition.underlyingTransition().setFiringMode(firingMode);
+        }
+
         context.network().buildConstraints();
 
 		int rotationIndex = rotationComboBox.getSelectedIndex();

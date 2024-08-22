@@ -5,7 +5,7 @@ import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
-public class RemoveVariableFromNetworkCommand extends Command {
+public class RemoveVariableFromNetworkCommand implements Command {
 
     private final Variable variable;
     private final TimedArcPetriNetNetwork network;

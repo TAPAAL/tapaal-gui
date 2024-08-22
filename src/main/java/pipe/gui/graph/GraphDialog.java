@@ -203,19 +203,18 @@ public class GraphDialog extends EscapableDialog {
             plot.setFixedLegendItems(legendItems);
         }
 
-        final double negativeMargin = -0.5;
-        final int xRatio = 10;
+        final double negativeMargin = -0.05;
         if (hasZeroPoint) {
             ValueAxis domainAxis = plot.getDomainAxis();
             domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
             ValueAxis rangeAxis = plot.getRangeAxis();
-            rangeAxis.setRange(negativeMargin / xRatio, rangeAxis.getUpperBound());
+            rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
         } else if (hasZeroX) {
             ValueAxis domainAxis = plot.getDomainAxis();
             domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
         } else if (hasZeroY) {
             ValueAxis rangeAxis = plot.getRangeAxis();
-            rangeAxis.setRange(negativeMargin / xRatio, rangeAxis.getUpperBound());
+            rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
         }
 
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();

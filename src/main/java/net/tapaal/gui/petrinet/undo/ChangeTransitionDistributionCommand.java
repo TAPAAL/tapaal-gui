@@ -4,7 +4,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.SMCDistribution;
 import pipe.gui.petrinet.PetriNetTab;
 
-public class ChangeTransitionDistributionCommand extends Command {
+public class ChangeTransitionDistributionCommand implements Command {
     private final TimedTransition transition;
     private final SMCDistribution oldValue;
     private final SMCDistribution newValue;
@@ -20,12 +20,14 @@ public class ChangeTransitionDistributionCommand extends Command {
     @Override
     public void redo() {
         transition.setDistribution(newValue);
+        tab.revalidate();
         tab.repaint();
     }
 
     @Override
     public void undo() {
         transition.setDistribution(oldValue);
+        tab.revalidate();
         tab.repaint();
     }
 
