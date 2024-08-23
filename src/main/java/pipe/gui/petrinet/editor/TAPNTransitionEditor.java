@@ -215,7 +215,6 @@ public class TAPNTransitionEditor extends JPanel {
 		gridBagConstraints = GridBagHelper.as(1,2, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
 
-        gridBagConstraints = GridBagHelper.as(0, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         if(context.tabContent().getLens().isStochastic()) {
             String weightToolTip = "Probability mass of the transition in the event of a firing date collision";
             JLabel weightLabel = new JLabel("Weight:");
@@ -224,27 +223,38 @@ public class TAPNTransitionEditor extends JPanel {
             infiniteWeight.setToolTipText("Selecting weight as an infinity gives an absolute priority of the transition firing in case of several transitions scheduled at the same time");
             infiniteWeight.addActionListener(act -> weightField.setEnabled(!infiniteWeight.isSelected()));
 
+            
 			String firingModeTooltip = "The firing mode of the transition";
 			JLabel firingModeLabel = new JLabel("Firing mode:");
             firingModeLabel.setToolTipText(firingModeTooltip);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
+
+            gridBagConstraints = GridBagHelper.as(0, 3, Anchor.EAST, new Insets(3, 3, 3, 3));
+            transitionEditorPanel.add(firingModeLabel, gridBagConstraints);
+            JPanel weightPanel = new JPanel(new GridBagLayout());
+            gridBagConstraints = GridBagHelper.as(0, 0, Anchor.WEST, new Insets(3, 0, 3, 14));
+            weightPanel.add(firingModeComboBox, gridBagConstraints);
+            gridBagConstraints.gridx++;
             gridBagConstraints.anchor = GridBagConstraints.EAST;
-            transitionEditorPanel.add(weightLabel, gridBagConstraints);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+            weightPanel.add(weightLabel, gridBagConstraints);
             gridBagConstraints.gridx++;
-            transitionEditorPanel.add(weightField, gridBagConstraints);
-            transitionEditorPanel.add(constantsComboBox, gridBagConstraints);
-            gridBagConstraints.gridx++;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(3, 3, 3, 0);
+            weightPanel.add(weightField, gridBagConstraints);
+            weightPanel.add(constantsComboBox, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(1, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+            gridBagConstraints.gridwidth = 1;
+            transitionEditorPanel.add(weightPanel, gridBagConstraints);
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
             transitionEditorPanel.add(infiniteWeight, gridBagConstraints);
             gridBagConstraints.gridx++;
             transitionEditorPanel.add(useConstantWeight, gridBagConstraints);
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy++;
-			transitionEditorPanel.add(firingModeLabel, gridBagConstraints);
-			gridBagConstraints.gridx++;
-			transitionEditorPanel.add(firingModeComboBox, gridBagConstraints);
         }
-
+        
         gridBagConstraints = GridBagHelper.as(0, 5, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         gridBagConstraints.gridwidth = 4;
         transitionEditorPanel.add(distributionPanel, gridBagConstraints);
