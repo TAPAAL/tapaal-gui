@@ -3,8 +3,6 @@ package dk.aau.cs.verification;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import net.tapaal.swinghelpers.GridBagHelper;
-import org.jdesktop.swingx.HorizontalLayout;
-import org.jdesktop.swingx.VerticalLayout;
 import pipe.gui.graph.Graph;
 import pipe.gui.graph.GraphDialog;
 import pipe.gui.graph.GraphPoint;

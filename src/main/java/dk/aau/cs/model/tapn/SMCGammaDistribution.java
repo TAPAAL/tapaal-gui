@@ -27,7 +27,7 @@ public class SMCGammaDistribution extends SMCDistribution {
     @Override
     public String explanation() {
         return "<html>" +
-            "Gamma distribution <br/>" +
+            "Gamma distribution" +
             "</html>";
     }
 

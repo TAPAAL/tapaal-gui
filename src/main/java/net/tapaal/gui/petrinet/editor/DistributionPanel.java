@@ -56,12 +56,13 @@ public class DistributionPanel extends JPanel {
         });
 
         distributionType = new JComboBox<>(continuous);
-        distributionShowGraph = new JButton("Plot density");
+        distributionShowGraph = new JButton("Show density function");
         distributionParam1Label = new JLabel();
         distributionParam2Label = new JLabel();
         distributionParam1Field = new JTextField();
         distributionParam2Field = new JTextField();
-        distributionExplanation = new JLabel();
+        meanLabel = new JLabel();
+        meanValueLabel = new JLabel();
         SwingHelper.setPreferredWidth(distributionParam1Field, 100);
         SwingHelper.setPreferredWidth(distributionParam2Field, 100);
         distributionType.addActionListener(actionEvent -> {
@@ -81,7 +82,14 @@ public class DistributionPanel extends JPanel {
             }
             public void display() {
                 SMCDistribution distrib = parseDistribution();
-                distributionExplanation.setText(distrib.explanation());
+                if (distrib.getMean() != null && !(distrib instanceof SMCNormalDistribution)) {
+                    meanLabel.setText("Mean :");
+                    meanValueLabel.setText(String.valueOf(distrib.getMean()));
+                } else {
+                    meanLabel.setText("");
+                    meanValueLabel.setText("");
+                }
+                distributionType.setToolTipText(distrib.explanation());
             }
         };
         distributionParam1Field.getDocument().addDocumentListener(updateDistribDisplay);
@@ -121,11 +129,15 @@ public class DistributionPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridwidth = 2;
         add(distributionParam2Field, gbc);
+        gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridy++;
         gbc.gridx = 0;
-        gbc.gridwidth = 3;
-        add(distributionExplanation, gbc);
+        gbc.gridwidth = 1;
+        add(meanLabel, gbc);
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(meanValueLabel, gbc);
     }
 
     public SMCDistribution parseDistribution() {
@@ -218,7 +230,16 @@ public class DistributionPanel extends JPanel {
             default:
                 break;
         }
-        distributionExplanation.setText(distribution.explanation());
+        distributionType.setToolTipText(distribution.explanation());
+
+        if (distribution.getMean() != null && !(distribution instanceof SMCNormalDistribution)) {
+            meanLabel.setText("Mean :");
+            meanValueLabel.setText(String.valueOf(distribution.getMean()));
+        } else {
+            meanLabel.setText("");
+            meanValueLabel.setText("");
+        }
+
         distributionType.setFocusable(false);
         distributionType.setSelectedItem(distribution.distributionName());
         distributionType.setFocusable(true);
@@ -489,6 +510,6 @@ public class DistributionPanel extends JPanel {
     private JLabel distributionParam2Label;
     private JTextField distributionParam1Field;
     private JTextField distributionParam2Field;
-    private JLabel distributionExplanation;
-
+    private JLabel meanLabel;
+    private JLabel meanValueLabel;
 }

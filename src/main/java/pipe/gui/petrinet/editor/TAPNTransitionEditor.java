@@ -19,12 +19,9 @@ import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import net.tapaal.gui.petrinet.editor.DistributionPanel;
 import net.tapaal.gui.petrinet.undo.*;
 import net.tapaal.swinghelpers.GridBagHelper;
-import net.tapaal.swinghelpers.GridBagHelper.Anchor;
-import net.tapaal.swinghelpers.GridBagHelper.Fill;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import net.tapaal.gui.petrinet.editor.ColoredTransitionGuardPanel;
-import pipe.gui.canvas.Grid;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import net.tapaal.gui.petrinet.Context;
@@ -212,41 +209,52 @@ public class TAPNTransitionEditor extends JPanel {
         }
 	
 		rotationLabel.setText("Rotate:");
-		gridBagConstraints = GridBagHelper.as(0,2, Anchor.NORTH, new Insets(3, 3, 3, 3));
+		gridBagConstraints = GridBagHelper.as(0,2, Anchor.EAST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationLabel, gridBagConstraints);
 
-		gridBagConstraints = GridBagHelper.as(1,2, Anchor.NORTHWEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = GridBagHelper.as(1,2, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
 
-        gridBagConstraints = GridBagHelper.as(0, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));;
         if(context.tabContent().getLens().isStochastic()) {
             String weightToolTip = "Probability mass of the transition in the event of a firing date collision";
-            JLabel weightLabel = new JLabel("Weight :");
+            JLabel weightLabel = new JLabel("Weight:");
             weightLabel.setToolTipText(weightToolTip);
             weightField.setToolTipText(weightToolTip);
             infiniteWeight.setToolTipText("Selecting weight as an infinity gives an absolute priority of the transition firing in case of several transitions scheduled at the same time");
             infiniteWeight.addActionListener(act -> weightField.setEnabled(!infiniteWeight.isSelected()));
 
+            
 			String firingModeTooltip = "The firing mode of the transition";
-			JLabel firingModeLabel = new JLabel("Firing mode :");
+			JLabel firingModeLabel = new JLabel("Firing mode:");
+            firingModeLabel.setToolTipText(firingModeTooltip);
 
-
-
-            transitionEditorPanel.add(weightLabel, gridBagConstraints);
+            gridBagConstraints = GridBagHelper.as(0, 3, Anchor.EAST, new Insets(3, 3, 3, 3));
+            transitionEditorPanel.add(firingModeLabel, gridBagConstraints);
+            JPanel weightPanel = new JPanel(new GridBagLayout());
+            gridBagConstraints = GridBagHelper.as(0, 0, Anchor.WEST, new Insets(3, 0, 3, 14));
+            weightPanel.add(firingModeComboBox, gridBagConstraints);
             gridBagConstraints.gridx++;
-            transitionEditorPanel.add(weightField, gridBagConstraints);
-            transitionEditorPanel.add(constantsComboBox, gridBagConstraints);
+            gridBagConstraints.anchor = GridBagConstraints.EAST;
+            gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+            weightPanel.add(weightLabel, gridBagConstraints);
             gridBagConstraints.gridx++;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(3, 3, 3, 0);
+            weightPanel.add(weightField, gridBagConstraints);
+            weightPanel.add(constantsComboBox, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(1, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+            gridBagConstraints.gridwidth = 1;
+            transitionEditorPanel.add(weightPanel, gridBagConstraints);
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
             transitionEditorPanel.add(infiniteWeight, gridBagConstraints);
             gridBagConstraints.gridx++;
             transitionEditorPanel.add(useConstantWeight, gridBagConstraints);
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy++;
-			transitionEditorPanel.add(firingModeLabel, gridBagConstraints);
-			gridBagConstraints.gridx++;
-			transitionEditorPanel.add(firingModeComboBox, gridBagConstraints);
         }
-
+        
         gridBagConstraints = GridBagHelper.as(0, 5, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         gridBagConstraints.gridwidth = 4;
         transitionEditorPanel.add(distributionPanel, gridBagConstraints);
@@ -552,14 +560,22 @@ public class TAPNTransitionEditor extends JPanel {
 
         SMCDistribution distribution = distributionPanel.parseDistribution();
         if(!transition.underlyingTransition().getDistribution().equals(distribution)) {
-            context.undoManager().addEdit(new ChangeTransitionDistributionCommand(transition.underlyingTransition(), context.tabContent(), distribution));
+            context.undoManager().addEdit(new ChangeTransitionDistributionCommand(transition, transition.underlyingTransition(),distribution));
             transition.underlyingTransition().setDistribution(distribution);
         }
 
         Probability weight = parseWeight();
-        //TODO : Undo weight
-        transition.underlyingTransition().setWeight(weight);
-		transition.underlyingTransition().setFiringMode((FiringMode)firingModeComboBox.getSelectedItem());
+        if (!transition.underlyingTransition().getWeight().equals(weight)) {
+            context.undoManager().addEdit(new ChangeProbabilityWeightCommand(transition, transition.underlyingTransition(), weight));
+            transition.underlyingTransition().setWeight(weight);
+        }
+
+        FiringMode firingMode = (FiringMode)firingModeComboBox.getSelectedItem();
+        if (!transition.underlyingTransition().getFiringMode().equals(firingMode)) {
+            context.undoManager().addEdit(new ChangeFiringModeCommand(transition.underlyingTransition(), firingMode));
+            transition.underlyingTransition().setFiringMode(firingMode);
+        }
+
         context.network().buildConstraints();
 
 		int rotationIndex = rotationComboBox.getSelectedIndex();

@@ -5,7 +5,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
-public class RemoveColorTypeFromNetworkCommand extends Command {
+public class RemoveColorTypeFromNetworkCommand implements Command {
 
     private final ColorType colorType;
     private final TimedArcPetriNetNetwork network;

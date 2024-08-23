@@ -10,7 +10,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MakePlaceNewSharedMultiCommand extends Command {
+public class MakePlaceNewSharedMultiCommand implements Command {
 
 		private final String newSharedName;
 		private final Context context;

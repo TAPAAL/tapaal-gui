@@ -4,7 +4,7 @@ import net.tapaal.gui.petrinet.editor.ConstantsPane;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.Constant;
 
-public class SortConstantsCommand extends Command{
+public class SortConstantsCommand implements Command{
 	
 	final PetriNetTab tabContent;
 	final ConstantsPane constantsPane;

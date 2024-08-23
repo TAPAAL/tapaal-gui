@@ -2,7 +2,6 @@ package pipe.gui.petrinet.editor;
 
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import net.tapaal.gui.petrinet.Context;
-//import java.awt.Color;
 import java.awt.event.ItemEvent;
 import java.util.*;
 
@@ -36,8 +35,6 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.awt.*;
@@ -49,8 +46,6 @@ import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
 import pipe.gui.swingcomponents.EscapableDialog;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Fill.HORIZONTAL;
-
-//import dk.aau.cs.gui.components.ColorComboBoxRenderer;
 
 public class PlaceEditorPanel extends JPanel {
 
