@@ -142,9 +142,9 @@ public class TAPNTransitionEditor extends JPanel {
 		
 		makeSharedButton = new JButton();
 		makeSharedButton.setText("Make shared");
-		makeSharedButton.setMaximumSize(new java.awt.Dimension(128, 25));
+		makeSharedButton.setMaximumSize(new java.awt.Dimension(110, 25));
 		makeSharedButton.setMinimumSize(new java.awt.Dimension(110, 25));
-		makeSharedButton.setPreferredSize(new java.awt.Dimension(128, 25));
+		makeSharedButton.setPreferredSize(new java.awt.Dimension(110, 25));
 		
 		makeSharedButton.addActionListener(evt -> {
             makeNewShared = true;
