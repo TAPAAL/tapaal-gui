@@ -167,7 +167,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         result.append(benchmark ? "--smc-benchmark " + benchmarkRuns + " " : "");
 
         if (isSmc) {
-            result.append("--smc-print-cumulative-stats 4");
+            result.append("--smc-print-cumulative-stats 4 ");
             if (isSimulate) {
                 result.append(" --smc-traces ");
                 result.append(numberOfTraces);

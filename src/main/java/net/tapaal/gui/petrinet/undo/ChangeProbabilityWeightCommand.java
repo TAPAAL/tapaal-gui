@@ -2,18 +2,17 @@ package net.tapaal.gui.petrinet.undo;
 
 import dk.aau.cs.model.tapn.Probability;
 import dk.aau.cs.model.tapn.TimedTransition;
-import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 
 public class ChangeProbabilityWeightCommand implements Command {
+    private final TimedTransitionComponent transitionComponent;
     private final TimedTransition transition;
-    private final PetriNetTab tab;
     private final Probability oldValue;
     private final Probability newValue;
     
-
-    public ChangeProbabilityWeightCommand(TimedTransition transition, PetriNetTab tab, Probability newWeight) {
+    public ChangeProbabilityWeightCommand(TimedTransitionComponent transitionComponent, TimedTransition transition, Probability newWeight) {
+        this.transitionComponent = transitionComponent;
         this.transition = transition;
-        this.tab = tab;
         this.oldValue = transition.getWeight();
         this.newValue = newWeight;
     }
@@ -21,12 +20,12 @@ public class ChangeProbabilityWeightCommand implements Command {
     @Override
     public void redo() {
         transition.setWeight(newValue);
-        tab.repaint();
+        transitionComponent.update(true);
     }
 
     @Override
     public void undo() {
         transition.setWeight(oldValue);
-        tab.repaint();
+        transitionComponent.update(true);
     }
 }

@@ -560,13 +560,13 @@ public class TAPNTransitionEditor extends JPanel {
 
         SMCDistribution distribution = distributionPanel.parseDistribution();
         if(!transition.underlyingTransition().getDistribution().equals(distribution)) {
-            context.undoManager().addEdit(new ChangeTransitionDistributionCommand(transition.underlyingTransition(), context.tabContent(), distribution));
+            context.undoManager().addEdit(new ChangeTransitionDistributionCommand(transition, transition.underlyingTransition(),distribution));
             transition.underlyingTransition().setDistribution(distribution);
         }
 
         Probability weight = parseWeight();
         if (!transition.underlyingTransition().getWeight().equals(weight)) {
-            context.undoManager().addEdit(new ChangeProbabilityWeightCommand(transition.underlyingTransition(), context.tabContent(), weight));
+            context.undoManager().addEdit(new ChangeProbabilityWeightCommand(transition, transition.underlyingTransition(), weight));
             transition.underlyingTransition().setWeight(weight);
         }
 

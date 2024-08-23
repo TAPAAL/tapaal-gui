@@ -3,30 +3,31 @@ package net.tapaal.gui.petrinet.undo;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.SMCDistribution;
 import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 
 public class ChangeTransitionDistributionCommand implements Command {
+    private final TimedTransitionComponent transitionComponent;
     private final TimedTransition transition;
     private final SMCDistribution oldValue;
     private final SMCDistribution newValue;
-    private final PetriNetTab tab;
 
-    public ChangeTransitionDistributionCommand(TimedTransition transition, PetriNetTab tab, SMCDistribution newDistribution){
+    public ChangeTransitionDistributionCommand(TimedTransitionComponent transitionComponent, TimedTransition transition, SMCDistribution newDistribution) {
+        this.transitionComponent = transitionComponent;
         this.transition = transition;
         oldValue = transition.getDistribution();
         newValue = newDistribution;
-        this.tab = tab;
     }
 
     @Override
     public void redo() {
         transition.setDistribution(newValue);
-        tab.repaint();
+        transitionComponent.update(true);
     }
 
     @Override
     public void undo() {
         transition.setDistribution(oldValue);
-        tab.repaint();
+        transitionComponent.update(true);
     }
 
 }
