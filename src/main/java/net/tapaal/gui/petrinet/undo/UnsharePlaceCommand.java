@@ -10,7 +10,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Require;
 
-public class UnsharePlaceCommand extends Command {
+public class UnsharePlaceCommand implements Command {
 	private final SharedPlace sharedPlace;
 	private final TimedPlace place;
 	private final TimedArcPetriNet tapn;

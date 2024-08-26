@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 
-public class AddTemplateCommand extends Command {
+public class AddTemplateCommand implements Command {
 	protected final Template template;
 	protected final TemplateExplorer templateExplorer;
 	private final int listIndex;

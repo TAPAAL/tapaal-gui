@@ -9,7 +9,7 @@ import net.tapaal.gui.petrinet.editor.ConstantsPane;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UpdateColorTypeCommand extends Command {
+public class UpdateColorTypeCommand implements Command {
     private final TimedArcPetriNetNetwork network;
     private final ColorType oldColorType;
     private final ColorType newColorType;
