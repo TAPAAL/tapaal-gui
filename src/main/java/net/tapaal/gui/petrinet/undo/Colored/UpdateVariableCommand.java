@@ -5,7 +5,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
-public class UpdateVariableCommand extends Command {
+public class UpdateVariableCommand implements Command {
     private final Variable variable;
     private final String newName;
     private final String oldName;

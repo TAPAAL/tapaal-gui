@@ -5,7 +5,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
-public class AddColorTypeCommand extends Command {
+public class AddColorTypeCommand implements Command {
     private final ColorType colorType;
     private final TimedArcPetriNetNetwork network;
     private final ConstantsPane.ColorTypesListModel colorTypesListModel;

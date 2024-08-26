@@ -11,7 +11,7 @@ import net.tapaal.gui.petrinet.undo.Command;
  * 
  * @author corveau
  */
-public class AnnotationBorderEditCommand extends Command {
+public class AnnotationBorderEditCommand implements Command {
 
 	final Note note;
 

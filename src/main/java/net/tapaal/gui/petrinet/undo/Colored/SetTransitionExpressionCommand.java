@@ -4,7 +4,7 @@ import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 
-public class SetTransitionExpressionCommand extends Command {
+public class SetTransitionExpressionCommand implements Command {
     private final TimedTransitionComponent transition;
     private final GuardExpression oldExpression;
     private final GuardExpression newExpression;

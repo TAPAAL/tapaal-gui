@@ -14,7 +14,7 @@ import net.tapaal.gui.petrinet.undo.Command;
  * 
  * @author Pere Bonet
  */
-public class DeleteArcPathPointEditCommand extends Command {
+public class DeleteArcPathPointEditCommand implements Command {
 
 	final ArcPath arcPath;
 	final ArcPathPoint point;

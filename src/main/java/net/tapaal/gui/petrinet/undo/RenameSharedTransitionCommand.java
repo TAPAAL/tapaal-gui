@@ -6,7 +6,7 @@ import dk.aau.cs.TCTL.visitors.RenameSharedTransitionVisitor;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.SharedTransition;
 
-public class RenameSharedTransitionCommand extends Command {
+public class RenameSharedTransitionCommand implements Command {
 	private final SharedTransition transition;
 	private final String oldName;
 	private final String newName;

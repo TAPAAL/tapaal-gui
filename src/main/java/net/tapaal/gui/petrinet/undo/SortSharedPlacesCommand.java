@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.model.tapn.SharedPlace;
 
-public class SortSharedPlacesCommand extends Command {
+public class SortSharedPlacesCommand implements Command {
 
 	final SharedPlacesListModel listModel;
 	SharedPlace[] oldOrder;
