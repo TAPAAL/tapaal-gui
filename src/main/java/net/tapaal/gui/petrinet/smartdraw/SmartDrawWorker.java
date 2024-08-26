@@ -36,7 +36,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 
     ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
-	final Quadtree pointsReserved = new Quadtree(new Boundary(new Point(0,0), halfDimension), true);
+	final Quadtree pointsReserved = new Quadtree();
 	final UndoManager undoManager;
 	
 	//weights

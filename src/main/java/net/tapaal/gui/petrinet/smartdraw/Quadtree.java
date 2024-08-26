@@ -16,13 +16,17 @@ public class Quadtree {
     Quadtree southWest;
     Quadtree southEast;
 
-    public Quadtree(Boundary boundary, boolean isParent) {
+    private Quadtree(Boundary boundary, boolean isParent) {
         this.boundary = boundary;
         this.isParent = isParent;
     }
 
     public Quadtree(Boundary boundary) {
-        this(boundary, false);
+        this(boundary, true);
+    }
+
+    public Quadtree() {
+        this(new Boundary(Boundary.DEFAULT_CENTER, Boundary.DEFAULT_HALF_DIMENSION));
     }
 
     public boolean insert(Point point) {
@@ -60,10 +64,10 @@ public class Quadtree {
         Boundary southWestBoundary = new Boundary(new Point(center.x - halfDimension, center.y + halfDimension), halfDimension);
         Boundary southEastBoundary = new Boundary(new Point(center.x + halfDimension, center.y + halfDimension), halfDimension);
 
-        northWest = new Quadtree(northWestBoundary);
-        northEast = new Quadtree(northEastBoundary);
-        southWest = new Quadtree(southWestBoundary);
-        southEast = new Quadtree(southEastBoundary);
+        northWest = new Quadtree(northWestBoundary, false);
+        northEast = new Quadtree(northEastBoundary, false);
+        southWest = new Quadtree(southWestBoundary, false);
+        southEast = new Quadtree(southEastBoundary, false);
     }
 
     public List<Point> queryRange(Boundary range) {

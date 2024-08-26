@@ -5,7 +5,6 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
-import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.*;
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
@@ -30,10 +29,6 @@ import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.Preferences;
 import net.tapaal.copypaste.CopyPastImportExport;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
-import net.tapaal.gui.petrinet.NameGenerator;
-import net.tapaal.gui.petrinet.TAPNLens;
-import net.tapaal.gui.petrinet.TabTransformer;
-import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
 
 import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
@@ -85,8 +80,11 @@ import java.awt.geom.Point2D;
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Arrays;
 public class PetriNetTab extends JSplitPane implements TabActions {
 
     final AbstractDrawingSurfaceManager notingManager = new AbstractDrawingSurfaceManager(){
@@ -1861,15 +1859,17 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	public void changeSpacing(double factor){ 
         if (factor < 1) {
-            Quadtree quadtree = new Quadtree(new Boundary(new Point(0, 0), 10000), true);
+            Quadtree quadtree = new Quadtree();
             final int minimumDistance = 2;
             /* Precompute the distance between all objects after translation,
-               and check if they are within the minimum distance */
+            and check if they are within the minimum distance */
             for (PetriNetObject obj : currentTemplate().guiModel().getPetriNetObjects()) {
                 if (obj instanceof PlaceTransitionObject) {
-                    int translatedX = (int) (obj.getLocation().x*factor-obj.getLocation().x);
-                    int translatedY = (int) (obj.getLocation().y*factor-obj.getLocation().y);
-                    Point newLocation = new Point(obj.getLocation().x + translatedX, obj.getLocation().y + translatedY);
+                    int translatedX = (int)(obj.getLocation().x*factor-obj.getLocation().x);
+                    int translatedY = (int)(obj.getLocation().y*factor-obj.getLocation().y);
+                    int newX = Zoomer.getUnzoomedValue(obj.getLocation().x + translatedX, obj.getZoom());
+                    int newY = Zoomer.getUnzoomedValue(obj.getLocation().y + translatedY, obj.getZoom());
+                    Point newLocation = new Point(newX, newY);
                     if (quadtree.containsWithin(newLocation, minimumDistance)) return;
                 } else {
                     int newX = (int) (obj.getLocation().x*factor);
