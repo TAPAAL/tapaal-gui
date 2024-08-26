@@ -41,7 +41,7 @@ import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel;
 
 import net.tapaal.gui.petrinet.undo.ChangeSpacingEditCommand;
 import net.tapaal.gui.petrinet.undo.Command;
-import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
+import net.tapaal.gui.petrinet.undo.MovePetriNetObjectCommand;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.*;
 import net.tapaal.gui.petrinet.widgets.QueryPane;
@@ -1592,9 +1592,33 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             int x = Grid.align(ptobject.getPositionX(), drawingSurface.getZoom());
             int y = Grid.align(ptobject.getPositionY(), drawingSurface.getZoom());
             Point point = new Point(x, y);
-            Command command = new MovePlaceTransitionObjectCommand(ptobject, point, drawingSurface);
+            Command command = new MovePetriNetObjectCommand(ptobject, point, drawingSurface);
             command.redo();
+
+            if (object instanceof Transition) {
+                for (Arc arc : ((PlaceTransitionObject) object).getPreset()) {
+                    for (ArcPathPoint arcPathPoint : arc.getArcPath().getArcPathPoints()) {
+                        x = Grid.align(arcPathPoint.getPositionX(), drawingSurface.getZoom());
+                        y = Grid.align(arcPathPoint.getPositionY(), drawingSurface.getZoom());
+                        point = new Point(x, y);
+                        Command pathCommand = new MovePetriNetObjectCommand(arcPathPoint, point, drawingSurface);
+                        pathCommand.redo();
+                    }
+                }
+
+                for (Arc arc : ((PlaceTransitionObject) object).getPostset()) {
+                    for (ArcPathPoint arcPathPoint : arc.getArcPath().getArcPathPoints()) {
+                        x = Grid.align(arcPathPoint.getPositionX(), drawingSurface.getZoom());
+                        y = Grid.align(arcPathPoint.getPositionY(), drawingSurface.getZoom());
+                        point = new Point(x, y);
+                        Command pathCommand = new MovePetriNetObjectCommand(arcPathPoint, point, drawingSurface);
+                        pathCommand.redo();
+                    }
+                }
+            }
+
             undoManager.addEdit(command);
+
             ptobject.updateOnMoveOrZoom();
         }
     }
