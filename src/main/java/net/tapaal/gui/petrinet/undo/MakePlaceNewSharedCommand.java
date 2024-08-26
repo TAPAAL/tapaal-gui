@@ -21,7 +21,7 @@ import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Require;
 
-public class MakePlaceNewSharedCommand extends Command {
+public class MakePlaceNewSharedCommand implements Command {
 	private final String newSharedName;
 	private final TimedPlace place;
 	private final TimedArcPetriNet tapn;

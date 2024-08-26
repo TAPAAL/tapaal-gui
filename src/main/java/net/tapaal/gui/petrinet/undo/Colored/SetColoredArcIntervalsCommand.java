@@ -6,7 +6,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 
 import java.util.List;
 
-public class SetColoredArcIntervalsCommand extends Command {
+public class SetColoredArcIntervalsCommand implements Command {
     private final TimedInputArcComponent arc;
     private final List<ColoredTimeInterval> oldIntervalList;
     private final List<ColoredTimeInterval> newIntervalList;

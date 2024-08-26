@@ -5,7 +5,7 @@ import net.tapaal.gui.petrinet.undo.Command;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompundCommand extends Command {
+public class CompundCommand implements Command {
     private final List<Command> commands;
 
     public CompundCommand(List<Command> commands) {

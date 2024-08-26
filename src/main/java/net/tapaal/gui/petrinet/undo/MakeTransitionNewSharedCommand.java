@@ -6,7 +6,7 @@ import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;
 
-public class MakeTransitionNewSharedCommand extends Command {
+public class MakeTransitionNewSharedCommand implements Command {
 	private SharedTransition sharedTransition;
 	private final TimedTransition timedTransition;
 	private final String newName;

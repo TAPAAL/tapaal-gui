@@ -4,7 +4,7 @@ import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 
-public class SetTransportArcExpressionsCommand extends Command {
+public class SetTransportArcExpressionsCommand implements Command {
     private final TimedTransportArcComponent arc;
     private final ArcExpression oldInputExpression;
     private final ArcExpression newInputExpression;

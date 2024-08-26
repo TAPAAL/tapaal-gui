@@ -13,7 +13,7 @@ import net.tapaal.gui.petrinet.undo.Command;
  * 
  * @author Pere Bonet
  */
-public class TranslatePetriNetObjectEditCommand extends Command {
+public class TranslatePetriNetObjectEditCommand implements Command {
 
 	final PetriNetObject pnObject;
 	final Integer transX;

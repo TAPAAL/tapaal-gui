@@ -11,7 +11,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ColoredPlaceMarkingEditCommand extends Command {
+public class ColoredPlaceMarkingEditCommand implements Command {
 
     private final ArrayList<TimedToken> tokenList;
     private final ArrayList<TimedToken> newTokenList;

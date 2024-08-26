@@ -11,7 +11,7 @@ import net.tapaal.gui.petrinet.undo.Command;
  * 
  * @author corveau
  */
-public class ArcPathPointTypeEditCommand extends Command {
+public class ArcPathPointTypeEditCommand implements Command {
 
 	final ArcPathPoint arcPathPoint;
 
