@@ -1587,6 +1587,17 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         ArrayList<PetriNetObject> petriNetObjects = drawingSurface.getGuiModel().getPlaceTransitionObjects();
         undoManager.newEdit();
 
+        Quadtree quadtree = new Quadtree();
+        final int minimumDistance = 45;
+        for (PetriNetObject object : petriNetObjects) {
+            int x = Grid.align(object.getPositionX(), drawingSurface.getZoom());
+            int y = Grid.align(object.getPositionY(), drawingSurface.getZoom());
+            Point point = new Point(x, y);
+
+            if (quadtree.containsWithin(point, minimumDistance)) return;
+            quadtree.insert(point);
+        }
+
         for (PetriNetObject object : petriNetObjects) {
             PlaceTransitionObject ptobject = (PlaceTransitionObject) object;
             int x = Grid.align(ptobject.getPositionX(), drawingSurface.getZoom());
@@ -1884,25 +1895,17 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public void changeSpacing(double factor){ 
         if (factor < 1) {
             Quadtree quadtree = new Quadtree();
-            final int minimumDistance = 2;
+            final int minimumDistance = 45;
             /* Precompute the distance between all objects after translation,
             and check if they are within the minimum distance */
             for (PetriNetObject obj : currentTemplate().guiModel().getPetriNetObjects()) {
                 if (obj instanceof PlaceTransitionObject) {
-                    int translatedX = (int)(obj.getLocation().x*factor-obj.getLocation().x);
-                    int translatedY = (int)(obj.getLocation().y*factor-obj.getLocation().y);
-                    int newX = Zoomer.getUnzoomedValue(obj.getLocation().x + translatedX, obj.getZoom());
-                    int newY = Zoomer.getUnzoomedValue(obj.getLocation().y + translatedY, obj.getZoom());
+                    int newX = (int)(obj.getOriginalX() * factor);
+                    int newY = (int)(obj.getOriginalY() * factor);
                     Point newLocation = new Point(newX, newY);
                     if (quadtree.containsWithin(newLocation, minimumDistance)) return;
-                } else {
-                    int newX = (int) (obj.getLocation().x*factor);
-                    int newY = (int) (obj.getLocation().y*factor);
-                    Point newLocation = new Point(newX, newY);
-                    if (quadtree.containsWithin(newLocation, minimumDistance)) return;
+                    quadtree.insert(newLocation);
                 }
-    
-                quadtree.insert(obj.getLocation());
             }
         }
 
