@@ -5,6 +5,10 @@ public class SMCTraceType {
     public static final String SATISFIED = "Satisfied";
     public static final String NOT_SATISFIED = "Not satisfied";
 
+    private static final int ANY_INT = 0;
+    private static final int SATISFIED_INT = 1;
+    private static final int NOT_SATISFIED_INT = 2;
+
     private final String type;
 
     public SMCTraceType() {
@@ -25,12 +29,14 @@ public class SMCTraceType {
         sb.append("--smc-traces-type ");
 
         if (type.equals(SATISFIED)) {
-            sb.append(1);
+            sb.append(SATISFIED_INT);
         } else if (type.equals(NOT_SATISFIED)) {
-            sb.append(2);
+            sb.append(NOT_SATISFIED_INT);
         } else {
-            sb.append(0);
+            sb.append(ANY_INT);
         }
+
+        sb.append(" ");
 
         return sb.toString();
     }
