@@ -4,24 +4,24 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuadTree {
+public class Quadtree {
     final int capacity = 4;
     final Boundary boundary;
     final boolean isParent;
 
     List<Point> points = new ArrayList<>();
 
-    QuadTree northWest;
-    QuadTree northEast;
-    QuadTree southWest;
-    QuadTree southEast;
+    Quadtree northWest;
+    Quadtree northEast;
+    Quadtree southWest;
+    Quadtree southEast;
 
-    public QuadTree(Boundary boundary, boolean isParent) {
+    public Quadtree(Boundary boundary, boolean isParent) {
         this.boundary = boundary;
         this.isParent = isParent;
     }
 
-    public QuadTree(Boundary boundary) {
+    public Quadtree(Boundary boundary) {
         this(boundary, false);
     }
 
@@ -60,10 +60,10 @@ public class QuadTree {
         Boundary southWestBoundary = new Boundary(new Point(center.x - halfDimension, center.y + halfDimension), halfDimension);
         Boundary southEastBoundary = new Boundary(new Point(center.x + halfDimension, center.y + halfDimension), halfDimension);
 
-        northWest = new QuadTree(northWestBoundary);
-        northEast = new QuadTree(northEastBoundary);
-        southWest = new QuadTree(southWestBoundary);
-        southEast = new QuadTree(southEastBoundary);
+        northWest = new Quadtree(northWestBoundary);
+        northEast = new Quadtree(northEastBoundary);
+        southWest = new Quadtree(southWestBoundary);
+        southEast = new Quadtree(southEastBoundary);
     }
 
     public List<Point> queryRange(Boundary range) {
@@ -113,7 +113,7 @@ public class QuadTree {
     
         List<Point> pointsToMove = new ArrayList<>();
         for (Point point : points) {
-            QuadTree quadrant = getQuadrantForPoint(point);
+            Quadtree quadrant = getQuadrantForPoint(point);
             if (quadrant == null || !quadrant.contains(point)) {
                 pointsToMove.add(point);
             }
@@ -126,7 +126,7 @@ public class QuadTree {
         }
     }
     
-    private QuadTree getQuadrantForPoint(Point point) {
+    private Quadtree getQuadrantForPoint(Point point) {
         if (point.x < boundary.getCenter().x) {
             if (point.y < boundary.getCenter().y) {
                 return northWest;

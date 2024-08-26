@@ -10,6 +10,8 @@ import net.tapaal.gui.*;
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
+import net.tapaal.gui.petrinet.smartdraw.Boundary;
+import net.tapaal.gui.petrinet.smartdraw.Quadtree;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import net.tapaal.gui.petrinet.model.GuiModelManager;
 import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
@@ -1857,10 +1859,35 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		getUndoManager().addNewEdit(new ChangeSpacingEditCommand(factor, this));
 	}
 
-	public void changeSpacing(double factor){
+	public void changeSpacing(double factor){ 
+        if (factor < 1) {
+            Quadtree quadtree = new Quadtree(new Boundary(new Point(0, 0), 10000), true);
+            final int minimumDistance = 2;
+            /* Precompute the distance between all objects after translation,
+               and check if they are within the minimum distance */
+            for (PetriNetObject obj : currentTemplate().guiModel().getPetriNetObjects()) {
+                if (obj instanceof PlaceTransitionObject) {
+                    int translatedX = (int) (obj.getLocation().x*factor-obj.getLocation().x);
+                    int translatedY = (int) (obj.getLocation().y*factor-obj.getLocation().y);
+                    Point newLocation = new Point(obj.getLocation().x + translatedX, obj.getLocation().y + translatedY);
+                    if (quadtree.containsWithin(newLocation, minimumDistance)) return;
+                } else {
+                    int newX = (int) (obj.getLocation().x*factor);
+                    int newY = (int) (obj.getLocation().y*factor);
+                    Point newLocation = new Point(newX, newY);
+                    if (quadtree.containsWithin(newLocation, minimumDistance)) return;
+                }
+    
+                quadtree.insert(obj.getLocation());
+            }
+        }
+
 		for(PetriNetObject obj : this.currentTemplate().guiModel().getPetriNetObjects()){
 			if(obj instanceof PlaceTransitionObject){
-				obj.translate((int) (obj.getLocation().x*factor-obj.getLocation().x), (int) (obj.getLocation().y*factor-obj.getLocation().y));
+                int translatedX = (int) (obj.getLocation().x*factor-obj.getLocation().x);
+                int translatedY = (int) (obj.getLocation().y*factor-obj.getLocation().y);
+
+				obj.translate(translatedX, translatedY);
 
 				if(obj instanceof Transition){
 					for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
@@ -1877,7 +1904,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 				((PlaceTransitionObject) obj).update(true);
 			}else{
-				obj.setLocation((int) (obj.getLocation().x*factor), (int) (obj.getLocation().y*factor));
+                int newX = (int) (obj.getLocation().x*factor);
+                int newY = (int) (obj.getLocation().y*factor);
+              
+				obj.setLocation(newX, newY);
 			}
 		}
 
