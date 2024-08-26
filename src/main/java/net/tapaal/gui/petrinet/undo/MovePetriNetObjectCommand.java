@@ -2,11 +2,10 @@ package net.tapaal.gui.petrinet.undo;
 
 import java.awt.Point;
 
-import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
-public class MovePetriNetObjectCommand extends Command {
+public class MovePetriNetObjectCommand implements Command {
 	
 	private final int newY;
 	private final int newX;
