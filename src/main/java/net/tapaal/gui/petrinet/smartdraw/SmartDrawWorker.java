@@ -9,7 +9,7 @@ import javax.swing.SwingWorker;
 
 import net.tapaal.gui.petrinet.undo.UpdateNameLabelOffsetCommand;
 import net.tapaal.gui.petrinet.undo.Command;
-import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
+import net.tapaal.gui.petrinet.undo.MovePetriNetObjectCommand;
 import dk.aau.cs.util.Require;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
@@ -223,7 +223,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		return arcsForObject;
 	}
 	private void moveObject(PlaceTransitionObject object, Point point) {
-		Command command = new MovePlaceTransitionObjectCommand(object, point, drawingSurface);
+		Command command = new MovePetriNetObjectCommand(object, point, drawingSurface);
 		undoManager.addEdit(command);
 		command.redo();
 	}
