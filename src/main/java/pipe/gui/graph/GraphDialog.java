@@ -246,11 +246,12 @@ public class GraphDialog extends EscapableDialog {
             XYSeries series = new XYSeries(graph.getName());
             List<GraphPoint> points = graph.getPoints();
 
+            double margin = 1e-6;
             if (!points.isEmpty()) {
                 double first = points.get(0).getX();
                 double last = points.get(points.size() - 1).getX();
 
-                isStraight = (first - last == 0) && !piecewise;
+                isStraight = Math.abs(first - last) < margin && !piecewise;
                 distanceToOrigin = first;
             }
 
@@ -258,18 +259,13 @@ public class GraphDialog extends EscapableDialog {
                 mean = graph.getMean();
             }
 
-            double margin = 1e-6;
             for (GraphPoint point : points) {
                 Require.that(point.getX() >= 0 && point.getY() >= 0, "Negative points are not supported");
 
                 series.add(point.getX(), point.getY());
-                if (point.getX() < margin) {
-                    hasZeroX = true;
-                }
 
-                if (point.getY() < margin) {
-                    hasZeroY = true;
-                }
+                hasZeroX = point.getX() < margin || hasZeroX;
+                hasZeroY = point.getY() < margin || hasZeroY;
             }
             
             hasZeroPoint = hasZeroX && hasZeroY;
