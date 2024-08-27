@@ -28,6 +28,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import dk.aau.cs.util.Require;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.swingcomponents.EscapableDialog;
 
@@ -257,16 +258,18 @@ public class GraphDialog extends EscapableDialog {
                 mean = graph.getMean();
             }
 
+            double margin = 1e-6;
             for (GraphPoint point : points) {
+                Require.that(point.getX() >= 0 && point.getY() >= 0, "Negative points are not supported");
+
                 series.add(point.getX(), point.getY());
-                if (point.getX() == 0) {
+                if (point.getX() < margin) {
                     hasZeroX = true;
                 }
 
-                if (point.getY() == 0) {
+                if (point.getY() < margin) {
                     hasZeroY = true;
                 }
-
             }
             
             hasZeroPoint = hasZeroX && hasZeroY;

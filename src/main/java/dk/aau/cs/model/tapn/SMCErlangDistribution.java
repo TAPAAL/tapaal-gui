@@ -31,6 +31,11 @@ public class SMCErlangDistribution extends SMCDistribution {
             "</html>";
     }
 
+    @Override
+    public Double getMean() {
+        return shape * scale;
+    }
+
     public static SMCErlangDistribution defaultDistribution() {
         return new SMCErlangDistribution(1, 1);
     }

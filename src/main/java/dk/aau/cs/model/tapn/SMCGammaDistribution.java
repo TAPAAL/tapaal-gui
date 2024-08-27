@@ -31,6 +31,11 @@ public class SMCGammaDistribution extends SMCDistribution {
             "</html>";
     }
 
+    @Override
+    public Double getMean() {
+        return shape * scale;
+    }
+
     public static SMCGammaDistribution defaultDistribution() {
         return new SMCGammaDistribution(1, 1);
     }

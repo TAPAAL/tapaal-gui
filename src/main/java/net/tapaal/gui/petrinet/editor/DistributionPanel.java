@@ -315,7 +315,7 @@ public class DistributionPanel extends JPanel {
         points.add(new GraphPoint(value, 0));
         points.add(new GraphPoint(value, 100));
 
-        return new Graph("Constant Distribution", points);
+        return new Graph("Constant Distribution", points, distribution.getMean());
     }
 
     private Graph createGraph(SMCDiscreteUniformDistribution distribution) {
@@ -375,7 +375,7 @@ public class DistributionPanel extends JPanel {
             x += step;	
         }
 
-        return new Graph("Gamma Distribution", points);
+        return new Graph("Gamma Distribution", points, distribution.getMean());
     }
 
     private Graph createGraph(SMCErlangDistribution distribution) {
@@ -401,7 +401,7 @@ public class DistributionPanel extends JPanel {
             x += step;
         }
 
-        return new Graph("Erlang Distribution", points);
+        return new Graph("Erlang Distribution", points, distribution.getMean());
     }
 
     private double spougeGammaApprox(double shape) {
@@ -498,7 +498,7 @@ public class DistributionPanel extends JPanel {
             x++;
         }
 
-        return new Graph("Geometric distribution", points);
+        return new Graph("Geometric distribution", points, distribution.getMean());
     }
 
     private JRadioButton useContinuousDistribution;

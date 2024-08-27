@@ -99,6 +99,7 @@ public class TAPNTransitionEditor extends JPanel {
         useConstantWeight.addActionListener(act -> displayWeight(parseWeight()));
 		
 		firingModeComboBox = new JComboBox<>(new FiringMode[]{new OldestFiringMode(), new YoungestFiringMode(), new RandomFiringMode()});
+        firingModeComboBox.setToolTipText("Determines what tokens are consumed during random runs");
 
         distributionPanel = new DistributionPanel(transition, dialog);
 
@@ -178,7 +179,7 @@ public class TAPNTransitionEditor extends JPanel {
 			}
 		});
 		
-		gridBagConstraints = GridBagHelper.as(2, 2, Anchor.WEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = GridBagHelper.as(3, 2, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(urgentCheckBox, gridBagConstraints);
         if(transition.isStochastic()) {
             urgentCheckBox.setToolTipText("Note: for SMC, it is recommended to prefer setting a constant(0) distribution instead of using urgent transitions");
@@ -214,6 +215,9 @@ public class TAPNTransitionEditor extends JPanel {
 
 		gridBagConstraints = GridBagHelper.as(1,2, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
+
+        gridBagConstraints = GridBagHelper.as(2,2, Anchor.WEST, new Insets(3, 3, 3, 3));
+		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
 
         if(context.tabContent().getLens().isStochastic()) {
             String weightToolTip = "Probability mass of the transition in the event of a firing date collision";
@@ -291,11 +295,6 @@ public class TAPNTransitionEditor extends JPanel {
 
 		gridBagConstraints = GridBagHelper.as(0,3, Anchor.EAST, new Insets(5, 0, 8, 3));
 		mainPanel.add(buttonPanel, gridBagConstraints);
-
-		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-		gridBagConstraints = GridBagHelper.as(1,transition.isStochastic() ? 6 : 3, Anchor.WEST, new Insets(3, 3, 3, 3));
-		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
 
 		gridBagConstraints = GridBagHelper.as(0,1,Anchor.WEST, new Insets(3, 3, 3, 3));
 		gridBagConstraints.weightx = 1.0;

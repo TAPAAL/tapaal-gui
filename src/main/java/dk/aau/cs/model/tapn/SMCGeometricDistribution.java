@@ -31,6 +31,11 @@ public class SMCGeometricDistribution extends SMCDistribution {
             "</html>";
     }
 
+    @Override
+    public Double getMean() {
+        return 1 / p;
+    }
+
     public static SMCGeometricDistribution defaultDistribution() {
         return new SMCGeometricDistribution(0.5);
     }
