@@ -26,6 +26,12 @@ public class ColorType implements Iterable<Color> {
         addColor(new Color(this, colors.size(), colorName));
     }
 
+    public void addColors(List<String> colorNames) {
+        for (String c : colorNames) {
+            addColor(c);
+        }
+    }
+
     public String getName() {
         return name;
     }
@@ -151,5 +157,21 @@ public class ColorType implements Iterable<Color> {
                 return false;
         }
         return true;
+    }
+
+    public Integer getLowerBound() {
+        if (isIntegerRange()) {
+            return Integer.parseInt(colors.get(0).getColorName());
+        }
+        
+        return null;
+    }
+
+    public Integer getUpperBound() {
+        if (isIntegerRange()) {
+            return Integer.parseInt(colors.get(colors.size() - 1).getColorName());
+        }
+        
+        return null;
     }
 }

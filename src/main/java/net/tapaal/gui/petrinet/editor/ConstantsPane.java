@@ -52,6 +52,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	private JButton editBtn;
 	private JButton removeBtn;
 	private JButton addConstantButton;
+    private JButton manuallyEditBtn;
 
 	private final PetriNetTab tab;
 	private JButton moveUpButton;
@@ -70,6 +71,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 
     private static final String toolTipComboBox = "Switch between constants, colors and variables";
+    private static final String toolTipManuallyEdit = "Manualy edit the values of all constants, color types and variables";
     private static final String toolTipEditConstant = "Edit the value of the selected constant";
     private static final String toolTipRemoveConstant = "Remove the selected constant";
     private static final String toolTipNewConstant = "Create a new constant";
@@ -471,6 +473,20 @@ public class ConstantsPane extends JPanel implements SidePane {
 		gbc.gridx = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(addConstantButton, gbc);
+
+        manuallyEditBtn = new JButton("Manual edit");
+        manuallyEditBtn.setToolTipText(toolTipManuallyEdit);
+
+        manuallyEditBtn.addActionListener(e -> {
+            showEditManuallyDialog();
+        });
+
+        gbc = new GridBagConstraints();
+        gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridwidth = 3;
+        gbc.anchor = GridBagConstraints.CENTER;
+        buttonsPanel.add(manuallyEditBtn, gbc);
 	}
 
 	public void showConstants() {
@@ -667,6 +683,12 @@ public class ConstantsPane extends JPanel implements SidePane {
         } else {
             panel = new ColorTypeDialogPanel(colorTypesListModel, tab.network(), undoManager);
         }
+        panel.showDialog();
+    }
+
+    private void showEditManuallyDialog() {
+        UndoManager undoManager = tab.getUndoManager();
+        ManuallyEditDialogPanel panel = new ManuallyEditDialogPanel(colorTypesListModel, variablesListModel,constantsListModel, tab.network(), undoManager);
         panel.showDialog();
     }
 
