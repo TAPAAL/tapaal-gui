@@ -196,8 +196,8 @@ public class StatisticsPanel extends JPanel{
                         }
                         cmd.redo();
                     }
-                    contents = template.model().getStatistics();
                 }
+                contents = tab.currentTemplate().model().getStatistics();
                 tab.drawingSurface().repaint();
 
                 location = StatisticsPanel.dialog.getLocationOnScreen();
@@ -237,8 +237,8 @@ public class StatisticsPanel extends JPanel{
                         }
                         cmd.redo();
                     }
-                    contents = template.model().getStatistics();
                 }
+                contents = tab.currentTemplate().model().getStatistics();
                 tab.drawingSurface().repaint();
 
                 location = StatisticsPanel.dialog.getLocationOnScreen();
