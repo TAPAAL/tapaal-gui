@@ -224,7 +224,7 @@ public class ConstantStore {
 		return null;
 	}
 
-	private boolean isConstantInUse(String name) {
+	public boolean isConstantInUse(String name) {
 		if (containsConstantByName(name)) {
 			return getConstantByName(name).isUsed();
 		}
@@ -297,6 +297,11 @@ public class ConstantStore {
 		constants.addAll(Arrays.asList(oldOrder));
 		
 	}
+
+    public void clear() {
+        constants.clear();
+        largest = -1;
+    }
 
 	public Constant getConstantByIndex(int index) {
 		return constants.get(index);
