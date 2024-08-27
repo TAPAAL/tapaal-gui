@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
-import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.GuiFrameActions;
 import pipe.gui.Constants;
 import pipe.gui.petrinet.PetriNetTab;
@@ -90,6 +89,7 @@ public class UndoManager {
 
 			// The currentEdit to undo (reverse order)
 			ArrayList<Command> currentEdit = edits.get(indexOfNextAdd);
+    
 			for (int i = currentEdit.size() - 1; i >= 0; i--) {
 				currentEdit.get(i).undo();
 			}
@@ -155,4 +155,17 @@ public class UndoManager {
 		return lastAdd;
 	}
 
+    public void removeCurrentEdit() {
+        if (sizeOfBuffer > 0 && currentIndex() >= 0 && currentIndex() < edits.size()) {
+            edits.set(currentIndex(), null);
+            --sizeOfBuffer;
+            --indexOfNextAdd;
+        }
+
+        setUndoRedoStatus();
+    }
+
+    public boolean currentEditIsEmpty() {
+        return edits.get(currentIndex()).isEmpty();
+    }
 }
