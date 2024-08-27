@@ -2,7 +2,7 @@ package net.tapaal.gui.petrinet.undo;
 
 import net.tapaal.gui.petrinet.widgets.SidePane;
 
-public class MoveElementDownCommand extends Command{
+public class MoveElementDownCommand implements Command{
     final int oldIndex;
     final int newIndex;
     final SidePane sidePane;

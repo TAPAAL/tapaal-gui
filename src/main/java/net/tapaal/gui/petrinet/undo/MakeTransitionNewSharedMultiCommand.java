@@ -10,7 +10,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MakeTransitionNewSharedMultiCommand extends Command {
+public class MakeTransitionNewSharedMultiCommand implements Command {
 	private final String newSharedName;
 	private final Context context;
 	private final Transition transition;

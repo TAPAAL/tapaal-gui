@@ -5,7 +5,7 @@ import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
-public class AddVariableCommand extends Command {
+public class AddVariableCommand implements Command {
     private final Variable variable;
     private final TimedArcPetriNetNetwork network;
     private final ConstantsPane.VariablesListModel variablesListModel;

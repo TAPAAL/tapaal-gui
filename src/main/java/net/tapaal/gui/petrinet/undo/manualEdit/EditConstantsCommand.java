@@ -6,7 +6,7 @@ import net.tapaal.gui.petrinet.editor.ConstantsPane.VariablesListModel;
 import net.tapaal.gui.petrinet.undo.Command;
 import pipe.gui.TAPAALGUI;
 
-public class EditConstantsCommand extends Command {
+public class EditConstantsCommand implements Command {
     private final NetworkState oldState;
     private final NetworkState newState;
     private final TimedArcPetriNetNetwork network;

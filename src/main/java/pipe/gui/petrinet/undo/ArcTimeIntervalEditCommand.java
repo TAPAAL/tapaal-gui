@@ -5,7 +5,7 @@ import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.Weight;
 
-public class ArcTimeIntervalEditCommand extends Command {
+public class ArcTimeIntervalEditCommand implements Command {
 	private final TimedOutputArcComponent arc;
 	final TimeInterval oldTimeInterval;
 	final TimeInterval newTimeInterval;
