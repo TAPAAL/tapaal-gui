@@ -37,7 +37,7 @@ public class ConstantsParser {
         }
     }
 
-    public static boolean parse(String constantsToParse, TimedArcPetriNetNetwork network) throws ParseException {
+    public static boolean parse(String constantsToParse, TimedArcPetriNetNetwork network) throws ParseException, TokenMgrError {
         ConstantsParser.network = network;
         ConstantsParser parser = new ConstantsParser(new StringReader(constantsToParse));
         constants.clear();
@@ -45,9 +45,6 @@ public class ConstantsParser {
         variables.clear();
 
         parser.startParsing();
-        ColorType dot = new ColorType("dot");
-        dot.addColor("dot");    
-        colorTypes.put("dot", dot);
 
         List<Constant> constantsList = constants.values()
                                                 .stream()
@@ -60,6 +57,10 @@ public class ConstantsParser {
         List<Variable> variablesList = variables.values()
                                                 .stream()
                                                 .collect(Collectors.toList());
+
+        ColorType dot = new ColorType("dot");
+        dot.addColor("dot");    
+        colorTypesList.add(0, dot);
 
         Map<String, Object> constantsMap = new HashMap<String, Object>();
         Map<String, Boolean> constantsBitMap = new HashMap<String, Boolean>();

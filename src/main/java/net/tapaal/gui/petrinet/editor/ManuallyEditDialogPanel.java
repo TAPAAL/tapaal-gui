@@ -30,6 +30,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.CPN.ConstantsParser.ConstantsParser;
 import dk.aau.cs.model.CPN.ConstantsParser.ParseException;
+import dk.aau.cs.model.CPN.ConstantsParser.TokenMgrError;
 
 import javax.swing.JOptionPane;
 
@@ -182,7 +183,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
                 undoManager.addNewEdit(command);
                 dispose();
             }
-        } catch (ParseException e) {
+        } catch (ParseException | TokenMgrError e) {
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.getMessage(), "Error during parsing", JOptionPane.ERROR_MESSAGE);
         }
     }
