@@ -180,6 +180,20 @@ public class GraphDialog extends EscapableDialog {
         XYPlot plot = chart.getXYPlot();
         float lineThickness = 3.0f;
 
+        final double negativeMargin = -0.05;
+        if (hasZeroPoint) {
+            ValueAxis domainAxis = plot.getDomainAxis();
+            domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
+            ValueAxis rangeAxis = plot.getRangeAxis();
+            rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
+        } else if (hasZeroX) {
+            ValueAxis domainAxis = plot.getDomainAxis();
+            domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
+        } else if (hasZeroY) {
+            ValueAxis rangeAxis = plot.getRangeAxis();
+            rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
+        }
+
         if (isStraight) {
             ValueAxis domainAxis = plot.getDomainAxis();
             domainAxis.setRange(distanceToOrigin - 1, distanceToOrigin + 1);
@@ -193,7 +207,7 @@ public class GraphDialog extends EscapableDialog {
                                                 dashPattern,
                                                 0.0f);
 
-            XYLineAnnotation annotation = new XYLineAnnotation(mean, 0, mean, rangeAxis.getUpperBound(), dashed, Color.BLACK);
+            XYLineAnnotation annotation = new XYLineAnnotation(mean, rangeAxis.getLowerBound(), mean, rangeAxis.getUpperBound(), dashed, Color.BLACK);
             plot.addAnnotation(annotation);
 
             Shape lineShape = new Line2D.Double(0, 0, 30, 0);
@@ -202,20 +216,6 @@ public class GraphDialog extends EscapableDialog {
             legendItems = showLegend ? plot.getLegendItems() : new LegendItemCollection();
             legendItems.add(new LegendItem("Mean", null, null, null, lineShape, Color.BLACK, dashed, Color.BLACK));
             plot.setFixedLegendItems(legendItems);
-        }
-
-        final double negativeMargin = -0.05;
-        if (hasZeroPoint) {
-            ValueAxis domainAxis = plot.getDomainAxis();
-            domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
-            ValueAxis rangeAxis = plot.getRangeAxis();
-            rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
-        } else if (hasZeroX) {
-            ValueAxis domainAxis = plot.getDomainAxis();
-            domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
-        } else if (hasZeroY) {
-            ValueAxis rangeAxis = plot.getRangeAxis();
-            rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
         }
 
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
@@ -246,7 +246,7 @@ public class GraphDialog extends EscapableDialog {
             XYSeries series = new XYSeries(graph.getName());
             List<GraphPoint> points = graph.getPoints();
 
-            double margin = 1e-6;
+            double margin = 1e-5;
             if (!points.isEmpty()) {
                 double first = points.get(0).getX();
                 double last = points.get(points.size() - 1).getX();
