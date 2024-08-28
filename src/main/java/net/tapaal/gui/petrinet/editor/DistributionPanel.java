@@ -59,8 +59,8 @@ public class DistributionPanel extends JPanel {
         distributionShowGraph = new JButton("Show density function");
         distributionParam1Label = new JLabel();
         distributionParam2Label = new JLabel();
-        distributionParam1Field = new JTextField();
-        distributionParam2Field = new JTextField();
+        distributionParam1Field = new JTextField(4);
+        distributionParam2Field = new JTextField(4);
         meanLabel = new JLabel();
         meanValueLabel = new JLabel();
         SwingHelper.setPreferredWidth(distributionParam1Field, 100);
@@ -105,39 +105,33 @@ public class DistributionPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(distributionType, gbc);
         gbc.fill = GridBagConstraints.NONE;
-        gbc.gridx += 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        add(distributionShowGraph, gbc);
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.gridy++;
-        gbc.gridx = 0;
+        gbc.gridx++;
         gbc.anchor = GridBagConstraints.EAST;
         add(distributionParam1Label, gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridwidth = 2;
         add(distributionParam1Field, gbc);
         gbc.fill = GridBagConstraints.NONE;
-        gbc.gridwidth = 1;
-        gbc.gridy++;
-        gbc.gridx = 0;
+        gbc.gridx++;
         gbc.anchor = GridBagConstraints.EAST;
         add(distributionParam2Label, gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridwidth = 2;
         add(distributionParam2Field, gbc);
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
-        gbc.gridy++;
-        gbc.gridx = 0;
+        gbc.gridx++;
         gbc.gridwidth = 1;
         add(meanLabel, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.WEST;
         add(meanValueLabel, gbc);
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(distributionShowGraph, gbc);
     }
 
     public SMCDistribution parseDistribution() {

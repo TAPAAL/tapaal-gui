@@ -232,7 +232,7 @@ public class TAPNTransitionEditor extends JPanel {
 			JLabel firingModeLabel = new JLabel("Firing mode:");
             firingModeLabel.setToolTipText(firingModeTooltip);
 
-            gridBagConstraints = GridBagHelper.as(0, 3, Anchor.EAST, new Insets(3, 3, 3, 3));
+            gridBagConstraints = GridBagHelper.as(0, 4, Anchor.EAST, new Insets(3, 3, 3, 3));
             transitionEditorPanel.add(firingModeLabel, gridBagConstraints);
             JPanel weightPanel = new JPanel(new GridBagLayout());
             gridBagConstraints = GridBagHelper.as(0, 0, Anchor.WEST, new Insets(3, 0, 3, 14));
@@ -249,7 +249,7 @@ public class TAPNTransitionEditor extends JPanel {
             weightPanel.add(weightField, gridBagConstraints);
             weightPanel.add(constantsComboBox, gridBagConstraints);
 
-            gridBagConstraints = GridBagHelper.as(1, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+            gridBagConstraints = GridBagHelper.as(1, 4, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
             gridBagConstraints.gridwidth = 1;
             transitionEditorPanel.add(weightPanel, gridBagConstraints);
             gridBagConstraints.gridx = 2;
@@ -259,7 +259,7 @@ public class TAPNTransitionEditor extends JPanel {
             transitionEditorPanel.add(useConstantWeight, gridBagConstraints);
         }
         
-        gridBagConstraints = GridBagHelper.as(0, 5, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+        gridBagConstraints = GridBagHelper.as(0, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
         gridBagConstraints.gridwidth = 4;
         transitionEditorPanel.add(distributionPanel, gridBagConstraints);
 
