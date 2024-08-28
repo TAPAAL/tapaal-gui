@@ -2115,6 +2115,15 @@ public class QueryDialog extends JPanel {
                     "<b>Approximation Options</b><br/>" +
                     "TAPAAL allows to approximate the time intervals on edges by dividing them by the given approximation constant and either enlarging the resulting intervals (over-approximation) or shrinking them (under-approximation). The larger the constant is, the faster is the verification but the more often the user can get an inconclusive answer." +
                     "<br/>" +
+                    "<b>SMC Options</b><br/>" +
+                    "Statistical model-checking simulates random runs in order to verify how often a property is satisfied. It explores random runs that do not exceed the given time and step bound. " +
+                    "There are three types of SMC queries :" +
+                    "<ul>" +
+                    "<li>The quantitative probability estimation performs a Monte-Carlo algorithm to produce an estimation of the probability of an event happening. The number of runs to execute is defined by the desired confidence and precision, which are the confidence that the real probability is in an interval of ± the precision around the estimation.</li>" +
+                    "<li>The qualitative probability testing performs a SPRT test, to produce an estimation whether the probability of an event happening is greater than a real constant C. According to the result of each run, a ratio is updated and a result is decided once it reaches a bound. The false-positives parameter is the probability of estimating the test to be true when it isn't, the false-negatives parameter is the opposite, and the indifference region is the zone C ± width, which bounds are used as thresholds.</li>" +
+                    "<li>The simulate mode generates an arbitrary number of random traces, that can then be explored in the simulator. The traces could be restricted to : any trace, only traces satisfying the property, or only traces violating the property. This mode must be used carefully, because in some cases it may not terminate : if asking for 5 traces satisfying the property, but no runs ever satisfy the property, then the algorithm will run forever.</li>" +
+                    "<ul/>" +
+                    "<br/>" +
                     "</html>";
             }
         });
