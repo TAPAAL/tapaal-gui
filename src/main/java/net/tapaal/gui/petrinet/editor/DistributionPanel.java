@@ -56,7 +56,7 @@ public class DistributionPanel extends JPanel {
         });
 
         distributionType = new JComboBox<>(continuous);
-        distributionShowGraph = new JButton("Show density function");
+        distributionShowGraph = new JButton("Show density");
         distributionParam1Label = new JLabel();
         distributionParam2Label = new JLabel();
         distributionParam1Field = new JTextField(5);
@@ -112,7 +112,7 @@ public class DistributionPanel extends JPanel {
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(distributionParam1Field, gbc);
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.EAST;
         add(distributionParam2Label, gbc);
@@ -121,7 +121,7 @@ public class DistributionPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(distributionParam2Field, gbc);
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx++;
         gbc.gridwidth = 1;
         add(meanLabel, gbc);

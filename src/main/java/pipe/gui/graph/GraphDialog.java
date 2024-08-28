@@ -73,6 +73,7 @@ public class GraphDialog extends EscapableDialog {
         }
 
         public GraphDialogBuilder setTitle(String title) {
+            this.title = title;
             return this;
         }
 

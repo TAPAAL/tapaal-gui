@@ -230,36 +230,49 @@ public class TAPNTransitionEditor extends JPanel {
             infiniteWeight.setToolTipText("Selecting weight as an infinity gives an absolute priority of the transition firing in case of several transitions scheduled at the same time");
             infiniteWeight.addActionListener(act -> weightField.setEnabled(!infiniteWeight.isSelected()));
 
-            
 			String firingModeTooltip = "The firing mode of the transition";
 			JLabel firingModeLabel = new JLabel("Firing mode:");
             firingModeLabel.setToolTipText(firingModeTooltip);
 
-            gridBagConstraints = GridBagHelper.as(0, 4, Anchor.EAST, new Insets(3, 3, 3, 3));
-            transitionEditorPanel.add(firingModeLabel, gridBagConstraints);
-            JPanel weightPanel = new JPanel(new GridBagLayout());
-            gridBagConstraints = GridBagHelper.as(0, 0, Anchor.WEST, new Insets(3, 0, 3, 14));
-            weightPanel.add(firingModeComboBox, gridBagConstraints);
-            gridBagConstraints.gridx++;
-            gridBagConstraints.anchor = GridBagConstraints.EAST;
-            gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-            weightPanel.add(weightLabel, gridBagConstraints);
-            gridBagConstraints.gridx++;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints = GridBagHelper.as(0, 0, Anchor.EAST, new Insets(3, 3, 3, 3));
+            JPanel firingModePanel = new JPanel(new GridBagLayout());
+
+            gridBagConstraints = GridBagHelper.as(0, 0, Anchor.EAST, new Insets(3, 3, 3, 3));
+            firingModePanel.add(firingModeLabel, gridBagConstraints);
+            
+            gridBagConstraints = GridBagHelper.as(1, 0, Anchor.WEST, new Insets(3, 3, 3, 3));
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 0.5;
+            firingModePanel.add(firingModeComboBox, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(2, 0, Anchor.EAST, new Insets(3, 3, 3, 3));
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.weightx = 0;
+            firingModePanel.add(weightLabel, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(3, 0, Anchor.WEST, new Insets(3, 3, 3, 0));
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(3, 3, 3, 0);
-            weightPanel.add(weightField, gridBagConstraints);
-            weightPanel.add(constantsComboBox, gridBagConstraints);
+            firingModePanel.add(weightField, gridBagConstraints);
 
-            gridBagConstraints = GridBagHelper.as(1, 4, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
-            gridBagConstraints.gridwidth = 1;
-            transitionEditorPanel.add(weightPanel, gridBagConstraints);
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            transitionEditorPanel.add(infiniteWeight, gridBagConstraints);
-            gridBagConstraints.gridx++;
-            transitionEditorPanel.add(useConstantWeight, gridBagConstraints);
+            gridBagConstraints = GridBagHelper.as(4, 0, Anchor.WEST, new Insets(3, 3, 3, 0));
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 1.0;
+            firingModePanel.add(constantsComboBox, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(5, 0, Anchor.WEST, new Insets(3, 3, 3, 3));
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.weightx = 0;
+            firingModePanel.add(infiniteWeight, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(6, 0, Anchor.WEST, new Insets(3, 3, 3, 3));
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.weightx = 0;
+            firingModePanel.add(useConstantWeight, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(0, 4, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+            gridBagConstraints.gridwidth = 10;
+            distributionPanel.add(firingModePanel, gridBagConstraints);
         }
         
         gridBagConstraints = GridBagHelper.as(0, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
