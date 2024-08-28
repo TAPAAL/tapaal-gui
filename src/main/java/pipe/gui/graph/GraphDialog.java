@@ -28,6 +28,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import dk.aau.cs.util.Require;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.swingcomponents.EscapableDialog;
 
@@ -72,6 +73,7 @@ public class GraphDialog extends EscapableDialog {
         }
 
         public GraphDialogBuilder setTitle(String title) {
+            this.title = title;
             return this;
         }
 
@@ -179,6 +181,20 @@ public class GraphDialog extends EscapableDialog {
         XYPlot plot = chart.getXYPlot();
         float lineThickness = 3.0f;
 
+        final double negativeMargin = -0.05;
+        if (hasZeroPoint) {
+            ValueAxis domainAxis = plot.getDomainAxis();
+            domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
+            ValueAxis rangeAxis = plot.getRangeAxis();
+            rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
+        } else if (hasZeroX) {
+            ValueAxis domainAxis = plot.getDomainAxis();
+            domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
+        } else if (hasZeroY) {
+            ValueAxis rangeAxis = plot.getRangeAxis();
+            rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
+        }
+
         if (isStraight) {
             ValueAxis domainAxis = plot.getDomainAxis();
             domainAxis.setRange(distanceToOrigin - 1, distanceToOrigin + 1);
@@ -192,7 +208,7 @@ public class GraphDialog extends EscapableDialog {
                                                 dashPattern,
                                                 0.0f);
 
-            XYLineAnnotation annotation = new XYLineAnnotation(mean, 0, mean, rangeAxis.getUpperBound(), dashed, Color.BLACK);
+            XYLineAnnotation annotation = new XYLineAnnotation(mean, rangeAxis.getLowerBound(), mean, rangeAxis.getUpperBound(), dashed, Color.BLACK);
             plot.addAnnotation(annotation);
 
             Shape lineShape = new Line2D.Double(0, 0, 30, 0);
@@ -201,20 +217,6 @@ public class GraphDialog extends EscapableDialog {
             legendItems = showLegend ? plot.getLegendItems() : new LegendItemCollection();
             legendItems.add(new LegendItem("Mean", null, null, null, lineShape, Color.BLACK, dashed, Color.BLACK));
             plot.setFixedLegendItems(legendItems);
-        }
-
-        final double negativeMargin = -0.05;
-        if (hasZeroPoint) {
-            ValueAxis domainAxis = plot.getDomainAxis();
-            domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
-            ValueAxis rangeAxis = plot.getRangeAxis();
-            rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
-        } else if (hasZeroX) {
-            ValueAxis domainAxis = plot.getDomainAxis();
-            domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
-        } else if (hasZeroY) {
-            ValueAxis rangeAxis = plot.getRangeAxis();
-            rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
         }
 
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
@@ -245,11 +247,12 @@ public class GraphDialog extends EscapableDialog {
             XYSeries series = new XYSeries(graph.getName());
             List<GraphPoint> points = graph.getPoints();
 
+            double margin = 1e-5;
             if (!points.isEmpty()) {
                 double first = points.get(0).getX();
                 double last = points.get(points.size() - 1).getX();
 
-                isStraight = (first - last == 0) && !piecewise;
+                isStraight = Math.abs(first - last) < margin && !piecewise;
                 distanceToOrigin = first;
             }
 
@@ -258,15 +261,12 @@ public class GraphDialog extends EscapableDialog {
             }
 
             for (GraphPoint point : points) {
+                Require.that(point.getX() >= 0 && point.getY() >= 0, "Negative points are not supported");
+
                 series.add(point.getX(), point.getY());
-                if (point.getX() == 0) {
-                    hasZeroX = true;
-                }
 
-                if (point.getY() == 0) {
-                    hasZeroY = true;
-                }
-
+                hasZeroX = point.getX() < margin || hasZeroX;
+                hasZeroY = point.getY() < margin || hasZeroY;
             }
             
             hasZeroPoint = hasZeroX && hasZeroY;

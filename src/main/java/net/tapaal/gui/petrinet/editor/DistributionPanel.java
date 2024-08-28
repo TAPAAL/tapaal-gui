@@ -56,11 +56,11 @@ public class DistributionPanel extends JPanel {
         });
 
         distributionType = new JComboBox<>(continuous);
-        distributionShowGraph = new JButton("Show density function");
+        distributionShowGraph = new JButton("Show density");
         distributionParam1Label = new JLabel();
         distributionParam2Label = new JLabel();
-        distributionParam1Field = new JTextField();
-        distributionParam2Field = new JTextField();
+        distributionParam1Field = new JTextField(5);
+        distributionParam2Field = new JTextField(5);
         meanLabel = new JLabel();
         meanValueLabel = new JLabel();
         SwingHelper.setPreferredWidth(distributionParam1Field, 100);
@@ -96,7 +96,7 @@ public class DistributionPanel extends JPanel {
         distributionParam2Field.getDocument().addDocumentListener(updateDistribDisplay);
 
         setLayout(new GridBagLayout());
-        setBorder(BorderFactory.createTitledBorder("Distribution"));
+        setBorder(BorderFactory.createTitledBorder("Distribution and Firing Mode"));
         GridBagConstraints gbc = GridBagHelper.as(0,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
         add(useContinuousDistribution, gbc);
         gbc.gridx++;
@@ -105,39 +105,34 @@ public class DistributionPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(distributionType, gbc);
         gbc.fill = GridBagConstraints.NONE;
-        gbc.gridx += 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        add(distributionShowGraph, gbc);
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.gridy++;
-        gbc.gridx = 0;
+        gbc.gridx++;
         gbc.anchor = GridBagConstraints.EAST;
         add(distributionParam1Label, gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridwidth = 2;
         add(distributionParam1Field, gbc);
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.gridwidth = 1;
-        gbc.gridy++;
-        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx++;
         gbc.anchor = GridBagConstraints.EAST;
         add(distributionParam2Label, gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridwidth = 2;
         add(distributionParam2Field, gbc);
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.gridy++;
-        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx++;
         gbc.gridwidth = 1;
         add(meanLabel, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.WEST;
         add(meanValueLabel, gbc);
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(distributionShowGraph, gbc);
+        
     }
 
     public SMCDistribution parseDistribution() {
@@ -315,7 +310,7 @@ public class DistributionPanel extends JPanel {
         points.add(new GraphPoint(value, 0));
         points.add(new GraphPoint(value, 100));
 
-        return new Graph("Constant Distribution", points);
+        return new Graph("Constant Distribution", points, distribution.getMean());
     }
 
     private Graph createGraph(SMCDiscreteUniformDistribution distribution) {
@@ -375,7 +370,7 @@ public class DistributionPanel extends JPanel {
             x += step;	
         }
 
-        return new Graph("Gamma Distribution", points);
+        return new Graph("Gamma Distribution", points, distribution.getMean());
     }
 
     private Graph createGraph(SMCErlangDistribution distribution) {
@@ -401,7 +396,7 @@ public class DistributionPanel extends JPanel {
             x += step;
         }
 
-        return new Graph("Erlang Distribution", points);
+        return new Graph("Erlang Distribution", points, distribution.getMean());
     }
 
     private double spougeGammaApprox(double shape) {
@@ -498,7 +493,7 @@ public class DistributionPanel extends JPanel {
             x++;
         }
 
-        return new Graph("Geometric distribution", points);
+        return new Graph("Geometric distribution", points, distribution.getMean());
     }
 
     private JRadioButton useContinuousDistribution;

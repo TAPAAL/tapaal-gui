@@ -236,6 +236,7 @@ public class QueryDialog extends JPanel {
     private JTextField smcConfidence;
     private QuerySlider smcConfidenceSlider;
     private QuerySlider smcPrecisionSlider;
+    private QuerySlider smcEstimatedTimeSlider;
     private JTextField smcEstimationIntervalWidth;
     private JTextField smcTimeExpected;
     private JButton smcTimeEstimationButton;
@@ -2856,6 +2857,7 @@ public class QueryDialog extends JPanel {
             smcConfidence.setText(roundedValue + "");
             smcConfidenceSlider.setRealValue(roundedValue);
             smcConfidenceSlider.setToolTipText(String.format("Value: %.1f", roundedValue));
+            smcMustUpdateTime = true;
         });
 
         quantitativePanel.add(smcConfidenceSlider, subPanelGbc);
@@ -2884,6 +2886,7 @@ public class QueryDialog extends JPanel {
             String formattedValue = df.format(roundedValue);
             smcEstimationIntervalWidth.setText(formattedValue);
             smcPrecisionSlider.setToolTipText(String.format("Value: %s", formattedValue));
+            smcMustUpdateTime = true;
         });
 
         quantitativePanel.add(smcPrecisionSlider, subPanelGbc);
@@ -2896,6 +2899,24 @@ public class QueryDialog extends JPanel {
         smcTimeExpected = new JTextField(7);
         smcTimeExpected.setToolTipText(TOOL_TIP_VERIFICATION_TIME);
         quantitativePanel.add(smcTimeExpected, subPanelGbc);
+
+        smcEstimatedTimeSlider = new QuerySlider(0, 0, 300);
+        smcEstimatedTimeSlider.addChangeListener(e -> {
+            int value = smcEstimatedTimeSlider.getValue();
+            double desiredMin = smcEstimatedTimeSlider.getDesiredMin();
+            double desiredMax = smcEstimatedTimeSlider.getDesiredMax();
+            double proportion = (double) value / smcEstimatedTimeSlider.getMaximum();
+            double interpretedValue = desiredMin + proportion * (desiredMax - desiredMin);
+            double roundedValue = Math.round(interpretedValue * 1000.0) / 1000.0;
+            smcTimeExpected.setText(roundedValue + "");
+            smcEstimatedTimeSlider.setRealValue(roundedValue);
+            smcEstimatedTimeSlider.setToolTipText(String.format("Value: %.1f", roundedValue));
+            smcMustUpdateTime = false;
+        });
+
+        subPanelGbc.gridx = 2;
+        quantitativePanel.add(smcEstimatedTimeSlider, subPanelGbc);
+
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
         subPanelGbc.gridwidth = 2;
