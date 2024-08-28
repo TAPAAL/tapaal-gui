@@ -1559,7 +1559,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             } else if(listColorTypes.get(i).isIntegerRange()) {
                 if(listColorTypes.get(i).size() > 1) {
                     int listSize = listColorTypes.get(i).size();
-                    buffer.append("[" + listColorTypes.get(i).getColors().get(0).getColorName() + ".." + listColorTypes.get(i).getColors().get(listSize - 1).getColorName() + "]");
+                    buffer.append("[" + listColorTypes.get(i).getColors().get(0).getColorName() + "," + listColorTypes.get(i).getColors().get(listSize - 1).getColorName() + "]");
                 } else {
                     buffer.append("[" + listColorTypes.get(i).getFirstColor().getColorName() + "]");
                 }

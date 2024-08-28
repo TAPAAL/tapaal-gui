@@ -467,7 +467,7 @@ public class TikZExporter {
                 out.append("$\\mathit{");
                 if(listColorTypes.get(i).size() > 1) {
                     int listSize = listColorTypes.get(i).size();
-                    out.append("[" + listColorTypes.get(i).getColors().get(0).getColorName().replace("_","\\_") + ".." + listColorTypes.get(i).getColors().get(listSize - 1).getColorName().replace("_","\\_") + "]");
+                    out.append("[" + listColorTypes.get(i).getColors().get(0).getColorName().replace("_","\\_") + "," + listColorTypes.get(i).getColors().get(listSize - 1).getColorName().replace("_","\\_") + "]");
                 } else {
                     out.append("[" + listColorTypes.get(i).getFirstColor().getColorName().replace("_","\\_") + "]");
                 }
