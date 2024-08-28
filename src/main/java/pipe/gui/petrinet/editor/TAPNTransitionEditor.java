@@ -179,7 +179,7 @@ public class TAPNTransitionEditor extends JPanel {
 			}
 		});
 		
-		gridBagConstraints = GridBagHelper.as(3, 2, Anchor.WEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = GridBagHelper.as(2, 2, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(urgentCheckBox, gridBagConstraints);
         if(transition.isStochastic()) {
             urgentCheckBox.setToolTipText("Note: for SMC, it is recommended to prefer setting a constant(0) distribution instead of using urgent transitions");
@@ -213,11 +213,14 @@ public class TAPNTransitionEditor extends JPanel {
 		gridBagConstraints = GridBagHelper.as(0,2, Anchor.EAST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationLabel, gridBagConstraints);
 
-		gridBagConstraints = GridBagHelper.as(1,2, Anchor.WEST, new Insets(3, 3, 3, 3));
-		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
+        JPanel comboBoxAndCheckBoxPanel = new JPanel(new GridBagLayout());
+        gridBagConstraints = GridBagHelper.as(0, 0, Anchor.WEST, new Insets(3, 3, 3, 3));
+        comboBoxAndCheckBoxPanel.add(rotationComboBox, gridBagConstraints);
+        gridBagConstraints = GridBagHelper.as(1, 0, Anchor.WEST, new Insets(3, 3, 3, 3));
+        comboBoxAndCheckBoxPanel.add(attributesCheckBox, gridBagConstraints);
 
-        gridBagConstraints = GridBagHelper.as(2,2, Anchor.WEST, new Insets(3, 3, 3, 3));
-		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
+		gridBagConstraints = GridBagHelper.as(1,2, Anchor.WEST, new Insets(3, 3, 3, 3));
+		transitionEditorPanel.add(comboBoxAndCheckBoxPanel, gridBagConstraints);
 
         if(context.tabContent().getLens().isStochastic()) {
             String weightToolTip = "Probability mass of the transition in the event of a firing date collision";

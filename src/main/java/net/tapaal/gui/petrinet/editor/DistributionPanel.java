@@ -59,8 +59,8 @@ public class DistributionPanel extends JPanel {
         distributionShowGraph = new JButton("Show density function");
         distributionParam1Label = new JLabel();
         distributionParam2Label = new JLabel();
-        distributionParam1Field = new JTextField(4);
-        distributionParam2Field = new JTextField(4);
+        distributionParam1Field = new JTextField(5);
+        distributionParam2Field = new JTextField(5);
         meanLabel = new JLabel();
         meanValueLabel = new JLabel();
         SwingHelper.setPreferredWidth(distributionParam1Field, 100);
@@ -96,7 +96,7 @@ public class DistributionPanel extends JPanel {
         distributionParam2Field.getDocument().addDocumentListener(updateDistribDisplay);
 
         setLayout(new GridBagLayout());
-        setBorder(BorderFactory.createTitledBorder("Distribution"));
+        setBorder(BorderFactory.createTitledBorder("Distribution and Firing Mode"));
         GridBagConstraints gbc = GridBagHelper.as(0,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
         add(useContinuousDistribution, gbc);
         gbc.gridx++;
@@ -132,6 +132,7 @@ public class DistributionPanel extends JPanel {
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.CENTER;
         add(distributionShowGraph, gbc);
+        
     }
 
     public SMCDistribution parseDistribution() {
