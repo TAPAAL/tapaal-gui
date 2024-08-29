@@ -2900,14 +2900,14 @@ public class QueryDialog extends JPanel {
         smcTimeExpected.setToolTipText(TOOL_TIP_VERIFICATION_TIME);
         quantitativePanel.add(smcTimeExpected, subPanelGbc);
 
-        smcEstimatedTimeSlider = new QuerySlider(0, 0, 300);
+        smcEstimatedTimeSlider = new QuerySlider(1, 1, 100);
         smcEstimatedTimeSlider.addChangeListener(e -> {
             int value = smcEstimatedTimeSlider.getValue();
             double desiredMin = smcEstimatedTimeSlider.getDesiredMin();
             double desiredMax = smcEstimatedTimeSlider.getDesiredMax();
             double proportion = (double) value / smcEstimatedTimeSlider.getMaximum();
             double interpretedValue = desiredMin + proportion * (desiredMax - desiredMin);
-            double roundedValue = Math.round(interpretedValue * 1000.0) / 1000.0;
+            double roundedValue = Math.round(interpretedValue);
             smcTimeExpected.setText(roundedValue + "");
             smcEstimatedTimeSlider.setRealValue(roundedValue);
             smcEstimatedTimeSlider.setToolTipText(String.format("Value: %.1f", roundedValue));
