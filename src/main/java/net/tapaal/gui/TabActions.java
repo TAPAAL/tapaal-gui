@@ -23,6 +23,8 @@ public interface TabActions {
 
     void zoomIn();
 
+    void fitToScreen();
+
     void selectAll();
 
     void deleteSelection();

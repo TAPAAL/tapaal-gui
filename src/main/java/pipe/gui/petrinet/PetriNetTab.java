@@ -5,7 +5,6 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
-import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.*;
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
@@ -28,10 +27,6 @@ import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.Preferences;
 import net.tapaal.copypaste.CopyPastImportExport;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
-import net.tapaal.gui.petrinet.NameGenerator;
-import net.tapaal.gui.petrinet.TAPNLens;
-import net.tapaal.gui.petrinet.TabTransformer;
-import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
 
 import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
@@ -1105,7 +1100,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public void zoomTo(int newZoomLevel) {
 		boolean didZoom = drawingSurface().getZoomController().setZoom(newZoomLevel);
 		if (didZoom) {
-			app.ifPresent(gfa -> gfa.updateZoomSlider(newZoomLevel));
 			drawingSurface().zoomToMidPoint(); //Do Zoom
 		}
 	}
@@ -1744,7 +1738,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		boolean didZoom = drawingSurface().getZoomController().zoomOut();
 		if (didZoom) {
 			app.ifPresent(e -> e.updateZoomSlider(drawingSurface().getZoomController().getPercent()));
-			drawingSurface().zoomToMidPoint(); //Do Zoom
 		}
 	}
 
@@ -1753,9 +1746,68 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		boolean didZoom = drawingSurface().getZoomController().zoomIn();
 		if (didZoom) {
 			app.ifPresent(e -> e.updateZoomSlider(drawingSurface().getZoomController().getPercent()));
-			drawingSurface().zoomToMidPoint(); //Do Zoom
 		}
 	}
+
+    @Override 
+    public void fitToScreen() {
+        Iterable<PetriNetObject> petriNetObjects = currentTemplate().guiModel().getPetriNetObjects();
+        if (!petriNetObjects.iterator().hasNext()) {
+            return;
+        }
+
+        int smallestX = Integer.MAX_VALUE;
+        int smallestY = Integer.MAX_VALUE;
+        int largestX = Integer.MIN_VALUE;
+        int largestY = Integer.MIN_VALUE;
+
+        JViewport viewport = (JViewport)drawingSurface().getParent();
+        for (PetriNetObject pno : currentTemplate().guiModel().getPetriNetObjects()) {
+            if (pno instanceof PlaceTransitionObject) {
+                if (pno.getOriginalX() < smallestX) {
+                    smallestX = pno.getOriginalX();
+                }
+
+                if (pno.getOriginalY() < smallestY) {
+                    smallestY = pno.getOriginalY();
+                }
+
+                if (pno.getOriginalX() + pno.getWidth() > largestX) {
+                    largestX = pno.getOriginalX() + pno.getWidth();
+                }
+
+                if (pno.getOriginalY() + pno.getHeight() > largestY) {
+                    largestY = pno.getOriginalY() + pno.getHeight();
+                }
+            }
+        }
+
+        System.out.println("Smallest X: " + smallestX);
+        System.out.println("Smallest Y: " + smallestY);
+        System.out.println("Largest X: " + largestX);
+        System.out.println("Largest Y: " + largestY);
+        System.out.println("Width: " + (largestX - smallestX));
+        System.out.println("Height: " + (largestY - smallestY));
+        System.out.println("Viewport width: " + viewport.getWidth());
+        System.out.println("Viewport height: " + viewport.getHeight());
+        int width = largestX - smallestX;
+        int height = largestY - smallestY;
+        Zoomer zoomer = drawingSurface().getZoomController();
+        double currentZoomFactor = zoomer.getPercent() * 0.01;
+        double xZoomFactor = (double) viewport.getWidth() / width;
+        double yZoomFactor = (double) viewport.getHeight() / height;
+        double zoomFactor = Math.min(xZoomFactor, yZoomFactor);
+        int zoomPercent = (int) (zoomFactor * 100);
+
+        System.out.println("currentZoomFactor: " + currentZoomFactor);
+        System.out.println("xZoomFactor: " + xZoomFactor);
+        System.out.println("yZoomFactor: " + yZoomFactor);
+        System.out.println("Zoom factor: " + zoomFactor);
+        System.out.println("Zoom percent: " + zoomPercent);
+        app.ifPresent(e -> e.updateZoomSlider(zoomPercent)); 
+        
+        drawingSurface().updatePreferredSize();
+    }
 
     @Override
     public void selectAll() {

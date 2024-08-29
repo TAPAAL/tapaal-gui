@@ -258,6 +258,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
+    private final GuiAction fitToScreenAction = new GuiAction("Fit to screen", "Fit the net to the screen", KeyStroke.getKeyStroke('F', shortcutkey)) {
+        public void actionPerformed(ActionEvent e) {
+            currentTab.ifPresent(TabActions::fitToScreen);
+        }
+    };
+
     private final GuiAction incSpacingAction = new GuiAction("Increase node spacing", "Increase spacing by 20% ", KeyStroke.getKeyStroke('U', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
             currentTab.ifPresent(TabActions::increaseSpacing);
@@ -465,8 +471,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JCheckBoxMenuItem showTokenAgeCheckBox;
     private JCheckBoxMenuItem showDelayEnabledTransitionsCheckbox;
     private JCheckBoxMenuItem showColoredTokensCheckbox;
-
-    private JMenu zoomMenu;
 
     public GuiFrame(String title) {
         // HAK-arrange for frameTitle to be initialized and the default file
@@ -684,13 +688,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         viewMenu = new JMenu("View");
         viewMenu.setMnemonic('V');
 
-        zoomMenu = new JMenu("Zoom");
-        zoomMenu.setIcon(ResourceManager.getIcon("Zoom.png"));
-
         viewMenu.add(zoomInAction);
 
         viewMenu.add(zoomOutAction);
-        viewMenu.add(zoomMenu);
+
+        viewMenu.add(fitToScreenAction);
 
         viewMenu.addSeparator();
 
@@ -866,6 +868,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         toolBar.add(zoomOutAction).setRequestFocusEnabled(false);
         addZoomSlider(toolBar);
         toolBar.add(zoomInAction).setRequestFocusEnabled(false);
+        toolBar.add(fitToScreenAction).setRequestFocusEnabled(false);
 
         // Modes
 
@@ -1084,7 +1087,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         zoomInAction.setEnabled(enable);
         zoomOutAction.setEnabled(enable);
         zoomSlider.setEnabled(enable);
-        zoomMenu.setEnabled(enable);
+        fitToScreenAction.setEnabled(enable);
 
         decSpacingAction.setEnabled(enable);
         incSpacingAction.setEnabled(enable);
