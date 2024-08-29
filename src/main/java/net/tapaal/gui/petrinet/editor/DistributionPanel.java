@@ -107,32 +107,39 @@ public class DistributionPanel extends JPanel {
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.EAST;
-        add(distributionParam1Label, gbc);
+
+        JPanel paramPanel = new JPanel(new GridBagLayout());
+        gbc = GridBagHelper.as(0,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
+        paramPanel.add(distributionParam1Label, gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(distributionParam1Field, gbc);
+        paramPanel.add(distributionParam1Field, gbc);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.EAST;
-        add(distributionParam2Label, gbc);
+        paramPanel.add(distributionParam2Label, gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(distributionParam2Field, gbc);
+        paramPanel.add(distributionParam2Field, gbc);
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx++;
         gbc.gridwidth = 1;
-        add(meanLabel, gbc);
+        paramPanel.add(meanLabel, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.WEST;
-        add(meanValueLabel, gbc);
+        paramPanel.add(meanValueLabel, gbc);
+        gbc = GridBagHelper.as(3 ,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paramPanel.setPreferredSize(new Dimension(350, paramPanel.getPreferredSize().height));
+        add(paramPanel, gbc);
+
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.anchor = GridBagConstraints.EAST;
         add(distributionShowGraph, gbc);
-        
     }
 
     public SMCDistribution parseDistribution() {
