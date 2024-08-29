@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface GuiFrameActions {
 
-    void updateZoomCombo(int zoom);
+    void updateZoomSlider(int zoom);
 
     void setRedoActionEnabled(boolean b);
 
