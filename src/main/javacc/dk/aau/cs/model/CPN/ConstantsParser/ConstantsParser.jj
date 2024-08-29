@@ -22,6 +22,8 @@ import java.util.HashSet;
 import dk.aau.cs.model.CPN.ProductType;
 
 public class ConstantsParser {
+    private static final String ERROR_PARSING_CONSTANTS_MESSAGE = "TAPAAL encountered an error trying to parse the constants";
+
     private static final Map<String, Constant> constants = new LinkedHashMap<String, Constant>();
     private static final Map<String, ColorType> colorTypes = new LinkedHashMap<String, ColorType>();
     private static final Map<String, Variable> variables = new LinkedHashMap<String, Variable>();
@@ -64,7 +66,6 @@ public class ConstantsParser {
         Map<String, Boolean> constantsBitMap = new HashMap<String, Boolean>();
         Map<String, List<String>> messages = new HashMap<String, List<String>>();        
         
-        // Populate maps with constants, color types and variables and if they can be removed
         for (Constant c : network.constants()) {
             constantsMap.put(c.name(), c);
             constantsBitMap.put(c.name(), network.getConstantStore().isConstantInUse(c.name()));
@@ -84,12 +85,10 @@ public class ConstantsParser {
             messages.put(v.getName(), messagesList);
         }
 
-        // Generate error messages
         for (String key : constantsBitMap.keySet()) {
             if (constants.containsKey(key) || 
                 colorTypes.containsKey(key) || 
-                variables.containsKey(key) ||
-                key.equals("dot")) {
+                variables.containsKey(key)) {
                 continue;
             }
 
@@ -237,14 +236,6 @@ void colorTypes() :
         if (isProductList.value) {
             ProductType pct = new ProductType(id.image);
             for (String product : values) {
-                if (product.equals("dot")) {
-                    ColorType dot = new ColorType("dot");
-                    dot.addColor("dot");
-
-                    pct.addType(dot);
-                    continue;
-                }
-
                 if (!colorTypes.containsKey(product)) {
                     throw new ParseException("Color type with name \"" + product + "\" does not exist");
                 }
@@ -316,10 +307,6 @@ void variables() :
         for (String id : ids) {
             idExists(id);
             
-            if (type.image.equals("dot")) {
-                throw new ParseException("Can not create a variable of color type \"dot\"");
-            }
-
             if (!colorTypes.containsKey(type.image)) {
                 throw new ParseException("Color type with name \"" + type.image + "\" does not exist");
             }
