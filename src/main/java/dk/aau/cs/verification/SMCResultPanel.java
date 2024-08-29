@@ -98,7 +98,7 @@ public class SMCResultPanel extends JPanel  {
         GridBagConstraints gbc = GridBagHelper.as(0,0, GridBagHelper.Anchor.WEST, new Insets(10, 0, 10, 30));
         JPanel generalStatsPanel = new JPanel(new GridBagLayout());
         addStatIfPositive(generalStatsPanel, "Executed runs: ", stats.getExecutedRuns(), gbc);
-        addStatIfPositive(generalStatsPanel, "Verification time / run (ms): ", (1000.0 * stats.getVerificationTime()) / stats.getExecutedRuns(), gbc, verifTimeFormat);
+        addStatIfPositive(generalStatsPanel, "Average simulation time per run (ms): ", (1000.0 * stats.getVerificationTime()) / stats.getExecutedRuns(), gbc, verifTimeFormat);
         gbc.gridy = 0;
         gbc.gridx = 3;
         addAvgStdDev(generalStatsPanel, "Average run duration: ", stats.getAverageRunTime(), stats.getRunTimeStdDev(), gbc);
