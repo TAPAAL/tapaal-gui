@@ -53,6 +53,21 @@ public class XMLQueryLoader extends QueryLoader{
 
     @Override
     protected ArrayList<TAPNQuery> getQueries(){
+        TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
+        return getQueries(lens, -1);
+    }
+
+
+    /**
+     * @param choice <ul>
+     *   <li>-1: Gui pop-up</li>
+     *   <li>0: Import all as CTL</li>
+     *   <li>1: Import all as LTL</li>
+     *   <li>2: Import all as HyperLTL</li>
+     *   <li>3: Do nothing</li>
+     * </ul>
+     */
+    public ArrayList<TAPNQuery> getQueries(TAPNLens lens, int choice){
         ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
 
         // Instantiate DOM builder components and build DOM
@@ -89,7 +104,7 @@ public class XMLQueryLoader extends QueryLoader{
 
         // Get all properties from DOM
         NodeList propList = doc.getElementsByTagName("property");
-        int choice = -1;
+        // int choice = -1;
 
         for (int i = 0; i < propList.getLength(); i++) {
             Node prop = propList.item(i);
@@ -98,7 +113,7 @@ public class XMLQueryLoader extends QueryLoader{
             // Save query for later use in dialog window
             this.faultyQueries.add(queryWrapper);
 
-            TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
+            // TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
             boolean isTimed = (lens != null && lens.isTimed()) || network.isTimed();
             boolean isKnownGame = (lens != null && lens.isGame()); // XXX: This is a hack, not sure why network does not know if it a game, also control tag should used to check if query is a game
             boolean canBeCTL = isTimed || canBeCTL(prop);

@@ -562,7 +562,7 @@ public class PNMLoader {
     }
 
     private boolean isNetDrawable() {
-        return netSize <= maxNetSize;
+        return true; //netSize <= maxNetSize;
     }
 
     Node getFirstDirectChild(Node parent, String tagName){

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import dk.aau.cs.pddl.pddlMain;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.dialog.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
@@ -54,6 +55,8 @@ public class TAPAAL {
 		// Create possible commandline options
 		Options options = new Options();
 		options.addOption("d", "debug", false, "enable debug output .");
+		options.addOption("p", "pddl-out", true, "PDDL output directory - Set to translate model to pddl.");
+		options.addOption("t", "pddl-test", false, "Report compatibility of pnml and query file.");
 
 		CommandLine commandline = null;
 
@@ -81,8 +84,31 @@ public class TAPAAL {
 			File batchFolder = new File(files[0]);
 
 			batchProcessing(batchFolder);
+            System.exit(0);
 			return;
 		}
+
+        if (commandline.hasOption("pddl-out")) {
+            String[] files = commandline.getArgs();
+            String pddlOutPath = commandline.getOptionValue("pddl-out");
+            pddlMain.main(
+                files[0],
+                files[1],
+                pddlOutPath
+            );
+            System.exit(0);
+            return;
+        }
+
+        if (commandline.hasOption("pddl-test")) {
+            String[] files = commandline.getArgs();
+            pddlMain.test(
+                files[0],
+                files[1]
+            );
+            System.exit(0);
+            return;
+        }
 
 		// Create the TAPAAL GUI
 		TAPAALGUI.init();

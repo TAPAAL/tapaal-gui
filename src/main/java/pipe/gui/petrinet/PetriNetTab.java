@@ -5,6 +5,7 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.pddl.PddlStringifier;
 import net.tapaal.gui.GuiFrameActions;
 import net.tapaal.gui.*;
 import net.tapaal.gui.petrinet.*;
@@ -388,6 +389,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 				tab.selectFirstElements();
 
 				tab.setMode(DrawTool.SELECT);
+
                 return tab;
 
 			} catch (Exception e) {
