@@ -1106,7 +1106,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public void zoomTo(int newZoomLevel) {
 		boolean didZoom = drawingSurface().getZoomController().setZoom(newZoomLevel);
 		if (didZoom) {
-			app.ifPresent(gfa -> gfa.updateZoomCombo(newZoomLevel));
+			app.ifPresent(gfa -> gfa.updateZoomSlider(newZoomLevel));
 			drawingSurface().zoomToMidPoint(); //Do Zoom
 		}
 	}
@@ -1306,7 +1306,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         nameGenerator.add(tapn.model());
         drawingSurface.setModel(tapn.guiModel(), tapn.zoomer());
 
-        app.ifPresent(gfa -> gfa.updateZoomCombo(tapn.zoomer().getPercent()));
+        app.ifPresent(gfa -> gfa.updateZoomSlider(tapn.zoomer().getPercent()));
 
         //XXX: moved from drawingsurface, temp while refactoring, there is a better way
         drawingSurface.getSelectionObject().clearSelection();
@@ -1768,7 +1768,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public void zoomOut() {
 		boolean didZoom = drawingSurface().getZoomController().zoomOut();
 		if (didZoom) {
-			app.ifPresent(e -> e.updateZoomCombo(drawingSurface().getZoomController().getPercent()));
+			app.ifPresent(e -> e.updateZoomSlider(drawingSurface().getZoomController().getPercent()));
 			drawingSurface().zoomToMidPoint(); //Do Zoom
 		}
 	}
@@ -1777,7 +1777,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public void zoomIn() {
 		boolean didZoom = drawingSurface().getZoomController().zoomIn();
 		if (didZoom) {
-			app.ifPresent(e -> e.updateZoomCombo(drawingSurface().getZoomController().getPercent()));
+			app.ifPresent(e -> e.updateZoomSlider(drawingSurface().getZoomController().getPercent()));
 			drawingSurface().zoomToMidPoint(); //Do Zoom
 		}
 	}
