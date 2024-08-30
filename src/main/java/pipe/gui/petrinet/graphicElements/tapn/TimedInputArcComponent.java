@@ -88,8 +88,12 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                 }
                 if (lens.isTimed()) {
                     arcPrint.append("\n");
-                    arcPrint.append(inputArc.interval().toString(showConstantNames));
-                    arcPrint.append("\n");
+                    if (TAPAALGUI.getAppGui().showZeroToInfinityIntervals() || 
+                        !inputArc.interval().toString(showConstantNames).equals("[0,inf)")) {
+                        arcPrint.append(inputArc.interval().toString(showConstantNames));
+                        arcPrint.append("\n");
+                    }
+            
                     List<ColoredTimeInterval> ctiList;
                     ctiList = this.underlyingTimedInputArc().getColorTimeIntervals();
                     for (ColoredTimeInterval coloredTimeInterval : ctiList) {
@@ -100,9 +104,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                     }
                 }
                 getNameLabel().setText(arcPrint.toString());
-            }
-            
-            if (!TAPAALGUI.getAppGui().showZeroToInfinityIntervals() || (lens != null && !lens.isTimed())) {
+            } else if (!TAPAALGUI.getAppGui().showZeroToInfinityIntervals() || (lens != null && !lens.isTimed())) {
                 if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
                     getNameLabel().setText("");
                 }
