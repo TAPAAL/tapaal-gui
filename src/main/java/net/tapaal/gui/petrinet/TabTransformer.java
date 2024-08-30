@@ -1,5 +1,19 @@
 package net.tapaal.gui.petrinet;
 
+import dk.aau.cs.TCTL.LTLANode;
+import dk.aau.cs.TCTL.LTLFNode;
+import dk.aau.cs.TCTL.LTLGNode;
+import dk.aau.cs.TCTL.StringPosition;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLAndListNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLNotNode;
+import dk.aau.cs.TCTL.TCTLOrListNode;
+import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
@@ -193,6 +207,73 @@ public class TabTransformer {
             }
         }
     }
+
+    public static void convertQueriesToNonSmc(Iterable<TAPNQuery> queries) {
+        // F -> EF
+        // G -> EG
+        for (TAPNQuery query : queries) {
+            TCTLAbstractProperty property = query.getProperty();
+            query.setProperty(smcConverter(property));
+        }
+    }
+
+    public static void convertQueriesToSmc(Iterable<TAPNQuery> queries) {
+        // EF -> F
+        // EG -> G
+        for (TAPNQuery query : queries) {
+            TCTLAbstractProperty property = query.getProperty();
+            query.setProperty(smcConverter(property));
+        }  
+    }
+
+    private static TCTLAbstractProperty smcConverter(TCTLAbstractProperty property) {
+        TCTLAbstractStateProperty child = getFirstChildOfProperty(property);
+        if (property instanceof LTLFNode) {
+            return new TCTLEFNode(child);
+        } else if (property instanceof LTLGNode) {
+            return new TCTLEGNode(child);
+        } else if (property instanceof TCTLEFNode) {
+            return new LTLFNode(child);
+        }  else if (property instanceof TCTLEGNode) {
+            return new LTLGNode(child);
+        } else if (property instanceof TCTLAndListNode) {
+            TCTLAndListNode andNode = (TCTLAndListNode) property;
+            List<TCTLAbstractStateProperty> properties = andNode.getProperties();
+            List<TCTLAbstractStateProperty> convertedProperties = new ArrayList<>();
+            for (TCTLAbstractStateProperty prop : properties) {
+                convertedProperties.add((TCTLAbstractStateProperty) smcConverter(prop));
+            }
+
+            return new TCTLAndListNode(convertedProperties);
+        } else if (property instanceof TCTLOrListNode) {
+            TCTLOrListNode orNode = (TCTLOrListNode) property;
+            List<TCTLAbstractStateProperty> properties = orNode.getProperties();
+            List<TCTLAbstractStateProperty> convertedProperties = new ArrayList<>();
+            for (TCTLAbstractStateProperty prop : properties) {
+                convertedProperties.add((TCTLAbstractStateProperty) smcConverter(prop));
+            }
+
+            return new TCTLOrListNode(convertedProperties);
+        } else if (property instanceof TCTLNotNode) {
+            TCTLNotNode notNode = (TCTLNotNode) property;
+            return new TCTLNotNode((TCTLAbstractStateProperty) smcConverter(notNode.getProperty()));
+        } else {
+            return property;
+        }
+    }
+
+    private static TCTLAbstractStateProperty getFirstChildOfProperty(TCTLAbstractProperty property) {
+        StringPosition[] children = property.getChildren();
+        for (int i = 0; i < children.length; ++i) {
+            TCTLAbstractProperty child = children[i].getObject();
+            if (child instanceof TCTLAbstractStateProperty) {
+                return (TCTLAbstractStateProperty) child;
+            }
+        }
+
+        return new TCTLStatePlaceHolder();
+    }
+
     static public void removeColorInformation(PetriNetTab tab) {
         tab.network().setColorTypes(List.of(ColorType.COLORTYPE_DOT));
         tab.network().setVariables(new ArrayList<Variable>());

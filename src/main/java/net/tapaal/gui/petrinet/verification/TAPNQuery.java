@@ -563,6 +563,10 @@ public class TAPNQuery {
         setParallel(isParallel());
     }
 
+    public void setProperty(TCTLAbstractProperty property) {
+        this.property = property;
+    }
+
 	public InclusionPlaces inclusionPlaces() {
 		return inclusionPlaces;
 	}
