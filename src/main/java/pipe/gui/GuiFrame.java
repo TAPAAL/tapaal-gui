@@ -69,6 +69,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final JComboBox<String> gameFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
     private final JComboBox<String> colorFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
 
+    private static final String FIT_TO_SCREEN_NAME = "Fit to screen";
+    private static final String FIT_TO_SCREEN_TOOLTIP = "Fit the net to the screen";
+    private static final String FIT_TO_SCREEN_ICON = "Fit to screen.png";
+
     private JSlider zoomSlider;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -255,6 +259,24 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction zoomInAction = new GuiAction("Zoom in", "Zoom in by 10% ", KeyStroke.getKeyStroke('J', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabActions::zoomIn);
+        }
+    };
+
+    private final GuiAction fitToScreenAction = new GuiAction(FIT_TO_SCREEN_NAME, FIT_TO_SCREEN_TOOLTIP, KeyStroke.getKeyStroke('F', shortcutkey)) {
+        public void actionPerformed(ActionEvent e) {
+            currentTab.ifPresent(o -> {
+                if (!o.isAlreadyFitToScreen()) {
+                    o.fitToScreen();
+                    putValue(Action.NAME, "Restore zoom");
+                    putValue(Action.SHORT_DESCRIPTION, "Restore the zoom to 100%");
+                    putValue(Action.SMALL_ICON, ResourceManager.getIcon("Restore zoom.png"));
+                } else {
+                    zoomSlider.setValue(100);
+                    putValue(Action.NAME, FIT_TO_SCREEN_NAME);
+                    putValue(Action.SHORT_DESCRIPTION, FIT_TO_SCREEN_TOOLTIP);
+                    putValue(Action.SMALL_ICON, ResourceManager.getIcon(FIT_TO_SCREEN_ICON));
+                }
+            });
         }
     };
 
@@ -465,8 +487,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JCheckBoxMenuItem showTokenAgeCheckBox;
     private JCheckBoxMenuItem showDelayEnabledTransitionsCheckbox;
     private JCheckBoxMenuItem showColoredTokensCheckbox;
-
-    private JMenu zoomMenu;
 
     public GuiFrame(String title) {
         // HAK-arrange for frameTitle to be initialized and the default file
@@ -684,13 +704,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         viewMenu = new JMenu("View");
         viewMenu.setMnemonic('V');
 
-        zoomMenu = new JMenu("Zoom");
-        zoomMenu.setIcon(ResourceManager.getIcon("Zoom.png"));
-
         viewMenu.add(zoomInAction);
 
         viewMenu.add(zoomOutAction);
-        viewMenu.add(zoomMenu);
+
+        viewMenu.add(fitToScreenAction);
 
         viewMenu.addSeparator();
 
@@ -866,6 +884,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         toolBar.add(zoomOutAction).setRequestFocusEnabled(false);
         addZoomSlider(toolBar);
         toolBar.add(zoomInAction).setRequestFocusEnabled(false);
+        toolBar.add(fitToScreenAction).setRequestFocusEnabled(false);
 
         // Modes
 
@@ -911,10 +930,19 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             int newZoomLevel = zoomSlider.getValue();
             currentTab.ifPresent(o -> o.zoomTo(newZoomLevel));
             zoomSlider.setToolTipText("Zoom: " + newZoomLevel + "%");
+            getCurrentTab().setIsAlreadyFitToScreen(false);
+            fitToScreenAction.putValue(Action.NAME, FIT_TO_SCREEN_NAME);
+            fitToScreenAction.putValue(Action.SHORT_DESCRIPTION, FIT_TO_SCREEN_TOOLTIP);
+            fitToScreenAction.putValue(Action.SMALL_ICON, ResourceManager.getIcon(FIT_TO_SCREEN_ICON));
         });
-
+        
         SwingHelper.setPreferredWidth(zoomSlider, zoomSliderDimension.width);
         toolBar.add(zoomSlider);
+    }
+
+    @Override
+    public JSlider getZoomSlider() {
+        return zoomSlider;
     }
 
     private JCheckBoxMenuItem addCheckboxMenuItem(JMenu menu, Action action) {
@@ -1084,7 +1112,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         zoomInAction.setEnabled(enable);
         zoomOutAction.setEnabled(enable);
         zoomSlider.setEnabled(enable);
-        zoomMenu.setEnabled(enable);
+        fitToScreenAction.setEnabled(enable);
 
         decSpacingAction.setEnabled(enable);
         incSpacingAction.setEnabled(enable);
