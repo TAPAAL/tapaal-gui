@@ -1751,62 +1751,113 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     @Override 
     public void fitToScreen() {
-        Iterable<PetriNetObject> petriNetObjects = currentTemplate().guiModel().getPetriNetObjects();
-        if (!petriNetObjects.iterator().hasNext()) {
-            return;
-        }
+        final int margin = 50;
 
-        int smallestX = Integer.MAX_VALUE;
-        int smallestY = Integer.MAX_VALUE;
-        int largestX = Integer.MIN_VALUE;
-        int largestY = Integer.MIN_VALUE;
-
-        JViewport viewport = (JViewport)drawingSurface().getParent();
-        for (PetriNetObject pno : currentTemplate().guiModel().getPetriNetObjects()) {
-            if (pno instanceof PlaceTransitionObject) {
-                if (pno.getOriginalX() < smallestX) {
-                    smallestX = pno.getOriginalX();
-                }
-
-                if (pno.getOriginalY() < smallestY) {
-                    smallestY = pno.getOriginalY();
-                }
-
-                if (pno.getOriginalX() + pno.getWidth() > largestX) {
-                    largestX = pno.getOriginalX() + pno.getWidth();
-                }
-
-                if (pno.getOriginalY() + pno.getHeight() > largestY) {
-                    largestY = pno.getOriginalY() + pno.getHeight();
+        // Loop until it converges
+        while (true) {
+            Iterable<PetriNetObject> petriNetObjects = currentTemplate().guiModel().getPetriNetObjects();
+            if (!petriNetObjects.iterator().hasNext()) {
+                return;
+            }
+    
+            int smallestX = Integer.MAX_VALUE;
+            int smallestY = Integer.MAX_VALUE;
+            int largestX = Integer.MIN_VALUE;
+            int largestY = Integer.MIN_VALUE;
+    
+            JViewport viewport = (JViewport)drawingSurface().getParent();
+            for (PetriNetObject pno : currentTemplate().guiModel().getPetriNetObjects()) {
+                if (pno instanceof PlaceTransitionObject) {
+                    if (pno.getOriginalX() < smallestX) {
+                        smallestX = pno.getOriginalX();
+                    }
+    
+                    if (pno.getOriginalY() < smallestY) {
+                        smallestY = pno.getOriginalY();
+                    }
+    
+                    if (pno.getOriginalX() + pno.getWidth() > largestX) {
+                        largestX = pno.getOriginalX() + pno.getWidth();
+                    }
+    
+                    if (pno.getOriginalY() + pno.getHeight() > largestY) {
+                        largestY = pno.getOriginalY() + pno.getHeight();
+                    }
+    
+                    if (pno instanceof Transition) {
+                        Transition t = (Transition) pno;
+                        for (Arc arc : t.getPreset()) {
+                            for (ArcPathPoint point : arc.getArcPath().getArcPathPoints()) {
+                                if (point.getOriginalX() < smallestX) {
+                                    smallestX = point.getOriginalX();
+                                }
+    
+                                if (point.getOriginalY() < smallestY) {
+                                    smallestY = point.getOriginalY();
+                                }
+    
+                                if (point.getOriginalX() > largestX) {
+                                    largestX = point.getOriginalX();
+                                }
+    
+                                if (point.getOriginalY() > largestY) {
+                                    largestY = point.getOriginalY();
+                                }
+                            }
+                        }
+    
+                        for (Arc arc : t.getPostset()) {
+                            for (ArcPathPoint point : arc.getArcPath().getArcPathPoints()) {
+                                if (point.getOriginalX() < smallestX) {
+                                    smallestX = point.getOriginalX();
+                                }
+    
+                                if (point.getOriginalY() < smallestY) {
+                                    smallestY = point.getOriginalY();
+                                }
+    
+                                if (point.getOriginalX() > largestX) {
+                                    largestX = point.getOriginalX();
+                                }
+    
+                                if (point.getOriginalY() > largestY) {
+                                    largestY = point.getOriginalY();
+                                }
+                            }
+                        }
+                    }
                 }
             }
+
+            smallestX = Math.max(0, smallestX - margin);
+            smallestY = Math.max(0, smallestY - margin);
+
+            largestX += margin;
+            largestY += margin;
+            
+            int width = largestX - smallestX;
+            int height = largestY - smallestY;
+            double xZoomFactor = (double) viewport.getWidth() / width;
+            double yZoomFactor = (double) viewport.getHeight() / height;
+            double zoomFactor = Math.min(xZoomFactor, yZoomFactor);
+            double zoomPercent = Math.min(xZoomFactor, yZoomFactor) * 100;
+
+            double currentZoomPercent = drawingSurface().getZoomController().getPercent();
+            
+            final double zoomConvergence = 1;
+            if (Math.abs(currentZoomPercent - zoomPercent) < zoomConvergence) {
+                int x = (int) (smallestX * zoomFactor) - margin;
+                int y = (int) (smallestY * zoomFactor) - margin;
+
+                x = Math.max(0, x);
+                y = Math.max(0, y);
+
+                viewport.setViewPosition(new Point(x, y));
+                return;
+            }
+            
+            app.ifPresent(e -> e.updateZoomSlider((int)zoomPercent)); 
         }
-
-        System.out.println("Smallest X: " + smallestX);
-        System.out.println("Smallest Y: " + smallestY);
-        System.out.println("Largest X: " + largestX);
-        System.out.println("Largest Y: " + largestY);
-        System.out.println("Width: " + (largestX - smallestX));
-        System.out.println("Height: " + (largestY - smallestY));
-        System.out.println("Viewport width: " + viewport.getWidth());
-        System.out.println("Viewport height: " + viewport.getHeight());
-        int width = largestX - smallestX;
-        int height = largestY - smallestY;
-        Zoomer zoomer = drawingSurface().getZoomController();
-        double currentZoomFactor = zoomer.getPercent() * 0.01;
-        double xZoomFactor = (double) viewport.getWidth() / width;
-        double yZoomFactor = (double) viewport.getHeight() / height;
-        double zoomFactor = Math.min(xZoomFactor, yZoomFactor);
-        int zoomPercent = (int) (zoomFactor * 100);
-
-        System.out.println("currentZoomFactor: " + currentZoomFactor);
-        System.out.println("xZoomFactor: " + xZoomFactor);
-        System.out.println("yZoomFactor: " + yZoomFactor);
-        System.out.println("Zoom factor: " + zoomFactor);
-        System.out.println("Zoom percent: " + zoomPercent);
-        app.ifPresent(e -> e.updateZoomSlider(zoomPercent)); 
-        
-        drawingSurface().updatePreferredSize();
     }
 
     @Override
