@@ -262,7 +262,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-    private final GuiAction fitToScreenAction = new GuiAction(FIT_TO_SCREEN_NAME, FIT_TO_SCREEN_TOOLTIP, KeyStroke.getKeyStroke('F', shortcutkey)) {
+    private final GuiAction fitToScreenAction = new GuiAction(FIT_TO_SCREEN_NAME, FIT_TO_SCREEN_TOOLTIP, KeyStroke.getKeyStroke('F', shortcutkey | InputEvent.SHIFT_DOWN_MASK)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(o -> {
                 if (!o.isAlreadyFitToScreen()) {
