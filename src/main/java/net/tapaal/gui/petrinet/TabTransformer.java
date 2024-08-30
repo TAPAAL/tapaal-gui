@@ -208,18 +208,10 @@ public class TabTransformer {
         }
     }
 
-    public static void convertQueriesToNonSmc(Iterable<TAPNQuery> queries) {
-        // F -> EF
-        // G -> EG
-        for (TAPNQuery query : queries) {
-            TCTLAbstractProperty property = query.getProperty();
-            query.setProperty(smcConverter(property));
-        }
-    }
-
-    public static void convertQueriesToSmc(Iterable<TAPNQuery> queries) {
-        // EF -> F
-        // EG -> G
+    /**
+     * Converts between SMC and reachability queries
+     */
+    public static void convertQueriesToOrFromSmc(Iterable<TAPNQuery> queries) {
         for (TAPNQuery query : queries) {
             TCTLAbstractProperty property = query.getProperty();
             query.setProperty(smcConverter(property));
@@ -231,10 +223,14 @@ public class TabTransformer {
         if (property instanceof LTLFNode) {
             return new TCTLEFNode(child);
         } else if (property instanceof LTLGNode) {
-            return new TCTLEGNode(child);
+            return new TCTLAGNode(child);
         } else if (property instanceof TCTLEFNode) {
             return new LTLFNode(child);
         }  else if (property instanceof TCTLEGNode) {
+            return new LTLGNode(child);
+        } else if (property instanceof TCTLAFNode) {
+            return new LTLFNode(child);
+        } else if (property instanceof TCTLAGNode) {
             return new LTLGNode(child);
         } else if (property instanceof TCTLAndListNode) {
             TCTLAndListNode andNode = (TCTLAndListNode) property;
