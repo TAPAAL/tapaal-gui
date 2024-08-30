@@ -73,7 +73,7 @@ public class ConstantsParser {
         for (ColorType ct : network.colorTypes()) {
             List<String> messagesList = new ArrayList<String>();
             constantsMap.put(ct.getName(), ct);
-            constantsBitMap.put(ct.getName(), network.canColorTypeBeRemoved(dot, messagesList));
+            constantsBitMap.put(ct.getName(), network.canColorTypeBeRemoved(ct, messagesList));
             messages.put(ct.getName(), messagesList);
         }
 
@@ -86,6 +86,7 @@ public class ConstantsParser {
 
         // Generate error messages
         for (String key : constantsBitMap.keySet()) {
+            System.out.println(key);
             if (constants.containsKey(key) || 
                 colorTypes.containsKey(key) || 
                 variables.containsKey(key) ||
