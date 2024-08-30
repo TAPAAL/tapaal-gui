@@ -65,19 +65,28 @@ import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
+import javax.swing.event.ChangeListener;
+
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
+import java.awt.Component;
+
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.Font;
+import java.awt.Toolkit;
 import java.io.*;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.*;
 
 public class PetriNetTab extends JSplitPane implements TabActions {
@@ -1100,6 +1109,22 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public void zoomTo(int newZoomLevel) {
 		boolean didZoom = drawingSurface().getZoomController().setZoom(newZoomLevel);
 		if (didZoom) {
+            app.ifPresent(gfa -> {
+                JSlider zoomSlider = gfa.getZoomSlider();
+
+                // Remove change listeners to avoid recursive calls
+                ChangeListener[] listeners = zoomSlider.getChangeListeners();
+                for (ChangeListener listener : listeners) {
+                    zoomSlider.removeChangeListener(listener);
+                }
+
+                zoomSlider.setValue(newZoomLevel);
+
+                for (ChangeListener listener : listeners) {
+                    zoomSlider.addChangeListener(listener);
+                }
+            });
+            
 			drawingSurface().zoomToMidPoint(); //Do Zoom
 		}
 	}

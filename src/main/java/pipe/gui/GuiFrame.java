@@ -915,9 +915,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(o -> o.zoomTo(newZoomLevel));
             zoomSlider.setToolTipText("Zoom: " + newZoomLevel + "%");
         });
-
+        
         SwingHelper.setPreferredWidth(zoomSlider, zoomSliderDimension.width);
         toolBar.add(zoomSlider);
+    }
+
+    @Override
+    public JSlider getZoomSlider() {
+        return zoomSlider;
     }
 
     private JCheckBoxMenuItem addCheckboxMenuItem(JMenu menu, Action action) {
