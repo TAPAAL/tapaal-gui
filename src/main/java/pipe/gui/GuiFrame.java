@@ -69,6 +69,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final JComboBox<String> gameFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
     private final JComboBox<String> colorFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
 
+    private static final String FIT_TO_SCREEN_NAME = "Fit to screen";
+    private static final String FIT_TO_SCREEN_TOOLTIP = "Fit the net to the screen";
+    private static final String FIT_TO_SCREEN_ICON = "Fit to screen.png";
+
     private JSlider zoomSlider;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -258,9 +262,21 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
 
-    private final GuiAction fitToScreenAction = new GuiAction("Fit to screen", "Fit the net to the screen", KeyStroke.getKeyStroke('F', shortcutkey)) {
+    private final GuiAction fitToScreenAction = new GuiAction(FIT_TO_SCREEN_NAME, FIT_TO_SCREEN_TOOLTIP, KeyStroke.getKeyStroke('F', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::fitToScreen);
+            currentTab.ifPresent(o -> {
+                if (!o.isAlreadyFitToScreen()) {
+                    o.fitToScreen();
+                    putValue(Action.NAME, "Restore zoom");
+                    putValue(Action.SHORT_DESCRIPTION, "Restore the zoom to 100%");
+                    putValue(Action.SMALL_ICON, ResourceManager.getIcon("Restore zoom.png"));
+                } else {
+                    zoomSlider.setValue(100);
+                    putValue(Action.NAME, FIT_TO_SCREEN_NAME);
+                    putValue(Action.SHORT_DESCRIPTION, FIT_TO_SCREEN_TOOLTIP);
+                    putValue(Action.SMALL_ICON, ResourceManager.getIcon(FIT_TO_SCREEN_ICON));
+                }
+            });
         }
     };
 
@@ -914,6 +930,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             int newZoomLevel = zoomSlider.getValue();
             currentTab.ifPresent(o -> o.zoomTo(newZoomLevel));
             zoomSlider.setToolTipText("Zoom: " + newZoomLevel + "%");
+            getCurrentTab().setIsAlreadyFitToScreen(false);
+            fitToScreenAction.putValue(Action.NAME, FIT_TO_SCREEN_NAME);
+            fitToScreenAction.putValue(Action.SHORT_DESCRIPTION, FIT_TO_SCREEN_TOOLTIP);
+            fitToScreenAction.putValue(Action.SMALL_ICON, ResourceManager.getIcon(FIT_TO_SCREEN_ICON));
         });
         
         SwingHelper.setPreferredWidth(zoomSlider, zoomSliderDimension.width);
