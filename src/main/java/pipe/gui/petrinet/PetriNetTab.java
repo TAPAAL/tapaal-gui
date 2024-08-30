@@ -1165,6 +1165,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     private void createNewAndConvertNonStochastic(){
         PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), lens.isColored(), false), "-nonstochastic");
         TabTransformer.removeDistributionInformation(tab);
+        TabTransformer.convertQueriesToNonSmc(tab.queries());
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
@@ -1245,6 +1246,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 }
             } else {
                 PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), lens.isColored(), true), "-stochastic");
+                TabTransformer.convertQueriesToSmc(tab.queries());
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
