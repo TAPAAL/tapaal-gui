@@ -1294,11 +1294,11 @@ public class QueryDialog extends JPanel {
         if (lens.isTimed()) {
             for (EngineSupportOptions engine : engineSupportOptions) {
                 if (engine.areOptionsSupported(queryOptions)) {
-                    if (engine.nameString.equals(name_verifyTAPN) && lens.isStochastic()) {
+                    if (engine.getNameString().equals(name_verifyTAPN) && lens.isStochastic()) {
                         continue;
                     }
 
-                    options.add(engine.nameString);
+                    options.add(engine.getNameString());
                 }
             }
         } else {

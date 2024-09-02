@@ -34,6 +34,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.RunningVerificationDialog;
 import pipe.gui.petrinet.PetriNetTab;
 
@@ -213,8 +214,11 @@ public class TabTransformer {
      */
     public static void convertQueriesToOrFromSmc(Iterable<TAPNQuery> queries) {
         for (TAPNQuery query : queries) {
+            boolean isSmc = query.getCategory().equals(QueryCategory.SMC);
             TCTLAbstractProperty property = query.getProperty();
             query.setProperty(smcConverter(property));
+            query.setCategory(isSmc ? QueryCategory.CTL : QueryCategory.SMC);
+            query.setSmcSettings(SMCSettings.Default());
         }  
     }
 

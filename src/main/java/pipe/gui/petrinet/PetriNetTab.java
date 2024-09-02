@@ -199,7 +199,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         return loader.loadLens(file);
     }
 
-    public static void checkQueries(PetriNetTab tab) {
+    private static void checkQueries(PetriNetTab tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<>();
         boolean gameChanged = false;
 
@@ -232,7 +232,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
                 q.hasUntimedOnlyProperties(),
                 tab.lens.isColored(),
-                tab.lens.isColored() && !tab.lens.isTimed(), q.getCategory() == TAPNQuery.QueryCategory.SMC
+                tab.lens.isColored() && !tab.lens.isTimed(), 
+                smcQuery
             };
 
             boolean hasEngine = tab.checkCurrentEngine(q.getReductionOption(), queryOptions);
