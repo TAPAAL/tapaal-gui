@@ -1,17 +1,21 @@
 package pipe.gui;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.*;
@@ -46,10 +50,6 @@ import pipe.gui.petrinet.editor.EditorFocusTraversalPolicy;
 
 
 public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameActions {
-
-    // for zoom combobox and dropdown
-    private final int[] zoomLevels = {40, 60, 80, 100, 120, 140, 160, 180, 200, 300};
-
     private final String frameTitle;
 
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
@@ -69,7 +69,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final JComboBox<String> gameFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
     private final JComboBox<String> colorFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
 
-    private JComboBox<String> zoomComboBox;
+    private static final String FIT_TO_SCREEN_NAME = "Fit to screen";
+    private static final String FIT_TO_SCREEN_TOOLTIP = "Fit the net to the screen";
+    private static final String FIT_TO_SCREEN_ICON = "Fit to screen.png";
+
+    private JSlider zoomSlider;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
@@ -257,13 +261,22 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabActions::zoomIn);
         }
     };
-    private final GuiAction zoomToAction = new GuiAction("Zoom", "Select zoom percentage ", "") {
-        public void actionPerformed(ActionEvent e) {
-            String selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
-            //parse selected zoom level, and strip of %.
-            int newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%", ""));
 
-            currentTab.ifPresent(o -> o.zoomTo(newZoomLevel));
+    private final GuiAction fitToScreenAction = new GuiAction(FIT_TO_SCREEN_NAME, FIT_TO_SCREEN_TOOLTIP, KeyStroke.getKeyStroke('F', shortcutkey | InputEvent.SHIFT_DOWN_MASK)) {
+        public void actionPerformed(ActionEvent e) {
+            currentTab.ifPresent(o -> {
+                if (!o.isAlreadyFitToScreen()) {
+                    o.fitToScreen();
+                    putValue(Action.NAME, "Restore zoom");
+                    putValue(Action.SHORT_DESCRIPTION, "Restore the zoom to 100%");
+                    putValue(Action.SMALL_ICON, ResourceManager.getIcon("Restore zoom.png"));
+                } else {
+                    zoomSlider.setValue(100);
+                    putValue(Action.NAME, FIT_TO_SCREEN_NAME);
+                    putValue(Action.SHORT_DESCRIPTION, FIT_TO_SCREEN_TOOLTIP);
+                    putValue(Action.SMALL_ICON, ResourceManager.getIcon(FIT_TO_SCREEN_ICON));
+                }
+            });
         }
     };
 
@@ -474,8 +487,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JCheckBoxMenuItem showTokenAgeCheckBox;
     private JCheckBoxMenuItem showDelayEnabledTransitionsCheckbox;
     private JCheckBoxMenuItem showColoredTokensCheckbox;
-
-    private JMenu zoomMenu;
 
     public GuiFrame(String title) {
         // HAK-arrange for frameTitle to be initialized and the default file
@@ -693,15 +704,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         viewMenu = new JMenu("View");
         viewMenu.setMnemonic('V');
 
-        zoomMenu = new JMenu("Zoom");
-        zoomMenu.setIcon(ResourceManager.getIcon("Zoom.png"));
-
-        addZoomMenuItems(zoomMenu);
-
         viewMenu.add(zoomInAction);
 
         viewMenu.add(zoomOutAction);
-        viewMenu.add(zoomMenu);
+
+        viewMenu.add(fitToScreenAction);
 
         viewMenu.addSeparator();
 
@@ -875,8 +882,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // Zoom
         toolBar.addSeparator();
         toolBar.add(zoomOutAction).setRequestFocusEnabled(false);
-        addZoomComboBox(toolBar, zoomToAction);
+        addZoomSlider(toolBar);
         toolBar.add(zoomInAction).setRequestFocusEnabled(false);
+        toolBar.add(fitToScreenAction).setRequestFocusEnabled(false);
 
         // Modes
 
@@ -913,37 +921,28 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         getContentPane().add(toolBarPaneltmp, BorderLayout.PAGE_START);
     }
 
-    private void addZoomMenuItems(JMenu zoomMenu) {
-        for (int i = 0; i <= zoomLevels.length - 1; i++) {
-
-            final int zoomper = zoomLevels[i];
-            GuiAction newZoomAction = new GuiAction(zoomLevels[i] + "%", "Select zoom percentage", "") {
-                public void actionPerformed(ActionEvent e) {
-                    currentTab.ifPresent(o -> o.zoomTo(zoomper));
-                }
-            };
-
-            zoomMenu.add(newZoomAction);
-        }
+    private void addZoomSlider(JToolBar toolBar) {
+        Dimension zoomSliderDimension = new Dimension(100, 28);
+        zoomSlider = new JSlider(Constants.ZOOM_MIN, Constants.ZOOM_MAX, 100);
+        zoomSlider.setMajorTickSpacing(50);
+        zoomSlider.setToolTipText("Zoom: " + zoomSlider.getValue() + "%");
+        zoomSlider.addChangeListener(e -> {
+            int newZoomLevel = zoomSlider.getValue();
+            currentTab.ifPresent(o -> o.zoomTo(newZoomLevel));
+            zoomSlider.setToolTipText("Zoom: " + newZoomLevel + "%");
+            getCurrentTab().setIsAlreadyFitToScreen(false);
+            fitToScreenAction.putValue(Action.NAME, FIT_TO_SCREEN_NAME);
+            fitToScreenAction.putValue(Action.SHORT_DESCRIPTION, FIT_TO_SCREEN_TOOLTIP);
+            fitToScreenAction.putValue(Action.SMALL_ICON, ResourceManager.getIcon(FIT_TO_SCREEN_ICON));
+        });
+        
+        SwingHelper.setPreferredWidth(zoomSlider, zoomSliderDimension.width);
+        toolBar.add(zoomSlider);
     }
 
-    private void addZoomComboBox(JToolBar toolBar, Action action) {
-        Dimension zoomComboBoxDimension = new Dimension(100, 28);
-
-        String[] zoomExamplesStrings = new String[zoomLevels.length];
-        int i;
-        for (i = 0; i < zoomLevels.length; i++) {
-            zoomExamplesStrings[i] = zoomLevels[i] + "%";
-        }
-
-        zoomComboBox = new JComboBox<>(zoomExamplesStrings);
-        zoomComboBox.setEditable(true);
-        zoomComboBox.setSelectedItem("100%");
-        zoomComboBox.setMaximumRowCount(zoomLevels.length);
-        SwingHelper.setPreferredWidth(zoomComboBox,zoomComboBoxDimension.width);
-        zoomComboBox.setAction(action);
-        zoomComboBox.setFocusable(false);
-        toolBar.add(zoomComboBox);
+    @Override
+    public JSlider getZoomSlider() {
+        return zoomSlider;
     }
 
     private JCheckBoxMenuItem addCheckboxMenuItem(JMenu menu, Action action) {
@@ -1112,8 +1111,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // View
         zoomInAction.setEnabled(enable);
         zoomOutAction.setEnabled(enable);
-        zoomComboBox.setEnabled(enable);
-        zoomMenu.setEnabled(enable);
+        zoomSlider.setEnabled(enable);
+        fitToScreenAction.setEnabled(enable);
 
         decSpacingAction.setEnabled(enable);
         incSpacingAction.setEnabled(enable);
@@ -1142,6 +1141,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // Tools
         netStatisticsAction.setEnabled(enable);
 
+    }
+
+    @Override
+    public void updateZoomSlider(int zoom) {
+        zoomSlider.setValue(zoom);
     }
 
     // set tabbed pane properties and add change listener that updates tab with
@@ -1449,19 +1453,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     @Override
     public void setRedoActionEnabled(boolean flag) {
         redoAction.setEnabled(flag);
-    }
-
-    /**
-     * @author Ben Kirby Remove the listener from the zoomComboBox, so that when
-     * the box's selected item is updated to keep track of ZoomActions
-     * called from other sources, a duplicate ZoomAction is not called
-     */
-    @Override
-    public void updateZoomCombo(int zoom) {
-        ActionListener zoomComboListener = (zoomComboBox.getActionListeners())[0];
-        zoomComboBox.removeActionListener(zoomComboListener);
-        zoomComboBox.setSelectedItem(zoom + "%");
-        zoomComboBox.addActionListener(zoomComboListener);
     }
 
     private JMenu buildMenuFiles() {

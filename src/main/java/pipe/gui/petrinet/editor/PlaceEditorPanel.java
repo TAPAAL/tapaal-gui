@@ -36,8 +36,6 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.awt.*;
@@ -715,6 +713,10 @@ public class PlaceEditorPanel extends JPanel {
 		context.network().buildConstraints();
 
         doOKChecked = true;
+        
+        if (context.undoManager().currentEditIsEmpty()) {
+            context.undoManager().removeCurrentEdit();
+        }
 
         return true;
 	}
@@ -730,7 +732,7 @@ public class PlaceEditorPanel extends JPanel {
         } else {
             int oldTokenCount = place.underlyingPlace().numberOfTokens();
             ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
-            ArrayList<TimedToken> oldTokenList = new ArrayList(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
+            ArrayList<TimedToken> oldTokenList = new ArrayList<>(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
             List<ColoredTimeInvariant> ctiList = new ArrayList<>();
             Vector<ArcExpression> v = new Vector<>();
 
@@ -755,9 +757,21 @@ public class PlaceEditorPanel extends JPanel {
             if (!colorType.equals(place.underlyingPlace().getColorType())) {
                 updateArcsAccordingToColorType();
             }
-            Command command = new ColoredPlaceMarkingEditCommand(oldTokenList, tokensToAdd, originalExpression, newExpression, context, place, ctiList, colorType, oldTokenCount, place.underlyingPlace().numberOfTokens());
-            command.redo();
-            context.undoManager().addEdit(command);
+
+            TimedPlace underlyingPlace = place.underlyingPlace();
+
+            boolean anyChanges = !underlyingPlace.getCtiList().equals(ctiList) ||
+                                 !underlyingPlace.getColorType().equals(colorType) ||
+                                 !oldTokenList.equals(tokensToAdd) ||
+                                 originalExpression != null &&
+                                 !originalExpression.equals(newExpression) ||
+                                 !(oldTokenCount == underlyingPlace.numberOfTokens());
+
+            if (anyChanges) { 
+                Command command = new ColoredPlaceMarkingEditCommand(oldTokenList, tokensToAdd, originalExpression, newExpression, context, place, ctiList, colorType, oldTokenCount, place.underlyingPlace().numberOfTokens());
+                command.redo();
+                context.undoManager().addEdit(command);
+            }
         }
     }
 
