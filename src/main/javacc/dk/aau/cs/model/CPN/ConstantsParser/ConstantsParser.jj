@@ -86,17 +86,30 @@ public class ConstantsParser {
 
         // Generate error messages
         for (String key : constantsBitMap.keySet()) {
-            System.out.println(key);
             if (constants.containsKey(key) || 
-                colorTypes.containsKey(key) || 
                 variables.containsKey(key) ||
                 key.equals("dot")) {
                 continue;
             }
 
+            if (colorTypes.containsKey(key) && 
+                colorTypes.get(key).equals(constantsMap.get(key))) {
+                continue;
+            }
+
             Object obj = constantsMap.get(key);
             if (!constantsBitMap.get(key)) {
-                String message = "Could not remove ";
+                String message = "Could not ";
+                String title = "Could not ";
+                if (obj instanceof ColorType && 
+                    colorTypes.containsKey(key)) {
+                    message += "modify ";
+                    title += "modify constant";
+                } else {
+                    message += "remove ";
+                    title += "remove constant";
+                }
+
                 if (obj instanceof ColorType) {
                     message += "color type";
                 } else if (obj instanceof Variable) {
@@ -114,7 +127,7 @@ public class ConstantsParser {
                     message += " because it is in use";
                 }
 
-                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove constant", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, title, JOptionPane.WARNING_MESSAGE);
 
                 return false;
             }
