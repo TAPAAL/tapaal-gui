@@ -2051,38 +2051,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     int newY = (int)(((PlaceTransitionObject)obj).getCenter().getY() * factor);
                     Point newLocation = new Point(newX, newY);
                     if (quadtree.containsWithin(newLocation, minimumDistance)) return;
-
-                    if (obj instanceof Transition) {
-                        final int nodePointDistance = 15;
-
-                        for (Arc arc : ((PlaceTransitionObject)obj).getPreset()) {
-                            for (ArcPathPoint point : arc.getArcPath().getArcPathPoints()) {
-                                if (point.isEndPoint()) continue;
-                                int newPointX = (int)(point.getPoint().x * factor);
-                                int newPointY = (int)(point.getPoint().y * factor);
-                                Point newPointLocation = new Point(newPointX, newPointY);
-                                if (quadtree.containsWithin(newPointLocation, nodePointDistance)) return;
-                                quadtree.insert(newPointLocation);
-                            }
-                        }
-
-                        for (Arc arc : ((PlaceTransitionObject)obj).getPostset()) {
-                            for (ArcPathPoint point : arc.getArcPath().getArcPathPoints()) {
-                                if (point.isEndPoint()) continue;
-                                int newPointX = (int)(point.getPoint().x * factor);
-                                int newPointY = (int)(point.getPoint().y * factor);
-                                Point newPointLocation = new Point(newPointX, newPointY);
-                                if (quadtree.containsWithin(newPointLocation, nodePointDistance)) return;
-                                quadtree.insert(newPointLocation);
-                            }
-                        }
-                    }
-
                     quadtree.insert(newLocation);
                 }
             }
         }
 
+        Map<PlaceTransitionObject, Point> locations = new HashMap<>();
 		for (PetriNetObject obj : this.currentTemplate().guiModel().getPetriNetObjects()){
 			if (obj instanceof PlaceTransitionObject){
                 PlaceTransitionObject pno = (PlaceTransitionObject) obj;
@@ -2092,6 +2066,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 int newCenterY = (int)(center.getY() * factor);
        
 				pno.setCenter(newCenterX, newCenterY);
+                locations.put(pno, new Point(newCenterX, newCenterY));
 
 				if (pno instanceof Transition) {
                     for (Arc arc : pno.getPreset()) {
@@ -2099,7 +2074,14 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                             int newX = (int)(point.getPoint().x * factor);
                             int newY = (int)(point.getPoint().y * factor);
 
-							point.setPointLocation(newX, newY);
+                            int offsetX = point.getPoint().x - newX > 0 ? Grid.getGridSpacing() : -Grid.getGridSpacing();
+                            int offsetY = point.getPoint().y - newY > 0 ? Grid.getGridSpacing() : -Grid.getGridSpacing();
+                            while (locations.containsValue(new Point(newX, newY))) {
+                                newX += offsetX;
+                                newY += offsetY;
+                            }
+
+                            point.setPointLocation(newX, newY);   
 						}
 					}
 
