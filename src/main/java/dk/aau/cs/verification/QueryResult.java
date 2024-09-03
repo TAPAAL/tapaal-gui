@@ -122,10 +122,11 @@ public class QueryResult {
                     "steps " + "&le; " + stepBound +
                     ((isQuantitative()) ?
                         "<br/>Confidence level: " + (query.getSMCSettings().confidence * 100) + "%" :
+                        (query.getSMCSettings().compareToFloat) ?
                         "<br/>Probability of false positive: " + query.getSMCSettings().falsePositives +
                         "<br/>Probability of false negative: " + query.getSMCSettings().falseNegatives +
                         "<br/>Indifference region: [" + (query.getSMCSettings().geqThan - query.getSMCSettings().indifferenceWidth) +
-                        ";" +  (query.getSMCSettings().geqThan + query.getSMCSettings().indifferenceWidth) + "]"
+                        ";" +  (query.getSMCSettings().geqThan + query.getSMCSettings().indifferenceWidth) + "]" : ""
                     );
         } else {
             return boundednessAnalysis.toString();
