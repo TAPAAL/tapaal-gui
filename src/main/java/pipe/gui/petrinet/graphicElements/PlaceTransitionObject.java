@@ -198,14 +198,14 @@ public abstract class PlaceTransitionObject extends PetriNetObjectWithLabel {
 	}
 
 	/** Sets the center of the component to position x, y */
-	public void setCentre(int x, int y) {
-		setPositionX((int) Math.round(x - (getWidth() / 2.0)));
-		setPositionY((int) Math.round(y - (getHeight() / 2.0)));
-		update(true);
+	public void setCenter(int x, int y) {
+		setPositionX((int)Math.round(x - (componentWidth / 2.0)));
+		setPositionY((int)Math.round(y - (componentHeight / 2.0)));
+		updateOnMoveOrZoom();   
 	}
 
-    public Point2D.Double getCentre() {
-        return new Point2D.Double(positionX + getWidth() / 2.0, positionY + getHeight() / 2.0);
+    public Point2D.Double getCenter() {
+        return new Point2D.Double(positionX + componentWidth / 2.0, positionY + componentHeight / 2.0);
     }
 
 	public void update(boolean displayConstantNames) {

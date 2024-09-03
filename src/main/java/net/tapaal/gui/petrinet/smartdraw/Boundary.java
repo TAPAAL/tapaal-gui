@@ -2,9 +2,12 @@ package net.tapaal.gui.petrinet.smartdraw;
 import java.awt.Point;
 
 public class Boundary {
+    public static final int DEFAULT_HALF_DIMENSION = 10000;
+    public static final Point DEFAULT_CENTER = new Point(0, 0);
+
     private final Point center;
     private int halfDimension;
-
+    
     public Boundary(Point center, int halfDimension) {
         this.halfDimension = Math.max(halfDimension, 1);
         this.center = center;

@@ -9,7 +9,7 @@ import javax.swing.SwingWorker;
 
 import net.tapaal.gui.petrinet.undo.UpdateNameLabelOffsetCommand;
 import net.tapaal.gui.petrinet.undo.Command;
-import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
+import net.tapaal.gui.petrinet.undo.MovePetriNetObjectCommand;
 import dk.aau.cs.util.Require;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
@@ -36,7 +36,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 
     ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
-	final QuadTree pointsReserved = new QuadTree(new Boundary(new Point(0,0), halfDimension), true);
+	final Quadtree pointsReserved = new Quadtree();
 	final UndoManager undoManager;
 	
 	//weights
@@ -223,7 +223,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		return arcsForObject;
 	}
 	private void moveObject(PlaceTransitionObject object, Point point) {
-		Command command = new MovePlaceTransitionObjectCommand(object, point, drawingSurface);
+		Command command = new MovePetriNetObjectCommand(object, point, drawingSurface);
 		undoManager.addEdit(command);
 		command.redo();
 	}
