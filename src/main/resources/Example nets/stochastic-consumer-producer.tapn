@@ -61,22 +61,6 @@
         </structure>
       </type>
     </place>
-    <place displayName="true" id="PickedByConvenient" initialMarking="0" invariant="&lt; inf" name="PickedByConvenient" nameOffsetX="71" nameOffsetY="-21" positionX="765" positionY="120">
-      <type>
-        <text>dot</text>
-        <structure>
-          <usersort declaration="dot"/>
-        </structure>
-      </type>
-    </place>
-    <place displayName="true" id="PickedByPicky" initialMarking="0" invariant="&lt; inf" name="PickedByPicky" nameOffsetX="58" nameOffsetY="48" positionX="765" positionY="270">
-      <type>
-        <text>dot</text>
-        <structure>
-          <usersort declaration="dot"/>
-        </structure>
-      </type>
-    </place>
     <transition a="1.0" angle="0" b="2.0" displayName="true" distribution="uniform" firingMode="Oldest" id="Recover" infiniteServer="false" name="Recover" nameOffsetX="63" nameOffsetY="-38" player="0" positionX="75" positionY="195" priority="0" urgent="false" weight="1.0"/>
     <transition angle="0" displayName="true" distribution="normal" firingMode="Oldest" id="Produce" infiniteServer="false" mean="2.5" name="Produce" nameOffsetX="98" nameOffsetY="-31" player="0" positionX="285" positionY="195" priority="0" stddev="0.5" urgent="false" weight="1.0"/>
     <transition angle="0" displayName="true" distribution="exponential" firingMode="Random" id="ConvenientCustomer" infiniteServer="false" name="ConvenientCustomer" nameOffsetX="84" nameOffsetY="-32" player="0" positionX="615" positionY="120" priority="0" rate="0.2" urgent="false" weight="1.0"/>
@@ -253,47 +237,9 @@
       <arcpath arcPointType="false" id="0" xCoord="450" yCoord="330"/>
       <arcpath arcPointType="false" id="1" xCoord="450" yCoord="405"/>
     </arc>
-    <arc id="A10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="ConvenientCustomer" target="PickedByConvenient" type="normal" weight="1">
-      <hlinscription>
-        <text>1'dot</text>
-        <structure>
-          <numberof>
-            <subterm>
-              <numberconstant value="1">
-                <positive/>
-              </numberconstant>
-            </subterm>
-            <subterm>
-              <useroperator declaration="dot"/>
-            </subterm>
-          </numberof>
-        </structure>
-      </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="635" yCoord="135"/>
-      <arcpath arcPointType="false" id="1" xCoord="765" yCoord="135"/>
-    </arc>
-    <arc id="A11" inscription="1" nameOffsetX="0" nameOffsetY="0" source="PickyCustomer" target="PickedByPicky" type="normal" weight="1">
-      <hlinscription>
-        <text>1'dot</text>
-        <structure>
-          <numberof>
-            <subterm>
-              <numberconstant value="1">
-                <positive/>
-              </numberconstant>
-            </subterm>
-            <subterm>
-              <useroperator declaration="dot"/>
-            </subterm>
-          </numberof>
-        </structure>
-      </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="635" yCoord="285"/>
-      <arcpath arcPointType="false" id="1" xCoord="765" yCoord="285"/>
-    </arc>
   </net>
   <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Overflow ?" numberOfTraces="1" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="Any" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Quantitative">
-    <smc confidence="0.95" interval-width="0.01" time-bound="1000"/>
+    <smc confidence="0.95" interval-width="0.05" time-bound="1000"/>
     <formula>
       <globally>
         <integer-le>
@@ -319,7 +265,7 @@
     </formula>
   </query>
   <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="TooMuchWaste" numberOfTraces="1" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="Any" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Quantitative">
-    <smc confidence="0.95" interval-width="0.01" time-bound="1000"/>
+    <smc confidence="0.95" interval-width="0.05" time-bound="1000"/>
     <formula>
       <finally>
         <integer-ge>
