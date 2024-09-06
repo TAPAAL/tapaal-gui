@@ -629,6 +629,7 @@ public class PlaceEditorPanel extends JPanel {
 				command.redo();
 			}catch(RequireException e){
 				context.undoManager().undo();
+                doNewEdit = true;
 				JOptionPane.showMessageDialog(this,"Another place in the same component is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}		
@@ -644,6 +645,7 @@ public class PlaceEditorPanel extends JPanel {
 			String oldName = place.underlyingPlace().name();
 			if(context.activeModel().isNameUsed(newName) && !oldName.equals(newName)){
 				context.undoManager().undo(); 
+                doNewEdit = true;
 				JOptionPane.showMessageDialog(this, "The specified name is already used by another place or transition.", "Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
@@ -655,6 +657,7 @@ public class PlaceEditorPanel extends JPanel {
                     renameCommand.redo();
                 } catch (RequireException e) {
                     context.undoManager().undo();
+                    doNewEdit = true;
                     JOptionPane.showMessageDialog(this, "Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
                     return false;
                 }
@@ -669,6 +672,7 @@ public class PlaceEditorPanel extends JPanel {
 					command.redo();
 				}catch(RequireException e){
 					context.undoManager().undo();
+                    doNewEdit = true;
 					//This is checked as a place cannot be shared if there exists a transition with the same name
 					if(context.activeModel().parentNetwork().isNameUsedForPlacesOnly(newName)) {
 						int dialogResult = JOptionPane.showConfirmDialog(this, "A place with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\nThis place name will be changed into shared one also in all other components.", "Error", JOptionPane.OK_CANCEL_OPTION);

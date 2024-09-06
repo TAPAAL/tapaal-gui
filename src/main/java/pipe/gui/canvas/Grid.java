@@ -55,6 +55,10 @@ public class Grid {
 		gridSpacing = (spacing * Constants.PLACE_TRANSITION_HEIGHT);
 	}
 
+    public static int getGridSpacing() {
+        return (int)gridSpacing;
+    }
+
 	public static void disableGrid() {
 		if (enabled) {
 			enabled = false;

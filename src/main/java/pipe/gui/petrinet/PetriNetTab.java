@@ -9,6 +9,8 @@ import net.tapaal.gui.*;
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
+import net.tapaal.gui.petrinet.smartdraw.Boundary;
+import net.tapaal.gui.petrinet.smartdraw.Quadtree;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import net.tapaal.gui.petrinet.model.GuiModelManager;
 import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
@@ -36,7 +38,7 @@ import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel;
 
 import net.tapaal.gui.petrinet.undo.ChangeSpacingEditCommand;
 import net.tapaal.gui.petrinet.undo.Command;
-import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
+import net.tapaal.gui.petrinet.undo.MovePetriNetObjectCommand;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.*;
 import net.tapaal.gui.petrinet.widgets.QueryPane;
@@ -87,8 +89,12 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.io.*;
 import java.math.BigDecimal;
-import java.util.*;
-
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Arrays;
 public class PetriNetTab extends JSplitPane implements TabActions {
     
     final AbstractDrawingSurfaceManager notingManager = new AbstractDrawingSurfaceManager(){
@@ -1635,14 +1641,49 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         ArrayList<PetriNetObject> petriNetObjects = drawingSurface.getGuiModel().getPlaceTransitionObjects();
         undoManager.newEdit();
 
+        Quadtree quadtree = new Quadtree();
+        final int minimumDistance = 45;
+        for (PetriNetObject object : petriNetObjects) {
+            int x = Grid.align(object.getPositionX(), drawingSurface.getZoom());
+            int y = Grid.align(object.getPositionY(), drawingSurface.getZoom());
+            Point point = new Point(x, y);
+
+            if (quadtree.containsWithin(point, minimumDistance)) return;
+            quadtree.insert(point);
+        }
+
         for (PetriNetObject object : petriNetObjects) {
             PlaceTransitionObject ptobject = (PlaceTransitionObject) object;
             int x = Grid.align(ptobject.getPositionX(), drawingSurface.getZoom());
             int y = Grid.align(ptobject.getPositionY(), drawingSurface.getZoom());
             Point point = new Point(x, y);
-            Command command = new MovePlaceTransitionObjectCommand(ptobject, point, drawingSurface);
+            Command command = new MovePetriNetObjectCommand(ptobject, point, drawingSurface);
             command.redo();
+
+            if (object instanceof Transition) {
+                for (Arc arc : ((PlaceTransitionObject) object).getPreset()) {
+                    for (ArcPathPoint arcPathPoint : arc.getArcPath().getArcPathPoints()) {
+                        x = Grid.align(arcPathPoint.getPositionX(), drawingSurface.getZoom());
+                        y = Grid.align(arcPathPoint.getPositionY(), drawingSurface.getZoom());
+                        point = new Point(x, y);
+                        Command pathCommand = new MovePetriNetObjectCommand(arcPathPoint, point, drawingSurface);
+                        pathCommand.redo();
+                    }
+                }
+
+                for (Arc arc : ((PlaceTransitionObject) object).getPostset()) {
+                    for (ArcPathPoint arcPathPoint : arc.getArcPath().getArcPathPoints()) {
+                        x = Grid.align(arcPathPoint.getPositionX(), drawingSurface.getZoom());
+                        y = Grid.align(arcPathPoint.getPositionY(), drawingSurface.getZoom());
+                        point = new Point(x, y);
+                        Command pathCommand = new MovePetriNetObjectCommand(arcPathPoint, point, drawingSurface);
+                        pathCommand.redo();
+                    }
+                }
+            }
+
             undoManager.addEdit(command);
+
             ptobject.updateOnMoveOrZoom();
         }
     }
@@ -2025,27 +2066,68 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		getUndoManager().addNewEdit(new ChangeSpacingEditCommand(factor, this));
 	}
 
-	public void changeSpacing(double factor){
-		for(PetriNetObject obj : this.currentTemplate().guiModel().getPetriNetObjects()){
-			if(obj instanceof PlaceTransitionObject){
-				obj.translate((int) (obj.getLocation().x*factor-obj.getLocation().x), (int) (obj.getLocation().y*factor-obj.getLocation().y));
+	public void changeSpacing(double factor) { 
+        if (factor < 1) {
+            Quadtree quadtree = new Quadtree();
+            final int minimumDistance = 45;
+            /* Precompute the distance between all objects after translation,
+            and check if they are within the minimum distance */
+            for (PetriNetObject obj : currentTemplate().guiModel().getPetriNetObjects()) {
+                if (obj instanceof PlaceTransitionObject) {
+                    int newX = (int)(((PlaceTransitionObject)obj).getCenter().getX() * factor);
+                    int newY = (int)(((PlaceTransitionObject)obj).getCenter().getY() * factor);
+                    Point newLocation = new Point(newX, newY);
+                    if (quadtree.containsWithin(newLocation, minimumDistance)) return;
+                    quadtree.insert(newLocation);
+                }
+            }
+        }
 
-				if(obj instanceof Transition){
-					for(Arc arc : ((PlaceTransitionObject) obj).getPreset()){
-						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
-							point.setPointLocation((int)Math.max(point.getPoint().x*factor, point.getWidth()), (int)Math.max(point.getPoint().y*factor, point.getHeight()));
+        Map<PlaceTransitionObject, Point> locations = new HashMap<>();
+		for (PetriNetObject obj : this.currentTemplate().guiModel().getPetriNetObjects()){
+			if (obj instanceof PlaceTransitionObject){
+                PlaceTransitionObject pno = (PlaceTransitionObject) obj;
+                Point2D center = pno.getCenter();
+
+                int newCenterX = (int)(center.getX() * factor);
+                int newCenterY = (int)(center.getY() * factor);
+       
+				pno.setCenter(newCenterX, newCenterY);
+                locations.put(pno, new Point(newCenterX, newCenterY));
+
+				if (pno instanceof Transition) {
+                    for (Arc arc : pno.getPreset()) {
+						for (ArcPathPoint point : arc.getArcPath().getArcPathPoints()) {
+                            int newX = (int)(point.getPoint().x * factor);
+                            int newY = (int)(point.getPoint().y * factor);
+
+                            int offsetX = point.getPoint().x - newX > 0 ? Grid.getGridSpacing() : -Grid.getGridSpacing();
+                            int offsetY = point.getPoint().y - newY > 0 ? Grid.getGridSpacing() : -Grid.getGridSpacing();
+                            while (locations.containsValue(new Point(newX, newY))) {
+                                newX += offsetX;
+                                newY += offsetY;
+                            }
+
+                            point.setPointLocation(newX, newY);   
 						}
 					}
-					for(Arc arc : ((PlaceTransitionObject) obj).getPostset()){
-						for(ArcPathPoint point : arc.getArcPath().getArcPathPoints()){
-							point.setPointLocation((int)Math.max(point.getPoint().x*factor, point.getWidth()), (int)Math.max(point.getPoint().y*factor, point.getHeight()));
+
+                    for (Arc arc : pno.getPostset()) {
+						for (ArcPathPoint point : arc.getArcPath().getArcPathPoints()) {
+                            int newX = (int)(point.getPoint().x * factor);
+                            int newY = (int)(point.getPoint().y * factor);
+
+							point.setPointLocation(newX, newY);
 						}
 					}
 				}
 
-				((PlaceTransitionObject) obj).update(true);
-			}else{
-				obj.setLocation((int) (obj.getLocation().x*factor), (int) (obj.getLocation().y*factor));
+				pno.update(true);
+			} else {
+                int newX = (int)(obj.getLocation().x * factor);
+                int newY = (int)(obj.getLocation().y * factor);
+              
+				obj.setLocation(newX, newY);
 			}
 		}
 
