@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <declaration>
+    <structure>
+      <declarations>
+        <namedsort id="dot" name="dot">
+          <dot/>
+        </namedsort>
+      </declarations>
+    </structure>
+  </declaration>
+  <net active="true" id="TAPN1" type="P/T net">
+    <place displayName="true" id="Ready" initialMarking="1" invariant="&lt; inf" name="Ready" nameOffsetX="32" nameOffsetY="-16" positionX="180" positionY="120">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+      <hlinitialMarking>
+        <text>(1'dot)</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <useroperator declaration="dot"/>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinitialMarking>
+    </place>
+    <place displayName="true" id="Resting" initialMarking="0" invariant="&lt; inf" name="Resting" nameOffsetX="37" nameOffsetY="43" positionX="180" positionY="270">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="Waiting" initialMarking="0" invariant="&lt; inf" name="Waiting" nameOffsetX="39" nameOffsetY="-19" positionX="435" positionY="195">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="Waste" initialMarking="0" invariant="&lt; inf" name="Waste" nameOffsetX="33" nameOffsetY="47" positionX="435" positionY="405">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="PickedByConvenient" initialMarking="0" invariant="&lt; inf" name="PickedByConvenient" nameOffsetX="71" nameOffsetY="-21" positionX="765" positionY="120">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="PickedByPicky" initialMarking="0" invariant="&lt; inf" name="PickedByPicky" nameOffsetX="58" nameOffsetY="48" positionX="765" positionY="270">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+    <transition a="1.0" angle="0" b="2.0" displayName="true" distribution="uniform" firingMode="Oldest" id="Recover" infiniteServer="false" name="Recover" nameOffsetX="63" nameOffsetY="-38" player="0" positionX="75" positionY="195" priority="0" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="normal" firingMode="Oldest" id="Produce" infiniteServer="false" mean="2.5" name="Produce" nameOffsetX="98" nameOffsetY="-31" player="0" positionX="285" positionY="195" priority="0" stddev="0.5" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="exponential" firingMode="Random" id="ConvenientCustomer" infiniteServer="false" name="ConvenientCustomer" nameOffsetX="84" nameOffsetY="-32" player="0" positionX="615" positionY="120" priority="0" rate="0.2" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="exponential" firingMode="Youngest" id="PickyCustomer" infiniteServer="false" name="PickyCustomer" nameOffsetX="69" nameOffsetY="43" player="0" positionX="615" positionY="270" priority="0" rate="0.5" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Oldest" id="Expiration" infiniteServer="false" name="Expiration" nameOffsetX="107" nameOffsetY="-1" player="0" positionX="435" positionY="300" priority="0" urgent="false" value="0.0" weight="Infinity"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Ready" target="Produce" type="timed" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="207" yCoord="144"/>
+      <arcpath arcPointType="false" id="1" xCoord="296" yCoord="206"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Produce" target="Resting" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="295" yCoord="216"/>
+      <arcpath arcPointType="false" id="1" xCoord="207" yCoord="276"/>
+    </arc>
+    <arc id="A2" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Resting" target="Recover" type="timed" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="183" yCoord="276"/>
+      <arcpath arcPointType="false" id="1" xCoord="95" yCoord="216"/>
+    </arc>
+    <arc id="A3" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Recover" target="Ready" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="96" yCoord="206"/>
+      <arcpath arcPointType="false" id="1" xCoord="183" yCoord="144"/>
+    </arc>
+    <arc id="A4" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Produce" target="Waiting" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="305" yCoord="210"/>
+      <arcpath arcPointType="false" id="1" xCoord="435" yCoord="210"/>
+    </arc>
+    <arc id="A8" inscription="[0,inf)" nameOffsetX="8" nameOffsetY="-18" source="Waiting" target="ConvenientCustomer" type="timed" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="464" yCoord="204"/>
+      <arcpath arcPointType="false" id="1" xCoord="625" yCoord="136"/>
+    </arc>
+    <arc id="A15" inscription="[3,8]" nameOffsetX="6" nameOffsetY="21" source="Waiting" target="PickyCustomer" type="timed" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="464" yCoord="216"/>
+      <arcpath arcPointType="false" id="1" xCoord="625" yCoord="286"/>
+    </arc>
+    <arc id="A7" inscription="[10,inf)" nameOffsetX="-2" nameOffsetY="-9" source="Waiting" target="Expiration" type="timed" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="450" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="450" yCoord="300"/>
+    </arc>
+    <arc id="A9" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Expiration" target="Waste" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="450" yCoord="330"/>
+      <arcpath arcPointType="false" id="1" xCoord="450" yCoord="405"/>
+    </arc>
+    <arc id="A10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="ConvenientCustomer" target="PickedByConvenient" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="635" yCoord="135"/>
+      <arcpath arcPointType="false" id="1" xCoord="765" yCoord="135"/>
+    </arc>
+    <arc id="A11" inscription="1" nameOffsetX="0" nameOffsetY="0" source="PickyCustomer" target="PickedByPicky" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="635" yCoord="285"/>
+      <arcpath arcPointType="false" id="1" xCoord="765" yCoord="285"/>
+    </arc>
+  </net>
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Overflow ?" numberOfTraces="1" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="Any" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Quantitative">
+    <smc confidence="0.95" interval-width="0.01" time-bound="1000"/>
+    <formula>
+      <globally>
+        <integer-le>
+          <tokens-count>
+            <place>TAPN1.Waiting</place>
+          </tokens-count>
+          <integer-constant>3</integer-constant>
+        </integer-le>
+      </globally>
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Overflow trace" numberOfTraces="3" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="Not satisfied" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Simulate">
+    <smc confidence="0.95" interval-width="0.05" time-bound="1000"/>
+    <formula>
+      <globally>
+        <integer-le>
+          <tokens-count>
+            <place>TAPN1.Waiting</place>
+          </tokens-count>
+          <integer-constant>3</integer-constant>
+        </integer-le>
+      </globally>
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="TooMuchWaste" numberOfTraces="1" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="Any" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Quantitative">
+    <smc confidence="0.95" interval-width="0.01" time-bound="1000"/>
+    <formula>
+      <finally>
+        <integer-ge>
+          <tokens-count>
+            <place>TAPN1.Waste</place>
+          </tokens-count>
+          <integer-constant>3</integer-constant>
+        </integer-ge>
+      </finally>
+    </formula>
+  </query>
+  <feature isColored="false" isGame="false" isStochastic="true" isTimed="true"/>
+</pnml>

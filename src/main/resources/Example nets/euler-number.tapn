@@ -10,7 +10,7 @@
     </structure>
   </declaration>
   <net active="true" id="Euler" type="P/T net">
-    <labels border="true" height="195" positionX="390" positionY="240" width="311">This simple stochastic Petri net uniformly samples delays between 0 and 1 and because of the transport arcs that do not reset the age of the token, the age of the token in "accumulated_time" represents the global time that has passed so far. As soon as this age reaches 1, the "timeout" transition fires.
+    <labels border="true" height="196" positionX="390" positionY="240" width="312">This simple stochastic Petri net uniformly samples delays between 0 and 1 and because of the transport arcs that do not reset the age of the token, the age of the token in "accumulated_time" represents the global time that has passed so far. As soon as this age reaches 1, the "timeout" transition fires.
 
 The query asks for the probability of placing a token to the place "finished" and it clearly converges to 1. 
 
@@ -52,27 +52,6 @@ The average number of steps before the place "finished" is marked converges to t
     </place>
     <transition a="0.0" angle="0" b="1.0" displayName="true" distribution="uniform" firingMode="Oldest" id="delay" infiniteServer="false" name="delay" nameOffsetX="56" nameOffsetY="50" player="0" positionX="240" positionY="300" priority="0" urgent="false" weight="1.0"/>
     <transition angle="0" displayName="true" distribution="constant" firingMode="Oldest" id="timeout" infiniteServer="false" name="timeout" nameOffsetX="53" nameOffsetY="-21" player="0" positionX="390" positionY="150" priority="0" urgent="false" value="0.0" weight="1.0"/>
-    <arc id="A0" inscription="[0,inf):1" nameOffsetX="0" nameOffsetY="0" source="delay" target="accumulated_time" transportID="1" type="transport" weight="1">
-      <hlinscription>
-        <text>1'dot</text>
-        <structure>
-          <numberof>
-            <subterm>
-              <numberconstant value="1">
-                <positive/>
-              </numberconstant>
-            </subterm>
-            <subterm>
-              <useroperator declaration="dot"/>
-            </subterm>
-          </numberof>
-        </structure>
-      </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="259" yCoord="315"/>
-      <arcpath arcPointType="false" id="1" xCoord="300" yCoord="270"/>
-      <arcpath arcPointType="true" id="2" xCoord="300" yCoord="210"/>
-      <arcpath arcPointType="false" id="3" xCoord="265" yCoord="175"/>
-    </arc>
     <arc id="A1" inscription="[0,inf):1" nameOffsetX="0" nameOffsetY="0" source="accumulated_time" target="delay" transportID="1" type="transport" weight="1">
       <hlinscription>
         <text>1'dot</text>
@@ -93,6 +72,27 @@ The average number of steps before the place "finished" is marked converges to t
       <arcpath arcPointType="false" id="1" xCoord="210" yCoord="210"/>
       <arcpath arcPointType="true" id="2" xCoord="210" yCoord="270"/>
       <arcpath arcPointType="false" id="3" xCoord="249" yCoord="315"/>
+    </arc>
+    <arc id="A0" inscription="[0,inf):1" nameOffsetX="0" nameOffsetY="0" source="delay" target="accumulated_time" transportID="1" type="transport" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="259" yCoord="315"/>
+      <arcpath arcPointType="false" id="1" xCoord="300" yCoord="270"/>
+      <arcpath arcPointType="true" id="2" xCoord="300" yCoord="210"/>
+      <arcpath arcPointType="false" id="3" xCoord="265" yCoord="175"/>
     </arc>
     <arc id="A2" inscription="[1,inf)" nameOffsetX="0" nameOffsetY="0" source="accumulated_time" target="timeout" type="timed" weight="1">
       <hlinscription>
@@ -133,8 +133,8 @@ The average number of steps before the place "finished" is marked converges to t
       <arcpath arcPointType="false" id="1" xCoord="555" yCoord="165"/>
     </arc>
   </net>
-  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Compute Euler number" numberOfTraces="5" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="Any" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Simulate">
-    <smc confidence="0.95" interval-width="0.05" time-bound="1000"/>
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Compute Euler number" numberOfTraces="5" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="Any" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Quantitative">
+    <smc confidence="0.95" interval-width="0.005" time-bound="1000"/>
     <formula>
       <finally>
         <integer-eq>
