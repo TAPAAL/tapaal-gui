@@ -67,7 +67,7 @@ public class ConstantsParser {
         // Populate maps with constants, color types and variables and if they can be removed
         for (Constant c : network.constants()) {
             constantsMap.put(c.name(), c);
-            constantsBitMap.put(c.name(), network.getConstantStore().isConstantInUse(c.name()));
+            constantsBitMap.put(c.name(), !network.getConstantStore().isConstantInUse(c.name()));
         }
 
         for (ColorType ct : network.colorTypes()) {
