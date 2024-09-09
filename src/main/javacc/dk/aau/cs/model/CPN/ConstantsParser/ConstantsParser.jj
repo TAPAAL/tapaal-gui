@@ -80,14 +80,15 @@ public class ConstantsParser {
         for (Variable v : network.variables()) {
             List<String> messagesList = new ArrayList<String>();
             constantsMap.put(v.getName(), v);
-            constantsBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList));
+            boolean canBeEdited = !(variables.containsKey(v.getName()) && !variables.get(v.getName()).getColorType().equals(v.getColorType()));
+            constantsBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList) && canBeEdited);
             messages.put(v.getName(), messagesList);
         }
 
         // Generate error messages
         for (String key : constantsBitMap.keySet()) {
             if (constants.containsKey(key) || 
-                variables.containsKey(key) ||
+                variables.containsKey(key) && constantsBitMap.get(key) ||
                 key.equals("dot")) {
                 continue;
             }
@@ -102,7 +103,9 @@ public class ConstantsParser {
                 String message = "Could not ";
                 String title = "Could not ";
                 if (obj instanceof ColorType && 
-                    colorTypes.containsKey(key)) {
+                    colorTypes.containsKey(key) ||
+                    obj instanceof Variable &&
+                    variables.containsKey(key)) {
                     message += "modify ";
                     title += "modify constant";
                 } else {
