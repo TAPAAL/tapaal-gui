@@ -2984,6 +2984,9 @@ public class QueryDialog extends JPanel {
         smcComparisonFloatSlider = new QuerySlider(50, 0.01, 0.99);
         smcComparisonFloatSlider.addChangeListener(e -> smcComparisonFloatSlider.updateValue(smcComparisonFloat, 2));
         qualitativePanel.add(smcComparisonFloatSlider, subPanelGbc);
+
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
         smcSettingsPanel.add(qualitativePanel, gbc);
     
         smcTracePanel = new JPanel();
