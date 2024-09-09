@@ -853,9 +853,41 @@ public class QueryDialog extends JPanel {
         if(!doingBenchmark) smcEstimationIntervalWidth.setText(precisionFormat.format(settings.estimationIntervalWidth));
 
         smcFalsePositives.setText(String.valueOf(settings.falsePositives));
+        double desiredMinFalsePositives = smcFalsePositivesSlider.getDesiredMin();
+        double desiredMaxFalsePositives = smcFalsePositivesSlider.getDesiredMax();
+        double initialProportionFalsePositives = (settings.falsePositives - desiredMinFalsePositives) / (desiredMaxFalsePositives - desiredMinFalsePositives);
+        int initialValueFalsePositives = (int) (initialProportionFalsePositives * smcFalsePositivesSlider.getMaximum());
+        smcFalsePositivesSlider.setValue(
+            Math.max(smcFalsePositivesSlider.getMinimum(), 
+                    Math.min(initialValueFalsePositives, smcFalsePositivesSlider.getMaximum())));
+
         smcFalseNegatives.setText(String.valueOf(settings.falseNegatives));
+        double desiredMinFalseNegatives = smcFalseNegativesSlider.getDesiredMin();
+        double desiredMaxFalseNegatives = smcFalseNegativesSlider.getDesiredMax();
+        double initialProportionFalseNegatives = (settings.falseNegatives - desiredMinFalseNegatives) / (desiredMaxFalseNegatives - desiredMinFalseNegatives);
+        int initialValueFalseNegatives = (int) (initialProportionFalseNegatives * smcFalseNegativesSlider.getMaximum());
+        smcFalseNegativesSlider.setValue(
+            Math.max(smcFalseNegativesSlider.getMinimum(), 
+                    Math.min(initialValueFalseNegatives, smcFalseNegativesSlider.getMaximum())));
+
         smcIndifference.setText(String.valueOf(settings.indifferenceWidth));
+        double desiredMinIndifference = smcIndifferenceSlider.getDesiredMin();
+        double desiredMaxIndifference = smcIndifferenceSlider.getDesiredMax();
+        double initialProportionIndifference = (settings.indifferenceWidth - desiredMinIndifference) / (desiredMaxIndifference - desiredMinIndifference);
+        int initialValueIndifference = (int) (initialProportionIndifference * smcIndifferenceSlider.getMaximum());
+        smcIndifferenceSlider.setValue(
+            Math.max(smcIndifferenceSlider.getMinimum(), 
+                    Math.min(initialValueIndifference, smcIndifferenceSlider.getMaximum())));
+
         smcComparisonFloat.setText(String.valueOf(settings.geqThan));
+        double desiredMinComparison = smcComparisonFloatSlider.getDesiredMin();
+        double desiredMaxComparison = smcComparisonFloatSlider.getDesiredMax();
+        double initialProportionComparison = (settings.geqThan - desiredMinComparison) / (desiredMaxComparison - desiredMinComparison);
+
+        int initialValueComparison = (int) (initialProportionComparison * smcComparisonFloatSlider.getMaximum());
+        smcComparisonFloatSlider.setValue(
+            Math.max(smcComparisonFloatSlider.getMinimum(), 
+                    Math.min(initialValueComparison, smcComparisonFloatSlider.getMaximum())));
     }
 
     private boolean queryIsReachability() {
@@ -2845,6 +2877,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(smcConfidence, subPanelGbc);
         subPanelGbc.gridx = 2;
         smcConfidenceSlider = new QuerySlider(95, 0.80, 0.99);
+        smcConfidenceSlider.setToolTipText("Value: 0.95");
         smcConfidenceSlider.addChangeListener(e -> {
             int value = smcConfidenceSlider.getValue();
             double desiredMin = smcConfidenceSlider.getDesiredMin();
@@ -2869,6 +2902,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
         subPanelGbc.gridx = 2;
         smcPrecisionSlider = new QuerySlider(0, 0.5, 0.0001);
+        smcPrecisionSlider.setToolTipText("Value: 0.5000");
         smcPrecisionSlider.addChangeListener(e -> {
             int value = smcPrecisionSlider.getValue();
             double desiredMin = smcPrecisionSlider.getDesiredMin();
@@ -2899,6 +2933,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(smcTimeExpected, subPanelGbc);
 
         smcEstimatedTimeSlider = new QuerySlider(0, 1, 100, 99);
+        smcEstimatedTimeSlider.setToolTipText("Value: 1.0");
         smcEstimatedTimeSlider.addChangeListener(e -> {
             int value = smcEstimatedTimeSlider.getValue();
             double desiredMin = smcEstimatedTimeSlider.getDesiredMin();
@@ -2944,6 +2979,7 @@ public class QueryDialog extends JPanel {
         qualitativePanel.add(smcFalsePositives, subPanelGbc);
         subPanelGbc.gridx = 2;
         smcFalsePositivesSlider = new QuerySlider(0, 0.01, 0.99, 98);
+        smcFalsePositivesSlider.setToolTipText("Value: 0.01");
         smcFalsePositivesSlider.addChangeListener(e -> smcFalsePositivesSlider.updateValue(smcFalsePositives, 2));
         qualitativePanel.add(smcFalsePositivesSlider, subPanelGbc);
         subPanelGbc.gridy = 1;
@@ -2956,6 +2992,7 @@ public class QueryDialog extends JPanel {
         qualitativePanel.add(smcFalseNegatives, subPanelGbc);
         subPanelGbc.gridx = 2;
         smcFalseNegativesSlider = new QuerySlider(0, 0.01, 0.99, 98);
+        smcFalseNegativesSlider.setToolTipText("Value: 0.01");
         smcFalseNegativesSlider.addChangeListener(e -> smcFalseNegativesSlider.updateValue(smcFalseNegatives, 2));
         qualitativePanel.add(smcFalseNegativesSlider, subPanelGbc);
         subPanelGbc.gridy = 2;
@@ -2968,6 +3005,7 @@ public class QueryDialog extends JPanel {
         qualitativePanel.add(smcIndifference, subPanelGbc);
         subPanelGbc.gridx = 2;
         smcIndifferenceSlider = new QuerySlider(5, 0.01, 0.99, 98);
+        smcIndifferenceSlider.setToolTipText("Value: 0.05");
         smcIndifferenceSlider.addChangeListener(e -> smcIndifferenceSlider.updateValue(smcIndifference, 2));
         qualitativePanel.add(smcIndifferenceSlider, subPanelGbc);
         subPanelGbc.gridy = 3;
@@ -2982,6 +3020,7 @@ public class QueryDialog extends JPanel {
         qualitativePanel.add(smcComparisonFloat, subPanelGbc);
         subPanelGbc.gridx = 2;
         smcComparisonFloatSlider = new QuerySlider(50, 0.01, 0.99);
+        smcComparisonFloatSlider.setToolTipText("Value: 0.50");
         smcComparisonFloatSlider.addChangeListener(e -> smcComparisonFloatSlider.updateValue(smcComparisonFloat, 2));
         qualitativePanel.add(smcComparisonFloatSlider, subPanelGbc);
 
