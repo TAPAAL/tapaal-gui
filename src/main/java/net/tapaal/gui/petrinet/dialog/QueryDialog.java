@@ -245,8 +245,12 @@ public class QueryDialog extends JPanel {
     private JTextField smcFalseNegatives;
     private JTextField smcIndifference;
     private JTextField smcComparisonFloat;
+    private QuerySlider smcFalsePositivesSlider;
+    private QuerySlider smcFalseNegativesSlider;
+    private QuerySlider smcIndifferenceSlider;
+    private QuerySlider smcComparisonFloatSlider;
     private JPanel smcTracePanel;
-    private JTextField smcNumberOfTraces;
+    private CustomJSpinner smcNumberOfTraces;
     private JComboBox<SMCTraceType> smcTraceType;
     private SMCSettings smcSettings;
     private boolean smcMustUpdateTime = true;
@@ -587,13 +591,7 @@ public class QueryDialog extends JPanel {
             }
             
             query.setVerificationType(verificationType);
-
-            try {
-                query.setNumberOfTraces(Integer.parseInt(smcNumberOfTraces.getText()));
-            } catch (NumberFormatException e) {
-                smcNumberOfTraces.setText(String.valueOf(query.getNumberOfTraces()));
-            }
-
+            query.setNumberOfTraces((Integer)smcNumberOfTraces.getValue());
             query.setSmcTraceType((SMCTraceType)smcTraceType.getSelectedItem());
         }
 
@@ -1792,7 +1790,7 @@ public class QueryDialog extends JPanel {
             setSMCSettings(queryToCreateFrom.getSmcSettings());
             smcParallel.setSelected(queryToCreateFrom.isParallel());
             smcVerificationType.setSelectedIndex(queryToCreateFrom.getVerificationType().ordinal());
-            smcNumberOfTraces.setText(String.valueOf(queryToCreateFrom.getNumberOfTraces()));
+            smcNumberOfTraces.setValue(queryToCreateFrom.getNumberOfTraces());
             smcTraceType.setSelectedItem(queryToCreateFrom.getSmcTraceType());
         }
 
@@ -1833,24 +1831,24 @@ public class QueryDialog extends JPanel {
         numberOfExtraTokensInNet.addChangeListener(e -> updateRawVerificationOptions());
         reductionOption.addActionListener(e -> updateRawVerificationOptions());
         smcVerificationType.addActionListener(e -> updateRawVerificationOptions());
-        smcNumberOfTraces.getDocument().addDocumentListener(new DocumentListener() {
+        smcNumberOfTraces.addChangeListener(e -> updateRawVerificationOptions());
+
+        final JTextField smcNumTracesTextField = ((JSpinner.DefaultEditor) smcNumberOfTraces.getEditor()).getTextField();
+
+        // Fix from https://stackoverflow.com/a/6276603 to update uppon typing
+        // to ensure raw options are updated correctly
+        smcNumTracesTextField.addKeyListener(new KeyAdapter() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                SwingUtilities.invokeLater(() -> updateRawVerificationOptions());
-            }
-        
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                SwingUtilities.invokeLater(() -> {
-                    if (!smcNumberOfTraces.getText().trim().isEmpty()) {
-                        updateRawVerificationOptions();
-                    }
-                });
-            }
-        
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                SwingUtilities.invokeLater(() -> updateRawVerificationOptions());
+            public void keyReleased(KeyEvent e) {
+                String text = smcNumTracesTextField.getText().replace(",", "");
+                int oldCaretPos = smcNumTracesTextField.getCaretPosition();
+                try {
+                    Integer newValue = Integer.valueOf(text);
+                    smcNumberOfTraces.setValue(newValue);
+                    smcNumTracesTextField.setCaretPosition(oldCaretPos);
+                } catch(NumberFormatException ex) {
+                    // Not a number in text field -> do nothing
+                }
             }
         });
 
@@ -2944,6 +2942,9 @@ public class QueryDialog extends JPanel {
         smcFalsePositives.addFocusListener(updater);
         smcFalsePositives.setToolTipText(TOOL_TIP_FALSE_POSITIVES);
         qualitativePanel.add(smcFalsePositives, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcFalsePositivesSlider = new QuerySlider(0, 0.5, 0.0001);
+        qualitativePanel.add(smcFalsePositivesSlider, subPanelGbc);
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
         qualitativePanel.add(new JLabel("False negatives : "), subPanelGbc);
@@ -2952,6 +2953,9 @@ public class QueryDialog extends JPanel {
         smcFalseNegatives.addFocusListener(updater);
         smcFalseNegatives.setToolTipText(TOOL_TIP_FALSE_NEGATIVES);
         qualitativePanel.add(smcFalseNegatives, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcFalseNegativesSlider = new QuerySlider(0, 0.5, 0.0001);
+        qualitativePanel.add(smcFalseNegativesSlider, subPanelGbc);
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
         qualitativePanel.add(new JLabel("Indifference region width : "), subPanelGbc);
@@ -2960,6 +2964,9 @@ public class QueryDialog extends JPanel {
         smcIndifference.addFocusListener(updater);
         smcIndifference.setToolTipText(TOOL_TIP_INDIFFERENCE);
         qualitativePanel.add(smcIndifference, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcIndifferenceSlider = new QuerySlider(5, 0.5, 0.0001);
+        qualitativePanel.add(smcIndifferenceSlider, subPanelGbc);
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
         JLabel testLabel = new JLabel("Property hold with probability >= ");
@@ -2970,6 +2977,9 @@ public class QueryDialog extends JPanel {
         smcComparisonFloat.setToolTipText(TOOL_TIP_QUALITATIVE_TEST);
         smcComparisonFloat.addFocusListener(updater);
         qualitativePanel.add(smcComparisonFloat, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcComparisonFloatSlider = new QuerySlider(50, 0.80, 0.99);
+        qualitativePanel.add(smcComparisonFloatSlider, subPanelGbc);
         smcSettingsPanel.add(qualitativePanel, gbc);
     
         smcTracePanel = new JPanel();
@@ -2982,7 +2992,7 @@ public class QueryDialog extends JPanel {
         numberOfTracesLabel.setToolTipText(TOOL_TIP_N_TRACES);
         smcTracePanel.add(numberOfTracesLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
-        smcNumberOfTraces = new JTextField(7);
+        smcNumberOfTraces = new CustomJSpinner(1, 1, Integer.MAX_VALUE);
         smcNumberOfTraces.addFocusListener(updater);
         smcNumberOfTraces.setToolTipText(TOOL_TIP_N_TRACES);
         smcTracePanel.add(smcNumberOfTraces, subPanelGbc);
