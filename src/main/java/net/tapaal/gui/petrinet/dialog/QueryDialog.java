@@ -2851,10 +2851,10 @@ public class QueryDialog extends JPanel {
             double desiredMax = smcConfidenceSlider.getDesiredMax();
             double proportion = (double) value / smcConfidenceSlider.getMaximum();
             double interpretedValue = desiredMin + proportion * (desiredMax - desiredMin);
-            double roundedValue = Math.round(interpretedValue * 1000.0) / 1000.0;
+            double roundedValue = Math.round(interpretedValue * 100.0) / 100.0;
             smcConfidence.setText(roundedValue + "");
             smcConfidenceSlider.setRealValue(roundedValue);
-            smcConfidenceSlider.setToolTipText(String.format("Value: %.1f", roundedValue));
+            smcConfidenceSlider.setToolTipText(String.format("Value: %.2f", roundedValue));
             smcMustUpdateTime = true;
         });
 
@@ -2898,7 +2898,7 @@ public class QueryDialog extends JPanel {
         smcTimeExpected.setToolTipText(TOOL_TIP_VERIFICATION_TIME);
         quantitativePanel.add(smcTimeExpected, subPanelGbc);
 
-        smcEstimatedTimeSlider = new QuerySlider(1, 1, 100);
+        smcEstimatedTimeSlider = new QuerySlider(0, 1, 100, 99);
         smcEstimatedTimeSlider.addChangeListener(e -> {
             int value = smcEstimatedTimeSlider.getValue();
             double desiredMin = smcEstimatedTimeSlider.getDesiredMin();
@@ -2943,7 +2943,8 @@ public class QueryDialog extends JPanel {
         smcFalsePositives.setToolTipText(TOOL_TIP_FALSE_POSITIVES);
         qualitativePanel.add(smcFalsePositives, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcFalsePositivesSlider = new QuerySlider(0, 0.5, 0.0001);
+        smcFalsePositivesSlider = new QuerySlider(0, 0.01, 0.99, 98);
+        smcFalsePositivesSlider.addChangeListener(e -> smcFalsePositivesSlider.updateValue(smcFalsePositives, 2));
         qualitativePanel.add(smcFalsePositivesSlider, subPanelGbc);
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
@@ -2954,7 +2955,8 @@ public class QueryDialog extends JPanel {
         smcFalseNegatives.setToolTipText(TOOL_TIP_FALSE_NEGATIVES);
         qualitativePanel.add(smcFalseNegatives, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcFalseNegativesSlider = new QuerySlider(0, 0.5, 0.0001);
+        smcFalseNegativesSlider = new QuerySlider(0, 0.01, 0.99, 98);
+        smcFalseNegativesSlider.addChangeListener(e -> smcFalseNegativesSlider.updateValue(smcFalseNegatives, 2));
         qualitativePanel.add(smcFalseNegativesSlider, subPanelGbc);
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
@@ -2965,7 +2967,8 @@ public class QueryDialog extends JPanel {
         smcIndifference.setToolTipText(TOOL_TIP_INDIFFERENCE);
         qualitativePanel.add(smcIndifference, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcIndifferenceSlider = new QuerySlider(5, 0.5, 0.0001);
+        smcIndifferenceSlider = new QuerySlider(5, 0.01, 0.99, 98);
+        smcIndifferenceSlider.addChangeListener(e -> smcIndifferenceSlider.updateValue(smcIndifference, 2));
         qualitativePanel.add(smcIndifferenceSlider, subPanelGbc);
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
@@ -2978,7 +2981,8 @@ public class QueryDialog extends JPanel {
         smcComparisonFloat.addFocusListener(updater);
         qualitativePanel.add(smcComparisonFloat, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcComparisonFloatSlider = new QuerySlider(50, 0.80, 0.99);
+        smcComparisonFloatSlider = new QuerySlider(50, 0.01, 0.99);
+        smcComparisonFloatSlider.addChangeListener(e -> smcComparisonFloatSlider.updateValue(smcComparisonFloat, 2));
         qualitativePanel.add(smcComparisonFloatSlider, subPanelGbc);
         smcSettingsPanel.add(qualitativePanel, gbc);
     
@@ -3009,6 +3013,8 @@ public class QueryDialog extends JPanel {
                                                            new SMCTraceType("Not satisfied") });
         smcTraceType.setToolTipText(TOOL_TIP_TRACE_TYPE);
         smcTracePanel.add(smcTraceType, subPanelGbc);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
         smcSettingsPanel.add(smcTracePanel, gbc);
 
         smcVerificationType.addActionListener(evt -> {
@@ -3027,6 +3033,7 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5,10,5,10);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1;
         add(smcSettingsPanel, gridBagConstraints);
 
         setupEstimationListeners();
@@ -3049,8 +3056,6 @@ public class QueryDialog extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.WEST;
         add(queryPanel, gbc);
-
-
     }
 
     private void initQueryField() {
