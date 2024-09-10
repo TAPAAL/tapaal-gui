@@ -2978,9 +2978,9 @@ public class QueryDialog extends JPanel {
         smcFalsePositives.setToolTipText(TOOL_TIP_FALSE_POSITIVES);
         qualitativePanel.add(smcFalsePositives, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcFalsePositivesSlider = new QuerySlider(0, 0.01, 0.99, 98);
-        smcFalsePositivesSlider.setToolTipText("Value: 0.01");
-        smcFalsePositivesSlider.addChangeListener(e -> smcFalsePositivesSlider.updateValue(smcFalsePositives, 2));
+        smcFalsePositivesSlider = new QuerySlider(0, 0.001, 0.5);
+        smcFalsePositivesSlider.setToolTipText("Value: 0.001");
+        smcFalsePositivesSlider.addChangeListener(e -> smcFalsePositivesSlider.updateValue(smcFalsePositives, 3));
         qualitativePanel.add(smcFalsePositivesSlider, subPanelGbc);
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
@@ -2991,9 +2991,9 @@ public class QueryDialog extends JPanel {
         smcFalseNegatives.setToolTipText(TOOL_TIP_FALSE_NEGATIVES);
         qualitativePanel.add(smcFalseNegatives, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcFalseNegativesSlider = new QuerySlider(0, 0.01, 0.99, 98);
-        smcFalseNegativesSlider.setToolTipText("Value: 0.01");
-        smcFalseNegativesSlider.addChangeListener(e -> smcFalseNegativesSlider.updateValue(smcFalseNegatives, 2));
+        smcFalseNegativesSlider = new QuerySlider(0, 0.001, 0.5);
+        smcFalseNegativesSlider.setToolTipText("Value: 0.001");
+        smcFalseNegativesSlider.addChangeListener(e -> smcFalseNegativesSlider.updateValue(smcFalseNegatives, 3));
         qualitativePanel.add(smcFalseNegativesSlider, subPanelGbc);
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
@@ -3004,9 +3004,9 @@ public class QueryDialog extends JPanel {
         smcIndifference.setToolTipText(TOOL_TIP_INDIFFERENCE);
         qualitativePanel.add(smcIndifference, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcIndifferenceSlider = new QuerySlider(5, 0.01, 0.99, 98);
-        smcIndifferenceSlider.setToolTipText("Value: 0.05");
-        smcIndifferenceSlider.addChangeListener(e -> smcIndifferenceSlider.updateValue(smcIndifference, 2));
+        smcIndifferenceSlider = new QuerySlider(100, 0.001, 0.5);
+        smcIndifferenceSlider.setToolTipText("Value: 0.500");
+        smcIndifferenceSlider.addChangeListener(e -> smcIndifferenceSlider.updateValue(smcIndifference, 3));
         qualitativePanel.add(smcIndifferenceSlider, subPanelGbc);
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
@@ -3019,7 +3019,7 @@ public class QueryDialog extends JPanel {
         smcComparisonFloat.addFocusListener(updater);
         qualitativePanel.add(smcComparisonFloat, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcComparisonFloatSlider = new QuerySlider(50, 0.01, 0.99);
+        smcComparisonFloatSlider = new QuerySlider(50, 0.01, 0.99, 98);
         smcComparisonFloatSlider.setToolTipText("Value: 0.50");
         smcComparisonFloatSlider.addChangeListener(e -> smcComparisonFloatSlider.updateValue(smcComparisonFloat, 2));
         qualitativePanel.add(smcComparisonFloatSlider, subPanelGbc);
