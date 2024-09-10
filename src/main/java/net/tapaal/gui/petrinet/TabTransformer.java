@@ -34,6 +34,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.RunningVerificationDialog;
 import pipe.gui.petrinet.PetriNetTab;
 
@@ -208,21 +209,16 @@ public class TabTransformer {
         }
     }
 
-    public static void convertQueriesToNonSmc(Iterable<TAPNQuery> queries) {
-        // F -> EF
-        // G -> EG
+    /**
+     * Converts between SMC and reachability queries
+     */
+    public static void convertQueriesToOrFromSmc(Iterable<TAPNQuery> queries) {
         for (TAPNQuery query : queries) {
+            boolean isSmc = query.getCategory().equals(QueryCategory.SMC);
             TCTLAbstractProperty property = query.getProperty();
             query.setProperty(smcConverter(property));
-        }
-    }
-
-    public static void convertQueriesToSmc(Iterable<TAPNQuery> queries) {
-        // EF -> F
-        // EG -> G
-        for (TAPNQuery query : queries) {
-            TCTLAbstractProperty property = query.getProperty();
-            query.setProperty(smcConverter(property));
+            query.setCategory(isSmc ? QueryCategory.CTL : QueryCategory.SMC);
+            query.setSmcSettings(SMCSettings.Default());
         }  
     }
 
@@ -231,10 +227,14 @@ public class TabTransformer {
         if (property instanceof LTLFNode) {
             return new TCTLEFNode(child);
         } else if (property instanceof LTLGNode) {
-            return new TCTLEGNode(child);
+            return new TCTLAGNode(child);
         } else if (property instanceof TCTLEFNode) {
             return new LTLFNode(child);
         }  else if (property instanceof TCTLEGNode) {
+            return new LTLGNode(child);
+        } else if (property instanceof TCTLAFNode) {
+            return new LTLFNode(child);
+        } else if (property instanceof TCTLAGNode) {
             return new LTLGNode(child);
         } else if (property instanceof TCTLAndListNode) {
             TCTLAndListNode andNode = (TCTLAndListNode) property;

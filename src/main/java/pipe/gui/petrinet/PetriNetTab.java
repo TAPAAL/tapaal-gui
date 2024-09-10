@@ -95,19 +95,20 @@ import java.util.HashMap;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Arrays;
+
 public class PetriNetTab extends JSplitPane implements TabActions {
-    
+
     final AbstractDrawingSurfaceManager notingManager = new AbstractDrawingSurfaceManager(){
         @Override
         public void registerEvents() {}
     };
-    
+
     private final MutableReference<GuiFrameControllerActions> guiFrameControllerActions = new MutableReference<>();
-    
+
     public void setGuiFrameControllerActions(GuiFrameControllerActions guiFrameControllerActions) {
         this.guiFrameControllerActions.setReference(guiFrameControllerActions);
     }
-    
+
     //Enum for all actions and types of elements
     public enum DrawTool {
         ANNOTATION,
@@ -125,55 +126,55 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         DRAW,
         DRAG,
     }
-    
+
     public final TAPNLens lens;
-    
+
 	//Model and state
 	private final TimedArcPetriNetNetwork tapnNetwork;
-    
+
 	//XXX: Replace with bi-map
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<>();
 	public final HashMap<DataLayer, TimedArcPetriNet> guiModelToModel = new HashMap<>();
-    
+
 	//XXX: should be replaced iwth DataLayer->Zoomer, TimedArcPetriNet has nothing to do with zooming
 	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<>();
-    
+
     private boolean alreadyFitToScreen;
-    
+
 	final UndoManager undoManager = new UndoManager(this); //warning leaking this, should be ok as it only used after construction
-    
+
     private final MutableReference<GuiFrameActions> app = new MutableReference<>();
     private final MutableReference<SafeGuiFrameActions> safeApp = new MutableReference<>();
-    
+
     final MutableReference<AbstractDrawingSurfaceManager> managerRef = new MutableReference<>(notingManager);
 	public final GuiModelManager guiModelManager = new GuiModelManager(this);
-    
+
     private final Animator animator = new Animator(this);
     private boolean netChanged = false;
-    
+
     @Override
     public boolean getNetChanged() {
         return netChanged;
     }
-    
+
     public void setNetChanged(boolean _netChanged) {
         netChanged = _netChanged;
     }
     private final NameGenerator nameGenerator = new NameGenerator();
-    
+
     public NameGenerator getNameGenerator() {
         return nameGenerator;
     }
-    
+
     /**
      * Creates a new tab with the selected filestream
 	 */
     public static PetriNetTab createNewTabFromInputStream(InputStream file, String name) throws Exception {
-        
+
         try {
             ModelLoader loader = new ModelLoader();
 			LoadedModel loadedModel = loader.load(file);
-            
+
 			if (loadedModel == null) {
                 throw new Exception("Could not open the selected file, as it does not have the correct format.");
 			}
@@ -185,13 +186,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     for (String s : loadedModel.getMessages()) {
                         message.append(s).append("\n\n");
                     }
-                    
+
                     new MessengerImpl().displayInfoMessage(message.toString(), "Warning");
                 }).start();
             }
 
             PetriNetTab tab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), loadedModel.getLens());
-            
+
             checkQueries(tab);
 
             tab.setInitialName(name);
@@ -205,16 +206,16 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             throw new Exception("TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.getMessage(), e);
         }
 	}
-    
+
     public static TAPNLens getFileLens(InputStream file) throws Exception {
         ModelLoader loader = new ModelLoader();
         return loader.loadLens(file);
     }
-    
+
     public static void checkQueries(PetriNetTab tab) {
         List<TAPNQuery> queriesToRemove = new ArrayList<>();
         boolean gameChanged = false;
-        
+
         EngineSupportOptions verifyTAPNOptions = new VerifyTAPNEngineOptions();
         EngineSupportOptions UPPAALCombiOptions = new UPPAALCombiOptions();
         EngineSupportOptions UPPAALOptimizedStandardOptions = new UPPAALOptimizedStandardOptions();
@@ -224,7 +225,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         EngineSupportOptions verifyDTAPNOptions = new VerifyDTAPNEngineOptions();
         EngineSupportOptions verifyPNOptions = new VerifyPNEngineOptions();
         EngineSupportOptions[] engineSupportOptions = new EngineSupportOptions[]{verifyDTAPNOptions,verifyTAPNOptions,UPPAALCombiOptions,UPPAALOptimizedStandardOptions,UPPAALStandardOptions,UPPAALBroadcastOptions,UPPAALBroadcastDegree2Options,verifyPNOptions};
-        
+
         TimedArcPetriNetNetwork net = tab.network();
         for (TAPNQuery q : tab.queries()) {
             boolean smcQuery = q.getCategory() == TAPNQuery.QueryCategory.SMC;
@@ -244,7 +245,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
                 q.hasUntimedOnlyProperties(),
                 tab.lens.isColored(),
-                tab.lens.isColored() && !tab.lens.isTimed(), q.getCategory() == TAPNQuery.QueryCategory.SMC
+                tab.lens.isColored() && !tab.lens.isTimed(),
+                smcQuery
             };
 
             boolean hasEngine = tab.checkCurrentEngine(q.getReductionOption(), queryOptions);
@@ -306,12 +308,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             //XXX: we should not do pop-up form there! I think these check should be part of loading a net.
             new Thread(() -> {
                 TAPAALGUI.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                
+
                 new MessengerImpl().displayInfoMessage(fmessage, "Information");
             }).start();
         }
 	}
-    
+
 	private boolean checkCurrentEngine(ReductionOption reductionOption, boolean[] queryOptions) {
         EngineSupportOptions engine;
         switch (reductionOption) {
@@ -1133,7 +1135,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     zoomSlider.addChangeListener(listener);
                 }
             });
-            
+
 			drawingSurface().zoomToMidPoint(); //Do Zoom
 		}
 	}
@@ -1192,7 +1194,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     private void createNewAndConvertNonStochastic(){
         PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), lens.isColored(), false), "-nonstochastic");
         TabTransformer.removeDistributionInformation(tab);
-        TabTransformer.convertQueriesToNonSmc(tab.queries());
+        TabTransformer.convertQueriesToOrFromSmc(tab.queries());
         guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
     }
 
@@ -1273,7 +1275,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 }
             } else {
                 PetriNetTab tab = duplicateTab(new TAPNLens(lens.isTimed(), lens.isGame(), lens.isColored(), true), "-stochastic");
-                TabTransformer.convertQueriesToSmc(tab.queries());
+                TabTransformer.convertQueriesToOrFromSmc(tab.queries());
                 guiFrameControllerActions.ifPresent(o -> o.openTab(tab));
             }
             updateFeatureText();
@@ -1854,7 +1856,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         return alreadyFitToScreen;
     }
 
-    @Override 
+    @Override
     public void fitToScreen() {
         final int margin = 50;
 
@@ -1864,31 +1866,31 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (!petriNetObjects.iterator().hasNext()) {
                 return;
             }
-    
+
             int smallestX = Integer.MAX_VALUE;
             int smallestY = Integer.MAX_VALUE;
             int largestX = Integer.MIN_VALUE;
             int largestY = Integer.MIN_VALUE;
-    
+
             JViewport viewport = (JViewport)drawingSurface().getParent();
             for (PetriNetObject pno : currentTemplate().guiModel().getPetriNetObjects()) {
                 if (pno instanceof PlaceTransitionObject) {
                     if (pno.getOriginalX() < smallestX) {
                         smallestX = pno.getOriginalX();
                     }
-    
+
                     if (pno.getOriginalY() < smallestY) {
                         smallestY = pno.getOriginalY();
                     }
-    
+
                     if (pno.getOriginalX() + pno.getWidth() > largestX) {
                         largestX = pno.getOriginalX() + pno.getWidth();
                     }
-    
+
                     if (pno.getOriginalY() + pno.getHeight() > largestY) {
                         largestY = pno.getOriginalY() + pno.getHeight();
                     }
-    
+
                     if (pno instanceof Transition) {
                         Transition t = (Transition) pno;
                         for (Arc arc : t.getPreset()) {
@@ -1896,35 +1898,35 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                                 if (point.getOriginalX() < smallestX) {
                                     smallestX = point.getOriginalX();
                                 }
-    
+
                                 if (point.getOriginalY() < smallestY) {
                                     smallestY = point.getOriginalY();
                                 }
-    
+
                                 if (point.getOriginalX() > largestX) {
                                     largestX = point.getOriginalX();
                                 }
-    
+
                                 if (point.getOriginalY() > largestY) {
                                     largestY = point.getOriginalY();
                                 }
                             }
                         }
-    
+
                         for (Arc arc : t.getPostset()) {
                             for (ArcPathPoint point : arc.getArcPath().getArcPathPoints()) {
                                 if (point.getOriginalX() < smallestX) {
                                     smallestX = point.getOriginalX();
                                 }
-    
+
                                 if (point.getOriginalY() < smallestY) {
                                     smallestY = point.getOriginalY();
                                 }
-    
+
                                 if (point.getOriginalX() > largestX) {
                                     largestX = point.getOriginalX();
                                 }
-    
+
                                 if (point.getOriginalY() > largestY) {
                                     largestY = point.getOriginalY();
                                 }
@@ -1939,7 +1941,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
             largestX += margin;
             largestY += margin;
-            
+
             int width = largestX - smallestX;
             int height = largestY - smallestY;
             double xZoomFactor = (double) viewport.getWidth() / width;
@@ -1948,7 +1950,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             double zoomPercent = Math.min(xZoomFactor, yZoomFactor) * 100;
 
             double currentZoomPercent = drawingSurface().getZoomController().getPercent();
-            
+
             final double zoomConvergence = 1;
             if (Math.abs(currentZoomPercent - zoomPercent) < zoomConvergence) {
                 int x = (int) (smallestX * zoomFactor) - margin;
@@ -1961,8 +1963,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 alreadyFitToScreen = true;
                 return;
             }
-            
-            app.ifPresent(e -> e.updateZoomSlider((int)zoomPercent)); 
+
+            app.ifPresent(e -> e.updateZoomSlider((int)zoomPercent));
         }
     }
 
@@ -2066,7 +2068,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		getUndoManager().addNewEdit(new ChangeSpacingEditCommand(factor, this));
 	}
 
-	public void changeSpacing(double factor) { 
+	public void changeSpacing(double factor) {
         if (factor < 1) {
             Quadtree quadtree = new Quadtree();
             final int minimumDistance = 45;
@@ -2091,7 +2093,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
                 int newCenterX = (int)(center.getX() * factor);
                 int newCenterY = (int)(center.getY() * factor);
-       
+
 				pno.setCenter(newCenterX, newCenterY);
                 locations.put(pno, new Point(newCenterX, newCenterY));
 
@@ -2108,7 +2110,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                                 newY += offsetY;
                             }
 
-                            point.setPointLocation(newX, newY);   
+                            point.setPointLocation(newX, newY);
 						}
 					}
 
@@ -2126,7 +2128,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			} else {
                 int newX = (int)(obj.getLocation().x * factor);
                 int newY = (int)(obj.getLocation().y * factor);
-              
+
 				obj.setLocation(newX, newY);
 			}
 		}
