@@ -2960,6 +2960,8 @@ public class QueryDialog extends JPanel {
         });
         quantitativePanel.add(smcTimeEstimationButton, subPanelGbc);
 
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
         smcSettingsPanel.add(quantitativePanel, gbc);
         gbc.gridx = 2;
 
