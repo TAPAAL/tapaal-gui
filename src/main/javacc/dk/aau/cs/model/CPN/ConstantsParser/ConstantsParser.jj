@@ -61,19 +61,19 @@ public class ConstantsParser {
         colorTypesList.add(0, dot);
 
         Map<String, Object> constantsMap = new HashMap<String, Object>();
-        Map<String, Boolean> constantsBitMap = new HashMap<String, Boolean>();
+        Map<String, Boolean> canBeRemovedBitMap = new HashMap<String, Boolean>();
         Map<String, List<String>> messages = new HashMap<String, List<String>>();        
         
         // Populate maps with constants, color types and variables and if they can be removed
         for (Constant c : network.constants()) {
             constantsMap.put(c.name(), c);
-            constantsBitMap.put(c.name(), !network.getConstantStore().isConstantInUse(c.name()));
+            canBeRemovedBitMap.put(c.name(), !network.getConstantStore().isConstantInUse(c.name()));
         }
 
         for (ColorType ct : network.colorTypes()) {
             List<String> messagesList = new ArrayList<String>();
             constantsMap.put(ct.getName(), ct);
-            constantsBitMap.put(ct.getName(), network.canColorTypeBeRemoved(ct, messagesList));
+            canBeRemovedBitMap.put(ct.getName(), network.canColorTypeBeRemoved(ct, messagesList));
             messages.put(ct.getName(), messagesList);
         }
 
@@ -81,25 +81,31 @@ public class ConstantsParser {
             List<String> messagesList = new ArrayList<String>();
             constantsMap.put(v.getName(), v);
             boolean canBeEdited = !(variables.containsKey(v.getName()) && !variables.get(v.getName()).getColorType().equals(v.getColorType()));
-            constantsBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList) && canBeEdited);
+            canBeRemovedBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList) && canBeEdited);
             messages.put(v.getName(), messagesList);
         }
 
         // Generate error messages
-        for (String key : constantsBitMap.keySet()) {
+        for (String key : canBeRemovedBitMap.keySet()) {
+            boolean skip = false;
             if (constants.containsKey(key) || 
-                variables.containsKey(key) && constantsBitMap.get(key) ||
-                key.equals("dot")) {
-                continue;
-            }
-
-            if (colorTypes.containsKey(key) && 
+                variables.containsKey(key) && canBeRemovedBitMap.get(key) ||
+                key.equals("dot") ||
+                colorTypes.containsKey(key) && 
                 colorTypes.get(key).equals(constantsMap.get(key))) {
                 continue;
+            } else if (variables.containsKey(key) && !canBeRemovedBitMap.get(key)) {
+                for (Variable v : network.variables()) {
+                    if (v.getName().equals(key)) {
+                        skip = v.getColorType().equals(variables.get(key).getColorType());
+                    }
+                }
             }
 
+            if (skip) continue;
+
             Object obj = constantsMap.get(key);
-            if (!constantsBitMap.get(key)) {
+            if (!canBeRemovedBitMap.get(key)) {
                 String message = "Could not ";
                 String title = "Could not ";
                 if (obj instanceof ColorType && 
