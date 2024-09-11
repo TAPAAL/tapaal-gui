@@ -924,6 +924,16 @@ public class TimedArcPetriNetNetwork {
                     messages.add("Variable contained on transport arc " + arc.fromTo());
                 }
             }
+
+            for (TimedTransition transition : tapn.transitions()) {
+                if (transition.getGuard() != null) {
+                    Set<Variable> variables = new HashSet<>();
+                    transition.getGuard().getVariables(variables);
+                    if (variables.contains(variable)) {
+                        messages.add("Variable contained in guard of transition " + transition.name());
+                    }
+                }
+            }
         }
         return messages.isEmpty();
     }

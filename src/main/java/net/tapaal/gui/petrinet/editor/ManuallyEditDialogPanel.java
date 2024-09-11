@@ -169,7 +169,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
 
         add(panel);
 
-        setSize(500, 550);
+        setSize(650, 500);
         setLocationRelativeTo(null);
     }
 
