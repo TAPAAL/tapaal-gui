@@ -22,8 +22,6 @@ import java.util.HashSet;
 import dk.aau.cs.model.CPN.ProductType;
 
 public class ConstantsParser {
-    private static final String ERROR_PARSING_CONSTANTS_MESSAGE = "TAPAAL encountered an error trying to parse the constants";
-
     private static final Map<String, Constant> constants = new LinkedHashMap<String, Constant>();
     private static final Map<String, ColorType> colorTypes = new LinkedHashMap<String, ColorType>();
     private static final Map<String, Variable> variables = new LinkedHashMap<String, Variable>();
@@ -63,38 +61,64 @@ public class ConstantsParser {
         colorTypesList.add(0, dot);
 
         Map<String, Object> constantsMap = new HashMap<String, Object>();
-        Map<String, Boolean> constantsBitMap = new HashMap<String, Boolean>();
+        Map<String, Boolean> canBeRemovedBitMap = new HashMap<String, Boolean>();
         Map<String, List<String>> messages = new HashMap<String, List<String>>();        
         
+        // Populate maps with constants, color types and variables and if they can be removed
         for (Constant c : network.constants()) {
             constantsMap.put(c.name(), c);
-            constantsBitMap.put(c.name(), network.getConstantStore().isConstantInUse(c.name()));
+            canBeRemovedBitMap.put(c.name(), !network.getConstantStore().isConstantInUse(c.name()));
         }
 
         for (ColorType ct : network.colorTypes()) {
             List<String> messagesList = new ArrayList<String>();
             constantsMap.put(ct.getName(), ct);
-            constantsBitMap.put(ct.getName(), network.canColorTypeBeRemoved(dot, messagesList));
+            canBeRemovedBitMap.put(ct.getName(), network.canColorTypeBeRemoved(ct, messagesList));
             messages.put(ct.getName(), messagesList);
         }
 
         for (Variable v : network.variables()) {
             List<String> messagesList = new ArrayList<String>();
             constantsMap.put(v.getName(), v);
-            constantsBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList));
+            boolean canBeEdited = !(variables.containsKey(v.getName()) && !variables.get(v.getName()).getColorType().equals(v.getColorType()));
+            canBeRemovedBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList) && canBeEdited);
             messages.put(v.getName(), messagesList);
         }
 
-        for (String key : constantsBitMap.keySet()) {
+        // Generate error messages
+        for (String key : canBeRemovedBitMap.keySet()) {
+            boolean skip = false;
             if (constants.containsKey(key) || 
-                colorTypes.containsKey(key) || 
-                variables.containsKey(key)) {
+                variables.containsKey(key) && canBeRemovedBitMap.get(key) ||
+                key.equals("dot") ||
+                colorTypes.containsKey(key) && 
+                colorTypes.get(key).equals(constantsMap.get(key))) {
                 continue;
+            } else if (variables.containsKey(key) && !canBeRemovedBitMap.get(key)) {
+                for (Variable v : network.variables()) {
+                    if (v.getName().equals(key)) {
+                        skip = v.getColorType().equals(variables.get(key).getColorType());
+                    }
+                }
             }
 
+            if (skip) continue;
+
             Object obj = constantsMap.get(key);
-            if (!constantsBitMap.get(key)) {
-                String message = "Could not remove ";
+            if (!canBeRemovedBitMap.get(key)) {
+                String message = "Could not ";
+                String title = "Could not ";
+                if (obj instanceof ColorType && 
+                    colorTypes.containsKey(key) ||
+                    obj instanceof Variable &&
+                    variables.containsKey(key)) {
+                    message += "modify ";
+                    title += "modify constant";
+                } else {
+                    message += "remove ";
+                    title += "remove constant";
+                }
+
                 if (obj instanceof ColorType) {
                     message += "color type";
                 } else if (obj instanceof Variable) {
@@ -112,7 +136,7 @@ public class ConstantsParser {
                     message += " because it is in use";
                 }
 
-                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove constant", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, title, JOptionPane.WARNING_MESSAGE);
 
                 return false;
             }
@@ -236,6 +260,14 @@ void colorTypes() :
         if (isProductList.value) {
             ProductType pct = new ProductType(id.image);
             for (String product : values) {
+                if (product.equals("dot")) {
+                    ColorType dot = new ColorType("dot");
+                    dot.addColor("dot");
+
+                    pct.addType(dot);
+                    continue;
+                }
+
                 if (!colorTypes.containsKey(product)) {
                     throw new ParseException("Color type with name \"" + product + "\" does not exist");
                 }
@@ -307,6 +339,10 @@ void variables() :
         for (String id : ids) {
             idExists(id);
             
+            if (type.image.equals("dot")) {
+                throw new ParseException("Can not create a variable of color type \"dot\"");
+            }
+
             if (!colorTypes.containsKey(type.image)) {
                 throw new ParseException("Color type with name \"" + type.image + "\" does not exist");
             }
