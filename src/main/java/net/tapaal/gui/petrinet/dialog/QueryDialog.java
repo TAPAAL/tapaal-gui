@@ -3065,8 +3065,7 @@ public class QueryDialog extends JPanel {
             qualitativePanel.setVisible(qualitative);
             smcTracePanel.setVisible(simulate);
 
-            guiDialog.revalidate();
-            guiDialog.repaint();
+            guiDialog.pack();
         });
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
