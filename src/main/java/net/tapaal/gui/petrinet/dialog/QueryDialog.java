@@ -3064,8 +3064,9 @@ public class QueryDialog extends JPanel {
             quantitativePanel.setVisible(quantitative);
             qualitativePanel.setVisible(qualitative);
             smcTracePanel.setVisible(simulate);
-        
-            guiDialog.setSize(guiDialog.getWidth(), guiDialog.getHeight());    
+
+            guiDialog.revalidate();
+            guiDialog.repaint();
         });
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
