@@ -2963,7 +2963,6 @@ public class QueryDialog extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1;
         smcSettingsPanel.add(quantitativePanel, gbc);
-        gbc.gridx = 2;
 
         subPanelGbc.gridwidth = 1;
         subPanelGbc.anchor = GridBagConstraints.WEST;
@@ -3026,8 +3025,6 @@ public class QueryDialog extends JPanel {
         smcComparisonFloatSlider.addChangeListener(e -> smcComparisonFloatSlider.updateValue(smcComparisonFloat, 2));
         qualitativePanel.add(smcComparisonFloatSlider, subPanelGbc);
 
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1;
         smcSettingsPanel.add(qualitativePanel, gbc);
     
         smcTracePanel = new JPanel();
@@ -3057,8 +3054,7 @@ public class QueryDialog extends JPanel {
                                                            new SMCTraceType("Not satisfied") });
         smcTraceType.setToolTipText(TOOL_TIP_TRACE_TYPE);
         smcTracePanel.add(smcTraceType, subPanelGbc);
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1;
+  
         smcSettingsPanel.add(smcTracePanel, gbc);
 
         smcVerificationType.addActionListener(evt -> {
@@ -3068,6 +3064,13 @@ public class QueryDialog extends JPanel {
             quantitativePanel.setVisible(quantitative);
             qualitativePanel.setVisible(qualitative);
             smcTracePanel.setVisible(simulate);
+        
+            int currentWidth = guiDialog.getWidth();
+    
+            guiDialog.pack();
+
+            // reset width
+            guiDialog.setSize(currentWidth, guiDialog.getHeight());
         });
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
