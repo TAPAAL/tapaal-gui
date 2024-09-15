@@ -362,7 +362,7 @@ public class DistributionPanel extends JPanel {
         double shape = params.get("shape");
         double scale = params.get("scale");
 
-        Require.that(shape > 0, "Shape must be a non-negative real");
+        Require.that(shape > 0, "Shape must be a positive real");
 
         double gamma = spougeGammaApprox(shape - 1);
         double coefficient = 1 / (gamma * Math.pow(scale, shape));
@@ -372,7 +372,7 @@ public class DistributionPanel extends JPanel {
         double x = 1e-6;
         while (true) {
             double y = coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
-            if (y < 1e-6) break;
+            if (y < 1e-6 && x > 1) break;
             points.add(new GraphPoint(x, y));
             x += step;	
         }
@@ -387,7 +387,7 @@ public class DistributionPanel extends JPanel {
         double shape = params.get("shape");
         double scale = params.get("scale");
 
-        Require.that(shape >= 1 && (shape % 1 == 0), "Shape must be a non-negative integer");
+        Require.that(shape >= 1 && (shape % 1 == 0), "Shape must be a positive integer");
 
 
         double gamma = spougeGammaApprox(shape - 1);
@@ -446,8 +446,8 @@ public class DistributionPanel extends JPanel {
         double step = 0.1 * stddev;
         double twoVariance = 2 * variance;
         double negInvTwoVariance = -1 / twoVariance;
-        
-        double min = mean - 3 * stddev;
+    
+        double min = Math.max(mean - 3 * stddev, 0);
         double max = mean + 3 * stddev;
 
         for (double x = min; x <= max; x += step) {
