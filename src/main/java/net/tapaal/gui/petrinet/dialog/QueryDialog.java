@@ -3061,6 +3061,7 @@ public class QueryDialog extends JPanel {
             boolean quantitative = smcVerificationType.getSelectedIndex() == 0;
             boolean qualitative = smcVerificationType.getSelectedIndex() == 1;
             boolean simulate = smcVerificationType.getSelectedIndex() == 2;
+
             quantitativePanel.setVisible(quantitative);
             qualitativePanel.setVisible(qualitative);
             smcTracePanel.setVisible(simulate);
@@ -3076,6 +3077,18 @@ public class QueryDialog extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1;
         add(smcSettingsPanel, gridBagConstraints);
+
+        Dimension quantitativeSize = quantitativePanel.getPreferredSize();
+        Dimension qualitativeSize = qualitativePanel.getPreferredSize();
+        Dimension smcTraceSize = smcTracePanel.getPreferredSize();
+
+        int maxWidth = Math.max(quantitativeSize.width, Math.max(qualitativeSize.width, smcTraceSize.width));
+        int maxHeight = Math.max(quantitativeSize.height, Math.max(qualitativeSize.height, smcTraceSize.height));
+        Dimension largestSize = new Dimension(maxWidth, maxHeight);
+        
+        quantitativePanel.setPreferredSize(largestSize);
+        qualitativePanel.setPreferredSize(largestSize);
+        smcTracePanel.setPreferredSize(largestSize);
 
         setupEstimationListeners();
     }
