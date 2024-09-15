@@ -1,6 +1,7 @@
 package net.tapaal.gui.petrinet.dialog;
 
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 
 public class QuerySlider extends JSlider {
     private double realValue;
@@ -8,7 +9,11 @@ public class QuerySlider extends JSlider {
     private double desiredMax;
 
     public QuerySlider(int value, double desiredMin, double desiredMax) {
-        super(0, 100, value);
+        this(value, desiredMin, desiredMax, 100);
+    }
+
+    public QuerySlider(int value, double desiredMin, double desiredMax, int resolution) {
+        super(0, resolution, value);
         this.desiredMin = desiredMin;
         this.desiredMax = desiredMax;
     }
@@ -27,5 +32,18 @@ public class QuerySlider extends JSlider {
 
     public double getDesiredMax() {
         return desiredMax;
+    }
+
+    public void updateValue(JTextField textField, int precision) {
+        int value = getValue();
+        double desiredMin = getDesiredMin();
+        double desiredMax = getDesiredMax();
+        double proportion = (double) value / getMaximum();
+        double interpretedValue = desiredMin + proportion * (desiredMax - desiredMin);
+        double scale = Math.pow(10, precision);
+        double roundedValue = Math.round(interpretedValue * scale) / scale;
+        textField.setText(roundedValue + "");
+        setRealValue(roundedValue);
+        setToolTipText(String.format("Value: %." + precision + "f", roundedValue));
     }
 }
