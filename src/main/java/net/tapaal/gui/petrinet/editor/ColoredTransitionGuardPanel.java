@@ -473,21 +473,21 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     private Pair<ColorExpression, ColorExpression> getLeftRightExpression(Expression currentSelection) {
-        if (currentSelection instanceof PlaceHolderGuardExpression ||
-            !(currentSelection instanceof LeftRightGuardExpression)) {
-            if (colorTypeCombobox.getSelectedItem() instanceof ProductType) {
-                int size = ((ProductType) colorTypeCombobox.getSelectedItem()).size();
-                Vector<ColorExpression> tempVec1 = createPlaceholderVectors(size);
-                Vector<ColorExpression> tempVec2 = createPlaceholderVectors(size);
-                return new Pair<>(new TupleExpression(tempVec1, (ProductType) colorTypeCombobox.getSelectedItem()),
-                                  new TupleExpression(tempVec2, (ProductType) colorTypeCombobox.getSelectedItem()));
-            }
-            ColorType type = (ColorType) colorTypeCombobox.getSelectedItem();
-            return new Pair<>(new PlaceHolderColorExpression(type), new PlaceHolderColorExpression(type));
-        } else {
+        if (currentSelection instanceof LeftRightGuardExpression) {
             return new Pair<>(((LeftRightGuardExpression) currentSelection).getLeftExpression(),
                 ((LeftRightGuardExpression) currentSelection).getRightExpression());
         }
+
+        if (colorTypeCombobox.getSelectedItem() instanceof ProductType) {
+            int size = ((ProductType) colorTypeCombobox.getSelectedItem()).size();
+            Vector<ColorExpression> tempVec1 = createPlaceholderVectors(size);
+            Vector<ColorExpression> tempVec2 = createPlaceholderVectors(size);
+            return new Pair<>(new TupleExpression(tempVec1, (ProductType) colorTypeCombobox.getSelectedItem()),
+                                new TupleExpression(tempVec2, (ProductType) colorTypeCombobox.getSelectedItem()));
+        }
+        
+        ColorType type = (ColorType) colorTypeCombobox.getSelectedItem();
+        return new Pair<>(new PlaceHolderColorExpression(type), new PlaceHolderColorExpression(type));
     }
 
     private void initExprEditPanel() {
