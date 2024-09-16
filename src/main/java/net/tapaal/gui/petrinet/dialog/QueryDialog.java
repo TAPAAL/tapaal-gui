@@ -2955,6 +2955,7 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridwidth = 2;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
         smcTimeEstimationButton = new JButton(UPDATE_VERIFICATION_TIME_BTN_TEXT);
+        smcTimeEstimationButton.setPreferredSize(new Dimension(378, 25));
         smcTimeEstimationButton.addActionListener(evt -> {
             runBenchmark();
         });
