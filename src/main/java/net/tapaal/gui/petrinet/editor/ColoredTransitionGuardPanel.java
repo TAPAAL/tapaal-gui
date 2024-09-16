@@ -473,7 +473,8 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
     private Pair<ColorExpression, ColorExpression> getLeftRightExpression(Expression currentSelection) {
-        if (currentSelection instanceof PlaceHolderGuardExpression) {
+        if (currentSelection instanceof PlaceHolderGuardExpression ||
+            !(currentSelection instanceof LeftRightGuardExpression)) {
             if (colorTypeCombobox.getSelectedItem() instanceof ProductType) {
                 int size = ((ProductType) colorTypeCombobox.getSelectedItem()).size();
                 Vector<ColorExpression> tempVec1 = createPlaceholderVectors(size);
