@@ -206,4 +206,13 @@ public class AddExpression extends ArcExpression {
         }
         return new AddExpression(arcExpressions);
     }
+
+    @Override
+    public ArcExpression getExprConverted(ColorType oldCt, ColorType newCt) {
+        Vector<ArcExpression> arcExpressions = new Vector<>();
+        for (ArcExpression expr : constituents) {
+            arcExpressions.add(expr.getExprConverted(oldCt, newCt));
+        }
+        return new AddExpression(arcExpressions);
+    }
 }

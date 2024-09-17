@@ -37,4 +37,6 @@ public abstract class ArcExpression extends Expression {
     public abstract Integer weight();
 
     public abstract ArcExpression getExprWithNewColorType(ColorType ct);
+
+    public abstract ArcExpression getExprConverted(ColorType oldCt, ColorType newCt);
 }

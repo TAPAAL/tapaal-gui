@@ -140,4 +140,9 @@ public class SubtractExpression extends ArcExpression {
     public ArcExpression getExprWithNewColorType(ColorType ct) {
         return new SubtractExpression(left.getExprWithNewColorType(ct), right.getExprWithNewColorType(ct));
     }
+
+    @Override
+    public ArcExpression getExprConverted(ColorType oldCt, ColorType newCt) {
+        return new SubtractExpression(left.getExprConverted(oldCt, newCt), right.getExprConverted(oldCt, newCt));
+    }
 }
