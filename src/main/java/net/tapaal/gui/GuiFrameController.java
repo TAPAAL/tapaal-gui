@@ -243,8 +243,8 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
         buffer.append("Credits\n\n");
         buffer.append("TAPAAL GUI and Translations:\n");
-            buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Malo Dautry, \nJakob Dyhr, Louise Foshammer, Malte Neve-Gr\u00E6sb\u00F8ll, ");
-            buffer.append("Lasse Jacobsen, Morten Jacobsen,\nThomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
+            buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Malo Dautry, \nTanguy Dubois, Jakob Dyhr, Louise Foshammer, Malte Neve-Gr\u00E6sb\u00F8ll, ");
+            buffer.append("Lasse Jacobsen, \nMorten Jacobsen,Thomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
             buffer.append("Mads Johannsen,\nKenneth Y. J\u00F8rgensen, Mikael H. M\u00F8ller, Christoffer Moesgaard, Kristian Morsing Pedersen,\nThomas Pedersen, Lena S. Ernstsen, Niels N. Samuelsen, Jiri Srba, Mathias G. S\u00F8rensen,\nJakob H. Taankvist, Peter H. Taankvist and Mikkel Tygesen\n");
 
             buffer.append("Aalborg University 2008-2023\n\n");
@@ -254,7 +254,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
             buffer.append("Aalborg University 2011-2023\n\n");
 
         buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
-            buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
+            buffer.append("Mathias Andersen, Tanguy Dubois, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
             buffer.append("Mathias G. S\u00F8rensen and Jakob H. Taankvist\n");
             buffer.append("Aalborg University 2012-2023\n\n");
 
