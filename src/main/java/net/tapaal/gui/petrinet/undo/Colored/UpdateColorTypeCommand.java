@@ -73,8 +73,9 @@ public class UpdateColorTypeCommand implements Command {
             for (TimedPlace place : tapn.places()) {
                 if (place.getColorType().equals(oldColorType)) {
 
-                    if(place.getTokensAsExpression() != null)
+                    if(place.getTokensAsExpression() != null) {
                         place.setTokenExpression(place.getTokensAsExpression().getExprConverted(oldColorType, newColorType));
+                    }
 
                     List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
                     place.setColorType(newColorType);
