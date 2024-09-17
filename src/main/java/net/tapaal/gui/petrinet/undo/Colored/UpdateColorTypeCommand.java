@@ -1,7 +1,7 @@
 package net.tapaal.gui.petrinet.undo.Colored;
 
 import dk.aau.cs.model.CPN.*;
-import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.*;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
@@ -72,6 +72,10 @@ public class UpdateColorTypeCommand implements Command {
         for (TimedArcPetriNet tapn : network.allTemplates()) {
             for (TimedPlace place : tapn.places()) {
                 if (place.getColorType().equals(oldColorType)) {
+
+                    if(place.getTokensAsExpression() != null)
+                        place.setTokenExpression(place.getTokensAsExpression().getExprConverted(oldColorType, newColorType));
+
                     List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
                     place.setColorType(newColorType);
                     for (TimedToken token : oldTokens) {
@@ -83,12 +87,12 @@ public class UpdateColorTypeCommand implements Command {
             }
             for (TimedInputArc arc : tapn.inputArcs()) {
                 if (arc.getArcExpression() != null) {
-                    arc.setExpression(arc.getArcExpression().getExprWithNewColorType(newColorType));
+                    arc.setExpression(arc.getArcExpression().getExprConverted(oldColorType, newColorType));
                 }
             }
             for (TimedOutputArc arc : tapn.outputArcs()) {
                 if (arc.getExpression() != null) {
-                    arc.setExpression(arc.getExpression().getExprWithNewColorType(newColorType));
+                    arc.setExpression(arc.getExpression().getExprConverted(oldColorType, newColorType));
                 }
             }
             for (TimedTransition transition : tapn.transitions()) {
