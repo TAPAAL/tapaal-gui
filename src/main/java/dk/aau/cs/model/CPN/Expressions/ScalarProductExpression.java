@@ -117,4 +117,9 @@ public class ScalarProductExpression extends ArcExpression {
     public ArcExpression getExprWithNewColorType(ColorType ct) {
         return new ScalarProductExpression(scalar, expr.getExprWithNewColorType(ct));
     }
+
+    @Override
+    public ArcExpression getExprConverted(ColorType oldCt, ColorType newCt) {
+        return new ScalarProductExpression(scalar, expr.getExprConverted(oldCt, newCt));
+    }
 }
