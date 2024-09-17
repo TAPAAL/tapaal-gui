@@ -92,7 +92,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean colorFixpoint = getUnfoldingOption(queryElement, "colorFixpoint", true);
         boolean symmetricVars = getUnfoldingOption(queryElement, "symmetricVars", true);
 
-        boolean parallel = getReductionOption(queryElement, "parallel", false);
+        boolean parallel = getReductionOption(queryElement, "parallel", true);
         VerificationType verificationType = VerificationType.fromString(queryElement.getAttribute("verificationType"));
 
         int numberOfTraces;

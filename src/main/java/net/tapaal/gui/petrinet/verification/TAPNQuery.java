@@ -91,7 +91,7 @@ public class TAPNQuery {
     private SMCSettings smcSettings;
     private boolean benchmark = false;
     private int benchmarkRuns = 100;
-    private boolean parallel = false;
+    private boolean parallel = true;
     
     public enum VerificationType {
         QUANTITATIVE, QUALITATIVE, SIMULATE;
