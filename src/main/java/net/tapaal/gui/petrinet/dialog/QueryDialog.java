@@ -2856,6 +2856,7 @@ public class QueryDialog extends JPanel {
         smcEngineOptions.add(smcParallelLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcParallel = new JCheckBox();
+        smcParallel.setSelected(true);
         smcEngineOptions.add(smcParallel, subPanelGbc);
 
         smcSettingsPanel.add(smcEngineOptions, gbc);
