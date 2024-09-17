@@ -13,7 +13,6 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
@@ -29,17 +28,16 @@ import net.tapaal.gui.petrinet.verification.UnfoldNet;
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class VerifyDTAPN implements ModelChecker{
 
@@ -56,6 +54,8 @@ public class VerifyDTAPN implements ModelChecker{
 
 	protected ProcessRunner runner;
 
+    private boolean isSMC = false;
+
 	public VerifyDTAPN(FileFinder fileFinder, Messenger messenger) {
 		this.fileFinder = fileFinder;
 		this.messenger = messenger;
@@ -66,10 +66,19 @@ public class VerifyDTAPN implements ModelChecker{
 	}
 
     public String[] getStatsExplanations(){
-        String[] explanations = new String[3];
-        explanations[0] = "The number of found markings (each time a successor is calculated, this number is incremented)";
-        explanations[1] = "The number of markings taken out of the waiting list during the search.";
-        explanations[2] = "The number of markings found in the passed/waiting list at the end of verification.";
+        String[] explanations;
+        if(!isSMC) {
+            explanations = new String[3];
+            explanations[0] = "The number of found markings (each time a successor is calculated, this number is incremented)";
+            explanations[1] = "The number of markings taken out of the waiting list during the search.";
+            explanations[2] = "The number of markings found in the passed/waiting list at the end of verification.";
+        } else {
+            explanations = new String[4];
+            explanations[0] = "The number of random runs executed during statistical verification";
+            explanations[1] = "The number of random runs satisfying the tested propriety";
+            explanations[2] = "The average total time delayed for executed random runs";
+            explanations[3] = "The average number of transitions firing for executed random runs";
+        }
         return explanations;
     }
 
@@ -278,6 +287,7 @@ public class VerifyDTAPN implements ModelChecker{
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
             }
+            isSMC = queryResult.value1().isSMC();
             return new VerificationResult<>(queryResult.value1(), null, null, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, null);
         }
     }
@@ -322,6 +332,7 @@ public class VerifyDTAPN implements ModelChecker{
 			if (queryResult == null || queryResult.value1() == null) {
 				return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
+                isSMC = queryResult.value1().isSMC();
                 TimedArcPetriNetTrace tapnTrace = null;
 
                 boolean isColored = (lens != null && lens.isColored() || (model.value1().parentNetwork() != null && model.value1().parentNetwork().isColored()));
@@ -329,8 +340,8 @@ public class VerifyDTAPN implements ModelChecker{
                     (query.getProperty() instanceof TCTLAGNode && !queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAFNode && !queryResult.value1().isQuerySatisfied()));
-
-                if (options.traceOption() != TraceOption.NONE && isColored && showTrace) {
+            
+                if (options.traceOption() != TraceOption.NONE && isColored && showTrace || isSMC && options.isSimulate() && isColored) {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
@@ -338,13 +349,13 @@ public class VerifyDTAPN implements ModelChecker{
                         LoadedModel loadedModel = tapnLoader.load(fileOut);
                         TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
                         model = newComposer.transformModel(loadedModel.network());
-
+                        
                         if (queryResult.value1() != null) {
                             tapnTrace = parseTrace(!errorOutput.contains("Trace:") ? errorOutput : (errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
                         }
 
-                        if (tapnTrace != null) {
-                            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
+                        if (tapnTrace != null || options.isSimulate()) {
+                            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false, lens.isStochastic()));
 
                             //The query being verified should be the only query
                             for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network(), query.getCategory())) {
@@ -357,6 +368,21 @@ public class VerifyDTAPN implements ModelChecker{
                     } catch (ThreadDeath | Exception e) {
                         e.printStackTrace();
                         return null;
+                    }
+                }
+
+                if (isSMC && options.isSimulate()) {
+                    VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
+                    BufferedReader reader = new BufferedReader(new StringReader(errorOutput));
+                    Map<String, TimedArcPetriNetTrace> parsedTraceMap = traceParser.parseTraces(reader);
+                    
+                    if (parsedTraceMap != null && !parsedTraceMap.isEmpty()) {
+                        if (parsedTraceMap.size() > 1) {
+                            var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab); 
+                            return result;
+                        }
+                        
+                        tapnTrace = parsedTraceMap.values().iterator().next();
                     }
                 }
 
@@ -374,6 +400,32 @@ public class VerifyDTAPN implements ModelChecker{
 			}
 		}
 	}
+
+    public Stats getStats(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) {
+        VerifyTAPNExporter exporter;
+        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+            exporter = new VerifyTACPNExporter();
+        } else {
+            exporter = new VerifyTAPNExporter();
+        }
+        ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query, lens, model.value2(), null, dataLayerQuery);
+
+        if (exportedModel == null) {
+            messenger.displayErrorMessage("There was an error exporting the model");
+            return null;
+        }
+
+        runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
+        runner.run();
+
+        if (runner.error()) {
+            return null;
+        } else {
+            String standardOutput = readOutput(runner.standardOutput());
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query, model.value1());
+            return queryResult.value2();
+        }
+    }
 
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
 		if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;

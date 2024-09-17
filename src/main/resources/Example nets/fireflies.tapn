@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <declaration>
+    <structure>
+      <declarations>
+        <namedsort id="dot" name="dot">
+          <dot/>
+        </namedsort>
+        <namedsort id="fireflies" name="fireflies">
+          <finiteintrange end="6" start="1"/>
+        </namedsort>
+        <variabledecl id="x" name="x">
+          <usersort declaration="fireflies"/>
+        </variabledecl>
+        <variabledecl id="y" name="y">
+          <usersort declaration="fireflies"/>
+        </variabledecl>
+      </declarations>
+    </structure>
+  </declaration>
+  <net active="true" id="TAPN1" type="P/T net">
+    <place displayName="true" id="waiting" initialMarking="6" invariant="&lt; inf" name="waiting" nameOffsetX="0" nameOffsetY="-3" positionX="135" positionY="165">
+      <type>
+        <text>fireflies</text>
+        <structure>
+          <usersort declaration="fireflies"/>
+        </structure>
+      </type>
+      <hlinitialMarking>
+        <text>(1'fireflies.all)</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <all>
+                    <usersort declaration="fireflies"/>
+                  </all>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinitialMarking>
+    </place>
+    <place displayName="true" id="charging" initialMarking="0" invariant="&lt; inf" name="charging" nameOffsetX="88" nameOffsetY="21" positionX="390" positionY="165">
+      <type>
+        <text>fireflies</text>
+        <structure>
+          <usersort declaration="fireflies"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="charged" initialMarking="0" invariant="&lt; inf" name="charged" nameOffsetX="-9" nameOffsetY="9" positionX="630" positionY="165">
+      <type>
+        <text>fireflies</text>
+        <structure>
+          <usersort declaration="fireflies"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="firing" initialMarking="0" invariant="&lt; inf" name="firing" nameOffsetX="89" nameOffsetY="-7" positionX="870" positionY="165">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+    <transition a="0.0" angle="0" b="2.0" displayName="true" distribution="uniform" firingMode="Oldest" id="arrive" infiniteServer="false" name="arrive" nameOffsetX="55" nameOffsetY="-26" player="0" positionX="270" positionY="165" priority="0" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="normal" firingMode="Oldest" id="ready" infiniteServer="false" mean="0.5" name="ready" nameOffsetX="0" nameOffsetY="0" player="0" positionX="525" positionY="90" priority="0" stddev="0.1" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="exponential" firingMode="Oldest" id="fire_alone" infiniteServer="false" name="fire_alone" nameOffsetX="104" nameOffsetY="-26" player="0" positionX="735" positionY="60" priority="0" rate="0.1" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Oldest" id="fire_jointly" infiniteServer="false" name="fire_jointly" nameOffsetX="66" nameOffsetY="55" player="0" positionX="630" positionY="255" priority="0" urgent="true" value="0.0" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Oldest" id="all_fired" infiniteServer="false" name="all_fired" nameOffsetX="45" nameOffsetY="-11" player="0" positionX="750" positionY="165" priority="0" urgent="true" value="0.0" weight="1.0"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="waiting" target="arrive" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="165" yCoord="180"/>
+      <arcpath arcPointType="false" id="1" xCoord="279" yCoord="180"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="arrive" target="charging" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="289" yCoord="180"/>
+      <arcpath arcPointType="false" id="1" xCoord="390" yCoord="180"/>
+    </arc>
+    <arc id="A2" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="charging" target="ready" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="417" yCoord="172"/>
+      <arcpath arcPointType="false" id="1" xCoord="534" yCoord="105"/>
+    </arc>
+    <arc id="A3" inscription="1" nameOffsetX="0" nameOffsetY="0" source="ready" target="charged" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="544" yCoord="105"/>
+      <arcpath arcPointType="false" id="1" xCoord="632" yCoord="171"/>
+    </arc>
+    <arc id="A4" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="charged" target="fire_alone" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="655" yCoord="169"/>
+      <arcpath arcPointType="false" id="1" xCoord="744" yCoord="75"/>
+    </arc>
+    <arc id="A9" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="charged" target="fire_jointly" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="644" yCoord="194"/>
+      <arcpath arcPointType="false" id="1" xCoord="644" yCoord="254"/>
+    </arc>
+    <arc id="A6" inscription="1" nameOffsetX="0" nameOffsetY="0" source="fire_alone" target="firing" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="754" yCoord="80"/>
+      <arcpath arcPointType="false" id="1" xCoord="873" yCoord="170"/>
+    </arc>
+    <arc id="A7" inscription="1" nameOffsetX="0" nameOffsetY="0" source="fire_alone" target="charging" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="749" yCoord="59"/>
+      <arcpath arcPointType="false" id="1" xCoord="750" yCoord="30"/>
+      <arcpath arcPointType="false" id="2" xCoord="405" yCoord="30"/>
+      <arcpath arcPointType="false" id="3" xCoord="405" yCoord="165"/>
+    </arc>
+    <arc id="A8" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="firing" target="fire_jointly" type="timed" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="879" yCoord="193"/>
+      <arcpath arcPointType="true" id="1" xCoord="810" yCoord="270"/>
+      <arcpath arcPointType="false" id="2" xCoord="649" yCoord="275"/>
+    </arc>
+    <arc id="A10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="fire_jointly" target="firing" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="650" yCoord="265"/>
+      <arcpath arcPointType="false" id="1" xCoord="870" yCoord="185"/>
+    </arc>
+    <arc id="A11" inscription="1" nameOffsetX="0" nameOffsetY="0" source="fire_jointly" target="charging" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="639" yCoord="270"/>
+      <arcpath arcPointType="false" id="1" xCoord="405" yCoord="270"/>
+      <arcpath arcPointType="false" id="2" xCoord="405" yCoord="195"/>
+    </arc>
+    <arc id="A12" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="firing" target="all_fired" type="timed" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="870" yCoord="180"/>
+      <arcpath arcPointType="false" id="1" xCoord="769" yCoord="180"/>
+    </arc>
+    <arc id="I12" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="charged" target="all_fired" type="tapnInhibitor" weight="1">
+      <hlinscription>
+        <text>1'fireflies.all</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <all>
+                <usersort declaration="fireflies"/>
+              </all>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="660" yCoord="180"/>
+      <arcpath arcPointType="false" id="1" xCoord="759" yCoord="180"/>
+    </arc>
+    <arc id="I13" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="firing" target="fire_alone" type="tapnInhibitor" weight="1">
+      <hlinscription>
+        <text>1'dot.all</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <all>
+                <usersort declaration="dot"/>
+              </all>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="883" yCoord="165"/>
+      <arcpath arcPointType="true" id="1" xCoord="840" yCoord="75"/>
+      <arcpath arcPointType="false" id="2" xCoord="755" yCoord="70"/>
+    </arc>
+  </net>
+  <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="All fireflies synchronize" numberOfTraces="1" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="Any" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Quantitative">
+    <smc confidence="0.95" interval-width="0.01" time-bound="50"/>
+    <formula>
+      <finally>
+        <conjunction>
+          <integer-eq>
+            <tokens-count>
+              <place>TAPN1.charging</place>
+            </tokens-count>
+            <integer-constant>1</integer-constant>
+          </integer-eq>
+          <integer-eq>
+            <tokens-count>
+              <place>TAPN1.firing</place>
+            </tokens-count>
+            <integer-constant>1</integer-constant>
+          </integer-eq>
+          <integer-eq>
+            <tokens-count>
+              <place>TAPN1.waiting</place>
+            </tokens-count>
+            <integer-constant>0</integer-constant>
+          </integer-eq>
+        </conjunction>
+      </finally>
+    </formula>
+  </query>
+  <feature isColored="true" isGame="false" isStochastic="true" isTimed="true"/>
+</pnml>

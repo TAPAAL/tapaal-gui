@@ -456,7 +456,7 @@ public class ApproximationWorker {
 		} else {
             NameMapping nameMapping = isColored? result.getUnfoldedModel().value2(): transformedModel.value2();
             TimedArcPetriNetNetwork netNetwork = isColored? result.getUnfoldedModel().value1().parentNetwork(): model;
-            if (dataLayerQuery != null && dataLayerQuery.getCategory() == net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.HyperLTL) {
+            if (dataLayerQuery != null && dataLayerQuery.getCategory() == net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.HyperLTL || dataLayerQuery.getCategory() == net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.SMC) {
                 toReturn =  new VerificationResult<>(
                     result.getQueryResult(),
                     decomposeTrace(result.getTraceMap(), nameMapping, netNetwork),
@@ -486,7 +486,7 @@ public class ApproximationWorker {
 		
 		options.setTraceOption(oldTraceOption);
 		// if the old traceoption was none, we need to set the results traces to null so GUI doesn't try to display the traces later
-		if (oldTraceOption == TraceOption.NONE && toReturn != null){
+		if (oldTraceOption == TraceOption.NONE && toReturn != null && dataLayerQuery.getCategory() != net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.SMC) {
 			toReturn.setTrace(null);
 			toReturn.setSecondaryTrace(null);
 		}
@@ -527,8 +527,9 @@ public class ApproximationWorker {
         boolean modelIsColored = composedModel.value1().isColored();
         boolean modelIsTimed = !composedModel.value1().isUntimed();
         boolean modelIsGame = composedModel.value1().hasUncontrollableTransitions();
+        boolean modelIsStochastic = composedModel.value1().isStochastic();
 
-        TAPNLens lens = new TAPNLens(modelIsTimed, modelIsGame, modelIsColored);
+        TAPNLens lens = new TAPNLens(modelIsTimed, modelIsGame, modelIsColored, modelIsStochastic);
 
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify, null, query, lens);
 		

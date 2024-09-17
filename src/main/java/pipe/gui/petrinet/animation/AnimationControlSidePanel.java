@@ -8,7 +8,6 @@ import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -18,7 +17,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.util.Require;
@@ -84,8 +82,6 @@ public class AnimationControlSidePanel extends JPanel {
         traceBox.setPreferredSize(new Dimension(100, 27));
         traceBox.setToolTipText(TRACEBOX_DROPDOWN_TOOL_TIP);
         showTraceBox(false);
-        animationToolBar.add(Box.createHorizontalStrut(10));
-        animationToolBar.add(traceBox);
 
         GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -122,7 +118,6 @@ public class AnimationControlSidePanel extends JPanel {
 
     public void updateTraceBox(Map<String, TAPNNetworkTrace> traceMap) {
         Vector<Object> tracesVector = new Vector<>();
-
         for (var entry : traceMap.entrySet()) {
             tracesVector.add(entry.getKey());
         }
@@ -137,12 +132,25 @@ public class AnimationControlSidePanel extends JPanel {
 
         showTraceBox(true);
 
+        if (timedelayPanel.isVisible()) {
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.weightx = 0.5;
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            gbc.insets = new Insets(10, 0, 0, 0); 
+            add(traceBox, gbc);
+        } else {
+            animationToolBar.add(Box.createHorizontalStrut(10));
+            animationToolBar.add(traceBox);
+        }
+
         remove(animationToolBar);
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
         c.gridx = 0;
-        c.gridy = 0;
+        c.gridy = 2;
         add(animationToolBar, c);
     }
 

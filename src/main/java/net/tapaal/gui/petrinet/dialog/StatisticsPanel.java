@@ -118,7 +118,7 @@ public class StatisticsPanel extends JPanel{
 	private boolean checkIfOrphan(int contentNumber, GridBagConstraints gbc, boolean orphanTransitions) {
         boolean isOrphan = false;
         int rowNumber;
-
+        
         for (int i = 1; i < contents[contents.length - contentNumber].length; i++) {
             if (!contents[contents.length - contentNumber][i].toString().equals("0")) {
                 isOrphan = true;

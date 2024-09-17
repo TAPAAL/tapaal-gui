@@ -100,10 +100,12 @@ public class Export {
             LTLQueryVisitor LTLXMLVisitor = new LTLQueryVisitor();
             HyperLTLQueryVisitor HyperLTLXMLVisitor = new HyperLTLQueryVisitor();
             CTLQueryVisitor CTLXMLVisitor = new CTLQueryVisitor();
+            SMCQueryVisitor SMCXMLVisitor = new SMCQueryVisitor();
 
             while (queryIterator.hasNext()) {
                 boolean isCTL = false;
                 boolean isHyperLTL = false;
+                boolean isSMC = false;
                 TAPNQuery clonedQuery = queryIterator.next().copy();
 
                 // Attempt to parse and possibly transform the string query using the manual edit parser
@@ -114,6 +116,9 @@ public class Export {
                     } else if (clonedQuery.getCategory().equals((TAPNQuery.QueryCategory.HyperLTL))) {
                         isHyperLTL = true;
                         newProperty = TAPAALHyperLTLQueryParser.parse(clonedQuery.getProperty().toString());
+                    } else if (clonedQuery.getCategory().equals((TAPNQuery.QueryCategory.SMC))) {
+                        isSMC = true;
+                        newProperty = TAPAALLTLQueryParser.parse(clonedQuery.getProperty().toString());
                     } else {
                         newProperty = TAPAALCTLQueryParser.parse(clonedQuery.getProperty().toString());
                         isCTL = true;
@@ -125,6 +130,8 @@ public class Export {
                 newProperty.accept(new RenameAllTransitionsVisitor(mapping), null);
                 if (isHyperLTL) {
                     HyperLTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
+                } else if (isSMC) {
+                    SMCXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName(), clonedQuery.getSmcSettings());
                 } else if (!isCTL) {
                     LTLXMLVisitor.buildXMLQuery(newProperty, clonedQuery.getName());
                 } else {
@@ -149,7 +156,7 @@ public class Export {
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(network);
         TimedArcPetriNet model = transformedModel.value1();
 
-        TAPNLens lens = new TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions(), model.isColored());
+        TAPNLens lens = new TAPNLens(!model.isUntimed(), model.hasUncontrollableTransitions(), model.isColored(), model.isStochastic());
 
         RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
         int i = 0;
@@ -158,9 +165,9 @@ public class Export {
             i++;
 
             if (lens.isGame() && isDTAPN) {
-                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".xml"), null, lens, transformedModel.value2(), composer.getGuiModel());
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0, query.getSmcSettings()), new File(modelFile), new File(queryFile + i + ".xml"), null, lens, transformedModel.value2(), composer.getGuiModel());
             } else {
-                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0), new File(modelFile), new File(queryFile + i + ".xml"), null, new TAPNLens(true, false, lens.isColored()), transformedModel.value2(), composer.getGuiModel());
+                exporter.export(model, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), 0, query.getSmcSettings()), new File(modelFile), new File(queryFile + i + ".xml"), null, new TAPNLens(true, false, lens.isColored(), lens.isStochastic()), transformedModel.value2(), composer.getGuiModel());
             }
         }
     }

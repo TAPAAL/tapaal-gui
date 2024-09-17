@@ -108,7 +108,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             }
             templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
             if(lens.isTimed()){
-                TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, model.constants());
+                TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, model.constants(), lens);
                 writerTACPN.savePNML(modelFile, false);
             } else{
                 var guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
@@ -185,7 +185,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 loadedModel = new PNMLoader().load(fileOut);
             }
             // addLocation(loadedModel, composer); // We can not get coords from server
-            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false));
+            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false, oldTab.getLens().isStochastic()));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
 
             Thread thread = new Thread(() -> TAPAALGUI.getAppGuiController().openTab(newTab));

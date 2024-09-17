@@ -399,9 +399,7 @@ public class XMLCTLQueryParser {
             }
         } else if (nodeName.equals("control")) {
             return parseFormula(child);
-        }else{
-        	parseFormula(property);
-        }
+        } 
 
         throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
     }

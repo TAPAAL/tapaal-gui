@@ -7,9 +7,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 
 import dk.aau.cs.TCTL.*;
-import dk.aau.cs.TCTL.visitors.HyperLTLQueryVisitor;
-import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
-import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.*;
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.verification.NameMapping;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -24,7 +22,6 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 
-import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.Place;
 import pipe.gui.petrinet.graphicElements.Transition;
@@ -65,9 +62,12 @@ public class VerifyTAPNExporter {
             } else if (query.getCategory() == QueryCategory.LTL) {
                 LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
-            } else if (query.getCategory() == QueryCategory.HyperLTL){
+            } else if (query.getCategory() == QueryCategory.HyperLTL) {
                 HyperLTLQueryVisitor XMLVisitor = new HyperLTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
+            } else if (query.getCategory() == QueryCategory.SMC) {
+                SMCQueryVisitor XMLVisitor = new SMCQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery.getName(), dataLayerQuery.getSmcSettings()));
             } else if (lens != null && lens.isGame()) {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null, true));
@@ -161,6 +161,9 @@ public class VerifyTAPNExporter {
         modelStream.append("player=\"" + (t.isUncontrollable() ? "1" : "0") + "\" ");
         modelStream.append("id=\"" + t.name() + "\" ");
 		modelStream.append("name=\"" + t.name() + "\" ");
+        modelStream.append("weight=\""+ t.getWeight().nameForSaving(false) + "\" ");
+        modelStream.append("firingMode=\"" + t.getFiringMode().toString() + "\" ");
+        modelStream.append(t.getDistribution().toString());
         modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
         modelStream.append(">\n");
 

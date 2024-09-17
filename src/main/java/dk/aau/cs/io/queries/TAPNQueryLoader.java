@@ -6,6 +6,9 @@ import java.util.List;
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.XMLParsing.XMLHyperLTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
+import dk.aau.cs.verification.SMCSettings;
+import dk.aau.cs.verification.SMCTraceType;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,6 +21,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.HashTableSize;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.VerificationType;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
@@ -77,6 +81,7 @@ public class TAPNQueryLoader extends QueryLoader{
         boolean isCTL = isTypeQuery(queryElement, "CTL");
         boolean isLTL = isTypeQuery(queryElement, "LTL");
         boolean isHyperLTL = isTypeQuery(queryElement, "HyperLTL");
+        boolean isSmc = isTypeQuery(queryElement, "SMC") || hasSmcTag(queryElement);
 
 		boolean siphontrap = getReductionOption(queryElement, "useSiphonTrapAnalysis", false);
 		boolean queryReduction = getReductionOption(queryElement, "useQueryReduction", true);
@@ -87,9 +92,32 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean colorFixpoint = getUnfoldingOption(queryElement, "colorFixpoint", true);
         boolean symmetricVars = getUnfoldingOption(queryElement, "symmetricVars", true);
 
+        boolean parallel = getReductionOption(queryElement, "parallel", false);
+        VerificationType verificationType = VerificationType.fromString(queryElement.getAttribute("verificationType"));
+
+        int numberOfTraces;
+        try {
+            numberOfTraces = Integer.parseInt(queryElement.getAttribute("numberOfTraces"));
+        } catch (NumberFormatException e) {
+            numberOfTraces = 1;
+        }
+
+        SMCTraceType smcTraceType = new SMCTraceType(queryElement.getAttribute("smcTraceType"));
+
+        SMCSettings smcSettings = SMCSettings.Default();
+
 		TCTLAbstractProperty query;
         ArrayList<String> tracesArr = new ArrayList<String>();
-		if (queryElement.hasAttribute("type") && queryElement.getAttribute("type").equals("LTL")) {
+        if(isSmc) {
+            NodeList smcTagList = queryElement.getElementsByTagName("smc");
+            if(smcTagList.getLength() > 0) {
+                Element settingsNode = (Element) smcTagList.item(0);
+                smcSettings = parseSmcSettings(settingsNode);
+            } else {
+                smcSettings = SMCSettings.Default();
+            }
+            query = parseLTLQueryProperty(queryElement);
+        } else if (queryElement.hasAttribute("type") && queryElement.getAttribute("type").equals("LTL")) {
             query = parseLTLQueryProperty(queryElement);
         } else if (queryElement.hasAttribute("type") && queryElement.getAttribute("type").equals("HyperLTL")){
 		    query = parseHyperLTLQueryProperty(queryElement);
@@ -106,7 +134,7 @@ public class TAPNQueryLoader extends QueryLoader{
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator, partitioning, colorFixpoint, symmetricVars, network.isColored(), coloredReduction);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
-			parsedQuery.setCategory(detectCategory(query, isCTL, isLTL, isHyperLTL));
+			parsedQuery.setCategory(detectCategory(query, isCTL, isLTL, isHyperLTL, isSmc));
 			parsedQuery.setUseSiphontrap(siphontrap);
 			parsedQuery.setUseQueryReduction(queryReduction);
 			parsedQuery.setUseStubbornReduction(stubborn);
@@ -116,16 +144,55 @@ public class TAPNQueryLoader extends QueryLoader{
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
 			} else if(parsedQuery.getCategory() == QueryCategory.HyperLTL) {
                 parsedQuery.setTraceList(tracesArr);
+            } else if(parsedQuery.getCategory() == QueryCategory.SMC) {
+                parsedQuery.setSmcSettings(smcSettings);
+                parsedQuery.setParallel(parallel);
+                parsedQuery.setVerificationType(verificationType);
+                parsedQuery.setNumberOfTraces(numberOfTraces);
+                parsedQuery.setSmcTraceType(smcTraceType);
             }
 			return parsedQuery;
 		} else
 			return null;
 	}
 
-	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query, boolean isCTL, boolean isLTL, boolean isHyperLTL){
+    public static boolean hasSmcTag(Node queryElement) {
+        NodeList children = queryElement.getChildNodes();
+        for(int i = 0 ; i < children.getLength() ; i++) {
+            Node child = children.item(i);
+            if(child.getNodeName().equals("smc")) return true;
+        }
+        return false;
+    }
+
+    public static SMCSettings parseSmcSettings(Element smcTag) {
+        SMCSettings settings = SMCSettings.Default();
+        if(smcTag.hasAttribute("time-bound"))
+            settings.timeBound = Integer.parseInt(smcTag.getAttribute("time-bound"));
+        if(smcTag.hasAttribute("step-bound"))
+            settings.stepBound = Integer.parseInt(smcTag.getAttribute("step-bound"));
+        if(smcTag.hasAttribute("compare-to")) {
+            settings.compareToFloat = true;
+            settings.geqThan = Float.parseFloat(smcTag.getAttribute("compare-to"));
+        }
+        if(smcTag.hasAttribute("confidence"))
+            settings.confidence = Float.parseFloat(smcTag.getAttribute("confidence"));
+        if(smcTag.hasAttribute("interval-width"))
+            settings.estimationIntervalWidth = Float.parseFloat(smcTag.getAttribute("interval-width"));
+        if(smcTag.hasAttribute("false-positives"))
+            settings.falsePositives = Float.parseFloat(smcTag.getAttribute("false-positives"));
+        if(smcTag.hasAttribute("false-negatives"))
+            settings.falsePositives = Float.parseFloat(smcTag.getAttribute("false-negatives"));
+        if(smcTag.hasAttribute("indifference"))
+            settings.indifferenceWidth = Float.parseFloat(smcTag.getAttribute("indifference"));
+        return settings;
+    }
+
+	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query, boolean isCTL, boolean isLTL, boolean isHyperLTL, boolean isSmc){
         if (isCTL) return TAPNQuery.QueryCategory.CTL;
         if (isLTL) return QueryCategory.LTL;
         if (isHyperLTL) return QueryCategory.HyperLTL;
+        if (isSmc) return QueryCategory.SMC;
 
         StringPosition[] children = query.getChildren();
 
@@ -163,7 +230,7 @@ public class TAPNQueryLoader extends QueryLoader{
         }
         if(query instanceof TCTLPlusListNode){
                 for(TCTLAbstractStateProperty sp : ((TCTLPlusListNode)query).getProperties()) {
-                        if(TAPNQueryLoader.detectCategory(sp, isCTL, isLTL, isHyperLTL) == TAPNQuery.QueryCategory.CTL){
+                        if(TAPNQueryLoader.detectCategory(sp, isCTL, isLTL, isHyperLTL, isSmc) == TAPNQuery.QueryCategory.CTL){
                             return TAPNQuery.QueryCategory.CTL;
                         }
                 }
@@ -171,7 +238,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		
                 // If any property has been converted
 		for (StringPosition child : children) {
-			if(TAPNQueryLoader.detectCategory(child.getObject(), isCTL, isLTL, isHyperLTL) == TAPNQuery.QueryCategory.CTL){
+			if(TAPNQueryLoader.detectCategory(child.getObject(), isCTL, isLTL, isHyperLTL, isSmc) == TAPNQuery.QueryCategory.CTL){
 				return TAPNQuery.QueryCategory.CTL;
 			} 
 		}

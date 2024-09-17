@@ -244,6 +244,10 @@ public class TimedArcPetriNetNetwork {
 				updatePlaceInvariant(oldName, newConstant, place);
 			}
 
+            for (TimedTransition transition : tapn.transitions()) {
+                updateProbability(oldName, newConstant, transition.getWeight());
+            }
+
 			for (TimedInputArc inputArc : tapn.inputArcs()) {
 				updateTimeIntervalAndWeight(oldName, newConstant, inputArc.interval(), inputArc.getWeight());
 			}
@@ -293,6 +297,15 @@ public class TimedArcPetriNetNetwork {
 		}
 		
 	}
+
+    private void updateProbability(String oldName, Constant newConstant, Probability probability) {
+        if(probability instanceof  ConstantProbability) {
+            ConstantProbability cp = (ConstantProbability) probability;
+            if(cp.constant().name().equals(oldName)) {
+                cp.setConstant(newConstant);
+            }
+        }
+    }
 
 	public Collection<Constant> constants() {
 		return constants.getConstants();
@@ -456,6 +469,15 @@ public class TimedArcPetriNetNetwork {
             }
         }
 	    return colorTypes.size() > 1 || variables.size() > 0;
+    }
+
+    public boolean isStochastic() {
+        for (TimedArcPetriNet tapn : tapns) {
+            if(tapn.isStochastic()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 	public boolean isUntimed(){

@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -130,13 +132,15 @@ public class VerifyTAPNTraceParser {
 
     private Document readerToDocument(BufferedReader reader) {
         Document document = null;
-
+        Pattern missingQueryIndexPattern = Pattern.compile("Missing query-indexes for query-file \\(which is identified as XML-format\\), assuming only first query is to be verified");
         try {
             StringBuilder sb = new StringBuilder();
             String line;
 
             while ((line = reader.readLine()) != null) {
                 if (line.contains("Trace")) continue;
+                Matcher matcher = missingQueryIndexPattern.matcher(line);
+                if (matcher.find()) continue;
                 sb.append(line);
                 sb.append(System.lineSeparator());
             }
@@ -165,7 +169,6 @@ public class VerifyTAPNTraceParser {
 
 	private TimedTransitionStep parseTransitionStep(Element element) {
 		TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
-		
 		NodeList tokenNodes = element.getChildNodes();
 		List<TimedToken> consumedTokens = new ArrayList<TimedToken>(tokenNodes.getLength());
 		for(int i = 0; i < tokenNodes.getLength(); i++){

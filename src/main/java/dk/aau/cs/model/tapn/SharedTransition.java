@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
-import net.tapaal.gui.petrinet.Template;
-import pipe.gui.TAPAALGUI;
 
 public class SharedTransition {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
@@ -18,6 +18,9 @@ public class SharedTransition {
 	private final List<TimedTransition> transitions = new ArrayList<TimedTransition>();
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
+    private SMCDistribution distribution = SMCDistribution.defaultDistribution();
+    private Probability weight = new DoubleProbability(1.0);
+	private FiringMode firingMode = new OldestFiringMode();
 	private GuardExpression guard = null;
 
 	private TimedArcPetriNetNetwork network;
@@ -40,6 +43,9 @@ public class SharedTransition {
 	
 	public void setUrgent(boolean value){
 		isUrgent = value;
+        if(isUrgent) {
+            setDistribution(SMCDistribution.urgent());
+        }
 		for(TimedTransition t : transitions){
 			t.setUrgent(value, false);
 		}
@@ -56,6 +62,39 @@ public class SharedTransition {
         }
     }
 
+    public SMCDistribution getDistribution() { return distribution; }
+
+    public void setDistribution(SMCDistribution distribution) {
+        this.distribution = distribution;
+        for (TimedTransition transition : transitions) {
+            transition.setDistribution(distribution, false);
+        }
+    }
+
+    public Probability getWeight() { return weight; }
+
+    public void setWeight(Probability weight) {
+        this.weight = weight;
+        for (TimedTransition transition : transitions) {
+            transition.setWeight(weight, false);
+        }
+    }
+
+	public void setFiringMode(FiringMode firingMode) {
+		this.firingMode = firingMode;
+		for (TimedTransition transition : transitions) {
+			transition.setFiringMode(firingMode);
+		}
+	}
+
+	public FiringMode getFiringMode() {
+		return firingMode;
+	}
+
+    public boolean hasCustomDistribution() {
+        return !this.distribution.equals(SMCDistribution.defaultDistribution());
+    }
+
     public GuardExpression getGuard() {
         return guard;
     }
@@ -63,9 +102,9 @@ public class SharedTransition {
     public void setGuard(GuardExpression guard) {
         this.guard = guard;
         for (TimedTransition transition : transitions) {
-            if(guard != null){
+            if(guard != null) {
                 transition.setGuard(guard.copy(), false);
-            } else{
+            } else {
                 transition.setGuard(null, false);
             }
         }
@@ -75,7 +114,7 @@ public class SharedTransition {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		name = newName;
-		for(TimedTransition transition : transitions){
+		for(TimedTransition transition : transitions) {
 			transition.setName(newName);
 		}
 	}

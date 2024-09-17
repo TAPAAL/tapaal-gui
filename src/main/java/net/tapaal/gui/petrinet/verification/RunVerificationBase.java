@@ -88,12 +88,13 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
             underaprx.modifyTAPN(transformedModel.value1(), options.approximationDenominator());
         }
 
-        clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
+        clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens(), query.getSMCSettings());
         MapQueryToNewNames(clonedQuery, transformedModel.value2());
 
         if (dataLayerQuery != null) {
             clonedQuery.setCategory(dataLayerQuery.getCategory()); // Used by the CTL engine
             clonedQuery.setTraceList(dataLayerQuery.getTraceList());
+            clonedQuery.setSMCSettings(dataLayerQuery.getSmcSettings());
         }
 
         if (options.enabledStateequationsCheck()) {
@@ -242,7 +243,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				return;
 			}
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-
+         
 			if (result == null) return;
 			if (showResult(result) && spinner != null) {
                 QueryReductionTime reductionTime = QueryReductionTime.UnlimitedTime;

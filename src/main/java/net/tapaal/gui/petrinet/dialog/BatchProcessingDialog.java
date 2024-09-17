@@ -97,6 +97,7 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String NOT_SATISFIED_STRING_SOUNDNESS = "Not Sound";
 	private final static String NOT_SATISFIED_STRING = "Not Satisfied";
     private final static String SATISFIED_STRING = "Satisfied";
+	private final static String PROBABILITY_STRING = "P = ";
     private final static String INCONCLUSIVE_STRING = "Inconclusive";
 	private final static String SATISFIED_SOUNDNESS_STRING = "Sound";
 	private final static String SATISFIED_STRONG_SOUNDNESS_STRING = "Strongly Sound";
@@ -1259,7 +1260,7 @@ public class BatchProcessingDialog extends JDialog {
 					boolean isQueryColumn = table.getColumnName(column).equals("Query");
 					if (value != null) {
 						if ((isResultColumn && value.toString().equals(SATISFIED_STRING) || value.toString().equals(SATISFIED_SOUNDNESS_STRING) ||
-                            value.toString().equals(SATISFIED_STRONG_SOUNDNESS_STRING)) || (isQueryColumn && value.toString().equals("TRUE"))) {
+                            value.toString().equals(SATISFIED_STRONG_SOUNDNESS_STRING)) || (isQueryColumn && value.toString().equals("TRUE")) || (isResultColumn && value.toString().contains(PROBABILITY_STRING))) {
                             setBackground(new Color(91, 255, 91)); // light green
                         } else if ((isResultColumn && (value.toString().equals(NOT_SATISFIED_STRING) || value.toString().equals(NOT_SATISFIED_STRING_STRONG_SOUNDNESS) ||
                             value.toString().equals(NOT_SATISFIED_STRING_SOUNDNESS))) || (isQueryColumn && value.toString().equals("FALSE"))) {

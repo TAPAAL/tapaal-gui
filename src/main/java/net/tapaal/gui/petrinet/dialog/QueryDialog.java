@@ -2,19 +2,13 @@ package net.tapaal.gui.petrinet.dialog;
 
 import java.awt.*;
 import java.awt.Dialog.ModalityType;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,7 +33,10 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.HyperLTLParsing.TAPAALHyperLTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
+import dk.aau.cs.TCTL.SMCParsing.TAPAALSMCQueryParser;
 import dk.aau.cs.TCTL.visitors.*;
+import dk.aau.cs.util.VerificationCallback;
+import dk.aau.cs.verification.*;
 import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
@@ -54,6 +51,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.VerificationType;
 import pipe.gui.*;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.approximation.OverApproximation;
@@ -63,17 +61,13 @@ import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
-import dk.aau.cs.verification.ITAPNComposer;
-import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 public class QueryDialog extends JPanel {
-	private static final String NO_UPPAAL_XML_FILE_SAVED = "No Uppaal XML file saved.";
+    private static final String NO_UPPAAL_XML_FILE_SAVED = "No Uppaal XML file saved.";
 	private static final String NO_VERIFYTAPN_XML_FILE_SAVED = "No verifytapn XML file saved.";
 	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported by the chosen reduction.";
 	private static final String UNSUPPORTED_QUERY_TEXT = "The query is not supported by the chosen reduction.";
@@ -82,6 +76,8 @@ public class QueryDialog extends JPanel {
 	private static final String EXPORT_VERIFYPN_BTN_TEXT = "Export PN XML";
 	private static final String EXPORT_COMPOSED_BTN_TEXT = "Merge net components";
     private static final String OPEN_REDUCED_BTN_TEXT = "Open reduced net";
+    public static final String UPDATE_VERIFICATION_TIME_BTN_TEXT = "Compute estimated verification time";
+    public static final String UPDATE_PRECISION_BTN_TEXT = "Compute precision for the given verification time";
 
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
 	private static final String SOME_TRACE_STRING = "Some trace       ";
@@ -225,6 +221,41 @@ public class QueryDialog extends JPanel {
     private JRadioButton overApproximationEnable;
     private JRadioButton underApproximationEnable;
     private CustomJSpinner overApproximationDenominator;
+
+    // SMC options panel
+    private JPanel smcSettingsPanel;
+    private JComboBox<String> smcVerificationType;
+    private JLabel smcVerificationTypeLabel;
+    private JTextField smcTimeBoundValue;
+    private JCheckBox smcTimeBoundInfinite;
+    private JTextField smcStepBoundValue;
+    private JCheckBox smcStepBoundInfinite;
+    private JPanel quantitativePanel;
+    private JLabel smcParallelLabel;
+    private JCheckBox smcParallel;
+    private JTextField smcConfidence;
+    private QuerySlider smcConfidenceSlider;
+    private QuerySlider smcPrecisionSlider;
+    private QuerySlider smcEstimatedTimeSlider;
+    private JTextField smcEstimationIntervalWidth;
+    private JTextField smcTimeExpected;
+    private JButton smcTimeEstimationButton;
+    private JPanel qualitativePanel;
+    private JTextField smcFalsePositives;
+    private JTextField smcFalseNegatives;
+    private JTextField smcIndifference;
+    private JTextField smcComparisonFloat;
+    private QuerySlider smcFalsePositivesSlider;
+    private QuerySlider smcFalseNegativesSlider;
+    private QuerySlider smcIndifferenceSlider;
+    private QuerySlider smcComparisonFloatSlider;
+    private JPanel smcTracePanel;
+    private CustomJSpinner smcNumberOfTraces;
+    private JComboBox<SMCTraceType> smcTraceType;
+    private SMCSettings smcSettings;
+    private boolean smcMustUpdateTime = true;
+    private boolean doingBenchmark = false;
+    private RunVerificationBase benchmarkThread = null;
 
     // Buttons in the bottom of the dialogue
     private JPanel buttonPanel;
@@ -410,6 +441,21 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_APPROXIMATION_METHOD_UNDER = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
     private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
 
+    //Tool tips for SMC panel
+    private final static String TOOL_TIP_ANALYSIS_TYPE = "Choose between probability quantitative estimation, qualitative hypothesis testing against a fixed probability, or trace generation.";
+    private final static String TOOL_TIP_TIME_BOUND = "Bound each run by a maximum accumulated delay";
+    private final static String TOOL_TIP_STEP_BOUND = "Bound each run by a maximum number of transition firings";
+    private final static String TOOL_TIP_CONFIDENCE = "Between 0 and 1, confidence that the probability is indeed in the computed interval";
+    private final static String TOOL_TIP_INTERVAL_WIDTH = "Between 0 and 1, error E of the computed probability (P±E)";
+    private final static String TOOL_TIP_FALSE_POSITIVES = "Probability to accept the hypothesis if it is false";
+    private final static String TOOL_TIP_FALSE_NEGATIVES = "Probability to reject the hypothesis if it is true";
+    private final static String TOOL_TIP_INDIFFERENCE = "Width of the indifference region used as a threshold by the algorithm";
+    private final static String TOOL_TIP_VERIFICATION_TIME = "Total estimated time (in seconds) to run the verification with the given confidence and precision";
+    private final static String TOOL_TIP_QUALITATIVE_TEST = "Probability threshold to be tested";
+    private final static String TOOL_TIP_N_TRACES = "Number of traces to be shown";
+    private final static String TOOL_TIP_TRACE_TYPE = "Specifies the type of traces to be shown";
+
+
     private QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
         this.tapnNetwork = tapnNetwork;
         this.guiModels = guiModels;
@@ -427,6 +473,7 @@ public class QueryDialog extends JPanel {
         init(option, queryToCreateFrom);
         makeShortcuts();
         toggleAdvancedSimpleView(false);
+        if (lens.isStochastic()) toggleSmc();
     }
 
     private boolean checkIfSomeReductionOption() {
@@ -494,8 +541,8 @@ public class QueryDialog extends JPanel {
         boolean symmetry = getSymmetry();
 		boolean timeDarts = useTimeDarts.isSelected();
 		boolean pTrie = usePTrie.isSelected();
-		boolean gcd = useGCD.isSelected();
-		boolean overApproximation = skeletonAnalysis.isSelected();
+		boolean gcd = useGCD.isSelected() && !lens.isStochastic();
+		boolean overApproximation = skeletonAnalysis.isSelected() && !lens.isStochastic();
 		boolean reduction = useReduction.isSelected();
 		TAPNQuery query = new TAPNQuery(
             name,
@@ -532,6 +579,22 @@ public class QueryDialog extends JPanel {
         if (reductionOptionToSet != null && reductionOptionToSet.equals(ReductionOption.VerifyTAPN)) {
             query.setDiscreteInclusion(discreteInclusion.isSelected());
         }
+
+        if(lens.isStochastic()) {
+            query.setCategory(TAPNQuery.QueryCategory.SMC);
+            query.setParallel(smcParallel.isSelected());
+            VerificationType verificationType = VerificationType.fromOrdinal(smcVerificationType.getSelectedIndex());
+            if (verificationType == VerificationType.SIMULATE) {
+                query.setSmcSettings(SMCSettings.Default());
+            } else {
+                query.setSmcSettings(getSMCSettings());
+            }
+            
+            query.setVerificationType(verificationType);
+            query.setNumberOfTraces((Integer)smcNumberOfTraces.getValue());
+            query.setSmcTraceType((SMCTraceType)smcTraceType.getSelectedItem());
+        }
+
         return query;
     }
 
@@ -685,6 +748,147 @@ public class QueryDialog extends JPanel {
             }
 		}
 	}
+
+    private void updateSMCSettings() {
+        DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
+        decimalFormatSymbols.setDecimalSeparator('.');
+        DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
+        smcSettings.compareToFloat = smcVerificationType.getSelectedIndex() == 1;
+        try {
+            smcSettings.timeBound = smcTimeBoundInfinite.isSelected() ?
+                Integer.MAX_VALUE :
+                Integer.parseInt(smcTimeBoundValue.getText());
+        } catch(NumberFormatException e) {
+            smcSettings.timeBound = 1000;
+            smcTimeBoundValue.setText("1000");
+        }
+        smcTimeBoundValue.setEnabled(!smcTimeBoundInfinite.isSelected() && !doingBenchmark);
+        try {
+            smcSettings.stepBound = smcStepBoundInfinite.isSelected() ?
+                Integer.MAX_VALUE :
+                Integer.parseInt(smcStepBoundValue.getText());
+        } catch(NumberFormatException e) {
+            smcSettings.stepBound = 1000;
+            smcStepBoundValue.setText("1000");
+        }
+        smcStepBoundValue.setEnabled(!smcStepBoundInfinite.isSelected());
+        smcTimeBoundInfinite.setEnabled(!smcStepBoundInfinite.isSelected());
+        smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
+        try {
+            smcSettings.confidence = Float.parseFloat(smcConfidence.getText());
+        } catch(NumberFormatException e) {
+            smcConfidence.setText(String.valueOf(smcSettings.confidence));
+        }
+        try {
+            smcSettings.estimationIntervalWidth = (doingBenchmark && !smcMustUpdateTime) ?
+                0.01f : Float.parseFloat(smcEstimationIntervalWidth.getText());
+        } catch(NumberFormatException e) {
+            smcEstimationIntervalWidth.setText(precisionFormat.format(smcSettings.estimationIntervalWidth));
+        }
+        try {
+            smcSettings.falsePositives = Float.parseFloat(smcFalsePositives.getText());
+        } catch(NumberFormatException e) {
+            smcFalsePositives.setText(String.valueOf(smcSettings.falsePositives));
+        }
+        try {
+            smcSettings.falseNegatives = Float.parseFloat(smcFalseNegatives.getText());
+        } catch(NumberFormatException e) {
+            smcFalseNegatives.setText(String.valueOf(smcSettings.falseNegatives));
+        }
+        try {
+            smcSettings.indifferenceWidth = Float.parseFloat(smcIndifference.getText());
+        } catch(NumberFormatException e) {
+            smcIndifference.setText(String.valueOf(smcSettings.indifferenceWidth));
+        }
+        try {
+            smcSettings.geqThan = Float.parseFloat(smcComparisonFloat.getText());
+        } catch(NumberFormatException e) {
+            smcComparisonFloat.setText(String.valueOf(smcSettings.geqThan));
+        }
+    }
+
+    private SMCSettings getSMCSettings() {
+        updateSMCSettings();
+        return smcSettings;
+    }
+
+    private void setSMCSettings(SMCSettings settings) {
+        smcSettings = settings;
+
+        double desiredMinConfidence = smcConfidenceSlider.getDesiredMin();
+        double desiredMaxConfidence = smcConfidenceSlider.getDesiredMax();
+        double initialProportionConfidence = (settings.confidence - desiredMinConfidence) / (desiredMaxConfidence - desiredMinConfidence);
+        int initialValueConfidence = (int) (initialProportionConfidence * smcConfidenceSlider.getMaximum());
+        smcConfidenceSlider.setValue(
+            Math.max(smcConfidenceSlider.getMinimum(), 
+                    Math.min(initialValueConfidence, smcConfidenceSlider.getMaximum())));
+
+        double desiredMinPrecision = smcPrecisionSlider.getDesiredMin();
+        double desiredMaxPrecision = smcPrecisionSlider.getDesiredMax();
+        double logMin = Math.log(desiredMinPrecision);
+        double logMax = Math.log(desiredMaxPrecision);
+        double initialProportionPrecision = (Math.log(settings.estimationIntervalWidth) - logMin) / (logMax - logMin);
+        int initialValuePrecision = (int) (initialProportionPrecision * smcPrecisionSlider.getMaximum());
+        
+        smcPrecisionSlider.setValue(
+            Math.max(smcPrecisionSlider.getMinimum(), 
+                    Math.min(initialValuePrecision, smcPrecisionSlider.getMaximum())));
+        DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
+        decimalFormatSymbols.setDecimalSeparator('.');
+        DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
+
+        smcVerificationType.setSelectedIndex(settings.compareToFloat ? 1 : 0);
+        smcTimeBoundValue.setText(smcSettings.timeBound < Integer.MAX_VALUE ?
+            String.valueOf(smcSettings.timeBound) : "");
+        smcTimeBoundInfinite.setSelected(smcSettings.timeBound == Integer.MAX_VALUE);
+        smcTimeBoundValue.setEnabled(!smcTimeBoundInfinite.isSelected() && !doingBenchmark);
+        smcStepBoundValue.setText(smcSettings.stepBound < Integer.MAX_VALUE ?
+            String.valueOf(smcSettings.stepBound) : "");
+        smcStepBoundInfinite.setSelected(smcSettings.stepBound == Integer.MAX_VALUE);
+        smcStepBoundValue.setEnabled(!smcStepBoundInfinite.isSelected());
+        smcTimeBoundInfinite.setEnabled(!smcStepBoundInfinite.isSelected());
+        smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
+
+        smcConfidence.setText(String.valueOf(settings.confidence));
+        if(!doingBenchmark) smcEstimationIntervalWidth.setText(precisionFormat.format(settings.estimationIntervalWidth));
+
+        smcFalsePositives.setText(String.valueOf(settings.falsePositives));
+        double desiredMinFalsePositives = smcFalsePositivesSlider.getDesiredMin();
+        double desiredMaxFalsePositives = smcFalsePositivesSlider.getDesiredMax();
+        double initialProportionFalsePositives = (settings.falsePositives - desiredMinFalsePositives) / (desiredMaxFalsePositives - desiredMinFalsePositives);
+        int initialValueFalsePositives = (int) (initialProportionFalsePositives * smcFalsePositivesSlider.getMaximum());
+        smcFalsePositivesSlider.setValue(
+            Math.max(smcFalsePositivesSlider.getMinimum(), 
+                    Math.min(initialValueFalsePositives, smcFalsePositivesSlider.getMaximum())));
+
+        smcFalseNegatives.setText(String.valueOf(settings.falseNegatives));
+        double desiredMinFalseNegatives = smcFalseNegativesSlider.getDesiredMin();
+        double desiredMaxFalseNegatives = smcFalseNegativesSlider.getDesiredMax();
+        double initialProportionFalseNegatives = (settings.falseNegatives - desiredMinFalseNegatives) / (desiredMaxFalseNegatives - desiredMinFalseNegatives);
+        int initialValueFalseNegatives = (int) (initialProportionFalseNegatives * smcFalseNegativesSlider.getMaximum());
+        smcFalseNegativesSlider.setValue(
+            Math.max(smcFalseNegativesSlider.getMinimum(), 
+                    Math.min(initialValueFalseNegatives, smcFalseNegativesSlider.getMaximum())));
+
+        smcIndifference.setText(String.valueOf(settings.indifferenceWidth));
+        double desiredMinIndifference = smcIndifferenceSlider.getDesiredMin();
+        double desiredMaxIndifference = smcIndifferenceSlider.getDesiredMax();
+        double initialProportionIndifference = (settings.indifferenceWidth - desiredMinIndifference) / (desiredMaxIndifference - desiredMinIndifference);
+        int initialValueIndifference = (int) (initialProportionIndifference * smcIndifferenceSlider.getMaximum());
+        smcIndifferenceSlider.setValue(
+            Math.max(smcIndifferenceSlider.getMinimum(), 
+                    Math.min(initialValueIndifference, smcIndifferenceSlider.getMaximum())));
+
+        smcComparisonFloat.setText(String.valueOf(settings.geqThan));
+        double desiredMinComparison = smcComparisonFloatSlider.getDesiredMin();
+        double desiredMaxComparison = smcComparisonFloatSlider.getDesiredMax();
+        double initialProportionComparison = (settings.geqThan - desiredMinComparison) / (desiredMaxComparison - desiredMinComparison);
+
+        int initialValueComparison = (int) (initialProportionComparison * smcComparisonFloatSlider.getMaximum());
+        smcComparisonFloatSlider.setValue(
+            Math.max(smcComparisonFloatSlider.getMinimum(), 
+                    Math.min(initialValueComparison, smcComparisonFloatSlider.getMaximum())));
+    }
 
     private boolean queryIsReachability() {
         return new IsReachabilityVisitor().isReachability(newProperty);
@@ -1071,7 +1275,8 @@ public class QueryDialog extends JPanel {
             (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) && highestNetDegree > 2,
             newProperty.hasNestedPathQuantifiers(),
             lens.isColored(),
-            lens.isColored() && !lens.isTimed()
+            lens.isColored() && !lens.isTimed(),
+            lens.isStochastic()
         };
 
 
@@ -1119,7 +1324,11 @@ public class QueryDialog extends JPanel {
         if (lens.isTimed()) {
             for (EngineSupportOptions engine : engineSupportOptions) {
                 if (engine.areOptionsSupported(queryOptions)) {
-                    options.add(engine.nameString);
+                    if (engine.getNameString().equals(name_verifyTAPN) && lens.isStochastic()) {
+                        continue;
+                    }
+
+                    options.add(engine.getNameString());
                 }
             }
         } else {
@@ -1323,6 +1532,14 @@ public class QueryDialog extends JPanel {
         deadLockPredicateButton.setEnabled(true);
         setEnablednessOfAddPredicateButton();
         if (queryType.getSelectedIndex() == 2) traceBox.setEnabled(traceBox.getModel().getSize() > 0);
+    }
+
+    private void enableOnlySMCButtons() {
+        finallyButton.setEnabled(true);
+        globallyButton.setEnabled(true);
+        if(lens.isStochastic()) {
+            updateSMCButtons();
+        }
     }
 
     private void enableOnlyUntimedStateButtons() {
@@ -1539,14 +1756,21 @@ public class QueryDialog extends JPanel {
         initUppaalOptionsPanel();
         initVerificationPanel();
         initOverApproximationPanel();
+        initSmcSettingsPanel();
         initRawVerificationOptionsPanel();
         initButtonPanel(option);
+
+        if (lens.isStochastic()) {
+            setSMCSettings(SMCSettings.Default());
+        }
 
         if (queryToCreateFrom != null) {
             setupFromQuery(queryToCreateFrom);
         }
 
         refreshTraceOptions();
+
+
         setEnabledReductionOptions();
 
         rootPane.setDefaultButton(saveAndVerifyButton);
@@ -1594,6 +1818,14 @@ public class QueryDialog extends JPanel {
             setupUnfoldingOptionsFromQuery(queryToCreateFrom);
         }
 
+        if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.SMC) {
+            setSMCSettings(queryToCreateFrom.getSmcSettings());
+            smcParallel.setSelected(queryToCreateFrom.isParallel());
+            smcVerificationType.setSelectedIndex(queryToCreateFrom.getVerificationType().ordinal());
+            smcNumberOfTraces.setValue(queryToCreateFrom.getNumberOfTraces());
+            smcTraceType.setSelectedItem(queryToCreateFrom.getSmcTraceType());
+        }
+
         setupQueryCategoryFromQuery(queryToCreateFrom);
         setupSearchOptionsFromQuery(queryToCreateFrom);
         setupReductionOptionsFromQuery(queryToCreateFrom);
@@ -1604,6 +1836,7 @@ public class QueryDialog extends JPanel {
         if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
         }
+
     }
 
     private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1629,6 +1862,29 @@ public class QueryDialog extends JPanel {
 
         numberOfExtraTokensInNet.addChangeListener(e -> updateRawVerificationOptions());
         reductionOption.addActionListener(e -> updateRawVerificationOptions());
+        smcVerificationType.addActionListener(e -> updateRawVerificationOptions());
+        smcNumberOfTraces.addChangeListener(e -> updateRawVerificationOptions());
+
+        final JTextField smcNumTracesTextField = ((JSpinner.DefaultEditor) smcNumberOfTraces.getEditor()).getTextField();
+
+        // Fix from https://stackoverflow.com/a/6276603 to update uppon typing
+        // to ensure raw options are updated correctly
+        smcNumTracesTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String text = smcNumTracesTextField.getText().replace(",", "");
+                int oldCaretPos = smcNumTracesTextField.getCaretPosition();
+                try {
+                    Integer newValue = Integer.valueOf(text);
+                    smcNumberOfTraces.setValue(newValue);
+                    smcNumTracesTextField.setCaretPosition(oldCaretPos);
+                } catch(NumberFormatException ex) {
+                    // Not a number in text field -> do nothing
+                }
+            }
+        });
+
+        smcTraceType.addActionListener(e -> updateRawVerificationOptions());
         
         if (reductionOption.getSelectedItem() != null) {
             updateRawVerificationOptions();
@@ -1826,7 +2082,7 @@ public class QueryDialog extends JPanel {
             }
         });
 
-        queryType = new JComboBox(new String[]{"CTL/Reachability", "LTL","HyperLTL"});
+        queryType = new JComboBox(new String[]{"CTL/Reachability", "LTL", "HyperLTL"});
         queryType.setToolTipText(TOOL_TIP_QUERY_TYPE);
         queryType.addActionListener(arg0 -> toggleDialogType());
 
@@ -1890,6 +2146,15 @@ public class QueryDialog extends JPanel {
                     "<b>Approximation Options</b><br/>" +
                     "TAPAAL allows to approximate the time intervals on edges by dividing them by the given approximation constant and either enlarging the resulting intervals (over-approximation) or shrinking them (under-approximation). The larger the constant is, the faster is the verification but the more often the user can get an inconclusive answer." +
                     "<br/>" +
+                    "<b>SMC Options</b><br/>" +
+                    "Statistical model-checking simulates random runs in order to verify how often a property is satisfied. It explores random runs that do not exceed the given time and step bound. " +
+                    "There are three types of SMC queries :" +
+                    "<ul>" +
+                    "<li>The quantitative probability estimation performs a Monte-Carlo algorithm to produce an estimation of the probability of an event happening. The number of runs to execute is defined by the desired confidence and precision, which are the confidence that the real probability is in an interval of ± the precision around the estimation.</li>" +
+                    "<li>The qualitative probability testing performs a SPRT test, to produce an estimation whether the probability of an event happening is greater than a real constant C. According to the result of each run, a ratio is updated and a result is decided once it reaches a bound. The false-positives parameter is the probability of estimating the test to be true when it isn't, the false-negatives parameter is the opposite, and the indifference region is the zone C ± width, which bounds are used as thresholds.</li>" +
+                    "<li>The simulate mode generates an arbitrary number of random traces, that can then be explored in the simulator. The traces could be restricted to : any trace, only traces satisfying the property, or only traces violating the property. This mode must be used carefully, because in some cases it may not terminate : if asking for 5 traces satisfying the property, but no runs ever satisfy the property, then the algorithm will run forever.</li>" +
+                    "<ul/>" +
+                    "<br/>" +
                     "</html>";
             }
         });
@@ -1925,18 +2190,20 @@ public class QueryDialog extends JPanel {
             setAdvancedView(!advancedView);
         }
 
+        boolean isSmc = lens.isStochastic();
+
         Point location = guiDialog.getLocation();
 
-        searchOptionsPanel.setVisible(advancedView);
+        searchOptionsPanel.setVisible(advancedView && !isSmc);
         if(lens.isColored() && !lens.isTimed()){
             unfoldingOptionsPanel.setVisible(advancedView);
         }
 
-        reductionOptionsPanel.setVisible(advancedView);
+        reductionOptionsPanel.setVisible(advancedView && !isSmc);
         if (lens.isTimed()) {
-            saveUppaalXMLButton.setVisible(advancedView);
+            saveUppaalXMLButton.setVisible(advancedView && !isSmc);
             // Disabled approximation options for colored models, because they are not supported yet (will generate error)
-            overApproximationOptionsPanel.setVisible(advancedView);
+            overApproximationOptionsPanel.setVisible(advancedView && !isSmc);
         } else if (!lens.isGame()){
             openReducedNetButton.setVisible(advancedView);
         }
@@ -2050,6 +2317,32 @@ public class QueryDialog extends JPanel {
 
         setEnabledOptionsAccordingToCurrentReduction();
         updateRawVerificationOptions();
+    }
+
+    private void toggleSmc() {
+        if(lens.isStochastic()) {
+            showSMCButtons(true);
+            reductionOption.setSelectedItem(name_DISCRETE);
+            useGCD.setSelected(false);
+            reductionOption.setEnabled(false);
+            traceOptionsPanel.setVisible(false);
+            boundednessCheckPanel.setVisible(false);
+            smcSettingsPanel.setVisible(true);
+            toggleAdvancedSimpleView(false);
+            queryChanged();
+        } else {
+            showSMCButtons(false);
+            reductionOption.setEnabled(true);
+            traceOptionsPanel.setVisible(true);
+            boundednessCheckPanel.setVisible(true);
+            smcSettingsPanel.setVisible(false);
+            toggleAdvancedSimpleView(false);
+            queryChanged();
+        }
+
+        if (undoManager != null) undoManager.discardAllEdits();
+        if (undoButton != null) undoButton.setEnabled(false);
+        if (redoButton != null) redoButton.setEnabled(false);
     }
 
     private boolean isValidLTL() {
@@ -2485,6 +2778,322 @@ public class QueryDialog extends JPanel {
         uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
     }
 
+    private void initSmcSettingsPanel() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.insets = new Insets(0,5,0,5);
+        GridBagConstraints subPanelGbc = new GridBagConstraints();
+        subPanelGbc.anchor = GridBagConstraints.WEST;
+        subPanelGbc.insets = new Insets(0,5,0,5);
+
+        FocusListener updater = new FocusListener() {
+            public void focusGained(FocusEvent focusEvent) { }
+            public void focusLost(FocusEvent focusEvent) {
+                updateSMCSettings();
+            }
+        };
+
+        smcSettingsPanel = new JPanel();
+        smcSettingsPanel.setLayout(new GridBagLayout());
+        smcSettingsPanel.setVisible(false);
+        smcSettingsPanel.setBorder(BorderFactory.createTitledBorder("SMC Options"));
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+
+        JPanel smcEngineOptions = new JPanel();
+        smcEngineOptions.setLayout(new GridBagLayout());
+        smcEngineOptions.setBorder(BorderFactory.createTitledBorder("SMC engine options"));
+        subPanelGbc.gridy = 0;
+        subPanelGbc.gridx = 0;
+        smcVerificationTypeLabel = new JLabel("Verification type : ");
+        smcEngineOptions.add(smcVerificationTypeLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
+        subPanelGbc.gridwidth = 2;
+        smcVerificationType = new JComboBox<>(new String[]{ "Quantitative", "Qualitative", "Simulate" });
+        smcVerificationType.setToolTipText(TOOL_TIP_ANALYSIS_TYPE);
+        smcEngineOptions.add(smcVerificationType, subPanelGbc);
+        subPanelGbc.fill = GridBagConstraints.NONE;
+        subPanelGbc.gridwidth = 1;
+        subPanelGbc.gridy = 1;
+        subPanelGbc.gridx = 0;
+        JLabel timeBoundLabel = new JLabel("Time bound : ");
+        timeBoundLabel.setToolTipText(TOOL_TIP_TIME_BOUND);
+        smcEngineOptions.add(timeBoundLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
+        smcTimeBoundValue = new JTextField(7);
+        smcTimeBoundValue.setToolTipText(TOOL_TIP_TIME_BOUND);
+        smcEngineOptions.add(smcTimeBoundValue, subPanelGbc);
+        smcTimeBoundValue.addFocusListener(updater);
+        subPanelGbc.fill = GridBagConstraints.NONE;
+        subPanelGbc.gridx = 2;
+        smcTimeBoundInfinite = new JCheckBox(Character.toString('∞'));
+        smcTimeBoundInfinite.addActionListener(evt -> updateSMCSettings());
+        smcEngineOptions.add(smcTimeBoundInfinite, subPanelGbc);
+
+        subPanelGbc.gridy = 2;
+        subPanelGbc.gridx = 0;
+        JLabel stepBoundLabel = new JLabel("Step bound : ");
+        stepBoundLabel.setToolTipText(TOOL_TIP_STEP_BOUND);
+        smcEngineOptions.add(stepBoundLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
+        smcStepBoundValue = new JTextField(7);
+        smcStepBoundValue.setToolTipText(TOOL_TIP_STEP_BOUND);
+        smcEngineOptions.add(smcStepBoundValue, subPanelGbc);
+        smcStepBoundValue.addFocusListener(updater);
+        subPanelGbc.fill = GridBagConstraints.NONE;
+        subPanelGbc.gridx = 2;
+        smcStepBoundInfinite = new JCheckBox(Character.toString('∞'));
+        smcStepBoundInfinite.addActionListener(evt -> updateSMCSettings());
+        smcEngineOptions.add(smcStepBoundInfinite, subPanelGbc);
+
+        subPanelGbc.gridy = 3;
+        subPanelGbc.gridx = 0;
+        smcParallelLabel = new JLabel("Use all available cores : ");
+        smcEngineOptions.add(smcParallelLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcParallel = new JCheckBox();
+        smcEngineOptions.add(smcParallel, subPanelGbc);
+
+        smcSettingsPanel.add(smcEngineOptions, gbc);
+        gbc.gridx = 1;
+
+        subPanelGbc.gridx = 0;
+        subPanelGbc.gridy = 0;
+        subPanelGbc.gridwidth = 1;
+        quantitativePanel = new JPanel();
+        quantitativePanel.setLayout(new GridBagLayout());
+        quantitativePanel.setBorder(BorderFactory.createTitledBorder("Quantitative estimation options"));
+        subPanelGbc.gridy = 0;
+        subPanelGbc.gridx = 0;
+        quantitativePanel.add(new JLabel("Confidence : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcConfidence = new JTextField(7);
+        smcConfidence.addFocusListener(updater);
+        smcConfidence.setToolTipText(TOOL_TIP_CONFIDENCE);
+        quantitativePanel.add(smcConfidence, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcConfidenceSlider = new QuerySlider(95, 0.80, 0.99);
+        smcConfidenceSlider.setToolTipText("Value: 0.95");
+        smcConfidenceSlider.addChangeListener(e -> {
+            int value = smcConfidenceSlider.getValue();
+            double desiredMin = smcConfidenceSlider.getDesiredMin();
+            double desiredMax = smcConfidenceSlider.getDesiredMax();
+            double proportion = (double) value / smcConfidenceSlider.getMaximum();
+            double interpretedValue = desiredMin + proportion * (desiredMax - desiredMin);
+            double roundedValue = Math.round(interpretedValue * 100.0) / 100.0;
+            smcConfidence.setText(roundedValue + "");
+            smcConfidenceSlider.setRealValue(roundedValue);
+            smcConfidenceSlider.setToolTipText(String.format("Value: %.2f", roundedValue));
+            smcMustUpdateTime = true;
+        });
+
+        quantitativePanel.add(smcConfidenceSlider, subPanelGbc);
+        subPanelGbc.gridy = 1;
+        subPanelGbc.gridx = 0;
+        quantitativePanel.add(new JLabel("Precision : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcEstimationIntervalWidth = new JTextField(7);
+        smcEstimationIntervalWidth.addFocusListener(updater);
+        smcEstimationIntervalWidth.setToolTipText(TOOL_TIP_INTERVAL_WIDTH);
+        quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcPrecisionSlider = new QuerySlider(0, 0.5, 0.0001);
+        smcPrecisionSlider.setToolTipText("Value: 0.5000");
+        smcPrecisionSlider.addChangeListener(e -> {
+            int value = smcPrecisionSlider.getValue();
+            double desiredMin = smcPrecisionSlider.getDesiredMin();
+            double desiredMax = smcPrecisionSlider.getDesiredMax();
+            double logMin = Math.log(desiredMin);
+            double logMax = Math.log(desiredMax);
+            double proportion = (double) value / smcPrecisionSlider.getMaximum();
+            double logValue = logMin + proportion * (logMax - logMin);
+            double interpretedValue = Math.exp(logValue);
+            smcPrecisionSlider.setRealValue(interpretedValue);
+            double roundedValue = Math.round(interpretedValue * 10000.0) / 10000.0;
+            DecimalFormat df = new DecimalFormat("#.####");
+            String formattedValue = df.format(roundedValue);
+            smcEstimationIntervalWidth.setText(formattedValue);
+            smcPrecisionSlider.setToolTipText(String.format("Value: %s", formattedValue));
+            smcMustUpdateTime = true;
+        });
+
+        quantitativePanel.add(smcPrecisionSlider, subPanelGbc);
+        subPanelGbc.gridy = 2;
+        subPanelGbc.gridx = 0;
+        JLabel verifTimeLabel = new JLabel("Estimated verification time (seconds) : ");
+        verifTimeLabel.setToolTipText(TOOL_TIP_VERIFICATION_TIME);
+        quantitativePanel.add(verifTimeLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcTimeExpected = new JTextField(7);
+        smcTimeExpected.setToolTipText(TOOL_TIP_VERIFICATION_TIME);
+        quantitativePanel.add(smcTimeExpected, subPanelGbc);
+
+        smcEstimatedTimeSlider = new QuerySlider(0, 1, 100, 99);
+        smcEstimatedTimeSlider.setToolTipText("Value: 1.0");
+        smcEstimatedTimeSlider.addChangeListener(e -> {
+            int value = smcEstimatedTimeSlider.getValue();
+            double desiredMin = smcEstimatedTimeSlider.getDesiredMin();
+            double desiredMax = smcEstimatedTimeSlider.getDesiredMax();
+            double proportion = (double) value / smcEstimatedTimeSlider.getMaximum();
+            double interpretedValue = desiredMin + proportion * (desiredMax - desiredMin);
+            double roundedValue = Math.round(interpretedValue);
+            smcTimeExpected.setText(roundedValue + "");
+            smcEstimatedTimeSlider.setRealValue(roundedValue);
+            smcEstimatedTimeSlider.setToolTipText(String.format("Value: %.1f", roundedValue));
+            smcMustUpdateTime = false;
+        });
+
+        subPanelGbc.gridx = 2;
+        quantitativePanel.add(smcEstimatedTimeSlider, subPanelGbc);
+
+        subPanelGbc.gridy = 3;
+        subPanelGbc.gridx = 0;
+        subPanelGbc.gridwidth = 2;
+        subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
+        smcTimeEstimationButton = new JButton(UPDATE_VERIFICATION_TIME_BTN_TEXT);
+        smcTimeEstimationButton.setPreferredSize(new Dimension(378, 25));
+        smcTimeEstimationButton.addActionListener(evt -> {
+            runBenchmark();
+        });
+        quantitativePanel.add(smcTimeEstimationButton, subPanelGbc);
+
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        smcSettingsPanel.add(quantitativePanel, gbc);
+
+        subPanelGbc.gridwidth = 1;
+        subPanelGbc.anchor = GridBagConstraints.WEST;
+        qualitativePanel = new JPanel();
+        qualitativePanel.setLayout(new GridBagLayout());
+        qualitativePanel.setBorder(BorderFactory.createTitledBorder("Qualitative estimation options"));
+        qualitativePanel.setVisible(false);
+        subPanelGbc.gridy = 0;
+        subPanelGbc.gridx = 0;
+        qualitativePanel.add(new JLabel("False positives : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcFalsePositives = new JTextField(7);
+        smcFalsePositives.addFocusListener(updater);
+        smcFalsePositives.setToolTipText(TOOL_TIP_FALSE_POSITIVES);
+        qualitativePanel.add(smcFalsePositives, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcFalsePositivesSlider = new QuerySlider(0, 0.001, 0.5);
+        smcFalsePositivesSlider.setToolTipText("Value: 0.001");
+        smcFalsePositivesSlider.addChangeListener(e -> smcFalsePositivesSlider.updateValue(smcFalsePositives, 3));
+        qualitativePanel.add(smcFalsePositivesSlider, subPanelGbc);
+        subPanelGbc.gridy = 1;
+        subPanelGbc.gridx = 0;
+        qualitativePanel.add(new JLabel("False negatives : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcFalseNegatives = new JTextField(7);
+        smcFalseNegatives.addFocusListener(updater);
+        smcFalseNegatives.setToolTipText(TOOL_TIP_FALSE_NEGATIVES);
+        qualitativePanel.add(smcFalseNegatives, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcFalseNegativesSlider = new QuerySlider(0, 0.001, 0.5);
+        smcFalseNegativesSlider.setToolTipText("Value: 0.001");
+        smcFalseNegativesSlider.addChangeListener(e -> smcFalseNegativesSlider.updateValue(smcFalseNegatives, 3));
+        qualitativePanel.add(smcFalseNegativesSlider, subPanelGbc);
+        subPanelGbc.gridy = 2;
+        subPanelGbc.gridx = 0;
+        qualitativePanel.add(new JLabel("Indifference region width : "), subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcIndifference = new JTextField(7);
+        smcIndifference.addFocusListener(updater);
+        smcIndifference.setToolTipText(TOOL_TIP_INDIFFERENCE);
+        qualitativePanel.add(smcIndifference, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcIndifferenceSlider = new QuerySlider(100, 0.001, 0.5);
+        smcIndifferenceSlider.setToolTipText("Value: 0.500");
+        smcIndifferenceSlider.addChangeListener(e -> smcIndifferenceSlider.updateValue(smcIndifference, 3));
+        qualitativePanel.add(smcIndifferenceSlider, subPanelGbc);
+        subPanelGbc.gridy = 3;
+        subPanelGbc.gridx = 0;
+        JLabel testLabel = new JLabel("Property hold with probability >= ");
+        testLabel.setToolTipText(TOOL_TIP_QUALITATIVE_TEST);
+        qualitativePanel.add(testLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcComparisonFloat = new JTextField(7);
+        smcComparisonFloat.setToolTipText(TOOL_TIP_QUALITATIVE_TEST);
+        smcComparisonFloat.addFocusListener(updater);
+        qualitativePanel.add(smcComparisonFloat, subPanelGbc);
+        subPanelGbc.gridx = 2;
+        smcComparisonFloatSlider = new QuerySlider(50, 0.01, 0.99, 98);
+        smcComparisonFloatSlider.setToolTipText("Value: 0.50");
+        smcComparisonFloatSlider.addChangeListener(e -> smcComparisonFloatSlider.updateValue(smcComparisonFloat, 2));
+        qualitativePanel.add(smcComparisonFloatSlider, subPanelGbc);
+
+        smcSettingsPanel.add(qualitativePanel, gbc);
+    
+        smcTracePanel = new JPanel();
+        smcTracePanel.setLayout(new GridBagLayout());
+        smcTracePanel.setBorder(BorderFactory.createTitledBorder("Trace options"));
+        smcTracePanel.setVisible(false);
+        subPanelGbc.gridy = 0;
+        subPanelGbc.gridx = 0;
+        JLabel numberOfTracesLabel = new JLabel("Number of traces : ");
+        numberOfTracesLabel.setToolTipText(TOOL_TIP_N_TRACES);
+        smcTracePanel.add(numberOfTracesLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcNumberOfTraces = new CustomJSpinner(1, 1, Integer.MAX_VALUE);
+        smcNumberOfTraces.addFocusListener(updater);
+        smcNumberOfTraces.setToolTipText(TOOL_TIP_N_TRACES);
+        smcTracePanel.add(smcNumberOfTraces, subPanelGbc);
+        subPanelGbc.gridy = 1;
+        smcTracePanel.add(Box.createVerticalStrut(5), subPanelGbc);
+        JLabel traceTypeLabel = new JLabel("Trace type : ");
+        traceTypeLabel.setToolTipText(TOOL_TIP_TRACE_TYPE);
+        subPanelGbc.gridx = 0;
+        subPanelGbc.gridy = 2;
+        smcTracePanel.add(traceTypeLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcTraceType = new JComboBox<>(new SMCTraceType[]{ new SMCTraceType("Any"), 
+                                                           new SMCTraceType("Satisfied"), 
+                                                           new SMCTraceType("Not satisfied") });
+        smcTraceType.setToolTipText(TOOL_TIP_TRACE_TYPE);
+        smcTracePanel.add(smcTraceType, subPanelGbc);
+  
+        smcSettingsPanel.add(smcTracePanel, gbc);
+
+        smcVerificationType.addActionListener(evt -> {
+            boolean quantitative = smcVerificationType.getSelectedIndex() == 0;
+            boolean qualitative = smcVerificationType.getSelectedIndex() == 1;
+            boolean simulate = smcVerificationType.getSelectedIndex() == 2;
+
+            quantitativePanel.setVisible(quantitative);
+            qualitativePanel.setVisible(qualitative);
+            smcTracePanel.setVisible(simulate);
+
+            guiDialog.pack();
+        });
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5,10,5,10);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1;
+        add(smcSettingsPanel, gridBagConstraints);
+
+        Dimension quantitativeSize = quantitativePanel.getPreferredSize();
+        Dimension qualitativeSize = qualitativePanel.getPreferredSize();
+        Dimension smcTraceSize = smcTracePanel.getPreferredSize();
+
+        int maxWidth = Math.max(quantitativeSize.width, Math.max(qualitativeSize.width, smcTraceSize.width));
+        int maxHeight = Math.max(quantitativeSize.height, Math.max(qualitativeSize.height, smcTraceSize.height));
+        Dimension largestSize = new Dimension(maxWidth, maxHeight);
+        
+        quantitativePanel.setPreferredSize(largestSize);
+        qualitativePanel.setPreferredSize(largestSize);
+        smcTracePanel.setPreferredSize(largestSize);
+
+        setupEstimationListeners();
+    }
+
     private void initQueryPanel() {
         queryPanel = new JPanel(new GridBagLayout());
         queryPanel.setBorder(BorderFactory.createTitledBorder("Query (click on the part of the query you want to change)"));
@@ -2502,8 +3111,6 @@ public class QueryDialog extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.WEST;
         add(queryPanel, gbc);
-
-
     }
 
     private void initQueryField() {
@@ -2707,6 +3314,9 @@ public class QueryDialog extends JPanel {
 
         if (lens.isTimed()|| lens.isGame()) {
             addTimedQuantificationListeners();
+            if(lens.isStochastic()) {
+                addSmcQuantificationListerners();
+            }
             showLTLButtons(false);
             showHyperLTLButtons(false);
         } else {
@@ -2744,6 +3354,18 @@ public class QueryDialog extends JPanel {
             forAllDiamond.setSelected(true);
             addPropertyToQuery(property);
             unselectButtons();
+        });
+    }
+
+    private void addSmcQuantificationListerners() {
+        finallyButton.addActionListener(e -> {
+            LTLFNode property = new LTLFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            addPropertyToQuery(property);
+        });
+
+        globallyButton.addActionListener(e -> {
+            LTLGNode property = new LTLGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
+            addPropertyToQuery(property);
         });
     }
 
@@ -2942,6 +3564,13 @@ public class QueryDialog extends JPanel {
         existsDiamond.setVisible(isVisible);
         existsNext.setVisible(isVisible);
         existsUntil.setVisible(isVisible);
+    }
+
+    private void showSMCButtons(boolean isVisible) {
+        showCTLButtons(!isVisible);
+        globallyButton.setVisible(isVisible);
+        finallyButton.setVisible(isVisible);
+        deadLockPredicateButton.setVisible(isVisible);
     }
 
     private void updateSiphonTrap(boolean isCTL) {
@@ -3971,6 +4600,8 @@ public class QueryDialog extends JPanel {
                             returnFromManualEdit(null);
                         else
                             return;
+                    } else if(lens.isStochastic()) {
+                        newQuery = TAPAALSMCQueryParser.parse(queryField.getText());
                     } else if (lens.isTimed()) {
                         newQuery = TAPAALQueryParser.parse(queryField.getText());
                     } else if (queryType.getSelectedIndex() == 0) {
@@ -4456,6 +5087,7 @@ public class QueryDialog extends JPanel {
         reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
 
         reductionOption.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
+
         reductionOption.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -4714,6 +5346,12 @@ public class QueryDialog extends JPanel {
         setAllEnabled(traceOptionsPanel, isEnabled);
         setAllEnabled(boundednessCheckPanel, isEnabled);
         setAllEnabled(searchOptionsPanel, isEnabled);
+        setAllEnabled(smcTracePanel, isEnabled);
+
+        smcVerificationTypeLabel.setEnabled(isEnabled);
+        smcVerificationType.setEnabled(isEnabled);
+        smcParallelLabel.setEnabled(isEnabled);
+        smcParallel.setEnabled(isEnabled);
 
         setEnabledOptionsAccordingToCurrentReduction();
     }
@@ -4892,6 +5530,7 @@ public class QueryDialog extends JPanel {
     }
 
 	private void refreshQueryEditingButtons() {
+        boolean isSmc = lens.isStochastic();
 		if (currentSelection != null) {
             if (lens.isGame()) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
@@ -4900,11 +5539,20 @@ public class QueryDialog extends JPanel {
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                     enableOnlyStateButtons();
                 }
-            } else if (lens.isTimed()) {
+            } else if (lens.isTimed() && !isSmc) {
                 if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
                     enableOnlyPathButtons();
                 } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                     enableOnlyStateButtons();
+                }
+                updateQueryButtonsAccordingToSelection();
+            } else if(isSmc) {
+                if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+                    enableOnlySMCButtons();
+                } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                    enableOnlyStateButtons();
+                    finallyButton.setEnabled(false);
+                    globallyButton.setEnabled(false);
                 }
                 updateQueryButtonsAccordingToSelection();
             } else {
@@ -5122,16 +5770,32 @@ public class QueryDialog extends JPanel {
         }
     }
 
+    private void updateSMCButtons() {
+        if (currentSelection != null && currentSelection.getObject() == newProperty) {
+            String ltlType = checkLTLType();
+            if (ltlType.equals("placeholder")) {
+                finallyButton.setEnabled(true);
+                globallyButton.setEnabled(true);
+            }
+        } else {
+            finallyButton.setEnabled(false);
+            globallyButton.setEnabled(false);
+        }
+    }
+
 
     private void queryChanged(){
         setEnabledReductionOptions();
         if (lens.isTimed()) refreshOverApproximationOption();
         int selectedIndex = queryType.getSelectedIndex();
+        boolean isSmc = lens.isStochastic();
         if (selectedIndex == 1) {
             updateLTLButtons();
         } else if (selectedIndex == 2) {
             updateHyperLTLButtons();
             updateTraceBox();
+        } else if (isSmc) {
+            updateSMCButtons();
         }
     }
 
@@ -5181,11 +5845,17 @@ public class QueryDialog extends JPanel {
             saveAndVerifyButton.addActionListener(evt -> {
                 updateRawVerificationOptions();
                 if (checkIfSomeReductionOption()) {
+                    if (lens.isStochastic() && !tapnNetwork.isNonStrict()) {
+                        JOptionPane.showMessageDialog(QueryDialog.this, "The model has strict intervals and can therefore not be verified", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
                     querySaved = true;
                     // Now if a query is saved and verified, the net is marked as modified
                     tab.setNetChanged(true);
                     exit();
                     TAPNQuery query = getQuery();
+                    
                     if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN) {
                         Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false, lens);
                     } else {
@@ -5320,7 +5990,7 @@ public class QueryDialog extends JPanel {
                     }
 
                     exit();
-
+                   
                     Verifier.runVerifyTAPNVerification(tapnNetwork, query,null, guiModels, true, null);
 
                     File reducedNetFile = new File(Verifier.getReducedNetFilePath());
@@ -5402,7 +6072,7 @@ public class QueryDialog extends JPanel {
         }
         // guimodel not working
         //templates.add(new Template(transformedModel.value1(), null, new Zoomer()));
-        TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(QueryDialog.this.tapnNetwork, templates, queries, QueryDialog.this.tapnNetwork.constants());
+        TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(QueryDialog.this.tapnNetwork, templates, queries, QueryDialog.this.tapnNetwork.constants(), lens);
         try {
             writerTACPN.savePNML(new File(xmlFile));
         } catch (IOException | ParserConfigurationException | TransformerException exception) {
@@ -5490,6 +6160,141 @@ public class QueryDialog extends JPanel {
         InputMap im = this.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
         im.put(KeyStroke.getKeyStroke('Z', shortcutkey), "undo");
         im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
+    }
+
+    private void setupEstimationListeners() {
+        DocumentListener needUpdateTime = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            public void update() {
+                if(!smcEstimationIntervalWidth.hasFocus() && !smcConfidence.hasFocus()) return;
+                smcMustUpdateTime = true;
+                smcTimeExpected.setText("");
+                smcTimeEstimationButton.setText(UPDATE_VERIFICATION_TIME_BTN_TEXT);
+                try {
+                    Float.parseFloat(smcEstimationIntervalWidth.getText());
+                    smcTimeEstimationButton.setEnabled(true);
+                } catch(NumberFormatException e) {
+                    smcTimeEstimationButton.setEnabled(false);
+                }
+            }
+        };
+        smcEstimationIntervalWidth.getDocument().addDocumentListener(needUpdateTime);
+        smcConfidence.getDocument().addDocumentListener(needUpdateTime);
+        smcTimeExpected.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                update();
+            }
+            public void update() {
+                if(!smcTimeExpected.hasFocus()) return;
+                smcMustUpdateTime = false;
+                smcEstimationIntervalWidth.setText("");
+                smcTimeEstimationButton.setText(UPDATE_PRECISION_BTN_TEXT);
+                try {
+                    Double.parseDouble(smcTimeExpected.getText());
+                    smcTimeEstimationButton.setEnabled(true);
+                } catch(NumberFormatException e) {
+                    smcTimeEstimationButton.setEnabled(false);
+                }
+            }
+        });
+    }
+
+    private void runBenchmark() {
+        DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
+        decimalFormatSymbols.setDecimalSeparator('.');
+        DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
+        DecimalFormat timeFormat = new DecimalFormat("#.##", decimalFormatSymbols);
+        if(doingBenchmark) {
+            if(benchmarkThread == null) return;
+            benchmarkThread.cancel(true);
+            doingBenchmark = false;
+            updateFieldsOnBenchmark();
+            smcTimeEstimationButton.setText(smcMustUpdateTime ? UPDATE_VERIFICATION_TIME_BTN_TEXT : UPDATE_PRECISION_BTN_TEXT);
+            return;
+        }
+        doingBenchmark = true;
+        updateFieldsOnBenchmark();
+        smcTimeEstimationButton.setText("Interrupt estimation");
+        boolean saved = querySaved;
+        querySaved = true;
+        TAPNQuery query = getQuery();
+        querySaved = saved;
+        SMCSettings settings = query.getSmcSettings();
+        query.setBenchmarkMode(true);
+        query.setBenchmarkRuns(48);
+        double timeWanted = 10;
+        try {
+            timeWanted = Double.parseDouble(smcTimeExpected.getText());
+        } catch(NumberFormatException ignored) { }
+        smcTimeExpected.setText("");
+        smcEstimationIntervalWidth.setText("");
+        double finalTimeWanted = timeWanted;
+        VerificationCallback callback1 = result1 -> {
+            query.setBenchmarkRuns(128);
+            SMCStats stats1 = (SMCStats) result1.stats();
+            float runsDone1 = stats1.getExecutedRuns();
+            float time1 = stats1.getVerificationTime();
+            VerificationCallback callback2 = result2 -> {
+                doingBenchmark = false;
+                updateFieldsOnBenchmark();
+                SMCStats stats2 = (SMCStats) result2.stats();
+                float runsDone2 = stats2.getExecutedRuns();
+                float time2 = stats2.getVerificationTime();
+                float coeff = (time2 - time1) / (runsDone2 - runsDone1);
+                float stat_err = time1 - coeff * runsDone1;
+                if(smcMustUpdateTime) {
+                    double runsNeeded = (double) settings.chernoffHoeffdingBound();
+                    double estimation = coeff * runsNeeded + stat_err;
+                    if(estimation < 0) estimation = 0.01;
+                    smcTimeExpected.setText(timeFormat.format(estimation));
+                    smcEstimationIntervalWidth.setText(precisionFormat.format(smcSettings.estimationIntervalWidth));
+                    smcTimeEstimationButton.setText(UPDATE_VERIFICATION_TIME_BTN_TEXT);
+                } else {
+                    int runsNeeded = (int) Math.ceil( (finalTimeWanted - stat_err) / coeff );
+                    float precision = settings.precisionFromRuns(runsNeeded);
+                    smcEstimationIntervalWidth.setText(precisionFormat.format(precision));
+                    smcTimeExpected.setText(String.valueOf(finalTimeWanted));
+                    smcTimeEstimationButton.setText(UPDATE_PRECISION_BTN_TEXT);
+                    updateSMCSettings();
+                }
+            };
+            
+            benchmarkThread = Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback2, guiModels, false, lens);
+        };
+       
+        benchmarkThread = Verifier.runVerifyTAPNSilent(tapnNetwork, query, callback1, guiModels,false, lens);
+    }
+
+    private void updateFieldsOnBenchmark() {
+        smcConfidence.setEnabled(!doingBenchmark);
+        smcEstimationIntervalWidth.setEnabled(!doingBenchmark);
+        smcTimeExpected.setEnabled(!doingBenchmark);
+        smcParallel.setEnabled(!doingBenchmark);
+        smcVerificationType.setEnabled(!doingBenchmark);
+        smcStepBoundValue.setEnabled(!doingBenchmark && !smcStepBoundInfinite.isSelected());
+        smcStepBoundInfinite.setEnabled(!doingBenchmark && !smcTimeBoundInfinite.isSelected());
+        smcTimeBoundValue.setEnabled(!doingBenchmark && !smcTimeBoundInfinite.isSelected());
+        smcTimeBoundInfinite.setEnabled(!doingBenchmark && !smcStepBoundInfinite.isSelected());
     }
 
 }

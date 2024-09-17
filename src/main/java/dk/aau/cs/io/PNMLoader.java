@@ -116,7 +116,7 @@ public class PNMLoader {
         Node pnmlElement = doc.getElementsByTagName("pnml").item(0);
         Node netNode = getFirstDirectChild(pnmlElement, "net");
 
-        lens = new TAPNLens(false, false, getFirstDirectChild(netNode, "declaration") != null);
+        lens = new TAPNLens(false, false, getFirstDirectChild(netNode, "declaration") != null, false);
 
         String name = getTAPNName(netNode);
 

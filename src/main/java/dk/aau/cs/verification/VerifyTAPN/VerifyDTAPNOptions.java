@@ -1,6 +1,9 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
 import com.sun.jna.Platform;
+
+import dk.aau.cs.verification.SMCTraceType;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
@@ -24,6 +27,12 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private final boolean colorFixpoint;
 	private boolean useRawVerification;
 	private String rawVerificationOptions;
+    private boolean parallel = false;
+    private boolean benchmark = false;
+    private int benchmarkRuns = 100;
+	private boolean isSmc;
+    private int numberOfTraces;
+    private SMCTraceType smcTraceType;
 
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(
@@ -45,7 +54,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean useRawVerification,
 			String rawVerificationOptions
 	) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions);
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions, false, 0, false, QueryCategory.Default, 1, new SMCTraceType(), false);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
@@ -71,7 +80,14 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             boolean colorFixpoint,
             boolean unfoldNet,
 			boolean useRawVerification,
-			String rawVerificationOptions
+			String rawVerificationOptions,
+            boolean benchmark,
+            int benchmarkRuns,
+            boolean parallel,
+			QueryCategory queryCategory,
+            int numberOfTraces,
+            SMCTraceType smcTraceType,
+            boolean isSimulate
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -86,9 +102,16 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         this.unfold = unfoldNet;
 		this.useRawVerification = useRawVerification;
 		this.rawVerificationOptions = rawVerificationOptions;
+        this.benchmark = benchmark;
+        this.benchmarkRuns = benchmarkRuns;
+        this.parallel = parallel;
+		this.isSmc = queryCategory == QueryCategory.SMC;
+        this.numberOfTraces = numberOfTraces;
+        this.smcTraceType = smcTraceType;
+        this.isSimulate = isSimulate;
 
 		// we only force unfolding when traces are involved
-        if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation) && !useRawVerification)
+        if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation || isSmc && isSimulate && unfold) && !useRawVerification)
         {
             try {
 				unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
@@ -104,26 +127,31 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		StringBuilder result = new StringBuilder();
 	
 		if (useRawVerification && rawVerificationOptions != null) {
-			return rawVerificationString(rawVerificationOptions, traceArg(traceOption));
+            String rawOptions = benchmark ?
+                ("--smc-benchmark " + benchmarkRuns + " ") + rawVerificationOptions :
+                rawVerificationOptions;
+			return rawVerificationString(rawOptions, traceArg(traceOption));
 		}
 
         result.append(kBoundArg());
         result.append(deadTokenArg());
         result.append(traceArg(traceOption));
-        if(unfold && trace() != TraceOption.NONE || enabledOverApproximation || enabledUnderApproximation)
+        if(unfold && trace() != TraceOption.NONE || enabledOverApproximation || enabledUnderApproximation || isSmc && isSimulate && unfold)
         {
             result.append(writeUnfolded());
-			result.append(" --bindings ");
+            result.append(" --bindings ");
         }
-        result.append(searchArg(searchOption));
-		result.append("--verification-method ");
-		result.append(timeDarts ? "1" : "0");
-		result.append(' ');
-		result.append("--memory-optimization ");
-		result.append(pTrie ? "1" : "0");
-		if (! useStubbornReduction) {
-			result.append(" --disable-partial-order ");
-		}
+        if(!isSmc) {
+            result.append(searchArg(searchOption));
+            result.append("--verification-method ");
+            result.append(timeDarts ? "1" : "0");
+            result.append(' ');
+            result.append("--memory-optimization ");
+            result.append(pTrie ? "1" : "0");
+            if (!useStubbornReduction) {
+                result.append(" --disable-partial-order ");
+            }
+        }
 		if(workflow == WorkflowMode.WORKFLOW_SOUNDNESS){
 			result.append(" --workflow 1 ");
 		} else if(workflow == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS){
@@ -136,6 +164,19 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		if (workflow != WorkflowMode.WORKFLOW_SOUNDNESS && workflow != WorkflowMode.WORKFLOW_STRONG_SOUNDNESS) {
 			result.append(gcd ? " --gcd-lower " : ""); // GCD optimization is not sound for workflow analysis
 		}
+
+        result.append(parallel ? "--smc-parallel " : "");
+        result.append(benchmark ? "--smc-benchmark " + benchmarkRuns + " " : "");
+
+        if (isSmc) {
+            result.append("--smc-print-cumulative-stats 4 ");
+            if (isSimulate) {
+                result.append(" --smc-traces ");
+                result.append(numberOfTraces);
+                result.append(" ");
+                result.append(smcTraceType.getArg());
+            }
+        }
 
 		return result.toString();
 	}

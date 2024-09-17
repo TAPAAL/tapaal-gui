@@ -7,22 +7,17 @@ import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.TCTL.*;
-import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.PNMLoader;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
-import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.swinghelpers.GridBagHelper;
-import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
+import pipe.gui.graph.Graph;
+import pipe.gui.graph.GraphDialog;
+import pipe.gui.graph.GraphPoint;
+import pipe.gui.graph.GraphDialog.GraphDialogBuilder;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
@@ -34,8 +29,11 @@ import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.File;
-import java.util.*;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import static java.util.Objects.nonNull;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
@@ -83,7 +81,7 @@ public class RunVerification extends RunVerificationBase {
 						iconSelector.getIconFor(result)
 				);
 
-                if (options.traceOption() != TAPNQuery.TraceOption.NONE) {
+                if (options.traceOption() != TAPNQuery.TraceOption.NONE || lens.isStochastic() && options.isSimulate()) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
                         if ((lens != null && lens.isColored()) || model.isColored()) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
@@ -93,6 +91,8 @@ public class RunVerification extends RunVerificationBase {
                         }
                         if (result.getTraceMap() == null) {
                             TAPAALGUI.getAnimator().setTrace(result.getTrace());
+                        } else if (lens.isStochastic() && options.isSimulate()) {
+                            TAPAALGUI.getAnimator().setTrace(result.getTrace(), result.getTraceMap());
                         } else {
                             Map<String, TAPNNetworkTrace> traceMap = new HashMap<>();
                             for (String key : result.getTraceMap().keySet()) {
@@ -130,7 +130,6 @@ public class RunVerification extends RunVerificationBase {
 			//version GLIB_2.0 not defined in file libc.so.6 with
 			//link time reference
 			//is the error as this (often) means the possibility for a uppaal licence key error
-
             if (((lens != null && lens.isColored()) || model.isColored())) {
                 if (result != null && result.errorMessage().contains("Only weight=1")) {
                     String[] split1 = result.errorMessage().split("between ", 2);
@@ -184,9 +183,10 @@ public class RunVerification extends RunVerificationBase {
         String[] statsStrings = stats.split(System.getProperty("line.separator"));
 
         for (int i = 0; i < statsStrings.length; i++) {
-            GridBagConstraints gbc = GridBagHelper.as(0, i+startOffset, WEST, new Insets(0,0,0,0));
+            GridBagConstraints gbc = GridBagHelper.as(i / 4, (i%4)+startOffset, WEST, new Insets(0, i >= 4 ? 10 : 0,0,0));
             JLabel statLabel = new JLabel(statsStrings[i]);
-            statLabel.setToolTipText(explanations[i]);
+            if(explanations.length > i)
+                statLabel.setToolTipText(explanations[i]);
             panel.add(statLabel, gbc);
         }
         return startOffset+statsStrings.length;
@@ -349,6 +349,10 @@ public class RunVerification extends RunVerificationBase {
         
 	private JPanel createMessagePanel(final VerificationResult<TAPNNetworkTrace> result) {
 		final JPanel panel = new JPanel(new GridBagLayout());
+
+        if(result.getQueryResult().isSMC()) {
+            return new SMCResultPanel(result);
+        }
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
