@@ -141,15 +141,17 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             result.append(writeUnfolded());
             result.append(" --bindings ");
         }
-        result.append(searchArg(searchOption));
-		result.append("--verification-method ");
-		result.append(timeDarts ? "1" : "0");
-		result.append(' ');
-		result.append("--memory-optimization ");
-		result.append(pTrie ? "1" : "0");
-		if (! useStubbornReduction) {
-			result.append(" --disable-partial-order ");
-		}
+        if(!isSmc) {
+            result.append(searchArg(searchOption));
+            result.append("--verification-method ");
+            result.append(timeDarts ? "1" : "0");
+            result.append(' ');
+            result.append("--memory-optimization ");
+            result.append(pTrie ? "1" : "0");
+            if (!useStubbornReduction) {
+                result.append(" --disable-partial-order ");
+            }
+        }
 		if(workflow == WorkflowMode.WORKFLOW_SOUNDNESS){
 			result.append(" --workflow 1 ");
 		} else if(workflow == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS){
