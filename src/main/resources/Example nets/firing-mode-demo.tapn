@@ -10,6 +10,12 @@
     </structure>
   </declaration>
   <net active="true" id="TAPN1" type="P/T net">
+    <labels border="true" height="240" positionX="750" positionY="90" width="296">In this example, the firing mode of Filter decides the resulting probability of reaching Youngest or Oldest
+
+P0, CreateDelay, and Ready are used to create two tokens of different ages in Buffer.
+Then, filter selects only one of the tokens in Buffer, according to its firing mode.
+
+The transitions later are immediate and only one will be enabled according to the age of the selected token.</labels>
     <place displayName="true" id="Buffer" initialMarking="1" invariant="&lt; inf" name="Buffer" nameOffsetX="34" nameOffsetY="-10" positionX="210" positionY="210">
       <type>
         <text>dot</text>
@@ -193,8 +199,8 @@
           </numberof>
         </structure>
       </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="240" yCoord="225"/>
-      <arcpath arcPointType="false" id="1" xCoord="339" yCoord="225"/>
+      <arcpath arcPointType="false" id="0" xCoord="239" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="339" yCoord="226"/>
     </arc>
     <arc id="A7" inscription="[0,inf):1" nameOffsetX="0" nameOffsetY="0" source="Filter" target="Selected" transportID="1" type="transport" weight="1">
       <hlinscription>
@@ -232,7 +238,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="490" yCoord="214"/>
-      <arcpath arcPointType="false" id="1" xCoord="564" yCoord="135"/>
+      <arcpath arcPointType="false" id="1" xCoord="564" yCoord="136"/>
     </arc>
     <arc id="A11" inscription="[1,inf)" nameOffsetX="2" nameOffsetY="16" source="Selected" target="OldestSelected" type="timed" weight="1">
       <hlinscription>
@@ -250,8 +256,8 @@
           </numberof>
         </structure>
       </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="490" yCoord="235"/>
-      <arcpath arcPointType="false" id="1" xCoord="564" yCoord="315"/>
+      <arcpath arcPointType="false" id="0" xCoord="490" yCoord="236"/>
+      <arcpath arcPointType="false" id="1" xCoord="564" yCoord="316"/>
     </arc>
     <arc id="A12" inscription="1" nameOffsetX="0" nameOffsetY="0" source="YoungestSelected" target="Youngest" type="normal" weight="1">
       <hlinscription>
