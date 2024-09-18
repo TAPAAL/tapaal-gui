@@ -8,6 +8,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
+import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
 import pipe.gui.petrinet.animation.Animator;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -31,7 +32,7 @@ public class TimedTransition extends TAPNElement {
 	private boolean isUncontrollable = false;
     private SMCDistribution distribution = SMCDistribution.defaultDistribution();
     private Probability weight = new DoubleProbability(1.0);
-	private FiringMode firingMode = new OldestFiringMode();
+	private FiringMode firingMode = new RandomFiringMode();
     private GuardExpression guard;
 
 	private SharedTransition sharedTransition;
@@ -139,7 +140,7 @@ public class TimedTransition extends TAPNElement {
 
 	public FiringMode getFiringMode() {
         if (firingMode == null) {
-            firingMode = new OldestFiringMode();
+            firingMode = new RandomFiringMode();
         }
         
         return firingMode;
