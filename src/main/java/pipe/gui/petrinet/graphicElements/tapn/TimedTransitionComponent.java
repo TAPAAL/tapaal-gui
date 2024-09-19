@@ -18,6 +18,7 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.*;
 
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import pipe.gui.TAPAALGUI;
@@ -216,6 +217,11 @@ public class TimedTransitionComponent extends Transition {
                     (   underlyingTransition().getWeight() instanceof ConstantProbability ||
                         underlyingTransition().getWeight().value() != 1 ?
                         "\nW=" + underlyingTransition().getWeight().toString() : ""
+                    ) +
+                    (
+                        underlyingTransition().getFiringMode() instanceof RandomFiringMode ?
+                            "" :
+                            "\nM=" + underlyingTransition().getFiringMode().toString()
                     )
                 );
             }

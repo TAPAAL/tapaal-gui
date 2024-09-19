@@ -225,7 +225,7 @@ public class TapnEngineXmlLoader {
 		String firingModeStr = element.getAttribute("firingMode");
         SMCDistribution distribution = SMCDistribution.defaultDistribution();
         Probability weight = new DoubleProbability(1.0);
-		FiringMode firingMode = new OldestFiringMode();
+		FiringMode firingMode = new RandomFiringMode();
         if(!distrib.isEmpty()){
             distribution = SMCDistribution.parseXml(element);
         }
@@ -423,7 +423,7 @@ public class TapnEngineXmlLoader {
         int priority = 0;
         SMCDistribution distribution = SMCDistribution.defaultDistribution();
         Probability weight = new DoubleProbability(1.0);
-		FiringMode firingMode = new OldestFiringMode();
+		FiringMode firingMode = new RandomFiringMode();
 		if(!posX.isEmpty()){
 		    positionXInput = (int)Double.parseDouble(posX);
         }
