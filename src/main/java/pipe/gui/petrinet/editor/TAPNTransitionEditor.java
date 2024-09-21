@@ -64,7 +64,7 @@ public class TAPNTransitionEditor extends JPanel {
 	    if(!transition.isColored() || !coloredTransitionGuardPanel.showGuardPanel()){
 	        coloredTransitionGuardPanel.setVisible(false);
         }
-        distributionPanel.setVisible((!urgentCheckBox.isSelected()) && transition.isStochastic());
+        distributionPanel.setVisible(transition.isStochastic());
     }
 
 	private void initComponents() {
@@ -189,8 +189,7 @@ public class TAPNTransitionEditor extends JPanel {
 			if(!isUrgencyOK()){
 				urgentCheckBox.setSelected(false);
 			}
-            distributionPanel.setVisible((!urgentCheckBox.isSelected()) && transition.isStochastic());
-            dialog.pack();
+            distributionPanel.setUrgent(urgentCheckBox.isSelected());
 		});
 
         gridBagConstraints = new java.awt.GridBagConstraints();
