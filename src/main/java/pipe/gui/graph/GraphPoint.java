@@ -16,4 +16,9 @@ public class GraphPoint {
     public double getY() {
         return y;
     }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
 }
