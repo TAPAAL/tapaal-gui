@@ -30,7 +30,7 @@ public class DoubleProbability extends Probability {
     }
 
     public String nameForSaving(boolean writeConstantNames){
-        return Double.toString(value);
+        return Double.isInfinite(value) ? "inf" : Double.toString(value);
     }
 }
 

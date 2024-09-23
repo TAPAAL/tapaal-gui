@@ -12,6 +12,7 @@ public abstract class Probability {
 
     public static Probability parseProbability(String attribute, ConstantStore constants) {
         Probability weight;
+        if(attribute.equals("inf")) return new DoubleProbability(Double.POSITIVE_INFINITY);
         try{
             double weightAsDouble = Double.parseDouble(attribute);
             weight = new DoubleProbability(weightAsDouble);
