@@ -19,7 +19,9 @@ public class DoubleProbability extends Probability {
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
+        if(isInfinite()) return "∞";
         return String.valueOf(value);
     }
 
@@ -28,7 +30,7 @@ public class DoubleProbability extends Probability {
     }
 
     public String nameForSaving(boolean writeConstantNames){
-        return Double.toString(value);
+        return Double.isInfinite(value) ? "inf" : Double.toString(value);
     }
 }
 

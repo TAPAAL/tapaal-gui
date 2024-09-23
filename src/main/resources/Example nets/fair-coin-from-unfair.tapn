@@ -89,11 +89,11 @@
         </structure>
       </type>
     </place>
-    <transition angle="0" displayName="true" distribution="constant" firingMode="Oldest" id="inconclusive" infiniteServer="false" name="inconclusive" nameOffsetX="0" nameOffsetY="0" player="0" positionX="300" positionY="180" priority="0" urgent="false" value="1.0" weight="1.0"/>
-    <transition angle="0" displayName="true" distribution="constant" firingMode="Oldest" id="head" infiniteServer="false" name="head" nameOffsetX="3" nameOffsetY="2" player="0" positionX="465" positionY="180" priority="0" urgent="true" value="0.0" weight="headprob"/>
-    <transition angle="0" displayName="true" distribution="constant" firingMode="Oldest" id="tail" infiniteServer="false" name="tail" nameOffsetX="8" nameOffsetY="8" player="0" positionX="615" positionY="180" priority="0" urgent="true" value="0.0" weight="tailprob"/>
-    <transition angle="0" displayName="true" distribution="constant" firingMode="Oldest" id="choosing_heads" infiniteServer="false" name="choosing_heads" nameOffsetX="-20" nameOffsetY="12" player="0" positionX="300" positionY="345" priority="0" urgent="true" value="0.0" weight="1.0"/>
-    <transition angle="0" displayName="true" distribution="constant" firingMode="Oldest" id="choosing_tails" infiniteServer="false" name="choosing_tails" nameOffsetX="116" nameOffsetY="11" player="0" positionX="795" positionY="345" priority="0" urgent="true" value="0.0" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Random" id="inconclusive" infiniteServer="false" name="inconclusive" nameOffsetX="0" nameOffsetY="0" player="0" positionX="300" positionY="180" priority="0" urgent="false" value="1.0" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Random" id="head" infiniteServer="false" name="head" nameOffsetX="3" nameOffsetY="2" player="0" positionX="465" positionY="180" priority="0" urgent="true" value="0.0" weight="headprob"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Random" id="tail" infiniteServer="false" name="tail" nameOffsetX="8" nameOffsetY="8" player="0" positionX="615" positionY="180" priority="0" urgent="true" value="0.0" weight="tailprob"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Random" id="choosing_heads" infiniteServer="false" name="choosing_heads" nameOffsetX="-20" nameOffsetY="12" player="0" positionX="300" positionY="345" priority="0" urgent="true" value="0.0" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Random" id="choosing_tails" infiniteServer="false" name="choosing_tails" nameOffsetX="116" nameOffsetY="11" player="0" positionX="795" positionY="345" priority="0" urgent="true" value="0.0" weight="1.0"/>
     <arc id="A0" inscription="[0,inf)" nameOffsetX="-37" nameOffsetY="-7" source="tossed" target="inconclusive" type="timed" weight="1">
       <hlinscription>
         <text>1'(coins.all, t)</text>
@@ -119,8 +119,8 @@
           </numberof>
         </structure>
       </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="542" yCoord="351"/>
-      <arcpath arcPointType="false" id="1" xCoord="319" yCoord="200"/>
+      <arcpath arcPointType="false" id="0" xCoord="543" yCoord="352"/>
+      <arcpath arcPointType="false" id="1" xCoord="320" yCoord="200"/>
     </arc>
     <arc id="A1" inscription="1" nameOffsetX="-49" nameOffsetY="-3" source="inconclusive" target="ready_to_toss" type="normal" weight="1">
       <hlinscription>
@@ -141,7 +141,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="320" yCoord="190"/>
-      <arcpath arcPointType="false" id="1" xCoord="542" yCoord="52"/>
+      <arcpath arcPointType="false" id="1" xCoord="542" yCoord="53"/>
     </arc>
     <arc id="A2" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="ready_to_toss" target="head" type="timed" weight="1">
       <hlinscription>
@@ -159,8 +159,8 @@
           </numberof>
         </structure>
       </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="547" yCoord="58"/>
-      <arcpath arcPointType="false" id="1" xCoord="479" yCoord="179"/>
+      <arcpath arcPointType="false" id="0" xCoord="548" yCoord="58"/>
+      <arcpath arcPointType="false" id="1" xCoord="480" yCoord="180"/>
     </arc>
     <arc id="A3" inscription="1" nameOffsetX="-21" nameOffsetY="-22" source="head" target="tossed" type="normal" weight="1">
       <hlinscription>
@@ -186,7 +186,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="480" yCoord="210"/>
-      <arcpath arcPointType="false" id="1" xCoord="548" yCoord="346"/>
+      <arcpath arcPointType="false" id="1" xCoord="548" yCoord="347"/>
     </arc>
     <arc id="A4" inscription="[0,inf)" nameOffsetX="39" nameOffsetY="0" source="ready_to_toss" target="tail" type="timed" weight="1">
       <hlinscription>
@@ -205,7 +205,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="562" yCoord="58"/>
-      <arcpath arcPointType="false" id="1" xCoord="629" yCoord="179"/>
+      <arcpath arcPointType="false" id="1" xCoord="630" yCoord="180"/>
     </arc>
     <arc id="A5" inscription="1" nameOffsetX="61" nameOffsetY="-19" source="tail" target="tossed" type="normal" weight="1">
       <hlinscription>
@@ -231,7 +231,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="630" yCoord="210"/>
-      <arcpath arcPointType="false" id="1" xCoord="561" yCoord="346"/>
+      <arcpath arcPointType="false" id="1" xCoord="562" yCoord="347"/>
     </arc>
     <arc id="A6" inscription="[0,inf)" nameOffsetX="69" nameOffsetY="10" source="tossed" target="choosing_heads" type="timed" weight="1">
       <hlinscription>
@@ -280,7 +280,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="540" yCoord="360"/>
-      <arcpath arcPointType="false" id="1" xCoord="319" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="320" yCoord="360"/>
     </arc>
     <arc id="A7" inscription="1" nameOffsetX="0" nameOffsetY="0" source="choosing_heads" target="heads" type="normal" weight="1">
       <hlinscription>
@@ -348,7 +348,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="570" yCoord="360"/>
-      <arcpath arcPointType="false" id="1" xCoord="804" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="805" yCoord="361"/>
     </arc>
     <arc id="A9" inscription="1" nameOffsetX="0" nameOffsetY="0" source="choosing_tails" target="tails" type="normal" weight="1">
       <hlinscription>

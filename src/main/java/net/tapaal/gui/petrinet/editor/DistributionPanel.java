@@ -140,6 +140,23 @@ public class DistributionPanel extends JPanel {
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.EAST;
         add(distributionShowGraph, gbc);
+
+        setUrgent(transition.underlyingTransition().isUrgent());
+    }
+
+    public void setUrgent(boolean urgent) {
+        if(urgent) {
+            displayDistributionFields(SMCDistribution.urgent());
+            distributionType.setEnabled(false);
+            useDiscreteDistribution.setEnabled(false);
+            useContinuousDistribution.setEnabled(false);
+            distributionParam1Field.setEnabled(false);
+        } else {
+            distributionType.setEnabled(true);
+            useDiscreteDistribution.setEnabled(true);
+            useContinuousDistribution.setEnabled(true);
+            distributionParam1Field.setEnabled(true);
+        }
     }
 
     public SMCDistribution parseDistribution() {
