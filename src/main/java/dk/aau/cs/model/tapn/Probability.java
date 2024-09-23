@@ -6,6 +6,10 @@ public abstract class Probability {
     public abstract String toString(boolean displayConstantnames);
     public abstract String nameForSaving(boolean writeConstantNames);
 
+    public boolean isInfinite() {
+        return Double.isInfinite(value());
+    }
+
     public static Probability parseProbability(String attribute, ConstantStore constants) {
         Probability weight;
         try{

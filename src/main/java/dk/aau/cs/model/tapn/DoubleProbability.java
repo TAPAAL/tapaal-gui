@@ -19,7 +19,9 @@ public class DoubleProbability extends Probability {
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
+        if(isInfinite()) return "∞";
         return String.valueOf(value);
     }
 
