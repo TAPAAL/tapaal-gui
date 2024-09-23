@@ -61,11 +61,11 @@
         </structure>
       </type>
     </place>
-    <transition a="0.5" angle="0" b="1.5" displayName="true" distribution="uniform" firingMode="Oldest" id="Recover" infiniteServer="false" name="Recover" nameOffsetX="63" nameOffsetY="-38" player="0" positionX="75" positionY="195" priority="0" urgent="false" weight="1.0"/>
-    <transition angle="0" displayName="true" distribution="normal" firingMode="Oldest" id="Produce" infiniteServer="false" mean="1.5" name="Produce" nameOffsetX="98" nameOffsetY="-31" player="0" positionX="285" positionY="195" priority="0" stddev="0.3" urgent="false" weight="1.0"/>
+    <transition a="0.5" angle="0" b="1.5" displayName="true" distribution="uniform" firingMode="Random" id="Recover" infiniteServer="false" name="Recover" nameOffsetX="63" nameOffsetY="-38" player="0" positionX="75" positionY="195" priority="0" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="normal" firingMode="Random" id="Produce" infiniteServer="false" mean="1.5" name="Produce" nameOffsetX="98" nameOffsetY="-31" player="0" positionX="285" positionY="195" priority="0" stddev="0.3" urgent="false" weight="1.0"/>
     <transition angle="0" displayName="true" distribution="exponential" firingMode="Random" id="Consume1" infiniteServer="false" name="Consume1" nameOffsetX="124" nameOffsetY="7" player="0" positionX="615" positionY="120" priority="0" rate="0.4" urgent="false" weight="1.0"/>
     <transition angle="0" displayName="true" distribution="exponential" firingMode="Youngest" id="Consume2" infiniteServer="false" name="Consume2" nameOffsetX="125" nameOffsetY="9" player="0" positionX="615" positionY="270" priority="0" rate="0.6" urgent="false" weight="1.0"/>
-    <transition angle="0" displayName="true" distribution="constant" firingMode="Oldest" id="Expire" infiniteServer="false" name="Expire" nameOffsetX="107" nameOffsetY="-1" player="0" positionX="435" positionY="300" priority="0" urgent="false" value="0.0" weight="Infinity"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Random" id="Expire" infiniteServer="false" name="Expire" nameOffsetX="107" nameOffsetY="-1" player="0" positionX="435" positionY="300" priority="0" urgent="false" value="0.0" weight="inf"/>
     <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Ready" target="Produce" type="timed" weight="1">
       <hlinscription>
         <text>1'dot</text>
@@ -82,8 +82,8 @@
           </numberof>
         </structure>
       </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="207" yCoord="143"/>
-      <arcpath arcPointType="false" id="1" xCoord="296" yCoord="206"/>
+      <arcpath arcPointType="false" id="0" xCoord="207" yCoord="144"/>
+      <arcpath arcPointType="false" id="1" xCoord="295" yCoord="206"/>
     </arc>
     <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Produce" target="Resting" type="normal" weight="1">
       <hlinscription>
@@ -102,7 +102,7 @@
         </structure>
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="295" yCoord="216"/>
-      <arcpath arcPointType="false" id="1" xCoord="207" yCoord="277"/>
+      <arcpath arcPointType="false" id="1" xCoord="207" yCoord="276"/>
     </arc>
     <arc id="A2" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Resting" target="Recover" type="timed" weight="1">
       <hlinscription>
@@ -120,8 +120,8 @@
           </numberof>
         </structure>
       </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="183" yCoord="277"/>
-      <arcpath arcPointType="false" id="1" xCoord="95" yCoord="216"/>
+      <arcpath arcPointType="false" id="0" xCoord="183" yCoord="276"/>
+      <arcpath arcPointType="false" id="1" xCoord="95" yCoord="215"/>
     </arc>
     <arc id="A3" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Recover" target="Ready" type="normal" weight="1">
       <hlinscription>
@@ -139,7 +139,7 @@
           </numberof>
         </structure>
       </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="96" yCoord="206"/>
+      <arcpath arcPointType="false" id="0" xCoord="95" yCoord="205"/>
       <arcpath arcPointType="false" id="1" xCoord="183" yCoord="144"/>
     </arc>
     <arc id="A4" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Produce" target="Store" type="normal" weight="1">
@@ -199,25 +199,6 @@
       <arcpath arcPointType="false" id="0" xCoord="464" yCoord="216"/>
       <arcpath arcPointType="false" id="1" xCoord="625" yCoord="286"/>
     </arc>
-    <arc id="A7" inscription="[9,inf):1" nameOffsetX="0" nameOffsetY="0" source="Expire" target="Waste" transportID="1" type="transport" weight="1">
-      <hlinscription>
-        <text>1'dot</text>
-        <structure>
-          <numberof>
-            <subterm>
-              <numberconstant value="1">
-                <positive/>
-              </numberconstant>
-            </subterm>
-            <subterm>
-              <useroperator declaration="dot"/>
-            </subterm>
-          </numberof>
-        </structure>
-      </hlinscription>
-      <arcpath arcPointType="false" id="0" xCoord="450" yCoord="330"/>
-      <arcpath arcPointType="false" id="1" xCoord="450" yCoord="405"/>
-    </arc>
     <arc id="A9" inscription="[9,inf):1" nameOffsetX="0" nameOffsetY="0" source="Store" target="Expire" transportID="1" type="transport" weight="1">
       <hlinscription>
         <text>1'dot</text>
@@ -236,6 +217,25 @@
       </hlinscription>
       <arcpath arcPointType="false" id="0" xCoord="450" yCoord="225"/>
       <arcpath arcPointType="false" id="1" xCoord="450" yCoord="300"/>
+    </arc>
+    <arc id="A7" inscription="[9,inf):1" nameOffsetX="0" nameOffsetY="0" source="Expire" target="Waste" transportID="1" type="transport" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="450" yCoord="330"/>
+      <arcpath arcPointType="false" id="1" xCoord="450" yCoord="405"/>
     </arc>
   </net>
   <query active="true" algorithmOption="CERTAIN_ZERO" capacity="4" gcd="false" name="Stays under capacity" numberOfTraces="1" overApproximation="false" parallel="true" reductionOption="VerifyDTAPN" smcTraceType="Any" timeDarts="false" traceOption="NONE" type="SMC" verificationType="Quantitative">
