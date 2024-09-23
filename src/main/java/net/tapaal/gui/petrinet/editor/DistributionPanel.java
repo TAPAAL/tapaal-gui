@@ -390,7 +390,7 @@ public class DistributionPanel extends JPanel {
         double x = 1e-300;
         while (true) {
             double y = coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
-            if (y < 1e-300 && x > 1) break;
+            if (y < 1e-8 && x > 10) break;
             points.add(new GraphPoint(x, y));
             x += step;	
         }
@@ -416,7 +416,7 @@ public class DistributionPanel extends JPanel {
         double x = 1e-300;
         while (true) {
             double y = coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
-            if (y < 1e-300 && x > 1) break;
+            if (y < 1e-8 && x > 10) break;
             points.add(new GraphPoint(x, y));
             x += step;
         }
