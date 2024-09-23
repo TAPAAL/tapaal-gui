@@ -80,7 +80,12 @@ public class ConstantsParser {
         for (Variable v : network.variables()) {
             List<String> messagesList = new ArrayList<String>();
             constantsMap.put(v.getName(), v);
-            boolean canBeEdited = !(variables.containsKey(v.getName()) && !variables.get(v.getName()).getColorType().equals(v.getColorType()));
+            boolean canBeEdited = true;
+            if (variables.containsKey(v.getName())) {
+                ColorType ct = variables.get(v.getName()).getColorType();
+                canBeEdited = ct.equals(v.getColorType()) || ct.isIntegerRange();
+            }
+    
             canBeRemovedBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList) && canBeEdited);
             messages.put(v.getName(), messagesList);
         }
@@ -88,11 +93,13 @@ public class ConstantsParser {
         // Generate error messages
         for (String key : canBeRemovedBitMap.keySet()) {
             boolean skip = false;
+
             if (constants.containsKey(key) || 
                 variables.containsKey(key) && canBeRemovedBitMap.get(key) ||
                 key.equals("dot") ||
                 colorTypes.containsKey(key) && 
-                colorTypes.get(key).equals(constantsMap.get(key))) {
+                (colorTypes.get(key).equals(constantsMap.get(key)) ||
+                colorTypes.get(key).isIntegerRange())) {
                 continue;
             } else if (variables.containsKey(key) && !canBeRemovedBitMap.get(key)) {
                 for (Variable v : network.variables()) {
@@ -276,7 +283,19 @@ void colorTypes() :
             }
 
             ct = pct;
-        } else if (!isProductList.value) {
+        } else if (isIntList.value) {
+            ct = new ColorType(id.image);
+            int lowerBound = Integer.parseInt(values.get(0));
+            int upperBound = Integer.parseInt(values.get(1));
+            
+            if (lowerBound > upperBound) {
+                throw new ParseException("Lower bound must be lowr than or equal to upper bound");
+            }
+
+            for (int i = lowerBound; i <= upperBound; ++i) {
+                ct.addColor(Integer.toString(i));
+            }
+        } else {
             ct = new ColorType(id.image);
             Set<String> uniqueVals = new HashSet<String>();
             for (String color : values) {
