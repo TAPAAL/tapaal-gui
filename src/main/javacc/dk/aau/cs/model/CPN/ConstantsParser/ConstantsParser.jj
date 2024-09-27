@@ -7,10 +7,18 @@ package dk.aau.cs.model.CPN.ConstantsParser;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.CPN.ColorMultiset;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -92,24 +100,72 @@ public class ConstantsParser {
 
         // Generate error messages
         for (String key : canBeRemovedBitMap.keySet()) {
-            boolean skip = false;
-
             if (constants.containsKey(key) || 
                 variables.containsKey(key) && canBeRemovedBitMap.get(key) ||
-                key.equals("dot") ||
-                colorTypes.containsKey(key) && 
-                (colorTypes.get(key).equals(constantsMap.get(key)) ||
-                colorTypes.get(key).isIntegerRange())) {
+                key.equals("dot")) {
                 continue;
             } else if (variables.containsKey(key) && !canBeRemovedBitMap.get(key)) {
+                boolean skip = false;
                 for (Variable v : network.variables()) {
                     if (v.getName().equals(key)) {
                         skip = v.getColorType().equals(variables.get(key).getColorType());
                     }
                 }
-            }
 
-            if (skip) continue;
+                if (skip) continue;
+            } else if (colorTypes.containsKey(key)) {
+                if (colorTypes.get(key).equals(constantsMap.get(key))) continue;
+
+                ColorType newCt = colorTypes.get(key);
+                ColorType ct = (ColorType)constantsMap.get(key);
+
+                List<Color> removedColors = new ArrayList<Color>();
+
+                for (Color color : ct.getColorList()) {
+                    if (!newCt.contains(color)) {
+                        removedColors.add(color);
+                    }
+                }
+
+                int removeableColors = 0;
+                for (Color c : removedColors) {
+                    List<String> newMessagesList = new ArrayList<String>();
+                    boolean colorCanBeRemoved = network.canColorBeRemoved(c, newMessagesList);
+                    if (colorCanBeRemoved) {
+                        ++removeableColors;
+                    } else {
+                        List<String> messagesList = messages.get(key);
+                        messagesList.addAll(newMessagesList);
+                        messages.put(key, messagesList);
+                    }
+                }
+
+                // Update place color types
+                for (TimedArcPetriNet tapn : network.allTemplates()) {
+                    for (TimedPlace p : tapn.places()) {
+                        if (p.getColorType().equals(ct)) {
+                            p.setColorType(newCt);
+                        }
+
+                        ArcExpression expression = p.getExprWithNewColorType(newCt);
+                        if (expression != p.getTokensAsExpression()) {
+                            ColorMultiset cm = expression.eval(network.getContext());
+                            if (cm != null) {
+                                List<TimedToken> tokensToAdd = new ArrayList<TimedToken>(p.tokens());
+                                for (TimedToken token : cm.getTokens(p)) {
+                                    tapn.marking().remove(token);
+                                }
+
+                                p.updateTokens(tokensToAdd, expression);
+                            }
+                        }
+                    }
+                }
+
+                if (removeableColors == removedColors.size()) {
+                    continue;
+                }
+            }
 
             Object obj = constantsMap.get(key);
             if (!canBeRemovedBitMap.get(key)) {

@@ -137,7 +137,7 @@ public class ColorType implements Iterable<Color> {
         }
         return false;
     }
-
+    
     public Color getColorByName(String name){
         for (Color c : colors) {
             if(c.getColorName().equals(name)){

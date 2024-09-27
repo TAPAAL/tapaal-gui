@@ -836,7 +836,7 @@ public class TimedArcPetriNetNetwork {
         }
     }
 
-    public boolean canColorBeRemoved(Color color, ArrayList<String> messages) {
+    public boolean canColorBeRemoved(Color color, List<String> messages) {
         isColorTypeUsedInProduct(color.getColorType(), messages);
         for (TimedArcPetriNet tapn : allTemplates()) {
             for (TimedPlace p : tapn.places()) {
