@@ -831,9 +831,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             if (currentSelection.getObject() instanceof  ColorExpression) {
                 succExpr = new SuccessorExpression((ColorExpression) currentSelection.getObject());
                 UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), succExpr);
-                System.out.println(arcExpression.getClass().getName());
-                System.out.println("currentSelection.getObject() = " + currentSelection.getObject());
-                System.out.println("succExpr = " + succExpr);
                 arcExpression = arcExpression.replace(currentSelection.getObject(), succExpr);
                 updateSelection(succExpr);
                 undoSupport.postEdit(edit);
