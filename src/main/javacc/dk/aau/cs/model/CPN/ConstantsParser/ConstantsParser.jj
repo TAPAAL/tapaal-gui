@@ -119,51 +119,53 @@ public class ConstantsParser {
                 ColorType newCt = colorTypes.get(key);
                 ColorType ct = (ColorType)constantsMap.get(key);
 
-                List<Color> removedColors = new ArrayList<Color>();
-
-                for (Color color : ct.getColorList()) {
-                    if (!newCt.contains(color)) {
-                        removedColors.add(color);
-                    }
-                }
-
-                int removeableColors = 0;
-                for (Color c : removedColors) {
-                    List<String> newMessagesList = new ArrayList<String>();
-                    boolean colorCanBeRemoved = network.canColorBeRemoved(c, newMessagesList);
-                    if (colorCanBeRemoved) {
-                        ++removeableColors;
-                    } else {
-                        List<String> messagesList = messages.get(key);
-                        messagesList.addAll(newMessagesList);
-                        messages.put(key, messagesList);
-                    }
-                }
-
-                // Update place color types
-                for (TimedArcPetriNet tapn : network.allTemplates()) {
-                    for (TimedPlace p : tapn.places()) {
-                        if (p.getColorType().equals(ct)) {
-                            p.setColorType(newCt);
+                if (!(ct instanceof ProductType)) {    
+                    List<Color> removedColors = new ArrayList<Color>();
+                        
+                    for (Color color : ct.getColorList()) {
+                        if (!newCt.contains(color)) {
+                            removedColors.add(color);
                         }
+                    }
+                    
+                    int removeableColors = 0;
+                    for (Color c : removedColors) {
+                        List<String> newMessagesList = new ArrayList<String>();
+                        boolean colorCanBeRemoved = network.canColorBeRemoved(c, newMessagesList);
+                        if (colorCanBeRemoved) {
+                            ++removeableColors;
+                        } else {
+                            List<String> messagesList = messages.get(key);
+                            messagesList.addAll(newMessagesList);
+                            messages.put(key, messagesList);
+                        }
+                    }
 
-                        ArcExpression expression = p.getExprWithNewColorType(newCt);
-                        if (expression != p.getTokensAsExpression()) {
-                            ColorMultiset cm = expression.eval(network.getContext());
-                            if (cm != null) {
-                                List<TimedToken> tokensToAdd = new ArrayList<TimedToken>(p.tokens());
-                                for (TimedToken token : cm.getTokens(p)) {
-                                    tapn.marking().remove(token);
+                    // Update place color types
+                    for (TimedArcPetriNet tapn : network.allTemplates()) {
+                        for (TimedPlace p : tapn.places()) {
+                            if (p.getColorType().equals(ct)) {
+                                p.setColorType(newCt);
+                            }
+                            
+                            ArcExpression expression = p.getExprWithNewColorType(newCt);
+                            if (expression != p.getTokensAsExpression()) {
+                                ColorMultiset cm = expression.eval(network.getContext());
+                                if (cm != null) {
+                                    List<TimedToken> tokensToAdd = new ArrayList<TimedToken>(p.tokens());
+                                    for (TimedToken token : cm.getTokens(p)) {
+                                        tapn.marking().remove(token);
+                                    }
+
+                                    p.updateTokens(tokensToAdd, expression);
                                 }
-
-                                p.updateTokens(tokensToAdd, expression);
                             }
                         }
                     }
-                }
-
-                if (removeableColors == removedColors.size()) {
-                    continue;
+                    
+                    if (removeableColors == removedColors.size()) {
+                        continue;
+                    }
                 }
             }
 
