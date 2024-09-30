@@ -113,7 +113,6 @@ public class ConstantsParser {
                 for (Variable v : network.variables()) {
                     if (v.getName().equals(key)) {
                         skip = v.getColorType().getName().equals(variables.get(key).getColorType().getName());
-                        break;
                     }
                 }
 
