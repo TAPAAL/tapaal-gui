@@ -149,8 +149,8 @@ public class GraphDialog extends EscapableDialog {
         setVisible(true);
     }
 
-    private ChartPanel createChartPanel(JFreeChart chart) {
-        ChartPanel chartPanel = new ChartPanel(chart);
+    private DraggableChartPanel createChartPanel(JFreeChart chart) {
+        DraggableChartPanel chartPanel = new DraggableChartPanel(chart);
         chartPanel.setMouseWheelEnabled(true);
         return chartPanel;
     }
@@ -181,7 +181,7 @@ public class GraphDialog extends EscapableDialog {
         XYPlot plot = chart.getXYPlot();
         float lineThickness = 3.0f;
 
-        final double negativeMargin = -0.05;
+        final double negativeMargin = -0.01;
         if (hasZeroPoint) {
             ValueAxis domainAxis = plot.getDomainAxis();
             domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
