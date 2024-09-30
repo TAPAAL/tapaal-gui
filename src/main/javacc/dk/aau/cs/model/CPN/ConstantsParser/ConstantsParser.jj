@@ -155,6 +155,7 @@ public class ConstantsParser {
                     ProductType newPct = (ProductType)newCt;
                     
                     if (pct.containsTypes(newPct.getColorTypes())) {
+                        updateColorTypes(ct, newCt);
                         continue;
                     }
                 }
@@ -237,7 +238,7 @@ public class ConstantsParser {
                     List<TimedToken> oldTokens = new ArrayList<TimedToken>(place.tokens());
                     place.setColorType(newCt);
                     for (TimedToken token : oldTokens) {
-                        if (newCt.contains(token.getColor())) {
+                        if (token.getColor() != null && newCt.contains(token.getColor())) {
                             place.addToken(new TimedToken(place, token.age(), newCt.getColorByName(token.getColor().getName())));
                         }
                     }
@@ -252,6 +253,7 @@ public class ConstantsParser {
                         for (TimedToken token : cm.getTokens(place)) {
                             tapn.marking().remove(token);
                         }
+;
                         place.updateTokens(tokensToAdd, expression);
                     }
                 }
@@ -266,10 +268,6 @@ public class ConstantsParser {
                 }
 
                 place.setCtiList(invariantsToAdd);
-
-                if (place.getColorType().getName().equals(ct.getName())) {
-                    place.setColorType(ct);
-                }
             }
 
             for (TimedInputArc arc : tapn.inputArcs()) {
@@ -398,7 +396,6 @@ void colorTypes() :
                 if (product.equals("dot")) {
                     ColorType dot = new ColorType("dot");
                     dot.addColor("dot");
-
                     pct.addType(dot);
                     continue;
                 }
