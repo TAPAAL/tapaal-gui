@@ -10,6 +10,10 @@ import java.util.List;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.CPN.Variable;
@@ -91,7 +95,7 @@ public class ConstantsParser {
             boolean canBeEdited = true;
             if (variables.containsKey(v.getName())) {
                 ColorType ct = variables.get(v.getName()).getColorType();
-                canBeEdited = ct.equals(v.getColorType()) || ct.isIntegerRange();
+                canBeEdited = ct.equals(v.getColorType());
             }
     
             canBeRemovedBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList) && canBeEdited);
@@ -108,7 +112,8 @@ public class ConstantsParser {
                 boolean skip = false;
                 for (Variable v : network.variables()) {
                     if (v.getName().equals(key)) {
-                        skip = v.getColorType().equals(variables.get(key).getColorType());
+                        skip = v.getColorType().getName().equals(variables.get(key).getColorType().getName());
+                        break;
                     }
                 }
 
@@ -140,30 +145,16 @@ public class ConstantsParser {
                             messages.put(key, messagesList);
                         }
                     }
-
-                    // Update place color types
-                    for (TimedArcPetriNet tapn : network.allTemplates()) {
-                        for (TimedPlace p : tapn.places()) {
-                            if (p.getColorType().equals(ct)) {
-                                p.setColorType(newCt);
-                            }
-                            
-                            ArcExpression expression = p.getExprWithNewColorType(newCt);
-                            if (expression != p.getTokensAsExpression()) {
-                                ColorMultiset cm = expression.eval(network.getContext());
-                                if (cm != null) {
-                                    List<TimedToken> tokensToAdd = new ArrayList<TimedToken>(p.tokens());
-                                    for (TimedToken token : cm.getTokens(p)) {
-                                        tapn.marking().remove(token);
-                                    }
-
-                                    p.updateTokens(tokensToAdd, expression);
-                                }
-                            }
-                        }
-                    }
                     
                     if (removeableColors == removedColors.size()) {
+                        updateColorTypes(ct, newCt);
+                        continue;
+                    }
+                } else {
+                    ProductType pct = (ProductType)ct;
+                    ProductType newPct = (ProductType)newCt;
+                    
+                    if (pct.containsTypes(newPct.getColorTypes())) {
                         continue;
                     }
                 }
@@ -232,6 +223,85 @@ public class ConstantsParser {
 
         if (variables.containsKey(id)) {
             throw new ParseException("Variable with name \"" + id + "\" already exists");
+        }
+    }
+
+    private static void updateColorTypes(ColorType ct, ColorType newCt) {
+        for (TimedArcPetriNet tapn : network.allTemplates()) {
+            for (TimedPlace place : tapn.places()) {
+                if (place.getColorType().equals(ct)) {
+                    if (place.getTokensAsExpression() != null) {
+                        place.setTokenExpression(place.getTokensAsExpression().getExprConverted(ct, newCt));
+                    }
+
+                    List<TimedToken> oldTokens = new ArrayList<TimedToken>(place.tokens());
+                    place.setColorType(newCt);
+                    for (TimedToken token : oldTokens) {
+                        if (newCt.contains(token.getColor())) {
+                            place.addToken(new TimedToken(place, token.age(), newCt.getColorByName(token.getColor().getName())));
+                        }
+                    }
+                }
+
+                ArcExpression expression = place.getExprWithNewColorType(ct);
+
+                if (expression != place.getTokensAsExpression()) {
+                    ColorMultiset cm = expression.eval(network.getContext());
+                    if (cm != null) {
+                        List<TimedToken> tokensToAdd = new ArrayList<TimedToken>(place.tokens());
+                        for (TimedToken token : cm.getTokens(place)) {
+                            tapn.marking().remove(token);
+                        }
+                        place.updateTokens(tokensToAdd, expression);
+                    }
+                }
+
+                List<ColoredTimeInvariant> invariantsToAdd = new ArrayList<ColoredTimeInvariant>();
+                for (ColoredTimeInvariant invariant : place.getCtiList()) {
+                    if (ct.contains(invariant.getColor())) {
+                        invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), ct.getColorByName(invariant.getColor().getColorName())));
+                    } else {
+                        invariantsToAdd.add(invariant);
+                    }
+                }
+
+                place.setCtiList(invariantsToAdd);
+
+                if (place.getColorType().getName().equals(ct.getName())) {
+                    place.setColorType(ct);
+                }
+            }
+
+            for (TimedInputArc arc : tapn.inputArcs()) {
+                if (arc.getArcExpression() != null) {
+                    arc.setExpression(arc.getArcExpression().getExprWithNewColorType(ct));
+                }
+            }
+
+            for (TimedOutputArc arc : tapn.outputArcs()) {
+                if (arc.getExpression() != null) {
+                    arc.setExpression(arc.getExpression().getExprWithNewColorType(ct));
+                }
+            }
+
+            for (TimedTransition transition : tapn.transitions()) {
+                if (transition.getGuard() != null) {
+                    transition.getGuard().setColorType(ct);
+                }
+            }
+        }
+
+        for (ColorType networkCt : network.colorTypes()) {
+            if (networkCt instanceof ProductType) {
+                ProductType networkPct = (ProductType)networkCt;
+                networkPct.replaceColorType(ct, newCt);
+            }
+        }
+
+        for (Variable var : network.variables()) {
+            if (var.getColorType().equals(newCt)) {
+                var.setColorType(ct);
+            }
         }
     }
 }
