@@ -124,9 +124,16 @@ public class ConstantsParser {
                 ColorType newCt = colorTypes.get(key);
                 ColorType ct = (ColorType)constantsMap.get(key);
 
-                if (!(ct instanceof ProductType)) {    
+                if (ct instanceof ProductType) {
+                    ProductType pct = (ProductType)ct;
+                    ProductType newPct = (ProductType)newCt;
+                    
+                    if (pct.containsTypes(newPct.getColorTypes())) {
+                        updateColorTypes(ct, newCt);
+                        continue;
+                    }
+                } else {    
                     List<Color> removedColors = new ArrayList<Color>();
-                        
                     for (Color color : ct.getColorList()) {
                         if (!newCt.contains(color)) {
                             removedColors.add(color);
@@ -147,14 +154,6 @@ public class ConstantsParser {
                     }
                     
                     if (removeableColors == removedColors.size()) {
-                        updateColorTypes(ct, newCt);
-                        continue;
-                    }
-                } else {
-                    ProductType pct = (ProductType)ct;
-                    ProductType newPct = (ProductType)newCt;
-                    
-                    if (pct.containsTypes(newPct.getColorTypes())) {
                         updateColorTypes(ct, newCt);
                         continue;
                     }
