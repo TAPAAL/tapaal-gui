@@ -52,12 +52,6 @@ public class TupleExpression extends ColorExpression {
         for (int i = 0; i < colors.size(); ++i) {
             if (colors.get(i).containsColor(color)) {
                 containsColor = true;
-
-                List<Color> tuple = color.getTuple();
-                if (tuple != null) {
-                    containsColor = tuple.size() == colors.size();
-                }
-                
                 break;
             }
         }
