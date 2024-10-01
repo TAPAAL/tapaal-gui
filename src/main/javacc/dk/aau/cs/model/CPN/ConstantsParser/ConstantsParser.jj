@@ -113,6 +113,7 @@ public class ConstantsParser {
                 for (Variable v : network.variables()) {
                     if (v.getName().equals(key)) {
                         skip = v.getColorType().getName().equals(variables.get(key).getColorType().getName());
+                        break;
                     }
                 }
 
@@ -413,7 +414,7 @@ void colorTypes() :
             int upperBound = Integer.parseInt(values.get(1));
             
             if (lowerBound > upperBound) {
-                throw new ParseException("Lower bound must be lowr than or equal to upper bound");
+                throw new ParseException("Lower bound must be lower than or equal to upper bound");
             }
 
             for (int i = lowerBound; i <= upperBound; ++i) {
