@@ -127,9 +127,15 @@ public class ConstantsParser {
                 if (ct instanceof ProductType) {
                     ProductType pct = (ProductType)ct;
                     ProductType newPct = (ProductType)newCt;
-                    
-                    if (pct.containsTypes(newPct.getColorTypes())) {
-                        updateColorTypes(ct, newCt);
+
+                    // Update product color types to new color types
+                    for (ColorType colorType : pct.getProductColorTypes()) {
+                        newPct.replaceColorType(colorType, (ColorType)colorTypes.get(colorType.getName()));
+                    }
+        
+                    boolean isSimiliar = pct.getProductColorTypes().size() == newPct.getProductColorTypes().size() && pct.containsTypes(newPct.getColorTypes());
+                    if (isSimiliar) {
+                        updateColorTypes(pct, newPct);
                         continue;
                     }
                 } else {    
