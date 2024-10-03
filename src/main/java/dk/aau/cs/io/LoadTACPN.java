@@ -171,7 +171,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             // Parse prodcut types last as they can used color types not yet declared
             productTypes.add(node);
         } else {
-            ColorType ct = new ColorType(name, id);
+            ColorType ct = new ColorType(name);
             if (typetag.equals("dot")) {
                 return;
             } else if (typetag.equals("finiteintrange")){

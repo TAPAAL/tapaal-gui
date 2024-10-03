@@ -249,8 +249,7 @@ public class ConstantsParser {
                     }
                 }
 
-                ArcExpression expression = place.getExprWithNewColorType(ct);
-
+                ArcExpression expression = place.getExprWithNewColorType(newCt);
                 if (expression != place.getTokensAsExpression()) {
                     ColorMultiset cm = expression.eval(network.getContext());
                     if (cm != null) {
