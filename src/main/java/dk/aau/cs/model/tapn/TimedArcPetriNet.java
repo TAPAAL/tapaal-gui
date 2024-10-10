@@ -10,7 +10,6 @@ import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
-import net.tapaal.gui.petrinet.TAPNLens;
 
 public class TimedArcPetriNet {
 	private String name;

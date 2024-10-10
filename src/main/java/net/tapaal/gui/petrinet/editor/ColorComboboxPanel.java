@@ -36,7 +36,6 @@ public abstract class ColorComboboxPanel extends JPanel {
     private void initPanel() {
         colorcomboBoxPanel = new JPanel();
         colorcomboBoxPanel.setLayout(new GridBagLayout());
-
         //This panel contains all comboboxes, there can be more than one with ProductTypes
         comboBoxPanel = new JPanel(new GridBagLayout());
         //In case it is a really large product type we have a scrollPane

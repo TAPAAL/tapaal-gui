@@ -7,10 +7,22 @@ package dk.aau.cs.model.CPN.ConstantsParser;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.CPN.ColorMultiset;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -80,29 +92,79 @@ public class ConstantsParser {
         for (Variable v : network.variables()) {
             List<String> messagesList = new ArrayList<String>();
             constantsMap.put(v.getName(), v);
-            boolean canBeEdited = !(variables.containsKey(v.getName()) && !variables.get(v.getName()).getColorType().equals(v.getColorType()));
+            boolean canBeEdited = true;
+            if (variables.containsKey(v.getName())) {
+                ColorType ct = variables.get(v.getName()).getColorType();
+                canBeEdited = ct.equals(v.getColorType());
+            }
+    
             canBeRemovedBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList) && canBeEdited);
             messages.put(v.getName(), messagesList);
         }
 
         // Generate error messages
         for (String key : canBeRemovedBitMap.keySet()) {
-            boolean skip = false;
             if (constants.containsKey(key) || 
                 variables.containsKey(key) && canBeRemovedBitMap.get(key) ||
-                key.equals("dot") ||
-                colorTypes.containsKey(key) && 
-                colorTypes.get(key).equals(constantsMap.get(key))) {
+                key.equals("dot")) {
                 continue;
             } else if (variables.containsKey(key) && !canBeRemovedBitMap.get(key)) {
+                boolean skip = false;
                 for (Variable v : network.variables()) {
                     if (v.getName().equals(key)) {
-                        skip = v.getColorType().equals(variables.get(key).getColorType());
+                        skip = v.getColorType().getName().equals(variables.get(key).getColorType().getName());
+                        break;
+                    }
+                }
+
+                if (skip) continue;
+            } else if (colorTypes.containsKey(key)) {
+                if (colorTypes.get(key).equals(constantsMap.get(key))) continue;
+
+                ColorType newCt = colorTypes.get(key);
+                ColorType ct = (ColorType)constantsMap.get(key);
+
+                if (ct instanceof ProductType) {
+                    ProductType pct = (ProductType)ct;
+                    ProductType newPct = (ProductType)newCt;
+
+                    // Update product color types to new color types
+                    for (ColorType colorType : pct.getProductColorTypes()) {
+                        newPct.replaceColorType(colorType, (ColorType)colorTypes.get(colorType.getName()));
+                    }
+        
+                    boolean isSimiliar = pct.getProductColorTypes().size() == newPct.getProductColorTypes().size() && pct.containsTypes(newPct.getColorTypes());
+                    if (isSimiliar) {
+                        updateColorTypes(pct, newPct);
+                        continue;
+                    }
+                } else {    
+                    List<Color> removedColors = new ArrayList<Color>();
+                    for (Color color : ct.getColorList()) {
+                        if (!newCt.contains(color)) {
+                            removedColors.add(color);
+                        }
+                    }
+                    
+                    int removeableColors = 0;
+                    for (Color c : removedColors) {
+                        List<String> newMessagesList = new ArrayList<String>();
+                        boolean colorCanBeRemoved = network.canColorBeRemoved(c, newMessagesList);
+                        if (colorCanBeRemoved) {
+                            ++removeableColors;
+                        } else {
+                            List<String> messagesList = new ArrayList<String>();
+                            messagesList.addAll(newMessagesList);
+                            messages.put(key, messagesList);
+                        }
+                    }
+                    
+                    if (removeableColors == removedColors.size()) {
+                        updateColorTypes(ct, newCt);
+                        continue;
                     }
                 }
             }
-
-            if (skip) continue;
 
             Object obj = constantsMap.get(key);
             if (!canBeRemovedBitMap.get(key)) {
@@ -131,7 +193,7 @@ public class ConstantsParser {
 
                 if (!(obj instanceof Constant)) {
                     message += " for the following reasons:  \n\n";
-                    message += String.join("\n", messages.get(key));
+                    message += String.join("", messages.get(key));
                 } else {
                     message += " because it is in use";
                 }
@@ -167,6 +229,81 @@ public class ConstantsParser {
 
         if (variables.containsKey(id)) {
             throw new ParseException("Variable with name \"" + id + "\" already exists");
+        }
+    }
+
+    private static void updateColorTypes(ColorType ct, ColorType newCt) {
+        for (TimedArcPetriNet tapn : network.allTemplates()) {
+            for (TimedPlace place : tapn.places()) {
+                if (place.getColorType().equals(ct)) {
+                    if (place.getTokensAsExpression() != null) {
+                        place.setTokenExpression(place.getTokensAsExpression().getExprConverted(ct, newCt));
+                    }
+
+                    List<TimedToken> oldTokens = new ArrayList<TimedToken>(place.tokens());
+                    place.setColorType(newCt);
+                    for (TimedToken token : oldTokens) {
+                        if (token.getColor() != null && newCt.contains(token.getColor())) {
+                            place.addToken(new TimedToken(place, token.age(), newCt.getColorByName(token.getColor().getName())));
+                        }
+                    }
+                }
+
+                ArcExpression expression = place.getExprWithNewColorType(newCt);
+                if (expression != place.getTokensAsExpression()) {
+                    ColorMultiset cm = expression.eval(network.getContext());
+                    if (cm != null) {
+                        List<TimedToken> tokensToAdd = new ArrayList<TimedToken>(place.tokens());
+                        for (TimedToken token : cm.getTokens(place)) {
+                            tapn.marking().remove(token);
+                        }
+;
+                        place.updateTokens(tokensToAdd, expression);
+                    }
+                }
+
+                List<ColoredTimeInvariant> invariantsToAdd = new ArrayList<ColoredTimeInvariant>();
+                for (ColoredTimeInvariant invariant : place.getCtiList()) {
+                    if (ct.contains(invariant.getColor())) {
+                        invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), ct.getColorByName(invariant.getColor().getColorName())));
+                    } else {
+                        invariantsToAdd.add(invariant);
+                    }
+                }
+
+                place.setCtiList(invariantsToAdd);
+            }
+
+            for (TimedInputArc arc : tapn.inputArcs()) {
+                if (arc.getArcExpression() != null) {
+                    arc.setExpression(arc.getArcExpression().getExprWithNewColorType(ct));
+                }
+            }
+
+            for (TimedOutputArc arc : tapn.outputArcs()) {
+                if (arc.getExpression() != null) {
+                    arc.setExpression(arc.getExpression().getExprWithNewColorType(ct));
+                }
+            }
+
+            for (TimedTransition transition : tapn.transitions()) {
+                if (transition.getGuard() != null) {
+                    transition.getGuard().setColorType(ct);
+                }
+            }
+        }
+
+        for (ColorType networkCt : network.colorTypes()) {
+            if (networkCt instanceof ProductType) {
+                ProductType networkPct = (ProductType)networkCt;
+                networkPct.replaceColorType(ct, newCt);
+            }
+        }
+
+        for (Variable var : network.variables()) {
+            if (var.getColorType().equals(newCt)) {
+                var.setColorType(ct);
+            }
         }
     }
 }
@@ -263,7 +400,6 @@ void colorTypes() :
                 if (product.equals("dot")) {
                     ColorType dot = new ColorType("dot");
                     dot.addColor("dot");
-
                     pct.addType(dot);
                     continue;
                 }
@@ -276,7 +412,19 @@ void colorTypes() :
             }
 
             ct = pct;
-        } else if (!isProductList.value) {
+        } else if (isIntList.value) {
+            ct = new ColorType(id.image);
+            int lowerBound = Integer.parseInt(values.get(0));
+            int upperBound = Integer.parseInt(values.get(1));
+            
+            if (lowerBound > upperBound) {
+                throw new ParseException("Lower bound must be lower than or equal to upper bound");
+            }
+
+            for (int i = lowerBound; i <= upperBound; ++i) {
+                ct.addColor(Integer.toString(i));
+            }
+        } else {
             ct = new ColorType(id.image);
             Set<String> uniqueVals = new HashSet<String>();
             for (String color : values) {
