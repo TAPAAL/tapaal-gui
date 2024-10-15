@@ -40,4 +40,20 @@ public class SMCSettings {
             Math.log(2.0 / (1 - confidence)) / (2.0 * runsNeeded)
         );
     }
+
+    public void setTimeBound(int timeBound) {
+        this.timeBound = timeBound;
+    }
+
+    public void setStepBound(int stepBound) {
+        this.stepBound = stepBound;
+    }
+
+    public int getTimeBound() {
+        return timeBound;
+    }
+
+    public int getStepBound() {
+        return stepBound;
+    }
 }
