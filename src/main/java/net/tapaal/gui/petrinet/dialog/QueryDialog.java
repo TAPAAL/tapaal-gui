@@ -585,7 +585,12 @@ public class QueryDialog extends JPanel {
             query.setParallel(smcParallel.isSelected());
             VerificationType verificationType = VerificationType.fromOrdinal(smcVerificationType.getSelectedIndex());
             if (verificationType == VerificationType.SIMULATE) {
-                query.setSmcSettings(SMCSettings.Default());
+                SMCSettings newSettings = SMCSettings.Default();
+                SMCSettings oldSettings = getSMCSettings();
+                newSettings.setStepBound(oldSettings.getStepBound());
+                newSettings.setTimeBound(oldSettings.getTimeBound());
+                
+                query.setSmcSettings(newSettings);
             } else {
                 query.setSmcSettings(getSMCSettings());
             }
