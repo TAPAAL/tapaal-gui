@@ -38,6 +38,7 @@ import net.tapaal.gui.petrinet.NameGenerator;
 import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.RequireException;
 
 public class TapnXmlLoader {
 	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
@@ -84,7 +85,7 @@ public class TapnXmlLoader {
 		if(doc == null) return null;
 		try {
             return parse(doc);
-        } catch (FormatException | NullPointerException e) {
+        } catch (FormatException | RequireException | NullPointerException e) {
             throw e;
         } catch (Exception e) {
             throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type", e);
