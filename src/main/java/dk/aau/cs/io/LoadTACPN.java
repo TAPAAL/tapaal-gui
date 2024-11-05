@@ -4,7 +4,7 @@ import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.FormatException;
-import dk.aau.cs.util.NameConformer;
+import dk.aau.cs.util.NameTransformer;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import org.w3c.dom.Element;
@@ -21,7 +21,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
     private final HashMap<String, ColorExpression> tupleVarExpressions = new HashMap<>();
     private final Collection<String> messages = new ArrayList<>(10);
     private final Collection<Node> productTypes = new ArrayList<>();
-    private final NameConformer nc = new NameConformer();
+    private final NameTransformer nc = new NameTransformer();
 
     public HashMap<String, ColorType> getColortypes() {
         return colortypes;
@@ -85,7 +85,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             var type = skipWS(n.getFirstChild());
             String typeTag = type.getNodeName();
             if (!typeTag.equals("productsort")) throw new FormatException("Expected productsort type got: " + typeTag);
-            String name = nc.conform(getAttribute(n, "name").getNodeValue());
+            String name = nc.transform(getAttribute(n, "name").getNodeValue());
             String id = getAttribute(n, "id").getNodeValue();
 
             ProductType pt = new ProductType(name);
@@ -106,7 +106,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         var variabledecl = declarations.getElementsByTagName("variabledecl");
         forEachElementInNodeList(variabledecl, element -> {
             String id = getAttribute(element, "id").getNodeValue();
-            String name = nc.conform(getAttribute(element, "name").getNodeValue());
+            String name = nc.transform(getAttribute(element, "name").getNodeValue());
             ColorType ct = parseUserSort(element);
             Variable var = new Variable(name, id, ct);
             Require.that(variables.put(id, var) == null, "the id " + id + ", was already used");
@@ -133,7 +133,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
 
                     renameWarnings.append(varName).append(elementSubstring).append(",");
 
-                    String name = nc.conform(var.getName() + elementSubstring);
+                    String name = nc.transform(var.getName() + elementSubstring);
                     Variable newVar = new Variable(name, varName + elementSubstring, colorType);
                     Require.that(newVars.put(varName + elementSubstring, newVar) == null, "the id " + varName + elementSubstring + ", was already used");
                     network.add(newVar);
@@ -167,7 +167,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
 
         Node type = skipWS(node.getFirstChild());
         String typetag = type.getNodeName();
-        String name = nc.conform((getAttribute(node, "name").getNodeValue()));
+        String name = nc.transform((getAttribute(node, "name").getNodeValue()));
         String id = getAttribute(node, "id").getNodeValue();
 
         if (typetag.equals("productsort")) {
@@ -188,7 +188,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                 while (typechild != null) {
                     Node colorId = getAttribute(typechild, "id");
                     if (colorId != null) {
-                        String colorName = nc.conform(colorId.getNodeValue());
+                        String colorName = nc.transform(colorId.getNodeValue());
                         ct.addColor(colorName);
                         typechild = skipWS(typechild.getNextSibling());
                     } else {
@@ -319,7 +319,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                 return tupleVarExpressions.get(varname);
             }
         } else if (name.equals("useroperator")) {
-            String colorname = nc.conform(getAttribute(node, "declaration").getNodeValue());
+            String colorname = nc.transform(getAttribute(node, "declaration").getNodeValue());
             Color color = getColor(colorname);
             return new UserOperatorExpression(color);
         } else if (name.equals("successor")) {
