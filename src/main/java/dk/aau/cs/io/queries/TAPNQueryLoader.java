@@ -8,6 +8,7 @@ import dk.aau.cs.TCTL.XMLParsing.XMLHyperLTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import dk.aau.cs.verification.SMCSettings;
 import dk.aau.cs.verification.SMCTraceType;
+import dk.aau.cs.verification.observations.Observation;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -113,9 +114,27 @@ public class TAPNQueryLoader extends QueryLoader{
             if(smcTagList.getLength() > 0) {
                 Element settingsNode = (Element) smcTagList.item(0);
                 smcSettings = parseSmcSettings(settingsNode);
+                NodeList observationsList = queryElement.getElementsByTagName("observations");
+                if (observationsList.getLength() > 0) {
+                    Element observationsNode = (Element)observationsList.item(0);
+                    NodeList watchList = observationsNode.getElementsByTagName("watch");
+
+                    List<Observation> observations = new ArrayList<>();
+                    for (int i = 0; i < watchList.getLength(); ++i) {
+                        Element watch = (Element)watchList.item(i);
+                        String id = watch.getAttribute("id");
+                        String name = watch.getAttribute("name");
+
+                        Observation observation = new Observation(name, id);
+                        observations.add(observation);
+                    }
+
+                    smcSettings.setObservations(observations);
+                }
             } else {
                 smcSettings = SMCSettings.Default();
             }
+
             query = parseLTLQueryProperty(queryElement);
         } else if (queryElement.hasAttribute("type") && queryElement.getAttribute("type").equals("LTL")) {
             query = parseLTLQueryProperty(queryElement);
