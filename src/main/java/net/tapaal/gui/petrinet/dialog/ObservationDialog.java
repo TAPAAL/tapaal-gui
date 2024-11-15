@@ -5,6 +5,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -14,15 +15,20 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.UndoManager;
 
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.verification.observations.Observation;
 import dk.aau.cs.verification.observations.expressions.ObsExprPosition;
 import dk.aau.cs.verification.observations.expressions.ObsAdd;
+import dk.aau.cs.verification.observations.expressions.ObsConstant;
 import dk.aau.cs.verification.observations.expressions.ObsExpression;
 import dk.aau.cs.verification.observations.expressions.ObsMultiply;
 import dk.aau.cs.verification.observations.expressions.ObsOperator;
+import dk.aau.cs.verification.observations.expressions.ObsPlace;
 import dk.aau.cs.verification.observations.expressions.ObsPlaceHolder;
 import dk.aau.cs.verification.observations.expressions.ObsSubtract;
 import net.tapaal.helpers.Enabler;
@@ -42,19 +48,21 @@ public class ObservationDialog extends EscapableDialog {
     private final DefaultListModel<Observation> observationModel;
     private final Observation observation;
 
+    private final TimedArcPetriNetNetwork tapnNetwork;
+    private final JTextPane expressionField = new JTextPane();
+    private final UndoManager undoManager = new UndoManager();
+    
     private JPanel placesPanel;
     private JPanel constantsPanel;
+    private JButton saveButton;
+    private JButton undoButton;
+    private JButton redoButton;
 
     private ObsExpression currentExpr;
     private ObsExpression selectedExpr;
 
     private boolean isNewObservation;
     private boolean isEditing;
-
-    private JButton saveButton;
-
-    private final TimedArcPetriNetNetwork tapnNetwork;
-    private final JTextPane expressionField = new JTextPane();
 
     public ObservationDialog(TimedArcPetriNetNetwork tapnNetwork, DefaultListModel<Observation> observationModel, Observation observation) {
         super(TAPAALGUI.getApp(), observation.getName(), true);
@@ -116,6 +124,9 @@ public class ObservationDialog extends EscapableDialog {
                 ObsExprPosition exprPos = currentExpr.getObjectPosition(pos - 1);
                 expressionField.select(exprPos.getStart(), exprPos.getEnd());
                 selectedExpr = exprPos.getObject();
+
+                Enabler.setAllEnabled(placesPanel, selectedExpr.isLeaf());
+                Enabler.setAllEnabled(constantsPanel, selectedExpr.isLeaf());
             }
         });
 
@@ -163,14 +174,14 @@ public class ObservationDialog extends EscapableDialog {
             templateComboBox.addItem(SHARED);
         }
 
-        JComboBox<String> placeComboBox = new JComboBox<>();
+        JComboBox<TimedPlace> placeComboBox = new JComboBox<>();
         templateComboBox.addActionListener(e -> {
             placeComboBox.removeAllItems();
             if (templateComboBox.getSelectedItem().equals(SHARED)) {
-                tapnNetwork.sharedPlaces().forEach(place -> placeComboBox.addItem(place.name()));
+                tapnNetwork.sharedPlaces().forEach(place -> placeComboBox.addItem(place));
             } else {
                 TimedArcPetriNet template = (TimedArcPetriNet) templateComboBox.getSelectedItem();
-                template.places().forEach(place -> placeComboBox.addItem(place.name()));
+                template.places().forEach(place -> placeComboBox.addItem(place));
             }
         });
 
@@ -180,6 +191,14 @@ public class ObservationDialog extends EscapableDialog {
         }
 
         JButton addPlaceButton = new JButton("Add place");
+        addPlaceButton.addActionListener(e -> {
+            Object template = templateComboBox.getSelectedItem();
+            TimedPlace place = (TimedPlace)placeComboBox.getSelectedItem();
+            ObsExpression placeExpr = new ObsPlace(template, place);
+            updateExpression(placeExpr);
+            Enabler.setAllEnabled(placesPanel, false);
+            Enabler.setAllEnabled(constantsPanel, false);
+        });
 
         GridBagConstraints placesGbc = new GridBagConstraints();
         placesGbc.gridx = 0;
@@ -200,8 +219,15 @@ public class ObservationDialog extends EscapableDialog {
         constantsPanel.setLayout(new GridBagLayout());
         constantsPanel.setBorder(BorderFactory.createTitledBorder("Constants"));
 
-        CustomJSpinner constantSpinner = new CustomJSpinner(0, 0, Integer.MAX_VALUE);
+        CustomJSpinner constantSpinner = new CustomJSpinner(1, 1, Integer.MAX_VALUE);
         JButton addConstantButton = new JButton("Add constant");
+        addConstantButton.addActionListener(e -> {
+            int value = (int)constantSpinner.getValue();
+            ObsExpression constantExpr = new ObsConstant(value);
+            updateExpression(constantExpr);
+            Enabler.setAllEnabled(placesPanel, false);
+            Enabler.setAllEnabled(constantsPanel, false);
+        });
 
         GridBagConstraints constantsGbc = new GridBagConstraints();
         constantsGbc.gridx = 0;
@@ -220,19 +246,36 @@ public class ObservationDialog extends EscapableDialog {
         editingPanel.setLayout(new GridBagLayout());
         editingPanel.setBorder(BorderFactory.createTitledBorder("Editing"));
 
-        JButton undoButton = new JButton("Undo");
+        undoButton = new JButton("Undo");
+        redoButton = new JButton("Redo");
         undoButton.setEnabled(false);
-
-        JButton redoButton = new JButton("Redo");
         redoButton.setEnabled(false);
+
+        undoButton.addActionListener(e -> {
+            if (undoManager.canUndo()) {
+                undoManager.undo();
+            }
+        });
+
+        redoButton.addActionListener(e -> {
+            if (undoManager.canRedo()) {
+                undoManager.redo();
+            }
+        });
 
         JButton deleteSelection = new JButton("Delete Selection");
         deleteSelection.setEnabled(false);
         JButton resetExpression = new JButton("Reset Expression");
 
         resetExpression.addActionListener(e -> {
+            ObsExpression oldExpr = currentExpr.copy();
             currentExpr = new ObsPlaceHolder();
             expressionField.setText(currentExpr.toString());
+
+            if (!oldExpr.isPlaceHolder()) {
+                undoManager.addEdit(new ExpressionEdit(oldExpr, currentExpr));
+                refreshUndoRedoButtons();
+            }
         });
 
         JButton editExpression = new JButton("Edit Expression");
@@ -243,7 +286,13 @@ public class ObservationDialog extends EscapableDialog {
             Enabler.setAllEnabled(operationsPanel, !isEditing);
             Enabler.setAllEnabled(placesPanel, !isEditing);
             Enabler.setAllEnabled(constantsPanel, !isEditing);
-            saveButton.setEnabled(!isEditing);
+
+            if (isEditing) {
+                saveButton.setEnabled(false);
+            } else {
+                saveButton.setEnabled(!includesPlaceHolder());
+            }
+
             expressionField.setEditable(isEditing);
         
             if (isEditing) {
@@ -311,21 +360,33 @@ public class ObservationDialog extends EscapableDialog {
         buttonPanel.setLayout(new GridBagLayout());
         JButton cancelButton = new JButton("Cancel");
         saveButton = new JButton("Save");
+        saveButton.setEnabled(!includesPlaceHolder());
 
-        cancelButton.addActionListener(e -> {
-            dispose();
-        });
-
+        cancelButton.addActionListener(e -> dispose());
         saveButton.addActionListener(e -> {
             observation.setName(nameField.getText());
+            observation.setExpression(currentExpr);
 
-            if (isNewObservation) {
-                observationModel.addElement(observation);
-            } else {
-                observationModel.setElementAt(observation, observationModel.indexOf(observation));
+            boolean nameExists = false;
+            for (int i = 0; i < observationModel.getSize(); i++) {
+                Observation obs = observationModel.getElementAt(i);
+                if (obs.getName().equals(observation.getName())) {
+                    nameExists = true;
+                    break;
+                }
             }
 
-            dispose();
+            if (nameExists) {
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "An observation with the name \"" + observation.getName() + "\" already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                if (isNewObservation) {
+                    observationModel.addElement(observation);
+                } else {
+                    observationModel.setElementAt(observation, observationModel.indexOf(observation));
+                }
+    
+                dispose();
+            }
         });
 
         GridBagConstraints buttonGbc = new GridBagConstraints();
@@ -352,6 +413,7 @@ public class ObservationDialog extends EscapableDialog {
     private void updateExpression(ObsExpression newExpr) {
         String selectedText = expressionField.getSelectedText();
         String fullText = expressionField.getText();
+        ObsExpression oldExpr = currentExpr.copy();
         if (selectedText != null && 
             !selectedText.equals(fullText) && 
             currentExpr.isOperator()) {
@@ -363,5 +425,44 @@ public class ObservationDialog extends EscapableDialog {
         }
 
         expressionField.setText(currentExpr.toString());
+        undoManager.addEdit(new ExpressionEdit(oldExpr, newExpr));
+        refreshUndoRedoButtons();
+
+        saveButton.setEnabled(!includesPlaceHolder());
+    }
+
+    private void refreshUndoRedoButtons() {
+        undoButton.setEnabled(undoManager.canUndo());
+        redoButton.setEnabled(undoManager.canRedo());
+    }
+
+    private boolean includesPlaceHolder() {
+        return currentExpr.toString().contains(new ObsPlaceHolder().toString());
+    }
+
+    private class ExpressionEdit extends AbstractUndoableEdit {
+        private final ObsExpression oldExpr;
+        private final ObsExpression newExpr;
+
+        public ExpressionEdit(ObsExpression oldExpr, ObsExpression newExpr) {
+            this.oldExpr = oldExpr;
+            this.newExpr = newExpr;
+        }
+
+        @Override
+        public void undo() {
+            super.undo();
+            currentExpr = oldExpr;
+            expressionField.setText(currentExpr.toString());
+            refreshUndoRedoButtons();
+        }
+
+        @Override
+        public void redo() {
+            super.redo();
+            currentExpr = newExpr;
+            expressionField.setText(currentExpr.toString());
+            refreshUndoRedoButtons();
+        }
     }
 }

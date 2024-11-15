@@ -5,4 +5,5 @@ public interface ObsExpression {
     ObsExprPosition getObjectPosition(int index);
     boolean isOperator();
     boolean isLeaf();
+    boolean isPlaceHolder();
 }

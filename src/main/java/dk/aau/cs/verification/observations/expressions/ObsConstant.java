@@ -1,19 +1,19 @@
 package dk.aau.cs.verification.observations.expressions;
 
 public class ObsConstant extends ObsLeaf {
-    private final int tokens;
+    private final int value;
 
-    public ObsConstant(int tokens) {
-        this.tokens = tokens;
+    public ObsConstant(int value) {
+        this.value = value;
     }
 
     @Override
     public String toString() {
-        return Integer.toString(tokens);
+        return Integer.toString(value);
     }
 
     @Override
     public ObsExpression copy() {
-        return new ObsConstant(tokens);
+        return new ObsConstant(value);
     }
 }

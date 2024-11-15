@@ -95,6 +95,11 @@ public abstract class ObsOperator implements ObsExpression {
     }
 
     @Override
+    public boolean isPlaceHolder() {
+        return false;
+    }
+
+    @Override
     public String toString() {
         String operator = getOperator();
         if (addParenthesis()) {

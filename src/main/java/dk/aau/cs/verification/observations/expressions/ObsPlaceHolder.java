@@ -10,4 +10,9 @@ public class ObsPlaceHolder extends ObsLeaf {
     public ObsExpression copy() {
         return new ObsPlaceHolder();
     }
+
+    @Override
+    public boolean isPlaceHolder() {
+        return true;
+    }
 }

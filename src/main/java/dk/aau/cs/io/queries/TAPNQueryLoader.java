@@ -122,10 +122,9 @@ public class TAPNQueryLoader extends QueryLoader{
                     List<Observation> observations = new ArrayList<>();
                     for (int i = 0; i < watchList.getLength(); ++i) {
                         Element watch = (Element)watchList.item(i);
-                        String id = watch.getAttribute("id");
                         String name = watch.getAttribute("name");
 
-                        Observation observation = new Observation(name, id);
+                        Observation observation = new Observation(name);
                         observations.add(observation);
                     }
 
