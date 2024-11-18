@@ -3,7 +3,8 @@ package dk.aau.cs.verification.observations.expressions;
 public abstract class ObsOperator implements ObsExpression {
     protected ObsExpression left;
     protected ObsExpression right;
-    protected ObsExpression parent;
+    private ObsExpression parent;
+    private boolean hadParentheses = false;
     
     protected ObsOperator(ObsExpression left, ObsExpression right) {
         this.left = left;
@@ -24,6 +25,14 @@ public abstract class ObsOperator implements ObsExpression {
         } else {
             left = expr;
         }
+    }
+
+    public void setLeft(ObsExpression left) {
+        this.left = left;
+    }
+
+    public void setRight(ObsExpression right) {
+        this.right = right;
     }
 
     public void replace(ObsExpression selectedExpr, ObsExpression newExpr) {
@@ -69,8 +78,12 @@ public abstract class ObsOperator implements ObsExpression {
         this.parent = parent;
     }
 
-    protected boolean addParenthesis() {
-        return parent != null && parent.getClass() != getClass();
+    public void hadParentheses(boolean hadParentheses) {
+        this.hadParentheses = hadParentheses;
+    }
+
+    private boolean addParenthesis() {
+        return (parent != null && parent.getClass() != getClass()) || hadParentheses;
     }
 
     @Override

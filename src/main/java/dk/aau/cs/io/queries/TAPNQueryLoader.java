@@ -263,18 +263,7 @@ public class TAPNQueryLoader extends QueryLoader{
         String templateName = parts[0];
         String placeName = parts[1];
     
-        Object template;
-        TimedPlace place;
-        if (templateName.equals("Shared")) {
-            template = templateName;
-            place = network.getSharedPlaceByName(placeName);
-        } else {
-            TimedArcPetriNet net = network.getTAPNByName(templateName);
-            template = net;
-            place = net.getPlaceByName(placeName);
-        }
-    
-        return new ObsPlace(template, place);
+        return new ObsPlace(templateName, placeName, network);
     }
 
     public static SMCSettings parseSmcSettings(Element smcTag) {

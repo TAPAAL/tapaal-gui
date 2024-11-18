@@ -18,6 +18,9 @@ import javax.swing.text.StyledDocument;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoManager;
 
+import dk.aau.cs.model.SMC.TokenMgrError;
+import dk.aau.cs.model.SMC.ParseException;
+import dk.aau.cs.model.SMC.ObservationParser;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -54,9 +57,12 @@ public class ObservationDialog extends EscapableDialog {
     
     private JPanel placesPanel;
     private JPanel constantsPanel;
+    private JPanel operationsPanel;
     private JButton saveButton;
     private JButton undoButton;
     private JButton redoButton;
+    private JButton resetExpression;
+    private JButton editExpression;
 
     private ObsExpression currentExpr;
     private ObsExpression selectedExpr;
@@ -120,6 +126,8 @@ public class ObservationDialog extends EscapableDialog {
         expressionField.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (isEditing) return;
+
                 int pos = expressionField.viewToModel2D(e.getPoint());
                 ObsExprPosition exprPos = currentExpr.getObjectPosition(pos - 1);
                 expressionField.select(exprPos.getStart(), exprPos.getEnd());
@@ -136,7 +144,7 @@ public class ObservationDialog extends EscapableDialog {
         expressionScrollPane.setPreferredSize(d);
         expressionScrollPane.setMinimumSize(d);
 
-        JPanel operationsPanel = new JPanel();
+        operationsPanel = new JPanel();
         operationsPanel.setLayout(new GridBagLayout());
         operationsPanel.setBorder(BorderFactory.createTitledBorder("Operations"));
         JButton plusButton = new JButton("+");
@@ -265,44 +273,36 @@ public class ObservationDialog extends EscapableDialog {
 
         JButton deleteSelection = new JButton("Delete Selection");
         deleteSelection.setEnabled(false);
-        JButton resetExpression = new JButton("Reset Expression");
+        resetExpression = new JButton("Reset Expression");
 
         resetExpression.addActionListener(e -> {
-            ObsExpression oldExpr = currentExpr.deepCopy();
-            currentExpr = new ObsPlaceHolder();
-            expressionField.setText(currentExpr.toString());
+            if (isEditing) {
+                try {
+                    System.out.println("Parsing expression: " + expressionField.getText());
+                    ObsExpression parsedExpr = ObservationParser.parse(expressionField.getText(), tapnNetwork);
+                    toggleManualEditing();  
+                    currentExpr = parsedExpr;
+                    expressionField.setText(currentExpr.toString());
+                    undoManager.addEdit(new ExpressionEdit(new ObsPlaceHolder(), currentExpr.deepCopy()));
+                    refreshUndoRedoButtons();
+                    saveButton.setEnabled(!includesPlaceHolder());
+                } catch (ParseException | TokenMgrError ex) {
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), ex.getMessage(), "Error during parsing", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                ObsExpression oldExpr = currentExpr.deepCopy();
+                currentExpr = new ObsPlaceHolder();
+                expressionField.setText(currentExpr.toString());
 
-            if (!oldExpr.isPlaceHolder()) {
-                undoManager.addEdit(new ExpressionEdit(oldExpr, currentExpr.deepCopy()));
-                refreshUndoRedoButtons();
+                if (!oldExpr.isPlaceHolder()) {
+                    undoManager.addEdit(new ExpressionEdit(oldExpr, currentExpr.deepCopy()));
+                    refreshUndoRedoButtons();
+                }
             }
         });
 
-        JButton editExpression = new JButton("Edit Expression");
-
-        editExpression.addActionListener(e -> {
-            isEditing = !isEditing;
-
-            Enabler.setAllEnabled(operationsPanel, !isEditing);
-            Enabler.setAllEnabled(placesPanel, !isEditing);
-            Enabler.setAllEnabled(constantsPanel, !isEditing);
-
-            if (isEditing) {
-                saveButton.setEnabled(false);
-            } else {
-                saveButton.setEnabled(!includesPlaceHolder());
-            }
-
-            expressionField.setEditable(isEditing);
-        
-            if (isEditing) {
-                resetExpression.setText("Parse Expression");
-                editExpression.setText("Cancel");
-            } else {
-                resetExpression.setText("Reset Expression");
-                editExpression.setText("Edit Expression");
-            }
-        });
+        editExpression = new JButton("Edit Expression");
+        editExpression.addActionListener(e -> toggleManualEditing());
 
         GridBagConstraints editingGbc = new GridBagConstraints();
         editingGbc.gridx = 0;
@@ -409,6 +409,30 @@ public class ObservationDialog extends EscapableDialog {
         add(buttonPanel, gbc);
 
         pack();
+    }
+
+    private void toggleManualEditing() {
+        isEditing = !isEditing;
+
+        Enabler.setAllEnabled(operationsPanel, !isEditing);
+        Enabler.setAllEnabled(placesPanel, !isEditing);
+        Enabler.setAllEnabled(constantsPanel, !isEditing);
+
+        if (isEditing) {
+            saveButton.setEnabled(false);
+        } else {
+            saveButton.setEnabled(!includesPlaceHolder());
+        }
+
+        expressionField.setEditable(isEditing);
+    
+        if (isEditing) {
+            resetExpression.setText("Parse Expression");
+            editExpression.setText("Cancel");
+        } else {
+            resetExpression.setText("Reset Expression");
+            editExpression.setText("Edit Expression");
+        }
     }
 
     private void updateExpression(ObsExpression newExpr) {
