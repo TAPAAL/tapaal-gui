@@ -12,6 +12,11 @@ public class Observation {
         this.name = name;
     }
 
+    public Observation(String name, ObsExpression expression) {
+        this.name = name;
+        this.expression = expression;
+    }
+
     public String getName() {
         return name;
     }
@@ -31,5 +36,9 @@ public class Observation {
     @Override
     public String toString() {
         return name;
+    }
+
+    public String toXml() {
+        return "<watch name=\"" + name + "\">" + expression.toXml() + "</watch>";
     }
 }

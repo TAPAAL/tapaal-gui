@@ -61,10 +61,7 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
         String observationXml = startTag(XML_OBSERVATIONS); 
         
         for (Observation observation : observations) {
-            String tagContent = XML_WATCH;
-            tagContent += tagAttribute(XML_WATCH_NAME, observation.getName());
-            observationXml += startTag(tagContent);
-            observationXml += endTag(XML_WATCH);
+            observationXml += observation.toXml();
         }
 
         observationXml += endTag(XML_OBSERVATIONS);

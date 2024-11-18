@@ -69,7 +69,7 @@ public class ObservationDialog extends EscapableDialog {
         this.tapnNetwork = tapnNetwork;
         this.observationModel = observationModel;
         this.observation = observation;
-        this.currentExpr = observation.getExpression().copy();
+        this.currentExpr = observation.getExpression();
 
         init();
     }
@@ -268,12 +268,12 @@ public class ObservationDialog extends EscapableDialog {
         JButton resetExpression = new JButton("Reset Expression");
 
         resetExpression.addActionListener(e -> {
-            ObsExpression oldExpr = currentExpr.copy();
+            ObsExpression oldExpr = currentExpr.deepCopy();
             currentExpr = new ObsPlaceHolder();
             expressionField.setText(currentExpr.toString());
 
             if (!oldExpr.isPlaceHolder()) {
-                undoManager.addEdit(new ExpressionEdit(oldExpr, currentExpr));
+                undoManager.addEdit(new ExpressionEdit(oldExpr, currentExpr.deepCopy()));
                 refreshUndoRedoButtons();
             }
         });
@@ -364,13 +364,11 @@ public class ObservationDialog extends EscapableDialog {
 
         cancelButton.addActionListener(e -> dispose());
         saveButton.addActionListener(e -> {
-            observation.setName(nameField.getText());
-            observation.setExpression(currentExpr);
-
             boolean nameExists = false;
             for (int i = 0; i < observationModel.getSize(); i++) {
                 Observation obs = observationModel.getElementAt(i);
-                if (obs.getName().equals(observation.getName())) {
+                if (obs.getName().equals(nameField.getText()) && 
+                    !obs.equals(observation)) {
                     nameExists = true;
                     break;
                 }
@@ -379,6 +377,9 @@ public class ObservationDialog extends EscapableDialog {
             if (nameExists) {
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "An observation with the name \"" + observation.getName() + "\" already exists.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
+                observation.setName(nameField.getText());
+                observation.setExpression(currentExpr);
+
                 if (isNewObservation) {
                     observationModel.addElement(observation);
                 } else {
@@ -413,7 +414,7 @@ public class ObservationDialog extends EscapableDialog {
     private void updateExpression(ObsExpression newExpr) {
         String selectedText = expressionField.getSelectedText();
         String fullText = expressionField.getText();
-        ObsExpression oldExpr = currentExpr.copy();
+        ObsExpression oldExpr = currentExpr.deepCopy();
         if (selectedText != null && 
             !selectedText.equals(fullText) && 
             currentExpr.isOperator()) {
@@ -424,11 +425,12 @@ public class ObservationDialog extends EscapableDialog {
             currentExpr = newExpr;
         }
 
-        expressionField.setText(currentExpr.toString());
-        undoManager.addEdit(new ExpressionEdit(oldExpr, newExpr));
-        refreshUndoRedoButtons();
-
-        saveButton.setEnabled(!includesPlaceHolder());
+        if (!currentExpr.toString().equals(oldExpr.toString())) {   
+            expressionField.setText(currentExpr.toString());
+            undoManager.addEdit(new ExpressionEdit(oldExpr, currentExpr.deepCopy()));
+            refreshUndoRedoButtons();
+            saveButton.setEnabled(!includesPlaceHolder());
+        }
     }
 
     private void refreshUndoRedoButtons() {

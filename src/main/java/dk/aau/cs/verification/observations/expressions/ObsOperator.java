@@ -53,14 +53,20 @@ public abstract class ObsOperator implements ObsExpression {
     }
 
     @Override
-    public ObsExpression copy() {
+    public ObsExpression deepCopy() {
         try {
-            return getClass()
+            ObsOperator copy = getClass()
                     .getConstructor(ObsExpression.class, ObsExpression.class)
-                    .newInstance(left.copy(), right.copy());
+                    .newInstance(left.deepCopy(), right.deepCopy());
+            copy.setParent(this.parent);
+            return copy;
         } catch (Exception e) {
             throw new RuntimeException("Failed to copy ObsOperator", e);
         }
+    }
+
+    public void setParent(ObsExpression parent) {
+        this.parent = parent;
     }
 
     protected boolean addParenthesis() {

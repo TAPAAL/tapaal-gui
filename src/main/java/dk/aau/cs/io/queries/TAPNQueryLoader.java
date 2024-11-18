@@ -3,12 +3,21 @@ package dk.aau.cs.io.queries;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
+
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.XMLParsing.XMLHyperLTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import dk.aau.cs.verification.SMCSettings;
 import dk.aau.cs.verification.SMCTraceType;
 import dk.aau.cs.verification.observations.Observation;
+import dk.aau.cs.verification.observations.expressions.ObsAdd;
+import dk.aau.cs.verification.observations.expressions.ObsConstant;
+import dk.aau.cs.verification.observations.expressions.ObsExpression;
+import dk.aau.cs.verification.observations.expressions.ObsMultiply;
+import dk.aau.cs.verification.observations.expressions.ObsOperator;
+import dk.aau.cs.verification.observations.expressions.ObsPlace;
+import dk.aau.cs.verification.observations.expressions.ObsSubtract;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,6 +37,7 @@ import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOptio
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
@@ -122,9 +132,10 @@ public class TAPNQueryLoader extends QueryLoader{
                     List<Observation> observations = new ArrayList<>();
                     for (int i = 0; i < watchList.getLength(); ++i) {
                         Element watch = (Element)watchList.item(i);
-                        String name = watch.getAttribute("name");
+                        String name = watch.getAttribute("name");                        
 
-                        Observation observation = new Observation(name);
+                        Element root = getFirstElementChild(watch);
+                        Observation observation = new Observation(name, parseObsExpression(root));
                         observations.add(observation);
                     }
 
@@ -181,6 +192,89 @@ public class TAPNQueryLoader extends QueryLoader{
             if(child.getNodeName().equals("smc")) return true;
         }
         return false;
+    }
+
+    private Element getFirstElementChild(Element parent) {
+        NodeList children = parent.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                return (Element)child;
+            }
+        }
+
+        return null;
+    }
+
+    private Element getSecondElementChild(Element parent) {
+        NodeList children = parent.getChildNodes();
+        int elementCount = 0;
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                ++elementCount;
+                if (elementCount == 2) {
+                    return (Element)child;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private ObsExpression parseObsExpression(Element element) {
+        String tagName = element.getTagName();
+    
+        switch (tagName) {
+            case "obs-add":
+                return createOperatorExpression(element, ObsAdd::new);
+            case "obs-subtract":
+                return createOperatorExpression(element, ObsSubtract::new);
+            case "obs-multiply":
+                return createOperatorExpression(element, ObsMultiply::new);
+            case "obs-constant":
+                return new ObsConstant(Integer.parseInt(element.getAttribute("value")));
+            case "obs-place":
+                return createPlaceExpression(element);
+            default:
+                throw new IllegalArgumentException("Unknown expression type: " + tagName);
+        }
+    }
+
+    private ObsExpression createOperatorExpression(Element element, BiFunction<ObsExpression, ObsExpression, ObsOperator> constructor) {
+        ObsExpression left = parseObsExpression(getFirstElementChild(element));
+        ObsExpression right = parseObsExpression(getSecondElementChild(element));
+        ObsOperator operator = constructor.apply(left, right);
+
+        if (left.isOperator()) {
+            ((ObsOperator)left).setParent(operator);
+        }
+        
+        if (right.isOperator()) {
+            ((ObsOperator)right).setParent(operator);
+        }
+
+        return operator;
+    }    
+
+    private ObsExpression createPlaceExpression(Element element) {
+        String name = element.getAttribute("name");
+        String[] parts = name.split("_");
+        String templateName = parts[0];
+        String placeName = parts[1];
+    
+        Object template;
+        TimedPlace place;
+        if (templateName.equals("Shared")) {
+            template = templateName;
+            place = network.getSharedPlaceByName(placeName);
+        } else {
+            TimedArcPetriNet net = network.getTAPNByName(templateName);
+            template = net;
+            place = net.getPlaceByName(placeName);
+        }
+    
+        return new ObsPlace(template, place);
     }
 
     public static SMCSettings parseSmcSettings(Element smcTag) {

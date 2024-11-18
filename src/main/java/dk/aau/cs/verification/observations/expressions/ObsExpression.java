@@ -1,9 +1,10 @@
 package dk.aau.cs.verification.observations.expressions;
 
 public interface ObsExpression {
-    ObsExpression copy();
+    ObsExpression deepCopy();
     ObsExprPosition getObjectPosition(int index);
     boolean isOperator();
     boolean isLeaf();
     boolean isPlaceHolder();
+    String toXml();
 }

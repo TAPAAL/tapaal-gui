@@ -13,4 +13,9 @@ public class ObsSubtract extends ObsOperator {
     protected String getOperator() {
         return "-";
     }
+
+    @Override
+    public String toXml() {
+        return "<obs-subtract>" + left.toXml() + right.toXml() + "</obs-subtract>";
+    }
 }

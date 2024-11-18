@@ -1,5 +1,7 @@
 package dk.aau.cs.verification.observations.expressions;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 
 public class ObsPlace extends ObsLeaf {
@@ -17,7 +19,12 @@ public class ObsPlace extends ObsLeaf {
     }
 
     @Override
-    public ObsExpression copy() {
+    public String toXml() {
+        return "<obs-place name=\"" + template + "_" + place.name() + "\"/>";
+    }
+
+    @Override
+    public ObsExpression deepCopy() {
         return new ObsPlace(template, place);
     }
 }

@@ -13,7 +13,12 @@ public class ObsConstant extends ObsLeaf {
     }
 
     @Override
-    public ObsExpression copy() {
+    public String toXml() {
+        return "<obs-constant value=\"" + value + "\"/>";
+    }
+
+    @Override
+    public ObsExpression deepCopy() {
         return new ObsConstant(value);
     }
 }

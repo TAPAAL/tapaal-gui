@@ -7,7 +7,12 @@ public class ObsPlaceHolder extends ObsLeaf {
     }
 
     @Override
-    public ObsExpression copy() {
+    public String toXml() {
+        throw new UnsupportedOperationException("Cannot convert a placeholder to XML");
+    }
+
+    @Override
+    public ObsExpression deepCopy() {
         return new ObsPlaceHolder();
     }
 
