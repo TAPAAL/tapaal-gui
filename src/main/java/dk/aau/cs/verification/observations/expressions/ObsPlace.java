@@ -1,7 +1,5 @@
 package dk.aau.cs.verification.observations.expressions;
 
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 
 public class ObsPlace extends ObsLeaf {
