@@ -226,15 +226,15 @@ public class TAPNQueryLoader extends QueryLoader{
         String tagName = element.getTagName();
     
         switch (tagName) {
-            case "obs-add":
+            case "add":
                 return createOperatorExpression(element, ObsAdd::new);
-            case "obs-subtract":
+            case "subtract":
                 return createOperatorExpression(element, ObsSubtract::new);
-            case "obs-multiply":
+            case "multiply":
                 return createOperatorExpression(element, ObsMultiply::new);
-            case "obs-constant":
+            case "constant":
                 return new ObsConstant(Integer.parseInt(element.getAttribute("value")));
-            case "obs-place":
+            case "place":
                 return createPlaceExpression(element);
             default:
                 throw new IllegalArgumentException("Unknown expression type: " + tagName);

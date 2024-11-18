@@ -16,6 +16,6 @@ public class ObsAdd extends ObsOperator {
 
     @Override
     public String toXml() {
-        return "<obs-add>" + left.toXml() + right.toXml() + "</obs-add>";
+        return "<add>" + left.toXml() + right.toXml() + "</add>";
     }
 }
