@@ -1,5 +1,10 @@
 package dk.aau.cs.verification;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import dk.aau.cs.verification.observations.Observation;
+
 public class SMCSettings {
 
     public int timeBound;
@@ -12,6 +17,8 @@ public class SMCSettings {
     public boolean compareToFloat;
     public float geqThan;
 
+    private List<Observation> observations;
+
     public static SMCSettings Default() {
         SMCSettings settings = new SMCSettings();
         settings.timeBound = 1000;
@@ -23,6 +30,7 @@ public class SMCSettings {
         settings.estimationIntervalWidth = 0.05f;
         settings.compareToFloat = false;
         settings.geqThan = 0.5f;
+        settings.setObservations(new ArrayList<>());
         return settings;
     }
 
@@ -55,5 +63,13 @@ public class SMCSettings {
 
     public int getStepBound() {
         return stepBound;
+    }
+
+    public void setObservations(List<Observation> observations) {
+        this.observations = observations;
+    }
+
+    public List<Observation> getObservations() {
+        return observations;
     }
 }

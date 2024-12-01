@@ -318,6 +318,9 @@ public class TapnXmlLoader {
 		NodeList constantNodes = doc.getElementsByTagName("constant");
 		for (int i = 0; i < constantNodes.getLength(); i++) {
 			Node c = constantNodes.item(i);
+            if (XmlUtil.isDescendantOfTag(c, "watch")) {
+                continue;
+            }
 
 			if (c instanceof Element) {
 				Constant constant = parseConstant((Element) c);

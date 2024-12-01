@@ -277,15 +277,20 @@ public class TapnEngineXmlLoader {
 		List<Constant> constants = new ArrayList<Constant>();
 		NodeList constantNodes = doc.getElementsByTagName("constant");
 		for (int i = 0; i < constantNodes.getLength(); i++) {
-			Node c = constantNodes.item(i);
+            Node c = constantNodes.item(i);
+            if (XmlUtil.isDescendantOfTag(c, "watch")) {
+                continue;
+            }
 
 			if (c instanceof Element) {
 				Constant constant = parseConstant((Element) c);
 				constants.add(constant);
 			}
 		}
+
 		return constants;
 	}
+
 
 	private Template parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
         String name = getTAPNName(tapnNode);
