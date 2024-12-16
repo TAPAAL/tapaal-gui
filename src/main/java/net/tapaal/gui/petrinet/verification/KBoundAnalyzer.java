@@ -1,36 +1,44 @@
 package net.tapaal.gui.petrinet.verification;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import javax.swing.JSpinner;
 
-import dk.aau.cs.TCTL.*;
+import dk.aau.cs.Messenger;
+import dk.aau.cs.TCTL.AritmeticOperator;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLTermListNode;
+import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import net.tapaal.gui.petrinet.TAPNLens;
-import pipe.gui.petrinet.dataLayer.DataLayer;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
-import pipe.gui.TAPAALGUI;
-import pipe.gui.MessengerImpl;
-import dk.aau.cs.Messenger;
-import dk.aau.cs.model.tapn.TAPNQuery;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
-
-import java.util.HashMap;
-import java.util.ArrayList;
+import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 
 public class KBoundAnalyzer {
 	protected final TimedArcPetriNetNetwork tapnNetwork;
@@ -110,7 +118,7 @@ public class KBoundAnalyzer {
         TCTLAbstractProperty property = new TCTLAGNode(child);
 
         TAPNQuery query = new TAPNQuery(property, k);
-        query.setCategory(QueryCategory.CTL);
+        dataLayerQuery.setCategory(QueryCategory.CTL);
 
         return query;
     }
