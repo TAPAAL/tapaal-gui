@@ -251,7 +251,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             ArcExpression childexp = parseArcExpression(child);
 
             return new ScalarProductExpression(scalarval, childexp);
-        }else if (name.equals("all")){
+        } else if (name.equals("all")){
             ColorType ct = parseUserSort(node);
             Vector<ColorExpression> ceVector = new Vector<>();
             ceVector.add(new AllExpression(ct));
