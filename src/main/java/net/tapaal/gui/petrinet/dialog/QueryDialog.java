@@ -2049,11 +2049,11 @@ public class QueryDialog extends JPanel {
         traceModel.removeAllElements();
 
         Set<String> traces = new HashSet<>(queryToCreateFrom.getTraceList());
-        Pattern pattern = Pattern.compile("\\s([a-zA-Z]\\w+)\\.");
+        
+        // Extracts trace names from the field
+        Pattern pattern = Pattern.compile("\\s([a-zA-Z]\\w*)\\.");
         Matcher matcher = pattern.matcher(queryToCreateFrom.getProperty().toString());
-        while (matcher.find()) {
-            traces.add(matcher.group(1));
-        }
+        while (matcher.find()) traces.add(matcher.group(1));
 
         for (String trace : traces) {
             traceModel.addElement(trace);
