@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
@@ -3994,15 +3995,19 @@ public class QueryDialog extends JPanel {
 
     private void updateTraceBox() {
         // Updates the trace box drop down menu
-        Set<Object> traceBoxSet = new HashSet<>();
-        Set<Object> traceBoxQuantificationSet = new HashSet<>();
+        List<String> traceList = getUsedTraces(newProperty);
+        Vector<Object> traceBoxVector = new Vector<>();
+        Vector<Object> traceBoxQuantificationVector = new Vector<>();
         for (int i = 0; i < traceModel.getSize(); i++) {
-            traceBoxSet.add(traceModel.getElementAt(i));
-            traceBoxQuantificationSet.add(traceModel.getElementAt(i));
+            if (traceList.contains(traceModel.get(i).toString())) {
+                traceBoxVector.add(traceModel.get(i));
+            } else {
+                traceBoxQuantificationVector.add(traceModel.get(i));
+            }
         }
 
-        traceBox.setModel(new DefaultComboBoxModel<>(traceBoxSet.toArray(new Object[0])));
-        traceBoxQuantification.setModel(new DefaultComboBoxModel<>(traceBoxQuantificationSet.toArray(new Object[0])));
+        traceBox.setModel(new DefaultComboBoxModel<>(traceBoxVector));
+        traceBoxQuantification.setModel(new DefaultComboBoxModel<>(traceBoxQuantificationVector));
         updateHyperLTLButtons();
     }
 
