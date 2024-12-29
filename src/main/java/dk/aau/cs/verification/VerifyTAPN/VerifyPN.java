@@ -481,17 +481,10 @@ public class VerifyPN implements ModelChecker {
         }
 
         VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
-        Map<String, TimedArcPetriNetTrace> parsedTracesMap = new LinkedHashMap<>();
-
-        if(query.getCategory() == QueryCategory.HyperLTL) {
-            for(int i = 0; i < query.getTraceList().size(); i++) {
-                traceParser.setTraceToParse(query.getTraceList().get(i));
-                TimedArcPetriNetTrace result = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
-                parsedTracesMap.put(query.getTraceList().get(i), result);
-
-            }
-            return parsedTracesMap;
+        if (query.getCategory() == QueryCategory.HyperLTL) {
+            return traceParser.parseTraces(new BufferedReader(new StringReader(output)));
         }
+
         return null;
     }
 
