@@ -1,13 +1,13 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import java.util.Set;
+
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
-
-import java.util.Set;
 
 public class SubtractExpression extends ArcExpression {
 
@@ -100,8 +100,9 @@ public class SubtractExpression extends ArcExpression {
         right.getVariables(variables);
     }
 
+    @Override
     public String toString() {
-        return left.toString() + " - " + right.toString();
+        return "("  + left.toString() + " - " + right.toString() + ")";
     }
 
     @Override

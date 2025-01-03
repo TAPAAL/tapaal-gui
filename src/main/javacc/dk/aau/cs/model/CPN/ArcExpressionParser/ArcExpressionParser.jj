@@ -86,30 +86,22 @@ ArcExpression AddExpression() :
 {
     ArcExpression left;
     ArcExpression right;
-}
-{
-    left = AddTerm()
-    (
-        <SUB> right = AddTerm()
-        { left = new SubtractExpression(left, right); }
-    )*
-    { return left; }
-}
-
-ArcExpression AddTerm() :
-{
-    ArcExpression left;
-    ArcExpression right;
-    Vector<ArcExpression> constituents = new Vector<ArcExpression>();
+    Token op;
 }
 {
     left = ScalarExpression()
-    { constituents.add(left); }
     (
-        <PLUS> right = ScalarExpression()
-        { constituents.add(right); }
+        (op = <PLUS> | op = <SUB>) 
+        right = ScalarExpression()
+        {
+            if (op.kind == PLUS) {
+                left = new AddExpression(left, right);
+            } else {
+                left = new SubtractExpression(left, right); 
+            }
+        }
     )*
-    { return constituents.size() == 1 ? left : new AddExpression(constituents); }
+    { return left; }
 }
 
 ArcExpression ScalarExpression() :

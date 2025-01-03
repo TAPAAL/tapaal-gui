@@ -1,5 +1,8 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import java.util.Set;
+import java.util.Vector;
+
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.ColorType;
@@ -8,14 +11,18 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
 
-import java.util.Objects;
-import java.util.Set;
-import java.util.Vector;
-import java.util.stream.Collectors;
-
 public class AddExpression extends ArcExpression {
 
     private final Vector<ArcExpression> constituents;
+
+    public AddExpression(ArcExpression left, ArcExpression right) {
+        Require.notNull(left);
+        Require.notNull(right);
+        Vector<ArcExpression> constituents = new Vector<>();
+        constituents.add(left);
+        constituents.add(right);
+        this.constituents = constituents;
+    }
 
     public AddExpression(Vector<ArcExpression> constituents) {
         Require.notNull(constituents);
@@ -152,9 +159,6 @@ public class AddExpression extends ArcExpression {
         }
 
         return children;
-
-
-
     }
 
     @Override
@@ -182,6 +186,7 @@ public class AddExpression extends ArcExpression {
         return false;
     }
 
+    @Override
     public String toString() {
 
         StringBuilder res = new StringBuilder("(" + constituents.get(0).toString());
