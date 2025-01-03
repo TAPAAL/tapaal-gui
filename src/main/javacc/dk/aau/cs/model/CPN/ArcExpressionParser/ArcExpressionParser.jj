@@ -76,7 +76,6 @@ SKIP :
 ArcExpression StartAddExpression() :
 {
 	ArcExpression currentChild;
-	Vector<ArcExpression> constituents = new Vector<ArcExpression>();
 }
 {
 	currentChild = AddExpression() <EOF>
@@ -85,30 +84,32 @@ ArcExpression StartAddExpression() :
 
 ArcExpression AddExpression() :
 {
-	ArcExpression currentChild;
-	Vector<ArcExpression> constituents = new Vector<ArcExpression>();
+    ArcExpression left;
+    ArcExpression right;
 }
 {
-	currentChild = SubExpression()
-	{ constituents.add(currentChild); }
-	(
-		<PLUS> currentChild = SubExpression()
-		{ constituents.add(currentChild); }
-	)*
-	{ return constituents.size() == 1 ? currentChild : new AddExpression(constituents); }
+    left = AddTerm()
+    (
+        <SUB> right = AddTerm()
+        { left = new SubtractExpression(left, right); }
+    )*
+    { return left; }
 }
 
-ArcExpression SubExpression() :
+ArcExpression AddTerm() :
 {
-	ArcExpression left = null;
-	ArcExpression right = null;
+    ArcExpression left;
+    ArcExpression right;
+    Vector<ArcExpression> constituents = new Vector<ArcExpression>();
 }
 {
-	left = ScalarExpression()
-	(
-		<SUB> right = ScalarExpression()
-	)?
-	{ return right == null ? left : new SubtractExpression(left,right); }
+    left = ScalarExpression()
+    { constituents.add(left); }
+    (
+        <PLUS> right = ScalarExpression()
+        { constituents.add(right); }
+    )*
+    { return constituents.size() == 1 ? left : new AddExpression(constituents); }
 }
 
 ArcExpression ScalarExpression() :
