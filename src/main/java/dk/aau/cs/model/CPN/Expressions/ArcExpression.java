@@ -6,6 +6,7 @@ import dk.aau.cs.model.CPN.ColorType;
 public abstract class ArcExpression extends Expression {
 
     protected ArcExpression parent;
+    protected boolean hadParentheses = false;
 
     public ArcExpression() {
 
@@ -39,4 +40,12 @@ public abstract class ArcExpression extends Expression {
     public abstract ArcExpression getExprWithNewColorType(ColorType ct);
 
     public abstract ArcExpression getExprConverted(ColorType oldCt, ColorType newCt);
+
+    public void hadParentheses(boolean hadParentheses) {
+        this.hadParentheses = hadParentheses;
+    }
+
+    public boolean addParentheses() {
+        return (parent != null && parent.getClass() != this.getClass()) || hadParentheses;
+    }
 }

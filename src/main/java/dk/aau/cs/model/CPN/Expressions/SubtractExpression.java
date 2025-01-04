@@ -102,7 +102,11 @@ public class SubtractExpression extends ArcExpression {
 
     @Override
     public String toString() {
-        return "("  + left.toString() + " - " + right.toString() + ")";
+        if (addParentheses()) {
+            return "(" + left.toString() + " - " + right.toString() + ")";
+        }
+
+        return left.toString() + " - " + right.toString();
     }
 
     @Override

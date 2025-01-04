@@ -188,12 +188,12 @@ public class AddExpression extends ArcExpression {
 
     @Override
     public String toString() {
-        StringBuilder res = new StringBuilder(constituents.get(0).toString());
+        StringBuilder res = new StringBuilder(addParentheses() ? "(" + constituents.get(0).toString() : constituents.get(0).toString());
         for (int i = 1; i < constituents.size(); ++i) {
             res.append(" + ").append(constituents.get(i).toString());
         }
 
-        return res.toString();
+        return addParentheses() ? res.append(")").toString() : res.toString();
     }
 
     public String toTokenString() {

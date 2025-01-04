@@ -95,9 +95,15 @@ ArcExpression AddExpression() :
         right = ScalarExpression()
         {
             if (op.kind == PLUS) {
-                left = new AddExpression(left, right);
+                AddExpression add = new AddExpression(left, right);
+                left.setParent(add);
+                right.setParent(add);
+                left = add;
             } else {
-                left = new SubtractExpression(left, right); 
+                SubtractExpression sub = new SubtractExpression(left, right);
+                left.setParent(sub);
+                right.setParent(sub);
+                left = sub;
             }
         }
     )*
@@ -106,20 +112,27 @@ ArcExpression AddExpression() :
 
 ArcExpression ScalarExpression() :
 {
-	ArcExpression currentChild;
-	Token number;
+    ArcExpression currentChild;
+    Token number;
 }
 {
-	LOOKAHEAD(2147483647) number = <NUM> <MULT> currentChild = AddExpression() { return new ScalarProductExpression(Integer.parseInt(number.image),currentChild); }
-    	| currentChild = term() { return currentChild; }
+    LOOKAHEAD(2147483647) number = <NUM> <MULT> currentChild = AddExpression() 
+    { 
+        ScalarProductExpression scalar = new ScalarProductExpression(Integer.parseInt(number.image), currentChild);
+        currentChild.setParent(scalar);
+        return scalar;
+    }
+    | currentChild = term() { return currentChild; }
 }
 
 ArcExpression term() : {
     ArcExpression childExpression;
 }{
-
-        childExpression = NumberOfExpression() {return childExpression;}
-    | "(" childExpression = AddExpression() ")" {return childExpression;}
+    childExpression = NumberOfExpression() {return childExpression;}
+    | "(" childExpression = AddExpression() ")" {
+        childExpression.hadParentheses(true); 
+        return childExpression;
+    }
 }
 
 NumberOfExpression StartNumberOfExpression() : {
