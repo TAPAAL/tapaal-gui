@@ -931,7 +931,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private void initExpr() {
         ArcExpression expression;
         arcExpression = new PlaceHolderArcExpression();
-        if(!isTransportArc) {
+        if (!isTransportArc) {
             if (isInputArc && !isInhibitorArc) {
                 expression = ((TimedInputArcComponent) objectToBeEdited).underlyingTimedInputArc().getArcExpression();
             } else if (isInhibitorArc) {
@@ -939,18 +939,19 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             } else {
                 expression = (((TimedOutputArcComponent) objectToBeEdited).underlyingArc()).getExpression();
             }
-        } else{
+        } else {
             TransportArc transportArc = ((TimedTransportArcComponent) objectToBeEdited).underlyingTransportArc();
             if (isInputArc) {
                 expression = transportArc.getInputExpression();
-            } else{
+            } else {
                 expression = transportArc.getOutputExpression();
             }
         }
 
-        if(expression != null){
+        if (expression != null) {
             arcExpression = expression.deepCopy();
         }
+
         exprField.setText(arcExpression.toString());
         updateSelection(arcExpression);
     }

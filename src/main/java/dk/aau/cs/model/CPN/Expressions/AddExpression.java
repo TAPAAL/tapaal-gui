@@ -99,7 +99,12 @@ public class AddExpression extends ArcExpression {
         for (ArcExpression expr : constituents) {
             constituentsCopy.add(expr.deepCopy());
         }
-        return new AddExpression(constituentsCopy);
+
+        ArcExpression copy = new AddExpression(constituentsCopy);
+        copy.setParent(parent);
+        copy.hadParentheses(hadParentheses);
+
+        return copy;
     }
 
     @Override
@@ -135,29 +140,20 @@ public class AddExpression extends ArcExpression {
     @Override
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[constituents.size()];
-        int i = 0;
-        int endPrev = 0;
-        for (ArcExpression p : constituents) {
-
-            int start = 1;
-            int end = 0;
-
-            if (i == 0) {
-                end = start + p.toString().length();
-                endPrev = end;
-            } else {
-                start = endPrev + 3;
-                end = start + p.toString().length();
-
-                endPrev = end;
+        int currentPosition = addParentheses() ? 1 : 0;
+        
+        for (int i = 0; i < constituents.size(); ++i) {
+            ArcExpression constituent = constituents.get(i);
+            
+            if (i > 0) {
+                currentPosition += 3;
             }
-
-            ExprStringPosition pos = new ExprStringPosition(start, end, p);
-
-            children[i] = pos;
-            i++;
+            
+            int constituentEnd = currentPosition + constituent.toString().length();
+            children[i] = new ExprStringPosition(currentPosition, constituentEnd, constituent);
+            currentPosition = constituentEnd;
         }
-
+        
         return children;
     }
 

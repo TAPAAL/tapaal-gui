@@ -128,7 +128,7 @@ ArcExpression ScalarExpression() :
 ArcExpression term() : {
     ArcExpression childExpression;
 }{
-    childExpression = NumberOfExpression() {return childExpression;}
+    childExpression = NumberOfExpression() { return childExpression; }
     | "(" childExpression = AddExpression() ")" {
         childExpression.hadParentheses(true); 
         return childExpression;

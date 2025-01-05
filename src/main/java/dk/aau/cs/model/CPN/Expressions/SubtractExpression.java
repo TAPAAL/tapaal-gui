@@ -71,7 +71,10 @@ public class SubtractExpression extends ArcExpression {
 
     @Override
     public ArcExpression deepCopy() {
-        return new SubtractExpression(left.deepCopy(), right.deepCopy());
+        ArcExpression copy = new SubtractExpression(left.deepCopy(), right.deepCopy());
+        copy.setParent(parent);
+        copy.hadParentheses(hadParentheses);
+        return copy;
     }
 
     @Override
@@ -115,19 +118,14 @@ public class SubtractExpression extends ArcExpression {
     @Override
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[2];
-        int endPrev = 0;
+        
+        int leftStart = addParentheses() ? 1 : 0;
+        int leftEnd = leftStart + left.toString().length();
+        children[0] = new ExprStringPosition(leftStart, leftEnd, left);
 
-        int start = 0;
-        int end = 0;
-
-        end = start + left.toString().length();
-        endPrev = end;
-        ExprStringPosition pos = new ExprStringPosition(start, end, left);
-        children[0] = pos;
-        start = endPrev + 3;
-        end = start + right.toString().length();
-        pos = new ExprStringPosition(start, end, right);
-        children[1] = pos;
+        int rightStart = leftEnd + 3;
+        int rightEnd = rightStart + right.toString().length();
+        children[1] = new ExprStringPosition(rightStart, rightEnd, right);
 
         return children;
     }

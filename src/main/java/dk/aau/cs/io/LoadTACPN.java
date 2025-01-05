@@ -1,18 +1,49 @@
 package dk.aau.cs.io;
 
-import dk.aau.cs.model.CPN.*;
-import dk.aau.cs.model.CPN.Expressions.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
+import java.util.function.Consumer;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorMultiset;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.AddExpression;
+import dk.aau.cs.model.CPN.Expressions.AllExpression;
+import dk.aau.cs.model.CPN.Expressions.AndExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.DotConstantExpression;
+import dk.aau.cs.model.CPN.Expressions.EqualityExpression;
+import dk.aau.cs.model.CPN.Expressions.GreaterThanEqExpression;
+import dk.aau.cs.model.CPN.Expressions.GreaterThanExpression;
+import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import dk.aau.cs.model.CPN.Expressions.InequalityExpression;
+import dk.aau.cs.model.CPN.Expressions.LessThanEqExpression;
+import dk.aau.cs.model.CPN.Expressions.LessThanExpression;
+import dk.aau.cs.model.CPN.Expressions.NotExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.OrExpression;
+import dk.aau.cs.model.CPN.Expressions.PredecessorExpression;
+import dk.aau.cs.model.CPN.Expressions.ScalarProductExpression;
+import dk.aau.cs.model.CPN.Expressions.SubtractExpression;
+import dk.aau.cs.model.CPN.Expressions.SuccessorExpression;
+import dk.aau.cs.model.CPN.Expressions.TupleExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import dk.aau.cs.model.CPN.Expressions.VariableExpression;
+import dk.aau.cs.model.CPN.ProductType;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.NameTransformer;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.util.*;
-import java.util.function.Consumer;
 
 public class LoadTACPN { //the import feature for CPN and load for TACPN share similarities. These similarities are shared here. Feel free to find a better name for this class
 
@@ -224,39 +255,50 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             return parseNumberOfExpression(node);
         } else if (name.equals("add")) {
             Vector<ArcExpression> constituents = new Vector<>();
-
+    
             Node child = skipWS(node.getFirstChild());
             while (child != null) {
                 ArcExpression subterm = parseArcExpression(child);
                 constituents.add(subterm);
                 child = skipWS(child.getNextSibling());
             }
-            return new AddExpression(constituents);
+
+            AddExpression addExpr = new AddExpression(constituents);
+            for (ArcExpression expr : constituents) {
+                expr.setParent(addExpr);
+            }
+
+            return addExpr;
         } else if (name.equals("subtract")) {
             Node headchild = skipWS(node.getFirstChild());
             ArcExpression headexp = parseArcExpression(headchild);
-
+    
             Node nextchild = skipWS(headchild.getNextSibling());
             while (nextchild != null) {
                 ArcExpression nextexp = parseArcExpression(nextchild);
-                headexp = new SubtractExpression(headexp, nextexp);
+                SubtractExpression subExpr = new SubtractExpression(headexp, nextexp);
+                headexp.setParent(subExpr);
+                nextexp.setParent(subExpr);
+                headexp = subExpr;
                 nextchild = skipWS(nextchild.getNextSibling());
             }
+
             return headexp;
         } else if (name.equals("scalarproduct")) {
             Node scalar = skipWS(node.getFirstChild());
             Integer scalarval = parseNumberConstantExpression(scalar);
-
+    
             Node child = skipWS(scalar.getNextSibling());
             ArcExpression childexp = parseArcExpression(child);
-
-            return new ScalarProductExpression(scalarval, childexp);
-        }else if (name.equals("all")){
+    
+            ScalarProductExpression scalarExpr = new ScalarProductExpression(scalarval, childexp);
+            childexp.setParent(scalarExpr);
+            return scalarExpr;
+        } else if (name.equals("all")){
             ColorType ct = parseUserSort(node);
             Vector<ColorExpression> ceVector = new Vector<>();
             ceVector.add(new AllExpression(ct));
             return new NumberOfExpression(1,ceVector);
-
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
             return parseArcExpression(child);
@@ -264,7 +306,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             Vector<ColorExpression> ceVector = new Vector<>();
             ceVector.add(parseColorExpression(node));
             return new NumberOfExpression(1, ceVector);
-        } else{
+        } else {
             throw new FormatException(String.format("Could not parse %s as an arc expression\n", name));
         }
     }
