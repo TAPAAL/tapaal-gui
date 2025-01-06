@@ -39,8 +39,12 @@ public abstract class ArcExpression extends Expression {
 
     public abstract ArcExpression getExprConverted(ColorType oldCt, ColorType newCt);
 
-    public void hadParentheses(boolean hadParentheses) {
+    public void setHadParentheses(boolean hadParentheses) {
         this.hadParentheses = hadParentheses;
+    }
+
+    public boolean hadParentheses() {
+        return hadParentheses;
     }
 
     public boolean addParentheses() {

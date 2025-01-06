@@ -40,7 +40,7 @@ public class AddExpression extends ArcExpression {
         this.constituents = new Vector<>(otherExpr.constituents);
     }
 
-    public Vector<ArcExpression> getAddExpression (){return constituents;}
+    public Vector<ArcExpression> getAddExpression () { return constituents; }
 
     public ColorMultiset eval(ExpressionContext context) {
         ColorMultiset result = null;
@@ -102,7 +102,7 @@ public class AddExpression extends ArcExpression {
 
         ArcExpression copy = new AddExpression(constituentsCopy);
         copy.setParent(parent);
-        copy.hadParentheses(hadParentheses);
+        copy.setHadParentheses(hadParentheses);
 
         return copy;
     }

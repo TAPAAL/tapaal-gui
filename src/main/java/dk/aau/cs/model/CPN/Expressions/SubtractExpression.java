@@ -73,7 +73,7 @@ public class SubtractExpression extends ArcExpression {
     public ArcExpression deepCopy() {
         ArcExpression copy = new SubtractExpression(left.deepCopy(), right.deepCopy());
         copy.setParent(parent);
-        copy.hadParentheses(hadParentheses);
+        copy.setHadParentheses(hadParentheses);
         return copy;
     }
 

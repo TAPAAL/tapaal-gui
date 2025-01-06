@@ -130,7 +130,7 @@ ArcExpression term() : {
 }{
     childExpression = NumberOfExpression() { return childExpression; }
     | "(" childExpression = AddExpression() ")" {
-        childExpression.hadParentheses(true); 
+        childExpression.setHadParentheses(true); 
         return childExpression;
     }
 }
