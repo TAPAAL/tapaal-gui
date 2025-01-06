@@ -36,6 +36,8 @@ import net.tapaal.gui.petrinet.undo.RemoveQueriesCommand;
 import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.petrinet.dialog.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.dialog.BatchProcessingDialog;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.undo.Command;
@@ -310,9 +312,17 @@ public class QueryPane extends JPanel implements SidePane {
 		addQueryButton.addActionListener(new ActionListener() {
 
 		    public void actionPerformed(ActionEvent e) {
-				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens(), tabContent);
+                TimedArcPetriNetNetwork network = tabContent.network();
+                TAPNLens lens = tabContent.getLens();
 
-                if(q == null) return;
+                if (lens.isStochastic() && !network.isNonStrict()) {
+                    JOptionPane.showMessageDialog(null, "SMC queries are only allowed for models with nonstrict intervals.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, network, tabContent.getGuiModels(), lens, tabContent);
+
+                if (q == null) return;
 
                 undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
                 addQuery(q);

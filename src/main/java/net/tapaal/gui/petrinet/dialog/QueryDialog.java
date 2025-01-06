@@ -1,21 +1,84 @@
 package net.tapaal.gui.petrinet.dialog;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.ComponentOrientation;
+import java.awt.Container;
 import java.awt.Dialog.ModalityType;
-import java.awt.event.*;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
-import javax.swing.event.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -29,42 +92,113 @@ import javax.swing.undo.UndoableEditSupport;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.HyperLTLPathScopeNode;
+import dk.aau.cs.TCTL.LTLANode;
+import dk.aau.cs.TCTL.LTLENode;
+import dk.aau.cs.TCTL.LTLFNode;
+import dk.aau.cs.TCTL.LTLGNode;
+import dk.aau.cs.TCTL.LTLUNode;
+import dk.aau.cs.TCTL.LTLXNode;
+import dk.aau.cs.TCTL.StringPosition;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAUNode;
+import dk.aau.cs.TCTL.TCTLAXNode;
+import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLAndListNode;
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLDeadlockNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLEUNode;
+import dk.aau.cs.TCTL.TCTLEXNode;
+import dk.aau.cs.TCTL.TCTLFalseNode;
+import dk.aau.cs.TCTL.TCTLNotNode;
+import dk.aau.cs.TCTL.TCTLOrListNode;
+import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
+import dk.aau.cs.TCTL.TCTLPathToStateConverter;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.TCTL.TCTLStateToPathConverter;
+import dk.aau.cs.TCTL.TCTLTransitionNode;
+import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.CTLParsing.TAPAALCTLQueryParser;
 import dk.aau.cs.TCTL.HyperLTLParsing.TAPAALHyperLTLQueryParser;
 import dk.aau.cs.TCTL.LTLParsing.TAPAALLTLQueryParser;
-import dk.aau.cs.TCTL.SMCParsing.TAPAALSMCQueryParser;
-import dk.aau.cs.TCTL.visitors.*;
-import dk.aau.cs.util.VerificationCallback;
-import dk.aau.cs.verification.*;
-import net.tapaal.gui.petrinet.TAPNLens;
-import pipe.gui.petrinet.PetriNetTab;
-import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.Variable;
-import dk.aau.cs.model.tapn.*;
-import dk.aau.cs.verification.VerifyTAPN.*;
 import dk.aau.cs.verification.observations.Observation;
-import net.tapaal.gui.petrinet.verification.*;
-import net.tapaal.swinghelpers.CustomJSpinner;
-import pipe.gui.petrinet.dataLayer.DataLayer;
-import dk.aau.cs.io.NetWriter;
-import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import net.tapaal.gui.petrinet.Template;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.VerificationType;
 import net.tapaal.helpers.Enabler;
-import pipe.gui.*;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.SMCParsing.TAPAALSMCQueryParser;
+import dk.aau.cs.TCTL.visitors.FixAbbrivPlaceNames;
+import dk.aau.cs.TCTL.visitors.FixAbbrivTransitionNames;
+import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
+import dk.aau.cs.TCTL.visitors.HyperLTLTraceNameVisitor;
+import dk.aau.cs.TCTL.visitors.IsReachabilityVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
+import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
+import dk.aau.cs.TCTL.visitors.VerifyTransitionNamesVisitor;
 import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.approximation.UnderApproximation;
+import dk.aau.cs.io.NetWriter;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.model.tapn.SharedTransition;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
+import dk.aau.cs.util.VerificationCallback;
+import dk.aau.cs.verification.ITAPNComposer;
+import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.SMCSettings;
+import dk.aau.cs.verification.SMCStats;
+import dk.aau.cs.verification.SMCTraceType;
+import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyCPNExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
+import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.Template;
+import net.tapaal.gui.petrinet.verification.ChooseInclusionPlacesDialog;
+import net.tapaal.gui.petrinet.verification.EngineSupportOptions;
+import net.tapaal.gui.petrinet.verification.InclusionPlaces;
+import net.tapaal.gui.petrinet.verification.RunVerificationBase;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.VerificationType;
+import net.tapaal.gui.petrinet.verification.UPPAALBroadcastDegree2Options;
+import net.tapaal.gui.petrinet.verification.UPPAALBroadcastOptions;
+import net.tapaal.gui.petrinet.verification.UPPAALCombiOptions;
+import net.tapaal.gui.petrinet.verification.UPPAALOptimizedStandardOptions;
+import net.tapaal.gui.petrinet.verification.UPPAALStandardOptions;
+import net.tapaal.gui.petrinet.verification.Verifier;
+import net.tapaal.gui.petrinet.verification.VerifyDTAPNEngineOptions;
+import net.tapaal.gui.petrinet.verification.VerifyPNEngineOptions;
+import net.tapaal.gui.petrinet.verification.VerifyTAPNEngineOptions;
+import net.tapaal.swinghelpers.CustomJSpinner;
+import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.Zoomer;
+import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
@@ -1921,9 +2055,17 @@ public class QueryDialog extends JPanel {
         // First remove all elements (removes the default trace that was added)
         traceModel.removeAllElements();
 
-        for(int i = 0; i < queryToCreateFrom.getTraceList().size(); i++) {
-            traceModel.addElement(queryToCreateFrom.getTraceList().get(i));
+        Set<String> traces = new HashSet<>(queryToCreateFrom.getTraceList());
+        
+        // Extracts trace names from the field
+        Pattern pattern = Pattern.compile("\\s([a-zA-Z]\\w*)\\.");
+        Matcher matcher = pattern.matcher(queryToCreateFrom.getProperty().toString());
+        while (matcher.find()) traces.add(matcher.group(1));
+
+        for (String trace : traces) {
+            traceModel.addElement(trace);
         }
+
         traceList.setModel(traceModel);
         updateTraceBox();
     }
@@ -3870,14 +4012,15 @@ public class QueryDialog extends JPanel {
 
     private void updateTraceBox() {
         // Updates the trace box drop down menu
-        ArrayList<String> traceList = getUsedTraces(newProperty);
+        List<String> traceList = getUsedTraces(newProperty);
         Vector<Object> traceBoxVector = new Vector<>();
         Vector<Object> traceBoxQuantificationVector = new Vector<>();
         for (int i = 0; i < traceModel.getSize(); i++) {
-            if (traceList.contains(traceModel.get(i).toString()))
+            if (traceList.contains(traceModel.get(i).toString())) {
                 traceBoxVector.add(traceModel.get(i));
-            else
+            } else {
                 traceBoxQuantificationVector.add(traceModel.get(i));
+            }
         }
 
         traceBox.setModel(new DefaultComboBoxModel<>(traceBoxVector));
