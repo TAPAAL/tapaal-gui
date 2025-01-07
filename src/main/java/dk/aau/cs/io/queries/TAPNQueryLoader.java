@@ -226,14 +226,14 @@ public class TAPNQueryLoader extends QueryLoader{
         String tagName = element.getTagName();
     
         switch (tagName) {
-            case "add":
+            case "integer-sum":
                 return createOperatorExpression(element, ObsAdd::new);
-            case "subtract":
+            case "integer-difference":
                 return createOperatorExpression(element, ObsSubtract::new);
-            case "multiply":
+            case "integer-product":
                 return createOperatorExpression(element, ObsMultiply::new);
-            case "constant":
-                return new ObsConstant(Integer.parseInt(element.getAttribute("value")));
+            case "integer-constant":
+                return new ObsConstant(Integer.parseInt(element.getTextContent()));
             case "place":
                 return createPlaceExpression(element);
             default:
@@ -258,7 +258,7 @@ public class TAPNQueryLoader extends QueryLoader{
     }    
 
     private ObsExpression createPlaceExpression(Element element) {
-        String name = element.getAttribute("name");
+        String name = element.getTextContent();
         String[] parts = name.split("_");
         String templateName = parts[0];
         String placeName = parts[1];

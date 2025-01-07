@@ -14,7 +14,7 @@ public class ObsConstant extends ObsLeaf {
 
     @Override
     public String toXml() {
-        return "<constant value=\"" + value + "\"/>";
+        return "<integer-constant>" + value + "</integer-constant>";
     }
 
     @Override

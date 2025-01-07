@@ -507,7 +507,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
             Node formula = doc.getElementsByTagName("formula").item(0);
             Node observations = doc.getElementsByTagName("observations").item(0);
             queryElement.appendChild(document.importNode(smcTag, true));
-            queryElement.appendChild(document.importNode(observations, true));
+            if(observations != null) {
+				queryElement.appendChild(document.importNode(observations, true));
+			}
             queryElement.appendChild(document.importNode(formula, true));
         } catch (SAXException | ParserConfigurationException | IOException e) {
             System.out.println(e + " thrown in savePNML() "

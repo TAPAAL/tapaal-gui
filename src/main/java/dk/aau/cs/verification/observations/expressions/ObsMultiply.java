@@ -16,6 +16,6 @@ public class ObsMultiply extends ObsOperator {
 
     @Override
     public String toXml() {
-        return "<multiply>" + left.toXml() + right.toXml() + "</multiply>";
+        return "<integer-product>" + left.toXml() + right.toXml() + "</integer-product>";
     }
 }

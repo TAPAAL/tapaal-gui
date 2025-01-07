@@ -16,6 +16,6 @@ public class ObsSubtract extends ObsOperator {
 
     @Override
     public String toXml() {
-        return "<subtract>" + left.toXml() + right.toXml() + "</subtract>";
+        return "<integer-difference>" + left.toXml() + right.toXml() + "</integer-difference>";
     }
 }
