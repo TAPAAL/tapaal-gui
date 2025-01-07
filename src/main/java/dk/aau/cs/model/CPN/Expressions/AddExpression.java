@@ -1,5 +1,8 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import java.util.Set;
+import java.util.Vector;
+
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.ColorType;
@@ -8,14 +11,18 @@ import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
 
-import java.util.Objects;
-import java.util.Set;
-import java.util.Vector;
-import java.util.stream.Collectors;
-
 public class AddExpression extends ArcExpression {
 
     private final Vector<ArcExpression> constituents;
+
+    public AddExpression(ArcExpression left, ArcExpression right) {
+        Require.notNull(left);
+        Require.notNull(right);
+        Vector<ArcExpression> constituents = new Vector<>();
+        constituents.add(left);
+        constituents.add(right);
+        this.constituents = constituents;
+    }
 
     public AddExpression(Vector<ArcExpression> constituents) {
         Require.notNull(constituents);
@@ -33,7 +40,7 @@ public class AddExpression extends ArcExpression {
         this.constituents = new Vector<>(otherExpr.constituents);
     }
 
-    public Vector<ArcExpression> getAddExpression (){return constituents;}
+    public Vector<ArcExpression> getAddExpression () { return constituents; }
 
     public ColorMultiset eval(ExpressionContext context) {
         ColorMultiset result = null;
@@ -70,13 +77,16 @@ public class AddExpression extends ArcExpression {
     @Override
     public ArcExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
         if (object1 == this && object2 instanceof ArcExpression) {
-            ArcExpression obj2 = (ArcExpression) object2;
+            ArcExpression obj2 = (ArcExpression)object2;
             obj2.setParent(parent);
             return obj2;
         } else {
-            for (int i = 0; i < constituents.size(); i++) {
-                constituents.set(i, constituents.get(i).replace(object1, object2, replaceAllInstances));
+            for (int i = 0; i < constituents.size(); ++i) {
+                ArcExpression newConstituent = constituents.get(i).replace(object1, object2, replaceAllInstances);
+                constituents.set(i, newConstituent);
+                newConstituent.setParent(this);
             }
+
             return this;
         }
     }
@@ -92,7 +102,11 @@ public class AddExpression extends ArcExpression {
         for (ArcExpression expr : constituents) {
             constituentsCopy.add(expr.deepCopy());
         }
-        return new AddExpression(constituentsCopy);
+
+        ArcExpression copy = new AddExpression(constituentsCopy);
+        copy.setParent(parent);
+
+        return copy;
     }
 
     @Override
@@ -128,33 +142,21 @@ public class AddExpression extends ArcExpression {
     @Override
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[constituents.size()];
-        int i = 0;
-        int endPrev = 0;
-        for (ArcExpression p : constituents) {
-
-            int start = 1;
-            int end = 0;
-
-            if (i == 0) {
-                end = start + p.toString().length();
-                endPrev = end;
-            } else {
-                start = endPrev + 3;
-                end = start + p.toString().length();
-
-                endPrev = end;
+        int currentPosition = addParentheses() ? 1 : 0;
+        
+        for (int i = 0; i < constituents.size(); ++i) {
+            ArcExpression constituent = constituents.get(i);
+            
+            if (i > 0) {
+                currentPosition += 3;
             }
-
-            ExprStringPosition pos = new ExprStringPosition(start, end, p);
-
-            children[i] = pos;
-            i++;
+            
+            int constituentEnd = currentPosition + constituent.toString().length();
+            children[i] = new ExprStringPosition(currentPosition, constituentEnd, constituent);
+            currentPosition = constituentEnd;
         }
-
+        
         return children;
-
-
-
     }
 
     @Override
@@ -182,13 +184,14 @@ public class AddExpression extends ArcExpression {
         return false;
     }
 
+    @Override
     public String toString() {
-
-        StringBuilder res = new StringBuilder("(" + constituents.get(0).toString());
+        StringBuilder res = new StringBuilder(addParentheses() ? "(" + constituents.get(0).toString() : constituents.get(0).toString());
         for (int i = 1; i < constituents.size(); ++i) {
             res.append(" + ").append(constituents.get(i).toString());
         }
-        return res + ")";
+
+        return addParentheses() ? res.append(")").toString() : res.toString();
     }
 
     public String toTokenString() {

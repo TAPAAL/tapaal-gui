@@ -1,13 +1,13 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import java.util.Set;
+
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
-
-import java.util.Set;
 
 public class ScalarProductExpression extends ArcExpression {
 
@@ -65,7 +65,9 @@ public class ScalarProductExpression extends ArcExpression {
 
     @Override
     public ArcExpression deepCopy() {
-        return new ScalarProductExpression(scalar, expr.deepCopy());
+        ArcExpression copy = new ScalarProductExpression(scalar, expr.deepCopy());
+        copy.setParent(parent);
+        return copy;
     }
 
     @Override

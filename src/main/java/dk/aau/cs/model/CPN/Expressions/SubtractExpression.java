@@ -1,13 +1,13 @@
 package dk.aau.cs.model.CPN.Expressions;
 
+import java.util.Set;
+
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
-
-import java.util.Set;
 
 public class SubtractExpression extends ArcExpression {
 
@@ -48,20 +48,32 @@ public class SubtractExpression extends ArcExpression {
     }
 
     @Override
-    public ArcExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
+    public ArcExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
+    }
+
+    @Override
+    public ArcExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
         if (object1 == this && object2 instanceof ArcExpression) {
-            ArcExpression obj2 = (ArcExpression) object2;
+            ArcExpression obj2 = (ArcExpression)object2;
             obj2.setParent(parent);
             return obj2;
         } else {
-            left = left.replace(object1, object2,replaceAllInstances);
-            right = right.replace(object1, object2,replaceAllInstances);
+            ArcExpression newLeft = left.replace(object1, object2, replaceAllInstances);
+            ArcExpression newRight = right.replace(object1, object2, replaceAllInstances);
+            
+            if (newLeft != left) {
+                left = newLeft;
+                left.setParent(this);
+            }
+
+            if (newRight != right) {
+                right = newRight;
+                right.setParent(this);
+            }
+
             return this;
         }
-    }
-    @Override
-    public ArcExpression replace(Expression object1, Expression object2){
-        return replace(object1,object2,false);
     }
 
     @Override
@@ -71,7 +83,9 @@ public class SubtractExpression extends ArcExpression {
 
     @Override
     public ArcExpression deepCopy() {
-        return new SubtractExpression(left.deepCopy(), right.deepCopy());
+        ArcExpression copy = new SubtractExpression(left.deepCopy(), right.deepCopy());
+        copy.setParent(parent);
+        return copy;
     }
 
     @Override
@@ -100,7 +114,17 @@ public class SubtractExpression extends ArcExpression {
         right.getVariables(variables);
     }
 
+    @Override
+    public boolean addParentheses() {
+        return parent != null;
+    }
+
+    @Override
     public String toString() {
+        if (addParentheses()) {
+            return "(" + left.toString() + " - " + right.toString() + ")";
+        }
+
         return left.toString() + " - " + right.toString();
     }
 
@@ -110,19 +134,14 @@ public class SubtractExpression extends ArcExpression {
     @Override
     public ExprStringPosition[] getChildren() {
         ExprStringPosition[] children = new ExprStringPosition[2];
-        int endPrev = 0;
+        
+        int leftStart = addParentheses() ? 1 : 0;
+        int leftEnd = leftStart + left.toString().length();
+        children[0] = new ExprStringPosition(leftStart, leftEnd, left);
 
-        int start = 0;
-        int end = 0;
-
-        end = start + left.toString().length();
-        endPrev = end;
-        ExprStringPosition pos = new ExprStringPosition(start, end, left);
-        children[0] = pos;
-        start = endPrev + 3;
-        end = start + right.toString().length();
-        pos = new ExprStringPosition(start, end, right);
-        children[1] = pos;
+        int rightStart = leftEnd + 3;
+        int rightEnd = rightStart + right.toString().length();
+        children[1] = new ExprStringPosition(rightStart, rightEnd, right);
 
         return children;
     }
