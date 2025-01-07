@@ -554,7 +554,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         
                 UndoableEdit edit = new ExpressionConstructionEdit(selectedExpr, subExpr);
                 arcExpression = arcExpression.replace(selectedExpr, subExpr);
-                updateSelection(subExpr);
+                updateSelection(rightExpr);
                 undoSupport.postEdit(edit);
             }
         });
