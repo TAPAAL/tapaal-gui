@@ -177,14 +177,11 @@ public class writeTACPN { // both export and save share some of the same syntax 
             Element addElement = document.createElement("add");
             AddExpression expr = (AddExpression) expression;
 
-            if (expr.hadParentheses()) {
-                addElement.setAttribute("hadParentheses", "true");
-            }
-
             for (ArcExpression arcExpression : expr.getAddExpression()) {
                 Element subtermElement = document.createElement("subterm");
                 addElement.appendChild(parseArcExpression(arcExpression, document, subtermElement));
             }
+            
             structureElement.appendChild(addElement);
         }
         else if (expression instanceof SubtractExpression) {
@@ -194,10 +191,6 @@ public class writeTACPN { // both export and save share some of the same syntax 
             subtractElement.appendChild(subtermLeftElement);
             subtractElement.appendChild(subtermRightElement);
             SubtractExpression expr = (SubtractExpression) expression;
-
-            if (expr.hadParentheses()) {
-                subtractElement.setAttribute("hadParentheses", "true");
-            }
 
             subtractElement.appendChild(parseArcExpression(expr.getLeftExpression(), document, subtermLeftElement));
             subtractElement.appendChild(parseArcExpression(expr.getRightExpression(), document, subtermRightElement));

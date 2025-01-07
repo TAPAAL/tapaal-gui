@@ -523,56 +523,52 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         scalarButton.setMinimumSize(new Dimension(110, 30));
         scalarButton.setMaximumSize(new Dimension(110, 30));
 
-
         additionButton.addActionListener(actionEvent -> {
-            AddExpression addExpr;
             if (currentSelection.getObject() instanceof ArcExpression) {
-                Vector<ArcExpression> exprArc = new Vector<>();
-                ArcExpression newExpr = new NumberOfExpression(1, getPlaceholderVec());
                 ArcExpression selectedExpr = (ArcExpression)currentSelection.getObject();
-
+                ArcExpression newExpr = new NumberOfExpression(1, getPlaceholderVec());
+                
+                Vector<ArcExpression> exprArc = new Vector<>();
                 exprArc.add(selectedExpr);
                 exprArc.add(newExpr);
-                addExpr = new AddExpression(exprArc);
-
+                
+                AddExpression addExpr = new AddExpression(exprArc);
                 selectedExpr.setParent(addExpr);
                 newExpr.setParent(addExpr);
-
-                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), addExpr);
-                arcExpression = arcExpression.replace(currentSelection.getObject(), addExpr);
+        
+                UndoableEdit edit = new ExpressionConstructionEdit(selectedExpr, addExpr);
+                arcExpression = arcExpression.replace(selectedExpr, addExpr);
                 updateSelection(newExpr);
                 undoSupport.postEdit(edit);
             }
         });
-
+        
         subtractionButton.addActionListener(actionEvent -> {
-            SubtractExpression subExpr;
             if (currentSelection.getObject() instanceof ArcExpression) {
-                ArcExpression leftExpr = (ArcExpression)currentSelection.getObject();
+                ArcExpression selectedExpr = (ArcExpression)currentSelection.getObject();
                 ArcExpression rightExpr = new NumberOfExpression(1, getPlaceholderVec());
-                subExpr = new SubtractExpression(leftExpr, rightExpr);
-
-                leftExpr.setParent(subExpr);
+                
+                SubtractExpression subExpr = new SubtractExpression(selectedExpr, rightExpr);
+                selectedExpr.setParent(subExpr);
                 rightExpr.setParent(subExpr);
-
-                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), subExpr);
-                arcExpression = arcExpression.replace(currentSelection.getObject(), subExpr);
+        
+                UndoableEdit edit = new ExpressionConstructionEdit(selectedExpr, subExpr);
+                arcExpression = arcExpression.replace(selectedExpr, subExpr);
                 updateSelection(subExpr);
                 undoSupport.postEdit(edit);
             }
         });
-
+        
         scalarButton.addActionListener(actionEvent -> {
-            ScalarProductExpression scalarExpr;
-            Integer value = (Integer)scalarJSpinner.getValue();
             if (currentSelection.getObject() instanceof ArcExpression) {
-                ArcExpression child = (ArcExpression)currentSelection.getObject();
-                scalarExpr = new ScalarProductExpression(value, child);
-
-                child.setParent(scalarExpr);
-
-                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), scalarExpr);
-                arcExpression = arcExpression.replace(currentSelection.getObject(), scalarExpr);
+                ArcExpression selectedExpr = (ArcExpression)currentSelection.getObject();
+                Integer value = (Integer)scalarJSpinner.getValue();
+                
+                ScalarProductExpression scalarExpr = new ScalarProductExpression(value, selectedExpr);
+                selectedExpr.setParent(scalarExpr);
+        
+                UndoableEdit edit = new ExpressionConstructionEdit(selectedExpr, scalarExpr);
+                arcExpression = arcExpression.replace(selectedExpr, scalarExpr);
                 updateSelection(scalarExpr);
                 undoSupport.postEdit(edit);
             }
@@ -708,7 +704,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
                 }
             }
         });
-
+        
         exprField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -980,7 +976,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         updateNumberExpressionsPanel(currentSelection.getObject());
 
         toggleEnabledButtons();
-
     }
 
     private Expression findParent (Expression child, Expression parent) {

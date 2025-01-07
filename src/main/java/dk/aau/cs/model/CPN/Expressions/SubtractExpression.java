@@ -48,20 +48,32 @@ public class SubtractExpression extends ArcExpression {
     }
 
     @Override
-    public ArcExpression replace(Expression object1, Expression object2,boolean replaceAllInstances) {
+    public ArcExpression replace(Expression object1, Expression object2){
+        return replace(object1,object2,false);
+    }
+
+    @Override
+    public ArcExpression replace(Expression object1, Expression object2, boolean replaceAllInstances) {
         if (object1 == this && object2 instanceof ArcExpression) {
-            ArcExpression obj2 = (ArcExpression) object2;
+            ArcExpression obj2 = (ArcExpression)object2;
             obj2.setParent(parent);
             return obj2;
         } else {
-            left = left.replace(object1, object2,replaceAllInstances);
-            right = right.replace(object1, object2,replaceAllInstances);
+            ArcExpression newLeft = left.replace(object1, object2, replaceAllInstances);
+            ArcExpression newRight = right.replace(object1, object2, replaceAllInstances);
+            
+            if (newLeft != left) {
+                left = newLeft;
+                left.setParent(this);
+            }
+
+            if (newRight != right) {
+                right = newRight;
+                right.setParent(this);
+            }
+
             return this;
         }
-    }
-    @Override
-    public ArcExpression replace(Expression object1, Expression object2){
-        return replace(object1,object2,false);
     }
 
     @Override
@@ -73,7 +85,6 @@ public class SubtractExpression extends ArcExpression {
     public ArcExpression deepCopy() {
         ArcExpression copy = new SubtractExpression(left.deepCopy(), right.deepCopy());
         copy.setParent(parent);
-        copy.setHadParentheses(hadParentheses);
         return copy;
     }
 

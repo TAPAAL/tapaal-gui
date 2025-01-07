@@ -268,11 +268,6 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                 expr.setParent(addExpr);
             }
 
-            Node hadParentheses = getAttribute(node, "hadParentheses");
-            if (hadParentheses != null) {
-                addExpr.setHadParentheses(Boolean.parseBoolean(hadParentheses.getNodeValue()));
-            }
-
             return addExpr;
         } else if (name.equals("subtract")) {
             Node headchild = skipWS(node.getFirstChild());
@@ -284,11 +279,6 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
                 SubtractExpression subExpr = new SubtractExpression(headexp, nextexp);
                 headexp.setParent(subExpr);
                 nextexp.setParent(subExpr);
-
-                Node hadParentheses = getAttribute(node, "hadParentheses");
-                if (hadParentheses != null) {
-                    subExpr.setHadParentheses(Boolean.parseBoolean(hadParentheses.getNodeValue()));
-                }
 
                 headexp = subExpr;
                 nextchild = skipWS(nextchild.getNextSibling());
