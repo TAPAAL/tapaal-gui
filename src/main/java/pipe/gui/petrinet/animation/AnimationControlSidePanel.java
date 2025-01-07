@@ -117,6 +117,11 @@ public class AnimationControlSidePanel extends JPanel {
 	}
 
     public void updateTraceBox(Map<String, TAPNNetworkTrace> traceMap) {
+        if (traceMap.size() < 2) {
+            showTraceBox(false);
+            return;
+        }
+
         Vector<Object> tracesVector = new Vector<>();
         for (var entry : traceMap.entrySet()) {
             tracesVector.add(entry.getKey());
