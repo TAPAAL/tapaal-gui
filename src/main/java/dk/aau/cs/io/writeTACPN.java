@@ -1,13 +1,38 @@
 package dk.aau.cs.io;
 
-import dk.aau.cs.model.CPN.*;
-import dk.aau.cs.model.CPN.Expressions.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.AddExpression;
+import dk.aau.cs.model.CPN.Expressions.AllExpression;
+import dk.aau.cs.model.CPN.Expressions.AndExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.DotConstantExpression;
+import dk.aau.cs.model.CPN.Expressions.EqualityExpression;
+import dk.aau.cs.model.CPN.Expressions.Expression;
+import dk.aau.cs.model.CPN.Expressions.GreaterThanEqExpression;
+import dk.aau.cs.model.CPN.Expressions.GreaterThanExpression;
+import dk.aau.cs.model.CPN.Expressions.InequalityExpression;
+import dk.aau.cs.model.CPN.Expressions.LessThanEqExpression;
+import dk.aau.cs.model.CPN.Expressions.LessThanExpression;
+import dk.aau.cs.model.CPN.Expressions.NotExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.OrExpression;
+import dk.aau.cs.model.CPN.Expressions.PredecessorExpression;
+import dk.aau.cs.model.CPN.Expressions.ScalarProductExpression;
+import dk.aau.cs.model.CPN.Expressions.SubtractExpression;
+import dk.aau.cs.model.CPN.Expressions.SuccessorExpression;
+import dk.aau.cs.model.CPN.Expressions.TupleExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import dk.aau.cs.model.CPN.Expressions.VariableExpression;
+import dk.aau.cs.model.CPN.ProductType;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.Transition;
@@ -127,7 +152,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
             }
 
         }
-        else if(expression instanceof VariableExpression) {
+        else if (expression instanceof VariableExpression) {
             Element variableElement = document.createElement("variable");
             variableElement.setAttribute("refvariable", ((VariableExpression) expression).getVariable().getId());
             structureElement.appendChild(variableElement);
@@ -151,10 +176,12 @@ public class writeTACPN { // both export and save share some of the same syntax 
         else if (expression instanceof AddExpression) {
             Element addElement = document.createElement("add");
             AddExpression expr = (AddExpression) expression;
-            for (ArcExpression arcExpression: expr.getAddExpression()) {
+
+            for (ArcExpression arcExpression : expr.getAddExpression()) {
                 Element subtermElement = document.createElement("subterm");
-                addElement.appendChild(parseArcExpression(arcExpression,document,subtermElement));
+                addElement.appendChild(parseArcExpression(arcExpression, document, subtermElement));
             }
+            
             structureElement.appendChild(addElement);
         }
         else if (expression instanceof SubtractExpression) {
@@ -164,6 +191,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
             subtractElement.appendChild(subtermLeftElement);
             subtractElement.appendChild(subtermRightElement);
             SubtractExpression expr = (SubtractExpression) expression;
+
             subtractElement.appendChild(parseArcExpression(expr.getLeftExpression(), document, subtermLeftElement));
             subtractElement.appendChild(parseArcExpression(expr.getRightExpression(), document, subtermRightElement));
             structureElement.appendChild(subtractElement);

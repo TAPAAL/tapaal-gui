@@ -1,21 +1,34 @@
 package dk.aau.cs.io;
 
-import pipe.gui.petrinet.PetriNetTab;
-import pipe.gui.petrinet.animation.Animator;
-import pipe.gui.TAPAALGUI;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.swing.JOptionPane;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import javax.swing.JOptionPane;
-import pipe.gui.swingcomponents.filebrowser.FileBrowser;
+
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -30,23 +43,12 @@ import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import static dk.aau.cs.verification.VerifyTAPN.TraceType.EG_DELAY_FOREVER;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNTraceParser;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import pipe.gui.TAPAALGUI;
+import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.animation.Animator;
+import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 public class TraceImportExport {
-
     public static void exportTrace(PetriNetTab tab) {
         String path = null;
         try {
@@ -57,9 +59,9 @@ public class TraceImportExport {
             String tabName = tab.getTabTitle();
             path = fb.saveFile(tabName.substring(0, tabName.lastIndexOf('.')));
 
-            FileOutputStream fs = new FileOutputStream(path);
-            fs.write(os.toByteArray());
-            fs.close();
+            try (FileOutputStream fs = new FileOutputStream(path)) {
+                fs.write(os.toByteArray());
+            }
         } catch (ParserConfigurationException e) {
             System.err
                     .println("ParserConfigurationException thrown in exportTrace() "
@@ -97,11 +99,11 @@ public class TraceImportExport {
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
         document = builder.newDocument();
 
-        Map<String, TAPNNetworkTrace> traces = new LinkedHashMap<>();
+        Map<String, Iterable<TAPNNetworkTraceStep>> traces = new LinkedHashMap<>();
         if (tab.getAnimator().getTraceMap() != null) {
             traces.putAll(tab.getAnimator().getTraceMap());
         } else {
-            traces.put("T1", tab.getAnimator().getTrace());
+            traces.put("T1", tab.getAnimator().getActionHistory());
         }
 
         boolean hasMultipleTraces = traces.size() > 1; 
@@ -119,13 +121,13 @@ public class TraceImportExport {
 
         TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), tab.getGuiModels(), tab.getLens(), false, true);
         
-        for (Map.Entry<String, TAPNNetworkTrace> trace : traces.entrySet()) {
+        for (Map.Entry<String, Iterable<TAPNNetworkTraceStep>> trace : traces.entrySet()) {
             if (hasMultipleTraces) {
                 traceRootNode = document.createElement("trace");
                 traceListRootNode.appendChild(traceRootNode);
                 traceRootNode.setAttribute("name", trace.getKey());
             }
-            
+  
             for (TAPNNetworkTraceStep step : trace.getValue()) {
                 if (step.isLoopStep()) {
                     Element loopElement = document.createElement("loop");

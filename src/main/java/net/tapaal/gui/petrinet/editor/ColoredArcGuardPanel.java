@@ -1,38 +1,94 @@
 package net.tapaal.gui.petrinet.editor;
 
-import net.tapaal.gui.petrinet.Context;
-import net.tapaal.gui.petrinet.undo.Colored.SetArcExpressionCommand;
-import net.tapaal.gui.petrinet.undo.Colored.SetColoredArcIntervalsCommand;
-import net.tapaal.gui.petrinet.undo.Colored.SetTransportArcExpressionsCommand;
-import net.tapaal.gui.petrinet.undo.Command;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+import javax.swing.undo.UndoableEdit;
+import javax.swing.undo.UndoableEditSupport;
+
 import dk.aau.cs.model.CPN.ArcExpressionParser.ArcExpressionParser;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
-import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.Expressions.AddExpression;
+import dk.aau.cs.model.CPN.Expressions.AllExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.Expression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.PlaceHolderArcExpression;
+import dk.aau.cs.model.CPN.Expressions.PlaceHolderColorExpression;
+import dk.aau.cs.model.CPN.Expressions.PlaceHolderExpression;
+import dk.aau.cs.model.CPN.Expressions.PredecessorExpression;
+import dk.aau.cs.model.CPN.Expressions.ScalarProductExpression;
+import dk.aau.cs.model.CPN.Expressions.SubtractExpression;
+import dk.aau.cs.model.CPN.Expressions.SuccessorExpression;
+import dk.aau.cs.model.CPN.Expressions.TupleExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import dk.aau.cs.model.CPN.Expressions.VariableExpression;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TransportArc;
+import net.tapaal.gui.petrinet.Context;
+import net.tapaal.gui.petrinet.undo.Colored.SetArcExpressionCommand;
+import net.tapaal.gui.petrinet.undo.Colored.SetColoredArcIntervalsCommand;
+import net.tapaal.gui.petrinet.undo.Colored.SetTransportArcExpressionsCommand;
+import net.tapaal.gui.petrinet.undo.Command;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.petrinet.graphicElements.Place;
-import pipe.gui.petrinet.graphicElements.tapn.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-import javax.swing.undo.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import java.util.List;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 
 public abstract class ColoredArcGuardPanel extends JPanel {
     final PetriNetObject objectToBeEdited;
@@ -467,44 +523,52 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         scalarButton.setMinimumSize(new Dimension(110, 30));
         scalarButton.setMaximumSize(new Dimension(110, 30));
 
-
         additionButton.addActionListener(actionEvent -> {
-            AddExpression addExpr;
             if (currentSelection.getObject() instanceof ArcExpression) {
-                Vector<ArcExpression> exprArc = new Vector<>();
+                ArcExpression selectedExpr = (ArcExpression)currentSelection.getObject();
                 ArcExpression newExpr = new NumberOfExpression(1, getPlaceholderVec());
-
-                exprArc.add((ArcExpression) currentSelection.getObject());
+                
+                Vector<ArcExpression> exprArc = new Vector<>();
+                exprArc.add(selectedExpr);
                 exprArc.add(newExpr);
-                addExpr = new AddExpression(exprArc);
-
-                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), addExpr);
-                arcExpression = arcExpression.replace(currentSelection.getObject(), addExpr);
+                
+                AddExpression addExpr = new AddExpression(exprArc);
+                selectedExpr.setParent(addExpr);
+                newExpr.setParent(addExpr);
+        
+                UndoableEdit edit = new ExpressionConstructionEdit(selectedExpr, addExpr);
+                arcExpression = arcExpression.replace(selectedExpr, addExpr);
                 updateSelection(newExpr);
                 undoSupport.postEdit(edit);
             }
         });
-
+        
         subtractionButton.addActionListener(actionEvent -> {
-            SubtractExpression subExpr;
             if (currentSelection.getObject() instanceof ArcExpression) {
+                ArcExpression selectedExpr = (ArcExpression)currentSelection.getObject();
                 ArcExpression rightExpr = new NumberOfExpression(1, getPlaceholderVec());
-                subExpr = new SubtractExpression((ArcExpression) currentSelection.getObject(), rightExpr);
-
-                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), subExpr);
-                arcExpression = arcExpression.replace(currentSelection.getObject(), subExpr);
-                updateSelection(subExpr);
+                
+                SubtractExpression subExpr = new SubtractExpression(selectedExpr, rightExpr);
+                selectedExpr.setParent(subExpr);
+                rightExpr.setParent(subExpr);
+        
+                UndoableEdit edit = new ExpressionConstructionEdit(selectedExpr, subExpr);
+                arcExpression = arcExpression.replace(selectedExpr, subExpr);
+                updateSelection(rightExpr);
                 undoSupport.postEdit(edit);
             }
         });
-
+        
         scalarButton.addActionListener(actionEvent -> {
-            ScalarProductExpression scalarExpr;
-            Integer value = (Integer)scalarJSpinner.getValue();
             if (currentSelection.getObject() instanceof ArcExpression) {
-                scalarExpr = new ScalarProductExpression(value, (ArcExpression) currentSelection.getObject());
-                UndoableEdit edit = new ColoredArcGuardPanel.ExpressionConstructionEdit(currentSelection.getObject(), scalarExpr);
-                arcExpression = arcExpression.replace(currentSelection.getObject(), scalarExpr);
+                ArcExpression selectedExpr = (ArcExpression)currentSelection.getObject();
+                Integer value = (Integer)scalarJSpinner.getValue();
+                
+                ScalarProductExpression scalarExpr = new ScalarProductExpression(value, selectedExpr);
+                selectedExpr.setParent(scalarExpr);
+        
+                UndoableEdit edit = new ExpressionConstructionEdit(selectedExpr, scalarExpr);
+                arcExpression = arcExpression.replace(selectedExpr, scalarExpr);
                 updateSelection(scalarExpr);
                 undoSupport.postEdit(edit);
             }
@@ -640,7 +704,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
                 }
             }
         });
-
+        
         exprField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -863,7 +927,7 @@ public abstract class ColoredArcGuardPanel extends JPanel {
     private void initExpr() {
         ArcExpression expression;
         arcExpression = new PlaceHolderArcExpression();
-        if(!isTransportArc) {
+        if (!isTransportArc) {
             if (isInputArc && !isInhibitorArc) {
                 expression = ((TimedInputArcComponent) objectToBeEdited).underlyingTimedInputArc().getArcExpression();
             } else if (isInhibitorArc) {
@@ -871,18 +935,19 @@ public abstract class ColoredArcGuardPanel extends JPanel {
             } else {
                 expression = (((TimedOutputArcComponent) objectToBeEdited).underlyingArc()).getExpression();
             }
-        } else{
+        } else {
             TransportArc transportArc = ((TimedTransportArcComponent) objectToBeEdited).underlyingTransportArc();
             if (isInputArc) {
                 expression = transportArc.getInputExpression();
-            } else{
+            } else {
                 expression = transportArc.getOutputExpression();
             }
         }
 
-        if(expression != null){
+        if (expression != null) {
             arcExpression = expression.deepCopy();
         }
+
         exprField.setText(arcExpression.toString());
         updateSelection(arcExpression);
     }
@@ -911,7 +976,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         updateNumberExpressionsPanel(currentSelection.getObject());
 
         toggleEnabledButtons();
-
     }
 
     private Expression findParent (Expression child, Expression parent) {
