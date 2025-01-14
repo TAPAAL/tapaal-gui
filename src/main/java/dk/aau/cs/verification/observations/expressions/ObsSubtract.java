@@ -5,9 +5,7 @@ public class ObsSubtract extends ObsOperator {
         super(left, right);
     }
 
-    public ObsSubtract() {
-        super();
-    }
+    public ObsSubtract() {}
 
     @Override
     protected String getOperator() {

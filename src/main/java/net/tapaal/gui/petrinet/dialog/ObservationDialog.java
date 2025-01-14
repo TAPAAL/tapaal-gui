@@ -42,12 +42,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.regex.Pattern;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 
 public class ObservationDialog extends EscapableDialog {
     private static final String SHARED = "Shared";
-
+    private static final Pattern namePattern = Pattern.compile("\\w+(?: \\w+)*");
+    
     private final DefaultListModel<Observation> observationModel;
     private final Observation observation;
 
@@ -364,6 +366,15 @@ public class ObservationDialog extends EscapableDialog {
 
         cancelButton.addActionListener(e -> dispose());
         saveButton.addActionListener(e -> {
+            nameField.setText(nameField.getText().trim());
+            if (!namePattern.matcher(nameField.getText()).matches()) {
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "\"The specified name is invalid.\n" +
+                                        "Acceptable names are defined by the regular expression:\n" +
+                                        namePattern, "Error", JOptionPane.ERROR_MESSAGE);                        
+                nameField.requestFocusInWindow();
+                return;
+            }
+
             boolean nameExists = false;
             for (int i = 0; i < observationModel.getSize(); i++) {
                 Observation obs = observationModel.getElementAt(i);

@@ -4,9 +4,11 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.SMCSettings;
+import dk.aau.cs.verification.observations.Observation;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TAPNQuery {
 	private TCTLAbstractProperty property;
@@ -81,6 +83,10 @@ public class TAPNQuery {
 
     public SMCSettings getSMCSettings() {
         return smcSettings;
+    }
+
+    public List<Observation> getObservations() {
+        return smcSettings.getObservations();
     }
 }
 

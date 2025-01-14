@@ -5,9 +5,7 @@ public class ObsAdd extends ObsOperator {
         super(left, right);
     }
 
-    public ObsAdd() {
-        super();
-    }
+    public ObsAdd() {}
 
     @Override
     protected String getOperator() {

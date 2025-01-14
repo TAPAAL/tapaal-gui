@@ -5,9 +5,7 @@ public class ObsMultiply extends ObsOperator {
         super(left, right);
     }
 
-    public ObsMultiply() {
-        super();
-    }
+    public ObsMultiply() {}
 
     @Override
     protected String getOperator() {

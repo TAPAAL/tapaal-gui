@@ -2,6 +2,7 @@ package dk.aau.cs.verification;
 
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
+import dk.aau.cs.verification.VerifyTAPN.ObservationData;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.graph.Graph;
 import pipe.gui.graph.GraphDialog;
@@ -15,6 +16,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
 
@@ -59,28 +61,43 @@ public class SMCResultPanel extends JPanel  {
         resultPanel.setBorder(BorderFactory.createTitledBorder("Query result"));
         resultPanel.add(new JLabel("<html>" + result.toString() + "</html>"), gbc);
 
-        java.util.List<Graph> graphs = new ArrayList<>();
+        List<Graph> cumulativeGraphs = new ArrayList<>();
 
-        java.util.List<GraphPoint> cumulativeDelayPoints = stats.getCumulativeDelayPoints();
+        List<GraphPoint> cumulativeDelayPoints = stats.getCumulativeDelayPoints();
         if (!cumulativeDelayPoints.isEmpty()) {
-            graphs.add(new Graph("Cumulative Probability / Delay", cumulativeDelayPoints, "Time", "Cumulative Probability", "Delay"));
+            cumulativeGraphs.add(new Graph("Cumulative Probability / Delay", cumulativeDelayPoints, "Time", "Cumulative Probability", "Delay"));
         }
 
         List<GraphPoint> cumulativeStepPoints = stats.getCumulativeStepPoints();
         if (!cumulativeStepPoints.isEmpty()) {
-            graphs.add(new Graph("Cumulative Probability / Step", cumulativeStepPoints, "Number of Steps", "Cumulative Probability", "Step"));
+            cumulativeGraphs.add(new Graph("Cumulative Probability / Step", cumulativeStepPoints, "Number of Steps", "Cumulative Probability", "Step"));
         }
 
-        if (!graphs.isEmpty()) {
+        if (!cumulativeGraphs.isEmpty()) {
             GraphDialog.GraphDialogBuilder builder = new GraphDialog.GraphDialogBuilder();
-            GraphDialog graphFrame = builder.addGraphs(graphs).setTitle("SMC Statistics").build();
+            GraphDialog graphFrame = builder.addGraphs(cumulativeGraphs).setTitle("SMC Statistics").build();
 
             String btnText = "Plot cumulative statistics";
 
-            JButton showGraphButton = new JButton(btnText);
+            JButton showCumulativeButton = new JButton(btnText);
             gbc = GridBagHelper.as(1, 0, WEST, new Insets(0,0,10,0));
-            resultPanel.add(showGraphButton, gbc);
-            showGraphButton.addActionListener(arg0 -> graphFrame.display());
+            resultPanel.add(showCumulativeButton, gbc);
+            showCumulativeButton.addActionListener(arg0 -> graphFrame.display());
+        }
+
+        Map<String, ObservationData> observationDataMap = stats.getObservationDataMap();
+        if (!observationDataMap.isEmpty()) {
+            List<Graph> observationGraphs = new ArrayList<>();
+
+            GraphDialog.GraphDialogBuilder builder = new GraphDialog.GraphDialogBuilder();
+            GraphDialog graphFrame = builder.addGraphs(observationGraphs).setTitle("Observations").build();
+     
+            String btnText = "Plot observations";
+
+            JButton showObservationButton = new JButton(btnText);
+            gbc = GridBagHelper.as(1, 1, WEST, new Insets(0,0,10,0));
+            resultPanel.add(showObservationButton, gbc);
+            showObservationButton.addActionListener(arg0 -> graphFrame.display());
         }
 
         return resultPanel;

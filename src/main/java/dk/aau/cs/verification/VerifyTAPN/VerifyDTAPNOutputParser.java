@@ -2,7 +2,10 @@ package dk.aau.cs.verification.VerifyTAPN;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +41,14 @@ public class VerifyDTAPNOutputParser {
 
     private static final Pattern smcCumulativeProbabilityStepPattern = Pattern.compile("\\s*cumulative probability / step :");
     private static final Pattern smcCumulativeProbabilityDelayPattern = Pattern.compile("\\s*cumulative probability / delay :");
+    private static final Map<String, Pattern> smcObservationPatterns = new LinkedHashMap<String, Pattern>() {{
+        put("avgStep", Pattern.compile("\\((\\w+(?: \\w+)*)\\) avg/step"));
+        put("minStep", Pattern.compile("\\((\\w+(?: \\w+)*)\\) min/step"));
+        put("maxStep", Pattern.compile("\\((\\w+(?: \\w+)*)\\) max/step"));
+        put("avgTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) avg/time"));
+        put("minTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) min/time"));
+        put("maxTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) max/time"));
+    }};
 
     private static final Pattern smcAverageValidTimePattern = Pattern.compile("\\s*duration of a valid run \\(average\\):\\s*([\\d\\.]+)\\s*");
     private static final Pattern smcAverageValidLengthPattern = Pattern.compile("\\s*length of a valid run \\(average\\):\\s*([\\d\\.]+)\\s*");
@@ -98,6 +109,7 @@ public class VerifyDTAPNOutputParser {
 
 		List<GraphPoint> cumulativeStepPoints = new ArrayList<>();
 		List<GraphPoint> cumulativeDelayPoints = new ArrayList<>();
+        Map<String, ObservationData> observationDataMap = new HashMap<>();
 
 		try {			
 			Matcher matcher = transitionStatsPattern.matcher(output);
@@ -266,6 +278,8 @@ public class VerifyDTAPNOutputParser {
                         }
                     }
 
+                    extractObservations(line, i, lines, observationDataMap);
+
                     matcher = smcNumberOfTracesPattern.matcher(line);
                     if (matcher.find()) {
                         foundResult = true;
@@ -281,7 +295,7 @@ public class VerifyDTAPNOutputParser {
             QueryResult queryRes;
 
             if(isSmc) {
-                verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength, smcVerificationTime, cumulativeStepPoints, cumulativeDelayPoints);
+                verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength, smcVerificationTime, cumulativeStepPoints, cumulativeDelayPoints, observationDataMap);
                 ((SMCStats) verifStats).setRunTimeStdDev(smcTimeStdDev);
                 ((SMCStats) verifStats).setRunLengthStdDev(smcLengthStdDev);
                 ((SMCStats) verifStats).setValidRunAverageTime(smcAverageValidTime);
@@ -306,4 +320,33 @@ public class VerifyDTAPNOutputParser {
 		return null;
 	}
 
+    private void extractObservations(String line, int i, String[] lines, Map<String, ObservationData> observationDataMap) {
+        for (Map.Entry<String, Pattern> entry : smcObservationPatterns.entrySet()) {
+            Pattern pattern = entry.getValue();
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find() && i < lines.length - 1) {
+                line = lines[i + 1];
+                String[] pointStrs = line.split(";");
+                List<GraphPoint> points = new ArrayList<>();
+                for (String pointStr : pointStrs) {
+                    String[] coordinates = pointStr.split(":");
+                    GraphPoint point = new GraphPoint(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
+                    points.add(point);
+                }
+
+                String observationName = matcher.group(1);
+                ObservationData observationData;
+                if (observationDataMap.containsKey(observationName)) {
+                    observationData = observationDataMap.get(observationName);
+                } else {
+                    observationData = new ObservationData();
+                }
+
+                observationData.setObservationData(points, entry.getKey());
+                if (!observationDataMap.containsKey(observationName)) {
+                    observationDataMap.put(observationName, observationData);
+                }
+            }
+        }
+    }
 }
