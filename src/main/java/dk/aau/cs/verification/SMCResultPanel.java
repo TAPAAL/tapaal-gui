@@ -5,8 +5,11 @@ import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.verification.VerifyTAPN.ObservationData;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.graph.Graph;
-import pipe.gui.graph.GraphDialog;
+import pipe.gui.graph.DefaultGraphDialog;
 import pipe.gui.graph.GraphPoint;
+import pipe.gui.graph.MultiGraph;
+import pipe.gui.graph.ObservationGraphDialog;
+import pipe.gui.graph.GraphDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -74,7 +77,7 @@ public class SMCResultPanel extends JPanel  {
         }
 
         if (!cumulativeGraphs.isEmpty()) {
-            GraphDialog.GraphDialogBuilder builder = new GraphDialog.GraphDialogBuilder();
+            DefaultGraphDialog.GraphDialogBuilder builder = new DefaultGraphDialog.GraphDialogBuilder();
             GraphDialog graphFrame = builder.addGraphs(cumulativeGraphs).setTitle("SMC Statistics").build();
 
             String btnText = "Plot cumulative statistics";
@@ -87,10 +90,58 @@ public class SMCResultPanel extends JPanel  {
 
         Map<String, ObservationData> observationDataMap = stats.getObservationDataMap();
         if (!observationDataMap.isEmpty()) {
-            List<Graph> observationGraphs = new ArrayList<>();
+            List<MultiGraph> observationGraphs = new ArrayList<>();
 
-            GraphDialog.GraphDialogBuilder builder = new GraphDialog.GraphDialogBuilder();
-            GraphDialog graphFrame = builder.addGraphs(observationGraphs).setTitle("Observations").build();
+            MultiGraph stepMultiGraph = new MultiGraph("Observation / Step", "Step", "Count", "Step");
+            MultiGraph timeMultiGraph = new MultiGraph("Observation / Time", "Time", "Count", "Time");
+
+            for (Map.Entry<String, ObservationData> entry : observationDataMap.entrySet()) {
+                String observationName = entry.getKey();
+                ObservationData observationData = entry.getValue();
+
+                List<GraphPoint> avgStepPoints = observationData.getSmcObservationAvgStep();
+                if (!avgStepPoints.isEmpty()) {
+                    stepMultiGraph.addGraph(observationName, "Avg Step", new Graph(avgStepPoints));
+                }
+
+                List<GraphPoint> minStepPoints = observationData.getSmcObservationMinStep();
+                if (!minStepPoints.isEmpty()) {
+                    stepMultiGraph.addGraph(observationName, "Min Step", new Graph(minStepPoints));
+                }
+
+                List<GraphPoint> maxStepPoints = observationData.getSmcObservationMaxStep();
+                if (!maxStepPoints.isEmpty()) {
+                    stepMultiGraph.addGraph(observationName, "Max Step", new Graph(maxStepPoints));
+                }
+
+                List<GraphPoint> avgTimePoints = observationData.getSmcObservationAvgTime();
+                if (!avgTimePoints.isEmpty()) {
+                    timeMultiGraph.addGraph(observationName, "Avg Time", new Graph(avgTimePoints));
+                }
+
+                List<GraphPoint> minTimePoints = observationData.getSmcObservationMinTime();
+                if (!minTimePoints.isEmpty()) {
+                    timeMultiGraph.addGraph(observationName, "Min Time", new Graph(minTimePoints));
+                }
+
+                List<GraphPoint> maxTimePoints = observationData.getSmcObservationMaxTime();
+                if (!maxTimePoints.isEmpty()) {
+                    timeMultiGraph.addGraph(observationName, "Max Time", new Graph(maxTimePoints));
+                }
+            }
+
+            if (!stepMultiGraph.isEmpty()) {
+                observationGraphs.add(stepMultiGraph);
+            }
+
+            if (!timeMultiGraph.isEmpty()) {
+                observationGraphs.add(timeMultiGraph);
+            }
+        
+            ObservationGraphDialog.GraphDialogBuilder builder = new ObservationGraphDialog.GraphDialogBuilder();
+            GraphDialog graphFrame = builder.addMultiGraphs(observationGraphs)
+                                            .setTitle("Observations")
+                                            .build();
      
             String btnText = "Plot observations";
 

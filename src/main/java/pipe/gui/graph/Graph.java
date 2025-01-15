@@ -31,6 +31,10 @@ public class Graph {
         this(name, points, null);
     }
 
+    public Graph(List<GraphPoint> points) {
+        this(null, points);
+    }
+
     public String getName() {
         return name;
     }

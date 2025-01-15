@@ -9,7 +9,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.graph.Graph;
 import pipe.gui.graph.GraphDialog;
 import pipe.gui.graph.GraphPoint;
-import pipe.gui.graph.GraphDialog.GraphDialogBuilder;
+import pipe.gui.graph.DefaultGraphDialog.GraphDialogBuilder;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.swingcomponents.EscapableDialog;
 
