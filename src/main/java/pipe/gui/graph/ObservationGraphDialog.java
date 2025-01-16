@@ -20,8 +20,16 @@ import org.jdesktop.swingx.WrapLayout;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.block.BlockBorder;
+import org.jfree.chart.block.BlockContainer;
+import org.jfree.chart.block.FlowArrangement;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.title.LegendTitle;
+import org.jfree.chart.ui.HorizontalAlignment;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.ui.VerticalAlignment;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -50,8 +58,17 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
     @Override
     public void display() {
         if (multiGraphs.isEmpty()) return; 
+        resetState();
         displayMultiView();
         setupDialog();
+    }
+
+    private void resetState() {
+        observationCheckboxes.clear();
+        propertyCheckboxes.clear();
+        currentChart = null;
+        currentView = null;
+        getContentPane().removeAll();
     }
 
     private void displayMultiView() {
@@ -163,7 +180,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         XYPlot plot = chart.getXYPlot();
         float lineThickness = 3.0f;
 
-        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             renderer.setSeriesStroke(i, new BasicStroke(lineThickness));
         }

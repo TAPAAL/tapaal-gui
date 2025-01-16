@@ -16,6 +16,8 @@ import pipe.gui.swingcomponents.EscapableDialog;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.GridBagConstraints;
 import java.util.List;
 
@@ -76,12 +78,15 @@ public class ObservationListDialog extends EscapableDialog {
         JButton editButton = new JButton("Edit");
         editButton.setEnabled(false);
         editButton.addActionListener(e -> {
-            int selectedIndex = observationList.getSelectedIndex();
-            if (selectedIndex != -1) {
-                ObservationDialog observationDialog = new ObservationDialog(tapnNetwork, listModel, listModel.get(selectedIndex));
+            showEditObservationDialog(observationList.getSelectedIndex(), listModel);
+        });
 
-                observationDialog.setLocationRelativeTo(this);
-                observationDialog.setVisible(true);
+        observationList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    showEditObservationDialog(observationList.getSelectedIndex(), listModel);
+                }
             }
         });
 
@@ -158,5 +163,13 @@ public class ObservationListDialog extends EscapableDialog {
         add(buttonPanel, gbc);
 
         pack();
+    }
+
+    private void showEditObservationDialog(int selectedIndex, DefaultListModel<Observation> listModel) {
+        if (selectedIndex != -1) {
+            ObservationDialog observationDialog = new ObservationDialog(tapnNetwork, listModel, listModel.get(selectedIndex));
+            observationDialog.setLocationRelativeTo(this);
+            observationDialog.setVisible(true);
+        }
     }
 }
