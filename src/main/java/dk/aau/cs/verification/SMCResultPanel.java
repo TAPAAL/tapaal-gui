@@ -76,6 +76,13 @@ public class SMCResultPanel extends JPanel  {
             cumulativeGraphs.add(new Graph("Cumulative Probability / Step", cumulativeStepPoints, "Number of Steps", "Cumulative Probability", "Step"));
         }
 
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints buttonGbc = new GridBagConstraints();
+        buttonGbc.gridx = 0;
+        buttonGbc.gridy = 0;
+        buttonGbc.fill = GridBagConstraints.HORIZONTAL;
+        buttonGbc.anchor = GridBagConstraints.WEST;
+        buttonGbc.insets = new Insets(0, 0, 10, 0);
         if (!cumulativeGraphs.isEmpty()) {
             DefaultGraphDialog.GraphDialogBuilder builder = new DefaultGraphDialog.GraphDialogBuilder();
             GraphDialog graphFrame = builder.addGraphs(cumulativeGraphs).setTitle("SMC Statistics").build();
@@ -83,11 +90,13 @@ public class SMCResultPanel extends JPanel  {
             String btnText = "Plot cumulative statistics";
 
             JButton showCumulativeButton = new JButton(btnText);
-            gbc = GridBagHelper.as(1, 0, WEST, new Insets(0,0,10,0));
-            resultPanel.add(showCumulativeButton, gbc);
             showCumulativeButton.addActionListener(arg0 -> graphFrame.display());
+            buttonPanel.add(showCumulativeButton, buttonGbc);
+            ++buttonGbc.gridy;
         }
-
+        
+        buttonGbc.insets = new Insets(0, 0, 0, 0);
+        
         Map<String, ObservationData> observationDataMap = stats.getObservationDataMap();
         if (!observationDataMap.isEmpty()) {
             List<MultiGraph> observationGraphs = new ArrayList<>();
@@ -140,16 +149,17 @@ public class SMCResultPanel extends JPanel  {
         
             ObservationGraphDialog.GraphDialogBuilder builder = new ObservationGraphDialog.GraphDialogBuilder();
             GraphDialog graphFrame = builder.addMultiGraphs(observationGraphs)
-                                            .setTitle("Observations")
+                                            .setTitle("Observation Statistics")
                                             .build();
      
             String btnText = "Plot observations";
 
             JButton showObservationButton = new JButton(btnText);
-            gbc = GridBagHelper.as(1, 1, WEST, new Insets(0,0,10,0));
-            resultPanel.add(showObservationButton, gbc);
+            buttonPanel.add(showObservationButton, buttonGbc);
             showObservationButton.addActionListener(arg0 -> graphFrame.display());
         }
+
+        resultPanel.add(buttonPanel, GridBagHelper.as(1, 0, WEST, new Insets(0, 0, 10, 0)));
 
         return resultPanel;
     }

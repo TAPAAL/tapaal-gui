@@ -196,6 +196,7 @@ import net.tapaal.gui.petrinet.verification.VerifyTAPNEngineOptions;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
+import pipe.gui.canvas.Grid;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -393,6 +394,9 @@ public class QueryDialog extends JPanel {
     private boolean doingBenchmark = false;
     private RunVerificationBase benchmarkThread = null;
     private java.util.List<Observation> smcObservations;
+    
+    private JTextField smcGranularityField;
+    private JCheckBox smcMaxGranularityCheckbox;
 
     // Buttons in the bottom of the dialogue
     private JPanel buttonPanel;
@@ -592,6 +596,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_N_TRACES = "Number of traces to be shown";
     private final static String TOOL_TIP_TRACE_TYPE = "Specifies the type of traces to be shown";
 
+    private final static String TOOL_TIP_GRANULARITY = "Uses the given granularity for observations";
 
     private QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
         this.tapnNetwork = tapnNetwork;
@@ -947,6 +952,17 @@ public class QueryDialog extends JPanel {
         } catch(NumberFormatException e) {
             smcComparisonFloat.setText(String.valueOf(smcSettings.geqThan));
         }
+
+        try {
+            smcSettings.setGranularity(smcMaxGranularityCheckbox.isSelected() ?
+            Integer.MAX_VALUE :
+            Integer.parseInt(smcGranularityField.getText()));
+        } catch (NumberFormatException e) {
+            smcSettings.setGranularity(500);
+            smcGranularityField.setText("500");
+        }
+
+        smcGranularityField.setEnabled(!smcMaxGranularityCheckbox.isSelected());
     }
 
     private SMCSettings getSMCSettings() {
@@ -1032,6 +1048,8 @@ public class QueryDialog extends JPanel {
         smcComparisonFloatSlider.setValue(
             Math.max(smcComparisonFloatSlider.getMinimum(), 
                     Math.min(initialValueComparison, smcComparisonFloatSlider.getMaximum())));
+
+        smcGranularityField.setText(String.valueOf(settings.getGranularity()));
     }
 
     private boolean queryIsReachability() {
@@ -3224,6 +3242,16 @@ public class QueryDialog extends JPanel {
             guiDialog.pack();
         });
 
+        JLabel granualityLabel = new JLabel("Granularity : ");
+        smcGranularityField = new JTextField(7);
+        smcGranularityField.addFocusListener(updater);
+
+        granualityLabel.setToolTipText(TOOL_TIP_GRANULARITY);
+        smcGranularityField.setToolTipText(TOOL_TIP_GRANULARITY);
+
+        smcMaxGranularityCheckbox = new JCheckBox(Character.toString('∞'));
+        smcMaxGranularityCheckbox.addActionListener(evt -> updateSMCSettings());
+
         JButton smcObservationsButton = new JButton("Edit observations");
         smcObservationsButton.addActionListener(evt -> {
             ObservationListDialog dialog = new ObservationListDialog(tapnNetwork, smcObservations);
@@ -3231,9 +3259,36 @@ public class QueryDialog extends JPanel {
             dialog.setVisible(true);
         });
 
+        JPanel smcObservationsPanel = new JPanel();
+        smcObservationsPanel.setLayout(new GridBagLayout());
+        smcObservationsPanel.setBorder(BorderFactory.createTitledBorder("SMC Observations"));
+
+        subPanelGbc.gridx = 0;
+        subPanelGbc.gridy = 0;
+        subPanelGbc.anchor = GridBagConstraints.WEST;
+        subPanelGbc.weightx = 0;
+        smcObservationsPanel.add(granualityLabel, subPanelGbc);
+
+        subPanelGbc.gridx = 1;
+        subPanelGbc.anchor = GridBagConstraints.EAST;
+        subPanelGbc.weightx = 1;
+        subPanelGbc.fill = GridBagConstraints.NONE;
+        smcObservationsPanel.add(smcGranularityField, subPanelGbc);
+
+        subPanelGbc.gridx = 2;
+        subPanelGbc.weightx = 0;
+        smcObservationsPanel.add(smcMaxGranularityCheckbox, subPanelGbc);
+    
+        subPanelGbc.gridx = 0;
+        subPanelGbc.gridy = 2;
+        subPanelGbc.gridwidth = GridBagConstraints.REMAINDER;
+        subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
+        subPanelGbc.weightx = 1;
+        smcObservationsPanel.add(smcObservationsButton, subPanelGbc);
+
         gbc.gridx = 0;
         gbc.gridy = 1;
-        smcSettingsPanel.add(smcObservationsButton, gbc);
+        smcSettingsPanel.add(smcObservationsPanel, gbc);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;

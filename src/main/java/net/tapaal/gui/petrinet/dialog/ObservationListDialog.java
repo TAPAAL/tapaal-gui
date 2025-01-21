@@ -1,10 +1,13 @@
 package net.tapaal.gui.petrinet.dialog;
 
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListDataEvent;
 
@@ -13,7 +16,9 @@ import dk.aau.cs.verification.observations.Observation;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.swingcomponents.EscapableDialog;
 
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
@@ -30,9 +35,43 @@ public class ObservationListDialog extends EscapableDialog {
         super(TAPAALGUI.getApp(), "Observations", true);
         this.tapnNetwork = tapnNetwork;
         this.observations = observations;
-
         init();
     }
+
+    private static class EllipsisListCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+            int availableWidth = list.getParent() instanceof JViewport ? ((JViewport)list.getParent()).getWidth() - 10 : list.getWidth();
+            if (availableWidth <= 0) return this;
+            
+            String text = getText();
+            FontMetrics fm = getFontMetrics(getFont());
+            int textWidth = fm.stringWidth(text);
+            
+            if (textWidth > availableWidth) {
+                int maxChars = text.length();
+                String dots = "...";
+                int dotsWidth = fm.stringWidth(dots);
+                
+                while (maxChars > 0) {
+                    String truncated = text.substring(0, maxChars);
+                    if (fm.stringWidth(truncated) + dotsWidth <= availableWidth) {
+                        setText(truncated + dots);
+                        setToolTipText(text);
+                        break;
+                    }
+
+                    --maxChars;
+                }
+            } else {
+                setToolTipText(null);
+            }
+            
+            return this;
+        }
+    }    
 
     private void init() {
         setSize(500, 350);
@@ -71,8 +110,10 @@ public class ObservationListDialog extends EscapableDialog {
         });
 
         JList<Observation> observationList = new JList<>(listModel);
+        observationList.setCellRenderer(new EllipsisListCellRenderer());
 
         JScrollPane observationScrollPane = new JScrollPane(observationList);
+        observationScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         observationScrollPane.setPreferredSize(new Dimension(500, observationScrollPane.getPreferredSize().height));
 
         JButton editButton = new JButton("Edit");

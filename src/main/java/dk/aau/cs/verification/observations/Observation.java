@@ -35,7 +35,7 @@ public class Observation {
 
     @Override
     public String toString() {
-        return name;
+        return name + ": " + expression.toString();
     }
 
     public String toXml() {

@@ -280,7 +280,6 @@ public class ObservationDialog extends EscapableDialog {
         resetExpression.addActionListener(e -> {
             if (isEditing) {
                 try {
-                    System.out.println("Parsing expression: " + expressionField.getText());
                     ObsExpression parsedExpr = ObservationParser.parse(expressionField.getText(), tapnNetwork);
                     toggleManualEditing();  
                     currentExpr = parsedExpr;

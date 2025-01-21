@@ -60,13 +60,13 @@ SKIP :
   | "\r"
 }
 
-ObsExpression startParsing(): {
+ObsExpression startParsing() : {
     ObsExpression expr;
 } {
     expr = expression() <EOF> { return expr; }
 }
 
-ObsExpression expression(): {
+ObsExpression expression() : {
     ObsExpression left, right;
     ObsOperator root;
     Token op;
@@ -96,7 +96,7 @@ ObsExpression expression(): {
     { return left; }
 }
 
-ObsExpression term(): {
+ObsExpression term() : {
     ObsExpression left, right;
     ObsOperator root;
 } {
@@ -122,7 +122,7 @@ ObsExpression term(): {
     { return left; }
 }
 
-ObsExpression factor(): {
+ObsExpression factor() : {
     ObsExpression expr;
 } {
     (
@@ -137,12 +137,17 @@ ObsExpression factor(): {
     { return expr; }
 }
 
-ObsExpression atom(): {
+ObsExpression atom() : {
     Token value, templateName, placeName;
 } {
     value = <CONSTANT> 
     { return new ObsConstant(Integer.parseInt(value.image)); }
     |
     templateName = <ID> <DOT> placeName = <ID>
-    { return new ObsPlace(templateName.image, placeName.image, network); }
+    { try {
+        return new ObsPlace(templateName.image, placeName.image, network);
+     } catch (NullPointerException e) {
+        throw new ParseException("Place " + templateName.image + "." + placeName.image + " does not exist in the network");
+     }
+    }
 }
