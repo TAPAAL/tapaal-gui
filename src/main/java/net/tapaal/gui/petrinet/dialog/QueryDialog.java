@@ -196,7 +196,6 @@ import net.tapaal.gui.petrinet.verification.VerifyTAPNEngineOptions;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.canvas.Grid;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -740,6 +739,10 @@ public class QueryDialog extends JPanel {
             query.setVerificationType(verificationType);
             query.setNumberOfTraces((Integer)smcNumberOfTraces.getValue());
             query.setSmcTraceType((SMCTraceType)smcTraceType.getSelectedItem());
+
+            try {
+                query.setGranularity(smcMaxGranularityCheckbox.isSelected() ? 0 : Integer.parseInt(smcGranularityField.getText()));
+            } catch (NumberFormatException e) {}
         }
 
         return query;
@@ -952,17 +955,6 @@ public class QueryDialog extends JPanel {
         } catch(NumberFormatException e) {
             smcComparisonFloat.setText(String.valueOf(smcSettings.geqThan));
         }
-
-        try {
-            smcSettings.setGranularity(smcMaxGranularityCheckbox.isSelected() ?
-            Integer.MAX_VALUE :
-            Integer.parseInt(smcGranularityField.getText()));
-        } catch (NumberFormatException e) {
-            smcSettings.setGranularity(500);
-            smcGranularityField.setText("500");
-        }
-
-        smcGranularityField.setEnabled(!smcMaxGranularityCheckbox.isSelected());
     }
 
     private SMCSettings getSMCSettings() {
@@ -1048,8 +1040,6 @@ public class QueryDialog extends JPanel {
         smcComparisonFloatSlider.setValue(
             Math.max(smcComparisonFloatSlider.getMinimum(), 
                     Math.min(initialValueComparison, smcComparisonFloatSlider.getMaximum())));
-
-        smcGranularityField.setText(String.valueOf(settings.getGranularity()));
     }
 
     private boolean queryIsReachability() {
@@ -1987,6 +1977,7 @@ public class QueryDialog extends JPanel {
             smcVerificationType.setSelectedIndex(queryToCreateFrom.getVerificationType().ordinal());
             smcNumberOfTraces.setValue(queryToCreateFrom.getNumberOfTraces());
             smcTraceType.setSelectedItem(queryToCreateFrom.getSmcTraceType());
+            smcGranularityField.setText(String.valueOf(queryToCreateFrom.getGranularity()));
         }
 
         setupQueryCategoryFromQuery(queryToCreateFrom);
@@ -2995,6 +2986,7 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridx = 1;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
         smcTimeBoundValue = new JTextField(7);
+        DocumentFilters.applyIntegerFilter(smcTimeBoundValue);
         smcTimeBoundValue.setToolTipText(TOOL_TIP_TIME_BOUND);
         smcEngineOptions.add(smcTimeBoundValue, subPanelGbc);
         smcTimeBoundValue.addFocusListener(updater);
@@ -3012,6 +3004,7 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridx = 1;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
         smcStepBoundValue = new JTextField(7);
+        DocumentFilters.applyIntegerFilter(smcStepBoundValue);
         smcStepBoundValue.setToolTipText(TOOL_TIP_STEP_BOUND);
         smcEngineOptions.add(smcStepBoundValue, subPanelGbc);
         smcStepBoundValue.addFocusListener(updater);
@@ -3044,6 +3037,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(new JLabel("Confidence : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcConfidence = new JTextField(7);
+        DocumentFilters.applyDoubleFilter(smcConfidence);
         smcConfidence.addFocusListener(updater);
         smcConfidence.setToolTipText(TOOL_TIP_CONFIDENCE);
         quantitativePanel.add(smcConfidence, subPanelGbc);
@@ -3069,6 +3063,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(new JLabel("Precision : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcEstimationIntervalWidth = new JTextField(7);
+        DocumentFilters.applyDoubleFilter(smcEstimationIntervalWidth);
         smcEstimationIntervalWidth.addFocusListener(updater);
         smcEstimationIntervalWidth.setToolTipText(TOOL_TIP_INTERVAL_WIDTH);
         quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
@@ -3101,6 +3096,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(verifTimeLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcTimeExpected = new JTextField(7);
+        DocumentFilters.applyDoubleFilter(smcTimeExpected);
         smcTimeExpected.setToolTipText(TOOL_TIP_VERIFICATION_TIME);
         quantitativePanel.add(smcTimeExpected, subPanelGbc);
 
@@ -3148,6 +3144,7 @@ public class QueryDialog extends JPanel {
         qualitativePanel.add(new JLabel("False positives : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcFalsePositives = new JTextField(7);
+        DocumentFilters.applyDoubleFilter(smcFalsePositives);
         smcFalsePositives.addFocusListener(updater);
         smcFalsePositives.setToolTipText(TOOL_TIP_FALSE_POSITIVES);
         qualitativePanel.add(smcFalsePositives, subPanelGbc);
@@ -3161,6 +3158,7 @@ public class QueryDialog extends JPanel {
         qualitativePanel.add(new JLabel("False negatives : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcFalseNegatives = new JTextField(7);
+        DocumentFilters.applyDoubleFilter(smcFalseNegatives);
         smcFalseNegatives.addFocusListener(updater);
         smcFalseNegatives.setToolTipText(TOOL_TIP_FALSE_NEGATIVES);
         qualitativePanel.add(smcFalseNegatives, subPanelGbc);
@@ -3174,6 +3172,7 @@ public class QueryDialog extends JPanel {
         qualitativePanel.add(new JLabel("Indifference region width : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcIndifference = new JTextField(7);
+        DocumentFilters.applyDoubleFilter(smcIndifference);
         smcIndifference.addFocusListener(updater);
         smcIndifference.setToolTipText(TOOL_TIP_INDIFFERENCE);
         qualitativePanel.add(smcIndifference, subPanelGbc);
@@ -3189,6 +3188,7 @@ public class QueryDialog extends JPanel {
         qualitativePanel.add(testLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcComparisonFloat = new JTextField(7);
+        DocumentFilters.applyDoubleFilter(smcComparisonFloat);
         smcComparisonFloat.setToolTipText(TOOL_TIP_QUALITATIVE_TEST);
         smcComparisonFloat.addFocusListener(updater);
         qualitativePanel.add(smcComparisonFloat, subPanelGbc);
@@ -3244,13 +3244,30 @@ public class QueryDialog extends JPanel {
 
         JLabel granualityLabel = new JLabel("Granularity : ");
         smcGranularityField = new JTextField(7);
-        smcGranularityField.addFocusListener(updater);
+        DocumentFilters.applyIntegerFilter(smcGranularityField);
+        smcGranularityField.getDocument().addDocumentListener(new DocumentListener() {
+            private void update() {
+                updateRawVerificationOptions();
+            }
+            
+            @Override
+            public void insertUpdate(DocumentEvent e) { update(); }
+            
+            @Override
+            public void removeUpdate(DocumentEvent e) { update(); }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e) { update(); }
+        });
 
         granualityLabel.setToolTipText(TOOL_TIP_GRANULARITY);
         smcGranularityField.setToolTipText(TOOL_TIP_GRANULARITY);
 
         smcMaxGranularityCheckbox = new JCheckBox(Character.toString('∞'));
-        smcMaxGranularityCheckbox.addActionListener(evt -> updateSMCSettings());
+        smcMaxGranularityCheckbox.addActionListener(e -> {
+            smcGranularityField.setEnabled(!smcMaxGranularityCheckbox.isSelected());
+            updateRawVerificationOptions();
+        });
 
         JButton smcObservationsButton = new JButton("Edit observations");
         smcObservationsButton.addActionListener(evt -> {

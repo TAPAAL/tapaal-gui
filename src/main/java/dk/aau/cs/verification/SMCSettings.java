@@ -17,8 +17,6 @@ public class SMCSettings {
     public boolean compareToFloat;
     public float geqThan;
 
-    private int granularity;
-
     private List<Observation> observations;
 
     public static SMCSettings Default() {
@@ -33,7 +31,6 @@ public class SMCSettings {
         settings.compareToFloat = false;
         settings.geqThan = 0.5f;
         settings.setObservations(new ArrayList<>());
-        settings.setGranularity(500);
         return settings;
     }
 
@@ -72,15 +69,7 @@ public class SMCSettings {
         this.observations = observations;
     }
 
-    public void setGranularity(int granularity) {
-        this.granularity = granularity;
-    }
-
     public List<Observation> getObservations() {
         return observations;
-    }
-
-    public int getGranularity() {
-        return granularity;
     }
 }

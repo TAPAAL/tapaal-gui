@@ -92,6 +92,7 @@ public class TAPNQuery {
     private boolean benchmark = false;
     private int benchmarkRuns = 100;
     private boolean parallel = true;
+    private int granularity = 500;
     
     public enum VerificationType {
         QUANTITATIVE, QUALITATIVE, SIMULATE;
@@ -653,6 +654,14 @@ public class TAPNQuery {
     public boolean isParallel() { return parallel; }
     public void setParallel(boolean value) {
         parallel = value;
+    }
+
+    public void setGranularity(int granularity) {
+        this.granularity = granularity;
+    }
+
+    public int getGranularity() {
+        return granularity;
     }
 
     public void setVerificationType(VerificationType verificationType) {
