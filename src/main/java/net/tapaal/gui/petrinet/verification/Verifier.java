@@ -303,7 +303,8 @@ public class Verifier {
                 query.getNumberOfTraces(),
                 query.getSmcTraceType(),
                 query.isSimulate(),
-                query.getGranularity()
+                query.getGranularity(),
+                query.isMaxGranularity()
         );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             return new VerifyPNOptions(

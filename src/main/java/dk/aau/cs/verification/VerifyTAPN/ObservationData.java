@@ -11,6 +11,8 @@ public class ObservationData {
     private List<GraphPoint> smcObservationAvgTime;
     private List<GraphPoint> smcObservationMinTime;
     private List<GraphPoint> smcObservationMaxTime;
+    private double smcGlobalAvgStep;
+    private double smcGlobalAvgTime;
 
     public void setObservationData(List<GraphPoint> points, String key) {
         switch (key) {
@@ -61,6 +63,14 @@ public class ObservationData {
         this.smcObservationMaxTime = smcObservationMaxTime;
     }
 
+    public void setSmcGlobalAvgStep(double smcGlobalAvgStep) {
+        this.smcGlobalAvgStep = smcGlobalAvgStep;
+    }
+
+    public void setSmcGlobalAvgTime(double smcGlobalAvgTime) {
+        this.smcGlobalAvgTime = smcGlobalAvgTime;
+    }
+
     public List<GraphPoint> getSmcObservationAvgStep() {
         return smcObservationAvgStep;
     }
@@ -83,5 +93,13 @@ public class ObservationData {
 
     public List<GraphPoint> getSmcObservationMaxTime() {
         return smcObservationMaxTime;
+    }
+
+    public double getSmcGlobalAvgStep() {
+        return smcGlobalAvgStep;
+    }
+
+    public double getSmcGlobalAvgTime() {
+        return smcGlobalAvgTime;
     }
 }

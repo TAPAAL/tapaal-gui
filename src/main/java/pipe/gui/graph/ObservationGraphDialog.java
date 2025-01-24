@@ -4,13 +4,11 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.JButton;
@@ -21,6 +19,8 @@ import org.jdesktop.swingx.WrapLayout;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.LegendItem;
+import org.jfree.chart.LegendItemCollection;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
@@ -37,6 +37,7 @@ import pipe.gui.swingcomponents.EscapableDialog;
 
 public class ObservationGraphDialog extends EscapableDialog implements GraphDialog {
     private final List<MultiGraph> multiGraphs;
+    private final boolean showGlobalAverages;
 
     private final Map<String, JCheckBox> observationCheckboxes = new HashMap<>(); 
     private final Map<String, JCheckBox> propertyCheckboxes = new HashMap<>();
@@ -44,9 +45,10 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
     private JFreeChart currentChart;
     private String currentView;
 
-    private ObservationGraphDialog(List<MultiGraph> multiGraphs, String title) {
+    private ObservationGraphDialog(List<MultiGraph> multiGraphs, String title, boolean showGlobalAverages) {
         super(TAPAALGUI.getAppGui(), title, true);
         this.multiGraphs = multiGraphs;
+        this.showGlobalAverages = showGlobalAverages;
     }
 
     @Override
@@ -104,7 +106,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             addButton(buttonPanel, cardLayout, cardPanel, buttonText);
         }
     
-        for (String label : new String[]{"Avg", "Min", "Max"}) {
+        for (String label : List.of("Avg", "Min", "Max")) {
             JCheckBox checkBox = new JCheckBox(label);
             checkBox.setBackground(Color.WHITE);
             checkBox.setSelected(label.equals("Avg"));
@@ -122,6 +124,11 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
 
         currentChart = ((ChartPanel)cardPanel.getComponent(0)).getChart();
         updateVisibility();
+
+        XYPlot plot = currentChart.getXYPlot();
+        XYDataset dataset = plot.getDataset();
+        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
+        plot.setFixedLegendItems(createCustomLegendItems(dataset, renderer, multiGraphs.get(0)));
     }
 
     private void updateVisibility() {
@@ -200,6 +207,13 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         return currentView;
     }
 
+    private MultiGraph getCurrentMultiGraph() {
+        return multiGraphs.stream()
+                .filter(multiGraph -> multiGraph.getButtonText().equals(getCurrentView()))
+                .findFirst()
+                .orElse(null);
+    }
+
     private DraggableChartPanel createChartPanel(JFreeChart chart) {
         DraggableChartPanel chartPanel = new DraggableChartPanel(chart);
         chartPanel.setMouseWheelEnabled(true);
@@ -217,7 +231,6 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
             renderer.setSeriesStroke(i, createStrokeForSeries(seriesKey, lineThickness));
-            renderer.setSeriesVisibleInLegend(i, seriesKey.contains("Avg"));
         }
 
         Map<String, Paint> baseColors = getBaseColors(dataset, renderer);
@@ -227,7 +240,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             if (baseColors.containsKey(baseName)) {
                 renderer.setSeriesPaint(i, baseColors.get(baseName));
             }
-        }
+        };
 
         plot.setRenderer(renderer);
         plot.setBackgroundPaint(Color.WHITE);
@@ -237,51 +250,60 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         return chart;
     }
 
-    private XYDataset constructDataset(MultiGraph multiGraph) {
-        Comparator<String> seriesComparator = (a, b) -> {
-            String[] partsA = a.split(" - ");
-            String[] partsB = b.split(" - ");
-            
-            int obsCompare = partsA[0].compareTo(partsB[0]);
-            if (obsCompare != 0) return obsCompare;
-            
-            String propA = partsA[1];
-            String propB = partsB[1];
-            
-            Map<String, Integer> propertyOrder = Map.of(
-                "Avg", 1,
-                "Min", 2, 
-                "Max", 3
-            );
-            
-            String typeA = propA.split(" ")[0];
-            String typeB = propB.split(" ")[0];
-            
-            return propertyOrder.get(typeA) - propertyOrder.get(typeB);
-        };
+    private LegendItemCollection createCustomLegendItems(XYDataset dataset, XYLineAndShapeRenderer renderer, MultiGraph multiGraph) {
+        LegendItemCollection legendItems = new LegendItemCollection();
+        Map<String, Paint> baseColors = new HashMap<>();
+        Set<String> uniqueBaseNames = new HashSet<>();
+        for (int i = 0; i < dataset.getSeriesCount(); ++i) {
+            String seriesKey = (String)dataset.getSeriesKey(i);
+            String baseName = seriesKey.split(" - ")[0];
+            uniqueBaseNames.add(baseName);
+        }
 
-        Map<String, XYSeries> seriesMap = new TreeMap<>(seriesComparator);
+        ColorGenerator colorGenerator = new ColorGenerator();
+        for (String baseName : uniqueBaseNames) {
+            baseColors.put(baseName, colorGenerator.nextColor());
+        }
+
+        for (int i = 0; i < dataset.getSeriesCount(); ++i) {
+            String seriesKey = (String)dataset.getSeriesKey(i);
+            String baseName = seriesKey.split(" - ")[0];
+
+            if (seriesKey.contains("Avg") && seriesKey.contains(getCurrentView())) {
+                Paint paint = baseColors.get(baseName);
+                String legendText = baseName;
+    
+                Map<String, Double> globalAvgMap = multiGraph.getMultiGraphGlobalAvgMap();
+                String key = baseName + " Avg " + getCurrentView();
+                if (globalAvgMap.containsKey(key) && showGlobalAverages) {
+                    legendText += " (avg=" + globalAvgMap.get(key) + ")";
+                }
+
+                LegendItem legendItem = new LegendItem(legendText, paint);
+                legendItems.add(legendItem);
+            }
+        }
+    
+        return legendItems;
+    }
+
+    private XYDataset constructDataset(MultiGraph multiGraph) {
+        XYSeriesCollection dataset = new XYSeriesCollection();
         for (Map.Entry<String, Map<String, Graph>> entry : multiGraph.getMultiGraphMap().entrySet()) {
             String observationName = entry.getKey();
             Map<String, Graph> propertyGraphs = entry.getValue();
-            
             for (Map.Entry<String, Graph> propertyGraph : propertyGraphs.entrySet()) {
                 String property = propertyGraph.getKey();
                 Graph graph = propertyGraph.getValue();
-
+            
                 String seriesKey = observationName + " - " + property;
                 XYSeries series = new XYSeries(seriesKey);
                 for (GraphPoint point : graph.getPoints()) {
                     series.add(point.getX(), point.getY());
                 }
 
-                seriesMap.put(seriesKey, series);
+                dataset.addSeries(series);
             }
-        }
-        
-        XYSeriesCollection dataset = new XYSeriesCollection();
-        for (XYSeries series : seriesMap.values()) {
-            dataset.addSeries(series);
         }
 
         return dataset;
@@ -307,6 +329,10 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             }
 
             updateVisibility();
+
+            XYPlot plot = currentChart.getXYPlot();
+            XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
+            plot.setFixedLegendItems(createCustomLegendItems(plot.getDataset(), renderer, getCurrentMultiGraph()));
         });
 
         buttonPanel.add(button);
@@ -316,9 +342,15 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
     public static class GraphDialogBuilder {
         private List<MultiGraph> multiGraphs = new ArrayList<>();
         private String title = "";
+        private boolean showGlobalAverages = false;
         
         public GraphDialogBuilder addMultiGraphs(List<MultiGraph> multiGraphs) {
             this.multiGraphs.addAll(multiGraphs);
+            return this;
+        }
+
+        public GraphDialogBuilder showGlobalAverages(boolean showGlobalAverages) {
+            this.showGlobalAverages = true;
             return this;
         }
 
@@ -328,7 +360,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         }
 
         public ObservationGraphDialog build() {
-            return new ObservationGraphDialog(multiGraphs, title);
+            return new ObservationGraphDialog(multiGraphs, title, showGlobalAverages);
         }
     }
 }

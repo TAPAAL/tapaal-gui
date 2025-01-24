@@ -48,6 +48,8 @@ public class VerifyDTAPNOutputParser {
         put("avgTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) avg/time"));
         put("minTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) min/time"));
         put("maxTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) max/time"));
+        put("globalAvgStep", Pattern.compile("\\((\\w+(?: \\w+)*)\\) Global steps avg.: ([0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?)"));
+        put("globalAvgTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) Global time avg.: ([0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?)"));
     }};
 
     private static final Pattern smcAverageValidTimePattern = Pattern.compile("\\s*duration of a valid run \\(average\\):\\s*([\\d\\.]+)\\s*");
@@ -324,7 +326,28 @@ public class VerifyDTAPNOutputParser {
         for (Map.Entry<String, Pattern> entry : smcObservationPatterns.entrySet()) {
             Pattern pattern = entry.getValue();
             Matcher matcher = pattern.matcher(line);
-            if (matcher.find() && i < lines.length - 1) {
+            String key = entry.getKey();
+
+            if (key.contains("global") && matcher.find()) {
+                String observationName = matcher.group(1);
+                double value = Double.parseDouble(matcher.group(2));
+
+                ObservationData observationData;
+                if (observationDataMap.containsKey(observationName)) {
+                    observationData = observationDataMap.get(observationName);
+                } else {
+                    observationData = new ObservationData();
+                }
+
+                switch (key) {
+                    case "globalAvgStep":
+                        observationData.setSmcGlobalAvgStep(value);
+                        break;
+                    case "globalAvgTime":
+                        observationData.setSmcGlobalAvgTime(value);
+                        break;
+                }
+            } else if (matcher.find() && i < lines.length - 1) {
                 line = lines[i + 1];
                 String[] pointStrs = line.split(";");
                 List<GraphPoint> points = new ArrayList<>();
@@ -342,11 +365,12 @@ public class VerifyDTAPNOutputParser {
                     observationData = new ObservationData();
                 }
 
-                observationData.setObservationData(points, entry.getKey());
+                observationData.setObservationData(points, key);
                 if (!observationDataMap.containsKey(observationName)) {
                     observationDataMap.put(observationName, observationData);
                 }
             }
+
         }
     }
 }

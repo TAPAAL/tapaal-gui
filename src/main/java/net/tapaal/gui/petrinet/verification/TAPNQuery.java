@@ -93,6 +93,7 @@ public class TAPNQuery {
     private int benchmarkRuns = 100;
     private boolean parallel = true;
     private int granularity = 500;
+    private boolean maxGranularity = false;
     
     public enum VerificationType {
         QUANTITATIVE, QUALITATIVE, SIMULATE;
@@ -562,6 +563,8 @@ public class TAPNQuery {
         setBenchmarkMode(isBenchmarkMode());
         setBenchmarkRuns(getBenchmarkRuns());
         setParallel(isParallel());
+        setGranularity(getGranularity());
+        setMaxGranularity(isMaxGranularity());
     }
 
     public void setProperty(TCTLAbstractProperty property) {
@@ -662,6 +665,14 @@ public class TAPNQuery {
 
     public int getGranularity() {
         return granularity;
+    }
+
+    public void setMaxGranularity(boolean maxGranularity) {
+        this.maxGranularity = maxGranularity;
+    }
+
+    public boolean isMaxGranularity() {
+        return maxGranularity;
     }
 
     public void setVerificationType(VerificationType verificationType) {

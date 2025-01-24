@@ -730,7 +730,7 @@ public class QueryDialog extends JPanel {
                 SMCSettings oldSettings = getSMCSettings();
                 newSettings.setStepBound(oldSettings.getStepBound());
                 newSettings.setTimeBound(oldSettings.getTimeBound());
-                
+                newSettings.setObservations(oldSettings.getObservations());
                 query.setSmcSettings(newSettings);
             } else {
                 query.setSmcSettings(getSMCSettings());
@@ -741,8 +741,10 @@ public class QueryDialog extends JPanel {
             query.setSmcTraceType((SMCTraceType)smcTraceType.getSelectedItem());
 
             try {
-                query.setGranularity(smcMaxGranularityCheckbox.isSelected() ? 0 : Integer.parseInt(smcGranularityField.getText()));
+                query.setGranularity(Integer.parseInt(smcGranularityField.getText()));
             } catch (NumberFormatException e) {}
+
+            query.setMaxGranularity(smcMaxGranularityCheckbox.isSelected());
         }
 
         return query;
@@ -1978,6 +1980,8 @@ public class QueryDialog extends JPanel {
             smcNumberOfTraces.setValue(queryToCreateFrom.getNumberOfTraces());
             smcTraceType.setSelectedItem(queryToCreateFrom.getSmcTraceType());
             smcGranularityField.setText(String.valueOf(queryToCreateFrom.getGranularity()));
+            smcGranularityField.setEnabled(!queryToCreateFrom.isMaxGranularity());
+            smcMaxGranularityCheckbox.setSelected(queryToCreateFrom.isMaxGranularity());
         }
 
         setupQueryCategoryFromQuery(queryToCreateFrom);
@@ -3287,24 +3291,18 @@ public class QueryDialog extends JPanel {
         smcObservationsPanel.add(granualityLabel, subPanelGbc);
 
         subPanelGbc.gridx = 1;
-        subPanelGbc.anchor = GridBagConstraints.EAST;
-        subPanelGbc.weightx = 1;
         subPanelGbc.fill = GridBagConstraints.NONE;
         smcObservationsPanel.add(smcGranularityField, subPanelGbc);
 
         subPanelGbc.gridx = 2;
-        subPanelGbc.weightx = 0;
         smcObservationsPanel.add(smcMaxGranularityCheckbox, subPanelGbc);
     
-        subPanelGbc.gridx = 0;
-        subPanelGbc.gridy = 2;
-        subPanelGbc.gridwidth = GridBagConstraints.REMAINDER;
-        subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
-        subPanelGbc.weightx = 1;
+        subPanelGbc.gridx = 3;
         smcObservationsPanel.add(smcObservationsButton, subPanelGbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.gridwidth = 2;
         smcSettingsPanel.add(smcObservationsPanel, gbc);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -5590,6 +5588,9 @@ public class QueryDialog extends JPanel {
         smcVerificationType.setEnabled(isEnabled);
         smcParallelLabel.setEnabled(isEnabled);
         smcParallel.setEnabled(isEnabled);
+
+        smcGranularityField.setEnabled(isEnabled);
+        smcMaxGranularityCheckbox.setEnabled(isEnabled);
 
         setEnabledOptionsAccordingToCurrentReduction();
     }

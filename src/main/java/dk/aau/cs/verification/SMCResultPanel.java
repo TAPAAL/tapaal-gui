@@ -137,6 +137,9 @@ public class SMCResultPanel extends JPanel  {
                 if (!maxTimePoints.isEmpty()) {
                     timeMultiGraph.addGraph(observationName, "Max Time", new Graph(maxTimePoints));
                 }
+
+                stepMultiGraph.addGlobalAvg(observationName + " Avg Step", observationData.getSmcGlobalAvgStep());
+                timeMultiGraph.addGlobalAvg(observationName + " Avg Time", observationData.getSmcGlobalAvgTime());
             }
 
             if (!stepMultiGraph.isEmpty()) {
@@ -150,6 +153,7 @@ public class SMCResultPanel extends JPanel  {
             ObservationGraphDialog.GraphDialogBuilder builder = new ObservationGraphDialog.GraphDialogBuilder();
             GraphDialog graphFrame = builder.addMultiGraphs(observationGraphs)
                                             .setTitle("Observation Statistics")
+                                            .showGlobalAverages(true)
                                             .build();
      
             String btnText = "Plot observations";
