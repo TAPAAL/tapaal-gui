@@ -119,6 +119,11 @@ public abstract class ObsOperator implements ObsExpression {
     }
 
     @Override
+    public boolean isPlace() {
+        return false;
+    }
+
+    @Override
     public String toString() {
         String operator = getOperator();
         if (addParenthesis()) {

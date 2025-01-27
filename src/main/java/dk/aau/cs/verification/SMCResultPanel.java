@@ -68,7 +68,7 @@ public class SMCResultPanel extends JPanel  {
 
         List<GraphPoint> cumulativeDelayPoints = stats.getCumulativeDelayPoints();
         if (!cumulativeDelayPoints.isEmpty()) {
-            cumulativeGraphs.add(new Graph("Cumulative Probability / Delay", cumulativeDelayPoints, "Time", "Cumulative Probability", "Delay"));
+            cumulativeGraphs.add(new Graph("Cumulative Probability / Delay", cumulativeDelayPoints, "Time", "Cumulative Probability", "Time"));
         }
 
         List<GraphPoint> cumulativeStepPoints = stats.getCumulativeStepPoints();
@@ -96,32 +96,17 @@ public class SMCResultPanel extends JPanel  {
         }
         
         buttonGbc.insets = new Insets(0, 0, 0, 0);
-        
+
         Map<String, ObservationData> observationDataMap = stats.getObservationDataMap();
         if (!observationDataMap.isEmpty()) {
             List<MultiGraph> observationGraphs = new ArrayList<>();
 
-            MultiGraph stepMultiGraph = new MultiGraph("Observation / Step", "Step", "Count", "Step");
             MultiGraph timeMultiGraph = new MultiGraph("Observation / Time", "Time", "Count", "Time");
+            MultiGraph stepMultiGraph = new MultiGraph("Observation / Step", "Step", "Count", "Step");
 
             for (Map.Entry<String, ObservationData> entry : observationDataMap.entrySet()) {
                 String observationName = entry.getKey();
                 ObservationData observationData = entry.getValue();
-
-                List<GraphPoint> avgStepPoints = observationData.getSmcObservationAvgStep();
-                if (!avgStepPoints.isEmpty()) {
-                    stepMultiGraph.addGraph(observationName, "Avg Step", new Graph(avgStepPoints));
-                }
-
-                List<GraphPoint> minStepPoints = observationData.getSmcObservationMinStep();
-                if (!minStepPoints.isEmpty()) {
-                    stepMultiGraph.addGraph(observationName, "Min Step", new Graph(minStepPoints));
-                }
-
-                List<GraphPoint> maxStepPoints = observationData.getSmcObservationMaxStep();
-                if (!maxStepPoints.isEmpty()) {
-                    stepMultiGraph.addGraph(observationName, "Max Step", new Graph(maxStepPoints));
-                }
 
                 List<GraphPoint> avgTimePoints = observationData.getSmcObservationAvgTime();
                 if (!avgTimePoints.isEmpty()) {
@@ -138,16 +123,31 @@ public class SMCResultPanel extends JPanel  {
                     timeMultiGraph.addGraph(observationName, "Max Time", new Graph(maxTimePoints));
                 }
 
-                stepMultiGraph.addGlobalAvg(observationName + " Avg Step", observationData.getSmcGlobalAvgStep());
-                timeMultiGraph.addGlobalAvg(observationName + " Avg Time", observationData.getSmcGlobalAvgTime());
-            }
+                List<GraphPoint> avgStepPoints = observationData.getSmcObservationAvgStep();
+                if (!avgStepPoints.isEmpty()) {
+                    stepMultiGraph.addGraph(observationName, "Avg Step", new Graph(avgStepPoints));
+                }
 
-            if (!stepMultiGraph.isEmpty()) {
-                observationGraphs.add(stepMultiGraph);
+                List<GraphPoint> minStepPoints = observationData.getSmcObservationMinStep();
+                if (!minStepPoints.isEmpty()) {
+                    stepMultiGraph.addGraph(observationName, "Min Step", new Graph(minStepPoints));
+                }
+
+                List<GraphPoint> maxStepPoints = observationData.getSmcObservationMaxStep();
+                if (!maxStepPoints.isEmpty()) {
+                    stepMultiGraph.addGraph(observationName, "Max Step", new Graph(maxStepPoints));
+                }
+
+                timeMultiGraph.addGlobalAvg(observationName + " Avg Time", observationData.getSmcGlobalAvgTime());
+                stepMultiGraph.addGlobalAvg(observationName + " Avg Step", observationData.getSmcGlobalAvgStep());
             }
 
             if (!timeMultiGraph.isEmpty()) {
                 observationGraphs.add(timeMultiGraph);
+            }
+
+            if (!stepMultiGraph.isEmpty()) {
+                observationGraphs.add(stepMultiGraph);
             }
         
             ObservationGraphDialog.GraphDialogBuilder builder = new ObservationGraphDialog.GraphDialogBuilder();

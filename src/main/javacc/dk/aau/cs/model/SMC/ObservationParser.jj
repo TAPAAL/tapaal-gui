@@ -14,6 +14,7 @@ import dk.aau.cs.verification.observations.expressions.ObsAdd;
 import dk.aau.cs.verification.observations.expressions.ObsSubtract;
 import dk.aau.cs.verification.observations.expressions.ObsMultiply;
 import dk.aau.cs.verification.observations.expressions.ObsOperator;
+import dk.aau.cs.model.tapn.TimedPlace;
 import java.io.StringReader;
 
 public class ObservationParser {
@@ -144,10 +145,27 @@ ObsExpression atom() : {
     { return new ObsConstant(Integer.parseInt(value.image)); }
     |
     templateName = <ID> <DOT> placeName = <ID>
-    { try {
-        return new ObsPlace(templateName.image, placeName.image, network);
-     } catch (NullPointerException e) {
-        throw new ParseException("Place " + templateName.image + "." + placeName.image + " does not exist in the network");
-     }
+    { 
+        try {
+            boolean isShared = false;
+            for (TimedPlace p : network.sharedPlaces()) {
+                if (p.name().equals(placeName.image)) {
+                    isShared = true;
+                    break;
+                }
+            }
+            
+            if (!templateName.image.equals("Shared") && isShared) {
+                throw new ParseException("Place " + templateName.image + "." + placeName.image + " does not exist in the network");
+            }
+
+            if (isShared) {
+                return new ObsPlace("Shared", placeName.image, network);
+            } else {
+                return new ObsPlace(templateName.image, placeName.image, network);
+            }
+        } catch (NullPointerException e) {
+            throw new ParseException("Place " + templateName.image + "." + placeName.image + " does not exist in the network");
+        }
     }
 }

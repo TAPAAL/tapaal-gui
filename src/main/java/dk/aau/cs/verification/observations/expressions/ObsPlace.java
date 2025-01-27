@@ -38,4 +38,9 @@ public class ObsPlace extends ObsLeaf {
     public ObsExpression deepCopy() {
         return new ObsPlace(template, place);
     }
+
+    @Override
+    public boolean isPlace() {
+        return true;
+    }
 }

@@ -3288,17 +3288,16 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridy = 0;
         subPanelGbc.anchor = GridBagConstraints.WEST;
         subPanelGbc.weightx = 0;
-        smcObservationsPanel.add(granualityLabel, subPanelGbc);
+        smcObservationsPanel.add(smcObservationsButton, subPanelGbc);
 
         subPanelGbc.gridx = 1;
-        subPanelGbc.fill = GridBagConstraints.NONE;
-        smcObservationsPanel.add(smcGranularityField, subPanelGbc);
+        smcObservationsPanel.add(granualityLabel, subPanelGbc);
 
         subPanelGbc.gridx = 2;
-        smcObservationsPanel.add(smcMaxGranularityCheckbox, subPanelGbc);
-    
+        smcObservationsPanel.add(smcGranularityField, subPanelGbc);
+
         subPanelGbc.gridx = 3;
-        smcObservationsPanel.add(smcObservationsButton, subPanelGbc);
+        smcObservationsPanel.add(smcMaxGranularityCheckbox, subPanelGbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;

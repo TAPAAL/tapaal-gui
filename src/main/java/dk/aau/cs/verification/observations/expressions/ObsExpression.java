@@ -6,5 +6,6 @@ public interface ObsExpression {
     boolean isOperator();
     boolean isLeaf();
     boolean isPlaceHolder();
+    boolean isPlace();
     String toXml();
 }

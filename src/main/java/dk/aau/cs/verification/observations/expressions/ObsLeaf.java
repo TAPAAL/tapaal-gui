@@ -20,4 +20,8 @@ public abstract class ObsLeaf implements ObsExpression {
     public boolean isPlaceHolder() {
         return false;
     }
+
+    public boolean isPlace() {
+        return false;
+    }
 }
