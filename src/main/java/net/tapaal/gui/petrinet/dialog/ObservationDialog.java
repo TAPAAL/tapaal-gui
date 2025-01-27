@@ -42,6 +42,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -179,7 +180,14 @@ public class ObservationDialog extends EscapableDialog {
         placesPanel.setBorder(BorderFactory.createTitledBorder("Places"));
 
         JComboBox<Object> templateComboBox = new JComboBox<>();
-        tapnNetwork.activeTemplates().forEach(templateComboBox::addItem);
+        tapnNetwork.activeTemplates().forEach(template -> {
+            List<TimedPlace> places = template.places();
+            long sharedPlaces = places.stream().filter(TimedPlace::isShared).count();
+            if (sharedPlaces != places.size() && !template.name().equals(SHARED)) {
+                templateComboBox.addItem(template);
+            }
+        });
+
         if (tapnNetwork.sharedPlaces().size() > 0) {
             templateComboBox.addItem(SHARED);
         }
@@ -187,11 +195,16 @@ public class ObservationDialog extends EscapableDialog {
         JComboBox<TimedPlace> placeComboBox = new JComboBox<>();
         templateComboBox.addActionListener(e -> {
             placeComboBox.removeAllItems();
+            System.out.println(templateComboBox.getSelectedItem());
             if (templateComboBox.getSelectedItem().equals(SHARED)) {
                 tapnNetwork.sharedPlaces().forEach(place -> placeComboBox.addItem(place));
             } else {
-                TimedArcPetriNet template = (TimedArcPetriNet) templateComboBox.getSelectedItem();
-                template.places().forEach(place -> placeComboBox.addItem(place));
+                TimedArcPetriNet template = (TimedArcPetriNet)templateComboBox.getSelectedItem();
+                template.places().forEach(place -> {
+                    if (!place.isShared()) {
+                        placeComboBox.addItem(place);
+                    }
+                });
             }
         });
 
