@@ -195,7 +195,6 @@ public class ObservationDialog extends EscapableDialog {
         JComboBox<TimedPlace> placeComboBox = new JComboBox<>();
         templateComboBox.addActionListener(e -> {
             placeComboBox.removeAllItems();
-            System.out.println(templateComboBox.getSelectedItem());
             if (templateComboBox.getSelectedItem().equals(SHARED)) {
                 tapnNetwork.sharedPlaces().forEach(place -> placeComboBox.addItem(place));
             } else {

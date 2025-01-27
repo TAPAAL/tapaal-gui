@@ -258,7 +258,7 @@ public class TAPNQueryLoader extends QueryLoader{
 
     private ObsExpression createPlaceExpression(Element element) {
         String name = element.getTextContent();
-        String[] parts = name.split("_");
+        String[] parts = name.split("_", 2);
         String templateName = parts[0];
         String placeName = parts[1];
     
