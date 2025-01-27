@@ -21,6 +21,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.LegendItem;
 import org.jfree.chart.LegendItemCollection;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
@@ -228,6 +229,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         float lineThickness = 3.0f;
 
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
+        renderer.setDefaultToolTipGenerator(new StandardXYToolTipGenerator());
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
             renderer.setSeriesStroke(i, createStrokeForSeries(seriesKey, lineThickness));

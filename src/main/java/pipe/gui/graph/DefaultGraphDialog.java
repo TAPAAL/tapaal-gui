@@ -21,6 +21,7 @@ import org.jfree.chart.LegendItem;
 import org.jfree.chart.LegendItemCollection;
 import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -168,6 +169,7 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         }
 
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        renderer.setDefaultToolTipGenerator(new StandardXYToolTipGenerator());
         Color lineColor = Color.RED;
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             renderer.setSeriesStroke(i, new BasicStroke(lineThickness));
