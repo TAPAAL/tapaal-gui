@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.jdesktop.swingx.WrapLayout;
 import org.jfree.chart.ChartFactory;
@@ -120,7 +121,10 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             }
         }
     
-        southPanel.add(observationPanel, BorderLayout.NORTH);
+        JScrollPane observationScrollPane = new JScrollPane(observationPanel);
+        observationScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+        southPanel.add(observationScrollPane, BorderLayout.NORTH);
         southPanel.add(buttonPanel, BorderLayout.SOUTH);
         
         mainPanel.add(cardPanel, BorderLayout.CENTER);
@@ -196,7 +200,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         boolean propSelected = false;
         
         if (isSimulate) return obsSelected;
-        
+
         String currentView = getCurrentView();
         for (Map.Entry<String, JCheckBox> entry : propertyCheckboxes.entrySet()) {
             if (entry.getValue().isSelected()) {
