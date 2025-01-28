@@ -725,7 +725,7 @@ public class QueryDialog extends JPanel {
             query.setCategory(TAPNQuery.QueryCategory.SMC);
             query.setParallel(smcParallel.isSelected());
             VerificationType verificationType = VerificationType.fromOrdinal(smcVerificationType.getSelectedIndex());
-            if (verificationType == VerificationType.SIMULATE) {
+            if (verificationType.equals(VerificationType.SIMULATE)) {
                 SMCSettings newSettings = SMCSettings.Default();
                 SMCSettings oldSettings = getSMCSettings();
                 newSettings.setStepBound(oldSettings.getStepBound());

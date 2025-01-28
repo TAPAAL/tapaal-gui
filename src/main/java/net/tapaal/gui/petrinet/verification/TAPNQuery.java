@@ -700,7 +700,7 @@ public class TAPNQuery {
     }
 
     public boolean isSimulate() {
-        return verificationType == VerificationType.SIMULATE;
+        return verificationType.equals(VerificationType.SIMULATE);
     }
 
 

@@ -3,9 +3,11 @@ package dk.aau.cs.verification.VerifyTAPN;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +50,8 @@ public class VerifyDTAPNOutputParser {
         put("avgTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) avg/time"));
         put("minTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) min/time"));
         put("maxTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) max/time"));
+        put("valueStep", Pattern.compile("\\((\\w+(?: \\w+)*)\\) value/step"));
+        put("valueTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) value/time"));
         put("globalAvgStep", Pattern.compile("\\((\\w+(?: \\w+)*)\\) Global steps avg.: ([0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?)"));
         put("globalAvgTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) Global time avg.: ([0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?)"));
     }};
@@ -71,7 +75,11 @@ public class VerifyDTAPNOutputParser {
 	private final int extraTokens;
 	private final List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
 	private final List<Tuple<String,Integer>> placeBoundStats = new ArrayList<Tuple<String,Integer>>();
-        
+
+    private final Set<String> uniqueMatches = new HashSet<>();
+
+    private int allMatches;
+
 	public VerifyDTAPNOutputParser(int totalTokens, int extraTokens, TAPNQuery query){
 		this.totalTokens = totalTokens;
 		this.extraTokens = extraTokens;
@@ -126,6 +134,7 @@ public class VerifyDTAPNOutputParser {
 			while (matcher.find()) {
 				placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), -1));
 			}
+
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
                 if (line.contains(SMC_Verification_INDICATOR_STRING)) isSmc = true;
@@ -323,15 +332,27 @@ public class VerifyDTAPNOutputParser {
 	}
 
     private void extractObservations(String line, int i, String[] lines, Map<String, ObservationData> observationDataMap) {
+        String startLine;
+        if (query.isSimulate()) {
+            startLine = line;
+            for (Map.Entry<String, Pattern> entry : smcObservationPatterns.entrySet()) {
+                Pattern pattern = entry.getValue();
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.find() && i < lines.length - 1) {
+                    uniqueMatches.add(matcher.group(0));
+                }
+            }
+
+            line = startLine;
+        }
+
         for (Map.Entry<String, Pattern> entry : smcObservationPatterns.entrySet()) {
             Pattern pattern = entry.getValue();
             Matcher matcher = pattern.matcher(line);
             String key = entry.getKey();
-
             if (key.contains("global") && matcher.find()) {
                 String observationName = matcher.group(1);
                 double value = Double.parseDouble(matcher.group(2));
-
                 ObservationData observationData;
                 if (observationDataMap.containsKey(observationName)) {
                     observationData = observationDataMap.get(observationName);
@@ -358,6 +379,10 @@ public class VerifyDTAPNOutputParser {
                 }
 
                 String observationName = matcher.group(1);
+                if (query.isSimulate()) {
+                    observationName += " (" + ((allMatches++ + uniqueMatches.size()) / uniqueMatches.size()) + ")";
+                }
+
                 ObservationData observationData;
                 if (observationDataMap.containsKey(observationName)) {
                     observationData = observationDataMap.get(observationName);
@@ -370,7 +395,6 @@ public class VerifyDTAPNOutputParser {
                     observationDataMap.put(observationName, observationData);
                 }
             }
-
         }
     }
 }

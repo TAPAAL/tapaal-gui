@@ -1,16 +1,20 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import pipe.gui.graph.GraphPoint;
 
 public class ObservationData {
-    private List<GraphPoint> smcObservationAvgStep;
-    private List<GraphPoint> smcObservationMinStep;
-    private List<GraphPoint> smcObservationMaxStep;
-    private List<GraphPoint> smcObservationAvgTime;
-    private List<GraphPoint> smcObservationMinTime;
-    private List<GraphPoint> smcObservationMaxTime;
+    private List<GraphPoint> smcObservationAvgStep = new ArrayList<>();
+    private List<GraphPoint> smcObservationMinStep = new ArrayList<>();
+    private List<GraphPoint> smcObservationMaxStep = new ArrayList<>();
+    private List<GraphPoint> smcObservationAvgTime = new ArrayList<>();
+    private List<GraphPoint> smcObservationMinTime = new ArrayList<>();
+    private List<GraphPoint> smcObservationMaxTime = new ArrayList<>();
+    private List<GraphPoint> smcObservationValueStep = new ArrayList<>();
+    private List<GraphPoint> smcObservationValueTime = new ArrayList<>();
+
     private double smcGlobalAvgStep;
     private double smcGlobalAvgTime;
 
@@ -33,6 +37,12 @@ public class ObservationData {
                 break;
             case "maxTime":
                 setSmcObservationMaxTime(points);
+                break;
+            case "valueStep":
+                setSmcObservationValueStep(points);
+                break;
+            case "valueTime":
+                setSmcObservationValueTime(points);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid key: " + key);
@@ -71,6 +81,14 @@ public class ObservationData {
         this.smcGlobalAvgTime = smcGlobalAvgTime;
     }
 
+    public void setSmcObservationValueStep(List<GraphPoint> smcObservationvalueStep) {
+        this.smcObservationValueStep = smcObservationvalueStep;
+    }
+
+    public void setSmcObservationValueTime(List<GraphPoint> smcObservationvalueTime) {
+        this.smcObservationValueTime = smcObservationvalueTime;
+    }
+
     public List<GraphPoint> getSmcObservationAvgStep() {
         return smcObservationAvgStep;
     }
@@ -101,5 +119,13 @@ public class ObservationData {
 
     public double getSmcGlobalAvgTime() {
         return smcGlobalAvgTime;
+    }
+
+    public List<GraphPoint> getSmcObservationValueStep() {
+        return smcObservationValueStep;
+    }
+
+    public List<GraphPoint> getSmcObservationValueTime() {
+        return smcObservationValueTime;
     }
 }

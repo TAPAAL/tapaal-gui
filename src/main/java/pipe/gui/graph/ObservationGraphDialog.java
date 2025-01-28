@@ -39,6 +39,7 @@ import pipe.gui.swingcomponents.EscapableDialog;
 public class ObservationGraphDialog extends EscapableDialog implements GraphDialog {
     private final List<MultiGraph> multiGraphs;
     private final boolean showGlobalAverages;
+    private final boolean isSimulate;
 
     private final Map<String, JCheckBox> observationCheckboxes = new HashMap<>(); 
     private final Map<String, JCheckBox> propertyCheckboxes = new HashMap<>();
@@ -46,10 +47,11 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
     private JFreeChart currentChart;
     private String currentView;
 
-    private ObservationGraphDialog(List<MultiGraph> multiGraphs, String title, boolean showGlobalAverages) {
+    private ObservationGraphDialog(List<MultiGraph> multiGraphs, String title, boolean showGlobalAverages, boolean isSimulate) {
         super(TAPAALGUI.getAppGui(), title, true);
         this.multiGraphs = multiGraphs;
         this.showGlobalAverages = showGlobalAverages;
+        this.isSimulate = isSimulate;
     }
 
     @Override
@@ -106,14 +108,16 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             cardPanel.add(chartPanel, buttonText);
             addButton(buttonPanel, cardLayout, cardPanel, buttonText);
         }
-    
-        for (String label : List.of("Avg", "Min", "Max")) {
-            JCheckBox checkBox = new JCheckBox(label);
-            checkBox.setBackground(Color.WHITE);
-            checkBox.setSelected(label.equals("Avg"));
-            checkBox.addActionListener(e -> updateVisibility());
-            propertyCheckboxes.put(label, checkBox);
-            buttonPanel.add(checkBox);
+        
+        if (!isSimulate) {
+            for (String label : List.of("Avg", "Min", "Max")) {
+                JCheckBox checkBox = new JCheckBox(label);
+                checkBox.setBackground(Color.WHITE);
+                checkBox.setSelected(label.equals("Avg"));
+                checkBox.addActionListener(e -> updateVisibility());
+                propertyCheckboxes.put(label, checkBox);
+                buttonPanel.add(checkBox);
+            }
         }
     
         southPanel.add(observationPanel, BorderLayout.NORTH);
@@ -137,6 +141,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         XYDataset dataset = plot.getDataset();
         XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
         float lineThickness = 3.0f;
+
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
             boolean visible = isSeriesVisible(seriesKey);
@@ -189,6 +194,8 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         
         boolean obsSelected = observationCheckboxes.get(observation).isSelected();
         boolean propSelected = false;
+        
+        if (isSimulate) return obsSelected;
         
         String currentView = getCurrentView();
         for (Map.Entry<String, JCheckBox> entry : propertyCheckboxes.entrySet()) {
@@ -303,7 +310,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
                 for (GraphPoint point : graph.getPoints()) {
                     series.add(point.getX(), point.getY());
                 }
-
+ 
                 dataset.addSeries(series);
             }
         }
@@ -344,15 +351,11 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
     public static class GraphDialogBuilder {
         private List<MultiGraph> multiGraphs = new ArrayList<>();
         private String title = "";
-        private boolean showGlobalAverages = false;
+        private boolean showGlobalAverages;
+        private boolean isSimulate;
         
         public GraphDialogBuilder addMultiGraphs(List<MultiGraph> multiGraphs) {
             this.multiGraphs.addAll(multiGraphs);
-            return this;
-        }
-
-        public GraphDialogBuilder showGlobalAverages(boolean showGlobalAverages) {
-            this.showGlobalAverages = true;
             return this;
         }
 
@@ -361,8 +364,18 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             return this;
         }
 
+        public GraphDialogBuilder showGlobalAverages(boolean showGlobalAverages) {
+            this.showGlobalAverages = true;
+            return this;
+        }
+
+        public GraphDialogBuilder isSimulate(boolean isSimulate) {
+            this.isSimulate = isSimulate;
+            return this;
+        }
+
         public ObservationGraphDialog build() {
-            return new ObservationGraphDialog(multiGraphs, title, showGlobalAverages);
+            return new ObservationGraphDialog(multiGraphs, title, showGlobalAverages, isSimulate);
         }
     }
 }

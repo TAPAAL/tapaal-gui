@@ -239,10 +239,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
     private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query, BatchProcessingVerificationOptions option) throws Exception {
         TAPNQuery queryToVerify = getTAPNQuery(query);
         queryToVerify.setCategory(query.getCategory());
+        queryToVerify.setVerificationType(query.getVerificationType());
         MapQueryToNewNames(queryToVerify, composedModel.value2());
 
         TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens(), query.getSmcSettings());
         clonedQuery.setCategory(query.getCategory());
+        clonedQuery.setVerificationType(query.getVerificationType());
         MapQueryToNewNames(clonedQuery, composedModel.value2());
 
         fireVerificationTaskStarted();

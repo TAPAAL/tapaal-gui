@@ -107,7 +107,6 @@ public class SMCResultPanel extends JPanel  {
             for (Map.Entry<String, ObservationData> entry : observationDataMap.entrySet()) {
                 String observationName = entry.getKey();
                 ObservationData observationData = entry.getValue();
-
                 List<GraphPoint> avgTimePoints = observationData.getSmcObservationAvgTime();
                 if (!avgTimePoints.isEmpty()) {
                     timeMultiGraph.addGraph(observationName, "Avg Time", new Graph(avgTimePoints));
@@ -138,6 +137,16 @@ public class SMCResultPanel extends JPanel  {
                     stepMultiGraph.addGraph(observationName, "Max Step", new Graph(maxStepPoints));
                 }
 
+                List<GraphPoint> observationTimePoints = observationData.getSmcObservationValueTime();
+                if (!observationTimePoints.isEmpty()) {
+                    timeMultiGraph.addGraph(observationName, "Time", new Graph(observationTimePoints));
+                }
+
+                List<GraphPoint> observationStepPoints = observationData.getSmcObservationValueStep();
+                if (!observationStepPoints.isEmpty()) {
+                    stepMultiGraph.addGraph(observationName, "Step", new Graph(observationStepPoints));
+                }
+
                 timeMultiGraph.addGlobalAvg(observationName + " Avg Time", observationData.getSmcGlobalAvgTime());
                 stepMultiGraph.addGlobalAvg(observationName + " Avg Step", observationData.getSmcGlobalAvgStep());
             }
@@ -154,6 +163,7 @@ public class SMCResultPanel extends JPanel  {
             GraphDialog graphFrame = builder.addMultiGraphs(observationGraphs)
                                             .setTitle("Observation Statistics")
                                             .showGlobalAverages(true)
+                                            .isSimulate(result.getQuery().isSimulate())
                                             .build();
      
             String btnText = "Plot observations";
