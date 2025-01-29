@@ -239,10 +239,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
     private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query, BatchProcessingVerificationOptions option) throws Exception {
         TAPNQuery queryToVerify = getTAPNQuery(query);
         queryToVerify.setCategory(query.getCategory());
+        queryToVerify.setVerificationType(query.getVerificationType());
         MapQueryToNewNames(queryToVerify, composedModel.value2());
 
         TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens(), query.getSmcSettings());
         clonedQuery.setCategory(query.getCategory());
+        clonedQuery.setVerificationType(query.getVerificationType());
         MapQueryToNewNames(clonedQuery, composedModel.value2());
 
         fireVerificationTaskStarted();
@@ -299,7 +301,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
             return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isColored(), false, query.getRawVerification(), query.getRawVerificationPrompt());    // XXX DISABLES OverApprox
         } else if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
-            return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false, query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), 0, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isStubbornReductionEnabled(), null, query.usePartitioning(), query.useColorFixpoint(), query.isColored(), query.getRawVerification(), query.getRawVerificationPrompt(), query.isBenchmarkMode(), query.getBenchmarkRuns(), query.isParallel(), query.getCategory(), query.getNumberOfTraces(), query.getSmcTraceType(), query.isSimulate());
+            return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false, query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), 0, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isStubbornReductionEnabled(), null, query.usePartitioning(), query.useColorFixpoint(), query.isColored(), query.getRawVerification(), query.getRawVerificationPrompt(), query.isBenchmarkMode(), query.getBenchmarkRuns(), query.isParallel(), query.getCategory(), query.getNumberOfTraces(), query.getSmcTraceType(), query.isSimulate(), query.getGranularity(), query.isMaxGranularity());
         } else if (query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce) {
             return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation(), query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.getCategory(), query.getAlgorithmOption(), query.isSiphontrapEnabled(), query.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime, query.isStubbornReductionEnabled(), null, query.isTarOptionEnabled(), query.isTarjan(), query.isColored(), false, query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars(), query.useColoredReduction(), query.getRawVerification(), query.getRawVerificationPrompt());
         } else {

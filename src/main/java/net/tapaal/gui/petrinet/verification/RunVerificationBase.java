@@ -93,6 +93,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
         if (dataLayerQuery != null) {
             clonedQuery.setCategory(dataLayerQuery.getCategory()); // Used by the CTL engine
+            clonedQuery.setVerificationType(dataLayerQuery.getVerificationType());
             clonedQuery.setTraceList(dataLayerQuery.getTraceList());
             clonedQuery.setSMCSettings(dataLayerQuery.getSmcSettings());
         }

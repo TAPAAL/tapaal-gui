@@ -291,7 +291,6 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
     
             Node child = skipWS(scalar.getNextSibling());
             ArcExpression childexp = parseArcExpression(child);
-    
             ScalarProductExpression scalarExpr = new ScalarProductExpression(scalarval, childexp);
             childexp.setParent(scalarExpr);
             return scalarExpr;

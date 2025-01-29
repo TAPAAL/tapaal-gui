@@ -14,10 +14,6 @@ import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.graph.Graph;
-import pipe.gui.graph.GraphDialog;
-import pipe.gui.graph.GraphPoint;
-import pipe.gui.graph.GraphDialog.GraphDialogBuilder;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 

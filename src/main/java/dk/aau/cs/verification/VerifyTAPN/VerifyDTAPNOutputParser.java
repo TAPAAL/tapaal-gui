@@ -2,7 +2,12 @@ package dk.aau.cs.verification.VerifyTAPN;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +43,18 @@ public class VerifyDTAPNOutputParser {
 
     private static final Pattern smcCumulativeProbabilityStepPattern = Pattern.compile("\\s*cumulative probability / step :");
     private static final Pattern smcCumulativeProbabilityDelayPattern = Pattern.compile("\\s*cumulative probability / delay :");
+    private static final Map<String, Pattern> smcObservationPatterns = new LinkedHashMap<String, Pattern>() {{
+        put("avgStep", Pattern.compile("\\((\\w+(?: \\w+)*)\\) avg/step"));
+        put("minStep", Pattern.compile("\\((\\w+(?: \\w+)*)\\) min/step"));
+        put("maxStep", Pattern.compile("\\((\\w+(?: \\w+)*)\\) max/step"));
+        put("avgTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) avg/time"));
+        put("minTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) min/time"));
+        put("maxTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) max/time"));
+        put("valueStep", Pattern.compile("\\((\\w+(?: \\w+)*)\\) value/step"));
+        put("valueTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) value/time"));
+        put("globalAvgStep", Pattern.compile("\\((\\w+(?: \\w+)*)\\) Global steps avg.: ([0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?)"));
+        put("globalAvgTime", Pattern.compile("\\((\\w+(?: \\w+)*)\\) Global time avg.: ([0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?)"));
+    }};
 
     private static final Pattern smcAverageValidTimePattern = Pattern.compile("\\s*duration of a valid run \\(average\\):\\s*([\\d\\.]+)\\s*");
     private static final Pattern smcAverageValidLengthPattern = Pattern.compile("\\s*length of a valid run \\(average\\):\\s*([\\d\\.]+)\\s*");
@@ -58,7 +75,11 @@ public class VerifyDTAPNOutputParser {
 	private final int extraTokens;
 	private final List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
 	private final List<Tuple<String,Integer>> placeBoundStats = new ArrayList<Tuple<String,Integer>>();
-        
+
+    private final Set<String> uniqueMatches = new HashSet<>();
+
+    private int allMatches;
+
 	public VerifyDTAPNOutputParser(int totalTokens, int extraTokens, TAPNQuery query){
 		this.totalTokens = totalTokens;
 		this.extraTokens = extraTokens;
@@ -98,6 +119,7 @@ public class VerifyDTAPNOutputParser {
 
 		List<GraphPoint> cumulativeStepPoints = new ArrayList<>();
 		List<GraphPoint> cumulativeDelayPoints = new ArrayList<>();
+        Map<String, ObservationData> observationDataMap = new HashMap<>();
 
 		try {			
 			Matcher matcher = transitionStatsPattern.matcher(output);
@@ -112,6 +134,7 @@ public class VerifyDTAPNOutputParser {
 			while (matcher.find()) {
 				placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), -1));
 			}
+
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
                 if (line.contains(SMC_Verification_INDICATOR_STRING)) isSmc = true;
@@ -266,6 +289,8 @@ public class VerifyDTAPNOutputParser {
                         }
                     }
 
+                    extractObservations(line, i, lines, observationDataMap);
+
                     matcher = smcNumberOfTracesPattern.matcher(line);
                     if (matcher.find()) {
                         foundResult = true;
@@ -281,7 +306,7 @@ public class VerifyDTAPNOutputParser {
             QueryResult queryRes;
 
             if(isSmc) {
-                verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength, smcVerificationTime, cumulativeStepPoints, cumulativeDelayPoints);
+                verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength, smcVerificationTime, cumulativeStepPoints, cumulativeDelayPoints, observationDataMap);
                 ((SMCStats) verifStats).setRunTimeStdDev(smcTimeStdDev);
                 ((SMCStats) verifStats).setRunLengthStdDev(smcLengthStdDev);
                 ((SMCStats) verifStats).setValidRunAverageTime(smcAverageValidTime);
@@ -306,4 +331,70 @@ public class VerifyDTAPNOutputParser {
 		return null;
 	}
 
+    private void extractObservations(String line, int i, String[] lines, Map<String, ObservationData> observationDataMap) {
+        String startLine;
+        if (query.isSimulate()) {
+            startLine = line;
+            for (Map.Entry<String, Pattern> entry : smcObservationPatterns.entrySet()) {
+                Pattern pattern = entry.getValue();
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.find() && i < lines.length - 1) {
+                    uniqueMatches.add(matcher.group(0));
+                }
+            }
+
+            line = startLine;
+        }
+
+        for (Map.Entry<String, Pattern> entry : smcObservationPatterns.entrySet()) {
+            Pattern pattern = entry.getValue();
+            Matcher matcher = pattern.matcher(line);
+            String key = entry.getKey();
+            if (key.contains("global") && matcher.find()) {
+                String observationName = matcher.group(1);
+                double value = Double.parseDouble(matcher.group(2));
+                ObservationData observationData;
+                if (observationDataMap.containsKey(observationName)) {
+                    observationData = observationDataMap.get(observationName);
+                } else {
+                    observationData = new ObservationData();
+                }
+
+                switch (key) {
+                    case "globalAvgStep":
+                        observationData.setSmcGlobalAvgStep(value);
+                        break;
+                    case "globalAvgTime":
+                        observationData.setSmcGlobalAvgTime(value);
+                        break;
+                }
+            } else if (matcher.find() && i < lines.length - 1) {
+                line = lines[i + 1];
+                String[] pointStrs = line.split(";");
+                List<GraphPoint> points = new ArrayList<>();
+                for (String pointStr : pointStrs) {
+                    String[] coordinates = pointStr.split(":");
+                    GraphPoint point = new GraphPoint(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
+                    points.add(point);
+                }
+
+                String observationName = matcher.group(1);
+                if (query.isSimulate()) {
+                    observationName += " (" + ((allMatches++ + uniqueMatches.size()) / uniqueMatches.size()) + ")";
+                }
+
+                ObservationData observationData;
+                if (observationDataMap.containsKey(observationName)) {
+                    observationData = observationDataMap.get(observationName);
+                } else {
+                    observationData = new ObservationData();
+                }
+
+                observationData.setObservationData(points, key);
+                if (!observationDataMap.containsKey(observationName)) {
+                    observationDataMap.put(observationName, observationData);
+                }
+            }
+        }
+    }
 }

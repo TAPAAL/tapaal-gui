@@ -1,7 +1,10 @@
 package dk.aau.cs.TCTL.visitors;
 
+import java.util.List;
+
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.verification.SMCSettings;
+import dk.aau.cs.verification.observations.Observation;
 
 public class SMCQueryVisitor extends LTLQueryVisitor {
 
@@ -14,6 +17,10 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
     private static final String XML_CONFIDENCE_TAG          = "confidence";
     private static final String XML_INTERVAL_WIDTH_TAG      = "interval-width";
     private static final String XML_COMPARE_TO_FLOAT_TAG    = "compare-to";
+    private static final String XML_OBSERVATIONS            = "observations";
+    private static final String XML_WATCH                   = "watch";
+    private static final String XML_WATCH_ID                = "id";
+    private static final String XML_WATCH_NAME              = "name";
 
     public String getXMLQueryFor(TCTLAbstractProperty property, String queryName, SMCSettings settings) {
         buildXMLQuery(property, queryName, settings);
@@ -21,7 +28,13 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
     }
 
     public void buildXMLQuery(TCTLAbstractProperty property, String queryName, SMCSettings settings) {
-        xmlQuery.append(startTag(XML_PROP) + queryInfo(queryName) + smcTag(settings) + startTag(XML_FORMULA));
+        xmlQuery.append(startTag(XML_PROP) + queryInfo(queryName) + smcTag(settings));
+
+        if (!settings.getObservations().isEmpty()) {
+            xmlQuery.append(observationTag(settings.getObservations()));
+        }
+            
+        xmlQuery.append(startTag(XML_FORMULA));
         property.accept(this, null);
         xmlQuery.append(endTag(XML_FORMULA) + endTag(XML_PROP));
     }
@@ -42,6 +55,18 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
             tagContent += tagAttribute(XML_INTERVAL_WIDTH_TAG, settings.estimationIntervalWidth);
         }
         return emptyElement(tagContent);
+    }
+
+    private String observationTag(List<Observation> observations) {
+        String observationXml = startTag(XML_OBSERVATIONS); 
+        
+        for (Observation observation : observations) {
+            observationXml += observation.toXml();
+        }
+
+        observationXml += endTag(XML_OBSERVATIONS);
+
+        return observationXml;
     }
 
     private String tagAttribute(String name, String value) {

@@ -11,7 +11,6 @@ import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 
 public class DraggableChartPanel extends ChartPanel {
-
     private int lastX;
     private int lastY;
 

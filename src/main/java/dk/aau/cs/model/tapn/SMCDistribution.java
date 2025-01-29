@@ -66,6 +66,10 @@ public abstract class SMCDistribution {
                 return SMCDiscreteUniformDistribution.defaultDistribution();
             case SMCGeometricDistribution.NAME:
                 return SMCGeometricDistribution.defaultDistribution();
+            case SMCTriangularDistribution.NAME:
+                return SMCTriangularDistribution.defaultDistribution();
+            case SMCLogNormalDistribution.NAME:
+                return SMCLogNormalDistribution.defaultDistribution();
             default:
                 return SMCDistribution.defaultDistribution();
         }
@@ -115,6 +119,15 @@ public abstract class SMCDistribution {
                 case SMCGeometricDistribution.NAME:
                     double p = Double.parseDouble(elem.getAttribute("p"));
                     return new SMCGeometricDistribution(p);
+                case SMCTriangularDistribution.NAME:
+                    double t_a = Double.parseDouble(elem.getAttribute("a"));
+                    double t_b = Double.parseDouble(elem.getAttribute("b"));
+                    double t_c = Double.parseDouble(elem.getAttribute("c"));
+                    return new SMCTriangularDistribution(t_a,t_b,t_c);
+                case SMCLogNormalDistribution.NAME:
+                    double logMean = Double.parseDouble(elem.getAttribute("logMean"));
+                    double logStddev = Double.parseDouble(elem.getAttribute("logStddev"));
+                    return new SMCLogNormalDistribution(logMean, logStddev);
             }
         } catch(NumberFormatException ignored) {}
         return SMCDistribution.defaultDistribution();

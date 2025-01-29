@@ -3,11 +3,21 @@ package dk.aau.cs.io.queries;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
+
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.XMLParsing.XMLHyperLTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import dk.aau.cs.verification.SMCSettings;
 import dk.aau.cs.verification.SMCTraceType;
+import dk.aau.cs.verification.observations.Observation;
+import dk.aau.cs.verification.observations.expressions.ObsAdd;
+import dk.aau.cs.verification.observations.expressions.ObsConstant;
+import dk.aau.cs.verification.observations.expressions.ObsExpression;
+import dk.aau.cs.verification.observations.expressions.ObsMultiply;
+import dk.aau.cs.verification.observations.expressions.ObsOperator;
+import dk.aau.cs.verification.observations.expressions.ObsPlace;
+import dk.aau.cs.verification.observations.expressions.ObsSubtract;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -113,9 +123,27 @@ public class TAPNQueryLoader extends QueryLoader{
             if(smcTagList.getLength() > 0) {
                 Element settingsNode = (Element) smcTagList.item(0);
                 smcSettings = parseSmcSettings(settingsNode);
+                NodeList observationsList = queryElement.getElementsByTagName("observations");
+                if (observationsList.getLength() > 0) {
+                    Element observationsNode = (Element)observationsList.item(0);
+                    NodeList watchList = observationsNode.getElementsByTagName("watch");
+
+                    List<Observation> observations = new ArrayList<>();
+                    for (int i = 0; i < watchList.getLength(); ++i) {
+                        Element watch = (Element)watchList.item(i);
+                        String name = watch.getAttribute("name");                        
+
+                        Element root = getFirstElementChild(watch);
+                        Observation observation = new Observation(name, parseObsExpression(root));
+                        observations.add(observation);
+                    }
+
+                    smcSettings.setObservations(observations);
+                }
             } else {
                 smcSettings = SMCSettings.Default();
             }
+
             query = parseLTLQueryProperty(queryElement);
         } else if (queryElement.hasAttribute("type") && queryElement.getAttribute("type").equals("LTL")) {
             query = parseLTLQueryProperty(queryElement);
@@ -163,6 +191,78 @@ public class TAPNQueryLoader extends QueryLoader{
             if(child.getNodeName().equals("smc")) return true;
         }
         return false;
+    }
+
+    private Element getFirstElementChild(Element parent) {
+        NodeList children = parent.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                return (Element)child;
+            }
+        }
+
+        return null;
+    }
+
+    private Element getSecondElementChild(Element parent) {
+        NodeList children = parent.getChildNodes();
+        int elementCount = 0;
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                ++elementCount;
+                if (elementCount == 2) {
+                    return (Element)child;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private ObsExpression parseObsExpression(Element element) {
+        String tagName = element.getTagName();
+    
+        switch (tagName) {
+            case "integer-sum":
+                return createOperatorExpression(element, ObsAdd::new);
+            case "integer-difference":
+                return createOperatorExpression(element, ObsSubtract::new);
+            case "integer-product":
+                return createOperatorExpression(element, ObsMultiply::new);
+            case "integer-constant":
+                return new ObsConstant(Integer.parseInt(element.getTextContent()));
+            case "place":
+                return createPlaceExpression(element);
+            default:
+                throw new IllegalArgumentException("Unknown expression type: " + tagName);
+        }
+    }
+
+    private ObsExpression createOperatorExpression(Element element, BiFunction<ObsExpression, ObsExpression, ObsOperator> constructor) {
+        ObsExpression left = parseObsExpression(getFirstElementChild(element));
+        ObsExpression right = parseObsExpression(getSecondElementChild(element));
+        ObsOperator operator = constructor.apply(left, right);
+
+        if (left.isOperator()) {
+            ((ObsOperator)left).setParent(operator);
+        }
+        
+        if (right.isOperator()) {
+            ((ObsOperator)right).setParent(operator);
+        }
+
+        return operator;
+    }    
+
+    private ObsExpression createPlaceExpression(Element element) {
+        String name = element.getTextContent();
+        String[] parts = name.split("_", 2);
+        String templateName = parts[0];
+        String placeName = parts[1];
+    
+        return new ObsPlace(templateName, placeName, network);
     }
 
     public static SMCSettings parseSmcSettings(Element smcTag) {

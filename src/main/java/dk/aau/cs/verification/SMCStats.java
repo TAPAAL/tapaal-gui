@@ -1,7 +1,9 @@
 package dk.aau.cs.verification;
 
 import java.util.List;
+import java.util.Map;
 
+import dk.aau.cs.verification.VerifyTAPN.ObservationData;
 import pipe.gui.graph.GraphPoint;
 
 public class SMCStats extends Stats {
@@ -24,6 +26,7 @@ public class SMCStats extends Stats {
 
     private List<GraphPoint> cumulativeStepPoints;
     private List<GraphPoint> cumulativeDelayPoints;
+    private Map<String, ObservationData> observationDataMap;
 
     public SMCStats(int executedRuns, int validRuns, float averageTime, float averageLength) {
         super(-1,-1,-1);
@@ -34,7 +37,7 @@ public class SMCStats extends Stats {
         this.verificationTime = -1.0f;
     }
 
-    public SMCStats(int executedRuns, int validRuns, float averageTime, float averageLength, float verificationTime, List<GraphPoint> cumulativeStepPoints, List<GraphPoint> cumulativeDelayPoints) {
+    public SMCStats(int executedRuns, int validRuns, float averageTime, float averageLength, float verificationTime, List<GraphPoint> cumulativeStepPoints, List<GraphPoint> cumulativeDelayPoints, Map<String, ObservationData> observationData) {
         super(-1,-1,-1);
         this.executedRuns = executedRuns;
         this.validRuns = validRuns;
@@ -43,6 +46,7 @@ public class SMCStats extends Stats {
         this.verificationTime = verificationTime;
         this.cumulativeStepPoints = cumulativeStepPoints;
         this.cumulativeDelayPoints = cumulativeDelayPoints; 
+        this.observationDataMap = observationData;
     }
 
     public float getVerificationTime() {
@@ -143,6 +147,10 @@ public class SMCStats extends Stats {
 
     public List<GraphPoint> getCumulativeDelayPoints() {
         return cumulativeDelayPoints;
+    }
+
+    public Map<String, ObservationData> getObservationDataMap() {
+        return observationDataMap;
     }
 
     public float getValidRunTimeStdDev() {

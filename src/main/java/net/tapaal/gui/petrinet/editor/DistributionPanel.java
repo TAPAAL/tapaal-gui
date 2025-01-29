@@ -9,7 +9,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.graph.Graph;
 import pipe.gui.graph.GraphDialog;
 import pipe.gui.graph.GraphPoint;
-import pipe.gui.graph.GraphDialog.GraphDialogBuilder;
+import pipe.gui.graph.DefaultGraphDialog.GraphDialogBuilder;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.swingcomponents.EscapableDialog;
 
@@ -27,7 +27,7 @@ public class DistributionPanel extends JPanel {
     private TimedTransitionComponent transition;
     private EscapableDialog dialog;
 
-    private static final String[] continuous =  { "constant", "uniform", "exponential", "normal", "gamma", "erlang" };
+    private static final String[] continuous =  { "constant", "uniform", "exponential", "normal", "gamma", "erlang", "triangular", "log normal" };
     private static final String[] discrete =    { "discrete uniform", "geometric" };
 
     public DistributionPanel(TimedTransitionComponent transition, EscapableDialog dialog) {
@@ -59,12 +59,15 @@ public class DistributionPanel extends JPanel {
         distributionShowGraph = new JButton("Show density");
         distributionParam1Label = new JLabel();
         distributionParam2Label = new JLabel();
+        distributionParam3Label = new JLabel();
         distributionParam1Field = new JTextField(5);
         distributionParam2Field = new JTextField(5);
+        distributionParam3Field = new JTextField(5);
         meanLabel = new JLabel();
         meanValueLabel = new JLabel();
         SwingHelper.setPreferredWidth(distributionParam1Field, 100);
         SwingHelper.setPreferredWidth(distributionParam2Field, 100);
+        SwingHelper.setPreferredWidth(distributionParam3Field, 100);
         distributionType.addActionListener(actionEvent -> {
             if(!distributionType.hasFocus()) return;
             displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
@@ -94,6 +97,7 @@ public class DistributionPanel extends JPanel {
         };
         distributionParam1Field.getDocument().addDocumentListener(updateDistribDisplay);
         distributionParam2Field.getDocument().addDocumentListener(updateDistribDisplay);
+        distributionParam3Field.getDocument().addDocumentListener(updateDistribDisplay);
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createTitledBorder("Distribution and Firing Mode"));
@@ -131,6 +135,15 @@ public class DistributionPanel extends JPanel {
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.WEST;
         paramPanel.add(meanValueLabel, gbc);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx -= 5;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.EAST;
+        paramPanel.add(distributionParam3Label, gbc);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx++;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paramPanel.add(distributionParam3Field, gbc);
         gbc = GridBagHelper.as(3 ,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
         gbc.fill = GridBagConstraints.HORIZONTAL;
         paramPanel.setPreferredSize(new Dimension(350, paramPanel.getPreferredSize().height));
@@ -195,6 +208,15 @@ public class DistributionPanel extends JPanel {
                 case SMCGeometricDistribution.NAME:
                     double p = Double.parseDouble(distributionParam1Field.getText());
                     return new SMCGeometricDistribution(p);
+                case SMCTriangularDistribution.NAME:
+                    double ta = Double.parseDouble(distributionParam1Field.getText());
+                    double tb = Double.parseDouble(distributionParam2Field.getText());
+                    double tc = Double.parseDouble(distributionParam3Field.getText());
+                    return new SMCTriangularDistribution(ta, tb, tc);
+                case SMCLogNormalDistribution.NAME:
+                    double logMean = Double.parseDouble(distributionParam1Field.getText());
+                    double logStddev = Double.parseDouble(distributionParam2Field.getText());
+                    return new SMCLogNormalDistribution(logMean, logStddev);
             }
         } catch(NumberFormatException ignored) {}
         return SMCDistribution.defaultDistributionFor(type);
@@ -246,6 +268,17 @@ public class DistributionPanel extends JPanel {
             case SMCGeometricDistribution.NAME:
                 displayOneVariable("P", ((SMCGeometricDistribution) distribution).p);
                 break;
+            case SMCTriangularDistribution.NAME:
+                displayThreeVariables(
+                    "A", ((SMCTriangularDistribution) distribution).a,
+                    "B", ((SMCTriangularDistribution) distribution).b,
+                    "C", ((SMCTriangularDistribution) distribution).c);
+                break;
+            case SMCLogNormalDistribution.NAME:
+                displayTwoVariables(
+                    "Log Mean", ((SMCLogNormalDistribution) distribution).logMean,
+                    "Log Std. Dev", ((SMCLogNormalDistribution) distribution).logStddev);
+                break;
             default:
                 break;
         }
@@ -270,6 +303,8 @@ public class DistributionPanel extends JPanel {
         distributionParam1Field.setText(String.valueOf(value));
         distributionParam2Label.setVisible(false);
         distributionParam2Field.setVisible(false);
+        distributionParam3Label.setVisible(false);
+        distributionParam3Field.setVisible(false);
     }
 
     private void displayTwoVariables(String name1, double value1, String name2, double value2) {
@@ -279,6 +314,21 @@ public class DistributionPanel extends JPanel {
         distributionParam2Field.setText(String.valueOf(value2));
         distributionParam2Label.setVisible(true);
         distributionParam2Field.setVisible(true);
+        distributionParam3Label.setVisible(false);
+        distributionParam3Field.setVisible(false);
+    }
+
+    private void displayThreeVariables(String name1, double value1, String name2, double value2, String name3, double value3) {
+        distributionParam1Label.setText(name1 + " :");
+        distributionParam2Label.setText(name2 + " :");
+        distributionParam3Label.setText(name3 + " :");
+        distributionParam1Field.setText(String.valueOf(value1));
+        distributionParam2Field.setText(String.valueOf(value2));
+        distributionParam3Field.setText(String.valueOf(value3));
+        distributionParam2Label.setVisible(true);
+        distributionParam2Field.setVisible(true);
+        distributionParam3Label.setVisible(true);
+        distributionParam3Field.setVisible(true);
     }
 
     private void showDistributionGraph() {
@@ -321,6 +371,12 @@ public class DistributionPanel extends JPanel {
         } else if (distribution instanceof SMCGeometricDistribution) {
             Graph graph = createGraph((SMCGeometricDistribution) distribution);
             builder = builder.addGraph(graph).setPointPlot(true);
+        } else if (distribution instanceof SMCTriangularDistribution) {
+            Graph graph = createGraph((SMCTriangularDistribution) distribution);
+            builder = builder.addGraph(graph);
+        } else if (distribution instanceof SMCLogNormalDistribution) {
+            Graph graph = createGraph((SMCLogNormalDistribution) distribution);
+            builder = builder.addGraph(graph);
         }
 
         return builder.setTitle(title).build();
@@ -521,6 +577,37 @@ public class DistributionPanel extends JPanel {
         return new Graph("Geometric distribution", points, distribution.getMean());
     }
 
+    private Graph createGraph(SMCTriangularDistribution distribution) {
+        List<GraphPoint> points = new ArrayList<>();
+
+        double mean = distribution.getMean();
+
+        points.add(new GraphPoint(distribution.a, 0));
+        points.add(new GraphPoint(distribution.c, 2 / (distribution.b - distribution.a)));
+        points.add(new GraphPoint(distribution.b, 0));
+
+        return new Graph("Triangular Distribution", points, mean);
+    }
+
+    private Graph createGraph(SMCLogNormalDistribution distribution) {
+        List<GraphPoint> points = new ArrayList<>();
+
+        double mean = distribution.getMean();
+        double logStddev = distribution.logStddev;
+        double logMean = distribution.logMean;
+
+        double min = Math.exp(logMean - 3 * logStddev);
+        double max = Math.exp(logMean + 3 * logStddev);
+        double step = (max - min) / 1000;
+
+        for (double x = min; x <= max; x += step) {
+            double y = distribution.pdf(x);
+            points.add(new GraphPoint(x, y));
+        }
+
+        return new Graph("Log Normal Distribution", points, mean);
+    }
+
     private JRadioButton useContinuousDistribution;
     private JRadioButton useDiscreteDistribution;
     private ButtonGroup distributionCategoryGroup;
@@ -528,8 +615,10 @@ public class DistributionPanel extends JPanel {
     private JButton distributionShowGraph;
     private JLabel distributionParam1Label;
     private JLabel distributionParam2Label;
+    private JLabel distributionParam3Label;
     private JTextField distributionParam1Field;
     private JTextField distributionParam2Field;
+    private JTextField distributionParam3Field;
     private JLabel meanLabel;
     private JLabel meanValueLabel;
 }

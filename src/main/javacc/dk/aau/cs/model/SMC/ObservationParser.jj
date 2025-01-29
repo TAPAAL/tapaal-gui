@@ -1,0 +1,171 @@
+options {
+    STATIC = false;
+}
+
+PARSER_BEGIN(ObservationParser)
+
+package dk.aau.cs.model.SMC;
+
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.verification.observations.expressions.ObsConstant;
+import dk.aau.cs.verification.observations.expressions.ObsPlace;
+import dk.aau.cs.verification.observations.expressions.ObsExpression;
+import dk.aau.cs.verification.observations.expressions.ObsAdd;
+import dk.aau.cs.verification.observations.expressions.ObsSubtract;
+import dk.aau.cs.verification.observations.expressions.ObsMultiply;
+import dk.aau.cs.verification.observations.expressions.ObsOperator;
+import dk.aau.cs.model.tapn.TimedPlace;
+import java.io.StringReader;
+
+public class ObservationParser {
+    private static TimedArcPetriNetNetwork network;
+
+    public static ObsExpression parse(String observationExpressionStr, TimedArcPetriNetNetwork network) throws ParseException, TokenMgrError {
+        ObservationParser.network = network;
+        ObservationParser parser = new ObservationParser(new StringReader(observationExpressionStr));
+
+        return parser.startParsing();
+    }
+}
+
+PARSER_END(ObservationParser)
+
+TOKEN:
+{
+    <PLUS: "+">
+    | 
+    <MINUS: "-">
+    |
+    <MULTIPLY: "*">
+    |
+    <DOT: ".">
+    |
+    <OPEN_PAREN: "(">
+    |
+    <CLOSE_PAREN: ")">
+    |
+    <CONSTANT: ["0"-"9"] | (["1"-"9"] (["0"-"9"])*)>
+    |
+    <#ALPHA: ["a"-"z","A"-"Z"]>
+    |
+    <#ALPHANUM: (["a"-"z","A"-"Z","0"-"9"])>
+    |
+    <ID: <ALPHA> ("_" | <ALPHANUM>)*>
+}
+
+SKIP :
+{
+    " "
+  | "\t"
+  | "\n"
+  | "\r"
+}
+
+ObsExpression startParsing() : {
+    ObsExpression expr;
+} {
+    expr = expression() <EOF> { return expr; }
+}
+
+ObsExpression expression() : {
+    ObsExpression left, right;
+    ObsOperator root;
+    Token op;
+} {
+    left = term()
+    (
+        (op = <PLUS> | op = <MINUS>) 
+        {
+            root = op.kind == PLUS ? 
+                   new ObsAdd(left, null) : 
+                   new ObsSubtract(left, null);
+            
+            if (left.isOperator()) {
+                ((ObsOperator)left).setParent(root);
+            }
+        }
+
+        right = term()
+        {
+            root.setRight(right);
+            if (right.isOperator()) {
+                ((ObsOperator)right).setParent(root);
+            }
+            left = root;
+        }
+    )*
+    { return left; }
+}
+
+ObsExpression term() : {
+    ObsExpression left, right;
+    ObsOperator root;
+} {
+    left = factor()
+    (
+        <MULTIPLY>
+        {
+            root = new ObsMultiply(left, null);
+            if (left.isOperator()) {
+                ((ObsOperator)left).setParent(root);
+            }
+        }
+
+        right = factor()
+        {
+            root.setRight(right);
+            if (right.isOperator()) {
+                ((ObsOperator)right).setParent(root);
+            }
+            left = root;
+        }
+    )*
+    { return left; }
+}
+
+ObsExpression factor() : {
+    ObsExpression expr;
+} {
+    (
+        expr = atom() |
+        <OPEN_PAREN> expr = expression() <CLOSE_PAREN>
+        {
+            if (expr.isOperator()) {
+                ((ObsOperator)expr).hadParentheses(true);
+            }
+        }
+    )
+    { return expr; }
+}
+
+ObsExpression atom() : {
+    Token value, templateName, placeName;
+} {
+    value = <CONSTANT> 
+    { return new ObsConstant(Integer.parseInt(value.image)); }
+    |
+    templateName = <ID> <DOT> placeName = <ID>
+    { 
+        try {
+            boolean isShared = false;
+            for (TimedPlace p : network.sharedPlaces()) {
+                if (p.name().equals(placeName.image)) {
+                    isShared = true;
+                    break;
+                }
+            }
+            
+            if (!templateName.image.equals("Shared") && isShared) {
+                throw new ParseException("Place " + templateName.image + "." + placeName.image + " does not exist in the network");
+            }
+
+            if (isShared) {
+                return new ObsPlace("Shared", placeName.image, network);
+            } else {
+                return new ObsPlace(templateName.image, placeName.image, network);
+            }
+        } catch (NullPointerException e) {
+            throw new ParseException("Place " + templateName.image + "." + placeName.image + " does not exist in the network");
+        }
+    }
+}

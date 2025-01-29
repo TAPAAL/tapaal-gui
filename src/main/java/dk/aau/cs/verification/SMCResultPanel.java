@@ -2,10 +2,14 @@ package dk.aau.cs.verification;
 
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
+import dk.aau.cs.verification.VerifyTAPN.ObservationData;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.graph.Graph;
-import pipe.gui.graph.GraphDialog;
+import pipe.gui.graph.DefaultGraphDialog;
 import pipe.gui.graph.GraphPoint;
+import pipe.gui.graph.MultiGraph;
+import pipe.gui.graph.ObservationGraphDialog;
+import pipe.gui.graph.GraphDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +19,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
 
@@ -59,29 +64,116 @@ public class SMCResultPanel extends JPanel  {
         resultPanel.setBorder(BorderFactory.createTitledBorder("Query result"));
         resultPanel.add(new JLabel("<html>" + result.toString() + "</html>"), gbc);
 
-        java.util.List<Graph> graphs = new ArrayList<>();
+        List<Graph> cumulativeGraphs = new ArrayList<>();
 
-        java.util.List<GraphPoint> cumulativeDelayPoints = stats.getCumulativeDelayPoints();
+        List<GraphPoint> cumulativeDelayPoints = stats.getCumulativeDelayPoints();
         if (!cumulativeDelayPoints.isEmpty()) {
-            graphs.add(new Graph("Cumulative Probability / Delay", cumulativeDelayPoints, "Time", "Cumulative Probability", "Delay"));
+            cumulativeGraphs.add(new Graph("Cumulative Probability / Delay", cumulativeDelayPoints, "Time", "Cumulative Probability", "Time"));
         }
 
         List<GraphPoint> cumulativeStepPoints = stats.getCumulativeStepPoints();
         if (!cumulativeStepPoints.isEmpty()) {
-            graphs.add(new Graph("Cumulative Probability / Step", cumulativeStepPoints, "Number of Steps", "Cumulative Probability", "Step"));
+            cumulativeGraphs.add(new Graph("Cumulative Probability / Step", cumulativeStepPoints, "Number of Steps", "Cumulative Probability", "Step"));
         }
 
-        if (!graphs.isEmpty()) {
-            GraphDialog.GraphDialogBuilder builder = new GraphDialog.GraphDialogBuilder();
-            GraphDialog graphFrame = builder.addGraphs(graphs).setTitle("SMC Statistics").build();
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints buttonGbc = new GridBagConstraints();
+        buttonGbc.gridx = 0;
+        buttonGbc.gridy = 0;
+        buttonGbc.fill = GridBagConstraints.HORIZONTAL;
+        buttonGbc.anchor = GridBagConstraints.WEST;
+        buttonGbc.insets = new Insets(0, 0, 10, 0);
+        if (!cumulativeGraphs.isEmpty()) {
+            DefaultGraphDialog.GraphDialogBuilder builder = new DefaultGraphDialog.GraphDialogBuilder();
+            GraphDialog graphFrame = builder.addGraphs(cumulativeGraphs).setTitle("SMC Statistics").build();
 
             String btnText = "Plot cumulative statistics";
 
-            JButton showGraphButton = new JButton(btnText);
-            gbc = GridBagHelper.as(1, 0, WEST, new Insets(0,0,10,0));
-            resultPanel.add(showGraphButton, gbc);
-            showGraphButton.addActionListener(arg0 -> graphFrame.display());
+            JButton showCumulativeButton = new JButton(btnText);
+            showCumulativeButton.addActionListener(arg0 -> graphFrame.display());
+            buttonPanel.add(showCumulativeButton, buttonGbc);
+            ++buttonGbc.gridy;
         }
+        
+        buttonGbc.insets = new Insets(0, 0, 0, 0);
+
+        Map<String, ObservationData> observationDataMap = stats.getObservationDataMap();
+        if (!observationDataMap.isEmpty()) {
+            List<MultiGraph> observationGraphs = new ArrayList<>();
+
+            MultiGraph timeMultiGraph = new MultiGraph("Observation / Time", "Time", "Count", "Time");
+            MultiGraph stepMultiGraph = new MultiGraph("Observation / Step", "Step", "Count", "Step");
+
+            for (Map.Entry<String, ObservationData> entry : observationDataMap.entrySet()) {
+                String observationName = entry.getKey();
+                ObservationData observationData = entry.getValue();
+                List<GraphPoint> avgTimePoints = observationData.getSmcObservationAvgTime();
+                if (!avgTimePoints.isEmpty()) {
+                    timeMultiGraph.addGraph(observationName, "Avg Time", new Graph(avgTimePoints));
+                }
+
+                List<GraphPoint> minTimePoints = observationData.getSmcObservationMinTime();
+                if (!minTimePoints.isEmpty()) {
+                    timeMultiGraph.addGraph(observationName, "Min Time", new Graph(minTimePoints));
+                }
+
+                List<GraphPoint> maxTimePoints = observationData.getSmcObservationMaxTime();
+                if (!maxTimePoints.isEmpty()) {
+                    timeMultiGraph.addGraph(observationName, "Max Time", new Graph(maxTimePoints));
+                }
+
+                List<GraphPoint> avgStepPoints = observationData.getSmcObservationAvgStep();
+                if (!avgStepPoints.isEmpty()) {
+                    stepMultiGraph.addGraph(observationName, "Avg Step", new Graph(avgStepPoints));
+                }
+
+                List<GraphPoint> minStepPoints = observationData.getSmcObservationMinStep();
+                if (!minStepPoints.isEmpty()) {
+                    stepMultiGraph.addGraph(observationName, "Min Step", new Graph(minStepPoints));
+                }
+
+                List<GraphPoint> maxStepPoints = observationData.getSmcObservationMaxStep();
+                if (!maxStepPoints.isEmpty()) {
+                    stepMultiGraph.addGraph(observationName, "Max Step", new Graph(maxStepPoints));
+                }
+
+                List<GraphPoint> observationTimePoints = observationData.getSmcObservationValueTime();
+                if (!observationTimePoints.isEmpty()) {
+                    timeMultiGraph.addGraph(observationName, "Time", new Graph(observationTimePoints));
+                }
+
+                List<GraphPoint> observationStepPoints = observationData.getSmcObservationValueStep();
+                if (!observationStepPoints.isEmpty()) {
+                    stepMultiGraph.addGraph(observationName, "Step", new Graph(observationStepPoints));
+                }
+
+                timeMultiGraph.addGlobalAvg(observationName + " Avg Time", observationData.getSmcGlobalAvgTime());
+                stepMultiGraph.addGlobalAvg(observationName + " Avg Step", observationData.getSmcGlobalAvgStep());
+            }
+
+            if (!timeMultiGraph.isEmpty()) {
+                observationGraphs.add(timeMultiGraph);
+            }
+
+            if (!stepMultiGraph.isEmpty()) {
+                observationGraphs.add(stepMultiGraph);
+            }
+        
+            ObservationGraphDialog.GraphDialogBuilder builder = new ObservationGraphDialog.GraphDialogBuilder();
+            GraphDialog graphFrame = builder.addMultiGraphs(observationGraphs)
+                                            .setTitle("Observation Statistics")
+                                            .showGlobalAverages(true)
+                                            .isSimulate(result.getQuery().isSimulate())
+                                            .build();
+     
+            String btnText = "Plot observations";
+
+            JButton showObservationButton = new JButton(btnText);
+            buttonPanel.add(showObservationButton, buttonGbc);
+            showObservationButton.addActionListener(arg0 -> graphFrame.display());
+        }
+
+        resultPanel.add(buttonPanel, GridBagHelper.as(1, 0, WEST, new Insets(0, 0, 10, 0)));
 
         return resultPanel;
     }

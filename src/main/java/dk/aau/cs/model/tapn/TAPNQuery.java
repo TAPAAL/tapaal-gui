@@ -4,9 +4,12 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.SMCSettings;
+import dk.aau.cs.verification.observations.Observation;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.VerificationType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TAPNQuery {
 	private TCTLAbstractProperty property;
@@ -14,6 +17,7 @@ public class TAPNQuery {
 	private QueryCategory queryCategory = QueryCategory.Default;
 	private ArrayList<String> traceList;
     private SMCSettings smcSettings;
+    private VerificationType smcVerificationType;
 
 	public TCTLAbstractProperty getProperty() {
 		return property;
@@ -67,6 +71,18 @@ public class TAPNQuery {
     	return this.queryCategory;
     }
 
+    public void setVerificationType(VerificationType smcVerificationType) {
+        this.smcVerificationType = smcVerificationType;
+    }
+
+    public VerificationType getVerificationType() {
+        return this.smcVerificationType;
+    }
+
+    public boolean isSimulate() {
+        return smcVerificationType.equals(VerificationType.SIMULATE);
+    }
+
     public void setTraceList(ArrayList<String> traces) {
 	    this.traceList = traces;
     }
@@ -81,6 +97,10 @@ public class TAPNQuery {
 
     public SMCSettings getSMCSettings() {
         return smcSettings;
+    }
+
+    public List<Observation> getObservations() {
+        return smcSettings.getObservations();
     }
 }
 
