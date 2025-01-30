@@ -48,11 +48,24 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
     private JFreeChart currentChart;
     private String currentView;
 
+    private int pointCount;
+
     private ObservationGraphDialog(List<MultiGraph> multiGraphs, String title, boolean showGlobalAverages, boolean isSimulate) {
         super(TAPAALGUI.getAppGui(), title, true);
         this.multiGraphs = multiGraphs;
         this.showGlobalAverages = showGlobalAverages;
         this.isSimulate = isSimulate;
+
+        int pointCount = 0;
+        for (MultiGraph multiGraph : multiGraphs) {
+            for (Map<String, Graph> propertyGraphs : multiGraph.getMultiGraphMap().values()) {
+                for (Graph graph : propertyGraphs.values()) {
+                    pointCount = Math.max(pointCount, graph.getPointCount());
+                }
+            }
+        }
+
+        this.pointCount = pointCount;
     }
 
     @Override
@@ -151,7 +164,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             boolean visible = isSeriesVisible(seriesKey);
     
             renderer.setSeriesVisible(i, visible);
-            renderer.setSeriesStroke(i, createStrokeForSeries(seriesKey, lineThickness));
+            renderer.setSeriesStroke(i, createStrokeForSeries(seriesKey, lineThickness, pointCount));
         }
 
         Map<String, Paint> baseColors = getBaseColors(dataset, renderer);
@@ -181,11 +194,14 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         return baseColors;
     }
 
-    private BasicStroke createStrokeForSeries(String seriesKey, float lineThickness) {
+    private BasicStroke createStrokeForSeries(String seriesKey, float lineThickness, float pointSize) {
+        float dashLength = Math.max(1.0f, pointSize / 50.0f);
+        float gapLength = Math.max(1.0f, pointSize / 45.0f);
+    
         if (seriesKey.contains("Min")) {
-            return new BasicStroke(lineThickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{6.0f, 6.0f}, 0.0f);
+            return new BasicStroke(lineThickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{dashLength / 1.2f, gapLength / 1.2f}, 0.0f);
         } else if (seriesKey.contains("Max")) {
-            return new BasicStroke(lineThickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{2.0f, 2.0f}, 0.0f);
+            return new BasicStroke(lineThickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{dashLength / 2.0f, gapLength / 2.0f}, 0.0f);
         } else {
             return new BasicStroke(lineThickness);
         }
@@ -243,7 +259,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         renderer.setDefaultToolTipGenerator(new StandardXYToolTipGenerator());
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
-            renderer.setSeriesStroke(i, createStrokeForSeries(seriesKey, lineThickness));
+            renderer.setSeriesStroke(i, createStrokeForSeries(seriesKey, lineThickness, pointCount));
         }
 
         Map<String, Paint> baseColors = getBaseColors(dataset, renderer);

@@ -43,6 +43,10 @@ public class Graph {
         return points;
     }
 
+    public int getPointCount() {
+        return points.size();
+    }
+
     public Double getMean() {
         return mean;
     }
