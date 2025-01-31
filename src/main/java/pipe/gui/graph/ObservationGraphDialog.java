@@ -184,7 +184,6 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
     }
 
     private BasicStroke createStrokeForSeries(String seriesKey, float lineThickness) {
-
         if (seriesKey.contains("Min")) {
             return new BasicStroke(lineThickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{6.0f, 6.0f}, 0.0f);
         } else if (seriesKey.contains("Max")) {
