@@ -255,7 +255,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             if (baseColors.containsKey(baseName)) {
                 renderer.setSeriesPaint(i, baseColors.get(baseName));
             }
-        };
+        }
 
         plot.setRenderer(renderer);
         plot.setBackgroundPaint(Color.WHITE);

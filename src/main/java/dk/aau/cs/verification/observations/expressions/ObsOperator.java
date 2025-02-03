@@ -39,10 +39,6 @@ public abstract class ObsOperator implements ObsExpression {
         if (left.equals(selectedExpr) || right.equals(selectedExpr)) {
             if (newExpr.isOperator()) {
                 ((ObsOperator)newExpr).parent = this;
-                if (selectedExpr.isOperator()) {
-                    ((ObsOperator)newExpr).left = ((ObsOperator)selectedExpr).left;
-                    ((ObsOperator)newExpr).right = ((ObsOperator)selectedExpr).right;
-                }
             }
 
             if (left.equals(selectedExpr)) {
@@ -50,13 +46,9 @@ public abstract class ObsOperator implements ObsExpression {
             } else if (right.equals(selectedExpr)) {
                 right = newExpr;
             }
-        }
-
-        if (left.isOperator()) {
+        } else if (left.isOperator()) {
             ((ObsOperator)left).replace(selectedExpr, newExpr);
-        }
-        
-        if (right.isOperator()) {
+        } else if (right.isOperator()) {
             ((ObsOperator)right).replace(selectedExpr, newExpr);
         }
     }

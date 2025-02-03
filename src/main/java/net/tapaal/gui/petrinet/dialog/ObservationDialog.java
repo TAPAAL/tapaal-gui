@@ -484,15 +484,17 @@ public class ObservationDialog extends EscapableDialog {
 
     private void updateExpression(ObsExpression newExpr) {
         String selectedText = expressionField.getSelectedText();
-        String fullText = expressionField.getText();
         ObsExpression oldExpr = currentExpr.deepCopy();
-        if (selectedText != null && 
-            !selectedText.equals(fullText) && 
-            currentExpr.isOperator()) {
-            ((ObsOperator)currentExpr).replace(selectedExpr, newExpr);
-        } else if (currentExpr.isOperator() && selectedText == null) {
-            ((ObsOperator)currentExpr).insertLeftMost(newExpr);
+        if (selectedText != null) {
+            if (newExpr.isOperator()) {
+                ((ObsOperator)newExpr).setLeft(selectedExpr);
+                ((ObsOperator)selectedExpr).setParent(newExpr);
+                ((ObsOperator)currentExpr).replace(selectedExpr, newExpr);
+            } else {
+                ((ObsOperator)currentExpr).replace(selectedExpr, newExpr);
+            }
         } else {
+            ((ObsOperator)newExpr).setLeft(currentExpr);
             currentExpr = newExpr;
         }
 
