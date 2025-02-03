@@ -154,6 +154,8 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             renderer.setSeriesStroke(i, createStrokeForSeries(seriesKey, lineThickness));
         }
 
+        renderer.setDrawSeriesLineAsPath(true);
+
         Map<String, Paint> baseColors = getBaseColors(dataset, renderer);
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
