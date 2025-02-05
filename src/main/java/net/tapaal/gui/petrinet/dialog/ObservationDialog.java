@@ -559,9 +559,11 @@ public class ObservationDialog extends EscapableDialog {
                 exprPos = currentExpr.getObjectPosition(newOpRight);
             }
 
-            expressionField.requestFocusInWindow();
-            expressionField.select(exprPos.getStart(), exprPos.getEnd());
-            updateSelected();
+            if (exprPos != null) {
+                expressionField.requestFocusInWindow();
+                expressionField.select(exprPos.getStart(), exprPos.getEnd());
+                updateSelected();
+            }
         }
     }
 
