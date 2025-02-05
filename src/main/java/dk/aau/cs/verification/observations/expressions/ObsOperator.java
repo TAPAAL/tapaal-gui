@@ -46,10 +46,14 @@ public abstract class ObsOperator implements ObsExpression {
             } else if (right.equals(selectedExpr)) {
                 right = newExpr;
             }
-        } else if (left.isOperator()) {
-            ((ObsOperator)left).replace(selectedExpr, newExpr);
-        } else if (right.isOperator()) {
-            ((ObsOperator)right).replace(selectedExpr, newExpr);
+        } else {
+            if (left.isOperator()) {
+                ((ObsOperator)left).replace(selectedExpr, newExpr);
+            } 
+            
+            if (right.isOperator()) {
+                ((ObsOperator)right).replace(selectedExpr, newExpr);
+            }
         }
     }
 
@@ -96,6 +100,29 @@ public abstract class ObsOperator implements ObsExpression {
     }
 
     @Override
+    public ObsExprPosition getObjectPosition(ObsExpression expr) {
+        if (equals(expr)) {
+            return new ObsExprPosition(0, toString().length(), this);
+        }
+
+        int parenOffset = addParenthesis() ? 1 : 0;
+        int leftLen = left.toString().length();
+        int thisLen = toString().length() - leftLen - right.toString().length();
+        
+        ObsExprPosition leftPos = left.getObjectPosition(expr);
+        if (leftPos != null) {
+            return leftPos.addOffset(parenOffset);
+        }
+
+        ObsExprPosition rightPos = right.getObjectPosition(expr);
+        if (rightPos != null) {
+            return rightPos.addOffset(leftLen + thisLen - parenOffset);
+        }
+
+        return null;
+    }
+
+    @Override
     public boolean isOperator() {
         return true;
     }
@@ -113,6 +140,18 @@ public abstract class ObsOperator implements ObsExpression {
     @Override
     public boolean isPlace() {
         return false;
+    }
+
+    public ObsExpression getParent() {
+        return parent;
+    }
+
+    public ObsExpression getLeft() {
+        return left;
+    }
+
+    public ObsExpression getRight() {
+        return right;
     }
 
     @Override

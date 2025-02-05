@@ -11,6 +11,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -134,36 +136,7 @@ public class ObservationDialog extends EscapableDialog {
         expressionField.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (isEditing) return;
-
-                int pos = expressionField.viewToModel2D(e.getPoint());
-                ObsExprPosition exprPos = currentExpr.getObjectPosition(pos - 1);
-                expressionField.select(exprPos.getStart(), exprPos.getEnd());
-                selectedExpr = exprPos.getObject();
-                if (selectedExpr.isPlace()) {
-                    String[] placeParts = selectedExpr.toString().split("\\.");
-                    String templateName = placeParts[0];
-                    String placeName = placeParts[1];
-                    Optional<?> selectedTemplateOpt = tapnNetwork.activeTemplates().stream()
-                        .filter(t -> t.name().equals(templateName))
-                        .findFirst();
-
-                    if (!selectedTemplateOpt.isPresent()) {
-                        selectedTemplateOpt = Optional.of(SHARED);
-                    }
-
-                    Object selectedTemplate = selectedTemplateOpt.get();
-                    templateComboBox.setSelectedItem(selectedTemplate);
-            
-                    if (selectedTemplate.equals(SHARED)) {
-                        placeComboBox.setSelectedItem(tapnNetwork.getSharedPlaceByName(placeName));
-                    } else {
-                        placeComboBox.setSelectedItem(((TimedArcPetriNet)selectedTemplate).getPlaceByName(placeName));
-                    }
-                }
-
-                Enabler.setAllEnabled(placesPanel, selectedExpr.isLeaf());
-                Enabler.setAllEnabled(constantsPanel, selectedExpr.isLeaf());
+                updateSelected();
             }
         });
 
@@ -313,6 +286,25 @@ public class ObservationDialog extends EscapableDialog {
 
         JButton deleteSelection = new JButton("Delete Selection");
         deleteSelection.setEnabled(false);
+        deleteSelection.addActionListener(e -> {
+            String fullText = expressionField.getText();
+            String selectedText = expressionField.getSelectedText();
+            if (currentExpr.isOperator() && !fullText.equals(selectedText)) {
+                ((ObsOperator)currentExpr).replace(selectedExpr, new ObsPlaceHolder());
+            } else {
+                currentExpr = new ObsPlaceHolder();
+            }
+
+            expressionField.setText(currentExpr.toString());
+        });
+
+        expressionField.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                deleteSelection.setEnabled(expressionField.getSelectedText() != null);
+            }
+        });
+
         resetExpression = new JButton("Reset Expression");
 
         resetExpression.addActionListener(e -> {
@@ -457,6 +449,8 @@ public class ObservationDialog extends EscapableDialog {
         add(buttonPanel, gbc);
 
         pack();
+
+        updateSelected();
     }
 
     private void toggleManualEditing() {
@@ -482,13 +476,52 @@ public class ObservationDialog extends EscapableDialog {
         expressionField.setEditable(isEditing);
     }
 
+    private void updateSelected() {
+        if (isEditing) return;
+
+        expressionField.requestFocusInWindow();
+    
+        int pos = expressionField.getCaretPosition();
+        ObsExprPosition exprPos = currentExpr.getObjectPosition(pos - 1);
+        expressionField.select(exprPos.getStart(), exprPos.getEnd());
+        selectedExpr = exprPos.getObject();
+        if (selectedExpr.isPlace()) {
+            String[] placeParts = selectedExpr.toString().split("\\.");
+            String templateName = placeParts[0];
+            String placeName = placeParts[1];
+            Optional<?> selectedTemplateOpt = tapnNetwork.activeTemplates().stream()
+                .filter(t -> t.name().equals(templateName))
+                .findFirst();
+    
+            if (!selectedTemplateOpt.isPresent()) {
+                selectedTemplateOpt = Optional.of(SHARED);
+            }
+    
+            Object selectedTemplate = selectedTemplateOpt.get();
+            templateComboBox.setSelectedItem(selectedTemplate);
+    
+            if (selectedTemplate.equals(SHARED)) {
+                placeComboBox.setSelectedItem(tapnNetwork.getSharedPlaceByName(placeName));
+            } else {
+                placeComboBox.setSelectedItem(((TimedArcPetriNet)selectedTemplate).getPlaceByName(placeName));
+            }
+        }
+    
+        Enabler.setAllEnabled(placesPanel, selectedExpr.isLeaf());
+        Enabler.setAllEnabled(constantsPanel, selectedExpr.isLeaf());
+    }
+
     private void updateExpression(ObsExpression newExpr) {
-        String selectedText = expressionField.getSelectedText();
         String fullText = expressionField.getText();
+        String selectedText = expressionField.getSelectedText();
         ObsExpression oldExpr = currentExpr.deepCopy();
-        if (selectedText != null && currentExpr.isOperator() && !selectedText.equals(fullText)) {
-            if (newExpr.isOperator() && selectedExpr.isOperator()) {
+
+        if (selectedText != null && currentExpr.isOperator() && !fullText.equals(selectedText)) {
+            if (newExpr.isOperator()) {
                 ((ObsOperator)newExpr).setLeft(selectedExpr);
+            }
+            
+            if (selectedExpr.isOperator()) {
                 ((ObsOperator)selectedExpr).setParent(newExpr);
             }
 
@@ -498,14 +531,37 @@ public class ObservationDialog extends EscapableDialog {
                 ((ObsOperator)newExpr).setLeft(currentExpr);
             }
 
+            if (currentExpr.isOperator()) {
+                ((ObsOperator)currentExpr).setParent(newExpr);
+            }
+
             currentExpr = newExpr;
         }
-
+        
         if (!currentExpr.toString().equals(oldExpr.toString())) {   
             expressionField.setText(currentExpr.toString());
             undoManager.addEdit(new ExpressionEdit(oldExpr, currentExpr.deepCopy()));
             refreshUndoRedoButtons();
             saveButton.setEnabled(!includesPlaceHolder());
+        }
+
+        if (newExpr.isOperator()) {
+            ObsOperator newOp = (ObsOperator)newExpr;
+            ObsExpression newOpLeft = newOp.getLeft();
+            ObsExpression newOpRight = newOp.getRight();
+
+            ObsExprPosition exprPos;
+            if (newOpLeft.isOperator()) {
+                exprPos = currentExpr.getObjectPosition(((ObsOperator)newOpLeft).getRight());
+            } else if (newOpLeft.isPlaceHolder()) {
+                exprPos = currentExpr.getObjectPosition(newOpLeft);
+            } else {
+                exprPos = currentExpr.getObjectPosition(newOpRight);
+            }
+
+            expressionField.requestFocusInWindow();
+            expressionField.select(exprPos.getStart(), exprPos.getEnd());
+            updateSelected();
         }
     }
 
