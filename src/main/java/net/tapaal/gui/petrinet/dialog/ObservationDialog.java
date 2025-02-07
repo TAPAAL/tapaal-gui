@@ -276,12 +276,16 @@ public class ObservationDialog extends EscapableDialog {
             if (undoManager.canUndo()) {
                 undoManager.undo();
             }
+
+            refreshSaveButton();
         });
 
         redoButton.addActionListener(e -> {
             if (undoManager.canRedo()) {
                 undoManager.redo();
             }
+
+            refreshSaveButton();
         });
 
         JButton deleteSelection = new JButton("Delete Selection");
@@ -296,6 +300,7 @@ public class ObservationDialog extends EscapableDialog {
             }
 
             expressionField.setText(currentExpr.toString());
+            refreshSaveButton();
         });
 
         expressionField.addCaretListener(new CaretListener() {
@@ -316,7 +321,7 @@ public class ObservationDialog extends EscapableDialog {
                     expressionField.setText(currentExpr.toString());
                     undoManager.addEdit(new ExpressionEdit(new ObsPlaceHolder(), currentExpr.deepCopy()));
                     refreshUndoRedoButtons();
-                    saveButton.setEnabled(!includesPlaceHolder());
+                    refreshSaveButton();
                 } catch (ParseException | TokenMgrError ex) {
                     JOptionPane.showMessageDialog(TAPAALGUI.getApp(), ex.getMessage(), "Error during parsing", JOptionPane.ERROR_MESSAGE);
                 }
@@ -329,6 +334,8 @@ public class ObservationDialog extends EscapableDialog {
                     undoManager.addEdit(new ExpressionEdit(oldExpr, currentExpr.deepCopy()));
                     refreshUndoRedoButtons();
                 }
+
+                refreshSaveButton();
             }
         });
 
@@ -391,7 +398,7 @@ public class ObservationDialog extends EscapableDialog {
         buttonPanel.setLayout(new GridBagLayout());
         JButton cancelButton = new JButton("Cancel");
         saveButton = new JButton("Save");
-        saveButton.setEnabled(!includesPlaceHolder());
+        refreshSaveButton();
 
         cancelButton.addActionListener(e -> dispose());
         saveButton.addActionListener(e -> {
@@ -466,7 +473,7 @@ public class ObservationDialog extends EscapableDialog {
             resetExpression.setText("Parse Expression");
             editExpression.setText("Cancel");
         } else {
-            saveButton.setEnabled(!includesPlaceHolder());
+            refreshSaveButton();
             currentExpr = previousExpr;
             expressionField.setText(currentExpr.toString());
             resetExpression.setText("Reset Expression");
@@ -542,7 +549,7 @@ public class ObservationDialog extends EscapableDialog {
             expressionField.setText(currentExpr.toString());
             undoManager.addEdit(new ExpressionEdit(oldExpr, currentExpr.deepCopy()));
             refreshUndoRedoButtons();
-            saveButton.setEnabled(!includesPlaceHolder());
+            refreshSaveButton();
         }
 
         if (newExpr.isOperator()) {
@@ -552,7 +559,12 @@ public class ObservationDialog extends EscapableDialog {
 
             ObsExprPosition exprPos;
             if (newOpLeft.isOperator()) {
-                exprPos = currentExpr.getObjectPosition(((ObsOperator)newOpLeft).getRight());
+                ObsOperator newOpLeftOp = (ObsOperator)newOpLeft;
+                if (newOpLeftOp.getRight().isPlaceHolder()) {
+                    exprPos = currentExpr.getObjectPosition(newOpLeftOp.getRight());
+                } else {
+                    exprPos = currentExpr.getObjectPosition(newOpRight);
+                }
             } else if (newOpLeft.isPlaceHolder()) {
                 exprPos = currentExpr.getObjectPosition(newOpLeft);
             } else {
@@ -574,6 +586,10 @@ public class ObservationDialog extends EscapableDialog {
 
     private boolean includesPlaceHolder() {
         return currentExpr.toString().contains(new ObsPlaceHolder().toString());
+    }
+
+    private void refreshSaveButton() {
+        saveButton.setEnabled(!includesPlaceHolder());
     }
 
     private class ExpressionEdit extends AbstractUndoableEdit {
