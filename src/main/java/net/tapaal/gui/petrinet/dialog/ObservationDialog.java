@@ -217,8 +217,6 @@ public class ObservationDialog extends EscapableDialog {
             TimedPlace place = (TimedPlace)placeComboBox.getSelectedItem();
             ObsExpression placeExpr = new ObsPlace(template, place);
             updateExpression(placeExpr);
-            Enabler.setAllEnabled(placesPanel, false);
-            Enabler.setAllEnabled(constantsPanel, false);
         });
 
         GridBagConstraints placesGbc = new GridBagConstraints();
@@ -246,8 +244,6 @@ public class ObservationDialog extends EscapableDialog {
             int value = (int)constantSpinner.getValue();
             ObsExpression constantExpr = new ObsConstant(value);
             updateExpression(constantExpr);
-            Enabler.setAllEnabled(placesPanel, false);
-            Enabler.setAllEnabled(constantsPanel, false);
         });
 
         GridBagConstraints constantsGbc = new GridBagConstraints();
@@ -528,20 +524,14 @@ public class ObservationDialog extends EscapableDialog {
                 ((ObsOperator)newExpr).setLeft(selectedExpr);
             }
             
-            if (selectedExpr.isOperator()) {
-                ((ObsOperator)selectedExpr).setParent(newExpr);
-            }
-
+            selectedExpr.setParent(newExpr);
             ((ObsOperator)currentExpr).replace(selectedExpr, newExpr);
         } else {
             if (newExpr.isOperator()) {
                 ((ObsOperator)newExpr).setLeft(currentExpr);
             }
 
-            if (currentExpr.isOperator()) {
-                ((ObsOperator)currentExpr).setParent(newExpr);
-            }
-
+            currentExpr.setParent(newExpr);
             currentExpr = newExpr;
         }
         
@@ -552,12 +542,12 @@ public class ObservationDialog extends EscapableDialog {
             refreshSaveButton();
         }
 
+        ObsExprPosition exprPos = null;
         if (newExpr.isOperator()) {
             ObsOperator newOp = (ObsOperator)newExpr;
             ObsExpression newOpLeft = newOp.getLeft();
             ObsExpression newOpRight = newOp.getRight();
 
-            ObsExprPosition exprPos;
             if (newOpLeft.isOperator()) {
                 ObsOperator newOpLeftOp = (ObsOperator)newOpLeft;
                 if (newOpLeftOp.getRight().isPlaceHolder()) {
@@ -570,12 +560,27 @@ public class ObservationDialog extends EscapableDialog {
             } else {
                 exprPos = currentExpr.getObjectPosition(newOpRight);
             }
+        } else {
+            ObsExpression parentOp = newExpr.getParent();
+            if (parentOp != null) {
+                ObsExpression rightExpr = ((ObsOperator)parentOp).getRight();
+                if (rightExpr.isPlaceHolder()) {
+                    exprPos = currentExpr.getObjectPosition(rightExpr);
+                } else {
+                    ObsExpression grandParentOp = parentOp.getParent();
+                    if (grandParentOp != null) {
+                        rightExpr = ((ObsOperator)grandParentOp).getRight();
+                        exprPos = currentExpr.getObjectPosition(rightExpr);
+                    }
+                }
 
-            if (exprPos != null) {
-                expressionField.requestFocusInWindow();
-                expressionField.select(exprPos.getStart(), exprPos.getEnd());
-                updateSelected();
             }
+        }
+
+        if (exprPos != null) {
+            expressionField.requestFocusInWindow();
+            expressionField.select(exprPos.getStart(), exprPos.getEnd());
+            updateSelected();
         }
     }
 

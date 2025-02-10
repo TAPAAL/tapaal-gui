@@ -245,13 +245,8 @@ public class TAPNQueryLoader extends QueryLoader{
         ObsExpression right = parseObsExpression(getSecondElementChild(element));
         ObsOperator operator = constructor.apply(left, right);
 
-        if (left.isOperator()) {
-            ((ObsOperator)left).setParent(operator);
-        }
-        
-        if (right.isOperator()) {
-            ((ObsOperator)right).setParent(operator);
-        }
+        left.setParent(operator);
+        right.setParent(operator);
 
         return operator;
     }    

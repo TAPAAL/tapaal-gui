@@ -80,17 +80,13 @@ ObsExpression expression() : {
                    new ObsAdd(left, null) : 
                    new ObsSubtract(left, null);
             
-            if (left.isOperator()) {
-                ((ObsOperator)left).setParent(root);
-            }
+            left.setParent(root);
         }
 
         right = term()
         {
             root.setRight(right);
-            if (right.isOperator()) {
-                ((ObsOperator)right).setParent(root);
-            }
+            right.setParent(root);
             left = root;
         }
     )*
@@ -106,17 +102,13 @@ ObsExpression term() : {
         <MULTIPLY>
         {
             root = new ObsMultiply(left, null);
-            if (left.isOperator()) {
-                ((ObsOperator)left).setParent(root);
-            }
+            left.setParent(root);
         }
 
         right = factor()
         {
             root.setRight(right);
-            if (right.isOperator()) {
-                ((ObsOperator)right).setParent(root);
-            }
+            right.setParent(root);
             left = root;
         }
     )*

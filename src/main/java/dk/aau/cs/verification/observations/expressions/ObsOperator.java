@@ -1,9 +1,8 @@
 package dk.aau.cs.verification.observations.expressions;
 
-public abstract class ObsOperator implements ObsExpression {
+public abstract class ObsOperator extends ObsExpression {
     protected ObsExpression left;
     protected ObsExpression right;
-    private ObsExpression parent;
     private boolean hadParentheses = false;
     
     protected ObsOperator(ObsExpression left, ObsExpression right) {
@@ -16,9 +15,7 @@ public abstract class ObsOperator implements ObsExpression {
     }
 
     public void insertLeftMost(ObsExpression expr) {
-        if (expr.isOperator()) {
-            ((ObsOperator)expr).parent = this;
-        }
+        expr.parent = this;
 
         if (left.isOperator()) {
             ((ObsOperator)left).insertLeftMost(expr);
@@ -37,9 +34,7 @@ public abstract class ObsOperator implements ObsExpression {
 
     public void replace(ObsExpression selectedExpr, ObsExpression newExpr) {
         if (left.equals(selectedExpr) || right.equals(selectedExpr)) {
-            if (newExpr.isOperator()) {
-                ((ObsOperator)newExpr).parent = this;
-            }
+            newExpr.parent = this;
 
             if (left.equals(selectedExpr)) {
                 left = newExpr;
@@ -63,15 +58,11 @@ public abstract class ObsOperator implements ObsExpression {
             ObsOperator copy = getClass()
                     .getConstructor(ObsExpression.class, ObsExpression.class)
                     .newInstance(left.deepCopy(), right.deepCopy());
-            copy.setParent(this.parent);
+            copy.setParent(parent);
             return copy;
         } catch (Exception e) {
             throw new RuntimeException("Failed to copy ObsOperator", e);
         }
-    }
-
-    public void setParent(ObsExpression parent) {
-        this.parent = parent;
     }
 
     public void hadParentheses(boolean hadParentheses) {
@@ -125,25 +116,6 @@ public abstract class ObsOperator implements ObsExpression {
     @Override
     public boolean isOperator() {
         return true;
-    }
-
-    @Override
-    public boolean isLeaf() {
-        return false;
-    }
-
-    @Override
-    public boolean isPlaceHolder() {
-        return false;
-    }
-
-    @Override
-    public boolean isPlace() {
-        return false;
-    }
-
-    public ObsExpression getParent() {
-        return parent;
     }
 
     public ObsExpression getLeft() {
