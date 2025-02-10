@@ -573,7 +573,6 @@ public class ObservationDialog extends EscapableDialog {
                         exprPos = currentExpr.getObjectPosition(rightExpr);
                     }
                 }
-
             }
         }
 
