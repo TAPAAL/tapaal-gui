@@ -276,6 +276,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     putValue(Action.NAME, FIT_TO_SCREEN_NAME);
                     putValue(Action.SHORT_DESCRIPTION, FIT_TO_SCREEN_TOOLTIP);
                     putValue(Action.SMALL_ICON, ResourceManager.getIcon(FIT_TO_SCREEN_ICON));
+                    o.setIsAlreadyFitToScreen(false);
                 }
             });
         }
