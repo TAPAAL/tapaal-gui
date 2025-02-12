@@ -1861,9 +1861,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         final int margin = 50;
 
         // Loop until it converges
+        Double prevZoom = null;
         while (true) {
             Iterable<PetriNetObject> petriNetObjects = currentTemplate().guiModel().getPetriNetObjects();
             if (!petriNetObjects.iterator().hasNext()) {
+                alreadyFitToScreen = true;
                 return;
             }
 
@@ -1947,12 +1949,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             double xZoomFactor = (double) viewport.getWidth() / width;
             double yZoomFactor = (double) viewport.getHeight() / height;
             double zoomFactor = Math.min(xZoomFactor, yZoomFactor);
-            double zoomPercent = Math.min(xZoomFactor, yZoomFactor) * 100;
+            double zoomPercent = zoomFactor * 100;
 
             double currentZoomPercent = drawingSurface().getZoomController().getPercent();
 
             final double zoomConvergence = 1;
-            if (Math.abs(currentZoomPercent - zoomPercent) < zoomConvergence) {
+            final double current = Math.abs(currentZoomPercent - zoomPercent);
+            if (current < zoomConvergence || (prevZoom != null && current == prevZoom)) {
                 int x = (int) (smallestX * zoomFactor) - margin;
                 int y = (int) (smallestY * zoomFactor) - margin;
 
@@ -1963,6 +1966,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 alreadyFitToScreen = true;
                 return;
             }
+
+            prevZoom = current;
 
             app.ifPresent(e -> e.updateZoomSlider((int)zoomPercent));
         }
