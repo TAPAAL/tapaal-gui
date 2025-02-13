@@ -19,6 +19,8 @@ public class ObsConstant extends ObsLeaf {
 
     @Override
     public ObsExpression deepCopy() {
-        return new ObsConstant(value);
+        ObsExpression copy = new ObsConstant(value);
+        copy.setParent(parent);
+        return copy;
     }
 }

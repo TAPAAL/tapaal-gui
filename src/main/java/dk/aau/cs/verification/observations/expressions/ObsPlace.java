@@ -36,7 +36,9 @@ public class ObsPlace extends ObsLeaf {
 
     @Override
     public ObsExpression deepCopy() {
-        return new ObsPlace(template, place);
+        ObsExpression copy = new ObsPlace(template, place);
+        copy.setParent(parent);
+        return copy;
     }
 
     @Override
