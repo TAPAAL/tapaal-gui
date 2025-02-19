@@ -149,7 +149,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         buttonPanelWrapper.add(exportPanel, BorderLayout.SOUTH);
 
         southPanel.add(observationScrollPane, BorderLayout.NORTH);
-        southPanel.add(buttonPanel, BorderLayout.SOUTH);
+        southPanel.add(buttonPanelWrapper, BorderLayout.SOUTH);
         
         mainPanel.add(cardPanel, BorderLayout.CENTER);
         mainPanel.add(southPanel, BorderLayout.SOUTH);
