@@ -48,7 +48,6 @@ public class DistributionPanel extends JPanel {
         useContinuousDistribution.addActionListener(act -> {
             distributionType.setModel(new DefaultComboBoxModel<>(continuous));
             displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
-
         });
         useDiscreteDistribution.addActionListener(act -> {
             distributionType.setModel(new DefaultComboBoxModel<>(discrete));
@@ -230,7 +229,9 @@ public class DistributionPanel extends JPanel {
     public void displayDistributionFields(SMCDistribution distribution) {
         if(Arrays.asList(continuous).contains(distribution.distributionName())) {
             useContinuousDistribution.setSelected(true);
+            distributionType.setModel(new DefaultComboBoxModel<>(continuous));
         } else {
+            distributionType.setModel(new DefaultComboBoxModel<>(discrete));
             useDiscreteDistribution.setSelected(true);
         }
         switch (distribution.distributionName()) {
@@ -339,7 +340,6 @@ public class DistributionPanel extends JPanel {
             dialog.display();
         } catch (RequireException e) {
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "There was an error opening the graph. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            return;
         }
     }
 

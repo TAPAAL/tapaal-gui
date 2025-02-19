@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -123,6 +124,29 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
     
         JScrollPane observationScrollPane = new JScrollPane(observationPanel);
         observationScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+        JPanel buttonPanelWrapper = new JPanel(new BorderLayout());
+        buttonPanelWrapper.setBackground(Color.WHITE);
+
+        JPanel exportPanel = new JPanel(new BorderLayout());
+        JButton exportButton = new JButton("Export to TikZ");
+        exportButton.addActionListener(e -> {
+            MultiGraph currentMultiGraph = getCurrentMultiGraph();
+            if (currentMultiGraph != null) {
+                GraphExporter.exportToTikz(currentMultiGraph, this);
+            }
+        });
+
+        JPanel buttonWrapper = new JPanel();
+        buttonWrapper.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5));
+        buttonWrapper.setBackground(Color.WHITE);
+        buttonWrapper.add(exportButton);
+        
+        exportPanel.add(buttonWrapper, BorderLayout.EAST);
+        exportPanel.setBackground(Color.WHITE);
+        
+        buttonPanelWrapper.add(buttonPanel, BorderLayout.CENTER);
+        buttonPanelWrapper.add(exportPanel, BorderLayout.SOUTH);
 
         southPanel.add(observationScrollPane, BorderLayout.NORTH);
         southPanel.add(buttonPanel, BorderLayout.SOUTH);

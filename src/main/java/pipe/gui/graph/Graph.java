@@ -2,13 +2,9 @@ package pipe.gui.graph;
 
 import java.util.List;
 
-public class Graph {
-    private final String name;
+public class Graph extends AbstractGraph {
     private final List<GraphPoint> points;
     private final Double mean;
-    private final String xAxisLabel;
-    private final String yAxisLabel;
-    private final String buttonText;
 
     public Graph(String name, List<GraphPoint> points, Double mean, String xAxisLabel, String yAxisLabel, String buttonText) {
         this.name = name;
@@ -23,6 +19,10 @@ public class Graph {
         this(name, points, null, xAxisLabel, yAxisLabel, buttonText);
     }
 
+    public Graph(String name, List<GraphPoint> points, Double mean, String xAxisLabel, String yAxisLabel) {
+        this(name, points, mean, xAxisLabel, yAxisLabel, null);
+    }
+
     public Graph(String name, List<GraphPoint> points, Double mean) {
         this(name, points, mean, "X axis", "Y axis", null);
     }
@@ -35,10 +35,6 @@ public class Graph {
         this(null, points);
     }
 
-    public String getName() {
-        return name;
-    }
-
     public List<GraphPoint> getPoints() {
         return points;
     }
@@ -47,15 +43,8 @@ public class Graph {
         return mean;
     }
 
-    public String getXAxisLabel() {
-        return xAxisLabel;
-    }
-
-    public String getYAxisLabel() {
-        return yAxisLabel;
-    }
-
-    public String getButtonText() {
-        return buttonText;
+    @Override
+    public boolean isEmpty() {
+        return points.isEmpty();
     }
 }
