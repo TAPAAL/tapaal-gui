@@ -122,31 +122,28 @@ public abstract class Place extends PlaceTransitionObject {
 		}
 	}
 
-	@Override
-	public void updateEndPoint(Arc arc) {
-		if (arc.getSource() == this) {
-			// Make it calculate the angle from the centre of the place rather
-			// than the current start point
-			arc.setSourceLocation(positionX + (getDiameter() * 0.5), positionY
-					+ (getDiameter() * 0.5));
-			double angle = arc.getArcPath().getStartAngle();
-			arc.setSourceLocation(positionX + centreOffsetLeft()
-					- (0.5 * getDiameter() * (Math.cos(angle))), positionY
-					+ centreOffsetTop()
-					+ (0.5 * getDiameter() * (Math.sin(angle))));
-		} else {
-			// Make it calculate the angle from the centre of the place rather
-			// than the current target point
-			arc.setTargetLocation(positionX + (getDiameter() * 0.5), positionY
-					+ (getDiameter() * 0.5));
-			double angle = arc.getArcPath().getEndAngle();
-			arc.setTargetLocation(positionX + centreOffsetLeft()
-					- (0.5 * getDiameter() * (Math.cos(angle))), positionY
-					+ centreOffsetTop()
-					+ (0.5 * getDiameter() * (Math.sin(angle))));
-		}
-	}
-
+    @Override
+    public void updateEndPoint(Arc arc) {
+        double centerX = positionX + centreOffsetLeft();
+        double centerY = positionY + centreOffsetTop();
+        double radius = getDiameter() * 0.5;
+        
+        boolean isSource = arc.getSource() == this;
+        double angle = isSource ? arc.getArcPath().getStartAngle() : arc.getArcPath().getEndAngle();
+        
+        // Calculate intersection point with place circumference
+        double intersectX = centerX - (radius * Math.cos(angle));
+        double intersectY = centerY + (radius * Math.sin(angle));
+        
+        if (isSource) {
+            arc.setSourceLocation(centerX, centerY);
+            arc.setSourceLocation(intersectX, intersectY);
+        } else {
+            arc.setTargetLocation(centerX, centerY);
+            arc.setTargetLocation(intersectX, intersectY);
+        }
+    }
+    
 	@Override
 	public void update(boolean displayConstantNames) {
         getNameLabel().setText("");

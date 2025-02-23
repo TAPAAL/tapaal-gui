@@ -1640,7 +1640,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 
     public void alignToGrid() {
-        ArrayList<PetriNetObject> petriNetObjects = drawingSurface.getGuiModel().getPlaceTransitionObjects();
+        List<PetriNetObject> petriNetObjects = drawingSurface.getGuiModel().getPlaceTransitionObjects();
         undoManager.newEdit();
 
         Quadtree quadtree = new Quadtree();
@@ -1661,6 +1661,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             Point point = new Point(x, y);
             Command command = new MovePetriNetObjectCommand(ptobject, point, drawingSurface);
             command.redo();
+            undoManager.addEdit(command);
 
             if (object instanceof Transition) {
                 for (Arc arc : ((PlaceTransitionObject) object).getPreset()) {
@@ -1670,6 +1671,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                         point = new Point(x, y);
                         Command pathCommand = new MovePetriNetObjectCommand(arcPathPoint, point, drawingSurface);
                         pathCommand.redo();
+                        undoManager.addEdit(pathCommand);
                     }
                 }
 
@@ -1680,11 +1682,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                         point = new Point(x, y);
                         Command pathCommand = new MovePetriNetObjectCommand(arcPathPoint, point, drawingSurface);
                         pathCommand.redo();
+                        undoManager.addEdit(pathCommand);
                     }
                 }
             }
-
-            undoManager.addEdit(command);
 
             ptobject.updateOnMoveOrZoom();
         }
