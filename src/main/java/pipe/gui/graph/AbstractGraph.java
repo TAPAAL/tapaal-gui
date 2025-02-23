@@ -22,5 +22,9 @@ public abstract class AbstractGraph {
         return buttonText;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public abstract boolean isEmpty();
 }

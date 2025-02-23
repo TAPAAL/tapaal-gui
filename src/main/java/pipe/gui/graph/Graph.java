@@ -47,4 +47,8 @@ public class Graph extends AbstractGraph {
     public boolean isEmpty() {
         return points.isEmpty();
     }
+
+    public void clear() {
+        points.clear();
+    }
 }

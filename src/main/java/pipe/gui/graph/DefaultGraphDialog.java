@@ -121,13 +121,15 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
             buttonPanel.add(button);
         }
 
+        currentCard = graphs.get(0).getButtonText();
+
         JPanel exportPanel = new JPanel(new BorderLayout());
         JButton exportButton = new JButton("Export to TikZ");
         exportButton.addActionListener(e -> {
             Graph currentGraph = graphs.stream()
                 .filter(g -> g.getButtonText().equals(currentCard))
                 .findFirst()
-                .orElse(graphs.get(0));
+                .orElseThrow(() -> new IllegalStateException("No graph found for current card: " + currentCard));
             GraphExporter.exportToTikz(currentGraph, this);
         });
         

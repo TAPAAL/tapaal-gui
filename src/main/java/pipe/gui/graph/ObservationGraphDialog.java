@@ -133,7 +133,20 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         exportButton.addActionListener(e -> {
             MultiGraph currentMultiGraph = getCurrentMultiGraph();
             if (currentMultiGraph != null) {
-                GraphExporter.exportToTikz(currentMultiGraph, this);
+                MultiGraph exportGraph = currentMultiGraph.copy();
+                Map<String, Map<String, Graph>> multiGraphMap = exportGraph.getMultiGraphMap();
+                multiGraphMap.entrySet().removeIf(entry -> {
+                    String observation = entry.getKey();
+                    entry.getValue().entrySet().removeIf(propertyEntry -> {
+                        String property = propertyEntry.getKey();
+                        String seriesKey = observation + " - " + property;
+                        return !isSeriesVisible(seriesKey);
+                    });
+
+                    return entry.getValue().isEmpty();
+                });
+               
+                GraphExporter.exportToTikz(exportGraph, this);
             }
         });
 

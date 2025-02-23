@@ -5,6 +5,8 @@ public class GraphExporterOptions {
     private boolean standalone;
     private boolean piecewise;
     private boolean pointPlot;
+    private boolean isMultiGraph;
+
     private Resolution resolution = Resolution.HIGH;
 
     public enum Resolution {
@@ -37,6 +39,10 @@ public class GraphExporterOptions {
         return pointPlot;
     }
 
+    public boolean isMultiGraph() {
+        return isMultiGraph;
+    }
+
     public Resolution getResolution() {
         return resolution;
     }
@@ -55,6 +61,10 @@ public class GraphExporterOptions {
 
     public void setPointPlot(boolean pointPlot) {
         this.pointPlot = pointPlot;
+    }
+
+    public void setMultiGraph(boolean isMultiGraph) {
+        this.isMultiGraph = isMultiGraph;
     }
 
     public void setResolution(Resolution resolution) {

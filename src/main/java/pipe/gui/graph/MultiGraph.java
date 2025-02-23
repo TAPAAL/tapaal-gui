@@ -41,8 +41,32 @@ public class MultiGraph extends AbstractGraph {
     }
 
     public List<Graph> getGraphs() {
-        return multiGraphMap.values().stream()
-                            .flatMap(map -> map.values().stream())
-                            .collect(Collectors.toList());
+        return multiGraphMap.entrySet().stream()
+            .flatMap(entry -> entry.getValue().entrySet().stream()
+                .map(propertyEntry -> {
+                    Graph graph = propertyEntry.getValue();
+                    graph.setName(entry.getKey() + " - " + propertyEntry.getKey());
+                    return graph;
+                }))
+            .collect(Collectors.toList());
+    }
+
+    public MultiGraph copy() {
+        MultiGraph copy = new MultiGraph(
+            this.name,
+            this.xAxisLabel,
+            this.yAxisLabel,
+            this.buttonText
+        );
+
+        multiGraphMap.forEach((observation, propertyMap) -> 
+            propertyMap.forEach((property, graph) -> 
+                copy.addGraph(observation, property, graph)
+            )
+        );
+
+        multiGraphGlobalAvgMap.forEach(copy::addGlobalAvg);
+
+        return copy;
     }
 }

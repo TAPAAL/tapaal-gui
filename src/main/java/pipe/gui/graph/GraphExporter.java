@@ -1,9 +1,10 @@
 package pipe.gui.graph;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JOptionPane;
 
@@ -80,6 +81,7 @@ public class GraphExporter {
 
         if (graph instanceof MultiGraph) {
             options.setShowLegend(true);
+            options.setMultiGraph(true);
             writeTikzGraph(((MultiGraph)graph).getGraphs(), path, options);
         } else {
             writeTikzGraph(Collections.singletonList((Graph)graph), path, options);
@@ -140,20 +142,36 @@ public class GraphExporter {
         
         tikzCode.append("]\n");
         
+        Map<String, Color> observationColors = new HashMap<>();
         ColorGenerator colorGenerator = new ColorGenerator();
-
         Color plotColor = null;
-        if (options.isPiecewise()) {
-            plotColor = colorGenerator.nextColor();
-        } 
-
         for (Graph graph : graphs) {
-            if (!options.isPiecewise()) {
+            String style = "solid,";
+            if (options.isMultiGraph()) {
+                String[] nameParts = graph.getName().split(" - ");
+                String observation = nameParts[0];
+                String property = nameParts[1];
+                if (!observationColors.containsKey(observation)) {
+                    observationColors.put(observation, colorGenerator.nextColor());
+                }
+
+                plotColor = observationColors.get(observation);
+                
+                if (property.startsWith("Max")) {
+                    style = "dash pattern=on 2pt off 2pt,";
+                } else if (property.startsWith("Min")) {
+                    style = "dash pattern=on 4pt off 4pt,";
+                }
+            } else if (options.isPiecewise()) {
+                plotColor = plotColor != null ? plotColor : colorGenerator.nextColor();
+            } else {
                 plotColor = colorGenerator.nextColor();
             }
 
             tikzCode.append("\\addplot[")
                     .append(options.isPointPlot() ? "only marks," : "")
+                    .append(style)
+                    .append("forget plot,")
                     .append("color={rgb,1:red,")
                     .append(plotColor.getRed() / COLOR_NORMALIZER)
                     .append("; green,")
@@ -163,17 +181,32 @@ public class GraphExporter {
                     .append("}] coordinates {\n");
 
             List<GraphPoint> points = reducePoints(graph.getPoints(), options.getResolution());
+            tikzCode.append("\t");
             for (GraphPoint point : points) {
-                tikzCode.append("\t(")
-                    .append(point.getX())
-                    .append(", ")
-                    .append(point.getY())
-                    .append(")\n");
+                tikzCode.append("(")
+                        .append(point.getX())
+                        .append(", ")
+                        .append(point.getY())
+                        .append(") ");
             }
 
             tikzCode.append("};\n");
             if (options.showLegend()) {
-                tikzCode.append("\\addlegendentry{")
+                if (options.isMultiGraph()) {
+                    String[] nameParts = graph.getName().split(" - ");
+                    String property = nameParts[1];
+                    if (!property.startsWith("Avg")) continue;
+
+                    tikzCode.append("\\addlegendimage{solid,color={rgb,1:red,")
+                            .append(plotColor.getRed() / COLOR_NORMALIZER)
+                            .append("; green,")
+                            .append(plotColor.getGreen() / COLOR_NORMALIZER)
+                            .append("; blue,")
+                            .append(plotColor.getBlue() / COLOR_NORMALIZER)
+                            .append("}\n");
+                }
+
+                tikzCode.append("}\\addlegendentry{")
                         .append(escapeLatex(graph.getName()))
                         .append("}\n");
             }
