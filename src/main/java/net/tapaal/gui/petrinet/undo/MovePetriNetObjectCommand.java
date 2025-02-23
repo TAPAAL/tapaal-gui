@@ -3,6 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import java.awt.Point;
 
 import pipe.gui.canvas.DrawingSurfaceImpl;
+import pipe.gui.canvas.Grid;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
 public class MovePetriNetObjectCommand implements Command {
@@ -27,8 +28,10 @@ public class MovePetriNetObjectCommand implements Command {
 
 	@Override
 	public void undo() {
+        Grid.disableGrid();
 		objectToBeMoved.setOriginalX(oldX);
 		objectToBeMoved.setOriginalY(oldY);
+        Grid.enableGrid();
 
 		objectToBeMoved.updateOnMoveOrZoom();
 		objectToBeMoved.repaint();
@@ -37,8 +40,10 @@ public class MovePetriNetObjectCommand implements Command {
 
 	@Override
 	public void redo() {
+        Grid.disableGrid();
 		objectToBeMoved.setOriginalX(newX);
 		objectToBeMoved.setOriginalY(newY);
+        Grid.enableGrid();
 
 		objectToBeMoved.updateOnMoveOrZoom();
 		objectToBeMoved.repaint();
