@@ -33,7 +33,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.Paint;
 
 import pipe.gui.TAPAALGUI;
 import pipe.gui.swingcomponents.EscapableDialog;
@@ -146,7 +145,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
                     return entry.getValue().isEmpty();
                 });
                
-                GraphExporter.exportToTikz(exportGraph, this);
+                GraphExporter.exportToTikz(exportGraph, this, getBaseColors(currentChart.getXYPlot().getDataset()));
             }
         });
 
@@ -193,7 +192,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
 
         renderer.setDrawSeriesLineAsPath(true);
 
-        Map<String, Paint> baseColors = getBaseColors(dataset, renderer);
+        Map<String, Color> baseColors = getBaseColors(dataset);
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
             String baseName = seriesKey.split(" - ")[0];
@@ -203,8 +202,8 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         }
     }
 
-    private Map<String, Paint> getBaseColors(XYDataset dataset, XYLineAndShapeRenderer renderer) {
-        Map<String, Paint> baseColors = new HashMap<>();
+    private Map<String, Color> getBaseColors(XYDataset dataset) {
+        Map<String, Color> baseColors = new HashMap<>();
         Set<String> uniqueBaseNames = new HashSet<>();
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
@@ -285,7 +284,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             renderer.setSeriesStroke(i, createStrokeForSeries(seriesKey, lineThickness));
         }
 
-        Map<String, Paint> baseColors = getBaseColors(dataset, renderer);
+        Map<String, Color> baseColors = getBaseColors(dataset);
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
             String baseName = seriesKey.split(" - ")[0];
@@ -304,7 +303,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
 
     private LegendItemCollection createCustomLegendItems(XYDataset dataset, XYLineAndShapeRenderer renderer, MultiGraph multiGraph) {
         LegendItemCollection legendItems = new LegendItemCollection();
-        Map<String, Paint> baseColors = new HashMap<>();
+        Map<String, Color> baseColors = new HashMap<>();
         Set<String> uniqueBaseNames = new HashSet<>();
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
@@ -322,7 +321,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             String baseName = seriesKey.split(" - ")[0];
 
             if (seriesKey.contains("Avg") && seriesKey.contains(getCurrentView())) {
-                Paint paint = baseColors.get(baseName);
+                Color Color = baseColors.get(baseName);
                 String legendText = baseName;
     
                 Map<String, Double> globalAvgMap = multiGraph.getMultiGraphGlobalAvgMap();
@@ -331,7 +330,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
                     legendText += " (avg=" + globalAvgMap.get(key) + ")";
                 }
 
-                LegendItem legendItem = new LegendItem(legendText, paint);
+                LegendItem legendItem = new LegendItem(legendText, Color);
                 legendItems.add(legendItem);
             }
         }

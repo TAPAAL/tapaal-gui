@@ -6,14 +6,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 import dk.aau.cs.util.Pair;
 import pipe.gui.TAPAALGUI;
+import pipe.gui.graph.GraphExporterOptions.LegendPosition;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.GridLayout;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
@@ -67,6 +77,10 @@ public class GraphExporter {
     }
 
     public static void exportToTikz(AbstractGraph graph, Component parent) {
+        exportToTikz(graph, parent, null);
+    }
+
+    public static void exportToTikz(AbstractGraph graph, Component parent, Map<String, Color> colorMappings) {
         if (graph == null || graph.isEmpty()) {
             throw new IllegalArgumentException("Cannot export graph(s) with empty data.");
         }
@@ -79,6 +93,8 @@ public class GraphExporter {
             return;
         }
 
+        options.setColorMappings(colorMappings);
+
         if (graph instanceof MultiGraph) {
             options.setShowLegend(true);
             options.setMultiGraph(true);
@@ -90,22 +106,68 @@ public class GraphExporter {
 
     private static Pair<String, GraphExporterOptions> displayExportGui(Component parent, String defaultName) {
         Object[] possibilities = {"Only the TikZ figure",
-                                  "Full compilable LaTex including your figure"};
+                            "Full compilable LaTex including your figure"};
+        JPanel panel = new JPanel(new GridLayout(5, 1, 5, 5));
+        
+        panel.add(new JLabel("Export type:"));
+        JComboBox<Object> outputBox = new JComboBox<>(possibilities);
+        panel.add(outputBox);
+        
+        panel.add(new JLabel("Legend position:"));
+        JComboBox<LegendPosition> legendBox = new JComboBox<>(LegendPosition.values());
+        panel.add(legendBox);
 
-        String figureOptions = (String)JOptionPane.showInputDialog(
-            parent,
-            "Choose how you would like your TikZ figure outputted: \n",
-            "Export to TikZ", JOptionPane.PLAIN_MESSAGE,
-            null, possibilities, "Only the TikZ figure");
+        JPanel sizePanel = new JPanel(new GridLayout(1, 4, 5, 5));
+        sizePanel.add(new JLabel("Width:"));
+        JTextField widthField = new JTextField("1.0");
+        sizePanel.add(widthField);
+        sizePanel.add(new JLabel("Height:"));
+        JTextField heightField = new JTextField("1.0");
+        sizePanel.add(heightField);
+        panel.add(sizePanel);
+
+        DocumentFilter numberFilter = new javax.swing.text.DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                if (string == null) return;
+                if (string.matches("\\d*\\.?\\d*")) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                if (text == null) return;
+                String newText = fb.getDocument().getText(0, fb.getDocument().getLength()) + text;
+                if (newText.matches("\\d*\\.?\\d*")) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+        };
+
+        ((AbstractDocument)widthField.getDocument()).setDocumentFilter(numberFilter);
+        ((AbstractDocument)heightField.getDocument()).setDocumentFilter(numberFilter);
+
+        int result = JOptionPane.showConfirmDialog(
+            parent, panel, "Export to TikZ",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
+        );
 
         GraphExporterOptions options = null;
         String path = null;
-        if (figureOptions != null) {
+        if (result == JOptionPane.OK_OPTION) {
             options = new GraphExporterOptions();
-            if (figureOptions.equals(possibilities[0])) {
-                options.setStandalone(false);
-            } else {
-                options.setStandalone(true);
+            options.setStandalone(outputBox.getSelectedIndex() == 1);
+            options.setLegendPosition((LegendPosition)legendBox.getSelectedItem());
+            
+            try {
+                double width = Double.parseDouble(widthField.getText());
+                double height = Double.parseDouble(heightField.getText());
+                options.setWidthMultiplier(width);
+                options.setHeightMultiplier(height);
+            } catch (NumberFormatException e) {
+                options.setWidthMultiplier(1.0);
+                options.setHeightMultiplier(1.0);
             }
 
             path = FileBrowser.constructor("TikZ figure", "tex", defaultName).saveFile();
@@ -125,7 +187,8 @@ public class GraphExporter {
 
         tikzCode.append("\\begin{tikzpicture}\n")
                 .append("\\begin{axis}[\n")
-                .append("\twidth=\\textwidth,\n")
+                .append("\twidth=").append(options.getWidthMultiplier()).append("\\textwidth,\n")
+                .append("\theight=").append(options.getHeightMultiplier()).append("\\textwidth,\n")
                 .append("\tscaled y ticks=false,\n")
                 .append("\ty tick label style={/pgf/number format/fixed},\n");
 
@@ -136,13 +199,23 @@ public class GraphExporter {
                 .append("\tline width=1.2pt,\n");
 
         if (options.showLegend()) {
-            tikzCode.append("\tlegend style={at={(0.98,0.02)},anchor=south east},\n")
-                    .append("\tlegend cell align={left}\n");
+            LegendPosition pos = options.getLegendPosition();
+            tikzCode.append("\tlegend style={at={")
+                    .append(pos.getCoordinates())
+                    .append("},anchor=")
+                    .append(pos.toString().toLowerCase())
+                    .append("},\n")
+                    .append("\tlegend cell align=left\n");
         }
         
         tikzCode.append("]\n");
         
-        Map<String, Color> observationColors = new HashMap<>();
+        Map<String, Color> colorMappings = options.getColorMappings();
+        boolean genColors = colorMappings == null;
+        if (genColors) {
+            colorMappings = new HashMap<>();
+        }
+
         ColorGenerator colorGenerator = new ColorGenerator();
         Color plotColor = null;
         for (Graph graph : graphs) {
@@ -151,12 +224,13 @@ public class GraphExporter {
                 String[] nameParts = graph.getName().split(" - ");
                 String observation = nameParts[0];
                 String property = nameParts[1];
-                if (!observationColors.containsKey(observation)) {
-                    observationColors.put(observation, colorGenerator.nextColor());
+
+                plotColor = options.getColorMappings().get(observation);
+                if (plotColor == null) {
+                    plotColor = colorGenerator.nextColor();
+                    colorMappings.put(observation, plotColor);
                 }
 
-                plotColor = observationColors.get(observation);
-                
                 if (property.startsWith("Max")) {
                     style = "dash pattern=on 2pt off 2pt,";
                 } else if (property.startsWith("Min")) {
@@ -203,10 +277,10 @@ public class GraphExporter {
                             .append(plotColor.getGreen() / COLOR_NORMALIZER)
                             .append("; blue,")
                             .append(plotColor.getBlue() / COLOR_NORMALIZER)
-                            .append("}\n");
+                            .append("}");
                 }
 
-                tikzCode.append("}\\addlegendentry{")
+                tikzCode.append("}\n\\addlegendentry{")
                         .append(escapeLatex(graph.getName()))
                         .append("}\n");
             }
