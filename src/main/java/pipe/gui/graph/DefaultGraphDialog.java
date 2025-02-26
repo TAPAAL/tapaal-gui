@@ -7,10 +7,10 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.BasicStroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
+
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
@@ -47,6 +47,8 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
     private boolean hasZeroX;
     private boolean hasZeroY;
 
+    private String currentCard = "";
+
     private DefaultGraphDialog(List<Graph> graphs, String title, boolean showLegend, boolean piecewise, boolean pointPlot) {
         super(TAPAALGUI.getAppGui(), title, true);
         this.graphs = graphs;
@@ -72,6 +74,29 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
 
         setLayout(new BorderLayout());
         add(chartPanel, BorderLayout.CENTER);
+
+        JPanel exportPanel = new JPanel(new BorderLayout());
+        JButton exportButton = new JButton("Export to TikZ");
+
+        exportButton.addActionListener(e -> {
+            if (piecewise) {
+                GraphExporter.exportPiecewiseToTikz(graphs, this);
+            } else if (pointPlot) {
+                GraphExporter.exportPointPlotToTikz(graphs.get(0), this);
+            } else {
+                GraphExporter.exportToTikz(graphs.get(0), this);
+            }
+        });
+
+        JPanel buttonWrapper = new JPanel();
+        buttonWrapper.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5));
+        buttonWrapper.setBackground(Color.WHITE);
+        buttonWrapper.add(exportButton);
+        
+        exportPanel.add(buttonWrapper, BorderLayout.EAST);
+        exportPanel.setBackground(Color.WHITE);
+        
+        add(exportPanel, BorderLayout.SOUTH);
     }
 
     private void displayWithButtons() {
@@ -84,13 +109,47 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
             ChartPanel chartPanel = createChartPanel(chart);
 
             String buttonText = graph.getButtonText();
+            currentCard = buttonText;
             cardPanel.add(chartPanel, buttonText);
-            addButton(buttonPanel, cardLayout, cardPanel, buttonText);
+
+            JButton button = new JButton(buttonText);
+            button.addActionListener(e -> {
+                cardLayout.show(cardPanel, buttonText);
+                currentCard = buttonText;
+            });
+
+            buttonPanel.add(button);
         }
 
+        currentCard = graphs.get(0).getButtonText();
+
+        JPanel exportPanel = new JPanel(new BorderLayout());
+        JButton exportButton = new JButton("Export to TikZ");
+        exportButton.addActionListener(e -> {
+            Graph currentGraph = graphs.stream()
+                .filter(g -> g.getButtonText().equals(currentCard))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No graph found for current card: " + currentCard));
+            GraphExporter.exportToTikz(currentGraph, this);
+        });
+        
+        JPanel buttonWrapper = new JPanel();
+        buttonWrapper.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5));
+        buttonWrapper.setBackground(Color.WHITE);
+        buttonWrapper.add(exportButton);
+        
+        exportPanel.add(buttonWrapper, BorderLayout.EAST);
+        exportPanel.setBackground(Color.WHITE);
+
+        JPanel southPanel = new JPanel(new BorderLayout());
+        buttonPanel.setBackground(Color.WHITE);
+        southPanel.add(buttonPanel, BorderLayout.CENTER);
+        southPanel.add(exportPanel, BorderLayout.SOUTH);
+        southPanel.setBackground(Color.WHITE);
+    
         setLayout(new BorderLayout());
         add(cardPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(southPanel, BorderLayout.SOUTH);
     }
 
     private void setupDialog() {
@@ -103,19 +162,6 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         DraggableChartPanel chartPanel = new DraggableChartPanel(chart);
         chartPanel.setMouseWheelEnabled(true);
         return chartPanel;
-    }
-
-    private void addButton(JPanel buttonPanel, CardLayout cardLayout, JPanel cardPanel, String buttonText) {
-        JButton button = new JButton(buttonText);
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cardLayout.show(cardPanel, buttonText);
-            }
-        });
-
-        buttonPanel.add(button);
-        buttonPanel.setBackground(Color.WHITE);
     }
 
     private JFreeChart createChart(List<Graph> graphs) {

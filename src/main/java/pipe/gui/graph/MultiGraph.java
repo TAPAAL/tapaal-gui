@@ -1,16 +1,13 @@
 package pipe.gui.graph;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public class MultiGraph {
+public class MultiGraph extends AbstractGraph {
     private final Map<String, Map<String, Graph>> multiGraphMap;
     private final Map<String, Double> multiGraphGlobalAvgMap;
-
-    private String name;
-    private String xAxisLabel;
-    private String yAxisLabel;
-    private String buttonText;
 
     public MultiGraph(String name, String xAxisLabel, String yAxisLabel, String buttonText) {
         this.name = name;
@@ -30,6 +27,7 @@ public class MultiGraph {
         multiGraphGlobalAvgMap.put(key, value);
     }
 
+    @Override
     public boolean isEmpty() {
         return multiGraphMap.values().stream().allMatch(Map::isEmpty);
     }
@@ -42,19 +40,33 @@ public class MultiGraph {
         return multiGraphGlobalAvgMap;
     }
 
-    public String getName() {
-        return name;
+    public List<Graph> getGraphs() {
+        return multiGraphMap.entrySet().stream()
+            .flatMap(entry -> entry.getValue().entrySet().stream()
+                .map(propertyEntry -> {
+                    Graph graph = propertyEntry.getValue();
+                    graph.setName(entry.getKey() + " - " + propertyEntry.getKey());
+                    return graph;
+                }))
+            .collect(Collectors.toList());
     }
 
-    public String getXAxisLabel() {
-        return xAxisLabel;
-    }   
+    public MultiGraph copy() {
+        MultiGraph copy = new MultiGraph(
+            this.name,
+            this.xAxisLabel,
+            this.yAxisLabel,
+            this.buttonText
+        );
 
-    public String getYAxisLabel() {
-        return yAxisLabel;
-    }
+        multiGraphMap.forEach((observation, propertyMap) -> 
+            propertyMap.forEach((property, graph) -> 
+                copy.addGraph(observation, property, graph)
+            )
+        );
 
-    public String getButtonText() {
-        return buttonText;
+        multiGraphGlobalAvgMap.forEach(copy::addGlobalAvg);
+
+        return copy;
     }
 }

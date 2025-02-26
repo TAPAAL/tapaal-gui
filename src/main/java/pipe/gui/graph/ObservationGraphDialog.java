@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -32,7 +33,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.Paint;
 
 import pipe.gui.TAPAALGUI;
 import pipe.gui.swingcomponents.EscapableDialog;
@@ -124,8 +124,44 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         JScrollPane observationScrollPane = new JScrollPane(observationPanel);
         observationScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
+        JPanel buttonPanelWrapper = new JPanel(new BorderLayout());
+        buttonPanelWrapper.setBackground(Color.WHITE);
+
+        JPanel exportPanel = new JPanel(new BorderLayout());
+        JButton exportButton = new JButton("Export to TikZ");
+        exportButton.addActionListener(e -> {
+            MultiGraph currentMultiGraph = getCurrentMultiGraph();
+            if (currentMultiGraph != null) {
+                MultiGraph exportGraph = currentMultiGraph.copy();
+                Map<String, Map<String, Graph>> multiGraphMap = exportGraph.getMultiGraphMap();
+                multiGraphMap.entrySet().removeIf(entry -> {
+                    String observation = entry.getKey();
+                    entry.getValue().entrySet().removeIf(propertyEntry -> {
+                        String property = propertyEntry.getKey();
+                        String seriesKey = observation + " - " + property;
+                        return !isSeriesVisible(seriesKey);
+                    });
+
+                    return entry.getValue().isEmpty();
+                });
+               
+                GraphExporter.exportToTikz(exportGraph, this, getBaseColors(currentChart.getXYPlot().getDataset()));
+            }
+        });
+
+        JPanel buttonWrapper = new JPanel();
+        buttonWrapper.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5));
+        buttonWrapper.setBackground(Color.WHITE);
+        buttonWrapper.add(exportButton);
+        
+        exportPanel.add(buttonWrapper, BorderLayout.EAST);
+        exportPanel.setBackground(Color.WHITE);
+        
+        buttonPanelWrapper.add(buttonPanel, BorderLayout.CENTER);
+        buttonPanelWrapper.add(exportPanel, BorderLayout.SOUTH);
+
         southPanel.add(observationScrollPane, BorderLayout.NORTH);
-        southPanel.add(buttonPanel, BorderLayout.SOUTH);
+        southPanel.add(buttonPanelWrapper, BorderLayout.SOUTH);
         
         mainPanel.add(cardPanel, BorderLayout.CENTER);
         mainPanel.add(southPanel, BorderLayout.SOUTH);
@@ -156,7 +192,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
 
         renderer.setDrawSeriesLineAsPath(true);
 
-        Map<String, Paint> baseColors = getBaseColors(dataset, renderer);
+        Map<String, Color> baseColors = getBaseColors(dataset);
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
             String baseName = seriesKey.split(" - ")[0];
@@ -166,8 +202,8 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
         }
     }
 
-    private Map<String, Paint> getBaseColors(XYDataset dataset, XYLineAndShapeRenderer renderer) {
-        Map<String, Paint> baseColors = new HashMap<>();
+    private Map<String, Color> getBaseColors(XYDataset dataset) {
+        Map<String, Color> baseColors = new HashMap<>();
         Set<String> uniqueBaseNames = new HashSet<>();
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
@@ -248,7 +284,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             renderer.setSeriesStroke(i, createStrokeForSeries(seriesKey, lineThickness));
         }
 
-        Map<String, Paint> baseColors = getBaseColors(dataset, renderer);
+        Map<String, Color> baseColors = getBaseColors(dataset);
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
             String baseName = seriesKey.split(" - ")[0];
@@ -267,7 +303,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
 
     private LegendItemCollection createCustomLegendItems(XYDataset dataset, XYLineAndShapeRenderer renderer, MultiGraph multiGraph) {
         LegendItemCollection legendItems = new LegendItemCollection();
-        Map<String, Paint> baseColors = new HashMap<>();
+        Map<String, Color> baseColors = new HashMap<>();
         Set<String> uniqueBaseNames = new HashSet<>();
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             String seriesKey = (String)dataset.getSeriesKey(i);
@@ -285,7 +321,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
             String baseName = seriesKey.split(" - ")[0];
 
             if (seriesKey.contains("Avg") && seriesKey.contains(getCurrentView())) {
-                Paint paint = baseColors.get(baseName);
+                Color Color = baseColors.get(baseName);
                 String legendText = baseName;
     
                 Map<String, Double> globalAvgMap = multiGraph.getMultiGraphGlobalAvgMap();
@@ -294,7 +330,7 @@ public class ObservationGraphDialog extends EscapableDialog implements GraphDial
                     legendText += " (avg=" + globalAvgMap.get(key) + ")";
                 }
 
-                LegendItem legendItem = new LegendItem(legendText, paint);
+                LegendItem legendItem = new LegendItem(legendText, Color);
                 legendItems.add(legendItem);
             }
         }
