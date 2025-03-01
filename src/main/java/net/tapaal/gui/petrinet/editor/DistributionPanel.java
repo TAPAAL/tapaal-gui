@@ -84,9 +84,10 @@ public class DistributionPanel extends JPanel {
             }
             public void display() {
                 SMCDistribution distrib = parseDistribution();
-                if (distrib.getMean() != null && !(distrib instanceof SMCNormalDistribution)) {
+                if (distrib.getMean() != null && !(distrib instanceof SMCNormalDistribution || 
+                                                   distrib instanceof SMCLogNormalDistribution)) {
                     meanLabel.setText("Mean :");
-                    meanValueLabel.setText(String.valueOf(distrib.getMean()));
+                    meanValueLabel.setText(String.format("%.3f", distrib.getMean()));
                 } else {
                     meanLabel.setText("");
                     meanValueLabel.setText("");
@@ -277,17 +278,18 @@ public class DistributionPanel extends JPanel {
                 break;
             case SMCLogNormalDistribution.NAME:
                 displayTwoVariables(
-                    "Log Mean", ((SMCLogNormalDistribution) distribution).logMean,
-                    "Log Std. Dev", ((SMCLogNormalDistribution) distribution).logStddev);
+                    "Mean", ((SMCLogNormalDistribution) distribution).logMean,
+                    "Std. Dev", ((SMCLogNormalDistribution) distribution).logStddev);
                 break;
             default:
                 break;
         }
         distributionType.setToolTipText(distribution.explanation());
 
-        if (distribution.getMean() != null && !(distribution instanceof SMCNormalDistribution)) {
+        if (distribution.getMean() != null && !(distribution instanceof SMCNormalDistribution || 
+                                                distribution instanceof SMCLogNormalDistribution)) {
             meanLabel.setText("Mean :");
-            meanValueLabel.setText(String.valueOf(distribution.getMean()));
+            meanValueLabel.setText(String.format("%.3f", distribution.getMean()));
         } else {
             meanLabel.setText("");
             meanValueLabel.setText("");
