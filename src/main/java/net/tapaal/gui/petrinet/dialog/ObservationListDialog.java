@@ -3,11 +3,13 @@ package net.tapaal.gui.petrinet.dialog;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListDataEvent;
 
@@ -16,15 +18,19 @@ import dk.aau.cs.verification.observations.Observation;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.swingcomponents.EscapableDialog;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.GridBagConstraints;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ObservationListDialog extends EscapableDialog {
     private final TimedArcPetriNetNetwork tapnNetwork;
@@ -73,6 +79,74 @@ public class ObservationListDialog extends EscapableDialog {
         }
     }    
 
+    private static class CheckboxListRenderer extends JPanel implements ListCellRenderer<Observation> {
+        private final JCheckBox checkBox;
+        private final JLabel label;
+        private final EllipsisListCellRenderer ellipsisRenderer;
+
+        public CheckboxListRenderer() {
+            setLayout(new BorderLayout());
+            checkBox = new JCheckBox();
+            label = new JLabel();
+            ellipsisRenderer = new EllipsisListCellRenderer();
+            add(checkBox, BorderLayout.WEST);
+            add(label, BorderLayout.CENTER);
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends Observation> list, Observation value, int index, boolean isSelected, boolean cellHasFocus) {       
+            ellipsisRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            
+            boolean checked = ((CheckboxListModel)list.getModel()).isChecked(value);
+            checkBox.setSelected(checked);
+
+            setToolTipText("Select the observation to be monitored during SMC execution");
+
+            label.setText(value.toString());
+            label.setToolTipText(ellipsisRenderer.getToolTipText());
+            label.setEnabled(checked);
+            
+            setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
+            setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
+            checkBox.setBackground(getBackground());
+            label.setBackground(getBackground());
+            
+            return this;
+        }
+    }
+
+    private static class CheckboxListModel extends DefaultListModel<Observation> {
+        private final Map<Observation, Boolean> checkMap = new HashMap<>();
+        
+        public boolean isChecked(Observation observation) {
+            return checkMap.getOrDefault(observation, observation.isEnabled());
+        }
+        
+        public void toggleChecked(Observation observation) {
+            boolean currentState = isChecked(observation);
+            boolean newState = !currentState;
+            checkMap.put(observation, newState);
+            observation.setEnabled(newState);
+            int index = indexOf(observation);
+            if (index >= 0) {
+                fireContentsChanged(this, index, index);
+            }
+        }
+        
+        @Override
+        public void addElement(Observation observation) {
+            super.addElement(observation);
+            checkMap.put(observation, observation.isEnabled());
+        }
+        
+        @Override
+        public boolean removeElement(Object observation) {
+            boolean removed = super.removeElement(observation);
+            checkMap.remove(observation);
+            return removed;
+        }
+    }
+
     private void init() {
         setSize(500, 350);
         setResizable(false);
@@ -81,7 +155,8 @@ public class ObservationListDialog extends EscapableDialog {
        
         JPanel observationPanel = new JPanel();
         observationPanel.setLayout(new GridBagLayout());
-        DefaultListModel<Observation> listModel = new DefaultListModel<>();
+        
+        CheckboxListModel listModel = new CheckboxListModel();
         for (Observation observation : observations) {
             listModel.addElement(observation);
         }
@@ -110,7 +185,7 @@ public class ObservationListDialog extends EscapableDialog {
         });
 
         JList<Observation> observationList = new JList<>(listModel);
-        observationList.setCellRenderer(new EllipsisListCellRenderer());
+        observationList.setCellRenderer(new CheckboxListRenderer());
 
         JScrollPane observationScrollPane = new JScrollPane(observationList);
         observationScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -125,8 +200,16 @@ public class ObservationListDialog extends EscapableDialog {
         observationList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    showEditObservationDialog(observationList.getSelectedIndex(), listModel);
+                int index = observationList.locationToIndex(e.getPoint());
+                if (index >= 0) {
+                    Rectangle bounds = observationList.getCellBounds(index, index);
+                    if (bounds != null && e.getX() < bounds.x + 20) {
+                        Observation observation = listModel.getElementAt(index);
+                        listModel.toggleChecked(observation);
+                        observationList.repaint();
+                    } else if (e.getClickCount() == 2) {
+                        showEditObservationDialog(observationList.getSelectedIndex(), listModel);
+                    }
                 }
             }
         });

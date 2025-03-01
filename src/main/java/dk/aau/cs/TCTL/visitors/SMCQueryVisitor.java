@@ -7,7 +7,6 @@ import dk.aau.cs.verification.SMCSettings;
 import dk.aau.cs.verification.observations.Observation;
 
 public class SMCQueryVisitor extends LTLQueryVisitor {
-
     private static final String XML_SMC		    	        = "smc";
     private static final String XML_TIME_BOUND_TAG          = "time-bound";
     private static final String XML_STEP_BOUND_TAG          = "step-bound";
@@ -18,9 +17,6 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
     private static final String XML_INTERVAL_WIDTH_TAG      = "interval-width";
     private static final String XML_COMPARE_TO_FLOAT_TAG    = "compare-to";
     private static final String XML_OBSERVATIONS            = "observations";
-    private static final String XML_WATCH                   = "watch";
-    private static final String XML_WATCH_ID                = "id";
-    private static final String XML_WATCH_NAME              = "name";
 
     public String getXMLQueryFor(TCTLAbstractProperty property, String queryName, SMCSettings settings) {
         buildXMLQuery(property, queryName, settings);
@@ -30,8 +26,9 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
     public void buildXMLQuery(TCTLAbstractProperty property, String queryName, SMCSettings settings) {
         xmlQuery.append(startTag(XML_PROP) + queryInfo(queryName) + smcTag(settings));
 
-        if (!settings.getObservations().isEmpty()) {
-            xmlQuery.append(observationTag(settings.getObservations()));
+        List<Observation> observations = settings.getObservations();
+        if (!observations.isEmpty()) {
+            xmlQuery.append(observationTag(observations));
         }
             
         xmlQuery.append(startTag(XML_FORMULA));
@@ -59,7 +56,6 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
 
     private String observationTag(List<Observation> observations) {
         String observationXml = startTag(XML_OBSERVATIONS); 
-        
         for (Observation observation : observations) {
             observationXml += observation.toXml();
         }
@@ -67,10 +63,6 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
         observationXml += endTag(XML_OBSERVATIONS);
 
         return observationXml;
-    }
-
-    private String tagAttribute(String name, String value) {
-        return " " + name + "=\"" + value + "\"";
     }
 
     private String tagAttribute(String name, float value) {
