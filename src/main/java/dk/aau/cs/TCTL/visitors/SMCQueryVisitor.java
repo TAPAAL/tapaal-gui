@@ -1,5 +1,6 @@
 package dk.aau.cs.TCTL.visitors;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dk.aau.cs.TCTL.*;
@@ -19,16 +20,20 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
     private static final String XML_OBSERVATIONS            = "observations";
 
     public String getXMLQueryFor(TCTLAbstractProperty property, String queryName, SMCSettings settings) {
-        buildXMLQuery(property, queryName, settings);
+        buildXMLQuery(property, queryName, settings, true);
         return getFormatted();
     }
 
     public void buildXMLQuery(TCTLAbstractProperty property, String queryName, SMCSettings settings) {
+        buildXMLQuery(property, queryName, settings, false);
+    }
+
+    public void buildXMLQuery(TCTLAbstractProperty property, String queryName, SMCSettings settings, boolean discardDisabled) {
         xmlQuery.append(startTag(XML_PROP) + queryInfo(queryName) + smcTag(settings));
 
         List<Observation> observations = settings.getObservations();
         if (!observations.isEmpty()) {
-            xmlQuery.append(observationTag(observations));
+            xmlQuery.append(observationTag(observations, discardDisabled));
         }
             
         xmlQuery.append(startTag(XML_FORMULA));
@@ -54,9 +59,14 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
         return emptyElement(tagContent);
     }
 
-    private String observationTag(List<Observation> observations) {
+    private String observationTag(List<Observation> observations, boolean discardDisabled) {
         String observationXml = startTag(XML_OBSERVATIONS); 
-        for (Observation observation : observations) {
+        List<Observation> observationsCopy = new ArrayList<>(observations);
+        if (discardDisabled) {
+            observationsCopy.removeIf(observation -> !observation.isEnabled());
+        }
+
+        for (Observation observation : observationsCopy) {
             observationXml += observation.toXml();
         }
 
