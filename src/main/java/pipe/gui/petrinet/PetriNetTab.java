@@ -2551,13 +2551,20 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             }
         }
 
+        /**
+         * Creates arcs between the given place and transition. If the place and transition are shared, it creates
+         * arcs in all templates. Otherwise, it creates arcs in the current template.
+         *
+         * @param place The place to connect to.
+         * @param transition The transition to connect to.
+         * @param inputArc True if the arc is an input arc, false if it is an output arc.
+         */
         private void createArcs(TimedPlaceComponent place, TimedTransitionComponent transition, boolean inputArc) {
             boolean isPlaceShared = place.underlyingPlace().isShared();
             boolean isTransitionShared = transition.underlyingTransition().isShared();
             
             canvas.clearAllPrototype();
-            
-            if (isPlaceShared && isTransitionShared) {
+                        if (isPlaceShared && isTransitionShared) {
                 List<Result<? extends Arc, ModelViolation>> results = new LinkedList<>();
                 PetriNetTab currentTab = canvas.getTabContent();
                 

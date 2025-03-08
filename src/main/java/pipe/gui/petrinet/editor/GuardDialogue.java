@@ -242,7 +242,6 @@ public class GuardDialogue extends JPanel
                             PlaceTransitionObject templateTarget = template.guiModel().getTransitionByName(targetName);
                             
                             if (templateSource != null && templateTarget != null) {
-                                // Find matching arc
                                 for (Arc possibleArc : templateSource.getPostset()) {
                                     if (possibleArc.getTarget().equals(templateTarget) &&
                                         ((objectToBeEdited instanceof TimedInhibitorArcComponent && possibleArc instanceof TimedInhibitorArcComponent) ||
@@ -257,7 +256,6 @@ public class GuardDialogue extends JPanel
                             PlaceTransitionObject templateTarget = template.guiModel().getPlaceByName(targetName);
                             
                             if (templateSource != null && templateTarget != null) {
-                                // Find matching arc
                                 for (Arc possibleArc : templateSource.getPostset()) {
                                     if (possibleArc.getTarget().equals(templateTarget) && possibleArc instanceof TimedOutputArcComponent) {
                                         templateArc = (TimedOutputArcComponent)possibleArc;

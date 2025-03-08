@@ -424,7 +424,7 @@ public class GuiModelManager {
                     cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), tabContent.getModel());
                 } else if (pnObject instanceof TimedTransportArcComponent) {
                     TimedTransportArcComponent transportArc = (TimedTransportArcComponent) pnObject;
-                    cmd = deleteArc(transportArc, false);
+                    cmd = deleteTransportArc(transportArc);
                 } else if (pnObject instanceof TimedInhibitorArcComponent) {
                     TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent) pnObject;
                     cmd = deleteArc(tia, true);
@@ -445,11 +445,63 @@ public class GuiModelManager {
         }
     }
 
-    private Command deleteArc(Arc arc, boolean isInputArc) {
-        if (arc instanceof TimedTransportArcComponent) {
-            return handleTransportArcDeletion((TimedTransportArcComponent)arc);
+    /**
+     * Creates delete command for a given transport arc. 
+     * If src and dst of arc is shared it will delete it across all templates where the connection exists
+     * @param transportArc transport arc
+     * @return delete command for the arc(s)
+     */
+    private Command deleteTransportArc(TimedTransportArcComponent transportArc) {
+        TimedPlace sourcePlace = transportArc.underlyingTransportArc().source();
+        TimedTransition transition = transportArc.underlyingTransportArc().transition();
+        TimedPlace targetPlace = transportArc.underlyingTransportArc().destination();
+        
+        boolean isSourceShared = sourcePlace.isShared();
+        boolean isTransitionShared = transition.isShared();
+        boolean isTargetShared = targetPlace.isShared();
+        
+        if (!(isSourceShared && isTransitionShared && isTargetShared)) {
+            return new DeleteTransportArcCommand(
+                transportArc, 
+                transportArc.underlyingTransportArc(), 
+                transportArc.underlyingTransportArc().model(), 
+                tabContent.getModel()
+            );
         }
+        
+        String transitionName = transition.name();
+        String inputPlaceName = sourcePlace.name();
+        String outputPlaceName = targetPlace.name();
+        int groupNr = transportArc.getGroupNr();
+        
+        List<Command> deleteCommands = new ArrayList<>();
+        deleteCommands.add(new DeleteTransportArcCommand(
+            transportArc, 
+            transportArc.underlyingTransportArc(), 
+            transportArc.underlyingTransportArc().model(), 
+            tabContent.getModel()
+        ));
+        
+        for (Template template : tabContent.allTemplates()) {
+            if (!template.guiModel().equals(tabContent.getModel())) {
+                findAndAddTransportArcDeleteCommand(
+                    template, inputPlaceName, transitionName, outputPlaceName, 
+                    groupNr, deleteCommands
+                );
+            }
+        }
+        
+        return new CompundCommand(deleteCommands);
+    }
 
+    /**
+     * Creates delete command for a given arc. 
+     * If src and dst of arc is shared it will delete it across all templates where the connection exists
+     * @param arc input, output or inhibitor arc
+     * @param isInputArc true if arc is input arc, false if it is output arc
+     * @return delete command for the arc(s)
+     */
+    private Command deleteArc(Arc arc, boolean isInputArc) {
         boolean isInhibitorArc = arc instanceof TimedInhibitorArcComponent;
 
         PlaceTransitionObject source = arc.getSource();
@@ -499,49 +551,6 @@ public class GuiModelManager {
                 if (templateSource != null && templateTarget != null) {
                     findAndAddDeleteCommand(templateSource, templateTarget, isInhibitorArc, isInputArc, deleteCommands, template.guiModel());
                 }
-            }
-        }
-        
-        return new CompundCommand(deleteCommands);
-    }
-    
-    private Command handleTransportArcDeletion(TimedTransportArcComponent transportArc) {
-        TimedPlace sourcePlace = transportArc.underlyingTransportArc().source();
-        TimedTransition transition = transportArc.underlyingTransportArc().transition();
-        TimedPlace targetPlace = transportArc.underlyingTransportArc().destination();
-        
-        boolean isSourceShared = sourcePlace.isShared();
-        boolean isTransitionShared = transition.isShared();
-        boolean isTargetShared = targetPlace.isShared();
-        
-        if (!(isSourceShared && isTransitionShared && isTargetShared)) {
-            return new DeleteTransportArcCommand(
-                transportArc, 
-                transportArc.underlyingTransportArc(), 
-                transportArc.underlyingTransportArc().model(), 
-                tabContent.getModel()
-            );
-        }
-        
-        String transitionName = transition.name();
-        String inputPlaceName = sourcePlace.name();
-        String outputPlaceName = targetPlace.name();
-        int groupNr = transportArc.getGroupNr();
-        
-        List<Command> deleteCommands = new ArrayList<>();
-        deleteCommands.add(new DeleteTransportArcCommand(
-            transportArc, 
-            transportArc.underlyingTransportArc(), 
-            transportArc.underlyingTransportArc().model(), 
-            tabContent.getModel()
-        ));
-        
-        for (Template template : tabContent.allTemplates()) {
-            if (!template.guiModel().equals(tabContent.getModel())) {
-                findAndAddTransportArcDeleteCommand(
-                    template, inputPlaceName, transitionName, outputPlaceName, 
-                    groupNr, deleteCommands
-                );
             }
         }
         
