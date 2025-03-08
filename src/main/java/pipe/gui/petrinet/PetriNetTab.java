@@ -92,6 +92,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Arrays;
@@ -2251,9 +2252,51 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         protected void transitionClicked(TimedTransitionComponent pno, MouseEvent e) {
             if (place != null && transition == null) {
                 transition = pno;
+                
+                boolean isPlaceShared = place.underlyingPlace().isShared();
+                boolean isTransitionShared = transition.underlyingTransition().isShared();
+                
                 canvas.clearAllPrototype();
-                var result = guiModelManager.addInhibitorArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
-                showPopupIfFailed(result);
+                
+                if (isPlaceShared && isTransitionShared) {
+                    List<Result<? extends Arc, ModelViolation>> results = new LinkedList<>();
+                    PetriNetTab currentTab = canvas.getTabContent();
+                    
+                    guiModelManager.startTransaction();
+                    for (Template template : currentTab.allTemplates()) {
+                        TimedPlaceComponent templatePlace = (TimedPlaceComponent)template.guiModel().getPlaceByName(place.getName());
+                        TimedTransitionComponent templateTransition = (TimedTransitionComponent)template.guiModel().getTransitionByName(transition.getName());
+                        
+                        if (templatePlace != null && templateTransition != null) {
+                            ArcPath arcPath;
+                            if (currentTab.currentTemplate().equals(template)) {
+                                arcPath = arc.getArcPath();
+                            } else {
+                                arcPath = new ArcPath();
+                                arcPath.addPoint(templatePlace.getPositionX(), templatePlace.getPositionY(), false);
+                                arcPath.addPoint(templateTransition.getPositionX(), templateTransition.getPositionY(), false);
+                            }
+    
+                            results.add(guiModelManager.addInhibitorArc(template.guiModel(), templatePlace, templateTransition, arcPath));
+                        }
+                    }
+                    
+                    boolean hasErrors = results.stream().anyMatch(r -> r.hasErrors);
+                    if (hasErrors) {
+                        for (Result<? extends Arc, ModelViolation> result : results) {
+                            if (result.hasErrors) {
+                                showPopupIfFailed(result);
+                                break;
+                            }
+                        }
+                    }
+    
+                    guiModelManager.commit();
+                } else {
+                    var result = guiModelManager.addInhibitorArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
+                    showPopupIfFailed(result);
+                }
+                
                 clearPendingArc();
             }
         }
@@ -2451,9 +2494,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (place != null && transition == null) {
                 transition = pno;
-                canvas.clearAllPrototype();
-                var result = guiModelManager.addTimedInputArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
-                showPopupIfFailed(result);
+                
+                createArcs(place, transition, true);
+
                 clearPendingArc();
 
                 if (e != null && e.isControlDown()) {
@@ -2487,9 +2530,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place == null) {
                 place = pno;
-                canvas.clearAllPrototype();
-                var result = guiModelManager.addTimedOutputArc(canvas.getGuiModel(), transition, place, arc.getArcPath());
-                showPopupIfFailed(result);
+
+                createArcs(place, transition, false);
+
                 clearPendingArc();
 
                 if (e!= null && e.isControlDown()) {
@@ -2508,6 +2551,66 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             }
         }
 
+        private void createArcs(TimedPlaceComponent place, TimedTransitionComponent transition, boolean inputArc) {
+            boolean isPlaceShared = place.underlyingPlace().isShared();
+            boolean isTransitionShared = transition.underlyingTransition().isShared();
+            
+            canvas.clearAllPrototype();
+            
+            if (isPlaceShared && isTransitionShared) {
+                List<Result<? extends Arc, ModelViolation>> results = new LinkedList<>();
+                PetriNetTab currentTab = canvas.getTabContent();
+                
+                guiModelManager.startTransaction();
+                for (Template template : currentTab.allTemplates()) {
+                    TimedPlaceComponent templatePlace = (TimedPlaceComponent)template.guiModel().getPlaceByName(place.getName());
+                    TimedTransitionComponent templateTransition = (TimedTransitionComponent)template.guiModel().getTransitionByName(transition.getName());
+                    
+                    if (templatePlace != null && templateTransition != null) {
+                        ArcPath arcPath;
+                        if (currentTab.currentTemplate().equals(template)) {
+                            arcPath = arc.getArcPath();
+                        } else {
+                            arcPath = new ArcPath();
+                            if (inputArc) {
+                                arcPath.addPoint(templatePlace.getPositionX(), templatePlace.getPositionY(), false);
+                                arcPath.addPoint(templateTransition.getPositionX(), templateTransition.getPositionY(), false);
+                            } else {
+                                arcPath.addPoint(templateTransition.getPositionX(), templateTransition.getPositionY(), false);
+                                arcPath.addPoint(templatePlace.getPositionX(), templatePlace.getPositionY(), false);
+                            }
+                        }
+
+                        if (inputArc) {
+                            results.add(guiModelManager.addTimedInputArc(template.guiModel(), templatePlace, templateTransition, arcPath));
+                        } else {
+                            results.add(guiModelManager.addTimedOutputArc(template.guiModel(), templateTransition, templatePlace, arcPath));
+                        }
+                    }
+                }
+                
+                boolean hasErrors = results.stream().anyMatch(r -> r.hasErrors);
+                if (hasErrors) {
+                    for (Result<? extends Arc, ModelViolation> result : results) {
+                        if (result.hasErrors) {
+                            showPopupIfFailed(result);
+                            break;
+                        }
+                    }
+                }
+
+                guiModelManager.commit();
+            } else {
+                if (inputArc) {
+                    var result = guiModelManager.addTimedInputArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
+                    showPopupIfFailed(result);
+                } else {
+                    var result = guiModelManager.addTimedOutputArc(canvas.getGuiModel(), transition, place, arc.getArcPath());
+                    showPopupIfFailed(result);
+                }
+            }
+        }
+
         @Override
         protected void clearPendingArc() {
             super.clearPendingArc();
@@ -2516,7 +2619,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             transition = null;
             arc = null;
         }
-
     }
 
 	static final class CanvasAnimationController extends AbstractDrawingSurfaceManager {
@@ -2676,9 +2778,71 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 arc.enableDrawingKeyBindings(this::clearPendingArc);
             } else if (transition != null && place2 == null) {
                 place2 = pno;
+
+                boolean isPlace1Shared = place1.underlyingPlace().isShared();
+                boolean isTransitionShared = transition.underlyingTransition().isShared();
+                boolean isPlace2Shared = place2.underlyingPlace().isShared();
+
                 canvas.clearAllPrototype();
-                var result = guiModelManager.addTimedTransportArc(canvas.getGuiModel(), place1, transition, place2, arc1.getArcPath(), arc2.getArcPath());
-                showPopupIfFailed(result);
+                if (isPlace1Shared && isTransitionShared && isPlace2Shared) {
+                    List<Result<? extends Arc, ModelViolation>> results = new LinkedList<>();
+                    PetriNetTab currentTab = canvas.getTabContent();
+                    
+                    guiModelManager.startTransaction();
+                    for (Template template : currentTab.allTemplates()) {
+                        TimedPlaceComponent templatePlace1 = (TimedPlaceComponent)template.guiModel().getPlaceByName(place1.getName());
+                        TimedTransitionComponent templateTransition = (TimedTransitionComponent)template.guiModel().getTransitionByName(transition.getName());
+                        TimedPlaceComponent templatePlace2 = (TimedPlaceComponent)template.guiModel().getPlaceByName(place2.getName());
+                        
+                        if (templatePlace1 != null && templateTransition != null && templatePlace2 != null) {
+                            ArcPath arcPath1, arcPath2;
+                            if (currentTab.currentTemplate().equals(template)) {
+                                arcPath1 = arc1.getArcPath();
+                                arcPath2 = arc2.getArcPath();
+                            } else {
+                                arcPath1 = new ArcPath();
+                                arcPath1.addPoint(templatePlace1.getPositionX(), templatePlace1.getPositionY(), false);
+                                arcPath1.addPoint(templateTransition.getPositionX(), templateTransition.getPositionY(), false);
+                                
+                                arcPath2 = new ArcPath();
+                                arcPath2.addPoint(templateTransition.getPositionX(), templateTransition.getPositionY(), false);
+                                arcPath2.addPoint(templatePlace2.getPositionX(), templatePlace2.getPositionY(), false);
+                            }
+                            
+                            results.add(guiModelManager.addTimedTransportArc(
+                                template.guiModel(), 
+                                templatePlace1, 
+                                templateTransition, 
+                                templatePlace2, 
+                                arcPath1, 
+                                arcPath2
+                            ));
+                        }
+                    }
+                    
+                    boolean hasErrors = results.stream().anyMatch(r -> r.hasErrors);
+                    if (hasErrors) {
+                        for (Result<? extends Arc, ModelViolation> result : results) {
+                            if (result.hasErrors) {
+                                showPopupIfFailed(result);
+                                break;
+                            }
+                        }
+                    }
+                    
+                    guiModelManager.commit();
+                } else {
+                    var result = guiModelManager.addTimedTransportArc(
+                        canvas.getGuiModel(), 
+                        place1, 
+                        transition, 
+                        place2, 
+                        arc1.getArcPath(), 
+                        arc2.getArcPath()
+                    );
+                    showPopupIfFailed(result);
+                }
+                
                 clearPendingArc();
 
                 if (e != null && e.isControlDown()) {

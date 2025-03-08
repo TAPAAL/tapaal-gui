@@ -54,6 +54,10 @@ public class ArcPath implements Shape {
 		addPoint();
 	}
 
+    public ArcPath() {
+        this(null, 0);
+    }
+
 	public ArcPath(Arc a, ArcPath path) {
 		this(a, 0);
 
@@ -345,7 +349,10 @@ public class ArcPath implements Shape {
             arcpath.zoomUpdate(myArc.getZoom());
         }
 		pathPoints.add(arcpath);
-        addPointsToGui(myArc.getGuiModel());
+
+        if (myArc != null) {
+            addPointsToGui(myArc.getGuiModel());
+        }
 	}
 
 

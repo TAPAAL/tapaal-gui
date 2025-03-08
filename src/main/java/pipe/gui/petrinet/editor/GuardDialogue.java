@@ -15,15 +15,20 @@ import javax.swing.event.ChangeEvent;
 
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import net.tapaal.gui.petrinet.Context;
+import net.tapaal.gui.petrinet.Template;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
 import net.tapaal.gui.petrinet.editor.ColoredArcGuardPanel;
+import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
+import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
 import pipe.gui.petrinet.graphicElements.Transition;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.petrinet.undo.UndoManager;
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -188,7 +193,88 @@ public class GuardDialogue extends JPanel
 				//Update colors
 				coloredArcGuardPanel.onOkColored(undoManager);
 				Weight weight = composeWeight();
-				undoManager.addEdit(arc.setGuardAndWeight(guard, weight));
+				
+                boolean sharedSrcDst = false;
+                String sourceName = "", targetName = "";
+                
+                if (objectToBeEdited instanceof TimedInputArcComponent || objectToBeEdited instanceof TimedInhibitorArcComponent) {
+                    TimedPlaceComponent sourcePlace = (TimedPlaceComponent)arc.getSource();
+                    TimedTransitionComponent targetTransition = (TimedTransitionComponent)arc.getTarget();
+                    
+                    boolean isSourceShared = sourcePlace.underlyingPlace().isShared();
+                    boolean isTargetShared = targetTransition.underlyingTransition().isShared();
+                    sharedSrcDst = isSourceShared && isTargetShared;
+                    
+                    if (sharedSrcDst) {
+                        sourceName = sourcePlace.getName();
+                        targetName = targetTransition.getName();
+                    }
+                } else if (!(objectToBeEdited instanceof TimedTransportArcComponent)) {
+                    TimedTransitionComponent sourceTransition = (TimedTransitionComponent)arc.getSource();
+                    TimedPlaceComponent targetPlace = (TimedPlaceComponent)arc.getTarget();
+                    
+                    boolean isSourceShared = sourceTransition.underlyingTransition().isShared();
+                    boolean isTargetShared = targetPlace.underlyingPlace().isShared();
+                    sharedSrcDst = isSourceShared && isTargetShared;
+                    
+                    if (sharedSrcDst) {
+                        sourceName = sourceTransition.getName();
+                        targetName = targetPlace.getName();
+                    }
+                } else if (objectToBeEdited instanceof TimedTransportArcComponent) {
+                    TimedTransportArcComponent transportArc = (TimedTransportArcComponent)objectToBeEdited;
+                    TimedPlace sourcePlace = transportArc.underlyingTransportArc().source();
+                    TimedTransition transition = transportArc.underlyingTransportArc().transition();
+                    TimedPlace targetPlace = transportArc.underlyingTransportArc().destination();
+                    
+                    boolean isSourceShared = sourcePlace.isShared();
+                    boolean isTransitionShared = transition.isShared();
+                    boolean isTargetShared = targetPlace.isShared();
+                    
+                    sharedSrcDst = isSourceShared && isTransitionShared && isTargetShared;
+                }
+                
+                if (sharedSrcDst) {
+                    for (Template template : context.tabContent().allTemplates()) {
+                        TimedOutputArcComponent templateArc = null;
+                        if (objectToBeEdited instanceof TimedInputArcComponent || objectToBeEdited instanceof TimedInhibitorArcComponent) {
+                            PlaceTransitionObject templateSource = template.guiModel().getPlaceByName(sourceName);
+                            PlaceTransitionObject templateTarget = template.guiModel().getTransitionByName(targetName);
+                            
+                            if (templateSource != null && templateTarget != null) {
+                                // Find matching arc
+                                for (Arc possibleArc : templateSource.getPostset()) {
+                                    if (possibleArc.getTarget().equals(templateTarget) &&
+                                        ((objectToBeEdited instanceof TimedInhibitorArcComponent && possibleArc instanceof TimedInhibitorArcComponent) ||
+                                        (objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent) && possibleArc instanceof TimedInputArcComponent))) {
+                                        templateArc = (TimedOutputArcComponent)possibleArc;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else if (!(objectToBeEdited instanceof TimedTransportArcComponent)) {
+                            PlaceTransitionObject templateSource = template.guiModel().getTransitionByName(sourceName);
+                            PlaceTransitionObject templateTarget = template.guiModel().getPlaceByName(targetName);
+                            
+                            if (templateSource != null && templateTarget != null) {
+                                // Find matching arc
+                                for (Arc possibleArc : templateSource.getPostset()) {
+                                    if (possibleArc.getTarget().equals(templateTarget) && possibleArc instanceof TimedOutputArcComponent) {
+                                        templateArc = (TimedOutputArcComponent)possibleArc;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (templateArc != null) {
+                            undoManager.addEdit(templateArc.setGuardAndWeight(guard, weight));
+                        }
+                    }
+                } else {
+                    undoManager.addEdit(arc.setGuardAndWeight(guard, weight));
+                }
+
 				context.network().buildConstraints();
 				exit();
 			}

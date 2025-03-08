@@ -409,4 +409,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
             }
         }
 	}
+
+    public PetriNetTab getTabContent() {
+        return tabContent;
+    }
 }
