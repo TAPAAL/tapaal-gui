@@ -135,6 +135,11 @@ public class TAPNQueryLoader extends QueryLoader{
 
                         Element root = getFirstElementChild(watch);
                         Observation observation = new Observation(name, parseObsExpression(root));
+                        
+                        if (watch.hasAttribute("isEnabled")) {
+                            observation.setEnabled(watch.getAttribute("isEnabled").equals("true"));
+                        }
+
                         observations.add(observation);
                     }
 
