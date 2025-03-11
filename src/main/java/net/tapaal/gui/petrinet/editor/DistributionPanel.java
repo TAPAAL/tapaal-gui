@@ -62,6 +62,7 @@ public class DistributionPanel extends JPanel {
         distributionParam1Field = new JTextField(5);
         distributionParam2Field = new JTextField(5);
         distributionParam3Field = new JTextField(5);
+
         meanLabel = new JLabel();
         meanValueLabel = new JLabel();
         SwingHelper.setPreferredWidth(distributionParam1Field, 100);
@@ -84,8 +85,7 @@ public class DistributionPanel extends JPanel {
             }
             public void display() {
                 SMCDistribution distrib = parseDistribution();
-                if (distrib.getMean() != null && !(distrib instanceof SMCNormalDistribution || 
-                                                   distrib instanceof SMCLogNormalDistribution)) {
+                if (distrib.getMean() != null && !(distrib instanceof SMCNormalDistribution)) {
                     meanLabel.setText("Mean :");
                     meanValueLabel.setText(String.format("%.3f", distrib.getMean()));
                 } else {
@@ -146,7 +146,7 @@ public class DistributionPanel extends JPanel {
         paramPanel.add(distributionParam3Field, gbc);
         gbc = GridBagHelper.as(3 ,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        paramPanel.setPreferredSize(new Dimension(350, paramPanel.getPreferredSize().height));
+        paramPanel.setPreferredSize(new Dimension(450, paramPanel.getPreferredSize().height));
         add(paramPanel, gbc);
 
         gbc.fill = GridBagConstraints.NONE;
@@ -278,16 +278,15 @@ public class DistributionPanel extends JPanel {
                 break;
             case SMCLogNormalDistribution.NAME:
                 displayTwoVariables(
-                    "Mean", ((SMCLogNormalDistribution) distribution).logMean,
-                    "Std. Dev", ((SMCLogNormalDistribution) distribution).logStddev);
+                    "Log Mean", ((SMCLogNormalDistribution) distribution).logMean,
+                    "Log Std. Dev", ((SMCLogNormalDistribution) distribution).logStddev);
                 break;
             default:
                 break;
         }
         distributionType.setToolTipText(distribution.explanation());
 
-        if (distribution.getMean() != null && !(distribution instanceof SMCNormalDistribution || 
-                                                distribution instanceof SMCLogNormalDistribution)) {
+        if (distribution.getMean() != null && !(distribution instanceof SMCNormalDistribution)) {
             meanLabel.setText("Mean :");
             meanValueLabel.setText(String.format("%.3f", distribution.getMean()));
         } else {
