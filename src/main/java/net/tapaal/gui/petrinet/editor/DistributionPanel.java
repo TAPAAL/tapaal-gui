@@ -62,6 +62,7 @@ public class DistributionPanel extends JPanel {
         distributionParam1Field = new JTextField(5);
         distributionParam2Field = new JTextField(5);
         distributionParam3Field = new JTextField(5);
+
         meanLabel = new JLabel();
         meanValueLabel = new JLabel();
         SwingHelper.setPreferredWidth(distributionParam1Field, 100);
@@ -86,7 +87,7 @@ public class DistributionPanel extends JPanel {
                 SMCDistribution distrib = parseDistribution();
                 if (distrib.getMean() != null && !(distrib instanceof SMCNormalDistribution)) {
                     meanLabel.setText("Mean :");
-                    meanValueLabel.setText(String.valueOf(distrib.getMean()));
+                    meanValueLabel.setText(String.format("%.3f", distrib.getMean()));
                 } else {
                     meanLabel.setText("");
                     meanValueLabel.setText("");
@@ -145,7 +146,7 @@ public class DistributionPanel extends JPanel {
         paramPanel.add(distributionParam3Field, gbc);
         gbc = GridBagHelper.as(3 ,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        paramPanel.setPreferredSize(new Dimension(350, paramPanel.getPreferredSize().height));
+        paramPanel.setPreferredSize(new Dimension(450, paramPanel.getPreferredSize().height));
         add(paramPanel, gbc);
 
         gbc.fill = GridBagConstraints.NONE;
@@ -287,7 +288,7 @@ public class DistributionPanel extends JPanel {
 
         if (distribution.getMean() != null && !(distribution instanceof SMCNormalDistribution)) {
             meanLabel.setText("Mean :");
-            meanValueLabel.setText(String.valueOf(distribution.getMean()));
+            meanValueLabel.setText(String.format("%.3f", distribution.getMean()));
         } else {
             meanLabel.setText("");
             meanValueLabel.setText("");
