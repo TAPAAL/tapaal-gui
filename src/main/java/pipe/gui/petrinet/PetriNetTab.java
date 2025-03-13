@@ -2292,6 +2292,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     }
     
                     guiModelManager.commit();
+                    guiModelManager.abort();
                 } else {
                     var result = guiModelManager.addInhibitorArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
                     showPopupIfFailed(result);
@@ -2607,6 +2608,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 }
 
                 guiModelManager.commit();
+                guiModelManager.abort();
             } else {
                 if (inputArc) {
                     var result = guiModelManager.addTimedInputArc(canvas.getGuiModel(), place, transition, arc.getArcPath());
@@ -2838,6 +2840,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     }
                     
                     guiModelManager.commit();
+                    guiModelManager.abort();
                 } else {
                     var result = guiModelManager.addTimedTransportArc(
                         canvas.getGuiModel(), 
