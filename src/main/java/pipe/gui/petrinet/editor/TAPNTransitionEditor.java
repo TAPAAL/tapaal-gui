@@ -140,7 +140,7 @@ public class TAPNTransitionEditor extends JPanel {
 		gridBagConstraints = GridBagHelper.as(2, 1, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(sharedCheckBox, gridBagConstraints);	
 		
-		
+	
 		makeSharedButton = new JButton();
 		makeSharedButton.setText("Make shared");
 		makeSharedButton.setMaximumSize(new java.awt.Dimension(110, 25));

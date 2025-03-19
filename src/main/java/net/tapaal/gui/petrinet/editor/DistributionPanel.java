@@ -17,6 +17,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class DistributionPanel extends JPanel {
 
     private TimedTransitionComponent transition;
     private EscapableDialog dialog;
+    private boolean updatingFields;
 
     private static final String[] continuous =  { "constant", "uniform", "exponential", "normal", "gamma", "erlang", "triangular", "log normal" };
     private static final String[] discrete =    { "discrete uniform", "geometric" };
@@ -62,6 +64,7 @@ public class DistributionPanel extends JPanel {
         distributionParam1Field = new JTextField(5);
         distributionParam2Field = new JTextField(5);
         distributionParam3Field = new JTextField(5);
+
         meanLabel = new JLabel();
         meanValueLabel = new JLabel();
         SwingHelper.setPreferredWidth(distributionParam1Field, 100);
@@ -84,9 +87,9 @@ public class DistributionPanel extends JPanel {
             }
             public void display() {
                 SMCDistribution distrib = parseDistribution();
-                if (distrib.getMean() != null && !(distrib instanceof SMCNormalDistribution)) {
+                if (distrib.getMean() != null && !(distrib instanceof SMCNormalDistribution) && !(distrib instanceof SMCExponentialDistribution)) {
                     meanLabel.setText("Mean :");
-                    meanValueLabel.setText(String.valueOf(distrib.getMean()));
+                    meanValueLabel.setText(formatValue(distrib.getMean()));
                 } else {
                     meanLabel.setText("");
                     meanValueLabel.setText("");
@@ -94,6 +97,62 @@ public class DistributionPanel extends JPanel {
                 distributionType.setToolTipText(distrib.explanation());
             }
         };
+
+        final DocumentListener rateFieldListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateMeanFromRate); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateMeanFromRate); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateMeanFromRate); }
+            
+            private void updateMeanFromRate() {
+                if (distributionType.getSelectedItem().equals(SMCExponentialDistribution.NAME) && 
+                    !updatingFields && distributionParam1Field.hasFocus()) {
+                    try {
+                        updatingFields = true;
+                        String text = distributionParam1Field.getText();
+                        if (!text.isEmpty()) {
+                            double rate = Double.parseDouble(text);
+                            distributionParam2Field.setText(formatValue(1.0 / rate));
+                        }
+                    } catch (NumberFormatException ignored) {
+                    } finally {
+                        updatingFields = false;
+                    }
+                }
+            }
+        };
+        
+        final DocumentListener meanFieldListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateRateFromMean); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateRateFromMean); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateRateFromMean); }
+            
+            private void updateRateFromMean() {
+                if (distributionType.getSelectedItem().equals(SMCExponentialDistribution.NAME) && 
+                    !updatingFields && distributionParam2Field.hasFocus()) {
+                    try {
+                        updatingFields = true;
+                        String text = distributionParam2Field.getText();
+                        if (!text.isEmpty()) {
+                            double mean = Double.parseDouble(text);
+                            distributionParam1Field.setText(formatValue(1.0 / mean));
+                        }
+                    } catch (NumberFormatException ignored) {
+                    } finally {
+                        updatingFields = false;
+                    }
+                }
+            }
+        };
+
+        distributionParam1Field.getDocument().addDocumentListener(rateFieldListener);
+        distributionParam2Field.getDocument().addDocumentListener(meanFieldListener);
+
         distributionParam1Field.getDocument().addDocumentListener(updateDistribDisplay);
         distributionParam2Field.getDocument().addDocumentListener(updateDistribDisplay);
         distributionParam3Field.getDocument().addDocumentListener(updateDistribDisplay);
@@ -145,7 +204,7 @@ public class DistributionPanel extends JPanel {
         paramPanel.add(distributionParam3Field, gbc);
         gbc = GridBagHelper.as(3 ,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        paramPanel.setPreferredSize(new Dimension(350, paramPanel.getPreferredSize().height));
+        paramPanel.setPreferredSize(new Dimension(450, paramPanel.getPreferredSize().height));
         add(paramPanel, gbc);
 
         gbc.fill = GridBagConstraints.NONE;
@@ -244,7 +303,8 @@ public class DistributionPanel extends JPanel {
                     "B", ((SMCUniformDistribution) distribution).b);
                 break;
             case SMCExponentialDistribution.NAME:
-                displayOneVariable("Rate", ((SMCExponentialDistribution) distribution).rate);
+                displayTwoVariables("Rate", ((SMCExponentialDistribution) distribution).rate,
+                                  "Mean", ((SMCExponentialDistribution) distribution).getMean());
                 break;
             case SMCNormalDistribution.NAME:
                 displayTwoVariables(
@@ -285,9 +345,9 @@ public class DistributionPanel extends JPanel {
         }
         distributionType.setToolTipText(distribution.explanation());
 
-        if (distribution.getMean() != null && !(distribution instanceof SMCNormalDistribution)) {
+        if (distribution.getMean() != null && !(distribution instanceof SMCNormalDistribution) && !(distribution instanceof SMCExponentialDistribution)) {
             meanLabel.setText("Mean :");
-            meanValueLabel.setText(String.valueOf(distribution.getMean()));
+            meanValueLabel.setText(String.format("%.3f", distribution.getMean()));
         } else {
             meanLabel.setText("");
             meanValueLabel.setText("");
@@ -301,7 +361,7 @@ public class DistributionPanel extends JPanel {
 
     private void displayOneVariable(String name, double value) {
         distributionParam1Label.setText(name + " :");
-        distributionParam1Field.setText(String.valueOf(value));
+        distributionParam1Field.setText(formatValue(value));
         distributionParam2Label.setVisible(false);
         distributionParam2Field.setVisible(false);
         distributionParam3Label.setVisible(false);
@@ -311,8 +371,8 @@ public class DistributionPanel extends JPanel {
     private void displayTwoVariables(String name1, double value1, String name2, double value2) {
         distributionParam1Label.setText(name1 + " :");
         distributionParam2Label.setText(name2 + " :");
-        distributionParam1Field.setText(String.valueOf(value1));
-        distributionParam2Field.setText(String.valueOf(value2));
+        distributionParam1Field.setText(formatValue(value1));
+        distributionParam2Field.setText(formatValue(value2));
         distributionParam2Label.setVisible(true);
         distributionParam2Field.setVisible(true);
         distributionParam3Label.setVisible(false);
@@ -323,13 +383,18 @@ public class DistributionPanel extends JPanel {
         distributionParam1Label.setText(name1 + " :");
         distributionParam2Label.setText(name2 + " :");
         distributionParam3Label.setText(name3 + " :");
-        distributionParam1Field.setText(String.valueOf(value1));
-        distributionParam2Field.setText(String.valueOf(value2));
-        distributionParam3Field.setText(String.valueOf(value3));
+        distributionParam1Field.setText(formatValue(value1));
+        distributionParam2Field.setText(formatValue(value2));
+        distributionParam3Field.setText(formatValue(value3));
         distributionParam2Label.setVisible(true);
         distributionParam2Field.setVisible(true);
         distributionParam3Label.setVisible(true);
         distributionParam3Field.setVisible(true);
+    }
+
+    private String formatValue(double value) {
+        DecimalFormat df = new DecimalFormat("#.#####");
+        return df.format(value);
     }
 
     private void showDistributionGraph() {
