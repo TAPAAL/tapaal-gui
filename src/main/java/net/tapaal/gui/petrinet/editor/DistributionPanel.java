@@ -393,7 +393,7 @@ public class DistributionPanel extends JPanel {
     }
 
     private String formatValue(double value) {
-        DecimalFormat df = new DecimalFormat("#.###");
+        DecimalFormat df = new DecimalFormat("#.#####");
         return df.format(value);
     }
 
