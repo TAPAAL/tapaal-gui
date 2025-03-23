@@ -201,10 +201,10 @@ public class PlaceEditorPanel extends JPanel {
 			sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
 		}
 
-		sharedCheckBox.setEnabled(sharedPlaces.size() > 0 && !hasArcsToSharedTransitions(place.underlyingPlace()));
+		sharedCheckBox.setEnabled(sharedPlaces.size() > 0);
 		sharedCheckBox.setSelected(place.underlyingPlace().isShared());
 		
-		makeSharedButton.setEnabled(!sharedCheckBox.isSelected() && !hasArcsToSharedTransitions(place.underlyingPlace()));
+		makeSharedButton.setEnabled(!sharedCheckBox.isSelected());
 
 		nameTextField.setText(place.underlyingPlace().name());
 		nameTextField.selectAll();
@@ -212,27 +212,6 @@ public class PlaceEditorPanel extends JPanel {
 
 		setMarking(place.underlyingPlace().numberOfTokens());
 		setInvariantControlsBasedOn(place.underlyingPlace().invariant());		
-	}
-
-	private boolean hasArcsToSharedTransitions(TimedPlace underlyingPlace) {
-		for(TimedInputArc arc : context.activeModel().inputArcs()){
-			if(arc.source().equals(underlyingPlace) && arc.destination().isShared()) return true;
-		}
-
-		for(TimedOutputArc arc : context.activeModel().outputArcs()){
-			if(arc.destination().equals(underlyingPlace) && arc.source().isShared()) return true;
-		}
-
-		for(TransportArc arc : context.activeModel().transportArcs()){
-			if(arc.source().equals(underlyingPlace) && arc.transition().isShared()) return true;
-			if(arc.destination().equals(underlyingPlace) && arc.transition().isShared()) return true;
-		}
-
-		for(TimedInhibitorArc arc : context.activeModel().inhibitorArcs()){
-			if(arc.source().equals(underlyingPlace) && arc.destination().isShared()) return true;
-		}
-
-		return false;
 	}
 
 	private void initBasicPropertiesPanel() {

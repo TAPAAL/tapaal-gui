@@ -346,7 +346,7 @@ public class TAPNTransitionEditor extends JPanel {
 		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
 		nameTextField.setText(transition.getName());
 		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel<>(sharedTransitions));
-		sharedCheckBox.setEnabled(sharedTransitions.size() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
+		sharedCheckBox.setEnabled(sharedTransitions.size() > 0);
 		urgentCheckBox.setSelected(transition.isUrgent());
 		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
 		coloredTransitionGuardPanel.initExpr(transition.getGuardExpression());
@@ -376,29 +376,8 @@ public class TAPNTransitionEditor extends JPanel {
 		}else{
 			switchToNameTextField();
 		}
-		makeSharedButton.setEnabled(!sharedCheckBox.isSelected() && !hasArcsToSharedPlaces(transition.underlyingTransition()));
+		makeSharedButton.setEnabled(!sharedCheckBox.isSelected());
 		attributesCheckBox.setSelected(transition.getAttributesVisible());
-	}
-	
-	private boolean hasArcsToSharedPlaces(TimedTransition underlyingTransition) {
-		for(TimedInputArc arc : context.activeModel().inputArcs()){
-			if(arc.destination().equals(underlyingTransition) && arc.source().isShared()) return true;
-		}
-		
-		for(TimedOutputArc arc : context.activeModel().outputArcs()){
-			if(arc.source().equals(underlyingTransition) && arc.destination().isShared()) return true;
-		}
-		
-		for(TransportArc arc : context.activeModel().transportArcs()){
-			if(arc.transition().equals(underlyingTransition) && arc.source().isShared()) return true;
-			if(arc.transition().equals(underlyingTransition) && arc.destination().isShared()) return true;
-		}
-		
-		for(TimedInhibitorArc arc : context.activeModel().inhibitorArcs()){
-			if(arc.destination().equals(underlyingTransition) && arc.source().isShared()) return true;
-		}
-		
-		return false;
 	}
 
 	protected void switchToNameTextField() {
