@@ -19,6 +19,8 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import com.sun.jna.Platform;
 import net.tapaal.gui.*;
@@ -45,6 +47,7 @@ import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.SearchBar;
 import pipe.gui.petrinet.animation.SimulatorFocusTraversalPolicy;
 import pipe.gui.petrinet.editor.EditorFocusTraversalPolicy;
 
@@ -63,6 +66,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JMenu viewMenu;
     private JMenu toolsMenu;
     private JToolBar drawingToolBar;
+    private JToolBar searchToolBar;
+    private JLabel searchLabel;
+    private SearchBar searchBar;
     private final JLabel featureInfoText = new JLabel();
 
     private final JComboBox<String> timeFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
@@ -915,6 +921,37 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         drawingToolBar.addSeparator();
         drawingToolBar.setRequestFocusEnabled(false);
 
+        // Search field
+        searchToolBar = new JToolBar();
+        searchToolBar.setFloatable(false);
+        searchToolBar.setRequestFocusEnabled(false);
+        
+        searchLabel = new JLabel("Search: ");
+        searchLabel.setEnabled(false);
+
+        searchToolBar.add(searchLabel);
+
+        searchBar = new SearchBar();
+        searchBar.setEnabled(false);
+        searchToolBar.add(searchBar);
+
+        searchBar.setOnSearchTextChanged(query -> {
+            if (query == null || query.trim().isEmpty()) {
+                searchBar.hideResults();
+                return;
+            }
+
+            currentTab.ifPresent(o -> o.search(query));
+        });
+
+        searchBar.setOnResultSelected(result -> {
+            if (result == null) {
+                return;
+            }
+
+            result.select();
+        });
+
         // Create panel to put toolbars in
         JPanel toolBarPanel = new JPanel();
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -932,6 +969,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         spacer.addSeparator();
         spacer.setFloatable(false);
         toolBarPaneltmp.add(spacer, BorderLayout.CENTER);
+        toolBarPaneltmp.add(searchToolBar, BorderLayout.EAST);
 
         // Add to GUI
         getContentPane().add(toolBarPaneltmp, BorderLayout.PAGE_START);
@@ -959,6 +997,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     @Override
     public JSlider getZoomSlider() {
         return zoomSlider;
+    }
+
+    @Override
+    public SearchBar getSearchBar() {
+        return searchBar;
     }
 
     private JCheckBoxMenuItem addCheckboxMenuItem(JMenu menu, Action action) {
@@ -1025,6 +1068,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 //Enable editor focus traversal policy
                 setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
                 fixBug812694GrayMenuAfterSimulationOnMac();
+
+                searchLabel.setEnabled(true);
+                searchBar.setEnabled(true);
+
                 break;
 
             case animation:
@@ -1064,6 +1111,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 //Enable simulator focus traversal policy
                 setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy(getCurrentTab().getAnimationController().TimeDelayField));
+                
+                searchLabel.setEnabled(false);
+                searchBar.setEnabled(false);
 
                 break;
             case noNet:
@@ -1094,12 +1144,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 colorFeatureOptions.setEnabled(false);
                 stochasticFeatureOptions.setEnabled(false);
 
-
                 enableAllActions(false);
 
                 // Disable All Actions
                 statusBar.changeText("Open a net to start editing");
                 setFocusTraversalPolicy(null);
+
+                searchLabel.setEnabled(false);
+                searchBar.setEnabled(false);
 
                 break;
         }

@@ -1140,6 +1140,29 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+    @Override
+    public void search(String query) {
+        if (query == null || query.isEmpty()) {
+            return;
+        }
+        
+        DataLayer guiModel = currentTemplate().guiModel();
+        List<PlaceTransitionObject> searchableItems = new ArrayList<>();
+        searchableItems.addAll(Arrays.asList(guiModel.getPlaces()));
+        searchableItems.addAll(Arrays.asList(guiModel.getTransitions()));
+        
+        Searcher<PlaceTransitionObject> searcher = new Searcher<>(searchableItems, 
+            obj -> obj.getName());
+    
+        List<PlaceTransitionObject> matches = searcher.findTopKMatches(query, 5);
+        app.ifPresent(gfa -> {
+            SearchBar searchBar = gfa.getSearchBar();
+            if (searchBar != null) {
+                searchBar.showResults(matches);
+            }
+        });
+    }
+
 	public void editSelectedQuery(){
 		queries.showEditDialog();
 	}
@@ -1434,8 +1457,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
     //XXX temp while refactoring, kyrke - 2019-07-25
-	@Override
-	public void setMode(DrawTool mode) {
+    @Override
+    public void setMode(DrawTool mode) {
+        boolean searchBarHasFocus = false;
+        if (app.get().getSearchBar() != null) {
+            searchBarHasFocus = app.get().getSearchBar().isFocusOwner();
+            if (searchBarHasFocus) return;
+        }
 
         changeStatusbarText(mode);
 

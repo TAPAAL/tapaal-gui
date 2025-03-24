@@ -68,6 +68,8 @@ public interface TabActions {
 
     void zoomTo(int newZoomLevel);
 
+    void search(String query);
+
     String getTabTitle();
 
     void saveNet(File outFile);
