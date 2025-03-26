@@ -21,20 +21,18 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
-
 public class SearchBar extends JPanel {
     private static final String SEARCH_TOOLTIP = "Search for places and transitions in the net";
 
     private final JTextField searchField;
     private final JPopupMenu resultsPopup;
     private Consumer<String> onSearchTextChanged;
-    private Consumer<PlaceTransitionObject> onResultSelected;
+    private Consumer<Object> onResultSelected;
 
     public SearchBar() {
         super(new BorderLayout());
         
-        searchField = new JTextField(15);
+        searchField = new JTextField(25);
         searchField.setToolTipText(SEARCH_TOOLTIP);
         add(searchField, BorderLayout.CENTER);
 
@@ -71,7 +69,7 @@ public class SearchBar extends JPanel {
         onSearchTextChanged = consumer;
     }
 
-    public void setOnResultSelected(Consumer<PlaceTransitionObject> consumer) {
+    public void setOnResultSelected(Consumer<Object> consumer) {
         onResultSelected = consumer;
     }
 
@@ -89,7 +87,7 @@ public class SearchBar extends JPanel {
         }
     }
 
-    public void showResults(List<PlaceTransitionObject> matches) {
+    public void showResults(List<Object> matches) {
         resultsPopup.removeAll();
         
         if (matches == null || matches.isEmpty()) {
@@ -98,8 +96,8 @@ public class SearchBar extends JPanel {
             noResults.setForeground(Color.GRAY);
             resultsPopup.add(noResults);
         } else {
-            for (PlaceTransitionObject match : matches) {
-                JButton resultButton = new JButton(match.getName());
+            for (Object match : matches) {
+                JButton resultButton = new JButton(match.toString());
                 resultButton.setHorizontalAlignment(SwingConstants.LEFT);
                 resultButton.setBorderPainted(false);
                 resultButton.setBackground(Color.WHITE);

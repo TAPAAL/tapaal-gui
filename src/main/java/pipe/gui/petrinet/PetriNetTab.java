@@ -22,6 +22,7 @@ import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.Pair;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
@@ -92,8 +93,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.Arrays;
 
 public class PetriNetTab extends JSplitPane implements TabActions {
@@ -1146,15 +1149,17 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             return;
         }
         
-        DataLayer guiModel = currentTemplate().guiModel();
-        List<PlaceTransitionObject> searchableItems = new ArrayList<>();
-        searchableItems.addAll(Arrays.asList(guiModel.getPlaces()));
-        searchableItems.addAll(Arrays.asList(guiModel.getTransitions()));
-        
-        Searcher<PlaceTransitionObject> searcher = new Searcher<>(searchableItems, 
-            obj -> obj.getName());
+        Set<Object> searchableItems = new HashSet<>();
+        for (Template template : allTemplates()) {
+            TimedArcPetriNet model = template.model();
+            searchableItems.addAll(model.places());
+            searchableItems.addAll(model.transitions());
+        }
+
+        Searcher<Object> searcher = new Searcher<>(searchableItems, 
+            obj -> obj.toString());
     
-        List<PlaceTransitionObject> matches = searcher.findTopKMatches(query, 5);
+        List<Object> matches = searcher.findTopKMatches(query, 5);
         app.ifPresent(gfa -> {
             SearchBar searchBar = gfa.getSearchBar();
             if (searchBar != null) {
@@ -1459,12 +1464,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     //XXX temp while refactoring, kyrke - 2019-07-25
     @Override
     public void setMode(DrawTool mode) {
-        boolean searchBarHasFocus = false;
-        if (app.get().getSearchBar() != null) {
-            searchBarHasFocus = app.get().getSearchBar().isFocusOwner();
-            if (searchBarHasFocus) return;
-        }
-
         changeStatusbarText(mode);
 
 		//Disable selection and deselect current selection
@@ -1545,6 +1544,15 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 		}
 	}
+
+    @Override
+    public boolean searchBarHasFocus() {
+        if (app == null || app.get() == null) {
+            return false;
+        }
+
+        return app.get().getSearchBar().isFocusOwner();
+    }
 
 	@Override
 	public void showStatistics() {
@@ -3024,90 +3032,90 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 
     private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.SELECT);
         }
     };
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.ANNOTATION);
         }
     };
     private final GuiAction inhibarcAction = new GuiAction("Inhibitor arc", "Add an inhibitor arc (I)", "I", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.INHIBITOR_ARC);
         }
     };
     private final GuiAction transAction = new GuiAction("Transition", "Add a transition (T)", "T", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.TRANSITION);
         }
     };
     private final GuiAction urgentTransAction = new GuiAction("Urgent transition", "Add an urgent transition (Y)", "Y", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.URGENT_TRANSITION);
         }
     };
     private final GuiAction uncontrollableTransAction = new GuiAction("Uncontrollable transition", "Add an uncontrollable transition (L)", "L", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.UNCONTROLLABLE_TRANSITION);
         }
     };
     private final GuiAction uncontrollableUrgentTransAction = new GuiAction("Uncontrollable urgent transition", "Add an uncontrollable urgent transition (O)", "O", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.URGENT_UNCONTROLLABLE_TRANSITION);
         }
     };
     private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.ADD_TOKEN);
         }
     };
     private final GuiAction deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.REMOVE_TOKEN);
         }
     };
     private final GuiAction timedPlaceAction = new GuiAction("Place", "Add a place (P)", "P", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.PLACE);
         }
     };
 
     private final GuiAction timedArcAction = new GuiAction("Arc", "Add an arc (A)", "A", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.ARC);
         }
     };
     private final GuiAction transportArcAction = new GuiAction("Transport arc", "Add a transport arc (R)", "R", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             setMode(DrawTool.TRANSPORT_ARC);
         }
     };
     private final GuiAction toggleUncontrollableAction = new GuiAction("Toggle uncontrollable transition", "Toggle between control/environment transition", "E", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             guiModelManager.toggleUncontrollableTrans();
         }
     };
     private final GuiAction toggleUrgentAction = new GuiAction("Toggle urgent transition", "Toggle between urgent/non-urgent transition", "U", true) {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             guiModelManager.toggleUrgentTrans();
         }
     };
     private final GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             getAnimator().letTimePass(BigDecimal.ONE);
         }
     };
     private final GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             getTransitionFiringComponent().fireSelectedTransition();
         }
     };
 
     private final GuiAction unfoldTabAction = new GuiAction("Unfold net", "Unfold the colors in the tab") {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void doActionPerformed(ActionEvent e) {
             UnfoldDialog.showDialog(PetriNetTab.this);
         }
     };

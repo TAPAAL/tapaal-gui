@@ -409,4 +409,20 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
             }
         }
 	}
+
+    @Override
+    public void scrollToCenter(Component component) {
+        int centerX = (int)(component.getX() + component.getWidth() / 2);
+        int centerY = (int)(component.getY() + component.getHeight() / 2);
+        
+        JViewport viewport = (JViewport)getParent();
+        int viewWidth = viewport.getWidth();
+        int viewHeight = viewport.getHeight();
+        
+        int scrollX = Math.max(0, centerX - (viewWidth / 2));
+        int scrollY = Math.max(0, centerY - (viewHeight / 2));
+        
+        viewport.setViewPosition(new Point(scrollX, scrollY));
+        SwingUtilities.invokeLater(this::requestFocusInWindow);
+    }
 }

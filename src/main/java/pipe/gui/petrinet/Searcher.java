@@ -3,8 +3,10 @@ package pipe.gui.petrinet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -13,7 +15,7 @@ import java.util.regex.Pattern;
  * @param <T> Type of object to search through
  */
 public class Searcher<T> {
-    private final List<T> items;
+    private final Set<T> items;
     private final Function<T, String> nameExtractor;
     
     /**
@@ -22,7 +24,7 @@ public class Searcher<T> {
      * @param nameExtractor Function to extract searchable text from items
      */
     public Searcher(Collection<T> items, Function<T, String> nameExtractor) {
-        this.items = new ArrayList<>(items);
+        this.items = new HashSet<>(items);
         this.nameExtractor = nameExtractor;
     }
     
@@ -43,8 +45,6 @@ public class Searcher<T> {
         // Score all items
         for (T item : items) {
             String name = nameExtractor.apply(item);
-            if (name == null) continue;
-            
             String lowerName = name.toLowerCase();
             double score = calculateScore(lowerName, lowerQuery);
             
@@ -81,7 +81,7 @@ public class Searcher<T> {
         if (text.startsWith(query)) {
             // Prefix match gets highest position bonus
             positionBonus = 0.3;
-        } else if (text.matches(".*\\b" + Pattern.quote(query) + "\\b.*")) {
+        } else if (text.matches(".*(_|^)" + Pattern.quote(query) + "($|_).*")) {
             // Word boundary match gets medium position bonus
             positionBonus = 0.2;
         } else if (text.contains(query)) {
