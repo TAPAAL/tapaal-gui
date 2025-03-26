@@ -126,8 +126,8 @@ public abstract class GuiAction extends AbstractAction {
             }
         } catch (IndexOutOfBoundsException ignored) {}
 
-        doActionPerformed(e);
+        interceptableActionPerformed(e);
     }
 
-    protected abstract void doActionPerformed(ActionEvent e);
+    protected abstract void interceptableActionPerformed(ActionEvent e);
 }

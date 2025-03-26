@@ -37,7 +37,7 @@ object DEBUG {
                 "Verify save/load",
                 KeyStroke.getKeyStroke('L'.code, Toolkit.getDefaultToolkit().menuShortcutKeyMask + InputEvent.SHIFT_MASK)
             ) {
-                override fun actionPerformed(e: ActionEvent?) {
+                override fun interceptableActionPerformed(e: ActionEvent?) {
                     val tab = TAPAALGUI.getCurrentTab();
                     val tmpFile = kotlin.io.path.createTempFile("tapaalSaveTest", ".tapn").toFile()
                     tab.writeNetToFile(tmpFile)
@@ -48,8 +48,6 @@ object DEBUG {
                         e.printStackTrace();
                         JOptionPane.showMessageDialog(null, "Debug: Save/Load Error","Failure to save/load, please check stack-trace on console.", JOptionPane.ERROR_MESSAGE)
                     }
-
-
                 }
             })
         }
