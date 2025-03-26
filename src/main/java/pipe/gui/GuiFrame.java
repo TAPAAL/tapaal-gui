@@ -44,6 +44,7 @@ import pipe.gui.canvas.Grid;
 import pipe.gui.canvas.SelectionManager;
 import net.tapaal.gui.petrinet.dialog.ExportBatchDialog;
 import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
+import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -960,50 +961,40 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             PetriNetObject selectedObject = null;
             PetriNetTab tab = (PetriNetTab)currentTab.get();
-            String resultStr = result.toString();
+            String resultStr = result.getFirst().toString();
 
             String templateName = null;
             String name;
+
             if (resultStr.contains(".")) {
                 templateName = resultStr.split("\\.")[0];
                 name = resultStr.split("\\.")[1];
             } else {
+                templateName = result.getSecond();
                 name = resultStr;
             }
-
-            // Check if the object is in the current template
-            Template currentTemplate = tab.currentTemplate();
-            DataLayer currentGuiModel = currentTemplate.guiModel();
             
-            if (result instanceof TimedPlace) {
-                selectedObject = currentGuiModel.getPlaceByName(name);
-            } else if (result instanceof TimedTransition) {
-                selectedObject = currentGuiModel.getTransitionByName(name);
-            }
+            Object resultObj = result.getFirst();
+            for (Template template : tab.allTemplates()) {
+                if (templateName != null && !template.toString().equals(templateName)) {
+                    continue;
+                }
 
-            if (selectedObject == null) {
-                for (Template template : tab.allTemplates()) {
-                    if (template.equals(currentTemplate) ||
-                        templateName != null && !template.toString().equals(templateName)) {
-                        continue;
-                    }
-
-                    DataLayer guiModel = template.guiModel();
-                    if (result instanceof TimedPlace) {
-                        selectedObject = guiModel.getPlaceByName(name);
-                    } else {
-                        selectedObject = guiModel.getTransitionByName(name);
-                    }
-                    
-                    if (selectedObject != null) {
-                        tab.changeToTemplate(template);
-                        break;
-                    }
+                DataLayer guiModel = template.guiModel();
+                if (resultObj instanceof TimedPlace) {
+                    selectedObject = guiModel.getPlaceByName(name);
+                } else {
+                    selectedObject = guiModel.getTransitionByName(name);
+                }
+                
+                if (selectedObject != null) {
+                    tab.selectTemplate(template);
+                    break;
                 }
             }
-
+        
             if (selectedObject == null) throw new IllegalStateException("Selected object is null");
-           
+            
             DrawingSurfaceImpl drawingSurface = tab.drawingSurface();
             SelectionManager selectionObject = drawingSurface.getSelectionObject();
             selectionObject.clearSelection();
@@ -1011,6 +1002,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             selectedObject.select();
             drawingSurface.scrollToCenter(selectedObject);
         });
+        
 
         // Create panel to put toolbars in
         JPanel toolBarPanel = new JPanel();
@@ -1025,6 +1017,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         JPanel toolBarPaneltmp = new JPanel();
         toolBarPaneltmp.setLayout(new BorderLayout());
         toolBarPaneltmp.add(toolBarPanel, BorderLayout.WEST);
+        
         JToolBar spacer = new JToolBar();
         spacer.addSeparator();
         spacer.setFloatable(false);

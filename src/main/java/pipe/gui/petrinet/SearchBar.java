@@ -14,6 +14,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import dk.aau.cs.util.Pair;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
@@ -27,13 +30,18 @@ public class SearchBar extends JPanel {
     private final JTextField searchField;
     private final JPopupMenu resultsPopup;
     private Consumer<String> onSearchTextChanged;
-    private Consumer<Object> onResultSelected;
+    private Consumer<Pair<?, String>> onResultSelected;
 
     public SearchBar() {
         super(new BorderLayout());
         
-        searchField = new JTextField(25);
+        searchField = new JTextField();
         searchField.setToolTipText(SEARCH_TOOLTIP);
+        
+        Dimension prefSize = new Dimension(300, 28);
+        searchField.setPreferredSize(prefSize);
+        searchField.setMinimumSize(new Dimension(100, 28));
+
         add(searchField, BorderLayout.CENTER);
 
         resultsPopup = new JPopupMenu();
@@ -69,7 +77,7 @@ public class SearchBar extends JPanel {
         onSearchTextChanged = consumer;
     }
 
-    public void setOnResultSelected(Consumer<Object> consumer) {
+    public void setOnResultSelected(Consumer<Pair<?, String>> consumer) {
         onResultSelected = consumer;
     }
 
@@ -87,7 +95,7 @@ public class SearchBar extends JPanel {
         }
     }
 
-    public void showResults(List<Object> matches) {
+    public void showResults(List<Pair<?, String>> matches) {
         resultsPopup.removeAll();
         
         if (matches == null || matches.isEmpty()) {
@@ -96,8 +104,10 @@ public class SearchBar extends JPanel {
             noResults.setForeground(Color.GRAY);
             resultsPopup.add(noResults);
         } else {
-            for (Object match : matches) {
-                JButton resultButton = new JButton(match.toString());
+            for (Pair<?, String> match : matches) {
+                String matchStr = match.getFirst().toString().contains(".") ? match.getFirst().toString() : match.getSecond() + "." + match.getFirst().toString() + " (shared)";
+                JButton resultButton = new JButton(matchStr);
+
                 resultButton.setHorizontalAlignment(SwingConstants.LEFT);
                 resultButton.setBorderPainted(false);
                 resultButton.setBackground(Color.WHITE);
@@ -131,7 +141,7 @@ public class SearchBar extends JPanel {
         }
         
         if (resultsPopup.getComponentCount() > 0) {
-            int width = searchField.getWidth();
+            final int width = searchField.getWidth();
             resultsPopup.setPreferredSize(new Dimension(width, resultsPopup.getComponentCount() * 26));
             resultsPopup.pack();
             

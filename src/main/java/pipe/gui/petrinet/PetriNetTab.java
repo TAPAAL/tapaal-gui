@@ -597,6 +597,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return templateExplorer;
 	}
 
+    public void selectTemplate(Template template) {
+        templateExplorer.selectTemplate(template);
+    }
+
 	public void createEditorLeftPane() {
 		constantsPanel = new ConstantsPane(this);
 		constantsPanel.setPreferredSize(
@@ -1149,17 +1153,31 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             return;
         }
         
-        Set<Object> searchableItems = new HashSet<>();
+        List<Pair<?, String>> searchableItems = new ArrayList<>();
         for (Template template : allTemplates()) {
             TimedArcPetriNet model = template.model();
-            searchableItems.addAll(model.places());
-            searchableItems.addAll(model.transitions());
+            for (TimedPlace place : model.places()) {
+                searchableItems.add(new Pair<>(place, template.toString()));
+            }
+
+            for (TimedTransition transition : model.transitions()) {
+                searchableItems.add(new Pair<>(transition, template.toString()));
+            }
         }
 
-        Searcher<Object> searcher = new Searcher<>(searchableItems, 
-            obj -> obj.toString());
+        Searcher<Pair<?, String>> searcher = new Searcher<>(searchableItems, obj -> {
+            Object element = obj.getFirst();
+            String templateName = obj.getSecond();
+            
+            String name = element.toString();
+            if (!name.contains(".")) {
+                return templateName + "." + name;
+            }
+
+            return name;
+        });
     
-        List<Object> matches = searcher.findTopKMatches(query, 5);
+        var matches = searcher.findTopKMatches(query, 5);
         app.ifPresent(gfa -> {
             SearchBar searchBar = gfa.getSearchBar();
             if (searchBar != null) {

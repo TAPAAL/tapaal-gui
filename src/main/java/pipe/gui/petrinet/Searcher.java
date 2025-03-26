@@ -1,12 +1,9 @@
 package pipe.gui.petrinet;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -15,7 +12,7 @@ import java.util.regex.Pattern;
  * @param <T> Type of object to search through
  */
 public class Searcher<T> {
-    private final Set<T> items;
+    private final List<T> items;
     private final Function<T, String> nameExtractor;
     
     /**
@@ -23,8 +20,8 @@ public class Searcher<T> {
      * @param items Collection of items to search through
      * @param nameExtractor Function to extract searchable text from items
      */
-    public Searcher(Collection<T> items, Function<T, String> nameExtractor) {
-        this.items = new HashSet<>(items);
+    public Searcher(List<T> items, Function<T, String> nameExtractor) {
+        this.items = new ArrayList<>(items);
         this.nameExtractor = nameExtractor;
     }
     
@@ -41,7 +38,6 @@ public class Searcher<T> {
         
         PriorityQueue<ScoredItem> bestMatches = new PriorityQueue<>(K);
         String lowerQuery = query.toLowerCase();
-        
         // Score all items
         for (T item : items) {
             String name = nameExtractor.apply(item);
