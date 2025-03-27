@@ -44,6 +44,8 @@ public interface TabActions {
 
     void setMode(PetriNetTab.DrawTool mode);
 
+    boolean searchBarHasFocus();
+
     void showStatistics();
 
     void importSUMOQueries();
@@ -67,6 +69,8 @@ public interface TabActions {
     void importTrace();
 
     void zoomTo(int newZoomLevel);
+
+    void search(String query);
 
     String getTabTitle();
 

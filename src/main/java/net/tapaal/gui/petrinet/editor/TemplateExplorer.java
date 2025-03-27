@@ -60,7 +60,6 @@ import dk.aau.cs.TCTL.visitors.ContainsPlaceWithDisabledTemplateVisitor;
 import net.tapaal.gui.swingcomponents.NonsearchableJList;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.SortTemplatesCommand;
-import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -686,6 +685,15 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		return templateList.getSelectedValue();
 	}
 
+    public void selectTemplate(Template template) {
+        for (int i = 0; i < listModel.getSize(); i++) {
+            if (listModel.getElementAt(i).equals(template)) {
+                templateList.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
+
 	public void updateTemplateList() {
 		int selectedIndex = templateList.getSelectedIndex();
 		DefaultListModel<Template> newList = new DefaultListModel<>();
@@ -895,6 +903,5 @@ public class TemplateExplorer extends JPanel implements SidePane {
 				toggleSelection(list.getSelectedIndex());
 			}
 		}
-		
 	}
 }

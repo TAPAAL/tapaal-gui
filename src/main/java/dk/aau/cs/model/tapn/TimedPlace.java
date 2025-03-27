@@ -14,7 +14,6 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public abstract class TimedPlace {
-
     protected static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
     protected final List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
     protected Tuple<PlaceType, Integer> extrapolation = new Tuple<PlaceType, Integer>(PlaceType.Dead, -2);
