@@ -37,13 +37,10 @@ public class SearchBar extends JPanel {
         
         searchField = new JTextField();
         searchField.setToolTipText(SEARCH_TOOLTIP);
-        
-        Dimension prefSize = new Dimension(300, 28);
-        searchField.setPreferredSize(prefSize);
-        searchField.setMinimumSize(new Dimension(100, 28));
 
         add(searchField, BorderLayout.CENTER);
-
+        //setMaximumSize(new Dimension(250, super.getMaximumSize().height));
+        
         resultsPopup = new JPopupMenu();
         resultsPopup.setLayout(new BoxLayout(resultsPopup, BoxLayout.Y_AXIS));
 
