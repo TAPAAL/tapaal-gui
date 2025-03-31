@@ -79,7 +79,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JToolBar searchToolBar;
     private JLabel searchLabel;
     private SearchBar searchBar;
-    private JPanel searchWrapPanel;
     private final JLabel featureInfoText = new JLabel();
 
     private final JComboBox<String> timeFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
@@ -1021,15 +1020,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         
         JToolBar spacer = new JToolBar();
         spacer.setFloatable(false);
-        searchWrapPanel = new JPanel(new BorderLayout());
-
-        JToolBar leftSpace = new JToolBar();
-        leftSpace.addSeparator();
-        leftSpace.setFloatable(false);
-        leftSpace.setPreferredSize(new Dimension(200, 1));
-        searchWrapPanel.add(leftSpace, BorderLayout.WEST);
-        searchWrapPanel.add(searchToolBar, BorderLayout.CENTER);
-        toolBarPaneltmp.add(searchWrapPanel, BorderLayout.CENTER);
+       
+        toolBarPaneltmp.add(searchToolBar, BorderLayout.CENTER);
         toolBarPaneltmp.add(spacer, BorderLayout.EAST);
 
         // Add to GUI
@@ -1343,7 +1335,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 pasteAction.setEnabled(true);
                 copyAction.setEnabled(true);
                 cutAction.setEnabled(true);
-                searchWrapPanel.setVisible(true);
+                searchBar.setVisible(true);
 
                 break;
             case animation:
@@ -1351,7 +1343,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 pasteAction.setEnabled(false);
                 copyAction.setEnabled(false);
                 cutAction.setEnabled(false);
-                searchWrapPanel.setVisible(false);
+                searchBar.setVisible(false);
 
                 break;
             case noNet:
@@ -1362,7 +1354,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 pasteAction.setEnabled(false);
                 copyAction.setEnabled(false);
                 cutAction.setEnabled(false);
-                searchWrapPanel.setVisible(false);
+                searchBar.setVisible(false);
                 break;
 
             default:

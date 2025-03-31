@@ -10,8 +10,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -39,7 +41,6 @@ public class SearchBar extends JPanel {
         searchField.setToolTipText(SEARCH_TOOLTIP);
 
         add(searchField, BorderLayout.CENTER);
-        //setMaximumSize(new Dimension(250, super.getMaximumSize().height));
         
         resultsPopup = new JPopupMenu();
         resultsPopup.setLayout(new BoxLayout(resultsPopup, BoxLayout.Y_AXIS));
@@ -101,6 +102,11 @@ public class SearchBar extends JPanel {
             noResults.setForeground(Color.GRAY);
             resultsPopup.add(noResults);
         } else {
+            // Create a panel to hold all result buttons
+            JPanel resultsPanel = new JPanel();
+            resultsPanel.setLayout(new BoxLayout(resultsPanel, BoxLayout.Y_AXIS));
+            resultsPanel.setBackground(Color.WHITE);
+            
             for (Pair<?, String> match : matches) {
                 String matchStr = match.getFirst().toString().contains(".") ? match.getFirst().toString() : match.getSecond() + "." + match.getFirst().toString() + " (shared)";
                 JButton resultButton = new JButton(matchStr);
@@ -116,7 +122,11 @@ public class SearchBar extends JPanel {
                     }
 
                     resultsPopup.setVisible(false);
-                    searchField.requestFocusInWindow();
+                    SwingUtilities.invokeLater(() -> {
+                        int caretPosition = searchField.getCaretPosition();
+                        searchField.requestFocusInWindow();
+                        searchField.setCaretPosition(caretPosition);
+                    });
                 });
             
                 resultButton.addMouseListener(new MouseAdapter() {
@@ -133,18 +143,35 @@ public class SearchBar extends JPanel {
                 
                 resultButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 
                     resultButton.getPreferredSize().height));
-                resultsPopup.add(resultButton);
+                resultsPanel.add(resultButton);
             }
+            
+            JScrollPane scrollPane = new JScrollPane(resultsPanel);
+            scrollPane.setBorder(null);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            
+            resultsPopup.add(scrollPane);
         }
         
         if (resultsPopup.getComponentCount() > 0) {
             final int width = searchField.getWidth();
-            resultsPopup.setPreferredSize(new Dimension(width, resultsPopup.getComponentCount() * 26));
+        
+            int itemHeight = 26;
+            int maxVisibleItems = 5;
+            int itemCount = matches != null ? Math.min(maxVisibleItems, matches.size()) : 1;
+            int height = itemCount * itemHeight;
+            
+            resultsPopup.setPreferredSize(new Dimension(width, height));
             resultsPopup.pack();
             
             resultsPopup.setLightWeightPopupEnabled(true);
             resultsPopup.show(searchField, 0, searchField.getHeight());
-            searchField.requestFocusInWindow();
+            SwingUtilities.invokeLater(() -> {
+                int caretPosition = searchField.getCaretPosition();
+                searchField.requestFocusInWindow();
+                searchField.setCaretPosition(caretPosition);
+            });
         } else {
             resultsPopup.setVisible(false);
         }

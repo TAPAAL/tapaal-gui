@@ -26,18 +26,18 @@ public class Searcher<T> {
     }
     
     /**
-     * Find the top matches for a search query
+     * Find all matches for a search query
      * @param query The search string
-     * @param K top K matches
-     * @return List of best matches ordered by relevance
+     * @return List of all matches ordered by relevance (highest score first)
      */
-    public List<T> findTopKMatches(String query, int K) {
+    public List<T> findAllMatches(String query) {
         if (query == null || query.isEmpty()) {
             return Collections.emptyList();
         }
         
-        PriorityQueue<ScoredItem> bestMatches = new PriorityQueue<>(K);
+        PriorityQueue<ScoredItem> allMatches = new PriorityQueue<>();
         String lowerQuery = query.toLowerCase();
+        
         // Score all items
         for (T item : items) {
             String name = nameExtractor.apply(item);
@@ -45,20 +45,13 @@ public class Searcher<T> {
             double score = calculateScore(lowerName, lowerQuery);
             
             if (score > 0) {
-                if (bestMatches.size() < K) {
-                    // Queue not full yet
-                    bestMatches.add(new ScoredItem(item, score));
-                } else if (score > bestMatches.peek().score) {
-                    // Better match than the worst in our current set
-                    bestMatches.poll();
-                    bestMatches.add(new ScoredItem(item, score));
-                }
+                allMatches.add(new ScoredItem(item, score));
             }
         }
         
-        List<T> results = new ArrayList<>(bestMatches.size());
-        while (!bestMatches.isEmpty()) {
-            results.add(0, bestMatches.poll().item); 
+        List<T> results = new ArrayList<>(allMatches.size());
+        while (!allMatches.isEmpty()) {
+            results.add(0, allMatches.poll().item); 
         }
         
         return results;

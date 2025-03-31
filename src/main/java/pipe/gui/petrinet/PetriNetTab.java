@@ -1177,7 +1177,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             return name;
         });
     
-        var matches = searcher.findTopKMatches(query, 5);
+        var matches = searcher.findAllMatches(query);
         app.ifPresent(gfa -> {
             SearchBar searchBar = gfa.getSearchBar();
             if (searchBar != null) {
