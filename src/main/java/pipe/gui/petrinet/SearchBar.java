@@ -29,17 +29,24 @@ import java.awt.event.MouseEvent;
 public class SearchBar extends JPanel {
     private static final String SEARCH_TOOLTIP = "Search for places and transitions in the net";
 
+    private final JLabel searchLabel;
     private final JTextField searchField;
     private final JPopupMenu resultsPopup;
     private Consumer<String> onSearchTextChanged;
     private Consumer<Pair<?, String>> onResultSelected;
+    private Runnable onFocusGained;
+    private Runnable onFocusLost;
+    
 
     public SearchBar() {
         super(new BorderLayout());
+       
+        searchLabel = new JLabel("Search: ");
         
         searchField = new JTextField();
         searchField.setToolTipText(SEARCH_TOOLTIP);
 
+        add(searchLabel, BorderLayout.WEST);
         add(searchField, BorderLayout.CENTER);
         
         resultsPopup = new JPopupMenu();
@@ -63,12 +70,30 @@ public class SearchBar extends JPanel {
         });
 
         searchField.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent evt) {
+                if (onFocusGained != null) {
+                    onFocusGained.run();
+                }
+            }
+            
             public void focusLost(FocusEvent evt) {
                 if (!evt.isTemporary() && !resultsPopup.isVisible()) {
                     resultsPopup.setVisible(false);
                 }
+                
+                if (!evt.isTemporary() && onFocusLost != null) {
+                    onFocusLost.run();
+                }
             }
         });
+    }
+
+    public void setOnFocusGained(Runnable callback) {
+        onFocusGained = callback;
+    }
+
+    public void setOnFocusLost(Runnable callback) {
+        onFocusLost = callback;
     }
 
     public void setOnSearchTextChanged(Consumer<String> consumer) {
@@ -126,6 +151,8 @@ public class SearchBar extends JPanel {
                         int caretPosition = searchField.getCaretPosition();
                         searchField.requestFocusInWindow();
                         searchField.setCaretPosition(caretPosition);
+                        searchField.select(caretPosition, caretPosition);
+                        getRootPane().requestFocusInWindow();
                     });
                 });
             
@@ -171,6 +198,7 @@ public class SearchBar extends JPanel {
                 int caretPosition = searchField.getCaretPosition();
                 searchField.requestFocusInWindow();
                 searchField.setCaretPosition(caretPosition);
+                searchField.select(caretPosition, caretPosition);
             });
         } else {
             resultsPopup.setVisible(false);

@@ -1166,14 +1166,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
 
         Searcher<Pair<?, String>> searcher = new Searcher<>(searchableItems, obj -> {
-            Object element = obj.getFirst();
-            String templateName = obj.getSecond();
-            
+            Object element = obj.getFirst();            
             String name = element.toString();
-            if (!name.contains(".")) {
-                return templateName + "." + name;
-            }
-
             return name;
         });
     
@@ -3050,90 +3044,90 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 
     private final GuiAction selectAction = new GuiAction("Select", "Select components (S)", "S", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.SELECT);
         }
     };
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.ANNOTATION);
         }
     };
     private final GuiAction inhibarcAction = new GuiAction("Inhibitor arc", "Add an inhibitor arc (I)", "I", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.INHIBITOR_ARC);
         }
     };
     private final GuiAction transAction = new GuiAction("Transition", "Add a transition (T)", "T", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.TRANSITION);
         }
     };
     private final GuiAction urgentTransAction = new GuiAction("Urgent transition", "Add an urgent transition (Y)", "Y", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.URGENT_TRANSITION);
         }
     };
     private final GuiAction uncontrollableTransAction = new GuiAction("Uncontrollable transition", "Add an uncontrollable transition (L)", "L", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.UNCONTROLLABLE_TRANSITION);
         }
     };
     private final GuiAction uncontrollableUrgentTransAction = new GuiAction("Uncontrollable urgent transition", "Add an uncontrollable urgent transition (O)", "O", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.URGENT_UNCONTROLLABLE_TRANSITION);
         }
     };
     private final GuiAction tokenAction = new GuiAction("Add token", "Add a token (+)", "typed +", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.ADD_TOKEN);
         }
     };
     private final GuiAction deleteTokenAction = new GuiAction("Delete token", "Delete a token (-)", "typed -", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.REMOVE_TOKEN);
         }
     };
     private final GuiAction timedPlaceAction = new GuiAction("Place", "Add a place (P)", "P", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.PLACE);
         }
     };
 
     private final GuiAction timedArcAction = new GuiAction("Arc", "Add an arc (A)", "A", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.ARC);
         }
     };
     private final GuiAction transportArcAction = new GuiAction("Transport arc", "Add a transport arc (R)", "R", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             setMode(DrawTool.TRANSPORT_ARC);
         }
     };
     private final GuiAction toggleUncontrollableAction = new GuiAction("Toggle uncontrollable transition", "Toggle between control/environment transition", "E", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             guiModelManager.toggleUncontrollableTrans();
         }
     };
     private final GuiAction toggleUrgentAction = new GuiAction("Toggle urgent transition", "Toggle between urgent/non-urgent transition", "U", true) {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             guiModelManager.toggleUrgentTrans();
         }
     };
     private final GuiAction timeAction = new GuiAction("Delay one time unit", "Let time pass one time unit", "W") {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             getAnimator().letTimePass(BigDecimal.ONE);
         }
     };
     private final GuiAction delayFireAction = new GuiAction("Delay and fire", "Delay and fire selected transition", "F") {
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             getTransitionFiringComponent().fireSelectedTransition();
         }
     };
 
     private final GuiAction unfoldTabAction = new GuiAction("Unfold net", "Unfold the colors in the tab") {
         @Override
-        public void interceptableActionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
             UnfoldDialog.showDialog(PetriNetTab.this);
         }
     };
@@ -3211,6 +3205,21 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     timeAction.setEnabled(true);
                 break;
         }
+    }
+
+    public void enableActionsForSearchBar(boolean enable) {
+        selectAction.setEnabled(enable);
+        transAction.setEnabled(enable);
+        urgentTransAction.setEnabled(enable);
+        uncontrollableTransAction.setEnabled(enable);
+        uncontrollableUrgentTransAction.setEnabled(enable);
+        timedPlaceAction.setEnabled(enable);
+        timedArcAction.setEnabled(enable);
+        transportArcAction.setEnabled(enable);
+        inhibarcAction.setEnabled(enable);
+        tokenAction.setEnabled(enable);
+        deleteTokenAction.setEnabled(enable);
+        annotationAction.setEnabled(enable);
     }
 
 

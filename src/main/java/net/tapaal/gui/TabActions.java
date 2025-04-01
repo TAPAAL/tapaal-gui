@@ -44,6 +44,8 @@ public interface TabActions {
 
     void setMode(PetriNetTab.DrawTool mode);
 
+    void enableActionsForSearchBar(boolean enable);
+
     boolean searchBarHasFocus();
 
     void showStatistics();

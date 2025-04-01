@@ -117,17 +117,4 @@ public abstract class GuiAction extends AbstractAction {
     public void setTooltip(String newTooltip){
         putValue(SHORT_DESCRIPTION, newTooltip);
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        try {
-            if (TAPAALGUI.getCurrentTab() != null && TAPAALGUI.getCurrentTab().searchBarHasFocus()) {
-                return;
-            }
-        } catch (IndexOutOfBoundsException ignored) {}
-
-        interceptableActionPerformed(e);
-    }
-
-    protected abstract void interceptableActionPerformed(ActionEvent e);
 }

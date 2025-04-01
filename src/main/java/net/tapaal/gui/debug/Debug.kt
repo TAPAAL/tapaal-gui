@@ -37,7 +37,7 @@ object DEBUG {
                 "Verify save/load",
                 KeyStroke.getKeyStroke('L'.code, Toolkit.getDefaultToolkit().menuShortcutKeyMask + InputEvent.SHIFT_MASK)
             ) {
-                override fun interceptableActionPerformed(e: ActionEvent?) {
+                override fun actionPerformed(e: ActionEvent?) {
                     val tab = TAPAALGUI.getCurrentTab();
                     val tmpFile = kotlin.io.path.createTempFile("tapaalSaveTest", ".tapn").toFile()
                     tab.writeNetToFile(tmpFile)
