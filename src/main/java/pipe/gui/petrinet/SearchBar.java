@@ -146,7 +146,6 @@ public class SearchBar extends JPanel {
                     }
 
                     resultsPopup.setVisible(false);
-                    searchField.requestFocusInWindow();
                 });
             
                 resultButton.addMouseListener(new MouseAdapter() {
