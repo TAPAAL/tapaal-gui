@@ -650,6 +650,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             // Grow size of boxes to add room for the resizer
             System.setProperty("apple.awt.showGrowBox", "true");
 
+            // Disable the auto select of text in text fields
+            System.setProperty("Quaqua.TextComponent.autoselect", "false");
+
         }
 
         this.setIconImage(ResourceManager.getIcon("icon.png").getImage());

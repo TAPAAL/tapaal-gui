@@ -13,7 +13,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -147,13 +146,7 @@ public class SearchBar extends JPanel {
                     }
 
                     resultsPopup.setVisible(false);
-                    SwingUtilities.invokeLater(() -> {
-                        int caretPosition = searchField.getCaretPosition();
-                        searchField.requestFocusInWindow();
-                        searchField.setCaretPosition(caretPosition);
-                        searchField.select(caretPosition, caretPosition);
-                        getRootPane().requestFocusInWindow();
-                    });
+                    searchField.requestFocusInWindow();
                 });
             
                 resultButton.addMouseListener(new MouseAdapter() {
@@ -194,12 +187,7 @@ public class SearchBar extends JPanel {
             
             resultsPopup.setLightWeightPopupEnabled(true);
             resultsPopup.show(searchField, 0, searchField.getHeight());
-            SwingUtilities.invokeLater(() -> {
-                int caretPosition = searchField.getCaretPosition();
-                searchField.requestFocusInWindow();
-                searchField.setCaretPosition(caretPosition);
-                searchField.select(caretPosition, caretPosition);
-            });
+            searchField.requestFocusInWindow();
         } else {
             resultsPopup.setVisible(false);
         }
