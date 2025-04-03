@@ -70,6 +70,10 @@ public class SearchBar extends JPanel {
 
         searchField.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
+                int endIdx = searchField.getText().length();
+                searchField.setSelectionStart(endIdx);
+                searchField.setSelectionEnd(endIdx);
+
                 if (onFocusGained != null) {
                     onFocusGained.run();
                 }
