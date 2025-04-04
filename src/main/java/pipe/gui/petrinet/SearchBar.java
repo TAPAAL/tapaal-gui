@@ -16,6 +16,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Pair;
 
 import java.awt.Color;
@@ -136,7 +138,16 @@ public class SearchBar extends JPanel {
             resultsPanel.setBackground(Color.WHITE);
             
             for (Pair<?, String> match : matches) {
-                String matchStr = match.getFirst().toString().contains(".") ? match.getFirst().toString() : match.getSecond() + "." + match.getFirst().toString() + " (shared)";
+                Object firstElem = match.getFirst();
+                boolean isShared = firstElem instanceof TimedPlace && ((TimedPlace)firstElem).isShared() ||
+                                   firstElem instanceof TimedTransition && ((TimedTransition) firstElem).isShared();
+
+                String firstElemStr = firstElem.toString();
+                if (isShared && firstElem instanceof TimedTransition && firstElemStr.contains(".")) {
+                    firstElemStr = firstElemStr.split("\\.")[1];
+                }
+
+                String matchStr = isShared ? match.getSecond() + "." + firstElemStr + " (shared)" : firstElemStr;
                 JButton resultButton = new JButton(matchStr);
 
                 resultButton.setHorizontalAlignment(SwingConstants.LEFT);
