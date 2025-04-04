@@ -1157,11 +1157,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         for (Template template : allTemplates()) {
             TimedArcPetriNet model = template.model();
             for (TimedPlace place : model.places()) {
-                searchableItems.add(new Pair<>(place, template.toString()));
+                searchableItems.add(new Pair<>(place.name(), template.toString()));
             }
 
             for (TimedTransition transition : model.transitions()) {
-                searchableItems.add(new Pair<>(transition, template.toString()));
+                searchableItems.add(new Pair<>(transition.name(), template.toString()));
             }
         }
 
