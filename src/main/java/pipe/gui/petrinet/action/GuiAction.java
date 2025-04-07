@@ -3,6 +3,7 @@
  */
 package pipe.gui.petrinet.action;
 
+import java.awt.event.ActionEvent;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
@@ -10,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
 import net.tapaal.resourcemanager.ResourceManager;
+import pipe.gui.TAPAALGUI;
 
 /**
  * GuiAction class
@@ -22,7 +24,6 @@ import net.tapaal.resourcemanager.ResourceManager;
  *         ChangeListeners to be notified of changes
  */
 public abstract class GuiAction extends AbstractAction {
-
 	public GuiAction(String name, String tooltip) {
 		this(name, tooltip, (KeyStroke)null);
 	}
@@ -116,5 +117,4 @@ public abstract class GuiAction extends AbstractAction {
     public void setTooltip(String newTooltip){
         putValue(SHORT_DESCRIPTION, newTooltip);
     }
-
 }

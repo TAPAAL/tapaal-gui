@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -19,6 +20,8 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import com.sun.jna.Platform;
 import net.tapaal.gui.*;
@@ -28,6 +31,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
@@ -35,18 +39,27 @@ import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import org.jetbrains.annotations.NotNull;
 import pipe.gui.petrinet.action.GuiAction;
+import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.canvas.Grid;
+import pipe.gui.canvas.SelectionManager;
 import net.tapaal.gui.petrinet.dialog.ExportBatchDialog;
 import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
+import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import kotlin.internal.RequireKotlin.Container;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.SearchBar;
 import pipe.gui.petrinet.animation.SimulatorFocusTraversalPolicy;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.editor.EditorFocusTraversalPolicy;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
 
 public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameActions {
@@ -63,6 +76,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JMenu viewMenu;
     private JMenu toolsMenu;
     private JToolBar drawingToolBar;
+    private JToolBar searchToolBar;
+    private SearchBar searchBar;
     private final JLabel featureInfoText = new JLabel();
 
     private final JComboBox<String> timeFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
@@ -166,6 +181,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction exportBatchAction = new GuiAction("Batch Export of model and queries", "Export multiple nets and queries for the command line use with the verification engines.", KeyStroke.getKeyStroke('D', (shortcutkey + InputEvent.SHIFT_DOWN_MASK))) {
         public void actionPerformed(ActionEvent e) {
+    
+
             ExportBatchDialog.ShowExportBatchDialog();
         }
     };
@@ -632,7 +649,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             // Grow size of boxes to add room for the resizer
             System.setProperty("apple.awt.showGrowBox", "true");
-
         }
 
         this.setIconImage(ResourceManager.getIcon("icon.png").getImage());
@@ -915,6 +931,83 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         drawingToolBar.addSeparator();
         drawingToolBar.setRequestFocusEnabled(false);
 
+        // Search field
+        searchToolBar = new JToolBar();
+        searchToolBar.setFloatable(false);
+        searchToolBar.setRequestFocusEnabled(false);
+
+        searchBar = new SearchBar();   
+        searchBar.setOnFocusGained(() -> {
+            currentTab.ifPresent(o -> o.setMode(PetriNetTab.DrawTool.SELECT));
+            enableActionsForSearchBar(false);
+        });    
+
+        searchBar.setOnFocusLost(() -> {
+            enableActionsForSearchBar(true);
+        });  
+
+        searchBar.setEnabled(false);
+        searchToolBar.add(searchBar);
+
+        searchBar.setOnSearchTextChanged(query -> {
+            if (query == null || query.trim().isEmpty()) {
+                searchBar.hideResults();
+                return;
+            }
+
+            currentTab.ifPresent(o -> o.search(query));
+        });
+
+        searchBar.setOnResultSelected(result -> {
+            if (result == null) return;
+
+            searchBar.clear();
+
+            PetriNetObject selectedObject = null;
+            PetriNetTab tab = (PetriNetTab)currentTab.get();
+            String resultStr = result.getFirst().toString();
+
+            String templateName = null;
+            String name;
+
+            if (resultStr.contains(".")) {
+                templateName = resultStr.split("\\.")[0];
+                name = resultStr.split("\\.")[1];
+            } else {
+                templateName = result.getSecond();
+                name = resultStr;
+            }
+            
+            Object resultObj = result.getFirst();
+            for (Template template : tab.allTemplates()) {
+                if (templateName != null && !template.toString().equals(templateName)) {
+                    continue;
+                }
+
+                DataLayer guiModel = template.guiModel();
+                if (resultObj instanceof TimedPlace) {
+                    selectedObject = guiModel.getPlaceByName(name);
+                } else {
+                    selectedObject = guiModel.getTransitionByName(name);
+                }
+                
+                if (selectedObject != null) {
+                    tab.selectTemplate(template);
+                    break;
+                }
+            }
+        
+            if (selectedObject == null) throw new IllegalStateException("Selected object is null");
+            
+            DrawingSurfaceImpl drawingSurface = tab.drawingSurface();
+            SelectionManager selectionObject = drawingSurface.getSelectionObject();
+            selectionObject.clearSelection();
+
+            selectedObject.select();
+            drawingSurface.scrollToCenter(selectedObject);
+        });
+        
+
         // Create panel to put toolbars in
         JPanel toolBarPanel = new JPanel();
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -928,13 +1021,40 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         JPanel toolBarPaneltmp = new JPanel();
         toolBarPaneltmp.setLayout(new BorderLayout());
         toolBarPaneltmp.add(toolBarPanel, BorderLayout.WEST);
+        
         JToolBar spacer = new JToolBar();
-        spacer.addSeparator();
         spacer.setFloatable(false);
-        toolBarPaneltmp.add(spacer, BorderLayout.CENTER);
+       
+        toolBarPaneltmp.add(searchToolBar, BorderLayout.CENTER);
+        toolBarPaneltmp.add(spacer, BorderLayout.EAST);
 
         // Add to GUI
         getContentPane().add(toolBarPaneltmp, BorderLayout.PAGE_START);
+    }
+
+    private void enableActionsForSearchBar(boolean enable) {
+        exportTraceAction.setEnabled(enable);
+        importTraceAction.setEnabled(enable);
+        verifyAction.setEnabled(enable);
+        showColorTypesVariables.setEnabled(enable);
+        annotationAction.setEnabled(enable);
+        selectAllAction.setEnabled(enable);
+        stepbackwardAction.setEnabled(enable);
+        stepforwardAction.setEnabled(enable);
+        deleteAction.setEnabled(enable);
+        undoAction.setEnabled(enable);
+        redoAction.setEnabled(enable);
+        prevcomponentAction.setEnabled(enable);
+        nextcomponentAction.setEnabled(enable);
+        smartDrawAction.setEnabled(enable);
+        mergeComponentsDialogAction.setEnabled(enable);
+        workflowDialogAction.setEnabled(enable);
+        timeFeatureOptions.setEnabled(enable);
+        gameFeatureOptions.setEnabled(enable);
+        colorFeatureOptions.setEnabled(enable);
+        stochasticFeatureOptions.setEnabled(enable);
+        enableAllActions(enable);
+        currentTab.ifPresent(o -> o.enableActionsForSearchBar(enable));
     }
 
     private void addZoomSlider(JToolBar toolBar) {
@@ -959,6 +1079,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     @Override
     public JSlider getZoomSlider() {
         return zoomSlider;
+    }
+
+    @Override
+    public SearchBar getSearchBar() {
+        return searchBar;
     }
 
     private JCheckBoxMenuItem addCheckboxMenuItem(JMenu menu, Action action) {
@@ -1025,6 +1150,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 //Enable editor focus traversal policy
                 setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
                 fixBug812694GrayMenuAfterSimulationOnMac();
+
+                searchBar.setEnabled(true);
+
                 break;
 
             case animation:
@@ -1064,6 +1192,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
                 //Enable simulator focus traversal policy
                 setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy(getCurrentTab().getAnimationController().TimeDelayField));
+                
+                searchBar.setEnabled(false);
 
                 break;
             case noNet:
@@ -1094,12 +1224,13 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 colorFeatureOptions.setEnabled(false);
                 stochasticFeatureOptions.setEnabled(false);
 
-
                 enableAllActions(false);
 
                 // Disable All Actions
                 statusBar.changeText("Open a net to start editing");
                 setFocusTraversalPolicy(null);
+
+                searchBar.setEnabled(false);
 
                 break;
         }
@@ -1230,6 +1361,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 pasteAction.setEnabled(true);
                 copyAction.setEnabled(true);
                 cutAction.setEnabled(true);
+                searchBar.setVisible(true);
 
                 break;
             case animation:
@@ -1237,6 +1369,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 pasteAction.setEnabled(false);
                 copyAction.setEnabled(false);
                 cutAction.setEnabled(false);
+                searchBar.setVisible(false);
 
                 break;
             case noNet:
@@ -1247,6 +1380,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 pasteAction.setEnabled(false);
                 copyAction.setEnabled(false);
                 cutAction.setEnabled(false);
+                searchBar.setVisible(false);
                 break;
 
             default:
