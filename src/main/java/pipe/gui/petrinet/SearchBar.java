@@ -33,6 +33,7 @@ import java.awt.event.MouseEvent;
 
 public class SearchBar extends JPanel {
     private static final String SEARCH_TOOLTIP = "Search for places and transitions in the net";
+    private static final int MAX_VISIBLE_ITEMS = 10;
 
     private final JLabel searchLabel;
     private final JTextField searchField;
@@ -43,7 +44,6 @@ public class SearchBar extends JPanel {
     private Runnable onFocusLost;
     private List<Pair<?, String>> currentMatches;
     
-
     public SearchBar() {
         super(new BorderLayout());
        
@@ -228,8 +228,7 @@ public class SearchBar extends JPanel {
             final int width = searchField.getWidth();
         
             int itemHeight = 26;
-            int maxVisibleItems = 5;
-            int itemCount = matches != null ? Math.min(maxVisibleItems, matches.size()) : 1;
+            int itemCount = matches != null ? Math.min(MAX_VISIBLE_ITEMS, matches.size()) : 1;
             int height = itemCount * itemHeight;
             
             resultsPopup.setPreferredSize(new Dimension(width, height));
