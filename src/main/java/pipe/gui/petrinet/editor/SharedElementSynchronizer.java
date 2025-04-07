@@ -4,8 +4,11 @@ import dk.aau.cs.model.tapn.*;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.graphicElements.ArcPath;
+import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import net.tapaal.gui.petrinet.Template;
 
 public class SharedElementSynchronizer {
@@ -159,7 +162,13 @@ public class SharedElementSynchronizer {
         }
         arcPath.addPoint(endX, endY, false);
         
-        currentTab.guiModelManager.addTimedInputArc(targetTemplate.guiModel(), guiPlace, guiTransition, arcPath);
+        TimedInputArcComponent newArc = currentTab.guiModelManager.addTimedInputArc(targetTemplate.guiModel(), guiPlace, guiTransition, arcPath).getResult();
+        TimedInputArc newInputArc = newArc.underlyingTimedInputArc();
+        newInputArc.setWeight(inputArc.getWeight());
+        newInputArc.setTimeInterval(inputArc.interval());
+        newInputArc.setExpression(inputArc.getArcExpression());
+        newInputArc.setColorTimeIntervals(inputArc.getColorTimeIntervals());
+        newArc.updateLabel(true);
     }
     
     private static void syncOutputArc(
@@ -204,7 +213,11 @@ public class SharedElementSynchronizer {
         }
         arcPath.addPoint(endX, endY, false);
         
-        currentTab.guiModelManager.addTimedOutputArc(targetTemplate.guiModel(), guiTransition, guiPlace, arcPath);
+        TimedOutputArcComponent newArc = currentTab.guiModelManager.addTimedOutputArc(targetTemplate.guiModel(), guiTransition, guiPlace, arcPath).getResult();
+        TimedOutputArc newOutputArc = newArc.underlyingArc();
+        newOutputArc.setWeight(outputArc.getWeight());
+        newOutputArc.setExpression(outputArc.getExpression());
+        newArc.updateLabel(true);
     }
     
     private static void syncInhibitorArc(
@@ -315,8 +328,15 @@ public class SharedElementSynchronizer {
             }
             destArcPath.addPoint(destX, destY, false);
             
-            currentTab.guiModelManager.addTimedTransportArc(
-                targetTemplate.guiModel(), guiSourcePlace, guiTransition, guiDestPlace, sourceArcPath, destArcPath);
+            TimedTransportArcComponent newArc = currentTab.guiModelManager.addTimedTransportArc(
+                targetTemplate.guiModel(), guiSourcePlace, guiTransition, guiDestPlace, sourceArcPath, destArcPath).getResult();
+            TransportArc newTransportArc = newArc.underlyingTransportArc();
+            newTransportArc.setWeight(transportArc.getWeight());
+            newTransportArc.setTimeInterval(transportArc.interval());
+            newTransportArc.setInputExpression(transportArc.getInputExpression());
+            newTransportArc.setOutputExpression(transportArc.getOutputExpression());
+            newTransportArc.setColorTimeIntervals(transportArc.getColorTimeIntervals());
+            newArc.updateLabel(true);
         }
     }
 }
