@@ -355,7 +355,9 @@ public class Verifier {
 
     public static void createTempFile() {
         try {
-            reducedNetTempFile = File.createTempFile("reduced-", ".pnml");
+            if (reducedNetTempFile == null) {
+                reducedNetTempFile = File.createTempFile("reduced-", ".pnml");
+            }
         } catch (IOException e) {
             new MessengerImpl().displayErrorMessage(
                 e.getMessage(),
