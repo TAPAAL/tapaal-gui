@@ -961,6 +961,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         searchBar.setOnResultSelected(result -> {
             if (result == null) return;
 
+            searchBar.clear();
+
             PetriNetObject selectedObject = null;
             PetriNetTab tab = (PetriNetTab)currentTab.get();
             String resultStr = result.getFirst().toString();

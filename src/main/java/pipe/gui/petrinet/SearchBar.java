@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -12,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -22,8 +24,10 @@ import dk.aau.cs.util.Pair;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -37,6 +41,7 @@ public class SearchBar extends JPanel {
     private Consumer<Pair<?, String>> onResultSelected;
     private Runnable onFocusGained;
     private Runnable onFocusLost;
+    private List<Pair<?, String>> currentMatches;
     
 
     public SearchBar() {
@@ -67,6 +72,21 @@ public class SearchBar extends JPanel {
             @Override
             public void changedUpdate(DocumentEvent e) {
                 notifySearchTextChanged();
+            }
+        });
+
+        // Select first match on enter
+        searchField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectFirstMatch");
+        searchField.getActionMap().put("selectFirstMatch", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (resultsPopup.isVisible() && currentMatches != null && !currentMatches.isEmpty()) {
+                    if (onResultSelected != null) {
+                        onResultSelected.accept(currentMatches.get(0));
+                    }
+
+                    resultsPopup.setVisible(false);
+                }
             }
         });
 
@@ -124,6 +144,8 @@ public class SearchBar extends JPanel {
     }
 
     public void showResults(List<Pair<?, String>> matches) {
+        currentMatches = matches;
+        
         resultsPopup.removeAll();
         
         if (matches == null || matches.isEmpty()) {
@@ -147,7 +169,21 @@ public class SearchBar extends JPanel {
                     firstElemStr = firstElemStr.split("\\.")[1];
                 }
 
-                String matchStr = isShared ? match.getSecond() + "." + firstElemStr + " (shared)" : firstElemStr;
+                String matchStr;
+                if (firstElem instanceof TimedTransition) {
+                    if (isShared) {
+                        matchStr = match.getSecond() + "." + firstElemStr + " (shared transition)";
+                    } else {
+                        matchStr = firstElemStr + " (transition)";
+                    }
+                } else {
+                    if (isShared) {
+                        matchStr = match.getSecond() + "." + firstElemStr + " (shared place)";
+                    } else {
+                        matchStr = firstElemStr + " (place)";
+                    }
+                }
+                
                 JButton resultButton = new JButton(matchStr);
 
                 resultButton.setHorizontalAlignment(SwingConstants.LEFT);
@@ -220,5 +256,9 @@ public class SearchBar extends JPanel {
     @Override
     public boolean isFocusOwner() {
         return searchField.isFocusOwner();
+    }
+
+    public void clear() {
+        searchField.setText("");
     }
 }
