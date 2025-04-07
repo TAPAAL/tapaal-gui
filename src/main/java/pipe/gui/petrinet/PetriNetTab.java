@@ -22,6 +22,7 @@ import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.Pair;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
@@ -92,9 +93,11 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.Arrays;
 
 public class PetriNetTab extends JSplitPane implements TabActions {
@@ -594,6 +597,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	public TemplateExplorer getTemplateExplorer(){
 		return templateExplorer;
 	}
+
+    public void selectTemplate(Template template) {
+        templateExplorer.selectTemplate(template);
+    }
 
 	public void createEditorLeftPane() {
 		constantsPanel = new ConstantsPane(this);
@@ -1141,6 +1148,43 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+    @Override
+    public void search(String query) {
+        if (query == null || query.isEmpty()) {
+            return;
+        }
+        
+        List<Pair<?, String>> searchableItems = new ArrayList<>();
+        for (Template template : allTemplates()) {
+            TimedArcPetriNet model = template.model();
+            for (TimedPlace place : model.places()) {
+                searchableItems.add(new Pair<>(place, template.toString()));
+            }
+
+            for (TimedTransition transition : model.transitions()) {
+                searchableItems.add(new Pair<>(transition, template.toString()));
+            }
+        }
+
+        Searcher<Pair<?, String>> searcher = new Searcher<>(searchableItems, obj -> {
+            Object element = obj.getFirst();            
+            String name = element.toString();
+            if (name.contains(".")) {
+                name = name.split("\\.")[1];
+            }
+
+            return name;
+        });
+    
+        var matches = searcher.findAllMatches(query);
+        app.ifPresent(gfa -> {
+            SearchBar searchBar = gfa.getSearchBar();
+            if (searchBar != null) {
+                searchBar.showResults(matches);
+            }
+        });
+    }
+
 	public void editSelectedQuery(){
 		queries.showEditDialog();
 	}
@@ -1435,9 +1479,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
     //XXX temp while refactoring, kyrke - 2019-07-25
-	@Override
-	public void setMode(DrawTool mode) {
-
+    @Override
+    public void setMode(DrawTool mode) {
         changeStatusbarText(mode);
 
 		//Disable selection and deselect current selection
@@ -1518,6 +1561,15 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 		}
 	}
+
+    @Override
+    public boolean searchBarHasFocus() {
+        if (app == null || app.get() == null) {
+            return false;
+        }
+
+        return app.get().getSearchBar().isFocusOwner();
+    }
 
 	@Override
 	public void showStatistics() {
@@ -3331,6 +3383,21 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     timeAction.setEnabled(true);
                 break;
         }
+    }
+
+    public void enableActionsForSearchBar(boolean enable) {
+        selectAction.setEnabled(enable);
+        transAction.setEnabled(enable);
+        urgentTransAction.setEnabled(enable);
+        uncontrollableTransAction.setEnabled(enable);
+        uncontrollableUrgentTransAction.setEnabled(enable);
+        timedPlaceAction.setEnabled(enable);
+        timedArcAction.setEnabled(enable);
+        transportArcAction.setEnabled(enable);
+        inhibarcAction.setEnabled(enable);
+        tokenAction.setEnabled(enable);
+        deleteTokenAction.setEnabled(enable);
+        annotationAction.setEnabled(enable);
     }
 
 

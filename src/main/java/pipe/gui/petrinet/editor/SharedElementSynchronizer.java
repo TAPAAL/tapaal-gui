@@ -1,9 +1,12 @@
 package pipe.gui.petrinet.editor;
 
+import javax.swing.JOptionPane;
+
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.graphicElements.ArcPath;
+import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
@@ -12,40 +15,57 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import net.tapaal.gui.petrinet.Template;
 
 public class SharedElementSynchronizer {
+    public static void updateSharedArcs(PlaceTransitionObject obj) {
+        PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
+        try {
+            currentTab.guiModelManager.startTransaction();
+            if (obj instanceof TimedTransitionComponent) {
+                updateSharedTransitionArcs((TimedTransitionComponent) obj);
+            } else if (obj instanceof TimedPlaceComponent) {
+                updateSharedPlaceArcs((TimedPlaceComponent) obj);
+            }
+
+            currentTab.guiModelManager.commit();
+        } catch (IllegalStateException e) {
+            JOptionPane.showMessageDialog(
+                TAPAALGUI.getApp(),
+                "Arc conflicts with an existing arc in one of the other components.\n Delete the arc in all but one of the components to resolve the conflict.",
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        currentTab.guiModelManager.abort();
+    }
+
     /**
      * Update and synchronize arcs for a shared transition across templates
      */
-    public static void updateSharedTransitionArcs(TimedTransitionComponent transition) {
+    private static void updateSharedTransitionArcs(TimedTransitionComponent transition) {
         PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
         Template currentTemplate = currentTab.currentTemplate();
         TimedTransition sourceTransition = transition.underlyingTransition();
         
-        currentTab.guiModelManager.startTransaction();
         for (Template template : currentTab.allTemplates()) {
             if (template.equals(currentTemplate)) continue;
     
             TimedTransition templateTransition = template.model().getTransitionByName(sourceTransition.name());
             if (templateTransition == null) continue;
-    
+
             syncTransitionArcsFromSourceToTarget(currentTab, currentTemplate, template, 
                 sourceTransition, templateTransition, false, transition);
             syncTransitionArcsFromSourceToTarget(currentTab, template, currentTemplate, 
                 templateTransition, sourceTransition, true, transition);
         }
-
-        currentTab.guiModelManager.commit();
-        currentTab.guiModelManager.abort();
     }
     
     /**
      * Update and synchronize arcs for a shared place across templates
      */
-    public static void updateSharedPlaceArcs(TimedPlaceComponent place) {
+    private static void updateSharedPlaceArcs(TimedPlaceComponent place) {
         PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
         Template currentTemplate = currentTab.currentTemplate();
         TimedPlace sourcePlace = place.underlyingPlace();
-        
-        currentTab.guiModelManager.startTransaction();
+
         for (Template template : currentTab.allTemplates()) {
             if (template.equals(currentTemplate)) continue;
     
@@ -57,9 +77,6 @@ public class SharedElementSynchronizer {
             syncPlaceArcsFromSourceToTarget(currentTab, template, currentTemplate, 
                 templatePlace, sourcePlace, true, place);
         }
-
-        currentTab.guiModelManager.commit();
-        currentTab.guiModelManager.abort();
     }
     
     private static void syncTransitionArcsFromSourceToTarget(
@@ -77,6 +94,11 @@ public class SharedElementSynchronizer {
             TimedPlace targetPlace = targetTemplate.model().getPlaceByName(sourcePlace.name());
             if (targetPlace == null) continue;
             
+            if (targetTemplate.model().hasArcFromPlaceToTransition(targetPlace, targetTransition) &&
+                sourceTemplate.model().hasArcFromPlaceToTransition(sourcePlace, sourceTransition)) {
+                throw new IllegalStateException("Arc already exists");
+            }
+
             syncInputArc(currentTab, sourceTemplate, targetTemplate, sourcePlace, targetPlace, 
                         sourceTransition, targetTransition, isCurrentTemplateTarget, currentTransition, null);
             
@@ -106,6 +128,11 @@ public class SharedElementSynchronizer {
             TimedTransition targetTransition = targetTemplate.model().getTransitionByName(sourceTransition.name());
             if (targetTransition == null) continue;
             
+            if (targetTemplate.model().hasArcFromTransitionToPlace(targetTransition, targetPlace) &&
+                sourceTemplate.model().hasArcFromTransitionToPlace(sourceTransition, sourcePlace)) {
+                throw new IllegalStateException("Arc already exists");
+            }
+
             syncInputArc(currentTab, sourceTemplate, targetTemplate, sourcePlace, targetPlace, 
                     sourceTransition, targetTransition, isCurrentTemplateTarget, null, currentPlace);
             

@@ -612,7 +612,7 @@ public class TAPNTransitionEditor extends JPanel {
 		doOKChecked = true;
 
         if (sharedCheckBox.isSelected()) {
-            SharedElementSynchronizer.updateSharedTransitionArcs(transition);
+            SharedElementSynchronizer.updateSharedArcs(transition);
         }
 
 		return true;

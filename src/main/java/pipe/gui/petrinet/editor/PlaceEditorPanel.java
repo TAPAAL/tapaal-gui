@@ -699,7 +699,7 @@ public class PlaceEditorPanel extends JPanel {
         }
 
         if (sharedCheckBox.isSelected()) {
-            SharedElementSynchronizer.updateSharedPlaceArcs(place);
+            SharedElementSynchronizer.updateSharedArcs(place);
         } 
 
         return true;

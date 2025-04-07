@@ -48,8 +48,6 @@ object DEBUG {
                         e.printStackTrace();
                         JOptionPane.showMessageDialog(null, "Debug: Save/Load Error","Failure to save/load, please check stack-trace on console.", JOptionPane.ERROR_MESSAGE)
                     }
-
-
                 }
             })
         }
