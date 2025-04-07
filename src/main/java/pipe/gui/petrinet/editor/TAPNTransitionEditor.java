@@ -611,9 +611,9 @@ public class TAPNTransitionEditor extends JPanel {
 		coloredTransitionGuardPanel.onOK(context.undoManager());
 		doOKChecked = true;
 
-        if (sharedCheckBox.isSelected()) {
-            SharedElementSynchronizer.updateSharedArcs(transition);
-        }
+        if (sharedCheckBox.isSelected() && !SharedElementSynchronizer.updateSharedArcs(transition)) {
+            return false;
+        }            
 
 		return true;
 	}

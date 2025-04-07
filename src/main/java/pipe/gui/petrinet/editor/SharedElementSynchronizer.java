@@ -15,26 +15,31 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import net.tapaal.gui.petrinet.Template;
 
 public class SharedElementSynchronizer {
-    public static void updateSharedArcs(PlaceTransitionObject obj) {
+    /**
+     * @param obj the place or transition to syncrhonize
+     * @return true if the arcs were synchronized successfully, false otherwise
+     */
+    public static boolean updateSharedArcs(PlaceTransitionObject obj) {
         PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
         try {
             currentTab.guiModelManager.startTransaction();
             if (obj instanceof TimedTransitionComponent) {
-                updateSharedTransitionArcs((TimedTransitionComponent) obj);
+                updateSharedTransitionArcs((TimedTransitionComponent)obj);
             } else if (obj instanceof TimedPlaceComponent) {
-                updateSharedPlaceArcs((TimedPlaceComponent) obj);
+                updateSharedPlaceArcs((TimedPlaceComponent)obj);
             }
 
             currentTab.guiModelManager.commit();
+            return true;
         } catch (IllegalStateException e) {
             JOptionPane.showMessageDialog(
                 TAPAALGUI.getApp(),
                 "Arc conflicts with an existing arc in one of the other components.\n Delete the arc in all but one of the components to resolve the conflict.",
                 "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+            return false;
+        } finally {
+            currentTab.guiModelManager.abort();
         }
-
-        currentTab.guiModelManager.abort();
     }
 
     /**
@@ -94,10 +99,7 @@ public class SharedElementSynchronizer {
             TimedPlace targetPlace = targetTemplate.model().getPlaceByName(sourcePlace.name());
             if (targetPlace == null) continue;
             
-            if (targetTemplate.model().hasArcFromPlaceToTransition(targetPlace, targetTransition) &&
-                sourceTemplate.model().hasArcFromPlaceToTransition(sourcePlace, sourceTransition)) {
-                throw new IllegalStateException("Arc already exists");
-            }
+            throwIfConflict(sourceTemplate, targetTemplate, sourcePlace, targetPlace, sourceTransition, targetTransition);
 
             syncInputArc(currentTab, sourceTemplate, targetTemplate, sourcePlace, targetPlace, 
                         sourceTransition, targetTransition, isCurrentTemplateTarget, currentTransition, null);
@@ -127,11 +129,8 @@ public class SharedElementSynchronizer {
             
             TimedTransition targetTransition = targetTemplate.model().getTransitionByName(sourceTransition.name());
             if (targetTransition == null) continue;
-            
-            if (targetTemplate.model().hasArcFromTransitionToPlace(targetTransition, targetPlace) &&
-                sourceTemplate.model().hasArcFromTransitionToPlace(sourceTransition, sourcePlace)) {
-                throw new IllegalStateException("Arc already exists");
-            }
+
+            throwIfConflict(sourceTemplate, targetTemplate, sourcePlace, targetPlace, sourceTransition, targetTransition);
 
             syncInputArc(currentTab, sourceTemplate, targetTemplate, sourcePlace, targetPlace, 
                     sourceTransition, targetTransition, isCurrentTemplateTarget, null, currentPlace);
@@ -144,6 +143,27 @@ public class SharedElementSynchronizer {
             
             syncTransportArcs(currentTab, sourceTemplate, targetTemplate, sourcePlace, targetPlace,
                     sourceTransition, targetTransition, isCurrentTemplateTarget, null, currentPlace);
+        }
+    }
+
+    private static void throwIfConflict(
+        Template sourceTemplate, 
+        Template targetTemplate,
+        TimedPlace sourcePlace, 
+        TimedPlace targetPlace,
+        TimedTransition sourceTransition, 
+        TimedTransition targetTransition
+    ) {
+        boolean inputArcConflict = 
+            targetTemplate.model().hasArcFromPlaceToTransition(targetPlace, targetTransition) &&
+            sourceTemplate.model().hasArcFromPlaceToTransition(sourcePlace, sourceTransition);
+        
+        boolean outputArcConflict = 
+            targetTemplate.model().hasArcFromTransitionToPlace(targetTransition, targetPlace) &&
+            sourceTemplate.model().hasArcFromTransitionToPlace(sourceTransition, sourcePlace);
+        
+        if (inputArcConflict || outputArcConflict) {
+            throw new IllegalStateException("Arc already exists");
         }
     }
     
