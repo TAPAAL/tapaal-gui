@@ -34,7 +34,7 @@ public class SharedElementSynchronizer {
         } catch (IllegalStateException e) {
             JOptionPane.showMessageDialog(
                 TAPAALGUI.getApp(),
-                "Arc conflicts with an existing arc in one of the other components.\n Delete the arc in all but one of the components to resolve the conflict.",
+                "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
                 "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         } finally {
