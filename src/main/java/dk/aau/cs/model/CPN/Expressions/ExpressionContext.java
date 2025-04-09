@@ -20,7 +20,15 @@ public class ExpressionContext {
         for (ColorType ct : colorTypes.values()) {
             if (ct instanceof ProductType) {
                 ProductType pt = (ProductType) ct;
-                if (pt.containsTypes(types)) {
+                boolean allMatch = true;
+                for (int i = 0; i < types.size(); ++i) {
+                    if (!pt.getColorTypes().get(i).equals(types.get(i))) {
+                        allMatch = false;
+                        break;
+                    }
+                }
+
+                if (allMatch) {
                     return pt;
                 }
             }

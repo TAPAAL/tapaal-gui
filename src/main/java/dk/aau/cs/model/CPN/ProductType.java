@@ -108,7 +108,6 @@ public class ProductType extends ColorType {
     public Vector<Color> getColors(){
 
         if (getConstituentCombinationSize() != colorCache.size()) {
-
             Vector<Vector<Color>> tupleColors = new Vector<>();
             for (ColorType ct : constituents) {
                 if (tupleColors.isEmpty()) {
@@ -120,11 +119,11 @@ public class ProductType extends ColorType {
                 } else {
                     Vector<Vector<Color>> newTupleColors = new Vector<>();
                     for (Color color : ct.getColors()) {
-                        Vector<Vector<Color>> tupleColorsClone = (Vector<Vector<Color>>) tupleColors.clone();
-                        for (Vector<Color> tupleColor : tupleColorsClone) {
-                            tupleColor.add(color);
+                        for (Vector<Color> tupleColor : tupleColors) {
+                            Vector<Color> newTupleColor = new Vector<>(tupleColor);
+                            newTupleColor.add(color);
+                            newTupleColors.add(newTupleColor);
                         }
-                        newTupleColors.addAll(tupleColorsClone);
                     }
                     tupleColors = newTupleColors;
                 }
