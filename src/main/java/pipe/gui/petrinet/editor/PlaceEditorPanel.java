@@ -698,7 +698,9 @@ public class PlaceEditorPanel extends JPanel {
             context.undoManager().removeCurrentEdit();
         }
 
-        if (sharedCheckBox.isSelected() && !SharedElementSynchronizer.updateSharedArcs(place)) {
+        SharedPlace placeBefore = sharedCheckBox.isSelected() ? (SharedPlace)place.underlyingPlace() : null;
+        boolean sameSharedAsBefore = placeBefore != null && selectedPlace.equals(underlyingPlace);
+        if (sameSharedAsBefore && !SharedElementSynchronizer.updateSharedArcs(place)) {
             return false;
         }
 

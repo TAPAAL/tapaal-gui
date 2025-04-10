@@ -458,7 +458,7 @@ public class TAPNTransitionEditor extends JPanel {
 
 	private boolean okButtonHandler(java.awt.event.ActionEvent evt) {
 		String newName = nameTextField.getText();
-		
+
 		// Check urgent constrain
 		if(urgentCheckBox.isSelected() && !isUrgencyOK()){
 			return false;
@@ -469,6 +469,7 @@ public class TAPNTransitionEditor extends JPanel {
 			doNewEdit = false;
 		}
 		
+        SharedTransition transitionBefore = transition.underlyingTransition().sharedTransition();
 		boolean wasShared = transition.underlyingTransition().isShared() && !sharedCheckBox.isSelected();
 		if(transition.underlyingTransition().isShared()){
 			context.undoManager().addEdit(new UnshareTransitionCommand(transition.underlyingTransition().sharedTransition(), transition.underlyingTransition()));
@@ -611,7 +612,9 @@ public class TAPNTransitionEditor extends JPanel {
 		coloredTransitionGuardPanel.onOK(context.undoManager());
 		doOKChecked = true;
 
-        if (sharedCheckBox.isSelected() && !SharedElementSynchronizer.updateSharedArcs(transition)) {
+        SharedTransition selectedTransition = sharedCheckBox.isSelected() ? (SharedTransition)sharedTransitionsComboBox.getSelectedItem() : null;
+        boolean sameSharedAsBefore = selectedTransition != null && selectedTransition.equals(transitionBefore);
+        if (!sameSharedAsBefore && !SharedElementSynchronizer.updateSharedArcs(transition)) {
             return false;
         }            
 
