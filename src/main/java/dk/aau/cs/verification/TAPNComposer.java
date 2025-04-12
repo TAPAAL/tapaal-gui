@@ -3,6 +3,7 @@ package dk.aau.cs.verification;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -35,6 +36,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.util.Pair;
 import dk.aau.cs.util.Tuple;
 
 public class TAPNComposer implements ITAPNComposer {
@@ -589,6 +591,8 @@ public class TAPNComposer implements ITAPNComposer {
 	
 	private void createInhibitorArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, int greatestWidth, int greatestHeight) {
 		int i = 0;
+
+        Set<Pair<String, String>> sharedInhibitorArcs = new HashSet<>();
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
                         
 			DataLayer currentGuiModel = null;
@@ -617,6 +621,11 @@ public class TAPNComposer implements ITAPNComposer {
                     }
                 }
 				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeightValue(), arc.getArcExpression());
+                if (sharedInhibitorArcs.contains(new Pair<>(source.name(), target.name()))) {
+                    continue;
+                }
+
+                sharedInhibitorArcs.add(new Pair<>(source.name(), target.name()));
 				constructedModel.add(addedArc);
 				
 				// Gui work
