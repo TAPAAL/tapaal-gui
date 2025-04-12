@@ -601,11 +601,13 @@ public class PlaceEditorPanel extends JPanel {
 		TimedPlace underlyingPlace = place.underlyingPlace();
 
 		SharedPlace selectedPlace = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
+
+        Command sharedCommand = null;
 		if(sharedCheckBox.isSelected() && !Objects.equals(selectedPlace, underlyingPlace)){
-			Command command = new MakePlaceSharedCommand(context.activeModel(), selectedPlace, place.underlyingPlace(), place, context.tabContent());
-			context.undoManager().addEdit(command);
+			sharedCommand = new MakePlaceSharedCommand(context.activeModel(), selectedPlace, place.underlyingPlace(), place, context.tabContent());
+			context.undoManager().addEdit(sharedCommand);
 			try{
-				command.redo();
+				sharedCommand.redo();
 			}catch(RequireException e){
 				context.undoManager().undo();
                 doNewEdit = true;
@@ -699,8 +701,11 @@ public class PlaceEditorPanel extends JPanel {
         }
 
         SharedPlace placeBefore = sharedCheckBox.isSelected() ? (SharedPlace)place.underlyingPlace() : null;
-        boolean sameSharedAsBefore = placeBefore != null && selectedPlace.equals(underlyingPlace);
-        if (sameSharedAsBefore && !SharedElementSynchronizer.updateSharedArcs(place)) {
+        boolean sameSharedAsBefore = placeBefore != null && selectedPlace.equals(placeBefore);
+        if (sharedCheckBox.isSelected() && sameSharedAsBefore && !SharedElementSynchronizer.updateSharedArcs(place)) {
+            sharedCommand.undo();
+            context.undoManager().removeCurrentEdit();
+            doNewEdit = true;
             return false;
         }
 

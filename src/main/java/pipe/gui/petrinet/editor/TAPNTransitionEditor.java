@@ -476,12 +476,13 @@ public class TAPNTransitionEditor extends JPanel {
 			transition.underlyingTransition().unshare();
 		}
 		
+        Command sharedCommand = null;
 		if(sharedCheckBox.isSelected()){
 			SharedTransition selectedTransition = (SharedTransition)sharedTransitionsComboBox.getSelectedItem();
-            Command command = new MakeTransitionSharedCommand(context.activeModel(), selectedTransition, transition.underlyingTransition(), context.tabContent());
-			context.undoManager().addEdit(command);
+            sharedCommand = new MakeTransitionSharedCommand(context.activeModel(), selectedTransition, transition.underlyingTransition(), context.tabContent());
+			context.undoManager().addEdit(sharedCommand);
 			try{
-				command.redo();
+				sharedCommand.redo();
 			}catch(RequireException e){
 				context.undoManager().undo();
                 doNewEdit = true;
@@ -515,8 +516,7 @@ public class TAPNTransitionEditor extends JPanel {
 				return false;
 			}
 			context.nameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
-		
-			
+	
 			if(makeNewShared && !makeSharedButton.isEnabled()){
 				Command command = new MakeTransitionNewSharedCommand(context.activeModel(), newName, transition.underlyingTransition(), context.tabContent(), false);
 				context.undoManager().addEdit(command);
@@ -609,14 +609,17 @@ public class TAPNTransitionEditor extends JPanel {
 		
 		transition.update(true);
 
-		coloredTransitionGuardPanel.onOK(context.undoManager());
-		doOKChecked = true;
-
         SharedTransition selectedTransition = sharedCheckBox.isSelected() ? (SharedTransition)sharedTransitionsComboBox.getSelectedItem() : null;
         boolean sameSharedAsBefore = selectedTransition != null && selectedTransition.equals(transitionBefore);
-        if (!sameSharedAsBefore && !SharedElementSynchronizer.updateSharedArcs(transition)) {
+        if (sharedCheckBox.isSelected() && !sameSharedAsBefore && !SharedElementSynchronizer.updateSharedArcs(transition)) {
+            sharedCommand.undo();
+            context.undoManager().removeCurrentEdit();
+            doNewEdit = true;
             return false;
-        }            
+        }   
+
+		coloredTransitionGuardPanel.onOK(context.undoManager());
+		doOKChecked = true;         
 
 		return true;
 	}
