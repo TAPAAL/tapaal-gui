@@ -480,8 +480,9 @@ public class TAPNComposer implements ITAPNComposer {
 	private void createTransportArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, int greatestWidth, int greatestHeight) {
 		int i = 0;
 		int nextGroupNr = 0;
-		for (TimedArcPetriNet tapn : model.activeTemplates()) {
-                        
+
+        Set<Pair<String, String>> sharedTransportArcs = new HashSet<>();
+		for (TimedArcPetriNet tapn : model.activeTemplates()) {            
 			DataLayer currentGuiModel = null;
 			if (this.guiModels != null) {
 				currentGuiModel = this.guiModels.get(tapn);
@@ -500,6 +501,11 @@ public class TAPNComposer implements ITAPNComposer {
 				TimedTransition transition = constructedModel.getTransitionByName(mapping.map(transitionTemplate, arc.transition().name()));
 				TimedPlace destination = constructedModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
 				
+                if (sharedTransportArcs.contains(new Pair<>(source.name(), transition.name())) &&
+                    sharedTransportArcs.contains(new Pair<>(transition.name(), destination.name()))) {
+                    continue;
+                }
+
 				TimeInterval newInterval = new TimeInterval(arc.interval());
 				if(inlineConstants){
                     newInterval.setLowerBound(new IntBound(newInterval.lowerBound().value()));
@@ -512,6 +518,8 @@ public class TAPNComposer implements ITAPNComposer {
 				TransportArc addedArc = new TransportArc(source, transition, destination, newInterval, arc.getWeightValue(),
                     arc.getInputExpression().deepCopy(), arc.getOutputExpression().deepCopy());
 				addedArc.setColorTimeIntervals(arc.getColorTimeIntervals());
+                sharedTransportArcs.add(new Pair<>(source.name(), transition.name()));
+                sharedTransportArcs.add(new Pair<>(transition.name(), destination.name()));
 				constructedModel.add(addedArc);
 				
 				//Create input transport arc
@@ -610,6 +618,9 @@ public class TAPNComposer implements ITAPNComposer {
 				
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(destinationTemplate, arc.destination().name()));
+                if (sharedInhibitorArcs.contains(new Pair<>(source.name(), target.name()))) {
+                    continue;
+                }
 
 				TimeInterval newInterval = new TimeInterval(arc.interval());
 				if(inlineConstants){
@@ -621,10 +632,6 @@ public class TAPNComposer implements ITAPNComposer {
                     }
                 }
 				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, newInterval, arc.getWeightValue(), arc.getArcExpression());
-                if (sharedInhibitorArcs.contains(new Pair<>(source.name(), target.name()))) {
-                    continue;
-                }
-
                 sharedInhibitorArcs.add(new Pair<>(source.name(), target.name()));
 				constructedModel.add(addedArc);
 				
