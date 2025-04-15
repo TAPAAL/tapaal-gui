@@ -1,7 +1,5 @@
 package pipe.gui.petrinet.editor;
 
-import javax.swing.JOptionPane;
-
 import dk.aau.cs.model.tapn.*;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
@@ -21,25 +19,28 @@ public class SharedElementSynchronizer {
      */
     public static boolean updateSharedArcs(PlaceTransitionObject obj) {
         PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
-        try {
-            currentTab.guiModelManager.startTransaction();
-            if (obj instanceof TimedTransitionComponent) {
-                updateSharedTransitionArcs((TimedTransitionComponent)obj);
-            } else if (obj instanceof TimedPlaceComponent) {
-                updateSharedPlaceArcs((TimedPlaceComponent)obj);
+        if (obj instanceof TimedTransitionComponent) {
+            if (checkSharedTransitionConflicts((TimedTransitionComponent)obj)) {
+                currentTab.guiModelManager.abort();
+                return false;
             }
-
-            currentTab.guiModelManager.commit();
-            return true;
-        } catch (IllegalStateException e) {
-            JOptionPane.showMessageDialog(
-                TAPAALGUI.getApp(),
-                "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
-                "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        } finally {
-            currentTab.guiModelManager.abort();
+        } else if (obj instanceof TimedPlaceComponent) {
+            if (checkSharedPlaceConflicts((TimedPlaceComponent)obj)) {
+                currentTab.guiModelManager.abort();
+                return false;
+            }
         }
+
+        currentTab.guiModelManager.startTransaction();
+        if (obj instanceof TimedTransitionComponent) {
+            updateSharedTransitionArcs((TimedTransitionComponent)obj);
+        } else if (obj instanceof TimedPlaceComponent) {
+            updateSharedPlaceArcs((TimedPlaceComponent)obj);
+        }
+
+        currentTab.guiModelManager.commit();
+        currentTab.guiModelManager.abort();
+        return true;
     }
 
     /**
@@ -76,7 +77,7 @@ public class SharedElementSynchronizer {
     
             TimedPlace templatePlace = template.model().getPlaceByName(sourcePlace.name());
             if (templatePlace == null) continue;
-    
+
             syncPlaceArcsFromSourceToTarget(currentTab, currentTemplate, template, 
                 sourcePlace, templatePlace, false, place);
             syncPlaceArcsFromSourceToTarget(currentTab, template, currentTemplate, 
@@ -93,13 +94,12 @@ public class SharedElementSynchronizer {
         boolean isCurrentTemplateTarget,
         TimedTransitionComponent currentTransition
     ) {
+
         for (TimedPlace sourcePlace : sourceTemplate.model().places()) {
             if (!sourcePlace.isShared()) continue;
             
             TimedPlace targetPlace = targetTemplate.model().getPlaceByName(sourcePlace.name());
             if (targetPlace == null) continue;
-            
-            throwIfConflict(sourceTemplate, targetTemplate, sourcePlace, targetPlace, sourceTransition, targetTransition);
 
             syncInputArc(currentTab, sourceTemplate, targetTemplate, sourcePlace, targetPlace, 
                         sourceTransition, targetTransition, isCurrentTemplateTarget, currentTransition, null);
@@ -130,8 +130,6 @@ public class SharedElementSynchronizer {
             TimedTransition targetTransition = targetTemplate.model().getTransitionByName(sourceTransition.name());
             if (targetTransition == null) continue;
 
-            throwIfConflict(sourceTemplate, targetTemplate, sourcePlace, targetPlace, sourceTransition, targetTransition);
-
             syncInputArc(currentTab, sourceTemplate, targetTemplate, sourcePlace, targetPlace, 
                     sourceTransition, targetTransition, isCurrentTemplateTarget, null, currentPlace);
             
@@ -146,7 +144,64 @@ public class SharedElementSynchronizer {
         }
     }
 
-    private static void throwIfConflict(
+    private static boolean checkSharedTransitionConflicts(TimedTransitionComponent transition) {
+        PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
+        Template currentTemplate = currentTab.currentTemplate();
+        TimedTransition sourceTransition = transition.underlyingTransition();
+        for (Template template : currentTab.allTemplates()) {
+            if (template.equals(currentTemplate)) continue;
+    
+            TimedTransition templateTransition = template.model().getTransitionByName(sourceTransition.name());
+            if (templateTransition == null) continue;
+    
+            for (TimedPlace sourcePlace : currentTemplate.model().places()) {
+                if (!sourcePlace.isShared()) continue;
+                
+                TimedPlace templatePlace = template.model().getPlaceByName(sourcePlace.name());
+                if (templatePlace == null) continue;
+    
+                if (checkIfConflict(currentTemplate, template, sourcePlace, templatePlace, sourceTransition, templateTransition) ||
+                    checkIfConflict(template, currentTemplate, templatePlace, sourcePlace, templateTransition, sourceTransition)) {
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean checkSharedPlaceConflicts(TimedPlaceComponent place) {
+        PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
+        Template currentTemplate = currentTab.currentTemplate();
+        TimedPlace sourcePlace = place.underlyingPlace();
+    
+        for (Template template : currentTab.allTemplates()) {
+            if (template.equals(currentTemplate)) continue;
+    
+            TimedPlace templatePlace = template.model().getPlaceByName(sourcePlace.name());
+            if (templatePlace == null) continue;
+
+            for (TimedTransition sourceTransition : currentTemplate.model().transitions()) {
+                if (!sourceTransition.isShared()) continue;
+                
+                TimedTransition templateTransition = template.model().getTransitionByName(sourceTransition.name());
+                if (templateTransition == null) continue;
+    
+
+                if (checkIfConflict(currentTemplate, template, sourcePlace, templatePlace, sourceTransition, templateTransition) ||
+                    checkIfConflict(template, currentTemplate, templatePlace, sourcePlace, templateTransition, sourceTransition)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return true if the two arcs are conflicting, false otherwise
+     */
+    private static boolean checkIfConflict(
         Template sourceTemplate, 
         Template targetTemplate,
         TimedPlace sourcePlace, 
@@ -161,10 +216,24 @@ public class SharedElementSynchronizer {
         boolean outputArcConflict = 
             targetTemplate.model().hasArcFromTransitionToPlace(targetTransition, targetPlace) &&
             sourceTemplate.model().hasArcFromTransitionToPlace(sourceTransition, sourcePlace);
-        
-        if (inputArcConflict || outputArcConflict) {
-            throw new IllegalStateException("Arc already exists");
+
+        if (inputArcConflict) {
+            TimedInputArc sourceInputArc = sourceTemplate.model().getInputArcFromPlaceToTransition(sourcePlace, sourceTransition);
+            TimedInputArc targetInputArc = targetTemplate.model().getInputArcFromPlaceToTransition(targetPlace, targetTransition);
+            if (sourceInputArc.isSimilarTo(targetInputArc)) {
+                inputArcConflict = false;
+            }
         }
+
+        if (outputArcConflict) {
+            TimedOutputArc sourceOutputArc = sourceTemplate.model().getOutputArcFromTransitionAndPlace(sourceTransition, sourcePlace);
+            TimedOutputArc targetOutputArc = targetTemplate.model().getOutputArcFromTransitionAndPlace(targetTransition, targetPlace);
+            if (sourceOutputArc.isSimilarTo(targetOutputArc)) {
+                outputArcConflict = false;
+            }
+        }
+
+        return inputArcConflict || outputArcConflict;
     }
     
     private static void syncInputArc(

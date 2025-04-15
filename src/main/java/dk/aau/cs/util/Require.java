@@ -1,7 +1,5 @@
 package dk.aau.cs.util;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;

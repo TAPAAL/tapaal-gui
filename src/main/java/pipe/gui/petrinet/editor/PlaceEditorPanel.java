@@ -694,16 +694,24 @@ public class PlaceEditorPanel extends JPanel {
 
 		context.network().buildConstraints();
 
+        SharedPlace placeBefore = sharedCheckBox.isSelected() ? (SharedPlace)place.underlyingPlace() : null;
+        boolean sameSharedAsBefore = placeBefore != null && selectedPlace.equals(placeBefore);
+        if (sharedCheckBox.isSelected() && sameSharedAsBefore && !SharedElementSynchronizer.updateSharedArcs(place)) {
+            sharedCommand.undo();
+            context.undoManager().removeCurrentEdit();
+            doNewEdit = true;
+            JOptionPane.showMessageDialog(
+                this,
+                "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
+                "Error", JOptionPane.ERROR_MESSAGE);
+
+            return false;
+        }
+
         doOKChecked = true;
         
         if (context.undoManager().currentEditIsEmpty()) {
             context.undoManager().removeCurrentEdit();
-        }
-
-        SharedPlace placeBefore = sharedCheckBox.isSelected() ? (SharedPlace)place.underlyingPlace() : null;
-        boolean sameSharedAsBefore = placeBefore != null && selectedPlace.equals(placeBefore);
-        if (sharedCheckBox.isSelected() && sameSharedAsBefore && !SharedElementSynchronizer.updateSharedArcs(place)) {
-            return false;
         }
 
         return true;

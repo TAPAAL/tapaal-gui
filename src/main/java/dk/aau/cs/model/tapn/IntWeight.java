@@ -34,4 +34,12 @@ public class IntWeight extends Weight{
 	public String nameForSaving(boolean writeConstantNames){
 		return Integer.toString(value);
 	}
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof IntWeight)) return false;
+        IntWeight other = (IntWeight)obj;
+        return value == other.value;
+    }
 }

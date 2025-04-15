@@ -615,6 +615,12 @@ public class TAPNTransitionEditor extends JPanel {
             sharedCommand.undo();
             context.undoManager().removeCurrentEdit();
             doNewEdit = true;
+
+            JOptionPane.showMessageDialog(
+                this,
+                "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
+                "Error", JOptionPane.ERROR_MESSAGE);
+
             return false;
         }   
 

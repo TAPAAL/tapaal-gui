@@ -84,4 +84,13 @@ public class TimedOutputArc extends TAPNElement {
     public void setExpression(ArcExpression expression) {this.expression = expression;}
 
     public ArcExpression getExpression(){return this.expression;}
+
+    public boolean isSimilarTo(TimedOutputArc other) {
+        if (equals(other)) return true;
+
+        if (!weight.equals(other.weight)) return false;
+        if (!expression.equals(other.expression)) return false;
+
+        return true;
+    }
 }

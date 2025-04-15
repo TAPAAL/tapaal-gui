@@ -211,4 +211,18 @@ public class NumberOfExpression extends ArcExpression {
         }
         return false;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof NumberOfExpression)) return false;
+        NumberOfExpression other = (NumberOfExpression)obj;
+        if (!number.equals(other.number)) return false;
+        if (color.size() != other.color.size()) return false;
+        for (int i = 0; i < color.size(); i++) {
+            if (!color.get(i).equals(other.color.get(i))) return false;
+        }
+        
+        return true;
+    }
 }
