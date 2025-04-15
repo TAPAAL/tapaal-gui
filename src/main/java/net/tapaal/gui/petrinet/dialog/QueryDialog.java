@@ -91,6 +91,7 @@ import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import java.awt.event.FocusAdapter;
 
 import dk.aau.cs.TCTL.HyperLTLPathScopeNode;
 import dk.aau.cs.TCTL.LTLANode;
@@ -216,8 +217,6 @@ public class QueryDialog extends JPanel {
     public static final String UPDATE_PRECISION_BTN_TEXT = "Compute precision for the given verification time";
 
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
-	private static final String SOME_TRACE_STRING = "Some trace       ";
-	private static final String FASTEST_TRACE_STRING = "Fastest trace       ";
 	private static final String SHARED = "Shared";
 
     public enum QueryDialogueOption {
@@ -1391,12 +1390,14 @@ public class QueryDialog extends JPanel {
             saveUppaalXMLButton.setEnabled(isQueryOk);
             mergeNetComponentsButton.setEnabled(isQueryOk);
             openReducedNetButton.setEnabled(isQueryOk && useReduction.isSelected());
+            smcTimeEstimationButton.setEnabled(isQueryOk);
         } else {
             saveButton.setEnabled(false);
             saveAndVerifyButton.setEnabled(false);
             saveUppaalXMLButton.setEnabled(false);
             mergeNetComponentsButton.setEnabled(false);
             openReducedNetButton.setEnabled(false);
+            smcTimeEstimationButton.setEnabled(false);
         }
     }
 
@@ -2991,6 +2992,13 @@ public class QueryDialog extends JPanel {
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
         smcTimeBoundValue = new JTextField(7);
         DocumentFilters.applyIntegerFilter(smcTimeBoundValue);
+        smcTimeBoundValue.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent evt) {
+                int endIdx = smcTimeBoundValue.getText().length();
+                smcTimeBoundValue.setSelectionStart(endIdx);
+                smcTimeBoundValue.setSelectionEnd(endIdx);
+            }
+        });
         smcTimeBoundValue.setToolTipText(TOOL_TIP_TIME_BOUND);
         smcEngineOptions.add(smcTimeBoundValue, subPanelGbc);
         smcTimeBoundValue.addFocusListener(updater);
@@ -3008,6 +3016,13 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridx = 1;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
         smcStepBoundValue = new JTextField(7);
+        smcStepBoundValue.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent evt) {
+                int endIdx = smcStepBoundValue.getText().length();
+                smcStepBoundValue.setSelectionStart(endIdx);
+                smcStepBoundValue.setSelectionEnd(endIdx);
+            }
+        });
         DocumentFilters.applyIntegerFilter(smcStepBoundValue);
         smcStepBoundValue.setToolTipText(TOOL_TIP_STEP_BOUND);
         smcEngineOptions.add(smcStepBoundValue, subPanelGbc);
@@ -3041,6 +3056,13 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(new JLabel("Confidence : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcConfidence = new JTextField(7);
+        smcConfidence.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent evt) {
+                int endIdx = smcConfidence.getText().length();
+                smcConfidence.setSelectionStart(endIdx);
+                smcConfidence.setSelectionEnd(endIdx);
+            }
+        });
         DocumentFilters.applyDoubleFilter(smcConfidence);
         smcConfidence.addFocusListener(updater);
         smcConfidence.setToolTipText(TOOL_TIP_CONFIDENCE);
@@ -3067,6 +3089,13 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(new JLabel("Precision : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcEstimationIntervalWidth = new JTextField(7);
+        smcEstimationIntervalWidth.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent evt) {
+                int endIdx = smcEstimationIntervalWidth.getText().length();
+                smcEstimationIntervalWidth.setSelectionStart(endIdx);
+                smcEstimationIntervalWidth.setSelectionEnd(endIdx);
+            }
+        });
         DocumentFilters.applyDoubleFilter(smcEstimationIntervalWidth);
         smcEstimationIntervalWidth.addFocusListener(updater);
         smcEstimationIntervalWidth.setToolTipText(TOOL_TIP_INTERVAL_WIDTH);
@@ -3100,6 +3129,13 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(verifTimeLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcTimeExpected = new JTextField(7);
+        smcTimeExpected.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent evt) {
+                int endIdx = smcTimeExpected.getText().length();
+                smcTimeExpected.setSelectionStart(endIdx);
+                smcTimeExpected.setSelectionEnd(endIdx);
+            }
+        });
         DocumentFilters.applyDoubleFilter(smcTimeExpected);
         smcTimeExpected.setToolTipText(TOOL_TIP_VERIFICATION_TIME);
         quantitativePanel.add(smcTimeExpected, subPanelGbc);

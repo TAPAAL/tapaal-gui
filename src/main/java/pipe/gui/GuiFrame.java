@@ -940,6 +940,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         searchBar.setOnFocusGained(() -> {
             currentTab.ifPresent(o -> o.setMode(PetriNetTab.DrawTool.SELECT));
             enableActionsForSearchBar(false);
+
+            if (!searchBar.getSearchText().isEmpty()) {
+                String query = searchBar.getSearchText();
+                currentTab.ifPresent(o -> o.search(query));
+            }
         });    
 
         searchBar.setOnFocusLost(() -> {
