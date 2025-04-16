@@ -1351,7 +1351,6 @@ public class QueryDialog extends JPanel {
 				replacement = new TCTLPathPlaceHolder();
 			}
 			if (replacement != null) {
-				UndoableEdit edit = new QueryConstructionEdit(selection, replacement);
 				newProperty = newProperty.replace(selection, replacement);
             } else if (selection instanceof TCTLAbstractPathProperty) {
                 replacement = new TCTLPathPlaceHolder();
@@ -1363,7 +1362,6 @@ public class QueryDialog extends JPanel {
                 }
 
                 UndoableEdit edit = new QueryConstructionEdit(selection, replacement);
-                newProperty = newProperty.replace(selection,	replacement);
 
                 if (selection instanceof TCTLAbstractPathProperty)
                     resetQuantifierSelectionButtons();
@@ -1383,8 +1381,7 @@ public class QueryDialog extends JPanel {
 
     private void setSaveButtonsEnabled() {
         if (!queryField.isEditable()) {
-            boolean isQueryOk = getQueryComment().length() > 0
-                && !newProperty.containsPlaceHolder();
+            boolean isQueryOk = getQueryComment().length() > 0 && !newProperty.containsPlaceHolder();
             saveButton.setEnabled(isQueryOk);
             saveAndVerifyButton.setEnabled(isQueryOk);
             saveUppaalXMLButton.setEnabled(isQueryOk);
@@ -6063,6 +6060,20 @@ public class QueryDialog extends JPanel {
 
     private void cancelAndExit() {
         cancelTraceChanges();
+    
+        // Ensure all query edits are undone
+        while (undoManager.canUndo()) {
+            UndoableEdit edit = undoManager.GetNextEditToUndo();
+            if (edit instanceof QueryConstructionEdit) {
+                TCTLAbstractProperty original = ((QueryConstructionEdit) edit)
+                        .getOriginal();
+                undoManager.undo();
+                refreshUndoRedo();
+                updateSelection(original);
+                queryChanged();
+            }
+        }
+
         exit();
     }
 
@@ -6445,7 +6456,8 @@ public class QueryDialog extends JPanel {
                 smcTimeEstimationButton.setText(UPDATE_VERIFICATION_TIME_BTN_TEXT);
                 try {
                     Float.parseFloat(smcEstimationIntervalWidth.getText());
-                    smcTimeEstimationButton.setEnabled(true);
+                    boolean isQueryOk = getQueryComment().length() > 0 && !newProperty.containsPlaceHolder();
+                    smcTimeEstimationButton.setEnabled(!queryField.isEditable() && isQueryOk);
                 } catch(NumberFormatException e) {
                     smcTimeEstimationButton.setEnabled(false);
                 }
@@ -6473,7 +6485,8 @@ public class QueryDialog extends JPanel {
                 smcTimeEstimationButton.setText(UPDATE_PRECISION_BTN_TEXT);
                 try {
                     Double.parseDouble(smcTimeExpected.getText());
-                    smcTimeEstimationButton.setEnabled(true);
+                    boolean isQueryOk = getQueryComment().length() > 0 && !newProperty.containsPlaceHolder();
+                    smcTimeEstimationButton.setEnabled(!queryField.isEditable() && isQueryOk);
                 } catch(NumberFormatException e) {
                     smcTimeEstimationButton.setEnabled(false);
                 }

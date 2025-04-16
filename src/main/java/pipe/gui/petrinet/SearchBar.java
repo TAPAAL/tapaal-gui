@@ -102,11 +102,8 @@ public class SearchBar extends JPanel {
             }
             
             public void focusLost(FocusEvent evt) {
-                if (!evt.isTemporary() && !resultsPopup.isVisible()) {
-                    resultsPopup.setVisible(false);
-                }
-                
                 if (!evt.isTemporary() && onFocusLost != null) {
+                    resultsPopup.setVisible(false);
                     onFocusLost.run();
                 }
             }

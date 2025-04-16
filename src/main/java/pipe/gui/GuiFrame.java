@@ -1010,6 +1010,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             selectedObject.select();
             drawingSurface.scrollToCenter(selectedObject);
+
+            enableActionsForSearchBar(true);
         });
         
 
