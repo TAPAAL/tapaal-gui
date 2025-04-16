@@ -6071,6 +6071,8 @@ public class QueryDialog extends JPanel {
                 refreshUndoRedo();
                 updateSelection(original);
                 queryChanged();
+            } else {
+                undoManager.undo();
             }
         }
 
