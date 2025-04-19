@@ -257,4 +257,10 @@ public class SearchBar extends JPanel {
     public void clear() {
         searchField.setText("");
     }
+
+    @Override
+    public void setFocusable(boolean focusable) {
+        super.setFocusable(focusable);
+        searchField.setFocusable(focusable);
+    }
 }
