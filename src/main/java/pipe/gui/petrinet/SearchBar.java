@@ -259,8 +259,7 @@ public class SearchBar extends JPanel {
     }
 
     @Override
-    public void setFocusable(boolean focusable) {
-        super.setFocusable(focusable);
-        searchField.setFocusable(focusable);
+    public boolean requestFocusInWindow() {
+        return searchField.requestFocusInWindow();
     }
 }

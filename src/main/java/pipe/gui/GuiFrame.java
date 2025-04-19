@@ -875,9 +875,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         JMenuItem clearPreferences = new JMenuItem(clearPreferencesAction);
         toolsMenu.add(clearPreferences);
-
         return toolsMenu;
     }
+
+    private final AbstractAction searchAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (searchBar != null && searchBar.isEnabled()) {
+                searchBar.requestFocusInWindow();
+            }
+        }
+    };
 
     private void buildToolbar() {
 
@@ -937,6 +945,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         searchToolBar.setRequestFocusEnabled(false);
 
         searchBar = new SearchBar();   
+        JRootPane rootPane = getRootPane();
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = rootPane.getActionMap();
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey | InputEvent.ALT_DOWN_MASK), "focusSearchBar");
+        actionMap.put("focusSearchBar", searchAction);
+
         searchBar.setOnFocusGained(() -> {
             currentTab.ifPresent(o -> o.setMode(PetriNetTab.DrawTool.SELECT));
             enableActionsForSearchBar(false);
@@ -1010,9 +1024,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             selectedObject.select();
             drawingSurface.scrollToCenter(selectedObject);
-
-            searchBar.setFocusable(false);
-            searchBar.setFocusable(true);
         });
         
 
