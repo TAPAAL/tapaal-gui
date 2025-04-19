@@ -254,7 +254,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabActions::verifySelectedQuery);
         }
     };
-    private final GuiAction workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)) {
+    private final GuiAction workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcutkey | InputEvent.SHIFT_DOWN_MASK)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabActions::workflowAnalyse);
         }
@@ -948,7 +948,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         JRootPane rootPane = getRootPane();
         InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = rootPane.getActionMap();
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey | InputEvent.ALT_DOWN_MASK), "focusSearchBar");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey), "focusSearchBar");
         actionMap.put("focusSearchBar", searchAction);
 
         searchBar.setOnFocusGained(() -> {
