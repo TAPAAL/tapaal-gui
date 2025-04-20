@@ -254,7 +254,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabActions::verifySelectedQuery);
         }
     };
-    private final GuiAction workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)) {
+    private final GuiAction workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcutkey | InputEvent.SHIFT_DOWN_MASK)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabActions::workflowAnalyse);
         }
@@ -875,9 +875,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         JMenuItem clearPreferences = new JMenuItem(clearPreferencesAction);
         toolsMenu.add(clearPreferences);
-
         return toolsMenu;
     }
+
+    private final AbstractAction searchAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (searchBar != null && searchBar.isEnabled()) {
+                searchBar.requestFocusInWindow();
+            }
+        }
+    };
 
     private void buildToolbar() {
 
@@ -937,9 +945,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         searchToolBar.setRequestFocusEnabled(false);
 
         searchBar = new SearchBar();   
+        JRootPane rootPane = getRootPane();
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = rootPane.getActionMap();
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey), "focusSearchBar");
+        actionMap.put("focusSearchBar", searchAction);
+
         searchBar.setOnFocusGained(() -> {
             currentTab.ifPresent(o -> o.setMode(PetriNetTab.DrawTool.SELECT));
             enableActionsForSearchBar(false);
+
+            if (!searchBar.getSearchText().isEmpty()) {
+                String query = searchBar.getSearchText();
+                currentTab.ifPresent(o -> o.search(query));
+            }
         });    
 
         searchBar.setOnFocusLost(() -> {
