@@ -33,21 +33,27 @@ import java.awt.event.MouseEvent;
 
 public class SearchBar extends JPanel {
     private static final String SEARCH_TOOLTIP = "Search for places and transitions in the net";
-    private static final int MAX_VISIBLE_ITEMS = 10;
 
     private final JLabel searchLabel;
     private final JTextField searchField;
     private final JPopupMenu resultsPopup;
+
     private Consumer<String> onSearchTextChanged;
     private Consumer<Pair<?, String>> onResultSelected;
     private Runnable onFocusGained;
     private Runnable onFocusLost;
     private List<Pair<?, String>> currentMatches;
+    private int maxVisibleItems = 10;
+    private boolean useSharedPrefix = true;
     
     public SearchBar() {
+        this("");
+    }
+
+    public SearchBar(String label) {
         super(new BorderLayout());
        
-        searchLabel = new JLabel("Search: ");
+        searchLabel = new JLabel(label);
         
         searchField = new JTextField();
         searchField.setToolTipText(SEARCH_TOOLTIP);
@@ -140,6 +146,10 @@ public class SearchBar extends JPanel {
         }
     }
 
+    public void useSharedPrefix(boolean useSharedPrefix) {
+        this.useSharedPrefix = useSharedPrefix;
+    }
+
     public void showResults(List<Pair<?, String>> matches) {
         currentMatches = matches;
         
@@ -169,13 +179,13 @@ public class SearchBar extends JPanel {
                 String matchStr;
                 if (firstElem instanceof TimedTransition) {
                     if (isShared) {
-                        matchStr = match.getSecond() + "." + firstElemStr + " (shared transition)";
+                        matchStr = (useSharedPrefix ? match.getSecond() + "." : "") + firstElemStr + " (shared transition)";
                     } else {
                         matchStr = firstElemStr + " (transition)";
                     }
                 } else {
                     if (isShared) {
-                        matchStr = match.getSecond() + "." + firstElemStr + " (shared place)";
+                        matchStr = (useSharedPrefix ? match.getSecond() + "." : "") + firstElemStr + " (shared place)";
                     } else {
                         matchStr = firstElemStr + " (place)";
                     }
@@ -225,7 +235,7 @@ public class SearchBar extends JPanel {
             final int width = searchField.getWidth();
         
             int itemHeight = 26;
-            int itemCount = matches != null ? Math.min(MAX_VISIBLE_ITEMS, matches.size()) : 1;
+            int itemCount = matches != null ? Math.min(maxVisibleItems, matches.size()) : 1;
             int height = itemCount * itemHeight;
             
             resultsPopup.setPreferredSize(new Dimension(width, height));
@@ -261,5 +271,9 @@ public class SearchBar extends JPanel {
     @Override
     public boolean requestFocusInWindow() {
         return searchField.requestFocusInWindow();
+    }
+
+    public void setMaxVisibleItems(int maxVisibleItems) {
+        this.maxVisibleItems = maxVisibleItems;
     }
 }

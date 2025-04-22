@@ -944,7 +944,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         searchToolBar.setFloatable(false);
         searchToolBar.setRequestFocusEnabled(false);
 
-        searchBar = new SearchBar();   
+        searchBar = new SearchBar("Search: ");   
         JRootPane rootPane = getRootPane();
         InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = rootPane.getActionMap();
