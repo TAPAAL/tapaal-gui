@@ -186,10 +186,6 @@ public class SearchBar extends JPanel {
         onFocusLost = callback;
     }
 
-    public Runnable getOnFocusLost() {
-        return onFocusLost;
-    }
-
     public void setOnSearchTextChanged(Consumer<String> consumer) {
         onSearchTextChanged = consumer;
     }
