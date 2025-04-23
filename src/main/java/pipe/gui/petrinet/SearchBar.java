@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -28,6 +29,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -80,41 +82,30 @@ public class SearchBar extends JPanel {
             }
         });
 
-        // Navigate through results with arrow keys
-        searchField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "selectNextMatch");
-        searchField.getActionMap().put("selectNextMatch", new AbstractAction() {
+        searchField.addKeyListener(new KeyAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void keyPressed(KeyEvent e) {
                 if (resultsPopup.isVisible() && !resultButtons.isEmpty()) {
-                    selectNextMatch();
-                }
-            }
-        });
-
-        searchField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "selectPreviousMatch");
-        searchField.getActionMap().put("selectPreviousMatch", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (resultsPopup.isVisible() && !resultButtons.isEmpty()) {
-                    selectPreviousMatch();
-                }
-            }
-        });
-
-        // Select highlighted match on enter
-        searchField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectHighlightedMatch");
-        searchField.getActionMap().put("selectHighlightedMatch", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (resultsPopup.isVisible() && currentMatches != null && !currentMatches.isEmpty()) {
-                    if (selectedIndex >= 0 && selectedIndex < currentMatches.size()) {
-                        if (onResultSelected != null) {
-                            onResultSelected.accept(currentMatches.get(selectedIndex));
+                    if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                        selectNextMatch();
+                        e.consume();
+                    } else if (e.getKeyCode() == KeyEvent.VK_UP) {
+                        selectPreviousMatch();
+                        e.consume();
+                    } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        if (currentMatches != null && !currentMatches.isEmpty()) {
+                            if (selectedIndex >= 0 && selectedIndex < currentMatches.size()) {
+                                if (onResultSelected != null) {
+                                    onResultSelected.accept(currentMatches.get(selectedIndex));
+                                }
+                            } else if (!currentMatches.isEmpty()) {
+                                if (onResultSelected != null) {
+                                    onResultSelected.accept(currentMatches.get(0));
+                                }
+                            }
                         }
-                    } else if (!currentMatches.isEmpty()) {
-                        if (onResultSelected != null) {
-                            onResultSelected.accept(currentMatches.get(0));
-                        }
+
+                        e.consume();
                     }
                 }
             }
@@ -324,11 +315,15 @@ public class SearchBar extends JPanel {
         if (resultsPopup.getComponentCount() > 0) {
             resultsPopup.pack();
             resultsPopup.show(searchField, 0, searchField.getHeight());
-            searchField.requestFocusInWindow();
-            if (!resultButtons.isEmpty()) {
-                selectedIndex = 0;
-                resultButtons.get(0).setBackground(HIGHLIGHT_COLOR);
-            }
+
+            SwingUtilities.invokeLater(() -> {
+                searchField.requestFocusInWindow();
+                if (!resultButtons.isEmpty()) {
+                    selectedIndex = 0;
+                    resultButtons.get(0).setBackground(HIGHLIGHT_COLOR);
+                    resultButtons.get(0).repaint();
+                }
+            });
         } else {
             hideResults();
         }
