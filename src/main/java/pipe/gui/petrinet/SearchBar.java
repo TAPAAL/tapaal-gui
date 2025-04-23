@@ -266,6 +266,7 @@ public class SearchBar extends JPanel {
                 resultButton.setHorizontalAlignment(SwingConstants.LEFT);
                 resultButton.setBorderPainted(false);
                 resultButton.setBackground(Color.WHITE);
+                resultButton.setFocusable(false);
 
                 resultButton.addActionListener(e -> {
                     if (onResultSelected != null) {
