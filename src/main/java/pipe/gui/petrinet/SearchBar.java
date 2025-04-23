@@ -116,7 +116,6 @@ public class SearchBar extends JPanel {
                             onResultSelected.accept(currentMatches.get(0));
                         }
                     }
-                    resultsPopup.setVisible(false);
                 }
             }
         });
@@ -126,16 +125,17 @@ public class SearchBar extends JPanel {
                 int endIdx = searchField.getText().length();
                 searchField.setSelectionStart(endIdx);
                 searchField.setSelectionEnd(endIdx);
-
                 if (onFocusGained != null) {
                     onFocusGained.run();
                 }
             }
             
             public void focusLost(FocusEvent evt) {
-                if (!evt.isTemporary() && onFocusLost != null) {
-                    resultsPopup.setVisible(false);
-                    onFocusLost.run();
+                if (!evt.isTemporary()) {
+                    hideResults();
+                    if (onFocusLost != null) {
+                        onFocusLost.run();
+                    }
                 }
             }
         });
@@ -266,16 +266,14 @@ public class SearchBar extends JPanel {
                 resultButton.setHorizontalAlignment(SwingConstants.LEFT);
                 resultButton.setBorderPainted(false);
                 resultButton.setBackground(Color.WHITE);
-                resultButton.setFocusable(false); 
-                
-                final int index = i;
+
                 resultButton.addActionListener(e -> {
                     if (onResultSelected != null) {
                         onResultSelected.accept(match);
                     }
-                    resultsPopup.setVisible(false);
                 });
             
+                final int index = i;
                 resultButton.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseEntered(MouseEvent e) {
@@ -326,7 +324,6 @@ public class SearchBar extends JPanel {
             resultsPopup.pack();
             resultsPopup.show(searchField, 0, searchField.getHeight());
             searchField.requestFocusInWindow();
-            
             if (!resultButtons.isEmpty()) {
                 selectedIndex = 0;
                 resultButtons.get(0).setBackground(HIGHLIGHT_COLOR);
