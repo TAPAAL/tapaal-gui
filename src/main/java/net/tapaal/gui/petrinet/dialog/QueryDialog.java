@@ -4650,7 +4650,7 @@ public class QueryDialog extends JPanel {
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 0;
         gbc.gridwidth = 4;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -4732,7 +4732,7 @@ public class QueryDialog extends JPanel {
         predicatePanel.add(searchBar, gbc);
 
         ++gbc.gridy;
-        --gbc.gridwidth;
+        gbc.gridwidth -= 2;
 
         JPanel templateRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
         predicatePanel.add(templateRow, gbc);
@@ -4777,9 +4777,19 @@ public class QueryDialog extends JPanel {
         deadLockPredicateButton = new JButton("Deadlock");
         deadLockPredicateButton.setPreferredSize(new Dimension(103, 27));
 
+        JSeparator verticalSeparator = new JSeparator(JSeparator.VERTICAL);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.gridheight = 3;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.insets = new Insets(5, 5, 5, 10);
+        gbc.anchor = GridBagConstraints.CENTER;
+        predicatePanel.add(verticalSeparator, gbc);
+
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
-        gbc.gridy = 2;
+        gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST;
         predicatePanel.add(truePredicateButton, gbc);
 
