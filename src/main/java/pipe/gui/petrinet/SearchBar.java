@@ -26,7 +26,6 @@ import dk.aau.cs.util.Pair;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -143,7 +142,7 @@ public class SearchBar extends JPanel {
         
         JButton selected = resultButtons.get(selectedIndex);
         selected.setBackground(HIGHLIGHT_COLOR);
-        
+
         JScrollPane scrollPane = null;
         if (resultsPopup.getComponentCount() > 0 && resultsPopup.getComponent(0) instanceof JScrollPane) {
             scrollPane = (JScrollPane)resultsPopup.getComponent(0);
@@ -211,7 +210,7 @@ public class SearchBar extends JPanel {
         if (matches == null || matches.isEmpty()) {
             JPanel noResultsPanel = new JPanel(new BorderLayout());
             noResultsPanel.setBackground(Color.WHITE);
-            
+  
             JLabel noResults = new JLabel("No matches found");
             noResults.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
             noResults.setForeground(Color.GRAY);
@@ -257,6 +256,8 @@ public class SearchBar extends JPanel {
                 resultButton.setHorizontalAlignment(SwingConstants.LEFT);
                 resultButton.setBorderPainted(false);
                 resultButton.setBackground(Color.WHITE);
+                resultButton.setFocusPainted(false);
+                resultButton.setOpaque(true);
                 resultButton.setFocusable(false);
 
                 resultButton.addActionListener(e -> {
@@ -321,7 +322,6 @@ public class SearchBar extends JPanel {
                 if (!resultButtons.isEmpty()) {
                     selectedIndex = 0;
                     resultButtons.get(0).setBackground(HIGHLIGHT_COLOR);
-                    resultButtons.get(0).repaint();
                 }
             });
         } else {
