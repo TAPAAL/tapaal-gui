@@ -291,20 +291,19 @@ public class SearchBar extends JPanel {
                 resultsPanel.add(resultButton);
             }
             
-            int itemHeight = resultButtons.get(0).getPreferredSize().height + 1;
+            int itemHeight = resultButtons.get(0).getPreferredSize().height;
             int itemCount = matches.size();
             
             // Determine if we need scrolling
             boolean needsScrolling = itemCount > MAX_VISIBLE_ITEMS;
             int visibleItems = needsScrolling ? MAX_VISIBLE_ITEMS : itemCount;
-            int height = visibleItems * itemHeight;
+            int height = visibleItems * itemHeight + 4;
             
             if (needsScrolling) {
                 JScrollPane scrollPane = new JScrollPane(resultsPanel);
                 scrollPane.setBorder(null);
                 scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
                 scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-                
                 resultsPopup.add(scrollPane);
             } else {
                 resultsPopup.add(resultsPanel);
