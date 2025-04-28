@@ -1,6 +1,7 @@
 package pipe.gui.petrinet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.function.Function;
  * @param <T> Type of object to search through
  */
 public class Searcher<T> {
-    private final List<T> items;
+    private final Collection<T> items;
     private final Function<T, String> nameExtractor;
     
     /**
@@ -19,8 +20,8 @@ public class Searcher<T> {
      * @param items Collection of items to search through
      * @param nameExtractor Function to extract searchable text from items
      */
-    public Searcher(List<T> items, Function<T, String> nameExtractor) {
-        this.items = new ArrayList<>(items);
+    public Searcher(Collection<T> items, Function<T, String> nameExtractor) {
+        this.items = items;
         this.nameExtractor = nameExtractor;
     }
     

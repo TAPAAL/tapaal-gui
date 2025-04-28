@@ -156,6 +156,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.Pair;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
@@ -199,7 +200,10 @@ import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.SearchBar;
+import pipe.gui.petrinet.Searcher;
 import pipe.gui.petrinet.dataLayer.DataLayer;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
@@ -276,6 +280,8 @@ public class QueryDialog extends JPanel {
 
     private JPanel predicatePanel;
     private JButton addPredicateButton;
+    private SearchBar searchBar;
+    private Searcher<Pair<?, String>> searcher;
     private JComboBox templateBox;
     private JComboBox traceBox;
     private JComboBox traceBoxQuantification;
@@ -1604,6 +1610,7 @@ public class QueryDialog extends JPanel {
         conjunctionButton.setEnabled(false);
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
+        searchBar.setEnabled(false);
         templateBox.setEnabled(false);
         placeTransitionBox.setEnabled(false);
         relationalOperatorBox.setEnabled(false);
@@ -1626,6 +1633,7 @@ public class QueryDialog extends JPanel {
         conjunctionButton.setEnabled(false);
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
+        searchBar.setEnabled(false);
         templateBox.setEnabled(false);
         placeTransitionBox.setEnabled(false);
         relationalOperatorBox.setEnabled(false);
@@ -1651,6 +1659,7 @@ public class QueryDialog extends JPanel {
         conjunctionButton.setEnabled(false);
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
+        searchBar.setEnabled(false);
         templateBox.setEnabled(false);
         placeTransitionBox.setEnabled(false);
         relationalOperatorBox.setEnabled(false);
@@ -1675,6 +1684,7 @@ public class QueryDialog extends JPanel {
         conjunctionButton.setEnabled(true);
         disjunctionButton.setEnabled(true);
         negationButton.setEnabled(true);
+        searchBar.setEnabled(true);
         templateBox.setEnabled(true);
         placeTransitionBox.setEnabled(true);
         relationalOperatorBox.setEnabled(true);
@@ -1707,6 +1717,7 @@ public class QueryDialog extends JPanel {
         conjunctionButton.setEnabled(true);
         disjunctionButton.setEnabled(true);
         negationButton.setEnabled(true);
+        searchBar.setEnabled(true);
         templateBox.setEnabled(true);
         placeTransitionBox.setEnabled(true);
         relationalOperatorBox.setEnabled(true);
@@ -1740,6 +1751,7 @@ public class QueryDialog extends JPanel {
         conjunctionButton.setEnabled(false);
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
+        searchBar.setEnabled(false);
         templateBox.setEnabled(false);
         placeTransitionBox.setEnabled(false);
         relationalOperatorBox.setEnabled(false);
@@ -4633,34 +4645,111 @@ public class QueryDialog extends JPanel {
                     }
                 }
                 if (!lens.isTimed()) setEnablednessOfOperatorAndMarkingBoxes();
-
             }
         });
-        Dimension dim = new Dimension(235, 27);
-        templateBox.setMaximumSize(dim);
-        templateBox.setMinimumSize(dim);
-        templateBox.setPreferredSize(dim);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 3;
+        gbc.gridy = 0;
+        gbc.gridwidth = 4;
         gbc.anchor = GridBagConstraints.WEST;
-        predicatePanel.add(templateBox, gbc);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JPanel templateRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        List<Pair<?, String>> searchableItems = new ArrayList<>();
+        for (TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
+            for (TimedPlace place : tapn.places()) {
+                if (!place.isShared()) {
+                    searchableItems.add(new Pair<>(place, tapn.toString()));
+                }
+            }
+
+            if (!lens.isTimed()) {
+                for (TimedTransition transition : tapn.transitions()) {
+                    if (!transition.isShared()) {
+                        searchableItems.add(new Pair<>(transition, tapn.toString()));
+                    }
+                }
+            }
+        }
+
+        for (TimedPlace place : tapnNetwork.sharedPlaces()) {
+            searchableItems.add(new Pair<>(place, SHARED.toString()));
+        }
+
+        for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
+            searchableItems.add(new Pair<>(transition, SHARED.toString()));
+        }
+
+        searcher = new Searcher<>(searchableItems, obj -> {
+            Object element = obj.getFirst();            
+            String name = element.toString();
+            if (name.contains(".")) {
+                name = name.split("\\.")[1];
+            }
+
+            return name;
+        });
+
+        searchBar = new SearchBar();
+        searchBar.useSharedPrefix(false);
+        searchBar.setMaxVisibleItems(4);
+        searchBar.setOnSearchTextChanged(query -> {
+            if (query == null || query.trim().isEmpty()) {
+                searchBar.hideResults();
+                return;
+            }
+
+            var matches = searcher.findAllMatches(query);
+            searchBar.showResults(matches);
+        });
+
+        searchBar.setOnResultSelected(result -> {
+            if (result == null) return;
+
+            searchBar.clear();
+
+            boolean isShared = false;
+            if (result.getFirst() instanceof TimedPlace) {
+                isShared = ((TimedPlace)result.getFirst()).isShared();
+            } else if (result.getFirst() instanceof TimedTransition) {
+                isShared = ((TimedTransition)result.getFirst()).isShared();
+            }
+
+            if (isShared) {
+                templateBox.setSelectedItem(SHARED);
+                placeTransitionBox.setSelectedItem(result.getFirst().toString());
+            } else {
+                templateBox.setSelectedItem(tapnNetwork.getTAPNByName(result.getSecond()));
+                placeTransitionBox.setSelectedItem(result.getFirst().toString().split("\\.")[1]);
+            }
+        });
+
+        Dimension dim = new Dimension(235, 27);
+        searchBar.setPreferredSize(dim);
+        searchBar.setMaximumSize(dim);
+        searchBar.setMinimumSize(dim);
+
+        predicatePanel.add(searchBar, gbc);
+
+        ++gbc.gridy;
+        gbc.gridwidth -= 2;
+
+        JPanel templateRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
         predicatePanel.add(templateRow, gbc);
         templateBox.setPreferredSize(new Dimension(292, 27));
+        templateBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         templateRow.add(templateBox);
 
-        JPanel placeRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        gbc.gridy = 2;
+        JPanel placeRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
+        ++gbc.gridy;
         predicatePanel.add(placeRow, gbc);
+        placeTransitionBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         placeRow.add(placeTransitionBox);
 
         String[] relationalSymbols = { "=", "!=", "<=", "<", ">=", ">" };
         relationalOperatorBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
         relationalOperatorBox.setPreferredSize(new Dimension(80, 27));
+        relationalOperatorBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         placeRow.add(relationalOperatorBox);
 
         placeMarking = new CustomJSpinner(0);
@@ -4671,42 +4760,43 @@ public class QueryDialog extends JPanel {
         transitionIsEnabledLabel.setPreferredSize(new Dimension(165, 27));
         if (!lens.isTimed()) placeRow.add(transitionIsEnabledLabel);
 
-        JPanel addPredicateRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        gbc.gridy = 3;
+        JPanel addPredicateRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
+        ++gbc.gridy;
+        addPredicateRow.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         predicatePanel.add(addPredicateRow, gbc);
         addPredicateButton = new JButton("Add predicate to the query");
         addPredicateButton.setPreferredSize(new Dimension(292, 27));
         addPredicateRow.add(addPredicateButton);
 
-        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-        separator.setEnabled(true);
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.gridwidth = 3;
-        gbc.insets = new Insets(2, 0, 2, 0);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        predicatePanel.add(separator,gbc);
-
         truePredicateButton = new JButton("True");
-        truePredicateButton.setPreferredSize(new Dimension(90, 27));
+        truePredicateButton.setPreferredSize(new Dimension(103, 27));
 
         falsePredicateButton = new JButton("False");
-        falsePredicateButton.setPreferredSize(new Dimension(90, 27));
+        falsePredicateButton.setPreferredSize(new Dimension(103, 27));
 
         deadLockPredicateButton = new JButton("Deadlock");
         deadLockPredicateButton.setPreferredSize(new Dimension(103, 27));
 
-        JPanel trueFalseDeadlock = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        trueFalseDeadlock.add(truePredicateButton);
-        trueFalseDeadlock.add(falsePredicateButton);
-        trueFalseDeadlock.add(deadLockPredicateButton);
-
+        JSeparator verticalSeparator = new JSeparator(JSeparator.VERTICAL);
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
-        gbc.gridy = 5;
+        gbc.gridy = 1;
+        gbc.gridheight = 3;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.insets = new Insets(5, 5, 5, 10);
         gbc.anchor = GridBagConstraints.CENTER;
-        predicatePanel.add(trueFalseDeadlock, gbc);
+        predicatePanel.add(verticalSeparator, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        predicatePanel.add(truePredicateButton, gbc);
+
+        ++gbc.gridy;
+        predicatePanel.add(falsePredicateButton, gbc);
+        ++gbc.gridy;
+        predicatePanel.add(deadLockPredicateButton, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 2;

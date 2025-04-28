@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -13,7 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -36,12 +34,12 @@ import java.util.ArrayList;
 
 public class SearchBar extends JPanel {
     private static final String SEARCH_TOOLTIP = "Search for places and transitions in the net";
-    private static final int MAX_VISIBLE_ITEMS = 10;
     private static final Color HIGHLIGHT_COLOR = new Color(230, 230, 250);
 
     private final JLabel searchLabel;
     private final JTextField searchField;
     private final JPopupMenu resultsPopup;
+
     private Consumer<String> onSearchTextChanged;
     private Consumer<Pair<?, String>> onResultSelected;
     private Runnable onFocusGained;
@@ -49,11 +47,17 @@ public class SearchBar extends JPanel {
     private List<Pair<?, String>> currentMatches;
     private List<JButton> resultButtons = new ArrayList<>();
     private int selectedIndex = -1;
+    private int maxVisibleItems = 10;
+    private boolean useSharedPrefix = true;
     
     public SearchBar() {
+        this("");
+    }
+
+    public SearchBar(String label) {
         super(new BorderLayout());
        
-        searchLabel = new JLabel("Search: ");
+        searchLabel = new JLabel(label);
         
         searchField = new JTextField();
         searchField.setToolTipText(SEARCH_TOOLTIP);
@@ -205,6 +209,10 @@ public class SearchBar extends JPanel {
         }
     }
 
+    public void useSharedPrefix(boolean useSharedPrefix) {
+        this.useSharedPrefix = useSharedPrefix;
+    }
+
     public void showResults(List<Pair<?, String>> matches) {
         currentMatches = matches;
         resultButtons.clear();
@@ -245,13 +253,13 @@ public class SearchBar extends JPanel {
                 String matchStr;
                 if (firstElem instanceof TimedTransition) {
                     if (isShared) {
-                        matchStr = match.getSecond() + "." + firstElemStr + " (shared transition)";
+                        matchStr = (useSharedPrefix ? match.getSecond() + "." : "") + firstElemStr + " (shared transition)";
                     } else {
                         matchStr = firstElemStr + " (transition)";
                     }
                 } else {
                     if (isShared) {
-                        matchStr = match.getSecond() + "." + firstElemStr + " (shared place)";
+                        matchStr = (useSharedPrefix ? match.getSecond() + "." : "") + firstElemStr + " (shared place)";
                     } else {
                         matchStr = firstElemStr + " (place)";
                     }
@@ -302,8 +310,8 @@ public class SearchBar extends JPanel {
             int itemCount = matches.size();
             
             // Determine if we need scrolling
-            boolean needsScrolling = itemCount > MAX_VISIBLE_ITEMS;
-            int visibleItems = needsScrolling ? MAX_VISIBLE_ITEMS : itemCount;
+            boolean needsScrolling = itemCount > maxVisibleItems;
+            int visibleItems = needsScrolling ? maxVisibleItems : itemCount;
             int height = visibleItems * itemHeight + 4;
             
             if (needsScrolling) {
@@ -357,5 +365,9 @@ public class SearchBar extends JPanel {
     @Override
     public boolean requestFocusInWindow() {
         return searchField.requestFocusInWindow();
+    }
+
+    public void setMaxVisibleItems(int maxVisibleItems) {
+        this.maxVisibleItems = maxVisibleItems;
     }
 }
