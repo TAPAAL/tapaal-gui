@@ -138,7 +138,14 @@ public class SearchBar extends JPanel {
             resultButtons.get(selectedIndex).setBackground(Color.WHITE);
         }
         
-        selectedIndex = (selectedIndex + direction + resultButtons.size()) % resultButtons.size();
+        int newIndex = selectedIndex + direction;
+        if (newIndex < 0) {
+            newIndex = 0;
+        } else if (newIndex >= resultButtons.size()) {
+            newIndex = resultButtons.size() - 1;
+        }
+        
+        selectedIndex = newIndex;
         
         JButton selected = resultButtons.get(selectedIndex);
         selected.setBackground(HIGHLIGHT_COLOR);
