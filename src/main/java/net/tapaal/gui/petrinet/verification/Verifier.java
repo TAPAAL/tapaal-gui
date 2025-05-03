@@ -307,6 +307,7 @@ public class Verifier {
                 query.isMaxGranularity()
         );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
+            boolean unfold = isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE && !query.useExplicitSearch();
             return new VerifyPNOptions(
                 query.getCapacity(),
                 query.getTraceOption(),
@@ -325,11 +326,12 @@ public class Verifier {
                 query.isTarOptionEnabled(),
                 query.isTarjan(),
                 isColored,
-                isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE,
+                unfold,
                 query.usePartitioning(),
                 query.useColorFixpoint(),
                 query.useSymmetricVars(),
                 query.useColoredReduction(),
+                query.useExplicitSearch(),
                 query.getRawVerification(),
                 query.getRawVerificationPrompt()
             );
