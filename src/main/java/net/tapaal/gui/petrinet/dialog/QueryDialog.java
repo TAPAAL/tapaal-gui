@@ -5856,7 +5856,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshExplicitSearch() {
-        if (heuristicSearch.isSelected()) {
+        if (heuristicSearch.isSelected() || !(newProperty.toString().contains("EF") || newProperty.toString().contains("AG"))) {
             useExplicitSearch.setSelected(false);
             useExplicitSearch.setEnabled(false);
         } else {
