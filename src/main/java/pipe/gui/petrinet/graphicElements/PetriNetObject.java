@@ -53,6 +53,12 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
         setOriginalX(positionXInput);
         setOriginalY(positionYInput);
 
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                requestFocusInWindow();
+            }
+        });
 	}
 
     public JPopupMenu getPopup(MouseEvent e) {
