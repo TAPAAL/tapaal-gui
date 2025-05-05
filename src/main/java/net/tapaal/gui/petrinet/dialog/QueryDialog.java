@@ -2026,6 +2026,7 @@ public class QueryDialog extends JPanel {
         reductionOption.addActionListener(e -> updateRawVerificationOptions());
         smcVerificationType.addActionListener(e -> updateRawVerificationOptions());
         smcNumberOfTraces.addChangeListener(e -> updateRawVerificationOptions());
+        smcParallel.addActionListener(e -> updateRawVerificationOptions());
 
         final JTextField smcNumTracesTextField = ((JSpinner.DefaultEditor) smcNumberOfTraces.getEditor()).getTextField();
 

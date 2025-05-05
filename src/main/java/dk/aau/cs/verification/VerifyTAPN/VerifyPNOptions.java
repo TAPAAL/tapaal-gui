@@ -280,7 +280,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
                 result.append(" -C ");
             }
         }
-		if (!this.useColoredReduction) {
+		if (!useColoredReduction && colored) {
 		    result.append(" --col-reduction 0 ");
         }
 
