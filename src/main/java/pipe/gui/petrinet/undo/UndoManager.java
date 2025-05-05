@@ -162,6 +162,8 @@ public class UndoManager {
             --indexOfNextAdd;
         }
 
+        undoneEdits = 0;
+
         setUndoRedoStatus();
     }
 

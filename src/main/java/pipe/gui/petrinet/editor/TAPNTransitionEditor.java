@@ -519,12 +519,10 @@ public class TAPNTransitionEditor extends JPanel {
 	
 			if(makeNewShared && !makeSharedButton.isEnabled()){
 				Command command = new MakeTransitionNewSharedCommand(context.activeModel(), newName, transition.underlyingTransition(), context.tabContent(), false);
-				context.undoManager().addEdit(command);
 				try{
-					command.redo();
+                    command.redo();
+                    context.undoManager().addEdit(command);
 				}catch(RequireException e){
-					context.undoManager().undo();
-                    doNewEdit = true;
 					//This is checked as a transition cannot be shared if there exists a place with the same name
 					if(transition.underlyingTransition().model().parentNetwork().isNameUsedForTransitionsOnly(newName)) {
 						int dialogResult = JOptionPane.showConfirmDialog(this, "A transition with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\nThis transition name will be changed into shared one also in all other components.", "Error", JOptionPane.OK_CANCEL_OPTION);
@@ -533,6 +531,7 @@ public class TAPNTransitionEditor extends JPanel {
 							cmd.redo();
 							context.undoManager().addEdit(cmd);
 						} else {
+                            doNewEdit = true;
 							return false;
 						}
 					} else {
@@ -641,6 +640,7 @@ public class TAPNTransitionEditor extends JPanel {
 	private void cancelButtonHandler(java.awt.event.ActionEvent evt) {
         if (doOKChecked) {
             context.undoManager().undo();
+            context.undoManager().removeCurrentEdit();
         }
 		exit();
 	}
