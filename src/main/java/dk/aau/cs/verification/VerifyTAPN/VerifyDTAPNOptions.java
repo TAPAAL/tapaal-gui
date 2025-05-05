@@ -171,11 +171,11 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			result.append(gcd ? " --gcd-lower " : ""); // GCD optimization is not sound for workflow analysis
 		}
 
-        result.append(parallel ? "--smc-parallel " : "");
-        result.append(benchmark ? "--smc-benchmark " + benchmarkRuns + " " : "");
-        result.append("--smc-obs-scale " + (maxGranularity ? 0 : granularity) + " ");
-
         if (isSmc) {
+            result.append(parallel ? "--smc-parallel " : "");
+            result.append(benchmark ? "--smc-benchmark " + benchmarkRuns + " " : "");
+            result.append("--smc-obs-scale " + (maxGranularity ? 0 : granularity) + " ");
+
             result.append("--smc-print-cumulative-stats 4 ");
             if (isSimulate) {
                 result.append(" --smc-traces ");
