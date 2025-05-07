@@ -465,7 +465,7 @@ public class VerifyPN implements ModelChecker {
             return null;
         }
 
-        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
+        VerifyPNTraceParser traceParser = new VerifyPNTraceParser(model.value1());
 
         return traceParser.parseTrace(new BufferedReader(new StringReader(output)));
     }
@@ -479,7 +479,7 @@ public class VerifyPN implements ModelChecker {
             return null;
         }
 
-        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
+        VerifyPNTraceParser traceParser = new VerifyPNTraceParser(model.value1());
         if (query.getCategory() == QueryCategory.HyperLTL) {
             return traceParser.parseTraces(new BufferedReader(new StringReader(output)));
         }

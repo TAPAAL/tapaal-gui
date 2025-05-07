@@ -294,4 +294,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	public AlgorithmOption getAlgorithmOption(){
 		return this.algorithmOption;
 	}
+
+    public boolean useExplicitSearch() {
+        return useExplicitSearch;
+    }
 }
