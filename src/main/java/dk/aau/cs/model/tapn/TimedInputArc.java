@@ -190,11 +190,12 @@ public class TimedInputArc extends TAPNElement {
     }
 
     public boolean isSimilarTo(TimedInputArc other) {
-        if (equals(other)) return true;;
+        if (equals(other)) return true;
         if (!weight.equals(other.weight)) return false;
         if (!interval.equals(other.interval)) return false;
         if (!expression.equals(other.expression)) return false;
-
+        if (!colorTimeIntervals.equals(other.colorTimeIntervals)) return false;
+        
         return true;
     }
 }

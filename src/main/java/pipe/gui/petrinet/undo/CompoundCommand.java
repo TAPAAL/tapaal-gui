@@ -5,10 +5,10 @@ import net.tapaal.gui.petrinet.undo.Command;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompundCommand implements Command {
+public class CompoundCommand implements Command {
     private final List<Command> commands;
 
-    public CompundCommand(List<Command> commands) {
+    public CompoundCommand(List<Command> commands) {
         this.commands = new ArrayList<>(commands);
     }
 

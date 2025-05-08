@@ -610,17 +610,23 @@ public class TAPNTransitionEditor extends JPanel {
 
         SharedTransition selectedTransition = sharedCheckBox.isSelected() ? (SharedTransition)sharedTransitionsComboBox.getSelectedItem() : null;
         boolean sameSharedAsBefore = selectedTransition != null && selectedTransition.equals(transitionBefore);
-        if (sharedCheckBox.isSelected() && !sameSharedAsBefore && !SharedElementSynchronizer.updateSharedArcs(transition)) {
-            sharedCommand.undo();
-            context.undoManager().removeCurrentEdit();
-            doNewEdit = true;
-
-            JOptionPane.showMessageDialog(
-                this,
-                "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
-                "Error", JOptionPane.ERROR_MESSAGE);
-
-            return false;
+        if (sharedCheckBox.isSelected() && !sameSharedAsBefore) {
+            boolean success = SharedElementSynchronizer.updateSharedArcs(transition);
+            if (!success) {
+                sharedCommand.undo();
+                context.undoManager().removeCurrentEdit();
+                doNewEdit = true;
+    
+                JOptionPane.showMessageDialog(
+                    this,
+                    "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+    
+                return false;
+            } else {
+                // Merge into a atomic command
+                context.undoManager().mergeTopKEdits(2);
+            }
         }   
 
 		coloredTransitionGuardPanel.onOK(context.undoManager());

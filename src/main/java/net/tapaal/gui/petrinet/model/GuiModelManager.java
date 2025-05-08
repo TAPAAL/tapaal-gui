@@ -16,7 +16,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.*;
 import pipe.gui.petrinet.graphicElements.tapn.*;
 import pipe.gui.petrinet.undo.AddAnnotationNoteCommand;
-import pipe.gui.petrinet.undo.CompundCommand;
+import pipe.gui.petrinet.undo.CompoundCommand;
 import pipe.gui.petrinet.undo.DeleteAnnotationNoteCommand;
 import pipe.gui.petrinet.undo.DeleteArcPathPointEditCommand;
 
@@ -42,7 +42,7 @@ public class GuiModelManager {
     }
     public void commit() {
         if (pendingEdits != null && pendingEdits.size() > 0) {
-            tabContent.getUndoManager().addNewEdit(new CompundCommand(pendingEdits));
+            tabContent.getUndoManager().addNewEdit(new CompoundCommand(pendingEdits));
             pendingEdits = null;
         }
     }
@@ -491,7 +491,7 @@ public class GuiModelManager {
             }
         }
         
-        return new CompundCommand(deleteCommands);
+        return new CompoundCommand(deleteCommands);
     }
 
     /**
@@ -554,7 +554,7 @@ public class GuiModelManager {
             }
         }
         
-        return new CompundCommand(deleteCommands);
+        return new CompoundCommand(deleteCommands);
     }
     
     private void findAndAddTransportArcDeleteCommand(

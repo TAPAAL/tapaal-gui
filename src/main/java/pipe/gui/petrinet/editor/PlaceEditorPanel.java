@@ -696,16 +696,22 @@ public class PlaceEditorPanel extends JPanel {
 
         SharedPlace placeBefore = sharedCheckBox.isSelected() ? (SharedPlace)place.underlyingPlace() : null;
         boolean sameSharedAsBefore = placeBefore != null && selectedPlace.equals(placeBefore);
-        if (sharedCheckBox.isSelected() && sameSharedAsBefore && !SharedElementSynchronizer.updateSharedArcs(place)) {
-            sharedCommand.undo();
-            context.undoManager().removeCurrentEdit();
-            doNewEdit = true;
-            JOptionPane.showMessageDialog(
-                this,
-                "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
-                "Error", JOptionPane.ERROR_MESSAGE);
-
-            return false;
+        if (sharedCheckBox.isSelected() && sameSharedAsBefore) {
+            boolean success = SharedElementSynchronizer.updateSharedArcs(place);
+            if (!success) {
+                sharedCommand.undo();
+                context.undoManager().removeCurrentEdit();
+                doNewEdit = true;
+                JOptionPane.showMessageDialog(
+                    this,
+                    "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+    
+                return false;
+            } else {
+                // Merge into a atomic command
+                context.undoManager().mergeTopKEdits(2);
+            }
         }
 
         doOKChecked = true;
