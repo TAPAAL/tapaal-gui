@@ -31,6 +31,9 @@ public class VerifyDTAPNOutputParser {
 	private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
 	private static final Pattern placeBoundPattern = Pattern.compile("<([^;\\s]+);(\\d+)>");
     private static final Pattern placeBoundPatternUnknown = Pattern.compile("<([^;\\s]+);\\?>");
+    private static final Pattern smcTransitionStatsPattern = Pattern.compile("<([^:\\s]+):([\\d]+(\\.[\\d]+)?)>");
+    private static final Pattern smcPlaceBoundPattern = Pattern.compile("<([^:\\s]+);([\\d]+(\\.[\\d]+)?)>");
+    private static final Pattern smcPlaceBoundPatternUnknown = Pattern.compile("<([^;\\s]+);\\?>");
 
     private static final Pattern smcEstimationPattern = Pattern.compile("\\s*P = ([^±]+) ± (.+)\\s*");
     private static final Pattern smcExecutedRunsPattern = Pattern.compile("\\s*runs executed:\\s*(\\d+)\\s*");
@@ -73,8 +76,8 @@ public class VerifyDTAPNOutputParser {
 	private final int totalTokens;
 	private final TAPNQuery query;
 	private final int extraTokens;
-	private final List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
-	private final List<Tuple<String,Integer>> placeBoundStats = new ArrayList<Tuple<String,Integer>>();
+    private final List<Tuple<String,Number>> transitionStats = new ArrayList<Tuple<String,Number>>();
+    private final List<Tuple<String,Number>> placeBoundStats = new ArrayList<Tuple<String,Number>>();
 
     private final Set<String> uniqueMatches = new HashSet<>();
 
@@ -121,23 +124,45 @@ public class VerifyDTAPNOutputParser {
 		List<GraphPoint> cumulativeDelayPoints = new ArrayList<>();
         Map<String, ObservationData> observationDataMap = new HashMap<>();
 
-		try {			
-			Matcher matcher = transitionStatsPattern.matcher(output);
-			while (matcher.find()) {
-				transitionStats.add(new Tuple<String,Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
-			}
-			matcher = placeBoundPattern.matcher(output);
-			while (matcher.find()) {
-				placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
-			}
-			matcher = placeBoundPatternUnknown.matcher(output);
-			while (matcher.find()) {
-				placeBoundStats.add(new Tuple<String, Integer>(matcher.group(1), -1));
-			}
+        if (output.contains(SMC_Verification_INDICATOR_STRING)) {
+            isSmc = true;
+        }
+
+		try {
+            Matcher matcher;
+
+            if (isSmc) {
+                matcher = smcTransitionStatsPattern.matcher(output);
+                while (matcher.find()) {
+                    transitionStats.add(new Tuple<String,Number>(matcher.group(1), Float.parseFloat(matcher.group(2))));
+                }
+
+                matcher = smcPlaceBoundPattern.matcher(output);
+                while (matcher.find()) {
+                    placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), Float.parseFloat(matcher.group(2))));
+                }
+
+                matcher = smcPlaceBoundPatternUnknown.matcher(output);
+                while (matcher.find()) {
+                    placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), -1));
+                }
+            } else {
+                matcher = transitionStatsPattern.matcher(output);
+                while (matcher.find()) {
+                    transitionStats.add(new Tuple<String,Number>(matcher.group(1), Integer.parseInt(matcher.group(2))));
+                }
+                matcher = placeBoundPattern.matcher(output);
+                while (matcher.find()) {
+                    placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), Integer.parseInt(matcher.group(2))));
+                }
+                matcher = placeBoundPatternUnknown.matcher(output);
+                while (matcher.find()) {
+                    placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), -1));
+                }
+            }
 
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
-                if (line.contains(SMC_Verification_INDICATOR_STRING)) isSmc = true;
 				if (line.contains(DISCRETE_INCLUSION)) { discreteInclusion = true; }
 				if (line.contains(Query_IS_SATISFIED_STRING) || line.contains(SMC_Hypothesis_IS_SATISFIED_STRING)) {
 					result = true;
@@ -306,7 +331,7 @@ public class VerifyDTAPNOutputParser {
             QueryResult queryRes;
 
             if(isSmc) {
-                verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength, smcVerificationTime, cumulativeStepPoints, cumulativeDelayPoints, observationDataMap);
+                verifStats = new SMCStats(smcExecutedRuns, smcValidRuns, smcAverageTime, smcAverageLength, smcVerificationTime, cumulativeStepPoints, cumulativeDelayPoints, observationDataMap, transitionStats, placeBoundStats);
                 ((SMCStats) verifStats).setRunTimeStdDev(smcTimeStdDev);
                 ((SMCStats) verifStats).setRunLengthStdDev(smcLengthStdDev);
                 ((SMCStats) verifStats).setValidRunAverageTime(smcAverageValidTime);
