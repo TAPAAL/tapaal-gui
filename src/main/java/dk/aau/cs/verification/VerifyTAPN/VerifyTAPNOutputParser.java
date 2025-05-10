@@ -25,8 +25,8 @@ public class VerifyTAPNOutputParser {
 	protected final int totalTokens;
 	protected final TAPNQuery query;
 	protected final int extraTokens;
-	protected final List<Tuple<String,Integer>> transitionStats = new ArrayList<>();
-    protected final List<Tuple<String,Integer>> placeBoundStats = new ArrayList<>();
+	protected final List<Tuple<String,Number>> transitionStats = new ArrayList<>();
+    protected final List<Tuple<String,Number>> placeBoundStats = new ArrayList<>();
 
 	public VerifyTAPNOutputParser(int totalTokens, int extraTokens, TAPNQuery query){
 		this.totalTokens = totalTokens;
@@ -63,7 +63,7 @@ public class VerifyTAPNOutputParser {
 		try {			
 			Matcher matcher = transitionStatsPattern.matcher(output);
 			while (matcher.find()) {
-				transitionStats.add(new Tuple<String,Integer>(matcher.group(1), Integer.parseInt(matcher.group(2))));
+				transitionStats.add(new Tuple<String,Number>(matcher.group(1), Integer.parseInt(matcher.group(2))));
 			}
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
