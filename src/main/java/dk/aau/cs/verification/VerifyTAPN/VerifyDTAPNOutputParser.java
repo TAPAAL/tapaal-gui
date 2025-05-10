@@ -28,12 +28,12 @@ public class VerifyDTAPNOutputParser {
 	private static final Pattern exploredPattern = Pattern.compile("\\s*explored markings:\\s*(\\d+)\\s*");
 	private static final Pattern storedPattern = Pattern.compile("\\s*stored markings:\\s*(\\d+)\\s*");
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
-	private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
-	private static final Pattern placeBoundPattern = Pattern.compile("<([^;\\s]+);(\\d+)>");
-    private static final Pattern placeBoundPatternUnknown = Pattern.compile("<([^;\\s]+);\\?>");
-    private static final Pattern smcTransitionStatsPattern = Pattern.compile("<([^:\\s]+):([\\d]+(\\.[\\d]+)?)>");
-    private static final Pattern smcPlaceBoundPattern = Pattern.compile("<([^:\\s]+);([\\d]+(\\.[\\d]+)?)>");
-    private static final Pattern smcPlaceBoundPatternUnknown = Pattern.compile("<([^;\\s]+);\\?>");
+    private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+)[;:](\\d+)>");
+    private static final Pattern placeBoundPattern = Pattern.compile("<([^;:\\s]+)[;:](\\d+)>");
+    private static final Pattern placeBoundPatternUnknown = Pattern.compile("<([^;:\\s]+)[;:]\\?>");
+    private static final Pattern smcTransitionStatsPattern = Pattern.compile("<([^:\\s]+)[;:]([\\d]+(\\.[\\d]+)?)>");
+    private static final Pattern smcPlaceBoundPattern = Pattern.compile("<([^:\\s]+)[;:]([\\d]+(\\.[\\d]+)?)>");
+    private static final Pattern smcPlaceBoundPatternUnknown = Pattern.compile("<([^;:\\s]+)[;:]\\?>");
 
     private static final Pattern smcEstimationPattern = Pattern.compile("\\s*P = ([^±]+) ± (.+)\\s*");
     private static final Pattern smcExecutedRunsPattern = Pattern.compile("\\s*runs executed:\\s*(\\d+)\\s*");
@@ -130,39 +130,65 @@ public class VerifyDTAPNOutputParser {
 
 		try {
             Matcher matcher;
-
-            if (isSmc) {
-                matcher = smcTransitionStatsPattern.matcher(output);
-                while (matcher.find()) {
-                    transitionStats.add(new Tuple<String,Number>(matcher.group(1), Float.parseFloat(matcher.group(2))));
-                }
-
-                matcher = smcPlaceBoundPattern.matcher(output);
-                while (matcher.find()) {
-                    placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), Float.parseFloat(matcher.group(2))));
-                }
-
-                matcher = smcPlaceBoundPatternUnknown.matcher(output);
-                while (matcher.find()) {
-                    placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), -1));
-                }
-            } else {
-                matcher = transitionStatsPattern.matcher(output);
-                while (matcher.find()) {
-                    transitionStats.add(new Tuple<String,Number>(matcher.group(1), Integer.parseInt(matcher.group(2))));
-                }
-                matcher = placeBoundPattern.matcher(output);
-                while (matcher.find()) {
-                    placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), Integer.parseInt(matcher.group(2))));
-                }
-                matcher = placeBoundPatternUnknown.matcher(output);
-                while (matcher.find()) {
-                    placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), -1));
-                }
-            }
+            boolean inTransitionStats = false;
+            boolean inPlaceBoundStats = false;
 
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
+                if (line.trim().equals("TRANSITION STATISTICS")) {
+                    inTransitionStats = true;
+                    inPlaceBoundStats = false;
+                    continue;
+                } else if (line.trim().equals("PLACE-BOUND STATISTICS")) {
+                    inTransitionStats = false;
+                    inPlaceBoundStats = true;
+                    continue;
+                }
+
+                if (inTransitionStats) {
+                    if (isSmc) {
+                        matcher = smcTransitionStatsPattern.matcher(line);
+                        while (matcher.find()) {
+                            transitionStats.add(new Tuple<String,Number>(matcher.group(1), Double.parseDouble(matcher.group(2))));
+                        }
+                    } else {
+                        matcher = transitionStatsPattern.matcher(line);
+                        while (matcher.find()) {
+                            transitionStats.add(new Tuple<String,Number>(matcher.group(1), Integer.parseInt(matcher.group(2))));
+                        }
+                    }
+                    
+                    if (line.trim().isEmpty()) {
+                        inTransitionStats = false;
+                    }
+                } else if (inPlaceBoundStats) {
+                    if (isSmc) {
+                        matcher = smcPlaceBoundPattern.matcher(line);
+                        while (matcher.find()) {
+                            placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), Double.parseDouble(matcher.group(2))));
+                        }
+                        
+                        matcher = smcPlaceBoundPatternUnknown.matcher(line);
+                        while (matcher.find()) {
+                            placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), -1));
+                        }
+                    } else {
+                        matcher = placeBoundPattern.matcher(line);
+                        while (matcher.find()) {
+                            placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), Integer.parseInt(matcher.group(2))));
+                        }
+                        
+                        matcher = placeBoundPatternUnknown.matcher(line);
+                        while (matcher.find()) {
+                            placeBoundStats.add(new Tuple<String,Number>(matcher.group(1), -1));
+                        }
+                    }
+
+                    if (line.trim().isEmpty()) {
+                        inPlaceBoundStats = false;
+                    }
+                }
+            
 				if (line.contains(DISCRETE_INCLUSION)) { discreteInclusion = true; }
 				if (line.contains(Query_IS_SATISFIED_STRING) || line.contains(SMC_Hypothesis_IS_SATISFIED_STRING)) {
 					result = true;
