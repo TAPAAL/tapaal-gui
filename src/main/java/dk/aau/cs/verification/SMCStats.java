@@ -3,6 +3,7 @@ package dk.aau.cs.verification;
 import java.util.List;
 import java.util.Map;
 
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.ObservationData;
 import pipe.gui.graph.GraphPoint;
 
@@ -28,17 +29,8 @@ public class SMCStats extends Stats {
     private List<GraphPoint> cumulativeDelayPoints;
     private Map<String, ObservationData> observationDataMap;
 
-    public SMCStats(int executedRuns, int validRuns, float averageTime, float averageLength) {
-        super(-1,-1,-1);
-        this.executedRuns = executedRuns;
-        this.validRuns = validRuns;
-        this.averageRunTime = averageTime;
-        this.averageRunLength = averageLength;
-        this.verificationTime = -1.0f;
-    }
-
-    public SMCStats(int executedRuns, int validRuns, float averageTime, float averageLength, float verificationTime, List<GraphPoint> cumulativeStepPoints, List<GraphPoint> cumulativeDelayPoints, Map<String, ObservationData> observationData) {
-        super(-1,-1,-1);
+    public SMCStats(int executedRuns, int validRuns, float averageTime, float averageLength, float verificationTime, List<GraphPoint> cumulativeStepPoints, List<GraphPoint> cumulativeDelayPoints, Map<String, ObservationData> observationData, List<Tuple<String,Number>> transitionStats, List<Tuple<String,Number>> placeBoundStats) {
+        super(-1,-1,-1, transitionStats, placeBoundStats);
         this.executedRuns = executedRuns;
         this.validRuns = validRuns;
         this.averageRunTime = averageTime;

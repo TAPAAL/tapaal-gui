@@ -2,6 +2,7 @@ package dk.aau.cs.verification;
 
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.ObservationData;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.graph.Graph;
@@ -12,25 +13,29 @@ import pipe.gui.graph.ObservationGraphDialog;
 import pipe.gui.graph.GraphDialog;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+
 import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
 
 public class SMCResultPanel extends JPanel  {
-
     public SMCResultPanel(final VerificationResult<TAPNNetworkTrace> result) {
         setLayout(new GridBagLayout());
         boolean quantitative = result.getQueryResult().isQuantitative();
         SMCStats stats = (SMCStats) result.getStats();
 
-        JPanel resultPanel = createResultPanel(result.getQueryResult(), stats);
+        JPanel resultPanel = createResultPanel(result, stats);
         JPanel statsPanel = createStatsPanel(stats, quantitative);
 
         JPanel estimates = new JPanel(new GridBagLayout());
@@ -40,6 +45,7 @@ public class SMCResultPanel extends JPanel  {
         estimates.add(new JLabel(result.getVerificationTimeString()), gbc);
         gbc = GridBagHelper.as(0, 1, WEST);
         estimates.add(new JLabel("Estimated memory usage: "+ MemoryMonitor.getPeakMemory()), gbc);
+        
         if (result.getRawOutput() != null) {
             JButton showRawQueryButton = new JButton("Show raw query results");
             showRawQueryButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(this, createRawQueryPanel(result.getRawOutput()), "Raw query results", JOptionPane.INFORMATION_MESSAGE));
@@ -58,11 +64,12 @@ public class SMCResultPanel extends JPanel  {
         add(estimates, gbc);
     }
 
-    private JPanel createResultPanel(QueryResult result, SMCStats stats) {
+    private JPanel createResultPanel(final VerificationResult<TAPNNetworkTrace> result, SMCStats stats) {
+        QueryResult queryResult = result.getQueryResult();
         JPanel resultPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = GridBagHelper.as(0, 0, new Insets(20, 20, 20, 20));
         resultPanel.setBorder(BorderFactory.createTitledBorder("Query result"));
-        resultPanel.add(new JLabel("<html>" + result.toString() + "</html>"), gbc);
+        resultPanel.add(new JLabel("<html>" + queryResult.toString() + "</html>"), gbc);
 
         List<Graph> cumulativeGraphs = new ArrayList<>();
 
@@ -83,6 +90,7 @@ public class SMCResultPanel extends JPanel  {
         buttonGbc.fill = GridBagConstraints.HORIZONTAL;
         buttonGbc.anchor = GridBagConstraints.WEST;
         buttonGbc.insets = new Insets(0, 0, 10, 0);
+
         if (!cumulativeGraphs.isEmpty()) {
             DefaultGraphDialog.GraphDialogBuilder builder = new DefaultGraphDialog.GraphDialogBuilder();
             GraphDialog graphFrame = builder.addGraphs(cumulativeGraphs).setTitle("SMC Statistics").build();
@@ -92,6 +100,20 @@ public class SMCResultPanel extends JPanel  {
             JButton showCumulativeButton = new JButton(btnText);
             showCumulativeButton.addActionListener(arg0 -> graphFrame.display());
             buttonPanel.add(showCumulativeButton, buttonGbc);
+            ++buttonGbc.gridy;
+        }
+
+        if (!result.getTransitionStatistics().isEmpty()) {
+            JButton transitionStatsButton = new JButton("Transition Statistics");
+            transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(this, StatisticsPanel.createPanel(result, true), "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
+            buttonPanel.add(transitionStatsButton, buttonGbc);
+            ++buttonGbc.gridy;
+        }
+        
+        if (!result.getPlaceBoundStatistics().isEmpty()) {
+            JButton placeStatsButton = new JButton("Place-Bound Statistics");
+            placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(this, StatisticsPanel.createPanel(result, false), "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
+            buttonPanel.add(placeStatsButton, buttonGbc);
             ++buttonGbc.gridy;
         }
         
@@ -163,7 +185,7 @@ public class SMCResultPanel extends JPanel  {
             GraphDialog graphFrame = builder.addMultiGraphs(observationGraphs)
                                             .setTitle("Observation Statistics")
                                             .showGlobalAverages(true)
-                                            .isSimulate(result.getQuery().isSimulate())
+                                            .isSimulate(queryResult.getQuery().isSimulate())
                                             .build();
      
             String btnText = "Plot observations";
@@ -228,16 +250,6 @@ public class SMCResultPanel extends JPanel  {
         }
 
         return statsPanel;
-    }
-
-    private void addStatIfPositive(JPanel panel, String label, double stat, GridBagConstraints gbc) {
-        if(stat < 0) return;
-        int x = gbc.gridx;
-        panel.add(new JLabel(label), gbc);
-        gbc.gridx++;
-        panel.add(new JLabel(String.valueOf(stat)), gbc);
-        gbc.gridx = x;
-        gbc.gridy++;
     }
 
     private void addAvgStdDev(JPanel panel, String label, double avg, double stdDev, GridBagConstraints gbc) {
@@ -317,5 +329,4 @@ public class SMCResultPanel extends JPanel  {
 
         return fullPanel;
     }
-
 }
