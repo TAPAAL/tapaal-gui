@@ -43,7 +43,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     private final boolean symmetricVars;
     private final boolean useTarjan;
     private final boolean useColoredReduction;
-    private final boolean useExplicitSearch;
+
     private boolean useRawVerification;
     private String rawVerificationOptions;
 
@@ -95,7 +95,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         this.useRawVerification = useRawVerification;
         this.rawVerificationOptions = rawVerificationOptions;
 
-        if (unfold && !useRawVerification) {
+        if (useExplicitSearch) {
+                unfoldedModelPath = null;
+                unfoldedQueriesPath = null;
+        } else if (unfold && !useRawVerification) {
             try {
                 if (Platform.isWindows()) {
                     unfoldedModelPath = "\"" + File.createTempFile("unfolded-", ".pnml").getAbsolutePath() + "\"";

@@ -1,12 +1,13 @@
 package dk.aau.cs.model.tapn.simulation;
 
+import dk.aau.cs.model.tapn.LocalTimedMarking;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 
 import java.util.List;
 import java.util.Map;
 
-public class ColoredTransitionStep {
+public class ColoredTransitionStep implements TimedArcPetriNetStep {
     private final TimedTransition transition;
     private final Map<String, List<String>> bindings;
 
@@ -28,4 +29,9 @@ public class ColoredTransitionStep {
 	public String toString() {
 		return transition.toString();
 	}
+
+    @Override
+    public LocalTimedMarking performStepFrom(LocalTimedMarking marking) {
+        return null;
+    }
 }

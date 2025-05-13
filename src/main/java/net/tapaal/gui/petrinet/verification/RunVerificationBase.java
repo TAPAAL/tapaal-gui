@@ -210,14 +210,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		return decomposer.decompose();
 	}
 
-    private static net.tapaal.gui.petrinet.verification.TAPNQuery getQuery(File queryFile, TimedArcPetriNetNetwork network) {
-        XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network);
-        List<net.tapaal.gui.petrinet.verification.TAPNQuery> queries = new ArrayList<net.tapaal.gui.petrinet.verification.TAPNQuery>();
-        queries.addAll(queryLoader.parseQueries().getQueries());
-        return queries.get(0);
-    }
-
-
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
 		RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
 		RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(mapping);

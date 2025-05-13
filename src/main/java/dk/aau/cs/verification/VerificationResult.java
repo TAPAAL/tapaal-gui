@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 import pipe.gui.petrinet.PetriNetTab;
 

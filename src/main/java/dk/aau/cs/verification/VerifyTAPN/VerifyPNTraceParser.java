@@ -108,16 +108,38 @@ public class VerifyPNTraceParser {
             if (childNode instanceof Element){
                 Element childElement = (Element)childNode;
                 if (childElement.getTagName().equals("marking")) {
-                    parseMarking();
+                    parseMarking(childElement);
                 } else if (childElement.getTagName().equals("transition")) {
-                    parseTransitionStep(childElement);
+                    trace.add(parseTransitionStep(childElement));
                 }
             }
         }
     }
 
-    private void parseMarking() {
-
+    private Map<String, Map<String, Integer>> parseMarking(Element markingElement) {
+        Map<String, Map<String, Integer>> markingMap = new LinkedHashMap<>();
+        NodeList placeNodes = markingElement.getElementsByTagName("place");
+        for (int i = 0; i < placeNodes.getLength(); ++i) {
+            Element placeElement = (Element)placeNodes.item(i);
+            String placeId = placeElement.getAttribute("id");
+            
+            Map<String, Integer> colorCounts = new LinkedHashMap<>();
+            markingMap.put(placeId, colorCounts);
+            
+            NodeList tokenNodes = placeElement.getElementsByTagName("token");
+            for (int j = 0; j < tokenNodes.getLength(); j++) {
+                Element tokenElement = (Element) tokenNodes.item(j);
+                int count = Integer.parseInt(tokenElement.getAttribute("count"));
+                NodeList colorNodes = tokenElement.getElementsByTagName("color");
+                for (int k = 0; k < colorNodes.getLength(); ++k) {
+                    Element colorElement = (Element)colorNodes.item(k);
+                    String colorName = colorElement.getTextContent();
+                    colorCounts.put(colorName, count);
+                }
+            }
+        }
+        
+        return markingMap;
     }
 
     private ColoredTransitionStep parseTransitionStep(Element element) {
