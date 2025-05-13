@@ -1143,8 +1143,8 @@ public class WorkflowDialog extends JDialog {
                         StringBuilder sb = new StringBuilder();
                         int lineLength = 0;
                         sb.append("<html>");
-                        for(Tuple<String, Integer> stat : result.getTransitionStatistics()){
-                            if(stat.value2() == 0){
+                        for(Tuple<String, Number> stat : result.getTransitionStatistics()){
+                            if(stat.value2().doubleValue() == 0){
                                 if(!hasUnusedTransitions){
                                     hasUnusedTransitions = true;
                                 }else{

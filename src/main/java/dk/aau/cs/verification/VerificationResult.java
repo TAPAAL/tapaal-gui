@@ -146,33 +146,33 @@ public class VerificationResult<TTrace> {
 		this.nameMapping = nameMapping;
 	}
 	
-	public List<Tuple<String,Integer>> getTransitionStatistics() {
-		List<Tuple<String,Integer>> returnList = new ArrayList<Tuple<String,Integer>>();
+	public List<Tuple<String,Number>> getTransitionStatistics() {
+		List<Tuple<String,Number>> returnList = new ArrayList<Tuple<String,Number>>();
 		for (int i = 0; i < stats.transitionsCount();i++) {
-			Tuple<String,Integer> element = stats.getTransitionStats(i);
+			Tuple<String,Number> element = stats.getTransitionStats(i);
 			//String transitionName = nameMapping.map(element.value1()).value1()+ "." + nameMapping.map(element.value1()).value2();
             String transitionName = element.value1().replace("_", ".");
 			if(transitionName.charAt(0) == '.'){
 				transitionName = "Shared"+transitionName;
 			}
-			Integer transitionFired = element.value2();
-			returnList.add(new Tuple<String, Integer>(transitionName, transitionFired));
+			Number transitionFired = element.value2();
+			returnList.add(new Tuple<String, Number>(transitionName, transitionFired));
 		}
 		returnList.sort(new transitionTupleComparator());
 		return returnList;
 	}
         
-	public List<Tuple<String,Integer>> getPlaceBoundStatistics() {
-		List<Tuple<String,Integer>> returnList = new ArrayList<Tuple<String,Integer>>();
+	public List<Tuple<String,Number>> getPlaceBoundStatistics() {
+		List<Tuple<String,Number>> returnList = new ArrayList<Tuple<String,Number>>();
 		for (int i = 0; i < stats.placeBoundCount();i++) {
-			Tuple<String,Integer> element = stats.getPlaceBoundStats(i);
+			Tuple<String,Number> element = stats.getPlaceBoundStats(i);
 			//String placeName = nameMapping.map(element.value1()).value1()+ "." + nameMapping.map(element.value1()).value2();
             String placeName = element.value1().replace("_", ".");
 			if(placeName.charAt(0) == '.'){
 			    placeName = "Shared"+placeName;
 			}
-			Integer placeBound = element.value2();
-			returnList.add(new Tuple<String, Integer>(placeName, placeBound));
+			Number placeBound = element.value2();
+			returnList.add(new Tuple<String, Number>(placeName, placeBound));
 		}
 		returnList.sort(new transitionTupleComparator());
 		return returnList;
@@ -185,12 +185,20 @@ public class VerificationResult<TTrace> {
         return this.resolvedUsingSkeletonPreprocessor = b;
     }
 
-    public static class transitionTupleComparator implements Comparator<Tuple<String,Integer>> {
-		
-		public int compare(Tuple<String,Integer> tuple1,Tuple<String,Integer> tuple2) {
-            return tuple2.value2() - tuple1.value2();
-		}
-	}
+    public static class transitionTupleComparator implements Comparator<Tuple<String,Number>> {
+        public int compare(Tuple<String,Number> tuple1, Tuple<String,Number> tuple2) {
+            double val1 = tuple1.value2().doubleValue();
+            double val2 = tuple2.value2().doubleValue();
+            
+            if (val2 > val1) {
+                return 1;
+            } else if (val2 < val1) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+    }
 
 	public QueryResult getQueryResult() {
 		return queryResult;

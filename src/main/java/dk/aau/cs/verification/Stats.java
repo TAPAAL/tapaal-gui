@@ -22,16 +22,16 @@ public class Stats {
 	private int minExecutionTime;
 	private int maxExecutionTime;
 	private ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking;
-	private List<Tuple<String,Integer>> transitionStats;
-	private List<Tuple<String,Integer>> placeBoundStats;
+	private List<Tuple<String,Number>> transitionStats;
+	private List<Tuple<String,Number>> placeBoundStats;
 	private ReductionStats reductionStats;
 	
-	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, List<Tuple<String,Integer>> placeBoundStats, int minExecutionTime, int maxExecutionTime, ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking)
+	public Stats(long discovered, long explored, long stored, List<Tuple<String,Number>> transitionStats, List<Tuple<String,Number>> placeBoundStats, int minExecutionTime, int maxExecutionTime, ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking)
 	{
 		this(discovered, explored,stored,transitionStats, placeBoundStats, minExecutionTime, maxExecutionTime,coveredMarking, null);
 	}
 	
-	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, List<Tuple<String,Integer>> placeBoundStats, int minExecutionTime, int maxExecutionTime, ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking, ReductionStats reductionStats)
+	public Stats(long discovered, long explored, long stored, List<Tuple<String,Number>> transitionStats, List<Tuple<String,Number>> placeBoundStats, int minExecutionTime, int maxExecutionTime, ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking, ReductionStats reductionStats)
 	{
 		this.discovered = discovered;
 		this.explored = explored;
@@ -44,19 +44,19 @@ public class Stats {
 		this.reductionStats = reductionStats;
 	}
 	
-	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, List<Tuple<String,Integer>> placeBoundStats)
+	public Stats(long discovered, long explored, long stored, List<Tuple<String,Number>> transitionStats, List<Tuple<String,Number>> placeBoundStats)
 	{
 		this(discovered, explored, stored, transitionStats, placeBoundStats, -1, -1, null);
 	}
 	
-	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, List<Tuple<String,Integer>> placeBoundStats, ReductionStats reductionStats)
+	public Stats(long discovered, long explored, long stored, List<Tuple<String,Number>> transitionStats, List<Tuple<String,Number>> placeBoundStats, ReductionStats reductionStats)
 	{
 		this(discovered, explored, stored, transitionStats, placeBoundStats, -1, -1, null, reductionStats);
 	}
 	
 	public Stats(long discovered, long explored, long stored)
 	{
-		this(discovered, explored, stored, new ArrayList<Tuple<String,Integer>>(), new ArrayList<Tuple<String,Integer>>());
+		this(discovered, explored, stored, new ArrayList<Tuple<String,Number>>(), new ArrayList<Tuple<String,Number>>());
 	}
 
 	// CTL stats
@@ -78,11 +78,11 @@ public class Stats {
 		return placeBoundStats.size();
 	}
         
-	public Tuple<String,Integer> getTransitionStats(int index) {
+	public Tuple<String,Number> getTransitionStats(int index) {
 		return transitionStats.get(index);
 	}
 	
-	public Tuple<String,Integer> getPlaceBoundStats(int index) {
+	public Tuple<String,Number> getPlaceBoundStats(int index) {
 		return placeBoundStats.get(index);
 	}
         
