@@ -85,6 +85,7 @@ public class TAPNQuery {
 	private boolean useStubbornReduction = true;
     private boolean useTarOption = false;
     private boolean useTarjan = false;
+    private boolean useExplicitSearch = true;
 	private boolean useRawVerification = false;
 	private String rawVerificationPrompt;
 
@@ -194,6 +195,14 @@ public class TAPNQuery {
 
     public void setUseTarjan(boolean useTarjan) {
         this.useTarjan = useTarjan;
+    }
+
+    public boolean useExplicitSearch() {
+        return useExplicitSearch;
+    }
+
+    public void setUseExplicitSearch(boolean useExplicitSearch) {
+        this.useExplicitSearch = useExplicitSearch;
     }
 
 	public int approximationDenominator() {

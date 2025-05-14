@@ -65,7 +65,7 @@ public class ColorBindingParser extends DefaultHandler {
         }
     }
 
-    private String createTooltip(Map<String, List<String>> bindings, Transition transition) {
+    public String createTooltip(Map<String, List<String>> bindings, Transition transition) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<html>");
@@ -80,7 +80,7 @@ public class ColorBindingParser extends DefaultHandler {
         return sb.toString();
     }
 
-    private Map<String, List<String>> parseBindings(String output) {
+    public Map<String, List<String>> parseBindings(String output) {
         InputStream stream = null;
 
         try {

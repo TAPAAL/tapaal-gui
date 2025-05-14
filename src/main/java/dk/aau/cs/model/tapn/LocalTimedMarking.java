@@ -198,5 +198,20 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		
 		return true;
 	}
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
+            sb.append(entry.getKey().name()).append(" -> ");
+            for (TimedToken token : entry.getValue()) {
+                sb.append(token.toString()).append(" ");
+            }
+            
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
 	
 }
