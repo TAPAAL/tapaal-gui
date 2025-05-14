@@ -111,7 +111,6 @@ public class Animator {
     private void setUntimedTrace(TAPNNetworkTrace trace) {
         tab.addAbstractAnimationPane();
         AnimationHistoryList untimedAnimationHistory = tab.getUntimedAnimationHistory();
-
         for(TAPNNetworkTraceStep step : trace){
             untimedAnimationHistory.addHistoryItem(step.toString());
         }

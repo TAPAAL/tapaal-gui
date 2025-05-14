@@ -9,13 +9,13 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 import org.jetbrains.annotations.NotNull;
 
-public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
+public class TimedArcPetriNetTrace implements Iterable<PetriNetStep> {
 	private boolean nextIsLoop;	
 	private int loopToIndex = -1;
 	private TraceType traceType;
 	private String traceName;
 
-	private final List<TimedArcPetriNetStep> steps = new ArrayList<TimedArcPetriNetStep>();
+	private final List<PetriNetStep> steps = new ArrayList<PetriNetStep>();
 	private final boolean isTimedTrace;
 
     public TimedArcPetriNetTrace(boolean isTimedTrace, String traceName) {
@@ -30,7 +30,7 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 		this.traceName = "";
 	}
 
-	public void add(TimedArcPetriNetStep step) {
+	public void add(PetriNetStep step) {
 		if(nextIsLoop){
 			Require.that(loopToIndex == -1, "There can only be one step to loop to in a trace");
 			loopToIndex = steps.size();
@@ -46,13 +46,26 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
     public void setTraceName(String traceName) {
         this.traceName = traceName;
     }
-	public @NotNull Iterator<TimedArcPetriNetStep> iterator() {
+	public @NotNull Iterator<PetriNetStep> iterator() {
 		return steps.iterator();
 	}
 
 	public int length() {
 		return steps.size();
 	}
+
+    public boolean isEmpty() {
+        return steps.isEmpty();
+    }
+
+    public PetriNetStep getLastStep() {
+        if (steps.isEmpty()) {
+            return null;
+        }
+
+        return steps.get(steps.size() - 1);
+
+    }
 
 	public boolean isTimedTrace() {
 		return isTimedTrace;
@@ -75,7 +88,7 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 	}
 	
 	public void reduceTraceForOriginalNet(String matchForTransition, String matchTokenRemoval) {
-		for (TimedArcPetriNetStep step : steps){
+		for (PetriNetStep step : steps){
 			if (step instanceof TimedTransitionStep) {
 				if (((TimedTransitionStep) step).transition().name().contains(matchForTransition)) {
 					((TimedTransitionStep) step).transition().setName(((TimedTransitionStep) step).transition().name().substring(0, ((TimedTransitionStep) step).transition().name().indexOf(matchForTransition)));
@@ -93,7 +106,7 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 	}
 	
 	public void removeTokens(String matchTokenRemoval){
-		for (TimedArcPetriNetStep step : steps){
+		for (PetriNetStep step : steps){
 			if (step instanceof TimedTransitionStep){
 				if(((TimedTransitionStep) step).consumedTokens() != null){
 					for (TimedToken token : ((TimedTransitionStep) step).consumedTokens()){

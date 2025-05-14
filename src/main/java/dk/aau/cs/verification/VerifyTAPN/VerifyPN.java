@@ -413,6 +413,7 @@ public class VerifyPN implements ModelChecker {
                     trace += split[1];
                     trace = trace.split("(?<=</trace>)")[0];
                     tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
+                    System.out.println("length: " + tapnTrace.length());
                 } else {
                     String trace = "Trace\n";
                     trace += errorOutput;
@@ -465,8 +466,8 @@ public class VerifyPN implements ModelChecker {
             return null;
         }
 
-        VerifyPNTraceParser traceParser = new VerifyPNTraceParser(model.value1());
-
+        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.useExplicitSearch());
+   
         return traceParser.parseTrace(new BufferedReader(new StringReader(output)));
     }
 
@@ -479,7 +480,7 @@ public class VerifyPN implements ModelChecker {
             return null;
         }
 
-        VerifyPNTraceParser traceParser = new VerifyPNTraceParser(model.value1());
+        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.useExplicitSearch());
         if (query.getCategory() == QueryCategory.HyperLTL) {
             return traceParser.parseTraces(new BufferedReader(new StringReader(output)));
         }

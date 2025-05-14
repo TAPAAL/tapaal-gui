@@ -3,6 +3,7 @@ package dk.aau.cs.verification.VerifyTAPN;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,11 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import dk.aau.cs.model.CPN.ColorType;
 
@@ -26,6 +32,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.ColoredTransitionStep;
+import dk.aau.cs.model.tapn.simulation.PetriNetStep;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
@@ -34,14 +42,21 @@ import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 public class VerifyTAPNTraceParser {
 
 	private final TimedArcPetriNet tapn;
+    private final boolean useExplicitSearch;
+
 	private String traceNameToParse;
 	
 	public VerifyTAPNTraceParser(TimedArcPetriNet tapn) {
-		this.tapn = tapn;
+		this(tapn, false);
 	}
 
+    public VerifyTAPNTraceParser(TimedArcPetriNet tapn, boolean useExplicitSearch) {
+        this.tapn = tapn;
+        this.useExplicitSearch = useExplicitSearch;
+    }
+
 	public TimedArcPetriNetTrace parseTrace(BufferedReader reader) {
-		TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
+		TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(!useExplicitSearch);
 
 		Document document = readerToDocument(reader);
 
@@ -94,7 +109,7 @@ public class VerifyTAPNTraceParser {
                 Element element = (Element)node;
 
                 String traceName = element.getAttribute("name");
-                TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
+                TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(!useExplicitSearch);
 
                 NodeList childNodes = element.getChildNodes();
                 parseTraceNodes(trace, childNodes);
@@ -113,7 +128,13 @@ public class VerifyTAPNTraceParser {
                 Element childElement = (Element)childNode;
 
                 if (childElement.getTagName().equals("transition")){
-                    TimedTransitionStep step = parseTransitionStep(childElement);
+                    PetriNetStep step;
+                    if (useExplicitSearch) {
+                        step = parseColoredTransitionStep(childElement);
+                    } else {
+                        step = parseTransitionStep(childElement);
+                    }
+
                     trace.add(step);
                 } else if (childElement.getTagName().equals("delay")){
                     if (childElement.getTextContent().equals("forever")){
@@ -185,6 +206,29 @@ public class VerifyTAPNTraceParser {
 		}
 		return new TimedTransitionStep(transition, consumedTokens);
 	}
+
+    private ColoredTransitionStep parseColoredTransitionStep(Element element) {
+        ColorBindingParser colorBindingParser = new ColorBindingParser();
+        Node bindingsNode = element.getElementsByTagName("bindings").item(0);
+        Map<String, List<String>> bindings = colorBindingParser.parseBindings(nodeToString(bindingsNode));
+        TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
+        return new ColoredTransitionStep(transition, bindings);
+    }
+
+    private static String nodeToString(Node node) {
+        try {
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(node), new StreamResult(writer));
+            return writer.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
 	private TimeDelayStep parseTimeDelay(Element element) {
 		return new TimeDelayStep(new BigDecimal(element.getTextContent()));

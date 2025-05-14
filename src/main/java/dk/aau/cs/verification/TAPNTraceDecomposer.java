@@ -8,12 +8,13 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.ColoredTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetStep;
+import dk.aau.cs.model.tapn.simulation.PetriNetStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
@@ -42,7 +43,7 @@ public class TAPNTraceDecomposer {
 	private TAPNNetworkTrace decomposeUntimedTrace() {
 		UntimedTAPNNetworkTrace decomposedTrace = new UntimedTAPNNetworkTrace();
 
-		for (TimedArcPetriNetStep action : trace) {
+		for (PetriNetStep action : trace) {
 			decomposedTrace.add((TAPNNetworkTimedTransitionStep)decomposeAction(action));
 		}
 
@@ -53,21 +54,26 @@ public class TAPNTraceDecomposer {
 		TimedTAPNNetworkTrace decomposedTrace = new TimedTAPNNetworkTrace(trace.getLoopToIndex());
 		decomposedTrace.setTraceType(trace.getTraceType());
 
-		for (TimedArcPetriNetStep action : trace) {
+		for (PetriNetStep action : trace) {
 			decomposedTrace.add(decomposeAction(action));
 		}
 
 		return decomposedTrace;
 	}
 
-	private TAPNNetworkTraceStep decomposeAction(TimedArcPetriNetStep action) {
+	private TAPNNetworkTraceStep decomposeAction(PetriNetStep action) {
 		TAPNNetworkTraceStep decomposedAction = null;
 		if (action instanceof TimedTransitionStep) {
 			TimedTransitionStep transitionFiring = (TimedTransitionStep) action;
 			decomposedAction = decomposeTransitionFiring(transitionFiring);
 		} else if (action instanceof TimeDelayStep) {
 			decomposedAction = new TAPNNetworkTimeDelayStep(((TimeDelayStep) action).delay());
-		}
+		} else if (action instanceof ColoredTransitionStep) {
+            decomposedAction = decomposeColoredTransitionFiring((ColoredTransitionStep) action);
+        } else {
+            throw new IllegalArgumentException("Unknown action type: " + action.getClass());
+        }
+
 		return decomposedAction;
 	}
 
@@ -91,4 +97,12 @@ public class TAPNTraceDecomposer {
 
 		return new TAPNNetworkTimedTransitionStep(transition, convertedTokens);
 	}
+
+    private TAPNNetworkTraceStep decomposeColoredTransitionFiring(ColoredTransitionStep coloredTransitionStep) {
+        Tuple<String, String> originalName = mapping.map(coloredTransitionStep.transition().name());
+        TimedTransition transition = (originalName.value1() == null || originalName.value1().isEmpty()) ? 
+            tapnNetwork.getSharedTransitionByName(originalName.value2()).transitions().iterator().next() : 
+            tapnNetwork.getTAPNByName(originalName.value1()).getTransitionByName(originalName.value2());
+        return new TAPNNetworkTimedTransitionStep(transition, new ArrayList<TimedToken>());
+    }
 }
