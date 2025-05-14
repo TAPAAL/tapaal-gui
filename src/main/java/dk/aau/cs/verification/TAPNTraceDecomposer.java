@@ -98,8 +98,8 @@ public class TAPNTraceDecomposer {
 		return new TAPNNetworkTimedTransitionStep(transition, convertedTokens);
 	}
 
-    private TAPNNetworkTraceStep decomposeColoredTransitionFiring(ColoredTransitionStep coloredTransitionStep) {
-        Tuple<String, String> originalName = mapping.map(coloredTransitionStep.transition().name());
+    private TAPNNetworkTraceStep decomposeColoredTransitionFiring(ColoredTransitionStep transitionFiring) {
+        Tuple<String, String> originalName = mapping.map(transitionFiring.transition().name());
         TimedTransition transition = (originalName.value1() == null || originalName.value1().isEmpty()) ? 
             tapnNetwork.getSharedTransitionByName(originalName.value2()).transitions().iterator().next() : 
             tapnNetwork.getTAPNByName(originalName.value1()).getTransitionByName(originalName.value2());

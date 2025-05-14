@@ -413,7 +413,6 @@ public class VerifyPN implements ModelChecker {
                     trace += split[1];
                     trace = trace.split("(?<=</trace>)")[0];
                     tapnTrace = parseTrace(trace, options, model, exportedModel, query, queryResult.value1());
-                    System.out.println("length: " + tapnTrace.length());
                 } else {
                     String trace = "Trace\n";
                     trace += errorOutput;

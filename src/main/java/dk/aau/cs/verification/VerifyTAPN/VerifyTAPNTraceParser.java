@@ -38,7 +38,6 @@ import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 
-
 public class VerifyTAPNTraceParser {
 
 	private final TimedArcPetriNet tapn;
