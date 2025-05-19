@@ -28,6 +28,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
+import dk.aau.cs.model.tapn.LocalTimedMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -39,7 +40,6 @@ import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 
 public class VerifyTAPNTraceParser {
-
 	private final TimedArcPetriNet tapn;
     private final boolean useExplicitSearch;
 
@@ -55,7 +55,7 @@ public class VerifyTAPNTraceParser {
     }
 
 	public TimedArcPetriNetTrace parseTrace(BufferedReader reader) {
-		TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(!useExplicitSearch);
+		TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
 
 		Document document = readerToDocument(reader);
 
@@ -108,7 +108,7 @@ public class VerifyTAPNTraceParser {
                 Element element = (Element)node;
 
                 String traceName = element.getAttribute("name");
-                TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(!useExplicitSearch);
+                TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
 
                 NodeList childNodes = element.getChildNodes();
                 parseTraceNodes(trace, childNodes);
@@ -121,12 +121,12 @@ public class VerifyTAPNTraceParser {
     }
 
     private void parseTraceNodes(TimedArcPetriNetTrace trace, NodeList childNodes) {
-        for (int j = 0; j < childNodes.getLength(); ++j){
+        for (int j = 0; j < childNodes.getLength(); ++j) {
             Node childNode = childNodes.item(j);
-            if (childNode instanceof Element){
+            if (childNode instanceof Element) {
                 Element childElement = (Element)childNode;
-
-                if (childElement.getTagName().equals("transition")){
+                String tag = childElement.getTagName();
+                if (tag.equals("transition")) {
                     PetriNetStep step;
                     if (useExplicitSearch) {
                         step = parseColoredTransitionStep(childElement);
@@ -135,16 +135,22 @@ public class VerifyTAPNTraceParser {
                     }
 
                     trace.add(step);
-                } else if (childElement.getTagName().equals("delay")){
+                } else if (tag.equals("delay")) {
                     if (childElement.getTextContent().equals("forever")){
                         trace.setTraceType(TraceType.EG_DELAY_FOREVER);
                     } else {
                         TimeDelayStep step = parseTimeDelay(childElement);
                         trace.add(step);
                     }
-                } else if (childElement.getTagName().equals("loop")){
+                } else if (tag.equals("loop")) {
                     trace.nextIsLoop();
                     trace.setTraceType(TraceType.EG_LOOP);
+                } else if (tag.equals("marking")) {
+                    LocalTimedMarking newMarking = parseMarking(childElement);
+                    ColoredTransitionStep lastStep = (ColoredTransitionStep)trace.getLastStep();
+                    if (lastStep != null) {
+                        lastStep.setPostMarking(newMarking);
+                    }
                 }
             }
         }
@@ -212,6 +218,34 @@ public class VerifyTAPNTraceParser {
         Map<String, List<String>> bindings = colorBindingParser.parseBindings(nodeToString(bindingsNode));
         TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
         return new ColoredTransitionStep(transition, bindings);
+    }
+
+    private LocalTimedMarking parseMarking(Element element) {
+        LocalTimedMarking marking = new LocalTimedMarking();
+        NodeList placeNodes = element.getElementsByTagName("place");
+        for (int i = 0; i < placeNodes.getLength(); ++i) {
+            Element placeElement = (Element)placeNodes.item(i);
+            String placeId = placeElement.getAttribute("id");
+            TimedPlace place = tapn.getPlaceByName(placeId);
+
+            NodeList tokenNodes = placeElement.getElementsByTagName("token");
+            for (int j = 0; j < tokenNodes.getLength(); ++j) {
+                Element tokenElement = (Element)tokenNodes.item(j);
+                int count = Integer.parseInt(tokenElement.getAttribute("count"));
+
+                NodeList colorNodes = tokenElement.getElementsByTagName("color");
+                for (int k = 0; k < colorNodes.getLength(); ++k) {
+                    Element colorElement = (Element)colorNodes.item(k);
+                    String colorName = colorElement.getTextContent();
+                    for (int l = 0; l < count; ++l) {
+                        TimedToken token = new TimedToken(place, tapn.parentNetwork().getColorByName(colorName));
+                        marking.add(token);
+                    }
+                }
+            }
+        }
+
+        return marking;
     }
 
     private static String nodeToString(Node node) {

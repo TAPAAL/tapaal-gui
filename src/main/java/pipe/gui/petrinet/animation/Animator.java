@@ -89,7 +89,11 @@ public class Animator {
         try {
             if (trace.isConcreteTrace()) {
                 this.trace = trace;
-                setTimedTrace(trace);
+                if (trace.isColoredTrace()) {
+                    setColoredTrace(trace);
+                } else {
+                    setTimedTrace(trace);
+                }
             } else {
                 setUntimedTrace(trace);
                 isDisplayingUntimedTrace = true;
@@ -131,7 +135,7 @@ public class Animator {
     }
 
     private void setTimedTrace(TAPNNetworkTrace trace) {
-        NetworkMarking previousMarking = null;
+        NetworkMarking previousMarking = initialMarking;
         TimedTransition previousTransition = null;
         for (TAPNNetworkTraceStep step : trace) {
             if (step instanceof TAPNNetworkTimedTransitionStep) {
@@ -149,6 +153,22 @@ public class Animator {
         }
         if (getTrace().getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
             tab.getAnimationHistorySidePanel().setLastShown(getTrace().getTraceType());
+        }
+    }
+
+    private void setColoredTrace(TAPNNetworkTrace trace) {
+        NetworkMarking previousMarking = initialMarking;
+        TimedTransition previousTransition = null;
+        for (TAPNNetworkTraceStep step : trace) {
+            TimedTransition transition = ((TAPNNetworkColoredTransitionStep)step).getTransition();
+            if (previousMarking != null && previousTransition != null) {
+                checkTokensRemoved(previousMarking, previousTransition);
+            }
+
+            previousMarking = currentMarking();
+            previousTransition = transition;
+
+            addMarking(step, ((TAPNNetworkColoredTransitionStep)step).getMarking());
         }
     }
 
@@ -338,7 +358,6 @@ public class Animator {
             updateAnimationButtonsEnabled();
             updateMouseOverInformation();
             reportBlockingPlaces();
-
         }
     }
 

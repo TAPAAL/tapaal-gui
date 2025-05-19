@@ -14,6 +14,7 @@ public class TimedArcPetriNetTrace implements Iterable<PetriNetStep> {
 	private int loopToIndex = -1;
 	private TraceType traceType;
 	private String traceName;
+    private boolean isColoredTrace;
 
 	private final List<PetriNetStep> steps = new ArrayList<PetriNetStep>();
 	private final boolean isTimedTrace;
@@ -31,6 +32,10 @@ public class TimedArcPetriNetTrace implements Iterable<PetriNetStep> {
 	}
 
 	public void add(PetriNetStep step) {
+        if (step instanceof ColoredTransitionStep) {
+            isColoredTrace = true;
+        }
+
 		if(nextIsLoop){
 			Require.that(loopToIndex == -1, "There can only be one step to loop to in a trace");
 			loopToIndex = steps.size();
@@ -64,12 +69,15 @@ public class TimedArcPetriNetTrace implements Iterable<PetriNetStep> {
         }
 
         return steps.get(steps.size() - 1);
-
     }
 
 	public boolean isTimedTrace() {
 		return isTimedTrace;
 	}
+
+    public boolean isColoredTrace() {
+        return isColoredTrace;
+    }
 	
 	public void nextIsLoop(){
 		nextIsLoop = true;
