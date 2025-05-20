@@ -65,7 +65,7 @@ public class ColorBindingParser extends DefaultHandler {
         }
     }
 
-    public String createTooltip(Map<String, List<String>> bindings, Transition transition) {
+    public static String createTooltip(Map<String, List<String>> bindings, Transition transition) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<html>");
@@ -80,7 +80,20 @@ public class ColorBindingParser extends DefaultHandler {
         return sb.toString();
     }
 
-    public Map<String, List<String>> parseBindings(String output) {
+    public static String createTooltip(List<String> bindings, Transition transition) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<html>");
+
+        sb.append(bindings);
+        sb.append("<br>");
+
+        sb.append("</html>");
+
+        return sb.toString();
+    }
+
+    private Map<String, List<String>> parseBindings(String output) {
         InputStream stream = null;
 
         try {
@@ -113,6 +126,73 @@ public class ColorBindingParser extends DefaultHandler {
         }
 
         return bindings;
+    }
+
+    public List<String> parseBindingsForSingleTransition(String output, String transitionName) {
+        List<String> result = new ArrayList<>();
+    
+        DefaultHandler handler = new DefaultHandler() {
+            private String currentElement = "";
+            private String varId = "";
+            private String colorValue = "";
+            
+            @Override
+            public void startElement(String uri, String localName, String qName, Attributes atts) {
+                currentElement = qName;
+                if ("variable".equals(qName)) {
+                    varId = atts.getValue("id");
+                }
+            }
+            
+            @Override
+            public void endElement(String uri, String localName, String qName) {
+                if ("color".equals(qName)) {
+                    String binding = varId + " -> " + colorValue;
+                    result.add(binding);
+                } else if ("variable".equals(qName)) {
+                    varId = "";
+                    colorValue = "";
+                }
+
+                currentElement = "";
+            }
+            
+            @Override
+            public void characters(char[] ch, int start, int length) {
+                if ("color".equals(currentElement)) {
+                    colorValue = new String(ch, start, length);
+                }
+            }
+        };
+        
+        InputStream stream = null;
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser parser = factory.newSAXParser();
+            
+            int start = output.indexOf("<bindings>");
+            
+            if (start == -1) return result;
+            
+            int end = output.indexOf("</bindings>") + "</bindings>".length();
+            String xml = output.substring(start, end);
+            
+            stream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+            parser.parse(new InputSource(new InputStreamReader(stream, StandardCharsets.UTF_8)), handler);
+            
+        } catch (SAXException | ParserConfigurationException | IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        return result;
     }
 
     @Override

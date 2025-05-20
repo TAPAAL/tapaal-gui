@@ -215,8 +215,8 @@ public class VerifyTAPNTraceParser {
     private ColoredTransitionStep parseColoredTransitionStep(Element element) {
         ColorBindingParser colorBindingParser = new ColorBindingParser();
         Node bindingsNode = element.getElementsByTagName("bindings").item(0);
-        Map<String, List<String>> bindings = colorBindingParser.parseBindings(nodeToString(bindingsNode));
         TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
+        List<String> bindings = colorBindingParser.parseBindingsForSingleTransition(nodeToString(bindingsNode), transition.name()); ;
         return new ColoredTransitionStep(transition, bindings);
     }
 

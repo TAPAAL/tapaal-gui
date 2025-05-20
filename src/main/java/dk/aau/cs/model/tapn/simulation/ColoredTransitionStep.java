@@ -9,11 +9,11 @@ import java.util.Map;
 
 public class ColoredTransitionStep implements PetriNetStep {
     private final TimedTransition transition;
-    private final Map<String, List<String>> bindings;
+    private final List<String> bindings;
 
     private LocalTimedMarking postMarking;
 
-    public ColoredTransitionStep(TimedTransition transition, Map<String, List<String>> bindings) {
+    public ColoredTransitionStep(TimedTransition transition, List<String> bindings) {
         Require.that(transition != null, "transition cannot be null");
         this.transition = transition;
         this.bindings = bindings;
@@ -23,7 +23,7 @@ public class ColoredTransitionStep implements PetriNetStep {
 		return transition;
 	}
 
-    public Map<String, List<String>> bindings() {
+    public List<String> bindings() {
         return bindings;
     }
 

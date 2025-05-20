@@ -33,6 +33,7 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class Animator {
@@ -160,7 +161,8 @@ public class Animator {
         NetworkMarking previousMarking = initialMarking;
         TimedTransition previousTransition = null;
         for (TAPNNetworkTraceStep step : trace) {
-            TimedTransition transition = ((TAPNNetworkColoredTransitionStep)step).getTransition();
+            TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)step;
+            TimedTransition transition = coloredStep.getTransition();
             if (previousMarking != null && previousTransition != null) {
                 checkTokensRemoved(previousMarking, previousTransition);
             }
@@ -168,8 +170,12 @@ public class Animator {
             previousMarking = currentMarking();
             previousTransition = transition;
 
-            addMarking(step, ((TAPNNetworkColoredTransitionStep)step).getMarking());
+            addMarking(step, coloredStep.getMarking());
         }
+
+        updateBindings((TAPNNetworkColoredTransitionStep)actionHistory.get(0));
+
+        tab.showEnabledTransitionsList(false);
     }
 
     /**
@@ -300,6 +306,9 @@ public class Animator {
                     untimedAnimationHistory.stepBackwards();
                 }
             }
+
+            updateBindings(actionHistory.get(Math.max(currentAction - 1, 0)));
+            
             tab.network().setMarking(markings.get(currentMarkingIndex - 1));
 
             activeGuiModel().repaintPlaces();
@@ -346,6 +355,9 @@ public class Animator {
                     untimedAnimationHistory.stepForward();
                 }
             }
+            
+            updateBindings(nextStep);
+
             tab.network().setMarking(markings.get(currentMarkingIndex + 1));
 
             activeGuiModel().repaintPlaces();
@@ -358,6 +370,16 @@ public class Animator {
             updateAnimationButtonsEnabled();
             updateMouseOverInformation();
             reportBlockingPlaces();
+        }
+    }
+
+    public void updateBindings(TAPNNetworkTraceStep step) {
+        if (step instanceof TAPNNetworkColoredTransitionStep) {
+            TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)step;
+            TimedTransition transition = coloredStep.getTransition();
+            Transition guiTransition = activeGuiModel().getTransitionByName(transition.name());
+            List<String> bindings = coloredStep.getBindings();
+            guiTransition.setToolTipText(ColorBindingParser.createTooltip(bindings, guiTransition));
         }
     }
 

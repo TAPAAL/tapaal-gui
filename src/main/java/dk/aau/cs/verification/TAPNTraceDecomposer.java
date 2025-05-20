@@ -118,6 +118,7 @@ public class TAPNTraceDecomposer {
             tapnNetwork.getSharedTransitionByName(originalName.value2()).transitions().iterator().next() : 
             tapnNetwork.getTAPNByName(originalName.value1()).getTransitionByName(originalName.value2());
 
+        // Convert names in marking to original names
         LocalTimedMarking newPostMarking = new LocalTimedMarking();
         for (var entry : step.getPostMarking().getPlacesToTokensMap().entrySet()) {
             String originalPlaceName = mapping.map(entry.getKey().name()).value2();
@@ -132,6 +133,6 @@ public class TAPNTraceDecomposer {
 
         newPostMarking.setNetworkMarking(tapnNetwork.marking());
 
-        return new TAPNNetworkColoredTransitionStep(transition, newPostMarking);
+        return new TAPNNetworkColoredTransitionStep(transition, step.bindings(), newPostMarking);
     }
 }
