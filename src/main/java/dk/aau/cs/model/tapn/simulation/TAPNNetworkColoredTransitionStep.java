@@ -40,7 +40,24 @@ public class TAPNNetworkColoredTransitionStep extends TAPNNetworkTraceStep  {
     @Override
     public String toString() {
         String transitionName = transition.isShared() ? transition.sharedTransition().name() : transition.name();
-        return isLoopStep() ? formatAsLoopStep(transitionName) : transitionName;
+        String result = isLoopStep() ? formatAsLoopStep(transitionName) : transitionName;
+
+        StringBuilder sb = new StringBuilder();
+        if (!bindings.isEmpty()) {
+            sb.append(" [");
+           for (int i = 0; i < bindings.size(); ++i) {
+                sb.append(bindings.get(i));
+                if (i < bindings.size() - 1) {
+                    sb.append(",");
+                }
+            }
+    
+            sb.append("]");
+        } 
+
+        result += sb.toString();
+
+        return result;
     }
 
     @Override

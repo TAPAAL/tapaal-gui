@@ -173,7 +173,7 @@ public class Animator {
             addMarking(step, coloredStep.getMarking());
         }
 
-        updateBindings((TAPNNetworkColoredTransitionStep)actionHistory.get(0));
+        updateBindings(0);
 
         tab.showEnabledTransitionsList(false);
     }
@@ -307,7 +307,7 @@ public class Animator {
                 }
             }
 
-            updateBindings(actionHistory.get(Math.max(currentAction - 1, 0)));
+            updateBindings(currentAction);
             
             tab.network().setMarking(markings.get(currentMarkingIndex - 1));
 
@@ -356,7 +356,7 @@ public class Animator {
                 }
             }
             
-            updateBindings(nextStep);
+            updateBindings(currentAction + 2);
 
             tab.network().setMarking(markings.get(currentMarkingIndex + 1));
 
@@ -373,13 +373,26 @@ public class Animator {
         }
     }
 
-    public void updateBindings(TAPNNetworkTraceStep step) {
-        if (step instanceof TAPNNetworkColoredTransitionStep) {
-            TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)step;
-            TimedTransition transition = coloredStep.getTransition();
-            Transition guiTransition = activeGuiModel().getTransitionByName(transition.name());
-            List<String> bindings = coloredStep.getBindings();
-            guiTransition.setToolTipText(ColorBindingParser.createTooltip(bindings, guiTransition));
+    public void updateBindings(int stepIdx) {
+        if (stepIdx < actionHistory.size() && stepIdx >= 0) {
+            TAPNNetworkTraceStep step = actionHistory.get(stepIdx);
+            if (step instanceof TAPNNetworkColoredTransitionStep) {
+                TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)step;
+                TimedTransition transition = coloredStep.getTransition();
+                Transition guiTransition = activeGuiModel().getTransitionByName(transition.name());
+                List<String> bindings = coloredStep.getBindings();
+                guiTransition.setToolTipText(ColorBindingParser.createTooltip(bindings, guiTransition));
+            }
+        } else {
+            resetBindings();
+        }
+    }
+
+    public void resetBindings() {
+        for (Template template : tab.activeTemplates()) {
+            for (Transition transition : template.guiModel().transitions()) {
+                transition.setToolTipText(null);
+            }
         }
     }
 
