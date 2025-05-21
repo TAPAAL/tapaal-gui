@@ -80,14 +80,11 @@ public class ColorBindingParser extends DefaultHandler {
         return sb.toString();
     }
 
-    public static String createTooltip(List<String> bindings, Transition transition) {
+    public static String createTooltip(List<String> bindings) {
         StringBuilder sb = new StringBuilder();
-
         sb.append("<html>");
-
         sb.append(bindings);
         sb.append("<br>");
-
         sb.append("</html>");
 
         return sb.toString();

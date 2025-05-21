@@ -1,9 +1,12 @@
 package pipe.gui.petrinet.animation;
 
+import java.awt.Component;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
@@ -17,15 +20,14 @@ import dk.aau.cs.verification.VerifyTAPN.TraceType;
 public class AnimationHistoryList extends JList<String> {
 
 	private TraceType lastShown = TraceType.NOT_EG;
+    private final Map<Integer, String> itemTooltips = new HashMap<>();
 
 	public AnimationHistoryList() {
 		super();
 		setModel(new DefaultListModel<>());
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
-		for (MouseListener listener : getMouseListeners()) {
-			removeMouseListener(listener);
-		}
+        setCellRenderer(new TooltipListCellRenderer());
 		
 		for (MouseMotionListener listener : getMouseMotionListeners()) {
 			removeMouseMotionListener(listener);
@@ -104,12 +106,23 @@ public class AnimationHistoryList extends JList<String> {
 		ensureIndexIsVisible(index);
 	}
 
+    public void setTooltipForIndex(int index, String tooltip) {
+        if (index >= 0 && index < getListModel().size()) {
+            itemTooltips.put(index, tooltip);
+        }
+    }
+
+    public void setTooltipForLastItem(String tooltip) {
+        setTooltipForIndex(getListModel().size() - 1, tooltip);
+    }
+
 	public void reset() {
 		getListModel().clear();
 		getListModel().addElement("Initial Marking");
 		setSelectedIndex(0);
 		lastShown = TraceType.NOT_EG;
 		updateAccordingToDeadlock();
+        itemTooltips.clear();
 	}
 	
 	static final private String deadlockString = "<html><i><font color=red>" + "Deadlock" + "</i></font></html>";
@@ -161,4 +174,21 @@ public class AnimationHistoryList extends JList<String> {
 		
 		setLastShown(TraceType.EG_DEADLOCK);
 	}
+
+    private class TooltipListCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value,
+                int index, boolean isSelected, boolean cellHasFocus) {
+            
+            Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            
+            if (itemTooltips.containsKey(index)) {
+                setToolTipText(itemTooltips.get(index));
+            } else {
+                setToolTipText(null);
+            }
+            
+            return c;
+        }
+    }
 }

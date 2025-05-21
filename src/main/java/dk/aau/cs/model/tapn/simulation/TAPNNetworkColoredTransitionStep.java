@@ -33,6 +33,11 @@ public class TAPNNetworkColoredTransitionStep extends TAPNNetworkTraceStep  {
     }
 
     @Override
+    public boolean isColoredTransitionStep() {
+        return true;
+    }
+
+    @Override
     public NetworkMarking performStepFrom(NetworkMarking marking) {
         throw new UnsupportedOperationException("This method is not implemented for TAPNNeworkColoredTransitionStep");
     }

@@ -158,18 +158,8 @@ public class Animator {
     }
 
     private void setColoredTrace(TAPNNetworkTrace trace) {
-        NetworkMarking previousMarking = initialMarking;
-        TimedTransition previousTransition = null;
         for (TAPNNetworkTraceStep step : trace) {
             TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)step;
-            TimedTransition transition = coloredStep.getTransition();
-            if (previousMarking != null && previousTransition != null) {
-                checkTokensRemoved(previousMarking, previousTransition);
-            }
-
-            previousMarking = currentMarking();
-            previousTransition = transition;
-
             addMarking(step, coloredStep.getMarking());
         }
 
@@ -225,6 +215,28 @@ public class Animator {
     }
 
     public void updateFireableTransitions(){
+        if (tab.getLens().isColored()) {
+            if (actionHistory.isEmpty()) {
+                return;
+            }
+
+            int idx = Math.max(0, currentAction + 2);
+
+            if (idx >= actionHistory.size()) return;
+
+            var coloredStep = ((TAPNNetworkColoredTransitionStep)actionHistory.get(idx));
+            TimedTransition transition = coloredStep.getTransition();
+            for (Template template : tab.activeTemplates()) {
+                for (Transition t : template.guiModel().transitions()) {
+                    if (t.getName().equals(transition.name())) {
+                        t.markTransitionEnabled(true);
+                    }
+                }
+            }
+
+            return;
+        }
+
         TransitionFiringComponent transFireComponent = tab.getTransitionFiringComponent();
         transFireComponent.startReInit();
         isUrgentTransitionEnabled = false;
@@ -381,7 +393,7 @@ public class Animator {
                 TimedTransition transition = coloredStep.getTransition();
                 Transition guiTransition = activeGuiModel().getTransitionByName(transition.name());
                 List<String> bindings = coloredStep.getBindings();
-                guiTransition.setToolTipText(ColorBindingParser.createTooltip(bindings, guiTransition));
+                guiTransition.setToolTipText(ColorBindingParser.createTooltip(bindings));
             }
         } else {
             resetBindings();
@@ -623,6 +635,12 @@ public class Animator {
 
         tab.network().setMarking(marking);
         tab.getAnimationHistorySidePanel().addHistoryItem(action.toString());
+        if (action.isColoredTransitionStep()) {
+            TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)action;
+            List<String> bindings = coloredStep.getBindings();
+            tab.getAnimationHistorySidePanel().setTooltipForLastItem(ColorBindingParser.createTooltip(bindings));
+        }
+
         actionHistory.add(action);
         markings.add(marking);
         currentAction++;
