@@ -112,8 +112,8 @@ public class AnimationHistoryList extends JList<String> {
         }
     }
 
-    public void setTooltipForLastItem(String tooltip) {
-        setTooltipForIndex(getListModel().size() - 1, tooltip);
+    public void setTooltipForSelectedItem(String tooltip) {
+        setTooltipForIndex(getSelectedIndex(), tooltip);
     }
 
 	public void reset() {
@@ -181,7 +181,6 @@ public class AnimationHistoryList extends JList<String> {
                 int index, boolean isSelected, boolean cellHasFocus) {
             
             Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            
             if (itemTooltips.containsKey(index)) {
                 setToolTipText(itemTooltips.get(index));
             } else {

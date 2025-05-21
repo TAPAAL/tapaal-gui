@@ -638,7 +638,7 @@ public class Animator {
         if (action.isColoredTransitionStep()) {
             TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)action;
             List<String> bindings = coloredStep.getBindings();
-            tab.getAnimationHistorySidePanel().setTooltipForLastItem(ColorBindingParser.createTooltip(bindings));
+            tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(ColorBindingParser.createTooltip(bindings));
         }
 
         actionHistory.add(action);
