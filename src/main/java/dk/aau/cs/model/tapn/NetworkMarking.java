@@ -3,8 +3,10 @@ package dk.aau.cs.model.tapn;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import pipe.gui.TAPAALGUI;
@@ -38,6 +40,28 @@ public class NetworkMarking implements TimedMarking {
 			marking.setNetworkMarking(null);
 		}
 	}
+
+    public void updateMarking(LocalTimedMarking newMarking) {
+        Set<TimedArcPetriNet> tapnsToReplace = new HashSet<>();
+        for (var entry : newMarking.getPlacesToTokensMap().entrySet()) {
+            TimedPlace place = entry.getKey();
+            List<TimedToken> tokens = entry.getValue();
+            if (place.isShared()) {
+                place.resetNumberOfTokens();
+                sharedPlacesTokens.put(place, new ArrayList<>(tokens));
+            } else {
+                tapnsToReplace.add(((LocalTimedPlace)place).model());
+            }
+        }
+
+        for (TimedArcPetriNet tapn : tapnsToReplace) {
+            for (TimedPlace place : tapn.places()) {
+                place.resetNumberOfTokens();
+            }
+
+            markings.put(tapn, newMarking);
+        }
+    }
 	
 	private LocalTimedMarking getMarkingFor(TimedArcPetriNet tapn) {
 		return markings.get(tapn);
@@ -297,4 +321,27 @@ public class NetworkMarking implements TimedMarking {
 		return true;
 	}
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
+            sb.append(entry.getKey().name()).append(": ").append(entry.getValue().toString()).append("\n");
+        }
+
+        if (sharedPlacesTokens.isEmpty()) {
+            return sb.toString();
+        }
+        
+        sb.append("Shared Places:\n");
+        for (Entry<TimedPlace, List<TimedToken>> entry : sharedPlacesTokens.entrySet()) {
+            sb.append(entry.getKey().name()).append(" -> ");
+            for (TimedToken token : entry.getValue()) {
+                sb.append(token.toString()).append(" ");
+            }
+
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
 }
