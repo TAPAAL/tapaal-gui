@@ -127,7 +127,7 @@ public class TAPNTraceDecomposer {
                 tapnNetwork.getTAPNByName(mapping.map(entry.getKey().name()).value1()).getPlaceByName(originalPlaceName);
     
             for (TimedToken token : entry.getValue()) {
-                newPostMarking.add(new TimedToken(place, token.age(), tapnNetwork.getColorByName(token.color().getName())));
+                newPostMarking.add(new TimedToken(place, token.age(), token.color()));
             }
         }
 

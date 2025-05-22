@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +22,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 
 import org.w3c.dom.*;
@@ -234,13 +236,27 @@ public class VerifyTAPNTraceParser {
                 int count = Integer.parseInt(tokenElement.getAttribute("count"));
 
                 NodeList colorNodes = tokenElement.getElementsByTagName("color");
-                for (int k = 0; k < colorNodes.getLength(); ++k) {
-                    Element colorElement = (Element)colorNodes.item(k);
+
+                Color color;
+                if (colorNodes.getLength() == 1) {
+                    Element colorElement = (Element)colorNodes.item(0);
                     String colorName = colorElement.getTextContent();
-                    for (int l = 0; l < count; ++l) {
-                        TimedToken token = new TimedToken(place, tapn.parentNetwork().getColorByName(colorName));
-                        marking.add(token);
+                    color = tapn.parentNetwork().getColorByName(colorName);
+                } else {
+                    Vector<Color> constituents = new Vector<>();   
+                    for (int k = 0; k < colorNodes.getLength(); ++k) {
+                        Element colorElement = (Element)colorNodes.item(k);
+                        String colorName = colorElement.getTextContent();
+                        Color constituentColor = tapn.parentNetwork().getColorByName(colorName);
+                        constituents.add(constituentColor);
                     }
+                    
+                    color = tapn.parentNetwork().getProductColorByConstituents(constituents);
+                }
+
+                for (int l = 0; l < count; ++l) {
+                    TimedToken token = new TimedToken(place, color);
+                    marking.add(token);
                 }
             }
         }

@@ -2,6 +2,7 @@ package pipe.gui.petrinet.animation;
 
 import java.awt.Component;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
+import javax.swing.ToolTipManager;
 
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
@@ -27,14 +29,24 @@ public class AnimationHistoryList extends JList<String> {
 		setModel(new DefaultListModel<>());
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
-        setCellRenderer(new TooltipListCellRenderer());
-		
-		for (MouseMotionListener listener : getMouseMotionListeners()) {
-			removeMouseMotionListener(listener);
+        ToolTipManager.sharedInstance().registerComponent(this);
+        for (MouseListener listener : getMouseListeners()) {
+			if (!(listener.getClass().getName().contains("ToolTipManager"))) {
+                removeMouseListener(listener);
+            }
 		}
+
+		for (MouseMotionListener listener : getMouseMotionListeners()) {
+			if (!(listener.getClass().getName().contains("ToolTipManager"))) {
+                removeMouseMotionListener(listener);
+            }
+		}
+
 		for (KeyListener listener : getKeyListeners()) {
 			removeKeyListener(listener);
 		}
+
+        setCellRenderer(new TooltipListCellRenderer());
 	}
 
 	public void addHistoryItem(String transitionName) {

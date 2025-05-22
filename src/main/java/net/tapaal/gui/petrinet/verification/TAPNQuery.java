@@ -85,7 +85,7 @@ public class TAPNQuery {
 	private boolean useStubbornReduction = true;
     private boolean useTarOption = false;
     private boolean useTarjan = false;
-    private boolean useExplicitSearch = true;
+    private boolean useExplicitSearch = false;
 	private boolean useRawVerification = false;
 	private String rawVerificationPrompt;
 
@@ -540,6 +540,7 @@ public class TAPNQuery {
 		useQueryReduction = newQuery.isQueryReductionEnabled();
 		useStubbornReduction = newQuery.isStubbornReductionEnabled();
 		useTarOption = newQuery.isTarOptionEnabled();
+        useExplicitSearch = newQuery.useExplicitSearch();
 	}
 
     public void copyOptions(TAPNQuery query){
@@ -574,6 +575,7 @@ public class TAPNQuery {
         setParallel(isParallel());
         setGranularity(getGranularity());
         setMaxGranularity(isMaxGranularity());
+        setUseExplicitSearch(query.useExplicitSearch());
     }
 
     public void setProperty(TCTLAbstractProperty property) {
@@ -605,6 +607,7 @@ public class TAPNQuery {
         copy.setBenchmarkMode(this.isBenchmarkMode());
         copy.setBenchmarkRuns(this.getBenchmarkRuns());
         copy.setParallel(this.isParallel());
+        copy.setUseExplicitSearch(this.useExplicitSearch());
 		return copy;
 	}
 	
