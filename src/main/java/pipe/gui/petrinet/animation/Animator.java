@@ -364,7 +364,6 @@ public class Animator {
             currentMarkingIndex++;
             updateBindings(currentAction + 1);
             tab.network().setMarking(markings.get(currentMarkingIndex));
-            updateColoredTokenList();
             activeGuiModel().repaintPlaces();
             unhighlightDisabledTransitions();
             updateFireableTransitions();
