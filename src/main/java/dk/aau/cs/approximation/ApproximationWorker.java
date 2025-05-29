@@ -17,7 +17,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetStep;
+import dk.aau.cs.model.tapn.simulation.PetriNetStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.util.MemoryMonitor;
@@ -256,7 +256,7 @@ public class ApproximationWorker {
 		} else if (options.enabledUnderApproximation()) {
 			// Under-approximation
 			if (result.getTrace() != null) {
-				for (TimedArcPetriNetStep k : result.getTrace()) {
+				for (PetriNetStep k : result.getTrace()) {
 					if (k instanceof TimeDelayStep){
 						((TimeDelayStep) k).setDelay(((TimeDelayStep) k).delay().multiply(new BigDecimal(options.approximationDenominator())));
 					}
@@ -1102,7 +1102,7 @@ public class ApproximationWorker {
         if (traceMap == null || traceMap.size() == 0 || traceMap.values().toArray()[0] == null) {
             return null;
         }
-
+        
         Map<String, TAPNNetworkTrace> decomposedTracesMap = new LinkedHashMap<>();
         for (var entry : traceMap.entrySet()) {
             TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(entry.getValue(), model, mapping);
