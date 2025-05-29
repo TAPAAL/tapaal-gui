@@ -379,6 +379,7 @@ public class TimedArcPetriNetNetwork {
 
 	public SharedTransition getSharedTransitionByName(String name) {
 		for(SharedTransition t : sharedTransitions){
+            System.out.println("Checking shared transition: " + t.name() + " against " + name);
 			if(t.name().equals(name)) return t;
 		}
 		return null;

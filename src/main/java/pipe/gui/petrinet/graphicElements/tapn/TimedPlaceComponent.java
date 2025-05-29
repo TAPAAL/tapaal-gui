@@ -108,7 +108,7 @@ public class TimedPlaceComponent extends Place {
             first = false;
         }
         buffer.append('}');
-
+        
         return buffer.toString();
     }
 

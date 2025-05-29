@@ -1,6 +1,9 @@
 package dk.aau.cs.verification;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.NTA.trace.TraceToken;
@@ -120,19 +123,24 @@ public class TAPNTraceDecomposer {
 
         // Convert names in marking to original names
         LocalTimedMarking newPostMarking = new LocalTimedMarking();
+        Map<TimedPlace, List<TimedToken>> sharedPlacesToTokensMap = new HashMap<>();
+        newPostMarking.setNetworkMarking(tapnNetwork.marking());
         for (var entry : step.getPostMarking().getPlacesToTokensMap().entrySet()) {
-            String originalPlaceName = mapping.map(entry.getKey().name()).value2();
-            TimedPlace place = (originalPlaceName == null || originalPlaceName.isEmpty()) ? 
-                tapnNetwork.getSharedPlaceByName(entry.getKey().name()) : 
-                tapnNetwork.getTAPNByName(mapping.map(entry.getKey().name()).value1()).getPlaceByName(originalPlaceName);
-    
+            String entryName = entry.getKey().name();
+            String originalPlaceName = mapping.map(entryName).value2();
+            boolean isSharedPlace = entryName.split("_")[0].equals("Shared");
+            TimedPlace place = isSharedPlace ? 
+                tapnNetwork.getSharedPlaceByName(originalPlaceName) : 
+                tapnNetwork.getTAPNByName(mapping.map(entryName).value1()).getPlaceByName(originalPlaceName);
             for (TimedToken token : entry.getValue()) {
-                newPostMarking.add(new TimedToken(place, token.age(), token.color()));
+                if (place.isShared()) {
+                    sharedPlacesToTokensMap.computeIfAbsent(place, k -> new ArrayList<>()).add(new TimedToken(place, token.age(), token.color()));
+                } else {
+                    newPostMarking.add(new TimedToken(place, token.age(), token.color()));
+                }
             }
         }
 
-        newPostMarking.setNetworkMarking(tapnNetwork.marking());
-
-        return new TAPNNetworkColoredTransitionStep(transition, step.bindings(), newPostMarking);
+        return new TAPNNetworkColoredTransitionStep(transition, step.bindings(), newPostMarking, sharedPlacesToTokensMap);
     }
 }

@@ -5,7 +5,6 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.model.tapn.LocalTimedMarking;
 
 import java.util.List;
-import java.util.Map;
 
 public class ColoredTransitionStep implements PetriNetStep {
     private final TimedTransition transition;

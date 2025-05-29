@@ -1,9 +1,12 @@
 package dk.aau.cs.model.tapn.simulation;
 
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 
 import java.util.List;
+import java.util.Map;
 
 import dk.aau.cs.model.tapn.LocalTimedMarking;
 
@@ -12,11 +15,11 @@ public class TAPNNetworkColoredTransitionStep extends TAPNNetworkTraceStep  {
     private final List<String> bindings;
     private final NetworkMarking marking;
 
-    public TAPNNetworkColoredTransitionStep(TimedTransition transition, List<String> bindings, LocalTimedMarking marking) {
+    public TAPNNetworkColoredTransitionStep(TimedTransition transition, List<String> bindings, LocalTimedMarking marking, Map<TimedPlace, List<TimedToken>> sharedPlacesToTokensMap) {
         this.transition = transition;
         this.bindings = bindings;
         NetworkMarking networkMarking = marking.getNetworkMarking().clone();
-        networkMarking.updateMarking(marking);
+        networkMarking.updateMarking(marking, sharedPlacesToTokensMap);
         this.marking = networkMarking;
     }
 

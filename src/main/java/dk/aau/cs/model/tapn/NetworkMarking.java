@@ -3,10 +3,9 @@ package dk.aau.cs.model.tapn;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import pipe.gui.TAPAALGUI;
@@ -15,8 +14,8 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class NetworkMarking implements TimedMarking {
-	private final HashMap<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
-	private final HashMap<TimedPlace, List<TimedToken>> sharedPlacesTokens = new HashMap<TimedPlace, List<TimedToken>>();
+	private final Map<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
+	private final Map<TimedPlace, List<TimedToken>> sharedPlacesTokens = new HashMap<TimedPlace, List<TimedToken>>();
 
 	public NetworkMarking() {
 	}
@@ -41,31 +40,29 @@ public class NetworkMarking implements TimedMarking {
 		}
 	}
 
-    public void updateMarking(LocalTimedMarking newMarking) {
-        Set<TimedArcPetriNet> tapnsToReplace = new HashSet<>();
-        for (var entry : newMarking.getPlacesToTokensMap().entrySet()) {
-            TimedPlace place = entry.getKey();
-            List<TimedToken> tokens = entry.getValue();
-            if (place.isShared()) {
-                place.resetNumberOfTokens();
-                sharedPlacesTokens.put(place, new ArrayList<>(tokens));
-            } else {
-                tapnsToReplace.add(((LocalTimedPlace)place).model());
-            }
+    public void updateMarking(LocalTimedMarking newMarking, Map<TimedPlace, List<TimedToken>> sharedPlacesToTokensMap) {
+        for (TimedPlace place : newMarking.getPlacesToTokensMap().keySet()) {
+            TimedArcPetriNet tapn = ((LocalTimedPlace)place).model();
+            markings.put(tapn, newMarking);
         }
 
-        for (TimedArcPetriNet tapn : tapnsToReplace) {
-            for (TimedPlace place : tapn.places()) {
-                place.resetNumberOfTokens();
-            }
-
-            markings.put(tapn, newMarking);
+        sharedPlacesTokens.clear();
+        for (TimedPlace place : sharedPlacesToTokensMap.keySet()) {
+            sharedPlacesTokens.put(place, sharedPlacesToTokensMap.get(place));
         }
     }
 	
 	private LocalTimedMarking getMarkingFor(TimedArcPetriNet tapn) {
 		return markings.get(tapn);
 	}
+
+    public Map<TimedArcPetriNet, LocalTimedMarking> getMarkingMap() {
+        return markings;
+    }
+
+    public Map<TimedPlace, List<TimedToken>> getSharedPlacesTokens() {
+        return sharedPlacesTokens;
+    }
 
 	public NetworkMarking clone() {
 		return delay(BigDecimal.ZERO);
