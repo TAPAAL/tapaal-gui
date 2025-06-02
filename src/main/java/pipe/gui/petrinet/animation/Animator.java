@@ -1,6 +1,8 @@
 package pipe.gui.petrinet.animation;
 
 import java.awt.Container;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -13,7 +15,9 @@ import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.tools.Tool;
 
 import dk.aau.cs.model.tapn.simulation.*;
 import net.tapaal.gui.petrinet.animation.AnimationTokenSelectDialog;
@@ -28,9 +32,11 @@ import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.DotConstantExpression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.tapn.NetworkMarking;
@@ -446,7 +452,7 @@ public class Animator {
         }        
     }
 
-    public void updateColoredMarking() {
+    private void updateColoredMarking() {
         if (!trace.isColoredTrace()) return;
 
         NetworkMarking marking = tab.network().marking();
@@ -484,7 +490,9 @@ public class Animator {
                 Color color = numberOfEntry.getKey();
                 int number = numberOfEntry.getValue();
                 Vector<ColorExpression> colorExpressions = new Vector<>();
-                for (int i = 0; i < number; ++i) {
+                if (color.getColorType().equals(ColorType.COLORTYPE_DOT)) {
+                    colorExpressions.add(new DotConstantExpression());
+                } else {
                     colorExpressions.add(new UserOperatorExpression(color));
                 }
 
@@ -497,7 +505,7 @@ public class Animator {
         }
     }
 
-    public void updateBindings(int stepIdx) {
+    private void updateBindings(int stepIdx) {
         resetBindings();
         if (stepIdx < actionHistory.size() && stepIdx >= 0) {
             TAPNNetworkTraceStep step = actionHistory.get(stepIdx);
@@ -507,21 +515,31 @@ public class Animator {
                 Transition guiTransition = activeGuiModel().getTransitionByName(transition.name());
                 List<String> bindings = coloredStep.getBindings();
                 guiTransition.setToolTipText(ColorBindingParser.createTooltip(bindings));
-                ToolTipManager.sharedInstance().mouseMoved(
-                    new MouseEvent(guiTransition, MouseEvent.MOUSE_MOVED, 
-                    System.currentTimeMillis(), 0, 1, 1, 0, false));
+                reloadTooltip(guiTransition);
             }
         }
     }
 
-    public void resetBindings() {
+    private void resetBindings() {
         for (Template template : tab.activeTemplates()) {
             for (Transition guiTransition : template.guiModel().transitions()) {
                 guiTransition.setToolTipText(null);
-                ToolTipManager.sharedInstance().mouseMoved(
-                    new MouseEvent(guiTransition, MouseEvent.MOUSE_MOVED, 
-                    System.currentTimeMillis(), 0, 1, 1, 0, false));
+                reloadTooltip(guiTransition);
             }
+        }
+    }
+
+    private void reloadTooltip(Transition transition) {
+        Point mousePos = MouseInfo.getPointerInfo().getLocation();
+        SwingUtilities.convertPointFromScreen(mousePos, transition);
+        
+        boolean mouseOver = transition.contains(mousePos) && 
+                            transition.isShowing() && 
+                            transition.isVisible();
+        if (mouseOver) {
+            ToolTipManager manager = ToolTipManager.sharedInstance();
+            long time = System.currentTimeMillis();
+            manager.mouseMoved(new MouseEvent(transition, -1, time, 0, mousePos.x, mousePos.y, 0, false));
         }
     }
 

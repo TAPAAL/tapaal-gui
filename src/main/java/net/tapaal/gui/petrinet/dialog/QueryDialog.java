@@ -3617,6 +3617,8 @@ public class QueryDialog extends JPanel {
         existsDiamond.addActionListener(e -> {
             TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             existsDiamond.setSelected(true);
+            useExplicitSearch.setSelected(true);
+            depthFirstSearch.setSelected(true);
             addPropertyToQuery(property);
             unselectButtons();
         });
@@ -3624,6 +3626,8 @@ public class QueryDialog extends JPanel {
         forAllBox.addActionListener(e -> {
             TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             forAllBox.setSelected(true);
+            useExplicitSearch.setSelected(true);
+            depthFirstSearch.setSelected(true);
             addPropertyToQuery(property);
             unselectButtons();
         });
@@ -5494,6 +5498,20 @@ public class QueryDialog extends JPanel {
         useTarjan = new JCheckBox("Use Tarjan");
         useExplicitSearch = new JCheckBox("Use explicit search");
 
+        useExplicitSearch.addActionListener(e -> {
+            if (useExplicitSearch.isSelected()) {
+                if (heuristicSearch.isSelected()) {
+                    depthFirstSearch.setSelected(true);
+                }
+            }
+        });
+
+        heuristicSearch.addActionListener(e -> {
+            if (heuristicSearch.isSelected()) {
+                useExplicitSearch.setSelected(false);
+            }
+        });
+
         useReduction.setSelected(true);
         useColoredReduction.setSelected(true);
         useSiphonTrap.setSelected(false);
@@ -5857,7 +5875,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshExplicitSearch() {
-        if (heuristicSearch.isSelected() || !(newProperty.toString().contains("EF") || newProperty.toString().contains("AG"))) {
+        if (!(newProperty.toString().contains("EF") || newProperty.toString().contains("AG"))) {
             useExplicitSearch.setSelected(false);
             useExplicitSearch.setEnabled(false);
         } else {
