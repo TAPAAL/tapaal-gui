@@ -329,6 +329,7 @@ public class Animator {
         initialMarking = tab.network().marking();
         resethistory();
         markings.add(initialMarking);
+        updateColoredMarking();
         storeTokenState();
     }
 
@@ -453,7 +454,7 @@ public class Animator {
     }
 
     private void updateColoredMarking() {
-        if (!trace.isColoredTrace()) return;
+        if (!tab.getLens().isColored()) return;
 
         NetworkMarking marking = tab.network().marking();
         var markingMap = marking.getMarkingMap();
@@ -911,6 +912,7 @@ public class Animator {
         removeSetTrace(false);
         markings.clear();
         markings.add(initialMarking);
+        updateColoredMarking();
         currentAction = -1;
     }
 
@@ -919,6 +921,7 @@ public class Animator {
         removeSetTrace(false);
         if(keepInitial && initialMarking != null){
             markings.add(initialMarking);
+            updateColoredMarking();
             tab.network().setMarking(initialMarking);
             currentAction = -1;
             updateFireableTransitions();
