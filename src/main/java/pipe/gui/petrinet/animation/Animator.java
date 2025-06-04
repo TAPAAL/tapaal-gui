@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -17,7 +16,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
-import javax.tools.Tool;
 
 import dk.aau.cs.model.tapn.simulation.*;
 import net.tapaal.gui.petrinet.animation.AnimationTokenSelectDialog;
@@ -329,8 +327,8 @@ public class Animator {
         initialMarking = tab.network().marking();
         resethistory();
         markings.add(initialMarking);
-        updateColoredMarking();
         storeTokenState();
+        updateColoredMarking();
     }
 
     /**
@@ -460,7 +458,7 @@ public class Animator {
         var markingMap = marking.getMarkingMap();
         Template template = tab.currentTemplate();
         var localMarking = markingMap.get(template.model());
-        Map<TimedPlace, List<TimedToken>> placesToTokensCopy = new LinkedHashMap<>();
+        Map<TimedPlace, List<TimedToken>> placesToTokensCopy = new HashMap<>();
         for (var entry : localMarking.getPlacesToTokensMap().entrySet()) {
             placesToTokensCopy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
         }
@@ -481,13 +479,15 @@ public class Animator {
             }
 
             List<TimedToken> tokens = placesToTokensCopy.get(place);
-            Map<Color, Integer> numberOfMap = new LinkedHashMap<>();
+            Map<Color, Integer> numberOfMap = new HashMap<>();
             for (TimedToken token : tokens) {
                 numberOfMap.merge(token.color(), 1, Integer::sum);
             }
 
             Vector<ArcExpression> numberOfExpressions = new Vector<>();
-            for (var numberOfEntry : numberOfMap.entrySet()) {
+            numberOfMap.entrySet().stream()
+            .sorted((e1, e2) -> e1.getKey().toString().compareTo(e2.getKey().toString()))
+            .forEach(numberOfEntry -> {
                 Color color = numberOfEntry.getKey();
                 int number = numberOfEntry.getValue();
                 Vector<ColorExpression> colorExpressions = new Vector<>();
@@ -498,7 +498,7 @@ public class Animator {
                 }
 
                 numberOfExpressions.add(new NumberOfExpression(number, colorExpressions));
-            }
+            });
 
             ArcExpression tokenExpression = new AddExpression(numberOfExpressions);
             place.updateTokens(tokens, tokenExpression);
@@ -912,7 +912,6 @@ public class Animator {
         removeSetTrace(false);
         markings.clear();
         markings.add(initialMarking);
-        updateColoredMarking();
         currentAction = -1;
     }
 
@@ -921,7 +920,6 @@ public class Animator {
         removeSetTrace(false);
         if(keepInitial && initialMarking != null){
             markings.add(initialMarking);
-            updateColoredMarking();
             tab.network().setMarking(initialMarking);
             currentAction = -1;
             updateFireableTransitions();
