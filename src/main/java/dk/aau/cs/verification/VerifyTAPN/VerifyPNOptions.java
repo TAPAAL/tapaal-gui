@@ -96,8 +96,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         this.rawVerificationOptions = rawVerificationOptions;
 
         if (useExplicitSearch) {
-                unfoldedModelPath = null;
-                unfoldedQueriesPath = null;
+            unfoldedModelPath = null;
+            unfoldedQueriesPath = null;
         } else if (unfold && !useRawVerification) {
             try {
                 if (Platform.isWindows()) {
@@ -134,9 +134,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean unfold,
         boolean partition,
         boolean colorFixpoint,
-        boolean useSymmetricVars
+        boolean useSymmetricVars,
+        boolean useExplicitSearch
     ) {
-        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false, true, false, null);
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false, useExplicitSearch, false, null);
     }
 
     public VerifyPNOptions(
@@ -187,9 +188,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean colored,
         boolean partition,
         boolean colorFixpoint,
-        boolean useSymmetricVars
+        boolean useSymmetricVars,
+        boolean useExplicitSearch
     ) {
-        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars);
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, useExplicitSearch);
     }
 
     @Override

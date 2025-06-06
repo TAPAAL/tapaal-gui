@@ -134,7 +134,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 model.isColored() && (!model.isUntimed() || options.traceOption() != net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE),
                                 dataLayerQuery.usePartitioning(),
                                 dataLayerQuery.useColorFixpoint(),
-                                dataLayerQuery.useSymmetricVars()
+                                dataLayerQuery.useSymmetricVars(),
+                                dataLayerQuery.useExplicitSearch()
                             ),
                             transformedModel,
                             clonedQuery,
@@ -164,7 +165,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 model.isColored() && (!model.isUntimed() || options.traceOption() != net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE),
                                 true,
                                 true,
-                                true
+                                options.useExplicitSearch()
                             ),
                             transformedModel,
                             clonedQuery,
@@ -197,7 +198,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
             }
         }
         ApproximationWorker worker = new ApproximationWorker();
-
+        
         return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model, guiModel, dataLayerQuery, lens);
     }
 
@@ -243,7 +244,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			    if (dataLayerQuery != null) {
                     reductionTime = dataLayerQuery.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime;
                 }
-			    options = new VerifyPNOptions(options.extraTokens(), net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.CTL, net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, reductionTime, false, null, false, false, false, false, false, false, false);
+			    options = new VerifyPNOptions(options.extraTokens(), net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.CTL, net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, reductionTime, false, null, false, false, false, false, false, false, false, options.useExplicitSearch());
                 // XXX: needs refactoring, will only work if the model verified in the one on top (using getCurrentTab)
                 KBoundAnalyzer optimizer = new KBoundAnalyzer(model, TAPAALGUI.getCurrentTab().lens, guiModels, options.extraTokens(), modelChecker, new MessengerImpl(), spinner, dataLayerQuery);
                 optimizer.analyze((VerifyTAPNOptions) options, true);

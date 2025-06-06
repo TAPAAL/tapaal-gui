@@ -1993,12 +1993,18 @@ public class QueryDialog extends JPanel {
         setupTraceOptionsFromQuery(queryToCreateFrom);
         setupTarOptionsFromQuery(queryToCreateFrom);
         setupTarjanOptionsFromQuery(queryToCreateFrom);
-        useExplicitSearch.setSelected(queryToCreateFrom.useExplicitSearch());
+        setupExplicitSearch(queryToCreateFrom.useExplicitSearch());
 
         if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
         }
 
+    }
+
+    private void setupExplicitSearch(boolean selectExplicitSearch) {
+        if (lens.isColored() && !lens.isGame() && !lens.isStochastic() && !lens.isTimed()) {
+            this.useExplicitSearch.setSelected(selectExplicitSearch);
+        }
     }
 
     private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -2171,9 +2177,7 @@ public class QueryDialog extends JPanel {
         useTraceRefinement.setSelected(queryToCreateFrom.isTarOptionEnabled());
         useTarjan.setSelected(queryToCreateFrom.isTarjan());
 
-        if (lens.isColored() && !lens.isGame() && !lens.isStochastic()) {
-            useExplicitSearch.setSelected(queryToCreateFrom.useExplicitSearch());
-        }
+        setupExplicitSearch(queryToCreateFrom.useExplicitSearch());
 
         useColoredReduction.setSelected(queryToCreateFrom.useColoredReduction());
     }
@@ -3617,7 +3621,7 @@ public class QueryDialog extends JPanel {
         existsDiamond.addActionListener(e -> {
             TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             existsDiamond.setSelected(true);
-            useExplicitSearch.setSelected(true);
+            setupExplicitSearch(true);
             depthFirstSearch.setSelected(true);
             addPropertyToQuery(property);
             unselectButtons();
@@ -3626,7 +3630,7 @@ public class QueryDialog extends JPanel {
         forAllBox.addActionListener(e -> {
             TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             forAllBox.setSelected(true);
-            useExplicitSearch.setSelected(true);
+            setupExplicitSearch(true);
             depthFirstSearch.setSelected(true);
             addPropertyToQuery(property);
             unselectButtons();
@@ -5508,7 +5512,7 @@ public class QueryDialog extends JPanel {
 
         heuristicSearch.addActionListener(e -> {
             if (heuristicSearch.isSelected()) {
-                useExplicitSearch.setSelected(false);
+                setupExplicitSearch(false);
             }
         });
 
@@ -5526,7 +5530,7 @@ public class QueryDialog extends JPanel {
         skeletonAnalysis.setSelected(true);
         useTraceRefinement.setSelected(false);
         useTarjan.setSelected(true);
-        useExplicitSearch.setSelected(true);
+        setupExplicitSearch(true);
 
         useReduction.setToolTipText(TOOL_TIP_USE_STRUCTURALREDUCTION);
         useColoredReduction.setToolTipText(TOOL_TIP_USE_COLORED_STRUCTURALREDUCTION);
@@ -5876,7 +5880,7 @@ public class QueryDialog extends JPanel {
 
     private void refreshExplicitSearch() {
         if (!(newProperty.toString().contains("EF") || newProperty.toString().contains("AG"))) {
-            useExplicitSearch.setSelected(false);
+            setupExplicitSearch(false);
             useExplicitSearch.setEnabled(false);
         } else {
             useExplicitSearch.setEnabled(true);
