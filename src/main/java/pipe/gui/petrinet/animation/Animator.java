@@ -565,7 +565,7 @@ public class Animator {
             return;
         }
 
-        if (trace.isColoredTrace()) {
+        if (trace != null && trace.isColoredTrace()) {
             if (isColoredTransitionEnabled(transition)) {
                 stepForward();
             }
