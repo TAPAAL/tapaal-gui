@@ -8,7 +8,6 @@ import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
@@ -18,17 +17,12 @@ import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Comparator;
 
 import static java.util.Objects.nonNull;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
@@ -78,7 +72,7 @@ public class RunVerification extends RunVerificationBase {
 
                 if (options.traceOption() != TAPNQuery.TraceOption.NONE || lens.isStochastic() && options.isSimulate()) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
-                        if ((lens != null && lens.isColored()) || model.isColored()) {
+                        if (((lens != null && lens.isColored()) || model.isColored()) && !options.useExplicitSearch()) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
                                 TAPAALGUI.openNewTabFromStream(result.getUnfoldedTab());
