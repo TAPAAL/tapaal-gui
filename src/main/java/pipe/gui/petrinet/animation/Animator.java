@@ -513,7 +513,12 @@ public class Animator {
             if (step instanceof TAPNNetworkColoredTransitionStep) {
                 TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)step;
                 TimedTransition transition = coloredStep.getTransition();
-                Transition guiTransition = activeGuiModel().getTransitionByName(transition.name());
+                Transition guiTransition = null;
+                for (Template template : tab.activeTemplates()) {
+                    guiTransition = template.guiModel().getTransitionByName(transition.name());
+                    if (guiTransition != null) break;
+                }
+
                 List<String> bindings = coloredStep.getBindings();
                 guiTransition.setToolTipText(ColorBindingParser.createTooltip(bindings));
                 reloadTooltip(guiTransition);

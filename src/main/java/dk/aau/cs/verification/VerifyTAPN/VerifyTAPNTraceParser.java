@@ -162,18 +162,41 @@ public class VerifyTAPNTraceParser {
         Document document = null;
         Pattern missingQueryIndexPattern = Pattern.compile("Missing query-indexes for query-file \\(which is identified as XML-format\\), assuming only first query is to be verified");
         try {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder allContent = new StringBuilder();
             String line;
-
             while ((line = reader.readLine()) != null) {
                 if (line.contains("Trace")) continue;
                 Matcher matcher = missingQueryIndexPattern.matcher(line);
                 if (matcher.find()) continue;
-                sb.append(line);
-                sb.append(System.lineSeparator());
+                
+                allContent.append(line);
+                allContent.append(System.lineSeparator());
             }
+            
+            String fullContent = allContent.toString();
+            String xml;
+            
 
-            String xml = sb.toString();
+            int startTraceList = fullContent.indexOf("<trace-list>");
+            int startTrace = fullContent.indexOf("<trace>");
+            if (startTraceList != -1) {
+                int endTraceList = fullContent.lastIndexOf("</trace-list>");
+                if (endTraceList != -1 && endTraceList > startTraceList) {
+                    xml = fullContent.substring(startTraceList, endTraceList + 13);
+                } else {
+                    return null;
+                }
+            } else if (startTrace != -1) {
+                int endTrace = fullContent.lastIndexOf("</trace>");
+                if (endTrace != -1 && endTrace > startTrace) {
+                    xml = fullContent.substring(startTrace, endTrace + 8);
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+            
             document = loadDocument(xml);
         } catch (IOException e) {
             e.printStackTrace();
@@ -285,11 +308,6 @@ public class VerifyTAPNTraceParser {
 
 	private Document loadDocument(String xml) {
 		try {
-			// Check if valid xml
-			int startTrace = xml.indexOf("<trace>");
-			int startTraceList = xml.indexOf("<trace-list>");
-			if (startTrace == -1 && startTraceList == -1) return null;
-
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			return builder.parse(new InputSource(new StringReader(xml)));
 		} catch (ParserConfigurationException | IOException | SAXException e) {
