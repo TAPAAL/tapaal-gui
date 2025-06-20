@@ -379,6 +379,7 @@ public class TimedArcPetriNetNetwork {
 
 	public SharedTransition getSharedTransitionByName(String name) {
 		for(SharedTransition t : sharedTransitions){
+            System.out.println("Checking shared transition: " + t.name() + " against " + name);
 			if(t.name().equals(name)) return t;
 		}
 		return null;
@@ -764,6 +765,21 @@ public class TimedArcPetriNetNetwork {
         }
         return null;
     }
+
+    public Color getProductColorByConstituents(Vector<Color> constituents) {
+        for (ColorType ct : colorTypes) {
+            if (ct.isProductColorType()) {
+                for (Color c : ct.getColors()) {
+                    if (c.getTuple() != null && c.getTuple().equals(constituents)) {
+                        return c;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public Variable getVariableByIndex(int index) {
         return variables.get(index);
     }
