@@ -339,8 +339,10 @@ public class VerifyDTAPNOutputParser {
                             cumulativeDelayPoints.add(point);
                         }
                     }
-
-                    extractObservations(line, i, lines, observationDataMap);
+                    
+                    if (isSmc) {
+                        extractObservations(line, i, lines, observationDataMap);
+                    }
 
                     matcher = smcNumberOfTracesPattern.matcher(line);
                     if (matcher.find()) {
