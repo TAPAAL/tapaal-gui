@@ -50,4 +50,12 @@ public class ConstantWeight extends Weight{
 		}
 		
 	}
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ConstantWeight)) return false;
+        ConstantWeight other = (ConstantWeight)obj;
+        return constant.equals(other.constant);
+    }
 }
