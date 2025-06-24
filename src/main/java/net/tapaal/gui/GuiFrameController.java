@@ -263,7 +263,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
             buffer.append("Jens Emil Fink Højriis, Jonas F. Jensen, Emil Gybel Henriksen, Lasse S. Jensen, Peter G. Jensen,\nNicolaj \u00D8. Jensen, ");
             buffer.append("Tobias S. Jepsen, Mads Johannsen, Kenneth Y. J\u00F8rgensen, Isabella Kaufmann, \n");
             buffer.append("Alan Mozafar Khorsid, Andreas H. Klostergaard, Esben Nielsen, S\u00F8ren M. Nielsen, \nThomas S. Nielsen, ");
-            buffer.append("Samuel Pastva, Thomas Pedersen, Kira S. Pedersen, Theodor Risager, Jiri Srba,  Adam M. St\u00FCck, \nAndreas S. S\u00F8rensen, Mathias M. S\u00F8rensen, Peter H. Taankvist, Rasmus G. Tollund, Nikolaj J. Ulrik, \nSimon M. Virenfeldt and Lars K. Oestergaard \n");
+            buffer.append("Samuel Pastva, Thomas Pedersen, Kira S. Pedersen, Theodor Risager, Jiri Srba, \nAdam M. St\u00FCck, Andreas S. S\u00F8rensen, Mathias M. S\u00F8rensen, Peter H. Taankvist, Rasmus G. Tollund, \nNikolaj J. Ulrik, Simon M. Virenfeldt and Lars K. Oestergaard \n");
             buffer.append("Aalborg University 2014-2025\n\n");
 
 
