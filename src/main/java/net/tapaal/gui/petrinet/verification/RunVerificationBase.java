@@ -97,7 +97,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
             clonedQuery.setTraceList(dataLayerQuery.getTraceList());
             clonedQuery.setSMCSettings(dataLayerQuery.getSmcSettings());
         }
-
+        
         if (options.enabledStateequationsCheck()) {
                 if ((query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) && !query.hasDeadlock() &&
                 !(options instanceof VerifyPNOptions)) {
@@ -196,8 +196,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                 }
             }
         }
+        
         ApproximationWorker worker = new ApproximationWorker();
-
         return worker.normalWorker(options, modelChecker, transformedModel, composer, clonedQuery, this, model, guiModel, dataLayerQuery, lens);
     }
 

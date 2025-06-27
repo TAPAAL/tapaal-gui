@@ -1549,11 +1549,8 @@ public class QueryDialog extends JPanel {
             depthFirstSearch.setEnabled(true);
             randomSearch.setEnabled(true);
 
-            if (!useTarjan.isSelected()) {
-                heuristicSearch.setEnabled(false);
-                if (someTraceRadioButton.isSelected()) {
-                    randomSearch.setEnabled(false);
-                }
+            if (!useTarjan.isSelected() && someTraceRadioButton.isSelected()) {
+                randomSearch.setEnabled(false);
             }
         } else {
             breadthFirstSearch.setEnabled(true);

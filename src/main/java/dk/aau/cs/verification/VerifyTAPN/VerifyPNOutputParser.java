@@ -13,6 +13,7 @@ import dk.aau.cs.verification.Stats;
 public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 	private static final String Query_IS_NOT_SATISFIED_STRING = "Query is NOT satisfied";
 	private static final String Query_IS_SATISFIED_STRING = "Query is satisfied";
+    private static final String Query_IS_MAYBE_SATISFIED_STRING = "Query is MAYBE satisfied";
 
 	private static final Pattern discoveredPattern = Pattern.compile("\\s*discovered states:\\s*(\\d+)\\s*");
 	private static final Pattern exploredPattern = Pattern.compile("\\s*explored states:\\s*(\\d+)\\s*");
@@ -41,6 +42,7 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 		boolean reductionUsed = false;
 		boolean result = false;
 		boolean foundResult = false;
+        boolean isInconclusive = false;
 		String[] lines = output.split(System.getProperty("line.separator"));
             try {
                 Matcher matcher = transitionStatsPattern.matcher(output);
@@ -66,9 +68,15 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
                 if (line.contains(Query_IS_SATISFIED_STRING)) {
                     result = true;
                     foundResult = true;
+                    isInconclusive = false;
+                } else if (line.contains(Query_IS_MAYBE_SATISFIED_STRING)) {
+                    result = true;
+                    foundResult = true;
+                    isInconclusive = true;
                 } else if (line.contains(Query_IS_NOT_SATISFIED_STRING)) {
                     result = false;
                     foundResult = true;
+                    isInconclusive = false;
                 } else {
                     parseSolvedMethod(line);
 
@@ -112,6 +120,7 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 			ReductionStats reductionStats = reductionUsed? new ReductionStats(removedTransitions, removedPlaces) : null;
 
             var qr = new QueryResult(result, boundedAnalysis, query, false);
+            qr.setApproximationInconclusive(isInconclusive);
             qr.setSolvedUsingQuerySimplification(solvedUsingQuerySimplification);
             qr.setSolvedUsingTraceAbstractRefinement(solvedUsingTraceAbstractRefinement);
             qr.setSolvedUsingSiphonTrap(solvedUsingSiphonTrap);
