@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
@@ -13,8 +14,8 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class NetworkMarking implements TimedMarking {
-	private final HashMap<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
-	private final HashMap<TimedPlace, List<TimedToken>> sharedPlacesTokens = new HashMap<TimedPlace, List<TimedToken>>();
+	private final Map<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
+	private final Map<TimedPlace, List<TimedToken>> sharedPlacesTokens = new HashMap<TimedPlace, List<TimedToken>>();
 
 	public NetworkMarking() {
 	}
@@ -38,10 +39,30 @@ public class NetworkMarking implements TimedMarking {
 			marking.setNetworkMarking(null);
 		}
 	}
+
+    public void updateMarking(LocalTimedMarking newMarking, Map<TimedPlace, List<TimedToken>> sharedPlacesToTokensMap) {
+        for (TimedPlace place : newMarking.getPlacesToTokensMap().keySet()) {
+            TimedArcPetriNet tapn = ((LocalTimedPlace)place).model();
+            markings.put(tapn, newMarking);
+        }
+
+        sharedPlacesTokens.clear();
+        for (TimedPlace place : sharedPlacesToTokensMap.keySet()) {
+            sharedPlacesTokens.put(place, sharedPlacesToTokensMap.get(place));
+        }
+    }
 	
 	private LocalTimedMarking getMarkingFor(TimedArcPetriNet tapn) {
 		return markings.get(tapn);
 	}
+
+    public Map<TimedArcPetriNet, LocalTimedMarking> getMarkingMap() {
+        return markings;
+    }
+
+    public Map<TimedPlace, List<TimedToken>> getSharedPlacesTokens() {
+        return sharedPlacesTokens;
+    }
 
 	public NetworkMarking clone() {
 		return delay(BigDecimal.ZERO);
@@ -297,4 +318,27 @@ public class NetworkMarking implements TimedMarking {
 		return true;
 	}
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
+            sb.append(entry.getKey().name()).append(": ").append(entry.getValue().toString()).append("\n");
+        }
+
+        if (sharedPlacesTokens.isEmpty()) {
+            return sb.toString();
+        }
+        
+        sb.append("Shared Places:\n");
+        for (Entry<TimedPlace, List<TimedToken>> entry : sharedPlacesTokens.entrySet()) {
+            sb.append(entry.getKey().name()).append(" -> ");
+            for (TimedToken token : entry.getValue()) {
+                sb.append(token.toString()).append(" ");
+            }
+
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
 }

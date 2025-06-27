@@ -2601,7 +2601,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 		void transitionLeftClicked(TimedTransitionComponent t) {
 			TimedTransition transition = t.underlyingTransition();
-
 			if (transition.isDEnabled()) {
 				animator.dFireTransition(transition);
 			}
