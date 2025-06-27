@@ -416,6 +416,9 @@ public class Animator {
         tab.getAnimationHistorySidePanel().stepForward();
         if (currentAction == actionHistory.size()-1 && trace != null) {
             int selectedIndex = tab.getAnimationHistorySidePanel().getSelectedIndex();
+            int action = currentAction;
+            int markingIndex = currentMarkingIndex;
+
             if (getTrace().getTraceType() == TraceType.EG_DELAY_FOREVER) {
                 addMarking(new TAPNNetworkTimeDelayStep(BigDecimal.ONE), currentMarking().delay(BigDecimal.ONE));
             }
@@ -425,7 +428,11 @@ public class Animator {
             }
 
             tab.getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
-        } else if (currentAction < actionHistory.size() - 1) {
+            currentAction = action;
+            currentMarkingIndex = markingIndex;
+        }
+        
+        if (currentAction < actionHistory.size() - 1) {
             TAPNNetworkTraceStep nextStep = actionHistory.get(currentAction+1);
             if(isDisplayingUntimedTrace && nextStep instanceof TAPNNetworkTimedTransitionStep){
                 AnimationHistoryList untimedAnimationHistory = tab.getUntimedAnimationHistory();
