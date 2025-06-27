@@ -168,14 +168,14 @@ public class VerifyTAPNTraceParser {
                 if (line.contains("Trace")) continue;
                 Matcher matcher = missingQueryIndexPattern.matcher(line);
                 if (matcher.find()) continue;
-                
+
                 allContent.append(line);
                 allContent.append(System.lineSeparator());
             }
-            
+
             String fullContent = allContent.toString();
             String xml;
-            
+
 
             int startTraceList = fullContent.indexOf("<trace-list>");
             int startTrace = fullContent.indexOf("<trace>");
@@ -196,7 +196,7 @@ public class VerifyTAPNTraceParser {
             } else {
                 return null;
             }
-            
+
             document = loadDocument(xml);
         } catch (IOException e) {
             e.printStackTrace();

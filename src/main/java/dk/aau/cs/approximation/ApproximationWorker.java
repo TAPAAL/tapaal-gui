@@ -47,7 +47,6 @@ public class ApproximationWorker {
         TAPNLens lens
     ) throws Exception {
         boolean isColored = lens != null && lens.isColored() || model.isColored();
-
 		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them
 		InclusionPlaces oldInclusionPlaces = null;
 		if (options instanceof VerifyTAPNOptions)
@@ -61,7 +60,6 @@ public class ApproximationWorker {
 		
 		VerificationResult<TAPNNetworkTrace> toReturn = null;
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery, guiModel, dataLayerQuery, lens);
-
 		if (result == null) return null;
         if (result.error()) {
 			options.setTraceOption(oldTraceOption);
