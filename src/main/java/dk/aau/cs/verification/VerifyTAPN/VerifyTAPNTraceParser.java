@@ -176,7 +176,6 @@ public class VerifyTAPNTraceParser {
             String fullContent = allContent.toString();
             String xml;
 
-
             int startTraceList = fullContent.indexOf("<trace-list>");
             int startTrace = fullContent.indexOf("<trace>");
             if (startTraceList != -1) {

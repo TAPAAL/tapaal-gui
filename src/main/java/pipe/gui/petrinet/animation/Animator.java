@@ -20,6 +20,7 @@ import javax.swing.ToolTipManager;
 import dk.aau.cs.model.tapn.simulation.*;
 import net.tapaal.gui.petrinet.animation.AnimationTokenSelectDialog;
 import pipe.gui.petrinet.dataLayer.DataLayer;
+import net.tapaal.gui.GuiFrameController;
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.action.GuiAction;
@@ -66,6 +67,8 @@ public class Animator {
     private static boolean isUrgentTransitionEnabled = false;
 
     private Map<String, TAPNNetworkTrace> traceMap;
+
+    private boolean previousTransitionListState;
 
     public static boolean isUrgentTransitionEnabled(){
         return isUrgentTransitionEnabled;
@@ -180,7 +183,13 @@ public class Animator {
 
         updateBindings(0);
 
-        tab.showEnabledTransitionsList(false);
+        GuiFrameController guiController = TAPAALGUI.getAppGuiController();
+        previousTransitionListState = guiController.isEnabledTransitionsListVisible();
+        guiController.setEnabledTransitionsList(false);
+    }
+
+    public boolean isColoredTrace() {
+        return trace != null && trace.isColoredTrace();
     }
 
     /**
@@ -341,6 +350,11 @@ public class Animator {
             tab.network().setMarking(initialMarking);
             restoreTokenState();
             currentAction = -1;
+
+            if (isColoredTrace()) {
+                GuiFrameController guiController = TAPAALGUI.getAppGuiController();
+                guiController.setEnabledTransitionsList(previousTransitionListState);
+            }
         }
     }
 

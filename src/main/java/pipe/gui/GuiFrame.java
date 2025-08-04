@@ -358,6 +358,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction showEnabledTransitionsAction = new GuiAction("Display enabled transitions", "Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('6', shortcutkey), true) {
         public void actionPerformed(ActionEvent e) {
+            if (TAPAALGUI.getCurrentTab().getAnimator().isColoredTrace()) {
+                return; // Ignore in colored traces;
+            }
+            
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleEnabledTransitionsList);
         }
     };
