@@ -118,6 +118,7 @@ public class GuiModelManager {
         Vector<ColorExpression> vecColorExpr = new Vector<>();
         vecColorExpr.add(ct.createColorExpressionForFirstColor());
         NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+
         TimedInputArc tia = new TimedInputArc(
             p.underlyingPlace(),
             t.underlyingTransition(),

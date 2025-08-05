@@ -2617,7 +2617,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             boolean isTransitionShared = transition.underlyingTransition().isShared();
             
             canvas.clearAllPrototype();
-                        if (isPlaceShared && isTransitionShared) {
+            if (isPlaceShared && isTransitionShared) {
                 List<Result<? extends Arc, ModelViolation>> results = new LinkedList<>();
                 PetriNetTab currentTab = canvas.getTabContent();
                 
@@ -2625,7 +2625,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 for (Template template : currentTab.allTemplates()) {
                     TimedPlaceComponent templatePlace = (TimedPlaceComponent)template.guiModel().getPlaceByName(place.getName());
                     TimedTransitionComponent templateTransition = (TimedTransitionComponent)template.guiModel().getTransitionByName(transition.getName());
-                    
+
                     if (templatePlace != null && templateTransition != null) {
                         ArcPath arcPath;
                         if (currentTab.currentTemplate().equals(template)) {

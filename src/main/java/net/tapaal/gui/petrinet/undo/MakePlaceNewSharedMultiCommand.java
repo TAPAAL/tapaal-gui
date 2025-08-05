@@ -52,7 +52,7 @@ public class MakePlaceNewSharedMultiCommand implements Command {
                         commands.add(command);
                         first = false;
                     } else { //For the rest we make them shared with the recently made place
-                        command = new MakePlaceSharedCommand(context.activeModel(), sharedPlace, component.underlyingPlace(), component, context.tabContent(), true);
+                        command = new MakePlaceSharedCommand(template.model(), sharedPlace, component.underlyingPlace(), component, context.tabContent(), true);
                         command.redo();
                         commands.add(command);
                     }

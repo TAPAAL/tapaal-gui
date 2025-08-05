@@ -708,9 +708,6 @@ public class PlaceEditorPanel extends JPanel {
                     "Error", JOptionPane.ERROR_MESSAGE);
     
                 return false;
-            } else {
-                // Merge into a atomic command
-                context.undoManager().mergeTopKEdits(2);
             }
         }
 

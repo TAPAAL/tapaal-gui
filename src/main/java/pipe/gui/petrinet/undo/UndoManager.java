@@ -171,47 +171,4 @@ public class UndoManager {
     public boolean currentEditIsEmpty() {
         return edits.get(currentIndex()).isEmpty();
     }
-
-    /**
-     * Merges the last k edits into a single compound command.
-     */
-    public void mergeTopKEdits(int k) {
-        if (k <= 0) {
-            return;
-        }
-    
-        if (k > sizeOfBuffer) {
-            k = sizeOfBuffer;
-        }
-
-        List<Command> editsToMerge = new ArrayList<>();
-        for (int i = 0; i < k; i++) {
-            int index = (indexOfNextAdd - 1 - i + UNDO_BUFFER_CAPACITY) % UNDO_BUFFER_CAPACITY;
-            ArrayList<Command> commands = edits.get(index);
-            if (commands != null) {
-                editsToMerge.addAll(commands);
-            }
-        }
-        
-        for (int i = 0; i < k; i++) {
-            int index = (indexOfNextAdd - 1 - i + UNDO_BUFFER_CAPACITY) % UNDO_BUFFER_CAPACITY;
-            edits.set(index, null);
-        }
-        
-        sizeOfBuffer -= k;
-
-        CompoundCommand compoundCommand = new CompoundCommand(editsToMerge);
-
-        indexOfNextAdd = (indexOfNextAdd - k + UNDO_BUFFER_CAPACITY) % UNDO_BUFFER_CAPACITY;
-        
-        ArrayList<Command> newEdit = new ArrayList<>();
-        newEdit.add(compoundCommand);
-        edits.set(indexOfNextAdd, newEdit);
-        
-        indexOfNextAdd = (indexOfNextAdd + 1) % UNDO_BUFFER_CAPACITY;
-        sizeOfBuffer++;
-
-        undoneEdits = 0;
-        setUndoRedoStatus();
-    }
 }
