@@ -43,7 +43,7 @@ import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.canvas.Grid;
 import pipe.gui.canvas.SelectionManager;
 import net.tapaal.gui.petrinet.dialog.ExportBatchDialog;
-import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
+import net.tapaal.gui.petrinet.dialog.ColoredSimulationDialog;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -447,10 +447,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             //XXX: this needs to be refactored, it breaks the abstraction in a really bad way -- 2022-01-23
             if(getCurrentTab().getLens().isColored() && !getCurrentTab().isInAnimationMode()) {
                 PetriNetTab oldTab = getCurrentTab();
-                UnfoldDialog.showSimulationDialog(oldTab);
+                ColoredSimulationDialog.showSimulationDialog(oldTab);
 
-                if(!UnfoldDialog.wasCancelled() && oldTab != getCurrentTab()){
-                    currentTab.ifPresent(TabActions::toggleAnimationMode);
+                if(!ColoredSimulationDialog.wasCancelled() && (oldTab != getCurrentTab() || ColoredSimulationDialog.explicitSimulationMode())){
+                    currentTab.ifPresent(tab -> tab.toggleAnimationMode(ColoredSimulationDialog.explicitSimulationMode()));
                 } else {
                     this.setSelected(false);
                 }

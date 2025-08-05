@@ -22,7 +22,6 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.Place;
 import pipe.gui.petrinet.graphicElements.Transition;
 
@@ -84,7 +83,7 @@ public class VerifyTAPNExporter {
         return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath());
 	}
 	
-	protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
+	public void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
         PrintStream modelStream = new PrintStream(modelFile);
 
 		modelStream.append("<pnml>\n");

@@ -54,7 +54,7 @@ public class Verifier {
         return verifydtapn;
     }
 
-    private static VerifyPN getVerifyPN() {
+    public static VerifyPN getVerifyPN() {
         VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
         verifypn.setup();
         return verifypn;

@@ -4,6 +4,7 @@ import java.awt.Container;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import net.tapaal.gui.petrinet.animation.AnimationTokenSelectDialog;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.GuiFrameController;
 import net.tapaal.gui.petrinet.Template;
+import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.petrinet.graphicElements.Transition;
@@ -40,6 +42,7 @@ import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -49,8 +52,12 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNInteractiveHandle;
 
 public class Animator {
     private final ArrayList<TAPNNetworkTraceStep> actionHistory = new ArrayList<TAPNNetworkTraceStep>();
@@ -70,6 +77,9 @@ public class Animator {
 
     private boolean previousTransitionListState;
 
+    private VerifyPNInteractiveHandle interactiveEngine;
+    private boolean isUsingInteractiveEngine;
+
     public static boolean isUrgentTransitionEnabled(){
         return isUrgentTransitionEnabled;
     }
@@ -78,6 +88,36 @@ public class Animator {
         super();
 
         this.tab = tab;
+    }
+
+    public void initializeInteractiveEngine() {
+        if (!tab.getLens().isColored()) return;
+
+        try {
+            interactiveEngine = new VerifyPNInteractiveHandle();
+    
+            TAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+            Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(tab.network());
+    
+            File tempFile = File.createTempFile("tapaal_interactive_", ".pnml");
+            tempFile.deleteOnExit();
+
+            VerifyPNExporter exporter = new VerifyPNExporter();
+            exporter.outputModel(composedModel.value1(), tempFile, composedModel.value2(), 
+                            tab.currentTemplate().guiModel());
+        
+            isUsingInteractiveEngine = interactiveEngine.startInteractiveMode(tempFile.getAbsolutePath());
+    
+            if (!isUsingInteractiveEngine) {
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), 
+                    "Failed to start VerifyPN interactive mode", 
+                    "Engine Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), 
+            "Error initializing interactive engine: " + e.getMessage(), 
+            "Engine Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private NetworkMarking currentMarking() {
@@ -354,6 +394,11 @@ public class Animator {
             if (isColoredTrace()) {
                 GuiFrameController guiController = TAPAALGUI.getAppGuiController();
                 guiController.setEnabledTransitionsList(previousTransitionListState);
+            }
+
+            if (isUsingInteractiveEngine) {
+                interactiveEngine.stopInteractiveMode();
+                isUsingInteractiveEngine = false;
             }
         }
     }

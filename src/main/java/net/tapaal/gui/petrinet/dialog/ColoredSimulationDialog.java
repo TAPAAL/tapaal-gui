@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class UnfoldDialog extends JDialog {
+public class ColoredSimulationDialog extends JDialog {
     private final static String TOOL_TIP_PARTITIONING = "Partitions the colors into logically equivalent groups before unfolding";
     private final static String TOOL_TIP_COLOR_FIXPOINT = "Explores the possible colored markings and only unfolds for those";
     private final static String TOOL_TIP_SYMMETRIC_VARIABLES = "Finds variables with equivalent behavior and treats them as the same variable";
@@ -17,26 +17,32 @@ public class UnfoldDialog extends JDialog {
     private JCheckBox useSymmetricvars;
 
     private static boolean cancelled = false;
+    private static boolean explicitSimulationMode = false;
 
     private static PetriNetTab currentTab;
 
-    public static UnfoldDialog unfoldDialog;
+    public static ColoredSimulationDialog coloredSimDialog;
 
-    private UnfoldDialog(Frame frame, String title, boolean modal) {
+    private ColoredSimulationDialog(Frame frame, String title, boolean modal) {
         super(frame, title, modal);
         initComponents();
     }
 
     public static void showSimulationDialog(PetriNetTab tab){
-        int unfoldAnswer = JOptionPane.showConfirmDialog(null, "The net will need to be unfolded before entering simulation mode", "Unfolding Required", JOptionPane.OK_CANCEL_OPTION);
-        if(unfoldAnswer == 0){
-            showDialog(tab);
+        String[] options = {"Cancel", "Unfold", "Explicit"};
+
+        int unfoldAnswer = JOptionPane.showOptionDialog(null, "Simulate the net explicitly or unfolded", "Simulation Mode",
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+        if(unfoldAnswer == 2) {
+            explicitSimulationMode = true;
+        } else if (unfoldAnswer == 1) {
+            showUnfoldDialog(tab);
         } else {
             cancelled = true;
         }
     }
 
-    public static void showDialog(PetriNetTab tab) {
+    public static void showUnfoldDialog(PetriNetTab tab) {
         currentTab = tab;
 
         if(tab.getLens().isTimed()){
@@ -44,21 +50,25 @@ public class UnfoldDialog extends JDialog {
             return;
         }
 
-        if(unfoldDialog == null){
-            unfoldDialog = new UnfoldDialog(TAPAALGUI.getApp(), "Unfold", true);
-            unfoldDialog.pack();
-            unfoldDialog.setPreferredSize(unfoldDialog.getSize());
-            unfoldDialog.setMinimumSize(new Dimension(unfoldDialog.getWidth(), unfoldDialog.getHeight()));
-            unfoldDialog.setLocationRelativeTo(null);
-            unfoldDialog.setResizable(false);
+        if(coloredSimDialog == null){
+            coloredSimDialog = new ColoredSimulationDialog(TAPAALGUI.getApp(), "Unfold", true);
+            coloredSimDialog.pack();
+            coloredSimDialog.setPreferredSize(coloredSimDialog.getSize());
+            coloredSimDialog.setMinimumSize(new Dimension(coloredSimDialog.getWidth(), coloredSimDialog.getHeight()));
+            coloredSimDialog.setLocationRelativeTo(null);
+            coloredSimDialog.setResizable(false);
         }
-        unfoldDialog.setEnabled(true);
-        unfoldDialog.setVisible(true);
+        coloredSimDialog.setEnabled(true);
+        coloredSimDialog.setVisible(true);
 
     }
 
     public static boolean wasCancelled(){
         return cancelled;
+    }
+
+    public static boolean explicitSimulationMode() {
+        return explicitSimulationMode;
     }
 
     private void initComponents() {
@@ -162,7 +172,7 @@ public class UnfoldDialog extends JDialog {
 
 
     private void exit() {
-        unfoldDialog.setVisible(false);
+        coloredSimDialog.setVisible(false);
     }
 
     private void onCancel(){

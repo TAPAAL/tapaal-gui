@@ -31,7 +31,7 @@ import java.util.List;
 
 public class VerifyTACPNExporter extends VerifyTAPNExporter {
     @Override
-    protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
+    public void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
         if (guiModel == null) {
             super.outputModel(model, modelFile, mapping, guiModel);
             return;

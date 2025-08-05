@@ -32,7 +32,7 @@ import net.tapaal.copypaste.CopyPastImportExport;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
 
-import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
+import net.tapaal.gui.petrinet.dialog.ColoredSimulationDialog;
 import net.tapaal.gui.petrinet.dialog.WorkflowDialog;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel;
@@ -1397,8 +1397,14 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	        toggleAnimationMode();
         }
     }
+
+    @Override
+    public void toggleAnimationMode() {
+        toggleAnimationMode(false);
+    }
+
 	@Override
-	public void toggleAnimationMode() {
+	public void toggleAnimationMode(boolean explicit) {
 		if (!animationmode) {
 			if (numberOfActiveTemplates() > 0) {
 				app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
@@ -1418,12 +1424,16 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 				getAnimator().reset(false);
 				if(animControllerBox != null) {
                     animControllerBox.resetPlacementOfAnimationToolBar();
-
                 }
+
 				getAnimator().storeModel();
                 getAnimator().updateFireableTransitions();
                 getAnimator().reportBlockingPlaces();
 				getAnimator().setFiringmode("Random");
+
+                if (explicit) {
+                    getAnimator().initializeInteractiveEngine();
+                }
 
 				// Set a light blue backgound color for animation mode
 				drawingSurface().setBackground(Constants.ANIMATION_BACKGROUND_COLOR);
@@ -3131,7 +3141,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     private final GuiAction unfoldTabAction = new GuiAction("Unfold net", "Unfold the colors in the tab") {
         @Override
         public void actionPerformed(ActionEvent e) {
-            UnfoldDialog.showDialog(PetriNetTab.this);
+            ColoredSimulationDialog.showUnfoldDialog(PetriNetTab.this);
         }
     };
 
