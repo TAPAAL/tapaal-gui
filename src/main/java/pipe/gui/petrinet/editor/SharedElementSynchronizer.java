@@ -220,7 +220,7 @@ public class SharedElementSynchronizer {
         if (inputArcConflict) {
             TimedInputArc sourceInputArc = sourceTemplate.model().getInputArcFromPlaceToTransition(sourcePlace, sourceTransition);
             TimedInputArc targetInputArc = targetTemplate.model().getInputArcFromPlaceToTransition(targetPlace, targetTransition);
-            if (sourceInputArc.isSimilarTo(targetInputArc)) {
+            if (sourceInputArc != null && targetInputArc != null && sourceInputArc.isSimilarTo(targetInputArc)) {
                 inputArcConflict = false;
             }
         }
@@ -228,7 +228,7 @@ public class SharedElementSynchronizer {
         if (outputArcConflict) {
             TimedOutputArc sourceOutputArc = sourceTemplate.model().getOutputArcFromTransitionAndPlace(sourceTransition, sourcePlace);
             TimedOutputArc targetOutputArc = targetTemplate.model().getOutputArcFromTransitionAndPlace(targetTransition, targetPlace);
-            if (sourceOutputArc.isSimilarTo(targetOutputArc)) {
+            if (sourceOutputArc != null && targetOutputArc != null && sourceOutputArc.isSimilarTo(targetOutputArc)) {
                 outputArcConflict = false;
             }
         }
