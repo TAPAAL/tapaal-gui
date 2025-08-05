@@ -28,31 +28,27 @@ public class NameGenerator {
 
 	public String getNewPlaceName(TimedArcPetriNet net) {
 		int newId = placeIDs.get(net);
-
-        // If a shared exists keep generating until we find free one
-        if (net.parentNetwork() != null && net.parentNetwork().isNameUsedForShared(PLACE_NAME_PREFIX + newId)) {
-            while (net.parentNetwork().isNameUsedForShared(PLACE_NAME_PREFIX + newId)) {
-                ++newId;
-            }
-        }
-
+        newId = getNextFreeId(net, PLACE_NAME_PREFIX, newId);
 		placeIDs.put(net, newId + 1);
 		return PLACE_NAME_PREFIX + newId;
 	}
 
 	public String getNewTransitionName(TimedArcPetriNet net) {
 		int newId = transitionIDs.get(net);
-
-        // If a shared exists keep generating until we find free one
-        if (net.parentNetwork() != null && net.parentNetwork().isNameUsedForShared(TRANSITION_NAME_PREFIX + newId)) {
-            while (net.parentNetwork().isNameUsedForShared(TRANSITION_NAME_PREFIX + newId)) {
-                ++newId;
-            }
-        }
-
+        newId = getNextFreeId(net, TRANSITION_NAME_PREFIX, newId);
 		transitionIDs.put(net, newId + 1);
 		return TRANSITION_NAME_PREFIX + newId;
 	}
+
+    private int getNextFreeId(TimedArcPetriNet net, String prefix, int currentId) {
+        if (net.parentNetwork() != null && net.parentNetwork().isNameUsedForShared(prefix + currentId)) {
+            while (net.parentNetwork().isNameUsedForShared(prefix + currentId)) {
+                ++currentId;
+            }
+        }
+
+        return currentId;
+    }
 
 	public String getNewTemplateName() {
 		return TEMPLATE_NAME_PREFIX + (++tapnId); 
