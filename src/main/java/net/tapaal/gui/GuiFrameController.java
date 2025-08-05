@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.lang.UnsupportedOperationException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -310,14 +311,17 @@ public final class GuiFrameController implements GuiFrameControllerActions{
                     if(f.exists() && f.isFile() && f.canRead()){
                         FileBrowser.userPath = f.getParent();
 
-                        if (f.getName().toLowerCase().endsWith(".pnml")) {
+                        FileType fileType = inferFileType(f);
+                        if (fileType == FileType.PNML) {
                             filesOpened.add(PetriNetTab.createNewTabFromPNMLFile(f));
-                        } else {
+                        } else if (fileType == FileType.TAPN) {
                             filesOpened.add(PetriNetTab.createNewTabFromFile(f));
+                        } else {
+                            throw new UnsupportedOperationException("The file " + f.getName() + " has an unsupported file extension. Please use a .tapn, .xml or .pnml file.");
                         }
-
                     }
                 }
+
                 return filesOpened;
             }
             @Override
@@ -367,6 +371,21 @@ public final class GuiFrameController implements GuiFrameControllerActions{
                 e.printStackTrace();
             }
         }
+    }
+
+    private enum FileType {
+        TAPN, PNML, UNKNOWN
+    }
+
+    private FileType inferFileType(File file) {
+        String fileName = file.getName().toLowerCase();
+        if (fileName.endsWith(".tapn") || fileName.endsWith(".xml")) {
+            return FileType.TAPN;
+        } else if (fileName.endsWith(".pnml")) {
+            return FileType.PNML;
+        } else {
+            return FileType.UNKNOWN;
+        } 
     }
 
     private void openPNMLFile(File[] files) {
