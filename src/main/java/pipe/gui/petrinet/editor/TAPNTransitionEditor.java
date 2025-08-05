@@ -530,6 +530,20 @@ public class TAPNTransitionEditor extends JPanel {
 							Command cmd = new MakeTransitionNewSharedMultiCommand(context, newName, transition);
 							cmd.redo();
 							context.undoManager().addEdit(cmd);
+
+                            boolean success = SharedElementSynchronizer.updateSharedArcs(transition);
+                            if (!success) {
+                                cmd.undo();
+                                context.undoManager().removeCurrentEdit();
+                                doNewEdit = true;
+                    
+                                JOptionPane.showMessageDialog(
+                                    this,
+                                    "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                    
+                                return false;
+                            }
 						} else {
                             doNewEdit = true;
 							return false;

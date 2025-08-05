@@ -390,6 +390,10 @@ public class GuiModelManager {
     }
 
     private void deleteObject(PetriNetObject pnObject) {
+        deleteObject(pnObject, false);
+    }
+
+    private void deleteObject(PetriNetObject pnObject, boolean onlyArcsInCurrentTemplate) {
         if (pnObject instanceof ArcPathPoint) {
 
             ArcPathPoint arcPathPoint = (ArcPathPoint) pnObject;
@@ -428,13 +432,13 @@ public class GuiModelManager {
                     cmd = deleteTransportArc(transportArc);
                 } else if (pnObject instanceof TimedInhibitorArcComponent) {
                     TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent) pnObject;
-                    cmd = deleteArc(tia, true);
+                    cmd = deleteArc(tia, true, onlyArcsInCurrentTemplate);
                 } else if (pnObject instanceof TimedInputArcComponent) {
                     TimedInputArcComponent tia = (TimedInputArcComponent) pnObject;
-                    cmd = deleteArc(tia, true);
+                    cmd = deleteArc(tia, true, onlyArcsInCurrentTemplate);
                 } else if (pnObject instanceof TimedOutputArcComponent) {
                     TimedOutputArcComponent toa = (TimedOutputArcComponent) pnObject;
-                    cmd = deleteArc(toa, false);
+                    cmd = deleteArc(toa, false, onlyArcsInCurrentTemplate);
                 } else if (pnObject instanceof AnnotationNote) {
                     cmd = new DeleteAnnotationNoteCommand((AnnotationNote) pnObject, tabContent.getModel());
                 } else {
@@ -500,9 +504,10 @@ public class GuiModelManager {
      * If src and dst of arc is shared it will delete it across all templates where the connection exists
      * @param arc input, output or inhibitor arc
      * @param isInputArc true if arc is input arc, false if it is output arc
+     * @param onlyArcsInCurrentTemplate if true, only delete arcs in the current template
      * @return delete command for the arc(s)
      */
-    private Command deleteArc(Arc arc, boolean isInputArc) {
+    private Command deleteArc(Arc arc, boolean isInputArc, boolean onlyArcsInCurrentTemplate) {
         boolean isInhibitorArc = arc instanceof TimedInhibitorArcComponent;
 
         PlaceTransitionObject source = arc.getSource();
@@ -531,7 +536,7 @@ public class GuiModelManager {
             if (isTargetShared) targetName = place.getName();
         }
 
-        if (!(isSourceShared && isTargetShared)) {
+        if (!(isSourceShared && isTargetShared) || onlyArcsInCurrentTemplate) {
             return createSingleArcDeleteCommand(arc, isInhibitorArc, isInputArc, tabContent.getModel());
         }
         
@@ -640,7 +645,7 @@ public class GuiModelManager {
                 arcsToDelete.add(arc);
             }
 
-            arcsToDelete.forEach(this::deleteObject);
+            arcsToDelete.forEach(arc -> deleteObject(arc, true));
         }
 
         deleteObject(pnObject);

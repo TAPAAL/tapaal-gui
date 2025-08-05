@@ -31,13 +31,14 @@ public class MakeTransitionNewSharedMultiCommand implements Command {
 	
 	@Override
 	public void redo() {
+        commands.clear();
+
 		SharedTransition sharedTransition = null;
 		boolean first = true;
 		for(Template template : context.tabContent().allTemplates()) {
 			TimedTransitionComponent component = (TimedTransitionComponent)template.guiModel().getTransitionByName(transition.getName());
             if (component != null) { //We make a new shared transition with the first transition
                 if (first) {
-                    System.out.println("first: " + component.getName() + ", model: " + template.model().name());
                     command = new MakeTransitionNewSharedCommand(template.model(), newSharedName, component.underlyingTransition(), context.tabContent(), true);
                     command.redo();
                     sharedTransition = component.underlyingTransition().sharedTransition();

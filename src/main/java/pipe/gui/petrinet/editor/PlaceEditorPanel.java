@@ -661,6 +661,20 @@ public class PlaceEditorPanel extends JPanel {
 							Command cmd = new MakePlaceNewSharedMultiCommand(context, newName, place);
 							cmd.redo();
 							context.undoManager().addNewEdit(cmd);
+                            
+                            boolean success = SharedElementSynchronizer.updateSharedArcs(place);
+                            if (!success) {
+                                cmd.undo();
+                                context.undoManager().removeCurrentEdit();
+                                doNewEdit = true;
+                    
+                                JOptionPane.showMessageDialog(
+                                    this,
+                                    "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                    
+                                return false;
+                            }
 						} else {
 							return false;
 						}
