@@ -76,12 +76,16 @@ public class VersionChecker {
 			return true;
 		}else if(newestVersionNumbers[0] == currentVersionNumbers[0] && newestVersionNumbers[1] == currentVersionNumbers[1] && newestVersionNumbers[2] > currentVersionNumbers[2]){
 			return true;
-		}
+		} else if (newestVersionNumbers[0] == currentVersionNumbers[0] && newestVersionNumbers[1] == currentVersionNumbers[1] && newestVersionNumbers[2] == currentVersionNumbers[2]) {
+            return isCurrentPreRelease(versionString);
+        }
 		
-        // If current is pre-release newest version is newer
-        boolean isCurrentPreRelease = versionString.contains(" ");
-		return isCurrentPreRelease;
+        return false;
 	}
+
+    private boolean isCurrentPreRelease(String versionString) {
+        return versionString.contains(" ");
+    }
 
 	private int[] getVersionNumbers(String version) {
         version = version.split("\\s+")[0]; // Remove pre-release suffix
