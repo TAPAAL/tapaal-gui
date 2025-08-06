@@ -32,6 +32,7 @@ import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
@@ -170,8 +171,10 @@ public class Animator {
 
             addMarking(step, step.performStepFrom(currentMarking()));
         }
-        if (getTrace().getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
-            tab.getAnimationHistorySidePanel().setLastShown(getTrace().getTraceType());
+        
+        TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;
+        if (timedTrace.getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
+            tab.getAnimationHistorySidePanel().setLastShown(timedTrace.getTraceType());
         }
     }
 
@@ -433,12 +436,13 @@ public class Animator {
             int action = currentAction;
             int markingIndex = currentMarkingIndex;
 
-            if (getTrace().getTraceType() == TraceType.EG_DELAY_FOREVER) {
+            TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;
+            if (timedTrace.getTraceType() == TraceType.EG_DELAY_FOREVER) {
                 addMarking(new TAPNNetworkTimeDelayStep(BigDecimal.ONE), currentMarking().delay(BigDecimal.ONE));
             }
 
-            if (getTrace().getLoopToIndex() != -1) {
-                addToTimedTrace(getTrace().getLoopSteps());
+            if (timedTrace.getLoopToIndex() != -1) {
+                addToTimedTrace(timedTrace.getLoopSteps());
             }
 
             tab.getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
@@ -540,7 +544,7 @@ public class Animator {
                     if (guiTransition != null) break;
                 }
 
-                List<String> bindings = coloredStep.getBindings();
+                Map<Variable, Color> bindings = coloredStep.getBindings();
                 guiTransition.setToolTipText(ColorBindingParser.createTooltip(bindings));
                 reloadTooltip(guiTransition);
             }
@@ -807,7 +811,7 @@ public class Animator {
         tab.getAnimationHistorySidePanel().addHistoryItem(action.toString());
         if (action.isColoredTransitionStep()) {
             TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)action;
-            List<String> bindings = coloredStep.getBindings();
+            Map<Variable, Color> bindings = coloredStep.getBindings();
             tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(ColorBindingParser.createTooltip(bindings));
         }
 
@@ -978,8 +982,8 @@ public class Animator {
         return true;
     }
 
-    public TimedTAPNNetworkTrace getTrace(){
-        return (TimedTAPNNetworkTrace)trace; 
+    public TAPNNetworkTrace getTrace(){
+        return trace; 
     }
 
     private boolean clearStepsForward(){
