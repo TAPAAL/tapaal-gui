@@ -16,4 +16,20 @@ public class Pair<K, V> {
     public V getSecond() {
         return second;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Pair)) return false;
+
+        Pair<?, ?> pair = (Pair<?, ?>)o;
+
+        if (!first.equals(pair.first)) return false;
+        return second.equals(pair.second);
+    }
+
+    @Override
+    public int hashCode() {
+        return first.hashCode() + second.hashCode();
+    }
 }

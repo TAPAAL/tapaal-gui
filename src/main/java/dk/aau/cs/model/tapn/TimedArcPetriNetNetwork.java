@@ -62,10 +62,10 @@ public class TimedArcPetriNetNetwork {
 		currentMarking.addMarking(tapn, marking);
 		tapn.setMarking(currentMarking);
 	}
+
 	public void add(SharedTransition sharedTransition){
 		add(sharedTransition, false);
 	}
-
 	
 	public void add(SharedTransition sharedTransition, boolean multiAdd){
 		Require.that(sharedTransition != null, "sharedTransition must not be null");

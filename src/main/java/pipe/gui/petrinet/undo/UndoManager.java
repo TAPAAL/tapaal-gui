@@ -3,6 +3,7 @@
  */
 package pipe.gui.petrinet.undo;
 
+import java.util.List;
 import java.util.ArrayList;
 
 import net.tapaal.gui.petrinet.undo.Command;
@@ -161,6 +162,8 @@ public class UndoManager {
             --sizeOfBuffer;
             --indexOfNextAdd;
         }
+
+        undoneEdits = 0;
 
         setUndoRedoStatus();
     }
