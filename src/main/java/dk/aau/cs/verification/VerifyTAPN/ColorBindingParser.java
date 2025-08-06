@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
 
@@ -18,6 +19,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.Transition;
@@ -80,13 +84,18 @@ public class ColorBindingParser extends DefaultHandler {
         return sb.toString();
     }
 
-    public static String createTooltip(List<String> bindings) {
+    public static String createTooltip(Map<Variable, Color> bindings) {
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
-        sb.append(bindings);
-        sb.append("<br>");
+        
+        for (Map.Entry<Variable, Color> entry : bindings.entrySet()) {
+            String bindingString = entry.getKey().getId() + " -> " + entry.getValue().getName();
+            sb.append(bindingString);
+            sb.append("<br>");
+        }
+        
         sb.append("</html>");
-
+        
         return sb.toString();
     }
 
@@ -125,8 +134,8 @@ public class ColorBindingParser extends DefaultHandler {
         return bindings;
     }
 
-    public List<String> parseBindingsForSingleTransition(String output, String transitionName) {
-        List<String> result = new ArrayList<>();
+    public Map<Variable, Color> parseBindingsForSingleTransition(String output, String transitionName, TimedArcPetriNetNetwork tapnNetwork) {
+        Map<Variable, Color> result = new LinkedHashMap<>();
     
         DefaultHandler handler = new DefaultHandler() {
             private String currentElement = "";
@@ -144,8 +153,9 @@ public class ColorBindingParser extends DefaultHandler {
             @Override
             public void endElement(String uri, String localName, String qName) {
                 if ("color".equals(qName)) {
-                    String binding = varId + " -> " + colorValue;
-                    result.add(binding);
+                    Variable variable = tapnNetwork.getVariableByName(varId);
+                    Color color = tapnNetwork.getColorByName(colorValue);
+                    result.put(variable, color);
                 } else if ("variable".equals(qName)) {
                     varId = "";
                     colorValue = "";

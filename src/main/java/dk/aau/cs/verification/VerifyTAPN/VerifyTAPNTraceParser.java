@@ -24,6 +24,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Variable;
 
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
@@ -240,7 +241,7 @@ public class VerifyTAPNTraceParser {
         ColorBindingParser colorBindingParser = new ColorBindingParser();
         Node bindingsNode = element.getElementsByTagName("bindings").item(0);
         TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
-        List<String> bindings = colorBindingParser.parseBindingsForSingleTransition(nodeToString(bindingsNode), transition.name());
+        Map<Variable, Color> bindings = colorBindingParser.parseBindingsForSingleTransition(nodeToString(bindingsNode), transition.name(), tapn.parentNetwork());
         return new ColoredTransitionStep(transition, bindings);
     }
 

@@ -8,14 +8,16 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import java.util.List;
 import java.util.Map;
 
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.LocalTimedMarking;
 
 public class TAPNNetworkColoredTransitionStep extends TAPNNetworkTraceStep  {
     private final TimedTransition transition;
-    private final List<String> bindings;
+    private final Map<Variable, Color> bindings;
     private final NetworkMarking marking;
 
-    public TAPNNetworkColoredTransitionStep(TimedTransition transition, List<String> bindings, LocalTimedMarking marking, Map<TimedPlace, List<TimedToken>> sharedPlacesToTokensMap) {
+    public TAPNNetworkColoredTransitionStep(TimedTransition transition, Map<Variable, Color> bindings, LocalTimedMarking marking, Map<TimedPlace, List<TimedToken>> sharedPlacesToTokensMap) {
         this.transition = transition;
         this.bindings = bindings;
         NetworkMarking networkMarking = marking.getNetworkMarking().clone();
@@ -27,7 +29,7 @@ public class TAPNNetworkColoredTransitionStep extends TAPNNetworkTraceStep  {
         return transition;
     }
 
-    public List<String> getBindings() {
+    public Map<Variable, Color> getBindings() {
         return bindings;
     }
 
@@ -53,11 +55,14 @@ public class TAPNNetworkColoredTransitionStep extends TAPNNetworkTraceStep  {
         StringBuilder sb = new StringBuilder();
         if (!bindings.isEmpty()) {
             sb.append(" [");
-           for (int i = 0; i < bindings.size(); ++i) {
-                sb.append(bindings.get(i));
+            int i = 0;
+            for (Map.Entry<Variable, Color> entry : bindings.entrySet()) {
+                sb.append(entry.getKey().getId()).append("->").append(entry.getValue().getName());
                 if (i < bindings.size() - 1) {
                     sb.append(",");
                 }
+                
+                ++i;
             }
     
             sb.append("]");
