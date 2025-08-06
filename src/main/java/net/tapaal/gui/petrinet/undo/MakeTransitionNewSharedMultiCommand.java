@@ -31,6 +31,8 @@ public class MakeTransitionNewSharedMultiCommand implements Command {
 	
 	@Override
 	public void redo() {
+        commands.clear();
+
 		SharedTransition sharedTransition = null;
 		boolean first = true;
 		for(Template template : context.tabContent().allTemplates()) {
