@@ -379,6 +379,15 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
     private FileType inferFileType(File file) {
         String fileName = file.getName().toLowerCase();
+        try {
+            String content = Files.readString(file.toPath());
+            if (content.contains("<query") || content.contains("<feature")) {
+                return FileType.TAPN;
+            } else if (content.contains("<pnml")) {
+                return FileType.PNML;
+            }
+        } catch (IOException ignore) {}
+
         if (fileName.endsWith(".tapn") || fileName.endsWith(".xml")) {
             return FileType.TAPN;
         } else if (fileName.endsWith(".pnml")) {
