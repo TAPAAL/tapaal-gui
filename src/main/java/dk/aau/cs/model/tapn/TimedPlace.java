@@ -178,7 +178,6 @@ public abstract class TimedPlace {
 		return name() == other.name();
 	}
 
-
     protected void fireMarkingChanged() {
         for(TimedPlaceListener listener : listeners){
             listener.markingChanged(new TimedPlaceEvent(this));

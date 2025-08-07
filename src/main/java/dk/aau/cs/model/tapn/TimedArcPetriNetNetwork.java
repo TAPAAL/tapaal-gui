@@ -764,6 +764,21 @@ public class TimedArcPetriNetNetwork {
         }
         return null;
     }
+
+    public Color getProductColorByConstituents(Vector<Color> constituents) {
+        for (ColorType ct : colorTypes) {
+            if (ct.isProductColorType()) {
+                for (Color c : ct.getColors()) {
+                    if (c.getTuple() != null && c.getTuple().equals(constituents)) {
+                        return c;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public Variable getVariableByIndex(int index) {
         return variables.get(index);
     }

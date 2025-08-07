@@ -4,18 +4,13 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import pipe.gui.Constants;
-import dk.aau.cs.model.tapn.LocalTimedMarking;
 
-public class TimeDelayStep implements TimedArcPetriNetStep {
+public class TimeDelayStep implements PetriNetStep {
 	private BigDecimal delay;
 	private static final DecimalFormat df = createDecimalFormat();
 
 	public TimeDelayStep(BigDecimal delay) {
 		this.delay = delay;
-	}
-
-	public LocalTimedMarking performStepFrom(LocalTimedMarking marking) {
-		return marking.delay(delay);
 	}
 	
 	public BigDecimal delay() {
