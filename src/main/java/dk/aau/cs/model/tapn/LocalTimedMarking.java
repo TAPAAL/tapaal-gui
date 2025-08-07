@@ -6,11 +6,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.TAPNComposer;
 
 // This class must remain immutable wrt. delays and transition firings!
 public class LocalTimedMarking implements TimedMarking { // TODO: Consider removing the interface here?
@@ -221,5 +227,4 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 
         return sb.toString();
     }
-	
 }

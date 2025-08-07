@@ -141,7 +141,7 @@ public class TraceImportExport {
                     .anyMatch(step -> step instanceof TAPNNetworkColoredTransitionStep);
             if (isColoredTrace) {
                 NetworkMarking initialMarking = tab.network().marking();
-                Element initialMarkingElement = createMarkingElement(document, initialMarking, composer);
+                Element initialMarkingElement = initialMarking.toXmlElement(document, composer);
                 traceRootNode.appendChild(initialMarkingElement);
             }
             
@@ -198,7 +198,7 @@ public class TraceImportExport {
                     traceRootNode.appendChild(transitionElement);
 
                     NetworkMarking marking = coloredStep.getMarking();
-                    Element markingElement = createMarkingElement(document, marking, composer);
+                    Element markingElement = marking.toXmlElement(document, composer);
                     traceRootNode.appendChild(markingElement);
                 }
             }
@@ -224,40 +224,6 @@ public class TraceImportExport {
         transformer.transform(source, result);
        
         return os;
-    }
-
-    private static Element createMarkingElement(Document document, NetworkMarking marking, TAPNComposer composer) {
-        Element markingElement = document.createElement("marking");
-
-        Map<TimedPlace, List<TimedToken>> markingMap = marking.getMarkingMap().values().stream()
-                .flatMap(m -> m.getPlacesToTokensMap().entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        Map<TimedPlace, List<TimedToken>> sharedPlacesTokens = marking.getSharedPlacesTokens();
-        markingMap.putAll(sharedPlacesTokens);
-
-        for (TimedPlace place : markingMap.keySet()) {
-            Element placeElement = document.createElement("place");
-            placeElement.setAttribute("id", composer.composedPlaceName(place));
-            List<TimedToken> tokens = markingMap.get(place);
-            Map<Color, List<TimedToken>> colorToTokensMap = tokens.stream()
-                    .collect(Collectors.groupingBy(TimedToken::color));
-
-            for (Color color : colorToTokensMap.keySet()) {
-                Element tokenElement = document.createElement("token");
-                tokenElement.setAttribute("count", String.valueOf(colorToTokensMap.get(color).size()));
-
-                Element colorElement = document.createElement("color");
-                colorElement.setTextContent(color.getName());
-
-                tokenElement.appendChild(colorElement);
-                placeElement.appendChild(tokenElement);
-            }
-
-            markingElement.appendChild(placeElement);
-        }
-
-        return markingElement;
     }
 
     public static void importTrace(Animator animator, PetriNetTab tab) {

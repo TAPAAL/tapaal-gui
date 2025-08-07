@@ -645,7 +645,7 @@ public class TAPNComposer implements ITAPNComposer {
 		}
 	}
 
-   public String composedTransitionName(TimedTransition transition) {
+    public String composedTransitionName(TimedTransition transition) {
         if (transition.isShared()) {
             return "Shared_" + transition.name();
         } else if (singleComponentNoPrefix) {
@@ -653,11 +653,58 @@ public class TAPNComposer implements ITAPNComposer {
         } else {
             return transition.model().name() + "_" + transition.name();
         }
-   }
+    }
    
-   public String composedPlaceName(TimedPlace place) {
-        return  place.isShared() ? "Shared_" + place.name() : ((LocalTimedPlace)place).model().name() + "_" + place.name();
-   }
-   
+    public String composedPlaceName(TimedPlace place) {
+        return place.isShared() ? "Shared_" + place.name() : ((LocalTimedPlace)place).model().name() + "_" + place.name();
+    }
 
+    public TimedTransition getTransitionByComposedName(String composedName) {
+        if (composedName.startsWith("Shared_")) {
+            String originalName = composedName.substring("Shared_".length());
+            for (TimedArcPetriNet tapn : guiModels.keySet()) {
+                for (TimedTransition transition : tapn.transitions()) {
+                    if (transition.isShared() && transition.name().equals(originalName)) {
+                        return transition;
+                    }
+                }
+            }
+            
+            return null;
+        }
+        
+        if (composedName.contains("_")) {
+            int lastUnderscoreIndex = composedName.lastIndexOf("_");
+            String templateName = composedName.substring(0, lastUnderscoreIndex);
+            String transitionName = composedName.substring(lastUnderscoreIndex + 1);
+            
+            for (TimedArcPetriNet tapn : guiModels.keySet()) {
+                if (tapn.name().equals(templateName)) {
+                    for (TimedTransition transition : tapn.transitions()) {
+                        if (!transition.isShared() && transition.name().equals(transitionName)) {
+                            return transition;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        if (singleComponentNoPrefix) {
+            for (TimedArcPetriNet tapn : guiModels.keySet()) {
+                for (TimedTransition transition : tapn.transitions()) {
+                    if (!transition.isShared() && transition.name().equals(composedName)) {
+                        return transition;
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    public TAPNLens getLens() {
+        return lens;
+    }
 }

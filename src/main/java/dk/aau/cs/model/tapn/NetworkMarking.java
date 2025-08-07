@@ -1,17 +1,32 @@
 package dk.aau.cs.model.tapn;
 
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import pipe.gui.TAPAALGUI;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.TAPNComposer;
 
 public class NetworkMarking implements TimedMarking {
 	private final Map<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
@@ -340,5 +355,65 @@ public class NetworkMarking implements TimedMarking {
         }
 
         return sb.toString();
+    }
+
+    public String toXmlStr(TAPNComposer composer) {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+            Document document = builder.newDocument();
+            
+            Element markingElement = toXmlElement(document, composer);
+            document.appendChild(markingElement);
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(writer));
+
+            return writer.getBuffer().toString().trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }   
+    }
+
+    public Element toXmlElement(Document document, TAPNComposer composer) {
+        try {
+            Map<TimedPlace, List<TimedToken>> allPlaces = new HashMap<>();
+            for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
+                allPlaces.putAll(entry.getValue().getPlacesToTokensMap());
+            }
+        
+            allPlaces.putAll(sharedPlacesTokens);
+
+            Element markingElement = document.createElement("marking");
+            for (Entry<TimedPlace, List<TimedToken>> entry : allPlaces.entrySet()) {
+                Element placeElement = document.createElement("place");
+                placeElement.setAttribute("id", composer.composedPlaceName(entry.getKey()));
+                
+                Map<Color, List<TimedToken>> colorToTokensMap = entry.getValue().stream()
+                        .collect(Collectors.groupingBy(TimedToken::color));
+                
+                for (Map.Entry<Color, List<TimedToken>> colorEntry : colorToTokensMap.entrySet()) {
+                    Element tokenElement = document.createElement("token");
+                    tokenElement.setAttribute("count", String.valueOf(colorEntry.getValue().size()));
+                    
+                    Element colorElement = document.createElement("color");
+                    colorElement.setTextContent(colorEntry.getKey().toString());
+                    tokenElement.appendChild(colorElement);
+                    placeElement.appendChild(tokenElement);
+                }
+
+                markingElement.appendChild(placeElement);
+            }
+
+            return markingElement;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }   
     }
 }

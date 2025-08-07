@@ -57,8 +57,9 @@ import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyCPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNInteractiveHandle;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
 public class Animator {
     private final ArrayList<TAPNNetworkTraceStep> actionHistory = new ArrayList<TAPNNetworkTraceStep>();
@@ -95,20 +96,19 @@ public class Animator {
         if (!tab.getLens().isColored()) return;
 
         try {
-            interactiveEngine = new VerifyPNInteractiveHandle();
-    
-            TAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
-            Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(tab.network());
-    
-            File tempFile = File.createTempFile("tapaal_interactive_", ".pnml");
-            tempFile.deleteOnExit();
+            HashMap<TimedArcPetriNet, DataLayer> tapns = new HashMap<>();
+            for (Template template : tab.allTemplates()) {
+                tapns.put(template.model(), template.guiModel());
+            }
 
-            VerifyPNExporter exporter = new VerifyPNExporter();
-            exporter.outputModel(composedModel.value1(), tempFile, composedModel.value2(), 
-                            tab.currentTemplate().guiModel());
-        
-            isUsingInteractiveEngine = interactiveEngine.startInteractiveMode(tempFile.getAbsolutePath());
-    
+            TAPNComposer composer = new TAPNComposer(new MessengerImpl(), tab.getGuiModels(), tab.getLens(), false, true);
+            Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(tab.network());
+
+            VerifyTAPNExporter exporter = new VerifyCPNExporter();
+            var exportedModel = exporter.exportModel(composedModel, composer.getGuiModel());
+
+            interactiveEngine = new VerifyPNInteractiveHandle(tab.network(), composer);
+            isUsingInteractiveEngine = interactiveEngine.startInteractiveMode(exportedModel.modelFile());
             if (!isUsingInteractiveEngine) {
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), 
                     "Failed to start VerifyPN interactive mode", 
@@ -282,18 +282,10 @@ public class Animator {
     }
 
     private boolean isColoredTransitionEnabled(TimedTransition transition) {
-        if (tab.getLens().isColored()) {
-            if (actionHistory.isEmpty()) {
-                return false;
-            }
-
-            int idx = Math.max(0, currentAction + 1);
-
-            if (idx >= actionHistory.size()) return false;
-
-            var coloredStep = ((TAPNNetworkColoredTransitionStep)actionHistory.get(idx));
-            TimedTransition coloredTransition = coloredStep.getTransition();
-            if (transition.name().equals(coloredTransition.name())) {
+        if (tab.getLens().isColored() && isUsingInteractiveEngine) {
+            var validBindingsMap = interactiveEngine.sendMarking(initialMarking);
+            
+            if (validBindingsMap.keySet().contains(transition)) {
                 return true;
             }
         }
@@ -303,20 +295,19 @@ public class Animator {
 
     private void updateFireableTransitionsColored() {
         if (tab.getLens().isColored()) {
-            if (actionHistory.isEmpty()) {
-                return;
-            }
-
-            int idx = Math.max(0, currentAction + 1);
-
-            if (idx >= actionHistory.size()) return;
-
-            var coloredStep = ((TAPNNetworkColoredTransitionStep)actionHistory.get(idx));
-            TimedTransition transition = coloredStep.getTransition();
             for (Template template : tab.activeTemplates()) {
-                for (Transition t : template.guiModel().transitions()) {
-                    if (t.getName().equals(transition.name())) {
-                        t.markTransitionEnabled(true);
+                for (TimedTransition transition : template.model().transitions()) {
+                    if (isColoredTransitionEnabled(transition)) {
+                        Transition guiTransition = template.guiModel().getTransitionByName(transition.name());
+                        if (guiTransition != null) {
+                            guiTransition.markTransitionEnabled(true);
+                            tab.getTransitionFiringComponent().addTransition(template, guiTransition);
+                        }
+                    } else {
+                        Transition guiTransition = template.guiModel().getTransitionByName(transition.name());
+                        if (guiTransition != null) {
+                            guiTransition.markTransitionEnabled(false);
+                        }
                     }
                 }
             }

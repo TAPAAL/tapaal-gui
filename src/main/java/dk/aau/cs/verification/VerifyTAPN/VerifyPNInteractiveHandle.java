@@ -4,18 +4,44 @@ import java.io.BufferedReader;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.gui.petrinet.verification.Verifier;
 
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 
 public class VerifyPNInteractiveHandle {
     private Process verifypnProcess;
     private BufferedWriter writer;
     private BufferedReader reader;
     private BufferedReader errorReader;
+
+    private TimedArcPetriNetNetwork network;
+    private TAPNComposer composer;
+
+    public VerifyPNInteractiveHandle(TimedArcPetriNetNetwork network, TAPNComposer composer) {
+        this.network = network;
+        this.composer = composer;
+    }
 
     public boolean startInteractiveMode(String modelPath) {
         try {
@@ -25,35 +51,134 @@ public class VerifyPNInteractiveHandle {
             ProcessBuilder pb = new ProcessBuilder(initCommand);
             verifypnProcess = pb.start();
     
+            System.out.println("Started VerifyPN process with command: " + String.join(" ", initCommand));
+            Thread.sleep(100);
+            if (!verifypnProcess.isAlive()) {
+                return false;
+            }
+
             writer = new BufferedWriter(new OutputStreamWriter(verifypnProcess.getOutputStream()));
             reader = new BufferedReader(new InputStreamReader(verifypnProcess.getInputStream()));
             errorReader = new BufferedReader(new InputStreamReader(verifypnProcess.getErrorStream()));
             return true;
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public String sendMessage(String message) throws IOException {
-        writer.write(message);
-        final int numNewlines = 3;
-        for (int i = 0; i < numNewlines; ++i) {
-            writer.newLine();
+    public Map<TimedTransition, List<Map<Variable, Color>>> sendMarking(NetworkMarking marking) {
+        try {
+            String xmlResponse = sendMessage(marking.toXmlStr(composer));
+            System.out.println(xmlResponse);
+            System.out.println("====");
+            return parseTransitionWithBindings(xmlResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Map.of();
         }
+    }
 
-        writer.flush();
-
-        StringBuilder response = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            response.append(line).append("\n");
-            if (line.trim().isEmpty()) {
-                break;
+    private String sendMessage(String message) {
+        try {
+            writer.write(message);
+            final int numNewlines = 3;
+            for (int i = 0; i < numNewlines; ++i) {
+                writer.newLine();
             }
-        }
 
-        return response.toString();
+            writer.flush();
+
+            StringBuilder response = new StringBuilder();
+            String line;
+            boolean insideValidBindings = false;
+            
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().equals("<valid-bindings>")) {
+                    insideValidBindings = true;
+                    response.append(line).append("\n");
+                    continue;
+                }
+                
+                if (line.trim().equals("</valid-bindings>")) {
+                    response.append(line).append("\n");
+                    break;
+                }
+                
+                if (insideValidBindings) {
+                    response.append(line).append("\n");
+                    continue;
+                }
+                
+                if (!insideValidBindings && line.trim().isEmpty()) {
+                    break;
+                }
+            }
+
+            return response.toString().trim();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private Map<TimedTransition, List<Map<Variable, Color>>> parseTransitionWithBindings(String xmlResponse) {
+        try {
+            Map<TimedTransition, List<Map<Variable, Color>>> transitionBindings = new LinkedHashMap<>();
+    
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(xmlResponse)));
+            
+            NodeList transitionNodes = document.getElementsByTagName("transition");
+            for (int i = 0; i < transitionNodes.getLength(); ++i) {
+                Element transitionElement = (Element)transitionNodes.item(i);
+                String transitionId = transitionElement.getAttribute("id");
+                TimedTransition transition = composer.getTransitionByComposedName(transitionId);
+
+                if (transition == null) {
+                    throw new IllegalArgumentException("Transition with ID " + transitionId + " not found in composer.");
+                }
+
+                List<Map<Variable, Color>> bindings = new ArrayList<>();
+                NodeList bindingNodes = transitionElement.getElementsByTagName("binding");
+                for (int j = 0; j < bindingNodes.getLength(); ++j) {
+                    Element bindingElement = (Element)bindingNodes.item(j);
+                    Map<Variable, Color> bindingMap = new LinkedHashMap<>();
+
+                    NodeList variableNodes = bindingElement.getElementsByTagName("variable");
+                    for (int k = 0; k < variableNodes.getLength(); ++k) {
+                        Element variableElement = (Element)variableNodes.item(k);
+                        String variableId = variableElement.getAttribute("id");
+                        
+                        Element colorElement = (Element)variableElement.getElementsByTagName("color").item(0);
+                        String colorName = colorElement.getTextContent();
+
+                        Variable variable = network.getVariableByName(variableId);
+                        Color color = network.getColorByName(colorName);
+
+                        if (variable == null || color == null) {
+                            throw new IllegalArgumentException("Variable or color not found for ID: " + variableId + " or " + colorName);
+                        }
+
+                        bindingMap.put(variable, color);
+                    }
+
+                    if (!bindingMap.isEmpty()) {
+                        bindings.add(bindingMap);
+                    }
+                }
+
+                if (!bindings.isEmpty()) {
+                    transitionBindings.put(transition, bindings);
+                }
+            }
+
+            return transitionBindings;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Map.of();
+        }
     }
 
     public void stopInteractiveMode() {
