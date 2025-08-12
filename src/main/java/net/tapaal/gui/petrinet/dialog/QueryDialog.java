@@ -801,7 +801,7 @@ public class QueryDialog extends JPanel {
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
         query.setUseTarOption(useTraceRefinement.isSelected());
         query.setUseTarjan(useTarjan.isSelected());
-        query.setUseExplicitSearch(useExplicitSearch.isSelected());
+        query.setUseExplicitSearch(useExplicitSearch.isEnabled() && useExplicitSearch.isSelected());
         return query;
     }
 
@@ -5876,12 +5876,27 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshExplicitSearch() {
-        if (!(newProperty.toString().contains("EF") || newProperty.toString().contains("AG"))) {
-            setupExplicitSearch(false);
-            useExplicitSearch.setEnabled(false);
+        useExplicitSearch.setEnabled(containsOnlyEFAndAG(newProperty));
+    }
+
+    private boolean containsOnlyEFAndAG(TCTLAbstractProperty property) {
+        if (property instanceof TCTLEGNode || property instanceof TCTLAFNode ||
+                property instanceof TCTLEUNode || property instanceof TCTLAUNode ||
+                property instanceof TCTLEXNode || property instanceof TCTLAXNode) {
+            return false;
         } else {
-            useExplicitSearch.setEnabled(true);
+            return checkAllChildrenContainsOnlyEFAndEG(property);
         }
+    }
+
+    private boolean checkAllChildrenContainsOnlyEFAndEG(TCTLAbstractProperty property) {
+        for (StringPosition child : property.getChildren()) {
+            if (!containsOnlyEFAndAG(child.getObject())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void refreshColoredReduction() {
