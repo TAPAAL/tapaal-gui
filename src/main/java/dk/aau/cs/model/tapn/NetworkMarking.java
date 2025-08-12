@@ -67,7 +67,7 @@ public class NetworkMarking implements TimedMarking {
         }
     }
 	
-	private LocalTimedMarking getMarkingFor(TimedArcPetriNet tapn) {
+	public LocalTimedMarking getMarkingFor(TimedArcPetriNet tapn) {
 		return markings.get(tapn);
 	}
 
@@ -381,39 +381,34 @@ public class NetworkMarking implements TimedMarking {
     }
 
     public Element toXmlElement(Document document, TAPNComposer composer) {
-        try {
-            Map<TimedPlace, List<TimedToken>> allPlaces = new HashMap<>();
-            for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
-                allPlaces.putAll(entry.getValue().getPlacesToTokensMap());
-            }
-        
-            allPlaces.putAll(sharedPlacesTokens);
+        Map<TimedPlace, List<TimedToken>> allPlaces = new HashMap<>();
+        for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
+            allPlaces.putAll(entry.getValue().getPlacesToTokensMap());
+        }
+    
+        allPlaces.putAll(sharedPlacesTokens);
 
-            Element markingElement = document.createElement("marking");
-            for (Entry<TimedPlace, List<TimedToken>> entry : allPlaces.entrySet()) {
-                Element placeElement = document.createElement("place");
-                placeElement.setAttribute("id", composer.composedPlaceName(entry.getKey()));
+        Element markingElement = document.createElement("marking");
+        for (Entry<TimedPlace, List<TimedToken>> entry : allPlaces.entrySet()) {
+            Element placeElement = document.createElement("place");
+            placeElement.setAttribute("id", composer.composedPlaceName(entry.getKey()));
+            
+            Map<Color, List<TimedToken>> colorToTokensMap = entry.getValue().stream()
+                    .collect(Collectors.groupingBy(TimedToken::color));
+            
+            for (Map.Entry<Color, List<TimedToken>> colorEntry : colorToTokensMap.entrySet()) {
+                Element tokenElement = document.createElement("token");
+                tokenElement.setAttribute("count", String.valueOf(colorEntry.getValue().size()));
                 
-                Map<Color, List<TimedToken>> colorToTokensMap = entry.getValue().stream()
-                        .collect(Collectors.groupingBy(TimedToken::color));
-                
-                for (Map.Entry<Color, List<TimedToken>> colorEntry : colorToTokensMap.entrySet()) {
-                    Element tokenElement = document.createElement("token");
-                    tokenElement.setAttribute("count", String.valueOf(colorEntry.getValue().size()));
-                    
-                    Element colorElement = document.createElement("color");
-                    colorElement.setTextContent(colorEntry.getKey().toString());
-                    tokenElement.appendChild(colorElement);
-                    placeElement.appendChild(tokenElement);
-                }
-
-                markingElement.appendChild(placeElement);
+                Element colorElement = document.createElement("color");
+                colorElement.setTextContent(colorEntry.getKey().toString());
+                tokenElement.appendChild(colorElement);
+                placeElement.appendChild(tokenElement);
             }
 
-            return markingElement;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }   
+            markingElement.appendChild(placeElement);
+        }
+
+        return markingElement;
     }
 }

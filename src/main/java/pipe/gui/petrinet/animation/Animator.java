@@ -4,7 +4,6 @@ import java.awt.Container;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -21,7 +20,6 @@ import javax.swing.ToolTipManager;
 import dk.aau.cs.model.tapn.simulation.*;
 import net.tapaal.gui.petrinet.animation.AnimationTokenSelectDialog;
 import pipe.gui.petrinet.dataLayer.DataLayer;
-import net.tapaal.gui.GuiFrameController;
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
@@ -32,6 +30,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
+import net.tapaal.gui.petrinet.dialog.ColoredBindingSelectionDialog;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
@@ -77,10 +76,9 @@ public class Animator {
 
     private Map<String, TAPNNetworkTrace> traceMap;
 
-    private boolean previousTransitionListState;
-
     private VerifyPNInteractiveHandle interactiveEngine;
     private boolean isUsingInteractiveEngine;
+    private Map<TimedTransition, List<Map<Variable, Color>>> validBindingsMap;
 
     public static boolean isUrgentTransitionEnabled(){
         return isUrgentTransitionEnabled;
@@ -225,10 +223,6 @@ public class Animator {
         }
 
         updateBindings(0);
-
-        GuiFrameController guiController = TAPAALGUI.getAppGuiController();
-        previousTransitionListState = guiController.isEnabledTransitionsListVisible();
-        guiController.setEnabledTransitionsList(false);
     }
 
     public boolean isColoredTrace() {
@@ -281,10 +275,13 @@ public class Animator {
         disableTransitions();
     }
 
+    private void updateValidBindingsMap() {
+        if (!isUsingInteractiveEngine) return;
+        validBindingsMap = interactiveEngine.sendMarking(currentMarking());
+    }
+
     private boolean isColoredTransitionEnabled(TimedTransition transition) {
         if (tab.getLens().isColored() && isUsingInteractiveEngine) {
-            var validBindingsMap = interactiveEngine.sendMarking(initialMarking);
-            
             if (validBindingsMap.keySet().contains(transition)) {
                 return true;
             }
@@ -295,6 +292,7 @@ public class Animator {
 
     private void updateFireableTransitionsColored() {
         if (tab.getLens().isColored()) {
+            updateValidBindingsMap();
             for (Template template : tab.activeTemplates()) {
                 for (TimedTransition transition : template.model().transitions()) {
                     if (isColoredTransitionEnabled(transition)) {
@@ -384,11 +382,6 @@ public class Animator {
             tab.network().setMarking(initialMarking);
             restoreTokenState();
             currentAction = -1;
-
-            if (isColoredTrace()) {
-                GuiFrameController guiController = TAPAALGUI.getAppGuiController();
-                guiController.setEnabledTransitionsList(previousTransitionListState);
-            }
 
             if (isUsingInteractiveEngine) {
                 interactiveEngine.stopInteractiveMode();
@@ -571,7 +564,7 @@ public class Animator {
         resetBindings();
         if (stepIdx < actionHistory.size() && stepIdx >= 0) {
             TAPNNetworkTraceStep step = actionHistory.get(stepIdx);
-            if (step instanceof TAPNNetworkColoredTransitionStep) {
+            if (step.isColoredTransitionStep()) {
                 TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)step;
                 TimedTransition transition = coloredStep.getTransition();
                 Transition guiTransition = null;
@@ -631,11 +624,8 @@ public class Animator {
             return;
         }
 
-        if (trace != null && trace.isColoredTrace()) {
-            if (isColoredTransitionEnabled(transition)) {
-                stepForward();
-            }
-            
+        if (tab.getLens().isColored()) {
+            fireColoredTransition(transition);
             return;
         }
 
@@ -663,6 +653,34 @@ public class Animator {
 
                 fireTransition(transition);
             }
+        }
+    }
+
+    private void fireColoredTransition(TimedTransition transition) {
+        if (trace != null && trace.isColoredTrace()) {
+            if (isColoredTransitionEnabled(transition)) {
+                stepForward();
+            }
+            
+            return;
+        }
+
+        if (isUsingInteractiveEngine) {
+            var binding = ColoredBindingSelectionDialog.showDialog(transition, validBindingsMap.get(transition));
+            if (binding == null) return; // Cancelled
+
+            if (!clearStepsForward()) return;
+
+            NetworkMarking newMarking = interactiveEngine.sendTransition(transition, binding);
+            
+            addMarking(new TAPNNetworkColoredTransitionStep(transition, binding, newMarking), newMarking);
+
+            updateColoredMarking();
+            activeGuiModel().repaintPlaces();
+            unhighlightDisabledTransitions();
+            updateFireableTransitions();
+
+            updateAnimationButtonsEnabled();
         }
     }
 

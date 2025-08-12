@@ -1427,13 +1427,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 }
 
 				getAnimator().storeModel();
-                getAnimator().updateFireableTransitions();
-                getAnimator().reportBlockingPlaces();
-				getAnimator().setFiringmode("Random");
-
                 if (explicit) {
                     getAnimator().initializeInteractiveEngine();
                 }
+
+                getAnimator().updateFireableTransitions();
+                getAnimator().reportBlockingPlaces();
+				getAnimator().setFiringmode("Random");
 
 				// Set a light blue backgound color for animation mode
 				drawingSurface().setBackground(Constants.ANIMATION_BACKGROUND_COLOR);

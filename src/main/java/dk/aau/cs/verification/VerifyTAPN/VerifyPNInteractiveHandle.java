@@ -22,6 +22,7 @@ import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.gui.petrinet.verification.Verifier;
 
@@ -69,116 +70,130 @@ public class VerifyPNInteractiveHandle {
 
     public Map<TimedTransition, List<Map<Variable, Color>>> sendMarking(NetworkMarking marking) {
         try {
-            String xmlResponse = sendMessage(marking.toXmlStr(composer));
-            System.out.println(xmlResponse);
-            System.out.println("====");
+            String xmlResponse = sendMessage(marking.toXmlStr(composer), "valid-bindings");
             return parseTransitionWithBindings(xmlResponse);
         } catch (Exception e) {
-            e.printStackTrace();
-            return Map.of();
-        }
-    }
-
-    private String sendMessage(String message) {
-        try {
-            writer.write(message);
-            final int numNewlines = 3;
-            for (int i = 0; i < numNewlines; ++i) {
-                writer.newLine();
-            }
-
-            writer.flush();
-
-            StringBuilder response = new StringBuilder();
-            String line;
-            boolean insideValidBindings = false;
-            
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().equals("<valid-bindings>")) {
-                    insideValidBindings = true;
-                    response.append(line).append("\n");
-                    continue;
-                }
-                
-                if (line.trim().equals("</valid-bindings>")) {
-                    response.append(line).append("\n");
-                    break;
-                }
-                
-                if (insideValidBindings) {
-                    response.append(line).append("\n");
-                    continue;
-                }
-                
-                if (!insideValidBindings && line.trim().isEmpty()) {
-                    break;
-                }
-            }
-
-            return response.toString().trim();
-        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    private Map<TimedTransition, List<Map<Variable, Color>>> parseTransitionWithBindings(String xmlResponse) {
+    public NetworkMarking sendTransition(TimedTransition transition, Tuple<Variable, Color> binding) {
         try {
-            Map<TimedTransition, List<Map<Variable, Color>>> transitionBindings = new LinkedHashMap<>();
-    
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(new InputSource(new StringReader(xmlResponse)));
+            String xmlResponse = sendMessage(transition.toBindingXmlStr(binding, composer), "marking");
+            return parseMarking(xmlResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String sendMessage(String message, String responseTag) throws IOException {
+        List<String> xmlResponses = sendMessage(message, List.of(responseTag));
+        return xmlResponses.isEmpty() ? "" : xmlResponses.get(0);
+    }
+
+    private List<String> sendMessage(String message, List<String> responseTags) throws IOException {
+        writer.write(message);
+        final int numNewlines = 3;
+        for (int i = 0; i < numNewlines; ++i) {
+            writer.newLine();
+        }
+
+        writer.flush();
+
+        List<String> responses = new ArrayList<>();
+        StringBuilder currentResponse = null;
+        String currentTag = null;
+
+        String line;
+        while ((line = reader.readLine()) != null && responses.size() < responseTags.size()) {
+            String trimmedLine = line.trim();
+            for (String tag : responseTags) {
+                if (trimmedLine.equals("<" + tag + ">")) {
+                    currentTag = tag;
+                    currentResponse = new StringBuilder();
+                    currentResponse.append(line).append("\n");
+                    break;
+                }
+                
+                if (trimmedLine.equals("</" + tag + ">") && currentTag != null && currentTag.equals(tag)) {
+                    currentResponse.append(line).append("\n");
+                    responses.add(currentResponse.toString().trim());
+                    currentResponse = null;
+                    currentTag = null;
+                    break;
+                }
+            }
             
-            NodeList transitionNodes = document.getElementsByTagName("transition");
-            for (int i = 0; i < transitionNodes.getLength(); ++i) {
-                Element transitionElement = (Element)transitionNodes.item(i);
-                String transitionId = transitionElement.getAttribute("id");
-                TimedTransition transition = composer.getTransitionByComposedName(transitionId);
+            if (currentResponse != null && !trimmedLine.equals("<" + currentTag + ">")) {
+                currentResponse.append(line).append("\n");
+            }
+        }
 
-                if (transition == null) {
-                    throw new IllegalArgumentException("Transition with ID " + transitionId + " not found in composer.");
-                }
+        return responses;
+    }
 
-                List<Map<Variable, Color>> bindings = new ArrayList<>();
-                NodeList bindingNodes = transitionElement.getElementsByTagName("binding");
-                for (int j = 0; j < bindingNodes.getLength(); ++j) {
-                    Element bindingElement = (Element)bindingNodes.item(j);
-                    Map<Variable, Color> bindingMap = new LinkedHashMap<>();
+    private NetworkMarking parseMarking(String xmlResponse) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(new InputSource(new StringReader(xmlResponse)));
+        Element markingElement = (Element)document.getElementsByTagName("marking").item(0);
+        return VerifyTAPNMarkingParser.parseComposedMarking(network, markingElement, composer);
+    }
 
-                    NodeList variableNodes = bindingElement.getElementsByTagName("variable");
-                    for (int k = 0; k < variableNodes.getLength(); ++k) {
-                        Element variableElement = (Element)variableNodes.item(k);
-                        String variableId = variableElement.getAttribute("id");
-                        
-                        Element colorElement = (Element)variableElement.getElementsByTagName("color").item(0);
-                        String colorName = colorElement.getTextContent();
+    private Map<TimedTransition, List<Map<Variable, Color>>> parseTransitionWithBindings(String xmlResponse) throws Exception {
+        Map<TimedTransition, List<Map<Variable, Color>>> transitionBindings = new LinkedHashMap<>();
 
-                        Variable variable = network.getVariableByName(variableId);
-                        Color color = network.getColorByName(colorName);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(new InputSource(new StringReader(xmlResponse)));
+        
+        NodeList transitionNodes = document.getElementsByTagName("transition");
+        for (int i = 0; i < transitionNodes.getLength(); ++i) {
+            Element transitionElement = (Element)transitionNodes.item(i);
+            String transitionId = transitionElement.getAttribute("id");
+            TimedTransition transition = composer.getTransitionByComposedName(transitionId);
 
-                        if (variable == null || color == null) {
-                            throw new IllegalArgumentException("Variable or color not found for ID: " + variableId + " or " + colorName);
-                        }
+            if (transition == null) {
+                throw new IllegalArgumentException("Transition with ID " + transitionId + " not found in composer.");
+            }
 
-                        bindingMap.put(variable, color);
+            List<Map<Variable, Color>> bindings = new ArrayList<>();
+            NodeList bindingNodes = transitionElement.getElementsByTagName("binding");
+            for (int j = 0; j < bindingNodes.getLength(); ++j) {
+                Element bindingElement = (Element)bindingNodes.item(j);
+                Map<Variable, Color> bindingMap = new LinkedHashMap<>();
+
+                NodeList variableNodes = bindingElement.getElementsByTagName("variable");
+                for (int k = 0; k < variableNodes.getLength(); ++k) {
+                    Element variableElement = (Element)variableNodes.item(k);
+                    String variableId = variableElement.getAttribute("id");
+                    
+                    Element colorElement = (Element)variableElement.getElementsByTagName("color").item(0);
+                    String colorName = colorElement.getTextContent();
+
+                    Variable variable = network.getVariableByName(variableId);
+                    Color color = network.getColorByName(colorName);
+
+                    if (variable == null || color == null) {
+                        throw new IllegalArgumentException("Variable or color not found for ID: " + variableId + " or " + colorName);
                     }
 
-                    if (!bindingMap.isEmpty()) {
-                        bindings.add(bindingMap);
-                    }
+                    bindingMap.put(variable, color);
                 }
 
-                if (!bindings.isEmpty()) {
-                    transitionBindings.put(transition, bindings);
+                if (!bindingMap.isEmpty()) {
+                    bindings.add(bindingMap);
                 }
             }
 
-            return transitionBindings;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Map.of();
+            if (!bindings.isEmpty()) {
+                transitionBindings.put(transition, bindings);
+            }
         }
+
+        return transitionBindings;
     }
 
     public void stopInteractiveMode() {

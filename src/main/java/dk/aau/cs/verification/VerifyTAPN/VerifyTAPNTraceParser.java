@@ -149,7 +149,7 @@ public class VerifyTAPNTraceParser {
                     trace.nextIsLoop();
                     trace.setTraceType(TraceType.EG_LOOP);
                 } else if (tag.equals("marking")) {
-                    LocalTimedMarking newMarking = parseMarking(childElement);
+                    LocalTimedMarking newMarking = VerifyTAPNMarkingParser.parseMarking(tapn, childElement);
                     ColoredTransitionStep lastStep = (ColoredTransitionStep)trace.getLastStep();
                     if (lastStep != null) {
                         lastStep.setPostMarking(newMarking);
@@ -243,48 +243,6 @@ public class VerifyTAPNTraceParser {
         TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
         Map<Variable, Color> bindings = colorBindingParser.parseBindingsForSingleTransition(nodeToString(bindingsNode), transition.name(), tapn.parentNetwork());
         return new ColoredTransitionStep(transition, bindings);
-    }
-
-    private LocalTimedMarking parseMarking(Element element) {
-        LocalTimedMarking marking = new LocalTimedMarking();
-        NodeList placeNodes = element.getElementsByTagName("place");
-        for (int i = 0; i < placeNodes.getLength(); ++i) {
-            Element placeElement = (Element)placeNodes.item(i);
-            String placeId = placeElement.getAttribute("id");
-            TimedPlace place = tapn.getPlaceByName(placeId);
-
-            NodeList tokenNodes = placeElement.getElementsByTagName("token");
-            for (int j = 0; j < tokenNodes.getLength(); ++j) {
-                Element tokenElement = (Element)tokenNodes.item(j);
-                int count = Integer.parseInt(tokenElement.getAttribute("count"));
-
-                NodeList colorNodes = tokenElement.getElementsByTagName("color");
-
-                Color color;
-                if (colorNodes.getLength() == 1) {
-                    Element colorElement = (Element)colorNodes.item(0);
-                    String colorName = colorElement.getTextContent();
-                    color = tapn.parentNetwork().getColorByName(colorName);
-                } else {
-                    Vector<Color> constituents = new Vector<>();   
-                    for (int k = 0; k < colorNodes.getLength(); ++k) {
-                        Element colorElement = (Element)colorNodes.item(k);
-                        String colorName = colorElement.getTextContent();
-                        Color constituentColor = tapn.parentNetwork().getColorByName(colorName);
-                        constituents.add(constituentColor);
-                    }
-                    
-                    color = tapn.parentNetwork().getProductColorByConstituents(constituents);
-                }
-
-                for (int l = 0; l < count; ++l) {
-                    TimedToken token = new TimedToken(place, color);
-                    marking.add(token);
-                }
-            }
-        }
-
-        return marking;
     }
 
     private static String nodeToString(Node node) {

@@ -3,6 +3,7 @@ package dk.aau.cs.verification;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -660,12 +661,29 @@ public class TAPNComposer implements ITAPNComposer {
     }
 
     public TimedTransition getTransitionByComposedName(String composedName) {
+        return findByComposedName(composedName, 
+            tapn -> tapn.transitions(), 
+            transition -> transition.isShared(), 
+            transition -> transition.name());
+    }
+
+    public TimedPlace getPlaceByComposedName(String composedName) {
+        return findByComposedName(composedName, 
+            tapn -> tapn.places(), 
+            place -> place.isShared(), 
+            place -> place.name());
+    }
+
+    private <T> T findByComposedName(String composedName, 
+                                    Function<TimedArcPetriNet, Iterable<T>> getCollection,
+                                    Function<T, Boolean> isShared,
+                                    Function<T, String> getName) {
         if (composedName.startsWith("Shared_")) {
             String originalName = composedName.substring("Shared_".length());
             for (TimedArcPetriNet tapn : guiModels.keySet()) {
-                for (TimedTransition transition : tapn.transitions()) {
-                    if (transition.isShared() && transition.name().equals(originalName)) {
-                        return transition;
+                for (T item : getCollection.apply(tapn)) {
+                    if (isShared.apply(item) && getName.apply(item).equals(originalName)) {
+                        return item;
                     }
                 }
             }
@@ -676,13 +694,13 @@ public class TAPNComposer implements ITAPNComposer {
         if (composedName.contains("_")) {
             int lastUnderscoreIndex = composedName.lastIndexOf("_");
             String templateName = composedName.substring(0, lastUnderscoreIndex);
-            String transitionName = composedName.substring(lastUnderscoreIndex + 1);
+            String itemName = composedName.substring(lastUnderscoreIndex + 1);
             
             for (TimedArcPetriNet tapn : guiModels.keySet()) {
                 if (tapn.name().equals(templateName)) {
-                    for (TimedTransition transition : tapn.transitions()) {
-                        if (!transition.isShared() && transition.name().equals(transitionName)) {
-                            return transition;
+                    for (T item : getCollection.apply(tapn)) {
+                        if (!isShared.apply(item) && getName.apply(item).equals(itemName)) {
+                            return item;
                         }
                     }
                 }
@@ -690,12 +708,12 @@ public class TAPNComposer implements ITAPNComposer {
 
             return null;
         }
-
+        
         if (singleComponentNoPrefix) {
             for (TimedArcPetriNet tapn : guiModels.keySet()) {
-                for (TimedTransition transition : tapn.transitions()) {
-                    if (!transition.isShared() && transition.name().equals(composedName)) {
-                        return transition;
+                for (T item : getCollection.apply(tapn)) {
+                    if (!isShared.apply(item) && getName.apply(item).equals(composedName)) {
+                        return item;
                     }
                 }
             }
