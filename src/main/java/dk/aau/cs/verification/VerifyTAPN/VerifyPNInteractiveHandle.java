@@ -57,6 +57,8 @@ public class VerifyPNInteractiveHandle {
                 modelPath = '"' + modelPath + '"';
             }
 
+            verifyPn.setup(); // Ensure the path is set up correctly
+
             List<String> initCommand = List.of(verifyPn.getPath(), modelPath, "-C", "--interactive-mode");
     
             ProcessBuilder pb = new ProcessBuilder(initCommand);
