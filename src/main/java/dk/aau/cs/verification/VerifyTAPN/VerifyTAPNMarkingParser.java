@@ -2,6 +2,7 @@ package dk.aau.cs.verification.VerifyTAPN;
 
 import java.util.Vector;
 import java.util.function.Function;
+import java.util.jar.Attributes.Name;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -14,6 +15,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 
 public class VerifyTAPNMarkingParser {
@@ -29,10 +32,13 @@ public class VerifyTAPNMarkingParser {
         return marking;
     }
 
-    public static NetworkMarking parseComposedMarking(TimedArcPetriNetNetwork network, Element element, TAPNComposer composer) {
+    public static NetworkMarking parseComposedMarking(TimedArcPetriNetNetwork network, Element element, NameMapping nameMapping) {
         NetworkMarking marking = new NetworkMarking();
         parseTokensForPlaces(element,
-            placeId -> composer.getPlaceByComposedName(placeId),
+            place -> {
+                Tuple<String, String> originalName = nameMapping.map(place);
+                return network.getTAPNByName(originalName.value1()).getPlaceByName(originalName.value2());
+            },
             network::getColorByName,
             network::getProductColorByConstituents,
             (place, token) -> {

@@ -660,68 +660,6 @@ public class TAPNComposer implements ITAPNComposer {
         return place.isShared() ? "Shared_" + place.name() : ((LocalTimedPlace)place).model().name() + "_" + place.name();
     }
 
-    public TimedTransition getTransitionByComposedName(String composedName) {
-        return findByComposedName(composedName, 
-            tapn -> tapn.transitions(), 
-            transition -> transition.isShared(), 
-            transition -> transition.name());
-    }
-
-    public TimedPlace getPlaceByComposedName(String composedName) {
-        return findByComposedName(composedName, 
-            tapn -> tapn.places(), 
-            place -> place.isShared(), 
-            place -> place.name());
-    }
-
-    private <T> T findByComposedName(String composedName, 
-                                    Function<TimedArcPetriNet, Iterable<T>> getCollection,
-                                    Function<T, Boolean> isShared,
-                                    Function<T, String> getName) {
-        if (composedName.startsWith("Shared_")) {
-            String originalName = composedName.substring("Shared_".length());
-            for (TimedArcPetriNet tapn : guiModels.keySet()) {
-                for (T item : getCollection.apply(tapn)) {
-                    if (isShared.apply(item) && getName.apply(item).equals(originalName)) {
-                        return item;
-                    }
-                }
-            }
-            
-            return null;
-        }
-        
-        if (composedName.contains("_")) {
-            int lastUnderscoreIndex = composedName.lastIndexOf("_");
-            String templateName = composedName.substring(0, lastUnderscoreIndex);
-            String itemName = composedName.substring(lastUnderscoreIndex + 1);
-            
-            for (TimedArcPetriNet tapn : guiModels.keySet()) {
-                if (tapn.name().equals(templateName)) {
-                    for (T item : getCollection.apply(tapn)) {
-                        if (!isShared.apply(item) && getName.apply(item).equals(itemName)) {
-                            return item;
-                        }
-                    }
-                }
-            }
-
-            return null;
-        }
-        
-        if (singleComponentNoPrefix) {
-            for (TimedArcPetriNet tapn : guiModels.keySet()) {
-                for (T item : getCollection.apply(tapn)) {
-                    if (!isShared.apply(item) && getName.apply(item).equals(composedName)) {
-                        return item;
-                    }
-                }
-            }
-        }
-        
-        return null;
-    }
-
     public TAPNLens getLens() {
         return lens;
     }

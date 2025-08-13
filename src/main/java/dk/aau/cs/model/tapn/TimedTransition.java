@@ -318,7 +318,6 @@ public class TimedTransition extends TAPNElement {
 			result = this.calculateDIntervalAlone();
 		}
 		
-		
 		//Invariants
 		for(TimedArcPetriNet model : model().parentNetwork().activeTemplates()){
 			for(TimedPlace place : model.places()){
@@ -615,17 +614,20 @@ public class TimedTransition extends TAPNElement {
         transitionElement.setAttribute("id", composer.composedTransitionName(this));
 
         Element bindingElement = document.createElement("binding");
+        
+        if (binding != null) {
+            Element variableElement = document.createElement("variable");
+            variableElement.setAttribute("id", binding.value1().getId());
+            
+            Element colorElement = document.createElement("color");
+            colorElement.setTextContent(binding.value2().getName());
+            
+            variableElement.appendChild(colorElement);
+            bindingElement.appendChild(variableElement);
+        }
 
-        Element variableElement = document.createElement("variable");
-        variableElement.setAttribute("id", binding.value1().getId());
-
-        Element colorElement = document.createElement("color");
-        colorElement.setTextContent(binding.value2().getName());
-
-        variableElement.appendChild(colorElement);
-        bindingElement.appendChild(variableElement);
         transitionElement.appendChild(bindingElement);
-
+        
         return transitionElement;
     }
 }

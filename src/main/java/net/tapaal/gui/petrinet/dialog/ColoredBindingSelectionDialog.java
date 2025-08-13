@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.MouseInfo;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,7 +24,7 @@ import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.Variable;
 
 public class ColoredBindingSelectionDialog {
-    public static Tuple<Variable, Color> showDialog(TimedTransition transition, Map<Variable, Color> validBindings) {
+    public static Tuple<Variable, Color> showDialog(TimedTransition transition, List<Tuple<Variable, Color>> validBindings) {
         EscapableDialog dialog = new EscapableDialog(
             TAPAALGUI.getApp(),
             "Select binding for transition: " + transition.name(),
@@ -33,8 +34,8 @@ public class ColoredBindingSelectionDialog {
         JPanel panel = new JPanel(new BorderLayout());
 
         DefaultListModel<Tuple<Variable, Color>> listModel = new DefaultListModel<>();
-        for (Map.Entry<Variable, Color> entry : validBindings.entrySet()) {
-            listModel.addElement(new Tuple<>(entry.getKey(), entry.getValue()));
+        for (var binding : validBindings) {
+            listModel.addElement(binding);
         }
 
         JList<Tuple<Variable, Color>> bindingList = new JList<>(listModel);
@@ -49,8 +50,8 @@ public class ColoredBindingSelectionDialog {
                     try {
                         Tuple<?, ?> tuple = (Tuple<?, ?>)value;
                         if (tuple.value1() instanceof Variable && tuple.value2() instanceof Color) {
-                            Variable variable = (Variable) tuple.value1();
-                            Color color = (Color) tuple.value2();
+                            Variable variable = (Variable)tuple.value1();
+                            Color color = (Color)tuple.value2();
                             setText(variable.getName() + " = " + color.getName());
                         } else {
                             setText(value.toString());

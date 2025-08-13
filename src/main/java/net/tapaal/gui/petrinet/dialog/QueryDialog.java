@@ -5875,32 +5875,24 @@ public class QueryDialog extends JPanel {
         }
     }
 
+    private boolean oldExplicitSearchState;
+
     private void refreshExplicitSearch() {
-        useExplicitSearch.setEnabled(canUseExplicitSearch());
+        if (canUseExplicitSearch()) {
+            useExplicitSearch.setSelected(oldExplicitSearchState);
+            useExplicitSearch.setEnabled(true);
+        } else {
+            if (useExplicitSearch.isEnabled()) {
+                oldExplicitSearchState = useExplicitSearch.isSelected();
+            }
+            
+            useExplicitSearch.setSelected(false);
+            useExplicitSearch.setEnabled(false);
+        }
     }
 
     private boolean canUseExplicitSearch() {
-        return containsOnlyEFAndAG(newProperty) && (newProperty.toString().contains("EF") || newProperty.toString().contains("AG"));
-    }
-
-    private boolean containsOnlyEFAndAG(TCTLAbstractProperty property) {
-        if (property instanceof TCTLEGNode || property instanceof TCTLAFNode ||
-                property instanceof TCTLEUNode || property instanceof TCTLAUNode ||
-                property instanceof TCTLEXNode || property instanceof TCTLAXNode) {
-            return false;
-        } else {
-            return checkAllChildrenContainsOnlyEFAndEG(property);
-        }
-    }
-
-    private boolean checkAllChildrenContainsOnlyEFAndEG(TCTLAbstractProperty property) {
-        for (StringPosition child : property.getChildren()) {
-            if (!containsOnlyEFAndAG(child.getObject())) {
-                return false;
-            }
-        }
-
-        return true;
+        return (newProperty.toString().contains("AG") || newProperty.toString().contains("EF")) && !newProperty.hasNestedPathQuantifiers();
     }
 
     private void refreshColoredReduction() {

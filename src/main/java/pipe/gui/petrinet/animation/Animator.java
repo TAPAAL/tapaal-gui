@@ -79,7 +79,7 @@ public class Animator {
 
     private VerifyPNInteractiveHandle interactiveEngine;
     private boolean isUsingInteractiveEngine;
-    private Map<TimedTransition, Map<Variable, Color>> validBindingsMap;
+    private Map<TimedTransition, List<Tuple<Variable, Color>>> validBindingsMap;
 
     public static boolean isUrgentTransitionEnabled(){
         return isUrgentTransitionEnabled;
@@ -101,7 +101,7 @@ public class Animator {
             VerifyTAPNExporter exporter = new VerifyCPNExporter();
             var exportedModel = exporter.exportModel(composedModel, composer.getGuiModel());
 
-            interactiveEngine = new VerifyPNInteractiveHandle(tab.network(), composer);
+            interactiveEngine = new VerifyPNInteractiveHandle(tab.network(), composer, composedModel.value2());
             isUsingInteractiveEngine = interactiveEngine.startInteractiveMode(exportedModel.modelFile());
             if (!isUsingInteractiveEngine) {
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), 
@@ -677,22 +677,24 @@ public class Animator {
         }
 
         if (isUsingInteractiveEngine) {
-            var validBindings = validBindingsMap.get(transition);
             Tuple<Variable, Color> binding = null; 
-            if (SimulationControl.getInstance().randomSimulation()) {
-                Random random = new Random();
-                List<Variable> keys = new ArrayList<>(validBindings.keySet());
-                Variable randomKey = keys.get(random.nextInt(keys.size()));
-                Color randomColor = validBindings.get(randomKey);
-                binding = new Tuple<>(randomKey, randomColor);
-            } else {
-                binding = ColoredBindingSelectionDialog.showDialog(transition, validBindings);
-                if (binding == null) return; // Cancelled
+            if (!validBindingsMap.isEmpty()) {
+                var validBindings = validBindingsMap.get(transition);
+                if (SimulationControl.getInstance().randomSimulation()) {
+                    Random random = new Random();
+                    int randomIndex = random.nextInt(validBindings.size());
+                    binding = validBindings.get(randomIndex);
+                } else if (!validBindings.isEmpty()){
+                    binding = ColoredBindingSelectionDialog.showDialog(transition, validBindings);
+                    if (binding == null) return; // Cancelled
+                }
             }
 
             if (!clearStepsForward()) return;
+            
+            NetworkMarking newMarking;
 
-            NetworkMarking newMarking = interactiveEngine.sendTransition(transition, binding);
+            newMarking = interactiveEngine.sendTransition(transition, binding);
             
             addMarking(new TAPNNetworkColoredTransitionStep(transition, binding, newMarking), newMarking);
 

@@ -4,7 +4,8 @@ import java.io.BufferedReader;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +24,7 @@ import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.debug.Logger;
 import net.tapaal.gui.petrinet.verification.Verifier;
@@ -41,12 +43,14 @@ public class VerifyPNInteractiveHandle {
 
     private TimedArcPetriNetNetwork network;
     private TAPNComposer composer;
+    private NameMapping nameMapping;
 
     private boolean isShutdownHookRegistered;
 
-    public VerifyPNInteractiveHandle(TimedArcPetriNetNetwork network, TAPNComposer composer) {
+    public VerifyPNInteractiveHandle(TimedArcPetriNetNetwork network, TAPNComposer composer, NameMapping nameMapping) {
         this.network = network;
         this.composer = composer;
+        this.nameMapping = nameMapping;
     }
 
     public boolean startInteractiveMode(String modelPath) {
@@ -84,11 +88,11 @@ public class VerifyPNInteractiveHandle {
         }
     }
 
-    public Map<TimedTransition, Map<Variable, Color>> sendMarking(NetworkMarking marking) {
+    public Map<TimedTransition, List<Tuple<Variable, Color>>> sendMarking(NetworkMarking marking) {
         try {
             String markingXmlStr = marking.toXmlStr(composer);
             if (markingXmlStr.equals("<marking/>")) {
-                return new LinkedHashMap<>();
+                return new HashMap<>();
             }
 
             String xmlResponse = sendMessage(marking.toXmlStr(composer), "valid-bindings");
@@ -146,11 +150,11 @@ public class VerifyPNInteractiveHandle {
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.parse(new InputSource(new StringReader(xmlResponse)));
         Element markingElement = (Element)document.getElementsByTagName("marking").item(0);
-        return VerifyTAPNMarkingParser.parseComposedMarking(network, markingElement, composer);
+        return VerifyTAPNMarkingParser.parseComposedMarking(network, markingElement, nameMapping);
     }
 
-    private Map<TimedTransition, Map<Variable, Color>> parseTransitionWithBindings(String xmlResponse) throws Exception {
-        Map<TimedTransition, Map<Variable, Color>> transitionBindings = new LinkedHashMap<>();
+    private Map<TimedTransition, List<Tuple<Variable, Color>>> parseTransitionWithBindings(String xmlResponse) throws Exception {
+        Map<TimedTransition, List<Tuple<Variable, Color>>> transitionBindings = new HashMap<>();
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -160,39 +164,37 @@ public class VerifyPNInteractiveHandle {
         for (int i = 0; i < transitionNodes.getLength(); ++i) {
             Element transitionElement = (Element)transitionNodes.item(i);
             String transitionId = transitionElement.getAttribute("id");
-            TimedTransition transition = composer.getTransitionByComposedName(transitionId);
+
+            Tuple<String, String> originalName = nameMapping.map(transitionId);
+            TimedTransition transition = network.getTAPNByName(originalName.value1())
+                                                .getTransitionByName(originalName.value2());
 
             if (transition == null) {
                 throw new IllegalArgumentException("Transition with ID " + transitionId + " not found in composer.");
             }
 
-            Map<Variable, Color> bindings = new LinkedHashMap<>();
+            List<Tuple<Variable, Color>> bindings = new ArrayList<>();
             NodeList bindingNodes = transitionElement.getElementsByTagName("binding");
             for (int j = 0; j < bindingNodes.getLength(); ++j) {
                 Element bindingElement = (Element)bindingNodes.item(j);
 
-                NodeList variableNodes = bindingElement.getElementsByTagName("variable");
-                for (int k = 0; k < variableNodes.getLength(); ++k) {
-                    Element variableElement = (Element)variableNodes.item(k);
-                    String variableId = variableElement.getAttribute("id");
-                    
-                    Element colorElement = (Element)variableElement.getElementsByTagName("color").item(0);
-                    String colorName = colorElement.getTextContent();
+                Element variableElement = (Element)bindingElement.getElementsByTagName("variable").item(0);
+                String variableId = variableElement.getAttribute("id");
+                
+                Element colorElement = (Element)variableElement.getElementsByTagName("color").item(0);
+                String colorName = colorElement.getTextContent();
 
-                    Variable variable = network.getVariableByName(variableId);
-                    Color color = network.getColorByName(colorName);
+                Variable variable = network.getVariableByName(variableId);
+                Color color = network.getColorByName(colorName);
 
-                    if (variable == null || color == null) {
-                        throw new IllegalArgumentException("Variable or color not found for ID: " + variableId + " or " + colorName);
-                    }
-
-                    bindings.put(variable, color);
+                if (variable == null || color == null) {
+                    throw new IllegalArgumentException("Variable or color not found for ID: " + variableId + " or " + colorName);
                 }
+
+                bindings.add(new Tuple<>(variable, color));
             }
 
-            if (!bindings.isEmpty()) {
-                transitionBindings.put(transition, bindings);
-            }
+            transitionBindings.put(transition, bindings);
         }
 
         return transitionBindings;
