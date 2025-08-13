@@ -28,11 +28,17 @@ public class ColoredSimulationDialog extends JDialog {
         initComponents();
     }
 
-    public static void showSimulationDialog(PetriNetTab tab){
-        String[] options = {"Cancel", "Unfold", "Explicit"};
+    public static void showSimulationDialog(PetriNetTab tab, boolean explicit) {
+        int unfoldAnswer = 0;
+        if (explicit) {
+            String[] options = {"Cancel", "Unfold", "Explicit"};
+            unfoldAnswer = JOptionPane.showOptionDialog(TAPAALGUI.getApp(), "Simulate the net explicitly or unfolded", "Simulation Mode",
+            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+        } else {
+            String[] options = {"Cancel", "Unfold"};
+            unfoldAnswer = JOptionPane.showOptionDialog(TAPAALGUI.getApp(), "The net will need to be unfolded before entering simulation mode", "Unfolding Required", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        }
 
-        int unfoldAnswer = JOptionPane.showOptionDialog(TAPAALGUI.getApp(), "Simulate the net explicitly or unfolded", "Simulation Mode",
-        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
         if (unfoldAnswer == 2) {
             explicitSimulationMode = true;
         } else if (unfoldAnswer == 1) {
