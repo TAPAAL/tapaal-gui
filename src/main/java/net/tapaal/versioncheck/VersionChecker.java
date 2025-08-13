@@ -64,25 +64,32 @@ public class VersionChecker {
 		int[] newestVersionNumbers = null;
 		try{
 			//currentVersionNumbers = getVersionNumbers(TAPAAL.VERSION);
-			currentVersionNumbers = getVersionNumbers(versionString);	
+            currentVersionNumbers = getVersionNumbers(versionString);
 			newestVersionNumbers = getVersionNumbers(newestVersion);
 		}catch(Exception e){
 			return false;
 		}
 		if(currentVersionNumbers.length != 3 || newestVersionNumbers.length != 3) return false;
-		
 		if(newestVersionNumbers[0] > currentVersionNumbers[0]){
 			return true;
 		}else if(newestVersionNumbers[0] == currentVersionNumbers[0] && newestVersionNumbers[1] > currentVersionNumbers[1]){
 			return true;
 		}else if(newestVersionNumbers[0] == currentVersionNumbers[0] && newestVersionNumbers[1] == currentVersionNumbers[1] && newestVersionNumbers[2] > currentVersionNumbers[2]){
 			return true;
-		}
+		} else if (newestVersionNumbers[0] == currentVersionNumbers[0] && newestVersionNumbers[1] == currentVersionNumbers[1] && newestVersionNumbers[2] == currentVersionNumbers[2]) {
+            return isCurrentPreRelease(versionString);
+        }
 		
-		return false;
+        return false;
 	}
 
+    private boolean isCurrentPreRelease(String versionString) {
+        return versionString.contains(" ");
+    }
+
 	private int[] getVersionNumbers(String version) {
+        version = version.split("\\s+")[0]; // Remove pre-release suffix
+
 		String delimiter = "\\.";
 		String[] split = version.split(delimiter);
 		return new int[]{ Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2])};
