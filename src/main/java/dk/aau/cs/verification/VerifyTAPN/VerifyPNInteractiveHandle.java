@@ -179,6 +179,8 @@ public class VerifyPNInteractiveHandle {
                 Element bindingElement = (Element)bindingNodes.item(j);
 
                 Element variableElement = (Element)bindingElement.getElementsByTagName("variable").item(0);
+                if (variableElement == null) continue;
+                
                 String variableId = variableElement.getAttribute("id");
                 
                 Element colorElement = (Element)variableElement.getElementsByTagName("color").item(0);
