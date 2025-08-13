@@ -64,12 +64,12 @@ public class VerifyPNInteractiveHandle {
             ProcessBuilder pb = new ProcessBuilder(initCommand);
             verifypnProcess = pb.start();
     
+            Logger.log("Running: " + String.join(" ", initCommand));
+
             Thread.sleep(100);
             if (!verifypnProcess.isAlive()) {
                 return false;
             }
-
-            Logger.log("Running: " + String.join(" ", initCommand));
 
             writer = new BufferedWriter(new OutputStreamWriter(verifypnProcess.getOutputStream()));
             reader = new BufferedReader(new InputStreamReader(verifypnProcess.getInputStream()));
@@ -86,6 +86,11 @@ public class VerifyPNInteractiveHandle {
 
     public Map<TimedTransition, Map<Variable, Color>> sendMarking(NetworkMarking marking) {
         try {
+            String markingXmlStr = marking.toXmlStr(composer);
+            if (markingXmlStr.equals("<marking/>")) {
+                return new LinkedHashMap<>();
+            }
+
             String xmlResponse = sendMessage(marking.toXmlStr(composer), "valid-bindings");
             return parseTransitionWithBindings(xmlResponse);
         } catch (Exception e) {
