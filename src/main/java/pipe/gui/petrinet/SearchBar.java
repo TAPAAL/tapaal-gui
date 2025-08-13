@@ -19,7 +19,7 @@ import javax.swing.event.DocumentListener;
 
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.util.Pair;
+import dk.aau.cs.util.Tuple;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -41,10 +41,10 @@ public class SearchBar extends JPanel {
     private final JPopupMenu resultsPopup;
 
     private Consumer<String> onSearchTextChanged;
-    private Consumer<Pair<?, String>> onResultSelected;
+    private Consumer<Tuple<?, String>> onResultSelected;
     private Runnable onFocusGained;
     private Runnable onFocusLost;
-    private List<Pair<?, String>> currentMatches;
+    private List<Tuple<?, String>> currentMatches;
     private List<JButton> resultButtons = new ArrayList<>();
     private int selectedIndex = -1;
     private int maxVisibleItems = 10;
@@ -191,7 +191,7 @@ public class SearchBar extends JPanel {
         onSearchTextChanged = consumer;
     }
 
-    public void setOnResultSelected(Consumer<Pair<?, String>> consumer) {
+    public void setOnResultSelected(Consumer<Tuple<?, String>> consumer) {
         onResultSelected = consumer;
     }
 
@@ -213,7 +213,7 @@ public class SearchBar extends JPanel {
         this.useSharedPrefix = useSharedPrefix;
     }
 
-    public void showResults(List<Pair<?, String>> matches) {
+    public void showResults(List<Tuple<?, String>> matches) {
         currentMatches = matches;
         resultButtons.clear();
         selectedIndex = -1;
@@ -240,8 +240,8 @@ public class SearchBar extends JPanel {
             resultsPanel.setBackground(Color.WHITE);
             
             for (int i = 0; i < matches.size(); i++) {
-                Pair<?, String> match = matches.get(i);
-                Object firstElem = match.getFirst();
+                Tuple<?, String> match = matches.get(i);
+                Object firstElem = match.value1();
                 boolean isShared = firstElem instanceof TimedPlace && ((TimedPlace)firstElem).isShared() ||
                                    firstElem instanceof TimedTransition && ((TimedTransition) firstElem).isShared();
     
@@ -253,13 +253,13 @@ public class SearchBar extends JPanel {
                 String matchStr;
                 if (firstElem instanceof TimedTransition) {
                     if (isShared) {
-                        matchStr = (useSharedPrefix ? match.getSecond() + "." : "") + firstElemStr + " (shared transition)";
+                        matchStr = (useSharedPrefix ? match.value2() + "." : "") + firstElemStr + " (shared transition)";
                     } else {
                         matchStr = firstElemStr + " (transition)";
                     }
                 } else {
                     if (isShared) {
-                        matchStr = (useSharedPrefix ? match.getSecond() + "." : "") + firstElemStr + " (shared place)";
+                        matchStr = (useSharedPrefix ? match.value2() + "." : "") + firstElemStr + " (shared place)";
                     } else {
                         matchStr = firstElemStr + " (place)";
                     }

@@ -984,7 +984,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             PetriNetObject selectedObject = null;
             PetriNetTab tab = (PetriNetTab)currentTab.get();
-            String resultStr = result.getFirst().toString();
+            String resultStr = result.value1().toString();
 
             String templateName = null;
             String name;
@@ -993,11 +993,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 templateName = resultStr.split("\\.")[0];
                 name = resultStr.split("\\.")[1];
             } else {
-                templateName = result.getSecond();
+                templateName = result.value2();
                 name = resultStr;
             }
             
-            Object resultObj = result.getFirst();
+            Object resultObj = result.value1();
             for (Template template : tab.allTemplates()) {
                 if (templateName != null && !template.toString().equals(templateName)) {
                     continue;
