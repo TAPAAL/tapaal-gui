@@ -448,16 +448,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             if(getCurrentTab().getLens().isColored() && !getCurrentTab().isInAnimationMode()) {
                 PetriNetTab oldTab = getCurrentTab();
                 ColoredSimulationDialog.showSimulationDialog(oldTab);
-
                 if(!ColoredSimulationDialog.wasCancelled() && (oldTab != getCurrentTab() || ColoredSimulationDialog.explicitSimulationMode())){
                     currentTab.ifPresent(tab -> tab.toggleAnimationMode(ColoredSimulationDialog.explicitSimulationMode()));
                 } else {
                     this.setSelected(false);
                 }
+
+                ColoredSimulationDialog.resetFlags();
             } else {
                 currentTab.ifPresent(TabActions::toggleAnimationMode);
             }
-
         }
     };
     public final GuiAction stepforwardAction = new GuiAction("Step forward", "Step forward", "released RIGHT") {

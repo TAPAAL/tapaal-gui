@@ -108,7 +108,6 @@ public class EnabledTransitionsList extends JPanel{
 
     public void fireSelectedTransition(){
 		TransitionListItem item = transitionsList.getSelectedValue();
-
 		if(item != null) {
 			animator.dFireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
 		}

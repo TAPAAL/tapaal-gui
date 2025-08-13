@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.dialog;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.util.List;
+import java.awt.MouseInfo;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,7 +23,7 @@ import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.Variable;
 
 public class ColoredBindingSelectionDialog {
-    public static Tuple<Variable, Color> showDialog(TimedTransition transition, List<Map<Variable, Color>> validBindings) {
+    public static Tuple<Variable, Color> showDialog(TimedTransition transition, Map<Variable, Color> validBindings) {
         EscapableDialog dialog = new EscapableDialog(
             TAPAALGUI.getApp(),
             "Select binding for transition: " + transition.name(),
@@ -33,10 +33,8 @@ public class ColoredBindingSelectionDialog {
         JPanel panel = new JPanel(new BorderLayout());
 
         DefaultListModel<Tuple<Variable, Color>> listModel = new DefaultListModel<>();
-        for (Map<Variable, Color> binding : validBindings) {
-            for (Map.Entry<Variable, Color> entry : binding.entrySet()) {
-                listModel.addElement(new Tuple<>(entry.getKey(), entry.getValue()));
-            }
+        for (Map.Entry<Variable, Color> entry : validBindings.entrySet()) {
+            listModel.addElement(new Tuple<>(entry.getKey(), entry.getValue()));
         }
 
         JList<Tuple<Variable, Color>> bindingList = new JList<>(listModel);
@@ -89,13 +87,18 @@ public class ColoredBindingSelectionDialog {
             }
         });
 
+        dialog.getRootPane().setDefaultButton(selectButton);
+
         buttonPanel.add(cancelButton);
         buttonPanel.add(selectButton);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         dialog.add(panel);
         dialog.pack();
+        var point = MouseInfo.getPointerInfo().getLocation();
+        dialog.setLocation(point.x - dialog.getWidth() / 2, point.y - dialog.getHeight() / 2);
         dialog.setVisible(true);
+
 
         return selectedBindingRef.get();
     }

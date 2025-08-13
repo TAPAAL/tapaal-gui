@@ -5876,7 +5876,11 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshExplicitSearch() {
-        useExplicitSearch.setEnabled(containsOnlyEFAndAG(newProperty));
+        useExplicitSearch.setEnabled(canUseExplicitSearch());
+    }
+
+    private boolean canUseExplicitSearch() {
+        return containsOnlyEFAndAG(newProperty) && (newProperty.toString().contains("EF") || newProperty.toString().contains("AG"));
     }
 
     private boolean containsOnlyEFAndAG(TCTLAbstractProperty property) {

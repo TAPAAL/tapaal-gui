@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
@@ -78,7 +79,7 @@ public class Animator {
 
     private VerifyPNInteractiveHandle interactiveEngine;
     private boolean isUsingInteractiveEngine;
-    private Map<TimedTransition, List<Map<Variable, Color>>> validBindingsMap;
+    private Map<TimedTransition, Map<Variable, Color>> validBindingsMap;
 
     public static boolean isUrgentTransitionEnabled(){
         return isUrgentTransitionEnabled;
@@ -94,11 +95,6 @@ public class Animator {
         if (!tab.getLens().isColored()) return;
 
         try {
-            HashMap<TimedArcPetriNet, DataLayer> tapns = new HashMap<>();
-            for (Template template : tab.allTemplates()) {
-                tapns.put(template.model(), template.guiModel());
-            }
-
             TAPNComposer composer = new TAPNComposer(new MessengerImpl(), tab.getGuiModels(), tab.getLens(), false, true);
             Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(tab.network());
 
@@ -142,7 +138,7 @@ public class Animator {
     }
 
     public void setTrace(TAPNNetworkTrace trace) {
-        tab.setAnimationMode(true);
+        tab.setAnimationMode(true, tab.getLens().isColored());
 
         try {
             if (trace.isConcreteTrace()) {
@@ -290,7 +286,7 @@ public class Animator {
         return false;
     }
 
-    private void updateFireableTransitionsColored() {
+    private void updateFireableTransitionsColored(TransitionFiringComponent transFireComponent) {
         if (tab.getLens().isColored()) {
             updateValidBindingsMap();
             for (Template template : tab.activeTemplates()) {
@@ -299,12 +295,7 @@ public class Animator {
                         Transition guiTransition = template.guiModel().getTransitionByName(transition.name());
                         if (guiTransition != null) {
                             guiTransition.markTransitionEnabled(true);
-                            tab.getTransitionFiringComponent().addTransition(template, guiTransition);
-                        }
-                    } else {
-                        Transition guiTransition = template.guiModel().getTransitionByName(transition.name());
-                        if (guiTransition != null) {
-                            guiTransition.markTransitionEnabled(false);
+                            transFireComponent.addTransition(template, guiTransition);
                         }
                     }
                 }
@@ -312,35 +303,35 @@ public class Animator {
         }
     }
 
-    public void updateFireableTransitions(){
-        if (tab.getLens().isColored()) {
-            updateFireableTransitionsColored();
-            return;
-        }
-
+    public void updateFireableTransitions() {
         TransitionFiringComponent transFireComponent = tab.getTransitionFiringComponent();
         transFireComponent.startReInit();
+
         isUrgentTransitionEnabled = false;
 
-        outer: for( Template template : tab.activeTemplates()){
-            for (TimedTransition t : template.model().transitions()) {
-                if (t.isUrgent() && t.isEnabled()) {
-                    isUrgentTransitionEnabled = true;
-                    break outer;
+        if (tab.getLens().isColored()) {
+            updateFireableTransitionsColored(transFireComponent);
+        } else {
+            outer: for( Template template : tab.activeTemplates()){
+                for (TimedTransition t : template.model().transitions()) {
+                    if (t.isUrgent() && t.isEnabled()) {
+                        isUrgentTransitionEnabled = true;
+                        break outer;
+                    }
                 }
             }
-        }
-
-        for (Template template : tab.activeTemplates()) {
-            for (Transition t : template.guiModel().transitions()) {
-                if (t.isTransitionEnabled()) {
-                    t.markTransitionEnabled(true);
-                    transFireComponent.addTransition(template, t);
-                } else if (TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() &&
-                    t.isDelayEnabled() && !isUrgentTransitionEnabled
-                ) {
-                    t.markTransitionDelayEnabled(true);
-                    transFireComponent.addTransition(template, t);
+    
+            for (Template template : tab.activeTemplates()) {
+                for (Transition t : template.guiModel().transitions()) {
+                    if (t.isTransitionEnabled()) {
+                        t.markTransitionEnabled(true);
+                        transFireComponent.addTransition(template, t);
+                    } else if (TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() &&
+                        t.isDelayEnabled() && !isUrgentTransitionEnabled
+                    ) {
+                        t.markTransitionDelayEnabled(true);
+                        transFireComponent.addTransition(template, t);
+                    }
                 }
             }
         }
@@ -618,14 +609,14 @@ public class Animator {
         }
     }
 
-    public void dFireTransition(TimedTransition transition){
-        if(!TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
-            fireTransition(transition);
+    public void dFireTransition(TimedTransition transition) {
+        if (tab.getLens().isColored()) {
+            fireColoredTransition(transition);
             return;
         }
 
-        if (tab.getLens().isColored()) {
-            fireColoredTransition(transition);
+        if (!TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
+            fireTransition(transition);
             return;
         }
 
@@ -659,15 +650,45 @@ public class Animator {
     private void fireColoredTransition(TimedTransition transition) {
         if (trace != null && trace.isColoredTrace()) {
             if (isColoredTransitionEnabled(transition)) {
-                stepForward();
+                if (currentAction < actionHistory.size() - 1) {
+                    TAPNNetworkTraceStep nextStep = actionHistory.get(currentAction + 1);
+                    if (nextStep.isColoredTransitionStep()) {
+                        TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)nextStep;
+                        if (coloredStep.getTransition().equals(transition)) {
+                            stepForward();
+                            return;
+                        }
+                    }
+                }
+
+                int fireTransition = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(),
+                        "Are you sure you want to fire a transition which does not follow the colored trace?\n"
+                            + "Firing this transition will discard the colored trace and revert to standard simulation.",
+                        "Discarding Colored Trace", JOptionPane.YES_NO_OPTION );
+
+                if (fireTransition == JOptionPane.NO_OPTION) {
+                    return;
+                }
+
+                removeSetTrace(false);
+            } else {
+                return;
             }
-            
-            return;
         }
 
         if (isUsingInteractiveEngine) {
-            var binding = ColoredBindingSelectionDialog.showDialog(transition, validBindingsMap.get(transition));
-            if (binding == null) return; // Cancelled
+            var validBindings = validBindingsMap.get(transition);
+            Tuple<Variable, Color> binding = null; 
+            if (SimulationControl.getInstance().randomSimulation()) {
+                Random random = new Random();
+                List<Variable> keys = new ArrayList<>(validBindings.keySet());
+                Variable randomKey = keys.get(random.nextInt(keys.size()));
+                Color randomColor = validBindings.get(randomKey);
+                binding = new Tuple<>(randomKey, randomColor);
+            } else {
+                binding = ColoredBindingSelectionDialog.showDialog(transition, validBindings);
+                if (binding == null) return; // Cancelled
+            }
 
             if (!clearStepsForward()) return;
 
@@ -720,7 +741,7 @@ public class Animator {
                     int fireTransition = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(),
                         "Are you sure you want to fire a transition which does not follow the untimed trace?\n"
                             + "Firing this transition will discard the untimed trace and revert to standard simulation.",
-                        "Discrading Untimed Trace", JOptionPane.YES_NO_OPTION );
+                        "Discarding Untimed Trace", JOptionPane.YES_NO_OPTION );
 
                     if (fireTransition == JOptionPane.NO_OPTION){
                         return;

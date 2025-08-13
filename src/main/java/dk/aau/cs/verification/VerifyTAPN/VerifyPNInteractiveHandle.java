@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,11 +24,14 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.debug.Logger;
 import net.tapaal.gui.petrinet.verification.Verifier;
 
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
+
+import com.sun.jna.Platform;
 
 public class VerifyPNInteractiveHandle {
     private Process verifypnProcess;
@@ -39,6 +42,8 @@ public class VerifyPNInteractiveHandle {
     private TimedArcPetriNetNetwork network;
     private TAPNComposer composer;
 
+    private boolean isShutdownHookRegistered;
+
     public VerifyPNInteractiveHandle(TimedArcPetriNetNetwork network, TAPNComposer composer) {
         this.network = network;
         this.composer = composer;
@@ -47,20 +52,29 @@ public class VerifyPNInteractiveHandle {
     public boolean startInteractiveMode(String modelPath) {
         try {
             VerifyPN verifyPn = Verifier.getVerifyPN();
+
+            if (Platform.isWindows()) {
+                modelPath = '"' + modelPath + '"';
+            }
+
             List<String> initCommand = List.of(verifyPn.getPath(), modelPath, "-C", "--interactive-mode");
     
             ProcessBuilder pb = new ProcessBuilder(initCommand);
             verifypnProcess = pb.start();
     
-            System.out.println("Started VerifyPN process with command: " + String.join(" ", initCommand));
             Thread.sleep(100);
             if (!verifypnProcess.isAlive()) {
                 return false;
             }
 
+            Logger.log("Running: " + String.join(" ", initCommand));
+
             writer = new BufferedWriter(new OutputStreamWriter(verifypnProcess.getOutputStream()));
             reader = new BufferedReader(new InputStreamReader(verifypnProcess.getInputStream()));
             errorReader = new BufferedReader(new InputStreamReader(verifypnProcess.getErrorStream()));
+
+            registerShutdownHook();
+
             return true;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -68,7 +82,7 @@ public class VerifyPNInteractiveHandle {
         }
     }
 
-    public Map<TimedTransition, List<Map<Variable, Color>>> sendMarking(NetworkMarking marking) {
+    public Map<TimedTransition, Map<Variable, Color>> sendMarking(NetworkMarking marking) {
         try {
             String xmlResponse = sendMessage(marking.toXmlStr(composer), "valid-bindings");
             return parseTransitionWithBindings(xmlResponse);
@@ -88,12 +102,10 @@ public class VerifyPNInteractiveHandle {
         }
     }
 
-    private String sendMessage(String message, String responseTag) throws IOException {
-        List<String> xmlResponses = sendMessage(message, List.of(responseTag));
-        return xmlResponses.isEmpty() ? "" : xmlResponses.get(0);
-    }
+    private String sendMessage(String message, String responseTag) throws Exception {
+        // Clear leftover lines in the reader
+        while (reader.ready()) reader.readLine();
 
-    private List<String> sendMessage(String message, List<String> responseTags) throws IOException {
         writer.write(message);
         final int numNewlines = 3;
         for (int i = 0; i < numNewlines; ++i) {
@@ -102,36 +114,24 @@ public class VerifyPNInteractiveHandle {
 
         writer.flush();
 
-        List<String> responses = new ArrayList<>();
-        StringBuilder currentResponse = null;
-        String currentTag = null;
+        StringBuilder response = new StringBuilder();
+        boolean insideTag = false;
 
         String line;
-        while ((line = reader.readLine()) != null && responses.size() < responseTags.size()) {
+        while ((line = reader.readLine()) != null) {
             String trimmedLine = line.trim();
-            for (String tag : responseTags) {
-                if (trimmedLine.equals("<" + tag + ">")) {
-                    currentTag = tag;
-                    currentResponse = new StringBuilder();
-                    currentResponse.append(line).append("\n");
-                    break;
-                }
-                
-                if (trimmedLine.equals("</" + tag + ">") && currentTag != null && currentTag.equals(tag)) {
-                    currentResponse.append(line).append("\n");
-                    responses.add(currentResponse.toString().trim());
-                    currentResponse = null;
-                    currentTag = null;
-                    break;
-                }
-            }
-            
-            if (currentResponse != null && !trimmedLine.equals("<" + currentTag + ">")) {
-                currentResponse.append(line).append("\n");
+            if (trimmedLine.equals("<" + responseTag + ">")) {
+                insideTag = true;
+                response.append(line).append("\n");
+            } else if (trimmedLine.equals("</" + responseTag + ">")) {
+                response.append(line).append("\n");
+                break;
+            } else if (insideTag) {
+                response.append(line).append("\n");
             }
         }
 
-        return responses;
+        return response.toString().trim();
     }
 
     private NetworkMarking parseMarking(String xmlResponse) throws Exception {
@@ -142,8 +142,8 @@ public class VerifyPNInteractiveHandle {
         return VerifyTAPNMarkingParser.parseComposedMarking(network, markingElement, composer);
     }
 
-    private Map<TimedTransition, List<Map<Variable, Color>>> parseTransitionWithBindings(String xmlResponse) throws Exception {
-        Map<TimedTransition, List<Map<Variable, Color>>> transitionBindings = new LinkedHashMap<>();
+    private Map<TimedTransition, Map<Variable, Color>> parseTransitionWithBindings(String xmlResponse) throws Exception {
+        Map<TimedTransition, Map<Variable, Color>> transitionBindings = new LinkedHashMap<>();
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -159,11 +159,10 @@ public class VerifyPNInteractiveHandle {
                 throw new IllegalArgumentException("Transition with ID " + transitionId + " not found in composer.");
             }
 
-            List<Map<Variable, Color>> bindings = new ArrayList<>();
+            Map<Variable, Color> bindings = new LinkedHashMap<>();
             NodeList bindingNodes = transitionElement.getElementsByTagName("binding");
             for (int j = 0; j < bindingNodes.getLength(); ++j) {
                 Element bindingElement = (Element)bindingNodes.item(j);
-                Map<Variable, Color> bindingMap = new LinkedHashMap<>();
 
                 NodeList variableNodes = bindingElement.getElementsByTagName("variable");
                 for (int k = 0; k < variableNodes.getLength(); ++k) {
@@ -180,11 +179,7 @@ public class VerifyPNInteractiveHandle {
                         throw new IllegalArgumentException("Variable or color not found for ID: " + variableId + " or " + colorName);
                     }
 
-                    bindingMap.put(variable, color);
-                }
-
-                if (!bindingMap.isEmpty()) {
-                    bindings.add(bindingMap);
+                    bindings.put(variable, color);
                 }
             }
 
@@ -196,12 +191,48 @@ public class VerifyPNInteractiveHandle {
         return transitionBindings;
     }
 
+    private void registerShutdownHook() {
+        if (!isShutdownHookRegistered) {
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                stopInteractiveMode();
+            }));
+
+            isShutdownHookRegistered = true;
+        }
+    }
+
     public void stopInteractiveMode() {
         try {
-            if (writer != null) writer.close();
-            if (reader != null) reader.close();
-            if (errorReader != null) errorReader.close();
-            if (verifypnProcess != null) verifypnProcess.destroy();
+            if (writer != null) {
+                writer.close();
+                writer = null;
+            }
+
+            if (reader != null) {
+                reader.close();
+                reader = null;
+            }
+
+            if (errorReader != null) {
+                errorReader.close();
+                errorReader = null;
+            }
+
+            if (verifypnProcess != null) {
+                verifypnProcess.destroy();
+
+                try {
+                    verifypnProcess.waitFor(3, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+
+                if (verifypnProcess.isAlive()) {
+                    verifypnProcess.destroyForcibly();
+                }
+
+                verifypnProcess = null;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

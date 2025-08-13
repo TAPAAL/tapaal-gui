@@ -16,8 +16,8 @@ public class ColoredSimulationDialog extends JDialog {
     private JCheckBox useColorFixpoint;
     private JCheckBox useSymmetricvars;
 
-    private static boolean cancelled = false;
-    private static boolean explicitSimulationMode = false;
+    private static boolean cancelled;
+    private static boolean explicitSimulationMode;
 
     private static PetriNetTab currentTab;
 
@@ -31,9 +31,9 @@ public class ColoredSimulationDialog extends JDialog {
     public static void showSimulationDialog(PetriNetTab tab){
         String[] options = {"Cancel", "Unfold", "Explicit"};
 
-        int unfoldAnswer = JOptionPane.showOptionDialog(null, "Simulate the net explicitly or unfolded", "Simulation Mode",
-                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
-        if(unfoldAnswer == 2) {
+        int unfoldAnswer = JOptionPane.showOptionDialog(TAPAALGUI.getApp(), "Simulate the net explicitly or unfolded", "Simulation Mode",
+        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+        if (unfoldAnswer == 2) {
             explicitSimulationMode = true;
         } else if (unfoldAnswer == 1) {
             showUnfoldDialog(tab);
@@ -45,25 +45,25 @@ public class ColoredSimulationDialog extends JDialog {
     public static void showUnfoldDialog(PetriNetTab tab) {
         currentTab = tab;
 
-        if(tab.getLens().isTimed()){
+        if (tab.getLens().isTimed()) {
             currentTab.createNewAndUnfoldColor(false, false, false);
             return;
         }
 
-        if(coloredSimDialog == null){
+        if (coloredSimDialog == null) {
             coloredSimDialog = new ColoredSimulationDialog(TAPAALGUI.getApp(), "Unfold", true);
             coloredSimDialog.pack();
             coloredSimDialog.setPreferredSize(coloredSimDialog.getSize());
             coloredSimDialog.setMinimumSize(new Dimension(coloredSimDialog.getWidth(), coloredSimDialog.getHeight()));
-            coloredSimDialog.setLocationRelativeTo(null);
+            coloredSimDialog.setLocationRelativeTo(TAPAALGUI.getApp());
             coloredSimDialog.setResizable(false);
         }
+
         coloredSimDialog.setEnabled(true);
         coloredSimDialog.setVisible(true);
-
     }
 
-    public static boolean wasCancelled(){
+    public static boolean wasCancelled() {
         return cancelled;
     }
 
@@ -183,5 +183,10 @@ public class ColoredSimulationDialog extends JDialog {
     private void onOK() {
             exit();
             currentTab.createNewAndUnfoldColor(usePartition.isSelected(), useColorFixpoint.isSelected(), useSymmetricvars.isSelected());
+    }
+
+    public static void resetFlags() {
+        cancelled = false;
+        explicitSimulationMode = false;
     }
 }
