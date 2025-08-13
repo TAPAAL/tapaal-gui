@@ -656,7 +656,7 @@ public class PlaceEditorPanel extends JPanel {
                     doNewEdit = true;
 					//This is checked as a place cannot be shared if there exists a transition with the same name
 					if(context.activeModel().parentNetwork().isNameUsedForPlacesOnly(newName)) {
-						int dialogResult = JOptionPane.showConfirmDialog(this, "A place with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\nThis place name will be changed into shared one also in all other components.", "Error", JOptionPane.OK_CANCEL_OPTION);
+						int dialogResult = JOptionPane.showConfirmDialog(this, "A place with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\nThis place name will be changed into shared one also in all other components.", "Warning", JOptionPane.OK_CANCEL_OPTION);
 						if(dialogResult == JOptionPane.OK_OPTION) {
 							Command cmd = new MakePlaceNewSharedMultiCommand(context, newName, place);
 							cmd.redo();
@@ -679,7 +679,7 @@ public class PlaceEditorPanel extends JPanel {
 							return false;
 						}
 					} else {
-						JOptionPane.showMessageDialog(this, "A transition with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(this, "A transition with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Warning", JOptionPane.ERROR_MESSAGE);
 						return false;
 					}
 				}	
