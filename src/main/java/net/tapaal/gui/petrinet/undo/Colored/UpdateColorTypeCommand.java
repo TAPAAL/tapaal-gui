@@ -56,6 +56,15 @@ public class UpdateColorTypeCommand implements Command {
             }
         }
 
+        for (ColorType ct : network.colorTypes()) {
+            if (ct.isProductColorType()) {
+                ProductType pt = (ProductType)ct;
+                if (pt.contains(newColorType)) {
+                    pt.replaceColorType(oldColorType, newColorType);
+                }
+            }
+        }
+
         eval(oldColorType);
 
         for (Variable var : network.variables()) {
@@ -99,6 +108,15 @@ public class UpdateColorTypeCommand implements Command {
             for (TimedTransition transition : tapn.transitions()) {
                 if (transition.getGuard() != null) {
                     transition.getGuard().setColorType(newColorType);
+                }
+            }
+        }
+
+        for (ColorType ct : network.colorTypes()) {
+            if (ct.isProductColorType()) {
+                ProductType pt = (ProductType)ct;
+                if (pt.contains(oldColorType)) {
+                    pt.replaceColorType(newColorType, oldColorType);
                 }
             }
         }
