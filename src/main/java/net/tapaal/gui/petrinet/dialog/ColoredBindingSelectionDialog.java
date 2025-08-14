@@ -2,7 +2,7 @@ package net.tapaal.gui.petrinet.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.MouseInfo;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +24,10 @@ import dk.aau.cs.model.CPN.Variable;
 
 public class ColoredBindingSelectionDialog {
     public static Map<Variable, Color> showDialog(TimedTransition transition, List<Map<Variable, Color>> validBindings) {
+        String title = "Select binding for transition: " + transition.name();
         EscapableDialog dialog = new EscapableDialog(
             TAPAALGUI.getApp(),
-            "Select binding for transition: " + transition.name(),
+            title,
             true
         );
 
@@ -45,29 +46,24 @@ public class ColoredBindingSelectionDialog {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Map<?, ?>) {
-                    @SuppressWarnings("unchecked")
-                    Map<Variable, Color> binding = (Map<Variable, Color>)value;
-                    StringBuilder sb = new StringBuilder();
-                    
-                    binding.entrySet().stream()
-                        .sorted((e1, e2) -> e1.getKey().getName().compareTo(e2.getKey().getName()))
-                        .forEach(entry -> {
-                            if (sb.length() > 0) sb.append(", ");
-                            sb.append(entry.getKey().getName()).append(" = ").append(entry.getValue().getName());
-                        });
-                    
-                    setText(sb.toString());
-                } else {
-                    setText(value != null ? value.toString() : "");
-                }
+                @SuppressWarnings("unchecked")
+                Map<Variable, Color> binding = (Map<Variable, Color>)value;
+                StringBuilder sb = new StringBuilder();
                 
+                binding.entrySet().stream()
+                    .sorted((e1, e2) -> e1.getKey().getName().compareTo(e2.getKey().getName()))
+                    .forEach(entry -> {
+                        if (sb.length() > 0) sb.append(", ");
+                        sb.append(entry.getKey().getName()).append(" = ").append(entry.getValue().getName());
+                    });
+                
+                setText(sb.toString());
+
                 return this;
             }
         });
 
         JScrollPane scrollPane = new JScrollPane(bindingList);
-        scrollPane.setPreferredSize(new Dimension(300, 200));
         panel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
@@ -95,8 +91,18 @@ public class ColoredBindingSelectionDialog {
 
         dialog.add(panel);
         dialog.pack();
+
+        FontMetrics fm = dialog.getFontMetrics(dialog.getFont());
+        int titleWidth = fm.stringWidth(title);
+        int decorationsWidth = 225;
+        int requiredWidth = titleWidth + decorationsWidth;
+        if (dialog.getWidth() < requiredWidth) {
+            dialog.setSize(requiredWidth, dialog.getHeight());
+        }
+        
         var point = MouseInfo.getPointerInfo().getLocation();
-        dialog.setLocation(point.x - dialog.getWidth() / 2, point.y - dialog.getHeight() / 2);
+        int yOffset = 30;
+        dialog.setLocation(point.x - dialog.getWidth() / 2, point.y + yOffset);
         dialog.setVisible(true);
 
         return selectedBindingRef.get();
