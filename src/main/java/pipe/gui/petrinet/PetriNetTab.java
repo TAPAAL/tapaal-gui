@@ -22,7 +22,7 @@ import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
-import dk.aau.cs.util.Pair;
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
@@ -1154,20 +1154,20 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             return;
         }
         
-        List<Pair<?, String>> searchableItems = new ArrayList<>();
+        List<Tuple<?, String>> searchableItems = new ArrayList<>();
         for (Template template : allTemplates()) {
             TimedArcPetriNet model = template.model();
             for (TimedPlace place : model.places()) {
-                searchableItems.add(new Pair<>(place, template.toString()));
+                searchableItems.add(new Tuple<>(place, template.toString()));
             }
 
             for (TimedTransition transition : model.transitions()) {
-                searchableItems.add(new Pair<>(transition, template.toString()));
+                searchableItems.add(new Tuple<>(transition, template.toString()));
             }
         }
 
-        Searcher<Pair<?, String>> searcher = new Searcher<>(searchableItems, obj -> {
-            Object element = obj.getFirst();            
+        Searcher<Tuple<?, String>> searcher = new Searcher<>(searchableItems, obj -> {
+            Object element = obj.value1();            
             String name = element.toString();
             if (name.contains(".")) {
                 name = name.split("\\.")[1];

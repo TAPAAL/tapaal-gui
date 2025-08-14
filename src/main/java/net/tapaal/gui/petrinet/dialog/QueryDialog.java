@@ -156,7 +156,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.translations.ReductionOption;
-import dk.aau.cs.util.Pair;
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
@@ -281,7 +281,7 @@ public class QueryDialog extends JPanel {
     private JPanel predicatePanel;
     private JButton addPredicateButton;
     private SearchBar searchBar;
-    private Searcher<Pair<?, String>> searcher;
+    private Searcher<Tuple<?, String>> searcher;
     private JComboBox templateBox;
     private JComboBox traceBox;
     private JComboBox traceBoxQuantification;
@@ -4653,33 +4653,33 @@ public class QueryDialog extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        List<Pair<?, String>> searchableItems = new ArrayList<>();
+        List<Tuple<?, String>> searchableItems = new ArrayList<>();
         for (TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
             for (TimedPlace place : tapn.places()) {
                 if (!place.isShared()) {
-                    searchableItems.add(new Pair<>(place, tapn.toString()));
+                    searchableItems.add(new Tuple<>(place, tapn.toString()));
                 }
             }
 
             if (!lens.isTimed()) {
                 for (TimedTransition transition : tapn.transitions()) {
                     if (!transition.isShared()) {
-                        searchableItems.add(new Pair<>(transition, tapn.toString()));
+                        searchableItems.add(new Tuple<>(transition, tapn.toString()));
                     }
                 }
             }
         }
 
         for (TimedPlace place : tapnNetwork.sharedPlaces()) {
-            searchableItems.add(new Pair<>(place, SHARED.toString()));
+            searchableItems.add(new Tuple<>(place, SHARED.toString()));
         }
 
         for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
-            searchableItems.add(new Pair<>(transition, SHARED.toString()));
+            searchableItems.add(new Tuple<>(transition, SHARED.toString()));
         }
 
         searcher = new Searcher<>(searchableItems, obj -> {
-            Object element = obj.getFirst();            
+            Object element = obj.value1();            
             String name = element.toString();
             if (name.contains(".")) {
                 name = name.split("\\.")[1];
@@ -4707,18 +4707,18 @@ public class QueryDialog extends JPanel {
             searchBar.clear();
 
             boolean isShared = false;
-            if (result.getFirst() instanceof TimedPlace) {
-                isShared = ((TimedPlace)result.getFirst()).isShared();
-            } else if (result.getFirst() instanceof TimedTransition) {
-                isShared = ((TimedTransition)result.getFirst()).isShared();
+            if (result.value1() instanceof TimedPlace) {
+                isShared = ((TimedPlace)result.value1()).isShared();
+            } else if (result.value1() instanceof TimedTransition) {
+                isShared = ((TimedTransition)result.value1()).isShared();
             }
 
             if (isShared) {
                 templateBox.setSelectedItem(SHARED);
-                placeTransitionBox.setSelectedItem(result.getFirst().toString());
+                placeTransitionBox.setSelectedItem(result.value1().toString());
             } else {
-                templateBox.setSelectedItem(tapnNetwork.getTAPNByName(result.getSecond()));
-                placeTransitionBox.setSelectedItem(result.getFirst().toString().split("\\.")[1]);
+                templateBox.setSelectedItem(tapnNetwork.getTAPNByName(result.value2()));
+                placeTransitionBox.setSelectedItem(result.value1().toString().split("\\.")[1]);
             }
         });
 
