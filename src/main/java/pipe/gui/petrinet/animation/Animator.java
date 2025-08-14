@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
@@ -546,7 +547,7 @@ public class Animator {
                     Vector<ColorExpression> subColorExpressions = new Vector<>();
                     subColorExpressions.addAll(subColors.stream()
                                                         .map(UserOperatorExpression::new)
-                                                        .toList());
+                                                        .collect(Collectors.toList()));
 
                     colorExpressions.add(new TupleExpression(subColorExpressions, pt));
                 } else {
