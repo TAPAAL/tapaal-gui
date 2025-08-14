@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -21,6 +22,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import pipe.gui.TAPAALGUI;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
@@ -400,9 +403,21 @@ public class NetworkMarking implements TimedMarking {
                 Element tokenElement = document.createElement("token");
                 tokenElement.setAttribute("count", String.valueOf(colorEntry.getValue().size()));
                 
-                Element colorElement = document.createElement("color");
-                colorElement.setTextContent(colorEntry.getKey().toString());
-                tokenElement.appendChild(colorElement);
+                Color color = colorEntry.getKey();
+                ColorType ct = color.getColorType();
+                if (ct.isProductColorType()) {
+                    Vector<Color> subColors = color.getTuple();
+                    for (Color subColor : subColors) {
+                        Element subColorElement = document.createElement("color");
+                        subColorElement.setTextContent(subColor.toString());
+                        tokenElement.appendChild(subColorElement);
+                    }
+                } else {
+                    Element colorElement = document.createElement("color");
+                    colorElement.setTextContent(colorEntry.getKey().toString());
+                    tokenElement.appendChild(colorElement);
+                }
+
                 placeElement.appendChild(tokenElement);
             }
 

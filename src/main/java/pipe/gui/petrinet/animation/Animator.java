@@ -34,12 +34,14 @@ import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import net.tapaal.gui.petrinet.dialog.ColoredBindingSelectionDialog;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.DotConstantExpression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.TupleExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -79,7 +81,7 @@ public class Animator {
 
     private VerifyPNInteractiveHandle interactiveEngine;
     private boolean isUsingInteractiveEngine;
-    private Map<TimedTransition, List<Tuple<Variable, Color>>> validBindingsMap;
+    private Map<TimedTransition, List<Map<Variable, Color>>> validBindingsMap;
 
     public static boolean isUrgentTransitionEnabled(){
         return isUrgentTransitionEnabled;
@@ -538,6 +540,15 @@ public class Animator {
                 Vector<ColorExpression> colorExpressions = new Vector<>();
                 if (color.getColorType().equals(ColorType.COLORTYPE_DOT)) {
                     colorExpressions.add(new DotConstantExpression());
+                } else if (color.getColorType().isProductColorType()) {
+                    ProductType pt = (ProductType)color.getColorType();
+                    Vector<Color> subColors = color.getTuple();
+                    Vector<ColorExpression> subColorExpressions = new Vector<>();
+                    subColorExpressions.addAll(subColors.stream()
+                                                        .map(UserOperatorExpression::new)
+                                                        .toList());
+
+                    colorExpressions.add(new TupleExpression(subColorExpressions, pt));
                 } else {
                     colorExpressions.add(new UserOperatorExpression(color));
                 }
@@ -648,6 +659,8 @@ public class Animator {
     }
 
     private void fireColoredTransition(TimedTransition transition) {
+        if (!validBindingsMap.containsKey(transition)) return;
+        
         if (trace != null && trace.isColoredTrace()) {
             if (isColoredTransitionEnabled(transition)) {
                 if (currentAction < actionHistory.size() - 1) {
@@ -677,26 +690,24 @@ public class Animator {
         }
 
         if (isUsingInteractiveEngine) {
-            Tuple<Variable, Color> binding = null; 
-            if (!validBindingsMap.isEmpty()) {
-                var validBindings = validBindingsMap.get(transition);
-                if (SimulationControl.getInstance().randomSimulation()) {
-                    Random random = new Random();
-                    int randomIndex = random.nextInt(validBindings.size());
-                    binding = validBindings.get(randomIndex);
-                } else if (!validBindings.isEmpty()){
-                    binding = ColoredBindingSelectionDialog.showDialog(transition, validBindings);
-                    if (binding == null) return; // Cancelled
-                }
+            Map<Variable, Color> bindings = new HashMap<>(); 
+            var validBindings = validBindingsMap.get(transition);
+            if (SimulationControl.getInstance().randomSimulation()) {
+                Random random = new Random();
+                int randomIndex = random.nextInt(validBindings.size());
+                bindings = validBindings.get(randomIndex);
+            } else if (!validBindings.isEmpty()){
+                bindings = ColoredBindingSelectionDialog.showDialog(transition, validBindings);
+                if (bindings == null) return; // Cancelled
             }
 
             if (!clearStepsForward()) return;
             
             NetworkMarking newMarking;
 
-            newMarking = interactiveEngine.sendTransition(transition, binding);
+            newMarking = interactiveEngine.sendTransition(transition, bindings);
             
-            addMarking(new TAPNNetworkColoredTransitionStep(transition, binding, newMarking), newMarking);
+            addMarking(new TAPNNetworkColoredTransitionStep(transition, bindings, newMarking), newMarking);
 
             updateColoredMarking();
             activeGuiModel().repaintPlaces();

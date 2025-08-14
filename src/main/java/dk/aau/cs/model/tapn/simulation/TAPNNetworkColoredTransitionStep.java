@@ -26,9 +26,9 @@ public class TAPNNetworkColoredTransitionStep extends TAPNNetworkTraceStep  {
         this.marking = networkMarking;
     }
 
-    public TAPNNetworkColoredTransitionStep(TimedTransition transition, Tuple<Variable, Color> binding, NetworkMarking marking) {
+    public TAPNNetworkColoredTransitionStep(TimedTransition transition, Map<Variable, Color> bindings, NetworkMarking marking) {
         this.transition = transition;
-        this.bindings = binding != null ? Map.of(binding.value1(), binding.value2()) : Map.of();
+        this.bindings = bindings;
         this.marking = marking;
     }
 

@@ -3,6 +3,7 @@ package dk.aau.cs.model.tapn;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -586,13 +587,13 @@ public class TimedTransition extends TAPNElement {
         }
 	}
 
-    public String toBindingXmlStr(Tuple<Variable, Color> binding, TAPNComposer composer) {
+    public String toBindingXmlStr(Map<Variable, Color> bindings, TAPNComposer composer) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbf.newDocumentBuilder();
             Document document = builder.newDocument();
             
-            Element transitionElement = toXmlElement(binding, document, composer);
+            Element transitionElement = toXmlElement(bindings, document, composer);
             document.appendChild(transitionElement);
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -609,21 +610,23 @@ public class TimedTransition extends TAPNElement {
         } 
     }
 
-    private Element toXmlElement(Tuple<Variable, Color> binding, Document document, TAPNComposer composer) {
+    private Element toXmlElement(Map<Variable, Color> bindings, Document document, TAPNComposer composer) {
         Element transitionElement = document.createElement("transition");
         transitionElement.setAttribute("id", composer.composedTransitionName(this));
 
         Element bindingElement = document.createElement("binding");
         
-        if (binding != null) {
-            Element variableElement = document.createElement("variable");
-            variableElement.setAttribute("id", binding.value1().getId());
-            
-            Element colorElement = document.createElement("color");
-            colorElement.setTextContent(binding.value2().getName());
-            
-            variableElement.appendChild(colorElement);
-            bindingElement.appendChild(variableElement);
+        if (!bindings.isEmpty()) {
+            for (Map.Entry<Variable, Color> binding : bindings.entrySet()) {
+                Element variableElement = document.createElement("variable");
+                variableElement.setAttribute("id", binding.getKey().getId());
+                
+                Element colorElement = document.createElement("color");
+                colorElement.setTextContent(binding.getValue().getName());
+                
+                variableElement.appendChild(colorElement);
+                bindingElement.appendChild(variableElement);
+            }
         }
 
         transitionElement.appendChild(bindingElement);

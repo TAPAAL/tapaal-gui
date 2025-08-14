@@ -88,7 +88,7 @@ public class VerifyPNInteractiveHandle {
         }
     }
 
-    public Map<TimedTransition, List<Tuple<Variable, Color>>> sendMarking(NetworkMarking marking) {
+    public Map<TimedTransition, List<Map<Variable, Color>>> sendMarking(NetworkMarking marking) {
         try {
             String markingXmlStr = marking.toXmlStr(composer);
             if (markingXmlStr.equals("<marking/>")) {
@@ -103,9 +103,9 @@ public class VerifyPNInteractiveHandle {
         }
     }
 
-    public NetworkMarking sendTransition(TimedTransition transition, Tuple<Variable, Color> binding) {
+    public NetworkMarking sendTransition(TimedTransition transition, Map<Variable, Color> bindings) {
         try {
-            String xmlResponse = sendMessage(transition.toBindingXmlStr(binding, composer), "marking");
+            String xmlResponse = sendMessage(transition.toBindingXmlStr(bindings, composer), "marking");
             return parseMarking(xmlResponse);
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,8 +153,8 @@ public class VerifyPNInteractiveHandle {
         return VerifyTAPNMarkingParser.parseComposedMarking(network, markingElement, nameMapping);
     }
 
-    private Map<TimedTransition, List<Tuple<Variable, Color>>> parseTransitionWithBindings(String xmlResponse) throws Exception {
-        Map<TimedTransition, List<Tuple<Variable, Color>>> transitionBindings = new HashMap<>();
+    private Map<TimedTransition, List<Map<Variable, Color>>> parseTransitionWithBindings(String xmlResponse) throws Exception {
+        Map<TimedTransition, List<Map<Variable, Color>>> transitionBindings = new HashMap<>();
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -173,30 +173,36 @@ public class VerifyPNInteractiveHandle {
                 throw new IllegalArgumentException("Transition with ID " + transitionId + " not found in composer.");
             }
 
-            List<Tuple<Variable, Color>> bindings = new ArrayList<>();
+            List<Map<Variable, Color>> validBindings = new ArrayList<>();
             NodeList bindingNodes = transitionElement.getElementsByTagName("binding");
             for (int j = 0; j < bindingNodes.getLength(); ++j) {
                 Element bindingElement = (Element)bindingNodes.item(j);
-
-                Element variableElement = (Element)bindingElement.getElementsByTagName("variable").item(0);
-                if (variableElement == null) continue;
+                Map<Variable, Color> singleBinding = new HashMap<>();
                 
-                String variableId = variableElement.getAttribute("id");
-                
-                Element colorElement = (Element)variableElement.getElementsByTagName("color").item(0);
-                String colorName = colorElement.getTextContent();
+                NodeList variableNodes = bindingElement.getElementsByTagName("variable");
+                for (int k = 0; k < variableNodes.getLength(); ++k) {
+                    Element variableElement = (Element)variableNodes.item(k);
+                    String variableId = variableElement.getAttribute("id");
+                    
+                    Element colorElement = (Element)variableElement.getElementsByTagName("color").item(0);
+                    String colorName = colorElement.getTextContent();
 
-                Variable variable = network.getVariableByName(variableId);
-                Color color = network.getColorByName(colorName);
+                    Variable variable = network.getVariableByName(variableId);
+                    Color color = network.getColorByName(colorName);
 
-                if (variable == null || color == null) {
-                    throw new IllegalArgumentException("Variable or color not found for ID: " + variableId + " or " + colorName);
+                    if (variable == null || color == null) {
+                        throw new IllegalArgumentException("Variable or color not found for ID: " + variableId + " or " + colorName);
+                    }
+
+                    singleBinding.put(variable, color);
                 }
-
-                bindings.add(new Tuple<>(variable, color));
+                
+                if (!singleBinding.isEmpty()) {
+                    validBindings.add(singleBinding);
+                }
             }
-
-            transitionBindings.put(transition, bindings);
+            
+            transitionBindings.put(transition, validBindings);
         }
 
         return transitionBindings;

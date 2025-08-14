@@ -2,7 +2,6 @@ package dk.aau.cs.verification.VerifyTAPN;
 
 import java.util.Vector;
 import java.util.function.Function;
-import java.util.jar.Attributes.Name;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -17,7 +16,6 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposer;
 
 public class VerifyTAPNMarkingParser {
     public static LocalTimedMarking parseMarking(TimedArcPetriNet tapn, Element element) {
