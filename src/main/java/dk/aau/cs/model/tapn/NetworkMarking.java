@@ -385,7 +385,9 @@ public class NetworkMarking implements TimedMarking {
     public Element toXmlElement(Document document, TAPNComposer composer) {
         Map<TimedPlace, List<TimedToken>> allPlaces = new HashMap<>();
         for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
-            allPlaces.putAll(entry.getValue().getPlacesToTokensMap());
+            if (entry.getKey().isActive()) {
+                allPlaces.putAll(entry.getValue().getPlacesToTokensMap());
+            }
         }
     
         allPlaces.putAll(sharedPlacesTokens);

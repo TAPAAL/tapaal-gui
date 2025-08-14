@@ -35,6 +35,10 @@ public class VerifyTAPNMarkingParser {
         parseTokensForPlaces(element,
             place -> {
                 Tuple<String, String> originalName = nameMapping.map(place);
+                if (originalName.value1().isEmpty()) {
+                    return network.getSharedPlaceByName(originalName.value2());
+                }
+
                 return network.getTAPNByName(originalName.value1()).getPlaceByName(originalName.value2());
             },
             network::getColorByName,

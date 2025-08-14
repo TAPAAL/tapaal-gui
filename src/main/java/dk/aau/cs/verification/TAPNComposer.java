@@ -656,7 +656,13 @@ public class TAPNComposer implements ITAPNComposer {
     }
    
     public String composedPlaceName(TimedPlace place) {
-        return place.isShared() ? "Shared_" + place.name() : ((LocalTimedPlace)place).model().name() + "_" + place.name();
+        if (place.isShared()) {
+            return "Shared_" + place.name();
+        } else if (singleComponentNoPrefix) {
+            return place.name();
+        } else {
+            return ((LocalTimedPlace)place).model().name() + "_" + place.name();
+        }
     }
 
     public TAPNLens getLens() {

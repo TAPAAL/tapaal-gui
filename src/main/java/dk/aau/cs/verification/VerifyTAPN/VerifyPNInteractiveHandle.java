@@ -166,8 +166,12 @@ public class VerifyPNInteractiveHandle {
             String transitionId = transitionElement.getAttribute("id");
 
             Tuple<String, String> originalName = nameMapping.map(transitionId);
-            TimedTransition transition = network.getTAPNByName(originalName.value1())
-                                                .getTransitionByName(originalName.value2());
+            TimedTransition transition; 
+            if (!originalName.value1().isEmpty()) {
+                transition = network.getTAPNByName(originalName.value1()).getTransitionByName(originalName.value2());
+            } else {
+                transition = network.getSharedTransitionByName(originalName.value2()).transitions().iterator().next();
+            }                                
 
             if (transition == null) {
                 throw new IllegalArgumentException("Transition with ID " + transitionId + " not found in composer.");

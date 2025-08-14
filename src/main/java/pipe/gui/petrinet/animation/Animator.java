@@ -151,6 +151,11 @@ public class Animator {
                 } else {
                     setTimedTrace(trace);
                 }
+
+                TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;
+                if (timedTrace.getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
+                    tab.getAnimationHistorySidePanel().setLastShown(timedTrace.getTraceType());
+                }
             } else {
                 setUntimedTrace(trace);
                 isDisplayingUntimedTrace = true;
@@ -207,11 +212,6 @@ public class Animator {
             }
 
             addMarking(step, step.performStepFrom(currentMarking()));
-        }
-        
-        TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;
-        if (timedTrace.getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
-            tab.getAnimationHistorySidePanel().setLastShown(timedTrace.getTraceType());
         }
     }
 
@@ -281,7 +281,13 @@ public class Animator {
 
     private boolean isColoredTransitionEnabled(TimedTransition transition) {
         if (tab.getLens().isColored() && isUsingInteractiveEngine) {
-            if (validBindingsMap.keySet().contains(transition)) {
+            if (transition.isShared()) {
+                for (TimedTransition t : transition.sharedTransition().transitions()) {
+                    if (validBindingsMap.keySet().contains(t)) {
+                        return true;
+                    }
+                }
+            } else if (validBindingsMap.keySet().contains(transition)) {
                 return true;
             }
         }
@@ -504,62 +510,64 @@ public class Animator {
 
         NetworkMarking marking = tab.network().marking();
         var markingMap = marking.getMarkingMap();
-        Template template = tab.currentTemplate();
-        var localMarking = markingMap.get(template.model());
-        Map<TimedPlace, List<TimedToken>> placesToTokensCopy = new HashMap<>();
-        for (var entry : localMarking.getPlacesToTokensMap().entrySet()) {
-            placesToTokensCopy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
-        }
-
-        for (var entry : marking.getSharedPlacesTokens().entrySet()) {
-            placesToTokensCopy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
-        }
- 
-        for (var guiPlace : template.guiModel().getPlaces()) {
-            var placeComponent = (TimedPlaceComponent)guiPlace;
-            TimedPlace place = placeComponent.underlyingPlace();
-            place.resetNumberOfTokensColor();
-            
-            if (!placesToTokensCopy.containsKey(place) || placesToTokensCopy.get(place).isEmpty()) {
-                place.updateTokens(new ArrayList<>(), null);
-                placeComponent.setUnderlyingPlace(place);
-                continue;
+        
+        for (var template : tab.activeTemplates()) {
+            var localMarking = markingMap.get(template.model());
+            Map<TimedPlace, List<TimedToken>> placesToTokensCopy = new HashMap<>();
+            for (var entry : localMarking.getPlacesToTokensMap().entrySet()) {
+                placesToTokensCopy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
             }
-
-            List<TimedToken> tokens = placesToTokensCopy.get(place);
-            Map<Color, Integer> numberOfMap = new HashMap<>();
-            for (TimedToken token : tokens) {
-                numberOfMap.merge(token.color(), 1, Integer::sum);
+    
+            for (var entry : marking.getSharedPlacesTokens().entrySet()) {
+                placesToTokensCopy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
             }
-
-            Vector<ArcExpression> numberOfExpressions = new Vector<>();
-            numberOfMap.entrySet().stream()
-            .sorted((e1, e2) -> e1.getKey().toString().compareTo(e2.getKey().toString()))
-            .forEach(numberOfEntry -> {
-                Color color = numberOfEntry.getKey();
-                int number = numberOfEntry.getValue();
-                Vector<ColorExpression> colorExpressions = new Vector<>();
-                if (color.getColorType().equals(ColorType.COLORTYPE_DOT)) {
-                    colorExpressions.add(new DotConstantExpression());
-                } else if (color.getColorType().isProductColorType()) {
-                    ProductType pt = (ProductType)color.getColorType();
-                    Vector<Color> subColors = color.getTuple();
-                    Vector<ColorExpression> subColorExpressions = new Vector<>();
-                    subColorExpressions.addAll(subColors.stream()
-                                                        .map(UserOperatorExpression::new)
-                                                        .collect(Collectors.toList()));
-
-                    colorExpressions.add(new TupleExpression(subColorExpressions, pt));
-                } else {
-                    colorExpressions.add(new UserOperatorExpression(color));
+     
+            for (var guiPlace : template.guiModel().getPlaces()) {
+                var placeComponent = (TimedPlaceComponent)guiPlace;
+                TimedPlace place = placeComponent.underlyingPlace();
+                place.resetNumberOfTokensColor();
+                
+                if (!placesToTokensCopy.containsKey(place) || placesToTokensCopy.get(place).isEmpty()) {
+                    place.updateTokens(new ArrayList<>(), null);
+                    placeComponent.setUnderlyingPlace(place);
+                    continue;
                 }
-
-                numberOfExpressions.add(new NumberOfExpression(number, colorExpressions));
-            });
-
-            ArcExpression tokenExpression = new AddExpression(numberOfExpressions);
-            place.updateTokens(tokens, tokenExpression);
-            placeComponent.setUnderlyingPlace(place);
+    
+                List<TimedToken> tokens = placesToTokensCopy.get(place);
+                Map<Color, Integer> numberOfMap = new HashMap<>();
+                for (TimedToken token : tokens) {
+                    numberOfMap.merge(token.color(), 1, Integer::sum);
+                }
+    
+                Vector<ArcExpression> numberOfExpressions = new Vector<>();
+                numberOfMap.entrySet().stream()
+                .sorted((e1, e2) -> e1.getKey().toString().compareTo(e2.getKey().toString()))
+                .forEach(numberOfEntry -> {
+                    Color color = numberOfEntry.getKey();
+                    int number = numberOfEntry.getValue();
+                    Vector<ColorExpression> colorExpressions = new Vector<>();
+                    if (color.getColorType().equals(ColorType.COLORTYPE_DOT)) {
+                        colorExpressions.add(new DotConstantExpression());
+                    } else if (color.getColorType().isProductColorType()) {
+                        ProductType pt = (ProductType)color.getColorType();
+                        Vector<Color> subColors = color.getTuple();
+                        Vector<ColorExpression> subColorExpressions = new Vector<>();
+                        subColorExpressions.addAll(subColors.stream()
+                                                            .map(UserOperatorExpression::new)
+                                                            .collect(Collectors.toList()));
+    
+                        colorExpressions.add(new TupleExpression(subColorExpressions, pt));
+                    } else {
+                        colorExpressions.add(new UserOperatorExpression(color));
+                    }
+    
+                    numberOfExpressions.add(new NumberOfExpression(number, colorExpressions));
+                });
+    
+                ArcExpression tokenExpression = new AddExpression(numberOfExpressions);
+                place.updateTokens(tokens, tokenExpression);
+                placeComponent.setUnderlyingPlace(place);
+            }
         }
     }
 
