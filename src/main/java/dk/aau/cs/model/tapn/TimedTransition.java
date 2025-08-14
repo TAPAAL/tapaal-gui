@@ -31,7 +31,6 @@ import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.TAPNComposer;
 
 public class TimedTransition extends TAPNElement {

@@ -24,7 +24,6 @@ import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.Require;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.Preferences;

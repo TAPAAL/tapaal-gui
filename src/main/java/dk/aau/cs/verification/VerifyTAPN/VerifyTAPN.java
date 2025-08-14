@@ -36,9 +36,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
-import dk.aau.cs.util.UnsupportedQueryException;
-
-import javax.swing.*;
+import dk.aau.cs.util.UnsupportedQueryException;;
 
 import com.sun.jna.Platform;
 

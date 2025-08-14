@@ -1,15 +1,11 @@
 package net.tapaal.gui.petrinet.verification;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.io.File;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.*;
 
 import net.tapaal.gui.petrinet.TAPNLens;
-import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.verification.*;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;

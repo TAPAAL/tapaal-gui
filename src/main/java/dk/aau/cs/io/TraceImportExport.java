@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import javax.swing.JOptionPane;
@@ -31,11 +30,9 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkColoredTransitionStep;

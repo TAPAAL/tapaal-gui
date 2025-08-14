@@ -3,7 +3,6 @@ package dk.aau.cs.TCTL.visitors;
 import dk.aau.cs.TCTL.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public class HyperLTLTraceNameVisitor extends VisitorBase {

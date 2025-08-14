@@ -3,7 +3,6 @@ package dk.aau.cs.verification;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
-import java.util.function.Function;
 
 import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.dataLayer.DataLayer;

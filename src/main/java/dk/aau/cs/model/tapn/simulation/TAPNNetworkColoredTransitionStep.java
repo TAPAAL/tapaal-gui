@@ -4,7 +4,6 @@ import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.util.Tuple;
 
 import java.util.List;
 import java.util.Map;

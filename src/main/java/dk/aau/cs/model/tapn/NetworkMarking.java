@@ -23,7 +23,6 @@ import org.w3c.dom.Element;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import pipe.gui.TAPAALGUI;
 import dk.aau.cs.model.tapn.simulation.FiringMode;

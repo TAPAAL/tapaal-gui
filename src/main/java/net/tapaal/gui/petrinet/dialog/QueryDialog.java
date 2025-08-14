@@ -157,7 +157,6 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.util.VerificationCallback;
@@ -203,7 +202,6 @@ import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.SearchBar;
 import pipe.gui.petrinet.Searcher;
 import pipe.gui.petrinet.dataLayer.DataLayer;
-import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
