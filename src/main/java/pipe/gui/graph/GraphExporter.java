@@ -16,7 +16,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
-import dk.aau.cs.util.Pair;
+import dk.aau.cs.util.Tuple;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.graph.GraphExporterOptions.LegendPosition;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
@@ -48,9 +48,9 @@ public class GraphExporter {
         }
 
         String defaultName = getDefaultName(pieces);
-        Pair<String, GraphExporterOptions> fileNameAndOptions = displayExportGui(parent, defaultName);
-        String path = fileNameAndOptions.getFirst();
-        GraphExporterOptions options = fileNameAndOptions.getSecond();
+        Tuple<String, GraphExporterOptions> fileNameAndOptions = displayExportGui(parent, defaultName);
+        String path = fileNameAndOptions.value1();
+        GraphExporterOptions options = fileNameAndOptions.value2();
         if (path == null || path.isEmpty() || options == null) {
             return;
         }
@@ -65,9 +65,9 @@ public class GraphExporter {
         }
 
         String defaultName = getDefaultName(graph);
-        Pair<String, GraphExporterOptions> fileNameAndOptions = displayExportGui(parent, defaultName);
-        String path = fileNameAndOptions.getFirst();
-        GraphExporterOptions options = fileNameAndOptions.getSecond();
+        Tuple<String, GraphExporterOptions> fileNameAndOptions = displayExportGui(parent, defaultName);
+        String path = fileNameAndOptions.value1();
+        GraphExporterOptions options = fileNameAndOptions.value2();
         if (path == null || path.isEmpty() || options == null) {
             return;
         }
@@ -86,9 +86,9 @@ public class GraphExporter {
         }
 
         String defaultName = getDefaultName(graph); 
-        Pair<String, GraphExporterOptions> fileNameAndOptions = displayExportGui(parent, defaultName);
-        String path = fileNameAndOptions.getFirst();
-        GraphExporterOptions options = fileNameAndOptions.getSecond();
+        Tuple<String, GraphExporterOptions> fileNameAndOptions = displayExportGui(parent, defaultName);
+        String path = fileNameAndOptions.value1();
+        GraphExporterOptions options = fileNameAndOptions.value2();
         if (path == null || path.isEmpty() || options == null) {
             return;
         }
@@ -104,7 +104,7 @@ public class GraphExporter {
         }
     }
 
-    private static Pair<String, GraphExporterOptions> displayExportGui(Component parent, String defaultName) {
+    private static Tuple<String, GraphExporterOptions> displayExportGui(Component parent, String defaultName) {
         Object[] possibilities = {"Only the TikZ figure",
                             "Full compilable LaTex including your figure"};
         JPanel panel = new JPanel(new GridLayout(5, 1, 5, 5));
@@ -173,7 +173,7 @@ public class GraphExporter {
             path = FileBrowser.constructor("TikZ figure", "tex", defaultName).saveFile();
         }
 
-        return new Pair<>(path, options);
+        return new Tuple<>(path, options);
     }
 
     private static void writeTikzGraph(List<Graph> graphs, String path, GraphExporterOptions options) {
