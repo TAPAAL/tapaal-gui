@@ -692,7 +692,7 @@ public class Animator {
         if (isUsingInteractiveEngine) {
             Map<Variable, Color> bindings = new HashMap<>(); 
             var validBindings = validBindingsMap.get(transition);
-            if (SimulationControl.getInstance().randomSimulation()) {
+            if (SimulationControl.getInstance().randomSimulation() && !validBindings.isEmpty()) {
                 Random random = new Random();
                 int randomIndex = random.nextInt(validBindings.size());
                 bindings = validBindings.get(randomIndex);
