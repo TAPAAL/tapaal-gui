@@ -1397,6 +1397,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	        toggleAnimationMode();
         }
     }
+
 	@Override
 	public void toggleAnimationMode() {
 		if (!animationmode) {
@@ -1439,6 +1440,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 				drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 				animationmode = true; //XXX: Must be called after setGuiMode as guiMode uses last state,
+                getUndoManager().setUndoRedoStatus();
+                setMode(DrawTool.SELECT);
                 app.ifPresent(o->o.setStatusBarText(textforAnimation));
 
                 animator.updateAnimationButtonsEnabled(); //Update stepBack/Forward
@@ -1450,6 +1453,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
 			}
 		} else {
+            getUndoManager().undoAll();
+            getUndoManager().clear();
+
 			drawingSurface().getSelectionObject().clearSelection();
             app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.draw));
 
@@ -1462,13 +1468,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             setManager(notingManager);
 
 			drawingSurface().setBackground(Constants.ELEMENT_FILL_COLOUR);
-			setMode(DrawTool.SELECT);
 
 			restoreSelectedTemplate();
 
 			// Undo/Redo is enabled based on undo/redo manager
-			getUndoManager().setUndoRedoStatus();
 			animationmode = false;
+			getUndoManager().setUndoRedoStatus();
+            setMode(DrawTool.SELECT);
             app.ifPresent(o->o.setStatusBarText(textforDrawing));
 
             if (restoreWorkflowDialog()) {
@@ -2048,18 +2054,14 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     @Override
     public void undo() {
-        if (!isInAnimationMode()) {
-            getUndoManager().undo();
-            network().buildConstraints();
-        }
+        getUndoManager().undo();
+        network().buildConstraints();
     }
 
     @Override
     public void redo() {
-        if (!isInAnimationMode()) {
-            getUndoManager().redo();
-            network().buildConstraints();
-        }
+        getUndoManager().redo();
+        network().buildConstraints();
     }
 
 	//Writes a tapaal net to a file, with the posibility to overwrite the quires
@@ -2760,7 +2762,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     }
 
-    static final class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
+    final class CanvasGeneralDrawController extends AbstractDrawingSurfaceManager {
         final TAPNLens lens;
 
         public CanvasGeneralDrawController(TAPNLens lens) {
@@ -2769,7 +2771,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         @Override
         public void registerEvents() {
-
             //Drag events
             registerEvent(
                 e->e.pno instanceof PetriNetObject && e.a == MouseAction.pressed,
@@ -2784,78 +2785,80 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 e-> pnoDragged((PetriNetObject)e.pno, e.e)
             );
 
-            registerEvent(
-                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.doubleClicked,
-                e-> ((TimedTransitionComponent) e.pno).showEditor()
-            );
-            registerEvent(
-                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.doubleClicked,
-                e-> ((TimedPlaceComponent) e.pno).showEditor()
-            );
-            registerEvent(
-                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.rightClicked,
-                e-> ((TimedTransitionComponent) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
-            );
-            registerEvent(
-                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.rightClicked,
-                e-> ((TimedPlaceComponent) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
-            );
-            registerEvent(
-                e->e.pno instanceof Arc && e.a == MouseAction.rightClicked,
-                e-> ((Arc) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
-            );
-            registerEvent(
-                e->e.pno instanceof ArcPathPoint && e.a == MouseAction.rightClicked,
-                e-> ((ArcPathPoint) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
-            );
-            registerEvent(
-                e->e.pno instanceof AnnotationNote && e.a == MouseAction.doubleClicked,
-                e-> ((AnnotationNote) e.pno).enableEditMode()
-            );
-            registerEvent(
-                e->e.pno instanceof AnnotationNote && e.a == MouseAction.rightClicked,
-                e-> ((AnnotationNote) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
-            );
-            registerEvent(
-                e->e.pno instanceof Arc && e.a == MouseAction.entered,
-                e -> ((Arc)e.pno).getArcPath().showPoints()
-            );
-            registerEvent(
-                e->e.pno instanceof Arc && e.a == MouseAction.exited,
-                e -> ((Arc)e.pno).getArcPath().hidePoints()
-            );
-            registerEvent(
-                e->e.pno instanceof TimedOutputArcComponent && e.a == MouseAction.doubleClicked && !e.e.isControlDown(),
-                e -> ((TimedOutputArcComponent) e.pno).showTimeIntervalEditor()
-            );
-            registerEvent(
-                e->e.pno instanceof Arc && e.a == MouseAction.doubleClicked && e.e.isControlDown(),
-                e->arcDoubleClickedWithContrl(((Arc) e.pno), e.e)
-            );
-            registerEvent(
-                e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.wheel,
-                e->timedPlaceMouseWheelWithShift(((TimedPlaceComponent) e.pno), ((MouseWheelEvent) e.e))
-            );
-            registerEvent(
-                e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.wheel,
-                e->timedTranstionMouseWheelWithShift(((TimedTransitionComponent) e.pno), ((MouseWheelEvent) e.e))
-            );
-            registerEvent(
-                e->e.pno instanceof ArcPathPoint && e.a == MouseAction.wheel,
-                e->{
-                    if (e.e.isShiftDown()) {
-                        guiModelManager.toggleArcPathPointType((ArcPathPoint) e.pno);
+            if (!isInAnimationMode()) {
+                registerEvent(
+                    e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.doubleClicked,
+                    e-> ((TimedTransitionComponent) e.pno).showEditor()
+                );
+                registerEvent(
+                    e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.doubleClicked,
+                    e-> ((TimedPlaceComponent) e.pno).showEditor()
+                );
+                registerEvent(
+                    e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.rightClicked,
+                    e-> ((TimedTransitionComponent) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+                );
+                registerEvent(
+                    e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.rightClicked,
+                    e-> ((TimedPlaceComponent) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+                );
+                registerEvent(
+                    e->e.pno instanceof Arc && e.a == MouseAction.rightClicked,
+                    e-> ((Arc) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+                );
+                registerEvent(
+                    e->e.pno instanceof ArcPathPoint && e.a == MouseAction.rightClicked,
+                    e-> ((ArcPathPoint) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+                );
+                registerEvent(
+                    e->e.pno instanceof AnnotationNote && e.a == MouseAction.doubleClicked,
+                    e-> ((AnnotationNote) e.pno).enableEditMode()
+                );
+                registerEvent(
+                    e->e.pno instanceof AnnotationNote && e.a == MouseAction.rightClicked,
+                    e-> ((AnnotationNote) e.pno).getPopup(e.e).show(e.pno, e.e.getX(), e.e.getY())
+                );
+                registerEvent(
+                    e->e.pno instanceof Arc && e.a == MouseAction.entered,
+                    e -> ((Arc)e.pno).getArcPath().showPoints()
+                );
+                registerEvent(
+                    e->e.pno instanceof Arc && e.a == MouseAction.exited,
+                    e -> ((Arc)e.pno).getArcPath().hidePoints()
+                );
+                registerEvent(
+                    e->e.pno instanceof TimedOutputArcComponent && e.a == MouseAction.doubleClicked && !e.e.isControlDown(),
+                    e -> ((TimedOutputArcComponent) e.pno).showTimeIntervalEditor()
+                );
+                registerEvent(
+                    e->e.pno instanceof Arc && e.a == MouseAction.doubleClicked && e.e.isControlDown(),
+                    e->arcDoubleClickedWithContrl(((Arc) e.pno), e.e)
+                );
+                registerEvent(
+                    e->e.pno instanceof TimedPlaceComponent && e.a == MouseAction.wheel,
+                    e->timedPlaceMouseWheelWithShift(((TimedPlaceComponent) e.pno), ((MouseWheelEvent) e.e))
+                );
+                registerEvent(
+                    e->e.pno instanceof TimedTransitionComponent && e.a == MouseAction.wheel,
+                    e->timedTranstionMouseWheelWithShift(((TimedTransitionComponent) e.pno), ((MouseWheelEvent) e.e))
+                );
+                registerEvent(
+                    e->e.pno instanceof ArcPathPoint && e.a == MouseAction.wheel,
+                    e->{
+                        if (e.e.isShiftDown()) {
+                            guiModelManager.toggleArcPathPointType((ArcPathPoint) e.pno);
+                        }
                     }
-                }
-            );
-            registerEvent(
-                e->e.pno instanceof Arc && e.a == MouseAction.wheel,
-                e->arcMouseWheel((PetriNetObject) e.pno, e.e)
-            );
-            registerEvent(
-                e->e.pno instanceof ArcPathPoint && e.a == MouseAction.wheel,
-                e->arcMouseWheel(((PetriNetObject) e.pno), e.e)
-            );
+                );
+                registerEvent(
+                    e->e.pno instanceof Arc && e.a == MouseAction.wheel,
+                    e->arcMouseWheel((PetriNetObject) e.pno, e.e)
+                );
+                registerEvent(
+                    e->e.pno instanceof ArcPathPoint && e.a == MouseAction.wheel,
+                    e->arcMouseWheel(((PetriNetObject) e.pno), e.e)
+                );
+            }
         }
 
         boolean justSelected = false;
@@ -3190,7 +3193,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 delayFireAction.setEnabled(false);
                 timeAction.setEnabled(false);
             case animation:
-                selectAction.setEnabled(false);
+                selectAction.setEnabled(true);
                 transAction.setEnabled(false);
                 urgentTransAction.setEnabled(false);
                 uncontrollableTransAction.setEnabled(false);
