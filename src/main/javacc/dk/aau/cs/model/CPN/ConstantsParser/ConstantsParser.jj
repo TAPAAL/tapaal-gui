@@ -167,6 +167,25 @@ public class ConstantsParser {
             }
 
             Object obj = constantsMap.get(key);
+
+            // If the object is a ColorType, check if all dependent variables are being removed
+            if (obj instanceof ColorType) {
+                ColorType ct = (ColorType)obj;
+                boolean allDependentVariablesBeingRemoved = true;
+                for (Variable v : network.variables()) {
+                    if (v.getColorType().equals(ct)) {
+                        if (variables.containsKey(v.getName())) {
+                            allDependentVariablesBeingRemoved = false;
+                            break;
+                        }
+                    }
+                }
+                
+                if (allDependentVariablesBeingRemoved) {
+                    continue;
+                }
+            }
+
             if (!canBeRemovedBitMap.get(key)) {
                 String message = "Could not ";
                 String title = "Could not ";
@@ -257,7 +276,7 @@ public class ConstantsParser {
                         for (TimedToken token : cm.getTokens(place)) {
                             tapn.marking().remove(token);
                         }
-;
+
                         place.updateTokens(tokensToAdd, expression);
                     }
                 }
