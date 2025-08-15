@@ -39,7 +39,7 @@ import net.tapaal.gui.petrinet.verification.Verifier;
 public class TAPAAL {
 
 	public static final String TOOLNAME = "TAPAAL";
-	public static final String VERSION = "4.0.1";
+	public static final String VERSION = "DEV";
 	public static final boolean IS_DEV = "DEV".equals(VERSION);
 
 	public static String getProgramName(){
