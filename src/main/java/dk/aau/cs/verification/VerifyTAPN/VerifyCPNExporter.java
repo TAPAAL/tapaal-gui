@@ -16,7 +16,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.PrintStream;
-import java.util.Collection;
 
 public class VerifyCPNExporter extends VerifyTAPNExporter{
     @Override

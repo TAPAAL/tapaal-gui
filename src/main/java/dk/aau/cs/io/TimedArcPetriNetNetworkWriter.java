@@ -323,41 +323,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			root.appendChild(newQuery);
 		}
 	}
-
-	private Element createQueryElement(TAPNQuery query, Document document) {
-		Require.that(query != null, "Error: query was null");
-		Require.that(document != null, "Error: document was null");
-		
-		Element queryElement = document.createElement("query");
-	
-		queryElement.setAttribute("name", query.getName());
-		queryElement.setAttribute("capacity", "" + query.getCapacity());
-		queryElement.setAttribute("query", query.getProperty().toString());
-		queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
-		queryElement.setAttribute("searchOption", "" + query.getSearchOption());
-		queryElement.setAttribute("hashTableSize", "" + query.getHashTableSize());
-		queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
-        queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
-		queryElement.setAttribute("symmetry", "" + query.useSymmetry());
-		queryElement.setAttribute("gcd", "" + query.useGCD());
-		queryElement.setAttribute("timeDarts", "" + query.useTimeDarts());
-		queryElement.setAttribute("pTrie", "" + query.usePTrie());
-		queryElement.setAttribute("discreteInclusion", String.valueOf(query.discreteInclusion()));
-		queryElement.setAttribute("active", "" + query.isActive());
-		queryElement.setAttribute("inclusionPlaces", getInclusionPlacesString(query));
-		queryElement.setAttribute("overApproximation", "" + query.useOverApproximation());
-		queryElement.setAttribute("reduction", "" + query.useReduction());
-		queryElement.setAttribute("enableOverApproximation", "" + query.isOverApproximationEnabled());
-		queryElement.setAttribute("enableUnderApproximation", "" + query.isUnderApproximationEnabled());
-		queryElement.setAttribute("approximationDenominator", "" + query.approximationDenominator());
-        queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
-        queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
-        queryElement.setAttribute("partitioning", "" + query.usePartitioning());
-        queryElement.setAttribute("colorFixpoint", "" + query.useColorFixpoint());
-        queryElement.setAttribute("symmetricVars", "" + query.useSymmetricVars());
-
-		return queryElement;
-	}
 	
 	private Element createCTLQueryElement(TAPNQuery query, Document document) {
 		Require.that(query != null, "Error: query was null");
@@ -401,6 +366,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("partitioning", "" + query.usePartitioning());
 		queryElement.setAttribute("colorFixpoint", "" + query.useColorFixpoint());
         queryElement.setAttribute("symmetricVars", "" + query.useSymmetricVars());
+        queryElement.setAttribute("useExplicitSearch" , "" + query.useExplicitSearch());
 
         return queryElement;
 	}

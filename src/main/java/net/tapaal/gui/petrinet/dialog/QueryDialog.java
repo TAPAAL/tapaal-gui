@@ -157,7 +157,6 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.util.VerificationCallback;
@@ -203,7 +202,6 @@ import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.SearchBar;
 import pipe.gui.petrinet.Searcher;
 import pipe.gui.petrinet.dataLayer.DataLayer;
-import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
@@ -349,6 +347,7 @@ public class QueryDialog extends JPanel {
 	private JCheckBox useStubbornReduction;
     private JCheckBox useTraceRefinement;
     private JCheckBox useTarjan;
+    private JCheckBox useExplicitSearch;
     // Raw verification options panel
     private JPanel rawVerificationOptionsPanel;
     private JTextArea rawVerificationOptionsTextArea;
@@ -546,6 +545,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_USE_QUERY_REDUCTION = "Use query rewriting rules and linear programming (state equations) to reduce the size of the query.";
     private final static String TOOL_TIP_USE_TRACE_REFINEMENT = "Enables Trace Abstraction Refinement for reachability properties";
     private final static String TOOL_TIP_USE_TARJAN= "Uses the Tarjan algorithm when verifying. If not selected it will verify using the nested DFS algorithm.";
+    private final static String TOOL_TIP_USE_EXPLICIT_SEARCH = "Use explicit search engine";
 
     // Tool tips for raw verification options panel
     private final static String TOOL_TIP_RAW_VERIFICATION_ENABLED_CHECKBOX = "Enable verification options for the engine.";
@@ -799,6 +799,7 @@ public class QueryDialog extends JPanel {
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
         query.setUseTarOption(useTraceRefinement.isSelected());
         query.setUseTarjan(useTarjan.isSelected());
+        query.setUseExplicitSearch(useExplicitSearch.isEnabled() && useExplicitSearch.isSelected());
         return query;
     }
 
@@ -1859,16 +1860,6 @@ public class QueryDialog extends JPanel {
         }
     }
 
-    private void checkTraceBoxSelection() {
-        String selectedTrace = traceBox.getSelectedItem().toString();
-        if (!getQuery().getTraceList().contains(selectedTrace)) {
-            JOptionPane.showMessageDialog(
-                TAPAALGUI.getApp(),
-                "Cannot select a trace that is not declared in ",
-                "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
     // Used in HyperLTL to update queries with the 'A' or 'E' quantifier
     private void updateQueryOnQuantificationChange() {
         // trace for HyperLTL
@@ -1997,11 +1988,18 @@ public class QueryDialog extends JPanel {
         setupTraceOptionsFromQuery(queryToCreateFrom);
         setupTarOptionsFromQuery(queryToCreateFrom);
         setupTarjanOptionsFromQuery(queryToCreateFrom);
+        setupExplicitSearch(queryToCreateFrom.useExplicitSearch());
 
         if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
         }
 
+    }
+
+    private void setupExplicitSearch(boolean selectExplicitSearch) {
+        if (lens.isColored() && !lens.isGame() && !lens.isStochastic() && !lens.isTimed()) {
+            this.useExplicitSearch.setSelected(selectExplicitSearch);
+        }
     }
 
     private void setupRawVerificationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -2173,6 +2171,9 @@ public class QueryDialog extends JPanel {
         useReduction.setSelected(queryToCreateFrom.useReduction());
         useTraceRefinement.setSelected(queryToCreateFrom.isTarOptionEnabled());
         useTarjan.setSelected(queryToCreateFrom.isTarjan());
+
+        setupExplicitSearch(queryToCreateFrom.useExplicitSearch());
+
         useColoredReduction.setSelected(queryToCreateFrom.useColoredReduction());
     }
 
@@ -3615,6 +3616,8 @@ public class QueryDialog extends JPanel {
         existsDiamond.addActionListener(e -> {
             TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             existsDiamond.setSelected(true);
+            setupExplicitSearch(true);
+            depthFirstSearch.setSelected(true);
             addPropertyToQuery(property);
             unselectButtons();
         });
@@ -3622,6 +3625,8 @@ public class QueryDialog extends JPanel {
         forAllBox.addActionListener(e -> {
             TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             forAllBox.setSelected(true);
+            setupExplicitSearch(true);
+            depthFirstSearch.setSelected(true);
             addPropertyToQuery(property);
             unselectButtons();
         });
@@ -5246,6 +5251,15 @@ public class QueryDialog extends JPanel {
         searchRadioButtonGroup.add(depthFirstSearch);
         searchRadioButtonGroup.add(randomSearch);
 
+        Enumeration<AbstractButton> buttons = searchRadioButtonGroup.getElements();
+        while (buttons.hasMoreElements()) {
+            AbstractButton button = buttons.nextElement();
+            button.addActionListener(e -> {
+                setEnabledReductionOptions();
+                setEnabledOptionsAccordingToCurrentReduction();
+            });
+        }
+
         heuristicSearch.setSelected(true);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -5481,6 +5495,21 @@ public class QueryDialog extends JPanel {
         skeletonAnalysis = new JCheckBox("Preprocess using skeleton analysis");
         useTraceRefinement = new JCheckBox("Use trace abstraction refinement");
         useTarjan = new JCheckBox("Use Tarjan");
+        useExplicitSearch = new JCheckBox("Use explicit search");
+
+        useExplicitSearch.addActionListener(e -> {
+            if (useExplicitSearch.isSelected()) {
+                if (heuristicSearch.isSelected()) {
+                    depthFirstSearch.setSelected(true);
+                }
+            }
+        });
+
+        heuristicSearch.addActionListener(e -> {
+            if (heuristicSearch.isSelected()) {
+                setupExplicitSearch(false);
+            }
+        });
 
         useReduction.setSelected(true);
         useColoredReduction.setSelected(true);
@@ -5496,6 +5525,7 @@ public class QueryDialog extends JPanel {
         skeletonAnalysis.setSelected(true);
         useTraceRefinement.setSelected(false);
         useTarjan.setSelected(true);
+        setupExplicitSearch(true);
 
         useReduction.setToolTipText(TOOL_TIP_USE_STRUCTURALREDUCTION);
         useColoredReduction.setToolTipText(TOOL_TIP_USE_COLORED_STRUCTURALREDUCTION);
@@ -5511,6 +5541,7 @@ public class QueryDialog extends JPanel {
         skeletonAnalysis.setToolTipText(TOOL_TIP_OVERAPPROX);
         useTraceRefinement.setToolTipText(TOOL_TIP_USE_TRACE_REFINEMENT);
         useTarjan.setToolTipText(TOOL_TIP_USE_TARJAN);
+        useExplicitSearch.setToolTipText(TOOL_TIP_USE_EXPLICIT_SEARCH);
 
         useTarjan.addActionListener(e -> updateSearchStrategies());
 
@@ -5578,8 +5609,11 @@ public class QueryDialog extends JPanel {
 
         if (lens.isColored()) {
             reductionOptionsPanel.add(useColoredReduction, gbc);
-            gbc.gridx = 0;
-            gbc.gridy = 3;
+            ++gbc.gridy;
+            if (!lens.isGame() && !lens.isStochastic()) {
+                reductionOptionsPanel.add(useExplicitSearch, gbc);
+                ++gbc.gridy;
+            }
         }
 
         reductionOptionsPanel.add(useQueryReduction, gbc);
@@ -5733,6 +5767,7 @@ public class QueryDialog extends JPanel {
         } else if (!lens.isTimed()) {
             refreshTraceRefinement();
             refreshTarjan();
+            refreshExplicitSearch();
             refreshColoredReduction();
             if (queryType.getSelectedIndex() == 2) {
                 traceBoxQuantification.setEnabled(traceBoxQuantification.getModel().getSize() > 0);
@@ -5776,7 +5811,7 @@ public class QueryDialog extends JPanel {
         querySaved = false;
 
         query = Verifier.convertQuery(query, lens);
-
+        
         Verifier.createTempFile();
 
         boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
@@ -5836,6 +5871,26 @@ public class QueryDialog extends JPanel {
                 useTarjan.setEnabled(false);
                 break;
         }
+    }
+
+    private boolean oldExplicitSearchState;
+
+    private void refreshExplicitSearch() {
+        if (canUseExplicitSearch()) {
+            useExplicitSearch.setSelected(oldExplicitSearchState);
+            useExplicitSearch.setEnabled(true);
+        } else {
+            if (useExplicitSearch.isEnabled()) {
+                oldExplicitSearchState = useExplicitSearch.isSelected();
+            }
+            
+            useExplicitSearch.setSelected(false);
+            useExplicitSearch.setEnabled(false);
+        }
+    }
+
+    private boolean canUseExplicitSearch() {
+        return (newProperty.toString().contains("AG") || newProperty.toString().contains("EF")) && !newProperty.hasNestedPathQuantifiers();
     }
 
     private void refreshColoredReduction() {

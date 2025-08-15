@@ -41,6 +41,7 @@ public interface TabActions {
     boolean getNetChanged();
 
     void toggleAnimationMode();
+    void toggleAnimationMode(boolean explicit);
 
     void setMode(PetriNetTab.DrawTool mode);
 
