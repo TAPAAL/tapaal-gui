@@ -114,24 +114,26 @@ public class ColoredBindingSelectionDialog {
         }
 
         Runnable filterList = () -> {
-            List<Map<Variable, Color>> filtered = new ArrayList<>(validBindings);
-
-            for (var entry : searchFields.entrySet()) {
-                String filter = entry.getValue().getText().trim();
-                if (!filter.isEmpty()) {
-                    filtered = searchers.get(entry.getKey()).findAllMatches(filter);
-                }
-            }
-
             listModel.clear();
-            for (var binding : filtered) {
+            outer: for (var binding : validBindings) {
+                for (var entry : searchFields.entrySet()) {
+                    String filter = entry.getValue().getText().trim().toLowerCase();
+                    if (!filter.isEmpty()) {
+                        Color c = binding.get(entry.getKey());
+                        if (c == null || !c.getName().toLowerCase().contains(filter)) {
+                            continue outer;
+                        }
+                    }
+                }
+
                 listModel.addElement(binding);
             }
+
             if (!listModel.isEmpty()) {
                 bindingList.setSelectedIndex(0);
             }
         };
-
+        
         for (JTextField field : searchFields.values()) {
             field.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
                 public void insertUpdate(javax.swing.event.DocumentEvent e) { filterList.run(); }
