@@ -2869,6 +2869,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         private int totalX = 0;
         private int totalY = 0;
         private void pnoPressed(PetriNetObject pno, MouseEvent e) {
+            if (isInAnimationMode() && pno instanceof TimedTransitionComponent) {
+                dragInit = e.getPoint();
+                justSelected = false;
+                return;
+            }
+
             if (!pno.isSelected()) {
                 if (!e.isShiftDown()) {
                     canvas.getSelectionObject().clearSelection();
@@ -2876,9 +2882,28 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 pno.select();
                 justSelected = true;
             }
+
             dragInit = e.getPoint();
         }
+
         private void pnoReleased(PetriNetObject pno, MouseEvent e) {
+            if (isInAnimationMode() && pno instanceof TimedTransitionComponent) {
+                if (!SwingUtilities.isLeftMouseButton(e)) return;
+                if (!isDragging) {
+                    TimedTransitionComponent t = (TimedTransitionComponent) pno;
+                    TimedTransition transition = t.underlyingTransition();
+                    if (transition.isDEnabled()) {
+                        animator.dFireTransition(transition);
+                    }
+                }
+
+                isDragging = false;
+                totalX = 0;
+                totalY = 0;
+                justSelected = false;
+
+                return;
+            }
 
             if (!SwingUtilities.isLeftMouseButton(e)) {
                 return;
@@ -2899,16 +2924,23 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     }
                 }
             }
+
             justSelected = false;
         }
+
         private void pnoDragged(PetriNetObject pno, MouseEvent e) {
+            if (isInAnimationMode() && pno instanceof TimedTransitionComponent && !pno.isSelected()) {
+                canvas.getSelectionObject().clearSelection();
+                pno.select();
+            }
 
             //Disabled dragging endpoints or arcs as its broken (sometimes)
-            if ( pno instanceof Arc ||
-                (pno instanceof ArcPathPoint && ((ArcPathPoint) pno).isEndPoint())
+            if (pno instanceof Arc ||
+               (pno instanceof ArcPathPoint && ((ArcPathPoint) pno).isEndPoint())
             ) {
                 return;
             }
+
             int previousX = pno.getX();
             int previousY = pno.getY();
 
@@ -2926,12 +2958,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             int transX = Grid.align(e.getX() - dragInit.x, canvas.getZoom());
             int transY = Grid.align(e.getY() - dragInit.y, canvas.getZoom());
             canvas.getSelectionObject().translateSelection(transX, transY);
-
+            
             //Only register the actual distance and direction moved (in case of dragging past edge)
             totalX += pno.getX() - previousX;
             totalY += pno.getY() - previousY;
         }
-
 
         private Point dragStartPoint;
         @Override
