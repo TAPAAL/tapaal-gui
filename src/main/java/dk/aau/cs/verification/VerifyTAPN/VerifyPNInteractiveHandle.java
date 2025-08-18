@@ -90,11 +90,6 @@ public class VerifyPNInteractiveHandle {
 
     public Map<TimedTransition, List<Map<Variable, Color>>> sendMarking(NetworkMarking marking) {
         try {
-            String markingXmlStr = marking.toXmlStr(composer);
-            if (markingXmlStr.equals("<marking/>")) {
-                return new HashMap<>();
-            }
-
             String xmlResponse = sendMessage(marking.toXmlStr(composer), "valid-bindings");
             return parseTransitionWithBindings(xmlResponse);
         } catch (Exception e) {
