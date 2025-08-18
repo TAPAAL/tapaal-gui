@@ -1998,7 +1998,8 @@ public class QueryDialog extends JPanel {
 
     private void setupExplicitSearch(boolean selectExplicitSearch) {
         if (lens.isColored() && !lens.isGame() && !lens.isStochastic() && !lens.isTimed()) {
-            this.useExplicitSearch.setSelected(selectExplicitSearch);
+            useExplicitSearch.setSelected(selectExplicitSearch);
+            oldExplicitSearchState = selectExplicitSearch;
         }
     }
 
@@ -5503,6 +5504,8 @@ public class QueryDialog extends JPanel {
                     depthFirstSearch.setSelected(true);
                 }
             }
+
+            setComponentEnabledRecursively(unfoldingOptionsPanel, !useExplicitSearch.isSelected());
         });
 
         heuristicSearch.addActionListener(e -> {
@@ -5887,6 +5890,20 @@ public class QueryDialog extends JPanel {
             useExplicitSearch.setSelected(false);
             useExplicitSearch.setEnabled(false);
         }
+    }
+
+    private void setComponentEnabledRecursively(Component component, boolean enabled) {
+        if (component instanceof Container) {
+            for (Component child : ((Container) component).getComponents()) {
+                setComponentEnabledRecursively(child, enabled);
+            }
+        }
+
+        if (!enabled && component instanceof AbstractButton) {
+            ((AbstractButton) component).setSelected(false);
+        }
+
+        component.setEnabled(enabled);
     }
 
     private boolean canUseExplicitSearch() {
