@@ -178,7 +178,7 @@ public class Animator {
         tab.addAbstractAnimationPane();
         AnimationHistoryList untimedAnimationHistory = tab.getUntimedAnimationHistory();
         for(TAPNNetworkTraceStep step : trace){
-            untimedAnimationHistory.addHistoryItem(step.toString());
+            untimedAnimationHistory.addHistoryItem(step.toString(), tab.getLens().isColored());
         }
 
         tab.getUntimedAnimationHistory().setSelectedIndex(0);
@@ -296,6 +296,7 @@ public class Animator {
     }
 
     private void updateFireableTransitionsColored(TransitionFiringComponent transFireComponent) {
+        boolean anyTransitionsEnabled = false;
         if (tab.getLens().isColored()) {
             updateValidBindingsMap();
             for (Template template : tab.activeTemplates()) {
@@ -305,10 +306,15 @@ public class Animator {
                         if (guiTransition != null) {
                             guiTransition.markTransitionEnabled(true);
                             transFireComponent.addTransition(template, guiTransition);
+                            anyTransitionsEnabled = true;
                         }
                     }
                 }
             }
+        }
+
+        if (!anyTransitionsEnabled) {
+            tab.getAnimationHistorySidePanel().setLastShown(TraceType.EG_DEADLOCK);
         }
     }
 
@@ -705,7 +711,9 @@ public class Animator {
                 Random random = new Random();
                 int randomIndex = random.nextInt(validBindings.size());
                 bindings = validBindings.get(randomIndex);
-            } else if (!validBindings.isEmpty()){
+            } else if (validBindings.size() == 1) {
+                bindings = validBindingsMap.get(transition).get(0);
+            } else if (!validBindings.isEmpty()) {
                 bindings = ColoredBindingSelectionDialog.showDialog(transition, validBindings);
                 if (bindings == null) return; // Cancelled
             }
@@ -871,9 +879,9 @@ public class Animator {
         markings.clear();
         currentAction = -1;
         currentMarkingIndex = 0;
-        tab.getAnimationHistorySidePanel().reset();
+        tab.getAnimationHistorySidePanel().reset(tab.getLens().isColored());
         if(tab.getUntimedAnimationHistory() != null){
-            tab.getUntimedAnimationHistory().reset();
+            tab.getUntimedAnimationHistory().reset(tab.getLens().isColored());
         }
     }
 
@@ -881,9 +889,9 @@ public class Animator {
         actionHistory.clear();
         currentAction = -1;
         currentMarkingIndex = 0;
-        tab.getAnimationHistorySidePanel().reset();
+        tab.getAnimationHistorySidePanel().reset(tab.getLens().isColored());
         if(tab.getUntimedAnimationHistory() != null){
-            tab.getUntimedAnimationHistory().reset();
+            tab.getUntimedAnimationHistory().reset(tab.getLens().isColored());
         }
     }
 
@@ -905,7 +913,7 @@ public class Animator {
         }
 
         tab.network().setMarking(marking);
-        tab.getAnimationHistorySidePanel().addHistoryItem(action.toString());
+        tab.getAnimationHistorySidePanel().addHistoryItem(action.toString(), tab.getLens().isColored());
         if (action.isColoredTransitionStep()) {
             TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)action;
             Map<Variable, Color> bindings = coloredStep.getBindings();
@@ -1090,7 +1098,7 @@ public class Animator {
         }
 
         if(answer){
-            tab.getAnimationHistorySidePanel().clearStepsForward();
+            tab.getAnimationHistorySidePanel().clearStepsForward(tab.getLens().isColored());
         } else if (SimulationControl.getInstance().isRunning()) {
             SimulationControl.stopSimulation();
         }

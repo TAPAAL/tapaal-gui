@@ -569,7 +569,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         this.setBorder(null); // avoid multiple borders
         this.setDividerSize(8);
         //XXX must be after the animationcontroller is created
-        animationModeController = new CanvasAnimationController(getAnimator());
+        animationModeController = new CanvasAnimationController(getAnimator(), getLens());
     }
 
     public PetriNetTab(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
@@ -2588,9 +2588,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	static final class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
+        private final TAPNLens lens;
 
-        public CanvasAnimationController(Animator animator) {
+        public CanvasAnimationController(Animator animator, TAPNLens lens) {
 			this.animator = animator;
+            this.lens = lens;
         }
 
 		@Override
@@ -2615,7 +2617,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 		void transitionLeftClicked(TimedTransitionComponent t) {
 			TimedTransition transition = t.underlyingTransition();
-			if (transition.isDEnabled()) {
+			if (lens.isColored() || transition.isDEnabled()) {
 				animator.dFireTransition(transition);
 			}
 		}

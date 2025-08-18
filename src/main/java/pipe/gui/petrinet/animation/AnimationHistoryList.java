@@ -49,7 +49,7 @@ public class AnimationHistoryList extends JList<String> {
         setCellRenderer(new TooltipListCellRenderer());
 	}
 
-	public void addHistoryItem(String transitionName) {
+	public void addHistoryItem(String transitionName, boolean isExplicit) {
 		if(lastShown == TraceType.NOT_EG){
 			getListModel().addElement(transitionName);
 			setSelectedIndex(getListModel().size() - 1);
@@ -58,10 +58,10 @@ public class AnimationHistoryList extends JList<String> {
 			setSelectedIndex(getListModel().size() - 2);
 		}
 		
-		updateAccordingToDeadlock();
+		updateAccordingToDeadlock(isExplicit);
 	}
 
-	public void clearStepsForward() {
+	public void clearStepsForward(boolean isExplicit) {
 		DefaultListModel<String> listModel = getListModel();
 		int lastIndex = listModel.size() - 1;
 
@@ -69,7 +69,7 @@ public class AnimationHistoryList extends JList<String> {
 			listModel.removeRange(getSelectedIndex() + 1, lastIndex);
 		}
 		lastShown = TraceType.NOT_EG;
-		updateAccordingToDeadlock();
+		updateAccordingToDeadlock(isExplicit);
 	}
 
 	public void stepForward() {
@@ -128,12 +128,12 @@ public class AnimationHistoryList extends JList<String> {
         setTooltipForIndex(getSelectedIndex(), tooltip);
     }
 
-	public void reset() {
+	public void reset(boolean isExplicit) {
 		getListModel().clear();
 		getListModel().addElement("Initial Marking");
 		setSelectedIndex(0);
 		lastShown = TraceType.NOT_EG;
-		updateAccordingToDeadlock();
+		updateAccordingToDeadlock(isExplicit);
         itemTooltips.clear();
 	}
 	
@@ -171,11 +171,13 @@ public class AnimationHistoryList extends JList<String> {
         }
     }
 	
-	private void updateAccordingToDeadlock() {
-		
+	private void updateAccordingToDeadlock(boolean isExplicit) {
+		if (isExplicit) return;
+
 		if(lastShown == TraceType.EG_DELAY_FOREVER){
 			return;
 		}
+        
 		for (Template t : TAPAALGUI.getCurrentTab().activeTemplates()){
 			for(Transition trans : t.guiModel().getTransitions()){
 				if(trans.isTransitionEnabled() || trans.isDelayEnabled()){
