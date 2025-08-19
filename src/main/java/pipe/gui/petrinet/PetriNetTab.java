@@ -2895,6 +2895,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     if (transition.isDEnabled()) {
                         animator.dFireTransition(transition);
                     }
+                } else {
+                    canvas.translateSelection(totalX, totalY);
                 }
 
                 isDragging = false;
