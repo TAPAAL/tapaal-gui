@@ -673,7 +673,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 				arcElement.setAttribute("weight", inputArc.getWeight().nameForSaving(true)+"");
 			}
 		}
-		writeTACPN.appendColoredArcsDependencies(inputArc, guiModel, document, arcElement);
+
+        if (!(inputArc instanceof TimedInhibitorArcComponent)) {
+            writeTACPN.appendColoredArcsDependencies(inputArc, guiModel, document, arcElement);
+        }
 
 		return arcElement;
 	}

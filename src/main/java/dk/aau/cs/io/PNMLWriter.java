@@ -354,7 +354,9 @@ public class PNMLWriter implements NetWriter {
         arcElement.setAttribute("source", (arc.getSource().getId() != null ? arc.getSource().getId() : ""));
         arcElement.setAttribute("target", (arc.getTarget().getId() != null ? arc.getTarget().getId() : ""));
 
-        writeTACPN.appendColoredArcsDependencies(arc, guiModel, document, arcElement);
+        if (!(arc instanceof TimedInhibitorArcComponent)) {
+            writeTACPN.appendColoredArcsDependencies(arc, guiModel, document, arcElement);
+        }
 
         if (arc instanceof TimedOutputArcComponent && arc.getWeight().value() > 1 ) {
             Element inscription = document.createElement("inscription");
