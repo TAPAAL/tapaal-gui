@@ -10,7 +10,6 @@ import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 
 class UndoRedoSpy : JFrame() {
-
     private val reloadBtn = JButton(object : AbstractAction("Reload") {
         override fun actionPerformed(e: ActionEvent?) {
             reloadUndoRedoStack()
@@ -24,19 +23,41 @@ class UndoRedoSpy : JFrame() {
         val m = tree.model as DefaultTreeModel
         treeRoot.removeAllChildren()
 
-        val edits = UndoManager::class.java.getDeclaredField("edits")
-        edits.isAccessible = true
-        val e = edits.get(TAPAALGUI.getCurrentTab().undoManager) as ArrayList<ArrayList<Command>?>
+        val undoManager = TAPAALGUI.getCurrentTab().undoManager
+        
+        // Normal edits
+        val normalEditsField = UndoManager::class.java.getDeclaredField("normalEdits")
+        normalEditsField.isAccessible = true
+        val normalEdits = normalEditsField.get(undoManager) as ArrayList<ArrayList<Command>?>
+        
+        // Animation edits
+        val animEditsField = UndoManager::class.java.getDeclaredField("animEdits")
+        animEditsField.isAccessible = true
+        val animEdits = animEditsField.get(undoManager) as ArrayList<ArrayList<Command>?>
 
-        e.forEach {
+        val normalNode = DefaultMutableTreeNode("Normal Mode")
+        normalEdits.forEach {
             if (it != null && it.size > 0) {
-                treeRoot.add(DefaultMutableTreeNode(it))
+                normalNode.add(DefaultMutableTreeNode(it))
             }
         }
+
+        treeRoot.add(normalNode)
+
+        val animNode = DefaultMutableTreeNode("Animation Mode")
+        animEdits.forEach {
+            if (it != null && it.size > 0) {
+                animNode.add(DefaultMutableTreeNode(it))
+            }
+        }
+
+        treeRoot.add(animNode)
+
         m.reload()
         tree.expandRow(0)
+        tree.expandRow(1)
+        tree.expandRow(2)
     }
-
 
     init {
         contentPane.layout = BoxLayout(contentPane, BoxLayout.Y_AXIS)
@@ -46,8 +67,5 @@ class UndoRedoSpy : JFrame() {
 
         reloadUndoRedoStack()
         pack()
-
     }
-
-
 }

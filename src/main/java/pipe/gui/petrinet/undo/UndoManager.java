@@ -20,147 +20,197 @@ import pipe.gui.petrinet.PetriNetTab;
  */
 public class UndoManager {
 
-	private static final int UNDO_BUFFER_CAPACITY = Constants.DEFAULT_BUFFER_CAPACITY;
+    private static final int UNDO_BUFFER_CAPACITY = Constants.DEFAULT_BUFFER_CAPACITY;
     private final PetriNetTab tab;
 
-    private int indexOfNextAdd = 0;
-	private int sizeOfBuffer = 0;
-	private int startOfBuffer = 0;
-	private int undoneEdits = 0;
+    // Normal mode undo stack
+    private int normalIndexOfNextAdd = 0;
+    private int normalSizeOfBuffer = 0;
+    private int normalStartOfBuffer = 0;
+    private int normalUndoneEdits = 0;
+    private final ArrayList<ArrayList<Command>> normalEdits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
 
-	private final ArrayList<ArrayList<Command>> edits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
+    // Animation mode undo stack
+    private int animIndexOfNextAdd = 0;
+    private int animSizeOfBuffer = 0;
+    private int animStartOfBuffer = 0;
+    private int animUndoneEdits = 0;
+    private final ArrayList<ArrayList<Command>> animEdits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
 
-	private Reference<GuiFrameActions> app = new MutableReference<>();
-	public void setApp(Reference<GuiFrameActions> app) {
-		this.app = app;
+    private Reference<GuiFrameActions> app = new MutableReference<>();
 
-		// Undo/Redo is enabled based on undo/redo manager
-		setUndoRedoStatus();
-	}
+    public void setApp(Reference<GuiFrameActions> app) {
+        this.app = app;
 
-	/**
-	 * Creates a new instance of UndoManager
-	 */
-	public UndoManager(PetriNetTab tab) {
+        // Undo/Redo is enabled based on undo/redo manager
+        setUndoRedoStatus();
+    }
+
+    /**
+     * Creates a new instance of UndoManager
+     */
+    public UndoManager(PetriNetTab tab) {
         this.tab = tab;
 
-        // Initialize the buffer
-		for (int i = 0; i < UNDO_BUFFER_CAPACITY; i++) {
-			edits.add(null);
-		}
-	}
+        // Initialize the buffers
+        for (int i = 0; i < UNDO_BUFFER_CAPACITY; i++) {
+            normalEdits.add(null);
+            animEdits.add(null);
+        }
+    }
 
-	public void redo() {
+    private int getIndexOfNextAdd() {
+        return tab != null && tab.isInAnimationMode() ? animIndexOfNextAdd : normalIndexOfNextAdd;
+    }
 
-		if (undoneEdits > 0) {
+    private void setIndexOfNextAdd(int value) {
+        if (tab != null && tab.isInAnimationMode()) {
+            animIndexOfNextAdd = value;
+        } else {
+            normalIndexOfNextAdd = value;
+        }
+    }
 
-			// The currentEdit to redo
-			for (Command command : edits.get(indexOfNextAdd)) {
-				command.redo();
-			}
-			indexOfNextAdd = (indexOfNextAdd + 1) % UNDO_BUFFER_CAPACITY;
-			sizeOfBuffer++;
-			undoneEdits--;
-			if (undoneEdits == 0) {
-				app.ifPresent(a -> a.setRedoActionEnabled(false));
-			}
-			app.ifPresent(a -> a.setUndoActionEnabled(true));
-		}
-	}
+    private int getSizeOfBuffer() {
+        return tab != null && tab.isInAnimationMode() ? animSizeOfBuffer : normalSizeOfBuffer;
+    }
 
-	public void setUndoRedoStatus() {
+    private void setSizeOfBuffer(int value) {
+        if (tab != null && tab.isInAnimationMode()) {
+            animSizeOfBuffer = value;
+        } else {
+            normalSizeOfBuffer = value;
+        }
+    }
 
-		boolean canRedo = (undoneEdits != 0);
-		app.ifPresent(a -> a.setRedoActionEnabled(canRedo));
+    private int getStartOfBuffer() {
+        return tab != null && tab.isInAnimationMode() ? animStartOfBuffer : normalStartOfBuffer;
+    }
 
-		boolean canUndo = sizeOfBuffer != 0;
-		app.ifPresent(a -> a.setUndoActionEnabled(canUndo));
+    private void setStartOfBuffer(int value) {
+        if (tab != null && tab.isInAnimationMode()) {
+            animStartOfBuffer = value;
+        } else {
+            normalStartOfBuffer = value;
+        }
+    }
 
-	}
+    private int getUndoneEdits() {
+        return tab != null && tab.isInAnimationMode() ? animUndoneEdits : normalUndoneEdits;
+    }
 
-	public void undo() {
+    private void setUndoneEdits(int value) {
+        if (tab != null && tab.isInAnimationMode()) {
+            animUndoneEdits = value;
+        } else {
+            normalUndoneEdits = value;
+        }
+    }
 
-		if (sizeOfBuffer > 0) {
+    private ArrayList<ArrayList<Command>> getEdits() {
+        return tab != null && tab.isInAnimationMode() ? animEdits : normalEdits;
+    }
 
-			if (--indexOfNextAdd < 0) {
-				indexOfNextAdd += UNDO_BUFFER_CAPACITY;
-			}
-			sizeOfBuffer--;
-			undoneEdits++;
+    public void redo() {
+        if (getUndoneEdits() > 0) {
+            for (Command command : getEdits().get(getIndexOfNextAdd())) {
+                command.redo();
+            }
 
-			// The currentEdit to undo (reverse order)
-			ArrayList<Command> currentEdit = edits.get(indexOfNextAdd);
-    
-			for (int i = currentEdit.size() - 1; i >= 0; i--) {
-				currentEdit.get(i).undo();
-			}
+            setIndexOfNextAdd((getIndexOfNextAdd() + 1) % UNDO_BUFFER_CAPACITY);
+            setSizeOfBuffer(getSizeOfBuffer() + 1);
+            setUndoneEdits(getUndoneEdits() - 1);
+        }
 
-			if (sizeOfBuffer == 0) {
-				app.ifPresent(a -> a.setUndoActionEnabled(false));
-			}
-			app.ifPresent(a -> a.setRedoActionEnabled(true));
-		}
-	}
+        setUndoRedoStatus();
+    }
 
-	public void clear() {
-		indexOfNextAdd = 0;
-		sizeOfBuffer = 0;
-		startOfBuffer = 0;
-		undoneEdits = 0;
-		app.ifPresent(a -> a.setUndoActionEnabled(false));
-		app.ifPresent(a -> a.setRedoActionEnabled(false));
-	}
+    public void setUndoRedoStatus() {
+        boolean canUndo = getSizeOfBuffer() != 0;
+        app.ifPresent(a -> a.setUndoActionEnabled(canUndo));
+        
+        boolean canRedo = getUndoneEdits() != 0;
+        app.ifPresent(a -> a.setRedoActionEnabled(canRedo));
+    }
 
-	public void newEdit() {
-		ArrayList<Command> lastEdit = edits.get(currentIndex());
-		if ((lastEdit != null) && (lastEdit.isEmpty())) {
-			return;
-		}
+    public void undo() {
+        if (getSizeOfBuffer() > 0) {
+            int indexOfNextAdd = getIndexOfNextAdd();
+            if (--indexOfNextAdd < 0) {
+                indexOfNextAdd += UNDO_BUFFER_CAPACITY;
+            }
+            setIndexOfNextAdd(indexOfNextAdd);
+            setSizeOfBuffer(getSizeOfBuffer() - 1);
+            setUndoneEdits(getUndoneEdits() + 1);
 
-		undoneEdits = 0;
-		app.ifPresent(a -> a.setUndoActionEnabled(true));
-		app.ifPresent(a -> a.setRedoActionEnabled(false));
+            // The currentEdit to undo (reverse order)
+            ArrayList<Command> currentEdit = getEdits().get(indexOfNextAdd);
+            
+            for (int i = currentEdit.size() - 1; i >= 0; i--) {
+                currentEdit.get(i).undo();
+            }
+        }
+
+        setUndoRedoStatus();
+    }
+
+    public void clear() {
+        if (tab != null && tab.isInAnimationMode()) {
+            animIndexOfNextAdd = 0;
+            animSizeOfBuffer = 0;
+            animStartOfBuffer = 0;
+            animUndoneEdits = 0;
+        } else {
+            normalIndexOfNextAdd = 0;
+            normalSizeOfBuffer = 0;
+            normalStartOfBuffer = 0;
+            normalUndoneEdits = 0;
+        }
+
+        setUndoRedoStatus();
+    }
+
+    public void undoAll() {
+        if (getSizeOfBuffer() > 0) {
+            int indexOfNextAdd = getIndexOfNextAdd();
+            int originalBufferSize = getSizeOfBuffer();
+            
+            setIndexOfNextAdd(0);
+            setSizeOfBuffer(0);
+            setUndoneEdits(getUndoneEdits() + originalBufferSize);
+
+            // The currentEdit to undo (reverse order)
+            for (int i = indexOfNextAdd - 1; i >= 0; i--) {
+                ArrayList<Command> currentEdit = getEdits().get(i);
+                for (int j = currentEdit.size() - 1; j >= 0; j--) {
+                    currentEdit.get(j).undo();
+                }
+            }
+        }
+
+        setUndoRedoStatus();
+    }
+
+    public void newEdit() {
+        ArrayList<Command> lastEdit = getEdits().get(currentIndex());
+        if ((lastEdit != null) && (lastEdit.isEmpty())) {
+            return;
+        }
+
+        setUndoneEdits(0);
 
         //XXX this is properly not the place to set net changed, can be null as also used in batch processor undo/redo
         if (tab != null) {
             tab.setNetChanged(true);
         }
 
-		ArrayList<Command> compoundEdit = new ArrayList<Command>();
-		edits.set(indexOfNextAdd, compoundEdit);
-		indexOfNextAdd = (indexOfNextAdd + 1) % UNDO_BUFFER_CAPACITY;
-		if (sizeOfBuffer < UNDO_BUFFER_CAPACITY) {
-			sizeOfBuffer++;
-		} else {
-			startOfBuffer = (startOfBuffer + 1) % UNDO_BUFFER_CAPACITY;
-		}
-	}
-
-	public void addEdit(Command undoableEdit) {
-		ArrayList<Command> compoundEdit = edits.get(currentIndex());
-		compoundEdit.add(undoableEdit);
-		// debug();
-	}
-
-	public void addNewEdit(Command undoableEdit) {
-		newEdit(); // mark for a new "transtaction""
-		addEdit(undoableEdit);
-	}
-
-
-	private int currentIndex() {
-		int lastAdd = indexOfNextAdd - 1;
-		if (lastAdd < 0) {
-			lastAdd += UNDO_BUFFER_CAPACITY;
-		}
-		return lastAdd;
-	}
-
-    public void removeCurrentEdit() {
-        if (sizeOfBuffer > 0 && currentIndex() >= 0 && currentIndex() < edits.size()) {
-            edits.set(currentIndex(), null);
-            --sizeOfBuffer;
-            --indexOfNextAdd;
+        ArrayList<Command> compoundEdit = new ArrayList<Command>();
+        getEdits().set(getIndexOfNextAdd(), compoundEdit);
+        setIndexOfNextAdd((getIndexOfNextAdd() + 1) % UNDO_BUFFER_CAPACITY);
+        if (getSizeOfBuffer() < UNDO_BUFFER_CAPACITY) {
+            setSizeOfBuffer(getSizeOfBuffer() + 1);
+        } else {
+            setStartOfBuffer((getStartOfBuffer() + 1) % UNDO_BUFFER_CAPACITY);
         }
 
         undoneEdits = 0;
@@ -168,7 +218,48 @@ public class UndoManager {
         setUndoRedoStatus();
     }
 
+    public void addEdit(Command undoableEdit) {
+        ArrayList<Command> compoundEdit = getEdits().get(currentIndex());
+        compoundEdit.add(undoableEdit);
+        // debug();
+    }
+
+    public void addNewEdit(Command undoableEdit) {
+        newEdit(); // mark for a new "transaction"
+        addEdit(undoableEdit);
+    }
+
+    private int currentIndex() {
+        int lastAdd = getIndexOfNextAdd() - 1;
+        if (lastAdd < 0) {
+            lastAdd += UNDO_BUFFER_CAPACITY;
+        }
+        return lastAdd;
+    }
+
+    public void removeCurrentEdit() {
+        if (getSizeOfBuffer() > 0 && currentIndex() >= 0 && currentIndex() < getEdits().size()) {
+            getEdits().set(currentIndex(), null);
+            setSizeOfBuffer(getSizeOfBuffer() - 1);
+            setIndexOfNextAdd(getIndexOfNextAdd() - 1);
+        }
+        setUndoRedoStatus();
+    }
+
+    public void undoAndRemoveCurrentEdit() {
+        int currentIdx = currentIndex();
+    
+        undo();
+    
+        getEdits().set(currentIdx, null);
+        if (getUndoneEdits() > 0) {
+            setUndoneEdits(getUndoneEdits() - 1);
+        }
+        
+        setUndoRedoStatus();
+    }
+
     public boolean currentEditIsEmpty() {
-        return edits.get(currentIndex()).isEmpty();
+        return getEdits().get(currentIndex()).isEmpty();
     }
 }
