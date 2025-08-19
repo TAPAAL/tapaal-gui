@@ -1194,8 +1194,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 nextcomponentAction.setEnabled(true);
 
                 deleteAction.setEnabled(false);
-                undoAction.setEnabled(false);
-                redoAction.setEnabled(false);
+                undoAction.setEnabled(true);
+                redoAction.setEnabled(true);
                 verifyAction.setEnabled(false);
 
                 showColorTypesVariables.setEnabled(getCurrentTab().lens.isColored());
