@@ -1999,6 +1999,7 @@ public class QueryDialog extends JPanel {
     private void setupExplicitSearch(boolean selectExplicitSearch) {
         if (lens.isColored() && !lens.isGame() && !lens.isStochastic() && !lens.isTimed()) {
             useExplicitSearch.setSelected(selectExplicitSearch);
+            setComponentEnabledRecursively(unfoldingOptionsPanel, !selectExplicitSearch);
             oldExplicitSearchState = selectExplicitSearch;
         }
     }
@@ -5893,6 +5894,10 @@ public class QueryDialog extends JPanel {
     }
 
     private void setComponentEnabledRecursively(Component component, boolean enabled) {
+        if (component == null) {
+            return;
+        }
+
         if (component instanceof Container) {
             for (Component child : ((Container) component).getComponents()) {
                 setComponentEnabledRecursively(child, enabled);
