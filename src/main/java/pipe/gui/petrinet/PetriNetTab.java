@@ -24,7 +24,6 @@ import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.Require;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.Preferences;
@@ -32,7 +31,7 @@ import net.tapaal.copypaste.CopyPastImportExport;
 import net.tapaal.gui.DrawingSurfaceManager.AbstractDrawingSurfaceManager;
 import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
 
-import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
+import net.tapaal.gui.petrinet.dialog.ColoredSimulationDialog;
 import net.tapaal.gui.petrinet.dialog.WorkflowDialog;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel;
@@ -570,7 +569,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         this.setBorder(null); // avoid multiple borders
         this.setDividerSize(8);
         //XXX must be after the animationcontroller is created
-        animationModeController = new CanvasAnimationController(getAnimator());
+        animationModeController = new CanvasAnimationController(getAnimator(), getLens());
     }
 
     public PetriNetTab(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
@@ -1392,14 +1391,24 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     //Animation mode stuff, moved from view
 	//XXX: kyrke -2019-07-06, temp solution while refactoring there is properly a better place
 	private boolean animationmode = false;
-	public void setAnimationMode(boolean on) {
+
+    public void setAnimationMode(boolean on, boolean explicit) {
 	    if (animationmode != on) {
-	        toggleAnimationMode();
+	        toggleAnimationMode(explicit);
         }
     }
 
+	public void setAnimationMode(boolean on) {
+	    setAnimationMode(on, false);
+    }
+
+    @Override
+    public void toggleAnimationMode() {
+        toggleAnimationMode(false);
+    }
+
 	@Override
-	public void toggleAnimationMode() {
+	public void toggleAnimationMode(boolean explicit) {
 		if (!animationmode) {
 			if (numberOfActiveTemplates() > 0) {
 				app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
@@ -1419,9 +1428,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 				getAnimator().reset(false);
 				if(animControllerBox != null) {
                     animControllerBox.resetPlacementOfAnimationToolBar();
-
                 }
+
 				getAnimator().storeModel();
+                if (explicit) {
+                    getAnimator().initializeInteractiveEngine();
+                }
+
                 getAnimator().updateFireableTransitions();
                 getAnimator().reportBlockingPlaces();
 				getAnimator().setFiringmode("Random");
@@ -2576,9 +2589,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	static final class CanvasAnimationController extends AbstractDrawingSurfaceManager {
 
 		private final Animator animator;
+        private final TAPNLens lens;
 
-        public CanvasAnimationController(Animator animator) {
+        public CanvasAnimationController(Animator animator, TAPNLens lens) {
 			this.animator = animator;
+            this.lens = lens;
         }
 
 		@Override
@@ -2603,8 +2618,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 		void transitionLeftClicked(TimedTransitionComponent t) {
 			TimedTransition transition = t.underlyingTransition();
-
-			if (transition.isDEnabled()) {
+			if (lens.isColored() || transition.isDEnabled()) {
 				animator.dFireTransition(transition);
 			}
 		}
@@ -3168,7 +3182,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     private final GuiAction unfoldTabAction = new GuiAction("Unfold net", "Unfold the colors in the tab") {
         @Override
         public void actionPerformed(ActionEvent e) {
-            UnfoldDialog.showDialog(PetriNetTab.this);
+            ColoredSimulationDialog.showUnfoldDialog(PetriNetTab.this);
         }
     };
 
