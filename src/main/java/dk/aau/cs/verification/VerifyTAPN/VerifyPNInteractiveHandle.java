@@ -186,11 +186,15 @@ public class VerifyPNInteractiveHandle {
                     Element colorElement = (Element)variableElement.getElementsByTagName("color").item(0);
                     String colorName = colorElement.getTextContent();
 
-                    Variable variable = network.getVariableByName(variableId);
+                    Variable variable = network.getVariableById(variableId);
                     Color color = network.getColorByName(colorName);
 
-                    if (variable == null || color == null) {
-                        throw new IllegalArgumentException("Variable or color not found for ID: " + variableId + " or " + colorName);
+                    if (variable == null) {
+                        throw new IllegalArgumentException("Variable with ID " + variableId + " not found in network.");
+                    }
+
+                    if (color == null) {
+                        throw new IllegalArgumentException("Color with name " + colorName + " not found in network.");
                     }
 
                     singleBinding.put(variable, color);
