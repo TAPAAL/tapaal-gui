@@ -642,7 +642,7 @@ public class TapnEngineXmlLoader {
         if(colorMarking!= null){
             ColorMultiset cm = colorMarking.eval(context);
 
-            p.setTokenExpression(loadTACPN.constructCleanAddExpression(p.getColorType(),cm));
+            p.setTokenExpression(loadTACPN.constructCleanAddExpression(colorMarking));
 
 
             for (TimedToken ctElement : cm.getTokens(p)) {
