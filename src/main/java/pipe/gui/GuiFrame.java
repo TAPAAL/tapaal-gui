@@ -450,10 +450,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 } else {
                     this.setSelected(false);
                 }
+
+                UnfoldDialog.resetCancelled();
             } else {
                 currentTab.ifPresent(TabActions::toggleAnimationMode);
             }
-
         }
     };
     public final GuiAction stepforwardAction = new GuiAction("Step forward", "Step forward", "released RIGHT") {

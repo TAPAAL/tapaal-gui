@@ -61,6 +61,10 @@ public class UnfoldDialog extends JDialog {
         return cancelled;
     }
 
+    public static void resetCancelled(){
+        cancelled = false;
+    }
+
     private void initComponents() {
         setLayout(new FlowLayout());
         JPanel mainPanel = new JPanel(new GridBagLayout());
