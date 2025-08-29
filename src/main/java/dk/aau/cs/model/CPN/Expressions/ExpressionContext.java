@@ -16,9 +16,13 @@ public class ExpressionContext {
        this.colorTypes = colorTypes;
    }
 
-   public ProductType findProductColorType(Vector<ColorType> types) {
+    public ProductType findProductColorType(Vector<ColorType> types) {
         for (ColorType ct : colorTypes.values()) {
             if (ct instanceof ProductType) {
+                if (((ProductType)ct).getColorTypes().size() != types.size()) {
+                    continue;
+                }
+
                 ProductType pt = (ProductType) ct;
                 boolean allMatch = true;
                 for (int i = 0; i < types.size(); ++i) {
@@ -33,7 +37,7 @@ public class ExpressionContext {
                 }
             }
         }
-        return null;
-   }
 
+        return null;
+    }
 }

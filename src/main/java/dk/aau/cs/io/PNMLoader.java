@@ -243,7 +243,7 @@ public class PNMLoader {
         if (colorMarking != null) {
             ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
             ColorMultiset cm = colorMarking.eval(context);
-            place.setTokenExpression(loadTACPN.constructCleanAddExpression(colorType,cm));
+            place.setTokenExpression(loadTACPN.constructCleanAddExpression(colorMarking));
             for (TimedToken ct : cm.getTokens(place)) {
                 tapn.parentNetwork().marking().add(ct);
             }
