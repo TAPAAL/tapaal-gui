@@ -163,7 +163,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, helpButton.getPreferredSize().height));
 
         panel.add(constantsLabel);
-        panel.add(constantsScrollPane);;
+        panel.add(constantsScrollPane);
         panel.add(Box.createVerticalStrut(GAP));
         panel.add(buttonPanel);
 

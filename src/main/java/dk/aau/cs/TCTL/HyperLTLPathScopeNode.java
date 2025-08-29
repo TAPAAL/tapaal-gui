@@ -1,7 +1,6 @@
 package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
-import dk.aau.cs.io.NamePurifier;
 
 public class HyperLTLPathScopeNode extends TCTLAbstractStateProperty {
 
