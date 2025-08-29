@@ -503,32 +503,46 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         throw new FormatException(String.format("The color \"%s\" was not declared in an int range\n", value));
     }
 
-    public AddExpression constructCleanAddExpression(ColorType ct, ColorMultiset multiset){
-        Vector<ArcExpression> coloredTokenList = new Vector<>();
-
-        for(Color c : ct.getColors()){
-            int numberOf = multiset.get(c);
-            if(numberOf < 1){
-                continue;
-            }
-            Vector<ColorExpression> v = new Vector<>();
-            if(ct.isProductColorType()){
-                Vector<ColorExpression> tupleColors = new Vector<>();
-                for(Color tupleCol : c.getTuple()){
-                    UserOperatorExpression color = new UserOperatorExpression(tupleCol);
-                    tupleColors.add(color);
-                }
-                TupleExpression tupleExpr = new TupleExpression(tupleColors);
-                v.add(tupleExpr);
+    public AddExpression constructCleanAddExpression(ArcExpression originalExpression) {
+            if (originalExpression instanceof AddExpression) {
+                return (AddExpression)originalExpression.deepCopy();
             } else {
-                UserOperatorExpression color = new UserOperatorExpression(c);
-                v.add(color);
+                Vector<ArcExpression> cleaned = new Vector<>();
+                cleaned.add(cleanArcExpression(originalExpression));
+                return new AddExpression(cleaned);
             }
-            NumberOfExpression numOf = new NumberOfExpression(numberOf,v);
-            coloredTokenList.add(numOf);
-
         }
-        if (coloredTokenList.isEmpty()) return null;
-        return new AddExpression(coloredTokenList);
-    }
+
+        private ArcExpression cleanArcExpression(ArcExpression expr) {
+            if (expr instanceof NumberOfExpression) {
+                NumberOfExpression noe = (NumberOfExpression) expr;
+                Vector<ColorExpression> cleanedColors = new Vector<>();
+                for (ColorExpression ce : noe.getColor()) {
+                    cleanedColors.add(cleanColorExpression(ce));
+                }
+
+                return new NumberOfExpression(noe.getNumber(), cleanedColors);
+            } else if (expr instanceof SubtractExpression) {
+                SubtractExpression se = (SubtractExpression) expr;
+                return new SubtractExpression(cleanArcExpression(se.getLeftExpression()), cleanArcExpression(se.getRightExpression()));
+            } else if (expr instanceof ScalarProductExpression) {
+                ScalarProductExpression spe = (ScalarProductExpression) expr;
+                return new ScalarProductExpression(spe.getScalar(), cleanArcExpression(spe.getExpr()));
+            }
+
+            return expr;
+        }
+
+        private ColorExpression cleanColorExpression(ColorExpression ce) {
+            if (ce instanceof TupleExpression) {
+                Vector<ColorExpression> cleaned = new Vector<>();
+                for (ColorExpression sub : ((TupleExpression) ce).getColors()) {
+                    cleaned.add(cleanColorExpression(sub));
+                }
+                
+                return new TupleExpression(cleaned);
+            }
+
+            return ce; 
+        }
 }
