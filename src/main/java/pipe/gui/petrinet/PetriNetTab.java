@@ -24,7 +24,6 @@ import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.Require;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import net.tapaal.Preferences;
@@ -456,8 +455,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return undoManager;
 	}
 
-    final AbstractDrawingSurfaceManager animationModeController;
-
 	//GUI
 	private final HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<>();
 
@@ -569,8 +566,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         this.setOneTouchExpandable(true);
         this.setBorder(null); // avoid multiple borders
         this.setDividerSize(8);
-        //XXX must be after the animationcontroller is created
-        animationModeController = new CanvasAnimationController(getAnimator());
     }
 
     public PetriNetTab(TimedArcPetriNetNetwork network, Collection<Template> templates, Iterable<TAPNQuery> tapnqueries, TAPNLens lens) {
@@ -1404,8 +1399,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			if (numberOfActiveTemplates() > 0) {
 				app.ifPresent(o->o.setGUIMode(GuiFrame.GUIMode.animation));
                 switchToAnimationComponents();
-
-				setManager(animationModeController);
 
 				drawingSurface().repaintAll();
 
@@ -2573,74 +2566,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     }
 
-	static final class CanvasAnimationController extends AbstractDrawingSurfaceManager {
-
-		private final Animator animator;
-
-        public CanvasAnimationController(Animator animator) {
-			this.animator = animator;
-        }
-
-		@Override
-		public void registerEvents() {
-			registerEvent(
-					e -> e.a == MouseAction.pressed && e.pno instanceof TimedTransitionComponent && SwingUtilities.isLeftMouseButton(e.e),
-					e -> transitionLeftClicked((TimedTransitionComponent)e.pno)
-			);
-			registerEvent(
-					e->e.a == MouseAction.entered && e.pno instanceof PlaceTransitionObject,
-					e->mouseEnterPTO((PlaceTransitionObject)e.pno)
-			);
-			registerEvent(
-					e->e.a == MouseAction.exited && e.pno instanceof PlaceTransitionObject,
-					e->mouseExitPTO((PlaceTransitionObject)e.pno)
-			);
-            registerEvent(
-                e -> e.a == MouseAction.wheel,
-                e -> e.pno.getParent().dispatchEvent(e.e) // Forward mouse wheel events to canvas
-            );
-		}
-
-		void transitionLeftClicked(TimedTransitionComponent t) {
-			TimedTransition transition = t.underlyingTransition();
-
-			if (transition.isDEnabled()) {
-				animator.dFireTransition(transition);
-			}
-		}
-
-		void mouseEnterPTO(PlaceTransitionObject pto) {
-			if (pto instanceof TimedPlaceComponent) {
-				((TimedPlaceComponent) pto).showAgeOfTokens(true);
-			} else if (pto instanceof TimedTransitionComponent) {
-				((TimedTransitionComponent) pto).showDInterval(true);
-			}
-		}
-		void mouseExitPTO(PlaceTransitionObject pto) {
-			if (pto instanceof TimedPlaceComponent) {
-				((TimedPlaceComponent) pto).showAgeOfTokens(false);
-			} else if (pto instanceof TimedTransitionComponent) {
-				((TimedTransitionComponent) pto).showDInterval(false);
-			}
-		}
-
-        @Override
-        public void teardownManager() {
-            //Remove all mouse-over menus if we exit animation mode
-            ArrayList<PetriNetObject> pnObjects = canvas.getGuiModel().getPNObjects();
-
-            for (PetriNetObject pn : pnObjects) {
-                if (pn instanceof TimedPlaceComponent) {
-                    TimedPlaceComponent place = (TimedPlaceComponent) pn;
-                    place.showAgeOfTokens(false);
-                } else if (pn instanceof TimedTransitionComponent) {
-                    TimedTransitionComponent transition = (TimedTransitionComponent) pn;
-                    transition.showDInterval(false);
-                }
-            }
-        }
-    }
-
     private void setManager(AbstractDrawingSurfaceManager newManager) {
         //De-register old manager
 		managerRef.get().deregisterManager();
@@ -2858,6 +2783,35 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     e->e.pno instanceof ArcPathPoint && e.a == MouseAction.wheel,
                     e->arcMouseWheel(((PetriNetObject) e.pno), e.e)
                 );
+
+                //Remove all mouse-over menus if we exit animation mode
+                List<PetriNetObject> pnObjects = drawingSurface.getGuiModel().getPNObjects();
+                for (PetriNetObject pn : pnObjects) {
+                    if (pn instanceof TimedPlaceComponent) {
+                        TimedPlaceComponent place = (TimedPlaceComponent) pn;
+                        place.showAgeOfTokens(false);
+                    } else if (pn instanceof TimedTransitionComponent) {
+                        TimedTransitionComponent transition = (TimedTransitionComponent) pn;
+                        transition.showDInterval(false);
+                    }
+                }
+            } else {
+                registerEvent(
+					e -> e.a == MouseAction.pressed && e.pno instanceof TimedTransitionComponent && SwingUtilities.isLeftMouseButton(e.e),
+					e -> transitionLeftClicked((TimedTransitionComponent)e.pno)
+                );
+                registerEvent(
+                        e->e.a == MouseAction.entered && e.pno instanceof PlaceTransitionObject,
+                        e->mouseEnterPTO((PlaceTransitionObject)e.pno)
+                );
+                registerEvent(
+                        e->e.a == MouseAction.exited && e.pno instanceof PlaceTransitionObject,
+                        e->mouseExitPTO((PlaceTransitionObject)e.pno)
+                );
+                registerEvent(
+                    e -> e.a == MouseAction.wheel,
+                    e -> e.pno.getParent().dispatchEvent(e.e) // Forward mouse wheel events to canvas
+                );
             }
         }
 
@@ -3045,7 +2999,33 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 )
             );
         }
+
+        
+		void transitionLeftClicked(TimedTransitionComponent t) {
+			TimedTransition transition = t.underlyingTransition();
+
+			if (transition.isDEnabled()) {
+				animator.dFireTransition(transition);
+			}
+		}
+
+		void mouseEnterPTO(PlaceTransitionObject pto) {
+			if (pto instanceof TimedPlaceComponent) {
+				((TimedPlaceComponent) pto).showAgeOfTokens(true);
+			} else if (pto instanceof TimedTransitionComponent) {
+				((TimedTransitionComponent) pto).showDInterval(true);
+			}
+		}
+
+		void mouseExitPTO(PlaceTransitionObject pto) {
+			if (pto instanceof TimedPlaceComponent) {
+				((TimedPlaceComponent) pto).showAgeOfTokens(false);
+			} else if (pto instanceof TimedTransitionComponent) {
+				((TimedTransitionComponent) pto).showDInterval(false);
+			}
+		}
     }
+    
     public List<GuiAction> getAvailableDrawActions(){
         List<GuiAction> actions;
         if (lens.isTimed() && !lens.isGame()) {
