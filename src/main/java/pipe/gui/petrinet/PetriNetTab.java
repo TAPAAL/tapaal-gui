@@ -3016,6 +3016,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 				((TimedTransitionComponent) pto).showDInterval(true);
 			}
 		}
+
 		void mouseExitPTO(PlaceTransitionObject pto) {
 			if (pto instanceof TimedPlaceComponent) {
 				((TimedPlaceComponent) pto).showAgeOfTokens(false);
@@ -3024,6 +3025,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			}
 		}
     }
+    
     public List<GuiAction> getAvailableDrawActions(){
         List<GuiAction> actions;
         if (lens.isTimed() && !lens.isGame()) {
