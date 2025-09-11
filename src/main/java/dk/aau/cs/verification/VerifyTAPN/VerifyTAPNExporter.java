@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collection;
 
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.TCTL.visitors.*;
@@ -21,8 +20,7 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
-
-import pipe.gui.TAPAALGUI;
+import dk.aau.cs.util.Tuple;
 import pipe.gui.petrinet.graphicElements.Place;
 import pipe.gui.petrinet.graphicElements.Transition;
 
@@ -83,7 +81,21 @@ public class VerifyTAPNExporter {
 
         return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath());
 	}
-	
+
+    public ExportedVerifyTAPNModel exportModel(Tuple<TimedArcPetriNet, NameMapping> composedModel, DataLayer guiModel) {
+        File modelFile = createTempFile(".xml");
+        try {
+            this.model = composedModel.value1();
+            NameMapping mapping = composedModel.value2();
+            outputModel(model, modelFile, mapping, guiModel);
+        } catch (FileNotFoundException e) {
+            System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
+            return null;
+        }
+
+        return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), null);
+    }
+
 	protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
         PrintStream modelStream = new PrintStream(modelFile);
 

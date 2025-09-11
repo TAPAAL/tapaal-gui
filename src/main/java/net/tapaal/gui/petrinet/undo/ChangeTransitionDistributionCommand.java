@@ -2,7 +2,6 @@ package net.tapaal.gui.petrinet.undo;
 
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.SMCDistribution;
-import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 
 public class ChangeTransitionDistributionCommand implements Command {
