@@ -394,7 +394,7 @@ public class VerifyTAPN implements ModelChecker {
 
     private String createArgumentString(String modelFile, String queryFile, String options) {
         if (Platform.isWindows()) {
-            return options + "\"" + modelFile + "\" \"" + queryFile + "\"";
+            return options + " \"" + modelFile + "\" \"" + queryFile + "\"";
         }
 
         return options + ' ' + modelFile + ' ' + queryFile;
