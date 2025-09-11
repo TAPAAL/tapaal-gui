@@ -150,11 +150,10 @@ public class Animator {
                     setColoredTrace(trace);
                 } else {
                     setTimedTrace(trace);
-                }
-
-                TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;
-                if (timedTrace.getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
-                    tab.getAnimationHistorySidePanel().setLastShown(timedTrace.getTraceType());
+                    TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;
+                    if (timedTrace.getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
+                        tab.getAnimationHistorySidePanel().setLastShown(timedTrace.getTraceType());
+                    }
                 }
             } else {
                 setUntimedTrace(trace);
