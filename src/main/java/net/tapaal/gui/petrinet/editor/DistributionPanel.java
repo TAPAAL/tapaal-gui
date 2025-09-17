@@ -48,11 +48,22 @@ public class DistributionPanel extends JPanel {
         useContinuousDistribution.setSelected(true);
 
         useContinuousDistribution.addActionListener(act -> {
+            boolean wasDiscreteUniform = distributionType.getSelectedItem().equals(SMCDiscreteUniformDistribution.NAME);
             distributionType.setModel(new DefaultComboBoxModel<>(continuous));
+            if (wasDiscreteUniform) {
+                distributionType.setSelectedItem(SMCUniformDistribution.NAME);
+            }
+
             displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
         });
+
         useDiscreteDistribution.addActionListener(act -> {
+            boolean wasUniform = distributionType.getSelectedItem().equals(SMCUniformDistribution.NAME);
             distributionType.setModel(new DefaultComboBoxModel<>(discrete));
+            if (wasUniform) {
+                distributionType.setSelectedItem(SMCDiscreteUniformDistribution.NAME);
+            }
+
             displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
         });
 
