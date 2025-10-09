@@ -48,12 +48,11 @@ public class DistributionPanel extends JPanel {
         useContinuousDistribution.setSelected(true);
 
         useContinuousDistribution.addActionListener(act -> {
-            distributionType.setModel(new DefaultComboBoxModel<>(continuous));
-            displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
+            switchDistributionCategory(true);
         });
+
         useDiscreteDistribution.addActionListener(act -> {
-            distributionType.setModel(new DefaultComboBoxModel<>(discrete));
-            displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
+            switchDistributionCategory(false);
         });
 
         distributionType = new JComboBox<>(continuous);
@@ -213,6 +212,27 @@ public class DistributionPanel extends JPanel {
         add(distributionShowGraph, gbc);
 
         setUrgent(transition.underlyingTransition().isUrgent());
+    }
+
+    private void switchDistributionCategory(boolean toContinuous) {
+        String currentDistribution = String.valueOf(distributionType.getSelectedItem());
+        String a = distributionParam1Field.getText();
+        String b = distributionParam2Field.getText();
+        
+        distributionType.setModel(new DefaultComboBoxModel<>(toContinuous ? continuous : discrete));
+
+        boolean isUniformConversion = (toContinuous && SMCDiscreteUniformDistribution.NAME.equals(currentDistribution)) ||
+                                    (!toContinuous && SMCUniformDistribution.NAME.equals(currentDistribution));
+        
+        if (isUniformConversion) {
+            String targetDistribution = toContinuous ? SMCUniformDistribution.NAME : SMCDiscreteUniformDistribution.NAME;
+            distributionType.setSelectedItem(targetDistribution);
+            displayDistributionFields(SMCDistribution.defaultDistributionFor(targetDistribution));
+            distributionParam1Field.setText(a);
+            distributionParam2Field.setText(b);
+        } else {
+            displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
+        }
     }
 
     public void setUrgent(boolean urgent) {
