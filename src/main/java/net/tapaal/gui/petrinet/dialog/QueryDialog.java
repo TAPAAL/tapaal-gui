@@ -2653,8 +2653,12 @@ public class QueryDialog extends JPanel {
         for (StringPosition childPos : children) {
             TCTLAbstractProperty child = childPos.getObject();
             TCTLAbstractProperty convertedChild = convertPropertyType(toCTL, child, false, isA);
-            if (convertedChild != null && convertedChild instanceof TCTLAbstractStateProperty) {
+            if (convertedChild == null) return null;
+
+            if (convertedChild instanceof TCTLAbstractStateProperty) {
                 convertedChildren.add((TCTLAbstractStateProperty)convertedChild);
+            } else if (convertedChild instanceof TCTLAbstractPathProperty) {
+                convertedChildren.add(ConvertToStateProperty((TCTLAbstractPathProperty)convertedChild));
             }
         }
         
@@ -2664,7 +2668,6 @@ public class QueryDialog extends JPanel {
             new TCTLAndListNode(convertedChildren) : 
             new TCTLOrListNode(convertedChildren);
     }
-
 
     private TCTLAbstractStateProperty getChild(boolean toCTL, TCTLAbstractProperty property, int childNumber, boolean isA) {
         property = removeConverter(property);
