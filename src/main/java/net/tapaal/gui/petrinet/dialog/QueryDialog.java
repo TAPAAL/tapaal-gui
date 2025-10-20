@@ -157,7 +157,6 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.util.VerificationCallback;
@@ -178,6 +177,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.Template;
+import net.tapaal.gui.petrinet.undo.AddQueryCommand;
 import net.tapaal.gui.petrinet.verification.ChooseInclusionPlacesDialog;
 import net.tapaal.gui.petrinet.verification.EngineSupportOptions;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
@@ -203,7 +203,6 @@ import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.SearchBar;
 import pipe.gui.petrinet.Searcher;
 import pipe.gui.petrinet.dataLayer.DataLayer;
-import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
@@ -6253,7 +6252,8 @@ public class QueryDialog extends JPanel {
                     tab.setNetChanged(true);
                     exit();
                     TAPNQuery query = getQuery();
-                    
+                    tab.getQueryPane().getUndoManager().addNewEdit(new AddQueryCommand(query, tab));
+                    tab.getQueryPane().addQuery(query);
                     if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN) {
                         Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false, lens);
                     } else {
