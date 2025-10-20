@@ -320,7 +320,13 @@ public class QueryPane extends JPanel implements SidePane {
                     return;
                 }
 
-				QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, network, tabContent.getGuiModels(), lens, tabContent);
+				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, network, tabContent.getGuiModels(), lens, tabContent);
+
+                if (q == null) return;
+
+                undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
+                addQuery(q);
+
 				updateQueryButtons();
 			}
 		});
@@ -388,10 +394,6 @@ public class QueryPane extends JPanel implements SidePane {
 			listModel.addElement(query);
 		}
 	}
-
-    public UndoManager getUndoManager() {
-        return undoManager;
-    }
 
 	public void removeQuery(TAPNQuery queryToRemove) {
 		listModel.removeElement(queryToRemove);
