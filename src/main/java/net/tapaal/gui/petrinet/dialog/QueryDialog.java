@@ -178,6 +178,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.Template;
+import net.tapaal.gui.petrinet.undo.AddQueryCommand;
 import net.tapaal.gui.petrinet.verification.ChooseInclusionPlacesDialog;
 import net.tapaal.gui.petrinet.verification.EngineSupportOptions;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
@@ -1920,7 +1921,7 @@ public class QueryDialog extends JPanel {
         initOverApproximationPanel();
         initSmcSettingsPanel();
         initRawVerificationOptionsPanel();
-        initButtonPanel(option);
+        initButtonPanel(option, queryToCreateFrom == null);
 
         if (lens.isStochastic()) {
             setSMCSettings(SMCSettings.Default());
@@ -6202,7 +6203,7 @@ public class QueryDialog extends JPanel {
         exit();
     }
 
-    private void initButtonPanel(QueryDialogueOption option) {
+    private void initButtonPanel(QueryDialogueOption option, boolean isNewQuery) {
         buttonPanel = new JPanel(new BorderLayout());
         if (option == QueryDialogueOption.Save) {
             saveButton = new JButton("Save");
@@ -6253,6 +6254,11 @@ public class QueryDialog extends JPanel {
                     tab.setNetChanged(true);
                     exit();
                     TAPNQuery query = getQuery();
+                    if (isNewQuery) {
+                        var queryPane = tab.getQueryPane();
+                        queryPane.getUndoManager().addNewEdit(new AddQueryCommand(query, tab));
+                        queryPane.addQuery(query);
+                    }
                     
                     if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN) {
                         Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false, lens);

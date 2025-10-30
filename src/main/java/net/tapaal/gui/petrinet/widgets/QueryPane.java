@@ -320,12 +320,7 @@ public class QueryPane extends JPanel implements SidePane {
                     return;
                 }
 
-				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, network, tabContent.getGuiModels(), lens, tabContent);
-
-                if (q == null) return;
-
-                undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
-                addQuery(q);
+				QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, network, tabContent.getGuiModels(), lens, tabContent);
 
 				updateQueryButtons();
 			}
@@ -337,6 +332,10 @@ public class QueryPane extends JPanel implements SidePane {
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(addQueryButton, gbc);
 	}
+
+    public UndoManager getUndoManager() {
+        return undoManager;
+    }
 
 	private void swapQueries(int currentIndex, int newIndex) {
 		TAPNQuery temp = listModel.get(currentIndex);
