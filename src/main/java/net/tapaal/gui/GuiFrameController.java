@@ -733,10 +733,17 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     public void toggleEnabledTransitionsList(){
         setEnabledTransitionsList(!showEnabledTransitions);
     }
-    private void setEnabledTransitionsList(boolean b){
+    
+    @Override
+    public void setEnabledTransitionsList(boolean b) {
         showEnabledTransitions = b;
         guiFrame.setShowEnabledTransitionsSelected(b);
         currentTab.ifPresent(o->o.showEnabledTransitionsList(b));
+    }
+
+    @Override
+    public boolean isEnabledTransitionsListVisible() {
+        return showEnabledTransitions;
     }
 
     @Override

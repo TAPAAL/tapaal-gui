@@ -38,7 +38,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -466,8 +465,8 @@ public class VerifyPN implements ModelChecker {
             return null;
         }
 
-        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
-
+        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.useExplicitSearch());
+   
         return traceParser.parseTrace(new BufferedReader(new StringReader(output)));
     }
 
@@ -480,7 +479,7 @@ public class VerifyPN implements ModelChecker {
             return null;
         }
 
-        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
+        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.useExplicitSearch());
         if (query.getCategory() == QueryCategory.HyperLTL) {
             return traceParser.parseTraces(new BufferedReader(new StringReader(output)));
         }
