@@ -13,7 +13,6 @@ import javax.swing.KeyStroke
 
 fun noOp() {}
 object DEBUG {
-
     @JvmStatic fun buildMenuDEBUG(): JMenu {
 
         val debugMenu = JMenu("DEBUG")
@@ -26,6 +25,10 @@ object DEBUG {
 
             add(object : AbstractAction("Throw Exception") {
                 override fun actionPerformed(e: ActionEvent) = throw RuntimeException("Casted Exception from DEBUG")
+            })
+
+            add(object : GuiAction("Inspect net", "Inspect net", KeyStroke.getKeyStroke('I'.code, Toolkit.getDefaultToolkit().menuShortcutKeyMask + InputEvent.SHIFT_MASK)) {
+                override fun actionPerformed(e: ActionEvent) = InspectSpy().show()
             })
 
             add(object : AbstractAction("Show undo/redo stack") {
@@ -54,5 +57,4 @@ object DEBUG {
 
         return debugMenu
     }
-
 }
