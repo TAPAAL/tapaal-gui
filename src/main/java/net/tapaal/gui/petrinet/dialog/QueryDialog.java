@@ -4246,17 +4246,20 @@ public class QueryDialog extends JPanel {
         traceBox.setMaximumSize(dim);
         traceBox.setMinimumSize(dim);
         traceBox.setPreferredSize(dim);
+        traceBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 2;
         gbc.insets = new Insets(1, 0, 1, 0);
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
 
-        traceRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        traceRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
         traceRow.add(traceBox);
-        gbc.gridy = 0;
+        gbc.gridy = 1;
         predicatePanel.add(traceRow, gbc);
+        traceRow.setVisible(false);
     }
 
     private boolean checkTraceBoxQuantification() {
@@ -4765,7 +4768,7 @@ public class QueryDialog extends JPanel {
 
         predicatePanel.add(searchBar, gbc);
 
-        ++gbc.gridy;
+        gbc.gridy += 2;
         gbc.gridwidth -= 2;
 
         JPanel templateRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
@@ -4815,7 +4818,7 @@ public class QueryDialog extends JPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 1;
-        gbc.gridheight = 3;
+        gbc.gridheight = 4;
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.insets = new Insets(5, 5, 5, 10);
         gbc.anchor = GridBagConstraints.CENTER;
@@ -4823,7 +4826,7 @@ public class QueryDialog extends JPanel {
 
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.EAST;
         predicatePanel.add(truePredicateButton, gbc);
 
