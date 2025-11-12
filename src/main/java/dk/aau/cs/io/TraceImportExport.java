@@ -254,8 +254,8 @@ public class TraceImportExport {
 
             Map<String, TAPNNetworkTrace> traces = new LinkedHashMap<>();
             for (Map.Entry<String, TimedArcPetriNetTrace> entry : tracesComposed.entrySet()) {
-                decomposer = new TAPNTraceDecomposer(entry.getValue(), tab.network(), model.value2());
-                traces.put(entry.getKey(), decomposer.decompose());
+                var entryDecomposer = new TAPNTraceDecomposer(entry.getValue(), tab.network(), model.value2());
+                traces.put(entry.getKey(), entryDecomposer.decompose());
             }
 
             animator.setTrace(decomposer.decompose(), traces);
