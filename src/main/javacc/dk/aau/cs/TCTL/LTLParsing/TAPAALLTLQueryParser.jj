@@ -170,61 +170,62 @@ TCTLAbstractStateProperty AndExpr() :
     { return conjunctions.size() == 1 ? currentChild : new TCTLAndListNode(conjunctions); }
 }
 
-    TCTLAbstractStateProperty NotExpr() :
-    {
+TCTLAbstractStateProperty NotExpr() :
+{
     TCTLAbstractStateProperty child;
     TCTLAbstractStateProperty child2 = null;
     TCTLAbstractPathProperty childConverter;
-    }
-    {
+}
+{
     <NOT> "(" child = OrExpr() [LOOKAHEAD(2) <U> child2 = OrExpr()] ")" { return new TCTLNotNode(child2 == null ? child : new TCTLPathToStateConverter(new LTLUNode(child, child2))); }
+    | LOOKAHEAD( "(" ( <F> | <G> | <X> ) )
+      "(" childConverter = QuantifierExpr() ")" { return new TCTLPathToStateConverter(childConverter); }
+    | LOOKAHEAD( "(" OrExpr() <U> )
+      "(" childConverter = QuantifierExpr() ")" { return new TCTLPathToStateConverter(childConverter); }
     | child = Factor() { return child; }
-    | "(" childConverter = QuantifierExpr() ")" { return new TCTLPathToStateConverter(childConverter); }
-    }
+}
 
-    TCTLAbstractStateProperty Factor() :
-    {
+TCTLAbstractStateProperty Factor() :
+{
     TCTLAbstractStateProperty thisProp;
     Token temp = null;
     Token transition;
-    }
-    {
+}
+{
     (
-<TRUE> {thisProp = new TCTLTrueNode(); }
+      <TRUE> {thisProp = new TCTLTrueNode(); }
     | <FALSE> {thisProp = new TCTLFalseNode(); }
     | LOOKAHEAD(AtomicProposition())
-    thisProp = AtomicProposition()
+      thisProp = AtomicProposition()
     | [ LOOKAHEAD(2) temp = <IDENT> "." ] transition = <IDENT> {
-    thisProp = new TCTLTransitionNode(temp == null ? "" : temp.image, transition.image); }
+      thisProp = new TCTLTransitionNode(temp == null ? "" : temp.image, transition.image); }
     | "(" thisProp = OrExpr() ")"
-    | LOOKAHEAD(ParanthesesExpr()) {
-    thisProp = new TCTLPathToStateConverter(QuantifierExpr()); }
     )
     { return thisProp; }
-    }
+}
 
-    TCTLAbstractStateProperty AtomicProposition() :
-    {
+TCTLAbstractStateProperty AtomicProposition() :
+{
     TCTLAbstractStateProperty left;
     TCTLAbstractStateProperty right;
     Token op;
-    }
-    {
+}
+{
     (
     left = AritmeticExpr() op = <OP> right = AritmeticExpr()
     )
     {
     return new TCTLAtomicPropositionNode(left, op.image, right);
     }
-    }
+}
 
-    TCTLAbstractStateProperty AritmeticExpr() :
-    {
+TCTLAbstractStateProperty AritmeticExpr() :
+{
     TCTLAbstractStateProperty currentChild;
     ArrayList<TCTLAbstractStateProperty> terms = new ArrayList<TCTLAbstractStateProperty>();
     Token op;
-    }
-    {
+}
+{
     currentChild = AritmeticMinusExpr()
     { terms.add(currentChild); }
     (
@@ -235,15 +236,15 @@ TCTLAbstractStateProperty AndExpr() :
     }
     )*
     { return terms.size() == 1 ? currentChild : new TCTLTermListNode(terms); }
-    }
+}
 
-    TCTLAbstractStateProperty AritmeticMinusExpr() :
-    {
+TCTLAbstractStateProperty AritmeticMinusExpr() :
+{
     TCTLAbstractStateProperty currentChild;
     ArrayList<TCTLAbstractStateProperty> terms = new ArrayList<TCTLAbstractStateProperty>();
     Token op;
-    }
-    {
+}
+{
     currentChild = AritmeticTerm()
     { terms.add(currentChild); }
     (
@@ -254,15 +255,15 @@ TCTLAbstractStateProperty AndExpr() :
     }
     )*
     { return terms.size() == 1 ? currentChild : new TCTLTermListNode(terms); }
-    }
+}
 
-    TCTLAbstractStateProperty AritmeticTerm() :
-    {
+TCTLAbstractStateProperty AritmeticTerm() :
+{
     TCTLAbstractStateProperty currentChild;
     ArrayList<TCTLAbstractStateProperty> factors = new ArrayList<TCTLAbstractStateProperty>();
     Token op;
-    }
-    {
+}
+{
     currentChild = AritmeticFactor()
     { factors.add(currentChild); }
     (
@@ -273,17 +274,17 @@ TCTLAbstractStateProperty AndExpr() :
     }
     )*
     { return factors.size() == 1 ? currentChild : new TCTLTermListNode(factors); }
-    }
+}
 
-    TCTLAbstractStateProperty AritmeticFactor() :
-    {
-    TCTLAbstractStateProperty thisProp;
+TCTLAbstractStateProperty AritmeticFactor() :
+{
+TCTLAbstractStateProperty thisProp;
     Token temp = null;
     Token place;
     Token op;
     Token num;
-    }
-    {
+}
+{
     (
     [ LOOKAHEAD(2) temp = <IDENT> "." ] place = <IDENT> { thisProp = new TCTLPlaceNode(temp == null ? "" : temp.image, place.image); }
     | num = <NUM> { thisProp = new TCTLConstNode(Integer.parseInt(num.image)); }
@@ -291,4 +292,4 @@ TCTLAbstractStateProperty AndExpr() :
     )
 
     { return thisProp; }
-    }
+}
