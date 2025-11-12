@@ -19,8 +19,11 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import java.util.LinkedHashMap;
 import java.util.HashMap;
 
@@ -135,10 +138,10 @@ public class ColoredBindingSelectionDialog {
         };
         
         for (JTextField field : searchFields.values()) {
-            field.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-                public void insertUpdate(javax.swing.event.DocumentEvent e) { filterList.run(); }
-                public void removeUpdate(javax.swing.event.DocumentEvent e) { filterList.run(); }
-                public void changedUpdate(javax.swing.event.DocumentEvent e) { filterList.run(); }
+            field.getDocument().addDocumentListener(new DocumentListener() {
+                public void insertUpdate(DocumentEvent e) { filterList.run(); }
+                public void removeUpdate(DocumentEvent e) { filterList.run(); }
+                public void changedUpdate(DocumentEvent e) { filterList.run(); }
             });
         }
 
@@ -179,6 +182,9 @@ public class ColoredBindingSelectionDialog {
         var point = MouseInfo.getPointerInfo().getLocation();
         int yOffset = 30;
         dialog.setLocation(point.x - dialog.getWidth() / 2, point.y + yOffset);
+        
+        SwingUtilities.invokeLater(() -> bindingList.requestFocusInWindow());
+
         dialog.setVisible(true);
 
         return selectedBindingRef.get();
