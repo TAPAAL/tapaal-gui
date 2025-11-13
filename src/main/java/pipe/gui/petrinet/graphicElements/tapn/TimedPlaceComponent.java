@@ -37,7 +37,7 @@ public class TimedPlaceComponent extends Place {
     private dk.aau.cs.model.tapn.TimedPlace place;
     private final dk.aau.cs.model.tapn.event.TimedPlaceListener listener = timedPlaceListener();
 
-    private Window ageOfTokensWindow = new Window(new Frame());
+    private Window ageOfTokensWindow;
     private final Shape dashedOutline = createDashedOutline();
 
     public TimedPlaceComponent (
@@ -168,7 +168,7 @@ public class TimedPlaceComponent extends Place {
     }
 
     public boolean isAgeOfTokensShown() {
-        return ageOfTokensWindow.isVisible();
+        return ageOfTokensWindow != null && ageOfTokensWindow.isVisible();
     }
 
     @Override
