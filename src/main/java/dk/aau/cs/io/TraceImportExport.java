@@ -213,9 +213,8 @@ public class TraceImportExport {
                 var entryDecomposer = new TAPNTraceDecomposer(entry.getValue(), tab.network(), model.value2());
                 traces.put(entry.getKey(), entryDecomposer.decompose());
             }
-
             animator.setTrace(decomposer.decompose(), traces);
- 
+            animator.setTraceMap(null);
         } catch (FileNotFoundException e) {
             // Will never happen
         } catch (Exception e) { //IOException
