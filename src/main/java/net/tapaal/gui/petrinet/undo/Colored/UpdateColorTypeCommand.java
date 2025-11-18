@@ -2,6 +2,7 @@ package net.tapaal.gui.petrinet.undo.Colored;
 
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.gui.petrinet.editor.ConstantsPane;
@@ -26,88 +27,52 @@ public class UpdateColorTypeCommand implements Command {
 
     @Override
     public void undo() {
+        performUpdate(oldColorType, newColorType);
         network.colorTypes().set(index, oldColorType);
-        for (TimedArcPetriNet tapn : network.allTemplates()) {
-            for (TimedPlace place : tapn.places()) {
-                if (place.getColorType().equals(newColorType)) {
-                    List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
-                    place.setColorType(oldColorType);
-                    for (TimedToken token : oldTokens) {
-                        if (oldColorType.contains(token.getColor())) {
-                            place.addToken(new TimedToken(place, token.age(), oldColorType.getColorByName(token.getColor().getName())));
-                        }
-                    }
-                }
-            }
-            for (TimedInputArc arc : tapn.inputArcs()) {
-                if (arc.getArcExpression() != null) {
-                    arc.setExpression(arc.getArcExpression().getExprWithNewColorType(oldColorType));
-                }
-            }
-            for (TimedOutputArc arc : tapn.outputArcs()) {
-                if (arc.getExpression() != null) {
-                    arc.setExpression(arc.getExpression().getExprWithNewColorType(oldColorType));
-                }
-            }
-            for (TimedTransition transition : tapn.transitions()) {
-                if (transition.getGuard() != null) {
-                    transition.getGuard().setColorType(oldColorType);
-                }
-            }
-        }
-
-        for (ColorType ct : network.colorTypes()) {
-            if (ct.isProductColorType()) {
-                ProductType pt = (ProductType)ct;
-                if (pt.contains(newColorType)) {
-                    pt.replaceColorType(oldColorType, newColorType);
-                }
-            }
-        }
-
-        eval(oldColorType);
-
-        for (Variable var : network.variables()) {
-            if (var.getColorType().equals(newColorType)) {
-                var.setColorType(oldColorType);
-            }
-        }
         colorTypesListModel.updateName();
     }
 
     @Override
     public void redo() {
         network.colorTypes().set(index, newColorType);
+        performUpdate(newColorType, oldColorType);
+        colorTypesListModel.updateName();
+    }
+
+    private void performUpdate(ColorType targetType, ColorType sourceType) {
         for (TimedArcPetriNet tapn : network.allTemplates()) {
             for (TimedPlace place : tapn.places()) {
-                if (place.getColorType().equals(oldColorType)) {
-
+                if (place.getColorType().equals(sourceType)) {
                     if(place.getTokensAsExpression() != null) {
-                        place.setTokenExpression(place.getTokensAsExpression().getExprConverted(oldColorType, newColorType));
+                        place.setTokenExpression(place.getTokensAsExpression().getExprConverted(sourceType, targetType));
                     }
-
                     List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
-                    place.setColorType(newColorType);
+                    place.setColorType(targetType);
                     for (TimedToken token : oldTokens) {
-                        if (newColorType.contains(token.getColor())) {
-                            place.addToken(new TimedToken(place, token.age(), newColorType.getColorByName(token.getColor().getName())));
+                        if (targetType.contains(token.getColor())) {
+                            place.addToken(new TimedToken(place, token.age(), targetType.getColorByName(token.getColor().getName())));
                         }
                     }
                 }
             }
             for (TimedInputArc arc : tapn.inputArcs()) {
                 if (arc.getArcExpression() != null) {
-                    arc.setExpression(arc.getArcExpression().getExprConverted(oldColorType, newColorType));
+                    arc.setExpression(arc.getArcExpression().getExprConverted(sourceType, targetType));
                 }
             }
             for (TimedOutputArc arc : tapn.outputArcs()) {
                 if (arc.getExpression() != null) {
-                    arc.setExpression(arc.getExpression().getExprConverted(oldColorType, newColorType));
+                    arc.setExpression(arc.getExpression().getExprConverted(sourceType, targetType));
                 }
             }
             for (TimedTransition transition : tapn.transitions()) {
                 if (transition.getGuard() != null) {
-                    transition.getGuard().setColorType(newColorType);
+                    Expression newGuardExpr = updateExpressionRecursively(transition.getGuard(), sourceType, targetType);
+                    if (newGuardExpr instanceof GuardExpression) {
+                        transition.setGuard((GuardExpression)newGuardExpr);
+                    }
+                   
+                    transition.getGuard().setColorType(targetType);
                 }
             }
         }
@@ -115,20 +80,42 @@ public class UpdateColorTypeCommand implements Command {
         for (ColorType ct : network.colorTypes()) {
             if (ct.isProductColorType()) {
                 ProductType pt = (ProductType)ct;
-                if (pt.contains(oldColorType)) {
-                    pt.replaceColorType(newColorType, oldColorType);
+                if (pt.contains(sourceType)) {
+                    pt.replaceColorType(targetType, sourceType);
                 }
             }
         }
 
-        eval(newColorType);
+        eval(targetType);
 
         for (Variable var : network.variables()) {
-            if (var.getColorType().equals(oldColorType)) {
-                var.setColorType(newColorType);
+            if (var.getColorType().equals(sourceType)) {
+                var.setColorType(targetType);
             }
         }
-        colorTypesListModel.updateName();
+    }
+    
+    private Expression updateExpressionRecursively(Expression expr, ColorType oldCt, ColorType newCt) {
+        if (expr == null) return null;
+
+        if (expr instanceof UserOperatorExpression) {
+            UserOperatorExpression uoe = (UserOperatorExpression) expr;
+            if (uoe.getUserOperator().getColorType().getName().equals(oldCt.getName())) {
+                return uoe.getExprWithNewColorType(newCt);
+            }
+            return expr;
+        }
+        
+        Expression result = expr;
+        for (ExprStringPosition pos : expr.getChildren()) {
+            Expression child = pos.getObject();
+            Expression updatedChild = updateExpressionRecursively(child, oldCt, newCt);
+            
+            if (updatedChild != child) {
+                result = result.replace(child, updatedChild);
+            }
+        }
+        return result;
     }
 
     private void eval(ColorType colorType) {
