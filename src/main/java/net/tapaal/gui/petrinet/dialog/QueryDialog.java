@@ -800,7 +800,7 @@ public class QueryDialog extends JPanel {
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
         query.setUseTarOption(useTraceRefinement.isSelected());
         query.setUseTarjan(useTarjan.isSelected());
-        query.setUseExplicitSearch(useExplicitSearch.isEnabled() && useExplicitSearch.isSelected());
+        query.setUseExplicitSearch(useExplicitSearch.isSelected());
         return query;
     }
 
@@ -835,8 +835,10 @@ public class QueryDialog extends JPanel {
         } else if (randomSearch.isSelected()) {
             return SearchOption.RANDOM;
         } else if (heuristicSearch.isSelected()) {
-            if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery())
+            if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery() && !useExplicitSearch.isSelected()) {
                 return SearchOption.RANDOMHEURISTIC;
+            }
+
             return SearchOption.HEURISTIC;
         } else if (breadthFirstSearch.isSelected()) {
             return SearchOption.BFS;
@@ -1579,8 +1581,12 @@ public class QueryDialog extends JPanel {
 			}
 		}
 
-		if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery()) {
-		    heuristicSearch.setText("Random heuristic    ");
+		refreshHeuristicButtonText();
+    }
+
+    private void refreshHeuristicButtonText() {
+        if (!lens.isTimed() && !lens.isGame() && isReachabilityQuery() && !useExplicitSearch.isSelected()) {
+            heuristicSearch.setText("Random heuristic    ");
         } else {
             heuristicSearch.setText("Heuristic    ");
         }
@@ -5539,19 +5545,9 @@ public class QueryDialog extends JPanel {
         useExplicitSearch = new JCheckBox("Use explicit search");
 
         useExplicitSearch.addActionListener(e -> {
-            if (useExplicitSearch.isSelected()) {
-                if (heuristicSearch.isSelected()) {
-                    depthFirstSearch.setSelected(true);
-                }
-            }
-
+            refreshHeuristicButtonText();
             setComponentEnabledRecursively(unfoldingOptionsPanel, !useExplicitSearch.isSelected());
-        });
-
-        heuristicSearch.addActionListener(e -> {
-            if (heuristicSearch.isSelected()) {
-                setupExplicitSearch(false);
-            }
+            oldExplicitSearchState = useExplicitSearch.isSelected();
         });
 
         useReduction.setSelected(true);
