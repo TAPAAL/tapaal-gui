@@ -344,18 +344,14 @@ public class ApproximationWorker {
 
                                 toReturn = new VerificationResult<>(
                                     unfoldedResult.getQueryResult(),
-                                    decomposeTrace(result.getTrace(), nameMapping, netNetwork),
-                                    decomposeTrace(result.getSecondaryTrace(), nameMapping, netNetwork),
+                                    null,
+                                    null,
                                     result.verificationTime() + unfoldedResult.verificationTime(),
                                     unfoldedResult.stats(),
                                     false,
                                     unfoldedResult.getRawOutput(),
                                     unfoldedResult.getUnfoldedModel(),
                                     null);
-                                if (toReturn != null) {
-                                    toReturn.setTrace(null);
-                                    toReturn.setSecondaryTrace(null);
-                                }
     
                                 return toReturn;
                             }

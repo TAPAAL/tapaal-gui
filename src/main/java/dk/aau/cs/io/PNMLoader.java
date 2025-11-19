@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -41,7 +39,6 @@ import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.Constants;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
@@ -81,13 +78,6 @@ public class PNMLoader {
         } catch (FileNotFoundException e){
             return null;
         } catch (NullPointerException e){
-            if (!isNetDrawable()) {
-                SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The net is too large to be loaded and drawn in the GUI", "Error", JOptionPane.ERROR_MESSAGE);
-                });
-                return null;
-            }
-
             throw new FormatException("the PNML file cannot be parsed due to syntax errors", e);
         }
     }
@@ -229,13 +219,11 @@ public class PNMLoader {
             "The name: " + id + ", was already used");
         tapn.add(place);
 
-        if (isNetDrawable()) {
-            //We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique
-            TimedPlaceComponent placeComponent;
-            placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y, lens);
-            placeComponent.setUnderlyingPlace(place);
-            template.guiModel().addPetriNetObject(placeComponent);
-        }
+        //We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique
+        TimedPlaceComponent placeComponent;
+        placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y, lens);
+        placeComponent.setUnderlyingPlace(place);
+        template.guiModel().addPetriNetObject(placeComponent);
 
         idResolver.add(tapn.name(), id, id);
 
@@ -311,13 +299,12 @@ public class PNMLoader {
             "The id: " + id + ", was already used");
         tapn.add(transition);
 
-        if(isNetDrawable()){
-            TimedTransitionComponent transitionComponent =
-                //We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique
-                new TimedTransitionComponent(position.x, position.y, id, name.point.x, name.point.y, 0, lens);
-            transitionComponent.setUnderlyingTransition(transition);
-            template.guiModel().addPetriNetObject(transitionComponent);
-        }
+        TimedTransitionComponent transitionComponent =
+            //We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique
+            new TimedTransitionComponent(position.x, position.y, id, name.point.x, name.point.y, 0, lens);
+        transitionComponent.setUnderlyingTransition(transition);
+        template.guiModel().addPetriNetObject(transitionComponent);
+        
         idResolver.add(tapn.name(), id, id);
     }
 
