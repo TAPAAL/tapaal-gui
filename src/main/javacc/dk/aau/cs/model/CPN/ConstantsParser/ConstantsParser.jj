@@ -126,7 +126,7 @@ public class ConstantsParser {
                 if (colorTypes.get(key).equals(constantsMap.get(key))) continue;
 
                 ColorType newCt = colorTypes.get(key);
-                ColorType ct = (ColorType)colorTypes.get(key);
+                ColorType ct = (ColorType)constantsMap.get(key);
 
                 if (ct instanceof ProductType) {
                     ProductType pct = (ProductType)ct;
@@ -134,9 +134,11 @@ public class ConstantsParser {
 
                     // Update product color types to new color types
                     for (ColorType colorType : pct.getProductColorTypes()) {
-                        newPct.replaceColorType(colorType, (ColorType)colorTypes.get(colorType.getName()));
+                        if (colorTypes.containsKey(colorType.getName())) {
+                            newPct.replaceColorType(colorType, (ColorType)colorTypes.get(colorType.getName()));
+                        }
                     }
-        
+
                     boolean isSimiliar = pct.getProductColorTypes().size() == newPct.getProductColorTypes().size() && pct.containsTypes(newPct.getColorTypes());
                     if (isSimiliar) {
                         updateColorTypes(pct, newPct);
@@ -186,7 +188,20 @@ public class ConstantsParser {
                 }
                 
                 if (allDependentVariablesBeingRemoved) {
-                    continue;
+                    boolean isUsedInPlace = false;
+                    for (TimedArcPetriNet tapn : network.allTemplates()) {
+                        for (TimedPlace place : tapn.places()) {
+                            if (place.getColorType().getName().equals(ct.getName())) {
+                                isUsedInPlace = true;
+                                break;
+                            }
+                        }
+                        if (isUsedInPlace) break;
+                    }
+
+                    if (!isUsedInPlace) {
+                        continue;
+                    }
                 }
             }
 
@@ -252,6 +267,14 @@ public class ConstantsParser {
 
         if (variables.containsKey(id)) {
             throw new ParseException("Variable with name \"" + id + "\" already exists");
+        }
+
+        for (ColorType ct : colorTypes.values()) {
+            for (Color c : ct.getColors()) {
+                if (c.getName().equals(id)) {
+                    throw new ParseException("The name \"" + id + "\" is already used as a color in type \"" + ct.getName() + "\"");
+                }
+            }
         }
     }
 
