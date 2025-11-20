@@ -70,7 +70,12 @@ public class RunVerification extends RunVerificationBase {
 						iconSelector.getIconFor(result)
 				);
 
-                if (options.traceOption() != TAPNQuery.TraceOption.NONE || lens.isStochastic() && options.isSimulate()) {
+                boolean isNetDrawable = true;
+                if (result.getUnfoldedTab() != null) {
+                    isNetDrawable = result.getUnfoldedTab().network().paintNet();
+                }
+
+                if ((options.traceOption() != TAPNQuery.TraceOption.NONE || lens.isStochastic() && options.isSimulate()) && isNetDrawable) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
                         if (((lens != null && lens.isColored()) || model.isColored()) && !options.useExplicitSearch()) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
@@ -108,9 +113,11 @@ public class RunVerification extends RunVerificationBase {
                             messenger.displayWrappedErrorMessage(message, "No trace generated");
                         }
                     }
+                } else if (!isNetDrawable) {
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The net is too large to be loaded and drawn in the GUI", "Error", JOptionPane.ERROR_MESSAGE);
+                    });
                 }
-
-
 			}
 		} else {
 			//Check if the is something like

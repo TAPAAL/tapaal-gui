@@ -258,8 +258,11 @@ public class TraceImportExport {
                 traces.put(entry.getKey(), entryDecomposer.decompose());
             }
 
-            animator.setTrace(decomposer.decompose(), traces);
- 
+            if (traces.size() > 1) {
+                animator.setTrace(decomposer.decompose(), traces);
+            } else {
+                animator.setTrace(decomposer.decompose());
+            }
         } catch (FileNotFoundException e) {
             // Will never happen
         } catch (Exception e) { //IOException
