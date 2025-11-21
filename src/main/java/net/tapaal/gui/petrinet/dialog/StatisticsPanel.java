@@ -14,7 +14,6 @@ import javax.swing.JSeparator;
 
 import dk.aau.cs.model.tapn.TimedPlace;
 import net.tapaal.gui.petrinet.Template;
-import pipe.gui.*;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import net.tapaal.gui.petrinet.undo.DeleteTimedPlaceCommand;

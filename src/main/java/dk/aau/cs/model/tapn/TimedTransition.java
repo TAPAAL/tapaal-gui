@@ -1,11 +1,26 @@
 package dk.aau.cs.model.tapn;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
 import pipe.gui.petrinet.animation.Animator;
@@ -16,6 +31,7 @@ import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.verification.TAPNComposer;
 
 public class TimedTransition extends TAPNElement {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
@@ -302,7 +318,6 @@ public class TimedTransition extends TAPNElement {
 			result = this.calculateDIntervalAlone();
 		}
 		
-		
 		//Invariants
 		for(TimedArcPetriNet model : model().parentNetwork().activeTemplates()){
 			for(TimedPlace place : model.places()){
@@ -570,4 +585,51 @@ public class TimedTransition extends TAPNElement {
             }
         }
 	}
+
+    public String toBindingXmlStr(Map<Variable, Color> bindings, TAPNComposer composer) {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+            Document document = builder.newDocument();
+            
+            Element transitionElement = toXmlElement(bindings, document, composer);
+            document.appendChild(transitionElement);
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(writer));
+
+            return writer.getBuffer().toString().trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } 
+    }
+
+    private Element toXmlElement(Map<Variable, Color> bindings, Document document, TAPNComposer composer) {
+        Element transitionElement = document.createElement("transition");
+        transitionElement.setAttribute("id", composer.composedTransitionName(this));
+
+        Element bindingElement = document.createElement("binding");
+        
+        if (!bindings.isEmpty()) {
+            for (Map.Entry<Variable, Color> binding : bindings.entrySet()) {
+                Element variableElement = document.createElement("variable");
+                variableElement.setAttribute("id", binding.getKey().getId());
+                
+                Element colorElement = document.createElement("color");
+                colorElement.setTextContent(binding.getValue().getName());
+                
+                variableElement.appendChild(colorElement);
+                bindingElement.appendChild(variableElement);
+            }
+        }
+
+        transitionElement.appendChild(bindingElement);
+        
+        return transitionElement;
+    }
 }
