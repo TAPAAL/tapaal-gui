@@ -1066,6 +1066,7 @@ public class PlaceEditorPanel extends JPanel {
             }
         });
 
+        removeTimeConstraintButton.setEnabled(!timeConstraintList.isSelectionEmpty());
         removeTimeConstraintButton.addActionListener(actionEvent -> {
             int index = timeConstraintList.getSelectedIndex();
             timeConstraintListModel.removeElementAt(index);
