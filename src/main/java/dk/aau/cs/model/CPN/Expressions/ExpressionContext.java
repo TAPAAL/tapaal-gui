@@ -26,7 +26,7 @@ public class ExpressionContext {
                 ProductType pt = (ProductType) ct;
                 boolean allMatch = true;
                 for (int i = 0; i < types.size(); ++i) {
-                    if (!pt.getColorTypes().get(i).equals(types.get(i))) {
+                    if (!pt.getColorTypes().get(i).getName().equals(types.get(i).getName())) {
                         allMatch = false;
                         break;
                     }
