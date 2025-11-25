@@ -22,6 +22,10 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.CPN.ColorMultiset;
+import dk.aau.cs.model.CPN.Expressions.Expression;
+import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -130,9 +134,11 @@ public class ConstantsParser {
 
                     // Update product color types to new color types
                     for (ColorType colorType : pct.getProductColorTypes()) {
-                        newPct.replaceColorType(colorType, (ColorType)colorTypes.get(colorType.getName()));
+                        if (colorTypes.containsKey(colorType.getName())) {
+                            newPct.replaceColorType(colorType, (ColorType)colorTypes.get(colorType.getName()));
+                        }
                     }
-        
+
                     boolean isSimiliar = pct.getProductColorTypes().size() == newPct.getProductColorTypes().size() && pct.containsTypes(newPct.getColorTypes());
                     if (isSimiliar) {
                         updateColorTypes(pct, newPct);
@@ -140,7 +146,7 @@ public class ConstantsParser {
                     }
                 } else {    
                     List<Color> removedColors = new ArrayList<Color>();
-                    for (Color color : ct.getColorList()) {
+                    for (Color color : ct.getColors()) {
                         if (!newCt.contains(color)) {
                             removedColors.add(color);
                         }
@@ -159,7 +165,7 @@ public class ConstantsParser {
                         }
                     }
                     
-                    if (removeableColors == removedColors.size()) {
+                    if (removeableColors >= removedColors.size()) {
                         updateColorTypes(ct, newCt);
                         continue;
                     }
@@ -182,7 +188,20 @@ public class ConstantsParser {
                 }
                 
                 if (allDependentVariablesBeingRemoved) {
-                    continue;
+                    boolean isUsedInPlace = false;
+                    for (TimedArcPetriNet tapn : network.allTemplates()) {
+                        for (TimedPlace place : tapn.places()) {
+                            if (place.getColorType().getName().equals(ct.getName())) {
+                                isUsedInPlace = true;
+                                break;
+                            }
+                        }
+                        if (isUsedInPlace) break;
+                    }
+
+                    if (!isUsedInPlace) {
+                        continue;
+                    }
                 }
             }
 
@@ -249,6 +268,37 @@ public class ConstantsParser {
         if (variables.containsKey(id)) {
             throw new ParseException("Variable with name \"" + id + "\" already exists");
         }
+
+        for (ColorType ct : colorTypes.values()) {
+            for (Color c : ct.getColors()) {
+                if (c.getName().equals(id)) {
+                    throw new ParseException("The name \"" + id + "\" is already used as a color in type \"" + ct.getName() + "\"");
+                }
+            }
+        }
+    }
+
+    private static Expression updateGuardTypes(Expression expr, ColorType oldCt, ColorType newCt) {
+        if (expr == null) return null;
+
+        if (expr instanceof UserOperatorExpression) {
+            UserOperatorExpression uoe = (UserOperatorExpression) expr;
+            if (uoe.getUserOperator().getColorType().getName().equals(oldCt.getName())) {
+                return uoe.getExprWithNewColorType(newCt);
+            }
+            return expr;
+        }
+
+        Expression result = expr;
+        for (ExprStringPosition pos : expr.getChildren()) {
+            Expression child = pos.getObject();
+            Expression updatedChild = updateGuardTypes(child, oldCt, newCt);
+            
+            if (updatedChild != child) {
+                result = result.replace(child, updatedChild);
+            }
+        }
+        return result;
     }
 
     private static void updateColorTypes(ColorType ct, ColorType newCt) {
@@ -284,7 +334,7 @@ public class ConstantsParser {
                 List<ColoredTimeInvariant> invariantsToAdd = new ArrayList<ColoredTimeInvariant>();
                 for (ColoredTimeInvariant invariant : place.getCtiList()) {
                     if (ct.contains(invariant.getColor())) {
-                        invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), ct.getColorByName(invariant.getColor().getColorName())));
+                        invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), newCt.getColorByName(invariant.getColor().getColorName())));
                     } else {
                         invariantsToAdd.add(invariant);
                     }
@@ -295,33 +345,23 @@ public class ConstantsParser {
 
             for (TimedInputArc arc : tapn.inputArcs()) {
                 if (arc.getArcExpression() != null) {
-                    arc.setExpression(arc.getArcExpression().getExprWithNewColorType(ct));
+                    arc.setExpression(arc.getArcExpression().getExprWithNewColorType(newCt));
                 }
             }
 
             for (TimedOutputArc arc : tapn.outputArcs()) {
                 if (arc.getExpression() != null) {
-                    arc.setExpression(arc.getExpression().getExprWithNewColorType(ct));
+                    arc.setExpression(arc.getExpression().getExprWithNewColorType(newCt));
                 }
             }
 
             for (TimedTransition transition : tapn.transitions()) {
                 if (transition.getGuard() != null) {
-                    transition.getGuard().setColorType(ct);
+                    Expression updatedGuardExpr = updateGuardTypes(transition.getGuard(), ct, newCt);
+                    GuardExpression newGuard = (GuardExpression) updatedGuardExpr;
+                    newGuard.setColorType(newCt);
+                    transition.setGuard(newGuard);
                 }
-            }
-        }
-
-        for (ColorType networkCt : network.colorTypes()) {
-            if (networkCt instanceof ProductType) {
-                ProductType networkPct = (ProductType)networkCt;
-                networkPct.replaceColorType(ct, newCt);
-            }
-        }
-
-        for (Variable var : network.variables()) {
-            if (var.getColorType().equals(newCt)) {
-                var.setColorType(ct);
             }
         }
     }

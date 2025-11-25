@@ -184,6 +184,12 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             } else{
                 loadedModel = new PNMLoader().load(fileOut);
             }
+
+            if (loadedModel == null) {
+                error.append("Unfolded model could not be loaded");
+                return error.toString();
+            }
+
             // addLocation(loadedModel, composer); // We can not get coords from server
             newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false, oldTab.getLens().isStochastic()));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
