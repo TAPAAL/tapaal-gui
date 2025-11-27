@@ -75,6 +75,11 @@ public class RunVerification extends RunVerificationBase {
                     isNetDrawable = result.getUnfoldedTab().network().paintNet();
                 }
 
+                if (result.getUnfoldedTab() != null) {
+                    ColorBindingParser parser = new ColorBindingParser();
+                    parser.addBindings(result.getUnfoldedTab().getModel(), result.getRawOutput());
+                }
+
                 if ((options.traceOption() != TAPNQuery.TraceOption.NONE || lens.isStochastic() && options.isSimulate()) && isNetDrawable) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
                         if (((lens != null && lens.isColored()) || model.isColored()) && !options.useExplicitSearch()) {
@@ -95,11 +100,6 @@ public class RunVerification extends RunVerificationBase {
                                 }
                             }
                             TAPAALGUI.getAnimator().setTrace(result.getTrace(), traceMap);
-                        }
-
-                        if (result.getUnfoldedTab() != null) {
-                            ColorBindingParser parser = new ColorBindingParser();
-                            parser.addBindings(result.getUnfoldedTab().getModel(), result.getRawOutput());
                         }
                     } else {
                         if ((

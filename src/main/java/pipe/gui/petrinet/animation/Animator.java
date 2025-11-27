@@ -917,6 +917,12 @@ public class Animator {
             TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)action;
             Map<Variable, Color> bindings = coloredStep.getBindings();
             tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(ColorBindingParser.createTooltip(bindings));
+        } else if (action.isTimedTransitionStep()) {
+            var timedStep = (TAPNNetworkTimedTransitionStep)action;
+            var transition = timedStep.getTransition();
+            var guiTransition = tab.getModel().getTransitionByName(transition.name());
+            System.out.println(guiTransition.getToolTipText());
+            tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(guiTransition.getToolTipText());
         }
 
         actionHistory.add(action);

@@ -13,6 +13,11 @@ public abstract class TAPNNetworkTraceStep {
 		return loopStep;
 	}
 
+    public boolean isTimedTransitionStep() {
+        return false;
+    }
+	
+
     public boolean isColoredTransitionStep() {
         return false;
     }

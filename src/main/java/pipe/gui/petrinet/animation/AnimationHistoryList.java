@@ -72,6 +72,16 @@ public class AnimationHistoryList extends JList<String> {
 		updateAccordingToDeadlock(isExplicit);
 	}
 
+    public void setTooltipForIndex(int index, String tooltip) {
+        if (index >= 0 && index < getListModel().size()) {
+            itemTooltips.put(index, tooltip);
+        }
+    }
+
+    public void setTooltipForSelectedItem(String tooltip) {
+        setTooltipForIndex(getSelectedIndex(), tooltip);
+    }
+
 	public void stepForward() {
 		if (isStepForwardAllowed()) {
 			int nextIndex = getSelectedIndex() + 1;
