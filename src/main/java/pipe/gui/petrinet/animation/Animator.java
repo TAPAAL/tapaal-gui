@@ -921,7 +921,6 @@ public class Animator {
             var timedStep = (TAPNNetworkTimedTransitionStep)action;
             var transition = timedStep.getTransition();
             var guiTransition = tab.getModel().getTransitionByName(transition.name());
-            System.out.println(guiTransition.getToolTipText());
             tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(guiTransition.getToolTipText());
         }
 
