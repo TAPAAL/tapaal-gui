@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -912,16 +913,20 @@ public class Animator {
         }
 
         tab.network().setMarking(marking);
-        tab.getAnimationHistorySidePanel().addHistoryItem(action.toString(), tab.getLens().isColored());
+        var historySidePanel = tab.getAnimationHistorySidePanel();
+        var isColored = tab.getLens().isColored();
         if (action.isColoredTransitionStep()) {
+            historySidePanel.addHistoryItem(action.toString(), isColored);
             TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)action;
             Map<Variable, Color> bindings = coloredStep.getBindings();
-            tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(ColorBindingParser.createTooltip(bindings));
+            historySidePanel.setTooltipForSelectedItem(ColorBindingParser.createTooltip(bindings));
         } else if (action.isTimedTransitionStep()) {
             var timedStep = (TAPNNetworkTimedTransitionStep)action;
             var transition = timedStep.getTransition();
             var guiTransition = tab.getModel().getTransitionByName(transition.name());
-            tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(guiTransition.getToolTipText());
+            var historyStr = action.toString() + formatHistoryBindingString(guiTransition.getToolTipText());
+            historySidePanel.addHistoryItem(historyStr, isColored);
+            historySidePanel.setTooltipForSelectedItem(guiTransition.getToolTipText());
         }
 
         actionHistory.add(action);
@@ -959,6 +964,20 @@ public class Animator {
 
         tab.getAnimationController().updateFiringModeComboBox();
         tab.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
+    }
+
+    private String formatHistoryBindingString(String tooltipStr) {
+        if (tooltipStr == null || tooltipStr.isBlank()) {
+            return "";
+        }
+
+        String stripped = tooltipStr.replaceAll("(?i)<html>|</html>", "");
+
+        return " " + Arrays.stream(stripped.split("(?i)<br\\s*/?>"))
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .map(line -> line.replace(" ", "")) 
+            .collect(Collectors.joining(",", "[", "]"));
     }
 
     public boolean hasNonZeroTrance() {
