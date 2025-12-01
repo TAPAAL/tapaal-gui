@@ -90,7 +90,13 @@ public class VerifyPNInteractiveHandle {
 
     public Map<TimedTransition, List<Map<Variable, Color>>> sendMarking(NetworkMarking marking) {
         try {
+            Logger.log("--- Sending marking to VerifyPN ---");
+            Logger.log(marking.toXmlStr(composer));
+            Logger.log("-----------------------------------");
             String xmlResponse = sendMessage(marking.toXmlStr(composer), "valid-bindings");
+            Logger.log("--- Received response from VerifyPN ---");
+            Logger.log(xmlResponse);
+            Logger.log("---------------------------------------");
             return parseTransitionWithBindings(xmlResponse);
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,7 +106,13 @@ public class VerifyPNInteractiveHandle {
 
     public NetworkMarking sendTransition(TimedTransition transition, Map<Variable, Color> bindings) {
         try {
+            Logger.log("--- Sending transition to VerifyPN ---");
+            Logger.log(transition.toBindingXmlStr(bindings, composer));
+            Logger.log("--------------------------------------");
             String xmlResponse = sendMessage(transition.toBindingXmlStr(bindings, composer), "marking");
+            Logger.log("--- Received response from VerifyPN ---");
+            Logger.log(xmlResponse);
+            Logger.log("---------------------------------------");
             return parseMarking(xmlResponse);
         } catch (Exception e) {
             e.printStackTrace();

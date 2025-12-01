@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,8 @@ import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import net.tapaal.gui.petrinet.dialog.ColoredBindingSelectionDialog;
+import dk.aau.cs.model.CPN.Expressions.AllExpression;
+import dk.aau.cs.model.CPN.Expressions.Expression;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ProductType;
@@ -540,13 +541,56 @@ public class Animator {
                 }
     
                 List<TimedToken> tokens = placesToTokensCopy.get(place);
-                Map<Color, Integer> numberOfMap = new HashMap<>();
-                for (TimedToken token : tokens) {
-                    numberOfMap.merge(token.color(), 1, Integer::sum);
+                
+                ArcExpression existingExpression = place.getTokensAsExpression();
+                ArcExpression tokenExpression = rebuildExpressionPreservingAll(tokens, place.getColorType(), existingExpression);
+                
+                place.updateTokens(tokens, tokenExpression);
+                placeComponent.setUnderlyingPlace(place);
+            }
+        }
+    }
+
+    private ArcExpression rebuildExpressionPreservingAll(List<TimedToken> tokens, ColorType placeColorType, ArcExpression existingExpression) {
+        Map<Color, Integer> numberOfMap = new HashMap<>();
+        for (TimedToken token : tokens) {
+            numberOfMap.merge(token.color(), 1, Integer::sum);
+        }
+
+        boolean hasAllExpression = existingExpression != null && containsAllExpression(existingExpression);
+        
+        Vector<ArcExpression> numberOfExpressions = new Vector<>();
+        
+        if (hasAllExpression && existingExpression instanceof AddExpression) {
+            AddExpression addExpr = (AddExpression) existingExpression;
+            for (ArcExpression arcExpr : addExpr.getAddExpression()) {
+                if (arcExpr instanceof NumberOfExpression) {
+                    NumberOfExpression numOfExpr = (NumberOfExpression) arcExpr;
+                    Vector<ColorExpression> colorExprs = new Vector<>();
+                    
+                    for (ColorExpression expr : numOfExpr.getNumberOfExpression()) {
+                        if (expr instanceof AllExpression) {
+                            colorExprs.add(expr);
+                        } else if (expr instanceof TupleExpression) {
+                            TupleExpression tupleExpr = (TupleExpression) expr;
+                            Vector<ColorExpression> tupleColors = new Vector<>();
+                            for (ColorExpression ce : tupleExpr.getColors()) {
+                                tupleColors.add(ce);
+                            }
+                            colorExprs.add(new TupleExpression(tupleColors, (ProductType) tupleExpr.getColorType()));
+                        } else {
+                            colorExprs.add(expr);
+                        }
+                    }
+                    
+                    int actualCount = calculateTokenCountForExpression(colorExprs, numberOfMap, placeColorType);
+                    if (actualCount > 0) {
+                        numberOfExpressions.add(new NumberOfExpression(actualCount, colorExprs));
+                    }
                 }
-    
-                Vector<ArcExpression> numberOfExpressions = new Vector<>();
-                numberOfMap.entrySet().stream()
+            }
+        } else {
+            numberOfMap.entrySet().stream()
                 .sorted((e1, e2) -> e1.getKey().toString().compareTo(e2.getKey().toString()))
                 .forEach(numberOfEntry -> {
                     Color color = numberOfEntry.getKey();
@@ -569,12 +613,57 @@ public class Animator {
     
                     numberOfExpressions.add(new NumberOfExpression(number, colorExpressions));
                 });
-    
-                ArcExpression tokenExpression = new AddExpression(numberOfExpressions);
-                place.updateTokens(tokens, tokenExpression);
-                placeComponent.setUnderlyingPlace(place);
+        }
+        
+        return new AddExpression(numberOfExpressions);
+    }
+
+    private boolean containsAllExpression(Expression expr) {
+        if (expr instanceof AllExpression) {
+            return true;
+        } else if (expr instanceof AddExpression) {
+            for (ArcExpression arcExpr : ((AddExpression) expr).getAddExpression()) {
+                if (containsAllExpression(arcExpr)) return true;
+            }
+        } else if (expr instanceof NumberOfExpression) {
+            for (ColorExpression e : ((NumberOfExpression) expr).getNumberOfExpression()) {
+                if (containsAllExpression(e)) return true;
+            }
+        } else if (expr instanceof TupleExpression) {
+            for (ColorExpression ce : ((TupleExpression) expr).getColors()) {
+                if (containsAllExpression(ce)) return true;
             }
         }
+        return false;
+    }
+
+    private int calculateTokenCountForExpression(Vector<ColorExpression> colorExprs, Map<Color, Integer> numberOfMap, ColorType placeColorType) {
+        if (colorExprs.isEmpty()) return 0;
+        
+        ColorExpression firstExpr = colorExprs.get(0);
+        if (firstExpr instanceof AllExpression) {
+            AllExpression allExpr = (AllExpression) firstExpr;
+            int totalCount = 0;
+            for (Map.Entry<Color, Integer> entry : numberOfMap.entrySet()) {
+                if (entry.getKey().getColorType().equals(allExpr.getColorType())) {
+                    totalCount = entry.getValue();
+                    break;
+                }
+            }
+            return totalCount;
+        } else if (firstExpr instanceof TupleExpression) {
+            TupleExpression tupleExpr = (TupleExpression) firstExpr;
+            if (containsAllExpression(tupleExpr)) {
+                int count = 0;
+                for (Map.Entry<Color, Integer> entry : numberOfMap.entrySet()) {
+                    count = entry.getValue();
+                    break;
+                }
+                return count;
+            }
+        }
+        
+        return 0;
     }
 
     private void updateBindings(int stepIdx) {
@@ -913,20 +1002,16 @@ public class Animator {
         }
 
         tab.network().setMarking(marking);
-        var historySidePanel = tab.getAnimationHistorySidePanel();
-        var isColored = tab.getLens().isColored();
+        tab.getAnimationHistorySidePanel().addHistoryItem(action.toString(), tab.getLens().isColored());
         if (action.isColoredTransitionStep()) {
-            historySidePanel.addHistoryItem(action.toString(), isColored);
             TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)action;
             Map<Variable, Color> bindings = coloredStep.getBindings();
-            historySidePanel.setTooltipForSelectedItem(ColorBindingParser.createTooltip(bindings));
+            tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(ColorBindingParser.createTooltip(bindings));
         } else if (action.isTimedTransitionStep()) {
             var timedStep = (TAPNNetworkTimedTransitionStep)action;
             var transition = timedStep.getTransition();
             var guiTransition = tab.getModel().getTransitionByName(transition.name());
-            var historyStr = action.toString() + formatHistoryBindingString(guiTransition.getToolTipText());
-            historySidePanel.addHistoryItem(historyStr, isColored);
-            historySidePanel.setTooltipForSelectedItem(guiTransition.getToolTipText());
+            tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(guiTransition.getToolTipText());
         }
 
         actionHistory.add(action);
@@ -964,20 +1049,6 @@ public class Animator {
 
         tab.getAnimationController().updateFiringModeComboBox();
         tab.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
-    }
-
-    private String formatHistoryBindingString(String tooltipStr) {
-        if (tooltipStr == null || tooltipStr.isBlank()) {
-            return "";
-        }
-
-        String stripped = tooltipStr.replaceAll("(?i)<html>|</html>", "");
-
-        return " " + Arrays.stream(stripped.split("(?i)<br\\s*/?>"))
-            .map(String::trim)
-            .filter(s -> !s.isEmpty())
-            .map(line -> line.replace(" ", "")) 
-            .collect(Collectors.joining(",", "[", "]"));
     }
 
     public boolean hasNonZeroTrance() {

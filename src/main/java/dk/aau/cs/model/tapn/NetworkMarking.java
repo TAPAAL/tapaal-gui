@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
-import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,9 +19,8 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import dk.aau.cs.model.CPN.Color;
-import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.NTA.trace.TraceToken;
+import dk.aau.cs.io.writeTACPN;
 import pipe.gui.TAPAALGUI;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
@@ -393,33 +390,28 @@ public class NetworkMarking implements TimedMarking {
         allPlaces.putAll(sharedPlacesTokens);
 
         Element markingElement = document.createElement("marking");
+
+        writeTACPN writer = null;
+        if (!allPlaces.isEmpty()) {
+             TimedPlace firstPlace = allPlaces.keySet().iterator().next();
+             TimedArcPetriNetNetwork network = null;
+             if (firstPlace instanceof LocalTimedPlace) {
+                 network = ((LocalTimedPlace)firstPlace).model().parentNetwork();
+             } else if (firstPlace instanceof SharedPlace) {
+                 network = ((SharedPlace)firstPlace).network();
+             }
+             if (network != null) {
+                 writer = new writeTACPN(network);
+             }
+        }
+
         for (Entry<TimedPlace, List<TimedToken>> entry : allPlaces.entrySet()) {
+            TimedPlace place = entry.getKey();
             Element placeElement = document.createElement("place");
             placeElement.setAttribute("id", composer.composedPlaceName(entry.getKey()));
             
-            Map<Color, List<TimedToken>> colorToTokensMap = entry.getValue().stream()
-                    .collect(Collectors.groupingBy(TimedToken::color));
-            
-            for (Map.Entry<Color, List<TimedToken>> colorEntry : colorToTokensMap.entrySet()) {
-                Element tokenElement = document.createElement("token");
-                tokenElement.setAttribute("count", String.valueOf(colorEntry.getValue().size()));
-                
-                Color color = colorEntry.getKey();
-                ColorType ct = color.getColorType();
-                if (ct.isProductColorType()) {
-                    Vector<Color> subColors = color.getTuple();
-                    for (Color subColor : subColors) {
-                        Element subColorElement = document.createElement("color");
-                        subColorElement.setTextContent(subColor.toString());
-                        tokenElement.appendChild(subColorElement);
-                    }
-                } else {
-                    Element colorElement = document.createElement("color");
-                    colorElement.setTextContent(colorEntry.getKey().toString());
-                    tokenElement.appendChild(colorElement);
-                }
-
-                placeElement.appendChild(tokenElement);
+            if (place.getTokensAsExpression() != null && writer != null) {
+                writer.parseArcExpression(place.getTokensAsExpression(), document, placeElement);
             }
 
             markingElement.appendChild(placeElement);
