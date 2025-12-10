@@ -1,20 +1,35 @@
 package dk.aau.cs.model.tapn;
 
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import dk.aau.cs.model.NTA.trace.TraceToken;
+import dk.aau.cs.io.writeTACPN;
 import pipe.gui.TAPAALGUI;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.TAPNComposer;
 
 public class NetworkMarking implements TimedMarking {
-	private final HashMap<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
-	private final HashMap<TimedPlace, List<TimedToken>> sharedPlacesTokens = new HashMap<TimedPlace, List<TimedToken>>();
+	private final Map<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
+	private final Map<TimedPlace, List<TimedToken>> sharedPlacesTokens = new HashMap<TimedPlace, List<TimedToken>>();
 
 	public NetworkMarking() {
 	}
@@ -38,10 +53,30 @@ public class NetworkMarking implements TimedMarking {
 			marking.setNetworkMarking(null);
 		}
 	}
+
+    public void updateMarking(LocalTimedMarking newMarking, Map<TimedPlace, List<TimedToken>> sharedPlacesToTokensMap) {
+        for (TimedPlace place : newMarking.getPlacesToTokensMap().keySet()) {
+            TimedArcPetriNet tapn = ((LocalTimedPlace)place).model();
+            markings.put(tapn, newMarking);
+        }
+
+        sharedPlacesTokens.clear();
+        for (TimedPlace place : sharedPlacesToTokensMap.keySet()) {
+            sharedPlacesTokens.put(place, sharedPlacesToTokensMap.get(place));
+        }
+    }
 	
-	private LocalTimedMarking getMarkingFor(TimedArcPetriNet tapn) {
+	public LocalTimedMarking getMarkingFor(TimedArcPetriNet tapn) {
 		return markings.get(tapn);
 	}
+
+    public Map<TimedArcPetriNet, LocalTimedMarking> getMarkingMap() {
+        return markings;
+    }
+
+    public Map<TimedPlace, List<TimedToken>> getSharedPlacesTokens() {
+        return sharedPlacesTokens;
+    }
 
 	public NetworkMarking clone() {
 		return delay(BigDecimal.ZERO);
@@ -297,4 +332,91 @@ public class NetworkMarking implements TimedMarking {
 		return true;
 	}
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
+            sb.append(entry.getKey().name()).append(": ").append(entry.getValue().toString()).append("\n");
+        }
+
+        if (sharedPlacesTokens.isEmpty()) {
+            return sb.toString();
+        }
+        
+        sb.append("Shared Places:\n");
+        for (Entry<TimedPlace, List<TimedToken>> entry : sharedPlacesTokens.entrySet()) {
+            sb.append(entry.getKey().name()).append(" -> ");
+            for (TimedToken token : entry.getValue()) {
+                sb.append(token.toString()).append(" ");
+            }
+
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    public String toXmlStr(TAPNComposer composer) {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+            Document document = builder.newDocument();
+            
+            Element markingElement = toXmlElement(document, composer);
+            document.appendChild(markingElement);
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(writer));
+
+            return writer.getBuffer().toString().trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }   
+    }
+
+    public Element toXmlElement(Document document, TAPNComposer composer) {
+        Map<TimedPlace, List<TimedToken>> allPlaces = new HashMap<>();
+        for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
+            if (entry.getKey().isActive()) {
+                allPlaces.putAll(entry.getValue().getPlacesToTokensMap());
+            }
+        }
+    
+        allPlaces.putAll(sharedPlacesTokens);
+
+        Element markingElement = document.createElement("marking");
+
+        writeTACPN writer = null;
+        if (!allPlaces.isEmpty()) {
+             TimedPlace firstPlace = allPlaces.keySet().iterator().next();
+             TimedArcPetriNetNetwork network = null;
+             if (firstPlace instanceof LocalTimedPlace) {
+                 network = ((LocalTimedPlace)firstPlace).model().parentNetwork();
+             } else if (firstPlace instanceof SharedPlace) {
+                 network = ((SharedPlace)firstPlace).network();
+             }
+             if (network != null) {
+                 writer = new writeTACPN(network);
+             }
+        }
+
+        for (Entry<TimedPlace, List<TimedToken>> entry : allPlaces.entrySet()) {
+            TimedPlace place = entry.getKey();
+            Element placeElement = document.createElement("place");
+            placeElement.setAttribute("id", composer.composedPlaceName(entry.getKey()));
+            
+            if (place.getTokensAsExpression() != null && writer != null) {
+                writer.parseArcExpression(place.getTokensAsExpression(), document, placeElement);
+            }
+
+            markingElement.appendChild(placeElement);
+        }
+
+        return markingElement;
+    }
 }

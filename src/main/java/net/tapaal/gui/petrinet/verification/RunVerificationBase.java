@@ -1,15 +1,11 @@
 package net.tapaal.gui.petrinet.verification;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.io.File;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.*;
 
 import net.tapaal.gui.petrinet.TAPNLens;
-import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.verification.*;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
@@ -134,7 +130,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 model.isColored() && (!model.isUntimed() || options.traceOption() != net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE),
                                 dataLayerQuery.usePartitioning(),
                                 dataLayerQuery.useColorFixpoint(),
-                                dataLayerQuery.useSymmetricVars()
+                                dataLayerQuery.useSymmetricVars(),
+                                dataLayerQuery.useExplicitSearch()
                             ),
                             transformedModel,
                             clonedQuery,
@@ -164,7 +161,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
                                 model.isColored() && (!model.isUntimed() || options.traceOption() != net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE),
                                 true,
                                 true,
-                                true
+                                options.useExplicitSearch()
                             ),
                             transformedModel,
                             clonedQuery,
@@ -210,14 +207,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		return decomposer.decompose();
 	}
 
-    private static net.tapaal.gui.petrinet.verification.TAPNQuery getQuery(File queryFile, TimedArcPetriNetNetwork network) {
-        XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network);
-        List<net.tapaal.gui.petrinet.verification.TAPNQuery> queries = new ArrayList<net.tapaal.gui.petrinet.verification.TAPNQuery>();
-        queries.addAll(queryLoader.parseQueries().getQueries());
-        return queries.get(0);
-    }
-
-
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
 		RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
 		RenameAllTransitionsVisitor transitionVisitor = new RenameAllTransitionsVisitor(mapping);
@@ -251,7 +240,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			    if (dataLayerQuery != null) {
                     reductionTime = dataLayerQuery.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime;
                 }
-			    options = new VerifyPNOptions(options.extraTokens(), net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.CTL, net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, reductionTime, false, null, false, false, false, false, false, false, false);
+			    options = new VerifyPNOptions(options.extraTokens(), net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.CTL, net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption.CERTAIN_ZERO, false, reductionTime, false, null, false, false, false, false, false, false, false, options.useExplicitSearch());
                 // XXX: needs refactoring, will only work if the model verified in the one on top (using getCurrentTab)
                 KBoundAnalyzer optimizer = new KBoundAnalyzer(model, TAPAALGUI.getCurrentTab().lens, guiModels, options.extraTokens(), modelChecker, new MessengerImpl(), spinner, dataLayerQuery);
                 optimizer.analyze((VerifyTAPNOptions) options, true);

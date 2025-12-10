@@ -75,9 +75,14 @@ public class RunVerification extends RunVerificationBase {
                     isNetDrawable = result.getUnfoldedTab().network().paintNet();
                 }
 
+                if (result.getUnfoldedTab() != null) {
+                    ColorBindingParser parser = new ColorBindingParser();
+                    parser.addBindings(result.getUnfoldedTab().getModel(), result.getRawOutput());
+                }
+
                 if ((options.traceOption() != TAPNQuery.TraceOption.NONE || lens.isStochastic() && options.isSimulate()) && isNetDrawable) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
-                        if ((lens != null && lens.isColored()) || model.isColored()) {
+                        if (((lens != null && lens.isColored()) || model.isColored()) && !options.useExplicitSearch()) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
                                 TAPAALGUI.openNewTabFromStream(result.getUnfoldedTab());
@@ -95,11 +100,6 @@ public class RunVerification extends RunVerificationBase {
                                 }
                             }
                             TAPAALGUI.getAnimator().setTrace(result.getTrace(), traceMap);
-                        }
-
-                        if (result.getUnfoldedTab() != null) {
-                            ColorBindingParser parser = new ColorBindingParser();
-                            parser.addBindings(result.getUnfoldedTab().getModel(), result.getRawOutput());
                         }
                     } else {
                         if ((

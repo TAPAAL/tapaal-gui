@@ -12,6 +12,15 @@ public abstract class TAPNNetworkTraceStep {
 	public boolean isLoopStep(){
 		return loopStep;
 	}
+
+    public boolean isTimedTransitionStep() {
+        return false;
+    }
+	
+
+    public boolean isColoredTransitionStep() {
+        return false;
+    }
 	
 	protected String formatAsLoopStep(String s){
 		return "<html><i><font color=red>* " + s + "</i></font></html>";
