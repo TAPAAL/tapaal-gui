@@ -68,7 +68,9 @@ public class VerifyPNInteractiveHandle {
             ProcessBuilder pb = new ProcessBuilder(initCommand);
             verifypnProcess = pb.start();
     
-            Logger.log("Running: " + String.join(" ", initCommand));
+            if (shouldLog()) {
+                Logger.log("Running: " + String.join(" ", initCommand));
+            }
 
             Thread.sleep(100);
             if (!verifypnProcess.isAlive()) {
@@ -88,15 +90,24 @@ public class VerifyPNInteractiveHandle {
         }
     }
 
+    // Run with -Ddebug.interactive=true to enable logging
+    private boolean shouldLog() {
+        return Boolean.getBoolean("debug.interactive");
+    }
+
     public Map<TimedTransition, List<Map<Variable, Color>>> sendMarking(NetworkMarking marking) {
         try {
-            Logger.log("--- Sending marking to VerifyPN ---");
-            Logger.log(marking.toXmlStr(composer));
-            Logger.log("-----------------------------------");
+            if (shouldLog()) {
+                Logger.log("--- Sending marking to VerifyPN ---");
+                Logger.log(marking.toXmlStr(composer));
+                Logger.log("-----------------------------------");
+            }
             String xmlResponse = sendMessage(marking.toXmlStr(composer), "valid-bindings");
-            Logger.log("--- Received response from VerifyPN ---");
-            Logger.log(xmlResponse);
-            Logger.log("---------------------------------------");
+            if (shouldLog()) {
+                Logger.log("--- Received response from VerifyPN ---");
+                Logger.log(xmlResponse);
+                Logger.log("---------------------------------------");
+            }
             return parseTransitionWithBindings(xmlResponse);
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,13 +117,17 @@ public class VerifyPNInteractiveHandle {
 
     public NetworkMarking sendTransition(TimedTransition transition, Map<Variable, Color> bindings) {
         try {
-            Logger.log("--- Sending transition to VerifyPN ---");
-            Logger.log(transition.toBindingXmlStr(bindings, composer));
-            Logger.log("--------------------------------------");
+            if (shouldLog()) {
+                Logger.log("--- Sending transition to VerifyPN ---");
+                Logger.log(transition.toBindingXmlStr(bindings, composer));
+                Logger.log("--------------------------------------");
+            }
             String xmlResponse = sendMessage(transition.toBindingXmlStr(bindings, composer), "marking");
-            Logger.log("--- Received response from VerifyPN ---");
-            Logger.log(xmlResponse);
-            Logger.log("---------------------------------------");
+            if (shouldLog()) {
+                Logger.log("--- Received response from VerifyPN ---");
+                Logger.log(xmlResponse);
+                Logger.log("---------------------------------------");
+            }
             return parseMarking(xmlResponse);
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,6 +149,7 @@ public class VerifyPNInteractiveHandle {
 
         StringBuilder response = new StringBuilder();
         boolean insideTag = false;
+        boolean foundEndTag = false;
 
         String line;
         while ((line = reader.readLine()) != null) {
@@ -143,10 +159,15 @@ public class VerifyPNInteractiveHandle {
                 response.append(line).append("\n");
             } else if (trimmedLine.equals("</" + responseTag + ">")) {
                 response.append(line).append("\n");
+                foundEndTag = true;
                 break;
             } else if (insideTag) {
                 response.append(line).append("\n");
             }
+        }
+
+        if (!foundEndTag) {
+            throw new IOException("Did not receive complete response from engine. Response so far: " + response.toString());
         }
 
         return response.toString().trim();

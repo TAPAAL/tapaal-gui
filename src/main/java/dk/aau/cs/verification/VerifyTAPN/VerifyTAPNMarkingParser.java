@@ -79,18 +79,27 @@ public class VerifyTAPNMarkingParser {
             String placeId = placeElement.getAttribute("id");
             TimedPlace place = placeResolver.apply(placeId);
 
+            Vector<ArcExpression> placeExpressions = new Vector<>();
             NodeList childNodes = placeElement.getChildNodes();
             for (int j = 0; j < childNodes.getLength(); ++j) {
                 Node child = childNodes.item(j);
                 if (child.getNodeType() == Node.ELEMENT_NODE) {
                     try {
                         ArcExpression arcExpr = parseSimpleArcExpression(child, network);
+                        placeExpressions.add(arcExpr);
                         expandArcExpressionToTokens(arcExpr, place, tokenConsumer, productColorResolver);
                     } catch (Exception e) {
                         System.err.println("Error parsing arc expression for place " + placeId + ": " + e.getMessage());
                         e.printStackTrace();
                     }
                 }
+            }
+            
+            if (!placeExpressions.isEmpty()) {
+                ArcExpression combinedExpression = placeExpressions.size() == 1 
+                    ? placeExpressions.get(0) 
+                    : new AddExpression(placeExpressions);
+                place.setTokenExpression(combinedExpression);
             }
         }
     }
@@ -173,6 +182,25 @@ public class VerifyTAPNMarkingParser {
             return new TupleExpression(components);
         } else if (name.equals("dotconstant")) {
             return new DotConstantExpression();
+        } else if (name.equals("finiteintrangeconstant")) {
+            String value = node.getAttributes().getNamedItem("value").getNodeValue();
+            Node rangeNode = skipWS(node.getFirstChild());
+            if (rangeNode != null && rangeNode.getNodeName().equals("finiteintrange")) {
+                String start = rangeNode.getAttributes().getNamedItem("start").getNodeValue();
+                String end = rangeNode.getAttributes().getNamedItem("end").getNodeValue();
+                
+                for (ColorType ct : network.colorTypes()) {
+                    if (ct.isIntegerRange() && 
+                        ct.getFirstColor().getColorName().equals(start) &&
+                        ct.getColors().lastElement().getColorName().equals(end)) {
+                        
+                        Color color = ct.getColorByName(value);
+                        if (color != null) {
+                            return new UserOperatorExpression(color);
+                        }
+                    }
+                }
+            }
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
             return parseColorExpression(child, network);

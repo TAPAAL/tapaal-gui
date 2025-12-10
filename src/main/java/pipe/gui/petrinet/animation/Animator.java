@@ -543,53 +543,51 @@ public class Animator {
                 List<TimedToken> tokens = placesToTokensCopy.get(place);
                 
                 ArcExpression existingExpression = place.getTokensAsExpression();
-                ArcExpression tokenExpression = rebuildExpressionPreservingAll(tokens, place.getColorType(), existingExpression);
-                
+                var tup = rebuildExpressionPreservingAll(tokens, place, existingExpression);
+                tokens = tup.value1();
+                ArcExpression tokenExpression = tup.value2();
                 place.updateTokens(tokens, tokenExpression);
                 placeComponent.setUnderlyingPlace(place);
             }
         }
     }
 
-    private ArcExpression rebuildExpressionPreservingAll(List<TimedToken> tokens, ColorType placeColorType, ArcExpression existingExpression) {
-        Map<Color, Integer> numberOfMap = new HashMap<>();
-        for (TimedToken token : tokens) {
-            numberOfMap.merge(token.color(), 1, Integer::sum);
-        }
-
+    private Tuple<List<TimedToken>, ArcExpression> rebuildExpressionPreservingAll(List<TimedToken> tokens, TimedPlace place, ArcExpression existingExpression) {
         boolean hasAllExpression = existingExpression != null && containsAllExpression(existingExpression);
         
         Vector<ArcExpression> numberOfExpressions = new Vector<>();
-        
+        List<TimedToken> newTokens = new ArrayList<>();
+         
         if (hasAllExpression && existingExpression instanceof AddExpression) {
-            AddExpression addExpr = (AddExpression) existingExpression;
+            var addExpr = (AddExpression)existingExpression;
             for (ArcExpression arcExpr : addExpr.getAddExpression()) {
                 if (arcExpr instanceof NumberOfExpression) {
-                    NumberOfExpression numOfExpr = (NumberOfExpression) arcExpr;
-                    Vector<ColorExpression> colorExprs = new Vector<>();
-                    
-                    for (ColorExpression expr : numOfExpr.getNumberOfExpression()) {
-                        if (expr instanceof AllExpression) {
-                            colorExprs.add(expr);
-                        } else if (expr instanceof TupleExpression) {
-                            TupleExpression tupleExpr = (TupleExpression) expr;
-                            Vector<ColorExpression> tupleColors = new Vector<>();
-                            for (ColorExpression ce : tupleExpr.getColors()) {
-                                tupleColors.add(ce);
+                    var numOfExpr = (NumberOfExpression)arcExpr;
+                    var expandedExpressions = computeCrossProduct(numOfExpr.getNumberOfExpression());
+                    numberOfExpressions.addAll(expandedExpressions);
+                }
+            }
+
+            for (ArcExpression arcExpr : numberOfExpressions) {
+                if (arcExpr instanceof NumberOfExpression) {
+                    NumberOfExpression numExpr = (NumberOfExpression) arcExpr;
+                    for (ColorExpression ce : numExpr.getNumberOfExpression()) {
+                        Color color = getColorFromExpression(ce);
+                        if (color != null) {
+                            for (int i = 0; i < numExpr.getNumber(); i++) {
+                                newTokens.add(new TimedToken(place, BigDecimal.ZERO, color));
                             }
-                            colorExprs.add(new TupleExpression(tupleColors, (ProductType) tupleExpr.getColorType()));
-                        } else {
-                            colorExprs.add(expr);
                         }
-                    }
-                    
-                    int actualCount = calculateTokenCountForExpression(colorExprs, numberOfMap, placeColorType);
-                    if (actualCount > 0) {
-                        numberOfExpressions.add(new NumberOfExpression(actualCount, colorExprs));
                     }
                 }
             }
         } else {
+            newTokens = tokens;
+            Map<Color, Integer> numberOfMap = new HashMap<>();
+            for (TimedToken token : tokens) {
+                numberOfMap.merge(token.color(), 1, Integer::sum);
+            }
+
             numberOfMap.entrySet().stream()
                 .sorted((e1, e2) -> e1.getKey().toString().compareTo(e2.getKey().toString()))
                 .forEach(numberOfEntry -> {
@@ -614,8 +612,101 @@ public class Animator {
                     numberOfExpressions.add(new NumberOfExpression(number, colorExpressions));
                 });
         }
+    
+
+        return new Tuple<>(newTokens, new AddExpression(numberOfExpressions));
+    }
+
+    private Color getColorFromExpression(ColorExpression expr) {
+        if (expr instanceof UserOperatorExpression) {
+            return ((UserOperatorExpression)expr).getUserOperator();
+        } else if (expr instanceof TupleExpression) {
+            TupleExpression tupleExpr = (TupleExpression)expr;
+            Vector<Color> components = new Vector<>();
+            for (ColorExpression ce : tupleExpr.getColors()) {
+                Color c = getColorFromExpression(ce);
+                if (c == null) return null;
+                components.add(c);
+            }
+            
+            return new Color(tupleExpr.getColorType(), 0, components);
+        }
+
+        return null;
+    }
+
+    private Vector<NumberOfExpression> computeCrossProduct(Vector<ColorExpression> colorExprs) {
+        Vector<NumberOfExpression> result = new Vector<>();
+        if (colorExprs.isEmpty()) return result;
+        List<List<ColorExpression>> allOptions = new ArrayList<>();
+        for (ColorExpression ce : colorExprs) {
+            List<ColorExpression> options = new ArrayList<>();
+            if (ce instanceof AllExpression) {
+                AllExpression allExpr = (AllExpression)ce;
+                for (Color c : allExpr.getColorType().getColors()) {
+                    options.add(new UserOperatorExpression(c));
+                }
+            } else if (ce instanceof TupleExpression) {
+                TupleExpression tupleExpr = (TupleExpression)ce;
+                List<List<ColorExpression>> tupleOptions = new ArrayList<>();
+                
+                for (ColorExpression subExpr : tupleExpr.getColors()) {
+                    List<ColorExpression> subOptions = new ArrayList<>();
+                    if (subExpr instanceof AllExpression) {
+                        AllExpression allExpr = (AllExpression)subExpr;
+                        for (Color c : allExpr.getColorType().getColors()) {
+                            subOptions.add(new UserOperatorExpression(c));
+                        }
+                    } else {
+                        subOptions.add(subExpr);
+                    }
+
+                    tupleOptions.add(subOptions);
+                }
         
-        return new AddExpression(numberOfExpressions);
+                List<Vector<ColorExpression>> tupleCombos = computeCrossProductHelper(tupleOptions);
+                for (Vector<ColorExpression> combo : tupleCombos) {
+                    options.add(new TupleExpression(combo, (ProductType)tupleExpr.getColorType()));
+                }
+            } else {
+                options.add(ce);
+            }
+            
+            allOptions.add(options);
+        }
+        
+        List<Vector<ColorExpression>> allCombinations = computeCrossProductHelper(allOptions);
+        for (Vector<ColorExpression> combo : allCombinations) {
+            result.add(new NumberOfExpression(1, combo));
+        }
+        
+        return result;
+    }
+    
+    private List<Vector<ColorExpression>> computeCrossProductHelper(List<List<ColorExpression>> options) {
+        List<Vector<ColorExpression>> result = new ArrayList<>();
+        if (options.isEmpty()) {
+            result.add(new Vector<>());
+            return result;
+        }
+        
+        computeCrossProductRecursive(options, 0, new Vector<>(), result);
+        return result;
+    }
+    
+    private void computeCrossProductRecursive(List<List<ColorExpression>> options, int index,
+                                              Vector<ColorExpression> current,
+                                              List<Vector<ColorExpression>> result) {
+        if (index == options.size()) {
+            result.add(new Vector<>(current));
+            return;
+        }
+        
+        for (ColorExpression option : options.get(index)) {
+            current.add(option);
+            computeCrossProductRecursive(options, index + 1, current, result);
+            current.remove(current.size() - 1);
+        }
     }
 
     private boolean containsAllExpression(Expression expr) {
@@ -634,36 +725,8 @@ public class Animator {
                 if (containsAllExpression(ce)) return true;
             }
         }
-        return false;
-    }
 
-    private int calculateTokenCountForExpression(Vector<ColorExpression> colorExprs, Map<Color, Integer> numberOfMap, ColorType placeColorType) {
-        if (colorExprs.isEmpty()) return 0;
-        
-        ColorExpression firstExpr = colorExprs.get(0);
-        if (firstExpr instanceof AllExpression) {
-            AllExpression allExpr = (AllExpression) firstExpr;
-            int totalCount = 0;
-            for (Map.Entry<Color, Integer> entry : numberOfMap.entrySet()) {
-                if (entry.getKey().getColorType().equals(allExpr.getColorType())) {
-                    totalCount = entry.getValue();
-                    break;
-                }
-            }
-            return totalCount;
-        } else if (firstExpr instanceof TupleExpression) {
-            TupleExpression tupleExpr = (TupleExpression) firstExpr;
-            if (containsAllExpression(tupleExpr)) {
-                int count = 0;
-                for (Map.Entry<Color, Integer> entry : numberOfMap.entrySet()) {
-                    count = entry.getValue();
-                    break;
-                }
-                return count;
-            }
-        }
-        
-        return 0;
+        return false;
     }
 
     private void updateBindings(int stepIdx) {
