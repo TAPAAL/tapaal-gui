@@ -320,7 +320,11 @@ public class QueryPane extends JPanel implements SidePane {
                     return;
                 }
 
-				QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, network, tabContent.getGuiModels(), lens, tabContent);
+				var query = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, network, tabContent.getGuiModels(), lens, tabContent);
+                if (query == null) return;
+
+                undoManager.addNewEdit(new AddQueryCommand(query, tabContent));
+                addQuery(query);
 
 				updateQueryButtons();
 			}
