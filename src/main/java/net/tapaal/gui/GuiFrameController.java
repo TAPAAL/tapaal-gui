@@ -334,7 +334,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
                         //Don't auto-layout on empty net, hotfix for issue #1960000, we assume only pnml file does not have layout, and they always only have one component
                         if(!tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
-                            int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                            int dialogResult = JOptionPane.showConfirmDialog (TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if(dialogResult == JOptionPane.YES_OPTION) {
                                 SmartDrawDialog.showSmartDrawDialog();
                             }
@@ -381,7 +381,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         String fileName = file.getName().toLowerCase();
         try {
             String content = Files.readString(file.toPath());
-            if (content.contains("<query") || content.contains("<feature")) {
+            if (content.contains("<query") || content.contains("<feature") || !content.contains("<page")) {
                 return FileType.TAPN;
             } else if (content.contains("<pnml")) {
                 return FileType.PNML;
