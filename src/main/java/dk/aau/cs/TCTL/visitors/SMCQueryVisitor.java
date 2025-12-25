@@ -17,6 +17,7 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
     private static final String XML_CONFIDENCE_TAG          = "confidence";
     private static final String XML_INTERVAL_WIDTH_TAG      = "interval-width";
     private static final String XML_COMPARE_TO_FLOAT_TAG    = "compare-to";
+    private static final String XML_NUMERIC_PFRECISION      = "numeric-precision";
     private static final String XML_OBSERVATIONS            = "observations";
 
     public String getXMLQueryFor(TCTLAbstractProperty property, String queryName, SMCSettings settings) {
@@ -56,6 +57,9 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
             tagContent += tagAttribute(XML_CONFIDENCE_TAG, settings.confidence);
             tagContent += tagAttribute(XML_INTERVAL_WIDTH_TAG, settings.estimationIntervalWidth);
         }
+
+        tagContent += tagAttribute(XML_NUMERIC_PFRECISION, settings.getNumericPrecision());
+
         return emptyElement(tagContent);
     }
 
@@ -77,6 +81,10 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
 
     private String tagAttribute(String name, float value) {
         return " " + name + "=\"" + String.valueOf(value) + "\"";
+    }
+
+    private String tagAttribute(String name, long value) {
+        return " " + name + "=\"" + Long.toUnsignedString(value) + "\"";
     }
 
     private String tagAttribute(String name, int value) {

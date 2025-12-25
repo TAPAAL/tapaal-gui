@@ -88,7 +88,7 @@ public class TAPNQuery {
 	private boolean useRawVerification = false;
 	private String rawVerificationPrompt;
 
-    private SMCSettings smcSettings;
+    private SMCSettings smcSettings = SMCSettings.Default();
     private boolean benchmark = false;
     private int benchmarkRuns = 100;
     private boolean parallel = true;

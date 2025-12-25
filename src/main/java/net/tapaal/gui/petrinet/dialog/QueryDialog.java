@@ -371,6 +371,8 @@ public class QueryDialog extends JPanel {
     private JCheckBox smcTimeBoundInfinite;
     private JTextField smcStepBoundValue;
     private JCheckBox smcStepBoundInfinite;
+    private JLabel smcNumericPrecisionLabel;
+    private JTextField smcNumericPrecision;
     private JPanel quantitativePanel;
     private JLabel smcParallelLabel;
     private JCheckBox smcParallel;
@@ -590,6 +592,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_ANALYSIS_TYPE = "Choose between probability quantitative estimation, qualitative hypothesis testing against a fixed probability, or trace generation.";
     private final static String TOOL_TIP_TIME_BOUND = "Bound each run by a maximum accumulated delay";
     private final static String TOOL_TIP_STEP_BOUND = "Bound each run by a maximum number of transition firings";
+    private final static String TOOL_TIP_NUMERIC_PRECISION = "Specify the number of rounding digits to use";
     private final static String TOOL_TIP_CONFIDENCE = "Between 0 and 1, confidence that the probability is indeed in the computed interval";
     private final static String TOOL_TIP_INTERVAL_WIDTH = "Between 0 and 1, error E of the computed probability (P±E)";
     private final static String TOOL_TIP_FALSE_POSITIVES = "Probability to accept the hypothesis if it is false";
@@ -931,6 +934,13 @@ public class QueryDialog extends JPanel {
         smcStepBoundValue.setEnabled(!smcStepBoundInfinite.isSelected());
         smcTimeBoundInfinite.setEnabled(!smcStepBoundInfinite.isSelected());
         smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
+
+        try {
+            smcSettings.setNumericPrecision(Long.parseUnsignedLong(smcNumericPrecision.getText()));
+        } catch(NumberFormatException e) {
+            smcSettings.setNumericPrecision(5);
+        }
+
         try {
             smcSettings.confidence = Float.parseFloat(smcConfidence.getText());
         } catch(NumberFormatException e) {
@@ -1005,6 +1015,8 @@ public class QueryDialog extends JPanel {
         smcStepBoundValue.setEnabled(!smcStepBoundInfinite.isSelected());
         smcTimeBoundInfinite.setEnabled(!smcStepBoundInfinite.isSelected());
         smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
+        
+        smcNumericPrecision.setText(Long.toUnsignedString(settings.getNumericPrecision()));
 
         smcObservations = settings.getObservations();
 
@@ -3055,6 +3067,7 @@ public class QueryDialog extends JPanel {
         JLabel stepBoundLabel = new JLabel("Step bound : ");
         stepBoundLabel.setToolTipText(TOOL_TIP_STEP_BOUND);
         smcEngineOptions.add(stepBoundLabel, subPanelGbc);
+    
         subPanelGbc.gridx = 1;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
         smcStepBoundValue = new JTextField(7);
@@ -3076,6 +3089,31 @@ public class QueryDialog extends JPanel {
         smcEngineOptions.add(smcStepBoundInfinite, subPanelGbc);
 
         subPanelGbc.gridy = 3;
+        subPanelGbc.gridx = 0;
+        smcNumericPrecisionLabel = new JLabel("Numeric precision : ");
+        smcEngineOptions.add(smcNumericPrecisionLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcNumericPrecision = new JTextField(7);
+        smcNumericPrecision.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent evt) {
+                int endIdx = smcNumericPrecision.getText().length();
+                smcNumericPrecision.setSelectionStart(endIdx);
+                smcNumericPrecision.setSelectionEnd(endIdx);
+            }
+        });
+
+        smcNumericPrecision.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { updateRawVerificationOptions(); }
+            public void removeUpdate(DocumentEvent e) { updateRawVerificationOptions(); }
+            public void changedUpdate(DocumentEvent e) { updateRawVerificationOptions(); }
+        });
+
+        DocumentFilters.applyIntegerFilter(smcNumericPrecision, 20);
+        smcNumericPrecision.setToolTipText(TOOL_TIP_NUMERIC_PRECISION);
+        smcNumericPrecision.addFocusListener(updater);
+        smcEngineOptions.add(smcNumericPrecision, subPanelGbc);
+
+        subPanelGbc.gridy = 4;
         subPanelGbc.gridx = 0;
         smcParallelLabel = new JLabel("Use all available cores : ");
         smcEngineOptions.add(smcParallelLabel, subPanelGbc);
@@ -5749,6 +5787,7 @@ public class QueryDialog extends JPanel {
 
         smcGranularityField.setEnabled(isEnabled);
         smcMaxGranularityCheckbox.setEnabled(isEnabled);
+        smcNumericPrecision.setEnabled(isEnabled);
 
         setEnabledOptionsAccordingToCurrentReduction();
     }
@@ -6709,6 +6748,7 @@ public class QueryDialog extends JPanel {
         smcStepBoundInfinite.setEnabled(!doingBenchmark && !smcTimeBoundInfinite.isSelected());
         smcTimeBoundValue.setEnabled(!doingBenchmark && !smcTimeBoundInfinite.isSelected());
         smcTimeBoundInfinite.setEnabled(!doingBenchmark && !smcStepBoundInfinite.isSelected());
+        smcNumericPrecision.setEnabled(!doingBenchmark);
     }
 
 }
