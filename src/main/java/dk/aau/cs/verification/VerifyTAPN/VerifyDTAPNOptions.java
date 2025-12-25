@@ -35,6 +35,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
     private SMCTraceType smcTraceType;
     private int granularity;
     private boolean maxGranularity = false;
+    private int numericPrecision;
 
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(
@@ -56,7 +57,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean useRawVerification,
 			String rawVerificationOptions
 	) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions, false, 0, false, QueryCategory.Default, 1, new SMCTraceType(), false, 500, false);
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions, false, 0, false, QueryCategory.Default, 1, new SMCTraceType(), false, 500, false, 5);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
@@ -91,7 +92,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             SMCTraceType smcTraceType,
             boolean isSimulate,
             int granularity,
-            boolean maxGranularity
+            boolean maxGranularity,
+            int numericPrecision
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -115,6 +117,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         this.isSimulate = isSimulate;
         this.granularity = granularity;
         this.maxGranularity = maxGranularity;
+        this.numericPrecision = numericPrecision;
 
 		// we only force unfolding when traces are involved
         if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation || isSmc && isSimulate && unfold) && !useRawVerification)
@@ -177,6 +180,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             result.append("--smc-obs-scale " + (maxGranularity ? 0 : granularity) + " ");
 
             result.append("--smc-print-cumulative-stats 4 ");
+            result.append("--smc-numeric-precision " + numericPrecision + " ");
             if (isSimulate) {
                 result.append(" --smc-traces ");
                 result.append(numberOfTraces);

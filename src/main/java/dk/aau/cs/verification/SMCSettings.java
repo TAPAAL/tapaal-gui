@@ -16,6 +16,7 @@ public class SMCSettings {
     public float estimationIntervalWidth;
     public boolean compareToFloat;
     public float geqThan;
+    private int numericPrecision;
 
     private List<Observation> observations;
 
@@ -30,6 +31,7 @@ public class SMCSettings {
         settings.estimationIntervalWidth = 0.05f;
         settings.compareToFloat = false;
         settings.geqThan = 0.5f;
+        settings.setNumericPrecision(5);
         settings.setObservations(new ArrayList<>());
         return settings;
     }
@@ -57,12 +59,20 @@ public class SMCSettings {
         this.stepBound = stepBound;
     }
 
+    public void setNumericPrecision(int precision) {
+        this.numericPrecision = precision;
+    }
+
     public int getTimeBound() {
         return timeBound;
     }
 
     public int getStepBound() {
         return stepBound;
+    }
+
+    public int getNumericPrecision() {
+        return numericPrecision;
     }
 
     public void setObservations(List<Observation> observations) {

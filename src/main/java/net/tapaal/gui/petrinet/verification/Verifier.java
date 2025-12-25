@@ -304,7 +304,8 @@ public class Verifier {
                 query.getSmcTraceType(),
                 query.isSimulate(),
                 query.getGranularity(),
-                query.isMaxGranularity()
+                query.isMaxGranularity(),
+                query.getSmcSettings().getNumericPrecision()
         );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             return new VerifyPNOptions(
