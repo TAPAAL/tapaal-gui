@@ -285,6 +285,10 @@ public class TAPNQueryLoader extends QueryLoader{
             settings.falsePositives = Float.parseFloat(smcTag.getAttribute("false-negatives"));
         if(smcTag.hasAttribute("indifference"))
             settings.indifferenceWidth = Float.parseFloat(smcTag.getAttribute("indifference"));
+        if (smcTag.hasAttribute("numeric-precision")) {
+            settings.setNumericPrecision(Long.parseUnsignedLong(smcTag.getAttribute("numeric-precision")));
+        }
+        
         return settings;
     }
 
