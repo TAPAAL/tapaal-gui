@@ -17,6 +17,9 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -30,7 +33,7 @@ public class DistributionPanel extends JPanel {
     private boolean updatingFields;
 
     private static final String[] continuous =  { "constant", "uniform", "exponential", "normal", "gamma", "erlang", "triangular", "log normal" };
-    private static final String[] discrete =    { "discrete uniform", "geometric" };
+    private static final String[] discrete =    { "discrete uniform", "geometric", "user defined" };
 
     public DistributionPanel(TimedTransitionComponent transition, EscapableDialog dialog) {
         this.transition = transition;
@@ -63,6 +66,9 @@ public class DistributionPanel extends JPanel {
         distributionParam1Field = new JTextField(5);
         distributionParam2Field = new JTextField(5);
         distributionParam3Field = new JTextField(5);
+        browseButton = new JButton("Browse");
+        browseButton.addActionListener(e -> browseFile());
+        browseButton.setVisible(false);
 
         meanLabel = new JLabel();
         meanValueLabel = new JLabel();
@@ -177,6 +183,8 @@ public class DistributionPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         paramPanel.add(distributionParam1Field, gbc);
         gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx++;
+        paramPanel.add(browseButton, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.EAST;
         paramPanel.add(distributionParam2Label, gbc);
@@ -295,9 +303,53 @@ public class DistributionPanel extends JPanel {
                     double logMean = Double.parseDouble(distributionParam1Field.getText());
                     double logStddev = Double.parseDouble(distributionParam2Field.getText());
                     return new SMCLogNormalDistribution(logMean, logStddev);
+                case SMCUserDefinedDistribution.NAME:
+                    return new SMCUserDefinedDistribution(userDefinedFile);
             }
         } catch(NumberFormatException ignored) {}
         return SMCDistribution.defaultDistributionFor(type);
+    }
+
+    private void browseFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            java.io.File selectedFile = fileChooser.getSelectedFile();
+            try {
+                validateUserDefinedFile(selectedFile);
+                userDefinedFile = selectedFile;
+                distributionParam1Field.setText(userDefinedFile.getName());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The selected file has an invalid format: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void validateUserDefinedFile(File file) throws Exception {
+        if (file == null || !file.exists()) {
+            throw new Exception("File not found.");
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            int lineNumber = 0;
+            boolean hasContent = false;
+            while ((line = br.readLine()) != null) {
+                ++lineNumber;
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                hasContent = true;
+                try {
+                    Double.parseDouble(line);
+                } catch (NumberFormatException e) {
+                    throw new Exception("Invalid number format at line " + lineNumber + ": " + line);
+                }
+            }
+
+            if (!hasContent) {
+                throw new Exception("The file is empty.");
+            }
+        }
     }
 
     public void displayDistribution() {
@@ -313,6 +365,10 @@ public class DistributionPanel extends JPanel {
             distributionType.setModel(new DefaultComboBoxModel<>(discrete));
             useDiscreteDistribution.setSelected(true);
         }
+        
+        browseButton.setVisible(false);
+        distributionParam1Field.setEditable(true);
+
         switch (distribution.distributionName()) {
             case SMCConstantDistribution.NAME:
                 displayOneVariable("Value", ((SMCConstantDistribution) distribution).value);
@@ -359,6 +415,9 @@ public class DistributionPanel extends JPanel {
                 displayTwoVariables(
                     "Log Mean", ((SMCLogNormalDistribution) distribution).logMean,
                     "Log Std. Dev", ((SMCLogNormalDistribution) distribution).logStddev);
+                break;
+            case SMCUserDefinedDistribution.NAME:
+                displayFileSelection((SMCUserDefinedDistribution) distribution);
                 break;
             default:
                 break;
@@ -412,6 +471,19 @@ public class DistributionPanel extends JPanel {
         distributionParam3Field.setVisible(true);
     }
 
+    private void displayFileSelection(SMCUserDefinedDistribution distribution) {
+        distributionParam1Label.setText("File path :");
+        userDefinedFile = distribution.getFile();
+        distributionParam1Field.setText(userDefinedFile != null ? userDefinedFile.getName() : "");
+        distributionParam1Field.setEditable(false);
+        
+        browseButton.setVisible(true);
+        distributionParam2Label.setVisible(false);
+        distributionParam2Field.setVisible(false);
+        distributionParam3Label.setVisible(false);
+        distributionParam3Field.setVisible(false);
+    }
+
     private String formatValue(double value) {
         DecimalFormat df = new DecimalFormat("#.#####");
         return df.format(value);
@@ -462,6 +534,9 @@ public class DistributionPanel extends JPanel {
         } else if (distribution instanceof SMCLogNormalDistribution) {
             Graph graph = createGraph((SMCLogNormalDistribution) distribution);
             builder = builder.addGraph(graph);
+        } else if (distribution instanceof SMCUserDefinedDistribution) {
+            Graph graph = createGraph((SMCUserDefinedDistribution) distribution);
+            builder = builder.addGraph(graph).setPointPlot(true);
         }
 
         return builder.setTitle(title).build();
@@ -693,6 +768,43 @@ public class DistributionPanel extends JPanel {
         return new Graph("Log Normal Distribution", points, mean);
     }
 
+    private Graph createGraph(SMCUserDefinedDistribution distribution) {
+        java.io.File file = distribution.getFile();
+        if (file == null || !file.exists()) {
+            throw new RequireException("File not found or not specified.");
+        }
+
+        List<GraphPoint> points = new ArrayList<>();
+        double sum = 0;
+        int count = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            int lineNumber = 0;
+            while ((line = br.readLine()) != null) {
+                ++lineNumber;
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                try {
+                    double value = Double.parseDouble(line);
+                    points.add(new GraphPoint(lineNumber, value));
+                    sum += value;
+                    ++count;
+                } catch (NumberFormatException e) {
+                    throw new RequireException("Invalid number format at line " + lineNumber + ": " + line);
+                }
+            }
+        } catch (java.io.IOException e) {
+            throw new RequireException("Error reading file: " + e.getMessage());
+        }
+
+        if (points.isEmpty()) {
+             throw new RequireException("The file is empty.");
+        }
+
+        return new Graph("User Defined Distribution", points, sum / count);
+    }
+
     private JRadioButton useContinuousDistribution;
     private JRadioButton useDiscreteDistribution;
     private ButtonGroup distributionCategoryGroup;
@@ -706,4 +818,6 @@ public class DistributionPanel extends JPanel {
     private JTextField distributionParam3Field;
     private JLabel meanLabel;
     private JLabel meanValueLabel;
+    private JButton browseButton;
+    private File userDefinedFile;
 }

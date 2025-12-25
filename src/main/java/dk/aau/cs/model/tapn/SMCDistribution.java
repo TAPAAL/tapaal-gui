@@ -2,6 +2,7 @@ package dk.aau.cs.model.tapn;
 
 import org.w3c.dom.Element;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -70,6 +71,8 @@ public abstract class SMCDistribution {
                 return SMCTriangularDistribution.defaultDistribution();
             case SMCLogNormalDistribution.NAME:
                 return SMCLogNormalDistribution.defaultDistribution();
+            case SMCUserDefinedDistribution.NAME:
+                return SMCUserDefinedDistribution.defaultDistribution();
             default:
                 return SMCDistribution.defaultDistribution();
         }
@@ -128,6 +131,10 @@ public abstract class SMCDistribution {
                     double logMean = Double.parseDouble(elem.getAttribute("logMean"));
                     double logStddev = Double.parseDouble(elem.getAttribute("logStddev"));
                     return new SMCLogNormalDistribution(logMean, logStddev);
+                case SMCUserDefinedDistribution.NAME:
+                    String path = elem.getAttribute("path");
+                    File file = path.isEmpty() ? null : new File(path);
+                    return new SMCUserDefinedDistribution(file);
             }
         } catch(NumberFormatException ignored) {}
         return SMCDistribution.defaultDistribution();
