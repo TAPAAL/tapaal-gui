@@ -937,7 +937,7 @@ public class QueryDialog extends JPanel {
         smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
 
         try {
-            smcSettings.setNumericPrecision(Integer.parseInt(smcNumericPrecision.getText()));
+            smcSettings.setNumericPrecision(Long.parseUnsignedLong(smcNumericPrecision.getText()));
         } catch(NumberFormatException e) {
             smcSettings.setNumericPrecision(5);
         }
@@ -1017,7 +1017,7 @@ public class QueryDialog extends JPanel {
         smcTimeBoundInfinite.setEnabled(!smcStepBoundInfinite.isSelected());
         smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
         
-        smcNumericPrecision.setText(String.valueOf(settings.getNumericPrecision()));
+        smcNumericPrecision.setText(Long.toUnsignedString(settings.getNumericPrecision()));
 
         smcObservations = settings.getObservations();
 
@@ -3109,7 +3109,7 @@ public class QueryDialog extends JPanel {
             public void changedUpdate(DocumentEvent e) { updateRawVerificationOptions(); }
         });
 
-        DocumentFilters.applyIntegerFilter(smcNumericPrecision);
+        DocumentFilters.applyIntegerFilter(smcNumericPrecision, 20);
         smcNumericPrecision.setToolTipText(TOOL_TIP_NUMERIC_PRECISION);
         smcNumericPrecision.addFocusListener(updater);
         smcEngineOptions.add(smcNumericPrecision, subPanelGbc);
@@ -5788,6 +5788,7 @@ public class QueryDialog extends JPanel {
 
         smcGranularityField.setEnabled(isEnabled);
         smcMaxGranularityCheckbox.setEnabled(isEnabled);
+        smcNumericPrecision.setEnabled(isEnabled);
 
         setEnabledOptionsAccordingToCurrentReduction();
     }

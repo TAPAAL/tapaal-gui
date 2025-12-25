@@ -16,7 +16,7 @@ public class SMCSettings {
     public float estimationIntervalWidth;
     public boolean compareToFloat;
     public float geqThan;
-    private int numericPrecision;
+    private long numericPrecision;
 
     private List<Observation> observations;
 
@@ -59,7 +59,7 @@ public class SMCSettings {
         this.stepBound = stepBound;
     }
 
-    public void setNumericPrecision(int precision) {
+    public void setNumericPrecision(long precision) {
         this.numericPrecision = precision;
     }
 
@@ -71,7 +71,7 @@ public class SMCSettings {
         return stepBound;
     }
 
-    public int getNumericPrecision() {
+    public long getNumericPrecision() {
         return numericPrecision;
     }
 
