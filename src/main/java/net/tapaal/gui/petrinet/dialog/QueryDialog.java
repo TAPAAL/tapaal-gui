@@ -593,7 +593,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_ANALYSIS_TYPE = "Choose between probability quantitative estimation, qualitative hypothesis testing against a fixed probability, or trace generation.";
     private final static String TOOL_TIP_TIME_BOUND = "Bound each run by a maximum accumulated delay";
     private final static String TOOL_TIP_STEP_BOUND = "Bound each run by a maximum number of transition firings";
-    private final static String TOOL_TIP_NUMERIC_PRECISION = "Specify the number of rounding digits to use";
+    private final static String TOOL_TIP_NUMERIC_PRECISION = "The number of digits after the decimal point used in sampling from distributions.";
     private final static String TOOL_TIP_CONFIDENCE = "Between 0 and 1, confidence that the probability is indeed in the computed interval";
     private final static String TOOL_TIP_INTERVAL_WIDTH = "Between 0 and 1, error E of the computed probability (P±E)";
     private final static String TOOL_TIP_FALSE_POSITIVES = "Probability to accept the hypothesis if it is false";
@@ -740,6 +740,7 @@ public class QueryDialog extends JPanel {
                 newSettings.setStepBound(oldSettings.getStepBound());
                 newSettings.setTimeBound(oldSettings.getTimeBound());
                 newSettings.setObservations(oldSettings.getObservations());
+                newSettings.setNumericPrecision(oldSettings.getNumericPrecision());
                 query.setSmcSettings(newSettings);
             } else {
                 query.setSmcSettings(getSMCSettings());
@@ -3092,6 +3093,7 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
         smcNumericPrecisionLabel = new JLabel("Numeric precision : ");
+        smcNumericPrecisionLabel.setToolTipText(TOOL_TIP_NUMERIC_PRECISION);
         smcEngineOptions.add(smcNumericPrecisionLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcNumericPrecision = new JTextField(7);
@@ -3109,7 +3111,9 @@ public class QueryDialog extends JPanel {
             public void changedUpdate(DocumentEvent e) { updateRawVerificationOptions(); }
         });
 
-        DocumentFilters.applyIntegerFilter(smcNumericPrecision, 20);
+        // Integer filter between 0 and 18 inclusive
+        DocumentFilters.applyIntegerFilter(smcNumericPrecision, 0, 18);
+
         smcNumericPrecision.setToolTipText(TOOL_TIP_NUMERIC_PRECISION);
         smcNumericPrecision.addFocusListener(updater);
         smcEngineOptions.add(smcNumericPrecision, subPanelGbc);
