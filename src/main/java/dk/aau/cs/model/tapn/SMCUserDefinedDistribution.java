@@ -6,7 +6,7 @@ import org.w3c.dom.Element;
 
 public class SMCUserDefinedDistribution extends SMCDistribution {
 
-    public static final String NAME = "user defined";
+    public static final String NAME = "custom";
 
     private File file;
 

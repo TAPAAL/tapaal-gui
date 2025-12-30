@@ -33,7 +33,7 @@ public class DistributionPanel extends JPanel {
     private boolean updatingFields;
 
     private static final String[] continuous =  { "constant", "uniform", "exponential", "normal", "gamma", "erlang", "triangular", "log normal" };
-    private static final String[] discrete =    { "discrete uniform", "geometric", "user defined" };
+    private static final String[] discrete =    { "discrete uniform", "geometric", "custom" };
 
     public DistributionPanel(TimedTransitionComponent transition, EscapableDialog dialog) {
         this.transition = transition;
