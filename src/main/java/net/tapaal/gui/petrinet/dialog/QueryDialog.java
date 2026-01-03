@@ -373,7 +373,7 @@ public class QueryDialog extends JPanel {
     private JTextField smcStepBoundValue;
     private JCheckBox smcStepBoundInfinite;
     private JLabel smcNumericPrecisionLabel;
-    private JTextField smcNumericPrecision;
+    private CustomJSpinner smcNumericPrecision;
     private JPanel quantitativePanel;
     private JLabel smcParallelLabel;
     private JCheckBox smcParallel;
@@ -400,7 +400,7 @@ public class QueryDialog extends JPanel {
     private boolean smcMustUpdateTime = true;
     private boolean doingBenchmark = false;
     private RunVerificationBase benchmarkThread = null;
-    private java.util.List<Observation> smcObservations;
+    private List<Observation> smcObservations;
     
     private JTextField smcGranularityField;
     private JCheckBox smcMaxGranularityCheckbox;
@@ -593,7 +593,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_ANALYSIS_TYPE = "Choose between probability quantitative estimation, qualitative hypothesis testing against a fixed probability, or trace generation.";
     private final static String TOOL_TIP_TIME_BOUND = "Bound each run by a maximum accumulated delay";
     private final static String TOOL_TIP_STEP_BOUND = "Bound each run by a maximum number of transition firings";
-    private final static String TOOL_TIP_NUMERIC_PRECISION = "The number of digits after the decimal point used in sampling from distributions.";
+    private final static String TOOL_TIP_NUMERIC_PRECISION = "The number of digits (from 1 to 18) after the decimal point used in sampling from distributions.";
     private final static String TOOL_TIP_CONFIDENCE = "Between 0 and 1, confidence that the probability is indeed in the computed interval";
     private final static String TOOL_TIP_INTERVAL_WIDTH = "Between 0 and 1, error E of the computed probability (P±E)";
     private final static String TOOL_TIP_FALSE_POSITIVES = "Probability to accept the hypothesis if it is false";
@@ -937,11 +937,7 @@ public class QueryDialog extends JPanel {
         smcTimeBoundInfinite.setEnabled(!smcStepBoundInfinite.isSelected());
         smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
 
-        try {
-            smcSettings.setNumericPrecision(Long.parseUnsignedLong(smcNumericPrecision.getText()));
-        } catch(NumberFormatException e) {
-            smcSettings.setNumericPrecision(5);
-        }
+        smcSettings.setNumericPrecision(((Integer)smcNumericPrecision.getValue()).longValue());
 
         try {
             smcSettings.confidence = Float.parseFloat(smcConfidence.getText());
@@ -1018,7 +1014,7 @@ public class QueryDialog extends JPanel {
         smcTimeBoundInfinite.setEnabled(!smcStepBoundInfinite.isSelected());
         smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
         
-        smcNumericPrecision.setText(Long.toUnsignedString(settings.getNumericPrecision()));
+        smcNumericPrecision.setValue((int)settings.getNumericPrecision());
 
         smcObservations = settings.getObservations();
 
@@ -3096,23 +3092,8 @@ public class QueryDialog extends JPanel {
         smcNumericPrecisionLabel.setToolTipText(TOOL_TIP_NUMERIC_PRECISION);
         smcEngineOptions.add(smcNumericPrecisionLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
-        smcNumericPrecision = new JTextField(7);
-        smcNumericPrecision.addFocusListener(new FocusAdapter() {
-            public void focusGained(FocusEvent evt) {
-                int endIdx = smcNumericPrecision.getText().length();
-                smcNumericPrecision.setSelectionStart(endIdx);
-                smcNumericPrecision.setSelectionEnd(endIdx);
-            }
-        });
-
-        smcNumericPrecision.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) { updateRawVerificationOptions(); }
-            public void removeUpdate(DocumentEvent e) { updateRawVerificationOptions(); }
-            public void changedUpdate(DocumentEvent e) { updateRawVerificationOptions(); }
-        });
-
-        // Integer filter between 0 and 18 inclusive
-        DocumentFilters.applyIntegerFilter(smcNumericPrecision, 0, 18);
+        smcNumericPrecision = new CustomJSpinner(1, 1, 18);
+        smcNumericPrecision.addChangeListener(e -> updateRawVerificationOptions());
 
         smcNumericPrecision.setToolTipText(TOOL_TIP_NUMERIC_PRECISION);
         smcNumericPrecision.addFocusListener(updater);
