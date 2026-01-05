@@ -774,9 +774,8 @@ public class DistributionPanel extends JPanel {
             throw new RequireException("File not found or not specified.");
         }
 
-        List<GraphPoint> points = new ArrayList<>();
+        List<Double> values = new ArrayList<>();
         double sum = 0;
-        int count = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
@@ -787,9 +786,8 @@ public class DistributionPanel extends JPanel {
                 if (line.isEmpty()) continue;
                 try {
                     double value = Double.parseDouble(line);
-                    points.add(new GraphPoint(lineNumber, value));
+                    values.add(value);
                     sum += value;
-                    ++count;
                 } catch (NumberFormatException e) {
                     throw new RequireException("Invalid number format at line " + lineNumber + ": " + line);
                 }
@@ -798,11 +796,43 @@ public class DistributionPanel extends JPanel {
             throw new RequireException("Error reading file: " + e.getMessage());
         }
 
-        if (points.isEmpty()) {
+        if (values.isEmpty()) {
              throw new RequireException("The file is empty.");
         }
 
-        return new Graph("User Defined Distribution", points, sum / count);
+        List<GraphPoint> points = new ArrayList<>();
+        double min = Double.MAX_VALUE;
+        double max = -Double.MAX_VALUE;
+        for (double v : values) {
+            if (v < min) min = v;
+            if (v > max) max = v;
+        }
+
+        if (Math.abs(max - min) < 1e-9) {
+            points.add(new GraphPoint(min, 1.0));
+        } else {
+            int numBins = (int)Math.sqrt(values.size());
+            numBins = Math.max(5, Math.min(numBins, 50));
+            double binWidth = (max - min) / numBins;
+            List<Integer> counts = new ArrayList<>();
+            for (int i = 0; i < numBins; ++i) {
+                counts.add(0);
+            }
+
+            for (double v : values) {
+                int bin = (int)((v - min) / binWidth);
+                if (bin >= numBins) bin = numBins - 1;
+                counts.set(bin, counts.get(bin) + 1);
+            }
+
+            for (int i = 0; i < numBins; ++i) {
+                double x = min + (i + 0.5) * binWidth;
+                double y = (double)counts.get(i) / values.size();
+                points.add(new GraphPoint(x, y));
+            }
+        }
+
+        return new Graph("Custom Distribution", points, sum / values.size());
     }
 
     private JRadioButton useContinuousDistribution;
