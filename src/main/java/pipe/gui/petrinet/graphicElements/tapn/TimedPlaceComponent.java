@@ -92,6 +92,10 @@ public class TimedPlaceComponent extends Place {
         return place.invariant();
     }
 
+    public boolean hasInvariant() {
+        return !(place.invariant().upperBound() instanceof InfBound);
+    }
+
     private String getStringOfTokens() {
         StringBuilder buffer = new StringBuilder("{");
         DecimalFormat df = new DecimalFormat();
