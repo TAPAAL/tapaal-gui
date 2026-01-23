@@ -96,6 +96,18 @@ public class TimedPlaceComponent extends Place {
         return !(place.invariant().upperBound() instanceof InfBound);
     }
 
+    public boolean hasAnyColorInvariant() {
+        if (place.getCtiList() != null) {
+            for (ColoredTimeInvariant cti : place.getCtiList()) {
+                if (cti != null && cti.upperBound().value() >= 0) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
     private String getStringOfTokens() {
         StringBuilder buffer = new StringBuilder("{");
         DecimalFormat df = new DecimalFormat();

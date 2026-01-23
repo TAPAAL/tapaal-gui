@@ -243,6 +243,9 @@ public class GuiModelManager {
         require.Not((p1.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
         require.Not((p2.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
+        boolean hasInvariant = p2.hasInvariant() || p2.hasAnyColorInvariant();
+        require.Not((t.underlyingTransition().isUrgent() && hasInvariant), ModelViolation.TransportArcUrgentTransitionAndInvariant);
+
         if (require.failed()) {
             return new Result<>(require.getErrors());
         }
