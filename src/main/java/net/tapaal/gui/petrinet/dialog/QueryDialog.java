@@ -204,7 +204,6 @@ import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.SearchBar;
 import pipe.gui.petrinet.Searcher;
 import pipe.gui.petrinet.dataLayer.DataLayer;
-import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 
@@ -6302,6 +6301,12 @@ public class QueryDialog extends JPanel {
                         // Now if a query is saved, the net is marked as modified
                         tab.setNetChanged(true);
                         exit();
+                        TAPNQuery query = getQuery();
+                        if (isNewQuery) {
+                            var queryPane = tab.getQueryPane();
+                            queryPane.getUndoManager().addNewEdit(new AddQueryCommand(query, tab));
+                            queryPane.addQuery(query);
+                        }
                     }
                 }
             });
