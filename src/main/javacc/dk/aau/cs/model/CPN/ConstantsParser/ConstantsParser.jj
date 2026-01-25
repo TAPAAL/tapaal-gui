@@ -7,6 +7,7 @@ package dk.aau.cs.model.CPN.ConstantsParser;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
@@ -132,19 +133,13 @@ public class ConstantsParser {
                     ProductType pct = (ProductType)ct;
                     ProductType newPct = (ProductType)newCt;
 
-                    // Update product color types to new color types
-                    for (ColorType colorType : pct.getProductColorTypes()) {
-                        if (colorTypes.containsKey(colorType.getName())) {
-                            newPct.replaceColorType(colorType, (ColorType)colorTypes.get(colorType.getName()));
-                        }
-                    }
-
                     boolean isSimiliar = pct.getProductColorTypes().size() == newPct.getProductColorTypes().size() && pct.containsTypes(newPct.getColorTypes());
                     if (isSimiliar) {
                         updateColorTypes(pct, newPct);
                         continue;
                     }
-                } else {    
+                } else {
+    
                     List<Color> removedColors = new ArrayList<Color>();
                     for (Color color : ct.getColors()) {
                         if (!newCt.contains(color)) {
@@ -301,6 +296,30 @@ public class ConstantsParser {
         return result;
     }
 
+    private static Color getNewColor(Color oldColor, ColorType newCt) {
+        if (newCt instanceof ProductType) {
+            ProductType newPt = (ProductType)newCt;
+            if (oldColor.getTuple() == null) {
+                return null; 
+            }
+            
+            Vector<Color> newTupleColors = new Vector<Color>();
+            Vector<ColorType> newConstituents = (Vector<ColorType>)newPt.getColorTypes();
+            Vector<Color> oldTupleColors = oldColor.getTuple();
+
+            if (newConstituents.size() != oldTupleColors.size()) return null;
+
+            for (int i = 0; i < oldTupleColors.size(); i++) {
+                Color componentColor = getNewColor(oldTupleColors.get(i), newConstituents.get(i));
+                if (componentColor == null) return null;
+                newTupleColors.add(componentColor);
+            }
+            return newPt.getColor(newTupleColors);
+        } else {
+             return newCt.getColorByName(oldColor.getColorName());
+        }
+    }
+
     private static void updateColorTypes(ColorType ct, ColorType newCt) {
         for (TimedArcPetriNet tapn : network.allTemplates()) {
             for (TimedPlace place : tapn.places()) {
@@ -313,7 +332,7 @@ public class ConstantsParser {
                     place.setColorType(newCt);
                     for (TimedToken token : oldTokens) {
                         if (token.getColor() != null && newCt.contains(token.getColor())) {
-                            place.addToken(new TimedToken(place, token.age(), newCt.getColorByName(token.getColor().getName())));
+                            place.addToken(new TimedToken(place, token.age(), getNewColor(token.getColor(), newCt)));
                         }
                     }
                 }
@@ -334,7 +353,7 @@ public class ConstantsParser {
                 List<ColoredTimeInvariant> invariantsToAdd = new ArrayList<ColoredTimeInvariant>();
                 for (ColoredTimeInvariant invariant : place.getCtiList()) {
                     if (ct.contains(invariant.getColor())) {
-                        invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), newCt.getColorByName(invariant.getColor().getColorName())));
+                        invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), getNewColor(invariant.getColor(), newCt)));
                     } else {
                         invariantsToAdd.add(invariant);
                     }

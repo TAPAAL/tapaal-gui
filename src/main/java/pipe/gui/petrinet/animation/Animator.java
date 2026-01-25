@@ -33,6 +33,8 @@ import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import net.tapaal.gui.petrinet.dialog.ColoredBindingSelectionDialog;
+import dk.aau.cs.model.CPN.Expressions.ExpressionContext;
+import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.Expression;
 import dk.aau.cs.model.CPN.Color;
@@ -421,7 +423,23 @@ public class Animator {
             Tuple<List<TimedToken>, ArcExpression> state = storedTokenState.get(place);
             if (state != null) {
                 place.resetNumberOfTokensColor();
-                place.updateTokens(state.value1(), state.value2());
+                List<TimedToken> tokens = state.value1();
+                ArcExpression expression = state.value2();
+
+                if (expression != null && containsAllExpression(expression)) {
+                    HashMap<String, ColorType> colorTypes = new HashMap<>();
+                    for (ColorType ct : tab.network().colorTypes()) {
+                        colorTypes.put(ct.getName(), ct);
+                    }
+                    ExpressionContext context = new ExpressionContext(null, colorTypes);
+
+                    ColorMultiset multiset = expression.eval(context);
+                    if (multiset != null) {
+                        tokens = new ArrayList<>(multiset.getTokens(place));
+                    }
+                }
+
+                place.updateTokens(tokens, expression);
                 placeComponent.setUnderlyingPlace(place);
             }
         }

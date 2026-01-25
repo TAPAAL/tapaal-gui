@@ -9,6 +9,7 @@ import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class UpdateColorTypeCommand implements Command {
     private final TimedArcPetriNetNetwork network;
@@ -40,8 +41,21 @@ public class UpdateColorTypeCommand implements Command {
     }
 
     private void performUpdate(ColorType targetType, ColorType sourceType) {
+        List<ProductType> modifiedProductTypes = new ArrayList<>();
+        for (ColorType ct : network.colorTypes()) {
+            if (ct.isProductColorType()) {
+                ProductType pt = (ProductType)ct;
+                if (pt.contains(sourceType)) {
+                    pt.replaceColorType(targetType, sourceType);
+                    modifiedProductTypes.add(pt);
+                }
+            }
+        }
+
         for (TimedArcPetriNet tapn : network.allTemplates()) {
             for (TimedPlace place : tapn.places()) {
+                boolean isModifiedProductType = place.getColorType().isProductColorType() && modifiedProductTypes.contains((ProductType)place.getColorType());
+
                 if (place.getColorType().equals(sourceType)) {
                     if(place.getTokensAsExpression() != null) {
                         place.setTokenExpression(place.getTokensAsExpression().getExprConverted(sourceType, targetType));
@@ -53,6 +67,18 @@ public class UpdateColorTypeCommand implements Command {
                             place.addToken(new TimedToken(place, token.age(), targetType.getColorByName(token.getColor().getName())));
                         }
                     }
+                } else if (isModifiedProductType) {
+                    if (place.getTokensAsExpression() != null) {
+                        place.setTokenExpression(place.getTokensAsExpression().getExprConverted(sourceType, targetType));
+                    }
+                    List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
+                    List<TimedToken> newTokens = new ArrayList<>();
+                    for (TimedToken token : oldTokens) {
+                        Color oldColor = token.getColor();
+                        Color newColor = updateColorRecursive(oldColor, sourceType, targetType);
+                        newTokens.add(new TimedToken(place, token.age(), newColor));
+                    }
+                    place.updateTokens(newTokens, place.getTokensAsExpression());
                 }
             }
             for (TimedInputArc arc : tapn.inputArcs()) {
@@ -77,15 +103,6 @@ public class UpdateColorTypeCommand implements Command {
             }
         }
 
-        for (ColorType ct : network.colorTypes()) {
-            if (ct.isProductColorType()) {
-                ProductType pt = (ProductType)ct;
-                if (pt.contains(sourceType)) {
-                    pt.replaceColorType(targetType, sourceType);
-                }
-            }
-        }
-
         eval(targetType);
 
         for (Variable var : network.variables()) {
@@ -93,6 +110,30 @@ public class UpdateColorTypeCommand implements Command {
                 var.setColorType(targetType);
             }
         }
+    }
+
+    private Color updateColorRecursive(Color color, ColorType sourceType, ColorType targetType) {
+        if (color == null) return null;
+        if (color.getColorType().equals(sourceType)) {
+            if (targetType.contains(color)) {
+                return targetType.getColorByName(color.getName());
+            }
+        }
+
+        if (color.getTuple() != null) {
+            Vector<Color> newTuple = new Vector<>();
+            boolean changed = false;
+            for (Color c : color.getTuple()) {
+                Color newC = updateColorRecursive(c, sourceType, targetType);
+                newTuple.add(newC);
+                if (newC != c) changed = true;
+            }
+            if (changed) {
+                return new Color(color.getColorType(), color.getId(), newTuple);
+            }
+        }
+        
+        return color;
     }
     
     private Expression updateExpressionRecursively(Expression expr, ColorType oldCt, ColorType newCt) {
