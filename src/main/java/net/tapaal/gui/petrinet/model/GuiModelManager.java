@@ -240,6 +240,9 @@ public class GuiModelManager {
         require.Not(modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
         require.Not(modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p2.underlyingPlace()), ModelViolation.MaxOneArcBetweenTransitionAndPlace);
 
+        boolean hasInvariant = p2.hasInvariant() || p2.hasAnyColorInvariant();
+        require.Not((t.underlyingTransition().isUrgent() && hasInvariant), ModelViolation.TransportArcUrgentTransitionAndInvariant);
+
         if (require.failed()) {
             return new Result<>(require.getErrors());
         }

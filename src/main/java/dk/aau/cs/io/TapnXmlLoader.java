@@ -307,11 +307,30 @@ public class TapnXmlLoader {
 		
 		for (int i = 0; i < nets.getLength(); i++) {
 			Template template = parseTimedArcPetriNet(nets.item(i), network, constants);
-            template.setHasPositionalInfo(true); //We assume that all templates have positional info
+            template.setHasPositionalInfo(hasPositionalInfo(nets.item(i)));
 			templates.add(template);
 		}
 		return templates;
 	}
+
+    private boolean hasPositionalInfo(Node netNode) {
+        if (netNode instanceof Element) {
+            NodeList children = netNode.getChildNodes();
+            for (int i = 0; i < children.getLength(); ++i) {
+                Node child = children.item(i);
+                if (child instanceof Element) {
+                    Element element = (Element) child;
+                    if (element.getNodeName().equals("place") || element.getNodeName().equals("transition")) {
+                        if (element.hasAttribute("positionX")) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 
 	private List<Constant> parseConstants(Document doc) {
 		List<Constant> constants = new ArrayList<Constant>();

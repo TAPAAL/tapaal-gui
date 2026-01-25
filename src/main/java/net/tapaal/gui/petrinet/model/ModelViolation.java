@@ -6,7 +6,9 @@ public enum ModelViolation {
     //TransitionNotNull("Transion can't be null"),
     //ModelNotNull("Model can't be null"),
     MaxOneArcBetweenPlaceAndTransition("There is already an arc between the selected place and transition"),
-    MaxOneArcBetweenTransitionAndPlace("There is already an arc between the selected transition and place");
+    MaxOneArcBetweenTransitionAndPlace("There is already an arc between the selected transition and place"),
+    CantHaveArcBetweenSharedPlaceAndTransition("You are attempting to draw an arc between a shared transition and a shared place"),
+    TransportArcUrgentTransitionAndInvariant("Transport arcs going through urgent transitions cannot have an invariant at the destination.");
 
     private final String errorMessage;
 

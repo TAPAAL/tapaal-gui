@@ -5,6 +5,7 @@ import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.gui.petrinet.Template;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.swingcomponents.WidthAdjustingComboBox;
 
@@ -53,11 +54,11 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
     private void setTimeInvariantVariables() {
         if (oldTimeInvariant.upperBound().value() == -1) {
             invariantInf.setSelected(true);
-            invariantCheckedEvent();
+            invariantCheckedEvent(false);
         } else {
             invariantInf.setSelected(false);
             invariantSpinner.setValue(oldTimeInvariant.upperBound().value());
-            invariantCheckedEvent();
+            invariantCheckedEvent(false);
         }
     }
 
@@ -95,10 +96,10 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         invariantInf.setEnabled(false);
     }
 
-    protected boolean isUrgencyOK(){
+    private boolean isUrgencyOK(boolean fromDialog){
         for(TransportArc arc : context.activeModel().transportArcs()){
-            if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent()){
-                JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
+            if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent() && (place.hasInvariant() || place.hasAnyColorInvariant() || fromDialog)){
+                JOptionPane.showMessageDialog(fromDialog ? rootPane : TAPAALGUI.getApp(), "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         }
@@ -115,8 +116,8 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         return true;
     }
 
-    private void invariantCheckedEvent() {
-        if(!isUrgencyOK()){
+    private void invariantCheckedEvent(boolean fromDialog) {
+        if(!isUrgencyOK(fromDialog)){
             invariantInf.setSelected(true);
             return;
         }
@@ -181,7 +182,7 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         invariantGroup.add(invariantSpinner, gbc);
 
         invariantInf = new JCheckBox(INF);
-        invariantInf.addActionListener(arg0 -> invariantCheckedEvent());
+        invariantInf.addActionListener(arg0 -> invariantCheckedEvent(true));
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
         gbc.gridy = 0;
