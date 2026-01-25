@@ -1021,7 +1021,12 @@ public class QueryDialog extends JPanel {
         smcObservations = settings.getObservations();
 
         smcConfidence.setText(String.valueOf(settings.confidence));
-        if(!doingBenchmark) smcEstimationIntervalWidth.setText(precisionFormat.format(settings.estimationIntervalWidth));
+        smcConfidenceSlider.setToolTipText(String.format("Value: %.2f", settings.confidence));
+        if (!doingBenchmark) {
+            String formattedIntervalWidth = precisionFormat.format(settings.estimationIntervalWidth);
+            smcEstimationIntervalWidth.setText(formattedIntervalWidth);
+            smcPrecisionSlider.setToolTipText(String.format("Value: %s", formattedIntervalWidth));
+        }
 
         double desiredMinFalsePositives = smcFalsePositivesSlider.getDesiredMin();
         double desiredMaxFalsePositives = smcFalsePositivesSlider.getDesiredMax();
@@ -1031,6 +1036,7 @@ public class QueryDialog extends JPanel {
             Math.max(smcFalsePositivesSlider.getMinimum(), 
                     Math.min(initialValueFalsePositives, smcFalsePositivesSlider.getMaximum())));
         smcFalsePositives.setText(String.valueOf(settings.falsePositives));
+        smcFalsePositivesSlider.setToolTipText(String.format("Value: %.3f", settings.falsePositives));
 
         double desiredMinFalseNegatives = smcFalseNegativesSlider.getDesiredMin();
         double desiredMaxFalseNegatives = smcFalseNegativesSlider.getDesiredMax();
@@ -1040,6 +1046,7 @@ public class QueryDialog extends JPanel {
             Math.max(smcFalseNegativesSlider.getMinimum(), 
                     Math.min(initialValueFalseNegatives, smcFalseNegativesSlider.getMaximum())));
         smcFalseNegatives.setText(String.valueOf(settings.falseNegatives));
+        smcFalseNegativesSlider.setToolTipText(String.format("Value: %.3f", settings.falseNegatives));
 
         double desiredMinIndifference = smcIndifferenceSlider.getDesiredMin();
         double desiredMaxIndifference = smcIndifferenceSlider.getDesiredMax();
@@ -1049,6 +1056,7 @@ public class QueryDialog extends JPanel {
             Math.max(smcIndifferenceSlider.getMinimum(), 
                     Math.min(initialValueIndifference, smcIndifferenceSlider.getMaximum())));
         smcIndifference.setText(String.valueOf(settings.indifferenceWidth));
+        smcIndifferenceSlider.setToolTipText(String.format("Value: %.3f", settings.indifferenceWidth));
 
         double desiredMinComparison = smcComparisonFloatSlider.getDesiredMin();
         double desiredMaxComparison = smcComparisonFloatSlider.getDesiredMax();
@@ -1059,6 +1067,7 @@ public class QueryDialog extends JPanel {
             Math.max(smcComparisonFloatSlider.getMinimum(), 
                     Math.min(initialValueComparison, smcComparisonFloatSlider.getMaximum())));
         smcComparisonFloat.setText(String.valueOf(settings.geqThan));
+        smcComparisonFloatSlider.setToolTipText(String.format("Value: %.2f", settings.geqThan));
         updatingSmcSettings = false;
     }
 
@@ -6730,6 +6739,17 @@ public class QueryDialog extends JPanel {
                     smcTimeExpected.setText(timeFormat.format(estimation));
                     smcEstimationIntervalWidth.setText(precisionFormat.format(smcSettings.estimationIntervalWidth));
                     smcTimeEstimationButton.setText(UPDATE_VERIFICATION_TIME_BTN_TEXT);
+
+                    double desiredMin = smcEstimatedTimeSlider.getDesiredMin();
+                    double desiredMax = smcEstimatedTimeSlider.getDesiredMax();
+                    double proportion = (estimation - desiredMin) / (desiredMax - desiredMin);
+                    int initialValue = (int) (proportion * smcEstimatedTimeSlider.getMaximum());
+                    updatingSmcSettings = true;
+                    smcEstimatedTimeSlider.setValue(
+                        Math.max(smcEstimatedTimeSlider.getMinimum(), 
+                                Math.min(initialValue, smcEstimatedTimeSlider.getMaximum())));
+                    smcEstimatedTimeSlider.setToolTipText(String.format("Value: %.1f", estimation));
+                    updatingSmcSettings = false;
                 } else {
                     int runsNeeded = (int) Math.ceil( (finalTimeWanted - stat_err) / coeff );
                     float precision = settings.precisionFromRuns(runsNeeded);
@@ -6737,6 +6757,18 @@ public class QueryDialog extends JPanel {
                     smcTimeExpected.setText(String.valueOf(finalTimeWanted));
                     smcTimeEstimationButton.setText(UPDATE_PRECISION_BTN_TEXT);
                     updateSMCSettings();
+                    setSMCSettings(smcSettings);
+
+                    double desiredMin = smcEstimatedTimeSlider.getDesiredMin();
+                    double desiredMax = smcEstimatedTimeSlider.getDesiredMax();
+                    double proportion = (finalTimeWanted - desiredMin) / (desiredMax - desiredMin);
+                    int initialValue = (int) (proportion * smcEstimatedTimeSlider.getMaximum());
+                    updatingSmcSettings = true;
+                    smcEstimatedTimeSlider.setValue(
+                        Math.max(smcEstimatedTimeSlider.getMinimum(), 
+                                Math.min(initialValue, smcEstimatedTimeSlider.getMaximum())));
+                    smcEstimatedTimeSlider.setToolTipText(String.format("Value: %.1f", finalTimeWanted));
+                    updatingSmcSettings = false;
                 }
             };
             
