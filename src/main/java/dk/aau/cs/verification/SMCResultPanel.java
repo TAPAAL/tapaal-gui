@@ -2,7 +2,6 @@ package dk.aau.cs.verification;
 
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.VerifyTAPN.ObservationData;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.graph.Graph;
@@ -13,9 +12,6 @@ import pipe.gui.graph.ObservationGraphDialog;
 import pipe.gui.graph.GraphDialog;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 import java.awt.*;
 import java.awt.event.HierarchyEvent;
@@ -23,7 +19,6 @@ import java.awt.event.HierarchyListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 

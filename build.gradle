@@ -72,3 +72,7 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+run {
+    systemProperties System.getProperties()
+}

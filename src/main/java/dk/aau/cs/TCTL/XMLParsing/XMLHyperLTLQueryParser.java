@@ -1,6 +1,5 @@
 package dk.aau.cs.TCTL.XMLParsing;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.lang.NumberFormatException;
@@ -9,7 +8,6 @@ import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
 
 import org.w3c.dom.NodeList;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class XMLHyperLTLQueryParser {

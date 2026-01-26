@@ -101,7 +101,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean partitioning = getUnfoldingOption(queryElement, "partitioning", true);
 		boolean colorFixpoint = getUnfoldingOption(queryElement, "colorFixpoint", true);
         boolean symmetricVars = getUnfoldingOption(queryElement, "symmetricVars", true);
-
+        boolean useExplicitSearch = getUnfoldingOption(queryElement, "useExplicitSearch", false);
         boolean parallel = getReductionOption(queryElement, "parallel", true);
         VerificationType verificationType = VerificationType.fromString(queryElement.getAttribute("verificationType"));
 
@@ -174,6 +174,7 @@ public class TAPNQueryLoader extends QueryLoader{
             parsedQuery.setUseTarOption(useTar);
             parsedQuery.setUseTarjan(useTarjan);
 			if (parsedQuery.getCategory() == QueryCategory.CTL){
+                parsedQuery.setUseExplicitSearch(useExplicitSearch);
 				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
 			} else if(parsedQuery.getCategory() == QueryCategory.HyperLTL) {
                 parsedQuery.setTraceList(tracesArr);
@@ -282,9 +283,13 @@ public class TAPNQueryLoader extends QueryLoader{
         if(smcTag.hasAttribute("false-positives"))
             settings.falsePositives = Float.parseFloat(smcTag.getAttribute("false-positives"));
         if(smcTag.hasAttribute("false-negatives"))
-            settings.falsePositives = Float.parseFloat(smcTag.getAttribute("false-negatives"));
+            settings.falseNegatives = Float.parseFloat(smcTag.getAttribute("false-negatives"));
         if(smcTag.hasAttribute("indifference"))
             settings.indifferenceWidth = Float.parseFloat(smcTag.getAttribute("indifference"));
+        if (smcTag.hasAttribute("numeric-precision")) {
+            settings.setNumericPrecision(Long.parseUnsignedLong(smcTag.getAttribute("numeric-precision")));
+        }
+        
         return settings;
     }
 

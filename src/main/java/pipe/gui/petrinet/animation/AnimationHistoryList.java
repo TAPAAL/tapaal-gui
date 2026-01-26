@@ -1,12 +1,17 @@
 package pipe.gui.petrinet.animation;
 
+import java.awt.Component;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
+import javax.swing.ToolTipManager;
 
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
@@ -17,25 +22,34 @@ import dk.aau.cs.verification.VerifyTAPN.TraceType;
 public class AnimationHistoryList extends JList<String> {
 
 	private TraceType lastShown = TraceType.NOT_EG;
+    private final Map<Integer, String> itemTooltips = new HashMap<>();
 
 	public AnimationHistoryList() {
 		super();
 		setModel(new DefaultListModel<>());
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
-		for (MouseListener listener : getMouseListeners()) {
-			removeMouseListener(listener);
+        ToolTipManager.sharedInstance().registerComponent(this);
+        for (MouseListener listener : getMouseListeners()) {
+			if (!(listener.getClass().getName().contains("ToolTipManager"))) {
+                removeMouseListener(listener);
+            }
 		}
-		
+
 		for (MouseMotionListener listener : getMouseMotionListeners()) {
-			removeMouseMotionListener(listener);
+			if (!(listener.getClass().getName().contains("ToolTipManager"))) {
+                removeMouseMotionListener(listener);
+            }
 		}
+
 		for (KeyListener listener : getKeyListeners()) {
 			removeKeyListener(listener);
 		}
+
+        setCellRenderer(new TooltipListCellRenderer());
 	}
 
-	public void addHistoryItem(String transitionName) {
+	public void addHistoryItem(String transitionName, boolean isExplicit) {
 		if(lastShown == TraceType.NOT_EG){
 			getListModel().addElement(transitionName);
 			setSelectedIndex(getListModel().size() - 1);
@@ -44,10 +58,10 @@ public class AnimationHistoryList extends JList<String> {
 			setSelectedIndex(getListModel().size() - 2);
 		}
 		
-		updateAccordingToDeadlock();
+		updateAccordingToDeadlock(isExplicit);
 	}
 
-	public void clearStepsForward() {
+	public void clearStepsForward(boolean isExplicit) {
 		DefaultListModel<String> listModel = getListModel();
 		int lastIndex = listModel.size() - 1;
 
@@ -55,7 +69,7 @@ public class AnimationHistoryList extends JList<String> {
 			listModel.removeRange(getSelectedIndex() + 1, lastIndex);
 		}
 		lastShown = TraceType.NOT_EG;
-		updateAccordingToDeadlock();
+		updateAccordingToDeadlock(isExplicit);
 	}
 
 	public void stepForward() {
@@ -104,12 +118,23 @@ public class AnimationHistoryList extends JList<String> {
 		ensureIndexIsVisible(index);
 	}
 
-	public void reset() {
+    public void setTooltipForIndex(int index, String tooltip) {
+        if (index >= 0 && index < getListModel().size()) {
+            itemTooltips.put(index, tooltip);
+        }
+    }
+
+    public void setTooltipForSelectedItem(String tooltip) {
+        setTooltipForIndex(getSelectedIndex(), tooltip);
+    }
+
+	public void reset(boolean isExplicit) {
 		getListModel().clear();
 		getListModel().addElement("Initial Marking");
 		setSelectedIndex(0);
 		lastShown = TraceType.NOT_EG;
-		updateAccordingToDeadlock();
+		updateAccordingToDeadlock(isExplicit);
+        itemTooltips.clear();
 	}
 	
 	static final private String deadlockString = "<html><i><font color=red>" + "Deadlock" + "</i></font></html>";
@@ -146,11 +171,13 @@ public class AnimationHistoryList extends JList<String> {
         }
     }
 	
-	private void updateAccordingToDeadlock() {
-		
+	private void updateAccordingToDeadlock(boolean isExplicit) {
+		if (isExplicit) return;
+
 		if(lastShown == TraceType.EG_DELAY_FOREVER){
 			return;
 		}
+        
 		for (Template t : TAPAALGUI.getCurrentTab().activeTemplates()){
 			for(Transition trans : t.guiModel().getTransitions()){
 				if(trans.isTransitionEnabled() || trans.isDelayEnabled()){
@@ -161,4 +188,20 @@ public class AnimationHistoryList extends JList<String> {
 		
 		setLastShown(TraceType.EG_DEADLOCK);
 	}
+
+    private class TooltipListCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value,
+                int index, boolean isSelected, boolean cellHasFocus) {
+            
+            Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            if (itemTooltips.containsKey(index)) {
+                setToolTipText(itemTooltips.get(index));
+            } else {
+                setToolTipText(null);
+            }
+            
+            return c;
+        }
+    }
 }

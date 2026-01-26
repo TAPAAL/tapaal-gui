@@ -85,10 +85,11 @@ public class TAPNQuery {
 	private boolean useStubbornReduction = true;
     private boolean useTarOption = false;
     private boolean useTarjan = false;
+    private boolean useExplicitSearch = false;
 	private boolean useRawVerification = false;
 	private String rawVerificationPrompt;
 
-    private SMCSettings smcSettings;
+    private SMCSettings smcSettings = SMCSettings.Default();
     private boolean benchmark = false;
     private int benchmarkRuns = 100;
     private boolean parallel = true;
@@ -194,6 +195,14 @@ public class TAPNQuery {
 
     public void setUseTarjan(boolean useTarjan) {
         this.useTarjan = useTarjan;
+    }
+
+    public boolean useExplicitSearch() {
+        return useExplicitSearch;
+    }
+
+    public void setUseExplicitSearch(boolean useExplicitSearch) {
+        this.useExplicitSearch = useExplicitSearch;
     }
 
 	public int approximationDenominator() {
@@ -531,6 +540,7 @@ public class TAPNQuery {
 		useQueryReduction = newQuery.isQueryReductionEnabled();
 		useStubbornReduction = newQuery.isStubbornReductionEnabled();
 		useTarOption = newQuery.isTarOptionEnabled();
+        useExplicitSearch = newQuery.useExplicitSearch();
 	}
 
     public void copyOptions(TAPNQuery query){
@@ -565,6 +575,7 @@ public class TAPNQuery {
         setParallel(isParallel());
         setGranularity(getGranularity());
         setMaxGranularity(isMaxGranularity());
+        setUseExplicitSearch(query.useExplicitSearch());
     }
 
     public void setProperty(TCTLAbstractProperty property) {
@@ -596,6 +607,7 @@ public class TAPNQuery {
         copy.setBenchmarkMode(this.isBenchmarkMode());
         copy.setBenchmarkRuns(this.getBenchmarkRuns());
         copy.setParallel(this.isParallel());
+        copy.setUseExplicitSearch(this.useExplicitSearch());
 		return copy;
 	}
 	

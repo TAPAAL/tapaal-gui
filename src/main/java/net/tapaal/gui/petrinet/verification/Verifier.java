@@ -54,7 +54,7 @@ public class Verifier {
         return verifydtapn;
     }
 
-    private static VerifyPN getVerifyPN() {
+    public static VerifyPN getVerifyPN() {
         VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
         verifypn.setup();
         return verifypn;
@@ -304,9 +304,11 @@ public class Verifier {
                 query.getSmcTraceType(),
                 query.isSimulate(),
                 query.getGranularity(),
-                query.isMaxGranularity()
+                query.isMaxGranularity(),
+                query.getSmcSettings().getNumericPrecision()
         );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
+            boolean unfold = isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE && !query.useExplicitSearch();
             return new VerifyPNOptions(
                 query.getCapacity(),
                 query.getTraceOption(),
@@ -325,11 +327,12 @@ public class Verifier {
                 query.isTarOptionEnabled(),
                 query.isTarjan(),
                 isColored,
-                isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE,
+                unfold,
                 query.usePartitioning(),
                 query.useColorFixpoint(),
                 query.useSymmetricVars(),
                 query.useColoredReduction(),
+                query.useExplicitSearch(),
                 query.getRawVerification(),
                 query.getRawVerificationPrompt()
             );

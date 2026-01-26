@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
 
@@ -18,6 +19,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.Transition;
@@ -65,7 +69,7 @@ public class ColorBindingParser extends DefaultHandler {
         }
     }
 
-    private String createTooltip(Map<String, List<String>> bindings, Transition transition) {
+    public static String createTooltip(Map<String, List<String>> bindings, Transition transition) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<html>");
@@ -77,6 +81,21 @@ public class ColorBindingParser extends DefaultHandler {
 
         sb.append("</html>");
 
+        return sb.toString();
+    }
+
+    public static String createTooltip(Map<Variable, Color> bindings) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>");
+        
+        for (Map.Entry<Variable, Color> entry : bindings.entrySet()) {
+            String bindingString = entry.getKey().getId() + " -> " + entry.getValue().getName();
+            sb.append(bindingString);
+            sb.append("<br>");
+        }
+        
+        sb.append("</html>");
+        
         return sb.toString();
     }
 
@@ -113,6 +132,74 @@ public class ColorBindingParser extends DefaultHandler {
         }
 
         return bindings;
+    }
+
+    public Map<Variable, Color> parseBindingsForSingleTransition(String output, String transitionName, TimedArcPetriNetNetwork tapnNetwork) {
+        Map<Variable, Color> result = new LinkedHashMap<>();
+    
+        DefaultHandler handler = new DefaultHandler() {
+            private String currentElement = "";
+            private String varId = "";
+            private String colorValue = "";
+            
+            @Override
+            public void startElement(String uri, String localName, String qName, Attributes atts) {
+                currentElement = qName;
+                if ("variable".equals(qName)) {
+                    varId = atts.getValue("id");
+                }
+            }
+            
+            @Override
+            public void endElement(String uri, String localName, String qName) {
+                if ("color".equals(qName)) {
+                    Variable variable = tapnNetwork.getVariableByName(varId);
+                    Color color = tapnNetwork.getColorByName(colorValue);
+                    result.put(variable, color);
+                } else if ("variable".equals(qName)) {
+                    varId = "";
+                    colorValue = "";
+                }
+
+                currentElement = "";
+            }
+            
+            @Override
+            public void characters(char[] ch, int start, int length) {
+                if ("color".equals(currentElement)) {
+                    colorValue = new String(ch, start, length);
+                }
+            }
+        };
+        
+        InputStream stream = null;
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser parser = factory.newSAXParser();
+            
+            int start = output.indexOf("<bindings>");
+            
+            if (start == -1) return result;
+            
+            int end = output.indexOf("</bindings>") + "</bindings>".length();
+            String xml = output.substring(start, end);
+            
+            stream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+            parser.parse(new InputSource(new InputStreamReader(stream, StandardCharsets.UTF_8)), handler);
+            
+        } catch (SAXException | ParserConfigurationException | IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        return result;
     }
 
     @Override
