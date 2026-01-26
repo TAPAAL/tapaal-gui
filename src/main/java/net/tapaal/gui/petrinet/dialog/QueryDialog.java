@@ -3214,6 +3214,8 @@ public class QueryDialog extends JPanel {
             smcEstimationIntervalWidth.setText(formattedValue);
             smcPrecisionSlider.setToolTipText(String.format("Value: %s", formattedValue));
             smcMustUpdateTime = true;
+            smcTimeExpected.setText("");
+            smcTimeEstimationButton.setText(UPDATE_VERIFICATION_TIME_BTN_TEXT);
         });
 
         quantitativePanel.add(smcPrecisionSlider, subPanelGbc);
@@ -3249,6 +3251,8 @@ public class QueryDialog extends JPanel {
             smcEstimatedTimeSlider.setRealValue(roundedValue);
             smcEstimatedTimeSlider.setToolTipText(String.format("Value: %.1f", roundedValue));
             smcMustUpdateTime = false;
+            smcEstimationIntervalWidth.setText("");
+            smcTimeEstimationButton.setText(UPDATE_PRECISION_BTN_TEXT);
         });
 
         subPanelGbc.gridx = 2;
