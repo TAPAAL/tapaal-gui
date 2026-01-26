@@ -1,19 +1,29 @@
 package pipe.gui.petrinet.animation;
 
 import java.awt.Container;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 
 import dk.aau.cs.model.tapn.simulation.*;
 import net.tapaal.gui.petrinet.animation.AnimationTokenSelectDialog;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.Template;
+import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.petrinet.graphicElements.Transition;
@@ -22,8 +32,25 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.swingcomponents.EscapableDialog;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
+import net.tapaal.gui.petrinet.dialog.ColoredBindingSelectionDialog;
+import dk.aau.cs.model.CPN.Expressions.ExpressionContext;
+import dk.aau.cs.model.CPN.ColorMultiset;
+import dk.aau.cs.model.CPN.Expressions.AllExpression;
+import dk.aau.cs.model.CPN.Expressions.Expression;
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ProductType;
+import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.CPN.Expressions.AddExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.DotConstantExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.TupleExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -33,7 +60,13 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
+import dk.aau.cs.verification.VerifyTAPN.VerifyCPNExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNInteractiveHandle;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
 public class Animator {
     private final ArrayList<TAPNNetworkTraceStep> actionHistory = new ArrayList<TAPNNetworkTraceStep>();
@@ -51,6 +84,10 @@ public class Animator {
 
     private Map<String, TAPNNetworkTrace> traceMap;
 
+    private VerifyPNInteractiveHandle interactiveEngine;
+    private boolean isUsingInteractiveEngine;
+    private Map<TimedTransition, List<Map<Variable, Color>>> validBindingsMap;
+
     public static boolean isUrgentTransitionEnabled(){
         return isUrgentTransitionEnabled;
     }
@@ -59,6 +96,30 @@ public class Animator {
         super();
 
         this.tab = tab;
+    }
+
+    public void initializeInteractiveEngine() {
+        if (!tab.getLens().isColored()) return;
+
+        try {
+            TAPNComposer composer = new TAPNComposer(new MessengerImpl(), tab.getGuiModels(), tab.getLens(), false, true);
+            Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(tab.network());
+
+            VerifyTAPNExporter exporter = new VerifyCPNExporter();
+            var exportedModel = exporter.exportModel(composedModel, composer.getGuiModel());
+
+            interactiveEngine = new VerifyPNInteractiveHandle(tab.network(), composer, composedModel.value2());
+            isUsingInteractiveEngine = interactiveEngine.startInteractiveMode(exportedModel.modelFile());
+            if (!isUsingInteractiveEngine) {
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), 
+                    "Failed to start VerifyPN interactive mode", 
+                    "Engine Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), 
+            "Error initializing interactive engine: " + e.getMessage(), 
+            "Engine Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private NetworkMarking currentMarking() {
@@ -84,12 +145,20 @@ public class Animator {
     }
 
     public void setTrace(TAPNNetworkTrace trace) {
-        tab.setAnimationMode(true);
+        tab.setAnimationMode(true, tab.getLens().isColored());
 
         try {
             if (trace.isConcreteTrace()) {
                 this.trace = trace;
-                setTimedTrace(trace);
+                if (trace.isColoredTrace()) {
+                    setColoredTrace(trace);
+                } else {
+                    setTimedTrace(trace);
+                    TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;
+                    if (timedTrace.getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
+                        tab.getAnimationHistorySidePanel().setLastShown(timedTrace.getTraceType());
+                    }
+                }
             } else {
                 setUntimedTrace(trace);
                 isDisplayingUntimedTrace = true;
@@ -111,9 +180,8 @@ public class Animator {
     private void setUntimedTrace(TAPNNetworkTrace trace) {
         tab.addAbstractAnimationPane();
         AnimationHistoryList untimedAnimationHistory = tab.getUntimedAnimationHistory();
-
         for(TAPNNetworkTraceStep step : trace){
-            untimedAnimationHistory.addHistoryItem(step.toString());
+            untimedAnimationHistory.addHistoryItem(step.toString(), tab.getLens().isColored());
         }
 
         tab.getUntimedAnimationHistory().setSelectedIndex(0);
@@ -132,7 +200,7 @@ public class Animator {
     }
 
     private void setTimedTrace(TAPNNetworkTrace trace) {
-        NetworkMarking previousMarking = null;
+        NetworkMarking previousMarking = initialMarking;
         TimedTransition previousTransition = null;
         for (TAPNNetworkTraceStep step : trace) {
             if (step instanceof TAPNNetworkTimedTransitionStep) {
@@ -148,9 +216,19 @@ public class Animator {
 
             addMarking(step, step.performStepFrom(currentMarking()));
         }
-        if (getTrace().getTraceType() != TraceType.NOT_EG) { //If the trace was not explicitly set, maybe we have calculated it is deadlock.
-            tab.getAnimationHistorySidePanel().setLastShown(getTrace().getTraceType());
+    }
+
+    private void setColoredTrace(TAPNNetworkTrace trace) {
+        for (TAPNNetworkTraceStep step : trace) {
+            TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)step;
+            addMarking(step, coloredStep.getMarking());
         }
+
+        updateBindings(0);
+    }
+
+    public boolean isColoredTrace() {
+        return trace != null && trace.isColoredTrace();
     }
 
     /**
@@ -199,30 +277,79 @@ public class Animator {
         disableTransitions();
     }
 
-    public void updateFireableTransitions(){
-        TransitionFiringComponent transFireComponent = tab.getTransitionFiringComponent();
-        transFireComponent.startReInit();
-        isUrgentTransitionEnabled = false;
+    private void updateValidBindingsMap() {
+        if (!isUsingInteractiveEngine) return;
+        validBindingsMap = interactiveEngine.sendMarking(currentMarking());
+    }
 
-        outer: for( Template template : tab.activeTemplates()){
-            for (TimedTransition t : template.model().transitions()) {
-                if (t.isUrgent() && t.isEnabled()) {
-                    isUrgentTransitionEnabled = true;
-                    break outer;
+    private boolean isColoredTransitionEnabled(TimedTransition transition) {
+        if (tab.getLens().isColored() && isUsingInteractiveEngine) {
+            if (transition.isShared()) {
+                for (TimedTransition t : transition.sharedTransition().transitions()) {
+                    if (validBindingsMap.keySet().contains(t)) {
+                        return true;
+                    }
+                }
+            } else if (validBindingsMap.keySet().contains(transition)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void updateFireableTransitionsColored(TransitionFiringComponent transFireComponent) {
+        boolean anyTransitionsEnabled = false;
+        if (tab.getLens().isColored()) {
+            updateValidBindingsMap();
+            for (Template template : tab.activeTemplates()) {
+                for (TimedTransition transition : template.model().transitions()) {
+                    if (isColoredTransitionEnabled(transition)) {
+                        Transition guiTransition = template.guiModel().getTransitionByName(transition.name());
+                        if (guiTransition != null) {
+                            guiTransition.markTransitionEnabled(true);
+                            transFireComponent.addTransition(template, guiTransition);
+                            anyTransitionsEnabled = true;
+                        }
+                    }
                 }
             }
         }
 
-        for (Template template : tab.activeTemplates()) {
-            for (Transition t : template.guiModel().transitions()) {
-                if (t.isTransitionEnabled()) {
-                    t.markTransitionEnabled(true);
-                    transFireComponent.addTransition(template, t);
-                } else if (TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() &&
-                    t.isDelayEnabled() && !isUrgentTransitionEnabled
-                ) {
-                    t.markTransitionDelayEnabled(true);
-                    transFireComponent.addTransition(template, t);
+        if (!anyTransitionsEnabled) {
+            tab.getAnimationHistorySidePanel().setLastShown(TraceType.EG_DEADLOCK);
+        }
+    }
+
+    public void updateFireableTransitions() {
+        TransitionFiringComponent transFireComponent = tab.getTransitionFiringComponent();
+        transFireComponent.startReInit();
+
+        isUrgentTransitionEnabled = false;
+
+        if (tab.getLens().isColored()) {
+            updateFireableTransitionsColored(transFireComponent);
+        } else {
+            outer: for( Template template : tab.activeTemplates()){
+                for (TimedTransition t : template.model().transitions()) {
+                    if (t.isUrgent() && t.isEnabled()) {
+                        isUrgentTransitionEnabled = true;
+                        break outer;
+                    }
+                }
+            }
+    
+            for (Template template : tab.activeTemplates()) {
+                for (Transition t : template.guiModel().transitions()) {
+                    if (t.isTransitionEnabled()) {
+                        t.markTransitionEnabled(true);
+                        transFireComponent.addTransition(template, t);
+                    } else if (TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() &&
+                        t.isDelayEnabled() && !isUrgentTransitionEnabled
+                    ) {
+                        t.markTransitionDelayEnabled(true);
+                        transFireComponent.addTransition(template, t);
+                    }
                 }
             }
         }
@@ -250,6 +377,8 @@ public class Animator {
         initialMarking = tab.network().marking();
         resethistory();
         markings.add(initialMarking);
+        storeTokenState();
+        updateColoredMarking();
     }
 
     /**
@@ -260,8 +389,62 @@ public class Animator {
         if (tab != null) {
             disableTransitions();
             tab.network().setMarking(initialMarking);
+            restoreTokenState();
             currentAction = -1;
+
+            if (isUsingInteractiveEngine) {
+                interactiveEngine.stopInteractiveMode();
+                isUsingInteractiveEngine = false;
+            }
         }
+    }
+
+    private Map<TimedPlace, Tuple<List<TimedToken>, ArcExpression>> storedTokenState = new HashMap<>();
+
+    private void storeTokenState() {
+        storedTokenState.clear();
+        for (Place guiPlace : tab.currentTemplate().guiModel().getPlaces()) {
+            TimedPlaceComponent placeComponent = (TimedPlaceComponent)guiPlace;
+            TimedPlace place = placeComponent.underlyingPlace();
+            NetworkMarking marking = tab.network().marking();
+            List<TimedToken> tokens = marking.getTokensFor(place);
+            ArcExpression expression = place.getTokensAsExpression();
+
+            List<TimedToken> tokensCopy = new ArrayList<>(tokens);
+            storedTokenState.put(place, new Tuple<>(tokensCopy, expression));
+        }
+    }
+
+    private void restoreTokenState() {
+        for (Place guiPlace : tab.currentTemplate().guiModel().getPlaces()) {
+            TimedPlaceComponent placeComponent = (TimedPlaceComponent)guiPlace;
+            TimedPlace place = placeComponent.underlyingPlace();
+            
+            Tuple<List<TimedToken>, ArcExpression> state = storedTokenState.get(place);
+            if (state != null) {
+                place.resetNumberOfTokensColor();
+                List<TimedToken> tokens = state.value1();
+                ArcExpression expression = state.value2();
+
+                if (expression != null && containsAllExpression(expression)) {
+                    HashMap<String, ColorType> colorTypes = new HashMap<>();
+                    for (ColorType ct : tab.network().colorTypes()) {
+                        colorTypes.put(ct.getName(), ct);
+                    }
+                    ExpressionContext context = new ExpressionContext(null, colorTypes);
+
+                    ColorMultiset multiset = expression.eval(context);
+                    if (multiset != null) {
+                        tokens = new ArrayList<>(multiset.getTokens(place));
+                    }
+                }
+
+                place.updateTokens(tokens, expression);
+                placeComponent.setUnderlyingPlace(place);
+            }
+        }
+
+        activeGuiModel().repaintPlaces();
     }
 
     /**
@@ -281,14 +464,15 @@ public class Animator {
                     untimedAnimationHistory.stepBackwards();
                 }
             }
-            tab.network().setMarking(markings.get(currentMarkingIndex - 1));
 
+            currentAction--;
+            currentMarkingIndex--;
+            updateBindings(currentAction + 1);
+            tab.network().setMarking(markings.get(currentMarkingIndex));
+            updateColoredMarking();
             activeGuiModel().repaintPlaces();
             unhighlightDisabledTransitions();
             updateFireableTransitions();
-            currentAction--;
-            currentMarkingIndex--;
-
             updateAnimationButtonsEnabled();
             updateMouseOverInformation();
             reportBlockingPlaces();
@@ -301,23 +485,25 @@ public class Animator {
 
     public void stepForward() {
         tab.getAnimationHistorySidePanel().stepForward();
-        if(currentAction == actionHistory.size()-1 && trace != null){
+        if (currentAction == actionHistory.size()-1 && trace != null) {
             int selectedIndex = tab.getAnimationHistorySidePanel().getSelectedIndex();
             int action = currentAction;
             int markingIndex = currentMarkingIndex;
 
-            if(getTrace().getTraceType() == TraceType.EG_DELAY_FOREVER){
+            TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;
+            if (timedTrace.getTraceType() == TraceType.EG_DELAY_FOREVER) {
                 addMarking(new TAPNNetworkTimeDelayStep(BigDecimal.ONE), currentMarking().delay(BigDecimal.ONE));
             }
-            if(getTrace().getLoopToIndex() != -1){
-                addToTimedTrace(getTrace().getLoopSteps());
+
+            if (timedTrace.getLoopToIndex() != -1) {
+                addToTimedTrace(timedTrace.getLoopSteps());
             }
 
             tab.getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
             currentAction = action;
             currentMarkingIndex = markingIndex;
         }
-
+        
         if (currentAction < actionHistory.size() - 1) {
             TAPNNetworkTraceStep nextStep = actionHistory.get(currentAction+1);
             if(isDisplayingUntimedTrace && nextStep instanceof TAPNNetworkTimedTransitionStep){
@@ -327,19 +513,297 @@ public class Animator {
                     untimedAnimationHistory.stepForward();
                 }
             }
-            tab.network().setMarking(markings.get(currentMarkingIndex + 1));
 
+            currentAction++;
+            currentMarkingIndex++;
+            updateBindings(currentAction + 1);
+            tab.network().setMarking(markings.get(currentMarkingIndex));
+            updateColoredMarking();
             activeGuiModel().repaintPlaces();
             unhighlightDisabledTransitions();
             updateFireableTransitions();
-            currentAction++;
-            currentMarkingIndex++;
             activeGuiModel().redrawVisibleTokenLists();
-
+        
             updateAnimationButtonsEnabled();
             updateMouseOverInformation();
             reportBlockingPlaces();
+        }        
+    }
 
+    private void updateColoredMarking() {
+        if (!tab.getLens().isColored()) return;
+
+        NetworkMarking marking = tab.network().marking();
+        var markingMap = marking.getMarkingMap();
+        
+        for (var template : tab.activeTemplates()) {
+            var localMarking = markingMap.get(template.model());
+            Map<TimedPlace, List<TimedToken>> placesToTokensCopy = new HashMap<>();
+            for (var entry : localMarking.getPlacesToTokensMap().entrySet()) {
+                placesToTokensCopy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+            }
+    
+            for (var entry : marking.getSharedPlacesTokens().entrySet()) {
+                placesToTokensCopy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+            }
+     
+            for (var guiPlace : template.guiModel().getPlaces()) {
+                var placeComponent = (TimedPlaceComponent)guiPlace;
+                TimedPlace place = placeComponent.underlyingPlace();
+                place.resetNumberOfTokensColor();
+                
+                if (!placesToTokensCopy.containsKey(place) || placesToTokensCopy.get(place).isEmpty()) {
+                    place.updateTokens(new ArrayList<>(), null);
+                    placeComponent.setUnderlyingPlace(place);
+                    continue;
+                }
+    
+                List<TimedToken> tokens = placesToTokensCopy.get(place);
+                
+                ArcExpression existingExpression = place.getTokensAsExpression();
+                var tup = rebuildExpressionPreservingAll(tokens, place, existingExpression);
+                tokens = tup.value1();
+                ArcExpression tokenExpression = tup.value2();
+                place.updateTokens(tokens, tokenExpression);
+                placeComponent.setUnderlyingPlace(place);
+            }
+        }
+    }
+
+    private Tuple<List<TimedToken>, ArcExpression> rebuildExpressionPreservingAll(List<TimedToken> tokens, TimedPlace place, ArcExpression existingExpression) {
+        boolean hasAllExpression = existingExpression != null && containsAllExpression(existingExpression);
+        
+        Vector<ArcExpression> numberOfExpressions = new Vector<>();
+        List<TimedToken> newTokens = new ArrayList<>();
+         
+        if (hasAllExpression && existingExpression instanceof AddExpression) {
+            var addExpr = (AddExpression)existingExpression;
+            for (ArcExpression arcExpr : addExpr.getAddExpression()) {
+                if (arcExpr instanceof NumberOfExpression) {
+                    var numOfExpr = (NumberOfExpression)arcExpr;
+                    var expandedExpressions = computeCrossProduct(numOfExpr.getNumberOfExpression());
+                    numberOfExpressions.addAll(expandedExpressions);
+                }
+            }
+
+            for (ArcExpression arcExpr : numberOfExpressions) {
+                if (arcExpr instanceof NumberOfExpression) {
+                    NumberOfExpression numExpr = (NumberOfExpression) arcExpr;
+                    for (ColorExpression ce : numExpr.getNumberOfExpression()) {
+                        Color color = getColorFromExpression(ce, place.getColorType());
+                        if (color != null) {
+                            for (int i = 0; i < numExpr.getNumber(); ++i) {
+                                newTokens.add(new TimedToken(place, BigDecimal.ZERO, color));
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            newTokens = tokens;
+            Map<Color, Integer> numberOfMap = new HashMap<>();
+            for (TimedToken token : tokens) {
+                numberOfMap.merge(token.color(), 1, Integer::sum);
+            }
+
+            numberOfMap.entrySet().stream()
+                .sorted((e1, e2) -> e1.getKey().toString().compareTo(e2.getKey().toString()))
+                .forEach(numberOfEntry -> {
+                    Color color = numberOfEntry.getKey();
+                    int number = numberOfEntry.getValue();
+                    Vector<ColorExpression> colorExpressions = new Vector<>();
+                    if (color.getColorType().equals(ColorType.COLORTYPE_DOT)) {
+                        colorExpressions.add(new DotConstantExpression());
+                    } else if (color.getColorType().isProductColorType()) {
+                        ProductType pt = (ProductType)color.getColorType();
+                        Vector<Color> subColors = color.getTuple();
+                        Vector<ColorExpression> subColorExpressions = new Vector<>();
+                        subColorExpressions.addAll(subColors.stream()
+                                                            .map(UserOperatorExpression::new)
+                                                            .collect(Collectors.toList()));
+    
+                        colorExpressions.add(new TupleExpression(subColorExpressions, pt));
+                    } else {
+                        colorExpressions.add(new UserOperatorExpression(color));
+                    }
+    
+                    numberOfExpressions.add(new NumberOfExpression(number, colorExpressions));
+                });
+        }
+    
+
+        return new Tuple<>(newTokens, new AddExpression(numberOfExpressions));
+    }
+
+    private Color getColorFromExpression(ColorExpression expr, ColorType expectedType) {
+        if (expr instanceof UserOperatorExpression) {
+            return ((UserOperatorExpression)expr).getUserOperator();
+        } else if (expr instanceof TupleExpression) {
+            TupleExpression tupleExpr = (TupleExpression)expr;
+            Vector<Color> components = new Vector<>();
+
+            if (expectedType != null && expectedType.isProductColorType()) {
+                ProductType pt = (ProductType)expectedType;
+                if (pt.getColorTypes().size() != tupleExpr.getColors().size()) return null;
+                int i = 0;
+                for (ColorExpression ce : tupleExpr.getColors()) {
+                    Color c = getColorFromExpression(ce, pt.getColorTypes().get(i));
+                    if (c == null) return null;
+                    components.add(c);
+                    ++i;
+                }
+
+                return new Color(expectedType, 0, components);
+            } else {
+                for (ColorExpression ce : tupleExpr.getColors()) {
+                    Color c = getColorFromExpression(ce, null);
+                    if (c == null) return null;
+                    components.add(c);
+                }
+                
+                return new Color(tupleExpr.getColorType(), 0, components);
+            }
+        } else if (expr instanceof DotConstantExpression) {
+            return ColorType.COLORTYPE_DOT.getFirstColor();
+        }
+
+        return null;
+    }
+
+    private Vector<NumberOfExpression> computeCrossProduct(Vector<ColorExpression> colorExprs) {
+        Vector<NumberOfExpression> result = new Vector<>();
+        if (colorExprs.isEmpty()) return result;
+        List<List<ColorExpression>> allOptions = new ArrayList<>();
+        for (ColorExpression ce : colorExprs) {
+            List<ColorExpression> options = new ArrayList<>();
+            if (ce instanceof AllExpression) {
+                AllExpression allExpr = (AllExpression)ce;
+                for (Color c : allExpr.getColorType().getColors()) {
+                    options.add(new UserOperatorExpression(c));
+                }
+            } else if (ce instanceof TupleExpression) {
+                TupleExpression tupleExpr = (TupleExpression)ce;
+                List<List<ColorExpression>> tupleOptions = new ArrayList<>();
+                
+                for (ColorExpression subExpr : tupleExpr.getColors()) {
+                    List<ColorExpression> subOptions = new ArrayList<>();
+                    if (subExpr instanceof AllExpression) {
+                        AllExpression allExpr = (AllExpression)subExpr;
+                        for (Color c : allExpr.getColorType().getColors()) {
+                            subOptions.add(new UserOperatorExpression(c));
+                        }
+                    } else {
+                        subOptions.add(subExpr);
+                    }
+
+                    tupleOptions.add(subOptions);
+                }
+        
+                List<Vector<ColorExpression>> tupleCombos = computeCrossProductHelper(tupleOptions);
+                for (Vector<ColorExpression> combo : tupleCombos) {
+                    options.add(new TupleExpression(combo, (ProductType)tupleExpr.getColorType()));
+                }
+            } else {
+                options.add(ce);
+            }
+            
+            allOptions.add(options);
+        }
+        
+        List<Vector<ColorExpression>> allCombinations = computeCrossProductHelper(allOptions);
+        for (Vector<ColorExpression> combo : allCombinations) {
+            result.add(new NumberOfExpression(1, combo));
+        }
+        
+        return result;
+    }
+    
+    private List<Vector<ColorExpression>> computeCrossProductHelper(List<List<ColorExpression>> options) {
+        List<Vector<ColorExpression>> result = new ArrayList<>();
+        if (options.isEmpty()) {
+            result.add(new Vector<>());
+            return result;
+        }
+        
+        computeCrossProductRecursive(options, 0, new Vector<>(), result);
+        return result;
+    }
+    
+    private void computeCrossProductRecursive(List<List<ColorExpression>> options, int index,
+                                              Vector<ColorExpression> current,
+                                              List<Vector<ColorExpression>> result) {
+        if (index == options.size()) {
+            result.add(new Vector<>(current));
+            return;
+        }
+        
+        for (ColorExpression option : options.get(index)) {
+            current.add(option);
+            computeCrossProductRecursive(options, index + 1, current, result);
+            current.remove(current.size() - 1);
+        }
+    }
+
+    private boolean containsAllExpression(Expression expr) {
+        if (expr instanceof AllExpression) {
+            return true;
+        } else if (expr instanceof AddExpression) {
+            for (ArcExpression arcExpr : ((AddExpression) expr).getAddExpression()) {
+                if (containsAllExpression(arcExpr)) return true;
+            }
+        } else if (expr instanceof NumberOfExpression) {
+            for (ColorExpression e : ((NumberOfExpression) expr).getNumberOfExpression()) {
+                if (containsAllExpression(e)) return true;
+            }
+        } else if (expr instanceof TupleExpression) {
+            for (ColorExpression ce : ((TupleExpression) expr).getColors()) {
+                if (containsAllExpression(ce)) return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void updateBindings(int stepIdx) {
+        resetBindings();
+        if (stepIdx < actionHistory.size() && stepIdx >= 0) {
+            TAPNNetworkTraceStep step = actionHistory.get(stepIdx);
+            if (step.isColoredTransitionStep()) {
+                TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)step;
+                TimedTransition transition = coloredStep.getTransition();
+                Transition guiTransition = null;
+                for (Template template : tab.activeTemplates()) {
+                    guiTransition = template.guiModel().getTransitionByName(transition.name());
+                    if (guiTransition != null) break;
+                }
+
+                Map<Variable, Color> bindings = coloredStep.getBindings();
+                guiTransition.setToolTipText(ColorBindingParser.createTooltip(bindings));
+                reloadTooltip(guiTransition);
+            }
+        }
+    }
+
+    private void resetBindings() {
+        for (Template template : tab.activeTemplates()) {
+            for (Transition guiTransition : template.guiModel().transitions()) {
+                guiTransition.setToolTipText(null);
+                reloadTooltip(guiTransition);
+            }
+        }
+    }
+
+    private void reloadTooltip(Transition transition) {
+        Point mousePos = MouseInfo.getPointerInfo().getLocation();
+        SwingUtilities.convertPointFromScreen(mousePos, transition);
+        
+        boolean mouseOver = transition.contains(mousePos) && 
+                            transition.isShowing() && 
+                            transition.isVisible();
+        if (mouseOver) {
+            ToolTipManager manager = ToolTipManager.sharedInstance();
+            long time = System.currentTimeMillis();
+            manager.mouseMoved(new MouseEvent(transition, -1, time, 0, mousePos.x, mousePos.y, 0, false));
         }
     }
 
@@ -358,8 +822,13 @@ public class Animator {
         }
     }
 
-    public void dFireTransition(TimedTransition transition){
-        if(!TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
+    public void dFireTransition(TimedTransition transition) {
+        if (tab.getLens().isColored()) {
+            fireColoredTransition(transition);
+            return;
+        }
+
+        if (!TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
             fireTransition(transition);
             return;
         }
@@ -388,6 +857,68 @@ public class Animator {
 
                 fireTransition(transition);
             }
+        }
+    }
+
+    private void fireColoredTransition(TimedTransition transition) {
+        if (!validBindingsMap.containsKey(transition)) return;
+        
+        if (trace != null && trace.isColoredTrace()) {
+            if (isColoredTransitionEnabled(transition)) {
+                if (currentAction < actionHistory.size() - 1) {
+                    TAPNNetworkTraceStep nextStep = actionHistory.get(currentAction + 1);
+                    if (nextStep.isColoredTransitionStep()) {
+                        TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)nextStep;
+                        if (coloredStep.getTransition().equals(transition)) {
+                            stepForward();
+                            return;
+                        }
+                    }
+                }
+
+                int fireTransition = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(),
+                        "Are you sure you want to fire a transition which does not follow the colored trace?\n"
+                            + "Firing this transition will discard the colored trace and revert to standard simulation.",
+                        "Discarding Colored Trace", JOptionPane.YES_NO_OPTION );
+
+                if (fireTransition == JOptionPane.NO_OPTION) {
+                    return;
+                }
+
+                removeSetTrace(false);
+            } else {
+                return;
+            }
+        }
+
+        if (isUsingInteractiveEngine) {
+            Map<Variable, Color> bindings = new HashMap<>(); 
+            var validBindings = validBindingsMap.get(transition);
+            if (SimulationControl.getInstance().randomSimulation() && !validBindings.isEmpty()) {
+                Random random = new Random();
+                int randomIndex = random.nextInt(validBindings.size());
+                bindings = validBindings.get(randomIndex);
+            } else if (validBindings.size() == 1) {
+                bindings = validBindingsMap.get(transition).get(0);
+            } else if (!validBindings.isEmpty()) {
+                bindings = ColoredBindingSelectionDialog.showDialog(transition, validBindings);
+                if (bindings == null) return; // Cancelled
+            }
+
+            if (!clearStepsForward()) return;
+            
+            NetworkMarking newMarking;
+
+            newMarking = interactiveEngine.sendTransition(transition, bindings);
+            
+            addMarking(new TAPNNetworkColoredTransitionStep(transition, bindings, newMarking), newMarking);
+
+            updateColoredMarking();
+            activeGuiModel().repaintPlaces();
+            unhighlightDisabledTransitions();
+            updateFireableTransitions();
+
+            updateAnimationButtonsEnabled();
         }
     }
 
@@ -427,7 +958,7 @@ public class Animator {
                     int fireTransition = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(),
                         "Are you sure you want to fire a transition which does not follow the untimed trace?\n"
                             + "Firing this transition will discard the untimed trace and revert to standard simulation.",
-                        "Discrading Untimed Trace", JOptionPane.YES_NO_OPTION );
+                        "Discarding Untimed Trace", JOptionPane.YES_NO_OPTION );
 
                     if (fireTransition == JOptionPane.NO_OPTION){
                         return;
@@ -535,9 +1066,9 @@ public class Animator {
         markings.clear();
         currentAction = -1;
         currentMarkingIndex = 0;
-        tab.getAnimationHistorySidePanel().reset();
+        tab.getAnimationHistorySidePanel().reset(tab.getLens().isColored());
         if(tab.getUntimedAnimationHistory() != null){
-            tab.getUntimedAnimationHistory().reset();
+            tab.getUntimedAnimationHistory().reset(tab.getLens().isColored());
         }
     }
 
@@ -545,9 +1076,9 @@ public class Animator {
         actionHistory.clear();
         currentAction = -1;
         currentMarkingIndex = 0;
-        tab.getAnimationHistorySidePanel().reset();
+        tab.getAnimationHistorySidePanel().reset(tab.getLens().isColored());
         if(tab.getUntimedAnimationHistory() != null){
-            tab.getUntimedAnimationHistory().reset();
+            tab.getUntimedAnimationHistory().reset(tab.getLens().isColored());
         }
     }
 
@@ -569,7 +1100,18 @@ public class Animator {
         }
 
         tab.network().setMarking(marking);
-        tab.getAnimationHistorySidePanel().addHistoryItem(action.toString());
+        tab.getAnimationHistorySidePanel().addHistoryItem(action.toString(), tab.getLens().isColored());
+        if (action.isColoredTransitionStep()) {
+            TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)action;
+            Map<Variable, Color> bindings = coloredStep.getBindings();
+            tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(ColorBindingParser.createTooltip(bindings));
+        } else if (action.isTimedTransitionStep()) {
+            var timedStep = (TAPNNetworkTimedTransitionStep)action;
+            var transition = timedStep.getTransition();
+            var guiTransition = tab.getModel().getTransitionByName(transition.name());
+            tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(guiTransition.getToolTipText());
+        }
+
         actionHistory.add(action);
         markings.add(marking);
         currentAction++;
@@ -737,8 +1279,8 @@ public class Animator {
         return true;
     }
 
-    public TimedTAPNNetworkTrace getTrace(){
-        return (TimedTAPNNetworkTrace)trace;
+    public TAPNNetworkTrace getTrace(){
+        return trace; 
     }
 
     private boolean clearStepsForward(){
@@ -746,8 +1288,9 @@ public class Animator {
         if(!isDisplayingUntimedTrace){
             answer = removeSetTrace(true);
         }
+
         if(answer){
-            tab.getAnimationHistorySidePanel().clearStepsForward();
+            tab.getAnimationHistorySidePanel().clearStepsForward(tab.getLens().isColored());
         } else if (SimulationControl.getInstance().isRunning()) {
             SimulationControl.stopSimulation();
         }

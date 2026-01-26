@@ -1,6 +1,5 @@
 package net.tapaal.gui.petrinet;
 
-import dk.aau.cs.TCTL.LTLANode;
 import dk.aau.cs.TCTL.LTLFNode;
 import dk.aau.cs.TCTL.LTLGNode;
 import dk.aau.cs.TCTL.StringPosition;

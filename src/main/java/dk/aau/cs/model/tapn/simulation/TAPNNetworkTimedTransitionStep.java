@@ -29,6 +29,11 @@ public class TAPNNetworkTimedTransitionStep extends TAPNNetworkTraceStep {
 		return consumedTokens;
 	}
 
+    @Override
+    public boolean isTimedTransitionStep() {
+        return true;
+    }
+
 	@Override
 	public String toString() {
 		

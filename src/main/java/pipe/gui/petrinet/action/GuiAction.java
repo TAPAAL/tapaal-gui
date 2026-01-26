@@ -3,7 +3,6 @@
  */
 package pipe.gui.petrinet.action;
 
-import java.awt.event.ActionEvent;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
@@ -11,7 +10,6 @@ import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
 import net.tapaal.resourcemanager.ResourceManager;
-import pipe.gui.TAPAALGUI;
 
 /**
  * GuiAction class

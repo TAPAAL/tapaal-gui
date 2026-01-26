@@ -80,7 +80,7 @@ public class TraceConverter {
 				convertedTokens.add(new TimedToken(place, token.age(), ColorType.COLORTYPE_DOT.getFirstColor()));
 			}
 		}
-
+        
 		return transition == null? null:new TAPNNetworkTimedTransitionStep(transition, convertedTokens);
 	}
 }

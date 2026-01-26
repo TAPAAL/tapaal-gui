@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
@@ -29,14 +30,18 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkColoredTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
@@ -127,7 +132,16 @@ public class TraceImportExport {
                 traceListRootNode.appendChild(traceRootNode);
                 traceRootNode.setAttribute("name", trace.getKey());
             }
-  
+
+            boolean isColoredTrace = StreamSupport.stream(
+                    trace.getValue().spliterator(), false)
+                    .anyMatch(step -> step instanceof TAPNNetworkColoredTransitionStep);
+            if (isColoredTrace) {
+                NetworkMarking initialMarking = tab.network().marking();
+                Element initialMarkingElement = initialMarking.toXmlElement(document, composer);
+                traceRootNode.appendChild(initialMarkingElement);
+            }
+            
             for (TAPNNetworkTraceStep step : trace.getValue()) {
                 if (step.isLoopStep()) {
                     Element loopElement = document.createElement("loop");
@@ -156,10 +170,40 @@ public class TraceImportExport {
                     delayElement.setTextContent(delay.toString());
                 }
     
+                if (step instanceof TAPNNetworkColoredTransitionStep) {
+                    TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)step;
+                
+                    TimedTransition transition = coloredStep.getTransition();
+                    Element transitionElement = document.createElement("transition");
+                    transitionElement.setAttribute("id", composer.composedTransitionName(transition));
+
+                    Element bindingsElement = document.createElement("bindings");
+                    var bindings = coloredStep.getBindings();
+                    for (Variable variable : bindings.keySet()) {
+                        Element variableElement = document.createElement("variable");
+                        variableElement.setAttribute("id", variable.getId());
+            
+                        Element colorElement = document.createElement("color");
+                        colorElement.setTextContent(bindings.get(variable).getName());
+
+                        variableElement.appendChild(colorElement);
+                        bindingsElement.appendChild(variableElement);
+                    }
+
+                    transitionElement.appendChild(bindingsElement);
+
+                    traceRootNode.appendChild(transitionElement);
+
+                    NetworkMarking marking = coloredStep.getMarking();
+                    Element markingElement = marking.toXmlElement(document, composer);
+                    traceRootNode.appendChild(markingElement);
+                }
             }
         }
 
-        if (tab.getAnimator().getTrace() != null && tab.getAnimator().getTrace().getTraceType() == EG_DELAY_FOREVER) {
+        TAPNNetworkTrace trace = tab.getAnimator().getTrace();
+        boolean isTimedTrace = trace instanceof TimedTAPNNetworkTrace;
+        if (tab.getAnimator().getTrace() != null && isTimedTrace && ((TimedTAPNNetworkTrace)trace).getTraceType() == EG_DELAY_FOREVER) {
             Element delayForeverElement = document.createElement("delay");
             traceRootNode.appendChild(delayForeverElement);
             delayForeverElement.setTextContent("forever");
@@ -203,7 +247,7 @@ public class TraceImportExport {
 
             TAPNComposer composer = new TAPNComposer(new pipe.gui.MessengerImpl(), tab.getGuiModels(), tab.getLens(), false, true);
             Tuple<TimedArcPetriNet, NameMapping> model = composer.transformModel(tab.network());
-            VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
+            VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), tab.getLens().isColored());
             Map<String, TimedArcPetriNetTrace> tracesComposed = traceParser.parseTraces(br);
             TimedArcPetriNetTrace traceComposed = tracesComposed.values().iterator().next();
             TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(traceComposed, tab.network(), model.value2());

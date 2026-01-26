@@ -5,7 +5,6 @@ import javax.swing.ImageIcon;
 import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.IconSelector;
 import dk.aau.cs.verification.VerificationResult;
-import net.tapaal.gui.petrinet.verification.TAPNQuery;
 
 public class VerifyTAPNIconSelector extends IconSelector {
 

@@ -43,7 +43,7 @@ import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.canvas.Grid;
 import pipe.gui.canvas.SelectionManager;
 import net.tapaal.gui.petrinet.dialog.ExportBatchDialog;
-import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
+import net.tapaal.gui.petrinet.dialog.ColoredSimulationDialog;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -357,7 +357,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
     private final GuiAction showEnabledTransitionsAction = new GuiAction("Display enabled transitions", "Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('6', shortcutkey), true) {
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {            
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleEnabledTransitionsList);
         }
     };
@@ -441,17 +441,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction startAction = new GuiAction("Simulation mode", "Toggle simulation mode (M)", "M", true) {
         public void actionPerformed(ActionEvent e) {
             //XXX: this needs to be refactored, it breaks the abstraction in a really bad way -- 2022-01-23
-            if(getCurrentTab().getLens().isColored() && !getCurrentTab().isInAnimationMode()) {
+            TAPNLens lens = getCurrentTab().getLens();
+            if (lens.isColored() && !getCurrentTab().isInAnimationMode()) {
                 PetriNetTab oldTab = getCurrentTab();
-                UnfoldDialog.showSimulationDialog(oldTab);
-
-                if(!UnfoldDialog.wasCancelled() && oldTab != getCurrentTab()){
-                    currentTab.ifPresent(TabActions::toggleAnimationMode);
+                boolean useExplicit = !lens.isGame() && !lens.isStochastic() && !lens.isTimed();
+                ColoredSimulationDialog.showSimulationDialog(oldTab, useExplicit);
+                if (!ColoredSimulationDialog.wasCancelled() && (oldTab != getCurrentTab() || ColoredSimulationDialog.explicitSimulationMode())) {
+                    currentTab.ifPresent(tab -> tab.toggleAnimationMode(ColoredSimulationDialog.explicitSimulationMode()));
                 } else {
                     this.setSelected(false);
                 }
 
-                UnfoldDialog.resetCancelled();
+                ColoredSimulationDialog.resetFlags();
             } else {
                 currentTab.ifPresent(TabActions::toggleAnimationMode);
             }

@@ -108,7 +108,6 @@ public class EnabledTransitionsList extends JPanel{
 
     public void fireSelectedTransition(){
 		TransitionListItem item = transitionsList.getSelectedValue();
-
 		if(item != null) {
 			animator.dFireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
 		}
@@ -178,25 +177,34 @@ public class EnabledTransitionsList extends JPanel{
 		}
 
 		public int compareTo(TransitionListItem o) {
-			BigDecimal thisLower = IntervalOperations.getRatBound(this.transition.getDInterval().lowerBound()).getBound();
-			BigDecimal otherLower = IntervalOperations.getRatBound(o.transition.getDInterval().lowerBound()).getBound();
-			StringComparator s = new StringComparator();
-			//Sort according to lower bound
-			int result = thisLower.compareTo(otherLower);
-			//According to strict non strict
-			if(result == 0 && this.transition.getDInterval().isLowerBoundNonStrict() != o.transition.getDInterval().isLowerBoundNonStrict()){
-				if(this.transition.getDInterval().isLowerBoundNonStrict()){
-					result = -1;
-				} else {
-					result = 1;
-				}				
-			}
+            int result = 0;
+            if (transition.getDInterval() != null && o.transition.getDInterval() != null) {
+
+                BigDecimal thisLower = IntervalOperations.getRatBound(transition.getDInterval().lowerBound()).getBound();
+                BigDecimal otherLower = IntervalOperations.getRatBound(o.transition.getDInterval().lowerBound()).getBound();
+                
+                //Sort according to lower bound
+                result = thisLower.compareTo(otherLower);
+
+                //According to strict non strict
+                if (result == 0 && transition.getDInterval().isLowerBoundNonStrict() != o.transition.getDInterval().isLowerBoundNonStrict()) {
+                    if (transition.getDInterval().isLowerBoundNonStrict()) {
+                        result = -1;
+                    } else {
+                        result = 1;
+                    }				
+                }
+            }
+
+            StringComparator s = new StringComparator();
+
 			//According to template name
-			if(result == 0){
+			if (result == 0) {
 				result = s.compare(this.template.model().name(), o.template.model().name()); 
 			}
+
 			//According to transition name
-			if(result == 0){
+			if (result == 0) {
 				result = s.compare(this.transition.getName(), o.transition.getName());
 			}
 			
