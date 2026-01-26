@@ -17,23 +17,28 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DistributionPanel extends JPanel {
 
     private TimedTransitionComponent transition;
     private EscapableDialog dialog;
     private boolean updatingFields;
+    private String userDefinedName;
 
     private static final String[] continuous =  { "constant", "uniform", "exponential", "normal", "gamma", "erlang", "triangular", "log normal" };
     private static final String[] discrete =    { "discrete uniform", "geometric", "custom" };
+
+    private static final double GRAPH_EPSILON = 1e-9;
+    private static final int GRAPH_MIN_BINS = 5;
+    private static final int GRAPH_MAX_BINS = 50;
 
     public DistributionPanel(TimedTransitionComponent transition, EscapableDialog dialog) {
         this.transition = transition;
@@ -304,7 +309,7 @@ public class DistributionPanel extends JPanel {
                     double logStddev = Double.parseDouble(distributionParam2Field.getText());
                     return new SMCLogNormalDistribution(logMean, logStddev);
                 case SMCUserDefinedDistribution.NAME:
-                    return new SMCUserDefinedDistribution(userDefinedFile);
+                    return new SMCUserDefinedDistribution(userDefinedName);
             }
         } catch(NumberFormatException ignored) {}
         return SMCDistribution.defaultDistributionFor(type);
@@ -316,40 +321,45 @@ public class DistributionPanel extends JPanel {
         if (result == JFileChooser.APPROVE_OPTION) {
             java.io.File selectedFile = fileChooser.getSelectedFile();
             try {
-                validateUserDefinedFile(selectedFile);
+                List<Double> values = validateUserDefinedFile(selectedFile);
                 userDefinedFile = selectedFile;
-                distributionParam1Field.setText(userDefinedFile.getName());
+                
+                String potentialName = userDefinedFile.getName();
+                if (potentialName.contains(".")) {
+                	potentialName = potentialName.substring(0, potentialName.lastIndexOf('.'));
+                }
+                
+                TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
+
+                SMCUserDefinedDistribution existingDistribution = null;
+                for (SMCUserDefinedDistribution cd : network.userDefinedDistributions()) {
+                	if (cd.getName().equals(potentialName)) {
+                		existingDistribution = cd;
+                		break;
+                	}
+                }
+                
+                if (existingDistribution != null) {
+                	userDefinedName = existingDistribution.getName();
+                } else {
+                    SMCUserDefinedDistribution cd = new SMCUserDefinedDistribution(potentialName, values);
+                    network.add(cd);
+                    userDefinedName = potentialName;
+                }
+                
+                distributionParam1Field.setText(userDefinedName);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The selected file has an invalid format: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
-    private void validateUserDefinedFile(File file) throws Exception {
-        if (file == null || !file.exists()) {
-            throw new Exception("File not found.");
-        }
-
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            int lineNumber = 0;
-            boolean hasContent = false;
-            while ((line = br.readLine()) != null) {
-                ++lineNumber;
-                line = line.trim();
-                if (line.isEmpty()) continue;
-                hasContent = true;
-                try {
-                    Double.parseDouble(line);
-                } catch (NumberFormatException e) {
-                    throw new Exception("Invalid number format at line " + lineNumber + ": " + line);
-                }
-            }
-
-            if (!hasContent) {
-                throw new Exception("The file is empty.");
-            }
-        }
+    private List<Double> validateUserDefinedFile(File file) throws Exception {
+        return Files.lines(file.toPath())
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .map(Double::parseDouble)
+            .collect(Collectors.toList());
     }
 
     public void displayDistribution() {
@@ -474,7 +484,8 @@ public class DistributionPanel extends JPanel {
     private void displayFileSelection(SMCUserDefinedDistribution distribution) {
         distributionParam1Label.setText("File path :");
         userDefinedFile = distribution.getFile();
-        distributionParam1Field.setText(userDefinedFile != null ? userDefinedFile.getName() : "");
+        userDefinedName = distribution.getCustomDistributionName();
+        distributionParam1Field.setText(userDefinedName != null ? userDefinedName : (userDefinedFile != null ? userDefinedFile.getName() : ""));
         distributionParam1Field.setEditable(false);
         
         browseButton.setVisible(true);
@@ -769,50 +780,45 @@ public class DistributionPanel extends JPanel {
     }
 
     private Graph createGraph(SMCUserDefinedDistribution distribution) {
-        java.io.File file = distribution.getFile();
-        if (file == null || !file.exists()) {
-            throw new RequireException("File not found or not specified.");
+        String name = distribution.getName();
+        if (name == null && distribution.getFile() != null) {
+        	name = distribution.getFile().getName();
         }
+        
+    	TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
+    	SMCUserDefinedDistribution cd = null;
+    	for(SMCUserDefinedDistribution c : network.userDefinedDistributions()) {
+    		if(c.getName().equals(name)) {
+    			cd = c;
+    			break;
+    		}
+    	}
+    	
+    	if (cd == null) {
+             throw new RequireException("Custom distribution '" + name + "' not found.");
+    	}
 
-        List<Double> values = new ArrayList<>();
-        double sum = 0;
-
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            int lineNumber = 0;
-            while ((line = br.readLine()) != null) {
-                ++lineNumber;
-                line = line.trim();
-                if (line.isEmpty()) continue;
-                try {
-                    double value = Double.parseDouble(line);
-                    values.add(value);
-                    sum += value;
-                } catch (NumberFormatException e) {
-                    throw new RequireException("Invalid number format at line " + lineNumber + ": " + line);
-                }
-            }
-        } catch (java.io.IOException e) {
-            throw new RequireException("Error reading file: " + e.getMessage());
-        }
+        List<Double> values = cd.getValues();
 
         if (values.isEmpty()) {
-             throw new RequireException("The file is empty.");
+             throw new RequireException("The distribution contains no values.");
         }
-
-        List<GraphPoint> points = new ArrayList<>();
+        
+        double sum = 0;
         double min = Double.MAX_VALUE;
         double max = -Double.MAX_VALUE;
         for (double v : values) {
+        	sum += v;
             if (v < min) min = v;
             if (v > max) max = v;
         }
 
-        if (Math.abs(max - min) < 1e-9) {
+        List<GraphPoint> points = new ArrayList<>();
+        if (Math.abs(max - min) < GRAPH_EPSILON) {
             points.add(new GraphPoint(min, 1.0));
         } else {
             int numBins = (int)Math.sqrt(values.size());
-            numBins = Math.max(5, Math.min(numBins, 50));
+            numBins = Math.max(GRAPH_MIN_BINS, Math.min(numBins, GRAPH_MAX_BINS));
             double binWidth = (max - min) / numBins;
             List<Integer> counts = new ArrayList<>();
             for (int i = 0; i < numBins; ++i) {

@@ -14,6 +14,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.SMCUserDefinedDistribution;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
@@ -39,7 +40,7 @@ public class VerifyTAPNExporter {
 
 		try {
             this.model = model;
-            outputModel(model, modelFile, mapping, guiModel);
+            outputModel(model, modelFile, mapping, guiModel, lens);
 
             RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
 			query.getProperty().accept(placeVisitor, null);
@@ -97,6 +98,10 @@ public class VerifyTAPNExporter {
     }
 
 	protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
+        outputModel(model, modelFile, mapping, guiModel, TAPNLens.Default);
+    }
+
+    protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel, TAPNLens lens) throws FileNotFoundException {
         PrintStream modelStream = new PrintStream(modelFile);
 
 		modelStream.append("<pnml>\n");
@@ -128,6 +133,10 @@ public class VerifyTAPNExporter {
             outputInhibitorArc(inhibArc, modelStream);
         }
 
+        if (model.parentNetwork() != null && lens != null && lens.isStochastic()) {
+            outputCustomDistributions(modelStream, model);
+        }
+
         modelStream.append("</net>\n");
 		modelStream.append("</pnml>");
 		modelStream.close();
@@ -135,6 +144,17 @@ public class VerifyTAPNExporter {
 
 	protected void outputDeclarations(PrintStream modelStream){
 	    return;
+    }
+
+    protected void outputCustomDistributions(PrintStream modelStream, TimedArcPetriNet model) {
+        for (SMCUserDefinedDistribution cd : model.parentNetwork().userDefinedDistributions()) {
+            modelStream.append("<custom_distribution name=\"" + cd.getName() + "\">\n");
+            for (Double val : cd.getValues()) {
+                modelStream.append("<value>" + val + "</value>");
+            }
+
+            modelStream.append("\n</custom_distribution>\n");
+        }
     }
 
 	protected void outputPlace(TimedPlace p, PrintStream modelStream, DataLayer guiModel, NameMapping mapping) {

@@ -132,9 +132,8 @@ public abstract class SMCDistribution {
                     double logStddev = Double.parseDouble(elem.getAttribute("logStddev"));
                     return new SMCLogNormalDistribution(logMean, logStddev);
                 case SMCUserDefinedDistribution.NAME:
-                    String path = elem.getAttribute("path");
-                    File file = path.isEmpty() ? null : new File(path);
-                    return new SMCUserDefinedDistribution(file);
+                    String distributionName = elem.getAttribute("distributionName");
+                    return new SMCUserDefinedDistribution(distributionName);
             }
         } catch(NumberFormatException ignored) {}
         return SMCDistribution.defaultDistribution();

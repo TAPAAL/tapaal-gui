@@ -23,6 +23,7 @@ public class TimedArcPetriNetNetwork {
 	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
 	private final List<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
 	private final List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
+    private final List<SMCUserDefinedDistribution> userDefinedDistributions = new ArrayList<SMCUserDefinedDistribution>();
 	
 	private NetworkMarking currentMarking = new NetworkMarking();
 	private final ConstantStore constants;
@@ -92,6 +93,15 @@ public class TimedArcPetriNetNetwork {
 		if(!(sharedPlaces.contains(sharedPlace)))
 			sharedPlaces.add(sharedPlace);
 	}
+
+    public void add(SMCUserDefinedDistribution distribution){
+        Require.that(distribution != null, "Distribution cannot be null");
+        userDefinedDistributions.add(distribution);
+    }
+    
+    public List<SMCUserDefinedDistribution> userDefinedDistributions() {
+        return userDefinedDistributions;
+    }
 
 	public boolean isNameUsedForShared(String name){
 		for(SharedTransition transition : sharedTransitions){
