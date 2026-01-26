@@ -590,9 +590,9 @@ public class Animator {
                 if (arcExpr instanceof NumberOfExpression) {
                     NumberOfExpression numExpr = (NumberOfExpression) arcExpr;
                     for (ColorExpression ce : numExpr.getNumberOfExpression()) {
-                        Color color = getColorFromExpression(ce);
+                        Color color = getColorFromExpression(ce, place.getColorType());
                         if (color != null) {
-                            for (int i = 0; i < numExpr.getNumber(); i++) {
+                            for (int i = 0; i < numExpr.getNumber(); ++i) {
                                 newTokens.add(new TimedToken(place, BigDecimal.ZERO, color));
                             }
                         }
@@ -635,19 +635,36 @@ public class Animator {
         return new Tuple<>(newTokens, new AddExpression(numberOfExpressions));
     }
 
-    private Color getColorFromExpression(ColorExpression expr) {
+    private Color getColorFromExpression(ColorExpression expr, ColorType expectedType) {
         if (expr instanceof UserOperatorExpression) {
             return ((UserOperatorExpression)expr).getUserOperator();
         } else if (expr instanceof TupleExpression) {
             TupleExpression tupleExpr = (TupleExpression)expr;
             Vector<Color> components = new Vector<>();
-            for (ColorExpression ce : tupleExpr.getColors()) {
-                Color c = getColorFromExpression(ce);
-                if (c == null) return null;
-                components.add(c);
+
+            if (expectedType != null && expectedType.isProductColorType()) {
+                ProductType pt = (ProductType)expectedType;
+                if (pt.getColorTypes().size() != tupleExpr.getColors().size()) return null;
+                int i = 0;
+                for (ColorExpression ce : tupleExpr.getColors()) {
+                    Color c = getColorFromExpression(ce, pt.getColorTypes().get(i));
+                    if (c == null) return null;
+                    components.add(c);
+                    ++i;
+                }
+
+                return new Color(expectedType, 0, components);
+            } else {
+                for (ColorExpression ce : tupleExpr.getColors()) {
+                    Color c = getColorFromExpression(ce, null);
+                    if (c == null) return null;
+                    components.add(c);
+                }
+                
+                return new Color(tupleExpr.getColorType(), 0, components);
             }
-            
-            return new Color(tupleExpr.getColorType(), 0, components);
+        } else if (expr instanceof DotConstantExpression) {
+            return ColorType.COLORTYPE_DOT.getFirstColor();
         }
 
         return null;
