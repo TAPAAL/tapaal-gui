@@ -3207,7 +3207,9 @@ public class QueryDialog extends JPanel {
             double interpretedValue = Math.exp(logValue);
             smcPrecisionSlider.setRealValue(interpretedValue);
             double roundedValue = Math.round(interpretedValue * 10000.0) / 10000.0;
-            DecimalFormat df = new DecimalFormat("#.####");
+            DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
+            decimalFormatSymbols.setDecimalSeparator('.');
+            DecimalFormat df = new DecimalFormat("#.####", decimalFormatSymbols);
             String formattedValue = df.format(roundedValue);
             smcEstimationIntervalWidth.setText(formattedValue);
             smcPrecisionSlider.setToolTipText(String.format("Value: %s", formattedValue));
