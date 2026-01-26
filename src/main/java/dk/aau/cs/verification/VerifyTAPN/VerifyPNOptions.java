@@ -16,7 +16,7 @@ import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 
 public class VerifyPNOptions extends VerifyTAPNOptions{
 	private static final Map<TraceOption, String> traceMap = Map.of(
-        TraceOption.SOME, " --trace",
+        TraceOption.SOME, " --trace ",
 		TraceOption.NONE, ""
     );
 	private static final Map<SearchOption, String> searchMap = Map.of(
@@ -43,6 +43,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     private final boolean symmetricVars;
     private final boolean useTarjan;
     private final boolean useColoredReduction;
+
     private boolean useRawVerification;
     private String rawVerificationOptions;
 
@@ -69,6 +70,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean colorFixpoint,
         boolean useSymmetricVars,
         boolean useColoredReduction,
+        boolean useExplicitSearch,
         boolean useRawVerification,
         String rawVerificationOptions
     ) {
@@ -89,10 +91,14 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		this.reducedModelPath = pathToReducedNet;
 		this.symmetricVars = useSymmetricVars;
 		this.useColoredReduction = useColoredReduction;
+        this.useExplicitSearch = useExplicitSearch;
         this.useRawVerification = useRawVerification;
         this.rawVerificationOptions = rawVerificationOptions;
 
-        if (unfold && !useRawVerification) {
+        if (useExplicitSearch) {
+            unfoldedModelPath = null;
+            unfoldedQueriesPath = null;
+        } else if (unfold && !useRawVerification) {
             try {
                 if (Platform.isWindows()) {
                     unfoldedModelPath = "\"" + File.createTempFile("unfolded-", ".pnml").getAbsolutePath() + "\"";
@@ -128,9 +134,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean unfold,
         boolean partition,
         boolean colorFixpoint,
-        boolean useSymmetricVars
+        boolean useSymmetricVars,
+        boolean useExplicitSearch
     ) {
-        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false, true, null);
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false, useExplicitSearch, false, null);
     }
 
     public VerifyPNOptions(
@@ -158,7 +165,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean useRawVerification,
         String rawVerificationOptions
     ) {
-        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false, useRawVerification, rawVerificationOptions);
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, false, false, useRawVerification, rawVerificationOptions);
     }
 
     public VerifyPNOptions(
@@ -181,9 +188,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         boolean colored,
         boolean partition,
         boolean colorFixpoint,
-        boolean useSymmetricVars
+        boolean useSymmetricVars,
+        boolean useExplicitSearch
     ) {
-        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars);
+        this(extraTokens, traceOption, search, useOverApproximation, modelReduction, enableOverApproximation, enableUnderApproximation, approximationDenominator,queryCategory, algorithmOption, siphontrap, queryReduction, stubbornReduction, pathToReducedNet, useTarOption, useTarjan, colored, false, partition, colorFixpoint, useSymmetricVars, useExplicitSearch);
     }
 
     @Override
@@ -262,6 +270,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		if (this.useTarOption) {
 		    result.append(" --trace-abstraction ");
         }
+
 		if (colored) {
             if (!this.partition) {
                 result.append(" --disable-partitioning ");
@@ -272,8 +281,12 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
             if (!symmetricVars) {
                 result.append(" --disable-symmetry-vars ");
             }
+            if (useExplicitSearch) {
+                result.append(" -C ");
+            }
         }
-		if (!useColoredReduction && colored) {
+        
+        if (!useColoredReduction && colored && !useExplicitSearch) {
 		    result.append(" --col-reduction 0 ");
         }
 
@@ -287,4 +300,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	public AlgorithmOption getAlgorithmOption(){
 		return this.algorithmOption;
 	}
+
+    public boolean useExplicitSearch() {
+        return useExplicitSearch;
+    }
 }

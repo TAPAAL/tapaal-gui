@@ -38,8 +38,6 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 
-import javax.swing.*;
-
 import com.sun.jna.Platform;
 
 public class VerifyTAPN implements ModelChecker {

@@ -87,7 +87,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
         return hlinscriptionElement;
     }
 
-    private Element parseArcExpression(Expression expression, Document document, Element structureElement) {
+    public Element parseArcExpression(Expression expression, Document document, Element structureElement) {
         Require.notNull(expression, "We cannot save a null expression for " + structureElement.getNodeName());
         if(expression instanceof DotConstantExpression) {
             Element dotConstantElement = document.createElement("dotconstant");

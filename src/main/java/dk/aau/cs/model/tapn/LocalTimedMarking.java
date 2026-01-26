@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
@@ -23,6 +24,10 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 	public void setNetworkMarking(NetworkMarking marking){
 		parent = marking;
 	}
+
+    public NetworkMarking getNetworkMarking() {
+        return parent;
+    }
 
 	public void add(TimedToken token) {
 		if(token.place().isShared()) {
@@ -59,7 +64,6 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		}
 	}
 
-
 	private void remove(List<TimedToken> tokensToConsume) {
 		for (TimedToken token : tokensToConsume) {
 			remove(token);
@@ -80,6 +84,10 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
         }
 		return placesToTokensMap.get(place);
 	}
+
+    public Map<TimedPlace, List<TimedToken>> getPlacesToTokensMap() {
+        return placesToTokensMap;
+    }
 
 	public List<TimedToken> getTokensFor(TimedPlace place){
 		if(place.isShared()){
@@ -198,5 +206,19 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		
 		return true;
 	}
-	
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
+            sb.append(entry.getKey().name()).append(" -> ");
+            for (TimedToken token : entry.getValue()) {
+                sb.append(token.toString()).append(" ");
+            }
+            
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
 }

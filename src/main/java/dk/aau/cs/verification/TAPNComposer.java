@@ -645,7 +645,7 @@ public class TAPNComposer implements ITAPNComposer {
 		}
 	}
 
-   public String composedTransitionName(TimedTransition transition) {
+    public String composedTransitionName(TimedTransition transition) {
         if (transition.isShared()) {
             return "Shared_" + transition.name();
         } else if (singleComponentNoPrefix) {
@@ -653,11 +653,19 @@ public class TAPNComposer implements ITAPNComposer {
         } else {
             return transition.model().name() + "_" + transition.name();
         }
-   }
+    }
    
-   public String composedPlaceName(TimedPlace place) {
-        return  place.isShared() ? "Shared_" + place.name() : ((LocalTimedPlace)place).model().name() + "_" + place.name();
-   }
-   
+    public String composedPlaceName(TimedPlace place) {
+        if (place.isShared()) {
+            return "Shared_" + place.name();
+        } else if (singleComponentNoPrefix) {
+            return place.name();
+        } else {
+            return ((LocalTimedPlace)place).model().name() + "_" + place.name();
+        }
+    }
 
+    public TAPNLens getLens() {
+        return lens;
+    }
 }

@@ -756,6 +756,17 @@ public class TimedArcPetriNetNetwork {
         }
         return null;
     }
+
+    public Variable getVariableById(String id) {
+        for (Variable variable : variables) {
+            if (variable.getId().equals(id)) {
+                return variable;
+            }
+        }
+        
+        return null;
+    }
+
     public Color getColorByName(String name){
         for (ColorType element : colorTypes) {
             if(element.getColorByName(name) != null){
@@ -764,6 +775,21 @@ public class TimedArcPetriNetNetwork {
         }
         return null;
     }
+
+    public Color getProductColorByConstituents(Vector<Color> constituents) {
+        for (ColorType ct : colorTypes) {
+            if (ct.isProductColorType()) {
+                for (Color c : ct.getColors()) {
+                    if (c.getTuple() != null && c.getTuple().equals(constituents)) {
+                        return c;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public Variable getVariableByIndex(int index) {
         return variables.get(index);
     }

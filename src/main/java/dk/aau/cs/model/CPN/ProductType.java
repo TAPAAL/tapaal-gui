@@ -180,14 +180,20 @@ public class ProductType extends ColorType {
     }
 
     public void replaceColorType(ColorType newColorType, ColorType oldColorType){
+        boolean changed = false;
         for (ColorType ct : constituents){
-            if(ct.equals(oldColorType)){
+            if (ct.equals(oldColorType)) {
                 int index = constituents.indexOf(ct);
                 constituents.set(index, newColorType);
+                changed = true;
             }
         }
-
+        
+        if (changed) {
+            colorCache.clear();
+        }
     }
+
     @Override
     public ColorExpression createColorExpressionForFirstColor() {
         Vector<ColorExpression> tempVec = new Vector<>();

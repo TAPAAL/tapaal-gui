@@ -5,7 +5,6 @@ import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class TimedInhibitorArc extends TimedInputArc {
