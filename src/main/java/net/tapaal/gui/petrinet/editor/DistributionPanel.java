@@ -331,21 +331,9 @@ public class DistributionPanel extends JPanel {
                 
                 TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
 
-                SMCUserDefinedDistribution existingDistribution = null;
-                for (SMCUserDefinedDistribution cd : network.userDefinedDistributions()) {
-                	if (cd.getName().equals(potentialName)) {
-                		existingDistribution = cd;
-                		break;
-                	}
-                }
-                
-                if (existingDistribution != null) {
-                	userDefinedName = existingDistribution.getName();
-                } else {
-                    SMCUserDefinedDistribution cd = new SMCUserDefinedDistribution(potentialName, values);
-                    network.add(cd);
-                    userDefinedName = potentialName;
-                }
+                SMCUserDefinedDistribution cd = new SMCUserDefinedDistribution(potentialName, values);
+                network.add(cd);
+                userDefinedName = cd.getName();
                 
                 distributionParam1Field.setText(userDefinedName);
             } catch (Exception e) {
@@ -484,7 +472,7 @@ public class DistributionPanel extends JPanel {
     private void displayFileSelection(SMCUserDefinedDistribution distribution) {
         distributionParam1Label.setText("File path :");
         userDefinedFile = distribution.getFile();
-        userDefinedName = distribution.getCustomDistributionName();
+        userDefinedName = distribution.getName();
         distributionParam1Field.setText(userDefinedName != null ? userDefinedName : (userDefinedFile != null ? userDefinedFile.getName() : ""));
         distributionParam1Field.setEditable(false);
         

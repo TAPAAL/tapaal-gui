@@ -23,7 +23,7 @@ public class TimedArcPetriNetNetwork {
 	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
 	private final List<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
 	private final List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
-    private final List<SMCUserDefinedDistribution> userDefinedDistributions = new ArrayList<SMCUserDefinedDistribution>();
+    private final Map<String, SMCUserDefinedDistribution> userDefinedDistributions = new LinkedHashMap<String, SMCUserDefinedDistribution>();
 	
 	private NetworkMarking currentMarking = new NetworkMarking();
 	private final ConstantStore constants;
@@ -94,13 +94,33 @@ public class TimedArcPetriNetNetwork {
 			sharedPlaces.add(sharedPlace);
 	}
 
-    public void add(SMCUserDefinedDistribution distribution){
+    public void add(SMCUserDefinedDistribution distribution) {
         Require.that(distribution != null, "Distribution cannot be null");
-        userDefinedDistributions.add(distribution);
+        if (userDefinedDistributions.containsKey(distribution.getName())) {
+            SMCUserDefinedDistribution existing = userDefinedDistributions.get(distribution.getName());
+             if (existing.equals(distribution)) {
+                 return;
+             } else {
+                 distribution.setName(makeUniqueDistName(distribution.getName()));
+             }
+        }
+
+        userDefinedDistributions.put(distribution.getName(), distribution);
+    }
+
+    private String makeUniqueDistName(String name) {
+        String newName = name;
+        int i = 1;
+        while (userDefinedDistributions.containsKey(newName)) {
+            newName = name + "_" + i;
+            ++i;
+        }
+        
+        return newName;
     }
     
     public List<SMCUserDefinedDistribution> userDefinedDistributions() {
-        return userDefinedDistributions;
+        return new ArrayList<SMCUserDefinedDistribution>(userDefinedDistributions.values());
     }
 
 	public boolean isNameUsedForShared(String name){
