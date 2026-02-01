@@ -1108,8 +1108,17 @@ public class Animator {
         } else if (action.isTimedTransitionStep()) {
             var timedStep = (TAPNNetworkTimedTransitionStep)action;
             var transition = timedStep.getTransition();
-            var guiTransition = tab.getModel().getTransitionByName(transition.name());
-            tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(guiTransition.getToolTipText());
+            Transition guiTransition = null;
+            for (Template template : tab.activeTemplates()) {
+                if (template.model().equals(transition.model())) {
+                    guiTransition = template.guiModel().getTransitionByName(transition.name());
+                    break;
+                }
+            }
+            
+            if (guiTransition != null) {
+                tab.getAnimationHistorySidePanel().setTooltipForSelectedItem(guiTransition.getToolTipText());
+            }
         }
 
         actionHistory.add(action);
