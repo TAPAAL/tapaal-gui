@@ -1,6 +1,5 @@
 package dk.aau.cs.model.tapn;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,13 +10,8 @@ public class SMCUserDefinedDistribution extends SMCDistribution {
 
     public static final String NAME = "custom";
 
-    private File file;
     private String name;
     private List<Double> values = new ArrayList<>();
-
-    public SMCUserDefinedDistribution(File file) {
-        this.file = file;
-    }
 
     public SMCUserDefinedDistribution(String name) {
         this.name = name;
@@ -71,16 +65,8 @@ public class SMCUserDefinedDistribution extends SMCDistribution {
         return distributionName() + "(" + name + ")";
     }
 
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
-    }
-
     public static SMCUserDefinedDistribution defaultDistribution() {
-        return new SMCUserDefinedDistribution((File)null);
+        return new SMCUserDefinedDistribution("");
     }
 
     @Override
