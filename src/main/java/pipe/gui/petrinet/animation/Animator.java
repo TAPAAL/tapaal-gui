@@ -1110,8 +1110,8 @@ public class Animator {
             var transition = timedStep.getTransition();
             Transition guiTransition = null;
             for (Template template : tab.activeTemplates()) {
-                guiTransition = template.guiModel().getTransitionByName(transition.name());
-                if (guiTransition != null) {
+                if (template.model().equals(transition.model())) {
+                    guiTransition = template.guiModel().getTransitionByName(transition.name());
                     break;
                 }
             }
