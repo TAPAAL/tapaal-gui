@@ -33,6 +33,9 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
         this.parent = parent;
         initComponents();
         loadDistributions();
+        if (!listModel.isEmpty()) {
+            distributionList.setSelectedIndex(0);
+        }
     }
 
     private void initComponents() {
@@ -120,23 +123,11 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
             }
         }
         
-        FileBrowser browser = FileBrowser.constructor("Import Distribution", "txt", FileBrowser.userPath);
-        File file = browser.openFile();
-        if (file != null) {
-            try {
-               List<Double> values = Files.lines(file.toPath())
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .map(Double::parseDouble)
-                    .collect(Collectors.toList());
-                    
-               SMCUserDefinedDistribution newDist = new SMCUserDefinedDistribution(name, values);
-               network.add(newDist);
-               loadDistributions();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Error loading file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        SMCUserDefinedDistribution newDist = new SMCUserDefinedDistribution(name, new ArrayList<>());
+        network.add(newDist);
+        loadDistributions();
+        distributionList.setSelectedValue(name, true);
+        editDistribution();
     }
 
     private void editDistribution() {
@@ -162,7 +153,35 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
             JScrollPane scroll = new JScrollPane(textArea);
             scroll.setPreferredSize(new Dimension(300, 400));
             
-            int result = JOptionPane.showConfirmDialog(this, scroll, "Edit Values for " + selected, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            JButton loadButton = new JButton("Load from a file");
+            loadButton.addActionListener(e -> {
+                 FileBrowser browser = FileBrowser.constructor("Import Distribution", "txt", FileBrowser.userPath);
+                 File file = browser.openFile();
+                 if (file != null) {
+                    try {
+                        List<String> lines = Files.lines(file.toPath())
+                            .map(String::trim)
+                            .filter(s -> !s.isEmpty())
+                            .collect(Collectors.toList());
+                        
+                         StringBuilder newContent = new StringBuilder();
+                         for(String line : lines) {
+                             newContent.append(line).append("\n");
+                         }
+                         textArea.setText(newContent.toString());
+                         textArea.setCaretPosition(0);
+
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(this, "Error loading file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                 }
+            });
+
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.add(scroll, BorderLayout.CENTER);
+            panel.add(loadButton, BorderLayout.SOUTH);
+
+            int result = JOptionPane.showConfirmDialog(this, panel, "Edit Values for " + selected, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if (result == JOptionPane.OK_OPTION) {
                 String text = textArea.getText();
                 List<Double> newValues = new ArrayList<>();

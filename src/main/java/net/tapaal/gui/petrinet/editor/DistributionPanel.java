@@ -815,8 +815,7 @@ public class DistributionPanel extends JPanel {
         if (Math.abs(max - min) < GRAPH_EPSILON) {
             points.add(new GraphPoint(min, 1.0));
         } else {
-            int numBins = (int)Math.sqrt(values.size());
-            numBins = Math.max(GRAPH_MIN_BINS, Math.min(numBins, GRAPH_MAX_BINS));
+            int numBins = values.size();
             double binWidth = (max - min) / numBins;
             List<Integer> counts = new ArrayList<>();
             for (int i = 0; i < numBins; ++i) {
