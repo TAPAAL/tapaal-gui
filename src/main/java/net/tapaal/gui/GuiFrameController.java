@@ -248,16 +248,16 @@ public final class GuiFrameController implements GuiFrameControllerActions{
             buffer.append("Lasse Jacobsen, \nMorten Jacobsen,Thomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
             buffer.append("Mads Johannsen,\nKenneth Y. J\u00F8rgensen, Mikael H. M\u00F8ller, Christoffer Moesgaard, Kristian Morsing Pedersen,\nThomas Pedersen, Lena S. Ernstsen, Niels N. Samuelsen, Jiri Srba, Mathias G. S\u00F8rensen,\nJakob H. Taankvist, Peter H. Taankvist and Mikkel Tygesen\n");
 
-            buffer.append("Aalborg University 2008-2025\n\n");
+            buffer.append("Aalborg University 2008-2026\n\n");
 
         buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
             buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-            buffer.append("Aalborg University 2011-2025\n\n");
+            buffer.append("Aalborg University 2011-2026\n\n");
 
         buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
             buffer.append("Mathias Andersen, Tanguy Dubois, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
             buffer.append("Mathias G. S\u00F8rensen and Jakob H. Taankvist\n");
-            buffer.append("Aalborg University 2012-2025\n\n");
+            buffer.append("Aalborg University 2012-2026\n\n");
 
         buffer.append("TAPAAL Untimed Engine (verifypn):\n");
             buffer.append("Alexander Bilgram, Emil Normann Brandt, Frederik M. B\u00F8nneland, Jakob Dyhr, Malo Dautry, Peter Fogh, \n");
@@ -265,7 +265,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
             buffer.append("Tobias S. Jepsen, Mads Johannsen, Kenneth Y. J\u00F8rgensen, Isabella Kaufmann, \n");
             buffer.append("Alan Mozafar Khorsid, Andreas H. Klostergaard, Esben Nielsen, S\u00F8ren M. Nielsen, \nThomas S. Nielsen, ");
             buffer.append("Samuel Pastva, Thomas Pedersen, Kira S. Pedersen, Theodor Risager, Jiri Srba, \nAdam M. St\u00FCck, Andreas S. S\u00F8rensen, Mathias M. S\u00F8rensen, Peter H. Taankvist, Rasmus G. Tollund, \nNikolaj J. Ulrik, Simon M. Virenfeldt and Lars K. Oestergaard \n");
-            buffer.append("Aalborg University 2014-2025\n\n");
+            buffer.append("Aalborg University 2014-2026\n\n");
 
 
         buffer.append("\n");
