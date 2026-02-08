@@ -21,6 +21,8 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.LinkedHashMap;
 
@@ -32,10 +34,6 @@ public class DistributionPanel extends JPanel {
 
     private static final String[] continuous =  { "constant", "uniform", "exponential", "normal", "gamma", "erlang", "triangular", "log normal" };
     private static final String[] discrete =    { "discrete uniform", "geometric" };
-
-    private static final double GRAPH_EPSILON = 1e-9;
-    private static final int GRAPH_MIN_BINS = 5;
-    private static final int GRAPH_MAX_BINS = 50;
 
     public DistributionPanel(TimedTransitionComponent transition, EscapableDialog dialog) {
         this.transition = transition;
@@ -59,7 +57,7 @@ public class DistributionPanel extends JPanel {
         useCustomDistribution.addActionListener(act -> updateDistributionCategory());
 
         distributionType = new JComboBox<>(continuous);
-        distributionType.setPreferredSize(new Dimension(160, distributionType.getPreferredSize().height));
+        distributionType.setPreferredSize(new Dimension(220, distributionType.getPreferredSize().height));
         manageCustomDistributionsButton = new JButton("Manage distributions");
         manageCustomDistributionsButton.setVisible(false);
         manageCustomDistributionsButton.addActionListener(e -> showManageCustomDistributionsDialog());
@@ -244,13 +242,16 @@ public class DistributionPanel extends JPanel {
             if (!names.isEmpty()) {
                 distributionType.setSelectedIndex(0);
                 displayDistributionFields(new SMCUserDefinedDistribution(names.get(0)));
+                distributionShowGraph.setEnabled(true);
             } else {
                  distributionType.setSelectedItem(null);
                  displayCustomDistribution();
                  meanLabel.setText("");
                  meanValueLabel.setText("");
+                 distributionShowGraph.setEnabled(false);
             }
         } else {
+            distributionShowGraph.setEnabled(true);
             manageCustomDistributionsButton.setVisible(false);
             boolean toContinuous = useContinuousDistribution.isSelected();
             String currentDistribution = String.valueOf(distributionType.getSelectedItem());
@@ -272,6 +273,8 @@ public class DistributionPanel extends JPanel {
                 displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
             }
         }
+
+        dialog.pack();
     }
 
     public void setUrgent(boolean urgent) {
@@ -353,10 +356,12 @@ public class DistributionPanel extends JPanel {
             useContinuousDistribution.setSelected(true);
             distributionType.setModel(new DefaultComboBoxModel<>(continuous));
             manageCustomDistributionsButton.setVisible(false);
+            distributionShowGraph.setEnabled(true);
         } else if (Arrays.asList(discrete).contains(distribution.distributionName())) {
             distributionType.setModel(new DefaultComboBoxModel<>(discrete));
             useDiscreteDistribution.setSelected(true);
             manageCustomDistributionsButton.setVisible(false);
+            distributionShowGraph.setEnabled(true);
         } else if (distribution instanceof SMCUserDefinedDistribution) {
              useCustomDistribution.setSelected(true);
              manageCustomDistributionsButton.setVisible(true);
@@ -365,6 +370,7 @@ public class DistributionPanel extends JPanel {
                 .map(SMCUserDefinedDistribution::getName)
                 .collect(Collectors.toList());
              distributionType.setModel(new DefaultComboBoxModel<>(names.toArray(new String[0])));
+             distributionShowGraph.setEnabled(!names.isEmpty());
         }
         
         distributionParam1Field.setEditable(true);
@@ -486,7 +492,6 @@ public class DistributionPanel extends JPanel {
         distributionParam3Label.setVisible(false);
         distributionParam3Field.setVisible(false);
     }
-
 
     private void showManageCustomDistributionsDialog() {
         TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
@@ -805,34 +810,18 @@ public class DistributionPanel extends JPanel {
         double sum = 0;
         double min = Double.MAX_VALUE;
         double max = -Double.MAX_VALUE;
+        TreeMap<Double, Integer> frequencies = new TreeMap<>();
+
         for (double v : values) {
         	sum += v;
             if (v < min) min = v;
             if (v > max) max = v;
+            frequencies.put(v, frequencies.getOrDefault(v, 0) + 1);
         }
 
         List<GraphPoint> points = new ArrayList<>();
-        if (Math.abs(max - min) < GRAPH_EPSILON) {
-            points.add(new GraphPoint(min, 1.0));
-        } else {
-            int numBins = values.size();
-            double binWidth = (max - min) / numBins;
-            List<Integer> counts = new ArrayList<>();
-            for (int i = 0; i < numBins; ++i) {
-                counts.add(0);
-            }
-
-            for (double v : values) {
-                int bin = (int)((v - min) / binWidth);
-                if (bin >= numBins) bin = numBins - 1;
-                counts.set(bin, counts.get(bin) + 1);
-            }
-
-            for (int i = 0; i < numBins; ++i) {
-                double x = min + (i + 0.5) * binWidth;
-                double y = (double)counts.get(i) / values.size();
-                points.add(new GraphPoint(x, y));
-            }
+        for (Map.Entry<Double, Integer> entry : frequencies.entrySet()) {
+            points.add(new GraphPoint(entry.getKey(), (double)entry.getValue() / values.size()));
         }
 
         return new Graph(distribution.distributionName(), points, sum / values.size());
