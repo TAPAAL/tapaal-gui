@@ -573,9 +573,14 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     private boolean saveAs(TabActions tab) {
         boolean result;
         // save as
-        String path = tab.getTabTitle();
+        String suggestedName = tab.getTabTitle();
+        String path = null;
+        if (tab.getFile() != null) {
+            path = tab.getFile().getParent();
+            suggestedName = tab.getFile().getName();
+        }
 
-        String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
+        String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(suggestedName);
         if (filename != null) {
             File modelFile = new File(filename);
             tab.saveNet(modelFile);

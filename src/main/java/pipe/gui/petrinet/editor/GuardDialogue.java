@@ -182,10 +182,12 @@ public class GuardDialogue extends JPanel
 						JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0," + '\u221E' + ")", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					} else {
-					    for (Object interval : coloredArcGuardPanel.getTimeConstraintModel().toArray()) {
-					        if (interval instanceof ColoredTimeInterval && !((ColoredTimeInterval) interval).getInterval().equals(TimeInterval.ZERO_INF.toString())) {
-                                JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0," + '\u221E' + ")", "Error", JOptionPane.ERROR_MESSAGE);
-                                return;
+					    if (coloredArcGuardPanel.getTimeConstraintModel() != null) {
+                            for (Object interval : coloredArcGuardPanel.getTimeConstraintModel().toArray()) {
+                                if (interval instanceof ColoredTimeInterval && !((ColoredTimeInterval) interval).getInterval().equals(TimeInterval.ZERO_INF.toString())) {
+                                    JOptionPane.showMessageDialog(myRootPane, "Incoming arcs to urgent transitions must have the interval [0," + '\u221E' + ")", "Error", JOptionPane.ERROR_MESSAGE);
+                                    return;
+                                }
                             }
                         }
                     }
