@@ -18,6 +18,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
@@ -413,7 +415,7 @@ public class DistributionPanel extends JPanel {
     }
 
     private String formatValue(double value) {
-        DecimalFormat df = new DecimalFormat("#.#####");
+        DecimalFormat df = new DecimalFormat("#.#####", new DecimalFormatSymbols(Locale.ENGLISH));
         return df.format(value);
     }
 
