@@ -181,7 +181,7 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
             panel.add(scroll, BorderLayout.CENTER);
             panel.add(loadButton, BorderLayout.SOUTH);
 
-            int result = JOptionPane.showConfirmDialog(this, panel, "Edit Values (one real per line) for " + selected, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            int result = JOptionPane.showConfirmDialog(this, panel, "Edit Values (one real number per line) for " + selected, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if (result == JOptionPane.OK_OPTION) {
                 String text = textArea.getText();
                 List<Double> newValues = new ArrayList<>();
