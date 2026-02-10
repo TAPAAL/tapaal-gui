@@ -1,5 +1,9 @@
 package dk.aau.cs.verification.observations.expressions;
 
+import dk.aau.cs.TCTL.visitors.BooleanResult;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
+
 public abstract class ObsExpression {
     protected ObsExpression parent;
 
@@ -7,6 +11,10 @@ public abstract class ObsExpression {
     public abstract ObsExprPosition getObjectPosition(int index);
     public abstract ObsExprPosition getObjectPosition(ObsExpression expr);
     public abstract String toXml();
+
+    public ObsExpression replacePlace(TimedPlace toReplace, TimedPlace replacement, TimedArcPetriNet tapn, BooleanResult affected) {
+        return this;
+    }
 
     public boolean isOperator() {
         return false;
