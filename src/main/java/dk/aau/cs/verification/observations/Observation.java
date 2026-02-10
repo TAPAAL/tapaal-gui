@@ -1,5 +1,8 @@
 package dk.aau.cs.verification.observations;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.verification.observations.expressions.ObsExpression;
 import dk.aau.cs.verification.observations.expressions.ObsPlaceHolder;
 
@@ -40,6 +43,16 @@ public class Observation {
 
     public void setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
+    }
+
+    public boolean replacePlace(TimedPlace toReplace, TimedPlace replacement, TimedArcPetriNet tapn) {
+        BooleanResult affected = new BooleanResult(false);
+        ObsExpression newExpr = expression.replacePlace(toReplace, replacement, tapn, affected);
+        if (newExpr != expression) {
+            expression = newExpr;
+        }
+
+        return affected.result();
     }
 
     @Override
