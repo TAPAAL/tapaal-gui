@@ -62,15 +62,15 @@ public class DistributionPanel extends JPanel {
         distributionParam1Label = new JLabel();
         distributionParam2Label = new JLabel();
         distributionParam3Label = new JLabel();
-        distributionParam1Field = new JTextField(5);
-        distributionParam2Field = new JTextField(5);
-        distributionParam3Field = new JTextField(5);
+        distributionParam1Field = new JTextField(10);
+        distributionParam2Field = new JTextField(10);
+        distributionParam3Field = new JTextField(10);
 
         meanLabel = new JLabel();
         meanValueLabel = new JLabel();
-        SwingHelper.setPreferredWidth(distributionParam1Field, 100);
-        SwingHelper.setPreferredWidth(distributionParam2Field, 100);
-        SwingHelper.setPreferredWidth(distributionParam3Field, 100);
+        SwingHelper.setPreferredWidth(distributionParam1Field, 150);
+        SwingHelper.setPreferredWidth(distributionParam2Field, 150);
+        SwingHelper.setPreferredWidth(distributionParam3Field, 150);
         distributionType.addActionListener(actionEvent -> {
             if(!distributionType.hasFocus()) return;
             displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
@@ -205,7 +205,7 @@ public class DistributionPanel extends JPanel {
         paramPanel.add(distributionParam3Field, gbc);
         gbc = GridBagHelper.as(3 ,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        paramPanel.setPreferredSize(new Dimension(450, paramPanel.getPreferredSize().height));
+        paramPanel.setPreferredSize(new Dimension(600, paramPanel.getPreferredSize().height));
         add(paramPanel, gbc);
 
         gbc.fill = GridBagConstraints.NONE;
