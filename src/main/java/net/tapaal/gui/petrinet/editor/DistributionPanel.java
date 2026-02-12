@@ -116,6 +116,7 @@ public class DistributionPanel extends JPanel {
                         if (!text.isEmpty()) {
                             double rate = Double.parseDouble(text);
                             distributionParam2Field.setText(formatValue(1.0 / rate));
+                            distributionParam2Field.setCaretPosition(0);
                         }
                     } catch (NumberFormatException ignored) {
                     } finally {
@@ -142,6 +143,7 @@ public class DistributionPanel extends JPanel {
                         if (!text.isEmpty()) {
                             double mean = Double.parseDouble(text);
                             distributionParam1Field.setText(formatValue(1.0 / mean));
+                            distributionParam1Field.setCaretPosition(0);
                         }
                     } catch (NumberFormatException ignored) {
                     } finally {
@@ -384,6 +386,7 @@ public class DistributionPanel extends JPanel {
     private void displayOneVariable(String name, double value) {
         distributionParam1Label.setText(name + " :");
         distributionParam1Field.setText(formatValue(value));
+        distributionParam1Field.setCaretPosition(0);
         distributionParam2Label.setVisible(false);
         distributionParam2Field.setVisible(false);
         distributionParam3Label.setVisible(false);
@@ -395,6 +398,8 @@ public class DistributionPanel extends JPanel {
         distributionParam2Label.setText(name2 + " :");
         distributionParam1Field.setText(formatValue(value1));
         distributionParam2Field.setText(formatValue(value2));
+        distributionParam1Field.setCaretPosition(0);
+        distributionParam2Field.setCaretPosition(0);
         distributionParam2Label.setVisible(true);
         distributionParam2Field.setVisible(true);
         distributionParam3Label.setVisible(false);
@@ -408,6 +413,9 @@ public class DistributionPanel extends JPanel {
         distributionParam1Field.setText(formatValue(value1));
         distributionParam2Field.setText(formatValue(value2));
         distributionParam3Field.setText(formatValue(value3));
+        distributionParam1Field.setCaretPosition(0);
+        distributionParam2Field.setCaretPosition(0);
+        distributionParam3Field.setCaretPosition(0);
         distributionParam2Label.setVisible(true);
         distributionParam2Field.setVisible(true);
         distributionParam3Label.setVisible(true);
