@@ -129,6 +129,7 @@ public class DistributionPanel extends JPanel {
                         if (!text.isEmpty()) {
                             double rate = Double.parseDouble(text);
                             distributionParam2Field.setText(formatValue(1.0 / rate));
+                            SwingUtilities.invokeLater(() -> distributionParam2Field.setCaretPosition(0));
                         }
                     } catch (NumberFormatException ignored) {
                     } finally {
@@ -155,6 +156,7 @@ public class DistributionPanel extends JPanel {
                         if (!text.isEmpty()) {
                             double mean = Double.parseDouble(text);
                             distributionParam1Field.setText(formatValue(1.0 / mean));
+                            SwingUtilities.invokeLater(() -> distributionParam1Field.setCaretPosition(0));
                         }
                     } catch (NumberFormatException ignored) {
                     } finally {
@@ -465,6 +467,7 @@ public class DistributionPanel extends JPanel {
     private void displayOneVariable(String name, double value) {
         distributionParam1Label.setText(name + " :");
         distributionParam1Field.setText(formatValue(value));
+        SwingUtilities.invokeLater(() -> distributionParam1Field.setCaretPosition(0));
         distributionParam2Label.setVisible(false);
         distributionParam2Field.setVisible(false);
         distributionParam3Label.setVisible(false);
@@ -476,7 +479,9 @@ public class DistributionPanel extends JPanel {
         distributionParam1Label.setText(name1 + " :");
         distributionParam2Label.setText(name2 + " :");
         distributionParam1Field.setText(formatValue(value1));
+        SwingUtilities.invokeLater(() -> distributionParam1Field.setCaretPosition(0));
         distributionParam2Field.setText(formatValue(value2));
+        SwingUtilities.invokeLater(() -> distributionParam2Field.setCaretPosition(0));
         distributionParam2Label.setVisible(true);
         distributionParam2Field.setVisible(true);
         distributionParam3Label.setVisible(false);
@@ -489,8 +494,11 @@ public class DistributionPanel extends JPanel {
         distributionParam2Label.setText(name2 + " :");
         distributionParam3Label.setText(name3 + " :");
         distributionParam1Field.setText(formatValue(value1));
+        SwingUtilities.invokeLater(() -> distributionParam1Field.setCaretPosition(0));
         distributionParam2Field.setText(formatValue(value2));
+        SwingUtilities.invokeLater(() -> distributionParam2Field.setCaretPosition(0));
         distributionParam3Field.setText(formatValue(value3));
+        SwingUtilities.invokeLater(() -> distributionParam3Field.setCaretPosition(0));
         distributionParam2Label.setVisible(true);
         distributionParam2Field.setVisible(true);
         distributionParam3Label.setVisible(true);
@@ -517,8 +525,11 @@ public class DistributionPanel extends JPanel {
     }
 
     private String formatValue(double value) {
-        DecimalFormat df = new DecimalFormat("#.#####", new DecimalFormatSymbols(Locale.ENGLISH));
-        return df.format(value);
+        if (value == (long) value)
+            return String.format("%d", (long) value);
+        else {
+            return String.valueOf(value);
+        }
     }
 
     private void showDistributionGraph() {
