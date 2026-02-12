@@ -201,10 +201,10 @@ public class PlaceEditorPanel extends JPanel {
 			sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
 		}
 
-		sharedCheckBox.setEnabled(sharedPlaces.size() > 0 && !hasArcsToSharedTransitions(place.underlyingPlace()));
+		sharedCheckBox.setEnabled(sharedPlaces.size() > 0);
 		sharedCheckBox.setSelected(place.underlyingPlace().isShared());
 		
-		makeSharedButton.setEnabled(!sharedCheckBox.isSelected() && !hasArcsToSharedTransitions(place.underlyingPlace()));
+		makeSharedButton.setEnabled(!sharedCheckBox.isSelected());
 
 		nameTextField.setText(place.underlyingPlace().name());
 		nameTextField.selectAll();
@@ -212,27 +212,6 @@ public class PlaceEditorPanel extends JPanel {
 
 		setMarking(place.underlyingPlace().numberOfTokens());
 		setInvariantControlsBasedOn(place.underlyingPlace().invariant());		
-	}
-
-	private boolean hasArcsToSharedTransitions(TimedPlace underlyingPlace) {
-		for(TimedInputArc arc : context.activeModel().inputArcs()){
-			if(arc.source().equals(underlyingPlace) && arc.destination().isShared()) return true;
-		}
-
-		for(TimedOutputArc arc : context.activeModel().outputArcs()){
-			if(arc.destination().equals(underlyingPlace) && arc.source().isShared()) return true;
-		}
-
-		for(TransportArc arc : context.activeModel().transportArcs()){
-			if(arc.source().equals(underlyingPlace) && arc.transition().isShared()) return true;
-			if(arc.destination().equals(underlyingPlace) && arc.transition().isShared()) return true;
-		}
-
-		for(TimedInhibitorArc arc : context.activeModel().inhibitorArcs()){
-			if(arc.source().equals(underlyingPlace) && arc.destination().isShared()) return true;
-		}
-
-		return false;
 	}
 
 	private void initBasicPropertiesPanel() {
@@ -622,11 +601,13 @@ public class PlaceEditorPanel extends JPanel {
 		TimedPlace underlyingPlace = place.underlyingPlace();
 
 		SharedPlace selectedPlace = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
+
+        Command sharedCommand = null;
 		if(sharedCheckBox.isSelected() && !Objects.equals(selectedPlace, underlyingPlace)){
-			Command command = new MakePlaceSharedCommand(context.activeModel(), selectedPlace, place.underlyingPlace(), place, context.tabContent());
-			context.undoManager().addEdit(command);
+			sharedCommand = new MakePlaceSharedCommand(context.activeModel(), selectedPlace, place.underlyingPlace(), place, context.tabContent());
+			context.undoManager().addEdit(sharedCommand);
 			try{
-				command.redo();
+				sharedCommand.redo();
 			}catch(RequireException e){
 				context.undoManager().undo();
                 doNewEdit = true;
@@ -680,6 +661,20 @@ public class PlaceEditorPanel extends JPanel {
 							Command cmd = new MakePlaceNewSharedMultiCommand(context, newName, place);
 							cmd.redo();
 							context.undoManager().addNewEdit(cmd);
+                            
+                            boolean success = SharedElementSynchronizer.updateSharedArcs(place);
+                            if (!success) {
+                                cmd.undo();
+                                context.undoManager().removeCurrentEdit();
+                                doNewEdit = true;
+                    
+                                JOptionPane.showMessageDialog(
+                                    this,
+                                    "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                    
+                                return false;
+                            }
 						} else {
 							return false;
 						}
@@ -712,6 +707,23 @@ public class PlaceEditorPanel extends JPanel {
 		place.repaint();
 
 		context.network().buildConstraints();
+
+        SharedPlace placeBefore = sharedCheckBox.isSelected() ? (SharedPlace)place.underlyingPlace() : null;
+        boolean sameSharedAsBefore = placeBefore != null && selectedPlace.equals(placeBefore);
+        if (sharedCheckBox.isSelected() && sameSharedAsBefore) {
+            boolean success = SharedElementSynchronizer.updateSharedArcs(place);
+            if (!success) {
+                sharedCommand.undo();
+                context.undoManager().removeCurrentEdit();
+                doNewEdit = true;
+                JOptionPane.showMessageDialog(
+                    this,
+                    "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+    
+                return false;
+            }
+        }
 
         doOKChecked = true;
         
