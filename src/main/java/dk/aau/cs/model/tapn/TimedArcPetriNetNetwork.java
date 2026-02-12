@@ -23,6 +23,7 @@ public class TimedArcPetriNetNetwork {
 	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
 	private final List<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
 	private final List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
+    private final Map<String, SMCUserDefinedDistribution> userDefinedDistributions = new LinkedHashMap<String, SMCUserDefinedDistribution>();
 	
 	private NetworkMarking currentMarking = new NetworkMarking();
 	private final ConstantStore constants;
@@ -92,6 +93,50 @@ public class TimedArcPetriNetNetwork {
 		if(!(sharedPlaces.contains(sharedPlace)))
 			sharedPlaces.add(sharedPlace);
 	}
+
+    public void add(SMCUserDefinedDistribution distribution) {
+        Require.that(distribution != null, "Distribution cannot be null");
+        userDefinedDistributions.put(distribution.getName(), distribution);
+    }
+
+    public void removeUserDefinedDistribution(String name) {
+        userDefinedDistributions.remove(name);
+    }
+    
+    public void renameUserDefinedDistribution(String oldName, String newName) {
+        if (!userDefinedDistributions.containsKey(oldName)) return;
+
+        SMCUserDefinedDistribution dist = userDefinedDistributions.remove(oldName);
+        dist.setName(newName);
+        userDefinedDistributions.put(newName, dist);
+
+        for (SharedTransition st : sharedTransitions) {
+            if (st.getDistribution() instanceof SMCUserDefinedDistribution) {
+                SMCUserDefinedDistribution d = (SMCUserDefinedDistribution) st.getDistribution();
+                if (d == dist || d.getName().equals(oldName)) {
+                    d.setName(newName);
+                    st.setDistribution(d);
+                }
+            }
+        }
+
+        for (TimedArcPetriNet tapn : tapns) {
+            for (TimedTransition t : tapn.transitions()) {
+                if (t.isShared()) continue;
+                if (t.getDistribution() instanceof SMCUserDefinedDistribution) {
+                    SMCUserDefinedDistribution d = (SMCUserDefinedDistribution) t.getDistribution();
+                    if (d == dist || d.getName().equals(oldName)) {
+                        d.setName(newName);
+                        t.setDistribution(d);
+                    }
+                }
+            }
+        }
+    }
+
+    public List<SMCUserDefinedDistribution> userDefinedDistributions() {
+        return new ArrayList<SMCUserDefinedDistribution>(userDefinedDistributions.values());
+    }
 
 	public boolean isNameUsedForShared(String name){
 		for(SharedTransition transition : sharedTransitions){
@@ -222,6 +267,22 @@ public class TimedArcPetriNetNetwork {
 		}
 		return cmd;
 	}
+
+    public void updateUserDefinedDistributions(String oldName, String newName) {
+        for (TimedArcPetriNet tapn : allTemplates()) {
+            for (TimedTransition transition : tapn.transitions()) {
+                if (transition.getDistribution() instanceof SMCUserDefinedDistribution) {
+                    SMCUserDefinedDistribution dist = (SMCUserDefinedDistribution) transition.getDistribution();
+                     if (dist.getName().equals(oldName)) {
+                         dist.setName(newName);
+                         transition.setDistribution(dist);
+                     } else if (dist.getName().equals(newName)) {
+                         transition.setDistribution(dist);
+                     }
+                }
+            }
+        }
+    }
 
 	public Command updateConstant(String oldName, Constant constant) {
 		Constant old = constants.getConstantByName(oldName);

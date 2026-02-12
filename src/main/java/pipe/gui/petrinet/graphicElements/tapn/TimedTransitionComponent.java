@@ -76,6 +76,8 @@ public class TimedTransitionComponent extends Transition {
 			}
 
 			public void sharedStateChanged(TimedTransitionEvent e) { repaint(); }
+            
+            public void distributionChanged(TimedTransitionEvent e) { TimedTransitionComponent.this.update(true); }
 		};
 	}
 

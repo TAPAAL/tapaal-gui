@@ -31,6 +31,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
+import dk.aau.cs.model.tapn.SMCUserDefinedDistribution;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Require;
@@ -78,8 +79,12 @@ public class PNMLWriter implements NetWriter {
         nameNode.appendChild(nameText);
         nameText.setTextContent(composedNetwork.name());
 
-        if(lens.isColored()) {
+        if (lens.isColored()) {
             writeTACPN.appendDeclarations(document, netNode);
+        }
+        
+        if (lens.isStochastic()) {
+            appendCustomDistributions(document, netNode);
         }
 
 		Element pageNode = document.createElement("page"); //Page node
@@ -101,6 +106,20 @@ public class PNMLWriter implements NetWriter {
 		
 		return os;
 	}
+
+    private void appendCustomDistributions(Document document, Element root) {
+        for (SMCUserDefinedDistribution cd : network.userDefinedDistributions()) {
+            Element element = document.createElement("custom_distribution");
+            element.setAttribute("name", cd.getName());
+            for (Double val : cd.getValues()) {
+                Element valElement = document.createElement("value");
+                valElement.setTextContent(val.toString());
+                element.appendChild(valElement);
+            }
+
+            root.appendChild(element);
+        }
+    }
 
 	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerException {
 		Require.that(file != null, "Error: file to save to was null");
