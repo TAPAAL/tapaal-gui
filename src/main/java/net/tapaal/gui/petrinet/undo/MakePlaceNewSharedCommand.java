@@ -20,6 +20,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.verification.observations.Observation;
 
 public class MakePlaceNewSharedCommand implements Command {
 	private final String newSharedName;
@@ -120,14 +121,20 @@ public class MakePlaceNewSharedCommand implements Command {
 	
 	private void updateQueries(TimedPlace toReplace, TimedPlace replacement) {
 		MakePlaceSharedVisitor visitor = new MakePlaceSharedVisitor((toReplace.isShared() ? "" : tapn.name()), toReplace.name(), (replacement.isShared() ? "" : tapn.name()), replacement.name());
-		for(TAPNQuery query : currentTab.queries()) {
+		for (TAPNQuery query : currentTab.queries()) {
 			TAPNQuery oldCopy = query.copy();
 			BooleanResult isQueryAffected = new BooleanResult(false);
 			query.getProperty().accept(visitor, isQueryAffected);
+
+			for (Observation obs : query.getSmcSettings().getObservations()) {
+				if (obs.replacePlace(toReplace, replacement, tapn)) {
+					isQueryAffected.setResult(true);
+				}
+			}
 			
-			if(isQueryAffected.result())
+			if (isQueryAffected.result()) {
 				newQueryToOldQueryMapping.put(query, oldCopy);
-				
+            }
 		}
 	}
 		
