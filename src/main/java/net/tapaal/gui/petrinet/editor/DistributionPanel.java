@@ -233,6 +233,10 @@ public class DistributionPanel extends JPanel {
     }
 
     private void updateDistributionCategory() {
+        updateDistributionCategory(null);
+    }
+
+    private void updateDistributionCategory(String selectedDistribution) {
         if (useCustomDistribution.isSelected()) {
             TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
             List<String> names = network.userDefinedDistributions().stream()
@@ -242,8 +246,14 @@ public class DistributionPanel extends JPanel {
             manageCustomDistributionsButton.setVisible(true);
             
             if (!names.isEmpty()) {
-                distributionType.setSelectedIndex(0);
-                displayDistributionFields(new SMCUserDefinedDistribution(names.get(0)));
+                if (selectedDistribution != null && names.contains(selectedDistribution)) {
+                     distributionType.setSelectedItem(selectedDistribution);
+                     displayDistributionFields(new SMCUserDefinedDistribution(selectedDistribution));
+                } else {
+                     distributionType.setSelectedIndex(0);
+                     displayDistributionFields(new SMCUserDefinedDistribution(names.get(0)));
+                }
+                
                 distributionShowGraph.setEnabled(true);
             } else {
                  distributionType.setSelectedItem(null);
@@ -285,11 +295,13 @@ public class DistributionPanel extends JPanel {
             distributionType.setEnabled(false);
             useDiscreteDistribution.setEnabled(false);
             useContinuousDistribution.setEnabled(false);
+            useCustomDistribution.setEnabled(false);
             distributionParam1Field.setEnabled(false);
         } else {
             distributionType.setEnabled(true);
             useDiscreteDistribution.setEnabled(true);
             useContinuousDistribution.setEnabled(true);
+            useCustomDistribution.setEnabled(true);
             distributionParam1Field.setEnabled(true);
         }
     }
@@ -500,7 +512,7 @@ public class DistributionPanel extends JPanel {
         ManageCustomDistributionsDialog dialog = new ManageCustomDistributionsDialog(network, this);
         dialog.setVisible(true);
         if (useCustomDistribution.isSelected()) {
-             updateDistributionCategory();
+             updateDistributionCategory(dialog.getSelectedDistribution());
         }
     }
 

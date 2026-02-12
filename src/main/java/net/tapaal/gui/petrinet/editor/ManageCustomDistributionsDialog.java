@@ -37,6 +37,10 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
             distributionList.setSelectedIndex(0);
         }
     }
+    
+    public String getSelectedDistribution() {
+        return distributionList.getSelectedValue();
+    }
 
     private void initComponents() {
         setLayout(new GridBagLayout());
@@ -110,7 +114,7 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
     }
 
     private void addDistribution() {
-        String name = JOptionPane.showInputDialog(this, "Enter name for the new distribution:");
+        String name = JOptionPane.showInputDialog(this, "Enter name for the new distribution:", "Create Distribution", JOptionPane.PLAIN_MESSAGE);
         if (name == null || name.trim().isEmpty()) {
             return;
         }
@@ -151,7 +155,7 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
             JTextArea textArea = new JTextArea(sb.toString());
             textArea.setEditable(true);
             JScrollPane scroll = new JScrollPane(textArea);
-            scroll.setPreferredSize(new Dimension(300, 400));
+            scroll.setPreferredSize(new Dimension(450, 400));
             
             JButton loadButton = new JButton("Load from a file");
             loadButton.addActionListener(e -> {
@@ -225,7 +229,7 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
 
         if (dist == null) return;
 
-        String newName = JOptionPane.showInputDialog(this, "Enter new name for the distribution:", selected);
+        String newName = (String)JOptionPane.showInputDialog(this, "Enter new name for the distribution:", "Rename Distribution", JOptionPane.PLAIN_MESSAGE, null, null, selected);
         if (newName == null) return;
         newName = newName.trim();
         
