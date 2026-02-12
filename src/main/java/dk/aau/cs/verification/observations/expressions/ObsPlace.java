@@ -3,6 +3,7 @@ package dk.aau.cs.verification.observations.expressions;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.TCTL.visitors.BooleanResult;
 
 public class ObsPlace extends ObsLeaf {
     private final Object template;
@@ -25,6 +26,20 @@ public class ObsPlace extends ObsLeaf {
     }
 
     @Override
+    public ObsExpression replacePlace(TimedPlace toReplace, TimedPlace replacement, TimedArcPetriNet tapn, BooleanResult affected) {
+        if (place.equals(toReplace)) {
+            affected.setResult(true);
+            if (replacement.isShared()) {
+                return new ObsPlace("Shared", replacement);
+            }
+            
+            return new ObsPlace(tapn, replacement);
+        }
+
+        return this;
+    }
+
+    @Override
     public String toString() {
         return template + "." + place.name();
     }
@@ -44,5 +59,13 @@ public class ObsPlace extends ObsLeaf {
     @Override
     public boolean isPlace() {
         return true;
+    }
+
+    public TimedPlace getPlace() {
+        return place;
+    }
+
+    public Object getTemplate() {
+        return template;
     }
 }

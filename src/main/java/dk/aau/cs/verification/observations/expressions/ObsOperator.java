@@ -1,5 +1,9 @@
 package dk.aau.cs.verification.observations.expressions;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.TCTL.visitors.BooleanResult;
+
 public abstract class ObsOperator extends ObsExpression {
     protected ObsExpression left;
     protected ObsExpression right;
@@ -12,6 +16,23 @@ public abstract class ObsOperator extends ObsExpression {
 
     protected ObsOperator() {
         this(new ObsPlaceHolder(), new ObsPlaceHolder());
+    }
+
+    @Override
+    public ObsExpression replacePlace(TimedPlace toReplace, TimedPlace replacement, TimedArcPetriNet tapn, BooleanResult affected) {
+        ObsExpression newLeft = left.replacePlace(toReplace, replacement, tapn, affected);
+        if (newLeft != left) {
+            setLeft(newLeft);
+            newLeft.setParent(this);
+        }
+
+        ObsExpression newRight = right.replacePlace(toReplace, replacement, tapn, affected);
+        if (newRight != right) {
+            setRight(newRight);
+            newRight.setParent(this);
+        }
+        
+        return this;
     }
 
     public void insertLeftMost(ObsExpression expr) {
