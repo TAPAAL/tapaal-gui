@@ -59,7 +59,7 @@ public class DistributionPanel extends JPanel {
         useCustomDistribution.addActionListener(act -> updateDistributionCategory());
 
         distributionType = new JComboBox<>(continuous);
-        distributionType.setPreferredSize(new Dimension(220, distributionType.getPreferredSize().height));
+        distributionType.setPreferredSize(new Dimension(150, distributionType.getPreferredSize().height));
         manageCustomDistributionsButton = new JButton("Manage distributions");
         manageCustomDistributionsButton.setVisible(false);
         manageCustomDistributionsButton.addActionListener(e -> showManageCustomDistributionsDialog());
@@ -80,7 +80,7 @@ public class DistributionPanel extends JPanel {
         distributionType.addActionListener(actionEvent -> {
             if(!distributionType.hasFocus()) return;
             if (useCustomDistribution.isSelected()) {
-                 String selectedName = (String) distributionType.getSelectedItem();
+                 String selectedName = (String)distributionType.getSelectedItem();
                  if (selectedName != null) {
                      displayDistributionFields(new SMCUserDefinedDistribution(selectedName));
                  }
@@ -189,6 +189,7 @@ public class DistributionPanel extends JPanel {
         
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.EAST;
+        add(distributionShowGraph, gbc);
 
         JPanel paramPanel = new JPanel(new GridBagLayout());
         gbc = GridBagHelper.as(0,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
@@ -222,15 +223,11 @@ public class DistributionPanel extends JPanel {
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         paramPanel.add(distributionParam3Field, gbc);
-        gbc = GridBagHelper.as(5 ,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
+        gbc = GridBagHelper.as(0, 1, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        paramPanel.setPreferredSize(new Dimension(600, paramPanel.getPreferredSize().height));
+        gbc.gridwidth = 6;
+        paramPanel.setPreferredSize(new Dimension(765, paramPanel.getPreferredSize().height));
         add(paramPanel, gbc);
-
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.EAST;
-        add(distributionShowGraph, gbc);
 
         setUrgent(transition.underlyingTransition().isUrgent());
     }
@@ -517,11 +514,27 @@ public class DistributionPanel extends JPanel {
     }
 
     private void showManageCustomDistributionsDialog() {
+        String previouslySelected = (String)distributionType.getSelectedItem();
         TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
+
+        SMCUserDefinedDistribution previousDist = null;
+        if (previouslySelected != null) {
+            for (SMCUserDefinedDistribution dist : network.userDefinedDistributions()) {
+                if (dist.getName().equals(previouslySelected)) {
+                    previousDist = dist;
+                    break;
+                }
+            }
+        }
+
         ManageCustomDistributionsDialog dialog = new ManageCustomDistributionsDialog(network, this);
         dialog.setVisible(true);
         if (useCustomDistribution.isSelected()) {
-             updateDistributionCategory(dialog.getSelectedDistribution());
+             if (previousDist != null && network.userDefinedDistributions().contains(previousDist)) {
+                 updateDistributionCategory(previousDist.getName());
+             } else {
+                 updateDistributionCategory(previouslySelected);
+             }
         }
     }
 
