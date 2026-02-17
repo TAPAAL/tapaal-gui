@@ -37,8 +37,26 @@ public class DistributionPanel extends JPanel {
     private static final String[] continuous =  { "constant", "uniform", "exponential", "normal", "gamma", "erlang", "triangular", "log normal" };
     private static final String[] discrete =    { "discrete uniform", "geometric" };
 
-    public DistributionPanel(TimedTransitionComponent transition, EscapableDialog dialog) {
+    private JRadioButton useContinuousDistribution;
+    private JRadioButton useDiscreteDistribution;
+    private JRadioButton useCustomDistribution;
+    private ButtonGroup distributionCategoryGroup;
+    private JComboBox<String> distributionType;
+    private JButton distributionShowGraph;
+    private JButton manageCustomDistributionsButton;
+    private JButton okButton;
+    private JLabel distributionParam1Label;
+    private JLabel distributionParam2Label;
+    private JLabel distributionParam3Label;
+    private JTextField distributionParam1Field;
+    private JTextField distributionParam2Field;
+    private JTextField distributionParam3Field;
+    private JLabel meanLabel;
+    private JLabel meanValueLabel;
+
+    public DistributionPanel(TimedTransitionComponent transition, JButton okButton, EscapableDialog dialog) {
         this.transition = transition;
+        this.okButton = okButton;
         this.dialog = dialog;
         initComponents();
         displayDistribution();
@@ -247,23 +265,26 @@ public class DistributionPanel extends JPanel {
             
             if (!names.isEmpty()) {
                 if (selectedDistribution != null && names.contains(selectedDistribution)) {
-                     distributionType.setSelectedItem(selectedDistribution);
-                     displayDistributionFields(new SMCUserDefinedDistribution(selectedDistribution));
+                    distributionType.setSelectedItem(selectedDistribution);
+                    displayDistributionFields(new SMCUserDefinedDistribution(selectedDistribution));
                 } else {
-                     distributionType.setSelectedIndex(0);
-                     displayDistributionFields(new SMCUserDefinedDistribution(names.get(0)));
+                    distributionType.setSelectedIndex(0);
+                    displayDistributionFields(new SMCUserDefinedDistribution(names.get(0)));
                 }
                 
                 distributionShowGraph.setEnabled(true);
+                okButton.setEnabled(true);
             } else {
-                 distributionType.setSelectedItem(null);
-                 displayCustomDistribution();
-                 meanLabel.setText("");
-                 meanValueLabel.setText("");
-                 distributionShowGraph.setEnabled(false);
+                distributionType.setSelectedItem(null);
+                displayCustomDistribution();
+                meanLabel.setText("");
+                meanValueLabel.setText("");
+                distributionShowGraph.setEnabled(false);
+                okButton.setEnabled(false);
             }
         } else {
             distributionShowGraph.setEnabled(true);
+            okButton.setEnabled(true);
             manageCustomDistributionsButton.setVisible(false);
             boolean toContinuous = useContinuousDistribution.isSelected();
             String currentDistribution = String.valueOf(distributionType.getSelectedItem());
@@ -371,20 +392,23 @@ public class DistributionPanel extends JPanel {
             distributionType.setModel(new DefaultComboBoxModel<>(continuous));
             manageCustomDistributionsButton.setVisible(false);
             distributionShowGraph.setEnabled(true);
+            okButton.setEnabled(true);
         } else if (Arrays.asList(discrete).contains(distribution.distributionName())) {
             distributionType.setModel(new DefaultComboBoxModel<>(discrete));
             useDiscreteDistribution.setSelected(true);
             manageCustomDistributionsButton.setVisible(false);
             distributionShowGraph.setEnabled(true);
+            okButton.setEnabled(true);
         } else if (distribution instanceof SMCUserDefinedDistribution) {
-             useCustomDistribution.setSelected(true);
-             manageCustomDistributionsButton.setVisible(true);
-             TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
-             List<String> names = network.userDefinedDistributions().stream()
-                .map(SMCUserDefinedDistribution::getName)
-                .collect(Collectors.toList());
-             distributionType.setModel(new DefaultComboBoxModel<>(names.toArray(new String[0])));
-             distributionShowGraph.setEnabled(!names.isEmpty());
+            useCustomDistribution.setSelected(true);
+            manageCustomDistributionsButton.setVisible(true);
+            TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
+            List<String> names = network.userDefinedDistributions().stream()
+                                        .map(SMCUserDefinedDistribution::getName)
+                                        .collect(Collectors.toList());
+            distributionType.setModel(new DefaultComboBoxModel<>(names.toArray(new String[0])));
+            distributionShowGraph.setEnabled(!names.isEmpty());
+            okButton.setEnabled(!names.isEmpty());
         }
         
         distributionParam1Field.setEditable(true);
@@ -862,20 +886,4 @@ public class DistributionPanel extends JPanel {
 
         return new Graph(distribution.distributionName(), points, sum / values.size());
     }
-
-    private JRadioButton useContinuousDistribution;
-    private JRadioButton useDiscreteDistribution;
-    private JRadioButton useCustomDistribution;
-    private ButtonGroup distributionCategoryGroup;
-    private JComboBox<String> distributionType;
-    private JButton distributionShowGraph;
-    private JButton manageCustomDistributionsButton;
-    private JLabel distributionParam1Label;
-    private JLabel distributionParam2Label;
-    private JLabel distributionParam3Label;
-    private JTextField distributionParam1Field;
-    private JTextField distributionParam2Field;
-    private JTextField distributionParam3Field;
-    private JLabel meanLabel;
-    private JLabel meanValueLabel;
 }
