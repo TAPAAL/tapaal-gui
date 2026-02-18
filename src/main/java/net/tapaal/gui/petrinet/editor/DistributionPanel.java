@@ -96,12 +96,12 @@ public class DistributionPanel extends JPanel {
         SwingHelper.setPreferredWidth(distributionParam2Field, 150);
         SwingHelper.setPreferredWidth(distributionParam3Field, 150);
         distributionType.addActionListener(actionEvent -> {
-            if(!distributionType.hasFocus()) return;
+            if (!distributionType.hasFocus()) return;
             if (useCustomDistribution.isSelected()) {
-                 String selectedName = (String)distributionType.getSelectedItem();
-                 if (selectedName != null) {
-                     displayDistributionFields(new SMCUserDefinedDistribution(selectedName));
-                 }
+                String selectedName = (String)distributionType.getSelectedItem();
+                if (selectedName != null) {
+                    displayDistributionFields(new SMCUserDefinedDistribution(selectedName));
+                }
             } else {
                 displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
             }
@@ -885,5 +885,13 @@ public class DistributionPanel extends JPanel {
         }
 
         return new Graph(distribution.distributionName(), points, sum / values.size());
+    }
+
+    public boolean canEnableOkButton() {
+        if (useCustomDistribution.isSelected()) {
+            return distributionType.getSelectedItem() != null;
+        }
+
+        return true;
     }
 }

@@ -635,7 +635,11 @@ public class TAPNTransitionEditor extends JPanel {
 		return true;
 	}
 
-	public void enableOKButton(boolean enable){
+	public void tryToEnableOkButton(boolean enable) {
+        if (enable && !distributionPanel.canEnableOkButton()) {
+            return;
+        }
+
 	    okButton.setEnabled(enable);
     }
 
