@@ -346,7 +346,7 @@ public class TAPNTransitionEditor extends JPanel {
 		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
 		nameTextField.setText(transition.getName());
 		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel<>(sharedTransitions));
-		sharedCheckBox.setEnabled(sharedTransitions.size() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
+		sharedCheckBox.setEnabled(sharedTransitions.size() > 0);
 		urgentCheckBox.setSelected(transition.isUrgent());
 		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
 		coloredTransitionGuardPanel.initExpr(transition.getGuardExpression());
@@ -376,29 +376,8 @@ public class TAPNTransitionEditor extends JPanel {
 		}else{
 			switchToNameTextField();
 		}
-		makeSharedButton.setEnabled(!sharedCheckBox.isSelected() && !hasArcsToSharedPlaces(transition.underlyingTransition()));
+		makeSharedButton.setEnabled(!sharedCheckBox.isSelected());
 		attributesCheckBox.setSelected(transition.getAttributesVisible());
-	}
-	
-	private boolean hasArcsToSharedPlaces(TimedTransition underlyingTransition) {
-		for(TimedInputArc arc : context.activeModel().inputArcs()){
-			if(arc.destination().equals(underlyingTransition) && arc.source().isShared()) return true;
-		}
-		
-		for(TimedOutputArc arc : context.activeModel().outputArcs()){
-			if(arc.source().equals(underlyingTransition) && arc.destination().isShared()) return true;
-		}
-		
-		for(TransportArc arc : context.activeModel().transportArcs()){
-			if(arc.transition().equals(underlyingTransition) && arc.source().isShared()) return true;
-			if(arc.transition().equals(underlyingTransition) && arc.destination().isShared()) return true;
-		}
-		
-		for(TimedInhibitorArc arc : context.activeModel().inhibitorArcs()){
-			if(arc.destination().equals(underlyingTransition) && arc.source().isShared()) return true;
-		}
-		
-		return false;
 	}
 
 	protected void switchToNameTextField() {
@@ -479,7 +458,7 @@ public class TAPNTransitionEditor extends JPanel {
 
 	private boolean okButtonHandler(java.awt.event.ActionEvent evt) {
 		String newName = nameTextField.getText();
-		
+
 		// Check urgent constrain
 		if(urgentCheckBox.isSelected() && !isUrgencyOK()){
 			return false;
@@ -490,18 +469,20 @@ public class TAPNTransitionEditor extends JPanel {
 			doNewEdit = false;
 		}
 		
+        SharedTransition transitionBefore = transition.underlyingTransition().sharedTransition();
 		boolean wasShared = transition.underlyingTransition().isShared() && !sharedCheckBox.isSelected();
 		if(transition.underlyingTransition().isShared()){
 			context.undoManager().addEdit(new UnshareTransitionCommand(transition.underlyingTransition().sharedTransition(), transition.underlyingTransition()));
 			transition.underlyingTransition().unshare();
 		}
 		
+        Command sharedCommand = null;
 		if(sharedCheckBox.isSelected()){
 			SharedTransition selectedTransition = (SharedTransition)sharedTransitionsComboBox.getSelectedItem();
-            Command command = new MakeTransitionSharedCommand(context.activeModel(), selectedTransition, transition.underlyingTransition(), context.tabContent());
-			context.undoManager().addEdit(command);
+            sharedCommand = new MakeTransitionSharedCommand(context.activeModel(), selectedTransition, transition.underlyingTransition(), context.tabContent());
+			context.undoManager().addEdit(sharedCommand);
 			try{
-				command.redo();
+				sharedCommand.redo();
 			}catch(RequireException e){
 				context.undoManager().undo();
                 doNewEdit = true;
@@ -535,16 +516,13 @@ public class TAPNTransitionEditor extends JPanel {
 				return false;
 			}
 			context.nameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
-		
-			
+	
 			if(makeNewShared && !makeSharedButton.isEnabled()){
 				Command command = new MakeTransitionNewSharedCommand(context.activeModel(), newName, transition.underlyingTransition(), context.tabContent(), false);
-				context.undoManager().addEdit(command);
 				try{
-					command.redo();
+                    command.redo();
+                    context.undoManager().addEdit(command);
 				}catch(RequireException e){
-					context.undoManager().undo();
-                    doNewEdit = true;
 					//This is checked as a transition cannot be shared if there exists a place with the same name
 					if(transition.underlyingTransition().model().parentNetwork().isNameUsedForTransitionsOnly(newName)) {
 						int dialogResult = JOptionPane.showConfirmDialog(this, "A transition with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\nThis transition name will be changed into shared one also in all other components.", "Warning", JOptionPane.OK_CANCEL_OPTION);
@@ -552,7 +530,22 @@ public class TAPNTransitionEditor extends JPanel {
 							Command cmd = new MakeTransitionNewSharedMultiCommand(context, newName, transition);
 							cmd.redo();
 							context.undoManager().addEdit(cmd);
+
+                            boolean success = SharedElementSynchronizer.updateSharedArcs(transition);
+                            if (!success) {
+                                cmd.undo();
+                                context.undoManager().removeCurrentEdit();
+                                doNewEdit = true;
+                    
+                                JOptionPane.showMessageDialog(
+                                    this,
+                                    "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                    
+                                return false;
+                            }
 						} else {
+                            doNewEdit = true;
 							return false;
 						}
 					} else {
@@ -629,8 +622,26 @@ public class TAPNTransitionEditor extends JPanel {
 		
 		transition.update(true);
 
+        SharedTransition selectedTransition = sharedCheckBox.isSelected() ? (SharedTransition)sharedTransitionsComboBox.getSelectedItem() : null;
+        boolean sameSharedAsBefore = selectedTransition != null && selectedTransition.equals(transitionBefore);
+        if (sharedCheckBox.isSelected() && !sameSharedAsBefore) {
+            boolean success = SharedElementSynchronizer.updateSharedArcs(transition);
+            if (!success) {
+                sharedCommand.undo();
+                context.undoManager().removeCurrentEdit();
+                doNewEdit = true;
+    
+                JOptionPane.showMessageDialog(
+                    this,
+                    "An arc between two shared nodes conflicts with an existing arc in another component.\nDelete the arc in all but one of the components to resolve the conflict.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+    
+                return false;
+            }
+        }   
+
 		coloredTransitionGuardPanel.onOK(context.undoManager());
-		doOKChecked = true;
+		doOKChecked = true;         
 
 		return true;
 	}
@@ -650,6 +661,7 @@ public class TAPNTransitionEditor extends JPanel {
 	private void cancelButtonHandler(java.awt.event.ActionEvent evt) {
         if (doOKChecked) {
             context.undoManager().undo();
+            context.undoManager().removeCurrentEdit();
         }
 		exit();
 	}

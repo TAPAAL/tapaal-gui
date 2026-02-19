@@ -26,4 +26,8 @@ public final class Result<T, R>  {
         public List<R> getErrors() {
             return Collections.unmodifiableList(errors);
         }
+
+        public T getResult() {
+            return result;
+        }
 }

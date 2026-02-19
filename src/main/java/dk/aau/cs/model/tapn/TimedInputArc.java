@@ -13,7 +13,6 @@ import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import pipe.gui.Constants;
-
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
@@ -30,14 +29,12 @@ public class TimedInputArc extends TAPNElement {
     }
 
     public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, ArcExpression expression){
-		this(source, destination, interval, new IntWeight(1), expression);
+		this(source, destination, interval, new IntWeight(1), expression); 
 	}
 	
 	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight, ArcExpression expression) {
 		Require.that(source != null, "A timed input arc cannot have a null source place");
 		Require.that(destination != null, "A timed input arc cannot have a null destination transition");
-		Require.that(!source.isShared() || !destination.isShared(), "You cannot draw an arc between a shared transition and shared place.");
-		
 		this.source = source;
 		this.destination = destination;
 		setTimeInterval(interval);
@@ -190,5 +187,15 @@ public class TimedInputArc extends TAPNElement {
 
     public void setColorTimeIntervals(List<ColoredTimeInterval> colorTimeIntervals) {
         this.colorTimeIntervals = colorTimeIntervals;
+    }
+
+    public boolean isSimilarTo(TimedInputArc other) {
+        if (equals(other)) return true;
+        if (!weight.equals(other.weight)) return false;
+        if (!interval.equals(other.interval)) return false;
+        if (!expression.equals(other.expression)) return false;
+        if (!colorTimeIntervals.equals(other.colorTimeIntervals)) return false;
+        
+        return true;
     }
 }

@@ -1,5 +1,6 @@
 package net.tapaal.gui.petrinet.model;
 
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.undo.*;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
@@ -15,7 +16,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.*;
 import pipe.gui.petrinet.graphicElements.tapn.*;
 import pipe.gui.petrinet.undo.AddAnnotationNoteCommand;
-import pipe.gui.petrinet.undo.CompundCommand;
+import pipe.gui.petrinet.undo.CompoundCommand;
 import pipe.gui.petrinet.undo.DeleteAnnotationNoteCommand;
 import pipe.gui.petrinet.undo.DeleteArcPathPointEditCommand;
 
@@ -41,7 +42,7 @@ public class GuiModelManager {
     }
     public void commit() {
         if (pendingEdits != null && pendingEdits.size() > 0) {
-            tabContent.getUndoManager().addNewEdit(new CompundCommand(pendingEdits));
+            tabContent.getUndoManager().addNewEdit(new CompoundCommand(pendingEdits));
             pendingEdits = null;
         }
     }
@@ -107,7 +108,6 @@ public class GuiModelManager {
 
         var require = new RequirementChecker<ModelViolation>();
         require.Not(tabContent.guiModelToModel.get(c).hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
-        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
             return new Result<>(require.getErrors());
@@ -118,6 +118,7 @@ public class GuiModelManager {
         Vector<ColorExpression> vecColorExpr = new Vector<>();
         vecColorExpr.add(ct.createColorExpressionForFirstColor());
         NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
+
         TimedInputArc tia = new TimedInputArc(
             p.underlyingPlace(),
             t.underlyingTransition(),
@@ -150,7 +151,6 @@ public class GuiModelManager {
 
         var require = new RequirementChecker<ModelViolation>();
         require.Not(tabContent.guiModelToModel.get(c).hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace()), ModelViolation.MaxOneArcBetweenTransitionAndPlace);
-        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
             return new Result<>(require.getErrors());
@@ -194,7 +194,6 @@ public class GuiModelManager {
 
         var require = new RequirementChecker<ModelViolation>();
         require.Not(modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
-        require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
             return new Result<>(require.getErrors());
@@ -240,8 +239,6 @@ public class GuiModelManager {
         var require = new RequirementChecker<ModelViolation>();
         require.Not(modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
         require.Not(modelNet.hasArcFromTransitionToPlace(t.underlyingTransition(), p2.underlyingPlace()), ModelViolation.MaxOneArcBetweenTransitionAndPlace);
-        require.Not((p1.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
-        require.Not((p2.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         boolean hasInvariant = p2.hasInvariant() || p2.hasAnyColorInvariant();
         require.Not((t.underlyingTransition().isUrgent() && hasInvariant), ModelViolation.TransportArcUrgentTransitionAndInvariant);
@@ -396,6 +393,10 @@ public class GuiModelManager {
     }
 
     private void deleteObject(PetriNetObject pnObject) {
+        deleteObject(pnObject, false);
+    }
+
+    private void deleteObject(PetriNetObject pnObject, boolean onlyInCurrentTemplate) {
         if (pnObject instanceof ArcPathPoint) {
 
             ArcPathPoint arcPathPoint = (ArcPathPoint) pnObject;
@@ -431,16 +432,16 @@ public class GuiModelManager {
                     cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), tabContent.getModel());
                 } else if (pnObject instanceof TimedTransportArcComponent) {
                     TimedTransportArcComponent transportArc = (TimedTransportArcComponent) pnObject;
-                    cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), tabContent.getModel());
+                    cmd = deleteTransportArc(transportArc, onlyInCurrentTemplate);
                 } else if (pnObject instanceof TimedInhibitorArcComponent) {
                     TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent) pnObject;
-                    cmd = new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInhibitorArc().model(), tabContent.getModel());
+                    cmd = deleteArc(tia, true, onlyInCurrentTemplate);
                 } else if (pnObject instanceof TimedInputArcComponent) {
                     TimedInputArcComponent tia = (TimedInputArcComponent) pnObject;
-                    cmd = new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), tabContent.getModel());
+                    cmd = deleteArc(tia, true, onlyInCurrentTemplate);
                 } else if (pnObject instanceof TimedOutputArcComponent) {
                     TimedOutputArcComponent toa = (TimedOutputArcComponent) pnObject;
-                    cmd = new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), tabContent.getModel());
+                    cmd = deleteArc(toa, false, onlyInCurrentTemplate);
                 } else if (pnObject instanceof AnnotationNote) {
                     cmd = new DeleteAnnotationNoteCommand((AnnotationNote) pnObject, tabContent.getModel());
                 } else {
@@ -452,6 +453,185 @@ public class GuiModelManager {
         }
     }
 
+    /**
+     * Creates delete command for a given transport arc. 
+     * If src and dst of arc is shared it will delete it across all templates where the connection exists
+     * @param transportArc transport arc
+     * @param onlyInCurrentTemplate if true, only delete arcs in the current template
+     * @return delete command for the arc(s)
+     */
+    private Command deleteTransportArc(TimedTransportArcComponent transportArc, boolean onlyInCurrentTemplate) {
+        TimedPlace sourcePlace = transportArc.underlyingTransportArc().source();
+        TimedTransition transition = transportArc.underlyingTransportArc().transition();
+        TimedPlace targetPlace = transportArc.underlyingTransportArc().destination();
+        
+        boolean isSourceShared = sourcePlace.isShared();
+        boolean isTransitionShared = transition.isShared();
+        boolean isTargetShared = targetPlace.isShared();
+        
+        if (!(isSourceShared && isTransitionShared && isTargetShared) || onlyInCurrentTemplate) {
+            return new DeleteTransportArcCommand(
+                transportArc, 
+                transportArc.underlyingTransportArc(), 
+                transportArc.underlyingTransportArc().model(), 
+                tabContent.getModel()
+            );
+        }
+        
+        String transitionName = transition.name();
+        String inputPlaceName = sourcePlace.name();
+        String outputPlaceName = targetPlace.name();
+        int groupNr = transportArc.getGroupNr();
+        
+        List<Command> deleteCommands = new ArrayList<>();
+        deleteCommands.add(new DeleteTransportArcCommand(
+            transportArc, 
+            transportArc.underlyingTransportArc(), 
+            transportArc.underlyingTransportArc().model(), 
+            tabContent.getModel()
+        ));
+        
+        for (Template template : tabContent.allTemplates()) {
+            if (!template.guiModel().equals(tabContent.getModel())) {
+                findAndAddTransportArcDeleteCommand(
+                    template, inputPlaceName, transitionName, outputPlaceName, 
+                    groupNr, deleteCommands
+                );
+            }
+        }
+        
+        return new CompoundCommand(deleteCommands);
+    }
+
+    /**
+     * Creates delete command for a given arc. 
+     * If src and dst of arc is shared it will delete it across all templates where the connection exists
+     * @param arc input, output or inhibitor arc
+     * @param isInputArc true if arc is input arc, false if it is output arc
+     * @param onlyInCurrentTemplate if true, only delete arcs in the current template
+     * @return delete command for the arc(s)
+     */
+    private Command deleteArc(Arc arc, boolean isInputArc, boolean onlyInCurrentTemplate) {
+        boolean isInhibitorArc = arc instanceof TimedInhibitorArcComponent;
+
+        PlaceTransitionObject source = arc.getSource();
+        PlaceTransitionObject target = arc.getTarget();
+        
+        boolean isSourceShared, isTargetShared;
+        String sourceName = "", targetName = "";
+        
+        if (isInputArc || isInhibitorArc) {
+            TimedPlaceComponent place = (TimedPlaceComponent)source;
+            TimedTransitionComponent transition = (TimedTransitionComponent)target;
+            
+            isSourceShared = place.underlyingPlace().isShared();
+            isTargetShared = transition.underlyingTransition().isShared();
+            
+            if (isSourceShared) sourceName = place.getName();
+            if (isTargetShared) targetName = transition.getName();
+        } else {
+            TimedTransitionComponent transition = (TimedTransitionComponent)source;
+            TimedPlaceComponent place = (TimedPlaceComponent)target;
+            
+            isSourceShared = transition.underlyingTransition().isShared();
+            isTargetShared = place.underlyingPlace().isShared();
+            
+            if (isSourceShared) sourceName = transition.getName();
+            if (isTargetShared) targetName = place.getName();
+        }
+
+        if (!(isSourceShared && isTargetShared) || onlyInCurrentTemplate) {
+            return createSingleArcDeleteCommand(arc, isInhibitorArc, isInputArc, tabContent.getModel());
+        }
+        
+        List<Command> deleteCommands = new ArrayList<>();
+        for (Template template : tabContent.allTemplates()) {
+            if (template.guiModel().equals(tabContent.getModel())) {
+                deleteCommands.add(createSingleArcDeleteCommand(arc, isInhibitorArc, isInputArc, tabContent.getModel()));
+            } else {
+                PlaceTransitionObject templateSource, templateTarget;
+                if (isInputArc || isInhibitorArc) {
+                    templateSource = template.guiModel().getPlaceByName(sourceName);
+                    templateTarget = template.guiModel().getTransitionByName(targetName);
+                } else {
+                    templateSource = template.guiModel().getTransitionByName(sourceName);
+                    templateTarget = template.guiModel().getPlaceByName(targetName);
+                }
+                
+                if (templateSource != null && templateTarget != null) {
+                    findAndAddDeleteCommand(templateSource, templateTarget, isInhibitorArc, isInputArc, deleteCommands, template.guiModel());
+                }
+            }
+        }
+        
+        return new CompoundCommand(deleteCommands);
+    }
+    
+    private void findAndAddTransportArcDeleteCommand(
+        Template template, String sourcePlaceName, String transitionName, 
+        String targetPlaceName, int groupNr, List<Command> commands
+    ) {
+        TimedPlaceComponent templateSourcePlace = (TimedPlaceComponent)template.guiModel().getPlaceByName(sourcePlaceName);
+        TimedTransitionComponent templateTransition = (TimedTransitionComponent)template.guiModel().getTransitionByName(transitionName);
+        TimedPlaceComponent templateTargetPlace = (TimedPlaceComponent)template.guiModel().getPlaceByName(targetPlaceName);
+        
+        if (templateSourcePlace != null && templateTransition != null && templateTargetPlace != null) {
+            for (Arc templateArc : templateTransition.getPreset()) {
+                if (templateArc instanceof TimedTransportArcComponent && 
+                    templateArc.getSource().equals(templateSourcePlace) &&
+                    ((TimedTransportArcComponent)templateArc).getGroupNr() == groupNr) {
+                    
+                    commands.add(new DeleteTransportArcCommand(
+                        (TimedTransportArcComponent)templateArc, 
+                        ((TimedTransportArcComponent)templateArc).underlyingTransportArc(), 
+                        ((TimedTransportArcComponent)templateArc).underlyingTransportArc().model(), 
+                        template.guiModel()
+                    ));
+                    
+                    break;
+                }
+            }
+        }
+    }
+    
+    private void findAndAddDeleteCommand(
+        PlaceTransitionObject source, PlaceTransitionObject target, 
+        boolean isInhibitorArc, boolean isInputArc,
+        List<Command> commands, DataLayer model
+    ) {
+        for (Arc templateArc : source.getPostset()) {
+            if (templateArc.getTarget().equals(target) &&
+                ((isInhibitorArc && templateArc instanceof TimedInhibitorArcComponent) ||
+                 (isInputArc && templateArc instanceof TimedInputArcComponent) ||
+                 (!isInputArc && !isInhibitorArc && templateArc instanceof TimedOutputArcComponent))) {
+                
+                commands.add(createSingleArcDeleteCommand(templateArc, isInhibitorArc, isInputArc, model));
+                break;
+            }
+        }
+    }
+    
+    private Command createSingleArcDeleteCommand(Arc arc, boolean isInhibitorArc, boolean isInputArc, DataLayer model) {
+        if (isInhibitorArc) {
+            return new DeleteTimedInhibitorArcCommand(
+                (TimedInhibitorArcComponent)arc, 
+                ((TimedInhibitorArcComponent)arc).underlyingTimedInhibitorArc().model(), 
+                model
+            );
+        } else if (isInputArc) {
+            return new DeleteTimedInputArcCommand(
+                (TimedInputArcComponent)arc, 
+                ((TimedInputArcComponent)arc).underlyingTimedInputArc().model(), 
+                model
+            );
+        } else {
+            return new DeleteTimedOutputArcCommand(
+                (TimedOutputArcComponent)arc, 
+                ((TimedOutputArcComponent)arc).underlyingArc().model(), 
+                model
+            );
+        }
+    }
 
     private void deleteSelection(PetriNetObject pnObject) {
         if (pnObject instanceof PlaceTransitionObject) {
@@ -469,7 +649,7 @@ public class GuiModelManager {
                 arcsToDelete.add(arc);
             }
 
-            arcsToDelete.forEach(this::deleteObject);
+            arcsToDelete.forEach(arc -> deleteObject(arc, true));
         }
 
         deleteObject(pnObject);

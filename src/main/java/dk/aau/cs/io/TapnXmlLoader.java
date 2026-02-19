@@ -842,6 +842,9 @@ public class TapnXmlLoader {
 			}
 
 		}
+
+        if (tempArc == null) return;
+
 		tempArc.setNameOffsetX(nameOffsetXInput);
 		tempArc.setNameOffsetY(nameOffsetYInput);
 
@@ -867,7 +870,11 @@ public class TapnXmlLoader {
 		TimedOutputArc outputArc = new TimedOutputArc(transition, place, weight, expr);
 		tempArc.setUnderlyingArc(outputArc);
 
-		if(template.model().hasArcFromTransitionToPlace(outputArc.source(),outputArc.destination())) {
+		if (template.model().hasArcFromTransitionToPlace(outputArc.source(),outputArc.destination())) {
+            if (!outputArc.source().isShared() && !outputArc.destination().isShared()) {
+                return null;
+            }
+                
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 
@@ -1004,7 +1011,11 @@ public class TapnXmlLoader {
         inputArc.setColorTimeIntervals(ctiList);
 		tempArc.setUnderlyingArc(inputArc);
 
-		if(template.model().hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
+		if (template.model().hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
+            if (!inputArc.source().isShared() && !inputArc.destination().isShared()) {
+                return null;
+            }
+
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 

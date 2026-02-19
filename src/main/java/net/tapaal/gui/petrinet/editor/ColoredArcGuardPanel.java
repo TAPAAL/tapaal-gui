@@ -61,7 +61,6 @@ import dk.aau.cs.model.CPN.Expressions.Expression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.CPN.Expressions.PlaceHolderArcExpression;
 import dk.aau.cs.model.CPN.Expressions.PlaceHolderColorExpression;
-import dk.aau.cs.model.CPN.Expressions.PlaceHolderExpression;
 import dk.aau.cs.model.CPN.Expressions.PredecessorExpression;
 import dk.aau.cs.model.CPN.Expressions.ScalarProductExpression;
 import dk.aau.cs.model.CPN.Expressions.SubtractExpression;
@@ -74,8 +73,11 @@ import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import net.tapaal.gui.petrinet.Context;
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.undo.Colored.SetArcExpressionCommand;
 import net.tapaal.gui.petrinet.undo.Colored.SetColoredArcIntervalsCommand;
 import net.tapaal.gui.petrinet.undo.Colored.SetTransportArcExpressionsCommand;
@@ -84,10 +86,12 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.petrinet.graphicElements.Place;
+import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 
 public abstract class ColoredArcGuardPanel extends JPanel {
@@ -978,18 +982,6 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         toggleEnabledButtons();
     }
 
-    private Expression findParent (Expression child, Expression parent) {
-        for (ExprStringPosition childCheck : parent.getChildren()) {
-            if (child == childCheck.getObject()) {
-                return parent;
-            } else if (!(childCheck.getObject() instanceof PlaceHolderExpression)) {
-                Expression foundParent = findParent(child, childCheck.getObject());
-                if (foundParent != child) return foundParent;
-            }
-        }
-        return child;
-    }
-
     private void updateSelectedColorType(){
         ColorType newSelectedColorType = getCurrentSelectionColorType();
         if (newSelectedColorType != null) {
@@ -1054,52 +1046,196 @@ public abstract class ColoredArcGuardPanel extends JPanel {
         }
 
     }
+    
     public void onOkColored(pipe.gui.petrinet.undo.UndoManager undoManager) {
-        if(isTransportArc){
-            TransportArc transportArc = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc();
-            if(isInputArc){
-                ArcExpression inputExpression = arcExpression;
-                //Output and input should have same value
-                ArcExpression outputExpression = transportArc.getOutputExpression().deepCopy();
-                ((NumberOfExpression)outputExpression).setNumber((((NumberOfExpression)arcExpression).getNumber()));
-
-                Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)objectToBeEdited, transportArc.getInputExpression(),
-                    inputExpression, transportArc.getOutputExpression(), outputExpression);
-                expressionsCommand.redo();
-                undoManager.addEdit(expressionsCommand);
-                Command cmd = new SetColoredArcIntervalsCommand((TimedTransportArcComponent) objectToBeEdited, ((TimedTransportArcComponent) objectToBeEdited).getCtiList(), getctiList());
-                cmd.redo();
-                undoManager.addEdit(cmd);
-            } else{
-                ArcExpression outputExpression = arcExpression;
-                //Output and input should have same value
-                ArcExpression inputExpression = transportArc.getInputExpression().deepCopy();
-                ((NumberOfExpression)inputExpression).setNumber((((NumberOfExpression)arcExpression).getNumber()));
-
-                Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)objectToBeEdited, transportArc.getInputExpression(),
-                    inputExpression, transportArc.getOutputExpression(), outputExpression);
-                expressionsCommand.redo();
-                undoManager.addEdit(expressionsCommand);
+        boolean sharedComponents = false;
+        String sourceName = "", targetName = "", transitionName = "";
+        
+        if (isTransportArc) {
+            TimedTransportArcComponent transportArc = (TimedTransportArcComponent)objectToBeEdited;
+            TimedPlace sourcePlace = transportArc.underlyingTransportArc().source();
+            TimedTransition transition = transportArc.underlyingTransportArc().transition();
+            TimedPlace targetPlace = transportArc.underlyingTransportArc().destination();
+            
+            boolean isSourceShared = sourcePlace.isShared();
+            boolean isTransitionShared = transition.isShared();
+            boolean isTargetShared = targetPlace.isShared();
+            
+            sharedComponents = isSourceShared && isTransitionShared && isTargetShared;
+            
+            if (sharedComponents) {
+                sourceName = sourcePlace.name();
+                transitionName = transition.name();
+                targetName = targetPlace.name();
+            }
+        } else {
+            Arc arc = (Arc)objectToBeEdited;
+            if (isInputArc || isInhibitorArc) {
+                TimedPlaceComponent sourcePlace = (TimedPlaceComponent)arc.getSource();
+                TimedTransitionComponent targetTransition = (TimedTransitionComponent)arc.getTarget();
+                
+                boolean isSourceShared = sourcePlace.underlyingPlace().isShared();
+                boolean isTargetShared = targetTransition.underlyingTransition().isShared();
+                
+                sharedComponents = isSourceShared && isTargetShared;
+                
+                if (sharedComponents) {
+                    sourceName = sourcePlace.getName();
+                    targetName = targetTransition.getName();
+                }
+            } else {
+                TimedTransitionComponent sourceTransition = (TimedTransitionComponent)arc.getSource();
+                TimedPlaceComponent targetPlace = (TimedPlaceComponent)arc.getTarget();
+                
+                boolean isSourceShared = sourceTransition.underlyingTransition().isShared();
+                boolean isTargetShared = targetPlace.underlyingPlace().isShared();
+                
+                sharedComponents = isSourceShared && isTargetShared;
+                
+                if (sharedComponents) {
+                    sourceName = sourceTransition.getName();
+                    targetName = targetPlace.getName();
+                }
             }
         }
-        else if (!isInhibitorArc && isInputArc) {
-            TimedInputArc inputArc = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc();
-            Command cmd = new SetArcExpressionCommand((TimedInputArcComponent)objectToBeEdited, inputArc.getArcExpression(), arcExpression);
-            cmd.redo();
-            undoManager.addEdit(cmd);
-            cmd = new SetColoredArcIntervalsCommand((TimedInputArcComponent)objectToBeEdited, inputArc.getColorTimeIntervals(), getctiList());
-            cmd.redo();
-            undoManager.addEdit(cmd);
-        } else if(isInhibitorArc){
-            TimedInhibitorArc inhibitorArc = ((TimedInhibitorArcComponent)objectToBeEdited).underlyingTimedInhibitorArc();
-            Command cmd = new SetArcExpressionCommand((TimedInhibitorArcComponent)objectToBeEdited, inhibitorArc.getArcExpression(), arcExpression);
-            cmd.redo();
-            undoManager.addEdit(cmd);
+
+        if (sharedComponents) {
+            List<Command> commands = new ArrayList<>();
+            for (Template template : context.tabContent().allTemplates()) {
+                if (isTransportArc) {
+                    TimedPlaceComponent templateSourcePlace = (TimedPlaceComponent)template.guiModel().getPlaceByName(sourceName);
+                    TimedTransitionComponent templateTransition = (TimedTransitionComponent)template.guiModel().getTransitionByName(transitionName);
+                    TimedPlaceComponent templateTargetPlace = (TimedPlaceComponent)template.guiModel().getPlaceByName(targetName);
+                    
+                    if (templateSourcePlace != null && templateTransition != null && templateTargetPlace != null) {
+                        TimedTransportArcComponent templateArc = null;
+                        int groupNr = ((TimedTransportArcComponent)objectToBeEdited).getGroupNr();
+                        
+                        for (Arc arc : templateTransition.getPreset()) {
+                            if (arc instanceof TimedTransportArcComponent && 
+                                arc.getSource().equals(templateSourcePlace) &&
+                                ((TimedTransportArcComponent)arc).getGroupNr() == groupNr) {
+                                templateArc = (TimedTransportArcComponent)arc;
+                                break;
+                            }
+                        }
+                        
+                        if (templateArc != null) {
+                            TransportArc transportArc = templateArc.underlyingTransportArc();
+                            boolean isCurrentInputArc = templateArc.getSource() instanceof TimedPlaceComponent;
+                            
+                            if (isCurrentInputArc) {
+                                ArcExpression inputExpression = arcExpression;
+                                ArcExpression outputExpression = transportArc.getOutputExpression().deepCopy();
+                                ((NumberOfExpression)outputExpression).setNumber((((NumberOfExpression)arcExpression).getNumber()));
+                                
+                                Command expressionsCommand = new SetTransportArcExpressionsCommand(templateArc, transportArc.getInputExpression(),
+                                    inputExpression, transportArc.getOutputExpression(), outputExpression);
+                                commands.add(expressionsCommand);
+                                
+                                Command intervalCmd = new SetColoredArcIntervalsCommand(templateArc, templateArc.getCtiList(), getctiList());
+                                commands.add(intervalCmd);
+                            } else {
+                                ArcExpression outputExpression = arcExpression;
+                                ArcExpression inputExpression = transportArc.getInputExpression().deepCopy();
+                                ((NumberOfExpression)inputExpression).setNumber((((NumberOfExpression)arcExpression).getNumber()));
+                                
+                                Command expressionsCommand = new SetTransportArcExpressionsCommand(templateArc, transportArc.getInputExpression(),
+                                    inputExpression, transportArc.getOutputExpression(), outputExpression);
+                                commands.add(expressionsCommand);
+                            }
+                        }
+                    }
+                } else {
+                    PlaceTransitionObject templateSource, templateTarget;
+                    
+                    if (isInputArc || isInhibitorArc) {
+                        templateSource = template.guiModel().getPlaceByName(sourceName);
+                        templateTarget = template.guiModel().getTransitionByName(targetName);
+                    } else {
+                        templateSource = template.guiModel().getTransitionByName(sourceName);
+                        templateTarget = template.guiModel().getPlaceByName(targetName);
+                    }
+                    
+                    if (templateSource != null && templateTarget != null) {
+                        for (Arc templateArc : templateSource.getPostset()) {
+                            if (templateArc.getTarget().equals(templateTarget) &&
+                                ((isInhibitorArc && templateArc instanceof TimedInhibitorArcComponent) ||
+                                (isInputArc && !(isInhibitorArc) && templateArc instanceof TimedInputArcComponent) ||
+                                (!isInputArc && !(isInhibitorArc) && templateArc instanceof TimedOutputArcComponent))) {
+                                
+                                if (!isInhibitorArc && isInputArc) {
+                                    TimedInputArc inputArc = ((TimedInputArcComponent)templateArc).underlyingTimedInputArc();
+                                    Command cmd = new SetArcExpressionCommand((TimedInputArcComponent)templateArc, inputArc.getArcExpression(), arcExpression);
+                                    commands.add(cmd);
+                                    cmd = new SetColoredArcIntervalsCommand((TimedInputArcComponent)templateArc, inputArc.getColorTimeIntervals(), getctiList());
+                                    commands.add(cmd);
+                                } else if (isInhibitorArc) {
+                                    TimedInhibitorArc inhibitorArc = ((TimedInhibitorArcComponent)templateArc).underlyingTimedInhibitorArc();
+                                    Command cmd = new SetArcExpressionCommand((TimedInhibitorArcComponent)templateArc, inhibitorArc.getArcExpression(), arcExpression);
+                                    commands.add(cmd);
+                                } else {
+                                    TimedOutputArc outputArc = ((TimedOutputArcComponent)templateArc).underlyingArc();
+                                    Command cmd = new SetArcExpressionCommand((TimedOutputArcComponent)templateArc, outputArc.getExpression(), arcExpression);
+                                    commands.add(cmd);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            for (Command cmd : commands) {
+                cmd.redo();
+                undoManager.addEdit(cmd);
+            }
         } else {
-            TimedOutputArc outputArc = ((TimedOutputArcComponent)objectToBeEdited).underlyingArc();
-            Command cmd = new SetArcExpressionCommand((TimedOutputArcComponent)objectToBeEdited, outputArc.getExpression(), arcExpression);
-            cmd.redo();
-            undoManager.addEdit(cmd);
+            if(isTransportArc){
+                TransportArc transportArc = ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc();
+                if(isInputArc){
+                    ArcExpression inputExpression = arcExpression;
+                    //Output and input should have same value
+                    ArcExpression outputExpression = transportArc.getOutputExpression().deepCopy();
+                    ((NumberOfExpression)outputExpression).setNumber((((NumberOfExpression)arcExpression).getNumber()));
+
+                    Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)objectToBeEdited, transportArc.getInputExpression(),
+                        inputExpression, transportArc.getOutputExpression(), outputExpression);
+                    expressionsCommand.redo();
+                    undoManager.addEdit(expressionsCommand);
+                    Command cmd = new SetColoredArcIntervalsCommand((TimedTransportArcComponent) objectToBeEdited, ((TimedTransportArcComponent) objectToBeEdited).getCtiList(), getctiList());
+                    cmd.redo();
+                    undoManager.addEdit(cmd);
+                } else{
+                    ArcExpression outputExpression = arcExpression;
+                    //Output and input should have same value
+                    ArcExpression inputExpression = transportArc.getInputExpression().deepCopy();
+                    ((NumberOfExpression)inputExpression).setNumber((((NumberOfExpression)arcExpression).getNumber()));
+
+                    Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)objectToBeEdited, transportArc.getInputExpression(),
+                        inputExpression, transportArc.getOutputExpression(), outputExpression);
+                    expressionsCommand.redo();
+                    undoManager.addEdit(expressionsCommand);
+                }
+            } else if (!isInhibitorArc && isInputArc) {
+                TimedInputArc inputArc = ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc();
+                Command cmd = new SetArcExpressionCommand((TimedInputArcComponent)objectToBeEdited, inputArc.getArcExpression(), arcExpression);
+                cmd.redo();
+                undoManager.addEdit(cmd);
+                cmd = new SetColoredArcIntervalsCommand((TimedInputArcComponent)objectToBeEdited, inputArc.getColorTimeIntervals(), getctiList());
+                cmd.redo();
+                undoManager.addEdit(cmd);
+            } else if(isInhibitorArc){
+                TimedInhibitorArc inhibitorArc = ((TimedInhibitorArcComponent)objectToBeEdited).underlyingTimedInhibitorArc();
+                Command cmd = new SetArcExpressionCommand((TimedInhibitorArcComponent)objectToBeEdited, inhibitorArc.getArcExpression(), arcExpression);
+                cmd.redo();
+                undoManager.addEdit(cmd);
+            } else {
+                TimedOutputArc outputArc = ((TimedOutputArcComponent)objectToBeEdited).underlyingArc();
+                Command cmd = new SetArcExpressionCommand((TimedOutputArcComponent)objectToBeEdited, outputArc.getExpression(), arcExpression);
+                cmd.redo();
+                undoManager.addEdit(cmd);
+            }
         }
     }
 
