@@ -174,7 +174,7 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
         }
         modelStream.append(colorInformationToXMLString(transArc.getInputExpression()));
         modelStream.append(colorInformationToXMLString(transArc.getOutputExpression()));
-        modelStream.append("/>\n");
+        modelStream.append("</transportArc>\n");
     }
 
     @Override

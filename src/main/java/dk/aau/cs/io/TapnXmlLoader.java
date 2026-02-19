@@ -147,6 +147,8 @@ public class TapnXmlLoader {
         } else{
             network.add(ColorType.COLORTYPE_DOT);
         }
+
+        parseCustomDistributions(doc, network);
 		parseSharedPlaces(doc, network, constants);
 		parseSharedTransitions(doc, network, constants);
         parseFeature(doc, network);
@@ -208,6 +210,31 @@ public class TapnXmlLoader {
         }
     }
 
+	private void parseCustomDistributions(Document doc, TimedArcPetriNetNetwork network) {
+        NodeList customDistNodes = doc.getElementsByTagName("custom_distribution");
+        for (int i = 0; i < customDistNodes.getLength(); ++i) {
+            Node node = customDistNodes.item(i);
+            if (node instanceof Element) {
+                SMCUserDefinedDistribution cd = parseCustomDistribution((Element)node);
+                network.add(cd);
+            }
+        }
+    }
+
+    private SMCUserDefinedDistribution parseCustomDistribution(Element element) {
+        String name = element.getAttribute("name");
+        List<Double> values = new ArrayList<>();
+        NodeList valueNodes = element.getElementsByTagName("value");
+        for (int i = 0; i < valueNodes.getLength(); ++i) {
+             Node node = valueNodes.item(i);
+             if (node instanceof Element) {
+                values.add(Double.parseDouble(node.getTextContent()));
+             }
+        }
+
+        return new SMCUserDefinedDistribution(name, values);
+    }
+    
 	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		NodeList sharedPlaceNodes = doc.getElementsByTagName("shared-place");
 
