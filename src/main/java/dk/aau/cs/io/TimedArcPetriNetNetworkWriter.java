@@ -111,6 +111,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
         writeTACPN.appendDeclarations(document, pnmlRootNode);
 
+        if (lens.isStochastic()) {
+            appendCustomDistributions(document, pnmlRootNode);
+        }
+
         appendSharedPlaces(document, pnmlRootNode);
 		appendSharedTransitions(document, pnmlRootNode);
 		appendConstants(document, pnmlRootNode);
@@ -200,6 +204,20 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         feature.setAttribute("isStochastic", isStochastic);
 
         return feature;
+    }
+
+    private void appendCustomDistributions(Document document, Element root) {
+        for (SMCUserDefinedDistribution cd : network.userDefinedDistributions()) {
+            Element element = document.createElement("custom_distribution");
+            element.setAttribute("name", cd.getName());
+            for (Double val : cd.getValues()) {
+                Element valElement = document.createElement("value");
+                valElement.setTextContent(val.toString());
+                element.appendChild(valElement);
+            }
+
+            root.appendChild(element);
+        }
     }
 	
 	private void appendSharedPlaces(Document document, Element root) {

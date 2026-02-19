@@ -132,7 +132,8 @@ public class TimedTransition extends TAPNElement {
 
     public void setDistribution(SMCDistribution distrib, boolean cascade) {
         this.distribution = distrib;
-        if(isShared() && cascade) {
+        fireDistributionChanged();
+        if (isShared() && cascade) {
             sharedTransition.setDistribution(distrib);
         }
     }
@@ -243,6 +244,12 @@ public class TimedTransition extends TAPNElement {
 	private void fireSharedStateChanged() {
 		for(TimedTransitionListener listener : listeners){
 			listener.sharedStateChanged(new TimedTransitionEvent(this));
+		}
+	}
+
+    private void fireDistributionChanged() {
+		for (TimedTransitionListener listener : listeners){
+			listener.distributionChanged(new TimedTransitionEvent(this));
 		}
 	}
 

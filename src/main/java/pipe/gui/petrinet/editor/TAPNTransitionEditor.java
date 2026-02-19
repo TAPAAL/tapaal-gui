@@ -101,7 +101,7 @@ public class TAPNTransitionEditor extends JPanel {
 		firingModeComboBox = new JComboBox<>(new FiringMode[]{new OldestFiringMode(), new YoungestFiringMode(), new RandomFiringMode()});
         firingModeComboBox.setToolTipText("Determines what tokens are consumed during random runs");
 
-        distributionPanel = new DistributionPanel(transition, dialog);
+        distributionPanel = new DistributionPanel(transition, okButton, dialog);
 
 		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);
 		SwingHelper.setPreferredWidth(sharedTransitionsComboBox,290);
@@ -635,7 +635,11 @@ public class TAPNTransitionEditor extends JPanel {
 		return true;
 	}
 
-	public void enableOKButton(boolean enable){
+	public void tryToEnableOkButton(boolean enable) {
+        if (enable && !distributionPanel.canEnableOkButton()) {
+            return;
+        }
+
 	    okButton.setEnabled(enable);
     }
 
