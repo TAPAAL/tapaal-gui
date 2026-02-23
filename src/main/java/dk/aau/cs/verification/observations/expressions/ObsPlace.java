@@ -46,7 +46,7 @@ public class ObsPlace extends ObsLeaf {
 
     @Override
     public String toXml() {
-        return "<place>" + template + "_" + place.name() + "</place>";
+        return "<place template=\"" + template + "\" id=\"" + place.name() + "\"/>";
     }
 
     @Override

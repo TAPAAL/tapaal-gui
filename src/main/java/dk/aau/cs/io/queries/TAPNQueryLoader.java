@@ -59,9 +59,12 @@ public class TAPNQueryLoader extends QueryLoader{
             Node q = queryNodes.item(i);
 
 			if (q instanceof Element) {
-				TAPNQuery query = parseTAPNQuery((Element) q, network);
-				
-				queries.add(query);
+                try {
+				    TAPNQuery query = parseTAPNQuery((Element)q, network);
+				    queries.add(query);
+                } catch(Exception e) {
+                    messages.add("Error parsing query: " + e.getMessage());
+                }
 			}
 		}
 		return queries;
@@ -259,39 +262,25 @@ public class TAPNQueryLoader extends QueryLoader{
     }    
 
     private ObsExpression createPlaceExpression(Element element) {
-        String name = element.getTextContent();
-        String templateName = null;
-        String placeName = null;
-        
-        final String SHARED = "Shared";
-        if (name.startsWith(SHARED + "_")) {
-            templateName = "Shared";
-            placeName = name.substring((SHARED + "_").length());
-        } else {
-            for (TimedArcPetriNet tapn : network.activeTemplates()) {
-                if (name.startsWith(tapn.name() + "_")) {
-                    String potentialPlaceName = name.substring(tapn.name().length() + 1);
-                    if (tapn.getPlaceByName(potentialPlaceName) != null) {
-                        templateName = tapn.name();
-                        placeName = potentialPlaceName;
-                        break;
-                    }
-                }
-            }
-        }
+         if (!element.hasAttribute("template") || !element.hasAttribute("id")) {
+             throw new IllegalArgumentException("Place expression must have 'template' and 'id' attributes");
+         }
 
-        if (templateName == null) {
-            String[] parts = name.split("_", 2);
-            if (parts.length == 2) {
-                templateName = parts[0];
-                placeName = parts[1];
-            } else {
-                templateName = "";
-                placeName = name;
-            }
-        }
-    
-        return new ObsPlace(templateName, placeName, network);
+         String templateName = element.getAttribute("template");
+         String placeName = element.getAttribute("id");
+
+         if (!"Shared".equals(templateName) && network.getTAPNByName(templateName) == null) {
+             throw new IllegalArgumentException("Template " + templateName + " not found when parsing place " + placeName);
+         }
+
+         if (!"Shared".equals(templateName)) {
+              TimedArcPetriNet tapn = network.getTAPNByName(templateName);
+              if (tapn != null && tapn.getPlaceByName(placeName) == null) {
+                  throw new IllegalArgumentException("Place " + placeName + " not found in template " + templateName);
+              }
+         }
+
+         return new ObsPlace(templateName, placeName, network);
     }
 
     public static SMCSettings parseSmcSettings(Element smcTag) {
