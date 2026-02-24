@@ -2,6 +2,7 @@ package net.tapaal.gui.petrinet.undo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
@@ -10,13 +11,16 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.verification.observations.Observation;
 import pipe.gui.petrinet.undo.TAPNElementCommand;
+
 
 public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	private final TimedPlaceComponent timedPlaceComponent;
 	private final TimedPlace timedPlace;
 	private final List<TimedToken> tokens;
 	private final ArrayList<TAPNQuery> queriesInclusion = new ArrayList<TAPNQuery>();
+	private final HashMap<TAPNQuery, List<Observation>> observationsInQuery = new HashMap<TAPNQuery, List<Observation>>();
 
 	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlaceComponent, TimedArcPetriNet tapn, DataLayer guiModel) {
 		super(tapn, guiModel);
@@ -31,6 +35,18 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 			if(q.inclusionPlaces().inclusionPlaces().contains(timedPlace)){
 				queriesInclusion.add(q);
 			}
+
+			if (q.getSmcSettings() != null) {
+				for (Observation obs : q.getSmcSettings().getObservations()) {
+					if (obs.getExpression() != null && obs.getExpression().containsPlace(timedPlace)) {
+						if (!observationsInQuery.containsKey(q)) {
+							observationsInQuery.put(q, new ArrayList<Observation>());
+						}
+
+						observationsInQuery.get(q).add(obs);
+					}
+				}
+			}
 		}
 	}
 
@@ -40,6 +56,10 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 		for (TAPNQuery q : queriesInclusion) {
 			q.inclusionPlaces().removePlace(timedPlace);
 		}
+
+		for(TAPNQuery q : observationsInQuery.keySet()) {
+			q.getSmcSettings().getObservations().removeAll(observationsInQuery.get(q));
+	    }
 
 		tapn.remove(timedPlace);
 		guiModel.removePetriNetObject(timedPlaceComponent);
@@ -51,15 +71,18 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 		guiModel.addPetriNetObject(timedPlaceComponent);
 		tapn.add(timedPlace);
 		
-		if(!timedPlace.isShared()){
+		if (!timedPlace.isShared()) {
 			for(TimedToken token : tokens) {
 				tapn.addToken(token);
 			}
 		}
 		
-		for(TAPNQuery q : queriesInclusion){
+		for (TAPNQuery q : queriesInclusion) {
 			q.inclusionPlaces().inclusionPlaces().add(timedPlace);
 		}
-	}
 
+		for (TAPNQuery q : observationsInQuery.keySet()) {
+			q.getSmcSettings().getObservations().addAll(observationsInQuery.get(q));
+	    }
+	}
 }

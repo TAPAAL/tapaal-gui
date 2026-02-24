@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsSharedPlaceVisitor;
 import dk.aau.cs.TCTL.visitors.ContainsSharedTransitionVisitor;
+import dk.aau.cs.verification.observations.Observation;
 import net.tapaal.gui.petrinet.NameGenerator;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
@@ -140,24 +141,56 @@ public final class DeleteSharedPlaceOrTransitionAction implements ActionListener
 	}
 
 	private void deleteSharedPlace(boolean deleteFromTemplates, SharedPlace placeToRemove, Collection<TAPNQuery> affectedQueries) {
-        if(affectedQueries.size() > 0 && !messageShown){
-			messageShown = true;
-			StringBuilder buffer = new StringBuilder("The following queries contains the shared place and will also be deleted:");
-			buffer.append(System.getProperty("line.separator"));
-			buffer.append(System.getProperty("line.separator"));
+		List<TAPNQuery> queriesToDelete = new ArrayList<TAPNQuery>();
+		List<TAPNQuery> queriesWithObservationsToRemove = new ArrayList<TAPNQuery>();
+		for (TAPNQuery q : affectedQueries) {
+			ContainsSharedPlaceVisitor visitor = new ContainsSharedPlaceVisitor(placeToRemove.name());
+			BooleanResult result = new BooleanResult();
+			q.getProperty().accept(visitor, result);
 			
-			for(TAPNQuery query : affectedQueries){
-				buffer.append(query.getName());
-				buffer.append(System.getProperty("line.separator"));
+			if (result.result()) {
+				queriesToDelete.add(q);
+			} else if (q.getSmcSettings() != null) {
+				for (Observation obs : q.getSmcSettings().getObservations()) {
+					if (obs.getExpression() != null && obs.getExpression().containsPlace(placeToRemove)) {
+						queriesWithObservationsToRemove.add(q);
+						break;
+					}
+				}
 			}
-			buffer.append(System.getProperty("line.separator"));
-			buffer.append("Do you want to continue?");
+		}
+
+		if ((!queriesToDelete.isEmpty() || !queriesWithObservationsToRemove.isEmpty()) && !messageShown) {
+			messageShown = true;
+			StringBuilder buffer = new StringBuilder();
+
+			if (!queriesToDelete.isEmpty()) {
+				buffer.append("The following queries are associated with the shared place and will be deleted:\n\n");
+				for (TAPNQuery query : queriesToDelete) {
+					buffer.append(query.getName());
+					buffer.append('\n');
+				}
+
+				buffer.append("\nAre you sure you want to remove the shared place and all associated queries?");
+			} else if (!queriesWithObservationsToRemove.isEmpty()) {
+				buffer.append("The following queries have observations associated with the shared place:\n\n");
+				for (TAPNQuery query : queriesWithObservationsToRemove) {
+					buffer.append(query.getName());
+					buffer.append('\n');
+				}
+				
+				buffer.append("\nObservations containing the removed place will be removed from these queries.");
+				buffer.append("\n\nAre you sure you want to remove the shared place?");
+			}
+
 			int choice = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), buffer.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if(choice == JOptionPane.NO_OPTION) return;
 			
-			Command cmd = new DeleteQueriesCommand(tab, affectedQueries);
-			cmd.redo();
-			undoManager.addEdit(cmd);
+			if (!queriesToDelete.isEmpty()) {
+				Command cmd = new DeleteQueriesCommand(tab, queriesToDelete);
+				cmd.redo();
+				undoManager.addEdit(cmd);
+			}
 		}
 		if(deleteFromTemplates){
 			for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
@@ -218,7 +251,18 @@ public final class DeleteSharedPlaceOrTransitionAction implements ActionListener
 			for(TAPNQuery query : tab.queries()){
 				BooleanResult result = new BooleanResult();
 				query.getProperty().accept(visitor, result);
-				if(result.result() && !(queries.contains(query))){
+
+				boolean usedInObservation = false;
+				if (query.getSmcSettings() != null) {
+					for(Observation obs : query.getSmcSettings().getObservations()) {
+						if (obs.getExpression() != null && obs.getExpression().containsPlace((SharedPlace)sharedPlace)) {
+							usedInObservation = true;
+							break;
+						}
+					}
+				}
+
+				if ((result.result() || usedInObservation) && !(queries.contains(query))) {
 					queries.add(query);
 				}
 			}

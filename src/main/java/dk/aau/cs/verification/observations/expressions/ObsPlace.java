@@ -26,6 +26,11 @@ public class ObsPlace extends ObsLeaf {
     }
 
     @Override
+    public boolean containsPlace(TimedPlace place) {
+        return this.place.equals(place);
+    }
+
+    @Override
     public ObsExpression replacePlace(TimedPlace toReplace, TimedPlace replacement, TimedArcPetriNet tapn, BooleanResult affected) {
         if (place.equals(toReplace)) {
             affected.setResult(true);
