@@ -57,7 +57,7 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 			q.inclusionPlaces().removePlace(timedPlace);
 		}
 
-		for(TAPNQuery q : observationsInQuery.keySet()) {
+		for (TAPNQuery q : observationsInQuery.keySet()) {
 			q.getSmcSettings().getObservations().removeAll(observationsInQuery.get(q));
 	    }
 
