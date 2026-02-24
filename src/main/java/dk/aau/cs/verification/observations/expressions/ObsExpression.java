@@ -10,8 +10,12 @@ public abstract class ObsExpression {
     public abstract ObsExpression deepCopy();
     public abstract ObsExprPosition getObjectPosition(int index);
     public abstract ObsExprPosition getObjectPosition(ObsExpression expr);
-    public abstract String toXml();
-
+    public abstract String toXml(boolean legacy);
+    
+    public String toXml() {
+        return toXml(false);
+    }
+    
     public ObsExpression replacePlace(TimedPlace toReplace, TimedPlace replacement, TimedArcPetriNet tapn, BooleanResult affected) {
         return this;
     }

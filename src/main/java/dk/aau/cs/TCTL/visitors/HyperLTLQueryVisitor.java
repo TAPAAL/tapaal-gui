@@ -35,8 +35,6 @@ public class HyperLTLQueryVisitor extends VisitorBase {
     private static final String XML_INTEGERGE           = "integer-ge";
     private static final String XML_ISFIREABLE		    = "is-fireable";
     private static final String XML_INTEGERCONSTANT 	= "integer-constant";
-    private static final String XML_TOKENSCOUNT 		= "tokens-count";
-    private static final String XML_PLACE 			    = "place";
     private static final String XML_TRANSITION		    = "transition";
     private static final String XML_INTEGERSUM          = "integer-sum";
     private static final String XML_INTEGERPRODUCT      = "integer-product";
@@ -47,6 +45,11 @@ public class HyperLTLQueryVisitor extends VisitorBase {
     private final StringBuffer XMLQuery;
 
     public HyperLTLQueryVisitor() {
+        this(false);
+    }
+
+    public HyperLTLQueryVisitor(boolean legacy) {
+        super(legacy);
         this.XMLQuery = new StringBuffer();
     }
 
@@ -197,7 +200,7 @@ public class HyperLTLQueryVisitor extends VisitorBase {
 
     public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
         XMLQuery.append(startTag(XML_TOKENSCOUNT));
-        XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
+        XMLQuery.append(createXMLPlace(tctlPlaceNode, legacy));
         XMLQuery.append(endTag(XML_TOKENSCOUNT));
     }
 

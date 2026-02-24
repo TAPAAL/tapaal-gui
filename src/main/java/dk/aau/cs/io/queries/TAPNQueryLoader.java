@@ -262,25 +262,60 @@ public class TAPNQueryLoader extends QueryLoader{
     }    
 
     private ObsExpression createPlaceExpression(Element element) {
-         if (!element.hasAttribute("template") || !element.hasAttribute("id")) {
-             throw new IllegalArgumentException("Place expression must have 'template' and 'id' attributes");
-         }
+        String componentName = "";
+        String placeName = "";
 
-         String templateName = element.getAttribute("template");
-         String placeName = element.getAttribute("id");
+        if (element.hasAttribute("component") && element.hasAttribute("id")) {
+             componentName = element.getAttribute("component");
+             placeName = element.getAttribute("id");
+        } else {
+             String text = element.getTextContent();
+             String[] parts = parseLegacyPlaceName(text);
+             componentName = parts[0];
+             placeName = parts[1];
+        }
 
-         if (!"Shared".equals(templateName) && network.getTAPNByName(templateName) == null) {
-             throw new IllegalArgumentException("Template " + templateName + " not found when parsing place " + placeName);
-         }
+        if (componentName == null || componentName.isEmpty()) {
+            if (network.getSharedPlaceByName(placeName) != null) {
+                componentName = "Shared";
+            }
+        }
+        
+        if (!componentName.isEmpty() && !"Shared".equals(componentName) && network.getTAPNByName(componentName) == null) {
+            throw new IllegalArgumentException("Component " + componentName + " not found when parsing place " + placeName);
+        }
 
-         if (!"Shared".equals(templateName)) {
-              TimedArcPetriNet tapn = network.getTAPNByName(templateName);
-              if (tapn != null && tapn.getPlaceByName(placeName) == null) {
-                  throw new IllegalArgumentException("Place " + placeName + " not found in template " + templateName);
-              }
-         }
+        if (!componentName.isEmpty() && !"Shared".equals(componentName)) {
+            TimedArcPetriNet tapn = network.getTAPNByName(componentName);
+            if (tapn != null && tapn.getPlaceByName(placeName) == null) {
+                throw new IllegalArgumentException("Place " + placeName + " not found in component " + componentName);
+            }
+        }
 
-         return new ObsPlace(templateName, placeName, network);
+        return new ObsPlace(componentName, placeName, network);
+    }
+
+    private String[] parseLegacyPlaceName(String text) {
+        if (text.contains(".") && !text.startsWith("Shared")) {
+            int index = text.lastIndexOf(".");
+            return new String[]{text.substring(0, index), text.substring(index + 1)};
+        }
+        
+        if (text.startsWith("Shared_")) {
+            return new String[]{"Shared", text.substring(7)};
+        }
+
+        int index = text.lastIndexOf("_");
+        while (index > 0) {
+            String potentialComponent = text.substring(0, index);
+            if (network.getTAPNByName(potentialComponent) != null) {
+                return new String[]{potentialComponent, text.substring(index + 1)};
+            }
+            
+            index = text.lastIndexOf("_", index - 1);
+        }
+        
+        return new String[]{"", text};
     }
 
     public static SMCSettings parseSmcSettings(Element smcTag) {

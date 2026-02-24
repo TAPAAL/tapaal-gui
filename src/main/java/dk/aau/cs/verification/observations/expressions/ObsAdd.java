@@ -13,7 +13,7 @@ public class ObsAdd extends ObsOperator {
     }
 
     @Override
-    public String toXml() {
-        return "<integer-sum>" + left.toXml() + right.toXml() + "</integer-sum>";
+    public String toXml(boolean legacy) {
+        return "<integer-sum>" + left.toXml(legacy) + right.toXml(legacy) + "</integer-sum>";
     }
 }

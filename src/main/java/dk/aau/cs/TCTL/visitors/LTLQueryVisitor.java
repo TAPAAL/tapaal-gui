@@ -35,8 +35,6 @@ public class LTLQueryVisitor extends VisitorBase {
     protected static final String XML_INTEGERGE           = "integer-ge";
     protected static final String XML_ISFIREABLE		    = "is-fireable";
     protected static final String XML_INTEGERCONSTANT 	= "integer-constant";
-    protected static final String XML_TOKENSCOUNT 		= "tokens-count";
-    protected static final String XML_PLACE 			    = "place";
     protected static final String XML_TRANSITION		    = "transition";
     protected static final String XML_INTEGERSUM          = "integer-sum";
     protected static final String XML_INTEGERPRODUCT      = "integer-product";
@@ -47,6 +45,10 @@ public class LTLQueryVisitor extends VisitorBase {
 
     public LTLQueryVisitor() {
         super();
+    }
+    
+    public LTLQueryVisitor(boolean legacy) {
+        super(legacy);
     }
 
     public String getXMLQueryFor(TCTLAbstractProperty property, String queryName) {
@@ -189,7 +191,7 @@ public class LTLQueryVisitor extends VisitorBase {
 
     public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
         xmlQuery.append(startTag(XML_TOKENSCOUNT));
-        xmlQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
+        xmlQuery.append(createXMLPlace(tctlPlaceNode, legacy));
         xmlQuery.append(endTag(XML_TOKENSCOUNT));
     }
 

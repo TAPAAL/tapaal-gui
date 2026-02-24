@@ -7,7 +7,7 @@ public class ObsPlaceHolder extends ObsLeaf {
     }
 
     @Override
-    public String toXml() {
+    public String toXml(boolean legacy) {
         throw new UnsupportedOperationException("Cannot convert a placeholder to XML");
     }
 

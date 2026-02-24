@@ -56,22 +56,20 @@ public class VerifyTAPNExporter {
             }
 
 			PrintStream queryStream = new PrintStream(queryFile);
-            if (query == null) {
-                throw new FileNotFoundException(null);
-            } else if (query.getCategory() == QueryCategory.LTL) {
-                LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
+            if (query.getCategory() == QueryCategory.LTL) {
+                LTLQueryVisitor XMLVisitor = new LTLQueryVisitor(true);
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
             } else if (query.getCategory() == QueryCategory.HyperLTL) {
-                HyperLTLQueryVisitor XMLVisitor = new HyperLTLQueryVisitor();
+                HyperLTLQueryVisitor XMLVisitor = new HyperLTLQueryVisitor(true);
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
             } else if (query.getCategory() == QueryCategory.SMC) {
                 SMCQueryVisitor XMLVisitor = new SMCQueryVisitor();
-                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery.getName(), dataLayerQuery.getSmcSettings()));
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery.getName(), dataLayerQuery.getSmcSettings(), true));
             } else if (lens != null && lens.isGame()) {
-                CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
-                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null, true));
+                CTLQueryVisitor XMLVisitor = new CTLQueryVisitor(true);
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null, true)); // Game query
             } else {
-                CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
+                CTLQueryVisitor XMLVisitor = new CTLQueryVisitor(true);
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery == null? model.name() : dataLayerQuery.getName(), false));
             }
 			queryStream.close();

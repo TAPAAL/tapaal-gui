@@ -1,20 +1,12 @@
 package dk.aau.cs.TCTL.XMLParsing;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.lang.NumberFormatException;
-
 import dk.aau.cs.TCTL.*;
 import dk.aau.cs.debug.Logger;
-
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
-public class XMLHyperLTLQueryParser {
+public class XMLHyperLTLQueryParser extends AbstractXMLQueryParser {
 
-    private Node property;
-    private QueryWrapper queryWrapper;
-    private static final String ERROR_MESSAGE = "Could not parse XML tag: ";
     private ArrayList<String> traceList = new ArrayList<String>();
 
     public static boolean parse(Node prop, QueryWrapper queryWrapper){
@@ -43,7 +35,7 @@ public class XMLHyperLTLQueryParser {
     final public TCTLAbstractProperty AbstractProperty() throws XMLQueryParseException{
         Node formula;
 
-        if((formula = findSubNode("formula", property)) != null){
+        if((formula = AbstractXMLQueryParser.findSubNode("formula", property)) != null){
             return parseFormula(getFirstChildNode(formula));
         } else{
             throw new XMLQueryParseException(ERROR_MESSAGE + property.getNodeName());
@@ -59,8 +51,8 @@ public class XMLHyperLTLQueryParser {
         String result;
 
         // Find <id> tag and get property name
-        if(((idNode = XMLHyperLTLQueryParser.findSubNode("id", this.property)) == null) ||
-            ((result = XMLHyperLTLQueryParser.getText(idNode)) == null)){
+        if (((idNode = AbstractXMLQueryParser.findSubNode("id", this.property)) == null) ||
+            ((result = AbstractXMLQueryParser.getText(idNode)) == null)) {
 
             // If no name was found, set generic name
             result = "Query Comment/Name Here";
@@ -354,193 +346,27 @@ public class XMLHyperLTLQueryParser {
         throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
     }
 
-    private TCTLAbstractStateProperty parseIntegerExpression(Node integerExpression)
-        throws XMLQueryParseException{
-
-        ArrayList<Node> children;
+    protected TCTLAbstractStateProperty parseIntegerExpression(Node integerExpression) throws XMLQueryParseException{
         String nodeName = integerExpression.getNodeName();
 
-        if(nodeName.equals("integer-constant")){
-            String value;
-            int result;
-
-            if((value = getText(integerExpression)) == null){
-                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
-            }
-
-            value = value.replace("\n", "");
-
-            try{
-                result = Integer.parseInt(value);
-            } catch (NumberFormatException e){
-                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
-            }
-
-            return new TCTLConstNode(result);
-        } else if(nodeName.equals("tokens-count")){
-            children = getAllChildren(integerExpression);
-
-            if(children.size() < 1){
-                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
-            } else if (children.size() == 1) {
-                String[] splits = getText(children.get(0)).replace("\n", "").split("\\.");
-                // Check if place contains a template name
-                if(splits.length > 1){
-                    return new TCTLPlaceNode(splits[0], splits[1]);
-                } else {
-                    return new TCTLPlaceNode(splits[0]);
-                }
-            }
-
-            ArrayList<TCTLAbstractStateProperty> terms = new ArrayList<TCTLAbstractStateProperty>();
-            Iterator<Node> itr = children.iterator();
-
-            while(itr.hasNext()){
-                Node n = itr.next();
-                String[] splits = getText(n).replace("\n", "").split("\\.");
-
-                // Check if place contains a template name
-                if(splits.length > 1){
-                    terms.add(new TCTLPlaceNode(splits[0], splits[1]));
-                } else {
-                    terms.add(new TCTLPlaceNode(splits[0]));
-                }
-
-                if(itr.hasNext()){
-                    terms.add(new AritmeticOperator("+"));
-                }
-            }
-
-            return new TCTLTermListNode(terms);
-        } else if(nodeName.equals("integer-sum") || nodeName.equals("integer-product") || nodeName.equals("integer-difference")){
-
-            children = getAllChildren(integerExpression);
-            Iterator<Node> itr = children.iterator();
-
-            if(children.size() < 2){
-                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
-            }
-
-            ArrayList<TCTLAbstractStateProperty> intExpList =
-                new ArrayList<TCTLAbstractStateProperty>();
-
-            while(itr.hasNext()){
-                Node n = itr.next();
-                intExpList.add(parseIntegerExpression(n));
-
-                if(itr.hasNext()){
-                    if(nodeName.equals("integer-sum")){
-                        intExpList.add(new AritmeticOperator("+"));
-                    } else if(nodeName.equals("integer-product")){
-                        intExpList.add(new AritmeticOperator("*"));
-                    } else{
-                        intExpList.add(new AritmeticOperator("-"));
-                    }
-                }
-            }
-
-            return new TCTLTermListNode(intExpList);
-        } else if(nodeName.equals("path-scope")) {
-            children = getAllChildren(integerExpression);
+        if (nodeName.equals("path-scope")) {
+            ArrayList<Node> children = getAllChildren(integerExpression);
             String trace = integerExpression.getAttributes().item(0).getNodeValue();
 
             TCTLAbstractProperty pathScopeChild = parseIntegerExpression(children.get(0));
             return new HyperLTLPathScopeNode((TCTLAbstractStateProperty) pathScopeChild, trace);
         }
 
-        throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
+        return super.parseIntegerExpression(integerExpression);
     }
 
-    public static Node findSubNode(String name, Node node){
-        if (node.getNodeType() != Node.ELEMENT_NODE) {
-            return null;
-        }
 
-        if (!node.hasChildNodes()){
-            return null;
-        }
-
-        NodeList children = node.getChildNodes();
-
-        for (int i = 0; i < children.getLength(); i++){
-            Node subNode = children.item(i);
-            if (subNode.getNodeType() == Node.ELEMENT_NODE) {
-                if (subNode.getNodeName().equals(name))
-                    return subNode;
-            }
-        }
-
-        return null;
-    }
-
-    private ArrayList<Node> getAllChildren(Node parentNode) {
-        NodeList children = parentNode.getChildNodes();
-        ArrayList<Node> elementNodes = new ArrayList<Node>();
-
-        for (int i = 0; i < children.getLength(); i++) {
-            Node node = children.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                elementNodes.add(node);
-            }
-        }
-
-        return elementNodes;
-    }
-
-    public static String getText(Node node){
-        String result = null;
-
-        if (!node.hasChildNodes()){
-            return null;
-        }
-
-        NodeList children = node.getChildNodes();
-
-        for (int i = 0; i < children.getLength(); i++){
-            Node subNode = children.item(i);
-            if (subNode.getNodeType() == Node.TEXT_NODE) {
-                result = subNode.getNodeValue();
-            }
-        }
-
-        return result;
-    }
-
-    public int getChildCount(Node node){
-        int result = 0;
-
-        if (!node.hasChildNodes()){
-            return result;
-        }
-
-        NodeList children = node.getChildNodes();
-
-        for (int i = 0; i < children.getLength(); i++){
-            Node subNode = children.item(i);
-            if (subNode.getNodeType() == Node.ELEMENT_NODE) {
-                result++;
-            }
-        }
-
-        return result;
-    }
-
-    private Node getFirstChildNode(Node parent){
-        Node child = parent.getFirstChild();
-
-        while (child != null && child.getNodeType() != Node.ELEMENT_NODE){
-            child = child.getNextSibling();
-        }
-
-        return child;
-    }
 
     public XMLHyperLTLQueryParser(Node prop, QueryWrapper qw){
-        this.property = prop;
-        this.queryWrapper = qw;
+        super(prop, qw);
     }
 
     public XMLHyperLTLQueryParser(Node prop){
-        this.property = prop;
+        super(prop);
     }
 }
