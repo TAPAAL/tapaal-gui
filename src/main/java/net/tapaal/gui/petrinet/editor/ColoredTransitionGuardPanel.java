@@ -794,7 +794,7 @@ public class ColoredTransitionGuardPanel  extends JPanel {
             lessThanButton.setEnabled(false);
             checkSelectionComparison();
         }
-        parent.enableOKButton(!newProperty.containsPlaceHolder() || newProperty instanceof PlaceHolderExpression);
+        parent.tryToEnableOkButton(!newProperty.containsPlaceHolder() || newProperty instanceof PlaceHolderExpression);
     }
 
     private void checkSelectionComparison() {

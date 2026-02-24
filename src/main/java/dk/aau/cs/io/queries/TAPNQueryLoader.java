@@ -37,6 +37,7 @@ import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOptio
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
@@ -259,9 +260,36 @@ public class TAPNQueryLoader extends QueryLoader{
 
     private ObsExpression createPlaceExpression(Element element) {
         String name = element.getTextContent();
-        String[] parts = name.split("_", 2);
-        String templateName = parts[0];
-        String placeName = parts[1];
+        String templateName = null;
+        String placeName = null;
+        
+        final String SHARED = "Shared";
+        if (name.startsWith(SHARED + "_")) {
+            templateName = "Shared";
+            placeName = name.substring((SHARED + "_").length());
+        } else {
+            for (TimedArcPetriNet tapn : network.activeTemplates()) {
+                if (name.startsWith(tapn.name() + "_")) {
+                    String potentialPlaceName = name.substring(tapn.name().length() + 1);
+                    if (tapn.getPlaceByName(potentialPlaceName) != null) {
+                        templateName = tapn.name();
+                        placeName = potentialPlaceName;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (templateName == null) {
+            String[] parts = name.split("_", 2);
+            if (parts.length == 2) {
+                templateName = parts[0];
+                placeName = parts[1];
+            } else {
+                templateName = "";
+                placeName = name;
+            }
+        }
     
         return new ObsPlace(templateName, placeName, network);
     }
