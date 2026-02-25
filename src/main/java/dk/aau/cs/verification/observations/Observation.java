@@ -61,6 +61,10 @@ public class Observation {
     }
 
     public String toXml() {
-        return "<watch name=\"" + name + "\" isEnabled=\"" + isEnabled + "\">" + expression.toXml() + "</watch>";
+        return toXml(false);
+    }
+
+    public String toXml(boolean legacy) {
+        return "<watch name=\"" + name + "\" isEnabled=\"" + isEnabled + "\">" + expression.toXml(legacy) + "</watch>";
     }
 }

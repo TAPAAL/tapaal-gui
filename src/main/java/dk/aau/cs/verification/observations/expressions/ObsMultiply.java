@@ -13,7 +13,7 @@ public class ObsMultiply extends ObsOperator {
     }
 
     @Override
-    public String toXml() {
-        return "<integer-product>" + left.toXml() + right.toXml() + "</integer-product>";
+    public String toXml(boolean legacy) {
+        return "<integer-product>" + left.toXml(legacy) + right.toXml(legacy) + "</integer-product>";
     }
 }

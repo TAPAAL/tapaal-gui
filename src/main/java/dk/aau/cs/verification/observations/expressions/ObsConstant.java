@@ -13,7 +13,7 @@ public class ObsConstant extends ObsLeaf {
     }
 
     @Override
-    public String toXml() {
+    public String toXml(boolean legacy) {
         return "<integer-constant>" + value + "</integer-constant>";
     }
 

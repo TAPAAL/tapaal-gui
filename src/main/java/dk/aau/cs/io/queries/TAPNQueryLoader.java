@@ -59,9 +59,12 @@ public class TAPNQueryLoader extends QueryLoader{
             Node q = queryNodes.item(i);
 
 			if (q instanceof Element) {
-				TAPNQuery query = parseTAPNQuery((Element) q, network);
-				
-				queries.add(query);
+                try {
+				    TAPNQuery query = parseTAPNQuery((Element)q, network);
+				    queries.add(query);
+                } catch(Exception e) {
+                    messages.add("Error parsing query: " + e.getMessage());
+                }
 			}
 		}
 		return queries;
@@ -259,39 +262,60 @@ public class TAPNQueryLoader extends QueryLoader{
     }    
 
     private ObsExpression createPlaceExpression(Element element) {
-        String name = element.getTextContent();
-        String templateName = null;
-        String placeName = null;
-        
-        final String SHARED = "Shared";
-        if (name.startsWith(SHARED + "_")) {
-            templateName = "Shared";
-            placeName = name.substring((SHARED + "_").length());
+        String componentName = "";
+        String placeName = "";
+
+        if (element.hasAttribute("component") && element.hasAttribute("id")) {
+             componentName = element.getAttribute("component");
+             placeName = element.getAttribute("id");
         } else {
-            for (TimedArcPetriNet tapn : network.activeTemplates()) {
-                if (name.startsWith(tapn.name() + "_")) {
-                    String potentialPlaceName = name.substring(tapn.name().length() + 1);
-                    if (tapn.getPlaceByName(potentialPlaceName) != null) {
-                        templateName = tapn.name();
-                        placeName = potentialPlaceName;
-                        break;
-                    }
-                }
+             String text = element.getTextContent();
+             String[] parts = parseLegacyPlaceName(text);
+             componentName = parts[0];
+             placeName = parts[1];
+        }
+
+        if (componentName == null || componentName.isEmpty()) {
+            if (network.getSharedPlaceByName(placeName) != null) {
+                componentName = "Shared";
+            }
+        }
+        
+        if (!componentName.isEmpty() && !"Shared".equals(componentName) && network.getTAPNByName(componentName) == null) {
+            throw new IllegalArgumentException("Component " + componentName + " not found when parsing place " + placeName);
+        }
+
+        if (!componentName.isEmpty() && !"Shared".equals(componentName)) {
+            TimedArcPetriNet tapn = network.getTAPNByName(componentName);
+            if (tapn != null && tapn.getPlaceByName(placeName) == null) {
+                throw new IllegalArgumentException("Place " + placeName + " not found in component " + componentName);
             }
         }
 
-        if (templateName == null) {
-            String[] parts = name.split("_", 2);
-            if (parts.length == 2) {
-                templateName = parts[0];
-                placeName = parts[1];
-            } else {
-                templateName = "";
-                placeName = name;
-            }
+        return new ObsPlace(componentName, placeName, network);
+    }
+
+    private String[] parseLegacyPlaceName(String text) {
+        if (text.contains(".") && !text.startsWith("Shared")) {
+            int index = text.lastIndexOf(".");
+            return new String[]{text.substring(0, index), text.substring(index + 1)};
         }
-    
-        return new ObsPlace(templateName, placeName, network);
+        
+        if (text.startsWith("Shared_")) {
+            return new String[]{"Shared", text.substring(7)};
+        }
+
+        int index = text.lastIndexOf("_");
+        while (index > 0) {
+            String potentialComponent = text.substring(0, index);
+            if (network.getTAPNByName(potentialComponent) != null) {
+                return new String[]{potentialComponent, text.substring(index + 1)};
+            }
+            
+            index = text.lastIndexOf("_", index - 1);
+        }
+        
+        return new String[]{"", text};
     }
 
     public static SMCSettings parseSmcSettings(Element smcTag) {

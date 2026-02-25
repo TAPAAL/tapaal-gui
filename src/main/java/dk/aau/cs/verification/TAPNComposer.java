@@ -221,6 +221,12 @@ public class TAPNComposer implements ITAPNComposer {
 			for (TimedPlace timedPlace : tapn.places()) {			
 				if (!timedPlace.isShared()) {
 					String uniquePlaceName = (!singleComponentNoPrefix || model.activeTemplates().size() > 1) ? composedPlaceName(timedPlace) : timedPlace.name();
+					String baseName = uniquePlaceName;
+					int count = 0;
+					while (constructedModel.isNameUsed(uniquePlaceName)){
+						++count;
+						uniquePlaceName = baseName + "_" + count;
+					}
 
 					LocalTimedPlace place = null;
 					if (timedPlace.invariant().upperBound() instanceof Bound.InfBound) {					
@@ -291,6 +297,13 @@ public class TAPNComposer implements ITAPNComposer {
                                 ? "Shared_" + timedTransition.name()
                                 : timedTransition.name();
                         }
+						
+						int count = 0;
+						String baseName = uniqueTransitionName;
+						while (constructedModel.isNameUsed(uniqueTransitionName)) {
+							++count;
+							uniqueTransitionName = baseName + "_" + count;
+						}
 
 						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent(), timedTransition.getGuard(), timedTransition.getDistribution(), timedTransition.getWeight(), timedTransition.getFiringMode());
 						if (timedTransition.isUncontrollable()) {

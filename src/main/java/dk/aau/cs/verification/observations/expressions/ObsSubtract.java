@@ -13,7 +13,7 @@ public class ObsSubtract extends ObsOperator {
     }
 
     @Override
-    public String toXml() {
-        return "<integer-difference>" + left.toXml() + right.toXml() + "</integer-difference>";
+    public String toXml(boolean legacy) {
+        return "<integer-difference>" + left.toXml(legacy) + right.toXml(legacy) + "</integer-difference>";
     }
 }

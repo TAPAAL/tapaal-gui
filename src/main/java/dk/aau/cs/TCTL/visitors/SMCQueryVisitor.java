@@ -21,20 +21,29 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
     private static final String XML_OBSERVATIONS            = "observations";
 
     public String getXMLQueryFor(TCTLAbstractProperty property, String queryName, SMCSettings settings) {
-        buildXMLQuery(property, queryName, settings, true);
+        return getXMLQueryFor(property, queryName, settings, false);
+    }
+
+    public String getXMLQueryFor(TCTLAbstractProperty property, String queryName, SMCSettings settings, boolean legacy) {
+        buildXMLQuery(property, queryName, settings, true, legacy);
         return getFormatted();
     }
 
     public void buildXMLQuery(TCTLAbstractProperty property, String queryName, SMCSettings settings) {
-        buildXMLQuery(property, queryName, settings, false);
+        buildXMLQuery(property, queryName, settings, false, false);
     }
 
     public void buildXMLQuery(TCTLAbstractProperty property, String queryName, SMCSettings settings, boolean discardDisabled) {
+        buildXMLQuery(property, queryName, settings, discardDisabled, false);
+    }
+
+    public void buildXMLQuery(TCTLAbstractProperty property, String queryName, SMCSettings settings, boolean discardDisabled, boolean legacy) {
+        this.legacy = legacy;
         xmlQuery.append(startTag(XML_PROP) + queryInfo(queryName) + smcTag(settings));
 
         List<Observation> observations = settings.getObservations();
         if (!observations.isEmpty()) {
-            xmlQuery.append(observationTag(observations, discardDisabled));
+            xmlQuery.append(observationTag(observations, discardDisabled, legacy));
         }
             
         xmlQuery.append(startTag(XML_FORMULA));
@@ -63,7 +72,7 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
         return emptyElement(tagContent);
     }
 
-    private String observationTag(List<Observation> observations, boolean discardDisabled) {
+    private String observationTag(List<Observation> observations, boolean discardDisabled, boolean legacy) {
         String observationXml = startTag(XML_OBSERVATIONS); 
         List<Observation> observationsCopy = new ArrayList<>(observations);
         if (discardDisabled) {
@@ -71,7 +80,7 @@ public class SMCQueryVisitor extends LTLQueryVisitor {
         }
 
         for (Observation observation : observationsCopy) {
-            observationXml += observation.toXml();
+            observationXml += observation.toXml(legacy);
         }
 
         observationXml += endTag(XML_OBSERVATIONS);

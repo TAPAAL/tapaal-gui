@@ -3,6 +3,16 @@ package dk.aau.cs.TCTL.visitors;
 import dk.aau.cs.TCTL.*;
 
 public abstract class VisitorBase implements ITCTLVisitor {
+    protected static final String XML_TOKENSCOUNT = "tokens-count";
+    protected static final String XML_PLACE = "place";    
+    protected boolean legacy = false;
+
+    public VisitorBase() {
+    }
+
+    public VisitorBase(boolean legacy) {
+        this.legacy = legacy;
+    }
 
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) { 
 		atomicPropositionNode.getLeft().accept(this, context);
@@ -67,5 +77,26 @@ public abstract class VisitorBase implements ITCTLVisitor {
 			p.accept(this, context);
 		}
 	}
-	
+
+    protected String createXMLPlace(TCTLPlaceNode placeNode, boolean legacy) {
+        StringBuilder xml = new StringBuilder();
+        if (legacy) {
+            String template = placeNode.getTemplate();
+            String place = placeNode.getPlace();
+            String delimiter = (template == null || template.isEmpty()) ? "" : "_";
+            xml.append("<place>" + template + delimiter + place + "</place>");
+        } else {
+            xml.append("<place");
+            String template = placeNode.getTemplate();
+            String place = placeNode.getPlace();
+            if (template != null && !template.isEmpty()) {
+                xml.append(" component=\"").append(template).append("\"");
+            }
+            
+            xml.append(" id=\"").append(place).append("\"");
+            xml.append(" />");
+        }
+
+        return xml.toString();
+    }
 }
