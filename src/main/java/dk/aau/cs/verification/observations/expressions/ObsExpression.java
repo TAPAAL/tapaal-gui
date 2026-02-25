@@ -32,6 +32,10 @@ public abstract class ObsExpression {
         return false;
     }
 
+    public boolean containsPlace(TimedPlace place) {
+        return false;
+    }
+
     public void setParent(ObsExpression parent) {
         this.parent = parent;
     }
