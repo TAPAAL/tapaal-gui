@@ -152,13 +152,14 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         JPanel sliderPanel = new JPanel();
         sliderPanel.setBackground(Color.WHITE);
         JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
-        JLabel label = new JLabel("Smoothing: None");
+        JLabel label = new JLabel("Bins: Max");
+        label.setPreferredSize(new java.awt.Dimension(80, 20));
         
         slider.addChangeListener(e -> {
             int value = ((JSlider) e.getSource()).getValue();
             if (value == 100) {
                 k = -1;
-                label.setText("Smoothing: None");
+                label.setText("Bins: Max");
             } else {
                 int bins = Math.max(2, value + 1);
                 k = bins;
@@ -330,7 +331,8 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         double binWidth = (maxX - minX) / binCount;
         List<GraphPoint> binned = new ArrayList<>();
         
-        double[] binSums = new double[binCount];
+        double[] binSumsY = new double[binCount];
+        double[] binSumsX = new double[binCount];
         int[] binCounts = new int[binCount];
         
         for (GraphPoint p : points) {
@@ -338,15 +340,16 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
             if (binIndex >= binCount) binIndex = binCount - 1;
             if (binIndex < 0) binIndex = 0;
             
-            binSums[binIndex] += p.getY();
+            binSumsX[binIndex] += p.getX();
+            binSumsY[binIndex] += p.getY();
             ++binCounts[binIndex];
         }
         
         for (int i = 0; i < binCount; ++i) {
             if (binCounts[i] > 0) {
-                double avgY = binSums[i] / binCounts[i];
-                double binCenterX = minX + (i + 0.5) * binWidth;
-                binned.add(new GraphPoint(binCenterX, avgY));
+                double avgX = binSumsX[i] / binCounts[i];
+                double sumY = binSumsY[i];
+                binned.add(new GraphPoint(avgX, sumY));
             }
         }
         
