@@ -17,6 +17,7 @@ public class SMCSettings {
     public boolean compareToFloat;
     public float geqThan;
     private long numericPrecision;
+    private boolean customRandomStart;
 
     private List<Observation> observations;
 
@@ -32,8 +33,32 @@ public class SMCSettings {
         settings.compareToFloat = false;
         settings.geqThan = 0.5f;
         settings.setNumericPrecision(5);
+        settings.setCustomRandomStart(false);
         settings.setObservations(new ArrayList<>());
         return settings;
+    }
+
+    public SMCSettings copy() {
+        SMCSettings copy = new SMCSettings();
+        copy.timeBound = timeBound;
+        copy.stepBound = stepBound;
+        copy.falsePositives = falsePositives;
+        copy.falseNegatives = falseNegatives;
+        copy.indifferenceWidth = indifferenceWidth;
+        copy.confidence = confidence;
+        copy.estimationIntervalWidth = estimationIntervalWidth;
+        copy.compareToFloat = compareToFloat;
+        copy.geqThan = geqThan;
+        copy.numericPrecision = numericPrecision;
+        copy.customRandomStart = customRandomStart;
+
+        if (observations != null) {
+            copy.observations = new ArrayList<>(observations);
+        } else {
+            copy.observations = new ArrayList<>();
+        }
+
+        return copy;
     }
 
     // Computes the number of runs needed according to :
@@ -73,6 +98,14 @@ public class SMCSettings {
 
     public long getNumericPrecision() {
         return numericPrecision;
+    }
+
+    public void setCustomRandomStart(boolean customRandomStart) {
+        this.customRandomStart = customRandomStart;
+    }
+
+    public boolean getCustomRandomStart() {
+        return customRandomStart;
     }
 
     public void setObservations(List<Observation> observations) {

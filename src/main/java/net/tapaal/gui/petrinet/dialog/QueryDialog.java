@@ -376,6 +376,8 @@ public class QueryDialog extends JPanel {
     private JPanel quantitativePanel;
     private JLabel smcParallelLabel;
     private JCheckBox smcParallel;
+    private JLabel smcCustomRandomStartLabel;
+    private JCheckBox smcCustomRandomStart;
     private JTextField smcConfidence;
     private QuerySlider smcConfidenceSlider;
     private QuerySlider smcPrecisionSlider;
@@ -920,6 +922,7 @@ public class QueryDialog extends JPanel {
         decimalFormatSymbols.setDecimalSeparator('.');
         DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
         smcSettings.compareToFloat = smcVerificationType.getSelectedIndex() == 1;
+        smcSettings.setCustomRandomStart(smcCustomRandomStart.isSelected());
         try {
             smcSettings.timeBound = smcTimeBoundInfinite.isSelected() ?
                 Integer.MAX_VALUE :
@@ -984,6 +987,8 @@ public class QueryDialog extends JPanel {
     private void setSMCSettings(SMCSettings settings) {
         updatingSmcSettings = true;
         smcSettings = settings;
+
+        if (smcCustomRandomStart != null) smcCustomRandomStart.setSelected(settings.getCustomRandomStart());
 
         double desiredMinConfidence = smcConfidenceSlider.getDesiredMin();
         double desiredMaxConfidence = smcConfidenceSlider.getDesiredMax();
@@ -2000,7 +2005,7 @@ public class QueryDialog extends JPanel {
         }
 
         if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.SMC) {
-            setSMCSettings(queryToCreateFrom.getSmcSettings());
+            setSMCSettings(queryToCreateFrom.getSmcSettings() != null ? queryToCreateFrom.getSmcSettings().copy() : null);
             smcParallel.setSelected(queryToCreateFrom.isParallel());
             smcVerificationType.setSelectedIndex(queryToCreateFrom.getVerificationType().ordinal());
             smcNumberOfTraces.setValue(queryToCreateFrom.getNumberOfTraces());
@@ -2062,6 +2067,9 @@ public class QueryDialog extends JPanel {
             if (!updatingSmcSettings) updateRawVerificationOptions();
         });
         smcParallel.addActionListener(e -> {
+            if (!updatingSmcSettings) updateRawVerificationOptions();
+        });
+        smcCustomRandomStart.addActionListener(e -> {
             if (!updatingSmcSettings) updateRawVerificationOptions();
         });
 
@@ -3142,6 +3150,15 @@ public class QueryDialog extends JPanel {
         smcParallel = new JCheckBox();
         smcParallel.setSelected(true);
         smcEngineOptions.add(smcParallel, subPanelGbc);
+
+        subPanelGbc.gridy = 5;
+        subPanelGbc.gridx = 0;
+        smcCustomRandomStartLabel = new JLabel("Custom random start : ");
+        smcEngineOptions.add(smcCustomRandomStartLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcCustomRandomStart = new JCheckBox();
+        smcCustomRandomStart.setSelected(false);
+        smcEngineOptions.add(smcCustomRandomStart, subPanelGbc);
 
         smcSettingsPanel.add(smcEngineOptions, gbc);
         gbc.gridx = 1;
@@ -5847,6 +5864,8 @@ public class QueryDialog extends JPanel {
         smcVerificationType.setEnabled(isEnabled);
         smcParallelLabel.setEnabled(isEnabled);
         smcParallel.setEnabled(isEnabled);
+        if (smcCustomRandomStartLabel != null) smcCustomRandomStartLabel.setEnabled(isEnabled);
+        if (smcCustomRandomStart != null) smcCustomRandomStart.setEnabled(isEnabled);
 
         smcGranularityField.setEnabled(isEnabled);
         smcMaxGranularityCheckbox.setEnabled(isEnabled);
@@ -6868,6 +6887,7 @@ public class QueryDialog extends JPanel {
         smcEstimationIntervalWidth.setEnabled(!doingBenchmark);
         smcTimeExpected.setEnabled(!doingBenchmark);
         smcParallel.setEnabled(!doingBenchmark);
+        if (smcCustomRandomStart != null) smcCustomRandomStart.setEnabled(!doingBenchmark);
         smcVerificationType.setEnabled(!doingBenchmark);
         smcStepBoundValue.setEnabled(!doingBenchmark && !smcStepBoundInfinite.isSelected());
         smcStepBoundInfinite.setEnabled(!doingBenchmark && !smcTimeBoundInfinite.isSelected());
