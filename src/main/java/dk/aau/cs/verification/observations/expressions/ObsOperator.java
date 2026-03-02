@@ -35,6 +35,11 @@ public abstract class ObsOperator extends ObsExpression {
         return this;
     }
 
+    @Override
+    public boolean containsPlace(TimedPlace place) {
+        return left.containsPlace(place) || right.containsPlace(place);
+    }
+
     public void insertLeftMost(ObsExpression expr) {
         expr.parent = this;
 
