@@ -224,8 +224,8 @@ public class TapnXmlLoader {
     private SMCUserDefinedDistribution parseCustomDistribution(Element element) {
         String name = element.getAttribute("name");
         boolean randomStart = false;
-        if (element.hasAttribute("random_start")) {
-            randomStart = Boolean.parseBoolean(element.getAttribute("random_start"));
+        if (element.hasAttribute("randomStart")) {
+            randomStart = Boolean.parseBoolean(element.getAttribute("randomStart"));
         }
         List<Double> values = new ArrayList<>();
         NodeList valueNodes = element.getElementsByTagName("value");
