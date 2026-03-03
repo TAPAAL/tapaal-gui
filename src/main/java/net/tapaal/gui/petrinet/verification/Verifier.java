@@ -305,8 +305,7 @@ public class Verifier {
                 query.isSimulate(),
                 query.getGranularity(),
                 query.isMaxGranularity(),
-                query.getSmcSettings().getNumericPrecision(),
-                query.getSmcSettings().getCustomRandomStart()
+                query.getSmcSettings().getNumericPrecision()
         );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             boolean unfold = isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE && !query.useExplicitSearch();

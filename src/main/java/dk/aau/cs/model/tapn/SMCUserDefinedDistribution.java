@@ -7,11 +7,11 @@ import java.util.List;
 import org.w3c.dom.Element;
 
 public class SMCUserDefinedDistribution extends SMCDistribution {
-
     public static final String NAME = "custom";
 
     private String name;
     private List<Double> values = new ArrayList<>();
+    private boolean randomStart = false;
 
     public SMCUserDefinedDistribution(String name) {
         this.name = name;
@@ -20,6 +20,14 @@ public class SMCUserDefinedDistribution extends SMCDistribution {
     public SMCUserDefinedDistribution(String name, List<Double> values) {
         this.name = name;
         this.values = values != null ? values : new ArrayList<>();
+    }
+
+    public boolean isRandomStart() {
+        return randomStart;
+    }
+
+    public void setRandomStart(boolean randomStart) {
+        this.randomStart = randomStart;
     }
 
     @Override
@@ -83,16 +91,19 @@ public class SMCUserDefinedDistribution extends SMCDistribution {
         }
 
         if (values == null) {
-            return other.values == null;
+            if (other.values != null) return false;
+        } else if (!values.equals(other.values)) {
+            return false;
         }
         
-        return values.equals(other.values);
+        return randomStart == other.randomStart;
     }
     
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (values != null ? values.hashCode() : 0);
+        result = 31 * result + (randomStart ? 1 : 0);
         return result;
     }
 }

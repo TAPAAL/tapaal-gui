@@ -17,7 +17,6 @@ public class SMCSettings {
     public boolean compareToFloat;
     public float geqThan;
     private long numericPrecision;
-    private boolean customRandomStart;
 
     private List<Observation> observations;
 
@@ -33,7 +32,6 @@ public class SMCSettings {
         settings.compareToFloat = false;
         settings.geqThan = 0.5f;
         settings.setNumericPrecision(5);
-        settings.setCustomRandomStart(false);
         settings.setObservations(new ArrayList<>());
         return settings;
     }
@@ -50,7 +48,6 @@ public class SMCSettings {
         copy.compareToFloat = compareToFloat;
         copy.geqThan = geqThan;
         copy.numericPrecision = numericPrecision;
-        copy.customRandomStart = customRandomStart;
 
         if (observations != null) {
             copy.observations = new ArrayList<>(observations);
@@ -100,13 +97,7 @@ public class SMCSettings {
         return numericPrecision;
     }
 
-    public void setCustomRandomStart(boolean customRandomStart) {
-        this.customRandomStart = customRandomStart;
-    }
 
-    public boolean getCustomRandomStart() {
-        return customRandomStart;
-    }
 
     public void setObservations(List<Observation> observations) {
         this.observations = observations;

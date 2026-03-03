@@ -111,6 +111,7 @@ public class PNMLWriter implements NetWriter {
         for (SMCUserDefinedDistribution cd : network.userDefinedDistributions()) {
             Element element = document.createElement("custom_distribution");
             element.setAttribute("name", cd.getName());
+            element.setAttribute("random_start", String.valueOf(cd.isRandomStart()));
             for (Double val : cd.getValues()) {
                 Element valElement = document.createElement("value");
                 valElement.setTextContent(val.toString());

@@ -922,7 +922,6 @@ public class QueryDialog extends JPanel {
         decimalFormatSymbols.setDecimalSeparator('.');
         DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
         smcSettings.compareToFloat = smcVerificationType.getSelectedIndex() == 1;
-        smcSettings.setCustomRandomStart(smcCustomRandomStart.isSelected());
         try {
             smcSettings.timeBound = smcTimeBoundInfinite.isSelected() ?
                 Integer.MAX_VALUE :
@@ -988,7 +987,7 @@ public class QueryDialog extends JPanel {
         updatingSmcSettings = true;
         smcSettings = settings;
 
-        if (smcCustomRandomStart != null) smcCustomRandomStart.setSelected(settings.getCustomRandomStart());
+        
 
         double desiredMinConfidence = smcConfidenceSlider.getDesiredMin();
         double desiredMaxConfidence = smcConfidenceSlider.getDesiredMax();

@@ -181,9 +181,16 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
                  }
             });
 
+            JCheckBox randomStartCheck = new JCheckBox("Custom random start");
+            randomStartCheck.setSelected(dist.isRandomStart());
+            
+            JPanel bottomPanel = new JPanel(new BorderLayout());
+            bottomPanel.add(randomStartCheck, BorderLayout.NORTH);
+            bottomPanel.add(loadButton, BorderLayout.SOUTH);
+
             JPanel panel = new JPanel(new BorderLayout());
             panel.add(scroll, BorderLayout.CENTER);
-            panel.add(loadButton, BorderLayout.SOUTH);
+            panel.add(bottomPanel, BorderLayout.SOUTH);
 
             int result = JOptionPane.showConfirmDialog(this, panel, "Edit Values (one real number per line) for " + selected, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if (result == JOptionPane.OK_OPTION) {
@@ -200,6 +207,7 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
 
                 	dist.getValues().clear();
                 	dist.getValues().addAll(newValues);
+                    dist.setRandomStart(randomStartCheck.isSelected());
                 } catch (NumberFormatException e) {
                 	JOptionPane.showMessageDialog(this, "Invalid number format: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
