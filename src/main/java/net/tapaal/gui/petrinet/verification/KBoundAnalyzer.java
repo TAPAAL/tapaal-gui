@@ -128,12 +128,12 @@ public class KBoundAnalyzer {
         ArrayList<TCTLAbstractStateProperty> factors = new ArrayList<>();
 
         tapnNetwork.sharedPlaces().forEach(o -> {
-            if (net.getPlaceByName(o.name()) != null && !net.getPlaceByName(o.name()).name().contains("Shared_")) {
-                net.getPlaceByName(o.name()).setName("Shared_" + o.name());
+            if (net.getPlaceByName(o.name()) != null && !net.getPlaceByName(o.name()).name().contains("Shared__")) {
+                net.getPlaceByName(o.name()).setName("Shared__" + o.name());
             }
         });
         tapnNetwork.allTemplates().forEach(o -> o.places().forEach(x -> {
-            if (net.getPlaceByName(x.name()) != null) net.getPlaceByName(x.name()).setName(o.name() + "_" + x.name());
+            if (net.getPlaceByName(x.name()) != null) net.getPlaceByName(x.name()).setName(o.name() + "__" + x.name());
         }));
 
         for (TimedPlace place : net.places()) {
