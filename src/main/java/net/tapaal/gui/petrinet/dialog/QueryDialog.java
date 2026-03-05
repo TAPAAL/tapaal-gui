@@ -376,7 +376,6 @@ public class QueryDialog extends JPanel {
     private JPanel quantitativePanel;
     private JLabel smcParallelLabel;
     private JCheckBox smcParallel;
-
     private JTextField smcConfidence;
     private QuerySlider smcConfidenceSlider;
     private QuerySlider smcPrecisionSlider;

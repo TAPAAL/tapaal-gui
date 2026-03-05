@@ -94,7 +94,6 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             int granularity,
             boolean maxGranularity,
             long numericPrecision
-            
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
