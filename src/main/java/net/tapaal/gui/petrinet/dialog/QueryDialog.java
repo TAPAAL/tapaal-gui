@@ -376,8 +376,7 @@ public class QueryDialog extends JPanel {
     private JPanel quantitativePanel;
     private JLabel smcParallelLabel;
     private JCheckBox smcParallel;
-    private JLabel smcCustomRandomStartLabel;
-    private JCheckBox smcCustomRandomStart;
+
     private JTextField smcConfidence;
     private QuerySlider smcConfidenceSlider;
     private QuerySlider smcPrecisionSlider;
@@ -2068,11 +2067,9 @@ public class QueryDialog extends JPanel {
         smcParallel.addActionListener(e -> {
             if (!updatingSmcSettings) updateRawVerificationOptions();
         });
-        smcCustomRandomStart.addActionListener(e -> {
-            if (!updatingSmcSettings) updateRawVerificationOptions();
-        });
 
         final JTextField smcNumTracesTextField = ((JSpinner.DefaultEditor) smcNumberOfTraces.getEditor()).getTextField();
+
 
         // Fix from https://stackoverflow.com/a/6276603 to update uppon typing
         // to ensure raw options are updated correctly
@@ -3150,14 +3147,7 @@ public class QueryDialog extends JPanel {
         smcParallel.setSelected(true);
         smcEngineOptions.add(smcParallel, subPanelGbc);
 
-        subPanelGbc.gridy = 5;
-        subPanelGbc.gridx = 0;
-        smcCustomRandomStartLabel = new JLabel("Custom random start : ");
-        smcEngineOptions.add(smcCustomRandomStartLabel, subPanelGbc);
-        subPanelGbc.gridx = 1;
-        smcCustomRandomStart = new JCheckBox();
-        smcCustomRandomStart.setSelected(false);
-        smcEngineOptions.add(smcCustomRandomStart, subPanelGbc);
+
 
         smcSettingsPanel.add(smcEngineOptions, gbc);
         gbc.gridx = 1;
@@ -5863,8 +5853,7 @@ public class QueryDialog extends JPanel {
         smcVerificationType.setEnabled(isEnabled);
         smcParallelLabel.setEnabled(isEnabled);
         smcParallel.setEnabled(isEnabled);
-        if (smcCustomRandomStartLabel != null) smcCustomRandomStartLabel.setEnabled(isEnabled);
-        if (smcCustomRandomStart != null) smcCustomRandomStart.setEnabled(isEnabled);
+
 
         smcGranularityField.setEnabled(isEnabled);
         smcMaxGranularityCheckbox.setEnabled(isEnabled);
@@ -6886,7 +6875,7 @@ public class QueryDialog extends JPanel {
         smcEstimationIntervalWidth.setEnabled(!doingBenchmark);
         smcTimeExpected.setEnabled(!doingBenchmark);
         smcParallel.setEnabled(!doingBenchmark);
-        if (smcCustomRandomStart != null) smcCustomRandomStart.setEnabled(!doingBenchmark);
+
         smcVerificationType.setEnabled(!doingBenchmark);
         smcStepBoundValue.setEnabled(!doingBenchmark && !smcStepBoundInfinite.isSelected());
         smcStepBoundInfinite.setEnabled(!doingBenchmark && !smcTimeBoundInfinite.isSelected());
