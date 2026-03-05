@@ -986,8 +986,6 @@ public class QueryDialog extends JPanel {
         updatingSmcSettings = true;
         smcSettings = settings;
 
-        
-
         double desiredMinConfidence = smcConfidenceSlider.getDesiredMin();
         double desiredMaxConfidence = smcConfidenceSlider.getDesiredMax();
         double initialProportionConfidence = (settings.confidence - desiredMinConfidence) / (desiredMaxConfidence - desiredMinConfidence);
@@ -2003,7 +2001,7 @@ public class QueryDialog extends JPanel {
         }
 
         if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.SMC) {
-            setSMCSettings(queryToCreateFrom.getSmcSettings() != null ? queryToCreateFrom.getSmcSettings().copy() : null);
+            setSMCSettings(queryToCreateFrom.getSmcSettings());
             smcParallel.setSelected(queryToCreateFrom.isParallel());
             smcVerificationType.setSelectedIndex(queryToCreateFrom.getVerificationType().ordinal());
             smcNumberOfTraces.setValue(queryToCreateFrom.getNumberOfTraces());
@@ -2069,7 +2067,6 @@ public class QueryDialog extends JPanel {
         });
 
         final JTextField smcNumTracesTextField = ((JSpinner.DefaultEditor) smcNumberOfTraces.getEditor()).getTextField();
-
 
         // Fix from https://stackoverflow.com/a/6276603 to update uppon typing
         // to ensure raw options are updated correctly
@@ -3146,8 +3143,6 @@ public class QueryDialog extends JPanel {
         smcParallel = new JCheckBox();
         smcParallel.setSelected(true);
         smcEngineOptions.add(smcParallel, subPanelGbc);
-
-
 
         smcSettingsPanel.add(smcEngineOptions, gbc);
         gbc.gridx = 1;
@@ -5854,7 +5849,6 @@ public class QueryDialog extends JPanel {
         smcParallelLabel.setEnabled(isEnabled);
         smcParallel.setEnabled(isEnabled);
 
-
         smcGranularityField.setEnabled(isEnabled);
         smcMaxGranularityCheckbox.setEnabled(isEnabled);
         smcNumericPrecision.setEnabled(isEnabled);
@@ -6875,7 +6869,6 @@ public class QueryDialog extends JPanel {
         smcEstimationIntervalWidth.setEnabled(!doingBenchmark);
         smcTimeExpected.setEnabled(!doingBenchmark);
         smcParallel.setEnabled(!doingBenchmark);
-
         smcVerificationType.setEnabled(!doingBenchmark);
         smcStepBoundValue.setEnabled(!doingBenchmark && !smcStepBoundInfinite.isSelected());
         smcStepBoundInfinite.setEnabled(!doingBenchmark && !smcTimeBoundInfinite.isSelected());

@@ -36,28 +36,6 @@ public class SMCSettings {
         return settings;
     }
 
-    public SMCSettings copy() {
-        SMCSettings copy = new SMCSettings();
-        copy.timeBound = timeBound;
-        copy.stepBound = stepBound;
-        copy.falsePositives = falsePositives;
-        copy.falseNegatives = falseNegatives;
-        copy.indifferenceWidth = indifferenceWidth;
-        copy.confidence = confidence;
-        copy.estimationIntervalWidth = estimationIntervalWidth;
-        copy.compareToFloat = compareToFloat;
-        copy.geqThan = geqThan;
-        copy.numericPrecision = numericPrecision;
-
-        if (observations != null) {
-            copy.observations = new ArrayList<>(observations);
-        } else {
-            copy.observations = new ArrayList<>();
-        }
-
-        return copy;
-    }
-
     // Computes the number of runs needed according to :
     // https://link.springer.com/content/pdf/10.1007/b94790.pdf p.78-79
     // ONLY RELEVANT FOR PROBABILITY ESTIMATION !
@@ -96,8 +74,6 @@ public class SMCSettings {
     public long getNumericPrecision() {
         return numericPrecision;
     }
-
-
 
     public void setObservations(List<Observation> observations) {
         this.observations = observations;
