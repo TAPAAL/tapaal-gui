@@ -181,7 +181,7 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
                  }
             });
 
-            JCheckBox randomStartCheck = new JCheckBox("Custom random start");
+            JCheckBox randomStartCheck = new JCheckBox("Random start");
             randomStartCheck.setSelected(dist.isRandomStart());
             
             JPanel bottomPanel = new JPanel(new BorderLayout());

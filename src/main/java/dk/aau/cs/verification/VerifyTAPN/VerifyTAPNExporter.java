@@ -148,7 +148,7 @@ public class VerifyTAPNExporter {
 
     protected void outputCustomDistributions(PrintStream modelStream, TimedArcPetriNet model) {
         for (SMCUserDefinedDistribution cd : model.parentNetwork().userDefinedDistributions()) {
-            modelStream.append("<custom_distribution name=\"" + cd.getName() + "\">\n");
+            modelStream.append("<custom_distribution name=\"" + cd.getName() + "\" randomStart=\"" + cd.isRandomStart() + "\">\n");
             for (Double val : cd.getValues()) {
                 modelStream.append("<value>" + val + "</value>");
             }
