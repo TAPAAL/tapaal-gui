@@ -27,6 +27,8 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
     private JButton editButton;
     private JButton closeButton;
 
+    private static final String RANDOM_START_TOOL_TIP = "Start sampling from a random (uniformly selected) element in the list.";
+
     public ManageCustomDistributionsDialog(TimedArcPetriNetNetwork network, DistributionPanel parent) {
         super(TAPAALGUI.getApp(), "Manage Custom Distributions", true);
         this.network = network;
@@ -182,6 +184,7 @@ public class ManageCustomDistributionsDialog extends EscapableDialog {
             });
 
             JCheckBox randomStartCheck = new JCheckBox("Random start");
+            randomStartCheck.setToolTipText(RANDOM_START_TOOL_TIP);
             randomStartCheck.setSelected(dist.isRandomStart());
             
             JPanel bottomPanel = new JPanel(new BorderLayout());
