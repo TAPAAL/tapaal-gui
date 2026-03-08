@@ -56,7 +56,7 @@ public class GraphExporter {
         }
         
         options.setPiecewise(true);
-        writeTikzGraph(pieces, path, options);
+        writeTikzGraph(pieces, path, options, pieces.get(0).getXAxisLabel(), pieces.get(0).getYAxisLabel());
     }
 
     public static void exportPointPlotToTikz(Graph graph, Component parent) {
@@ -73,7 +73,7 @@ public class GraphExporter {
         }
 
         options.setPointPlot(true);
-        writeTikzGraph(Collections.singletonList(graph), path, options);
+        writeTikzGraph(Collections.singletonList(graph), path, options, graph.getXAxisLabel(), graph.getYAxisLabel());
     }
 
     public static void exportToTikz(AbstractGraph graph, Component parent) {
@@ -98,9 +98,9 @@ public class GraphExporter {
         if (graph instanceof MultiGraph) {
             options.setShowLegend(true);
             options.setMultiGraph(true);
-            writeTikzGraph(((MultiGraph)graph).getGraphs(), path, options);
+            writeTikzGraph(((MultiGraph)graph).getGraphs(), path, options, graph.getXAxisLabel(), graph.getYAxisLabel());
         } else {
-            writeTikzGraph(Collections.singletonList((Graph)graph), path, options);
+            writeTikzGraph(Collections.singletonList((Graph)graph), path, options, graph.getXAxisLabel(), graph.getYAxisLabel());
         }
     }
 
@@ -176,7 +176,7 @@ public class GraphExporter {
         return new Tuple<>(path, options);
     }
 
-    private static void writeTikzGraph(List<Graph> graphs, String path, GraphExporterOptions options) {
+    private static void writeTikzGraph(List<Graph> graphs, String path, GraphExporterOptions options, String xAxisLabel, String yAxisLabel) {
         StringBuilder tikzCode = new StringBuilder();
         if (options.isStandalone()) {
             tikzCode.append("\\documentclass{standalone}\n")
@@ -193,8 +193,8 @@ public class GraphExporter {
                 .append("\ty tick label style={/pgf/number format/fixed},\n");
 
         Graph firstGraph = graphs.get(0);
-        tikzCode.append("\txlabel={").append(escapeLatex(firstGraph.getXAxisLabel())).append("},\n")
-                .append("\tylabel={").append(escapeLatex(firstGraph.getYAxisLabel())).append("},\n")
+        tikzCode.append("\txlabel={").append(escapeLatex(xAxisLabel)).append("},\n")
+                .append("\tylabel={").append(escapeLatex(yAxisLabel)).append("},\n")
                 .append("\tgrid=major,\n")
                 .append("\tline width=1.2pt,\n");
 
@@ -245,7 +245,6 @@ public class GraphExporter {
             tikzCode.append("\\addplot[")
                     .append(options.isPointPlot() ? "only marks," : "")
                     .append(style)
-                    .append("forget plot,")
                     .append("color={rgb,1:red,")
                     .append(plotColor.getRed() / COLOR_NORMALIZER)
                     .append("; green,")
@@ -266,21 +265,7 @@ public class GraphExporter {
 
             tikzCode.append("};\n");
             if (options.showLegend()) {
-                if (options.isMultiGraph()) {
-                    String[] nameParts = graph.getName().split(" - ");
-                    String property = nameParts[1];
-                    if (!property.startsWith("Avg")) continue;
-
-                    tikzCode.append("\\addlegendimage{solid,color={rgb,1:red,")
-                            .append(plotColor.getRed() / COLOR_NORMALIZER)
-                            .append("; green,")
-                            .append(plotColor.getGreen() / COLOR_NORMALIZER)
-                            .append("; blue,")
-                            .append(plotColor.getBlue() / COLOR_NORMALIZER)
-                            .append("}");
-                }
-
-                tikzCode.append("}\n\\addlegendentry{")
+                tikzCode.append("\\addlegendentry{")
                         .append(escapeLatex(graph.getName()))
                         .append("}\n");
             }
