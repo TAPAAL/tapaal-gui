@@ -3,6 +3,7 @@ package dk.aau.cs.io.queries;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import dk.aau.cs.TCTL.*;
@@ -116,6 +117,14 @@ public class TAPNQueryLoader extends QueryLoader{
         SMCTraceType smcTraceType = new SMCTraceType(queryElement.getAttribute("smcTraceType"));
 
         SMCSettings smcSettings = SMCSettings.Default();
+
+        if (queryElement.hasAttribute("smcSeed")) {
+            try {
+                smcSettings.setSmcSeed(Optional.of(Long.parseUnsignedLong(queryElement.getAttribute("smcSeed"))));
+            } catch (NumberFormatException e) {
+                smcSettings.setSmcSeed(Optional.empty());
+            }
+        }
 
 		TCTLAbstractProperty query;
         ArrayList<String> tracesArr = new ArrayList<String>();

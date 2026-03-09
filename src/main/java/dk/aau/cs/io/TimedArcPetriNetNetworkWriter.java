@@ -517,6 +517,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         queryElement.setAttribute("numberOfTraces", "" + query.getNumberOfTraces());
         queryElement.setAttribute("smcTraceType", query.getSmcTraceType().toString());
 
+        query.getSmcSettings().getSmcSeed().ifPresent(seed -> queryElement.setAttribute("smcSeed", Long.toUnsignedString(seed)));
+
         return queryElement;
     }
 	

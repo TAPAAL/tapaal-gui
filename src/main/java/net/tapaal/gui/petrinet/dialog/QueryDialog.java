@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -376,6 +377,8 @@ public class QueryDialog extends JPanel {
     private JPanel quantitativePanel;
     private JLabel smcParallelLabel;
     private JCheckBox smcParallel;
+    private JLabel smcSeedLabel;
+    private JTextField smcSeed;
     private JTextField smcConfidence;
     private QuerySlider smcConfidenceSlider;
     private QuerySlider smcPrecisionSlider;
@@ -742,6 +745,7 @@ public class QueryDialog extends JPanel {
                 newSettings.setTimeBound(oldSettings.getTimeBound());
                 newSettings.setObservations(oldSettings.getObservations());
                 newSettings.setNumericPrecision(oldSettings.getNumericPrecision());
+                newSettings.setSmcSeed(oldSettings.getSmcSeed());
                 query.setSmcSettings(newSettings);
             } else {
                 query.setSmcSettings(getSMCSettings());
@@ -942,6 +946,17 @@ public class QueryDialog extends JPanel {
         smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
 
         smcSettings.setNumericPrecision(((Integer)smcNumericPrecision.getValue()).longValue());
+
+        if (smcSeed.getText().trim().isEmpty()) {
+            smcSettings.setSmcSeed(Optional.empty());
+        } else {
+            try {
+                smcSettings.setSmcSeed(Optional.of(Long.parseUnsignedLong(smcSeed.getText().trim())));
+            } catch(NumberFormatException e) {
+                smcSettings.setSmcSeed(Optional.empty());
+                smcSeed.setText("");
+            }
+        }
 
         try {
             smcSettings.confidence = Float.parseFloat(smcConfidence.getText());
@@ -2008,6 +2023,11 @@ public class QueryDialog extends JPanel {
             smcGranularityField.setText(String.valueOf(queryToCreateFrom.getGranularity()));
             smcGranularityField.setEnabled(!queryToCreateFrom.isMaxGranularity());
             smcMaxGranularityCheckbox.setSelected(queryToCreateFrom.isMaxGranularity());
+            if (queryToCreateFrom.getSmcSettings().getSmcSeed().isPresent()) {
+                smcSeed.setText(Long.toUnsignedString(queryToCreateFrom.getSmcSettings().getSmcSeed().get()));
+            } else {
+                smcSeed.setText("");
+            }
         }
 
         setupQueryCategoryFromQuery(queryToCreateFrom);
@@ -3135,6 +3155,35 @@ public class QueryDialog extends JPanel {
         smcEngineOptions.add(smcNumericPrecision, subPanelGbc);
 
         subPanelGbc.gridy = 4;
+        subPanelGbc.gridx = 0;
+        smcSeedLabel = new JLabel("Seed : ");
+        smcEngineOptions.add(smcSeedLabel, subPanelGbc);
+        subPanelGbc.gridx = 1;
+        smcSeed = new JTextField(7);
+        smcSeed.setToolTipText("64-bit unsigned value to seed the SMC random engine");
+        smcSeed.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent evt) {
+                int endIdx = smcSeed.getText().length();
+                smcSeed.setSelectionStart(endIdx);
+                smcSeed.setSelectionEnd(endIdx);
+            }
+        });
+        DocumentFilters.applyLongFilter(smcSeed);
+        smcSeed.addFocusListener(updater);
+        smcSeed.getDocument().addDocumentListener(new DocumentListener() {
+            private void update() {
+                updateRawVerificationOptions();
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) { update(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { update(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { update(); }
+        });
+        smcEngineOptions.add(smcSeed, subPanelGbc);
+
+        subPanelGbc.gridy = 5;
         subPanelGbc.gridx = 0;
         smcParallelLabel = new JLabel("Use all available cores : ");
         smcEngineOptions.add(smcParallelLabel, subPanelGbc);
@@ -5847,6 +5896,8 @@ public class QueryDialog extends JPanel {
         smcVerificationType.setEnabled(isEnabled);
         smcParallelLabel.setEnabled(isEnabled);
         smcParallel.setEnabled(isEnabled);
+        smcSeedLabel.setEnabled(isEnabled);
+        smcSeed.setEnabled(isEnabled);
 
         smcGranularityField.setEnabled(isEnabled);
         smcMaxGranularityCheckbox.setEnabled(isEnabled);
@@ -6874,6 +6925,7 @@ public class QueryDialog extends JPanel {
         smcTimeBoundValue.setEnabled(!doingBenchmark && !smcTimeBoundInfinite.isSelected());
         smcTimeBoundInfinite.setEnabled(!doingBenchmark && !smcStepBoundInfinite.isSelected());
         smcNumericPrecision.setEnabled(!doingBenchmark);
+        smcSeed.setEnabled(!doingBenchmark);
     }
 
 }
