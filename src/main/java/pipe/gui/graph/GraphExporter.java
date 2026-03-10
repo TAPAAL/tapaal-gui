@@ -189,6 +189,8 @@ public class GraphExporter {
                 .append("\\begin{axis}[\n")
                 .append("\twidth=").append(options.getWidthMultiplier()).append("\\textwidth,\n")
                 .append("\theight=").append(options.getHeightMultiplier()).append("\\textwidth,\n")
+                .append("\tscaled x ticks=false,\n")
+                .append("\tx tick label style={/pgf/number format/fixed},\n")
                 .append("\tscaled y ticks=false,\n")
                 .append("\ty tick label style={/pgf/number format/fixed},\n");
 
