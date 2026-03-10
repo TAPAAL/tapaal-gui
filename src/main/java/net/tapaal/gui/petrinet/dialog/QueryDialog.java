@@ -145,6 +145,7 @@ import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyTransitionNamesVisitor;
 import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.approximation.UnderApproximation;
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.io.NetWriter;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.CPN.ColorType;
@@ -607,7 +608,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_QUALITATIVE_TEST = "Probability threshold to be tested";
     private final static String TOOL_TIP_N_TRACES = "Number of traces to be shown";
     private final static String TOOL_TIP_TRACE_TYPE = "Specifies the type of traces to be shown";
-
+    private final static String TOOL_TIP_SMC_SEED = "64-bit unsigned value to seed the SMC random engine. Will use hardware (if available) or pseudo random engine if left empty.";
     private final static String TOOL_TIP_GRANULARITY = "Uses the given granularity for observations";
 
     private QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
@@ -738,26 +739,19 @@ public class QueryDialog extends JPanel {
             query.setCategory(TAPNQuery.QueryCategory.SMC);
             query.setParallel(smcParallel.isSelected());
             VerificationType verificationType = VerificationType.fromOrdinal(smcVerificationType.getSelectedIndex());
-            if (verificationType.equals(VerificationType.SIMULATE)) {
-                SMCSettings newSettings = SMCSettings.Default();
-                SMCSettings oldSettings = getSMCSettings();
-                newSettings.setStepBound(oldSettings.getStepBound());
-                newSettings.setTimeBound(oldSettings.getTimeBound());
-                newSettings.setObservations(oldSettings.getObservations());
-                newSettings.setNumericPrecision(oldSettings.getNumericPrecision());
-                newSettings.setSmcSeed(oldSettings.getSmcSeed());
-                query.setSmcSettings(newSettings);
-            } else {
-                query.setSmcSettings(getSMCSettings());
-            }
+            query.setSmcSettings(getSMCSettings());
             
             query.setVerificationType(verificationType);
             query.setNumberOfTraces((Integer)smcNumberOfTraces.getValue());
             query.setSmcTraceType((SMCTraceType)smcTraceType.getSelectedItem());
 
             try {
-                query.setGranularity(Integer.parseInt(smcGranularityField.getText()));
-            } catch (NumberFormatException e) {}
+                if (!smcGranularityField.getText().trim().isEmpty()) {
+                    query.setGranularity(Integer.parseInt(smcGranularityField.getText().trim()));
+                }
+            } catch (NumberFormatException e) {
+                Logger.log(e);
+            }
 
             query.setMaxGranularity(smcMaxGranularityCheckbox.isSelected());
         }
@@ -946,6 +940,7 @@ public class QueryDialog extends JPanel {
         smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
 
         smcSettings.setNumericPrecision(((Integer)smcNumericPrecision.getValue()).longValue());
+        smcSettings.setObservations(smcObservations);
 
         if (smcSeed.getText().trim().isEmpty()) {
             smcSettings.setSmcSeed(Optional.empty());
@@ -1035,6 +1030,12 @@ public class QueryDialog extends JPanel {
         smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
         
         smcNumericPrecision.setValue((int)settings.getNumericPrecision());
+        
+        if (settings.getSmcSeed().isPresent()) {
+            smcSeed.setText(Long.toUnsignedString(settings.getSmcSeed().get()));
+        } else {
+            smcSeed.setText("");
+        }
 
         smcObservations = settings.getObservations();
 
@@ -3157,10 +3158,11 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridy = 4;
         subPanelGbc.gridx = 0;
         smcSeedLabel = new JLabel("Seed : ");
+        smcSeedLabel.setToolTipText(TOOL_TIP_SMC_SEED);
         smcEngineOptions.add(smcSeedLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcSeed = new JTextField(7);
-        smcSeed.setToolTipText("64-bit unsigned value to seed the SMC random engine");
+        smcSeed.setToolTipText(TOOL_TIP_SMC_SEED);
         smcSeed.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 int endIdx = smcSeed.getText().length();

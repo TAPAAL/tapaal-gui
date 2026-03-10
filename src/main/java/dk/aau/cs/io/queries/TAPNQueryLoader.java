@@ -132,7 +132,11 @@ public class TAPNQueryLoader extends QueryLoader{
             NodeList smcTagList = queryElement.getElementsByTagName("smc");
             if(smcTagList.getLength() > 0) {
                 Element settingsNode = (Element) smcTagList.item(0);
+                Optional<Long> oldSeed = smcSettings.getSmcSeed();
                 smcSettings = parseSmcSettings(settingsNode);
+                if (oldSeed.isPresent()) {
+                    smcSettings.setSmcSeed(oldSeed);
+                }
                 NodeList observationsList = queryElement.getElementsByTagName("observations");
                 if (observationsList.getLength() > 0) {
                     Element observationsNode = (Element)observationsList.item(0);
