@@ -330,6 +330,9 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         return dataset;
     }
 
+    /**
+     * Bins the points into the specified number of bins and averages the Y values within each bin.
+     */
     private List<GraphPoint> binPoints(List<GraphPoint> points, int binCount) {
         if (points.isEmpty()) return points;
 
@@ -359,7 +362,6 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
             ++binCounts[binIndex];
         }
 
-        // Create binned points (using avgX, avgY)
         for (int i = 0; i < binCount; ++i) {
             if (binCounts[i] > 0) {
                 double avgX = binSumsX[i] / binCounts[i];
@@ -368,11 +370,7 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
             }
         }
 
-        // Normalize so sum of Y = 1 (if total > 0)
-        double totalY = 0.0;
-        for (GraphPoint gp : binned) {
-            totalY += gp.getY();
-        }
+        double totalY = binned.stream().mapToDouble(GraphPoint::getY).sum();
         if (totalY > 0) {
             for (int i = 0; i < binned.size(); ++i) {
                 GraphPoint old = binned.get(i);
