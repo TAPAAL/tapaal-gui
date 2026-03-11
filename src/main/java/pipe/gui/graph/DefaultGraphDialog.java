@@ -332,7 +332,7 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
 
     private List<GraphPoint> binPoints(List<GraphPoint> points, int binCount) {
         if (points.isEmpty()) return points;
-        
+
         double minX = Double.MAX_VALUE;
         double maxX = Double.MIN_VALUE;
         for (GraphPoint p : points) {
@@ -344,29 +344,42 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
 
         double binWidth = (maxX - minX) / binCount;
         List<GraphPoint> binned = new ArrayList<>();
-        
+
         double[] binSumsY = new double[binCount];
         double[] binSumsX = new double[binCount];
         int[] binCounts = new int[binCount];
-        
+
         for (GraphPoint p : points) {
             int binIndex = (int)((p.getX() - minX) / binWidth);
             if (binIndex >= binCount) binIndex = binCount - 1;
             if (binIndex < 0) binIndex = 0;
-            
+
             binSumsX[binIndex] += p.getX();
             binSumsY[binIndex] += p.getY();
             ++binCounts[binIndex];
         }
-        
+
+        // Create binned points (using avgX, avgY)
         for (int i = 0; i < binCount; ++i) {
             if (binCounts[i] > 0) {
                 double avgX = binSumsX[i] / binCounts[i];
-                double sumY = binSumsY[i];
-                binned.add(new GraphPoint(avgX, sumY));
+                double avgY = binSumsY[i] / binCounts[i];
+                binned.add(new GraphPoint(avgX, avgY));
             }
         }
-        
+
+        // Normalize so sum of Y = 1 (if total > 0)
+        double totalY = 0.0;
+        for (GraphPoint gp : binned) {
+            totalY += gp.getY();
+        }
+        if (totalY > 0) {
+            for (int i = 0; i < binned.size(); ++i) {
+                GraphPoint old = binned.get(i);
+                binned.set(i, new GraphPoint(old.getX(), old.getY() / totalY));
+            }
+        }
+
         return binned;
     }
 
