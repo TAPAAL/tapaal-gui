@@ -177,6 +177,19 @@ public class GraphExporter {
     }
 
     private static void writeTikzGraph(List<Graph> graphs, String path, GraphExporterOptions options, String xAxisLabel, String yAxisLabel) {
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        for (Graph graph : graphs) {
+            for (GraphPoint point : graph.getPoints()) {
+                if (point.getX() < minX) {
+                    minX = point.getX();
+                }
+                if (point.getY() < minY) {
+                    minY = point.getY();
+                }
+            }
+        }
+
         StringBuilder tikzCode = new StringBuilder();
         if (options.isStandalone()) {
             tikzCode.append("\\documentclass{standalone}\n")
@@ -190,9 +203,18 @@ public class GraphExporter {
                 .append("\twidth=").append(options.getWidthMultiplier()).append("\\textwidth,\n")
                 .append("\theight=").append(options.getHeightMultiplier()).append("\\textwidth,\n")
                 .append("\tscaled x ticks=false,\n")
-                .append("\tx tick label style={/pgf/number format/fixed},\n")
-                .append("\tscaled y ticks=false,\n")
+                .append("\tx tick label style={/pgf/number format/fixed},\n");
+        
+        if (minX != Double.MAX_VALUE) {
+            tikzCode.append("\txmin=").append(minX).append(",\n");
+        }
+
+        tikzCode.append("\tscaled y ticks=false,\n")
                 .append("\ty tick label style={/pgf/number format/fixed},\n");
+
+        if (minY != Double.MAX_VALUE) {
+            tikzCode.append("\tymin=").append(minY).append(",\n");
+        }
 
         Graph firstGraph = graphs.get(0);
         tikzCode.append("\txlabel={").append(escapeLatex(xAxisLabel)).append("},\n")
