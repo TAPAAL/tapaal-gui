@@ -3,6 +3,7 @@ package dk.aau.cs.io.queries;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import dk.aau.cs.TCTL.*;
@@ -117,13 +118,25 @@ public class TAPNQueryLoader extends QueryLoader{
 
         SMCSettings smcSettings = SMCSettings.Default();
 
+        if (queryElement.hasAttribute("smcSeed")) {
+            try {
+                smcSettings.setSmcSeed(Optional.of(Long.parseUnsignedLong(queryElement.getAttribute("smcSeed"))));
+            } catch (NumberFormatException e) {
+                smcSettings.setSmcSeed(Optional.empty());
+            }
+        }
+
 		TCTLAbstractProperty query;
         ArrayList<String> tracesArr = new ArrayList<String>();
         if(isSmc) {
             NodeList smcTagList = queryElement.getElementsByTagName("smc");
             if(smcTagList.getLength() > 0) {
                 Element settingsNode = (Element) smcTagList.item(0);
+                Optional<Long> oldSeed = smcSettings.getSmcSeed();
                 smcSettings = parseSmcSettings(settingsNode);
+                if (oldSeed.isPresent()) {
+                    smcSettings.setSmcSeed(oldSeed);
+                }
                 NodeList observationsList = queryElement.getElementsByTagName("observations");
                 if (observationsList.getLength() > 0) {
                     Element observationsNode = (Element)observationsList.item(0);
