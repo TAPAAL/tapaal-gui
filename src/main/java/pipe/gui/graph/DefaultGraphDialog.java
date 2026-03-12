@@ -6,13 +6,17 @@ import java.util.Collections;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.BasicStroke;
 import java.awt.Shape;
+import java.awt.event.ActionListener;
 import java.awt.geom.Line2D;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JLabel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -42,12 +46,14 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
     private boolean isStraight;
     private double distanceToOrigin;
     private Double mean;
+    private int k;
 
-    private boolean hasZeroPoint;   
     private boolean hasZeroX;
     private boolean hasZeroY;
 
     private String currentCard = "";
+    private final List<ChartPanel> chartPanels = new ArrayList<>();
+    private JFreeChart singleChart;
 
     private DefaultGraphDialog(List<Graph> graphs, String title, boolean showLegend, boolean piecewise, boolean pointPlot) {
         super(TAPAALGUI.getAppGui(), title, true);
@@ -55,6 +61,7 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         this.showLegend = showLegend;
         this.piecewise = piecewise;
         this.pointPlot = pointPlot;
+        this.k = -1;
     }
 
     @Override
@@ -70,15 +77,13 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
 
     private void displayWithoutButtons() {
         JFreeChart chart = createChart(graphs);
+        singleChart = chart;
         ChartPanel chartPanel = createChartPanel(chart);
 
         setLayout(new BorderLayout());
         add(chartPanel, BorderLayout.CENTER);
 
-        JPanel exportPanel = new JPanel(new BorderLayout());
-        JButton exportButton = new JButton("Export to TikZ");
-
-        exportButton.addActionListener(e -> {
+        JPanel exportPanel = createExportPanel(e -> {
             if (piecewise) {
                 GraphExporter.exportPiecewiseToTikz(graphs, this);
             } else if (pointPlot) {
@@ -87,14 +92,6 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
                 GraphExporter.exportToTikz(graphs.get(0), this);
             }
         });
-
-        JPanel buttonWrapper = new JPanel();
-        buttonWrapper.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5));
-        buttonWrapper.setBackground(Color.WHITE);
-        buttonWrapper.add(exportButton);
-        
-        exportPanel.add(buttonWrapper, BorderLayout.EAST);
-        exportPanel.setBackground(Color.WHITE);
         
         add(exportPanel, BorderLayout.SOUTH);
     }
@@ -106,7 +103,8 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
 
         for (Graph graph : graphs) {
             JFreeChart chart = createChart(Collections.singletonList(graph));
-            ChartPanel chartPanel = createChartPanel(chart);
+            chartPanels.add(createChartPanel(chart));
+            ChartPanel chartPanel = chartPanels.get(chartPanels.size() - 1);
 
             String buttonText = graph.getButtonText();
             currentCard = buttonText;
@@ -123,23 +121,13 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
 
         currentCard = graphs.get(0).getButtonText();
 
-        JPanel exportPanel = new JPanel(new BorderLayout());
-        JButton exportButton = new JButton("Export to TikZ");
-        exportButton.addActionListener(e -> {
+        JPanel exportPanel = createExportPanel(e -> {
             Graph currentGraph = graphs.stream()
                 .filter(g -> g.getButtonText().equals(currentCard))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No graph found for current card: " + currentCard));
-            GraphExporter.exportToTikz(currentGraph, this);
+            GraphExporter.exportToTikz(currentGraph, DefaultGraphDialog.this);
         });
-        
-        JPanel buttonWrapper = new JPanel();
-        buttonWrapper.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5));
-        buttonWrapper.setBackground(Color.WHITE);
-        buttonWrapper.add(exportButton);
-        
-        exportPanel.add(buttonWrapper, BorderLayout.EAST);
-        exportPanel.setBackground(Color.WHITE);
 
         JPanel southPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(Color.WHITE);
@@ -152,6 +140,49 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         add(southPanel, BorderLayout.SOUTH);
     }
 
+    private JPanel createExportPanel(ActionListener exportAction) {
+        JPanel exportPanel = new JPanel(new BorderLayout());
+        JButton exportButton = new JButton("Export to TikZ");
+        exportButton.addActionListener(exportAction);
+        
+        JPanel buttonWrapper = new JPanel();
+        buttonWrapper.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5));
+        buttonWrapper.setBackground(Color.WHITE);
+        buttonWrapper.add(exportButton);
+
+        if (pointPlot) {
+            JPanel sliderPanel = new JPanel();
+            sliderPanel.setBackground(Color.WHITE);
+            JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
+            JLabel label = new JLabel("Bins: Max");
+            label.setPreferredSize(new Dimension(80, 20));
+            
+            slider.addChangeListener(e -> {
+                int maxPoints = graphs.stream().mapToInt(g -> g.getPoints().size()).max().orElse(1);
+                int maxBinsAllowed = Math.max(1, maxPoints - 1);
+                
+                int value = ((JSlider) e.getSource()).getValue();
+                if (value == 100) {
+                    k = -1;
+                    label.setText("Bins: Max");
+                } else {
+                    int bins = Math.max(1, (int)(value * maxBinsAllowed / 100.0));
+                    k = bins;
+                    label.setText("Bins: " + k);
+                }
+                updateDataset();
+            });
+            sliderPanel.add(label);
+            sliderPanel.add(slider);
+            
+            exportPanel.add(sliderPanel, BorderLayout.WEST);
+        }
+        exportPanel.add(buttonWrapper, BorderLayout.EAST);
+        exportPanel.setBackground(Color.WHITE);
+
+        return exportPanel;
+    }
+
     private void setupDialog() {
         setSize(800, 600);
         setLocationRelativeTo(getOwner());
@@ -162,6 +193,10 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         DraggableChartPanel chartPanel = new DraggableChartPanel(chart);
         chartPanel.setMouseWheelEnabled(true);
         return chartPanel;
+    }
+
+    private boolean isBinningEnabled(List<Graph> graphList) {
+        return k > 0 && graphList.stream().anyMatch(g -> g.getPoints().size() > k);
     }
 
     private JFreeChart createChart(List<Graph> graphs) {
@@ -177,15 +212,12 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         float lineThickness = 3.0f;
 
         final double negativeMargin = -0.01;
-        if (hasZeroPoint) {
+        if (hasZeroX) {
             ValueAxis domainAxis = plot.getDomainAxis();
             domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
-            ValueAxis rangeAxis = plot.getRangeAxis();
-            rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
-        } else if (hasZeroX) {
-            ValueAxis domainAxis = plot.getDomainAxis();
-            domainAxis.setRange(negativeMargin, domainAxis.getUpperBound());
-        } else if (hasZeroY) {
+        }
+        
+        if (hasZeroY) {
             ValueAxis rangeAxis = plot.getRangeAxis();
             rangeAxis.setRange(negativeMargin, rangeAxis.getUpperBound());
         }
@@ -217,10 +249,13 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         renderer.setDefaultToolTipGenerator(new StandardXYToolTipGenerator());
         Color lineColor = Color.RED;
+        
+        boolean usesBinning = isBinningEnabled(graphs);
+
         for (int i = 0; i < dataset.getSeriesCount(); ++i) {
             renderer.setSeriesStroke(i, new BasicStroke(lineThickness));
             renderer.setSeriesShapesVisible(i, pointPlot);
-            renderer.setSeriesLinesVisible(i, !pointPlot);
+            renderer.setSeriesLinesVisible(i, !pointPlot || usesBinning);
             renderer.setSeriesPaint(i, lineColor);
         }
 
@@ -232,16 +267,40 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         return chart;
     }
 
+    private void updateDataset() {
+        if (singleChart != null) {
+            boolean usesBinning = isBinningEnabled(graphs);
+            updatePlotDataset(singleChart.getXYPlot(), constructDataset(graphs), usesBinning);
+        } else {
+            for (int i = 0; i < Math.min(graphs.size(), chartPanels.size()); ++i) {
+                List<Graph> singleGraphList = Collections.singletonList(graphs.get(i));
+                boolean usesBinning = isBinningEnabled(singleGraphList);
+                updatePlotDataset(chartPanels.get(i).getChart().getXYPlot(), constructDataset(singleGraphList), usesBinning);
+            }
+        }
+    }
+
+    private void updatePlotDataset(XYPlot plot, XYDataset dataset, boolean usesBinning) {
+        plot.setDataset(dataset);
+        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+        for (int i = 0; i < dataset.getSeriesCount(); ++i) {
+            renderer.setSeriesLinesVisible(i, !pointPlot || usesBinning);
+        }
+    }
+
     private XYDataset constructDataset(List<Graph> graphs) {
         XYSeriesCollection dataset = new XYSeriesCollection();
         
-        hasZeroPoint = false;
         hasZeroX = false;
         hasZeroY = false;
         
         for (Graph graph : graphs) {
             XYSeries series = new XYSeries(graph.getName());
             List<GraphPoint> points = graph.getPoints();
+
+            if (k > 0 && points.size() > k) {
+                points = binPoints(points, k);
+            }
 
             double margin = 1e-5;
             if (!points.isEmpty()) {
@@ -261,15 +320,65 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
 
                 series.add(point.getX(), point.getY());
 
-                hasZeroX = point.getX() < margin || hasZeroX;
-                hasZeroY = point.getY() < margin || hasZeroY;
+                hasZeroX |= point.getX() < margin;
+                hasZeroY |= point.getY() < margin;
             }
             
-            hasZeroPoint = hasZeroX && hasZeroY;
             dataset.addSeries(series);
         }
         
         return dataset;
+    }
+
+    /**
+     * Bins the points into the specified number of bins and averages the Y values within each bin.
+     */
+    private List<GraphPoint> binPoints(List<GraphPoint> points, int binCount) {
+        if (points.isEmpty()) return points;
+
+        double minX = Double.MAX_VALUE;
+        double maxX = Double.MIN_VALUE;
+        for (GraphPoint p : points) {
+            minX = Math.min(minX, p.getX());
+            maxX = Math.max(maxX, p.getX());
+        }
+
+        if (minX == maxX) return points;
+
+        double binWidth = (maxX - minX) / binCount;
+        List<GraphPoint> binned = new ArrayList<>();
+
+        double[] binSumsY = new double[binCount];
+        double[] binSumsX = new double[binCount];
+        int[] binCounts = new int[binCount];
+
+        for (GraphPoint p : points) {
+            int binIndex = (int)((p.getX() - minX) / binWidth);
+            if (binIndex >= binCount) binIndex = binCount - 1;
+            if (binIndex < 0) binIndex = 0;
+
+            binSumsX[binIndex] += p.getX();
+            binSumsY[binIndex] += p.getY();
+            ++binCounts[binIndex];
+        }
+
+        for (int i = 0; i < binCount; ++i) {
+            if (binCounts[i] > 0) {
+                double avgX = binSumsX[i] / binCounts[i];
+                double avgY = binSumsY[i] / binCounts[i];
+                binned.add(new GraphPoint(avgX, avgY));
+            }
+        }
+
+        double totalY = binned.stream().mapToDouble(GraphPoint::getY).sum();
+        if (totalY > 0) {
+            for (int i = 0; i < binned.size(); ++i) {
+                GraphPoint old = binned.get(i);
+                binned.set(i, new GraphPoint(old.getX(), old.getY() / totalY));
+            }
+        }
+
+        return binned;
     }
 
     public static class GraphDialogBuilder {
@@ -311,9 +420,7 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         }
 
         public GraphDialog build() {
-            GraphDialog dialog = new DefaultGraphDialog(graphs, title, showLegend, piecewise, pointPlot);
-            return dialog;
+            return new DefaultGraphDialog(graphs, title, showLegend, piecewise, pointPlot);
         }
-
     }
 }
