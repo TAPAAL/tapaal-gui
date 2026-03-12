@@ -262,30 +262,46 @@ public class TAPNQueryLoader extends QueryLoader{
         String name = element.getTextContent();
         String templateName = null;
         String placeName = null;
+
+        // Order important. Try to split on "__" before using legacy separator "_"
+        String[] separators = {"__", "_"};
         
         final String SHARED = "Shared";
-        if (name.startsWith(SHARED + "_")) {
-            templateName = "Shared";
-            placeName = name.substring((SHARED + "_").length());
-        } else {
+        for (String sep : separators) {
+            if (name.startsWith(SHARED + sep)) {
+                templateName = SHARED;
+                placeName = name.substring((SHARED + sep).length());
+                break;
+            }
+        }
+        
+        if (templateName == null) {
             for (TimedArcPetriNet tapn : network.activeTemplates()) {
-                if (name.startsWith(tapn.name() + "_")) {
-                    String potentialPlaceName = name.substring(tapn.name().length() + 1);
-                    if (tapn.getPlaceByName(potentialPlaceName) != null) {
-                        templateName = tapn.name();
-                        placeName = potentialPlaceName;
-                        break;
+                for (String sep : separators) {
+                    if (name.startsWith(tapn.name() + sep)) {
+                        String potentialPlaceName = name.substring((tapn.name() + sep).length());
+                        if (tapn.getPlaceByName(potentialPlaceName) != null) {
+                            templateName = tapn.name();
+                            placeName = potentialPlaceName;
+                            break;
+                        }
                     }
                 }
+
+                if (templateName != null) break;
             }
         }
 
         if (templateName == null) {
-            String[] parts = name.split("_", 2);
-            if (parts.length == 2) {
-                templateName = parts[0];
-                placeName = parts[1];
-            } else {
+            for (String sep : separators) {
+                String[] parts = name.split(sep, 2);
+                if (parts.length == 2) {
+                    templateName = parts[0];
+                    placeName = parts[1];
+                    break;
+                }
+            }
+            if (templateName == null) {
                 templateName = "";
                 placeName = name;
             }
