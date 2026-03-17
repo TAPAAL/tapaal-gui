@@ -3,6 +3,7 @@ package pipe.gui.graph;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.DoubleSummaryStatistics;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -334,56 +335,30 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
      * Bins the points into the specified number of bins.
      */
     private List<GraphPoint> binPoints(List<GraphPoint> points, int binCount) {
-        if (points.isEmpty()) return points;
+        if (points == null || points.isEmpty()) return Collections.emptyList();
 
-        double minX = Double.MAX_VALUE;
-        double maxX = -Double.MAX_VALUE;
-        for (GraphPoint p : points) {
-            minX = Math.min(minX, p.getX());
-            maxX = Math.max(maxX, p.getX());
-        }
+        DoubleSummaryStatistics stats = points.stream()
+                                              .mapToDouble(GraphPoint::getX)
+                                              .summaryStatistics();
 
-        if (minX == maxX) return points;
+        double minX = stats.getMin();
+        double maxX = stats.getMax();
+
+        if (minX == maxX) return Collections.emptyList();
 
         double binWidth = (maxX - minX) / binCount;
-        List<GraphPoint> binned = new ArrayList<>();
-
-        double[] binSumsY = new double[binCount];
-        double[] binSumsX = new double[binCount];
         int[] binCounts = new int[binCount];
-
         for (GraphPoint p : points) {
             int binIndex = (int)((p.getX() - minX) / binWidth);
             if (binIndex >= binCount) binIndex = binCount - 1;
-            if (binIndex < 0) binIndex = 0;
-
-            binSumsX[binIndex] += p.getX();
-            binSumsY[binIndex] += p.getY();
             ++binCounts[binIndex];
         }
 
+        double c = 1.0 / (points.size() * binWidth);
+        List<GraphPoint> binned = new ArrayList<>(binCount);
         for (int i = 0; i < binCount; ++i) {
-            if (binCounts[i] > 0) {
-                double avgX = binSumsX[i] / binCounts[i];
-                double avgY = binSumsY[i] / binCounts[i];
-                binned.add(new GraphPoint(avgX, avgY));
-            }
-        }
-
-        double area = 0.0;
-        for (int i = 0; i < binned.size() - 1; ++i) {
-            GraphPoint p1 = binned.get(i);
-            GraphPoint p2 = binned.get(i + 1);
-            double dx = p2.getX() - p1.getX();
-            double avgY = (p1.getY() + p2.getY()) / 2.0;
-            area += dx * avgY;
-        }
-
-        if (area > 0) {
-            for (int i = 0; i < binned.size(); ++i) {
-                GraphPoint old = binned.get(i);
-                binned.set(i, new GraphPoint(old.getX(), old.getY() / area));
-            }
+            double binCenter = minX + (i + 0.5) * binWidth;
+            binned.add(new GraphPoint(binCenter, binCounts[i] * c));
         }
 
         return binned;
