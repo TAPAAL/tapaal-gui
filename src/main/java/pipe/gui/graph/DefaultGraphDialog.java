@@ -39,6 +39,8 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.swingcomponents.EscapableDialog;
 
 public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
+    private static final String BIN_WIDTH_PLACEHOLDER = "Bin Width: 1";
+
     private final List<Graph> graphs;
     private final boolean showLegend;
     private final boolean piecewise;
@@ -155,14 +157,14 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
             sliderPanel.setBackground(Color.WHITE);
             JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
             slider.setBackground(Color.WHITE);
-            JLabel label = new JLabel("Bin Width: 1.00");
-            label.setPreferredSize(new Dimension(130, 20));
+            JLabel label = new JLabel(BIN_WIDTH_PLACEHOLDER);
+            label.setPreferredSize(new Dimension(125, 20));
 
             slider.addChangeListener(e -> {
                 int value = ((JSlider)e.getSource()).getValue();
                 if (value == 0) {
                     binWidth = -1;
-                    label.setText("Bin Width: 1.00");
+                    label.setText(BIN_WIDTH_PLACEHOLDER);
                 } else {
                     DoubleSummaryStatistics stats = graphs.stream()
                                                           .flatMap(g -> g.getPoints().stream())
@@ -182,12 +184,12 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
 
                     if (validMultiples.isEmpty()) {
                         binWidth = -1;
-                        label.setText("Bin Width: 1");
+                        label.setText(BIN_WIDTH_PLACEHOLDER);
                     } else {
                         int idx = (int)Math.round(((value - 1) / 99.0) * (validMultiples.size() - 1));
                         idx = Math.max(0, Math.min(idx, validMultiples.size() - 1));
                         binWidth = validMultiples.get(idx) * natural;
-                        label.setText(String.format("Bin Width: %.4g", binWidth));
+                        label.setText(String.format("Bin Width: %d", Math.round(binWidth)));
                     }
                 }
                 updateDataset();
@@ -381,16 +383,15 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         double start = minX - (natural / 2.0);
         int binCount = (int)Math.ceil((maxX - minX + natural) / binWidth);
 
-        int[] binCounts = new int[binCount];
+        double[] binSums = new double[binCount];
         for (GraphPoint p : points) {
-            ++binCounts[(int)((p.getX() - start) / binWidth)];
+            binSums[(int)((p.getX() - start) / binWidth)] += p.getY();
         }
 
-        double c = 1.0 / (points.size() * binWidth);
         List<GraphPoint> binned = new ArrayList<>();
         for (int i = 0; i < binCount; ++i) {
-            if (binCounts[i] > 0) {
-                binned.add(new GraphPoint(start + (i + 0.5) * binWidth, binCounts[i] * c));
+            if (binSums[i] > 0) {
+                binned.add(new GraphPoint(start + (i + 0.5) * binWidth, binSums[i] / binWidth));
             }
         }
         return binned;
