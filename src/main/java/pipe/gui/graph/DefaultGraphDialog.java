@@ -154,23 +154,24 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
             JPanel sliderPanel = new JPanel();
             sliderPanel.setBackground(Color.WHITE);
             JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-            JLabel label = new JLabel("Bin Width: 1");
+            slider.setBackground(Color.WHITE);
+            JLabel label = new JLabel("Bin Width: 1.00");
             label.setPreferredSize(new Dimension(130, 20));
 
             slider.addChangeListener(e -> {
                 int value = ((JSlider)e.getSource()).getValue();
                 if (value == 0) {
                     binWidth = -1;
-                    label.setText("Bin Width: 1");
+                    label.setText("Bin Width: 1.00");
                 } else {
                     DoubleSummaryStatistics stats = graphs.stream()
-                        .flatMap(g -> g.getPoints().stream())
-                        .mapToDouble(GraphPoint::getX)
-                        .summaryStatistics();
+                                                          .flatMap(g -> g.getPoints().stream())
+                                                          .mapToDouble(GraphPoint::getX)
+                                                          .summaryStatistics();
 
                     double range = stats.getMax() - stats.getMin();
                     double natural = naturalResolution(graphs);
-                    int maxMultiple = (int)Math.round(range / natural);
+                    int maxMultiple = (int)Math.round(range / natural) + 1;
 
                     List<Integer> validMultiples = new ArrayList<>();
                     for (int i = 1; i <= maxMultiple; ++i) {
