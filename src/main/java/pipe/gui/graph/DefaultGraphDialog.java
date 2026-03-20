@@ -177,7 +177,7 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
 
                     List<Integer> validMultiples = new ArrayList<>();
                     for (int i = 1; i <= maxMultiple; ++i) {
-                        if (maxMultiple % i == 0 && (i * natural) > 1.0) {
+                        if ((i * natural) >= 1.0) {
                             validMultiples.add(i);
                         }
                     }
@@ -367,9 +367,6 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         return dataset;
     }
 
-    /**
-     * Bins the points based on the specified bin width.
-     */
     private List<GraphPoint> binPoints(List<GraphPoint> points, double binWidth) {
         if (points == null || points.isEmpty()) return Collections.emptyList();
 
@@ -381,7 +378,9 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
 
         double natural = getResolution(points.stream().mapToDouble(GraphPoint::getX).distinct().sorted().toArray());
         double start = minX - (natural / 2.0);
-        int binCount = (int)Math.ceil((maxX - minX + natural) / binWidth);
+        double end = maxX + (natural / 2.0); 
+
+        int binCount = (int)Math.ceil((end - start) / binWidth);
 
         double[] binSums = new double[binCount];
         for (GraphPoint p : points) {
@@ -391,7 +390,11 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         List<GraphPoint> binned = new ArrayList<>();
         for (int i = 0; i < binCount; ++i) {
             if (binSums[i] > 0) {
-                binned.add(new GraphPoint(start + (i + 0.5) * binWidth, binSums[i] / binWidth));
+                double binStart = start + i * binWidth;
+                double binEnd = Math.min(start + (i + 1) * binWidth, end);
+                double actualBinWidth = binEnd - binStart;
+                
+                binned.add(new GraphPoint(binStart + actualBinWidth / 2.0, binSums[i] / actualBinWidth));
             }
         }
         return binned;
