@@ -2,6 +2,7 @@ package dk.aau.cs.verification;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import dk.aau.cs.verification.observations.Observation;
 
@@ -17,6 +18,7 @@ public class SMCSettings {
     public boolean compareToFloat;
     public float geqThan;
     private long numericPrecision;
+    private Optional<Long> smcSeed;
 
     private List<Observation> observations;
 
@@ -32,6 +34,7 @@ public class SMCSettings {
         settings.compareToFloat = false;
         settings.geqThan = 0.5f;
         settings.setNumericPrecision(5);
+        settings.setSmcSeed(Optional.empty());
         settings.setObservations(new ArrayList<>());
         return settings;
     }
@@ -73,6 +76,14 @@ public class SMCSettings {
 
     public long getNumericPrecision() {
         return numericPrecision;
+    }
+
+    public void setSmcSeed(Optional<Long> smcSeed) {
+        this.smcSeed = smcSeed;
+    }
+
+    public Optional<Long> getSmcSeed() {
+        return smcSeed;
     }
 
     public void setObservations(List<Observation> observations) {

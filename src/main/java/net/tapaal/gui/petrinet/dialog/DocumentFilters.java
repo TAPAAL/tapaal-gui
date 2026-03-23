@@ -7,8 +7,13 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 public class DocumentFilters extends DocumentFilter {
+    private static final String LONG_REGEX = "^\\d*$";
     private static final String INT_REGEX = "^\\d*$";
     private static final String DOUBLE_REGEX = "^\\d*\\.?\\d*$";
+
+    public static DocumentFilter createLongFilter() {
+        return createFilter(LONG_REGEX, 20);
+    }
 
     public static DocumentFilter createIntegerFilter(int maxLength) {
         return createFilter(INT_REGEX, maxLength);
@@ -42,6 +47,10 @@ public class DocumentFilters extends DocumentFilter {
                 }
             }
         };
+    }
+
+    public static void applyLongFilter(JTextField textField) {
+        ((PlainDocument)textField.getDocument()).setDocumentFilter(createLongFilter());
     }
 
     public static void applyIntegerFilter(JTextField textField, int maxLength) {

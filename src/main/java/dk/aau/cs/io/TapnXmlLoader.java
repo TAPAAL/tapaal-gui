@@ -223,16 +223,22 @@ public class TapnXmlLoader {
 
     private SMCUserDefinedDistribution parseCustomDistribution(Element element) {
         String name = element.getAttribute("name");
+        boolean randomStart = false;
+        if (element.hasAttribute("randomStart")) {
+            randomStart = Boolean.parseBoolean(element.getAttribute("randomStart"));
+        }
         List<Double> values = new ArrayList<>();
         NodeList valueNodes = element.getElementsByTagName("value");
         for (int i = 0; i < valueNodes.getLength(); ++i) {
-             Node node = valueNodes.item(i);
-             if (node instanceof Element) {
+            Node node = valueNodes.item(i);
+            if (node instanceof Element) {
                 values.add(Double.parseDouble(node.getTextContent()));
-             }
+            }
         }
 
-        return new SMCUserDefinedDistribution(name, values);
+        SMCUserDefinedDistribution dist = new SMCUserDefinedDistribution(name, values);
+        dist.setRandomStart(randomStart);
+        return dist;
     }
     
 	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
