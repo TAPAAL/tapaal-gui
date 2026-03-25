@@ -210,6 +210,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         for (SMCUserDefinedDistribution cd : network.userDefinedDistributions()) {
             Element element = document.createElement("custom_distribution");
             element.setAttribute("name", cd.getName());
+            element.setAttribute("randomStart", String.valueOf(cd.isRandomStart()));
             for (Double val : cd.getValues()) {
                 Element valElement = document.createElement("value");
                 valElement.setTextContent(val.toString());
@@ -515,6 +516,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         queryElement.setAttribute("verificationType", query.getVerificationType().toString());
         queryElement.setAttribute("numberOfTraces", "" + query.getNumberOfTraces());
         queryElement.setAttribute("smcTraceType", query.getSmcTraceType().toString());
+
+        query.getSmcSettings().getSmcSeed().ifPresent(seed -> queryElement.setAttribute("smcSeed", Long.toUnsignedString(seed)));
 
         return queryElement;
     }

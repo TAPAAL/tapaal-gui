@@ -286,11 +286,11 @@ public class TAPNComposer implements ITAPNComposer {
                         String uniqueTransitionName = "";
                         if (!singleComponentNoPrefix || model.activeTemplates().size() > 1) {
                             uniqueTransitionName = timedTransition.isShared()
-                                ? "Shared_" + timedTransition.name()
-                                : timedTransition.model().name() + "_" + timedTransition.name();
+                                ? "Shared__" + timedTransition.name()
+                                : timedTransition.model().name() + "__" + timedTransition.name();
                         } else {
                             uniqueTransitionName = timedTransition.isShared()
-                                ? "Shared_" + timedTransition.name()
+                                ? "Shared__" + timedTransition.name()
                                 : timedTransition.name();
                         }
 
@@ -663,21 +663,21 @@ public class TAPNComposer implements ITAPNComposer {
 
     public String composedTransitionName(TimedTransition transition) {
         if (transition.isShared()) {
-            return "Shared_" + transition.name();
+            return "Shared__" + transition.name();
         } else if (singleComponentNoPrefix) {
             return transition.name();
         } else {
-            return transition.model().name() + "_" + transition.name();
+            return transition.model().name() + "__" + transition.name();
         }
     }
    
     public String composedPlaceName(TimedPlace place) {
         if (place.isShared()) {
-            return "Shared_" + place.name();
+            return "Shared__" + place.name();
         } else if (singleComponentNoPrefix) {
             return place.name();
         } else {
-            return ((LocalTimedPlace)place).model().name() + "_" + place.name();
+            return ((LocalTimedPlace)place).model().name() + "__" + place.name();
         }
     }
 

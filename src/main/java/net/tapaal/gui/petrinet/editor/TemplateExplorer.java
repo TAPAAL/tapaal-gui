@@ -432,6 +432,16 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			exit();
 			return;
 		}
+		if (newName.equalsIgnoreCase("Shared")) {
+			JOptionPane.showMessageDialog(
+							parent.drawingSurface(),
+							"The component name 'Shared' is reserved for the global component and cannot be used.\n\nThe component could not be renamed.",
+							"Error Renaming Component",
+							JOptionPane.ERROR_MESSAGE);
+			exit();
+			showRenameTemplateDialog(newName);
+			return;
+		}
 		if (!isNameAllowed(newName)) {
 			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
@@ -461,6 +471,16 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	
 	private void onOK() {
         String templateName = nameTextField.getText().trim();
+		if (templateName.equalsIgnoreCase("Shared")) {
+			JOptionPane.showMessageDialog(
+							parent.drawingSurface(),
+							"The component name 'Shared' is reserved for the global component and cannot be used.\n\nThe new component could not be created.",
+							"Error Creating Component",
+							JOptionPane.ERROR_MESSAGE);
+			exit();
+			ShowNewTemplateDialog(templateName);
+			return;
+		}
         if(!isNameAllowed(templateName)) {
             JOptionPane.showMessageDialog(parent.drawingSurface(),
                     "Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",

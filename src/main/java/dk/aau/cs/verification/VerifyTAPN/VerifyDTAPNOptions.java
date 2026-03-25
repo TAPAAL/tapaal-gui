@@ -12,6 +12,7 @@ import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	
@@ -36,6 +37,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
     private int granularity;
     private boolean maxGranularity = false;
     private long numericPrecision;
+    private Optional<Long> smcSeed;
 
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(
@@ -57,8 +59,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			boolean useRawVerification,
 			String rawVerificationOptions
 	) {
-		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions, false, 0, false, QueryCategory.Default, 1, new SMCTraceType(), false, 500, false, 5);
-		this.dontUseDeadPlaces = dontUseDeadPlaces;
+                this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW, 0, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, null, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions, false, 0, false, QueryCategory.Default, 1, new SMCTraceType(), false, 500, false, 5, Optional.empty());
+                this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
 	public VerifyDTAPNOptions(
@@ -93,7 +95,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             boolean isSimulate,
             int granularity,
             boolean maxGranularity,
-            long numericPrecision
+            long numericPrecision,
+            Optional<Long> smcSeed
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -118,6 +121,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         this.granularity = granularity;
         this.maxGranularity = maxGranularity;
         this.numericPrecision = numericPrecision;
+        this.smcSeed = smcSeed;
 
 		// we only force unfolding when traces are involved
         if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation || isSmc && isSimulate && unfold) && !useRawVerification)
@@ -181,6 +185,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 
             result.append("--smc-print-cumulative-stats 4 ");
             result.append("--smc-numeric-precision " + Long.toUnsignedString(numericPrecision) + " ");
+            smcSeed.ifPresent(seed -> result.append("--smc-seed ").append(Long.toUnsignedString(seed)).append(" "));
             if (isSimulate) {
                 result.append(" --smc-traces ");
                 result.append(numberOfTraces);
