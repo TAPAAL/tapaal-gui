@@ -1054,8 +1054,8 @@ public class QueryDialog extends JPanel {
         smcFalsePositivesSlider.setValue(
             Math.max(smcFalsePositivesSlider.getMinimum(), 
                     Math.min(initialValueFalsePositives, smcFalsePositivesSlider.getMaximum())));
-            smcFalsePositives.setText(precisionFormat.format(settings.falsePositives));
-            smcFalsePositivesSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.falsePositives)));
+        smcFalsePositives.setText(precisionFormat.format(settings.falsePositives));
+        smcFalsePositivesSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.falsePositives)));
 
         double desiredMinFalseNegatives = smcFalseNegativesSlider.getDesiredMin();
         double desiredMaxFalseNegatives = smcFalseNegativesSlider.getDesiredMax();
@@ -1064,8 +1064,8 @@ public class QueryDialog extends JPanel {
         smcFalseNegativesSlider.setValue(
             Math.max(smcFalseNegativesSlider.getMinimum(), 
                     Math.min(initialValueFalseNegatives, smcFalseNegativesSlider.getMaximum())));
-            smcFalseNegatives.setText(precisionFormat.format(settings.falseNegatives));
-            smcFalseNegativesSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.falseNegatives)));
+        smcFalseNegatives.setText(precisionFormat.format(settings.falseNegatives));
+        smcFalseNegativesSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.falseNegatives)));
 
         double desiredMinIndifference = smcIndifferenceSlider.getDesiredMin();
         double desiredMaxIndifference = smcIndifferenceSlider.getDesiredMax();
@@ -1074,8 +1074,8 @@ public class QueryDialog extends JPanel {
         smcIndifferenceSlider.setValue(
             Math.max(smcIndifferenceSlider.getMinimum(), 
                     Math.min(initialValueIndifference, smcIndifferenceSlider.getMaximum())));
-            smcIndifference.setText(precisionFormat.format(settings.indifferenceWidth));
-            smcIndifferenceSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.indifferenceWidth)));
+        smcIndifference.setText(precisionFormat.format(settings.indifferenceWidth));
+        smcIndifferenceSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.indifferenceWidth)));
 
         double desiredMinComparison = smcComparisonFloatSlider.getDesiredMin();
         double desiredMaxComparison = smcComparisonFloatSlider.getDesiredMax();
