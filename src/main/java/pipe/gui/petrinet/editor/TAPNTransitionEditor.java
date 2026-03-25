@@ -291,7 +291,19 @@ public class TAPNTransitionEditor extends JPanel {
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		okButton.addActionListener(evt -> {
-			if(okButtonHandler(evt)){
+			String name = nameTextField.getText();
+			if (name != null && name.contains("__")) {
+				int result = JOptionPane.showConfirmDialog(this,
+						"Using double underscores (__) in names is not recommended as it can cause ambiguity issues when using multiple components.\nDo you want to continue?",
+						"Warning",
+						JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE);
+				if (result != JOptionPane.OK_OPTION) {
+					return;
+				}
+			}
+            
+			if (okButtonHandler(evt)) {
 				exit();
 			}
 		});
