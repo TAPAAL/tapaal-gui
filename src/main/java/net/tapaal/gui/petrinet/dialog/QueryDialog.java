@@ -967,17 +967,17 @@ public class QueryDialog extends JPanel {
         try {
             smcSettings.falsePositives = Float.parseFloat(smcFalsePositives.getText());
         } catch(NumberFormatException e) {
-            smcFalsePositives.setText(String.valueOf(smcSettings.falsePositives));
+            smcFalsePositives.setText(precisionFormat.format(smcSettings.falsePositives));
         }
         try {
             smcSettings.falseNegatives = Float.parseFloat(smcFalseNegatives.getText());
         } catch(NumberFormatException e) {
-            smcFalseNegatives.setText(String.valueOf(smcSettings.falseNegatives));
+            smcFalseNegatives.setText(precisionFormat.format(smcSettings.falseNegatives));
         }
         try {
             smcSettings.indifferenceWidth = Float.parseFloat(smcIndifference.getText());
         } catch(NumberFormatException e) {
-            smcIndifference.setText(String.valueOf(smcSettings.indifferenceWidth));
+            smcIndifference.setText(precisionFormat.format(smcSettings.indifferenceWidth));
         }
         try {
             smcSettings.geqThan = Float.parseFloat(smcComparisonFloat.getText());
@@ -1054,8 +1054,8 @@ public class QueryDialog extends JPanel {
         smcFalsePositivesSlider.setValue(
             Math.max(smcFalsePositivesSlider.getMinimum(), 
                     Math.min(initialValueFalsePositives, smcFalsePositivesSlider.getMaximum())));
-        smcFalsePositives.setText(String.valueOf(settings.falsePositives));
-        smcFalsePositivesSlider.setToolTipText(String.format("Value: %.3f", settings.falsePositives));
+            smcFalsePositives.setText(precisionFormat.format(settings.falsePositives));
+            smcFalsePositivesSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.falsePositives)));
 
         double desiredMinFalseNegatives = smcFalseNegativesSlider.getDesiredMin();
         double desiredMaxFalseNegatives = smcFalseNegativesSlider.getDesiredMax();
@@ -1064,8 +1064,8 @@ public class QueryDialog extends JPanel {
         smcFalseNegativesSlider.setValue(
             Math.max(smcFalseNegativesSlider.getMinimum(), 
                     Math.min(initialValueFalseNegatives, smcFalseNegativesSlider.getMaximum())));
-        smcFalseNegatives.setText(String.valueOf(settings.falseNegatives));
-        smcFalseNegativesSlider.setToolTipText(String.format("Value: %.3f", settings.falseNegatives));
+            smcFalseNegatives.setText(precisionFormat.format(settings.falseNegatives));
+            smcFalseNegativesSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.falseNegatives)));
 
         double desiredMinIndifference = smcIndifferenceSlider.getDesiredMin();
         double desiredMaxIndifference = smcIndifferenceSlider.getDesiredMax();
@@ -1074,8 +1074,8 @@ public class QueryDialog extends JPanel {
         smcIndifferenceSlider.setValue(
             Math.max(smcIndifferenceSlider.getMinimum(), 
                     Math.min(initialValueIndifference, smcIndifferenceSlider.getMaximum())));
-        smcIndifference.setText(String.valueOf(settings.indifferenceWidth));
-        smcIndifferenceSlider.setToolTipText(String.format("Value: %.3f", settings.indifferenceWidth));
+            smcIndifference.setText(precisionFormat.format(settings.indifferenceWidth));
+            smcIndifferenceSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.indifferenceWidth)));
 
         double desiredMinComparison = smcComparisonFloatSlider.getDesiredMin();
         double desiredMaxComparison = smcComparisonFloatSlider.getDesiredMax();
