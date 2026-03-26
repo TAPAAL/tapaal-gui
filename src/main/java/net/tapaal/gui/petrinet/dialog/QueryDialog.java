@@ -1069,7 +1069,7 @@ public class QueryDialog extends JPanel {
 
         double desiredMinIndifference = smcIndifferenceSlider.getDesiredMin();
         double desiredMaxIndifference = smcIndifferenceSlider.getDesiredMax();
-        double initialProportionIndifference = (settings.indifferenceWidth - desiredMinIndifference) / (desiredMaxIndifference - desiredMinIndifference);
+        double initialProportionIndifference = Math.sqrt((settings.indifferenceWidth - desiredMinIndifference) / (desiredMaxIndifference - desiredMinIndifference));
         int initialValueIndifference = (int) (initialProportionIndifference * smcIndifferenceSlider.getMaximum());
         smcIndifferenceSlider.setValue(
             Math.max(smcIndifferenceSlider.getMinimum(), 
@@ -3382,10 +3382,10 @@ public class QueryDialog extends JPanel {
         smcIndifference.setToolTipText(TOOL_TIP_INDIFFERENCE);
         qualitativePanel.add(smcIndifference, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcIndifferenceSlider = new QuerySlider(100, 0.001, 0.5);
+        smcIndifferenceSlider = new QuerySlider(100, 0.00001, 0.5, 100, true);
         smcIndifferenceSlider.setToolTipText("Value: 0.500");
         smcIndifferenceSlider.addChangeListener(e -> {
-            if (!updatingSmcSettings) smcIndifferenceSlider.updateValue(smcIndifference, 3);
+            if (!updatingSmcSettings) smcIndifferenceSlider.updateValue(smcIndifference, 5);
         });
         qualitativePanel.add(smcIndifferenceSlider, subPanelGbc);
         subPanelGbc.gridy = 3;
