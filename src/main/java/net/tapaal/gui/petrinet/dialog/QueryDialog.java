@@ -995,99 +995,78 @@ public class QueryDialog extends JPanel {
         updatingSmcSettings = true;
         smcSettings = settings;
 
-        double desiredMinConfidence = smcConfidenceSlider.getDesiredMin();
-        double desiredMaxConfidence = smcConfidenceSlider.getDesiredMax();
-        double initialProportionConfidence = (settings.confidence - desiredMinConfidence) / (desiredMaxConfidence - desiredMinConfidence);
-        int initialValueConfidence = (int) (initialProportionConfidence * smcConfidenceSlider.getMaximum());
-        smcConfidenceSlider.setValue(
-            Math.max(smcConfidenceSlider.getMinimum(), 
-                    Math.min(initialValueConfidence, smcConfidenceSlider.getMaximum())));
+        updateSliderLinear(smcConfidenceSlider, settings.confidence);
+        updateSliderLog(smcPrecisionSlider, settings.estimationIntervalWidth);
+        updateSliderLog(smcFalsePositivesSlider, settings.falsePositives);
+        updateSliderLog(smcFalseNegativesSlider, settings.falseNegatives);
+        updateSliderLog(smcIndifferenceSlider, settings.indifferenceWidth);
+        updateSliderLinear(smcComparisonFloatSlider, settings.geqThan);
 
-        double desiredMinPrecision = smcPrecisionSlider.getDesiredMin();
-        double desiredMaxPrecision = smcPrecisionSlider.getDesiredMax();
-        double logMin = Math.log(desiredMinPrecision);
-        double logMax = Math.log(desiredMaxPrecision);
-        double initialProportionPrecision = (Math.log(settings.estimationIntervalWidth) - logMin) / (logMax - logMin);
-        int initialValuePrecision = (int) (initialProportionPrecision * smcPrecisionSlider.getMaximum());
-        
-        smcPrecisionSlider.setValue(
-            Math.max(smcPrecisionSlider.getMinimum(), 
-                    Math.min(initialValuePrecision, smcPrecisionSlider.getMaximum())));
         DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
         decimalFormatSymbols.setDecimalSeparator('.');
         DecimalFormat precisionFormat = new DecimalFormat("#.#####", decimalFormatSymbols);
 
         smcVerificationType.setSelectedIndex(settings.compareToFloat ? 1 : 0);
-        smcTimeBoundValue.setText(smcSettings.timeBound < Integer.MAX_VALUE ?
-            String.valueOf(smcSettings.timeBound) : "");
-        smcTimeBoundInfinite.setSelected(smcSettings.timeBound == Integer.MAX_VALUE);
-        smcTimeBoundValue.setEnabled(!smcTimeBoundInfinite.isSelected() && !doingBenchmark);
-        smcStepBoundValue.setText(smcSettings.stepBound < Integer.MAX_VALUE ?
-            String.valueOf(smcSettings.stepBound) : "");
-        smcStepBoundInfinite.setSelected(smcSettings.stepBound == Integer.MAX_VALUE);
-        smcStepBoundValue.setEnabled(!smcStepBoundInfinite.isSelected());
-        smcTimeBoundInfinite.setEnabled(!smcStepBoundInfinite.isSelected());
-        smcStepBoundInfinite.setEnabled(!smcTimeBoundInfinite.isSelected());
+        
+        boolean timeBoundInfinite = settings.timeBound == Integer.MAX_VALUE;
+        smcTimeBoundValue.setText(timeBoundInfinite ? "" : String.valueOf(settings.timeBound));
+        smcTimeBoundInfinite.setSelected(timeBoundInfinite);
+        smcTimeBoundValue.setEnabled(!timeBoundInfinite && !doingBenchmark);
+        
+        boolean stepBoundInfinite = settings.stepBound == Integer.MAX_VALUE;
+        smcStepBoundValue.setText(stepBoundInfinite ? "" : String.valueOf(settings.stepBound));
+        smcStepBoundInfinite.setSelected(stepBoundInfinite);
+        smcStepBoundValue.setEnabled(!stepBoundInfinite);
+        
+        smcTimeBoundInfinite.setEnabled(!stepBoundInfinite);
+        smcStepBoundInfinite.setEnabled(!timeBoundInfinite);
         
         smcNumericPrecision.setValue((int)settings.getNumericPrecision());
         
-        if (settings.getSmcSeed().isPresent()) {
-            smcSeed.setText(Long.toUnsignedString(settings.getSmcSeed().get()));
-        } else {
-            smcSeed.setText("");
-        }
+        smcSeed.setText(settings.getSmcSeed().map(Long::toUnsignedString).orElse(""));
 
         smcObservations = settings.getObservations();
 
-        smcConfidence.setText(String.valueOf(settings.confidence));
-        smcConfidenceSlider.setToolTipText(String.format("Value: %.2f", settings.confidence));
+        updateTextAndTooltipFloat(smcConfidence, smcConfidenceSlider, settings.confidence);
+        
         if (!doingBenchmark) {
-            String formattedIntervalWidth = precisionFormat.format(settings.estimationIntervalWidth);
-            smcEstimationIntervalWidth.setText(formattedIntervalWidth);
-            smcPrecisionSlider.setToolTipText(String.format("Value: %s", formattedIntervalWidth));
+            updateTextAndTooltipPrecision(smcEstimationIntervalWidth, smcPrecisionSlider, settings.estimationIntervalWidth, precisionFormat);
         }
 
-        double desiredMinFalsePositives = smcFalsePositivesSlider.getDesiredMin();
-        double desiredMaxFalsePositives = smcFalsePositivesSlider.getDesiredMax();
-        double initialProportionFalsePositives = (settings.falsePositives - desiredMinFalsePositives) / (desiredMaxFalsePositives - desiredMinFalsePositives);
-        int initialValueFalsePositives = (int) (initialProportionFalsePositives * smcFalsePositivesSlider.getMaximum());
-        smcFalsePositivesSlider.setValue(
-            Math.max(smcFalsePositivesSlider.getMinimum(), 
-                    Math.min(initialValueFalsePositives, smcFalsePositivesSlider.getMaximum())));
-        smcFalsePositives.setText(precisionFormat.format(settings.falsePositives));
-        smcFalsePositivesSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.falsePositives)));
+        updateTextAndTooltipPrecision(smcFalsePositives, smcFalsePositivesSlider, settings.falsePositives, precisionFormat);
+        updateTextAndTooltipPrecision(smcFalseNegatives, smcFalseNegativesSlider, settings.falseNegatives, precisionFormat);
+        updateTextAndTooltipPrecision(smcIndifference, smcIndifferenceSlider, settings.indifferenceWidth, precisionFormat);
+        updateTextAndTooltipFloat(smcComparisonFloat, smcComparisonFloatSlider, settings.geqThan);
 
-        double desiredMinFalseNegatives = smcFalseNegativesSlider.getDesiredMin();
-        double desiredMaxFalseNegatives = smcFalseNegativesSlider.getDesiredMax();
-        double initialProportionFalseNegatives = (settings.falseNegatives - desiredMinFalseNegatives) / (desiredMaxFalseNegatives - desiredMinFalseNegatives);
-        int initialValueFalseNegatives = (int) (initialProportionFalseNegatives * smcFalseNegativesSlider.getMaximum());
-        smcFalseNegativesSlider.setValue(
-            Math.max(smcFalseNegativesSlider.getMinimum(), 
-                    Math.min(initialValueFalseNegatives, smcFalseNegativesSlider.getMaximum())));
-        smcFalseNegatives.setText(precisionFormat.format(settings.falseNegatives));
-        smcFalseNegativesSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.falseNegatives)));
-
-        double desiredMinIndifference = smcIndifferenceSlider.getDesiredMin();
-        double desiredMaxIndifference = smcIndifferenceSlider.getDesiredMax();
-        double initialProportionIndifference = Math.sqrt((settings.indifferenceWidth - desiredMinIndifference) / (desiredMaxIndifference - desiredMinIndifference));
-        int initialValueIndifference = (int) (initialProportionIndifference * smcIndifferenceSlider.getMaximum());
-        smcIndifferenceSlider.setValue(
-            Math.max(smcIndifferenceSlider.getMinimum(), 
-                    Math.min(initialValueIndifference, smcIndifferenceSlider.getMaximum())));
-        smcIndifference.setText(precisionFormat.format(settings.indifferenceWidth));
-        smcIndifferenceSlider.setToolTipText(String.format("Value: %s", precisionFormat.format(settings.indifferenceWidth)));
-
-        double desiredMinComparison = smcComparisonFloatSlider.getDesiredMin();
-        double desiredMaxComparison = smcComparisonFloatSlider.getDesiredMax();
-        double initialProportionComparison = (settings.geqThan - desiredMinComparison) / (desiredMaxComparison - desiredMinComparison);
-
-        int initialValueComparison = (int) (initialProportionComparison * smcComparisonFloatSlider.getMaximum());
-        smcComparisonFloatSlider.setValue(
-            Math.max(smcComparisonFloatSlider.getMinimum(), 
-                    Math.min(initialValueComparison, smcComparisonFloatSlider.getMaximum())));
-        smcComparisonFloat.setText(String.valueOf(settings.geqThan));
-        smcComparisonFloatSlider.setToolTipText(String.format("Value: %.2f", settings.geqThan));
         updatingSmcSettings = false;
+    }
+
+    private void updateTextAndTooltipPrecision(JTextField textField, QuerySlider slider, double value, DecimalFormat format) {
+        String formattedValue = format.format(value);
+        textField.setText(formattedValue);
+        slider.setToolTipText(String.format("Value: %s", formattedValue));
+    }
+
+    private void updateTextAndTooltipFloat(JTextField textField, QuerySlider slider, double value) {
+        textField.setText(String.valueOf(value));
+        slider.setToolTipText(String.format("Value: %.2f", value));
+    }
+
+    private void updateSliderLinear(QuerySlider slider, double value) {
+        double min = slider.getDesiredMin();
+        double max = slider.getDesiredMax();
+        applySliderProportion(slider, (value - min) / (max - min));
+    }
+
+    private void updateSliderLog(QuerySlider slider, double value) {
+        double logMin = Math.log(slider.getDesiredMin());
+        double logMax = Math.log(slider.getDesiredMax());
+        applySliderProportion(slider, (Math.log(value) - logMin) / (logMax - logMin));
+    }
+
+    private void applySliderProportion(QuerySlider slider, double proportion) {
+        int initialValue = (int)(proportion * slider.getMaximum());
+        slider.setValue(Math.max(slider.getMinimum(), Math.min(initialValue, slider.getMaximum())));
     }
 
     private boolean queryIsReachability() {
@@ -3237,6 +3216,8 @@ public class QueryDialog extends JPanel {
         });
 
         quantitativePanel.add(smcConfidenceSlider, subPanelGbc);
+        bindTextFieldToSlider(smcConfidence, smcConfidenceSlider);
+
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
         quantitativePanel.add(new JLabel("Precision : "), subPanelGbc);
@@ -3254,7 +3235,7 @@ public class QueryDialog extends JPanel {
         smcEstimationIntervalWidth.setToolTipText(TOOL_TIP_INTERVAL_WIDTH);
         quantitativePanel.add(smcEstimationIntervalWidth, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcPrecisionSlider = new QuerySlider(0, 0.5, 0.0001);
+        smcPrecisionSlider = new QuerySlider(0, 0.5, 0.00001, true);
         smcPrecisionSlider.setToolTipText("Value: 0.5000");
         smcPrecisionSlider.addChangeListener(e -> {
             if (updatingSmcSettings) return;
@@ -3270,7 +3251,7 @@ public class QueryDialog extends JPanel {
             double roundedValue = Math.round(interpretedValue * 10000.0) / 10000.0;
             DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
             decimalFormatSymbols.setDecimalSeparator('.');
-            DecimalFormat df = new DecimalFormat("#.####", decimalFormatSymbols);
+            DecimalFormat df = new DecimalFormat("#.#####", decimalFormatSymbols);
             String formattedValue = df.format(roundedValue);
             smcEstimationIntervalWidth.setText(formattedValue);
             smcPrecisionSlider.setToolTipText(String.format("Value: %s", formattedValue));
@@ -3280,6 +3261,8 @@ public class QueryDialog extends JPanel {
         });
 
         quantitativePanel.add(smcPrecisionSlider, subPanelGbc);
+        bindTextFieldToSlider(smcEstimationIntervalWidth, smcPrecisionSlider);
+
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
         JLabel verifTimeLabel = new JLabel("Estimated verification time (seconds) : ");
@@ -3318,6 +3301,7 @@ public class QueryDialog extends JPanel {
 
         subPanelGbc.gridx = 2;
         quantitativePanel.add(smcEstimatedTimeSlider, subPanelGbc);
+        bindTextFieldToSlider(smcTimeExpected, smcEstimatedTimeSlider);
 
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
@@ -3350,12 +3334,14 @@ public class QueryDialog extends JPanel {
         smcFalsePositives.setToolTipText(TOOL_TIP_FALSE_POSITIVES);
         qualitativePanel.add(smcFalsePositives, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcFalsePositivesSlider = new QuerySlider(0, 0.001, 0.5);
-        smcFalsePositivesSlider.setToolTipText("Value: 0.001");
+        smcFalsePositivesSlider = new QuerySlider(0, 0.00001, 0.5, true);
+        smcFalsePositivesSlider.setToolTipText("Value: 0.00001");
         smcFalsePositivesSlider.addChangeListener(e -> {
-            if (!updatingSmcSettings) smcFalsePositivesSlider.updateValue(smcFalsePositives, 3);
+            if (!updatingSmcSettings) smcFalsePositivesSlider.updateValue(smcFalsePositives, 5);
         });
         qualitativePanel.add(smcFalsePositivesSlider, subPanelGbc);
+        bindTextFieldToSlider(smcFalsePositives, smcFalsePositivesSlider);
+        
         subPanelGbc.gridy = 1;
         subPanelGbc.gridx = 0;
         qualitativePanel.add(new JLabel("False negatives : "), subPanelGbc);
@@ -3366,12 +3352,14 @@ public class QueryDialog extends JPanel {
         smcFalseNegatives.setToolTipText(TOOL_TIP_FALSE_NEGATIVES);
         qualitativePanel.add(smcFalseNegatives, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcFalseNegativesSlider = new QuerySlider(0, 0.001, 0.5);
-        smcFalseNegativesSlider.setToolTipText("Value: 0.001");
+        smcFalseNegativesSlider = new QuerySlider(0, 0.00001, 0.5, true);
+        smcFalseNegativesSlider.setToolTipText("Value: 0.00001");
         smcFalseNegativesSlider.addChangeListener(e -> {
-            if (!updatingSmcSettings) smcFalseNegativesSlider.updateValue(smcFalseNegatives, 3);
+            if (!updatingSmcSettings) smcFalseNegativesSlider.updateValue(smcFalseNegatives, 5);
         });
         qualitativePanel.add(smcFalseNegativesSlider, subPanelGbc);
+        bindTextFieldToSlider(smcFalseNegatives, smcFalseNegativesSlider);
+        
         subPanelGbc.gridy = 2;
         subPanelGbc.gridx = 0;
         qualitativePanel.add(new JLabel("Indifference region width : "), subPanelGbc);
@@ -3382,12 +3370,14 @@ public class QueryDialog extends JPanel {
         smcIndifference.setToolTipText(TOOL_TIP_INDIFFERENCE);
         qualitativePanel.add(smcIndifference, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcIndifferenceSlider = new QuerySlider(100, 0.00001, 0.5, 100, true);
+        smcIndifferenceSlider = new QuerySlider(100, 0.00001, 0.5, true);
         smcIndifferenceSlider.setToolTipText("Value: 0.500");
         smcIndifferenceSlider.addChangeListener(e -> {
             if (!updatingSmcSettings) smcIndifferenceSlider.updateValue(smcIndifference, 5);
         });
         qualitativePanel.add(smcIndifferenceSlider, subPanelGbc);
+        bindTextFieldToSlider(smcIndifference, smcIndifferenceSlider);
+        
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
         JLabel testLabel = new JLabel("Property hold with probability >= ");
@@ -3406,6 +3396,7 @@ public class QueryDialog extends JPanel {
             if (!updatingSmcSettings) smcComparisonFloatSlider.updateValue(smcComparisonFloat, 2);
         });
         qualitativePanel.add(smcComparisonFloatSlider, subPanelGbc);
+        bindTextFieldToSlider(smcComparisonFloat, smcComparisonFloatSlider);
 
         smcSettingsPanel.add(qualitativePanel, gbc);
     
@@ -3550,6 +3541,36 @@ public class QueryDialog extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.WEST;
         add(queryPanel, gbc);
+    }
+
+    /**
+     * Bind text field to a slider so that when a text field is updated the slider moves accordingly, and when the slider is moved the text field updates.
+     * @param textField Text field to update
+     * @param slider Query slider to update
+     */
+    private void bindTextFieldToSlider(JTextField textField, QuerySlider slider) {
+        textField.getDocument().addDocumentListener(new DocumentListener() {
+            private void update() {
+                if (!textField.hasFocus()) return; 
+
+                try {
+                    double value = Double.parseDouble(textField.getText());
+                    
+                    updatingSmcSettings = true; 
+                    
+                    if (slider.isLog()) {
+                        updateSliderLog(slider, value);
+                    } else {
+                        updateSliderLinear(slider, value);
+                    }
+                    
+                    updatingSmcSettings = false;
+                } catch (NumberFormatException ex) {}
+            }
+            @Override public void insertUpdate(DocumentEvent e) { update(); }
+            @Override public void removeUpdate(DocumentEvent e) { update(); }
+            @Override public void changedUpdate(DocumentEvent e) { update(); }
+        });
     }
 
     private void initQueryField() {
