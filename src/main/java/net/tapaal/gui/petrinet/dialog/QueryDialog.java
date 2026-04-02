@@ -1000,7 +1000,7 @@ public class QueryDialog extends JPanel {
         updateSliderLog(smcFalsePositivesSlider, settings.falsePositives);
         updateSliderLog(smcFalseNegativesSlider, settings.falseNegatives);
         updateSliderLog(smcIndifferenceSlider, settings.indifferenceWidth);
-        updateSliderLinear(smcComparisonFloatSlider, settings.geqThan);
+        updateSliderLog(smcComparisonFloatSlider, settings.geqThan);
 
         DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
         decimalFormatSymbols.setDecimalSeparator('.');
@@ -1036,7 +1036,7 @@ public class QueryDialog extends JPanel {
         updateTextAndTooltipPrecision(smcFalsePositives, smcFalsePositivesSlider, settings.falsePositives, precisionFormat);
         updateTextAndTooltipPrecision(smcFalseNegatives, smcFalseNegativesSlider, settings.falseNegatives, precisionFormat);
         updateTextAndTooltipPrecision(smcIndifference, smcIndifferenceSlider, settings.indifferenceWidth, precisionFormat);
-        updateTextAndTooltipFloat(smcComparisonFloat, smcComparisonFloatSlider, settings.geqThan);
+        updateTextAndTooltipPrecision(smcComparisonFloat, smcComparisonFloatSlider, settings.geqThan, precisionFormat);
 
         updatingSmcSettings = false;
     }
@@ -3350,7 +3350,7 @@ public class QueryDialog extends JPanel {
         qualitativePanel.add(smcIndifference, subPanelGbc);
         subPanelGbc.gridx = 2;
         smcIndifferenceSlider = new QuerySlider(100, 0.00001, 0.5, true);
-        smcIndifferenceSlider.setToolTipText("Value: 0.500");
+        smcIndifferenceSlider.setToolTipText("Value: 0.500000");
         smcIndifferenceSlider.addChangeListener(e -> {
             if (!updatingSmcSettings) smcIndifferenceSlider.updateValue(smcIndifference, 5);
         });
@@ -3359,7 +3359,7 @@ public class QueryDialog extends JPanel {
         
         subPanelGbc.gridy = 3;
         subPanelGbc.gridx = 0;
-        JLabel testLabel = new JLabel("Property hold with probability >= ");
+        JLabel testLabel = new JLabel("Property holds with probability >= ");
         testLabel.setToolTipText(TOOL_TIP_QUALITATIVE_TEST);
         qualitativePanel.add(testLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
@@ -3369,28 +3369,10 @@ public class QueryDialog extends JPanel {
         smcComparisonFloat.addFocusListener(updater);
         qualitativePanel.add(smcComparisonFloat, subPanelGbc);
         subPanelGbc.gridx = 2;
-        smcComparisonFloatSlider = new QuerySlider(940, 0.00001, 0.99999, 1000);
+        smcComparisonFloatSlider = new QuerySlider(940, 0.00001, 0.99999, 1000, true);
         smcComparisonFloatSlider.setToolTipText("Value: 0.50000");
         smcComparisonFloatSlider.addChangeListener(e -> {
-            if (updatingSmcSettings) return;
-            int value = smcComparisonFloatSlider.getValue();
-            double desiredMin = smcComparisonFloatSlider.getDesiredMin();
-            double desiredMax = smcComparisonFloatSlider.getDesiredMax();
-            double logMin = Math.log(desiredMin);
-            double logMax = Math.log(desiredMax);
-            double proportion = (double) value / smcComparisonFloatSlider.getMaximum();
-            double logValue = logMin + proportion * (logMax - logMin);
-            double interpretedValue = Math.exp(logValue);
-            double roundedValue = Math.round(interpretedValue * 100000.0) / 100000.0;
-            smcComparisonFloatSlider.setRealValue(roundedValue);
-            
-            DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
-            decimalFormatSymbols.setDecimalSeparator('.');
-            DecimalFormat df = new DecimalFormat("#.#####", decimalFormatSymbols);
-            String formattedValue = df.format(roundedValue);
-            
-            smcComparisonFloat.setText(formattedValue);
-            smcComparisonFloatSlider.setToolTipText(String.format("Value: %s", formattedValue));
+            if (!updatingSmcSettings) smcComparisonFloatSlider.updateValue(smcComparisonFloat, 5);
         });
         qualitativePanel.add(smcComparisonFloatSlider, subPanelGbc);
         bindTextFieldToSlider(smcComparisonFloat, smcComparisonFloatSlider);
