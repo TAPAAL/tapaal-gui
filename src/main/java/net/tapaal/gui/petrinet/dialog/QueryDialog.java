@@ -3203,15 +3203,7 @@ public class QueryDialog extends JPanel {
         smcConfidenceSlider.setToolTipText("Value: 0.95");
         smcConfidenceSlider.addChangeListener(e -> {
             if (updatingSmcSettings) return;
-            int value = smcConfidenceSlider.getValue();
-            double desiredMin = smcConfidenceSlider.getDesiredMin();
-            double desiredMax = smcConfidenceSlider.getDesiredMax();
-            double proportion = (double) value / smcConfidenceSlider.getMaximum();
-            double interpretedValue = desiredMin + proportion * (desiredMax - desiredMin);
-            double roundedValue = Math.round(interpretedValue * 100.0) / 100.0;
-            smcConfidence.setText(roundedValue + "");
-            smcConfidenceSlider.setRealValue(roundedValue);
-            smcConfidenceSlider.setToolTipText(String.format("Value: %.2f", roundedValue));
+            smcConfidenceSlider.updateValue(smcConfidence, 2);
             smcMustUpdateTime = true;
         });
 
@@ -3239,22 +3231,9 @@ public class QueryDialog extends JPanel {
         smcPrecisionSlider.setToolTipText("Value: 0.50000");
         smcPrecisionSlider.addChangeListener(e -> {
             if (updatingSmcSettings) return;
-            int value = smcPrecisionSlider.getValue();
-            double desiredMin = smcPrecisionSlider.getDesiredMin();
-            double desiredMax = smcPrecisionSlider.getDesiredMax();
-            double logMin = Math.log(desiredMin);
-            double logMax = Math.log(desiredMax);
-            double proportion = (double) value / smcPrecisionSlider.getMaximum();
-            double logValue = logMin + proportion * (logMax - logMin);
-            double interpretedValue = Math.exp(logValue);
-            smcPrecisionSlider.setRealValue(interpretedValue);
-            double roundedValue = Math.round(interpretedValue * 100000.0) / 100000.0;
-            DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
-            decimalFormatSymbols.setDecimalSeparator('.');
-            DecimalFormat df = new DecimalFormat("#.#####", decimalFormatSymbols);
-            String formattedValue = df.format(roundedValue);
-            smcEstimationIntervalWidth.setText(formattedValue);
-            smcPrecisionSlider.setToolTipText(String.format("Value: %s", formattedValue));
+            
+            smcPrecisionSlider.updateValue(smcEstimationIntervalWidth, 5);
+            
             smcMustUpdateTime = true;
             smcTimeExpected.setText("");
             smcTimeEstimationButton.setText(UPDATE_VERIFICATION_TIME_BTN_TEXT);
