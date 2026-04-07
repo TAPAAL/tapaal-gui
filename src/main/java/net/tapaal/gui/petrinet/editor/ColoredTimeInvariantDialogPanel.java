@@ -106,7 +106,7 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
         if(place.underlyingPlace().isShared()){
             for(Template t : context.tabContent().allTemplates()){
                 for(TransportArc arc : t.model().transportArcs()){
-                    if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent()){
+                    if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent() && (place.hasInvariant() || place.hasAnyColorInvariant() || fromDialog)){
                         JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
                         return false;
                     }
