@@ -99,7 +99,7 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
     private boolean isUrgencyOK(boolean fromDialog){
         for(TransportArc arc : context.activeModel().transportArcs()){
             if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent() && (place.hasInvariant() || place.hasAnyColorInvariant() || fromDialog)){
-                JOptionPane.showMessageDialog(fromDialog ? rootPane : TAPAALGUI.getApp(), "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(fromDialog ? rootPane : TAPAALGUI.getApp(), "Transport arcs going through urgent transitions cannot have an invariant at the destination. Transition: '" + arc.transition().name() + "'", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         }
@@ -107,7 +107,7 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
             for(Template t : context.tabContent().allTemplates()){
                 for(TransportArc arc : t.model().transportArcs()){
                     if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent() && (place.hasInvariant() || place.hasAnyColorInvariant() || fromDialog)){
-                        JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination. Transition: '" + arc.transition().name() + "' in component: '" + t.model().name() + "'", "Error", JOptionPane.ERROR_MESSAGE);
                         return false;
                     }
                 }
