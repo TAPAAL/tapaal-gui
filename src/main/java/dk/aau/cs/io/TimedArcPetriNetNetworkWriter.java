@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -261,8 +262,14 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		Element constantElement = document.createElement("constant");
 		
 		constantElement.setAttribute("name", constant.name());
-		constantElement.setAttribute("value", String.valueOf(constant.value()));
-	
+		if (constant.hasMultipleValues()) {
+			String valuesStr = constant.values().stream()
+				.map(String::valueOf).collect(Collectors.joining(","));
+			constantElement.setAttribute("value", valuesStr);
+		} else {
+			constantElement.setAttribute("value", String.valueOf(constant.value()));
+		}
+
 		return constantElement;
 	}
 

@@ -4,9 +4,11 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.swing.JCheckBox;
@@ -30,7 +32,7 @@ import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import pipe.gui.swingcomponents.EscapableDialog;
 
-public class ConstantsDialogPanel extends javax.swing.JPanel {
+public class ConstantsDialogPanel extends JPanel {
 
     private final TimedArcPetriNetNetwork model;
     private int lowerBound;
@@ -63,7 +65,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
         listModel = new DefaultListModel<>();
 
         if (constant != null) {
-            listModel.addElement(constant.value());
+            for (int val : constant.values()) {
+                listModel.addElement(val);
+            }
             oldName = constant.name();
             lowerBound = constant.lowerBound();
             upperBound = constant.upperBound();
@@ -73,6 +77,12 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
         
         initComponents();
         nameTextField.setText(oldName);
+        if (constant != null && constant.values().size() > 1) {
+            globalCheckBox.setSelected(true);
+            for (ActionListener listener : globalCheckBox.getActionListeners()) {
+                listener.actionPerformed(new ActionEvent(globalCheckBox, ActionEvent.ACTION_PERFORMED, ""));
+            }
+        }
     }
 
     public void showDialog() {
@@ -89,7 +99,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
         container = new JPanel();
         container.setLayout(new GridBagLayout());
         
-        nameTextField = new javax.swing.JTextField();
+        nameTextField = new JTextField();
         SwingHelper.setPreferredWidth(nameTextField, 330);
         nameTextField.addAncestorListener(new RequestFocusListener());
         nameTextField.addActionListener(e -> {
@@ -198,9 +208,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
             if (selectedIndex != -1) {
                 listModel.remove(selectedIndex);
                 if (listModel.getSize() > 0) {
-                    int lastIndex = listModel.getSize() - 1;
-                    valueList.setSelectedIndex(lastIndex);
-                    valueList.ensureIndexIsVisible(lastIndex);
+                    int nextIndex = Math.min(selectedIndex, listModel.getSize() - 1);
+                    valueList.setSelectedIndex(nextIndex);
+                    valueList.ensureIndexIsVisible(nextIndex);
                 } else {
                     removeButton.setEnabled(false);
                 }
@@ -335,9 +345,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
             return;             
         } 
         
-        List<Integer> vals = new ArrayList<>();
+        Set<Integer> vals = new LinkedHashSet<>();
         if (globalCheckBox.isSelected()) {
-            for (int i = 0; i < listModel.size(); i++) {
+            for (int i = 0; i < listModel.size(); ++i) {
                 vals.add(listModel.get(i));
             }
         } else {
@@ -368,7 +378,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
                 }
             }
 
-            Command edit = model.updateConstant(oldName, new Constant(newName, vals.get(0))); //TODO: change to handle entire list
+            Command edit = model.updateConstant(oldName, new Constant(newName, vals));
             if (edit == null) {
                 JOptionPane.showMessageDialog(
                         TAPAALGUI.getApp(),
@@ -384,7 +394,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
                 exit();
             }
         } else {
-            Command edit = model.addConstant(newName, vals.get(0)); //TODO: change to handle entire list
+            Command edit = model.addConstant(newName, vals);
             
             if (edit == null) {
                 JOptionPane.showMessageDialog(

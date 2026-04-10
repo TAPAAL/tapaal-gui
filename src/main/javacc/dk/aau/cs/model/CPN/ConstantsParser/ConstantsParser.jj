@@ -400,6 +400,10 @@ TOKEN :
     |
     <EBRACKET: "]">
     |
+    <LCURLY: "{">
+    |
+    <RCURLY: "}">
+    |
     <LT: "<">
     |
     <GT: ">">
@@ -448,12 +452,26 @@ void values() :
 void constants() :
 {
     Token id, value;
+    List<String> values = new ArrayList<String>();
+    BoolRef isInt = new BoolRef(false);
 }
 {
-    <CONST> id = <ID> <EQ> value = <INTEGER> { 
-        idExists(id.image);
-        constants.put(id.image, new Constant(id.image, Integer.parseInt(value.image)));
-    }
+    <CONST> id = <ID> <EQ> 
+    (
+        value = <INTEGER> { 
+            idExists(id.image);
+            constants.put(id.image, new Constant(id.image, Integer.parseInt(value.image)));
+        }
+    |
+        <LCURLY> intList(values, isInt) <RCURLY> {
+            idExists(id.image);
+            Set<Integer> setVals = new HashSet<Integer>();
+            for(String s : values) {
+                setVals.add(Integer.parseInt(s));
+            }
+            constants.put(id.image, new Constant(id.image, setVals));
+        }
+    )
 }
 
 void colorTypes() :

@@ -271,7 +271,9 @@ public class BatchProcessingDialog extends JDialog {
 	
 	private void setFileListToTempFile() {
 		if (!(isQueryListEmpty())) {
-			files.add(QueryPane.getTemporaryFile());
+			for (File f : QueryPane.getTemporaryFiles()) {
+				files.add(f);
+			}
 		}
 	}
 	

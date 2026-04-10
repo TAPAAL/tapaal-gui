@@ -1071,9 +1071,17 @@ public class TapnXmlLoader {
 
 	private Constant parseConstant(Element constantElement) {
 		String name = constantElement.getAttribute("name");
-		int value = Integer.parseInt(constantElement.getAttribute("value"));
+		String valueAttr = constantElement.getAttribute("value");
+		if (valueAttr.contains(",")) {
+			Set<Integer> setVals = new HashSet<>();
+			for (String val : valueAttr.split(",")) {
+				setVals.add(Integer.parseInt(val.trim()));
+			}
+			return new Constant(name, setVals);
+		}
 
-		return new Constant(name, value);
+        int value = Integer.parseInt(valueAttr);
+        return new Constant(name, value);
 	}
 
     private Pair<String, Vector<Color>> parseColorInvariant(Element colorinvariant, TimedArcPetriNetNetwork network) throws FormatException {
