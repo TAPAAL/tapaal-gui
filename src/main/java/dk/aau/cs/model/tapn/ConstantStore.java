@@ -191,7 +191,7 @@ public class ConstantStore {
 		}
 	}
 
-	public Command addConstant(String name, java.util.Set<Integer> vals) {
+	public Command addConstant(String name, Set<Integer> vals) {
 		if (isNameInf(name))
 			return null;
 
