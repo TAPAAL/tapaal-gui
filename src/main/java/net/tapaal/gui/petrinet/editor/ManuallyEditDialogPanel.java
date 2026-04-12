@@ -197,7 +197,8 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
 
         String helpText = "Syntax for defining " + (isColored ? "color types, variables, and " : "") + "constants:\n" +
                           "const {ID} = {INTEGER};\n" +
-                          "e.g. const a = 5; is a valid constant.\n\n" +
+                          "const {ID} = {{INTEGER}, ..., {INTEGER}};\n" +
+                          "e.g. const a = 5; or const b = {1, 2, 3}; are valid constants.\n\n" +
                           (isColored ? "Syntax for defining color types:\n" +
                             "type {ID} is [{COLOR}, ..., {COLOR}];\n" +
                             "type {ID} is [{LOWER_BOUND}, {UPPER_BOUND}];\n" +

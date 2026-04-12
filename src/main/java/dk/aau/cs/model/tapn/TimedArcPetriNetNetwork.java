@@ -243,6 +243,13 @@ public class TimedArcPetriNetNetwork {
 		constants.buildConstraints(this);
 	}
 
+	public Command addConstant(String name, Set<Integer> vals) {
+		Command cmd = constants.addConstant(name, vals);
+		Constant constant = constants.getConstantByName(name);
+		fireConstantAdded(constant);
+		return cmd;
+	}
+
 	// TODO: Command is a GUI concern. This should not know anything about it
 	public Command addConstant(String name, int val) {
 		Command cmd = constants.addConstant(name, val); 
@@ -672,10 +679,14 @@ public class TimedArcPetriNetNetwork {
 			network.add(new SharedTransition(t.name()));	// TODO This is okay for now
 		}
 		
-		for(Constant c : constants()){
-			network.addConstant(c.name(), c.value());
+		for (Constant c : constants()) {
+			if (c.hasMultipleValues()) {
+				network.addConstant(c.name(), c.values());
+			} else {
+				network.addConstant(c.name(), c.value());
+			}
 		}
-		
+
 		for(TimedArcPetriNet t : tapns){
 			TimedArcPetriNet new_t = t.copy();
 			network.add(new_t);

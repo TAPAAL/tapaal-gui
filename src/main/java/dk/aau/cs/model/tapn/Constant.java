@@ -1,5 +1,6 @@
 package dk.aau.cs.model.tapn;
 
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.util.Require;
@@ -8,7 +9,7 @@ public class Constant {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	
 	private String name;
-	private int value;
+	private Set<Integer> values;
 	private int lowerBound;
 	private int upperBound;
 	private boolean isUsed;
@@ -23,11 +24,19 @@ public class Constant {
 		reset();
 	}
 
+    public Constant(String name, Set<Integer> values) {
+		setName(name);
+		setValues(values);
+		setIsUsed(false);
+		setFocused(false);
+		reset();
+	}
+
 	public Constant(Constant constant) {
 		Require.that(constant != null, "Constant cannot be null");
 
 		name = constant.name;
-		value = constant.value;
+		values = constant.values;
 		lowerBound = constant.lowerBound;
 		upperBound = constant.upperBound;
 		isUsed = constant.isUsed;
@@ -65,14 +74,33 @@ public class Constant {
 	}
 
 	public void setValue(int value) {
-		Require.that(value >= 0, "value must be non-negative");
-		this.value = value;
+		setValues(Set.of(value));
+	}
+
+    public void setValues(Set<Integer> values) {
+        values.forEach(value -> Require.that(value >= 0, "Constant value(s) must be non-negative"));
+        this.values = values;
+    }
+
+	public boolean hasMultipleValues() {
+		return values != null && values.size() > 1;
 	}
 
 	public int value() {
-		return value;
+        if (values == null || values.isEmpty()) {
+            throw new IllegalStateException("Constant has no values");
+        }
+
+        return values.iterator().next();
 	}
 
+    public Set<Integer> values() {
+        if (values == null || values.isEmpty()) {
+            throw new IllegalStateException("Constant has no values");
+        }
+
+        return values;
+    }
 
 	public int lowerBound() {
 		return lowerBound;
@@ -115,7 +143,24 @@ public class Constant {
 
 	@Override
 	public String toString() {
-		return name + " = " + value;
+        if (values == null || values.isEmpty()) {
+            return name + " = <no value>";
+        }
+
+        if (values.size() == 1) {
+            return name + " = " + values.iterator().next();
+        }
+
+        var sb = new StringBuilder();
+        sb.append(name).append(" = {");
+        for (Integer value : values) {
+            sb.append(value).append(", ");
+        }
+
+        sb.delete(sb.length() - 2, sb.length());
+        sb.append("}");
+
+        return sb.toString();
 	}
 
 	@Override

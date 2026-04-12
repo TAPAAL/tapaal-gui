@@ -7,6 +7,7 @@ import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -671,32 +672,6 @@ public class GuardDialogue extends JPanel
 		return firstValue;
 	}
 	
-	private void updateWeightConstantComboBox() {
-		int value = getFirstValue();
-
-		String oldWeight = weightConstantsComboBox.getSelectedItem() != null ? weightConstantsComboBox
-				.getSelectedItem().toString()
-				: null;
-				weightConstantsComboBox.removeAllItems();
-				Collection<Constant> constants = context.network().constants();
-
-				//List <Constant> constantList = new ArrayList(constants);
-				List <Constant> constantList = new ArrayList<Constant>();
-				constantList.addAll(constants);
-
-				constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
-
-				for (Constant c : constantList) {
-					if (c.value() >= value) {
-						weightConstantsComboBox.addItem(c.name());
-					}
-				}
-
-				if (oldWeight != null) {
-                    weightConstantsComboBox.setSelectedItem(oldWeight);
-                }
-	}
-
 	private void updateRightConstantComboBox() {
 		int value = getFirstValue();
 
@@ -714,7 +689,11 @@ public class GuardDialogue extends JPanel
 
 
         for (Constant c : constantList) {
-            if (c.value() >= value) {
+            if (c.hasMultipleValues()) {
+                if (Collections.min(c.values()) >= value) {
+                    rightConstantsComboBox.addItem(c.name());
+                }
+            } else if (c.value() >= value) {
                 rightConstantsComboBox.addItem(c.name());
             }
         }

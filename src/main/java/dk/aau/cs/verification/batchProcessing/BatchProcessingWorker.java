@@ -227,8 +227,17 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	private void publishResult(String fileName, net.tapaal.gui.petrinet.verification.TAPNQuery query, String verificationResult, long verificationTime, String rawOutput, Stats stats, int optionNumber) {
 		BatchProcessingVerificationResult result;		
-		if (QueryPane.getTemporaryFile() != null && fileName.equals(QueryPane.getTemporaryFile().getName())) {
-			//removes numbers from tempFile so it looks good
+		boolean isTempFile = false;
+		if (QueryPane.getTemporaryFiles() != null) {
+			for (File tf : QueryPane.getTemporaryFiles()) {
+				if (fileName.equals(tf.getName())) {
+					isTempFile = true;
+					break;
+				}
+			}
+		}
+
+		if (isTempFile) {
 			result = new BatchProcessingVerificationResult(TAPAALGUI.getAppGui().getCurrentTabName(), query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), rawOutput, stats, optionNumber);
 		} else {
 			result = new BatchProcessingVerificationResult(fileName, query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), rawOutput, stats, optionNumber);
