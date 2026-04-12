@@ -462,9 +462,10 @@ public class QueryPane extends JPanel implements SidePane {
 
 	}
 
-	private void verifyQuery() {
-		TAPNQuery query = queryList.getSelectedValue();
-		int NumberOfSelectedElements = queryList.getSelectedIndices().length;
+	public void verifyQueries(List<TAPNQuery> queries) {
+		if (queries.isEmpty()) return;
+		TAPNQuery query = queries.get(0);
+		int NumberOfSelectedElements = queries.size();
 		
 		boolean isSmc = query.getCategory() == QueryCategory.SMC;
 
@@ -487,12 +488,16 @@ public class QueryPane extends JPanel implements SidePane {
 			else
 				Verifier.runUppaalVerification(tabContent.network(), query);
 		} else if (NumberOfSelectedElements > 1 || hasMultipleConstants) {
-			saveNetAndRunBatchProcessing();
+			saveNetAndRunBatchProcessing(queries);
 		}
 	}
 
-	private void saveNetAndRunBatchProcessing() {
+	private void verifyQuery() {
 		List<TAPNQuery> selectedQueries = queryList.getSelectedValuesList();
+		verifyQueries(selectedQueries);
+	}
+
+	private void saveNetAndRunBatchProcessing(List<TAPNQuery> selectedQueries) {
 		tempFiles.clear();
 
 		List<Constant> multiConstants = new ArrayList<>();
@@ -541,7 +546,7 @@ public class QueryPane extends JPanel implements SidePane {
 				int val = currentCombination.get(i);
 				c.setValues(Collections.singleton(val));
 				suffix.append(c.name()).append("=").append(val);
-				if (i < multiConstants.size() - 1) suffix.append("; ");
+				if (i < multiConstants.size() - 1) suffix.append(", ");
 			}
 			suffix.append("]");
 

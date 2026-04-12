@@ -51,6 +51,7 @@ public class ConstantsDialogPanel extends JPanel {
     CustomJSpinner newValueSpinner;
     CustomJSpinner singleValueSpinner;
     JButton addButton;
+    JButton editButton;
     JButton removeButton;
     
     JPanel container;
@@ -163,7 +164,7 @@ public class ConstantsDialogPanel extends JPanel {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridheight = 3;
+        gbc.gridheight = 4;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
@@ -186,6 +187,7 @@ public class ConstantsDialogPanel extends JPanel {
                 valueList.setSelectedIndex(newIndex);
                 valueList.ensureIndexIsVisible(newIndex);
                 removeButton.setEnabled(true);
+                editButton.setEnabled(true);
             }
         });
         gbc = new GridBagConstraints();
@@ -196,11 +198,32 @@ public class ConstantsDialogPanel extends JPanel {
         gbc.insets = new Insets(0, 4, 4, 0);
         listPanel.add(addButton, gbc);
         
+        editButton = new JButton("Edit");
+        editButton.setEnabled(!listModel.isEmpty() && valueList.getSelectedIndex() != -1);
+        editButton.addActionListener(e -> {
+            int selectedIndex = valueList.getSelectedIndex();
+            if (selectedIndex != -1 && !((JSpinner.NumberEditor)newValueSpinner.getEditor()).getTextField().getText().isEmpty()) {
+                listModel.set(selectedIndex, (Integer) newValueSpinner.getValue());
+            }
+        });
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(0, 4, 4, 0);
+        listPanel.add(editButton, gbc);
+
         removeButton = new JButton("Remove");
         removeButton.setEnabled(!listModel.isEmpty() && valueList.getSelectedIndex() != -1);
         
         valueList.addListSelectionListener(e -> {
-            removeButton.setEnabled(!listModel.isEmpty() && valueList.getSelectedIndex() != -1);
+            boolean hasSelection = !listModel.isEmpty() && valueList.getSelectedIndex() != -1;
+            removeButton.setEnabled(hasSelection);
+            editButton.setEnabled(hasSelection);
+            if (hasSelection && !e.getValueIsAdjusting()) {
+                newValueSpinner.setValue(listModel.get(valueList.getSelectedIndex()));
+            }
         });
 
         removeButton.addActionListener(e -> {
@@ -213,12 +236,13 @@ public class ConstantsDialogPanel extends JPanel {
                     valueList.ensureIndexIsVisible(nextIndex);
                 } else {
                     removeButton.setEnabled(false);
+                    editButton.setEnabled(false);
                 }
             }
         });
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.NORTH;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(0, 4, 0, 0);
