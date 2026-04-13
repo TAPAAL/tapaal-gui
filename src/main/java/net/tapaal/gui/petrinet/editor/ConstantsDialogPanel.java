@@ -7,7 +7,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -20,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
@@ -47,12 +50,14 @@ public class ConstantsDialogPanel extends JPanel {
     
     DefaultListModel<Integer> listModel;
     JList<Integer> valueList;
+    JTextArea valueTextArea;
     JScrollPane listScrollPane;
     CustomJSpinner newValueSpinner;
     CustomJSpinner singleValueSpinner;
     JButton addButton;
     JButton editButton;
     JButton removeButton;
+    boolean isParsingMode = false;
     
     JPanel container;
     JPanel buttonContainer;
@@ -99,6 +104,7 @@ public class ConstantsDialogPanel extends JPanel {
     private void initComponents() {
         container = new JPanel();
         container.setLayout(new GridBagLayout());
+        valueTextArea = new JTextArea();
         
         nameTextField = new JTextField();
         SwingHelper.setPreferredWidth(nameTextField, 330);
@@ -187,7 +193,6 @@ public class ConstantsDialogPanel extends JPanel {
                 valueList.setSelectedIndex(newIndex);
                 valueList.ensureIndexIsVisible(newIndex);
                 removeButton.setEnabled(true);
-                editButton.setEnabled(true);
             }
         });
         gbc = new GridBagConstraints();
@@ -199,11 +204,51 @@ public class ConstantsDialogPanel extends JPanel {
         listPanel.add(addButton, gbc);
         
         editButton = new JButton("Edit");
-        editButton.setEnabled(!listModel.isEmpty() && valueList.getSelectedIndex() != -1);
+        editButton.setEnabled(true);
         editButton.addActionListener(e -> {
-            int selectedIndex = valueList.getSelectedIndex();
-            if (selectedIndex != -1 && !((JSpinner.NumberEditor)newValueSpinner.getEditor()).getTextField().getText().isEmpty()) {
-                listModel.set(selectedIndex, (Integer) newValueSpinner.getValue());
+            if (!isParsingMode) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < listModel.size(); ++i) {
+                    sb.append(listModel.get(i)).append("\n");
+                }
+
+                valueTextArea.setText(sb.toString());
+                listScrollPane.setViewportView(valueTextArea);
+                editButton.setText("Parse");
+                addButton.setEnabled(false);
+                removeButton.setEnabled(false);
+                newValueSpinner.setEnabled(false);
+                valueList.setEnabled(false);
+                isParsingMode = true;
+            } else {
+                String[] lines = valueTextArea.getText().split("\\n");
+                List<Integer> newValues = new ArrayList<>();
+                for (String line : lines) {
+                    String trimmed = line.trim();
+                    if (trimmed.isEmpty()) continue;
+                    try {
+                        int val = Integer.parseInt(trimmed);
+                        if (val < 0) throw new NumberFormatException();
+                        newValues.add(val);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(container, "All lines must be valid non-negative integers.", "Parse Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+
+                listModel.clear();
+                for (int val : newValues) {
+                    listModel.addElement(val);
+                }
+                
+                listScrollPane.setViewportView(valueList);
+                editButton.setText("Edit");
+                newValueSpinner.setEnabled(true);
+                valueList.setEnabled(true);
+                boolean hasSelection = !listModel.isEmpty() && valueList.getSelectedIndex() != -1;
+                removeButton.setEnabled(hasSelection);
+                addButton.setEnabled(true);
+                isParsingMode = false;
             }
         });
         gbc = new GridBagConstraints();
@@ -218,9 +263,9 @@ public class ConstantsDialogPanel extends JPanel {
         removeButton.setEnabled(!listModel.isEmpty() && valueList.getSelectedIndex() != -1);
         
         valueList.addListSelectionListener(e -> {
+            if (isParsingMode) return;
             boolean hasSelection = !listModel.isEmpty() && valueList.getSelectedIndex() != -1;
             removeButton.setEnabled(hasSelection);
-            editButton.setEnabled(hasSelection);
             if (hasSelection && !e.getValueIsAdjusting()) {
                 newValueSpinner.setValue(listModel.get(valueList.getSelectedIndex()));
             }
@@ -236,7 +281,6 @@ public class ConstantsDialogPanel extends JPanel {
                     valueList.ensureIndexIsVisible(nextIndex);
                 } else {
                     removeButton.setEnabled(false);
-                    editButton.setEnabled(false);
                 }
             }
         });
