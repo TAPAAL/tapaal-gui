@@ -528,13 +528,14 @@ public class QueryPane extends JPanel implements SidePane {
 
 		try {
 			generateTempFilesForCombinations(multiConstants, originalValues, 0, new ArrayList<>(), selectedQueries);
-			if (!tempFiles.isEmpty()) {
-				BatchProcessingDialog.showBatchProcessingDialog(queryList);
-			}
 		} finally {
 			for (Constant c : multiConstants) {
 				c.setValues(originalValues.get(c));
 			}
+		}
+
+		if (!tempFiles.isEmpty()) {
+		    BatchProcessingDialog.showBatchProcessingDialog(queryList);
 		}
 	}
 
