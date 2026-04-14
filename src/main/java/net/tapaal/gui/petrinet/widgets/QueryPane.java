@@ -521,7 +521,7 @@ public class QueryPane extends JPanel implements SidePane {
 			return;
 		}
 
-		Map<Constant, Set<Integer>> originalValues = new HashMap<>();
+		Map<Constant, LinkedHashSet<Integer>> originalValues = new HashMap<>();
 		for (Constant c : multiConstants) {
 			originalValues.put(c, new LinkedHashSet<>(c.values()));
 		}
@@ -538,13 +538,15 @@ public class QueryPane extends JPanel implements SidePane {
 		}
 	}
 
-	private void generateTempFilesForCombinations(List<Constant> multiConstants, Map<Constant, Set<Integer>> originalValues, int index, List<Integer> currentCombination, List<TAPNQuery> selectedQueries) {
+	private void generateTempFilesForCombinations(List<Constant> multiConstants, Map<Constant, LinkedHashSet<Integer>> originalValues, int index, List<Integer> currentCombination, List<TAPNQuery> selectedQueries) {
 		if (index == multiConstants.size()) {
 			StringBuilder suffix = new StringBuilder(" [");
 			for (int i = 0; i < multiConstants.size(); ++i) {
 				Constant c = multiConstants.get(i);
 				int val = currentCombination.get(i);
-				c.setValues(Collections.singleton(val));
+				LinkedHashSet<Integer> singleVal = new LinkedHashSet<>();
+				singleVal.add(val);
+				c.setValues(singleVal);
 				suffix.append(c.name()).append("=").append(val);
 				if (i < multiConstants.size() - 1) suffix.append(", ");
 			}

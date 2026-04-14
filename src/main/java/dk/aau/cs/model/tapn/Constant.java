@@ -1,6 +1,6 @@
 package dk.aau.cs.model.tapn;
 
-import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.util.Require;
@@ -9,7 +9,7 @@ public class Constant {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	
 	private String name;
-	private Set<Integer> values;
+	private LinkedHashSet<Integer> values;
 	private int lowerBound;
 	private int upperBound;
 	private boolean isUsed;
@@ -24,7 +24,7 @@ public class Constant {
 		reset();
 	}
 
-    public Constant(String name, Set<Integer> values) {
+    public Constant(String name, LinkedHashSet<Integer> values) {
 		setName(name);
 		setValues(values);
 		setIsUsed(false);
@@ -74,10 +74,12 @@ public class Constant {
 	}
 
 	public void setValue(int value) {
-		setValues(Set.of(value));
+		var singleValue = new LinkedHashSet<Integer>();
+		singleValue.add(value);
+		setValues(singleValue);
 	}
 
-    public void setValues(Set<Integer> values) {
+    public void setValues(LinkedHashSet<Integer> values) {
         values.forEach(value -> Require.that(value >= 0, "Constant value(s) must be non-negative"));
         this.values = values;
     }
@@ -94,7 +96,7 @@ public class Constant {
         return values.iterator().next();
 	}
 
-    public Set<Integer> values() {
+    public LinkedHashSet<Integer> values() {
         if (values == null || values.isEmpty()) {
             throw new IllegalStateException("Constant has no values");
         }

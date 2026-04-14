@@ -243,7 +243,7 @@ public class TimedArcPetriNetNetwork {
 		constants.buildConstraints(this);
 	}
 
-	public Command addConstant(String name, Set<Integer> vals) {
+	public Command addConstant(String name, LinkedHashSet<Integer> vals) {
 		Command cmd = constants.addConstant(name, vals);
 		Constant constant = constants.getConstantByName(name);
 		fireConstantAdded(constant);

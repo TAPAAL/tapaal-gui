@@ -2,7 +2,10 @@ package dk.aau.cs.verification.batchProcessing;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.SwingWorker;
@@ -34,6 +37,7 @@ import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
+import dk.aau.cs.model.tapn.Constant;
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
 	private final List<File> files;
@@ -96,22 +100,83 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
             LoadedBatchProcessingModel model = loadModel(file);
             this.model = model;
             if (model != null) {
-                Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
-                for (net.tapaal.gui.petrinet.verification.TAPNQuery query : model.queries()) {
-                    if (exiting()) {
-                        return null;
+                List<Constant> multiConstants = new ArrayList<>();
+                for (Constant c : model.network().constants()) {
+                    if (c.values() != null && c.values().size() > 1) {
+                        multiConstants.add(c);
                     }
-                    if (isModelCheckOnly && filesProcessed.contains(file)) {
-                        continue;
-                    }
-
-                    processQuery(file, composedModel, query);
                 }
+
+                Map<Constant, LinkedHashSet<Integer>> originalValues = new HashMap<>();
+                for (Constant c : multiConstants) {
+                    originalValues.put(c, new LinkedHashSet<>(c.values()));
+                }
+
+                try {
+                    generateCombinationsAndProcess(file, model, multiConstants, originalValues, 0, new ArrayList<>());
+                } finally {
+                    for (Constant c : multiConstants) {
+                        c.setValues(originalValues.get(c));
+                    }
+                }
+                
+                if (exiting()) return null;
             }
         }
         fireFileChanged("");
         fireStatusChanged("");
         return null;
+    }
+
+    private void generateCombinationsAndProcess(File file, LoadedBatchProcessingModel model, List<Constant> multiConstants, Map<Constant, LinkedHashSet<Integer>> originalValues, int index, List<Integer> currentCombination) throws Exception {
+        if (exiting()) {
+            return;
+        }
+        if (index == multiConstants.size()) {
+            String suffix = "";
+            if (!multiConstants.isEmpty()) {
+                var suffixBuilder = new StringBuilder(" [");
+                for (int i = 0; i < multiConstants.size(); ++i) {
+                    Constant c = multiConstants.get(i);
+                    int val = currentCombination.get(i);
+                    var singleVal = new LinkedHashSet<Integer>();
+                    singleVal.add(val);
+                    c.setValues(singleVal);
+                    suffixBuilder.append(c.name()).append("=").append(val);
+                    if (i < multiConstants.size() - 1) suffixBuilder.append(", ");
+                }
+                
+                suffixBuilder.append("]");
+                suffix = suffixBuilder.toString();
+            }
+
+            var composedModel = composeModel(model);
+            for (var query : model.queries()) {
+                if (exiting()) {
+                    return;
+                }
+                if (isModelCheckOnly && filesProcessed.contains(file)) {
+                    continue;
+                }
+
+                var queryToProcess = query;
+                if (!suffix.isEmpty()) {
+                    queryToProcess = query.copy();
+                    queryToProcess.setName(query.getName() + suffix);
+                }
+                processQuery(file, composedModel, queryToProcess);
+            }
+
+            return;
+        }
+
+        Constant c = multiConstants.get(index);
+        var vals = originalValues.get(c);
+        for (int val : vals) {
+            currentCombination.add(val);
+            generateCombinationsAndProcess(file, model, multiConstants, originalValues, index + 1, currentCombination);
+            currentCombination.remove(currentCombination.size() - 1);
+        }
     }
 
 	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel,

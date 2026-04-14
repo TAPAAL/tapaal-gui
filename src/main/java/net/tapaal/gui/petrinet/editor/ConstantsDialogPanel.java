@@ -413,7 +413,7 @@ public class ConstantsDialogPanel extends JPanel {
             return;             
         } 
         
-        Set<Integer> vals = new LinkedHashSet<>();
+        LinkedHashSet<Integer> vals = new LinkedHashSet<>();
         if (globalCheckBox.isSelected()) {
             for (int i = 0; i < listModel.size(); ++i) {
                 vals.add(listModel.get(i));

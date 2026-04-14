@@ -601,7 +601,7 @@ public class BatchProcessingDialog extends JDialog {
 		timeoutValue.setMaximumSize(new Dimension(70, 30));
 		timeoutValue.setMinimumSize(new Dimension(70, 30));
 		timeoutValue.setPreferredSize(new Dimension(70, 30));
-		timeoutValue.setEnabled(true);
+		timeoutValue.setEnabled(false);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -612,7 +612,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		noTimeoutCheckbox = new JCheckBox("Do not use timeout");
 		noTimeoutCheckbox.setToolTipText(TOOL_TIP_NoTimeoutCheckBox);
-		noTimeoutCheckbox.setSelected(false);
+		noTimeoutCheckbox.setSelected(true);
 		noTimeoutCheckbox.addActionListener(e -> {
             if (noTimeoutCheckbox.isSelected()) {
                 timeoutValue.setEnabled(false);
@@ -644,7 +644,7 @@ public class BatchProcessingDialog extends JDialog {
 		oomValue.setMaximumSize(new Dimension(70, 30));
 		oomValue.setMinimumSize(new Dimension(70, 30));
 		oomValue.setPreferredSize(new Dimension(70, 30));
-		oomValue.setEnabled(true);
+		oomValue.setEnabled(false);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -655,7 +655,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		noOOMCheckbox = new JCheckBox("Do not limit memory usage");
 		noOOMCheckbox.setToolTipText(TOOL_TIP_NoOOMCheckBox);
-		noOOMCheckbox.setSelected(false);
+		noOOMCheckbox.setSelected(true);
 		noOOMCheckbox.addActionListener(e -> {
             if (noOOMCheckbox.isSelected()) {
                 oomValue.setEnabled(false);
@@ -686,6 +686,7 @@ public class BatchProcessingDialog extends JDialog {
         }
 
 		timeoutValue.setEnabled(useTimeout());
+		oomValue.setEnabled(useOOM());
 	}
 
 	private List<BatchProcessingVerificationOptions> getVerificationOptions() {

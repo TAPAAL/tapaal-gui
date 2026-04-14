@@ -8,6 +8,14 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
@@ -27,16 +35,10 @@ import dk.aau.cs.model.CPN.Expressions.Expression;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
+import dk.aau.cs.model.CPN.ProductType;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 import pipe.gui.TAPAALGUI;
-import java.util.Set;
-import java.util.HashSet;
-import dk.aau.cs.model.CPN.ProductType;
 
 public class ConstantsParser {
     private static final Map<String, Constant> constants = new LinkedHashMap<String, Constant>();
@@ -465,8 +467,8 @@ void constants() :
     |
         <LCURLY> intList(values, isInt) <RCURLY> {
             idExists(id.image);
-            Set<Integer> setVals = new HashSet<Integer>();
-            for(String s : values) {
+            LinkedHashSet<Integer> setVals = new LinkedHashSet<Integer>();
+            for (String s : values) {
                 setVals.add(Integer.parseInt(s));
             }
             constants.put(id.image, new Constant(id.image, setVals));

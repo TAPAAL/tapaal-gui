@@ -1073,10 +1073,11 @@ public class TapnXmlLoader {
 		String name = constantElement.getAttribute("name");
 		String valueAttr = constantElement.getAttribute("value");
 		if (valueAttr.contains(",")) {
-			Set<Integer> setVals = new HashSet<>();
+			LinkedHashSet<Integer> setVals = new LinkedHashSet<>();
 			for (String val : valueAttr.split(",")) {
 				setVals.add(Integer.parseInt(val.trim()));
 			}
+
 			return new Constant(name, setVals);
 		}
 
