@@ -373,6 +373,11 @@ public class ConstantsDialogPanel extends JPanel {
     }
 
     private void onOK() {
+        if (isParsingMode) {
+            editButton.doClick();
+            if (isParsingMode) return;
+        }
+
         if (globalCheckBox.isSelected() && listModel.isEmpty()){
             JOptionPane.showMessageDialog(
                     TAPAALGUI.getApp(),
