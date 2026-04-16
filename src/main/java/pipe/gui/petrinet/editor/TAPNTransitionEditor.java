@@ -475,17 +475,20 @@ public class TAPNTransitionEditor extends JPanel {
 	};
 	
 	private boolean isUrgencyOK(){
-		if(!transition.hasUntimedPreset()){
+		if (!transition.hasUntimedPreset()) {
 			JOptionPane.showMessageDialog(transitionEditorPanel, untimed_preset_warning, "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		
-		for(TransportArc arc : transition.underlyingTransition().getTransportArcsGoingThrough()){
-			if(arc.destination().invariant().upperBound() != Bound.Infinity){
+		for (TransportArc arc : transition.underlyingTransition().getTransportArcsGoingThrough()){
+            var destination = arc.destination();
+            var hasCtiInvariant = destination.getCtiList().stream().anyMatch(cti -> cti.upperBound() != Bound.Infinity);
+			if (hasCtiInvariant || destination.invariant().upperBound() != Bound.Infinity){
 				JOptionPane.showMessageDialog(transitionEditorPanel, transport_destination_invariant_warning, "Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 		}
+        
 		return true;
 	}
 
