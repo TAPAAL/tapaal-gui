@@ -455,7 +455,6 @@ void constants() :
 {
     Token id, value;
     List<String> values = new ArrayList<String>();
-    BoolRef isInt = new BoolRef(false);
 }
 {
     <CONST> id = <ID> <EQ> 
@@ -465,7 +464,7 @@ void constants() :
             constants.put(id.image, new Constant(id.image, Integer.parseInt(value.image)));
         }
     |
-        <LCURLY> intList(values, isInt) <RCURLY> {
+        <LCURLY> intSet(values) <RCURLY> {
             idExists(id.image);
             LinkedHashSet<Integer> setVals = new LinkedHashSet<Integer>();
             for (String s : values) {
@@ -551,6 +550,15 @@ void idList(List<String> values) :
 {
     id = <ID> { values.add(id.image); } 
     (<COMMA> id = <ID> { values.add(id.image); })*
+}
+
+void intSet(List<String> values) :
+{
+    Token val;
+}
+{
+    val = <INTEGER> { values.add(val.image); } 
+    (<COMMA> val = <INTEGER> { values.add(val.image); })*
 }
 
 void intList(List<String> values, BoolRef isIntList) :
