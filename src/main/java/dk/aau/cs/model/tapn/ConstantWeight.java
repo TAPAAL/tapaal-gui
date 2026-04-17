@@ -1,5 +1,7 @@
 package dk.aau.cs.model.tapn;
 
+import java.util.stream.Collectors;
+
 import dk.aau.cs.util.Require;
 
 public class ConstantWeight extends Weight{
@@ -33,21 +35,20 @@ public class ConstantWeight extends Weight{
 	}
 	
 	public String toString(boolean displayConstantNames) {
-		if(displayConstantNames){
+		if (displayConstantNames) {
 			return constant.name() + " x";
-		} else if(constant.value() > 1){
-			return constant.value() + "x";
-		} else {
-			return "";
+		} else if(constant.hasMultipleValues() || constant.value() > 1){
+			return (constant.hasMultipleValues() ? constant.values().toString() : constant.value()) + "x";
 		}
+
+        return "";
 	}
 	
-	public String nameForSaving(boolean writeConstantNames){
-		if(writeConstantNames){
+	public String nameForSaving(boolean writeConstantNames) {
+		if (writeConstantNames) {
 			return constant.name();
-		} else {
-			return Integer.toString(constant.value());
 		}
-		
+
+        return constant.hasMultipleValues() ? constant.values().stream().map(String::valueOf).collect(Collectors.joining(",")) : Integer.toString(constant.value());
 	}
 }

@@ -8,6 +8,14 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
@@ -27,16 +35,10 @@ import dk.aau.cs.model.CPN.Expressions.Expression;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
+import dk.aau.cs.model.CPN.ProductType;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 import pipe.gui.TAPAALGUI;
-import java.util.Set;
-import java.util.HashSet;
-import dk.aau.cs.model.CPN.ProductType;
 
 public class ConstantsParser {
     private static final Map<String, Constant> constants = new LinkedHashMap<String, Constant>();
@@ -400,6 +402,10 @@ TOKEN :
     |
     <EBRACKET: "]">
     |
+    <LCURLY: "{">
+    |
+    <RCURLY: "}">
+    |
     <LT: "<">
     |
     <GT: ">">
@@ -448,12 +454,25 @@ void values() :
 void constants() :
 {
     Token id, value;
+    List<String> values = new ArrayList<String>();
 }
 {
-    <CONST> id = <ID> <EQ> value = <INTEGER> { 
-        idExists(id.image);
-        constants.put(id.image, new Constant(id.image, Integer.parseInt(value.image)));
-    }
+    <CONST> id = <ID> <EQ> 
+    (
+        value = <INTEGER> { 
+            idExists(id.image);
+            constants.put(id.image, new Constant(id.image, Integer.parseInt(value.image)));
+        }
+    |
+        <LCURLY> intSet(values) <RCURLY> {
+            idExists(id.image);
+            LinkedHashSet<Integer> setVals = new LinkedHashSet<Integer>();
+            for (String s : values) {
+                setVals.add(Integer.parseInt(s));
+            }
+            constants.put(id.image, new Constant(id.image, setVals));
+        }
+    )
 }
 
 void colorTypes() :
@@ -531,6 +550,15 @@ void idList(List<String> values) :
 {
     id = <ID> { values.add(id.image); } 
     (<COMMA> id = <ID> { values.add(id.image); })*
+}
+
+void intSet(List<String> values) :
+{
+    Token val;
+}
+{
+    val = <INTEGER> { values.add(val.image); } 
+    (<COMMA> val = <INTEGER> { values.add(val.image); })*
 }
 
 void intList(List<String> values, BoolRef isIntList) :

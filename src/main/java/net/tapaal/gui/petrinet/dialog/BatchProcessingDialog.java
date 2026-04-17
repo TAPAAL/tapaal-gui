@@ -271,7 +271,9 @@ public class BatchProcessingDialog extends JDialog {
 	
 	private void setFileListToTempFile() {
 		if (!(isQueryListEmpty())) {
-			files.add(QueryPane.getTemporaryFile());
+			for (File f : QueryPane.getTemporaryFiles()) {
+				files.add(f);
+			}
 		}
 	}
 	
@@ -599,7 +601,7 @@ public class BatchProcessingDialog extends JDialog {
 		timeoutValue.setMaximumSize(new Dimension(70, 30));
 		timeoutValue.setMinimumSize(new Dimension(70, 30));
 		timeoutValue.setPreferredSize(new Dimension(70, 30));
-		timeoutValue.setEnabled(true);
+		timeoutValue.setEnabled(false);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -610,7 +612,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		noTimeoutCheckbox = new JCheckBox("Do not use timeout");
 		noTimeoutCheckbox.setToolTipText(TOOL_TIP_NoTimeoutCheckBox);
-		noTimeoutCheckbox.setSelected(false);
+		noTimeoutCheckbox.setSelected(true);
 		noTimeoutCheckbox.addActionListener(e -> {
             if (noTimeoutCheckbox.isSelected()) {
                 timeoutValue.setEnabled(false);
@@ -642,7 +644,7 @@ public class BatchProcessingDialog extends JDialog {
 		oomValue.setMaximumSize(new Dimension(70, 30));
 		oomValue.setMinimumSize(new Dimension(70, 30));
 		oomValue.setPreferredSize(new Dimension(70, 30));
-		oomValue.setEnabled(true);
+		oomValue.setEnabled(false);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -653,7 +655,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		noOOMCheckbox = new JCheckBox("Do not limit memory usage");
 		noOOMCheckbox.setToolTipText(TOOL_TIP_NoOOMCheckBox);
-		noOOMCheckbox.setSelected(false);
+		noOOMCheckbox.setSelected(true);
 		noOOMCheckbox.addActionListener(e -> {
             if (noOOMCheckbox.isSelected()) {
                 oomValue.setEnabled(false);
@@ -684,6 +686,7 @@ public class BatchProcessingDialog extends JDialog {
         }
 
 		timeoutValue.setEnabled(useTimeout());
+		oomValue.setEnabled(useOOM());
 	}
 
 	private List<BatchProcessingVerificationOptions> getVerificationOptions() {
@@ -805,12 +808,13 @@ public class BatchProcessingDialog extends JDialog {
             public void mousePressed(MouseEvent mouseEvent) {
                 JTable source =(JTable) mouseEvent.getSource();
                 Point point = mouseEvent.getPoint();
-                int row = source.rowAtPoint(point);
-                if (mouseEvent.getClickCount() == 2 && source.getSelectedRow() != -1) {
-                    String rawOutput = tableModel.getResult(row).getRawOutput();
-                    if (rawOutput != null && !rawOutput.equals("")) {
+				int viewRow = source.rowAtPoint(point);
+				if (mouseEvent.getClickCount() == 2 && viewRow != -1) {
+					int modelRow = source.convertRowIndexToModel(viewRow);
+					String rawOutput = tableModel.getResult(modelRow).getRawOutput();
+					if (rawOutput != null && !rawOutput.equals("")) {
                         final JPanel panel = new JPanel(new GridBagLayout());
-                        JOptionPane.showMessageDialog(panel, createRawQueryPanel(tableModel.getResult(row).getRawOutput()), "Raw results", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(panel, createRawQueryPanel(rawOutput), "Raw results", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
             }
@@ -1302,9 +1306,11 @@ public class BatchProcessingDialog extends JDialog {
                     Point mousePos = table.getMousePosition();
                     BatchProcessingVerificationResult result = null;
                     if (mousePos != null) {
-                        result = ((BatchProcessingResultsTableModel) table
-                            .getModel()).getResult(table
-                            .rowAtPoint(mousePos));
+						int viewRow = table.rowAtPoint(mousePos);
+						if (viewRow != -1) {
+							int modelRow = table.convertRowIndexToModel(viewRow);
+							result = ((BatchProcessingResultsTableModel) table.getModel()).getResult(modelRow);
+						}
                     }
 
                     if (table.getColumnName(column).equals("Verification Time"))

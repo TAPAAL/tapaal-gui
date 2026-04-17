@@ -10,7 +10,12 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -31,11 +36,11 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.Verifier;
-import net.tapaal.gui.petrinet.undo.AddQueryCommand;
 import net.tapaal.gui.petrinet.undo.RemoveQueriesCommand;
 import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.petrinet.dialog.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.dialog.BatchProcessingDialog;
@@ -67,7 +72,7 @@ public class QueryPane extends JPanel implements SidePane {
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;
-	private static File tempFile;
+	private static List<File> tempFiles = new ArrayList<>();
 
 	private static final String toolTipNewQuery = "Create a new query";
 	private static final String toolTipEditQuery="Edit the selected query";
@@ -457,9 +462,10 @@ public class QueryPane extends JPanel implements SidePane {
 
 	}
 
-	private void verifyQuery() {
-		TAPNQuery query = queryList.getSelectedValue();
-		int NumberOfSelectedElements = queryList.getSelectedIndices().length;
+	public void verifyQueries(List<TAPNQuery> queries) {
+		if (queries.isEmpty()) return;
+		TAPNQuery query = queries.get(0);
+		int NumberOfSelectedElements = queries.size();
 		
 		boolean isSmc = query.getCategory() == QueryCategory.SMC;
 
@@ -468,39 +474,117 @@ public class QueryPane extends JPanel implements SidePane {
 			return;
 		}
 
-		if (NumberOfSelectedElements == 1) {
+		boolean hasMultipleConstants = false;
+		for (Constant c : tabContent.network().constants()) {
+			if (c.values() != null && c.values().size() > 1) {
+				hasMultipleConstants = true;
+				break;
+			}
+		}
+
+		if (NumberOfSelectedElements == 1 && !hasMultipleConstants) {
 			if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN)
 				Verifier.runVerifyTAPNVerification(tabContent.network(), query, null, tabContent.getGuiModels(), false, tabContent.lens);
 			else
 				Verifier.runUppaalVerification(tabContent.network(), query);
-		} else if (NumberOfSelectedElements > 1) {
-			saveNetAndRunBatchProcessing();
+		} else if (NumberOfSelectedElements > 1 || hasMultipleConstants) {
+			saveNetAndRunBatchProcessing(queries);
 		}
 	}
-	
-	private void saveNetAndRunBatchProcessing() {
-        List<TAPNQuery> selectedQueries = queryList.getSelectedValuesList();
-        //Saves the net in a temporary file which is used in batchProcessing File is deleted on exit
-		try {
-			tempFile = File.createTempFile(tabContent.getTabTitle(), ".xml");
 
-            tabContent.writeNetToFile(tempFile, selectedQueries, tabContent.getLens());
-			//XXX is it not an error that the tempFile is not passed down to the batchProcessing?
-            // I would think it runs the query on the unsaved net -- kyrke 2022-02-21
-            BatchProcessingDialog.showBatchProcessingDialog(queryList);
-			tempFile.deleteOnExit();
-			if (tempFile == null) {
-				throw new IOException();
+	private void verifyQuery() {
+		List<TAPNQuery> selectedQueries = queryList.getSelectedValuesList();
+		verifyQueries(selectedQueries);
+	}
+
+	private void saveNetAndRunBatchProcessing(List<TAPNQuery> selectedQueries) {
+		tempFiles.clear();
+
+		List<Constant> multiConstants = new ArrayList<>();
+		for (Constant c : tabContent.network().constants()) {
+			if (c.values() != null && c.values().size() > 1) {
+				multiConstants.add(c);
 			}
-		} catch(IOException e) {
-			messenger.displayErrorMessage("Creation of temporary file needed for verification failed.");
+		}
+
+		if (multiConstants.isEmpty()) {
+			try {
+				File tf = File.createTempFile(tabContent.getTabTitle(), ".xml");
+				tabContent.writeNetToFile(tf, selectedQueries, tabContent.getLens());
+				tf.deleteOnExit();
+				tempFiles.add(tf);
+				BatchProcessingDialog.showBatchProcessingDialog(queryList);
+			} catch (IOException e) {
+				messenger.displayErrorMessage("Creation of temporary file needed for verification failed.");
+			}
+
+			return;
+		}
+
+		Map<Constant, LinkedHashSet<Integer>> originalValues = new HashMap<>();
+		for (Constant c : multiConstants) {
+			originalValues.put(c, new LinkedHashSet<>(c.values()));
+		}
+
+		try {
+			generateTempFilesForCombinations(multiConstants, originalValues, 0, new ArrayList<>(), selectedQueries);
+		} finally {
+			for (Constant c : multiConstants) {
+				c.setValues(originalValues.get(c));
+			}
+		}
+
+		if (!tempFiles.isEmpty()) {
+		    BatchProcessingDialog.showBatchProcessingDialog(queryList);
 		}
 	}
 
-    public static File getTemporaryFile() {
-		return tempFile;
+	private void generateTempFilesForCombinations(List<Constant> multiConstants, Map<Constant, LinkedHashSet<Integer>> originalValues, int index, List<Integer> currentCombination, List<TAPNQuery> selectedQueries) {
+		if (index == multiConstants.size()) {
+			StringBuilder suffix = new StringBuilder(" [");
+			for (int i = 0; i < multiConstants.size(); ++i) {
+				Constant c = multiConstants.get(i);
+				int val = currentCombination.get(i);
+				LinkedHashSet<Integer> singleVal = new LinkedHashSet<>();
+				singleVal.add(val);
+				c.setValues(singleVal);
+				suffix.append(c.name()).append("=").append(val);
+				if (i < multiConstants.size() - 1) suffix.append(", ");
+			}
+			suffix.append("]");
+
+			List<TAPNQuery> queryCopies = new ArrayList<>();
+			for (TAPNQuery q : selectedQueries) {
+				TAPNQuery qCopy = q.copy();
+				qCopy.setName(q.getName() + suffix.toString());
+				queryCopies.add(qCopy);
+			}
+
+			try {
+				File tf = File.createTempFile(tabContent.getTabTitle(), ".xml");
+				tf.deleteOnExit();
+				tabContent.writeNetToFile(tf, queryCopies, tabContent.getLens());
+				tempFiles.add(tf);
+			} catch (IOException e) {
+				messenger.displayErrorMessage("Creation of temporary file needed for verification failed.");
+			}
+
+			return;
+		}
+
+		Constant c = multiConstants.get(index);
+		Set<Integer> vals = originalValues.get(c);
+		for (int val : vals) {
+			currentCombination.add(val);
+			generateTempFilesForCombinations(multiConstants, originalValues, index + 1, currentCombination, selectedQueries);
+			currentCombination.remove(currentCombination.size() - 1);
+		}
 	}
-	
+
+	public static Iterable<File> getTemporaryFiles() {
+		return tempFiles;
+	}
+
 	public boolean isQueryPossible() {
 		return (queryList.getModel().getSize() > 0 );
 	}
