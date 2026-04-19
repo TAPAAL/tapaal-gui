@@ -51,4 +51,12 @@ public class ConstantWeight extends Weight{
 
         return constant.hasMultipleValues() ? constant.values().stream().map(String::valueOf).collect(Collectors.joining(",")) : Integer.toString(constant.value());
 	}
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ConstantWeight)) return false;
+        ConstantWeight other = (ConstantWeight)obj;
+        return constant.equals(other.constant);
+    }
 }
