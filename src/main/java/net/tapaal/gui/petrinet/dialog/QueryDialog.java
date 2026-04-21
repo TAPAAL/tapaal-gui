@@ -272,6 +272,12 @@ public class QueryDialog extends JPanel {
     private JButton disjunctionButton;
     private JButton negationButton;
 
+    private JPanel arithmeticButtonPanel;
+    private ButtonGroup arithmeticButtonGroup;
+    private JButton addButton;
+    private JButton subtractButton;
+    private JButton multiplyButton;
+
     private JPanel editingButtonPanel;
     private ButtonGroup editingButtonsGroup;
     private JButton deleteButton;
@@ -508,6 +514,11 @@ public class QueryDialog extends JPanel {
 	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently selected part of the query with a conjunction.";
 	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";
 	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently selected part of the query.";
+
+    //Tool tips for arithmetic panel
+    private static final String TOOL_TIP_ADDBUTTON = "Add token count of two places";
+    private static final String TOOL_TIP_SUBTRACTBUTTON = "Subtract token count of two places";
+    private static final String TOOL_TIP_MULTIPLYBUTTON = "Multiply token count of two places";
 
     //Tool tips for query panel
     private static final String TOOL_TIP_PLACESBOX = "Choose a place for the predicate.";
@@ -1105,7 +1116,7 @@ public class QueryDialog extends JPanel {
         // 2 Add query editor
         QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels, lens, tab);
 
-        guiDialog.setResizable(false);
+        guiDialog.setResizable(true);
 
         // setResizable seems to be platform dependent so use scrolling as a fallback
         JScrollPane scrollPane = new JScrollPane(queryDialogue);
@@ -1632,6 +1643,11 @@ public class QueryDialog extends JPanel {
         conjunctionButton.setEnabled(false);
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
+
+        addButton.setEnabled(false);
+        subtractButton.setEnabled(false);
+        multiplyButton.setEnabled(false);
+
         searchBar.setEnabled(false);
         templateBox.setEnabled(false);
         placeTransitionBox.setEnabled(false);
@@ -1655,6 +1671,9 @@ public class QueryDialog extends JPanel {
         conjunctionButton.setEnabled(false);
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
+        addButton.setEnabled(false);
+        subtractButton.setEnabled(false);
+        multiplyButton.setEnabled(false);
         searchBar.setEnabled(false);
         templateBox.setEnabled(false);
         placeTransitionBox.setEnabled(false);
@@ -1681,6 +1700,9 @@ public class QueryDialog extends JPanel {
         conjunctionButton.setEnabled(false);
         disjunctionButton.setEnabled(false);
         negationButton.setEnabled(false);
+        addButton.setEnabled(false);
+        subtractButton.setEnabled(false);
+        multiplyButton.setEnabled(false);
         searchBar.setEnabled(false);
         templateBox.setEnabled(false);
         placeTransitionBox.setEnabled(false);
@@ -3511,15 +3533,49 @@ public class QueryDialog extends JPanel {
         initQueryField();
         initQuantificationPanel();
         initLogicPanel();
+        initArithmeticPanel();
         initPredicationConstructionPanel();
         initQueryEditingPanel();
 
+        JPanel mainRowPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints rowGbc = new GridBagConstraints();
+        rowGbc.gridy = 0;
+        rowGbc.weighty = 1.0;
+        rowGbc.fill = GridBagConstraints.BOTH;
+
+        rowGbc.gridx = 0;
+        rowGbc.weightx = 1.0;
+        mainRowPanel.add(quantificationPanel, rowGbc);
+
+        rowGbc.gridx = 1;
+        mainRowPanel.add(logicButtonPanel, rowGbc);
+
+        rowGbc.gridx = 2;
+        mainRowPanel.add(arithmeticButtonPanel, rowGbc);
+
+        rowGbc.gridx = 3;
+        mainRowPanel.add(predicatePanel, rowGbc);
+
+        rowGbc.gridx = 4;
+        mainRowPanel.add(editingButtonPanel, rowGbc);
+
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        queryPanel.add(mainRowPanel, gbc);
+
+        gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.insets = new Insets(5,10,5,10);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
         add(queryPanel, gbc);
     }
 
@@ -3638,7 +3694,9 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridwidth = 4;
+        gbc.gridwidth = 5;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
         queryPanel.add(queryScrollPane, gbc);
     }
 
@@ -3744,13 +3802,6 @@ public class QueryDialog extends JPanel {
         addTraceButton.setPreferredSize(new Dimension(78, 27));
         quantificationPanel.add(addTraceButton, gbc);
 
-        // Add quantification panel to query panel
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.VERTICAL;
-        queryPanel.add(quantificationPanel, gbc);
 
         if (lens.isTimed()|| lens.isGame()) {
             addTimedQuantificationListeners();
@@ -4118,11 +4169,6 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 2;
         logicButtonPanel.add(negationButton, gbc);
 
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.VERTICAL;
-        queryPanel.add(logicButtonPanel, gbc);
 
         // Add Action listener for logic buttons
         conjunctionButton.addActionListener(evt -> {
@@ -4210,6 +4256,49 @@ public class QueryDialog extends JPanel {
                 TCTLNotNode property = new TCTLNotNode(root);
                 addPropertyToQuery(property);
             }
+        });
+    }
+
+    private void initArithmeticPanel() {
+        arithmeticButtonPanel = new JPanel(new GridBagLayout());
+        arithmeticButtonPanel.setBorder(BorderFactory.createTitledBorder("Arithmetic"));
+
+        arithmeticButtonGroup = new ButtonGroup();
+        addButton = new JButton("+");
+        subtractButton = new JButton("-");
+        multiplyButton = new JButton("*");
+
+        addButton.setToolTipText(TOOL_TIP_ADDBUTTON);
+        subtractButton.setToolTipText(TOOL_TIP_SUBTRACTBUTTON);
+        multiplyButton.setToolTipText(TOOL_TIP_MULTIPLYBUTTON);
+
+        arithmeticButtonGroup.add(addButton);
+        arithmeticButtonGroup.add(subtractButton);
+        arithmeticButtonGroup.add(multiplyButton);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        arithmeticButtonPanel.add(addButton, gbc);
+
+        gbc.gridy = 1;
+        arithmeticButtonPanel.add(subtractButton, gbc);
+
+        gbc.gridy = 2;
+        arithmeticButtonPanel.add(multiplyButton, gbc);
+
+        addButton.addActionListener(e -> {
+           //TODO: implement
+        });
+
+        subtractButton.addActionListener(e -> {
+            //TODO: implement
+        });
+
+        multiplyButton.addActionListener(e -> {
+            //TODO: implement
         });
     }
 
@@ -4966,11 +5055,6 @@ public class QueryDialog extends JPanel {
         ++gbc.gridy;
         predicatePanel.add(deadLockPredicateButton, gbc);
 
-        gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.VERTICAL;
-        queryPanel.add(predicatePanel, gbc);
 
         //Add tool tips for predicate panel
         placeTransitionBox.setToolTipText(TOOL_TIP_PLACESBOX);
@@ -5211,13 +5295,6 @@ public class QueryDialog extends JPanel {
                 changeToEditMode();
             }
         });
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 3;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.WEST;
-        queryPanel.add(editingButtonPanel, gbc);
     }
 
     private void checkTraceNamesForManuallyParsedQuery(TCTLAbstractProperty newQuery) {
