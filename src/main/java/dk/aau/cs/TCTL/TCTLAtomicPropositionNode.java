@@ -33,11 +33,28 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	}
 
 	public TCTLAtomicPropositionNode(TCTLAbstractStateProperty left, String op, TCTLAbstractStateProperty right) {
-		this.left = left;
-		this.op = op;
-		this.right = right;
-	}
+        this.left = left;
+        this.op = op;
+        this.right = right;
+        
+        if (this.left != null) this.left.setParent(this);
+        if (this.right != null) this.right.setParent(this);
+    }
 	
+    @Override
+    public StringPosition[] getChildren() {
+        int leftLength = left.toString().length();
+        int opLength = op.length();
+        
+        int rightStart = leftLength + 1 + opLength + 1;
+        
+        StringPosition[] children = new StringPosition[2];
+        children[0] = new StringPosition(0, leftLength, left);
+        children[1] = new StringPosition(rightStart, rightStart + right.toString().length(), right);
+        
+        return children;
+    }
+
 	@Override
 	public TCTLAbstractStateProperty copy() {
 		return new TCTLAtomicPropositionNode(left.copy(), op, right.copy());
@@ -55,17 +72,27 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 		return false;
 	}
 
-	@Override
-	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1,
-			TCTLAbstractProperty object2) {
-		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
-			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty) object2;
-			obj2.setParent(parent);
-			return obj2;
-		} else {
-			return this;
-		}
-	}
+    @Override
+    public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1,
+            TCTLAbstractProperty object2) {
+        if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
+            TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty)object2;
+            obj2.setParent(parent);
+            return obj2;
+        } else {
+            if (left != null) {
+                left = (TCTLAbstractStateProperty)left.replace(object1, object2);
+                left.setParent(this);
+            }
+
+            if (right != null) {
+                right = (TCTLAbstractStateProperty)right.replace(object1, object2);
+                right.setParent(this);
+            }
+
+            return this;
+        }
+    }
 
     @Override
     public void convertForReducedNet(String templateName) {

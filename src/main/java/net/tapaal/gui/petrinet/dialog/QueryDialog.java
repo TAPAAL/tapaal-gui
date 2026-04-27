@@ -1,6 +1,7 @@
 package net.tapaal.gui.petrinet.dialog;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
@@ -32,8 +33,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -439,6 +442,12 @@ public class QueryDialog extends JPanel {
     private final TAPNLens lens;
     private final PetriNetTab tab;
 
+    JSeparator verticalSeparator;
+
+    private enum OperatorContextMode {
+        LOGIC, ARITHMETIC
+    }
+
 	private static final String name_verifyTAPN = "TAPAAL: Continuous Engine (verifytapn)";
 	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimized Standard Reduction";
@@ -479,6 +488,9 @@ public class QueryDialog extends JPanel {
     private boolean isExistsPath = false;
     private boolean updateTraceBox = true;
     private boolean updateTraceBoxQuantification = true;
+
+    private CardLayout contextCardLayout;
+    private JPanel contextCardPanel;
 
     //Strings for tool tips
     //Tool tips for top panel
@@ -1230,30 +1242,103 @@ public class QueryDialog extends JPanel {
         if (current instanceof TCTLStateToPathConverter && !lens.isTimed()) {
             current = ((TCTLStateToPathConverter) current).getProperty();
         }
+
+        if (isInsideArithmetic(current)) {
+            disableAllQueryButtons();
+            contextCardLayout.show(contextCardPanel, OperatorContextMode.ARITHMETIC.name());
+            
+            predicatePanel.setBorder(BorderFactory.createTitledBorder("Arithmetic Term"));
+            
+            relationalOperatorBox.setVisible(false);
+            addPredicateButton.setVisible(false);
+            truePredicateButton.setVisible(false);
+            falsePredicateButton.setVisible(false);
+            deadLockPredicateButton.setVisible(false);
+            verticalSeparator.setVisible(false); 
+
+            addButton.setEnabled(true);
+            subtractButton.setEnabled(true);
+            multiplyButton.setEnabled(true);
+            
+            boolean isLeaf = current instanceof TCTLPlaceNode || current instanceof TCTLConstNode || current instanceof TCTLStatePlaceHolder;
+            templateBox.setEnabled(isLeaf);
+            placeTransitionBox.setEnabled(isLeaf);
+            placeMarking.setEnabled(isLeaf);
+            searchBar.setEnabled(isLeaf);
+
+            updatePredicatesAccordingToSelection(current);
+            guiDialog.pack();
+            return;
+        }
+
+        contextCardLayout.show(contextCardPanel, OperatorContextMode.LOGIC.name());
+        predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
+        relationalOperatorBox.setVisible(true);
+        addPredicateButton.setVisible(true);
+        truePredicateButton.setVisible(true);
+        falsePredicateButton.setVisible(true);
+        deadLockPredicateButton.setVisible(true);
+        verticalSeparator.setVisible(true);
+
+        addButton.setEnabled(false);
+        subtractButton.setEnabled(false);
+        multiplyButton.setEnabled(false);
+
         updatePredicatesAccordingToSelection(current);
         if (!lens.isTimed()) {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
 
-        if (lens.isGame() && 
-            newProperty instanceof TCTLAbstractPathProperty && 
-            !(newProperty instanceof TCTLPathPlaceHolder)) {
-                enableOnlyStateButtons();
+        guiDialog.pack();
+    }
+
+    private boolean isInsideArithmetic(TCTLAbstractProperty target) {
+        if (target == null) return false;
+        Deque<TCTLAbstractProperty> nodes = new ArrayDeque<>();
+        Deque<Boolean> states = new ArrayDeque<>();
+        nodes.push(newProperty);
+        states.push(false);
+        while (!nodes.isEmpty()) {
+            TCTLAbstractProperty node = nodes.pop();
+            boolean inside = states.pop();
+            if (node == target) return inside;
+            inside |= node instanceof TCTLAtomicPropositionNode;
+            for (StringPosition sp : node.getChildren()) {
+                nodes.push(sp.getObject());
+                states.push(inside);
+            }
         }
 
-        if ((lens.isGame() || lens.isTimed() || queryType.getSelectedIndex() != 0) &&
-             (current instanceof TCTLAbstractPathProperty || newProperty instanceof TCTLPathPlaceHolder)) {
-            boolean enableBooleanOperators = !(current instanceof LTLANode || current instanceof LTLENode) && queryType.getSelectedIndex() != 0 && isValidLTL();
+        return false;
+    }
 
-            disjunctionButton.setEnabled(enableBooleanOperators);
-            conjunctionButton.setEnabled(enableBooleanOperators);
-            negationButton.setEnabled(enableBooleanOperators); 
-        } else if (queryType.getSelectedIndex() == 0) {
-            disjunctionButton.setEnabled(true);
-            conjunctionButton.setEnabled(true);
-            negationButton.setEnabled(true);
+    private void updateSelectedLeafToPlace() {
+        if (currentSelection == null) return;
+        Object item = templateBox.getSelectedItem();
+        String template = (item == null || item.equals(SHARED)) ? "" : item.toString();
+        String place = (String) placeTransitionBox.getSelectedItem();
+        
+        if (place != null) {
+            replaceCurrentSelectionWith(new TCTLPlaceNode(template, place));
         }
-	}
+    }
+
+    private void updateSelectedLeafToConstant() {
+        if (currentSelection == null) return;
+        int value = (Integer) placeMarking.getValue();
+        replaceCurrentSelectionWith(new TCTLConstNode(value));
+    }
+
+    private void replaceCurrentSelectionWith(TCTLAbstractProperty replacement) {
+        TCTLAbstractProperty oldProp = currentSelection.getObject();
+        if (!oldProp.equals(replacement)) {
+            UndoableEdit edit = new QueryConstructionEdit(oldProp, replacement);
+            newProperty = newProperty.replace(oldProp, replacement);
+            updateSelection(replacement);
+            undoSupport.postEdit(edit);
+            queryChanged();
+        }
+    }
 
 	private void updateSelectionPlaceNode(TCTLPlaceNode node) {
         if (node == null) return;
@@ -3537,6 +3622,11 @@ public class QueryDialog extends JPanel {
         initPredicationConstructionPanel();
         initQueryEditingPanel();
 
+        contextCardLayout = new CardLayout();
+        contextCardPanel = new JPanel(contextCardLayout);
+        contextCardPanel.add(logicButtonPanel, OperatorContextMode.LOGIC.name());
+        contextCardPanel.add(arithmeticButtonPanel, OperatorContextMode.ARITHMETIC.name());
+
         JPanel mainRowPanel = new JPanel(new GridBagLayout());
         GridBagConstraints rowGbc = new GridBagConstraints();
         rowGbc.gridy = 0;
@@ -3548,15 +3638,12 @@ public class QueryDialog extends JPanel {
         mainRowPanel.add(quantificationPanel, rowGbc);
 
         rowGbc.gridx = 1;
-        mainRowPanel.add(logicButtonPanel, rowGbc);
+        mainRowPanel.add(contextCardPanel, rowGbc);
 
         rowGbc.gridx = 2;
-        mainRowPanel.add(arithmeticButtonPanel, rowGbc);
-
-        rowGbc.gridx = 3;
         mainRowPanel.add(predicatePanel, rowGbc);
 
-        rowGbc.gridx = 4;
+        rowGbc.gridx = 3;
         mainRowPanel.add(editingButtonPanel, rowGbc);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -4290,15 +4377,27 @@ public class QueryDialog extends JPanel {
         arithmeticButtonPanel.add(multiplyButton, gbc);
 
         addButton.addActionListener(e -> {
-           //TODO: implement
+            if (currentSelection != null && currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+                TCTLAbstractStateProperty prop = getStateProperty(currentSelection.getObject());
+                addPropertyToQuery(new TCTLAtomicPropositionNode(prop, "+", ph));
+            }
         });
 
         subtractButton.addActionListener(e -> {
-            //TODO: implement
+            if (currentSelection != null && currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+                TCTLAbstractStateProperty prop = getStateProperty(currentSelection.getObject());
+                addPropertyToQuery(new TCTLAtomicPropositionNode(prop, "-", ph));
+            }
         });
 
         multiplyButton.addActionListener(e -> {
-            //TODO: implement
+            if (currentSelection != null && currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+                TCTLAbstractStateProperty prop = getStateProperty(currentSelection.getObject());
+                addPropertyToQuery(new TCTLAtomicPropositionNode(prop, "*", ph));
+            }
         });
     }
 
@@ -4879,7 +4978,14 @@ public class QueryDialog extends JPanel {
                         currentlySelected = tapn;
                         setEnablednessOfAddPredicateButton();
                         if (userChangedAtomicPropSelection && placeNames.size() > 0) {
-                            updateQueryOnAtomicPropositionChange();
+                            TCTLAbstractProperty current = currentSelection != null ? currentSelection.getObject() : null;
+                            boolean isLeaf = current instanceof TCTLPlaceNode || current instanceof TCTLConstNode || current instanceof TCTLStatePlaceHolder;
+                            
+                            if (isInsideArithmetic(current) && isLeaf) {
+                                updateSelectedLeafToPlace();
+                            } else {
+                                updateQueryOnAtomicPropositionChange();
+                            }
                         }
                     }
                 }else{
@@ -4898,7 +5004,14 @@ public class QueryDialog extends JPanel {
                     currentlySelected = SHARED;
                     setEnablednessOfAddPredicateButton();
                     if (userChangedAtomicPropSelection && placeNames.size() > 0) {
-                        updateQueryOnAtomicPropositionChange();
+                        TCTLAbstractProperty current = currentSelection != null ? currentSelection.getObject() : null;
+                        boolean isLeaf = current instanceof TCTLPlaceNode || current instanceof TCTLConstNode || current instanceof TCTLStatePlaceHolder;
+                        
+                        if (isInsideArithmetic(current) && isLeaf) {
+                            updateSelectedLeafToPlace();
+                        } else {
+                            updateQueryOnAtomicPropositionChange();
+                        }
                     }
                 }
                 if (!lens.isTimed()) setEnablednessOfOperatorAndMarkingBoxes();
@@ -5034,7 +5147,7 @@ public class QueryDialog extends JPanel {
         deadLockPredicateButton = new JButton("Deadlock");
         deadLockPredicateButton.setPreferredSize(new Dimension(103, 27));
 
-        JSeparator verticalSeparator = new JSeparator(JSeparator.VERTICAL);
+        verticalSeparator = new JSeparator(JSeparator.VERTICAL);
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 1;
@@ -5119,11 +5232,13 @@ public class QueryDialog extends JPanel {
 
         placeTransitionBox.addActionListener(e -> {
             if (userChangedAtomicPropSelection) {
-                updateQueryOnAtomicPropositionChange();
+                if (isInsideArithmetic(currentSelection.getObject())) {
+                    updateSelectedLeafToPlace();
+                } else {
+                    updateQueryOnAtomicPropositionChange();
+                }
             }
-            if (!lens.isTimed()) {
-                setEnablednessOfOperatorAndMarkingBoxes();
-            }
+            if (!lens.isTimed()) setEnablednessOfOperatorAndMarkingBoxes();
         });
 
         relationalOperatorBox.addActionListener(e -> {
@@ -5135,11 +5250,15 @@ public class QueryDialog extends JPanel {
 
         placeMarking.addChangeListener(arg0 -> {
             if (userChangedAtomicPropSelection) {
-                updateQueryOnAtomicPropositionChange();
+                if (isInsideArithmetic(currentSelection.getObject())) {
+                    updateSelectedLeafToConstant();
+                } else {
+                    updateQueryOnAtomicPropositionChange();
+                }
             }
         });
 
-        templateBox.setSelectedIndex(0); // Fills placesBox with correct places. Must be called here to ensure addPredicateButton is not null
+        templateBox.setSelectedIndex(0);
     }
 
     private void initQueryEditingPanel() {
