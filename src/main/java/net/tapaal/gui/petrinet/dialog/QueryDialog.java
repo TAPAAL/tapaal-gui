@@ -442,13 +442,16 @@ public class QueryDialog extends JPanel {
     private final TAPNLens lens;
     private final PetriNetTab tab;
 
-    JSeparator verticalSeparator;
+    private JSeparator verticalSeparator;
 
     private enum OperatorContextMode {
         LOGIC, ARITHMETIC
     }
 
-	private static final String name_verifyTAPN = "TAPAAL: Continuous Engine (verifytapn)";
+    private JButton addPlaceButton;
+    private JButton addConstantButton;
+
+    private static final String name_verifyTAPN = "TAPAAL: Continuous Engine (verifytapn)";
 	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimized Standard Reduction";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
@@ -1266,6 +1269,14 @@ public class QueryDialog extends JPanel {
             placeMarking.setEnabled(isLeaf);
             searchBar.setEnabled(isLeaf);
 
+            userChangedAtomicPropSelection = false;
+            if (current instanceof TCTLConstNode) {
+                placeMarking.setValue(((TCTLConstNode) current).getConstant());
+            } else if (current instanceof TCTLStatePlaceHolder) {
+                placeMarking.setValue(0); 
+            }
+            userChangedAtomicPropSelection = true;
+
             updatePredicatesAccordingToSelection(current);
             guiDialog.pack();
             return;
@@ -1326,7 +1337,28 @@ public class QueryDialog extends JPanel {
     private void updateSelectedLeafToConstant() {
         if (currentSelection == null) return;
         int value = (Integer) placeMarking.getValue();
-        replaceCurrentSelectionWith(new TCTLConstNode(value));
+        TCTLAbstractProperty replacement = new TCTLConstNode(value);
+        
+        TCTLAbstractProperty oldProp = currentSelection.getObject();
+        if (!oldProp.equals(replacement)) {
+            UndoableEdit edit = new QueryConstructionEdit(oldProp, replacement);
+            newProperty = newProperty.replace(oldProp, replacement);
+            
+            queryField.setText(newProperty.toString());
+            StringPosition position = newProperty.indexOf(replacement);
+            queryField.select(position.getStart(), position.getEnd());
+            currentSelection = position;
+            
+            updateQueryButtonsAccordingToSelection();
+            if (currentSelection != null) {
+                setEnabledOptionsAccordingToCurrentReduction();
+            } else {
+                disableAllQueryButtons();
+            }
+            
+            undoSupport.postEdit(edit);
+            queryChanged();
+        }
     }
 
     private void replaceCurrentSelectionWith(TCTLAbstractProperty replacement) {
@@ -4935,7 +4967,30 @@ public class QueryDialog extends JPanel {
     }
 
     private void initPredicationConstructionPanel() {
-        predicatePanel = new JPanel(new GridBagLayout());
+        // Lock the width of the predicate panel so it stays the same when switching to arithmetic context.
+        predicatePanel = new JPanel(new GridBagLayout()) {
+            private int maxWidth = 0;
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension d = super.getPreferredSize();
+                return lockedWidthDimension(d);
+            }
+
+            @Override
+            public Dimension getMinimumSize() {
+                Dimension d = super.getMinimumSize();
+                return lockedWidthDimension(d);
+            }
+
+            private Dimension lockedWidthDimension(Dimension d) {
+                if (d.width > maxWidth) {
+                    maxWidth = d.width;
+                }
+
+                return new Dimension(maxWidth, d.height);
+            }
+        };
+        
         predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
 
         initTracePanels();
