@@ -300,6 +300,8 @@ public class QueryDialog extends JPanel {
     private JComboBox<String> relationalOperatorBox;
     private JLabel transitionIsEnabledLabel;
     private CustomJSpinner placeMarking;
+    private JPanel placeRow;
+    private JPanel constantRow;
     private JButton addTraceButton;
     private JButton truePredicateButton;
     private JButton falsePredicateButton;
@@ -450,6 +452,7 @@ public class QueryDialog extends JPanel {
 
     private JButton addPlaceButton;
     private JButton addConstantButton;
+    private Component constantRowStrut;
 
     private static final String name_verifyTAPN = "TAPAAL: Continuous Engine (verifytapn)";
 	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
@@ -1254,6 +1257,14 @@ public class QueryDialog extends JPanel {
             
             relationalOperatorBox.setVisible(false);
             addPredicateButton.setVisible(false);
+            addPlaceButton.setVisible(true);
+            addConstantButton.setVisible(true);
+            
+            constantRow.add(placeMarking);
+            constantRow.add(constantRowStrut);
+            constantRow.add(addConstantButton);
+            constantRow.setVisible(true);
+
             truePredicateButton.setVisible(false);
             falsePredicateButton.setVisible(false);
             deadLockPredicateButton.setVisible(false);
@@ -1278,14 +1289,23 @@ public class QueryDialog extends JPanel {
             userChangedAtomicPropSelection = true;
 
             updatePredicatesAccordingToSelection(current);
+
             guiDialog.pack();
             return;
         }
-
+        
         contextCardLayout.show(contextCardPanel, OperatorContextMode.LOGIC.name());
         predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
         relationalOperatorBox.setVisible(true);
         addPredicateButton.setVisible(true);
+        addPlaceButton.setVisible(false);
+        addConstantButton.setVisible(false);
+
+        placeRow.add(relationalOperatorBox);
+        placeRow.add(placeMarking);
+        if (!lens.isTimed()) placeRow.add(transitionIsEnabledLabel);
+        constantRow.setVisible(false);
+
         truePredicateButton.setVisible(true);
         falsePredicateButton.setVisible(true);
         deadLockPredicateButton.setVisible(true);
@@ -5165,28 +5185,40 @@ public class QueryDialog extends JPanel {
         templateBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         templateRow.add(templateBox);
 
-        JPanel placeRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
+        placeRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
         ++gbc.gridy;
         predicatePanel.add(placeRow, gbc);
         placeTransitionBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         placeRow.add(placeTransitionBox);
 
+        addPlaceButton = new JButton("Add place");
+        addPlaceButton.setVisible(false);
+        placeRow.add(addPlaceButton);
+
+        constantRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
+        ++gbc.gridy;
+        predicatePanel.add(constantRow, gbc);
+
         String[] relationalSymbols = { "=", "!=", "<=", "<", ">=", ">" };
         relationalOperatorBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
         relationalOperatorBox.setPreferredSize(new Dimension(80, 27));
         relationalOperatorBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
-        placeRow.add(relationalOperatorBox);
+        constantRow.add(relationalOperatorBox);
 
         placeMarking = new CustomJSpinner(0);
         placeMarking.setPreferredSize(new Dimension(80, 27));
-        placeRow.add(placeMarking);
+        constantRow.add(placeMarking);
+
+        addConstantButton = new JButton("Add constant");
+        addConstantButton.setVisible(false);
+        constantRowStrut = Box.createHorizontalStrut(5);
+        constantRow.add(addConstantButton);
 
         transitionIsEnabledLabel = new JLabel(" is enabled");
         transitionIsEnabledLabel.setPreferredSize(new Dimension(165, 27));
-        if (!lens.isTimed()) placeRow.add(transitionIsEnabledLabel);
+        if (!lens.isTimed()) constantRow.add(transitionIsEnabledLabel);
 
         JPanel addPredicateRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
-        ++gbc.gridy;
         addPredicateRow.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         predicatePanel.add(addPredicateRow, gbc);
         addPredicateButton = new JButton("Add predicate to the query");
@@ -5310,6 +5342,18 @@ public class QueryDialog extends JPanel {
                 } else {
                     updateQueryOnAtomicPropositionChange();
                 }
+            }
+        });
+
+        addPlaceButton.addActionListener(e -> {
+            if (userChangedAtomicPropSelection && isInsideArithmetic(currentSelection.getObject())) {
+                updateSelectedLeafToPlace();
+            }
+        });
+
+        addConstantButton.addActionListener(e -> {
+            if (userChangedAtomicPropSelection && isInsideArithmetic(currentSelection.getObject())) {
+                updateSelectedLeafToConstant();
             }
         });
 
