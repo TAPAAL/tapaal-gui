@@ -2136,6 +2136,8 @@ public class QueryDialog extends JPanel {
         } else {
             setupRawVerificationOptions();
         }
+
+        updateSelection(newProperty);
     }
 
     private void setupFromQuery(TAPNQuery queryToCreateFrom) {
@@ -4990,24 +4992,24 @@ public class QueryDialog extends JPanel {
         // Lock the width of the predicate panel so it stays the same when switching to arithmetic context.
         predicatePanel = new JPanel(new GridBagLayout()) {
             private int maxWidth = 0;
+            private int maxHeight = 0;
+
             @Override
             public Dimension getPreferredSize() {
                 Dimension d = super.getPreferredSize();
-                return lockedWidthDimension(d);
+                return lockedDimension(d);
             }
 
             @Override
             public Dimension getMinimumSize() {
                 Dimension d = super.getMinimumSize();
-                return lockedWidthDimension(d);
+                return lockedDimension(d);
             }
 
-            private Dimension lockedWidthDimension(Dimension d) {
-                if (d.width > maxWidth) {
-                    maxWidth = d.width;
-                }
-
-                return new Dimension(maxWidth, d.height);
+            private Dimension lockedDimension(Dimension d) {
+                if (d.width > maxWidth) maxWidth = d.width;
+                if (d.height > maxHeight) maxHeight = d.height;
+                return new Dimension(maxWidth, maxHeight);
             }
         };
         
@@ -5030,65 +5032,64 @@ public class QueryDialog extends JPanel {
             private Object currentlySelected = null;
 
             public void actionPerformed(ActionEvent e) {
-                if(!templateBox.getSelectedItem().equals(SHARED)){
-                    TimedArcPetriNet tapn = (TimedArcPetriNet) templateBox.getSelectedItem();
-                    if (!tapn.equals(currentlySelected)) {
-                        Vector<String> placeNames = new Vector<String>();
-                        for (TimedPlace place : tapn.places()) {
-                            if(!place.isShared()){
-                                placeNames.add(place.name());
-                            }
-                        }
-                        if (!lens.isTimed()) {
-                            for (TimedTransition transition : tapn.transitions()) {
-                                if (!transition.isShared()) {
-                                    placeNames.add(transition.name());
-                                }
-                            }
-                        }
+                Object selectedItem = templateBox.getSelectedItem();
 
-                        placeNames.sort(String::compareToIgnoreCase);
-                        placeTransitionBox.setModel(new DefaultComboBoxModel<>(placeNames));
+                if (!SHARED.equals(selectedItem) && selectedItem.equals(currentlySelected)) {
+                    return;
+                }
 
-                        currentlySelected = tapn;
-                        setEnablednessOfAddPredicateButton();
-                        if (userChangedAtomicPropSelection && placeNames.size() > 0) {
-                            TCTLAbstractProperty current = currentSelection != null ? currentSelection.getObject() : null;
-                            boolean isLeaf = current instanceof TCTLPlaceNode || current instanceof TCTLConstNode || current instanceof TCTLStatePlaceHolder;
-                            
-                            if (isInsideArithmetic(current) && isLeaf) {
-                                updateSelectedLeafToPlace();
-                            } else {
-                                updateQueryOnAtomicPropositionChange();
+                Vector<String> placeNames = new Vector<>();
+
+                if (!SHARED.equals(selectedItem)) {
+                    TimedArcPetriNet tapn = (TimedArcPetriNet) selectedItem;
+                    currentlySelected = tapn;
+
+                    for (TimedPlace place : tapn.places()) {
+                        if (!place.isShared()) {
+                            placeNames.add(place.name());
+                        }
+                    }
+
+                    if (!lens.isTimed()) {
+                        for (TimedTransition transition : tapn.transitions()) {
+                            if (!transition.isShared()) {
+                                placeNames.add(transition.name());
                             }
                         }
                     }
-                }else{
-                    Vector<String> placeNames = new Vector<String>();
+
+                } else {
+                    currentlySelected = SHARED;
+
                     for (SharedPlace place : tapnNetwork.sharedPlaces()) {
                         placeNames.add(place.name());
                     }
+
                     if (lens.isTimed()) {
                         for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
                             placeNames.add(transition.name());
                         }
                     }
-                    placeNames.sort(String::compareToIgnoreCase);
-                    placeTransitionBox.setModel(new DefaultComboBoxModel<>(placeNames));
+                }
 
-                    currentlySelected = SHARED;
-                    setEnablednessOfAddPredicateButton();
-                    if (userChangedAtomicPropSelection && placeNames.size() > 0) {
-                        TCTLAbstractProperty current = currentSelection != null ? currentSelection.getObject() : null;
-                        boolean isLeaf = current instanceof TCTLPlaceNode || current instanceof TCTLConstNode || current instanceof TCTLStatePlaceHolder;
-                        
-                        if (isInsideArithmetic(current) && isLeaf) {
-                            updateSelectedLeafToPlace();
-                        } else {
-                            updateQueryOnAtomicPropositionChange();
-                        }
+                placeNames.sort(String::compareToIgnoreCase);
+                placeTransitionBox.setModel(new DefaultComboBoxModel<>(placeNames));
+                setEnablednessOfAddPredicateButton();
+
+                if (userChangedAtomicPropSelection && !placeNames.isEmpty()) {
+                    TCTLAbstractProperty current = currentSelection != null ? currentSelection.getObject() : null;
+                    boolean isLeaf = current instanceof TCTLPlaceNode || 
+                                    current instanceof TCTLConstNode || 
+                                    current instanceof TCTLStatePlaceHolder;
+
+                    if (isInsideArithmetic(current) && isLeaf) {
+                        if (current instanceof TCTLStatePlaceHolder) return;
+                        updateSelectedLeafToPlace();
+                    } else {
+                        updateQueryOnAtomicPropositionChange();
                     }
                 }
+
                 if (!lens.isTimed()) setEnablednessOfOperatorAndMarkingBoxes();
             }
         });
@@ -5319,7 +5320,9 @@ public class QueryDialog extends JPanel {
 
         placeTransitionBox.addActionListener(e -> {
             if (userChangedAtomicPropSelection) {
-                if (isInsideArithmetic(currentSelection.getObject())) {
+                var oldProp = currentSelection.getObject();
+                if (isInsideArithmetic(oldProp)) {
+                    if (oldProp instanceof TCTLStatePlaceHolder) return;
                     updateSelectedLeafToPlace();
                 } else {
                     updateQueryOnAtomicPropositionChange();
@@ -5337,7 +5340,9 @@ public class QueryDialog extends JPanel {
 
         placeMarking.addChangeListener(arg0 -> {
             if (userChangedAtomicPropSelection) {
-                if (isInsideArithmetic(currentSelection.getObject())) {
+                var oldProp = currentSelection.getObject();
+                if (isInsideArithmetic(oldProp)) {
+                    if (oldProp instanceof TCTLStatePlaceHolder) return;
                     updateSelectedLeafToConstant();
                 } else {
                     updateQueryOnAtomicPropositionChange();
