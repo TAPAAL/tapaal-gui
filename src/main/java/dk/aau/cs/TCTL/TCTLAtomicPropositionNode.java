@@ -43,14 +43,19 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	
     @Override
     public StringPosition[] getChildren() {
+        boolean leftParenthesis = op.equals("*") && left instanceof TCTLAtomicPropositionNode && (((TCTLAtomicPropositionNode) left).getOp().equals("+") || ((TCTLAtomicPropositionNode) left).getOp().equals("-"));
+        boolean rightParenthesis = op.equals("*") && right instanceof TCTLAtomicPropositionNode && (((TCTLAtomicPropositionNode) right).getOp().equals("+") || ((TCTLAtomicPropositionNode) right).getOp().equals("-"));
+
+        int leftOffset = leftParenthesis ? 1 : 0;
         int leftLength = left.toString().length();
         int opLength = op.length();
         
-        int rightStart = leftLength + 1 + opLength + 1;
+        int rightOffset = rightParenthesis ? 1 : 0;
+        int rightStart = (leftParenthesis ? 2 : 0) + leftLength + 1 + opLength + 1;
         
         StringPosition[] children = new StringPosition[2];
-        children[0] = new StringPosition(0, leftLength, left);
-        children[1] = new StringPosition(rightStart, rightStart + right.toString().length(), right);
+        children[0] = new StringPosition(leftOffset, leftOffset + leftLength, left);
+        children[1] = new StringPosition(rightStart + rightOffset, rightStart + rightOffset + right.toString().length(), right);
         
         return children;
     }
@@ -102,7 +107,19 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 
     @Override
 	public String toString() {
-		return left + " " + op + " " + right;
+		String leftString = left.toString();
+        String rightString = right.toString();
+
+        if (op.equals("*")) {
+            if (left instanceof TCTLAtomicPropositionNode && (((TCTLAtomicPropositionNode) left).getOp().equals("+") || ((TCTLAtomicPropositionNode) left).getOp().equals("-"))) {
+                leftString = "(" + leftString + ")";
+            }
+            if (right instanceof TCTLAtomicPropositionNode && (((TCTLAtomicPropositionNode) right).getOp().equals("+") || ((TCTLAtomicPropositionNode) right).getOp().equals("-"))) {
+                rightString = "(" + rightString + ")";
+            }
+        }
+
+		return leftString + " " + op + " " + rightString;
 	}
 
 	@Override
