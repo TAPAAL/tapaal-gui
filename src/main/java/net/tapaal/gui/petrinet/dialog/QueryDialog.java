@@ -1252,6 +1252,7 @@ public class QueryDialog extends JPanel {
         if (isInsideArithmetic(current)) {
             disableAllQueryButtons();
             contextCardLayout.show(contextCardPanel, OperatorContextMode.ARITHMETIC.name());
+            refreshPlaceTransitionBox(false);
             
             predicatePanel.setBorder(BorderFactory.createTitledBorder("Arithmetic Term"));
             
@@ -1295,6 +1296,7 @@ public class QueryDialog extends JPanel {
         }
         
         contextCardLayout.show(contextCardPanel, OperatorContextMode.LOGIC.name());
+        refreshPlaceTransitionBox(true);
         predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
         relationalOperatorBox.setVisible(true);
         addPredicateButton.setVisible(true);
@@ -1321,6 +1323,43 @@ public class QueryDialog extends JPanel {
         }
 
         guiDialog.pack();
+    }
+
+    private void refreshPlaceTransitionBox(boolean includeTransitions) {
+        Vector<String> placeNames = new Vector<>();
+        Object selectedItem = templateBox.getSelectedItem();
+
+        if (!SHARED.equals(selectedItem) && selectedItem != null) {
+            TimedArcPetriNet tapn = (TimedArcPetriNet) selectedItem;
+            for (TimedPlace place : tapn.places()) {
+                if (!place.isShared()) placeNames.add(place.name());
+            }
+            if (includeTransitions && !lens.isTimed()) {
+                for (TimedTransition t : tapn.transitions()) {
+                    if (!t.isShared()) placeNames.add(t.name());
+                }
+            }
+        } else {
+            for (SharedPlace place : tapnNetwork.sharedPlaces()) {
+                placeNames.add(place.name());
+            }
+            if (includeTransitions && !lens.isTimed()) {
+                for (SharedTransition t : tapnNetwork.sharedTransitions()) {
+                    placeNames.add(t.name());
+                }
+            }
+        }
+
+        placeNames.sort(String::compareToIgnoreCase);
+        Object previousSelection = placeTransitionBox.getSelectedItem();
+
+        userChangedAtomicPropSelection = false;
+        placeTransitionBox.setModel(new DefaultComboBoxModel<>(placeNames));
+        if (previousSelection != null && placeNames.contains(previousSelection.toString())) {
+            placeTransitionBox.setSelectedItem(previousSelection);
+        }
+        
+        userChangedAtomicPropSelection = true;
     }
 
     private boolean isInsideArithmetic(TCTLAbstractProperty target) {
@@ -1494,7 +1533,7 @@ public class QueryDialog extends JPanel {
         } else {
             transitionIsEnabledLabel.setVisible(false);
             placeMarking.setVisible(true);
-            relationalOperatorBox.setVisible(true);
+            relationalOperatorBox.setVisible(currentSelection != null && !isInsideArithmetic(currentSelection.getObject()));
         }
     }
 
@@ -5029,70 +5068,39 @@ public class QueryDialog extends JPanel {
 
         templateBox = new JComboBox<>(new DefaultComboBoxModel<>(items));
         templateBox.addActionListener(new ActionListener() {
-            private Object currentlySelected = null;
+        private Object currentlySelected = null;
 
-            public void actionPerformed(ActionEvent e) {
-                Object selectedItem = templateBox.getSelectedItem();
+        public void actionPerformed(ActionEvent e) {
+            Object selectedItem = templateBox.getSelectedItem();
 
-                if (!SHARED.equals(selectedItem) && selectedItem.equals(currentlySelected)) {
-                    return;
-                }
-
-                Vector<String> placeNames = new Vector<>();
-
-                if (!SHARED.equals(selectedItem)) {
-                    TimedArcPetriNet tapn = (TimedArcPetriNet) selectedItem;
-                    currentlySelected = tapn;
-
-                    for (TimedPlace place : tapn.places()) {
-                        if (!place.isShared()) {
-                            placeNames.add(place.name());
-                        }
-                    }
-
-                    if (!lens.isTimed()) {
-                        for (TimedTransition transition : tapn.transitions()) {
-                            if (!transition.isShared()) {
-                                placeNames.add(transition.name());
-                            }
-                        }
-                    }
-
-                } else {
-                    currentlySelected = SHARED;
-
-                    for (SharedPlace place : tapnNetwork.sharedPlaces()) {
-                        placeNames.add(place.name());
-                    }
-
-                    if (lens.isTimed()) {
-                        for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
-                            placeNames.add(transition.name());
-                        }
-                    }
-                }
-
-                placeNames.sort(String::compareToIgnoreCase);
-                placeTransitionBox.setModel(new DefaultComboBoxModel<>(placeNames));
-                setEnablednessOfAddPredicateButton();
-
-                if (userChangedAtomicPropSelection && !placeNames.isEmpty()) {
-                    TCTLAbstractProperty current = currentSelection != null ? currentSelection.getObject() : null;
-                    boolean isLeaf = current instanceof TCTLPlaceNode || 
-                                    current instanceof TCTLConstNode || 
-                                    current instanceof TCTLStatePlaceHolder;
-
-                    if (isInsideArithmetic(current) && isLeaf) {
-                        if (current instanceof TCTLStatePlaceHolder) return;
-                        updateSelectedLeafToPlace();
-                    } else {
-                        updateQueryOnAtomicPropositionChange();
-                    }
-                }
-
-                if (!lens.isTimed()) setEnablednessOfOperatorAndMarkingBoxes();
+            if (!SHARED.equals(selectedItem) && selectedItem.equals(currentlySelected)) {
+                return;
             }
-        });
+
+            currentlySelected = selectedItem;
+
+            boolean inArithmeticContext = currentSelection != null
+                && isInsideArithmetic(currentSelection.getObject());
+            refreshPlaceTransitionBox(!inArithmeticContext);
+            setEnablednessOfAddPredicateButton();
+
+            if (userChangedAtomicPropSelection && placeTransitionBox.getItemCount() > 0) {
+                TCTLAbstractProperty current = currentSelection != null ? currentSelection.getObject() : null;
+                boolean isLeaf = current instanceof TCTLPlaceNode ||
+                                current instanceof TCTLConstNode ||
+                                current instanceof TCTLStatePlaceHolder;
+
+                if (isInsideArithmetic(current) && isLeaf) {
+                    if (current instanceof TCTLStatePlaceHolder) return;
+                    updateSelectedLeafToPlace();
+                } else {
+                    updateQueryOnAtomicPropositionChange();
+                }
+            }
+
+            if (!lens.isTimed()) setEnablednessOfOperatorAndMarkingBoxes();
+        }
+    });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
