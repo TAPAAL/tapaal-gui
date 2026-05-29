@@ -8,9 +8,9 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 //Represents a list of factors and the operators between then, these are all stored in the factors list
 public class TCTLTermListNode extends TCTLAbstractStateProperty {
 
-	final ArrayList<TCTLAbstractStateProperty> factors;
+	final List<TCTLAbstractStateProperty> factors;
 
-	public TCTLTermListNode(ArrayList<TCTLAbstractStateProperty> factors) {
+	public TCTLTermListNode(List<TCTLAbstractStateProperty> factors) {
 		this.factors = factors;
 		for(TCTLAbstractStateProperty factor: factors){
 			factor.setParent(this);
@@ -97,7 +97,25 @@ public class TCTLTermListNode extends TCTLAbstractStateProperty {
     }
 
     @Override
-	public TCTLAbstractProperty findFirstPlaceHolder() {
+    public StringPosition[] getChildren() {
+        List<StringPosition> children = new ArrayList<>();
+        int currentLength = 0;
+        for (int i = 0; i < factors.size(); i++) {
+            TCTLAbstractStateProperty p = factors.get(i);
+            int start = currentLength + (p.isSimpleProperty() ? 0 : 1);
+            int end = start + p.toString().length();
+            
+            children.add(new StringPosition(start, end, p));
+            
+            currentLength += (p.isSimpleProperty() ? p.toString().length() : p.toString().length() + 2);
+            currentLength += 1;
+        }
+
+        return children.toArray(new StringPosition[0]);
+    }
+
+    @Override	
+    public TCTLAbstractProperty findFirstPlaceHolder() {
 		for(TCTLAbstractStateProperty factor : factors){
 			TCTLAbstractProperty placeholder = factor.findFirstPlaceHolder(); 
 			if(placeholder != null){

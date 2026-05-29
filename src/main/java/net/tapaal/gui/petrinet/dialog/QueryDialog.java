@@ -98,7 +98,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.awt.event.FocusAdapter;
 
+import dk.aau.cs.TCTL.AritmeticOperator;
 import dk.aau.cs.TCTL.HyperLTLPathScopeNode;
+import dk.aau.cs.TCTL.TCTLTermListNode;
 import dk.aau.cs.TCTL.LTLANode;
 import dk.aau.cs.TCTL.LTLENode;
 import dk.aau.cs.TCTL.LTLFNode;
@@ -4473,7 +4475,11 @@ public class QueryDialog extends JPanel {
             if (currentSelection != null && currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                 TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
                 TCTLAbstractStateProperty prop = getStateProperty(currentSelection.getObject());
-                addPropertyToQuery(new TCTLAtomicPropositionNode(prop, "+", ph));
+                List<TCTLAbstractStateProperty> properties = new ArrayList<>();
+                properties.add(prop);
+                properties.add(new AritmeticOperator("+"));
+                properties.add(ph);
+                addPropertyToQuery(new TCTLTermListNode(properties));
             }
         });
 
@@ -4481,7 +4487,11 @@ public class QueryDialog extends JPanel {
             if (currentSelection != null && currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                 TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
                 TCTLAbstractStateProperty prop = getStateProperty(currentSelection.getObject());
-                addPropertyToQuery(new TCTLAtomicPropositionNode(prop, "-", ph));
+                List<TCTLAbstractStateProperty> properties = new ArrayList<>();
+                properties.add(prop);
+                properties.add(new AritmeticOperator("-"));
+                properties.add(ph);
+                addPropertyToQuery(new TCTLTermListNode(properties));
             }
         });
 
@@ -4489,7 +4499,11 @@ public class QueryDialog extends JPanel {
             if (currentSelection != null && currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                 TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
                 TCTLAbstractStateProperty prop = getStateProperty(currentSelection.getObject());
-                addPropertyToQuery(new TCTLAtomicPropositionNode(prop, "*", ph));
+                List<TCTLAbstractStateProperty> properties = new ArrayList<>();
+                properties.add(prop);
+                properties.add(new AritmeticOperator("*"));
+                properties.add(ph);
+                addPropertyToQuery(new TCTLTermListNode(properties));
             }
         });
     }
