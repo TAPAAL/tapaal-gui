@@ -256,7 +256,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
         buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
             buffer.append("Mathias Andersen, Tanguy Dubois, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
-            buffer.append("Mathias G. S\u00F8rensen and Jakob H. Taankvist\n");
+            buffer.append("Mathias G. S\u00F8rensen, Jakob H. Taankvist and Mikkel Tygesen\n");
             buffer.append("Aalborg University 2012-2026\n\n");
 
         buffer.append("TAPAAL Untimed Engine (verifypn):\n");
@@ -264,7 +264,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
             buffer.append("Jens Emil Fink Højriis, Jonas F. Jensen, Emil Gybel Henriksen, Lasse S. Jensen, Peter G. Jensen,\nNicolaj \u00D8. Jensen, ");
             buffer.append("Tobias S. Jepsen, Mads Johannsen, Kenneth Y. J\u00F8rgensen, Isabella Kaufmann, \n");
             buffer.append("Alan Mozafar Khorsid, Andreas H. Klostergaard, Esben Nielsen, S\u00F8ren M. Nielsen, \nThomas S. Nielsen, ");
-            buffer.append("Samuel Pastva, Thomas Pedersen, Kira S. Pedersen, Theodor Risager, Jiri Srba, \nAdam M. St\u00FCck, Andreas S. S\u00F8rensen, Mathias M. S\u00F8rensen, Peter H. Taankvist, Rasmus G. Tollund, \nNikolaj J. Ulrik, Simon M. Virenfeldt and Lars K. Oestergaard \n");
+            buffer.append("Samuel Pastva, Thomas Pedersen, Kira S. Pedersen, Theodor Risager, Jiri Srba, \nAdam M. St\u00FCck, Andreas S. S\u00F8rensen, Mathias M. S\u00F8rensen, Peter H. Taankvist, Rasmus G. Tollund, \nMikkel Tygesen, Nikolaj J. Ulrik, Simon M. Virenfeldt and Lars K. Oestergaard \n");
             buffer.append("Aalborg University 2014-2026\n\n");
 
 
