@@ -174,6 +174,14 @@ public class CTLQueryVisitor extends VisitorBase {
         createList(orListNode.getProperties(), context, XML_DISJUNCTION);
     }
 
+    public void visit(TCTLPlusListNode tctlPlusListNode, Object context) {
+        if (tctlPlusListNode.getProperties().size() > 1) {
+            createList(tctlPlusListNode.getProperties(), context, XML_INTEGERSUM);
+        } else if (tctlPlusListNode.getProperties().size() == 1) {
+            tctlPlusListNode.getProperties().get(0).accept(this, context);
+        }
+    }
+
     public void visit(TCTLTermListNode termListNode, Object context) {
         if (termListNode.getProperties().size() > 1) {
             assert termListNode.getProperties().get(1) instanceof AritmeticOperator;

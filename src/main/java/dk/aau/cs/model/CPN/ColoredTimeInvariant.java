@@ -17,6 +17,10 @@ public class ColoredTimeInvariant extends TimeInvariant {
         return new ColoredTimeInvariant(false, Bound.Infinity, color);
     }
 
+    public Bound upperBound() {
+        return super.upperBound();
+    }
+
     public Color getColor() {
         return color;
     }

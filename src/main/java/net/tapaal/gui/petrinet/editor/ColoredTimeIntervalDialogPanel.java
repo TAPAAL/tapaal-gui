@@ -412,14 +412,17 @@ public class ColoredTimeIntervalDialogPanel extends JPanel {
         rightConstantsComboBox.removeAllItems();
         Collection<Constant> constants = context.network().constants();
 
-        //List <Constant> constantList = new ArrayList(constants);
         List<Constant> constantList = new ArrayList<>(constants);
 
         constantList.sort((o1, o2) -> o1.name().compareToIgnoreCase(o2.name()));
 
 
         for (Constant c : constantList) {
-            if (c.value() >= value) {
+            if (c.hasMultipleValues()) {
+                if (Collections.min(c.values()) >= value) {
+                    rightConstantsComboBox.addItem(c.name());
+                }
+            } else if (c.value() >= value) {
                 rightConstantsComboBox.addItem(c.name());
             }
         }

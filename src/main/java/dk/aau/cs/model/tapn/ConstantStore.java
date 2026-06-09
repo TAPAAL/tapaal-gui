@@ -156,12 +156,14 @@ public class ConstantStore {
 			upperConstant.setIsUsed(true);
 
 			if (!lower.equals(upper)) {
-				if (lowerConstant.value() + diff > upperConstant.lowerBound()) {
-					upperConstant.setLowerBound(lowerConstant.value() + diff);
+				int lowerConstVal = lowerConstant.hasMultipleValues() ? Collections.max(lowerConstant.values()) : lowerConstant.value();
+					int upperConstVal = upperConstant.hasMultipleValues() ? Collections.min(upperConstant.values()) : upperConstant.value();
+					if (lowerConstVal + diff > upperConstant.lowerBound()) {
+					upperConstant.setLowerBound(lowerConstVal + diff);
 				}
 
-				if (upperConstant.value() - diff < lowerConstant.upperBound()) {
-					lowerConstant.setUpperBound(upperConstant.value() - diff);
+				if (upperConstVal - diff < lowerConstant.upperBound()) {
+					lowerConstant.setUpperBound(upperConstVal - diff);
 				}
 			}
 		} else if (lower instanceof ConstantBound) {
@@ -189,6 +191,21 @@ public class ConstantStore {
 		}
 	}
 
+	public Command addConstant(String name, LinkedHashSet<Integer> vals) {
+		if (isNameInf(name))
+			return null;
+
+		if (!containsConstantByName(name)) {
+			Constant c = new Constant(name, vals);
+			constants.add(c);
+			Collections.sort(constants, new StringComparator());
+
+			return new AddConstantEditCommand(c, this);
+		}
+
+		return null;
+	}
+
 	public Command addConstant(String name, int val) {
 		if (isNameInf(name))
 			return null;
@@ -206,8 +223,12 @@ public class ConstantStore {
 	public void add(Constant constant) {
 		if(!containsConstantByName(constant.name())) {
 			constants.add(constant);
-			if (constant.value() > largest)
+			if (constant.hasMultipleValues()) {
+				int max = Collections.max(constant.values());
+				if (max > largest) largest = max;
+			} else if (constant.value() > largest) {
 				largest = constant.value();
+			}
 		}
 	}
 
@@ -241,8 +262,12 @@ public class ConstantStore {
 		largest = -1;
 
 		for (Constant c : constants) {
-			if (c.value() > largest)
+			if (c.hasMultipleValues()) {
+				int max = Collections.max(c.values());
+				if (max > largest) largest = max;
+			} else if (c.value() > largest) {
 				largest = c.value();
+			}
 		}
 
 	}

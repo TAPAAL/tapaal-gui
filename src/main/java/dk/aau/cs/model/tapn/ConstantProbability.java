@@ -1,5 +1,7 @@
 package dk.aau.cs.model.tapn;
 
+import java.util.stream.Collectors;
+
 import dk.aau.cs.util.Require;
 
 public class ConstantProbability extends Probability {
@@ -33,21 +35,20 @@ public class ConstantProbability extends Probability {
     }
 
     public String toString(boolean displayConstantNames) {
-        if(displayConstantNames){
-            return constant.name();
-        } else if(constant.value() != 1){
-            return String.valueOf(constant.value());
-        } else {
-            return "";
+        if (displayConstantNames) {
+            return constant.name(); 
+        } else if(constant.hasMultipleValues() || constant.value() != 1) {
+            return constant.hasMultipleValues() ? constant.values().toString() : String.valueOf(constant.value());
         }
+
+        return "";
     }
 
     public String nameForSaving(boolean writeConstantNames){
-        if(writeConstantNames){
+        if (writeConstantNames) {
             return constant.name();
-        } else {
-            return Integer.toString(constant.value());
         }
 
+        return constant.hasMultipleValues() ? constant.values().stream().map(String::valueOf).collect(Collectors.joining(",")) : Integer.toString(constant.value());
     }
 }

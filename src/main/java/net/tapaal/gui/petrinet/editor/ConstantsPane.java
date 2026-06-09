@@ -180,8 +180,8 @@ public class ConstantsPane extends JPanel implements SidePane {
 				ListModel model = list.getModel();
 				if (model.getSize()>0 && isDisplayingGlobalConstants()) {
 					Constant c = (Constant) model.getElementAt(list.getSelectedIndex());
-					if (c != null) {
-						if (arg0.getKeyCode() == KeyEvent.VK_LEFT) {										
+					if (c != null && !c.hasMultipleValues()) {
+						if (arg0.getKeyCode() == KeyEvent.VK_LEFT) {
 							if (!(c.lowerBound() == c.value())){
 								Command edit = tab.network().updateConstant(c.name(), new Constant(c.name(), c.value()-1));
 								currentTab.getUndoManager().addNewEdit(edit);
@@ -194,7 +194,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 								currentTab.getUndoManager().addNewEdit(edit);
 								tab.network().buildConstraints();
 							}
-						} 
+						}
 						else if (arg0.getKeyCode() == KeyEvent.VK_UP) {
 							if(list.getSelectedIndex() > 0){
 								highlightConstant(list.getSelectedIndex()-1);

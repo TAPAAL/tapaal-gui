@@ -11,6 +11,7 @@ import pipe.gui.swingcomponents.EscapableDialog;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.Box;
@@ -142,7 +143,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
 
         JPanel helpPanel = new JPanel();
         JButton helpButton = new JButton("Help");
-        helpButton.addActionListener(e -> showHelpDialog(network.isColored()));
+        helpButton.addActionListener(e -> showHelpDialog());
 
         helpPanel.add(helpButton);
 
@@ -181,23 +182,26 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
                 Command command = new EditConstantsCommand(oldState, network, colorTypesListModel, variablesListModel);
                 command.redo();
                 undoManager.addNewEdit(command);
-                dispose();
+                SwingUtilities.invokeLater(this::dispose);
             }
         } catch (ParseException | TokenMgrError e) {
-            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.getMessage(), "Error during parsing", JOptionPane.ERROR_MESSAGE);
+            SwingUtilities.invokeLater(() ->
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.getMessage(), "Error during parsing", JOptionPane.ERROR_MESSAGE)
+            );
         }
     }
 
-    private void showHelpDialog(boolean isColored) {
+    private void showHelpDialog() {
         EscapableDialog helpDialog = new EscapableDialog(this, "Help", true);
 
         JTextArea helpTextArea = new JTextArea();
 
         helpTextArea.setEditable(false);
-
+        boolean isColored = network.isColored();
         String helpText = "Syntax for defining " + (isColored ? "color types, variables, and " : "") + "constants:\n" +
                           "const {ID} = {INTEGER};\n" +
-                          "e.g. const a = 5; is a valid constant.\n\n" +
+                          "const {ID} = {{INTEGER}, ..., {INTEGER}};\n" +
+                          "e.g. const a = 5; or const b = {1, 2, 3}; are valid constants.\n\n" +
                           (isColored ? "Syntax for defining color types:\n" +
                             "type {ID} is [{COLOR}, ..., {COLOR}];\n" +
                             "type {ID} is [{LOWER_BOUND}, {UPPER_BOUND}];\n" +

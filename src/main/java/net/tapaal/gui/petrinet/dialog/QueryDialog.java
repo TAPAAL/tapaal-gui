@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -6462,11 +6463,7 @@ public class QueryDialog extends JPanel {
                         queryPane.addQuery(query);
                     }
                     
-                    if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN) {
-                        Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels,false, lens);
-                    } else {
-                        Verifier.runUppaalVerification(tapnNetwork, query);
-                    }
+                    tab.getQueryPane().verifyQueries(Arrays.asList(query));
                 }});
             cancelButton.addActionListener(evt -> cancelAndExit());
 
