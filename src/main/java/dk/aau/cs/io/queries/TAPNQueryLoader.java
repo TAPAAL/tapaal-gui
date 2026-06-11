@@ -253,7 +253,7 @@ public class TAPNQueryLoader extends QueryLoader{
                 return createOperatorExpression(element, ObsMultiply::new);
             case "integer-constant": // Backwards compatibility
             case "real-constant":
-                return new ObsConstant(Double.parseDouble(element.getTextContent()));
+                return new ObsConstant(Float.parseFloat(element.getTextContent()));
             case "place":
                 return createPlaceExpression(element);
             default:

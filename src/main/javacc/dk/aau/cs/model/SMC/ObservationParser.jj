@@ -134,7 +134,7 @@ ObsExpression atom() : {
     Token value, templateName, placeName;
 } {
     value = <CONSTANT> 
-    { return new ObsConstant(Double.parseDouble(value.image)); }
+    { return new ObsConstant(Float.parseFloat(value.image)); }
     |
     templateName = <ID> <DOT> placeName = <ID>
     { 

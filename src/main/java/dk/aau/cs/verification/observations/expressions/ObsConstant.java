@@ -1,15 +1,15 @@
 package dk.aau.cs.verification.observations.expressions;
 
 public class ObsConstant extends ObsLeaf {
-    private final double value;
+    private final float value;
 
-    public ObsConstant(double value) {
+    public ObsConstant(float value) {
         this.value = value;
     }
 
     @Override
     public String toString() {
-        return Double.toString(value);
+        return Float.toString(value);
     }
 
     @Override
