@@ -100,12 +100,14 @@ public class TCTLTermListNode extends TCTLAbstractStateProperty {
     public StringPosition[] getChildren() {
         List<StringPosition> children = new ArrayList<>();
         int currentLength = 0;
-        for (int i = 0; i < factors.size(); i++) {
-            TCTLAbstractStateProperty p = factors.get(i);
+        for (int i = 0; i < factors.size(); ++i) {
+            var p = factors.get(i);
             int start = currentLength + (p.isSimpleProperty() ? 0 : 1);
             int end = start + p.toString().length();
             
-            children.add(new StringPosition(start, end, p));
+            if (!(p instanceof AritmeticOperator)) {
+                children.add(new StringPosition(start, end, p));
+            }
             
             currentLength += (p.isSimpleProperty() ? p.toString().length() : p.toString().length() + 2);
             currentLength += 1;

@@ -128,6 +128,7 @@ import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLPathToStateConverter;
+import dk.aau.cs.TCTL.TCTLPlusListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLStateToPathConverter;
@@ -4471,41 +4472,45 @@ public class QueryDialog extends JPanel {
         gbc.gridy = 2;
         arithmeticButtonPanel.add(multiplyButton, gbc);
 
-        addButton.addActionListener(e -> {
-            if (currentSelection != null && currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-                TCTLAbstractStateProperty prop = getStateProperty(currentSelection.getObject());
-                List<TCTLAbstractStateProperty> properties = new ArrayList<>();
-                properties.add(prop);
-                properties.add(new AritmeticOperator("+"));
-                properties.add(ph);
-                addPropertyToQuery(new TCTLTermListNode(properties));
-            }
-        });
+        addButton.addActionListener(e -> addArithmeticOperatorToQuery("+"));
+        subtractButton.addActionListener(e -> addArithmeticOperatorToQuery("-"));
+        multiplyButton.addActionListener(e -> addArithmeticOperatorToQuery("*"));
+    }
 
-        subtractButton.addActionListener(e -> {
-            if (currentSelection != null && currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-                TCTLAbstractStateProperty prop = getStateProperty(currentSelection.getObject());
+    private void addArithmeticOperatorToQuery(String operator) {
+        if (currentSelection != null) {
+            if (currentSelection.getObject() instanceof TCTLTermListNode) {
+                var termNode = (TCTLTermListNode) currentSelection.getObject();
+                List<TCTLAbstractStateProperty> newProps = new ArrayList<>();
+                for (var p : termNode.getProperties()) {
+                    if (p instanceof AritmeticOperator) {
+                        newProps.add(new AritmeticOperator(operator));
+                    } else {
+                        newProps.add(p.copy());
+                    }
+                }
+                addPropertyToQuery(new TCTLTermListNode(newProps));
+            } else if (currentSelection.getObject() instanceof TCTLPlusListNode) {
+                var plusNode = (TCTLPlusListNode) currentSelection.getObject();
+                var newProps = new ArrayList<TCTLAbstractStateProperty>();
+                for (var p : plusNode.getProperties()) {
+                    if (p instanceof AritmeticOperator) {
+                        newProps.add(new AritmeticOperator(operator));
+                    } else {
+                        newProps.add(p.copy());
+                    }
+                }
+                addPropertyToQuery(new TCTLPlusListNode(newProps));
+            } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+                var ph = new TCTLStatePlaceHolder();
+                var prop = getStateProperty(currentSelection.getObject());
                 List<TCTLAbstractStateProperty> properties = new ArrayList<>();
                 properties.add(prop);
-                properties.add(new AritmeticOperator("-"));
+                properties.add(new AritmeticOperator(operator));
                 properties.add(ph);
                 addPropertyToQuery(new TCTLTermListNode(properties));
             }
-        });
-
-        multiplyButton.addActionListener(e -> {
-            if (currentSelection != null && currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-                TCTLAbstractStateProperty prop = getStateProperty(currentSelection.getObject());
-                List<TCTLAbstractStateProperty> properties = new ArrayList<>();
-                properties.add(prop);
-                properties.add(new AritmeticOperator("*"));
-                properties.add(ph);
-                addPropertyToQuery(new TCTLTermListNode(properties));
-            }
-        });
+        }
     }
 
     private void checkUntimedAndNode() {
