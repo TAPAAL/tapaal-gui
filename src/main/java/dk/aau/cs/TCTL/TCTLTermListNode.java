@@ -140,11 +140,40 @@ public class TCTLTermListNode extends TCTLAbstractStateProperty {
 		return sb.toString().trim();
 	}
 	
+	private String getOperator() {
+		String op = null;
+		for (TCTLAbstractStateProperty factor : factors) {
+			if (factor instanceof AritmeticOperator) {
+				if (op == null) {
+					op = factor.toString();
+				} else if (!op.equals(factor.toString())) {
+					return null;
+				}
+			}
+		}
+        
+		return op;
+	}
+
 	@Override
 	public boolean isSimpleProperty() {
-		if(factors.size() > 1)
-		    return false;
-		else
-		    return true;
+		if (factors.size() > 1) {
+			if (parent instanceof TCTLTermListNode) {
+				TCTLTermListNode p = (TCTLTermListNode) parent;
+				String op = getOperator();
+				String parentOp = p.getOperator();
+				if (op != null && op.equals(parentOp)) {
+					if (op.equals("+") || op.equals("*")) {
+						return true;
+					} else if (op.equals("-") && p.factors.indexOf(this) == 0){
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+        
+		return true;
 	}
 }
