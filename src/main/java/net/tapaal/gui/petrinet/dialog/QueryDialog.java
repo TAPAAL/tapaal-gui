@@ -4503,7 +4503,44 @@ public class QueryDialog extends JPanel {
                 addPropertyToQuery(new TCTLPlusListNode(newProps));
             } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
                 var ph = new TCTLStatePlaceHolder();
-                var prop = getStateProperty(currentSelection.getObject());
+                var originalProp = (TCTLAbstractStateProperty) currentSelection.getObject();
+                var prop = getStateProperty(originalProp);
+                TCTLAbstractProperty parent = originalProp.getParent();
+                
+                List<TCTLAbstractStateProperty> parentProps = null;
+                String parentOp = null;
+
+                if (parent instanceof TCTLTermListNode) {
+                    parentProps = ((TCTLTermListNode) parent).getProperties();
+                    parentOp = ((TCTLTermListNode) parent).getOperator();
+                } else if (parent instanceof TCTLPlusListNode) {
+                    parentProps = ((TCTLPlusListNode) parent).getProperties();
+                    parentOp = "+";
+                }
+
+                if (parentProps != null && !parentProps.isEmpty() && parentProps.get(parentProps.size() - 1) == originalProp) {
+                    int newPrec = operator.equals("*") ? 2 : 1;
+                    int parentPrec = "*".equals(parentOp) ? 2 : 1;
+                    
+                    if (newPrec <= parentPrec) {
+                        List<TCTLAbstractStateProperty> properties = new ArrayList<>();
+                        properties.add((TCTLAbstractStateProperty) parent.copy());
+                        properties.add(new AritmeticOperator(operator));
+                        properties.add(ph);
+
+                        TCTLAbstractStateProperty newNode = parent instanceof TCTLTermListNode 
+                            ? new TCTLTermListNode(properties) 
+                            : new TCTLPlusListNode(new ArrayList<>(properties));
+
+                        UndoableEdit edit = new QueryConstructionEdit(parent, newNode);
+                        newProperty = newProperty.replace(parent, newNode);
+                        updateSelection(newNode);
+                        undoSupport.postEdit(edit);
+                        queryChanged();
+                        return;
+                    }
+                }
+
                 List<TCTLAbstractStateProperty> properties = new ArrayList<>();
                 properties.add(prop);
                 properties.add(new AritmeticOperator(operator));

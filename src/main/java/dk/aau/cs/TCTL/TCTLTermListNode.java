@@ -140,7 +140,7 @@ public class TCTLTermListNode extends TCTLAbstractStateProperty {
 		return sb.toString().trim();
 	}
 	
-	private String getOperator() {
+	public String getOperator() {
 		String op = null;
 		for (TCTLAbstractStateProperty factor : factors) {
 			if (factor instanceof AritmeticOperator) {
