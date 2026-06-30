@@ -44,7 +44,7 @@ TOKEN:
     |
     <CLOSE_PAREN: ")">
     |
-    <CONSTANT: ["0"-"9"] | (["1"-"9"] (["0"-"9"])*)>
+    <CONSTANT: (["0"-"9"])+ ("." (["0"-"9"])+)?>
     |
     <#ALPHA: ["a"-"z","A"-"Z"]>
     |
@@ -134,7 +134,7 @@ ObsExpression atom() : {
     Token value, templateName, placeName;
 } {
     value = <CONSTANT> 
-    { return new ObsConstant(Integer.parseInt(value.image)); }
+    { return new ObsConstant(Float.parseFloat(value.image)); }
     |
     templateName = <ID> <DOT> placeName = <ID>
     { 
