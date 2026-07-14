@@ -80,7 +80,7 @@ public class RunVerification extends RunVerificationBase {
                     parser.addBindings(result.getUnfoldedTab().getModel(), result.getRawOutput());
                 }
 
-                if ((options.traceOption() != TAPNQuery.TraceOption.NONE || lens.isStochastic() && options.isSimulate()) && isNetDrawable) {
+                if ((options.traceOption() != TAPNQuery.TraceOption.NONE || (lens != null && lens.isStochastic() && options.isSimulate())) && isNetDrawable) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
                         if (((lens != null && lens.isColored()) || model.isColored()) && !options.useExplicitSearch()) {
                             int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
@@ -90,7 +90,7 @@ public class RunVerification extends RunVerificationBase {
                         }
                         if (result.getTraceMap() == null) {
                             TAPAALGUI.getAnimator().setTrace(result.getTrace());
-                        } else if (lens.isStochastic() && options.isSimulate()) {
+                        } else if (lens != null && lens.isStochastic() && options.isSimulate()) {
                             TAPAALGUI.getAnimator().setTrace(result.getTrace(), result.getTraceMap());
                         } else {
                             Map<String, TAPNNetworkTrace> traceMap = new HashMap<>();
