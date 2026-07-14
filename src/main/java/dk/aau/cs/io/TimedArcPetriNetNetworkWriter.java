@@ -253,6 +253,15 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			Element elem = createConstantElement(constant, document);
 			root.appendChild(elem);
 		}
+
+		for (var constant : network.realConstants()) {
+			Element elem = document.createElement("constant");
+			elem.setAttribute("name", constant.name());
+			elem.setAttribute("type", "real");
+			elem.setAttribute("value", constant.values().stream()
+				.map(String::valueOf).collect(Collectors.joining(",")));
+			root.appendChild(elem);
+		}
 	}
 	
 	private Element createConstantElement(Constant constant, Document document) {

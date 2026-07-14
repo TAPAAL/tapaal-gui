@@ -1,5 +1,6 @@
 package net.tapaal.gui.petrinet.editor;
 
+import dk.aau.cs.model.tapn.RealConstant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.editor.ConstantsPane.ColorTypesListModel;
 import net.tapaal.gui.petrinet.editor.ConstantsPane.VariablesListModel;
@@ -118,6 +119,10 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
             constantsArea.append("const " + constantsListModel.getElementAt(i) + ";\n");
         }
 
+        for (var c : network.realConstants()) {
+            constantsArea.append("real " + c + ";\n");
+        }
+
         setVisible(true);
     }
 
@@ -202,6 +207,10 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
                           "const {ID} = {INTEGER};\n" +
                           "const {ID} = {{INTEGER}, ..., {INTEGER}};\n" +
                           "e.g. const a = 5; or const b = {1, 2, 3}; are valid constants.\n\n" +
+                          (network.isStochastic() ? "Syntax for defining real constants (usable as distribution parameters):\n" +
+                            "real {ID} = {REAL};\n" +
+                            "real {ID} = {{REAL}, ..., {REAL}};\n" +
+                            "e.g. real lambda = 0.5; or real mu = {0.1, 0.5, 1.0}; are valid real constants.\n\n" : "") +
                           (isColored ? "Syntax for defining color types:\n" +
                             "type {ID} is [{COLOR}, ..., {COLOR}];\n" +
                             "type {ID} is [{LOWER_BOUND}, {UPPER_BOUND}];\n" +

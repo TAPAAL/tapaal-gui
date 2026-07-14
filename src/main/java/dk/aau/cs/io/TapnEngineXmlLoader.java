@@ -282,7 +282,7 @@ public class TapnEngineXmlLoader {
                 continue;
             }
 
-			if (c instanceof Element) {
+			if (c instanceof Element && !"real".equals(((Element) c).getAttribute("type"))) {
 				Constant constant = parseConstant((Element) c);
 				constants.add(constant);
 			}

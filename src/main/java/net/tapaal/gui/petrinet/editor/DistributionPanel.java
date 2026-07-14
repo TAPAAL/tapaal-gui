@@ -54,6 +54,12 @@ public class DistributionPanel extends JPanel {
     private JLabel meanLabel;
     private JLabel meanValueLabel;
 
+    private JLabel[] paramLabels;
+    private JTextField[] paramFields;
+    private JCheckBox[] paramUseConstant;
+    private JComboBox<Object>[] paramConstantCombos;
+    private JPanel[] paramCells;
+
     public DistributionPanel(TimedTransitionComponent transition, JButton okButton, EscapableDialog dialog) {
         this.transition = transition;
         this.okButton = okButton;
@@ -90,6 +96,49 @@ public class DistributionPanel extends JPanel {
         distributionParam2Field = new JTextField(10);
         distributionParam3Field = new JTextField(10);
 
+        paramLabels = new JLabel[]{ distributionParam1Label, distributionParam2Label, distributionParam3Label };
+        paramFields = new JTextField[]{ distributionParam1Field, distributionParam2Field, distributionParam3Field };
+        paramUseConstant = new JCheckBox[3];
+        paramConstantCombos = new JComboBox[3];
+        paramCells = new JPanel[3];
+
+        List<SMCParameterConstant> constantItems = new ArrayList<>();
+        if (transition.underlyingTransition().model() != null) {
+            TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
+            if (network != null) {
+                constantItems.addAll(network.realConstants());
+                constantItems.addAll(network.constants());
+            }
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            final int index = i;
+            paramUseConstant[i] = new JCheckBox("Constant");
+            paramUseConstant[i].setToolTipText("Use a global constant as this parameter");
+            paramUseConstant[i].setEnabled(!constantItems.isEmpty());
+            paramConstantCombos[i] = new JComboBox<>(constantItems.toArray());
+            paramConstantCombos[i].setPreferredSize(new Dimension(150, paramConstantCombos[i].getPreferredSize().height));
+            paramConstantCombos[i].setVisible(false);
+
+            paramUseConstant[i].addActionListener(e -> {
+                boolean useConstant = paramUseConstant[index].isSelected();
+                paramFields[index].setVisible(!useConstant);
+                paramConstantCombos[index].setVisible(useConstant);
+                updateExponentialMeanFromConstant();
+                refreshDistributionPreview();
+                dialog.pack();
+            });
+            paramConstantCombos[i].addActionListener(e -> {
+                updateExponentialMeanFromConstant();
+                refreshDistributionPreview();
+            });
+
+            paramCells[i] = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+            paramCells[i].add(paramFields[i]);
+            paramCells[i].add(paramConstantCombos[i]);
+            paramCells[i].add(paramUseConstant[i]);
+        }
+
         meanLabel = new JLabel();
         meanValueLabel = new JLabel();
         SwingHelper.setPreferredWidth(distributionParam1Field, 150);
@@ -109,24 +158,13 @@ public class DistributionPanel extends JPanel {
         distributionShowGraph.addActionListener(actionEvent -> showDistributionGraph());
         DocumentListener updateDistribDisplay = new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
-                display();
+                refreshDistributionPreview();
             }
             public void removeUpdate(DocumentEvent e) {
-                display();
+                refreshDistributionPreview();
             }
             public void insertUpdate(DocumentEvent e) {
-                display();
-            }
-            public void display() {
-                SMCDistribution distrib = parseDistribution();
-                if (distrib.getMean() != null && !(distrib instanceof SMCNormalDistribution) && !(distrib instanceof SMCExponentialDistribution)) {
-                    meanLabel.setText("Mean :");
-                    meanValueLabel.setText(formatValue(distrib.getMean()));
-                } else {
-                    meanLabel.setText("");
-                    meanValueLabel.setText("");
-                }
-                distributionType.setToolTipText(distrib.explanation());
+                refreshDistributionPreview();
             }
         };
 
@@ -215,7 +253,7 @@ public class DistributionPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        paramPanel.add(distributionParam1Field, gbc);
+        paramPanel.add(paramCells[0], gbc);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.EAST;
@@ -223,7 +261,7 @@ public class DistributionPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        paramPanel.add(distributionParam2Field, gbc);
+        paramPanel.add(paramCells[1], gbc);
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx++;
@@ -240,7 +278,7 @@ public class DistributionPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        paramPanel.add(distributionParam3Field, gbc);
+        paramPanel.add(paramCells[2], gbc);
         gbc = GridBagHelper.as(0, 1, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridwidth = 6;
@@ -248,6 +286,44 @@ public class DistributionPanel extends JPanel {
         add(paramPanel, gbc);
 
         setUrgent(transition.underlyingTransition().isUrgent());
+    }
+
+    private void refreshDistributionPreview() {
+        SMCDistribution distrib = parseDistribution();
+        if (distrib.getMean() != null && !(distrib instanceof SMCNormalDistribution) && !(distrib instanceof SMCExponentialDistribution)) {
+            meanLabel.setText("Mean :");
+            meanValueLabel.setText(formatValue(distrib.getMean()));
+        } else {
+            meanLabel.setText("");
+            meanValueLabel.setText("");
+        }
+        distributionType.setToolTipText(distrib.explanation());
+    }
+
+    private void updateExponentialMeanFromConstant() {
+        if (!SMCExponentialDistribution.NAME.equals(String.valueOf(distributionType.getSelectedItem()))) {
+            return;
+        }
+
+        boolean rateFromConstant = paramUseConstant[0].isSelected();
+        paramFields[1].setEditable(!rateFromConstant);
+        if (!rateFromConstant || updatingFields) {
+            return;
+        }
+
+        Object selected = paramConstantCombos[0].getSelectedItem();
+        if (selected instanceof SMCParameterConstant) {
+            double rate = ((SMCParameterConstant) selected).paramValue();
+            if (rate != 0) {
+                try {
+                    updatingFields = true;
+                    paramFields[1].setText(formatValue(1.0 / rate));
+                    paramFields[1].setCaretPosition(0);
+                } finally {
+                    updatingFields = false;
+                }
+            }
+        }
     }
 
     private void updateDistributionCategory() {
@@ -318,12 +394,16 @@ public class DistributionPanel extends JPanel {
             useContinuousDistribution.setEnabled(false);
             useCustomDistribution.setEnabled(false);
             distributionParam1Field.setEnabled(false);
+            paramUseConstant[0].setEnabled(false);
+            paramConstantCombos[0].setEnabled(false);
         } else {
             distributionType.setEnabled(true);
             useDiscreteDistribution.setEnabled(true);
             useContinuousDistribution.setEnabled(true);
             useCustomDistribution.setEnabled(true);
             distributionParam1Field.setEnabled(true);
+            paramUseConstant[0].setEnabled(paramConstantCombos[0].getItemCount() > 0);
+            paramConstantCombos[0].setEnabled(true);
         }
     }
 
@@ -335,50 +415,93 @@ public class DistributionPanel extends JPanel {
         if (useCustomDistribution.isSelected()) {
              return new SMCUserDefinedDistribution(type);
         }
-        
+
+        pendingRefs.clear();
         try {
+            SMCDistribution result = null;
             switch (type) {
                 case SMCConstantDistribution.NAME:
-                    double value = Double.parseDouble(distributionParam1Field.getText());
-                    return new SMCConstantDistribution(value);
+                    double value = parseParam("value", 0);
+                    result = new SMCConstantDistribution(value);
+                    break;
                 case SMCUniformDistribution.NAME:
-                    double a = Double.parseDouble(distributionParam1Field.getText());
-                    double b = Double.parseDouble(distributionParam2Field.getText());
-                    return new SMCUniformDistribution(a, b);
+                    double a = parseParam("a", 0);
+                    double b = parseParam("b", 1);
+                    result = new SMCUniformDistribution(a, b);
+                    break;
                 case SMCExponentialDistribution.NAME:
-                    double rate = Double.parseDouble(distributionParam1Field.getText());
-                    return new SMCExponentialDistribution(rate);
+                    double rate = parseParam("rate", 0);
+                    result = new SMCExponentialDistribution(rate);
+                    break;
                 case SMCNormalDistribution.NAME:
-                    double mean = Double.parseDouble(distributionParam1Field.getText());
-                    double stddev = Double.parseDouble(distributionParam2Field.getText());
-                    return new SMCNormalDistribution(mean, stddev);
+                    double mean = parseParam("mean", 0);
+                    double stddev = parseParam("stddev", 1);
+                    result = new SMCNormalDistribution(mean, stddev);
+                    break;
                 case SMCGammaDistribution.NAME:
-                    double shape = Double.parseDouble(distributionParam1Field.getText());
-                    double scale = Double.parseDouble(distributionParam2Field.getText());
-                    return new SMCGammaDistribution(shape, scale);
+                    double shape = parseParam("shape", 0);
+                    double scale = parseParam("scale", 1);
+                    result = new SMCGammaDistribution(shape, scale);
+                    break;
                 case SMCErlangDistribution.NAME:
-                    double eshape = Integer.parseInt(distributionParam1Field.getText());
-                    double escale = Double.parseDouble(distributionParam2Field.getText());
-                    return new SMCErlangDistribution(eshape, escale);
+                    double eshape = parseIntParam("shape", 0);
+                    double escale = parseParam("scale", 1);
+                    result = new SMCErlangDistribution(eshape, escale);
+                    break;
                 case SMCDiscreteUniformDistribution.NAME:
-                    double da = Integer.parseInt(distributionParam1Field.getText());
-                    double db = Integer.parseInt(distributionParam2Field.getText());
-                    return new SMCDiscreteUniformDistribution(da, db);
+                    double da = parseIntParam("a", 0);
+                    double db = parseIntParam("b", 1);
+                    result = new SMCDiscreteUniformDistribution(da, db);
+                    break;
                 case SMCGeometricDistribution.NAME:
-                    double p = Double.parseDouble(distributionParam1Field.getText());
-                    return new SMCGeometricDistribution(p);
+                    double p = parseParam("p", 0);
+                    result = new SMCGeometricDistribution(p);
+                    break;
                 case SMCTriangularDistribution.NAME:
-                    double ta = Double.parseDouble(distributionParam1Field.getText());
-                    double tb = Double.parseDouble(distributionParam2Field.getText());
-                    double tc = Double.parseDouble(distributionParam3Field.getText());
-                    return new SMCTriangularDistribution(ta, tb, tc);
+                    double ta = parseParam("a", 0);
+                    double tb = parseParam("b", 1);
+                    double tc = parseParam("c", 2);
+                    result = new SMCTriangularDistribution(ta, tb, tc);
+                    break;
                 case SMCLogNormalDistribution.NAME:
-                    double logMean = Double.parseDouble(distributionParam1Field.getText());
-                    double logStddev = Double.parseDouble(distributionParam2Field.getText());
-                    return new SMCLogNormalDistribution(logMean, logStddev);
+                    double logMean = parseParam("logMean", 0);
+                    double logStddev = parseParam("logStddev", 1);
+                    result = new SMCLogNormalDistribution(logMean, logStddev);
+                    break;
+            }
+            if (result != null) {
+                pendingRefs.forEach(result::setParamRef);
+                return result;
             }
         } catch(NumberFormatException ignored) {}
         return SMCDistribution.defaultDistributionFor(type);
+    }
+
+    private final Map<String, SMCParameterConstant> pendingRefs = new LinkedHashMap<>();
+
+    private SMCParameterConstant selectedConstant(int index) {
+        Object selected = paramConstantCombos[index].getSelectedItem();
+        return selected instanceof SMCParameterConstant ? (SMCParameterConstant) selected : null;
+    }
+
+    private double parseParam(String key, int index) {
+        if (paramUseConstant[index].isSelected()) {
+            var constant = selectedConstant(index);
+            if (constant == null) {
+                throw new NumberFormatException("No constant selected");
+            }
+            pendingRefs.put(key, constant);
+            return constant.paramValue();
+        }
+        return Double.parseDouble(paramFields[index].getText().trim());
+    }
+
+    private double parseIntParam(String key, int index) {
+        if (paramUseConstant[index].isSelected()) {
+            return parseParam(key, index);
+        }
+        
+        return Integer.parseInt(paramFields[index].getText().trim());
     }
 
     public void displayDistribution() {
@@ -415,50 +538,55 @@ public class DistributionPanel extends JPanel {
 
         switch (distribution.distributionName()) {
             case SMCConstantDistribution.NAME:
-                displayOneVariable("Value", ((SMCConstantDistribution) distribution).value);
+                displayParam(0, "Value", distribution, "value");
+                hideParam(1);
+                hideParam(2);
                 break;
             case SMCUniformDistribution.NAME:
-                displayTwoVariables(
-                    "A", ((SMCUniformDistribution) distribution).a,
-                    "B", ((SMCUniformDistribution) distribution).b);
+                displayParam(0, "A", distribution, "a");
+                displayParam(1, "B", distribution, "b");
+                hideParam(2);
                 break;
             case SMCExponentialDistribution.NAME:
-                displayTwoVariables("Rate", ((SMCExponentialDistribution) distribution).rate,
-                                  "Mean", ((SMCExponentialDistribution) distribution).getMean());
+                displayParam(0, "Rate", distribution, "rate");
+                displayDerivedParam(1, "Mean", formatValue(1.0 / distribution.getResolvedParameters().get("rate")));
+                paramFields[1].setEditable(distribution.getParamRef("rate") == null);
+                hideParam(2);
                 break;
             case SMCNormalDistribution.NAME:
-                displayTwoVariables(
-                    "Mean", ((SMCNormalDistribution) distribution).mean,
-                    "Std. Dev", ((SMCNormalDistribution) distribution).stddev);
+                displayParam(0, "Mean", distribution, "mean");
+                displayParam(1, "Std. Dev", distribution, "stddev");
+                hideParam(2);
                 break;
             case SMCGammaDistribution.NAME:
-                displayTwoVariables(
-                    "Shape", ((SMCGammaDistribution) distribution).shape,
-                    "Scale", ((SMCGammaDistribution) distribution).scale);
+                displayParam(0, "Shape", distribution, "shape");
+                displayParam(1, "Scale", distribution, "scale");
+                hideParam(2);
                 break;
             case SMCErlangDistribution.NAME:
-                displayTwoVariables(
-                    "Shape", ((SMCErlangDistribution) distribution).shape,
-                    "Scale", ((SMCErlangDistribution) distribution).scale);
+                displayParam(0, "Shape", distribution, "shape");
+                displayParam(1, "Scale", distribution, "scale");
+                hideParam(2);
                 break;
             case SMCDiscreteUniformDistribution.NAME:
-                displayTwoVariables(
-                    "A", ((SMCDiscreteUniformDistribution) distribution).a,
-                    "B", ((SMCDiscreteUniformDistribution) distribution).b);
+                displayParam(0, "A", distribution, "a");
+                displayParam(1, "B", distribution, "b");
+                hideParam(2);
                 break;
             case SMCGeometricDistribution.NAME:
-                displayOneVariable("P", ((SMCGeometricDistribution) distribution).p);
+                displayParam(0, "P", distribution, "p");
+                hideParam(1);
+                hideParam(2);
                 break;
             case SMCTriangularDistribution.NAME:
-                displayThreeVariables(
-                    "A", ((SMCTriangularDistribution) distribution).a,
-                    "B", ((SMCTriangularDistribution) distribution).b,
-                    "C", ((SMCTriangularDistribution) distribution).c);
+                displayParam(0, "A", distribution, "a");
+                displayParam(1, "B", distribution, "b");
+                displayParam(2, "C", distribution, "c");
                 break;
             case SMCLogNormalDistribution.NAME:
-                displayTwoVariables(
-                    "Log Mean", ((SMCLogNormalDistribution) distribution).logMean,
-                    "Log Std. Dev", ((SMCLogNormalDistribution) distribution).logStddev);
+                displayParam(0, "Log Mean", distribution, "logMean");
+                displayParam(1, "Log Std. Dev", distribution, "logStddev");
+                hideParam(2);
                 break;
             case SMCUserDefinedDistribution.NAME:
                 displayCustomDistribution();
@@ -486,55 +614,53 @@ public class DistributionPanel extends JPanel {
         dialog.pack();
     }
 
-    private void displayOneVariable(String name, double value) {
-        distributionParam1Label.setText(name + " :");
-        distributionParam1Field.setText(formatValue(value));
-        distributionParam1Field.setCaretPosition(0);
-        distributionParam2Label.setVisible(false);
-        distributionParam2Field.setVisible(false);
-        distributionParam3Label.setVisible(false);
-        distributionParam3Field.setVisible(false);
-        distributionParam1Field.setVisible(true);
+    private void displayParam(int i, String label, SMCDistribution distribution, String key) {
+        paramLabels[i].setText(label + " :");
+        paramLabels[i].setVisible(true);
+        paramCells[i].setVisible(true);
+
+        SMCParameterConstant ref = distribution.getParamRef(key);
+        boolean hasConstants = paramConstantCombos[i].getItemCount() > 0;
+        paramUseConstant[i].setVisible(true);
+        paramUseConstant[i].setEnabled(hasConstants);
+
+        if (ref != null && hasConstants) {
+            paramUseConstant[i].setSelected(true);
+            paramConstantCombos[i].setSelectedItem(ref);
+            paramConstantCombos[i].setVisible(true);
+            paramFields[i].setVisible(false);
+        } else {
+            paramUseConstant[i].setSelected(false);
+            paramFields[i].setText(formatValue(distribution.getParameters().get(key)));
+            paramFields[i].setCaretPosition(0);
+            paramFields[i].setVisible(true);
+            paramConstantCombos[i].setVisible(false);
+        }
     }
 
-    private void displayTwoVariables(String name1, double value1, String name2, double value2) {
-        distributionParam1Label.setText(name1 + " :");
-        distributionParam2Label.setText(name2 + " :");
-        distributionParam1Field.setText(formatValue(value1));
-        distributionParam2Field.setText(formatValue(value2));
-        distributionParam1Field.setCaretPosition(0);
-        distributionParam2Field.setCaretPosition(0);
-        distributionParam2Label.setVisible(true);
-        distributionParam2Field.setVisible(true);
-        distributionParam3Label.setVisible(false);
-        distributionParam3Field.setVisible(false);
-        distributionParam1Field.setVisible(true);
+    private void displayDerivedParam(int i, String label, String text) {
+        paramLabels[i].setText(label + " :");
+        paramLabels[i].setVisible(true);
+        paramCells[i].setVisible(true);
+        paramUseConstant[i].setSelected(false);
+        paramUseConstant[i].setVisible(false);
+        paramConstantCombos[i].setVisible(false);
+        paramFields[i].setText(text);
+        paramFields[i].setCaretPosition(0);
+        paramFields[i].setVisible(true);
     }
 
-    private void displayThreeVariables(String name1, double value1, String name2, double value2, String name3, double value3) {
-        distributionParam1Label.setText(name1 + " :");
-        distributionParam2Label.setText(name2 + " :");
-        distributionParam3Label.setText(name3 + " :");
-        distributionParam1Field.setText(formatValue(value1));
-        distributionParam2Field.setText(formatValue(value2));
-        distributionParam3Field.setText(formatValue(value3));
-        distributionParam1Field.setCaretPosition(0);
-        distributionParam2Field.setCaretPosition(0);
-        distributionParam3Field.setCaretPosition(0);
-        distributionParam2Label.setVisible(true);
-        distributionParam2Field.setVisible(true);
-        distributionParam3Label.setVisible(true);
-        distributionParam3Field.setVisible(true);
-        distributionParam1Field.setVisible(true);
+    private void hideParam(int i) {
+        paramLabels[i].setVisible(false);
+        paramCells[i].setVisible(false);
+        paramUseConstant[i].setSelected(false);
     }
 
     private void displayCustomDistribution() {
-        distributionParam1Label.setText("");
-        distributionParam1Field.setVisible(false);
-        distributionParam2Label.setVisible(false);
-        distributionParam2Field.setVisible(false);
-        distributionParam3Label.setVisible(false);
-        distributionParam3Field.setVisible(false);
+        paramLabels[0].setText("");
+        hideParam(0);
+        hideParam(1);
+        hideParam(2);
     }
 
     private void showManageCustomDistributionsDialog() {
