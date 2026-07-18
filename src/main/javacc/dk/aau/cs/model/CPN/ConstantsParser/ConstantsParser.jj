@@ -436,7 +436,9 @@ TOKEN :
     |
     <CONST: "const">
     |
-    <REALCONST: "real">
+    <INTTYPE: "int">
+    |
+    <REALTYPE: "real">
     |
     <MINUS: "-">
     |
@@ -473,19 +475,24 @@ void values() :
 {}
 {
     constants() |
-    realConstantDecl() |
     colorTypes() |
     variables()
 }
 
-void realConstantDecl() :
+void constants() :
+{}
+{
+    <CONST> (<REALTYPE> realConstant() | <INTTYPE> intConstant())
+}
+
+void realConstant() :
 {
     Token id;
     String value;
     List<String> values = new ArrayList<String>();
 }
 {
-    <REALCONST> id = <ID> <EQ>
+    id = <ID> <EQ>
     (
         value = realValue() {
             idExists(id.image);
@@ -521,13 +528,13 @@ void realSet(List<String> values) :
     (<COMMA> val = realValue() { values.add(val); })*
 }
 
-void constants() :
+void intConstant() :
 {
     Token id, value;
     List<String> values = new ArrayList<String>();
 }
 {
-    <CONST> id = <ID> <EQ> 
+    id = <ID> <EQ>
     (
         value = <INTEGER> { 
             idExists(id.image);
