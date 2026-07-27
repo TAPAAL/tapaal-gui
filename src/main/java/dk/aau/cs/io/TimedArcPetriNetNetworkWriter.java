@@ -243,7 +243,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
             element.setAttribute("player", transition.isUncontrollable() ? "1" : "0");
             element.setAttribute("weight", transition.getWeight().nameForSaving(saveConstantNames));
 			element.setAttribute("firingMode", transition.getFiringMode().toString());
-            transition.getDistribution().writeToXml(element);
+            transition.getDistribution().writeToXml(element, saveConstantNames);
 			root.appendChild(element);
 		}
 	}
@@ -666,7 +666,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         transitionElement.setAttribute("player", inputTransition.underlyingTransition().isUncontrollable() ? "1" : "0");
         transitionElement.setAttribute("weight", inputTransition.underlyingTransition().getWeight().nameForSaving(saveConstantNames));
 		transitionElement.setAttribute("firingMode", inputTransition.underlyingTransition().getFiringMode().toString());
-        inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement);
+        inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement, saveConstantNames);
         writeTACPN.appendColoredTransitionDependencies(inputTransition.underlyingTransition(), document, transitionElement);
 
         return transitionElement;

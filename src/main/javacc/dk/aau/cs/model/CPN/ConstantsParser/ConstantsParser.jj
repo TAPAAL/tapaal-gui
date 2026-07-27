@@ -25,6 +25,7 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.RealConstant;
+import dk.aau.cs.model.tapn.SMCParameterConstant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -68,16 +69,6 @@ public class ConstantsParser {
 
         network.buildConstraints();
 
-        // A real constant that is referenced by a transition distribution cannot be removed or renamed away
-        for (RealConstant rc : network.realConstants()) {
-            if (rc.isUsed() && !realConstants.containsKey(rc.name())) {
-                JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
-                    "Could not remove real constant \"" + rc.name() + "\" because it is in use",
-                    "Could not remove constant", JOptionPane.WARNING_MESSAGE);
-                return false;
-            }
-        }
-
         List<Constant> constantsList = constants.values()
                                                 .stream()
                                                 .collect(Collectors.toList());
@@ -104,6 +95,11 @@ public class ConstantsParser {
             canBeRemovedBitMap.put(c.name(), !network.getConstantStore().isConstantInUse(c.name()));
         }
 
+        for (RealConstant rc : network.realConstants()) {
+            constantsMap.put(rc.name(), rc);
+            canBeRemovedBitMap.put(rc.name(), !network.getConstantStore().isRealConstantInUse(rc.name()));
+        }
+
         for (ColorType ct : network.colorTypes()) {
             List<String> messagesList = new ArrayList<String>();
             constantsMap.put(ct.getName(), ct);
@@ -126,7 +122,8 @@ public class ConstantsParser {
 
         // Generate error messages
         for (String key : canBeRemovedBitMap.keySet()) {
-            if (constants.containsKey(key) || 
+            if (constants.containsKey(key) ||
+                realConstants.containsKey(key) ||
                 variables.containsKey(key) && canBeRemovedBitMap.get(key) ||
                 key.equals("dot")) {
                 continue;
@@ -234,14 +231,14 @@ public class ConstantsParser {
                 if (obj instanceof ColorType) {
                     message += "color type";
                 } else if (obj instanceof Variable) {
-                    message += "variable"; 
+                    message += "variable";
                 } else {
                     message += "constant";
                 }
 
                 message += " \"" + key + "\"";
 
-                if (!(obj instanceof Constant)) {
+                if (!(obj instanceof SMCParameterConstant)) {
                     message += " for the following reasons:  \n\n";
                     message += String.join("", messages.get(key));
                 } else {

@@ -127,7 +127,8 @@ public abstract class SMCDistribution {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        return getParameters().equals(((SMCDistribution) o).getParameters());
+        SMCDistribution other = (SMCDistribution) o;
+        return getParameters().equals(other.getParameters()) && paramRefs.equals(other.paramRefs);
     }
 
     public static SMCDistribution parseXml(Element elem) {

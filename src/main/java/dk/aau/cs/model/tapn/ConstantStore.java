@@ -309,6 +309,16 @@ public class ConstantStore {
 		findLargestConstantValue();
 	}
 
+	public void replace(Constant oldConstant, Constant newConstant) {
+		int index = constants.indexOf(oldConstant);
+		if (index < 0) {
+			add(newConstant);
+			return;
+		}
+		constants.set(index, newConstant);
+		findLargestConstantValue();
+	}
+
 	private void findLargestConstantValue() {
 		largest = -1;
 
@@ -342,10 +352,7 @@ public class ConstantStore {
 				updatedConstant.setLowerBound(old.lowerBound());
 				updatedConstant.setUpperBound(old.upperBound());
 				updatedConstant.setIsUsed(old.isUsed());
-				int index = constants.indexOf(old);
-				constants.remove(old);
-				constants.add(index, updatedConstant);
-				findLargestConstantValue();
+				replace(old, updatedConstant);
 				return new UpdateConstantEditCommand(old, updatedConstant, this, model);
 			}
 		}
@@ -413,6 +420,16 @@ public class ConstantStore {
 		realConstants.remove(constant);
 	}
 
+	public void replace(RealConstant oldConstant, RealConstant newConstant) {
+		int index = realConstants.indexOf(oldConstant);
+		if (index < 0) {
+			add(newConstant);
+			return;
+		}
+        
+		realConstants.set(index, newConstant);
+	}
+
 	public Command removeRealConstant(String name) {
 		if (isRealConstantInUse(name)) {
 			return null;
@@ -444,8 +461,7 @@ public class ConstantStore {
 		}
 
 		updatedConstant.setIsUsed(old.isUsed());
-		int index = realConstants.indexOf(old);
-		realConstants.set(index, updatedConstant);
+		replace(old, updatedConstant);
 		return new UpdateRealConstantEditCommand(old, updatedConstant, this, model);
 	}
 

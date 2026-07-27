@@ -22,16 +22,14 @@ public class UpdateRealConstantEditCommand implements Command {
 
 	@Override
 	public void redo() {
-		store.remove(oldConstant);
-		store.add(newConstant);
+		store.replace(oldConstant, newConstant);
 		model.updateDistributionsWithNewConstant(oldConstant.name(), newConstant);
 		TAPAALGUI.getCurrentTab().updateConstantsList();
 	}
 
 	@Override
 	public void undo() {
-		store.remove(newConstant);
-		store.add(oldConstant);
+		store.replace(newConstant, oldConstant);
 		model.updateDistributionsWithNewConstant(newConstant.name(), oldConstant);
 		TAPAALGUI.getCurrentTab().updateConstantsList();
 	}
