@@ -11,11 +11,9 @@ import java.util.Vector;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
@@ -69,17 +67,9 @@ public class ConstantsParser {
 
         network.buildConstraints();
 
-        List<Constant> constantsList = constants.values()
-                                                .stream()
-                                                .collect(Collectors.toList());
-
-        List<ColorType> colorTypesList = colorTypes.values()
-                                                   .stream()
-                                                   .collect(Collectors.toList());
-        
-        List<Variable> variablesList = variables.values()
-                                                .stream()
-                                                .collect(Collectors.toList());
+        List<Constant> constantsList = new ArrayList<Constant>(constants.values());
+        List<ColorType> colorTypesList = new ArrayList<ColorType>(colorTypes.values());
+        List<Variable> variablesList = new ArrayList<Variable>(variables.values());
 
         ColorType dot = new ColorType("dot");
         dot.addColor("dot");    
