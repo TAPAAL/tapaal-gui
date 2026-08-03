@@ -393,7 +393,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	}
 	
 	private void removeArcPathPoints() {
-		ArrayList<ArcPathPoint> toRemove = new ArrayList<ArcPathPoint>();
+		List<ArcPathPoint> toRemove = new ArrayList<ArcPathPoint>();
 		for (var pnObj : model.getPNObjects()) {
 			if (pnObj instanceof Arc) {
 				var arc = (Arc)pnObj;
