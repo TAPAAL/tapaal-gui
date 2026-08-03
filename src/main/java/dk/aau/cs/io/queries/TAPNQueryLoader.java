@@ -385,7 +385,11 @@ public class TAPNQueryLoader extends QueryLoader{
                 query instanceof LTLANode ||
                 query instanceof LTLENode){
             return TAPNQuery.QueryCategory.LTL;
-        } else if(query instanceof TCTLEUNode ||
+        } else if(query instanceof TCTLAFNode ||
+                query instanceof TCTLAGNode ||
+                query instanceof TCTLEFNode ||
+                query instanceof TCTLEGNode ||
+                query instanceof TCTLEUNode ||
                 query instanceof TCTLEXNode ||
 				query instanceof TCTLAUNode ||
 				query instanceof TCTLAXNode) {
