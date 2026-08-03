@@ -271,11 +271,7 @@ public class WorkflowDialog extends JDialog {
 		setContentPane(panel);
 
 		pack();
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Dimension screenSize = toolkit.getScreenSize();
-		int x = (screenSize.width - getWidth()) / 2;
-		int y = (int) ((screenSize.height - getHeight()) / 2 * 0.5);
-		setLocation(x, y);
+		setLocationRelativeTo(TAPAALGUI.getApp());
 		setResizable(true);
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 	}
