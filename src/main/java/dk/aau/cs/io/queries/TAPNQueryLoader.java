@@ -243,7 +243,7 @@ public class TAPNQueryLoader extends QueryLoader{
 
     private ObsExpression parseObsExpression(Element element) {
         String tagName = element.getTagName();
-    
+   
         switch (tagName) {
             case "integer-sum":
                 return createOperatorExpression(element, ObsAdd::new);
@@ -251,8 +251,9 @@ public class TAPNQueryLoader extends QueryLoader{
                 return createOperatorExpression(element, ObsSubtract::new);
             case "integer-product":
                 return createOperatorExpression(element, ObsMultiply::new);
-            case "integer-constant":
-                return new ObsConstant(Integer.parseInt(element.getTextContent()));
+            case "integer-constant": // Backwards compatibility
+            case "real-constant":
+                return new ObsConstant(Float.parseFloat(element.getTextContent()));
             case "place":
                 return createPlaceExpression(element);
             default:
