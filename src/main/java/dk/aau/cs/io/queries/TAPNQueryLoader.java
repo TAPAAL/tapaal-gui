@@ -89,7 +89,6 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean active = getActiveStatus(queryElement);
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
 		boolean reduction = getReductionOption(queryElement, "reduction", true);
-		String algorithmOption = queryElement.getAttribute("algorithmOption");
         boolean isCTL = isTypeQuery(queryElement, "CTL");
         boolean isLTL = isTypeQuery(queryElement, "LTL");
         boolean isHyperLTL = isTypeQuery(queryElement, "HyperLTL");
@@ -189,7 +188,7 @@ public class TAPNQueryLoader extends QueryLoader{
             parsedQuery.setUseTarjan(useTarjan);
 			if (parsedQuery.getCategory() == QueryCategory.CTL){
                 parsedQuery.setUseExplicitSearch(useExplicitSearch);
-				parsedQuery.setAlgorithmOption(AlgorithmOption.valueOf(algorithmOption));
+				parsedQuery.setAlgorithmOption(getAlgorithmOption(queryElement));
 			} else if(parsedQuery.getCategory() == QueryCategory.HyperLTL) {
                 parsedQuery.setTraceList(tracesArr);
             } else if(parsedQuery.getCategory() == QueryCategory.SMC) {
@@ -203,6 +202,15 @@ public class TAPNQueryLoader extends QueryLoader{
 		} else
 			return null;
 	}
+
+    private AlgorithmOption getAlgorithmOption(Element queryElement) {
+        String algorithmStr = queryElement.getAttribute("algorithmOption");
+        if (algorithmStr == null || algorithmStr.trim().isEmpty()) {
+            return AlgorithmOption.CERTAIN_ZERO;
+        }
+        
+        return AlgorithmOption.valueOf(algorithmStr);
+    }
 
     public static boolean hasSmcTag(Node queryElement) {
         NodeList children = queryElement.getChildNodes();
