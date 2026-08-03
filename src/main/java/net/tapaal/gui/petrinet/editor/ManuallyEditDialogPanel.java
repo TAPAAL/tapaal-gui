@@ -171,7 +171,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         add(panel);
 
         setSize(650, 500);
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(TAPAALGUI.getApp());
     }
 
     private void save() {

@@ -38,7 +38,7 @@ public class NewTAPNPanel extends EscapableDialog {
             newTAPNPanel.setPreferredSize(newTAPNPanel.getSize());
             //Set the minimum size to 150 less than the preferred, to be consistent with the minimum size of the result panel
             newTAPNPanel.setMinimumSize(new Dimension(newTAPNPanel.getWidth(), newTAPNPanel.getHeight()-150));
-            newTAPNPanel.setLocationRelativeTo(null);
+            newTAPNPanel.setLocationRelativeTo(frame);
             newTAPNPanel.setResizable(true);
         }
         String defaultName = String.format("New Petri net %1$d", newNameCounter);

@@ -100,7 +100,7 @@ public class RunningVerificationDialog extends JDialog {
 	}
 
 	public void initComponents() {		
-		setLocationRelativeTo(null);
+		setLocationRelativeTo(getOwner());
 		setLayout(new GridBagLayout());
 		
 		timer = new Timer(1000, new AbstractAction() {

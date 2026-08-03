@@ -238,12 +238,16 @@ public class ObservationDialog extends EscapableDialog {
         constantsPanel.setLayout(new GridBagLayout());
         constantsPanel.setBorder(BorderFactory.createTitledBorder("Constants"));
 
-        CustomJSpinner constantSpinner = new CustomJSpinner(1, 1, Integer.MAX_VALUE);
+        JTextField constantTextField = new JTextField("1.0");
         JButton addConstantButton = new JButton("Add constant");
         addConstantButton.addActionListener(e -> {
-            int value = (int)constantSpinner.getValue();
-            ObsExpression constantExpr = new ObsConstant(value);
-            updateExpression(constantExpr);
+            try {
+                float value = Float.parseFloat(constantTextField.getText());
+                ObsExpression constantExpr = new ObsConstant(value);
+                updateExpression(constantExpr);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(ObservationDialog.this, "The constant value must be a valid real number.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         GridBagConstraints constantsGbc = new GridBagConstraints();
@@ -252,7 +256,7 @@ public class ObservationDialog extends EscapableDialog {
         constantsGbc.weightx = 1;
         constantsGbc.fill = GridBagConstraints.HORIZONTAL;
         constantsGbc.insets = new Insets(0, 10, 0, 10);
-        constantsPanel.add(constantSpinner, constantsGbc);
+        constantsPanel.add(constantTextField, constantsGbc);
         ++constantsGbc.gridy;
         constantsGbc.insets = new Insets(5, 10, 0, 10);
         constantsPanel.add(addConstantButton, constantsGbc);
