@@ -182,7 +182,7 @@ public class VerifytaTraceParser {
 						TimeDelayFiringAction delay = TimeDelayFiringAction.parse(
 								previousState, element);
 						trace.addFiringAction(delay);
-					} else if (element.contains("Transitions:")) {
+					} else if (element.contains("Transitions:") || element.contains("Transition:")) { 
 						if(!element.contains("__fill_remove_from_trace__!")){
 							boolean test = true;
 							int end = 0;
@@ -259,7 +259,7 @@ public class VerifytaTraceParser {
 						TimeDelayFiringAction delay = TimeDelayFiringAction.parse(
 								previousState, element);
 						trace.addFiringAction(delay);
-					} else if (element.contains("Transitions:")) {
+					} else if (element.contains("Transitions:") || element.contains("Transition:")) {
 						TransitionFiring transition = TransitionFiring.parse(
 								previousState, element);
 						trace.addFiringAction(transition);

@@ -293,7 +293,7 @@ public class Verifyta implements ModelChecker {
 			if (queryResult == null) {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
-				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult);
+				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
 				return new VerificationResult<TimedArcPetriNetTrace>(queryResult, tapnTrace, runner.getRunningTime(), standardOutput + "\n\n" + errorOutput);
 			}
 		}
@@ -325,11 +325,13 @@ public class Verifyta implements ModelChecker {
 		return outputParser.parseOutput(output);
 	}
 
-	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel, TAPNQuery query, QueryResult queryResult) {
+	private TimedArcPetriNetTrace parseTrace(String errorOutput, String standardOutput, VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel, TAPNQuery query, QueryResult queryResult) {
 		TimedArcPetriNetTrace tapnTrace = null;
 
 		VerifytaTraceParser traceParser = new VerifytaTraceParser();
-		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)), (VerifytaOptions) options);
+		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(errorOutput)), (VerifytaOptions) options);
+		if (trace == null)
+			trace = traceParser.parseTrace(new BufferedReader(new StringReader(standardOutput)), (VerifytaOptions) options);
 
 		if (trace == null) {
 			if (options.traceOption() != TraceOption.NONE) {
