@@ -4522,7 +4522,7 @@ public class QueryDialog extends JPanel {
                     int newPrec = operator.equals("*") ? 2 : 1;
                     int parentPrec = "*".equals(parentOp) ? 2 : 1;
                     
-                    if (newPrec <= parentPrec) {
+                    if (newPrec == parentPrec) {
                         List<TCTLAbstractStateProperty> properties = new ArrayList<>();
                         properties.add((TCTLAbstractStateProperty) parent.copy());
                         properties.add(new AritmeticOperator(operator));
