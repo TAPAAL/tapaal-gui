@@ -20,6 +20,7 @@ import net.tapaal.gui.petrinet.undo.DeleteTimedPlaceCommand;
 import net.tapaal.gui.petrinet.undo.DeleteTimedTransitionCommand;
 import pipe.gui.petrinet.undo.UndoManager;
 
+import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -56,7 +57,7 @@ public class StatisticsPanel extends JPanel{
 
 		JOptionPane optionPane = new JOptionPane(panel, JOptionPane.INFORMATION_MESSAGE);
 		
-		dialog = optionPane.createDialog(DIALOG_TITLE);
+		dialog = optionPane.createDialog(TAPAALGUI.getApp(), DIALOG_TITLE);
 		
 		dialog.pack();
 		dialog.setVisible(true);
@@ -207,7 +208,7 @@ public class StatisticsPanel extends JPanel{
                 JOptionPane optionPane = new JOptionPane(StatisticsPanel.this, JOptionPane.INFORMATION_MESSAGE);
 
                 dialog.dispose();
-                dialog = optionPane.createDialog(DIALOG_TITLE);
+                dialog = optionPane.createDialog(TAPAALGUI.getApp(), DIALOG_TITLE);
                 dialog.setLocation(location);
                 dialog.pack();
                 dialog.setVisible(true);
@@ -248,7 +249,7 @@ public class StatisticsPanel extends JPanel{
                 JOptionPane optionPane = new JOptionPane(StatisticsPanel.this, JOptionPane.INFORMATION_MESSAGE);
 
                 dialog.dispose();
-                dialog = optionPane.createDialog(DIALOG_TITLE);
+                dialog = optionPane.createDialog(TAPAALGUI.getApp(), DIALOG_TITLE);
                 dialog.setLocation(location);
                 dialog.pack();
                 dialog.setVisible(true);

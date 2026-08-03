@@ -392,7 +392,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 
 		guiDialog.setResizable(false);
 		guiDialog.pack();
-		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
 		guiDialog.setVisible(true);
 	}
 
@@ -413,7 +413,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel implements SidePane 
 
 		guiDialog.setResizable(false);
 		guiDialog.pack();
-		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
 		guiDialog.setVisible(true);
 	}
 

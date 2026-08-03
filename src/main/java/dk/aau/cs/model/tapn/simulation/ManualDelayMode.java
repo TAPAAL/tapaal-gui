@@ -66,7 +66,7 @@ public class ManualDelayMode implements DelayMode{
 		panel = new ChooseDelayPanel(transition, dInterval, delayGranularity);
 		dialog.setContentPane(panel);
 		dialog.pack();
-		dialog.setLocationRelativeTo(null);
+		dialog.setLocationRelativeTo(TAPAALGUI.getApp());
 		dialog.setVisible(true);
 		
 		BigDecimal result;
