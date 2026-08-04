@@ -3,8 +3,7 @@ package pipe.gui.petrinet.editor;
 import net.tapaal.gui.petrinet.Context;
 import java.awt.event.ItemEvent;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+
 import java.util.*;
 
 import net.tapaal.gui.petrinet.undo.*;
@@ -332,13 +331,13 @@ public class PlaceEditorPanel extends JPanel {
 		gridBagConstraints = GridBagHelper.as(1,2, WEST, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(markingSpinner, gridBagConstraints);
 
-        uncoloredTokenAgeSpinner = new JSpinner(new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 1.0));
-        uncoloredTokenAgeSpinner.setEditor(new JSpinner.NumberEditor(uncoloredTokenAgeSpinner, "0.0####"));
+        uncoloredTokenAgeSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+        uncoloredTokenAgeSpinner.setEditor(new JSpinner.NumberEditor(uncoloredTokenAgeSpinner, "#0"));
         uncoloredTokenAgeSpinner.setPreferredSize(markingSpinner.getPreferredSize());
         uncoloredTokenAgeSpinner.setVisible(false);
         basicPropertiesPanel.add(uncoloredTokenAgeSpinner, gridBagConstraints);
 
-        tokenAgesCheckBox = new JCheckBox("Token ages");
+        tokenAgesCheckBox = new JCheckBox("Non-zero token ages");
         tokenAgesCheckBox.addActionListener(event -> {
             if (tokenAgesCheckBox.isSelected()) {
                 int marking = (Integer)markingSpinner.getValue();
@@ -408,7 +407,7 @@ public class PlaceEditorPanel extends JPanel {
                 modifyButton.setEnabled(selected);
                 removeButton.setEnabled(selected);
                 if (selected && usesTokenAgeEditor()) {
-                    uncoloredTokenAgeSpinner.setValue(uncoloredTokenAgeList.getSelectedValue().doubleValue());
+                    uncoloredTokenAgeSpinner.setValue(uncoloredTokenAgeList.getSelectedValue().intValue());
                 }
             }
         });
@@ -463,7 +462,7 @@ public class PlaceEditorPanel extends JPanel {
         uncoloredTokenAgeSpinner.setVisible(visible);
         if (visible) {
             if (!uncoloredTokenAgeList.isSelectionEmpty()) {
-                uncoloredTokenAgeSpinner.setValue(uncoloredTokenAgeList.getSelectedValue().doubleValue());
+                uncoloredTokenAgeSpinner.setValue(uncoloredTokenAgeList.getSelectedValue().intValue());
             }
         } else {
             markingSpinner.setValue(uncoloredTokenAgeListModel.size());
@@ -1177,12 +1176,11 @@ public class PlaceEditorPanel extends JPanel {
     }
 
     private String formatTokenAge(BigDecimal age) {
-        DecimalFormat format = new DecimalFormat("0.0####", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-        return format.format(age);
+        return String.valueOf(age.intValue());
     }
 
     private BigDecimal getSpinnerDecimal(JSpinner spinner) {
-        return BigDecimal.valueOf(((Number)spinner.getValue()).doubleValue());
+        return BigDecimal.valueOf(((Number)spinner.getValue()).longValue());
     }
 
     private boolean showTokenLimitError(int numberOfTokens) {
