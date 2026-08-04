@@ -164,7 +164,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                         } else{
                             ColorType ct = (ColorType) dlm.getElementAt(index);
                             if((ct).equals(ColorType.COLORTYPE_DOT)) {
-                                JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
+                                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Dot color cannot be edited");
                             }else {
                                 showEditColorTypeDialog(ct);
                             }
@@ -425,7 +425,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             else {
                 ColorType ct = (ColorType) list.getSelectedValue();
                 if ((ct).equals(ColorType.COLORTYPE_DOT)) {
-                    JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Dot color cannot be edited");
                 } else {
                     showEditColorTypeDialog(ct);
                 }
@@ -737,7 +737,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         for (Object colorType : list.getSelectedValuesList()) {
             if (colorType instanceof ColorType) {
                 if (colorType.equals(ColorType.COLORTYPE_DOT)) {
-                    JOptionPane.showMessageDialog(null, "Dot color cannot be removed");
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Dot color cannot be removed");
                 } else {
                     colorTypesListModel.removeElement((ColorType) colorType);
                 }

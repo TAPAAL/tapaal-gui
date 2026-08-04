@@ -34,6 +34,7 @@ import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.Verifier;
 import net.tapaal.gui.petrinet.undo.RemoveQueriesCommand;
@@ -321,7 +322,7 @@ public class QueryPane extends JPanel implements SidePane {
                 TAPNLens lens = tabContent.getLens();
 
                 if (lens.isStochastic() && !network.isNonStrict()) {
-                    JOptionPane.showMessageDialog(null, "SMC queries are only allowed for models with nonstrict intervals.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "SMC queries are only allowed for models with nonstrict intervals.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -470,7 +471,7 @@ public class QueryPane extends JPanel implements SidePane {
 		boolean isSmc = query.getCategory() == QueryCategory.SMC;
 
 		if (isSmc && !tabContent.network().isNonStrict()) {
-			JOptionPane.showMessageDialog(null, "The model has strict intervals and can therefore not be verified", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The model has strict intervals and can therefore not be verified", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
