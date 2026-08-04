@@ -6,6 +6,7 @@ import java.util.Map;
 
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.RunVerificationBase;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
@@ -450,7 +451,7 @@ public class ApproximationWorker {
 		} else {
             NameMapping nameMapping = isColored? result.getUnfoldedModel().value2(): transformedModel.value2();
             TimedArcPetriNetNetwork netNetwork = isColored? result.getUnfoldedModel().value1().parentNetwork(): model;
-            if (dataLayerQuery != null && dataLayerQuery.getCategory() == net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.HyperLTL || dataLayerQuery.getCategory() == net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.SMC) {
+            if (dataLayerQuery != null && (dataLayerQuery.getCategory() == QueryCategory.HyperLTL || dataLayerQuery.getCategory() == QueryCategory.SMC)) {
                 toReturn =  new VerificationResult<>(
                     result.getQueryResult(),
                     decomposeTrace(result.getTraceMap(), nameMapping, netNetwork),
@@ -480,7 +481,7 @@ public class ApproximationWorker {
 		
 		options.setTraceOption(oldTraceOption);
 		// if the old traceoption was none, we need to set the results traces to null so GUI doesn't try to display the traces later
-		if (oldTraceOption == TraceOption.NONE && toReturn != null && dataLayerQuery.getCategory() != net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.SMC) {
+		if (oldTraceOption == TraceOption.NONE && toReturn != null && (dataLayerQuery == null || dataLayerQuery.getCategory() != QueryCategory.SMC)) {
 			toReturn.setTrace(null);
 			toReturn.setSecondaryTrace(null);
 		}

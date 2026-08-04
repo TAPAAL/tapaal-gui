@@ -1277,6 +1277,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         exportTraceAction.setEnabled(enable);
         importTraceAction.setEnabled(enable);
+        importXMLAction.setEnabled(enable);
+        importSUMOAction.setEnabled(enable);
 
         printAction.setEnabled(enable);
 

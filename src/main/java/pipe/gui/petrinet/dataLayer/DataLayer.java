@@ -424,6 +424,12 @@ public class DataLayer {
 			arc.getSource().removeFromArc(arc);
 			arc.getTarget().removeToArc(arc);
 
+			for (ArcPathPoint point : arc.getArcPath().getArcPathPoints()) {
+				petriNetObjects.remove(point);
+				arcPathSet.remove(point);
+				point.setDeleted(true);
+			}
+
 		}else if (pnObject instanceof ArcPathPoint) {
 			arcPathSet.remove(pnObject);
 		}

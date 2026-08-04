@@ -97,6 +97,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PetriNetTab extends JSplitPane implements TabActions {
 
@@ -440,13 +441,16 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+	private static final AtomicBoolean fileEndingDialogPending = new AtomicBoolean(false);
+
 	private static void showFileEndingChangedMessage(boolean showMessage) {
-		if(showMessage) {
+		if (showMessage && fileEndingDialogPending.compareAndSet(false, true)) {
 			//We thread this so it does not block the EDT
 			new Thread(() -> {
                 TAPAALGUI.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
                         + "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+                fileEndingDialogPending.set(false);
             }).start();
 		}
 	}

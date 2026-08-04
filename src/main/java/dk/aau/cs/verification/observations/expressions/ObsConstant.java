@@ -1,20 +1,20 @@
 package dk.aau.cs.verification.observations.expressions;
 
 public class ObsConstant extends ObsLeaf {
-    private final int value;
+    private final float value;
 
-    public ObsConstant(int value) {
+    public ObsConstant(float value) {
         this.value = value;
     }
 
     @Override
     public String toString() {
-        return Integer.toString(value);
+        return Float.toString(value);
     }
 
     @Override
     public String toXml() {
-        return "<integer-constant>" + value + "</integer-constant>";
+        return "<real-constant>" + value + "</real-constant>";
     }
 
     @Override

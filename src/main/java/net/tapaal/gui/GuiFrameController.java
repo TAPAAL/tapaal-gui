@@ -269,7 +269,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
 
         buffer.append("\n");
-        JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.getProgramName(),
+        JOptionPane.showMessageDialog(TAPAALGUI.getApp(), buffer.toString(), "About " + TAPAAL.getProgramName(),
                 JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
     }
 
@@ -422,7 +422,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
                         openTab(tab);
                         //Don't autolayout on empty net, hotfix for issue #1960000. Imported PNML will only have one template.
                         if(!tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
-                            int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                            int dialogResult = JOptionPane.showConfirmDialog (TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if(dialogResult == JOptionPane.YES_OPTION) {
                                 SmartDrawDialog.showSmartDrawDialog();
                             }
@@ -489,7 +489,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
             optionPane.setOptions(new Object[] {updateButton, laterButton, ignoreButton});
 
 
-            final JDialog dialog = optionPane.createDialog(null, "New Version of TAPAAL");
+            final JDialog dialog = optionPane.createDialog(TAPAALGUI.getApp(), "New Version of TAPAAL");
             laterButton.addActionListener(e -> {
                 Preferences.getInstance().setLatestVersion(null);
                 dialog.setVisible(false);
@@ -520,7 +520,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         } catch (IOException | UnsupportedOperationException e) {
             Logger.log("Cannot open the browser.");
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "There was a problem opening the default web browser \n" +
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "There was a problem opening the default web browser \n" +
                             "Please open the url in your browser by entering " + url.toString(),
                     "Error opening browser", JOptionPane.ERROR_MESSAGE);
         }

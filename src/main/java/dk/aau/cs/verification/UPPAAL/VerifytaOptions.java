@@ -47,7 +47,11 @@ public class VerifytaOptions extends VerificationOptions {
 			result.append("-Y ");
 		}
 
-		result.append(traceMap.get(traceOption));
+		String trace = traceMap.get(traceOption);
+		if (trace != null && !trace.isEmpty()) {
+			result.append(trace).append(' ');
+		}
+        
 		result.append(searchMap.get(searchOption));
 
 		return result.toString();

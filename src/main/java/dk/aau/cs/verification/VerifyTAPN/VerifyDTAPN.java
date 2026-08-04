@@ -139,7 +139,7 @@ public class VerifyDTAPN implements ModelChecker{
             Preferences.getInstance().setVerifydtapnLocation(path);
         } else {
             messenger.displayErrorMessage(
-                "The specified version of the file verifydtapn is too old, or not recognized as verifypn", "Verifydtapn Error"
+                "The specified version of the file verifydtapn is too old, or not recognized as verifydtapn", "Verifydtapn Error"
             );
         }
 	}

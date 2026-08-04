@@ -690,6 +690,7 @@ public class DistributionPanel extends JPanel {
 
     private String formatValue(double value) {
         DecimalFormat df = new DecimalFormat("#.################", new DecimalFormatSymbols(Locale.ENGLISH));
+        df.setMinimumFractionDigits(1);
         return df.format(value);
     }
 

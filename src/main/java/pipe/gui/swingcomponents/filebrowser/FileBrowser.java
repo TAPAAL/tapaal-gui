@@ -163,7 +163,7 @@ public class FileBrowser {
             JFileChooser c = new JFileChooser(specifiedPath);
             c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             c.setDialogTitle("Choose target directory for export");
-            int rVal = c.showSaveDialog(c);
+            int rVal = c.showSaveDialog(TAPAALGUI.getApp());
             if (rVal == JFileChooser.APPROVE_OPTION) {
                 selectedDir = c.getSelectedFile();
                 Preferences.getInstance().setFileBrowserLocation(selectedDir.getPath());
