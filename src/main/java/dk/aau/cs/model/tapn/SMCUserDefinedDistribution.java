@@ -58,7 +58,7 @@ public class SMCUserDefinedDistribution extends SMCDistribution {
     }
 
     @Override
-    public void writeToXml(Element target) {
+    public void writeToXml(Element target, boolean writeConstantNames) {
         target.setAttribute("distribution", distributionName());
         target.setAttribute("distributionName", name);
     }

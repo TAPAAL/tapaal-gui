@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import dk.aau.cs.util.Require;
 
-public class Constant {
+public class Constant implements SMCParameterConstant {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	
 	private String name;
@@ -94,6 +94,11 @@ public class Constant {
         }
 
         return values.iterator().next();
+	}
+
+	@Override
+	public double paramValue() {
+		return value();
 	}
 
     public LinkedHashSet<Integer> values() {
