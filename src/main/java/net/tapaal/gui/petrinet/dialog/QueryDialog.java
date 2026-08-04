@@ -4289,11 +4289,7 @@ public class QueryDialog extends JPanel {
             return;
         }
 
-        UndoableEdit edit = new QueryConstructionEdit(selection, property);
-        newProperty = newProperty.replace(selection, property);
-        updateSelection(property);
-        undoSupport.postEdit(edit);
-        queryChanged();
+        replacePropertyInQuery(selection, property);
     }
 
     private void addPropertyToQuery(TCTLAbstractStateProperty property) {
@@ -4302,9 +4298,13 @@ public class QueryDialog extends JPanel {
             return;
         }
 
-        UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
-        newProperty = newProperty.replace(currentSelection.getObject(), property);
-        updateSelection(property);
+        replacePropertyInQuery(currentSelection.getObject(), property);
+    }
+
+    private void replacePropertyInQuery(TCTLAbstractProperty original, TCTLAbstractProperty replacement) {
+        UndoableEdit edit = new QueryConstructionEdit(original, replacement);
+        newProperty = newProperty.replace(original, replacement);
+        updateSelection(replacement);
         undoSupport.postEdit(edit);
         queryChanged();
     }
@@ -4374,11 +4374,7 @@ public class QueryDialog extends JPanel {
                     // new placeholder conjunct to it
                     andListNode = new TCTLAndListNode((TCTLAndListNode) parentNode);
                     andListNode.addConjunct(new TCTLStatePlaceHolder());
-                    UndoableEdit edit = new QueryConstructionEdit(parentNode, andListNode);
-                    newProperty = newProperty.replace(parentNode, andListNode);
-                    updateSelection(andListNode);
-                    undoSupport.postEdit(edit);
-                    queryChanged();
+                    replacePropertyInQuery(parentNode, andListNode);
                 } else {
                     TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
                     andListNode = new TCTLAndListNode(getStateProperty(currentSelection.getObject()), ph);
@@ -4410,11 +4406,7 @@ public class QueryDialog extends JPanel {
                     // new placeholder disjunct to it
                     orListNode = new TCTLOrListNode((TCTLOrListNode) parentNode);
                     orListNode.addDisjunct(new TCTLStatePlaceHolder());
-                    UndoableEdit edit = new QueryConstructionEdit(parentNode, orListNode);
-                    newProperty = newProperty.replace(parentNode, orListNode);
-                    updateSelection(orListNode);
-                    undoSupport.postEdit(edit);
-                    queryChanged();
+                    replacePropertyInQuery(parentNode, orListNode);
                 } else {
                     TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
                     orListNode = new TCTLOrListNode(getStateProperty(currentSelection.getObject()), ph);
@@ -4521,22 +4513,26 @@ public class QueryDialog extends JPanel {
                 if (parentProps != null && !parentProps.isEmpty() && parentProps.get(parentProps.size() - 1) == originalProp) {
                     int newPrec = operator.equals("*") ? 2 : 1;
                     int parentPrec = "*".equals(parentOp) ? 2 : 1;
-                    
+
                     if (newPrec == parentPrec) {
+                        boolean sameAssociativeOp = operator.equals(parentOp)
+                                && (operator.equals("+") || operator.equals("*"));
+
                         List<TCTLAbstractStateProperty> properties = new ArrayList<>();
-                        properties.add((TCTLAbstractStateProperty) parent.copy());
+                        if (sameAssociativeOp) {
+                            for (TCTLAbstractStateProperty property : parentProps) {
+                                properties.add(property.copy());
+                            }
+                        } else {
+                            properties.add((TCTLAbstractStateProperty) parent.copy());
+                        }
                         properties.add(new AritmeticOperator(operator));
                         properties.add(ph);
 
-                        TCTLAbstractStateProperty newNode = parent instanceof TCTLTermListNode 
-                            ? new TCTLTermListNode(properties) 
+                        TCTLAbstractStateProperty newNode = parent instanceof TCTLTermListNode
+                            ? new TCTLTermListNode(properties)
                             : new TCTLPlusListNode(new ArrayList<>(properties));
-
-                        UndoableEdit edit = new QueryConstructionEdit(parent, newNode);
-                        newProperty = newProperty.replace(parent, newNode);
-                        updateSelection(newNode);
-                        undoSupport.postEdit(edit);
-                        queryChanged();
+                        replacePropertyInQuery(parent, newNode);
                         return;
                     }
                 }
