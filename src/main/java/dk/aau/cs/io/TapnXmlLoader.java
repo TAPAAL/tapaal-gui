@@ -128,7 +128,7 @@ public class TapnXmlLoader {
 	private LoadedModel parse(Document doc) throws FormatException {
 		idResolver.clear();
 
-		ConstantStore constants = new ConstantStore(parseConstants(doc));
+		ConstantStore constants = new ConstantStore(parseConstants(doc), parseRealConstants(doc));
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants, new ArrayList<>());
         NodeList declarations = doc.getElementsByTagName("declaration");
 
@@ -300,7 +300,7 @@ public class TapnXmlLoader {
         Probability weight = new DoubleProbability(1.0);
 		FiringMode firingMode = new RandomFiringMode();
         if(!distrib.isEmpty()){
-            distribution = SMCDistribution.parseXml(element);
+            distribution = SMCDistribution.parseXml(element, constants);
         }
         if(!weightStr.isEmpty()) {
             weight = Probability.parseProbability(weightStr, constants);
@@ -308,7 +308,7 @@ public class TapnXmlLoader {
 		if (!firingModeStr.isEmpty()) {
 			firingMode = getFiringMode(firingModeStr);
 		}
-		
+
 		SharedTransition st = new SharedTransition(name);
 		st.setUrgent(urgent);
 		st.setUncontrollable(isUncontrollable);
@@ -374,12 +374,47 @@ public class TapnXmlLoader {
                 continue;
             }
 
-			if (c instanceof Element) {
+			if (c instanceof Element && !isRealConstant((Element) c)) {
 				Constant constant = parseConstant((Element) c);
 				constants.add(constant);
 			}
 		}
 		return constants;
+	}
+
+	private List<RealConstant> parseRealConstants(Document doc) {
+		List<RealConstant> constants = new ArrayList<RealConstant>();
+		NodeList constantNodes = doc.getElementsByTagName("constant");
+		for (int i = 0; i < constantNodes.getLength(); ++i) {
+			Node c = constantNodes.item(i);
+			if (XmlUtil.isDescendantOfTag(c, "watch")) {
+				continue;
+			}
+
+			if (c instanceof Element && isRealConstant((Element) c)) {
+				constants.add(parseRealConstant((Element) c));
+			}
+		}
+		return constants;
+	}
+
+	private boolean isRealConstant(Element constantElement) {
+		return "real".equals(constantElement.getAttribute("type"));
+	}
+
+	private RealConstant parseRealConstant(Element constantElement) {
+		String name = constantElement.getAttribute("name");
+		String valueAttr = constantElement.getAttribute("value");
+		if (valueAttr.contains(",")) {
+			LinkedHashSet<Double> setVals = new LinkedHashSet<>();
+			for (String val : valueAttr.split(",")) {
+				setVals.add(Double.parseDouble(val.trim()));
+			}
+
+			return new RealConstant(name, setVals);
+		}
+
+		return new RealConstant(name, Double.parseDouble(valueAttr));
 	}
 
 	private Template parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
@@ -505,7 +540,6 @@ public class TapnXmlLoader {
 		String nameOffsetX = transition.getAttribute("nameOffsetX");
 		String nameOffsetY = transition.getAttribute("nameOffsetY");
 		String angleStr = transition.getAttribute("angle");
-		String priorityStr = transition.getAttribute("priority");
         String distrib = transition.getAttribute("distribution");
         String weightStr = transition.getAttribute("weight");
 		String firingModeStr = transition.getAttribute("firingMode");
@@ -514,7 +548,6 @@ public class TapnXmlLoader {
 		int nameOffsetXInput = 0;
 		int nameOffsetYInput = 0;
 		int angle = 0;
-        int priority = 0;
         SMCDistribution distribution = SMCDistribution.defaultDistribution();
         Probability weight = new DoubleProbability(1.0);
 		FiringMode firingMode = new RandomFiringMode();
@@ -534,11 +567,8 @@ public class TapnXmlLoader {
 		if(!angleStr.isEmpty()){
 		    angle = Integer.parseInt(angleStr);
         }
-		if(!priorityStr.isEmpty()){
-		    priority = Integer.parseInt(priorityStr);
-        }
         if(!distrib.isEmpty()){
-            distribution = SMCDistribution.parseXml(transition);
+            distribution = SMCDistribution.parseXml(transition, constants);
         }
         if(!weightStr.isEmpty()) {
             weight = Probability.parseProbability(weightStr, constants);

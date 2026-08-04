@@ -1,5 +1,6 @@
 package net.tapaal.gui.petrinet.editor;
 
+import dk.aau.cs.model.tapn.RealConstant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.editor.ConstantsPane.ColorTypesListModel;
 import net.tapaal.gui.petrinet.editor.ConstantsPane.VariablesListModel;
@@ -115,7 +116,11 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         }
 
         for (int i = 0; i < constantsListModel.getSize(); ++i) {
-            constantsArea.append("const " + constantsListModel.getElementAt(i) + ";\n");
+            constantsArea.append("const int " + constantsListModel.getElementAt(i) + ";\n");
+        }
+
+        for (var c : network.realConstants()) {
+            constantsArea.append("const real " + c + ";\n");
         }
 
         setVisible(true);
@@ -199,9 +204,13 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         helpTextArea.setEditable(false);
         boolean isColored = network.isColored();
         String helpText = "Syntax for defining " + (isColored ? "color types, variables, and " : "") + "constants:\n" +
-                          "const {ID} = {INTEGER};\n" +
-                          "const {ID} = {{INTEGER}, ..., {INTEGER}};\n" +
-                          "e.g. const a = 5; or const b = {1, 2, 3}; are valid constants.\n\n" +
+                          "const int {ID} = {INTEGER};\n" +
+                          "const int {ID} = {{INTEGER}, ..., {INTEGER}};\n" +
+                          "e.g. const int a = 5; or const int b = {1, 2, 3}; are valid constants.\n\n" +
+                          (network.isStochastic() ? "Syntax for defining real constants (usable as distribution parameters):\n" +
+                            "const real {ID} = {REAL};\n" +
+                            "const real {ID} = {{REAL}, ..., {REAL}};\n" +
+                            "e.g. const real lambda = 0.5; or const real mu = {0.1, 0.5, 1.0}; are valid real constants.\n\n" : "") +
                           (isColored ? "Syntax for defining color types:\n" +
                             "type {ID} is [{COLOR}, ..., {COLOR}];\n" +
                             "type {ID} is [{LOWER_BOUND}, {UPPER_BOUND}];\n" +

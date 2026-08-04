@@ -106,6 +106,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             for (Variable variable: model.variables()) {
                 network.add(variable);
             }
+            network.setRealConstants(model.realConstants());
             templates.add(new Template(transformedModel.value1(), composer.getGuiModel(), new Zoomer()));
             if(lens.isTimed()){
                 TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(network, templates, queries, model.constants(), lens);

@@ -1045,7 +1045,7 @@ public class Animator {
                     for (TimedPlace t : blockingPlaces) {
                         sb.append(t.toString() + "<br />");
                     }
-                    //JOptionPane.showMessageDialog(null, sb.toString());
+                    //JOptionPane.showMessageDialog(TAPAALGUI.getApp(), sb.toString());
                     sb.append("</html>");
                     tab.getAnimationController().getOkButton().setEnabled(false);
                     tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
