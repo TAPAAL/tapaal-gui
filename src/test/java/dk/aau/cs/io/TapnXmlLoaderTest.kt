@@ -150,19 +150,47 @@ internal class TapnXmlLoaderTest {
         fun `Initial token ages survive save and load`() {
             val loader = TapnXmlLoader()
             val loaded = loader.load(xmlNet("""
-                    <place displayName="true" id="Start" initialMarking="2" initialMarkingAge="1.5,2.25" invariant="&lt; inf" name="Start" nameOffsetX="0" nameOffsetY="0" positionX="0" positionY="0"/>
+                    <place displayName="true" id="Start" initialMarking="2" invariant="&lt; inf" name="Start" nameOffsetX="0" nameOffsetY="0" positionX="0" positionY="0">
+                        <initialMarkingAge><token age="1.5"/></initialMarkingAge>
+                    </place>
                 """).asInpurtStream())
 
             val writer = TimedArcPetriNetNetworkWriter(
                 loaded.network(), loaded.templates(), loaded.queries(), loaded.network().constants(), loaded.getLens()
             )
-            val reloaded = TapnXmlLoader().load(java.io.ByteArrayInputStream(writer.savePNML().toByteArray()))
+            val saved = writer.savePNML().toString()
+            val reloaded = TapnXmlLoader().load(saved.asInpurtStream())
             val ages = reloaded.templates().first().model().getPlaceByName("Start").tokens().map { it.age() }
 
-            Assertions.assertEquals(listOf(BigDecimal("1.5"), BigDecimal("2.25")), ages)
+            Assertions.assertTrue(saved.contains("<initialMarkingAge>"))
+            Assertions.assertTrue(saved.contains("<token age=\"1.5\"/>"))
+            Assertions.assertFalse(saved.contains("color=\"dot\""))
+            Assertions.assertFalse(saved.contains("age=\"0\""))
+            Assertions.assertFalse(saved.contains("initialMarkingAge=\""))
+            Assertions.assertEquals(listOf(BigDecimal("1.5"), BigDecimal.ZERO), ages)
         }
 
+        @Test
+        fun `Structured initial token ages are matched to colors`() {
+            val xml = javaClass.getResource("/Example nets/fireflies.tapn")!!.readText()
+            val tokenAges = (6 downTo 1).joinToString("") {
+                "<token color=\"$it\" age=\"${it + 10}\"/>"
+            }
+            val model = TapnXmlLoader().load(xml.replaceFirst(
+                "</hlinitialMarking>",
+                "</hlinitialMarking><initialMarkingAge>$tokenAges</initialMarkingAge>"
+            ).asInpurtStream())
+            val tokens = model.templates().first().model().getPlaceByName("waiting").tokens()
+            val saved = TimedArcPetriNetNetworkWriter(
+                model.network(), model.templates(), model.queries(), model.network().constants(), model.getLens()
+            ).savePNML().toString()
 
+            Assertions.assertEquals(
+                (1..6).associate { it.toString() to BigDecimal(it + 10) },
+                tokens.associate { it.color().toString() to it.age() }
+            )
+            Assertions.assertTrue(saved.contains("color=\"1\""))
+        }
     }
 
     class Transition {

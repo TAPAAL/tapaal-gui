@@ -595,9 +595,23 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		if (tokens.stream().allMatch(token -> token.age().signum() == 0)) {
 			return;
 		}
-		element.setAttribute("initialMarkingAge", tokens.stream()
-			.map(token -> token.age().toPlainString())
-			.collect(Collectors.joining(",")));
+
+		Element markingAge = element.getOwnerDocument().createElement("initialMarkingAge");
+		for (TimedToken token : tokens) {
+			if (token.age().signum() == 0) {
+				continue;
+			}
+            
+			Element tokenElement = element.getOwnerDocument().createElement("token");
+			if (lens.isColored()) {
+				tokenElement.setAttribute("color", token.color().toString());
+			}
+
+			tokenElement.setAttribute("age", token.age().toPlainString());
+			markingAge.appendChild(tokenElement);
+		}
+
+		element.appendChild(markingAge);
 	}
 
     private void createColoredInvariants(TimedPlace inputPlace, Document document, Element placeElement) {

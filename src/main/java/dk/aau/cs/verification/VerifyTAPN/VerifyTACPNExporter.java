@@ -57,6 +57,7 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
         modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
         modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
         modelStream.append(">\n");
+        outputInitialMarkingAges(p, modelStream, true);
         modelStream.append(colorInformationToXMLString(p));
 
         if (guiModel != null) {

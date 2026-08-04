@@ -752,24 +752,53 @@ public class TapnXmlLoader {
     }
 
     private void applyInitialMarkingAges(Element place, List<TimedToken> tokens) throws FormatException {
-        String value = place.getAttribute("initialMarkingAge");
-        if (value.isEmpty()) {
+        Node markingAge = getFirstDirectChild(place, "initialMarkingAge");
+        if (markingAge != null) {
+            List<Element> tokenElements = new ArrayList<>();
+            NodeList children = markingAge.getChildNodes();
+            for (int i = 0; i < children.getLength(); ++i) {
+                if (children.item(i) instanceof Element && children.item(i).getNodeName().equals("token")) {
+                    tokenElements.add((Element)children.item(i));
+                }
+            }
+
+            if (tokenElements.size() > tokens.size()) {
+                throw new FormatException("The number of initial token ages does not match the initial marking of place " + place.getAttribute("name") + ".");
+            }
+
+            List<TimedToken> remainingTokens = new ArrayList<>(tokens);
+            for (Element tokenElement : tokenElements) {
+                String color = tokenElement.getAttribute("color");
+                TimedToken matchingToken = color.isEmpty() && !remainingTokens.isEmpty() ? remainingTokens.get(0) : null;
+                if (matchingToken == null) {
+                    for (TimedToken token : remainingTokens) {
+                        if (token.color().toString().equals(color)) {
+                            matchingToken = token;
+                            break;
+                        }
+                    }
+                }
+
+                if (matchingToken == null) {
+                    throw new FormatException("Initial token color " + color + " does not match the initial marking of place " + place.getAttribute("name") + ".");
+                }
+
+                matchingToken.setAge(parseInitialMarkingAge(tokenElement.getAttribute("age"), place));
+                remainingTokens.remove(matchingToken);
+            }
+
             return;
         }
+    }
 
-        String[] ages = value.split(",", -1);
-        if (ages.length != 1 && ages.length != tokens.size()) {
-            throw new FormatException("The number of initial token ages does not match the initial marking of place " + place.getAttribute("name") + ".");
-        }
-
+    private BigDecimal parseInitialMarkingAge(String value, Element place) throws FormatException {
         try {
-            for (int i = 0; i < tokens.size(); ++i) {
-                BigDecimal age = new BigDecimal(ages.length == 1 ? ages[0] : ages[i]);
-                if (age.signum() < 0) {
-                    throw new FormatException("Initial token ages must be nonnegative.");
-                }
-                tokens.get(i).setAge(age);
+            BigDecimal age = new BigDecimal(value);
+            if (age.signum() < 0) {
+                throw new FormatException("Initial token ages must be nonnegative.");
             }
+            
+            return age;
         } catch (NumberFormatException e) {
             throw new FormatException("Invalid initial token age in place " + place.getAttribute("name") + ".", e);
         }
