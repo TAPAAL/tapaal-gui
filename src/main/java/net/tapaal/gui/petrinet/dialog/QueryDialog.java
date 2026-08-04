@@ -5422,7 +5422,7 @@ public class QueryDialog extends JPanel {
 
         addConstantButton.addActionListener(e -> {
             if (userChangedAtomicPropSelection && isInsideArithmetic(currentSelection.getObject())) {
-                updateSelectedLeafToConstant();
+                replaceCurrentSelectionWith(new TCTLConstNode((Integer)placeMarking.getValue()));
             }
         });
 
