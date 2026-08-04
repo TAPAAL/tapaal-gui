@@ -3,6 +3,7 @@ package dk.aau.cs.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -682,14 +683,14 @@ public class TapnXmlLoader {
     }
 
 	private void addColoredDependencies(TimedPlace p, Element place, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
-        List<ColoredTimeInvariant> ctiList = new ArrayList<ColoredTimeInvariant>();
+        List<ColoredTimeInvariant> ctiList = new ArrayList<>();
         int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
 
         ArcExpression colorMarking = null;
         NodeList nodes = place.getElementsByTagName("colorinvariant");
         if (nodes != null) {
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Pair<String, Vector<Color>> pair = parseColorInvariant((Element) nodes.item(i), network);
+            for (int i = 0; i < nodes.getLength(); ++i) {
+                Pair<String, Vector<Color>> pair = parseColorInvariant((Element)nodes.item(i), network);
                 ColoredTimeInvariant cti = ColoredTimeInvariant.parse(pair.getFirst(), constants, pair.getSecond());
                 ctiList.add(cti);
             }
@@ -711,27 +712,66 @@ public class TapnXmlLoader {
 
 	    p.setCtiList(ctiList);
         ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
-        if(colorMarking!= null){
-            ColorMultiset cm = colorMarking.eval(context);
-
+        List<TimedToken> tokens;
+        if (colorMarking != null) {
             p.setTokenExpression(colorMarking, loadTACPN.constructCleanAddExpression(colorMarking));
-
-            for (TimedToken ctElement : cm.getTokens(p)) {
-                network.marking().add(ctElement);
-                //p.addToken(ctElement);
-            }
+            tokens = evaluateInitialMarking(colorMarking, p, context);
+            p.setNumberOfTokens(tokens.size());
         } else {
-            for (int i = 0; i < initialMarkingInput; i++) {
+            tokens = new ArrayList<>(initialMarkingInput);
+            for (int i = 0; i < initialMarkingInput; ++i) {
                 //Regular tokens will just be dotconstant
-                network.marking().add(new TimedToken(p, ColorType.COLORTYPE_DOT.getFirstColor()));
+                tokens.add(new TimedToken(p, ColorType.COLORTYPE_DOT.getFirstColor()));
             }
-            if(initialMarkingInput > 1) {
+            if (initialMarkingInput > 1) {
                 Vector<ColorExpression> v = new Vector<>();
                 v.add(new DotConstantExpression());
                 Vector<ArcExpression> numbOfExpression = new Vector<>();
                 numbOfExpression.add(new NumberOfExpression(initialMarkingInput, v));
                 p.setTokenExpression(new AddExpression(numbOfExpression));
             }
+        }
+        applyInitialMarkingAges(place, tokens);
+        tokens.forEach(network.marking()::add);
+    }
+
+    private List<TimedToken> evaluateInitialMarking(ArcExpression expression, TimedPlace place, ExpressionContext context) {
+        List<TimedToken> tokens = new ArrayList<>();
+        Collection<ArcExpression> expressions = expression instanceof AddExpression
+            ? ((AddExpression)expression).getAddExpression()
+            : Collections.singleton(expression);
+
+        for (ArcExpression child : expressions) {
+            for (Map.Entry<Color, Integer> entry : child.eval(context).entrySet()) {
+                for (int i = 0; i < entry.getValue(); ++i) {
+                    tokens.add(new TimedToken(place, entry.getKey()));
+                }
+            }
+        }
+        return tokens;
+    }
+
+    private void applyInitialMarkingAges(Element place, List<TimedToken> tokens) throws FormatException {
+        String value = place.getAttribute("initialMarkingAge");
+        if (value.isEmpty()) {
+            return;
+        }
+
+        String[] ages = value.split(",", -1);
+        if (ages.length != 1 && ages.length != tokens.size()) {
+            throw new FormatException("The number of initial token ages does not match the initial marking of place " + place.getAttribute("name") + ".");
+        }
+
+        try {
+            for (int i = 0; i < tokens.size(); ++i) {
+                BigDecimal age = new BigDecimal(ages.length == 1 ? ages[0] : ages[i]);
+                if (age.signum() < 0) {
+                    throw new FormatException("Initial token ages must be nonnegative.");
+                }
+                tokens.get(i).setAge(age);
+            }
+        } catch (NumberFormatException e) {
+            throw new FormatException("Invalid initial token age in place " + place.getAttribute("name") + ".", e);
         }
     }
 

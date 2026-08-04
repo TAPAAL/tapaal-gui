@@ -146,6 +146,22 @@ internal class TapnXmlLoaderTest {
             }
         }
 
+        @Test
+        fun `Initial token ages survive save and load`() {
+            val loader = TapnXmlLoader()
+            val loaded = loader.load(xmlNet("""
+                    <place displayName="true" id="Start" initialMarking="2" initialMarkingAge="1.5,2.25" invariant="&lt; inf" name="Start" nameOffsetX="0" nameOffsetY="0" positionX="0" positionY="0"/>
+                """).asInpurtStream())
+
+            val writer = TimedArcPetriNetNetworkWriter(
+                loaded.network(), loaded.templates(), loaded.queries(), loaded.network().constants(), loaded.getLens()
+            )
+            val reloaded = TapnXmlLoader().load(java.io.ByteArrayInputStream(writer.savePNML().toByteArray()))
+            val ages = reloaded.templates().first().model().getPlaceByName("Start").tokens().map { it.age() }
+
+            Assertions.assertEquals(listOf(BigDecimal("1.5"), BigDecimal("2.25")), ages)
+        }
+
 
     }
 

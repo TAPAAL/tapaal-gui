@@ -1,8 +1,10 @@
 package pipe.gui.petrinet.editor;
 
-import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import net.tapaal.gui.petrinet.Context;
 import java.awt.event.ItemEvent;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 import net.tapaal.gui.petrinet.undo.*;
@@ -90,19 +92,22 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private void hideIrrelevantInformation(){
-        if(!place.isTimed()) {
+        if (!place.isTimed()) {
             timeInvariantPanel.setVisible(false);
             timeInvariantColorPanel.setVisible(false);
         }
-        if(!place.isColored()){
+        if (!place.isColored()) {
             timeInvariantColorPanel.setVisible(false);
-            tokenPanel.setVisible(false);
             colorTypePanel.setVisible(false);
         }
-        if(place.isColored()){
+
+        tokenAgesCheckBox.setVisible(place.isTimed() && !place.isColored());
+        tokenPanel.setVisible(place.isColored());
+        updateTokenAgeEditorSelection(place.underlyingPlace());
+        if (place.isColored()) {
             markingLabel.setVisible(false);
             markingSpinner.setVisible(false);
-            if(place.isTimed()){
+            if (place.isTimed()) {
                 timeInvariantPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Default Age Invariant"));
             }
         }
@@ -310,17 +315,9 @@ public class PlaceEditorPanel extends JPanel {
 			if (place.getComponentsUsingThisPlace().size() > 0) {
 			    if (currentTab.lens.isColored()) {
                     colorTypeComboBox.setSelectedItem(place.getColorType());
-                    coloredTokenListModel.clear();
-
-                    ArcExpression expr = place.getTokensAsExpression();
-                    if (expr != null) {
-                        for (ExprStringPosition child : expr.getChildren()) {
-                            if (child.getObject() instanceof NumberOfExpression) {
-                                coloredTokenListModel.addElement((NumberOfExpression) child.getObject());
-                            }
-                        }
-                    }
-                }
+				}
+				writeTokensToList(place);
+				updateTokenAgeEditorSelection(place);
 				setMarking(place.numberOfTokens());
 			}
 			setInvariantControlsBasedOn(place);
@@ -335,13 +332,153 @@ public class PlaceEditorPanel extends JPanel {
 		gridBagConstraints = GridBagHelper.as(1,2, WEST, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(markingSpinner, gridBagConstraints);
 
+        uncoloredTokenAgeSpinner = new JSpinner(new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 1.0));
+        uncoloredTokenAgeSpinner.setEditor(new JSpinner.NumberEditor(uncoloredTokenAgeSpinner, "0.0####"));
+        uncoloredTokenAgeSpinner.setPreferredSize(markingSpinner.getPreferredSize());
+        uncoloredTokenAgeSpinner.setVisible(false);
+        basicPropertiesPanel.add(uncoloredTokenAgeSpinner, gridBagConstraints);
+
+        tokenAgesCheckBox = new JCheckBox("Token ages");
+        tokenAgesCheckBox.addActionListener(event -> {
+            if (tokenAgesCheckBox.isSelected()) {
+                int marking = (Integer)markingSpinner.getValue();
+                setUncoloredTokenAgeEditorVisible(true);
+                if (marking != uncoloredTokenAgeListModel.size()) {
+                    setUncoloredTokenCount(marking);
+                }
+            } else {
+                setUncoloredTokenAgeEditorVisible(false);
+            }
+
+            parent.pack();
+        });
+
+        gridBagConstraints = GridBagHelper.as(2,2, WEST, new Insets(3, 3, 3, 3));
+        basicPropertiesPanel.add(tokenAgesCheckBox, gridBagConstraints);
+
+        initUncoloredTokenAgePanel();
+        gridBagConstraints = GridBagHelper.as(0,3, WEST, HORIZONTAL, new Insets(3, 3, 3, 3));
+        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
+        basicPropertiesPanel.add(uncoloredTokenAgePanel, gridBagConstraints);
+
 		attributesCheckBox = new javax.swing.JCheckBox("Show place name");
 		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		attributesCheckBox.setMargin(new Insets(0, 0, 0, 0));
 
-		gridBagConstraints = GridBagHelper.as(1,3,WEST, new Insets(3, 3, 3, 3));
+		gridBagConstraints = GridBagHelper.as(1,4,WEST, new Insets(3, 3, 3, 3));
 		basicPropertiesPanel.add(attributesCheckBox, gridBagConstraints);
 	}
+
+    private void initUncoloredTokenAgePanel() {
+        uncoloredTokenAgeListModel = new DefaultListModel<>();
+        uncoloredTokenAgeList = new JList<>(uncoloredTokenAgeListModel);
+        uncoloredTokenAgeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        uncoloredTokenAgeList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                setText(formatTokenAge((BigDecimal)value));
+                return this;
+            }
+        });
+
+        uncoloredTokenAgePanel = new JPanel(new GridBagLayout());
+        JScrollPane scrollPane = new JScrollPane(uncoloredTokenAgeList);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Tokens in initial marking"));
+        scrollPane.setPreferredSize(new Dimension(100, 150));
+
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 0));
+        JButton addButton = new JButton("Add");
+        JButton modifyButton = new JButton("Modify");
+        JButton removeButton = new JButton("Remove");
+        buttons.add(addButton);
+        buttons.add(modifyButton);
+        buttons.add(removeButton);
+        GridBagConstraints gbc = GridBagHelper.as(0,0, WEST, new Insets(0, 0, 3, 0));
+        uncoloredTokenAgePanel.add(buttons, gbc);
+
+        gbc = GridBagHelper.as(0,1, WEST, HORIZONTAL, new Insets(0, 0, 0, 0));
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        uncoloredTokenAgePanel.add(scrollPane, gbc);
+
+        uncoloredTokenAgeList.addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting()) {
+                boolean selected = !uncoloredTokenAgeList.isSelectionEmpty();
+                modifyButton.setEnabled(selected);
+                removeButton.setEnabled(selected);
+                if (selected && usesTokenAgeEditor()) {
+                    uncoloredTokenAgeSpinner.setValue(uncoloredTokenAgeList.getSelectedValue().doubleValue());
+                }
+            }
+        });
+
+        addButton.addActionListener(event -> {
+            if (showTokenLimitError(uncoloredTokenAgeListModel.size() + 1)) {
+                return;
+            }
+            uncoloredTokenAgeListModel.addElement(getSpinnerDecimal(uncoloredTokenAgeSpinner));
+            uncoloredTokenAgeList.setSelectedIndex(uncoloredTokenAgeListModel.size() - 1);
+            parent.pack();
+        });
+
+        modifyButton.addActionListener(event -> {
+            int index = uncoloredTokenAgeList.getSelectedIndex();
+            if (index >= 0) {
+                uncoloredTokenAgeListModel.setElementAt(getSpinnerDecimal(uncoloredTokenAgeSpinner), index);
+            }
+        });
+
+        removeButton.addActionListener(event -> {
+            int index = uncoloredTokenAgeList.getSelectedIndex();
+            if (index >= 0) {
+                uncoloredTokenAgeListModel.remove(index);
+                if (!uncoloredTokenAgeListModel.isEmpty()) {
+                    uncoloredTokenAgeList.setSelectedIndex(Math.min(index, uncoloredTokenAgeListModel.size() - 1));
+                }
+                parent.pack();
+            }
+        });
+
+        modifyButton.setEnabled(false);
+        removeButton.setEnabled(false);
+        uncoloredTokenAgePanel.setVisible(false);
+    }
+
+    private boolean usesTokenAgeEditor() {
+        return place.isTimed() && !place.isColored() && tokenAgesCheckBox.isSelected();
+    }
+
+    private void updateTokenAgeEditorSelection(TimedPlace timedPlace) {
+        if (place.isTimed() && !place.isColored()) {
+            tokenAgesCheckBox.setSelected(timedPlace.tokens().stream().anyMatch(token -> token.age().signum() != 0));
+            setUncoloredTokenAgeEditorVisible(tokenAgesCheckBox.isSelected());
+        }
+    }
+
+    private void setUncoloredTokenAgeEditorVisible(boolean visible) {
+        uncoloredTokenAgePanel.setVisible(visible);
+        markingLabel.setText(visible ? "Age:" : "Marking:");
+        markingSpinner.setVisible(!visible);
+        uncoloredTokenAgeSpinner.setVisible(visible);
+        if (visible) {
+            if (!uncoloredTokenAgeList.isSelectionEmpty()) {
+                uncoloredTokenAgeSpinner.setValue(uncoloredTokenAgeList.getSelectedValue().doubleValue());
+            }
+        } else {
+            markingSpinner.setValue(uncoloredTokenAgeListModel.size());
+        }
+    }
+
+    private void setUncoloredTokenCount(int count) {
+        uncoloredTokenAgeListModel.clear();
+        for (int i = 0; i < count; ++i) {
+            uncoloredTokenAgeListModel.addElement(BigDecimal.ZERO);
+        }
+        if (count > 0) {
+            uncoloredTokenAgeList.setSelectedIndex(0);
+        }
+    }
 
 	private boolean isUrgencyOK(){
 		for(TransportArc arc : context.activeModel().transportArcs()){
@@ -563,7 +700,9 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private void setMarking(int numberOfTokens) {
-		markingSpinner.setValue(numberOfTokens);
+		if (!usesTokenAgeEditor()) {
+			markingSpinner.setValue(numberOfTokens);
+		}
 	}
 
 	private void setInvariantControlsBasedOn(TimedPlace place) {
@@ -616,14 +755,13 @@ public class PlaceEditorPanel extends JPanel {
 			return false;
 		}
 
-        int newMarking = (Integer)markingSpinner.getValue();
-        
-        if (place.isColored()) {
-            newMarking = (int)addTokenSpinner.getValue();
-        }
+        int newMarking = place.isColored()
+            ? getTokenListSum()
+            : usesTokenAgeEditor()
+                ? uncoloredTokenAgeListModel.size()
+                : (Integer)markingSpinner.getValue();
 
-		if (newMarking > Constants.MAX_NUMBER_OF_TOKENS_ALLOWED) {
-			JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Constants.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
+		if (showTokenLimitError(newMarking)) {
 			return false;
 		}
 		//Only make new edit if it has not already been done
@@ -735,57 +873,76 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private void doOkColors(int newMarking){
-        if (!place.isColored()) {
-            if(newMarking != place.underlyingPlace().numberOfTokens()){
-                Command command = new TimedPlaceMarkingEditCommand(place, newMarking - place.underlyingPlace().numberOfTokens());
-                command.redo();
-                context.undoManager().addEdit(command);
+        if (!place.isColored() && !usesTokenAgeEditor() && !hasNonzeroTokenAges()) {
+            if (newMarking == place.underlyingPlace().numberOfTokens()) {
                 return;
             }
-        } else {
-            int oldTokenCount = place.underlyingPlace().numberOfTokens();
-            ArrayList<TimedToken> tokensToAdd = new ArrayList<>();
-            ArrayList<TimedToken> oldTokenList = new ArrayList<>(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
-            List<ColoredTimeInvariant> ctiList = new ArrayList<>();
-            Vector<ArcExpression> v = new Vector<>();
+            Command command = new TimedPlaceMarkingEditCommand(place, newMarking - place.underlyingPlace().numberOfTokens());
+            command.redo();
+            context.undoManager().addEdit(command);
+            return;
+        }
 
-            for (int i = 0; i < coloredTokenListModel.getSize(); i++) {
-                v.add(coloredTokenListModel.getElementAt(i));
-            }
+        int oldTokenCount = place.underlyingPlace().numberOfTokens();
+        ArrayList<TimedToken> oldTokenList = new ArrayList<>(context.activeModel().marking().getTokensFor(place.underlyingPlace()));
+        Vector<ArcExpression> expressions = new Vector<>();
+        ArrayList<TimedToken> tokensToAdd = buildTokensFromEditor(expressions, newMarking);
+        AddExpression newExpression = expressions.isEmpty() ? null : new AddExpression(expressions);
+        List<ColoredTimeInvariant> ctiList = Collections.list(timeConstraintListModel.elements());
 
-            AddExpression newExpression = null;
-            if (!v.isEmpty()) {
-                newExpression = new AddExpression(v);
-                ColorMultiset cm = newExpression.eval(context.network().getContext());
-                if (cm != null) {
-                    tokensToAdd.addAll(cm.getTokens(place.underlyingPlace()));
+        if (!colorType.equals(place.underlyingPlace().getColorType())) {
+            updateArcsAccordingToColorType();
+        }
+
+        TimedPlace underlyingPlace = place.underlyingPlace();
+        boolean anyChanges = !underlyingPlace.getCtiList().equals(ctiList) ||
+                             !underlyingPlace.getColorType().equals(colorType) ||
+                             !oldTokenList.equals(tokensToAdd) ||
+                             !Objects.equals(originalExpression, newExpression) ||
+                             oldTokenCount != tokensToAdd.size();
+
+        if (anyChanges) {
+            Command command = new ColoredPlaceMarkingEditCommand(oldTokenList, tokensToAdd, originalExpression, newExpression, context, place, ctiList, colorType, oldTokenCount, tokensToAdd.size());
+            command.redo();
+            context.undoManager().addEdit(command);
+        }
+    }
+
+    private boolean hasNonzeroTokenAges() {
+        return place.isTimed() && place.underlyingPlace().tokens().stream().anyMatch(token -> token.age().signum() != 0);
+    }
+
+    private ArrayList<TimedToken> buildTokensFromEditor(Vector<ArcExpression> expressions, int newMarking) {
+        ArrayList<TimedToken> tokens = new ArrayList<>();
+        if (!place.isColored()) {
+            if (usesTokenAgeEditor()) {
+                for (int i = 0; i < uncoloredTokenAgeListModel.size(); ++i) {
+                    tokens.add(new TimedToken(place.underlyingPlace(), uncoloredTokenAgeListModel.getElementAt(i), ColorType.COLORTYPE_DOT.getFirstColor()));
                 }
             } else {
-                place.underlyingPlace().resetNumberOfTokensColor();
+                for (int i = 0; i < newMarking; ++i) {
+                    tokens.add(new TimedToken(place.underlyingPlace(), ColorType.COLORTYPE_DOT.getFirstColor()));
+                }
+            }
+
+            if (!tokens.isEmpty()) {
+                expressions.add(buildTokenExpression(tokens.size()));
             }
             
-            for (int i = 0; i < timeConstraintListModel.size(); i++) {
-                ctiList.add(timeConstraintListModel.get(i));
-            }
-            if (!colorType.equals(place.underlyingPlace().getColorType())) {
-                updateArcsAccordingToColorType();
-            }
+            return tokens;
+        }
 
-            TimedPlace underlyingPlace = place.underlyingPlace();
-
-            boolean anyChanges = !underlyingPlace.getCtiList().equals(ctiList) ||
-                                 !underlyingPlace.getColorType().equals(colorType) ||
-                                 !oldTokenList.equals(tokensToAdd) ||
-                                 originalExpression != null &&
-                                 !originalExpression.equals(newExpression) ||
-                                 !(oldTokenCount == underlyingPlace.numberOfTokens());
-
-            if (anyChanges) { 
-                Command command = new ColoredPlaceMarkingEditCommand(oldTokenList, tokensToAdd, originalExpression, newExpression, context, place, ctiList, colorType, oldTokenCount, place.underlyingPlace().numberOfTokens());
-                command.redo();
-                context.undoManager().addEdit(command);
+        for (int i = 0; i < coloredTokenListModel.size(); ++i) {
+            NumberOfExpression expression = coloredTokenListModel.getElementAt(i);
+            expressions.add(expression);
+            BigDecimal age = tokenAgeListModel.getElementAt(i);
+            for (Map.Entry<Color, Integer> entry : expression.eval(context.network().getContext()).entrySet()) {
+                for (int j = 0; j < entry.getValue(); ++j) {
+                    tokens.add(new TimedToken(place.underlyingPlace(), age, entry.getKey()));
+                }
             }
         }
+        return tokens;
     }
 
 	private TimeInvariant constructInvariant() {
@@ -816,7 +973,9 @@ public class PlaceEditorPanel extends JPanel {
         tokenColorComboboxPanel = new ColorComboboxPanel(colorType,true) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
-                updateSpinnerValue(true);
+                if (!updatingTokenSelection && tokenList != null) {
+                    updateTokenSelectionFromControls();
+                }
             }
         };
         tokenColorComboboxPanel.removeScrollPaneBorder();
@@ -826,17 +985,40 @@ public class PlaceEditorPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.CENTER;
-        tokenPanel.add(tokenColorComboboxPanel, gbc);
+        if (place.isColored()) {
+            tokenPanel.add(tokenColorComboboxPanel, gbc);
+        }
         //Logger.log(tokenColorComboboxPanel.getColorTypeComboBoxesArray()[0].getItemAt(0).toString());
 
 
         coloredTokenListModel = new DefaultListModel();
+        tokenAgeListModel = new DefaultListModel<>();
         tokenList = new JList(coloredTokenListModel);
+        tokenList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (place.isTimed()) {
+                    setText(value + " - " + formatTokenAge(getTokenAge(index)));
+                }
+                return this;
+            }
+        });
         tokenList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tokenList.addListSelectionListener(listSelectionEvent -> {
             if(!listSelectionEvent.getValueIsAdjusting() && !tokenList.isSelectionEmpty()) {
-                tokenColorComboboxPanel.updateSelection(((NumberOfExpression)tokenList.getSelectedValue()).getColor().get(0));
-                updateSpinnerValue(false);
+                updatingTokenSelection = true;
+                try {
+                    if (place.isColored()) {
+                        tokenColorComboboxPanel.updateSelection(((NumberOfExpression)tokenList.getSelectedValue()).getColor().get(0));
+                    }
+                    addTokenSpinner.setValue(((NumberOfExpression)tokenList.getSelectedValue()).getNumber());
+                    if (place.isTimed()) {
+                        tokenAgeSpinner.setValue(getTokenAge(tokenList.getSelectedIndex()).doubleValue());
+                    }
+                } finally {
+                    updatingTokenSelection = false;
+                }
                 addColoredTokenButton.setText("Modify");
                 removeColoredTokenButton.setEnabled(true);
             } else if(tokenList.isSelectionEmpty()){
@@ -858,7 +1040,7 @@ public class PlaceEditorPanel extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.insets = new Insets(3, 3, 3,3);
         tokenListScrollPane.setPreferredSize(tokenScrollPaneDim);
         //tokenListScrollPane.setMinimumSize(new Dimension(700,100));
@@ -884,20 +1066,25 @@ public class PlaceEditorPanel extends JPanel {
 
             for (int i = 0; i < coloredTokenListModel.size(); ++i) {
                 if (i != tokenList.getSelectedIndex()) {
-                    tokenListSum += Integer.parseInt(coloredTokenListModel.getElementAt(i).toString().split("'")[0]);
+                    tokenListSum += coloredTokenListModel.getElementAt(i).getNumber();
                 }
             }
 
             tokenListSum += tokenSpinnerValue;
 
-            if (tokenListSum > Constants.MAX_NUMBER_OF_TOKENS_ALLOWED) {
-                JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Constants.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
+            if (showTokenLimitError(tokenListSum)) {
                 return;
             }
 
             NumberOfExpression exprToAdd = buildTokenExpression(tokenSpinnerValue);
-
-            addTokenExpression(exprToAdd);
+            BigDecimal age = getSpinnerDecimal(tokenAgeSpinner);
+            int selectedIndex = tokenList.getSelectedIndex();
+            if (selectedIndex >= 0) {
+                coloredTokenListModel.setElementAt(exprToAdd, selectedIndex);
+                tokenAgeListModel.setElementAt(age, selectedIndex);
+            } else {
+                addTokenExpression(exprToAdd, age);
+            }
             addColoredTokenButton.setText("Modify");
             if(tokenList.isSelectionEmpty()){
                 tokenList.setSelectedIndex(coloredTokenListModel.size()-1);
@@ -913,6 +1100,27 @@ public class PlaceEditorPanel extends JPanel {
         gbc.insets = new Insets(3, 3, 3,3);
         tokenPanel.add(addTokenSpinner, gbc);
 
+        tokenAgeSpinner = new JSpinner(new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 1.0));
+        tokenAgeSpinner.setEditor(new JSpinner.NumberEditor(tokenAgeSpinner, "0.0####"));
+        tokenAgeSpinner.setPreferredSize(buttonSize);
+        tokenAgeSpinner.addChangeListener(event -> {
+            if (!updatingTokenSelection && place.isColored() && place.isTimed()) {
+                updateTokenSelectionFromControls();
+            }
+        });
+        JPanel tokenAgePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 0));
+        tokenAgePanel.add(new JLabel("Age:"));
+        tokenAgePanel.add(tokenAgeSpinner);
+
+        if (place.isColored() && place.isTimed()) {
+            gbc = new GridBagConstraints();
+            gbc.gridx = 2;
+            gbc.gridy = 0;
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.insets = new Insets(3, 3, 3, 3);
+            tokenPanel.add(tokenAgePanel, gbc);
+        }
+
         removeColoredTokenButton = new JButton("Remove");
 
         removeColoredTokenButton.setPreferredSize(buttonSize);
@@ -923,11 +1131,12 @@ public class PlaceEditorPanel extends JPanel {
             if(tokenList.getSelectedIndex() > -1){
                 int index = tokenList.getSelectedIndex();
                 coloredTokenListModel.remove(tokenList.getSelectedIndex());
-                updateTokenSelection(index);
+                tokenAgeListModel.remove(index);
+                updateTokenSelectionAfterRemoval(index);
             }
 
         });
-        removeColoredTokenButton.setEnabled(tokenList.getSelectedIndex() > 0);
+        removeColoredTokenButton.setEnabled(!tokenList.isSelectionEmpty());
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -936,7 +1145,7 @@ public class PlaceEditorPanel extends JPanel {
         tokenButtonPanel.add(removeColoredTokenButton, gbc);
 
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = place.isTimed() ? 3 : 2;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         tokenPanel.add(tokenButtonPanel, gbc);
@@ -952,15 +1161,60 @@ public class PlaceEditorPanel extends JPanel {
         mainPanel.add(tokenPanel, gbc);
     }
 
-    private void updateTokenSelection(int index) {
-	    int currentSize = tokenList.getModel().getSize();
-	    if (currentSize > index)
-	        tokenList.setSelectedIndex(index);
-	    else if (currentSize != 0)
-	        tokenList.setSelectedIndex(currentSize-1);
-	    else {
-            addColoredTokenButton.setText("Add");
-            removeColoredTokenButton.setEnabled(false);
+    private BigDecimal getTokenAge(int listIndex) {
+        if (listIndex >= 0 && listIndex < tokenAgeListModel.size()) {
+            return tokenAgeListModel.getElementAt(listIndex);
+        }
+        return getSpinnerDecimal(tokenAgeSpinner);
+    }
+
+    private int getTokenListSum() {
+        int sum = 0;
+        for (int i = 0; i < coloredTokenListModel.size(); ++i) {
+            sum += coloredTokenListModel.getElementAt(i).getNumber();
+        }
+        return sum;
+    }
+
+    private String formatTokenAge(BigDecimal age) {
+        DecimalFormat format = new DecimalFormat("0.0####", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+        return format.format(age);
+    }
+
+    private BigDecimal getSpinnerDecimal(JSpinner spinner) {
+        return BigDecimal.valueOf(((Number)spinner.getValue()).doubleValue());
+    }
+
+    private boolean showTokenLimitError(int numberOfTokens) {
+        if (numberOfTokens <= Constants.MAX_NUMBER_OF_TOKENS_ALLOWED) {
+            return false;
+        }
+        JOptionPane.showMessageDialog(this,"It is allowed to have at most " + Constants.MAX_NUMBER_OF_TOKENS_ALLOWED + " tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
+        return true;
+    }
+
+    private void updateTokenSelectionFromControls() {
+        NumberOfExpression expression = buildTokenExpression(1);
+        BigDecimal age = getSpinnerDecimal(tokenAgeSpinner);
+        for (int i = 0; i < coloredTokenListModel.size(); ++i) {
+            if (expression.equalsColor(coloredTokenListModel.getElementAt(i))
+                && (!place.isTimed() || age.compareTo(tokenAgeListModel.getElementAt(i)) == 0)) {
+                addTokenSpinner.setValue(coloredTokenListModel.getElementAt(i).getNumber());
+                tokenList.setSelectedIndex(i);
+                return;
+            }
+        }
+        tokenList.clearSelection();
+        addTokenSpinner.setValue(1);
+        addColoredTokenButton.setText("Add");
+        removeColoredTokenButton.setEnabled(false);
+    }
+
+    private void updateTokenSelectionAfterRemoval(int index) {
+        if (coloredTokenListModel.isEmpty()) {
+            updateTokenSelectionFromControls();
+        } else {
+            tokenList.setSelectedIndex(Math.min(index, coloredTokenListModel.size() - 1));
         }
     }
 
@@ -1266,33 +1520,32 @@ public class PlaceEditorPanel extends JPanel {
 
     private void writeTokensToList(TimedPlace tp) {
         coloredTokenListModel.clear();
+        tokenAgeListModel.clear();
+        if (!place.isColored()) {
+            uncoloredTokenAgeListModel.clear();
+            for (TimedToken token : tp.tokens()) {
+                uncoloredTokenAgeListModel.addElement(token.age());
+            }
+            if (!uncoloredTokenAgeListModel.isEmpty()) {
+                uncoloredTokenAgeList.setSelectedIndex(0);
+            }
+            return;
+        }
         AddExpression tokenExpression = (AddExpression)tp.getTokensAsExpression();
+        int tokenIndex = 0;
         if(tokenExpression != null){
             for(ArcExpression expr : tokenExpression.getAddExpression()){
-                addTokenExpression((NumberOfExpression)expr);
+                NumberOfExpression numberOfExpression = (NumberOfExpression)expr;
+                BigDecimal age = tokenIndex < tp.tokens().size() ? tp.tokens().get(tokenIndex).age() : BigDecimal.ZERO;
+                addTokenExpression(numberOfExpression, age);
+                tokenIndex += numberOfExpression.eval(context.network().getContext()).values().stream().mapToInt(Integer::intValue).sum();
             }
         }
-        updateSpinnerValue(true);
-    }
-
-    private void updateSpinnerValue(boolean updateSelection){
-        NumberOfExpression expr = buildTokenExpression(1);
-
-        if(coloredTokenListModel.getSize() > 0){
-            for(int i = 0; i < coloredTokenListModel.getSize();i++){
-                NumberOfExpression otherExpr = coloredTokenListModel.getElementAt(i);
-                if(expr.equalsColor(otherExpr)){
-                    addTokenSpinner.setValue(otherExpr.getNumber());
-                    if(updateSelection){
-                        tokenList.setSelectedIndex(i);
-                    }
-                    return;
-                }
-            }
+        if (coloredTokenListModel.isEmpty()) {
+            updateTokenSelectionFromControls();
+        } else {
+            tokenList.setSelectedIndex(0);
         }
-        addTokenSpinner.setValue(1);
-        tokenList.clearSelection();
-        addColoredTokenButton.setText("Add");
     }
 
     private void setInitialComboBoxValue() {
@@ -1308,6 +1561,7 @@ public class PlaceEditorPanel extends JPanel {
     private void setNewColorType(ColorType colorType) {
         this.colorType = colorType;
         coloredTokenListModel.clear();
+        tokenAgeListModel.clear();
         timeConstraintListModel.clear();
         tokenColorComboboxPanel.updateColorType(colorType);
         colorInvariantComboboxPanel.updateColorType(colorType);
@@ -1324,21 +1578,18 @@ public class PlaceEditorPanel extends JPanel {
         timeConstraintList.setSelectedIndex(0);
     }
 
-    private void addTokenExpression(NumberOfExpression expr){
-	    boolean exists = false;
-        for(int i = 0; i < coloredTokenListModel.getSize();i++){
-            NumberOfExpression otherExpr = coloredTokenListModel.getElementAt(i);
-            if(expr.equalsColor(otherExpr)){
-                exists = true;
-
-                otherExpr.setNumber(expr.getNumber());
-
-                break;
+    private void addTokenExpression(NumberOfExpression expr, BigDecimal age){
+        if (!place.isTimed()) {
+            for (int i = 0; i < coloredTokenListModel.size(); ++i) {
+                if (expr.equalsColor(coloredTokenListModel.getElementAt(i))) {
+                    coloredTokenListModel.setElementAt(expr, i);
+                    tokenAgeListModel.setElementAt(age, i);
+                    return;
+                }
             }
         }
-        if(!exists){
-            coloredTokenListModel.addElement(expr);
-        }
+        coloredTokenListModel.addElement(expr);
+        tokenAgeListModel.addElement(age);
         tokenList.updateUI();
     }
 
@@ -1382,6 +1633,11 @@ public class PlaceEditorPanel extends JPanel {
 	private javax.swing.JButton cancelButton;
 	private javax.swing.JLabel markingLabel;
 	private javax.swing.JSpinner markingSpinner;
+    private JCheckBox tokenAgesCheckBox;
+    private JSpinner uncoloredTokenAgeSpinner;
+    private JPanel uncoloredTokenAgePanel;
+    private DefaultListModel<BigDecimal> uncoloredTokenAgeListModel;
+    private JList<BigDecimal> uncoloredTokenAgeList;
 	private javax.swing.JLabel nameLabel;
 	private javax.swing.JTextField nameTextField;
 	private javax.swing.JButton okButton;
@@ -1398,7 +1654,9 @@ public class PlaceEditorPanel extends JPanel {
 	private JRadioButton constantInvRadioButton;
     private JPanel tokenPanel;
     private DefaultListModel<NumberOfExpression> coloredTokenListModel;
+    private DefaultListModel<BigDecimal> tokenAgeListModel;
     private JList tokenList;
+    private boolean updatingTokenSelection;
     private JPanel tokenButtonPanel;
     private JButton addColoredTokenButton;
     private JButton removeColoredTokenButton;
@@ -1410,6 +1668,7 @@ public class PlaceEditorPanel extends JPanel {
     JComboBox<ColorType> colorTypeComboBox;
     JPanel colorTypePanel;
     JSpinner addTokenSpinner;
+    JSpinner tokenAgeSpinner;
     ColoredTimeInvariantDialogPanel invariantEditorPanel;
     JButton addTimeConstraintButton;
     JButton removeTimeConstraintButton;
