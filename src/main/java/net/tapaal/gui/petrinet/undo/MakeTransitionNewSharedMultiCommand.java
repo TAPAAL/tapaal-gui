@@ -37,7 +37,6 @@ public class MakeTransitionNewSharedMultiCommand implements Command {
 		boolean first = true;
 		for(Template template : context.tabContent().allTemplates()) {
 			TimedTransitionComponent component = (TimedTransitionComponent)template.guiModel().getTransitionByName(transition.getName());
-
             if (component != null) { //We make a new shared transition with the first transition
                 if (first) {
                     command = new MakeTransitionNewSharedCommand(template.model(), newSharedName, component.underlyingTransition(), context.tabContent(), true);
@@ -49,6 +48,7 @@ public class MakeTransitionNewSharedMultiCommand implements Command {
                     command = new MakeTransitionSharedCommand(template.model(), sharedTransition, component.underlyingTransition(), context.tabContent());
                     command.redo();
                     commands.add(command);
+                    template.model().add(component.underlyingTransition());
                 }
             }
 		}
