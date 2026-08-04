@@ -239,7 +239,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		guiDialog.pack();
 
 		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
 		guiDialog.setVisible(true);
 
 		return dialog.getInclusionPlaces();

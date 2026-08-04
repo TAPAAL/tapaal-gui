@@ -99,7 +99,7 @@ public class ColorTypeDialogPanel extends JPanel {
         //size of range of integers panel
         dialog.setMinimumSize(new Dimension(447, 231));
 
-        dialog.setLocationRelativeTo(null);
+        dialog.setLocationRelativeTo(TAPAALGUI.getApp());
         dialog.setVisible(true);
     }
 

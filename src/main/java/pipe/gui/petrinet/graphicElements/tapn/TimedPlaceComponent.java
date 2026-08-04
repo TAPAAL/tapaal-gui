@@ -439,7 +439,7 @@ public class TimedPlaceComponent extends Place {
         guiDialog.pack();
 
         // Move window to the middle of the screen
-        guiDialog.setLocationRelativeTo(null);
+        guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
         guiDialog.setVisible(true);
     }
 

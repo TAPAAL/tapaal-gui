@@ -108,7 +108,7 @@ public class SmartDrawDialog extends JDialog {
         smartDrawDialog.pack();
         smartDrawDialog.setPreferredSize(smartDrawDialog.getSize());
         smartDrawDialog.setMinimumSize(new Dimension(smartDrawDialog.getWidth(), smartDrawDialog.getHeight()));
-        smartDrawDialog.setLocationRelativeTo(null);
+        smartDrawDialog.setLocationRelativeTo(TAPAALGUI.getApp());
         smartDrawDialog.setResizable(false);
         smartDrawDialog.updateLists();
 		smartDrawDialog.enableButtons();
@@ -136,7 +136,7 @@ public class SmartDrawDialog extends JDialog {
                     if (stateValue.equals(SwingWorker.StateValue.DONE)) {
                         //Don't auto-layout on empty net, hotfix for issue #1960000
                         if (!TAPAALGUI.getCurrentTab().currentTemplate().getHasPositionalInfo() && (TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getPlaces().length + TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getTransitions().length) > 0) {
-                            int dialogResult = JOptionPane.showConfirmDialog(null, "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                            int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if (dialogResult == JOptionPane.YES_OPTION) {
                                 showSmartDrawDialog();
                             }

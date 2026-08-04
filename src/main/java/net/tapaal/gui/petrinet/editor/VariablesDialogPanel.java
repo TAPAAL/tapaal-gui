@@ -76,7 +76,7 @@ public class VariablesDialogPanel extends JPanel {
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(false);
         dialog.pack();
-        dialog.setLocationRelativeTo(null);
+        dialog.setLocationRelativeTo(TAPAALGUI.getApp());
         dialog.setVisible(true);
     }
 

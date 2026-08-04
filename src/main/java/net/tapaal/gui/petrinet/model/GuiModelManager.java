@@ -707,7 +707,7 @@ public class GuiModelManager {
             if (o instanceof TimedTransitionComponent) {
                 TimedTransitionComponent transition = (TimedTransitionComponent) o;
                 if (!transition.underlyingTransition().hasUntimedPreset()) {
-                    JOptionPane.showMessageDialog(null, "Incoming arcs to urgent transitions must have the interval [0,\u221e).", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Incoming arcs to urgent transitions must have the interval [0,\u221e).", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 

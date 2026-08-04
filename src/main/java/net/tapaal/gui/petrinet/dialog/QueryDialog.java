@@ -1135,7 +1135,7 @@ public class QueryDialog extends JPanel {
         }
 
         // Move window to the middle of the screen
-        guiDialog.setLocationRelativeTo(null);
+        guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
         guiDialog.setVisible(true);
 
         return queryDialogue.getQuery();
@@ -4605,7 +4605,7 @@ public class QueryDialog extends JPanel {
         traceDialog.pack();
         //size of range of integers panel
         traceDialog.setMinimumSize(new Dimension(447, 231));
-        traceDialog.setLocationRelativeTo(null);
+        traceDialog.setLocationRelativeTo(TAPAALGUI.getApp());
 
         UpdateTempTraceList();
 

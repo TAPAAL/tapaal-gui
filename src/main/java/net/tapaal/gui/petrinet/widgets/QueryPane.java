@@ -10,12 +10,10 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -34,6 +32,7 @@ import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.Verifier;
 import net.tapaal.gui.petrinet.undo.RemoveQueriesCommand;
@@ -41,6 +40,7 @@ import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.petrinet.dialog.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.RealConstant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.dialog.BatchProcessingDialog;
@@ -321,7 +321,7 @@ public class QueryPane extends JPanel implements SidePane {
                 TAPNLens lens = tabContent.getLens();
 
                 if (lens.isStochastic() && !network.isNonStrict()) {
-                    JOptionPane.showMessageDialog(null, "SMC queries are only allowed for models with nonstrict intervals.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "SMC queries are only allowed for models with nonstrict intervals.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -470,13 +470,20 @@ public class QueryPane extends JPanel implements SidePane {
 		boolean isSmc = query.getCategory() == QueryCategory.SMC;
 
 		if (isSmc && !tabContent.network().isNonStrict()) {
-			JOptionPane.showMessageDialog(null, "The model has strict intervals and can therefore not be verified", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The model has strict intervals and can therefore not be verified", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
 		boolean hasMultipleConstants = false;
 		for (Constant c : tabContent.network().constants()) {
 			if (c.values() != null && c.values().size() > 1) {
+				hasMultipleConstants = true;
+				break;
+			}
+		}
+
+		for (RealConstant c : tabContent.network().realConstants()) {
+			if (c.hasMultipleValues()) {
 				hasMultipleConstants = true;
 				break;
 			}
@@ -507,7 +514,14 @@ public class QueryPane extends JPanel implements SidePane {
 			}
 		}
 
-		if (multiConstants.isEmpty()) {
+	    List<RealConstant> multiRealConstants = new ArrayList<RealConstant>();
+		for (var c : tabContent.network().realConstants()) {
+			if (c.hasMultipleValues()) {
+				multiRealConstants.add(c);
+			}
+		}
+
+		if (multiConstants.isEmpty() && multiRealConstants.isEmpty()) {
 			try {
 				File tf = File.createTempFile(tabContent.getTabTitle(), ".xml");
 				tabContent.writeNetToFile(tf, selectedQueries, tabContent.getLens());
@@ -526,11 +540,20 @@ public class QueryPane extends JPanel implements SidePane {
 			originalValues.put(c, new LinkedHashSet<>(c.values()));
 		}
 
+		Map<RealConstant, LinkedHashSet<Double>> originalRealValues = new HashMap<>();
+		for (RealConstant c : multiRealConstants) {
+			originalRealValues.put(c, new LinkedHashSet<>(c.values()));
+		}
+
 		try {
-			generateTempFilesForCombinations(multiConstants, originalValues, 0, new ArrayList<>(), selectedQueries);
+			generateTempFilesForCombinations(multiConstants, originalValues, multiRealConstants, originalRealValues, 0, selectedQueries);
 		} finally {
 			for (Constant c : multiConstants) {
 				c.setValues(originalValues.get(c));
+			}
+
+			for (var c : multiRealConstants) {
+				c.setValues(originalRealValues.get(c));
 			}
 		}
 
@@ -539,24 +562,24 @@ public class QueryPane extends JPanel implements SidePane {
 		}
 	}
 
-	private void generateTempFilesForCombinations(List<Constant> multiConstants, Map<Constant, LinkedHashSet<Integer>> originalValues, int index, List<Integer> currentCombination, List<TAPNQuery> selectedQueries) {
-		if (index == multiConstants.size()) {
-			StringBuilder suffix = new StringBuilder(" [");
-			for (int i = 0; i < multiConstants.size(); ++i) {
-				Constant c = multiConstants.get(i);
-				int val = currentCombination.get(i);
-				LinkedHashSet<Integer> singleVal = new LinkedHashSet<>();
-				singleVal.add(val);
-				c.setValues(singleVal);
-				suffix.append(c.name()).append("=").append(val);
-				if (i < multiConstants.size() - 1) suffix.append(", ");
+	private void generateTempFilesForCombinations(List<Constant> multiConstants, Map<Constant, LinkedHashSet<Integer>> originalValues,
+			List<RealConstant> multiRealConstants, Map<RealConstant, LinkedHashSet<Double>> originalRealValues,
+			int index, List<TAPNQuery> selectedQueries) {
+		if (index == multiConstants.size() + multiRealConstants.size()) {
+			List<String> parts = new ArrayList<>();
+			for (var c : multiConstants) {
+				parts.add(c.name() + "=" + c.value());
 			}
-			suffix.append("]");
+
+			for (var c : multiRealConstants) {
+				parts.add(c.name() + "=" + c.value());
+			}
+			String suffix = " [" + String.join(", ", parts) + "]";
 
 			List<TAPNQuery> queryCopies = new ArrayList<>();
 			for (TAPNQuery q : selectedQueries) {
 				TAPNQuery qCopy = q.copy();
-				qCopy.setName(q.getName() + suffix.toString());
+				qCopy.setName(q.getName() + suffix);
 				queryCopies.add(qCopy);
 			}
 
@@ -572,12 +595,18 @@ public class QueryPane extends JPanel implements SidePane {
 			return;
 		}
 
-		Constant c = multiConstants.get(index);
-		Set<Integer> vals = originalValues.get(c);
-		for (int val : vals) {
-			currentCombination.add(val);
-			generateTempFilesForCombinations(multiConstants, originalValues, index + 1, currentCombination, selectedQueries);
-			currentCombination.remove(currentCombination.size() - 1);
+		if (index < multiConstants.size()) {
+			Constant c = multiConstants.get(index);
+			for (int val : originalValues.get(c)) {
+				c.setValue(val);
+				generateTempFilesForCombinations(multiConstants, originalValues, multiRealConstants, originalRealValues, index + 1, selectedQueries);
+			}
+		} else {
+			RealConstant c = multiRealConstants.get(index - multiConstants.size());
+			for (double val : originalRealValues.get(c)) {
+				c.setValue(val);
+				generateTempFilesForCombinations(multiConstants, originalValues, multiRealConstants, originalRealValues, index + 1, selectedQueries);
+			}
 		}
 	}
 

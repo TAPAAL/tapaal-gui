@@ -393,17 +393,18 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	}
 	
 	private void removeArcPathPoints() {
-		ArrayList<ArcPathPoint> toRemove = new ArrayList<ArcPathPoint>();
-		for(PetriNetObject object : model.getPNObjects()) {
-			if(object instanceof ArcPathPoint) {
-				ArcPathPoint arcPathPoint = (ArcPathPoint)object;
-				if(!(arcPathPoint.isEndPoint())) {
-					toRemove.add(arcPathPoint);
+		List<ArcPathPoint> toRemove = new ArrayList<ArcPathPoint>();
+		for (var pnObj : model.getPNObjects()) {
+			if (pnObj instanceof Arc) {
+				var arc = (Arc)pnObj;
+				var path = arc.getArcPath();
+				for (int i = 1; i < path.getNumPoints() - 1; ++i) {
+					toRemove.add(path.getPathPoint(i));
 				}
 			}
-
 		}
-		for(ArcPathPoint p : toRemove) {
+
+		for (ArcPathPoint p : toRemove) {
 			Command command = new DeleteArcPathPointEditCommand(p.getArcPath().getArc(), p, p.getIndex(), model);
 			command.redo();
 			undoManager.addEdit(command);

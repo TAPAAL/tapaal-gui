@@ -102,7 +102,7 @@ public class ExportBatchDialog extends JDialog {
 			exportBatchDialog.pack();
 			exportBatchDialog.setPreferredSize(exportBatchDialog.getSize());
 			exportBatchDialog.setMinimumSize(new Dimension(exportBatchDialog.getWidth(), exportBatchDialog.getHeight()));
-			exportBatchDialog.setLocationRelativeTo(null);
+			exportBatchDialog.setLocationRelativeTo(TAPAALGUI.getApp());
 			exportBatchDialog.setResizable(true);
 		}
 		exportBatchDialog.setVisible(true);

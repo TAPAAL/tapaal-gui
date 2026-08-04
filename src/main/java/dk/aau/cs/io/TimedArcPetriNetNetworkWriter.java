@@ -243,7 +243,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
             element.setAttribute("player", transition.isUncontrollable() ? "1" : "0");
             element.setAttribute("weight", transition.getWeight().nameForSaving(saveConstantNames));
 			element.setAttribute("firingMode", transition.getFiringMode().toString());
-            transition.getDistribution().writeToXml(element);
+            transition.getDistribution().writeToXml(element, saveConstantNames);
 			root.appendChild(element);
 		}
 	}
@@ -251,6 +251,15 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private void appendConstants(Document document, Element root) {
 		for (Constant constant : constants) {
 			Element elem = createConstantElement(constant, document);
+			root.appendChild(elem);
+		}
+
+		for (var constant : network.realConstants()) {
+			Element elem = document.createElement("constant");
+			elem.setAttribute("name", constant.name());
+			elem.setAttribute("type", "real");
+			elem.setAttribute("value", constant.values().stream()
+				.map(String::valueOf).collect(Collectors.joining(",")));
 			root.appendChild(elem);
 		}
 	}
@@ -657,7 +666,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         transitionElement.setAttribute("player", inputTransition.underlyingTransition().isUncontrollable() ? "1" : "0");
         transitionElement.setAttribute("weight", inputTransition.underlyingTransition().getWeight().nameForSaving(saveConstantNames));
 		transitionElement.setAttribute("firingMode", inputTransition.underlyingTransition().getFiringMode().toString());
-        inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement);
+        inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement, saveConstantNames);
         writeTACPN.appendColoredTransitionDependencies(inputTransition.underlyingTransition(), document, transitionElement);
 
         return transitionElement;

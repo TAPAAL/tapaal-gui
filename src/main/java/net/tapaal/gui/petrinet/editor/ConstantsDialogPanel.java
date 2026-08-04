@@ -32,12 +32,18 @@ import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.RealConstant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import pipe.gui.swingcomponents.EscapableDialog;
 
 public class ConstantsDialogPanel extends JPanel {
 
+    private enum Type {
+        INT, REAL
+    }
+
     private final TimedArcPetriNetNetwork model;
+    private final Type type;
     private int lowerBound;
     private int upperBound;
     private EscapableDialog dialog;
@@ -48,12 +54,19 @@ public class ConstantsDialogPanel extends JPanel {
     JCheckBox globalCheckBox;
     JLabel valueLabel;
     
-    DefaultListModel<Integer> listModel;
-    JList<Integer> valueList;
+    DefaultListModel<Number> listModel;
+    JList<Number> valueList;
     JTextArea valueTextArea;
     JScrollPane listScrollPane;
+
+    // Components for INT constants
     CustomJSpinner newValueSpinner;
     CustomJSpinner singleValueSpinner;
+
+    // Components for REAL constants
+    JTextField newValueField;
+    JTextField singleValueField;
+
     JButton addButton;
     JButton editButton;
     JButton removeButton;
@@ -68,6 +81,7 @@ public class ConstantsDialogPanel extends JPanel {
 
     public ConstantsDialogPanel(TimedArcPetriNetNetwork model, Constant constant) {
         this.model = model;
+        this.type = Type.INT;
         listModel = new DefaultListModel<>();
 
         if (constant != null) {
@@ -91,13 +105,41 @@ public class ConstantsDialogPanel extends JPanel {
         }
     }
 
+    public ConstantsDialogPanel(TimedArcPetriNetNetwork model, RealConstant constant) {
+        this.model = model;
+        this.type = Type.REAL;
+        listModel = new DefaultListModel<>();
+
+        if (constant != null) {
+            for (double val : constant.values()) {
+                listModel.addElement(val);
+            }
+            oldName = constant.name();
+        } else {
+            oldName = "";
+        }
+
+        initComponents();
+        nameTextField.setText(oldName);
+        if (constant != null) {
+            singleValueField.setText(String.valueOf(constant.value()));
+        }
+
+        if (constant != null && constant.values().size() > 1) {
+            globalCheckBox.setSelected(true);
+            for (ActionListener listener : globalCheckBox.getActionListeners()) {
+                listener.actionPerformed(new ActionEvent(globalCheckBox, ActionEvent.ACTION_PERFORMED, ""));
+            }
+        }
+    }
+
     public void showDialog() {
-        dialog = new EscapableDialog(TAPAALGUI.getApp(), "Edit Constant", true);
+        dialog = new EscapableDialog(TAPAALGUI.getApp(), type == Type.INT ? "Edit Constant" : "Edit Real Constant", true);
         dialog.add(container);
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(false);
         dialog.pack();
-        dialog.setLocationRelativeTo(null);
+        dialog.setLocationRelativeTo(TAPAALGUI.getApp());
         dialog.setVisible(true);
     }
 
@@ -176,23 +218,43 @@ public class ConstantsDialogPanel extends JPanel {
         gbc.weighty = 1.0;
         listPanel.add(listScrollPane, gbc);
         
-        newValueSpinner = new CustomJSpinner(0, okButton);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(0, 4, 4, 0);
-        listPanel.add(newValueSpinner, gbc);
+        if (type == Type.INT) {
+            newValueSpinner = new CustomJSpinner(0, okButton);
+            gbc = new GridBagConstraints();
+            gbc.gridx = 1;
+            gbc.gridy = 0;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.insets = new Insets(0, 4, 4, 0);
+            listPanel.add(newValueSpinner, gbc);
+        } else {
+            newValueField = new JTextField(8);
+            gbc = new GridBagConstraints();
+            gbc.gridx = 1;
+            gbc.gridy = 0;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.insets = new Insets(0, 4, 4, 0);
+            listPanel.add(newValueField, gbc);
+        }
         
         addButton = new JButton("Add");
         addButton.addActionListener(e -> {
-            if (!((JSpinner.NumberEditor)newValueSpinner.getEditor()).getTextField().getText().isEmpty()) {
-                listModel.addElement((Integer) newValueSpinner.getValue());
-                int newIndex = listModel.getSize() - 1;
-                valueList.setSelectedIndex(newIndex);
-                valueList.ensureIndexIsVisible(newIndex);
-                removeButton.setEnabled(true);
+            if (type == Type.INT) {
+                if (!((JSpinner.NumberEditor)newValueSpinner.getEditor()).getTextField().getText().isEmpty()) {
+                    listModel.addElement((Integer)newValueSpinner.getValue());
+                    int newIndex = listModel.getSize() - 1;
+                    valueList.setSelectedIndex(newIndex);
+                    valueList.ensureIndexIsVisible(newIndex);
+                    removeButton.setEnabled(true);
+                }
+            } else {
+                Double val = parseDouble(newValueField.getText());
+                if (val != null) {
+                    listModel.addElement(val);
+                    int newIndex = listModel.getSize() - 1;
+                    valueList.setSelectedIndex(newIndex);
+                    valueList.ensureIndexIsVisible(newIndex);
+                    removeButton.setEnabled(true);
+                }
             }
         });
         gbc = new GridBagConstraints();
@@ -217,33 +279,60 @@ public class ConstantsDialogPanel extends JPanel {
                 editButton.setText("Parse");
                 addButton.setEnabled(false);
                 removeButton.setEnabled(false);
-                newValueSpinner.setEnabled(false);
+                if (type == Type.INT) {
+                    newValueSpinner.setEnabled(false);
+                } else {
+                    newValueField.setEnabled(false);
+                }
+
                 valueList.setEnabled(false);
                 isParsingMode = true;
             } else {
                 String[] lines = valueTextArea.getText().split("\\n");
-                List<Integer> newValues = new ArrayList<>();
-                for (String line : lines) {
-                    String trimmed = line.trim();
-                    if (trimmed.isEmpty()) continue;
-                    try {
-                        int val = Integer.parseInt(trimmed);
-                        if (val < 0) throw new NumberFormatException();
-                        newValues.add(val);
-                    } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(container, "All lines must be valid non-negative integers.", "Parse Error", JOptionPane.ERROR_MESSAGE);
-                        return;
+                if (type == Type.INT) {
+                    List<Integer> newValues = new ArrayList<>();
+                    for (String line : lines) {
+                        String trimmed = line.trim();
+                        if (trimmed.isEmpty()) continue;
+                        try {
+                            int val = Integer.parseInt(trimmed);
+                            if (val < 0) throw new NumberFormatException();
+                            newValues.add(val);
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(container, "All lines must be valid non-negative integers.", "Parse Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
                     }
-                }
-
-                listModel.clear();
-                for (int val : newValues) {
-                    listModel.addElement(val);
+                    listModel.clear();
+                    for (int val : newValues) {
+                        listModel.addElement(val);
+                    }
+                } else {
+                    List<Double> newValues = new ArrayList<>();
+                    for (String line : lines) {
+                        String trimmed = line.trim();
+                        if (trimmed.isEmpty()) continue;
+                        try {
+                            newValues.add(Double.parseDouble(trimmed));
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(container, "All lines must be valid real numbers.", "Parse Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                    listModel.clear();
+                    for (double val : newValues) {
+                        listModel.addElement(val);
+                    }
                 }
                 
                 listScrollPane.setViewportView(valueList);
                 editButton.setText("Edit");
-                newValueSpinner.setEnabled(true);
+                if (type == Type.INT) {
+                    newValueSpinner.setEnabled(true);
+                } else {
+                    newValueField.setEnabled(true);
+                }
+
                 valueList.setEnabled(true);
                 boolean hasSelection = !listModel.isEmpty() && valueList.getSelectedIndex() != -1;
                 removeButton.setEnabled(hasSelection);
@@ -267,7 +356,11 @@ public class ConstantsDialogPanel extends JPanel {
             boolean hasSelection = !listModel.isEmpty() && valueList.getSelectedIndex() != -1;
             removeButton.setEnabled(hasSelection);
             if (hasSelection && !e.getValueIsAdjusting()) {
-                newValueSpinner.setValue(listModel.get(valueList.getSelectedIndex()));
+                if (type == Type.INT) {
+                    newValueSpinner.setValue(listModel.get(valueList.getSelectedIndex()));
+                } else {
+                    newValueField.setText(String.valueOf(listModel.get(valueList.getSelectedIndex())));
+                }
             }
         });
 
@@ -300,19 +393,35 @@ public class ConstantsDialogPanel extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         container.add(listPanel, gbc);
         
-        singleValueSpinner = new CustomJSpinner(listModel.isEmpty() ? 0 : listModel.get(0), okButton);
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.NORTH;
-        gbc.insets = new Insets(2, 4, 2, 4);
-        container.add(singleValueSpinner, gbc);
+        if (type == Type.INT) {
+            singleValueSpinner = new CustomJSpinner(listModel.isEmpty() ? 0 : (Integer) listModel.get(0), okButton);
+            gbc = new GridBagConstraints();
+            gbc.gridx = 1;
+            gbc.gridy = 2;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.anchor = GridBagConstraints.NORTH;
+            gbc.insets = new Insets(2, 4, 2, 4);
+            container.add(singleValueSpinner, gbc);
+        } else {
+            singleValueField = new JTextField();
+            singleValueField.setText("0.0");
+            gbc = new GridBagConstraints();
+            gbc.gridx = 1;
+            gbc.gridy = 2;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.anchor = GridBagConstraints.NORTH;
+            gbc.insets = new Insets(2, 4, 2, 4);
+            container.add(singleValueField, gbc);
+        }
 
         globalCheckBox.addActionListener(e -> {
             boolean multiple = globalCheckBox.isSelected();
             listPanel.setVisible(multiple);
-            singleValueSpinner.setVisible(!multiple);
+            if (type == Type.INT) {
+                singleValueSpinner.setVisible(!multiple);
+            } else {
+                singleValueField.setVisible(!multiple);
+            }
             valueLabel.setText(multiple ? "Values: " : "Value: ");
             valueLabel.setVerticalAlignment(multiple ? JLabel.TOP : JLabel.CENTER);
             if (dialog != null) {
@@ -323,7 +432,11 @@ public class ConstantsDialogPanel extends JPanel {
         boolean initialMultiple = false;
         globalCheckBox.setSelected(initialMultiple);
         listPanel.setVisible(initialMultiple);
-        singleValueSpinner.setVisible(!initialMultiple);
+        if (type == Type.INT) {
+            singleValueSpinner.setVisible(!initialMultiple);
+        } else {
+            singleValueField.setVisible(!initialMultiple);
+        }
         valueLabel.setText(initialMultiple ? "Values: " : "Value: ");
         valueLabel.setVerticalAlignment(initialMultiple ? JLabel.TOP : JLabel.CENTER);
 
@@ -368,8 +481,25 @@ public class ConstantsDialogPanel extends JPanel {
         container.add(buttonContainer, gbc);
     }
     
+    private Double parseDouble(String text) {
+        try {
+            return Double.parseDouble(text.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private void exit() {
         dialog.setVisible(false);
+    }
+
+    private void showNameInUseError() {
+        JOptionPane.showMessageDialog(
+                TAPAALGUI.getApp(),
+                "There is already another constant with the same name.\n\n"
+                + "Choose a different name for the constant.",
+                "Error", JOptionPane.ERROR_MESSAGE);
+        nameTextField.requestFocusInWindow();
     }
 
     private void onOK() {
@@ -384,14 +514,21 @@ public class ConstantsDialogPanel extends JPanel {
                     "The value list cannot be empty.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-            newValueSpinner.requestFocusInWindow();
+            if (type == Type.INT) {
+                newValueSpinner.requestFocusInWindow();
+            } else {
+                newValueField.requestFocusInWindow();
+            }
+            
             return;
         }
         
         String newName = nameTextField.getText();
 
         if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName)) {
-            System.err.println("Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*");
+            if (type == Type.INT) {
+                System.err.println("Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*");
+            }
             JOptionPane.showMessageDialog(
                     TAPAALGUI.getApp(),
                     "Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
@@ -418,28 +555,37 @@ public class ConstantsDialogPanel extends JPanel {
             return;             
         } 
         
-        LinkedHashSet<Integer> vals = new LinkedHashSet<>();
-        if (globalCheckBox.isSelected()) {
-            for (int i = 0; i < listModel.size(); ++i) {
-                vals.add(listModel.get(i));
-            }
-        } else {
-            vals.add((Integer) singleValueSpinner.getValue());
-        }
-
-        if (!oldName.equals("")) {
-            if (!oldName.equals(newName) && model.isNameUsedForConstant(newName)) {
-                JOptionPane.showMessageDialog(
-                        TAPAALGUI.getApp(),
-                        "There is already another constant with the same name.\n\n"
-                        + "Choose a different name for the constant.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                nameTextField.requestFocusInWindow();
-                return;
+        if (type == Type.INT) {
+            LinkedHashSet<Integer> vals = new LinkedHashSet<>();
+            if (globalCheckBox.isSelected()) {
+                for (int i = 0; i < listModel.size(); ++i) {
+                    vals.add((Integer) listModel.get(i));
+                }
+            } else {
+                vals.add((Integer) singleValueSpinner.getValue());
             }
 
-            for (int val : vals) {
-                if (!(lowerBound <= val && val <= upperBound)){
+            if (!oldName.equals("")) {
+                if (!oldName.equals(newName) && (model.isNameUsedForConstant(newName) || model.isNameUsedForRealConstant(newName))) {
+                    showNameInUseError();
+                    return;
+                }
+
+                for (int val : vals) {
+                    if (!(lowerBound <= val && val <= upperBound)){
+                        JOptionPane.showMessageDialog(
+                                TAPAALGUI.getApp(),
+                                "One or more specified values are invalid for the current net.\n"
+                                + "Updating the constant invalidates the guard\n"
+                                + "on one or more arcs, or it sets the weight of an arc to 0.",
+                                "Constant value invalid for current net",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+
+                Command edit = model.updateConstant(oldName, new Constant(newName, vals));
+                if (edit == null) {
                     JOptionPane.showMessageDialog(
                             TAPAALGUI.getApp(),
                             "One or more specified values are invalid for the current net.\n"
@@ -448,39 +594,77 @@ public class ConstantsDialogPanel extends JPanel {
                             "Constant value invalid for current net",
                             JOptionPane.ERROR_MESSAGE);
                     return;
+                } else {
+                    TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
+                    TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
+                    exit();
                 }
-            }
-
-            Command edit = model.updateConstant(oldName, new Constant(newName, vals));
-            if (edit == null) {
-                JOptionPane.showMessageDialog(
-                        TAPAALGUI.getApp(),
-                        "One or more specified values are invalid for the current net.\n"
-                        + "Updating the constant invalidates the guard\n"
-                        + "on one or more arcs, or it sets the weight of an arc to 0.",
-                        "Constant value invalid for current net",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
             } else {
-                TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
-                TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
+                Command edit = model.addConstant(newName, vals);
+                
+                if (edit == null) {
+                    JOptionPane.showMessageDialog(
+                            TAPAALGUI.getApp(),
+                            "A constant with the specified name already exists.",
+                            "Constant exists",
+                            JOptionPane.ERROR_MESSAGE);
+                    nameTextField.requestFocusInWindow();
+                    return;
+                } else {
+                    TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
+                }
                 exit();
             }
         } else {
-            Command edit = model.addConstant(newName, vals);
-            
-            if (edit == null) {
-                JOptionPane.showMessageDialog(
-                        TAPAALGUI.getApp(),
-                        "A constant with the specified name already exists.",
-                        "Constant exists",
-                        JOptionPane.ERROR_MESSAGE);
-                nameTextField.requestFocusInWindow();
-                return;
+            LinkedHashSet<Double> vals = new LinkedHashSet<>();
+            if (globalCheckBox.isSelected()) {
+                for (int i = 0; i < listModel.size(); ++i) {
+                    vals.add((Double) listModel.get(i));
+                }
             } else {
-                TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
+                Double val = parseDouble(singleValueField.getText());
+                if (val == null) {
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
+                            "The value must be a valid real number.", "Invalid value",
+                            JOptionPane.ERROR_MESSAGE);
+                    singleValueField.requestFocusInWindow();
+                    return;
+                }
+                vals.add(val);
             }
-            exit();
+
+            if (!oldName.equals("")) {
+                if (!oldName.equals(newName)
+                        && (model.isNameUsedForRealConstant(newName) || model.isNameUsedForConstant(newName))) {
+                    showNameInUseError();
+                    return;
+                }
+
+                Command edit = model.updateRealConstant(oldName, new RealConstant(newName, vals));
+                if (edit == null) {
+                    showNameInUseError();
+                    return;
+                }
+
+                TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
+                TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
+                exit();
+            } else {
+                Command edit = model.addRealConstant(newName, vals);
+
+                if (edit == null) {
+                    JOptionPane.showMessageDialog(
+                            TAPAALGUI.getApp(),
+                            "A constant with the specified name already exists.",
+                            "Constant exists",
+                            JOptionPane.ERROR_MESSAGE);
+                    nameTextField.requestFocusInWindow();
+                    return;
+                }
+
+                TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(edit);
+                exit();
+            }
         }
         model.buildConstraints();
     }

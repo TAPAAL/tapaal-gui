@@ -98,6 +98,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PetriNetTab extends JSplitPane implements TabActions {
 
@@ -441,13 +442,16 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 	}
 
+	private static final AtomicBoolean fileEndingDialogPending = new AtomicBoolean(false);
+
 	private static void showFileEndingChangedMessage(boolean showMessage) {
-		if(showMessage) {
+		if (showMessage && fileEndingDialogPending.compareAndSet(false, true)) {
 			//We thread this so it does not block the EDT
 			new Thread(() -> {
                 TAPAALGUI.getAppGui().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 new MessengerImpl().displayInfoMessage("We have changed the ending of TAPAAL files from .xml to .tapn and the opened file was automatically renamed to end with .tapn.\n"
                         + "Once you save the .tapn model, we recommend that you manually delete the .xml file.", "FILE CHANGED");
+                fileEndingDialogPending.set(false);
             }).start();
 		}
 	}
@@ -1630,7 +1634,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         JLabel label = new JLabel("<html>" + buffer + "</html>");
         label.setFont(new Font(label.getFont().getName(), Font.PLAIN, label.getFont().getSize()));
 
-        JOptionPane.showMessageDialog(null, label, "Global color types/variables", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(TAPAALGUI.getApp(), label, "Global color types/variables", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private String getColorTypesFormattedString(List<ColorType> listColorTypes, StringBuilder buffer) {
@@ -3507,7 +3511,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         } else {
             String message = "The net is too big and cannot be saved or exported.";
             Object[] dialogContent = {message};
-            JOptionPane.showMessageDialog(null, dialogContent, "Large net limitation", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), dialogContent, "Large net limitation", JOptionPane.WARNING_MESSAGE);
         }
         return false;
     }
@@ -3541,7 +3545,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 String message = "In the saved PNML all timing information will be lost\n" +
                     "and the components in the net will be merged into one big net.";
                 Object[] dialogContent = {message, showAgain};
-                JOptionPane.showMessageDialog(null, dialogContent,
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), dialogContent,
                     "PNML loss of information", JOptionPane.WARNING_MESSAGE);
                 Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
             }

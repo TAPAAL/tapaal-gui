@@ -307,6 +307,8 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public void updateGuardsAndWeightsWithNewConstant(String oldName, Constant newConstant) {
+		updateDistributionsWithNewConstant(oldName, newConstant);
+
 		for (TimedArcPetriNet tapn : allTemplates()) {
 			for (TimedPlace place : tapn.places()) {
 				updatePlaceInvariant(oldName, newConstant, place);
@@ -374,6 +376,93 @@ public class TimedArcPetriNetNetwork {
             }
         }
     }
+
+	public Command addRealConstant(String name, LinkedHashSet<Double> vals) {
+		return constants.addRealConstant(name, vals);
+	}
+
+	public Command removeRealConstant(String name) {
+		buildConstraints();
+		return constants.removeRealConstant(name);
+	}
+
+	public Command updateRealConstant(String oldName, RealConstant constant) {
+		Command edit = constants.updateRealConstant(oldName, constant, this);
+
+		if (edit != null) {
+			updateDistributionsWithNewConstant(oldName, constant);
+		}
+
+		return edit;
+	}
+
+	public void updateDistributionsWithNewConstant(String oldName, SMCParameterConstant newConstant) {
+		for (var tapn : allTemplates()) {
+			for (var transition : tapn.transitions()) {
+				updateDistributionRefs(oldName, newConstant, transition.getDistribution());
+			}
+		}
+
+		for (var transition : sharedTransitions) {
+			updateDistributionRefs(oldName, newConstant, transition.getDistribution());
+		}
+	}
+
+	private void updateDistributionRefs(String oldName, SMCParameterConstant newConstant, SMCDistribution distribution) {
+		if (distribution == null) return;
+
+		for (var entry : distribution.getParamRefs().entrySet()) {
+			if (entry.getValue().name().equals(oldName)) {
+				entry.setValue(newConstant);
+			}
+		}
+	}
+
+	public void rebindDistributionRefs() {
+		for (var c : constants.getRealConstants()) {
+			updateDistributionsWithNewConstant(c.name(), c);
+		}
+
+		for (var c : constants.getConstants()) {
+			updateDistributionsWithNewConstant(c.name(), c);
+		}
+	}
+
+	public List<RealConstant> realConstants() {
+		return constants.getRealConstants();
+	}
+
+	public RealConstant getRealConstant(String name) {
+		return constants.getRealConstantByName(name);
+	}
+
+	public RealConstant getRealConstant(int index) {
+		return constants.getRealConstantByIndex(index);
+	}
+
+	public void setRealConstants(Iterable<RealConstant> newConstants) {
+		for (var c : newConstants) {
+			constants.add(c);
+		}
+        
+		rebindDistributionRefs();
+	}
+
+	public boolean isNameUsedForRealConstant(String name) {
+		return constants.containsRealConstantByName(name);
+	}
+
+	public void swapRealConstants(int currentIndex, int newIndex) {
+		constants.swapRealConstants(currentIndex, newIndex);
+	}
+
+	public List<RealConstant> sortRealConstants() {
+		return constants.sortRealConstants();
+	}
+
+	public void undoSortRealConstants(List<RealConstant> oldOrder) {
+		constants.undoSortRealConstants(oldOrder);
+	}
 
 	public Collection<Constant> constants() {
 		return constants.getConstants();

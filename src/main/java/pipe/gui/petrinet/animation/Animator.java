@@ -1045,7 +1045,7 @@ public class Animator {
                     for (TimedPlace t : blockingPlaces) {
                         sb.append(t.toString() + "<br />");
                     }
-                    //JOptionPane.showMessageDialog(null, sb.toString());
+                    //JOptionPane.showMessageDialog(TAPAALGUI.getApp(), sb.toString());
                     sb.append("</html>");
                     tab.getAnimationController().getOkButton().setEnabled(false);
                     tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
@@ -1237,7 +1237,7 @@ public class Animator {
         guiDialog.pack();
 
         // Move window to the middle of the screen
-        guiDialog.setLocationRelativeTo(null);
+        guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
         guiDialog.setVisible(true);
 
         return animationSelectmodeDialog.getTokens();

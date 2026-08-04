@@ -583,7 +583,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		dialog.add(scrollPane);
 		dialog.setResizable(false);
 		dialog.pack();
-		dialog.setLocationRelativeTo(null);
+		dialog.setLocationRelativeTo(TAPAALGUI.getApp());
 		dialog.setVisible(true);
 	}
 
@@ -673,7 +673,7 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		dialog.add(scrollPane);
 		dialog.setResizable(false);
 		dialog.pack();
-		dialog.setLocationRelativeTo(null);
+		dialog.setLocationRelativeTo(TAPAALGUI.getApp());
 		dialog.setVisible(true);
 	}
 

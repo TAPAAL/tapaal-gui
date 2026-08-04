@@ -3,8 +3,11 @@ package dk.aau.cs.model.tapn;
 import java.util.*;
 
 import net.tapaal.gui.petrinet.undo.AddConstantEditCommand;
+import net.tapaal.gui.petrinet.undo.AddRealConstantEditCommand;
 import net.tapaal.gui.petrinet.undo.RemoveConstantEditCommand;
+import net.tapaal.gui.petrinet.undo.RemoveRealConstantEditCommand;
 import net.tapaal.gui.petrinet.undo.UpdateConstantEditCommand;
+import net.tapaal.gui.petrinet.undo.UpdateRealConstantEditCommand;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
@@ -12,23 +15,37 @@ import dk.aau.cs.util.StringComparator;
 
 public class ConstantStore {
 	private List<Constant> constants = new ArrayList<Constant>();
+	private List<RealConstant> realConstants = new ArrayList<RealConstant>();
 	private int largest = -1;
 
 	public ConstantStore() {
 
 	}
-	
+
 	public ConstantStore(List<Constant> constants){
 		this.constants = constants;
+	}
+
+	public ConstantStore(List<Constant> constants, List<RealConstant> realConstants){
+		this.constants = constants;
+		this.realConstants = realConstants;
 	}
 
 	public Collection<Constant> getConstants() {
 		return constants;
 	}
 
+	public List<RealConstant> getRealConstants() {
+		return realConstants;
+	}
+
 	public void buildConstraints(TimedArcPetriNetNetwork model) {
 		for (Constant c : constants) {
 			c.reset();
+		}
+
+		for (var c : realConstants) {
+			c.setIsUsed(false);
 		}
 
 		for (TimedArcPetriNet tapn : model.allTemplates()) {
@@ -54,6 +71,14 @@ public class ConstantStore {
 			
 			for (TimedOutputArc outputArc : tapn.outputArcs()){
 				buildConstraints(outputArc);
+			}
+		}
+
+		for (SharedTransition sharedTransition : model.sharedTransitions()) {
+			if (sharedTransition.getDistribution() != null) {
+				for (SMCParameterConstant constant : sharedTransition.getDistribution().getParamRefs().values()) {
+					constant.setIsUsed(true);
+				}
 			}
 		}
 
@@ -96,6 +121,12 @@ public class ConstantStore {
             Constant constant = ((ConstantProbability) weight).constant();
             constant.setIsUsed(true);
         }
+
+        if (transition.getDistribution() != null) {
+            for (SMCParameterConstant constant : transition.getDistribution().getParamRefs().values()) {
+                constant.setIsUsed(true);
+            }
+        }
     }
 
 	public boolean containsConstantByName(String name) {
@@ -104,6 +135,26 @@ public class ConstantStore {
 				return true;
 		}
 		return false;
+	}
+
+	public boolean containsRealConstantByName(String name) {
+		for (var c : realConstants) {
+			if (c.name().equals(name)) {
+                return true;
+            }
+		}
+
+		return false;
+	}
+
+	public RealConstant getRealConstantByName(String name) {
+		for (var c : realConstants) {
+			if (c.name().equals(name)) {
+				return c;
+            }
+		}
+
+		return null;
 	}
 
 	public Constant getConstantByName(String name) {
@@ -192,7 +243,7 @@ public class ConstantStore {
 	}
 
 	public Command addConstant(String name, LinkedHashSet<Integer> vals) {
-		if (isNameInf(name))
+		if (isNameInf(name) || containsRealConstantByName(name))
 			return null;
 
 		if (!containsConstantByName(name)) {
@@ -207,7 +258,7 @@ public class ConstantStore {
 	}
 
 	public Command addConstant(String name, int val) {
-		if (isNameInf(name))
+		if (isNameInf(name) || containsRealConstantByName(name))
 			return null;
 
 		if (!containsConstantByName(name)) {
@@ -258,6 +309,16 @@ public class ConstantStore {
 		findLargestConstantValue();
 	}
 
+	public void replace(Constant oldConstant, Constant newConstant) {
+		int index = constants.indexOf(oldConstant);
+		if (index < 0) {
+			add(newConstant);
+			return;
+		}
+		constants.set(index, newConstant);
+		findLargestConstantValue();
+	}
+
 	private void findLargestConstantValue() {
 		largest = -1;
 
@@ -281,16 +342,17 @@ public class ConstantStore {
 	}
 
 	public Command updateConstant(String oldName, Constant updatedConstant,	TimedArcPetriNetNetwork model) {
+		if (containsRealConstantByName(updatedConstant.name())) {
+			return null;
+        }
+
 		if (oldName.equals(updatedConstant.name()) || !containsConstantByName(updatedConstant.name())) {
 			if (containsConstantByName(oldName)) {
 				Constant old = getConstantByName(oldName);
 				updatedConstant.setLowerBound(old.lowerBound());
 				updatedConstant.setUpperBound(old.upperBound());
 				updatedConstant.setIsUsed(old.isUsed());
-				int index = constants.indexOf(old);
-				constants.remove(old);
-				constants.add(index, updatedConstant);
-				findLargestConstantValue();
+				replace(old, updatedConstant);
 				return new UpdateConstantEditCommand(old, updatedConstant, this, model);
 			}
 		}
@@ -325,6 +387,7 @@ public class ConstantStore {
 
     public void clear() {
         constants.clear();
+        realConstants.clear();
         largest = -1;
     }
 
@@ -334,5 +397,92 @@ public class ConstantStore {
 
 	public int getIndexOf(Constant constant) {
 		return constants.indexOf(constant);
+	}
+
+	public Command addRealConstant(String name, LinkedHashSet<Double> vals) {
+		if (isNameInf(name) || containsRealConstantByName(name) || containsConstantByName(name)) {
+			return null;
+		}
+
+		var c = new RealConstant(name, vals);
+		realConstants.add(c);
+		realConstants.sort(new StringComparator());
+		return new AddRealConstantEditCommand(c, this);
+	}
+
+	public void add(RealConstant constant) {
+		if (!containsRealConstantByName(constant.name())) {
+			realConstants.add(constant);
+		}
+	}
+
+	public void remove(RealConstant constant) {
+		realConstants.remove(constant);
+	}
+
+	public void replace(RealConstant oldConstant, RealConstant newConstant) {
+		int index = realConstants.indexOf(oldConstant);
+		if (index < 0) {
+			add(newConstant);
+			return;
+		}
+        
+		realConstants.set(index, newConstant);
+	}
+
+	public Command removeRealConstant(String name) {
+		if (isRealConstantInUse(name)) {
+			return null;
+		}
+
+		var c = getRealConstantByName(name);
+		if (c == null) {
+			return null;
+		}
+
+		realConstants.remove(c);
+		return new RemoveRealConstantEditCommand(c, this);
+	}
+
+	public boolean isRealConstantInUse(String name) {
+		var c = getRealConstantByName(name);
+		return c != null && c.isUsed();
+	}
+
+	public Command updateRealConstant(String oldName, RealConstant updatedConstant, TimedArcPetriNetNetwork model) {
+		if (!oldName.equals(updatedConstant.name())
+				&& (containsRealConstantByName(updatedConstant.name()) || containsConstantByName(updatedConstant.name()))) {
+			return null;
+		}
+
+		var old = getRealConstantByName(oldName);
+		if (old == null) {
+			return null;
+		}
+
+		updatedConstant.setIsUsed(old.isUsed());
+		replace(old, updatedConstant);
+		return new UpdateRealConstantEditCommand(old, updatedConstant, this, model);
+	}
+
+	public void swapRealConstants(int currentIndex, int newIndex) {
+		var temp = realConstants.get(currentIndex);
+		realConstants.set(currentIndex, realConstants.get(newIndex));
+		realConstants.set(newIndex, temp);
+	}
+
+	public List<RealConstant> sortRealConstants() {
+		List<RealConstant> oldOrder = List.copyOf(realConstants);
+		realConstants.sort(new StringComparator());
+		return oldOrder;
+	}
+
+	public void undoSortRealConstants(List<RealConstant> oldOrder) {
+		realConstants.clear();
+		realConstants.addAll(oldOrder);
+	}
+
+	public RealConstant getRealConstantByIndex(int index) {
+		return realConstants.get(index);
 	}
 }
