@@ -25,6 +25,7 @@ public class EditConstantsCommand implements Command {
     public void undo() {
         network.getConstantStore().clear();
         network.setConstants(oldState.getConstants());
+        network.setRealConstants(oldState.getRealConstants());
         network.setColorTypes(oldState.getColorTypes());
         network.setVariables(oldState.getVariables());
         TAPAALGUI.getCurrentTab().updateConstantsList();
@@ -36,6 +37,7 @@ public class EditConstantsCommand implements Command {
     public void redo() {
         network.getConstantStore().clear();
         network.setConstants(newState.getConstants());
+        network.setRealConstants(newState.getRealConstants());
         network.setColorTypes(newState.getColorTypes());
         network.setVariables(newState.getVariables());
         TAPAALGUI.getCurrentTab().updateConstantsList();

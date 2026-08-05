@@ -1633,7 +1633,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         JLabel label = new JLabel("<html>" + buffer + "</html>");
         label.setFont(new Font(label.getFont().getName(), Font.PLAIN, label.getFont().getSize()));
 
-        JOptionPane.showMessageDialog(null, label, "Global color types/variables", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(TAPAALGUI.getApp(), label, "Global color types/variables", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private String getColorTypesFormattedString(List<ColorType> listColorTypes, StringBuilder buffer) {
@@ -3337,7 +3337,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         } else {
             String message = "The net is too big and cannot be saved or exported.";
             Object[] dialogContent = {message};
-            JOptionPane.showMessageDialog(null, dialogContent, "Large net limitation", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), dialogContent, "Large net limitation", JOptionPane.WARNING_MESSAGE);
         }
         return false;
     }
@@ -3371,7 +3371,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 String message = "In the saved PNML all timing information will be lost\n" +
                     "and the components in the net will be merged into one big net.";
                 Object[] dialogContent = {message, showAgain};
-                JOptionPane.showMessageDialog(null, dialogContent,
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), dialogContent,
                     "PNML loss of information", JOptionPane.WARNING_MESSAGE);
                 Preferences.getInstance().setShowPNMLWarning(!showAgain.isSelected());
             }
