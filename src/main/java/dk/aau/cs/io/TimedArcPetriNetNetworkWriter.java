@@ -228,6 +228,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			element.setAttribute("invariant", place.invariant().toString());
 			element.setAttribute("name", place.name());
 			element.setAttribute("initialMarking", String.valueOf(place.numberOfTokens()));
+			writeInitialMarkingAges(place, element);
 			createColoredInvariants(place, document, element);
             writeTACPN.appendColoredPlaceDependencies(place, document, element);
 
@@ -587,7 +588,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		placeElement.setAttribute("id", (inputPlace.getId() != null ? inputPlace.getId() : "error"));
 		placeElement.setAttribute("nameOffsetX", String.valueOf(inputPlace.getNameOffsetX()));
 		placeElement.setAttribute("nameOffsetY", String.valueOf(inputPlace.getNameOffsetY()));
-		placeElement.setAttribute("initialMarking", ((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));
+		placeElement.setAttribute("initialMarking", String.valueOf(inputPlace.getNumberOfTokens()));
+		writeInitialMarkingAges(inputPlace.underlyingPlace(), placeElement);
 		placeElement.setAttribute("invariant", inputPlace.underlyingPlace().invariant().toString());
         writeTACPN.appendColoredPlaceDependencies(inputPlace.underlyingPlace(), document, placeElement);
 
@@ -596,6 +598,31 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         createColoredInvariants(inputPlace.underlyingPlace(), document, placeElement);
         return placeElement;
 	}
+
+	private void writeInitialMarkingAges(TimedPlace place, Element element) {
+		List<TimedToken> tokens = place.tokens();
+		if (tokens.stream().allMatch(token -> token.age().signum() == 0)) {
+			return;
+		}
+
+		Element markingAge = element.getOwnerDocument().createElement("initialMarkingAge");
+		for (TimedToken token : tokens) {
+			if (token.age().signum() == 0) {
+				continue;
+			}
+            
+			Element tokenElement = element.getOwnerDocument().createElement("token");
+			if (lens.isColored()) {
+				tokenElement.setAttribute("color", token.color().toString());
+			}
+
+			tokenElement.setAttribute("age", token.age().toPlainString());
+			markingAge.appendChild(tokenElement);
+		}
+
+		element.appendChild(markingAge);
+	}
+
     private void createColoredInvariants(TimedPlace inputPlace, Document document, Element placeElement) {
         List<ColoredTimeInvariant> ctiList = inputPlace.getCtiList();
 

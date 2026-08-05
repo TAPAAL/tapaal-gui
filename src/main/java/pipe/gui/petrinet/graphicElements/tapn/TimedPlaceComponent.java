@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -15,6 +17,8 @@ import javax.swing.*;
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ExpressionContext;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.petrinet.graphicElements.Place;
@@ -25,6 +29,8 @@ import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.ConstantBound;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -181,6 +187,35 @@ public class TimedPlaceComponent extends Place {
         buffer.append('}');
 
         return buffer.toString();
+    }
+
+    private String getColoredTokenExpression() {
+        ArcExpression expression = place.getTokensAsExpression();
+        Collection<ArcExpression> expressions = expression instanceof AddExpression
+            ? ((AddExpression)expression).getAddExpression()
+            : Collections.singleton(expression);
+        List<TimedToken> tokens = place.tokens();
+        ExpressionContext context = isTimed() ? getExpressionContext() : null;
+        StringBuilder buffer = new StringBuilder();
+        int tokenIndex = 0;
+
+        for (ArcExpression child : expressions) {
+            buffer.append(child);
+            if (isTimed() && tokenIndex < tokens.size()) {
+                buffer.append(" - ").append(tokens.get(tokenIndex).age().stripTrailingZeros().toPlainString());
+                tokenIndex += child.eval(context).values().stream().mapToInt(Integer::intValue).sum();
+            }
+            
+            buffer.append('\n');
+        }
+
+        return buffer.toString();
+    }
+
+    private ExpressionContext getExpressionContext() {
+        return place.isShared()
+            ? ((SharedPlace)place).network().getContext()
+            : ((LocalTimedPlace)place).model().parentNetwork().getContext();
     }
 
     public boolean isAgeOfTokensShown() {
@@ -482,7 +517,7 @@ public class TimedPlaceComponent extends Place {
                 if (TAPAALGUI.getAppGui().showColoredTokens()) {
                     if (underlyingPlace().getTokensAsExpression() != null) {
                         buffer.append("\n");
-                        buffer.append(((AddExpression)underlyingPlace().getTokensAsExpression()).toTokenString());
+                        buffer.append(getColoredTokenExpression());
                     }
                 }
 
