@@ -13,7 +13,7 @@ public class ColorType implements Iterable<Color> {
     public static final ColorType COLORTYPE_DOT = new ColorType("dot") {{addColor("dot");}};
     private final Vector<Color> colors = new Vector<>();
     private final String id;
-    private final String name;
+    private String name;
 
     public ColorType(String name) { this(name, name); } //id is unused. Solution for now.
 
