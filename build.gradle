@@ -1,16 +1,17 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.10'
-    id "ca.coglinc.javacc" version "2.4.0"
+    id 'org.jetbrains.kotlin.jvm' version '2.1.20'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.1.20'
+    id "org.javacc.javacc" version "4.0.3"
 }
 
 group 'net.tapaal'
 version '4.0-SNAPSHOT'
 
-var targetJavaVersion = JavaVersion.VERSION_11
+var targetJavaVersion = "11"
 var targetKotlinVersion = "1.6"
+
 java {
     sourceCompatibility = targetJavaVersion
     targetCompatibility = targetJavaVersion
@@ -19,9 +20,6 @@ java {
 compileKotlin {
     dependsOn compileJavacc
 
-    sourceCompatibility = targetJavaVersion
-    targetCompatibility = targetJavaVersion
-
     kotlinOptions {
         jvmTarget = targetJavaVersion
         apiVersion = targetKotlinVersion
@@ -29,7 +27,9 @@ compileKotlin {
     }
 }
 
-mainClassName = 'TAPAAL'
+application {
+    mainClass = 'TAPAAL'
+}
 
 repositories {
     mavenCentral()
@@ -49,7 +49,7 @@ jar {
     //Sets the main call for the Jar, you can double click to run the jar file
     manifest {
         attributes (
-            'Main-Class': mainClassName
+            'Main-Class': application.mainClass.get()
         )
     }
     //The following lines makes libs a part of the build jar file (standalone jar)
