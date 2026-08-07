@@ -9,7 +9,7 @@ plugins {
 group 'net.tapaal'
 version '4.0-SNAPSHOT'
 
-var targetJavaVersion = "11"
+var targetJavaVersion = "17"
 var targetKotlinVersion = "1.6"
 
 java {
