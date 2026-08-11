@@ -4510,22 +4510,30 @@ public class QueryDialog extends JPanel {
                     parentOp = "+";
                 }
 
-                if (parentProps != null && !parentProps.isEmpty() && parentProps.get(parentProps.size() - 1) == originalProp) {
+                if (parentProps != null && !parentProps.isEmpty()) {
                     int newPrec = operator.equals("*") ? 2 : 1;
                     int parentPrec = "*".equals(parentOp) ? 2 : 1;
 
-                    if (newPrec == parentPrec) {
-                        boolean sameAssociativeOp = operator.equals(parentOp)
-                                && (operator.equals("+") || operator.equals("*"));
-
+                    if (newPrec == parentPrec && operator.equals(parentOp)) {
                         List<TCTLAbstractStateProperty> properties = new ArrayList<>();
-                        if (sameAssociativeOp) {
-                            for (TCTLAbstractStateProperty property : parentProps) {
-                                properties.add(property.copy());
+                        for (var property : parentProps) {
+                            properties.add(property.copy());
+                            if (property == originalProp) {
+                                properties.add(new AritmeticOperator(operator));
+                                properties.add(ph);
                             }
-                        } else {
-                            properties.add((TCTLAbstractStateProperty) parent.copy());
                         }
+
+                        TCTLAbstractStateProperty newNode = parent instanceof TCTLTermListNode
+                            ? new TCTLTermListNode(properties)
+                            : new TCTLPlusListNode(new ArrayList<>(properties));
+                        replacePropertyInQuery(parent, newNode);
+                        return;
+                    }
+
+                    if (newPrec == parentPrec && parentProps.get(parentProps.size() - 1) == originalProp) {
+                        List<TCTLAbstractStateProperty> properties = new ArrayList<>();
+                        properties.add((TCTLAbstractStateProperty)parent.copy());
                         properties.add(new AritmeticOperator(operator));
                         properties.add(ph);
 
@@ -5206,6 +5214,9 @@ public class QueryDialog extends JPanel {
             }
 
             var matches = searcher.findAllMatches(query);
+            if (currentSelection != null && isInsideArithmetic(currentSelection.getObject())) {
+                matches.removeIf(match -> match.value1() instanceof TimedTransition || match.value1() instanceof SharedTransition);
+            }
             searchBar.showResults(matches);
         });
 
