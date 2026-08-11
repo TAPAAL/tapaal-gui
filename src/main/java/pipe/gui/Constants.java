@@ -78,4 +78,5 @@ public class Constants {
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;
 
 	public static final int MAX_NUMBER_OF_TOKENS_ALLOWED = 9999999;
+	public static final int MAX_NET_SIZE = 4000;
 }

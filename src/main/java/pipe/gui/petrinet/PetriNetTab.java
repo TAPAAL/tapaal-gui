@@ -173,6 +173,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
      * Creates a new tab with the selected filestream
 	 */
     public static PetriNetTab createNewTabFromInputStream(InputStream file, String name) throws Exception {
+        return createNewTabFromInputStream(file, name, true);
+    }
+
+    public static PetriNetTab createNewTabFromInputStream(InputStream file, String name, boolean parentPaintNet) throws Exception {
 
         try {
             ModelLoader loader = new ModelLoader();
@@ -181,6 +185,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 			if (loadedModel == null) {
                 throw new Exception("Could not open the selected file, as it does not have the correct format.");
 			}
+
+            if (!parentPaintNet || !loadedModel.network().isNetDrawable()) {
+                loadedModel.network().setPaintNet(false);
+            }
 
 			if (loadedModel.getMessages().size() != 0) {
                 new Thread(() -> {
@@ -2222,7 +2230,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             String composedName = getTabTitle();
             composedName = composedName.replace(".tapn", "");
             composedName += appendName;
-            return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+            return createNewTabFromInputStream(new ByteArrayInputStream(outputStream.toByteArray()), composedName, network().paintNet());
         } catch (Exception e1) {
             Logger.log("Could not load model");
             e1.printStackTrace();

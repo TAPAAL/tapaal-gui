@@ -54,7 +54,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
     protected final boolean symmetricVars;
     
     //if the unfolded net is too big, do not try to load it
-    private final int maxNetSize = 4000;
+    private final int maxNetSize = Constants.MAX_NET_SIZE;
     private boolean netTooBig = false;
 
     public UnfoldNet(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
