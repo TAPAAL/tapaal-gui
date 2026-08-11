@@ -220,7 +220,9 @@ public class TAPNComposer implements ITAPNComposer {
 			
 			for (TimedPlace timedPlace : tapn.places()) {			
 				if (!timedPlace.isShared()) {
-					String uniquePlaceName = (!singleComponentNoPrefix || model.activeTemplates().size() > 1) ? composedPlaceName(timedPlace) : timedPlace.name();
+					String uniquePlaceName = (!singleComponentNoPrefix || model.activeTemplates().size() > 1)
+						? ((LocalTimedPlace)timedPlace).model().name() + "__" + timedPlace.name()
+						: timedPlace.name();
 
 					LocalTimedPlace place = null;
 					if (timedPlace.invariant().upperBound() instanceof Bound.InfBound) {					

@@ -286,7 +286,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
             }
         }
         
-        if (!useColoredReduction && colored && !useExplicitSearch) {
+        if (!useColoredReduction && colored) {
 		    result.append(" --col-reduction 0 ");
         }
 
