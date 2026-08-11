@@ -34,7 +34,6 @@ import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import net.tapaal.gui.petrinet.dialog.ColoredBindingSelectionDialog;
 import dk.aau.cs.model.CPN.Expressions.ExpressionContext;
-import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.Expression;
 import dk.aau.cs.model.CPN.Color;
@@ -385,44 +384,42 @@ public class Animator {
 
     private void storeTokenState() {
         storedTokenState.clear();
-        for (Place guiPlace : tab.currentTemplate().guiModel().getPlaces()) {
-            TimedPlaceComponent placeComponent = (TimedPlaceComponent)guiPlace;
-            TimedPlace place = placeComponent.underlyingPlace();
-            NetworkMarking marking = tab.network().marking();
-            List<TimedToken> tokens = marking.getTokensFor(place);
-            ArcExpression expression = place.getTokensAsExpression();
-
-            List<TimedToken> tokensCopy = new ArrayList<>(tokens);
-            storedTokenState.put(place, new Tuple<>(tokensCopy, expression));
+        var marking = tab.network().marking();
+        for (var template : tab.activeTemplates()) {
+            for (var guiPlace : template.guiModel().getPlaces()) {
+                var place = ((TimedPlaceComponent)guiPlace).underlyingPlace();
+                List<TimedToken> tokensCopy = new ArrayList<>(marking.getTokensFor(place));
+                storedTokenState.put(place, new Tuple<>(tokensCopy, place.getTokensAsExpression()));
+            }
         }
     }
 
     private void restoreTokenState() {
-        for (Place guiPlace : tab.currentTemplate().guiModel().getPlaces()) {
-            TimedPlaceComponent placeComponent = (TimedPlaceComponent)guiPlace;
-            TimedPlace place = placeComponent.underlyingPlace();
-            
-            Tuple<List<TimedToken>, ArcExpression> state = storedTokenState.get(place);
-            if (state != null) {
-                place.resetNumberOfTokensColor();
-                List<TimedToken> tokens = state.value1();
-                ArcExpression expression = state.value2();
+        for (var template : tab.activeTemplates()) {
+            for (var guiPlace : template.guiModel().getPlaces()) {
+                var placeComponent = (TimedPlaceComponent)guiPlace;
+                var place = placeComponent.underlyingPlace();
+                var state = storedTokenState.get(place);
+                if (state != null) {
+                    place.resetNumberOfTokensColor();
+                    var tokens = state.value1();
+                    var expression = state.value2();
+                    if (expression != null && containsAllExpression(expression)) {
+                        Map<String, ColorType> colorTypes = new HashMap<>();
+                        for (var ct : tab.network().colorTypes()) {
+                            colorTypes.put(ct.getName(), ct);
+                        }
 
-                if (expression != null && containsAllExpression(expression)) {
-                    HashMap<String, ColorType> colorTypes = new HashMap<>();
-                    for (ColorType ct : tab.network().colorTypes()) {
-                        colorTypes.put(ct.getName(), ct);
+                        var context = new ExpressionContext(null, colorTypes);
+                        var multiset = expression.eval(context);
+                        if (multiset != null) {
+                            tokens = new ArrayList<>(multiset.getTokens(place));
+                        }
                     }
-                    ExpressionContext context = new ExpressionContext(null, colorTypes);
 
-                    ColorMultiset multiset = expression.eval(context);
-                    if (multiset != null) {
-                        tokens = new ArrayList<>(multiset.getTokens(place));
-                    }
+                    place.updateTokens(tokens, expression);
+                    placeComponent.setUnderlyingPlace(place);
                 }
-
-                place.updateTokens(tokens, expression);
-                placeComponent.setUnderlyingPlace(place);
             }
         }
 
