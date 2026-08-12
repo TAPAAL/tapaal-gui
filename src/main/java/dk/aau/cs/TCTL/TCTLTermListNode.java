@@ -8,9 +8,9 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 //Represents a list of factors and the operators between then, these are all stored in the factors list
 public class TCTLTermListNode extends TCTLAbstractStateProperty {
 
-	final ArrayList<TCTLAbstractStateProperty> factors;
+	final List<TCTLAbstractStateProperty> factors;
 
-	public TCTLTermListNode(ArrayList<TCTLAbstractStateProperty> factors) {
+	public TCTLTermListNode(List<TCTLAbstractStateProperty> factors) {
 		this.factors = factors;
 		for(TCTLAbstractStateProperty factor: factors){
 			factor.setParent(this);
@@ -97,7 +97,27 @@ public class TCTLTermListNode extends TCTLAbstractStateProperty {
     }
 
     @Override
-	public TCTLAbstractProperty findFirstPlaceHolder() {
+    public StringPosition[] getChildren() {
+        List<StringPosition> children = new ArrayList<>();
+        int currentLength = 0;
+        for (int i = 0; i < factors.size(); ++i) {
+            var p = factors.get(i);
+            int start = currentLength + (p.isSimpleProperty() ? 0 : 1);
+            int end = start + p.toString().length();
+            
+            if (!(p instanceof AritmeticOperator)) {
+                children.add(new StringPosition(start, end, p));
+            }
+            
+            currentLength += (p.isSimpleProperty() ? p.toString().length() : p.toString().length() + 2);
+            currentLength += 1;
+        }
+
+        return children.toArray(new StringPosition[0]);
+    }
+
+    @Override	
+    public TCTLAbstractProperty findFirstPlaceHolder() {
 		for(TCTLAbstractStateProperty factor : factors){
 			TCTLAbstractProperty placeholder = factor.findFirstPlaceHolder(); 
 			if(placeholder != null){
@@ -120,11 +140,40 @@ public class TCTLTermListNode extends TCTLAbstractStateProperty {
 		return sb.toString().trim();
 	}
 	
+	public String getOperator() {
+		String op = null;
+		for (TCTLAbstractStateProperty factor : factors) {
+			if (factor instanceof AritmeticOperator) {
+				if (op == null) {
+					op = factor.toString();
+				} else if (!op.equals(factor.toString())) {
+					return null;
+				}
+			}
+		}
+        
+		return op;
+	}
+
 	@Override
 	public boolean isSimpleProperty() {
-		if(factors.size() > 1)
-		    return false;
-		else
-		    return true;
+		if (factors.size() > 1) {
+			if (parent instanceof TCTLTermListNode) {
+				TCTLTermListNode p = (TCTLTermListNode) parent;
+				String op = getOperator();
+				String parentOp = p.getOperator();
+				if (op != null && op.equals(parentOp)) {
+					if (op.equals("+") || op.equals("*")) {
+						return true;
+					} else if (op.equals("-") && p.factors.indexOf(this) == 0){
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+        
+		return true;
 	}
 }

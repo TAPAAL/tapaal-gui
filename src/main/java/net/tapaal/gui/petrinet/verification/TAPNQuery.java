@@ -1,6 +1,7 @@
 package net.tapaal.gui.petrinet.verification;
 
 import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.SMCSettings;
@@ -307,7 +308,8 @@ public class TAPNQuery {
 	}
 	
 	public boolean useGCD(){
-		return gcd;
+		return gcd && property != null && queryType() != QueryType.EG && queryType() != QueryType.AF
+			&& !new HasDeadlockVisitor().hasDeadLock(property);
 	}
 	
 	public void setUseGCD(boolean useGCD){
