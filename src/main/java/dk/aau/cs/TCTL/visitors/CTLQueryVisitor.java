@@ -175,11 +175,35 @@ public class CTLQueryVisitor extends VisitorBase {
     }
 
     public void visit(TCTLPlusListNode tctlPlusListNode, Object context) {
-        if (tctlPlusListNode.getProperties().size() > 1) {
-            createList(tctlPlusListNode.getProperties(), context, XML_INTEGERSUM);
-        } else if (tctlPlusListNode.getProperties().size() == 1) {
-            tctlPlusListNode.getProperties().get(0).accept(this, context);
+        List<TCTLAbstractStateProperty> properties = tctlPlusListNode.getProperties();
+        if (properties.size() == 1) {
+            properties.get(0).accept(this, context);
+        } else if (containsSubtraction(properties)) {
+            createArithmeticExpression(properties, properties.size() - 1, context);
+        } else {
+            createList(properties, context, XML_INTEGERSUM);
         }
+    }
+
+    private boolean containsSubtraction(List<TCTLAbstractStateProperty> properties) {
+        for (int i = 1; i < properties.size(); i += 2) {
+            if (properties.get(i).toString().equals("-")) return true;
+        }
+        return false;
+    }
+
+    private void createArithmeticExpression(List<TCTLAbstractStateProperty> properties, int operandIndex, Object context) {
+        if (operandIndex == 0) {
+            properties.get(0).accept(this, context);
+            return;
+        }
+
+        String operator = properties.get(operandIndex - 1).toString();
+        String element = operator.equals("-") ? XML_INTEGERDIFFERENCE : XML_INTEGERSUM;
+        xmlQuery.append(startTag(element));
+        createArithmeticExpression(properties, operandIndex - 2, context);
+        properties.get(operandIndex).accept(this, context);
+        xmlQuery.append(endTag(element));
     }
 
     public void visit(TCTLTermListNode termListNode, Object context) {
