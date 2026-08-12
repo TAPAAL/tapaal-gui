@@ -121,4 +121,9 @@ public class TCTLPlusListNode extends TCTLAbstractStateProperty {
 		
 		return sb.toString().trim();
 	}
+
+	@Override
+	public boolean isSimpleProperty() {
+		return terms.size() == 1;
+	}
 }
