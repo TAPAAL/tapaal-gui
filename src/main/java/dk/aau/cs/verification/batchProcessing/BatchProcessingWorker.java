@@ -112,16 +112,32 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
                         }
                     }
 
+                    List<RealConstant> multiRealConstants = new ArrayList<>();
+                    for (var c : model.network().realConstants()) {
+                        if (c.hasMultipleValues()) {
+                            multiRealConstants.add(c);
+                        }
+                    }
+
                     Map<Constant, LinkedHashSet<Integer>> originalValues = new HashMap<>();
                     for (Constant c : multiConstants) {
                         originalValues.put(c, new LinkedHashSet<>(c.values()));
                     }
 
+                    var originalRealValues = new HashMap<RealConstant, LinkedHashSet<Double>>();
+                    for (var c : multiRealConstants) {
+                        originalRealValues.put(c, new LinkedHashSet<>(c.values()));
+                    }
+
                     try {
-                        generateCombinationsAndProcess(file, model, multiConstants, originalValues, 0, new ArrayList<>());
+                        generateCombinationsAndProcess(file, model, multiConstants, originalValues, multiRealConstants, originalRealValues, 0);
                     } finally {
                         for (Constant c : multiConstants) {
                             c.setValues(originalValues.get(c));
+                        }
+
+                        for (var c : multiRealConstants) {
+                            c.setValues(originalRealValues.get(c));
                         }
                     }
                 } catch (Exception e) {
