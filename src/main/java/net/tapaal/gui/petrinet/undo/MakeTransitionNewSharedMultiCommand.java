@@ -46,7 +46,7 @@ public class MakeTransitionNewSharedMultiCommand implements Command {
                     commands.add(command);
                     first = false;
                 } else { //For the rest we make them shared with the recently made transition
-                    command = new MakeTransitionSharedCommand(context.activeModel(), sharedTransition, component.underlyingTransition(), context.tabContent());
+                    command = new MakeTransitionSharedCommand(template.model(), sharedTransition, component.underlyingTransition(), context.tabContent());
                     command.redo();
                     commands.add(command);
                 }
@@ -56,7 +56,8 @@ public class MakeTransitionNewSharedMultiCommand implements Command {
 
 	@Override
 	public void undo() {	
-		for(Command command : commands)
-			command.undo();
+		for (int i = commands.size() - 1; i >= 0; --i) {
+			commands.get(i).undo();
+        }
 	}
 }

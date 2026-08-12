@@ -1,27 +1,23 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.10'
-    id "ca.coglinc.javacc" version "2.4.0"
+    id 'org.jetbrains.kotlin.jvm' version '2.1.20'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.1.20'
+    id "org.javacc.javacc" version "4.0.3"
 }
 
 group 'net.tapaal'
 version '4.0-SNAPSHOT'
 
-var targetJavaVersion = JavaVersion.VERSION_11
-var targetKotlinVersion = "1.6"
+var targetJavaVersion = "17"
+var targetKotlinVersion = "2.0"
+
 java {
     sourceCompatibility = targetJavaVersion
     targetCompatibility = targetJavaVersion
 }
 
-compileKotlin {
-    dependsOn compileJavacc
-
-    sourceCompatibility = targetJavaVersion
-    targetCompatibility = targetJavaVersion
-
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
         jvmTarget = targetJavaVersion
         apiVersion = targetKotlinVersion
@@ -29,7 +25,13 @@ compileKotlin {
     }
 }
 
-mainClassName = 'TAPAAL'
+compileKotlin {
+    dependsOn compileJavacc
+}
+
+application {
+    mainClass = 'TAPAAL'
+}
 
 repositories {
     mavenCentral()
@@ -49,7 +51,7 @@ jar {
     //Sets the main call for the Jar, you can double click to run the jar file
     manifest {
         attributes (
-            'Main-Class': mainClassName
+            'Main-Class': application.mainClass.get()
         )
     }
     //The following lines makes libs a part of the build jar file (standalone jar)
@@ -65,8 +67,11 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3'
     implementation 'org.jfree:jfreechart:1.5.5'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    
+   // testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+   // testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
 
 test {

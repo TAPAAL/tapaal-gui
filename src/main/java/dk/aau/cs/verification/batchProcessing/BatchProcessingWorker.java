@@ -41,6 +41,7 @@ import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.RealConstant;
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
 	private final List<File> files;
@@ -128,7 +129,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
                     Logger.log(e);
                     publishResult(file.getName(), null, "Error processing model", 0, e.toString(), new NullStats(), -1);
                 }
-                
+
                 if (exiting()) return null;
             }
         }
@@ -137,26 +138,24 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         return null;
     }
 
-    private void generateCombinationsAndProcess(File file, LoadedBatchProcessingModel model, List<Constant> multiConstants, Map<Constant, LinkedHashSet<Integer>> originalValues, int index, List<Integer> currentCombination) throws Exception {
+    private void generateCombinationsAndProcess(File file, LoadedBatchProcessingModel model,
+            List<Constant> multiConstants, Map<Constant, LinkedHashSet<Integer>> originalValues,
+            List<RealConstant> multiRealConstants, Map<RealConstant, LinkedHashSet<Double>> originalRealValues,
+            int index) throws Exception {
         if (exiting()) {
             return;
         }
-        if (index == multiConstants.size()) {
+        if (index == multiConstants.size() + multiRealConstants.size()) {
             String suffix = "";
-            if (!multiConstants.isEmpty()) {
-                var suffixBuilder = new StringBuilder(" [");
-                for (int i = 0; i < multiConstants.size(); ++i) {
-                    Constant c = multiConstants.get(i);
-                    int val = currentCombination.get(i);
-                    var singleVal = new LinkedHashSet<Integer>();
-                    singleVal.add(val);
-                    c.setValues(singleVal);
-                    suffixBuilder.append(c.name()).append("=").append(val);
-                    if (i < multiConstants.size() - 1) suffixBuilder.append(", ");
+            if (!multiConstants.isEmpty() || !multiRealConstants.isEmpty()) {
+                var parts = new ArrayList<String>();
+                for (var c : multiConstants) {
+                    parts.add(c.name() + "=" + c.value());
                 }
-                
-                suffixBuilder.append("]");
-                suffix = suffixBuilder.toString();
+                for (var c : multiRealConstants) {
+                    parts.add(c.name() + "=" + c.value());
+                }
+                suffix = " [" + String.join(", ", parts) + "]";
             }
 
             var composedModel = composeModel(model);
@@ -179,12 +178,18 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
             return;
         }
 
-        Constant c = multiConstants.get(index);
-        var vals = originalValues.get(c);
-        for (int val : vals) {
-            currentCombination.add(val);
-            generateCombinationsAndProcess(file, model, multiConstants, originalValues, index + 1, currentCombination);
-            currentCombination.remove(currentCombination.size() - 1);
+        if (index < multiConstants.size()) {
+            var c = multiConstants.get(index);
+            for (int val : originalValues.get(c)) {
+                c.setValue(val);
+                generateCombinationsAndProcess(file, model, multiConstants, originalValues, multiRealConstants, originalRealValues, index + 1);
+            }
+        } else {
+            var c = multiRealConstants.get(index - multiConstants.size());
+            for (double val : originalRealValues.get(c)) {
+                c.setValue(val);
+                generateCombinationsAndProcess(file, model, multiConstants, originalValues, multiRealConstants, originalRealValues, index + 1);
+            }
         }
     }
 

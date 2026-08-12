@@ -11,11 +11,9 @@ import java.util.Vector;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
@@ -24,6 +22,8 @@ import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.RealConstant;
+import dk.aau.cs.model.tapn.SMCParameterConstant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -42,6 +42,7 @@ import pipe.gui.TAPAALGUI;
 
 public class ConstantsParser {
     private static final Map<String, Constant> constants = new LinkedHashMap<String, Constant>();
+    private static final Map<String, RealConstant> realConstants = new LinkedHashMap<String, RealConstant>();
     private static final Map<String, ColorType> colorTypes = new LinkedHashMap<String, ColorType>();
     private static final Map<String, Variable> variables = new LinkedHashMap<String, Variable>();
     private static TimedArcPetriNetNetwork network;
@@ -58,22 +59,17 @@ public class ConstantsParser {
         ConstantsParser.network = network;
         ConstantsParser parser = new ConstantsParser(new StringReader(constantsToParse));
         constants.clear();
+        realConstants.clear();
         colorTypes.clear();
         variables.clear();
 
         parser.startParsing();
 
-        List<Constant> constantsList = constants.values()
-                                                .stream()
-                                                .collect(Collectors.toList());
+        network.buildConstraints();
 
-        List<ColorType> colorTypesList = colorTypes.values()
-                                                   .stream()
-                                                   .collect(Collectors.toList());
-        
-        List<Variable> variablesList = variables.values()
-                                                .stream()
-                                                .collect(Collectors.toList());
+        List<Constant> constantsList = new ArrayList<Constant>(constants.values());
+        List<ColorType> colorTypesList = new ArrayList<ColorType>(colorTypes.values());
+        List<Variable> variablesList = new ArrayList<Variable>(variables.values());
 
         ColorType dot = new ColorType("dot");
         dot.addColor("dot");    
@@ -87,6 +83,11 @@ public class ConstantsParser {
         for (Constant c : network.constants()) {
             constantsMap.put(c.name(), c);
             canBeRemovedBitMap.put(c.name(), !network.getConstantStore().isConstantInUse(c.name()));
+        }
+
+        for (RealConstant rc : network.realConstants()) {
+            constantsMap.put(rc.name(), rc);
+            canBeRemovedBitMap.put(rc.name(), !network.getConstantStore().isRealConstantInUse(rc.name()));
         }
 
         for (ColorType ct : network.colorTypes()) {
@@ -111,7 +112,8 @@ public class ConstantsParser {
 
         // Generate error messages
         for (String key : canBeRemovedBitMap.keySet()) {
-            if (constants.containsKey(key) || 
+            if (constants.containsKey(key) ||
+                realConstants.containsKey(key) ||
                 variables.containsKey(key) && canBeRemovedBitMap.get(key) ||
                 key.equals("dot")) {
                 continue;
@@ -219,14 +221,14 @@ public class ConstantsParser {
                 if (obj instanceof ColorType) {
                     message += "color type";
                 } else if (obj instanceof Variable) {
-                    message += "variable"; 
+                    message += "variable";
                 } else {
                     message += "constant";
                 }
 
                 message += " \"" + key + "\"";
 
-                if (!(obj instanceof Constant)) {
+                if (!(obj instanceof SMCParameterConstant)) {
                     message += " for the following reasons:  \n\n";
                     message += String.join("", messages.get(key));
                 } else {
@@ -241,6 +243,7 @@ public class ConstantsParser {
 
         network.getConstantStore().clear();
         network.setConstants(constantsList);
+        network.setRealConstants(new ArrayList<RealConstant>(realConstants.values()));
         if (network.isColored()) {
             network.setColorTypes(colorTypesList);
             network.setVariables(variablesList);
@@ -256,6 +259,10 @@ public class ConstantsParser {
 
         if (constants.containsKey(id)) {
             throw new ParseException("Constant with name \"" + id + "\" already exists");
+        }
+
+        if (realConstants.containsKey(id)) {
+            throw new ParseException("Real constant with name \"" + id + "\" already exists");
         }
 
         if (colorTypes.containsKey(id)) {
@@ -416,6 +423,12 @@ TOKEN :
     |
     <CONST: "const">
     |
+    <INTTYPE: "int">
+    |
+    <REALTYPE: "real">
+    |
+    <MINUS: "-">
+    |
     <VAR: "var">
     |
     <TYPE: "type">
@@ -425,6 +438,8 @@ TOKEN :
     <#ALPHANUM: ["a"-"z","A"-"Z","0"-"9"]>
     |
     <INTEGER: ["0"-"9"] | (["1"-"9"] (["0"-"9"])*)>
+    |
+    <REAL: (["0"-"9"])+ "." (["0"-"9"])+>
     |
     <ID: <ALPHA> ("_" | <ALPHANUM>)*>
 }
@@ -446,18 +461,67 @@ void startParsing() :
 void values() :
 {}
 {
-    constants() | 
-    colorTypes() | 
+    constants() |
+    colorTypes() |
     variables()
 }
 
 void constants() :
+{}
+{
+    <CONST> (<REALTYPE> realConstant() | <INTTYPE> intConstant())
+}
+
+void realConstant() :
+{
+    Token id;
+    String value;
+    List<String> values = new ArrayList<String>();
+}
+{
+    id = <ID> <EQ>
+    (
+        value = realValue() {
+            idExists(id.image);
+            realConstants.put(id.image, new RealConstant(id.image, Double.parseDouble(value)));
+        }
+    |
+        <LCURLY> realSet(values) <RCURLY> {
+            idExists(id.image);
+            LinkedHashSet<Double> setVals = new LinkedHashSet<Double>();
+            for (String s : values) {
+                setVals.add(Double.parseDouble(s));
+            }
+            realConstants.put(id.image, new RealConstant(id.image, setVals));
+        }
+    )
+}
+
+String realValue() :
+{
+    Token val;
+    String sign = "";
+}
+{
+    (<MINUS> { sign = "-"; })? (val = <REAL> | val = <INTEGER>) { return sign + val.image; }
+}
+
+void realSet(List<String> values) :
+{
+    String val;
+}
+{
+    val = realValue() { values.add(val); }
+    (<COMMA> val = realValue() { values.add(val); })*
+}
+
+void intConstant() :
 {
     Token id, value;
     List<String> values = new ArrayList<String>();
 }
 {
-    <CONST> id = <ID> <EQ> 
+    id = <ID> <EQ>
     (
         value = <INTEGER> { 
             idExists(id.image);

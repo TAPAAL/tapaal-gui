@@ -267,7 +267,7 @@ public class PNMLWriter implements NetWriter {
 		
 		Element transitionElement = document.createElement("transition");
 		transitionElement.setAttribute("id", (inputTransition.getId() != null ? inputTransition.getId()	: "error"));
-        inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement);
+        inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement, false);
 
 		Element name = document.createElement("name"); //Name
 		transitionElement.appendChild(name);
@@ -297,7 +297,7 @@ public class PNMLWriter implements NetWriter {
 
         Element transitionElement = document.createElement("transition");
         transitionElement.setAttribute("id", (inputTransition.getId() != null ? inputTransition.getId()	: "error"));
-        inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement);
+        inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement, false);
 
         Element name = document.createElement("name"); //Name
         transitionElement.appendChild(name);

@@ -227,7 +227,7 @@ public class TapnEngineXmlLoader {
         Probability weight = new DoubleProbability(1.0);
 		FiringMode firingMode = new RandomFiringMode();
         if(!distrib.isEmpty()){
-            distribution = SMCDistribution.parseXml(element);
+            distribution = SMCDistribution.parseXml(element, constants);
         }
         if(!weightStr.isEmpty()) {
             weight = Probability.parseProbability(weightStr, constants);
@@ -282,7 +282,7 @@ public class TapnEngineXmlLoader {
                 continue;
             }
 
-			if (c instanceof Element) {
+			if (c instanceof Element && !"real".equals(((Element) c).getAttribute("type"))) {
 				Constant constant = parseConstant((Element) c);
 				constants.add(constant);
 			}
@@ -455,7 +455,7 @@ public class TapnEngineXmlLoader {
 		    priority = Integer.parseInt(priorityStr);
         }
         if(!distrib.isEmpty()){
-            distribution = SMCDistribution.parseXml(transition);
+            distribution = SMCDistribution.parseXml(transition, constants);
         }
         if(!weightStr.isEmpty()) {
             weight = Probability.parseProbability(weightStr, constants);

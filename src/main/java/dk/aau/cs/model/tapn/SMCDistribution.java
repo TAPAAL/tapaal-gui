@@ -2,12 +2,12 @@ package dk.aau.cs.model.tapn;
 
 import org.w3c.dom.Element;
 
-import java.io.File;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 public abstract class SMCDistribution {
+    private final LinkedHashMap<String, SMCParameterConstant> paramRefs = new LinkedHashMap<>();
 
     public abstract String distributionName();
 
@@ -15,20 +15,59 @@ public abstract class SMCDistribution {
 
     public abstract String explanation();
 
+    public Map<String, SMCParameterConstant> getParamRefs() {
+        return paramRefs;
+    }
+
+    public void setParamRef(String param, SMCParameterConstant constant) {
+        if (constant == null) {
+            paramRefs.remove(param);
+            return;
+        } 
+
+        paramRefs.put(param, constant);
+    }
+
+    public SMCParameterConstant getParamRef(String param) {
+        return paramRefs.get(param);
+    }
+
+    public Map<String, Double> getResolvedParameters() {
+        var params = getParameters();
+        for (var entry : paramRefs.entrySet()) {
+            if (params.containsKey(entry.getKey())) {
+                params.put(entry.getKey(), entry.getValue().paramValue());
+            }
+        }
+
+        return params;
+    }
+
     public Double getMean() {
         return null;
     }
 
     public void writeToXml(Element target) {
+        writeToXml(target, true);
+    }
+
+    public void writeToXml(Element target, boolean writeConstantNames) {
         target.setAttribute("distribution", distributionName());
-        for(HashMap.Entry<String, Double> entry : getParameters().entrySet()) {
+        var params = writeConstantNames ? getParameters() : getResolvedParameters();
+        for (var entry : params.entrySet()) {
+            var ref = paramRefs.get(entry.getKey());
+            if (writeConstantNames && ref != null) {
+                target.setAttribute(entry.getKey(), ref.name());
+                continue;
+            }
+
             target.setAttribute(entry.getKey(), entry.getValue().toString());
         }
     }
 
     public String toString() {
         StringBuilder res = new StringBuilder("distribution=\"" + distributionName() + "\" ");
-        for(HashMap.Entry<String, Double> entry : getParameters().entrySet()) {
+        for (var entry : getResolvedParameters().entrySet()) {
             res.append(entry.getKey()).append("=\"").append(entry.getValue().toString()).append("\" ");
         }
         return res.toString();
@@ -37,8 +76,9 @@ public abstract class SMCDistribution {
     public String summary() {
         StringBuilder res = new StringBuilder(distributionName() + "(");
         LinkedList<String> params = new LinkedList<>();
-        for(HashMap.Entry<String, Double> entry : getParameters().entrySet()) {
-            params.add(entry.getValue().toString());
+        for (var entry : getParameters().entrySet()) {
+            var ref = paramRefs.get(entry.getKey());
+            params.add(ref != null ? ref.name() : entry.getValue().toString());
         }
         res.append(String.join(",", params));
         res.append(")");
@@ -86,57 +126,100 @@ public abstract class SMCDistribution {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        return getParameters().equals(((SMCDistribution) o).getParameters());
+        SMCDistribution other = (SMCDistribution) o;
+        return getParameters().equals(other.getParameters()) && paramRefs.equals(other.paramRefs);
     }
 
     public static SMCDistribution parseXml(Element elem) {
+        return parseXml(elem, null);
+    }
+
+    public static SMCDistribution parseXml(Element elem, ConstantStore constants) {
         String type = elem.getAttribute("distribution");
+        var refs = new LinkedHashMap<String, SMCParameterConstant>();
         try {
+            SMCDistribution result = null;
             switch (type) {
                 case SMCConstantDistribution.NAME:
-                    double value = Double.parseDouble(elem.getAttribute("value"));
-                    return new SMCConstantDistribution(value);
+                    double value = parseParam(elem, "value", constants, refs);
+                    result = new SMCConstantDistribution(value);
+                    break;
                 case SMCUniformDistribution.NAME:
-                    double a = Double.parseDouble(elem.getAttribute("a"));
-                    double b = Double.parseDouble(elem.getAttribute("b"));
-                    return new SMCUniformDistribution(a, b);
+                    double a = parseParam(elem, "a", constants, refs);
+                    double b = parseParam(elem, "b", constants, refs);
+                    result = new SMCUniformDistribution(a, b);
+                    break;
                 case SMCExponentialDistribution.NAME:
-                    double rate = Double.parseDouble(elem.getAttribute("rate"));
-                    return new SMCExponentialDistribution(rate);
+                    double rate = parseParam(elem, "rate", constants, refs);
+                    result = new SMCExponentialDistribution(rate);
+                    break;
                 case SMCNormalDistribution.NAME:
-                    double mean = Double.parseDouble(elem.getAttribute("mean"));
-                    double stddev = Double.parseDouble(elem.getAttribute("stddev"));
-                    return new SMCNormalDistribution(mean, stddev);
+                    double mean = parseParam(elem, "mean", constants, refs);
+                    double stddev = parseParam(elem, "stddev", constants, refs);
+                    result = new SMCNormalDistribution(mean, stddev);
+                    break;
                 case SMCGammaDistribution.NAME:
-                    double shape = Double.parseDouble(elem.getAttribute("shape"));
-                    double scale = Double.parseDouble(elem.getAttribute("scale"));
-                    return new SMCGammaDistribution(shape, scale);
+                    double shape = parseParam(elem, "shape", constants, refs);
+                    double scale = parseParam(elem, "scale", constants, refs);
+                    result = new SMCGammaDistribution(shape, scale);
+                    break;
                 case SMCErlangDistribution.NAME:
-                    double e_shape = Double.parseDouble(elem.getAttribute("shape"));
-                    double e_scale = Double.parseDouble(elem.getAttribute("scale"));
-                    return new SMCErlangDistribution(e_shape, e_scale);
+                    double e_shape = parseParam(elem, "shape", constants, refs);
+                    double e_scale = parseParam(elem, "scale", constants, refs);
+                    result = new SMCErlangDistribution(e_shape, e_scale);
+                    break;
                 case SMCDiscreteUniformDistribution.NAME:
-                    double da = Double.parseDouble(elem.getAttribute("a"));
-                    double db = Double.parseDouble(elem.getAttribute("b"));
-                    return new SMCDiscreteUniformDistribution(da,db);
+                    double da = parseParam(elem, "a", constants, refs);
+                    double db = parseParam(elem, "b", constants, refs);
+                    result = new SMCDiscreteUniformDistribution(da,db);
+                    break;
                 case SMCGeometricDistribution.NAME:
-                    double p = Double.parseDouble(elem.getAttribute("p"));
-                    return new SMCGeometricDistribution(p);
+                    double p = parseParam(elem, "p", constants, refs);
+                    result = new SMCGeometricDistribution(p);
+                    break;
                 case SMCTriangularDistribution.NAME:
-                    double t_a = Double.parseDouble(elem.getAttribute("a"));
-                    double t_b = Double.parseDouble(elem.getAttribute("b"));
-                    double t_c = Double.parseDouble(elem.getAttribute("c"));
-                    return new SMCTriangularDistribution(t_a,t_b,t_c);
+                    double t_a = parseParam(elem, "a", constants, refs);
+                    double t_b = parseParam(elem, "b", constants, refs);
+                    double t_c = parseParam(elem, "c", constants, refs);
+                    result = new SMCTriangularDistribution(t_a,t_b,t_c);
+                    break;
                 case SMCLogNormalDistribution.NAME:
-                    double logMean = Double.parseDouble(elem.getAttribute("logMean"));
-                    double logStddev = Double.parseDouble(elem.getAttribute("logStddev"));
-                    return new SMCLogNormalDistribution(logMean, logStddev);
+                    double logMean = parseParam(elem, "logMean", constants, refs);
+                    double logStddev = parseParam(elem, "logStddev", constants, refs);
+                    result = new SMCLogNormalDistribution(logMean, logStddev);
+                    break;
                 case SMCUserDefinedDistribution.NAME:
                     String distributionName = elem.getAttribute("distributionName");
-                    return new SMCUserDefinedDistribution(distributionName);
+                    result = new SMCUserDefinedDistribution(distributionName);
+                    break;
+            }
+            if (result != null) {
+                refs.forEach(result::setParamRef);
+                return result;
             }
         } catch(NumberFormatException ignored) {}
         return SMCDistribution.defaultDistribution();
+    }
+
+    private static double parseParam(Element elem, String attr, ConstantStore constants, Map<String, SMCParameterConstant> refs) {
+        String raw = elem.getAttribute(attr);
+        try {
+            return Double.parseDouble(raw);
+        } catch (NumberFormatException e) {
+            if (constants != null) {
+                SMCParameterConstant c = constants.getRealConstantByName(raw);
+                if (c == null) {
+                    c = constants.getConstantByName(raw);
+                }
+                
+                if (c != null) {
+                    refs.put(attr, c);
+                    return c.paramValue();
+                }
+            }
+
+            throw e;
+        }
     }
 
 }

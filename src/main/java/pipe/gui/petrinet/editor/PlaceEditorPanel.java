@@ -26,6 +26,7 @@ import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.editor.ColorComboboxPanel;
 import net.tapaal.gui.petrinet.editor.ColoredTimeInvariantDialogPanel;
 import pipe.gui.Constants;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
@@ -1172,7 +1173,7 @@ public class PlaceEditorPanel extends JPanel {
                 return;
             }
             if (!editSharedPlace && (!(coloredTokenListModel.getSize() < 1) || !timeConstraintListModel.isEmpty())){
-                int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to change the color type for this place?\n" +
+                int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "Are you sure you want to change the color type for this place?\n" +
                     "All tokens and time invariants for colors will be deleted.","alert", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
                     setNewColorType(colorTypeComboBox.getItemAt(colorTypeComboBox.getSelectedIndex()));
