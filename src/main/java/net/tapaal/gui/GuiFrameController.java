@@ -554,7 +554,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     @Override
     public void showBatchProcessingDialog() {
         if (showSavePendingChangesDialogForAllTabs()) {
-            BatchProcessingDialog.showBatchProcessingDialog(new JList<>(new DefaultListModel<>()));
+            BatchProcessingDialog.showBatchProcessingDialog();
         }
     }
 
