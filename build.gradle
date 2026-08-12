@@ -10,21 +10,23 @@ group 'net.tapaal'
 version '4.0-SNAPSHOT'
 
 var targetJavaVersion = "17"
-var targetKotlinVersion = "1.6"
+var targetKotlinVersion = "2.0"
 
 java {
     sourceCompatibility = targetJavaVersion
     targetCompatibility = targetJavaVersion
 }
 
-compileKotlin {
-    dependsOn compileJavacc
-
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
         jvmTarget = targetJavaVersion
         apiVersion = targetKotlinVersion
         languageVersion = targetKotlinVersion
     }
+}
+
+compileKotlin {
+    dependsOn compileJavacc
 }
 
 application {
