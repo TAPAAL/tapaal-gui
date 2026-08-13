@@ -7,6 +7,7 @@ import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.verification.NameMapping;
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,16 +32,16 @@ import java.util.List;
 
 public class VerifyTACPNExporter extends VerifyTAPNExporter {
     @Override
-    protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
+    protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel, TAPNLens lens) throws FileNotFoundException {
         if (guiModel == null) {
-            super.outputModel(model, modelFile, mapping, guiModel);
+            super.outputModel(model, modelFile, mapping, null, lens);
             return;
         }
         ArrayList<Template> templates = new ArrayList<>(1);
         ArrayList<TAPNQuery> queries = new ArrayList<>(1);
         templates.add(new Template(model, guiModel, new Zoomer()));
 
-        TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(model.parentNetwork(), templates, queries, model.parentNetwork().constants());
+        TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(model.parentNetwork(), templates, queries, model.parentNetwork().constants(), lens);
 
         try {
             writerTACPN.savePNML(modelFile, false);
