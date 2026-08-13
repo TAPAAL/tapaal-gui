@@ -490,7 +490,7 @@ public class QueryPane extends JPanel implements SidePane {
 		}
 
 		if (NumberOfSelectedElements == 1 && !hasMultipleConstants) {
-			if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN)
+			if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN || Verifier.hasNonzeroInitialTokenAges(tabContent.network()))
 				Verifier.runVerifyTAPNVerification(tabContent.network(), query, null, tabContent.getGuiModels(), false, tabContent.lens);
 			else
 				Verifier.runUppaalVerification(tabContent.network(), query);

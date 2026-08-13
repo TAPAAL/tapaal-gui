@@ -126,6 +126,22 @@ public class Verifier {
         return newQuery;
     }
 
+    public static TAPNQuery convertQuery(TAPNQuery query, TAPNLens lens, TimedArcPetriNetNetwork network) {
+        TAPNQuery convertedQuery = convertQuery(query, lens);
+        if (hasNonzeroInitialTokenAges(network) && convertedQuery.getReductionOption() != ReductionOption.VerifyDTAPN) {
+            convertedQuery = convertedQuery.copy();
+            convertedQuery.setReductionOption(ReductionOption.VerifyDTAPN);
+        }
+        return convertedQuery;
+    }
+
+    public static boolean hasNonzeroInitialTokenAges(TimedArcPetriNetNetwork network) {
+        return network.activeTemplates().stream()
+            .flatMap(template -> template.places().stream())
+            .flatMap(place -> network.marking().getTokensFor(place).stream())
+            .anyMatch(token -> token.age().signum() != 0);
+    }
+
     public static ModelChecker getModelChecker(TAPNQuery query) {
         if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
             return getVerifyTAPN();
@@ -227,7 +243,7 @@ public class Verifier {
         HashMap<TimedArcPetriNet, DataLayer> guiModels,
         boolean onlyCreateReducedNet,
         TAPNLens lens) {
-        query = convertQuery(query, lens);
+        query = convertQuery(query, lens, tapnNetwork);
         ModelChecker verifytapn = getModelChecker(query);
 
         if (reducedNetTempFile == null) createTempFile();

@@ -37,6 +37,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.RunningVerificationDialog;
 import pipe.gui.petrinet.PetriNetTab;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -278,20 +279,25 @@ public class TabTransformer {
         tab.network().setVariables(new ArrayList<Variable>());
         for (Template template : tab.allTemplates()) {
             for(TimedPlace place : template.model().places()){
+                int numberOfTokens = place.numberOfTokens();
+                var tokenAges = place.tokens().stream().map(TimedToken::age).toList();
                 place.setCtiList(new ArrayList<>());
                 place.setColorType(ColorType.COLORTYPE_DOT);
-                int numberOfTokens = place.tokens().size();
 
-                //kind of hack to convert from coloredTokens to uncolored
-                if (place.numberOfTokens() > 0) {
+                Vector<ArcExpression> expressions = new Vector<>();
+                if (numberOfTokens > 0) {
                     Vector<ColorExpression> v = new Vector<>();
                     v.add(new DotConstantExpression());
-                    Vector<ArcExpression> numbOfExpression = new Vector<>();
-                    numbOfExpression.add(new NumberOfExpression(place.numberOfTokens(), v));
-                    place.setTokenExpression(new AddExpression(numbOfExpression));
-                } else {
-                    place.resetNumberOfTokens();
+                    expressions.add(new NumberOfExpression(numberOfTokens, v));
                 }
+
+                var tokens = new ArrayList<TimedToken>(numberOfTokens);
+                for (var i = 0; i < numberOfTokens; ++i) {
+                    tokens.add(new TimedToken(place, i < tokenAges.size() ? tokenAges.get(i) : BigDecimal.ZERO, ColorType.COLORTYPE_DOT.getFirstColor()));
+                }
+                
+                place.updateTokens(tokens, expressions.isEmpty() ? null : new AddExpression(expressions));
+                place.setNumberOfTokens(numberOfTokens);
             }
 
             for (TimedTransition transition : template.model().transitions()) {

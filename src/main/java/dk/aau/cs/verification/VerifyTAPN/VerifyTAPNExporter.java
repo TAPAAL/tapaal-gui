@@ -19,6 +19,7 @@ import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Tuple;
@@ -171,6 +172,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
         modelStream.append(">\n");
+        outputInitialMarkingAges(p, modelStream, false);
         if (guiPlace == null) {
             outputPosition(modelStream, 0, 0);
         } else {
@@ -179,6 +181,25 @@ public class VerifyTAPNExporter {
 
         modelStream.append("</place>\n");
 	}
+
+    protected void outputInitialMarkingAges(TimedPlace place, PrintStream modelStream, boolean includeColor) {
+        if (place.tokens().stream().allMatch(token -> token.age().signum() == 0)) {
+            return;
+        }
+
+        modelStream.append("<initialMarkingAge>\n");
+        for (TimedToken token : place.tokens()) {
+            if (token.age().signum() != 0) {
+                modelStream.append("<token");
+                if (includeColor) {
+                    modelStream.append(" color=\"" + token.color() + "\"");
+                }
+                modelStream.append(" age=\"" + token.age().toPlainString() + "\"/>\n");
+            }
+        }
+        
+        modelStream.append("</initialMarkingAge>\n");
+    }
 
 	protected void outputTransition(TimedTransition t, PrintStream modelStream, DataLayer guiModel, NameMapping mapping) {
 
