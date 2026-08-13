@@ -338,7 +338,7 @@ public class PlaceEditorPanel extends JPanel {
         uncoloredTokenAgeSpinner.setVisible(false);
         basicPropertiesPanel.add(uncoloredTokenAgeSpinner, gridBagConstraints);
 
-        tokenAgesCheckBox = new JCheckBox("Non-zero token ages");
+        tokenAgesCheckBox = new JCheckBox("Allow non-zero token ages in the initial marking");
         tokenAgesCheckBox.addActionListener(event -> {
             if (tokenAgesCheckBox.isSelected()) {
                 int marking = (Integer)markingSpinner.getValue();
@@ -1443,6 +1443,7 @@ public class PlaceEditorPanel extends JPanel {
             if (!alreadyExists){
                 timeConstraintListModel.addElement(timeConstraint);
                 timeConstraintList.setSelectedIndex(timeConstraintListModel.size()-1);
+                parent.pack();
             }
         });
 
@@ -1455,6 +1456,7 @@ public class PlaceEditorPanel extends JPanel {
             } else{
                 timeConstraintList.setSelectedIndex(index);
             }
+            parent.pack();
 
         });
 
