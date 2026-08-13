@@ -1293,7 +1293,10 @@ public class QueryDialog extends JPanel {
             boolean isLeaf = current instanceof TCTLPlaceNode || current instanceof TCTLConstNode || current instanceof TCTLStatePlaceHolder;
             templateBox.setEnabled(isLeaf);
             placeTransitionBox.setEnabled(isLeaf);
+            colorBox.setEnabled(false);
             placeMarking.setEnabled(isLeaf);
+            addPlaceButton.setEnabled(isLeaf);
+            addConstantButton.setEnabled(isLeaf);
             searchBar.setEnabled(isLeaf);
 
             userChangedAtomicPropSelection = false;
@@ -1317,6 +1320,8 @@ public class QueryDialog extends JPanel {
         addPredicateButton.setVisible(true);
         addPlaceButton.setVisible(false);
         addConstantButton.setVisible(false);
+        addPlaceButton.setEnabled(false);
+        addConstantButton.setEnabled(false);
         colorBox.setVisible(supportsColoredPlaceQueries());
 
         placeRow.add(relationalOperatorBox);
@@ -1920,8 +1925,11 @@ public class QueryDialog extends JPanel {
         searchBar.setEnabled(false);
         templateBox.setEnabled(false);
         placeTransitionBox.setEnabled(false);
+        colorBox.setEnabled(false);
         relationalOperatorBox.setEnabled(false);
         placeMarking.setEnabled(false);
+        addPlaceButton.setEnabled(false);
+        addConstantButton.setEnabled(false);
         addPredicateButton.setEnabled(false);
         truePredicateButton.setEnabled(false);
         falsePredicateButton.setEnabled(false);
@@ -1946,8 +1954,11 @@ public class QueryDialog extends JPanel {
         searchBar.setEnabled(false);
         templateBox.setEnabled(false);
         placeTransitionBox.setEnabled(false);
+        colorBox.setEnabled(false);
         relationalOperatorBox.setEnabled(false);
         placeMarking.setEnabled(false);
+        addPlaceButton.setEnabled(false);
+        addConstantButton.setEnabled(false);
         addPredicateButton.setEnabled(false);
         truePredicateButton.setEnabled(false);
         falsePredicateButton.setEnabled(false);
@@ -1975,8 +1986,11 @@ public class QueryDialog extends JPanel {
         searchBar.setEnabled(false);
         templateBox.setEnabled(false);
         placeTransitionBox.setEnabled(false);
+        colorBox.setEnabled(false);
         relationalOperatorBox.setEnabled(false);
         placeMarking.setEnabled(false);
+        addPlaceButton.setEnabled(false);
+        addConstantButton.setEnabled(false);
         addPredicateButton.setEnabled(false);
         truePredicateButton.setEnabled(false);
         falsePredicateButton.setEnabled(false);
@@ -2000,8 +2014,11 @@ public class QueryDialog extends JPanel {
         searchBar.setEnabled(true);
         templateBox.setEnabled(true);
         placeTransitionBox.setEnabled(true);
+        colorBox.setEnabled(true);
         relationalOperatorBox.setEnabled(true);
         placeMarking.setEnabled(true);
+        addPlaceButton.setEnabled(false);
+        addConstantButton.setEnabled(false);
         truePredicateButton.setEnabled(true);
         falsePredicateButton.setEnabled(true);
         deadLockPredicateButton.setEnabled(true);
@@ -2033,8 +2050,11 @@ public class QueryDialog extends JPanel {
         searchBar.setEnabled(true);
         templateBox.setEnabled(true);
         placeTransitionBox.setEnabled(true);
+        colorBox.setEnabled(true);
         relationalOperatorBox.setEnabled(true);
         placeMarking.setEnabled(true);
+        addPlaceButton.setEnabled(false);
+        addConstantButton.setEnabled(false);
         truePredicateButton.setEnabled(true);
         falsePredicateButton.setEnabled(true);
         deadLockPredicateButton.setEnabled(true);
@@ -2067,8 +2087,11 @@ public class QueryDialog extends JPanel {
         searchBar.setEnabled(false);
         templateBox.setEnabled(false);
         placeTransitionBox.setEnabled(false);
+        colorBox.setEnabled(false);
         relationalOperatorBox.setEnabled(false);
         placeMarking.setEnabled(false);
+        addPlaceButton.setEnabled(false);
+        addConstantButton.setEnabled(false);
         addPredicateButton.setEnabled(false);
         truePredicateButton.setEnabled(false);
         falsePredicateButton.setEnabled(false);
