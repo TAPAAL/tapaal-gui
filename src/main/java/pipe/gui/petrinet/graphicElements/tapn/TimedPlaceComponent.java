@@ -85,7 +85,7 @@ public class TimedPlaceComponent extends Place {
             }
 
             public void markingChanged(TimedPlaceEvent e) {
-                repaint();
+                update(true);
             }
         };
     }
@@ -132,6 +132,10 @@ public class TimedPlaceComponent extends Place {
         buffer.append('}');
         
         return buffer.toString();
+    }
+
+    private boolean hasNonZeroTokenAge() {
+        return place.tokens().stream().anyMatch(token -> token.age().signum() != 0);
     }
 
     private String getStringOfColoredTimedTokens() {
@@ -200,13 +204,12 @@ public class TimedPlaceComponent extends Place {
         int tokenIndex = 0;
 
         for (ArcExpression child : expressions) {
-            buffer.append(child);
+            var token = child.toString();
             if (isTimed() && tokenIndex < tokens.size()) {
-                buffer.append(" - ").append(tokens.get(tokenIndex).age().stripTrailingZeros().toPlainString());
+                token = formatTokenWithAge(token, tokens.get(tokenIndex).age());
                 tokenIndex += child.eval(context).values().stream().mapToInt(Integer::intValue).sum();
             }
-            
-            buffer.append('\n');
+            buffer.append(token).append('\n');
         }
 
         return buffer.toString();
@@ -216,6 +219,12 @@ public class TimedPlaceComponent extends Place {
         return place.isShared()
             ? ((SharedPlace)place).network().getContext()
             : ((LocalTimedPlace)place).model().parentNetwork().getContext();
+    }
+
+    public static String formatTokenWithAge(Object token, BigDecimal age) {
+        return age.signum() == 0
+            ? token.toString()
+            : token + " (age " + age.stripTrailingZeros().toPlainString() + ")";
     }
 
     public boolean isAgeOfTokensShown() {
@@ -489,6 +498,10 @@ public class TimedPlaceComponent extends Place {
                     buffer.append("\nInv: ");
                     buffer.append(place.invariant().toString(displayConstantNames));
                 }
+                
+                if (isTimed() && !isColored() && hasNonZeroTokenAge()) {
+                    buffer.append("\nAges: ").append(getStringOfTokens());
+                }
                 getNameLabel().setText(buffer.toString());
             }
             if (lens != null && this.isColored()) {
@@ -541,6 +554,7 @@ public class TimedPlaceComponent extends Place {
             }
 
             getNameLabel().displayName(attributesVisible);
+            setToolTipText(isTimed() && !isColored() ? "Token ages: " + getStringOfTokens() : null);
 
         } else {
             getNameLabel().setName("");

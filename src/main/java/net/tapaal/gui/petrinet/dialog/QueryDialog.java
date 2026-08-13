@@ -1738,10 +1738,7 @@ public class QueryDialog extends JPanel {
     }
 
     private boolean hasNonzeroInitialTokenAges() {
-        return tapnNetwork.activeTemplates().stream()
-            .flatMap(template -> template.places().stream())
-            .flatMap(place -> tapnNetwork.marking().getTokensFor(place).stream())
-            .anyMatch(token -> token.age().signum() != 0);
+        return Verifier.hasNonzeroInitialTokenAges(tapnNetwork);
     }
 
     private void updateSearchStrategies(){

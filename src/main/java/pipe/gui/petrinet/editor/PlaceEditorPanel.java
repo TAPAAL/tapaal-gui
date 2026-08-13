@@ -1064,7 +1064,7 @@ public class PlaceEditorPanel extends JPanel {
         tokenColorComboboxPanel = new ColorComboboxPanel(colorType,true) {
             @Override
             public void changedColor(JComboBox[] comboBoxes) {
-                if (!updatingTokenSelection && tokenList != null) {
+                if (!updatingTokenSelection && tokenList != null && tokenList.isSelectionEmpty()) {
                     updateTokenSelectionFromControls();
                 }
             }
@@ -1090,7 +1090,7 @@ public class PlaceEditorPanel extends JPanel {
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (place.isTimed()) {
-                    setText(value + " - " + formatTokenAge(getTokenAge(index)));
+                    setText(TimedPlaceComponent.formatTokenWithAge(value, getTokenAge(index)));
                 }
                 return this;
             }
