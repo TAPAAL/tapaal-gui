@@ -475,6 +475,7 @@ public class QueryDialog extends JPanel {
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private static final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
+	private static final Set<ReductionOption> INITIAL_TOKEN_AGE_ENGINES = Set.of(ReductionOption.VerifyDTAPN);
 	private boolean userChangedAtomicPropSelection = true;
 
     //In order: name of engine, support fastest trace, support deadlock with net degree 2 and (EF or AG), support deadlock with EG or AF, support deadlock with inhibitor arcs
@@ -1795,6 +1796,10 @@ public class QueryDialog extends JPanel {
             options.add(name_UNTIMED);
         }
 
+        if (hasNonzeroInitialTokenAges()) {
+            options.removeIf(option -> !INITIAL_TOKEN_AGE_ENGINES.contains(getReductionOption(option)));
+        }
+
         if (hasColorSpecificPlaces(newProperty)) {
             options.removeIf(option -> !COLOR_QUERY_ENGINES.contains(getReductionOption(option)));
         }
@@ -1820,6 +1825,10 @@ public class QueryDialog extends JPanel {
         }
 
         disableSymmetryUpdate = false;
+    }
+
+    private boolean hasNonzeroInitialTokenAges() {
+        return Verifier.hasNonzeroInitialTokenAges(tapnNetwork);
     }
 
     private void updateSearchStrategies(){
