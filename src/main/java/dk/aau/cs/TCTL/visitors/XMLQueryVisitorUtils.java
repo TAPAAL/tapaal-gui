@@ -7,7 +7,7 @@ final class XMLQueryVisitorUtils {
 
     static String tokensCount(TCTLPlaceNode placeNode) {
         var place = (placeNode.getTemplate().isEmpty() ? "" : placeNode.getTemplate() + ".") + placeNode.getPlace();
-        var color = placeNode.getColor() == null ? "" : tag(tag(placeNode.getColor(), "color"), "color-expression");
+        var color = placeNode.getColor() == null ? "" : tag("<color id=\"" + placeNode.getColor() + "\"/>", "color-expression");
         return tag(tag(place + color, "place"), "tokens-count");
     }
 

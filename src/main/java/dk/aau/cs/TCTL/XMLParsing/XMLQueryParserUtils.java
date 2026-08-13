@@ -1,6 +1,8 @@
 package dk.aau.cs.TCTL.XMLParsing;
 
 import dk.aau.cs.TCTL.TCTLPlaceNode;
+
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
@@ -46,7 +48,7 @@ final class XMLQueryParserUtils {
             throw new XMLQueryParseException(error);
         }
 
-        var color = children.get(0).getTextContent().trim();
+        var color = ((Element)children.get(0)).getAttribute("id").trim();
         if (color.isEmpty()) throw new XMLQueryParseException(error);
         return color;
     }
