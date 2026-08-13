@@ -341,7 +341,31 @@ TCTLAbstractStateProperty Place() :
 {
     Token temp = null;
     Token place;
+	String color = null;
 }
 {
-    temp = <IDENT> "." place = <IDENT> { return new TCTLPlaceNode(temp == null ? "" : temp.image, place.image); }
+    temp = <IDENT> "." place = <IDENT> [ "." color = QueryColor() ] { return TCTLPlaceNode.fromManualQuery(temp.image, place.image, color); }
+}
+
+String QueryColor() :
+{
+    Token color;
+    ArrayList<String> tuple = new ArrayList<>();
+}
+{
+    (
+        color = <IDENT> { return color.image; }
+        | color = <NUM> { return color.image; }
+        | "(" color = QueryColorPart() { tuple.add(color.image); }
+            ("," color = QueryColorPart() { tuple.add(color.image); })* ")"
+            { return "(" + String.join(", ", tuple) + ")"; }
+    )
+}
+
+Token QueryColorPart() :
+{
+    Token color;
+}
+{
+    (color = <IDENT> | color = <NUM>) { return color; }
 }

@@ -9,6 +9,7 @@ import java.awt.Container;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -56,6 +57,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
@@ -146,6 +148,7 @@ import dk.aau.cs.TCTL.visitors.FixAbbrivTransitionNames;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.TCTL.visitors.HyperLTLTraceNameVisitor;
 import dk.aau.cs.TCTL.visitors.IsReachabilityVisitor;
+import dk.aau.cs.TCTL.visitors.PlaceNodeCollectorVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
@@ -300,6 +303,11 @@ public class QueryDialog extends JPanel {
     private JComboBox traceBox;
     private JComboBox traceBoxQuantification;
     private JComboBox<String> placeTransitionBox;
+    private static final String ANY_COLOR = "Any";
+    private static final int PREDICATE_WIDTH = 292;
+    private static final int COLORED_PREDICATE_WIDTH = 417;
+    private static final Set<ReductionOption> COLOR_QUERY_ENGINES = Set.of(ReductionOption.VerifyPN);
+    private JComboBox<Object> colorBox;
     private JComboBox<String> relationalOperatorBox;
     private JLabel transitionIsEnabledLabel;
     private CustomJSpinner placeMarking;
@@ -886,8 +894,10 @@ public class QueryDialog extends JPanel {
 	}
 
     private ReductionOption getReductionOption() {
-        String reductionOptionString = getReductionOptionAsString();
+        return getReductionOption(getReductionOptionAsString());
+    }
 
+    private ReductionOption getReductionOption(String reductionOptionString) {
         if (reductionOptionString == null)
             return null;
         else if (reductionOptionString.equals(name_STANDARD))
@@ -1262,6 +1272,9 @@ public class QueryDialog extends JPanel {
             addPredicateButton.setVisible(false);
             addPlaceButton.setVisible(true);
             addConstantButton.setVisible(true);
+            colorBox.setVisible(false);
+            placeMarking.setVisible(true);
+            transitionIsEnabledLabel.setVisible(false);
             
             constantRow.add(placeMarking);
             constantRow.add(constantRowStrut);
@@ -1304,6 +1317,7 @@ public class QueryDialog extends JPanel {
         addPredicateButton.setVisible(true);
         addPlaceButton.setVisible(false);
         addConstantButton.setVisible(false);
+        colorBox.setVisible(supportsColoredPlaceQueries());
 
         placeRow.add(relationalOperatorBox);
         placeRow.add(placeMarking);
@@ -1361,7 +1375,60 @@ public class QueryDialog extends JPanel {
             placeTransitionBox.setSelectedItem(previousSelection);
         }
         
+        refreshColorBox();
         userChangedAtomicPropSelection = true;
+    }
+
+    private void refreshColorBox() {
+        var previousSelection = colorBox.getSelectedItem();
+        var placeName = (String)placeTransitionBox.getSelectedItem();
+        var template = templateBox.getSelectedItem();
+        var place = SHARED.equals(template)
+            ? tapnNetwork.getSharedPlaceByName(placeName)
+            : template instanceof TimedArcPetriNet ? ((TimedArcPetriNet)template).getPlaceByName(placeName) : null;
+
+        var colors = new Vector<>();
+        colors.add(ANY_COLOR);
+        if (supportsColoredPlaceQueries() && place != null) colors.addAll(place.getColorType().getColors());
+        colorBox.setModel(new DefaultComboBoxModel<>(colors));
+        if (colors.contains(previousSelection)) colorBox.setSelectedItem(previousSelection);
+    }
+
+    private String selectedColor() {
+        if (!supportsColoredPlaceQueries()) return null;
+        var color = colorBox.getSelectedItem();
+        return color == null || ANY_COLOR.equals(color) ? null : color.toString();
+    }
+
+    private TCTLPlaceNode selectedPlaceNode(String template) {
+        return new TCTLPlaceNode(template, (String)placeTransitionBox.getSelectedItem(), selectedColor());
+    }
+
+    private int predicateWidth() {
+        return supportsColoredPlaceQueries() ? COLORED_PREDICATE_WIDTH : PREDICATE_WIDTH;
+    }
+
+    private boolean supportsColoredPlaceQueries() {
+        if (!lens.isColored() || reductionOption == null) return false;
+        var engine = getReductionOption();
+        return engine != null && COLOR_QUERY_ENGINES.contains(engine);
+    }
+
+    private void updateColorQueryControls() {
+        refreshColorBox();
+        var dimension = new Dimension(predicateWidth(), 27);
+        templateBox.setPreferredSize(dimension);
+        addPredicateButton.setPreferredSize(dimension);
+        traceBox.setMinimumSize(dimension);
+        traceBox.setPreferredSize(dimension);
+        traceBox.setMaximumSize(dimension);
+        var arithmetic = currentSelection != null && isInsideArithmetic(currentSelection.getObject());
+        colorBox.setVisible(supportsColoredPlaceQueries() && !arithmetic && !transitionIsSelected());
+        predicatePanel.revalidate();
+    }
+
+    private boolean hasColorSpecificPlaces(TCTLAbstractProperty query) {
+        return PlaceNodeCollectorVisitor.collect(query).stream().anyMatch(place -> place.getColor() != null);
     }
 
     private boolean isInsideArithmetic(TCTLAbstractProperty target) {
@@ -1501,6 +1568,7 @@ public class QueryDialog extends JPanel {
         }
 
         placeTransitionBox.setSelectedItem(placeNode.getPlace());
+        selectColor(placeNode);
         relationalOperatorBox.setSelectedItem(node.getOp());
         placeMarking.setValue(placeMarkingNode.getConstant());
         userChangedAtomicPropSelection = true;
@@ -1517,6 +1585,7 @@ public class QueryDialog extends JPanel {
             }
 
             placeTransitionBox.setSelectedItem(placeNode.getPlace());
+            selectColor(placeNode);
         } else {
             if (placeTransitionBox.getItemCount() > 0) {
                 placeTransitionBox.setSelectedIndex(0);
@@ -1531,8 +1600,22 @@ public class QueryDialog extends JPanel {
         userChangedAtomicPropSelection = true;
     }
 
+    private void selectColor(TCTLPlaceNode placeNode) {
+        colorBox.setSelectedItem(ANY_COLOR);
+        if (placeNode.getColor() == null) return;
+        for (int i = 1; i < colorBox.getItemCount(); ++i) {
+            var color = colorBox.getItemAt(i);
+            if (placeNode.getColor().equals(color.toString())) {
+                colorBox.setSelectedItem(color);
+                return;
+            }
+        }
+    }
+
     private void setEnablednessOfOperatorAndMarkingBoxes() {
-        if (transitionIsSelected()) {
+        var transitionSelected = transitionIsSelected();
+        colorBox.setVisible(supportsColoredPlaceQueries() && !transitionSelected);
+        if (transitionSelected) {
             placeMarking.setVisible(false);
             relationalOperatorBox.setVisible(false);
             transitionIsEnabledLabel.setVisible(true);
@@ -1705,6 +1788,10 @@ public class QueryDialog extends JPanel {
             }
         } else {
             options.add(name_UNTIMED);
+        }
+
+        if (hasColorSpecificPlaces(newProperty)) {
+            options.removeIf(option -> !COLOR_QUERY_ENGINES.contains(getReductionOption(option)));
         }
 
         reductionOption.removeAllItems();
@@ -2064,15 +2151,15 @@ public class QueryDialog extends JPanel {
                 else
                     property = new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem());
             } else {
-                if(isHyperLTL) {
-                    HyperLTLPathScopeNode pathScope = new HyperLTLPathScopeNode(new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()), selectedTrace);
+                if (isHyperLTL) {
+                    var pathScope = new HyperLTLPathScopeNode(selectedPlaceNode(template), selectedTrace);
                     property =  new TCTLAtomicPropositionNode(
                         pathScope,
                         (String) relationalOperatorBox.getSelectedItem(),
                         new TCTLConstNode((Integer) placeMarking.getValue()));
                 } else {
                     property =  new TCTLAtomicPropositionNode(
-                        new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()),
+                        selectedPlaceNode(template),
                         (String) relationalOperatorBox.getSelectedItem(),
                         new TCTLConstNode((Integer) placeMarking.getValue()));
                 }
@@ -4692,7 +4779,7 @@ public class QueryDialog extends JPanel {
         traceBoxQuantification.setPreferredSize(new Dimension(76,27));
         quantificationPanel.add(traceBoxQuantification, gbc);
 
-        Dimension dim = new Dimension(292, 27);
+        var dim = new Dimension(predicateWidth(), 27);
         traceBox.setMaximumSize(dim);
         traceBox.setMinimumSize(dim);
         traceBox.setPreferredSize(dim);
@@ -5099,6 +5186,20 @@ public class QueryDialog extends JPanel {
         placeTransitionBox.setMaximumSize(d);
         placeTransitionBox.setPreferredSize(d);
 
+        colorBox = new JComboBox<>();
+        colorBox.setPreferredSize(d);
+        colorBox.setVisible(supportsColoredPlaceQueries());
+        colorBox.setToolTipText("Choose a color for the selected place.");
+        colorBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                var label = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                label.setFont(label.getFont().deriveFont(ANY_COLOR.equals(value) ? Font.ITALIC : Font.PLAIN));
+                return label;
+            }
+        });
+
         Vector<Object> items = new Vector<>(tapnNetwork.activeTemplates().size()+1);
         items.addAll(tapnNetwork.activeTemplates());
         if(tapnNetwork.numberOfSharedPlaces() > 0) items.add(SHARED);
@@ -5231,7 +5332,7 @@ public class QueryDialog extends JPanel {
 
         JPanel templateRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
         predicatePanel.add(templateRow, gbc);
-        templateBox.setPreferredSize(new Dimension(292, 27));
+        templateBox.setPreferredSize(new Dimension(predicateWidth(), 27));
         templateBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         templateRow.add(templateBox);
 
@@ -5240,6 +5341,8 @@ public class QueryDialog extends JPanel {
         predicatePanel.add(placeRow, gbc);
         placeTransitionBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         placeRow.add(placeTransitionBox);
+        colorBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+        placeRow.add(colorBox);
 
         addPlaceButton = new JButton("Add place");
         addPlaceButton.setVisible(false);
@@ -5272,7 +5375,7 @@ public class QueryDialog extends JPanel {
         addPredicateRow.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         predicatePanel.add(addPredicateRow, gbc);
         addPredicateButton = new JButton("Add predicate to the query");
-        addPredicateButton.setPreferredSize(new Dimension(292, 27));
+        addPredicateButton.setPreferredSize(new Dimension(predicateWidth(), 27));
         addPredicateRow.add(addPredicateButton);
 
         truePredicateButton = new JButton("True");
@@ -5318,7 +5421,7 @@ public class QueryDialog extends JPanel {
 
         // Action listeners for predicate panel
         addPredicateButton.addActionListener(e -> {
-            String template = templateBox.getSelectedItem().toString();
+            var template = templateBox.getSelectedItem().toString();
             if (template.equals(SHARED)) template = "";
 
             if ((!lens.isTimed()) && transitionIsSelected()) {
@@ -5333,7 +5436,7 @@ public class QueryDialog extends JPanel {
                     TCTLAtomicPropositionNode property =
                         new TCTLAtomicPropositionNode (
                             new HyperLTLPathScopeNode (
-                                new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()),
+                                selectedPlaceNode(template),
                                 traceBox.getSelectedItem().toString()
                             ),
                             (String) relationalOperatorBox.getSelectedItem(),
@@ -5343,7 +5446,7 @@ public class QueryDialog extends JPanel {
                 } else {
                     TCTLAtomicPropositionNode property =
                         new TCTLAtomicPropositionNode (
-                            new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()),
+                            selectedPlaceNode(template),
                             (String) relationalOperatorBox.getSelectedItem(),
                             new TCTLConstNode((Integer) placeMarking.getValue())
                         );
@@ -5368,6 +5471,7 @@ public class QueryDialog extends JPanel {
         });
 
         placeTransitionBox.addActionListener(e -> {
+            refreshColorBox();
             if (userChangedAtomicPropSelection) {
                 var oldProp = currentSelection.getObject();
                 if (isInsideArithmetic(oldProp)) {
@@ -5378,6 +5482,12 @@ public class QueryDialog extends JPanel {
                 }
             }
             if (!lens.isTimed()) setEnablednessOfOperatorAndMarkingBoxes();
+        });
+
+        colorBox.addActionListener(e -> {
+            if (userChangedAtomicPropSelection && colorBox.isVisible()) {
+                updateQueryOnAtomicPropositionChange();
+            }
         });
 
         relationalOperatorBox.addActionListener(e -> {
@@ -5628,23 +5738,20 @@ public class QueryDialog extends JPanel {
     private void checkPlacesAndTransitionsForManuallyParsedQuery(TCTLAbstractProperty newQuery) {
         VerifyPlaceNamesVisitor.Context placeContext = getPlaceContext(newQuery);
         VerifyTransitionNamesVisitor.Context transitionContext = getTransitionContext(newQuery);
-
-        boolean isResultFalse = false;
-        if (lens.isGame()) {
-            isResultFalse = newQuery.hasNestedPathQuantifiers() || newQuery instanceof TCTLNotNode;
-        }
-        if (lens.isTimed()) {
-            isResultFalse = isResultFalse || !placeContext.getResult();
-        } else {
-            isResultFalse = isResultFalse || !transitionContext.getResult() || !placeContext.getResult();
-        }
+        var invalidColors = getInvalidColors(newQuery);
+        var unsupportedColors = hasColorSpecificPlaces(newQuery) && !supportsColoredPlaceQueries();
+        var invalidGameQuery = lens.isGame() && (newQuery.hasNestedPathQuantifiers() || newQuery instanceof TCTLNotNode);
+        var missingPlacesOrTransitions = !placeContext.getResult() || (!lens.isTimed() && !transitionContext.getResult());
+        var isResultFalse = invalidGameQuery || missingPlacesOrTransitions || !invalidColors.isEmpty() || unsupportedColors;
 
         if (isResultFalse) {
-            StringBuilder message = new StringBuilder();
+            var message = new StringBuilder();
 
-            if (lens.isGame()) {
+            if (invalidGameQuery) {
                 message.append("The parsed query does not conform with the syntax supported for games in TAPAAL.\n");
-            } else {
+            }
+
+            if (missingPlacesOrTransitions) {
                 message.append("The following places")
                     .append(lens.isTimed() ? "" : " or transitions")
                     .append(" were used in the query, but are not present in your model:\n\n");
@@ -5656,6 +5763,15 @@ public class QueryDialog extends JPanel {
                 for (String transitionName : transitionContext.getIncorrectTransitionNames()) {
                     message.append(transitionName).append('\n');
                 }
+            }
+
+            if (!invalidColors.isEmpty()) {
+                message.append("\nThe following colors are not declared for their places:\n\n");
+                invalidColors.forEach(color -> message.append(color).append('\n'));
+            }
+
+            if (unsupportedColors) {
+                message.append("\nColor-specific place predicates are not supported by the selected verification engine.\n");
             }
 
             message.append("\nThe specified query has not been saved. Do you want to edit it again?");
@@ -5672,6 +5788,22 @@ public class QueryDialog extends JPanel {
             returnFromManualEdit(newQuery);
             undoSupport.postEdit(edit);
         }
+    }
+
+    private List<String> getInvalidColors(TCTLAbstractProperty query) {
+        var invalidColors = new ArrayList<String>();
+        for (TCTLPlaceNode placeNode : PlaceNodeCollectorVisitor.collect(query)) {
+            if (placeNode.getColor() == null) continue;
+            var template = tapnNetwork.getTAPNByName(placeNode.getTemplate());
+            var place = placeNode.getTemplate().isEmpty()
+                ? tapnNetwork.getSharedPlaceByName(placeNode.getPlace())
+                : template == null ? null : template.getPlaceByName(placeNode.getPlace());
+            if (place == null || place.getColorType().getColors().stream().noneMatch(color -> color.toString().equals(placeNode.getColor()))) {
+                invalidColors.add(placeNode.toString());
+            }
+        }
+
+        return invalidColors;
     }
 
     private VerifyPlaceNamesVisitor.Context getPlaceContext(TCTLAbstractProperty newQuery) {
@@ -5980,6 +6112,7 @@ public class QueryDialog extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
+                    updateColorQueryControls();
                     showRawVerificationOptions(advancedView);
                     guiDialog.pack();
                 }
