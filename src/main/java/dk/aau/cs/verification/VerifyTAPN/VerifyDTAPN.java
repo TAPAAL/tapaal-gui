@@ -281,8 +281,9 @@ public class VerifyDTAPN implements ModelChecker{
         } else {
             String errorOutput = readOutput(runner.errorOutput());
             String standardOutput = readOutput(runner.standardOutput());
+            var tokenBounds = VerificationArguments.tokenBounds(VerificationArguments.hasKBound(options), model.value1().marking().size(), query.getExtraTokens());
 
-            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query, model.value1());
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, tokenBounds.totalTokens(), tokenBounds.extraTokens(), query, model.value1());
 
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
@@ -327,7 +328,8 @@ public class VerifyDTAPN implements ModelChecker{
             String errorOutput = readOutput(runner.errorOutput());
 			String standardOutput = readOutput(runner.standardOutput());
 
-			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query, model.value1());
+			var tokenBounds = VerificationArguments.tokenBounds(VerifyTAPNOptions.usesKBound(options), model.value1().marking().size(), query.getExtraTokens());
+			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, tokenBounds.totalTokens(), tokenBounds.extraTokens(), query, model.value1());
 
 			if (queryResult == null || queryResult.value1() == null) {
 				return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
@@ -422,7 +424,8 @@ public class VerifyDTAPN implements ModelChecker{
             return null;
         } else {
             String standardOutput = readOutput(runner.standardOutput());
-            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query, model.value1());
+            var tokenBounds = VerificationArguments.tokenBounds(VerifyTAPNOptions.usesKBound(options), model.value1().marking().size(), query.getExtraTokens());
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, tokenBounds.totalTokens(), tokenBounds.extraTokens(), query, model.value1());
             return queryResult.value2();
         }
     }

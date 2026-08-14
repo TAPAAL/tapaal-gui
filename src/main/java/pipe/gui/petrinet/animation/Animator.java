@@ -34,7 +34,6 @@ import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.animation.TransitionFiringComponent;
 import net.tapaal.gui.petrinet.dialog.ColoredBindingSelectionDialog;
 import dk.aau.cs.model.CPN.Expressions.ExpressionContext;
-import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.Expression;
 import dk.aau.cs.model.CPN.Color;
@@ -93,8 +92,6 @@ public class Animator {
     }
 
     public Animator(PetriNetTab tab) {
-        super();
-
         this.tab = tab;
     }
 
@@ -135,9 +132,6 @@ public class Animator {
     public Map<String, TAPNNetworkTrace> getTraceMap() {
         return this.traceMap;
     }
-    public void setTraceMap(Map<String, TAPNNetworkTrace> traceMap) {
-        this.traceMap = traceMap;
-    }
 
     public void changeTrace(TAPNNetworkTrace trace) {
         resetForTraceChange();
@@ -170,7 +164,7 @@ public class Animator {
             updateAnimationButtonsEnabled();
             updateFireableTransitions();
         } catch (RequireException e) {
-            unhighlightDisabledTransitions();
+            disableTransitions();
             tab.setAnimationMode(false);
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "There was an error in the trace. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -227,10 +221,6 @@ public class Animator {
         updateBindings(0);
     }
 
-    public boolean isColoredTrace() {
-        return trace != null && trace.isColoredTrace();
-    }
-
     /**
      * Checks if the number of tokens removed from a place is as expected, otherwise shows an error message
      */
@@ -270,13 +260,6 @@ public class Animator {
         return initialMarking;
     }
 
-    /**
-     * Called during animation to unhighlight previously highlighted transitions
-     */
-    private void unhighlightDisabledTransitions() {
-        disableTransitions();
-    }
-
     private void updateValidBindingsMap() {
         if (!isUsingInteractiveEngine) return;
         validBindingsMap = interactiveEngine.sendMarking(currentMarking());
@@ -300,17 +283,15 @@ public class Animator {
 
     private void updateFireableTransitionsColored(TransitionFiringComponent transFireComponent) {
         boolean anyTransitionsEnabled = false;
-        if (tab.getLens().isColored()) {
-            updateValidBindingsMap();
-            for (Template template : tab.activeTemplates()) {
-                for (TimedTransition transition : template.model().transitions()) {
-                    if (isColoredTransitionEnabled(transition)) {
-                        Transition guiTransition = template.guiModel().getTransitionByName(transition.name());
-                        if (guiTransition != null) {
-                            guiTransition.markTransitionEnabled(true);
-                            transFireComponent.addTransition(template, guiTransition);
-                            anyTransitionsEnabled = true;
-                        }
+        updateValidBindingsMap();
+        for (Template template : tab.activeTemplates()) {
+            for (TimedTransition transition : template.model().transitions()) {
+                if (isColoredTransitionEnabled(transition)) {
+                    Transition guiTransition = template.guiModel().getTransitionByName(transition.name());
+                    if (guiTransition != null) {
+                        guiTransition.markTransitionEnabled(true);
+                        transFireComponent.addTransition(template, guiTransition);
+                        anyTransitionsEnabled = true;
                     }
                 }
             }
@@ -403,44 +384,42 @@ public class Animator {
 
     private void storeTokenState() {
         storedTokenState.clear();
-        for (Place guiPlace : tab.currentTemplate().guiModel().getPlaces()) {
-            TimedPlaceComponent placeComponent = (TimedPlaceComponent)guiPlace;
-            TimedPlace place = placeComponent.underlyingPlace();
-            NetworkMarking marking = tab.network().marking();
-            List<TimedToken> tokens = marking.getTokensFor(place);
-            ArcExpression expression = place.getTokensAsExpression();
-
-            List<TimedToken> tokensCopy = new ArrayList<>(tokens);
-            storedTokenState.put(place, new Tuple<>(tokensCopy, expression));
+        var marking = tab.network().marking();
+        for (var template : tab.activeTemplates()) {
+            for (var guiPlace : template.guiModel().getPlaces()) {
+                var place = ((TimedPlaceComponent)guiPlace).underlyingPlace();
+                List<TimedToken> tokensCopy = new ArrayList<>(marking.getTokensFor(place));
+                storedTokenState.put(place, new Tuple<>(tokensCopy, place.getTokensAsExpression()));
+            }
         }
     }
 
     private void restoreTokenState() {
-        for (Place guiPlace : tab.currentTemplate().guiModel().getPlaces()) {
-            TimedPlaceComponent placeComponent = (TimedPlaceComponent)guiPlace;
-            TimedPlace place = placeComponent.underlyingPlace();
-            
-            Tuple<List<TimedToken>, ArcExpression> state = storedTokenState.get(place);
-            if (state != null) {
-                place.resetNumberOfTokensColor();
-                List<TimedToken> tokens = state.value1();
-                ArcExpression expression = state.value2();
+        for (var template : tab.activeTemplates()) {
+            for (var guiPlace : template.guiModel().getPlaces()) {
+                var placeComponent = (TimedPlaceComponent)guiPlace;
+                var place = placeComponent.underlyingPlace();
+                var state = storedTokenState.get(place);
+                if (state != null) {
+                    place.resetNumberOfTokensColor();
+                    var tokens = state.value1();
+                    var expression = state.value2();
+                    if (expression != null && containsAllExpression(expression)) {
+                        Map<String, ColorType> colorTypes = new HashMap<>();
+                        for (var ct : tab.network().colorTypes()) {
+                            colorTypes.put(ct.getName(), ct);
+                        }
 
-                if (expression != null && containsAllExpression(expression)) {
-                    HashMap<String, ColorType> colorTypes = new HashMap<>();
-                    for (ColorType ct : tab.network().colorTypes()) {
-                        colorTypes.put(ct.getName(), ct);
+                        var context = new ExpressionContext(null, colorTypes);
+                        var multiset = expression.eval(context);
+                        if (multiset != null) {
+                            tokens = new ArrayList<>(multiset.getTokens(place));
+                        }
                     }
-                    ExpressionContext context = new ExpressionContext(null, colorTypes);
 
-                    ColorMultiset multiset = expression.eval(context);
-                    if (multiset != null) {
-                        tokens = new ArrayList<>(multiset.getTokens(place));
-                    }
+                    place.updateTokens(tokens, expression);
+                    placeComponent.setUnderlyingPlace(place);
                 }
-
-                place.updateTokens(tokens, expression);
-                placeComponent.setUnderlyingPlace(place);
             }
         }
 
@@ -470,10 +449,7 @@ public class Animator {
             updateBindings(currentAction + 1);
             tab.network().setMarking(markings.get(currentMarkingIndex));
             updateColoredMarking();
-            activeGuiModel().repaintPlaces();
-            unhighlightDisabledTransitions();
-            updateFireableTransitions();
-            updateAnimationButtonsEnabled();
+            refreshAnimation();
             updateMouseOverInformation();
             reportBlockingPlaces();
         }
@@ -519,12 +495,8 @@ public class Animator {
             updateBindings(currentAction + 1);
             tab.network().setMarking(markings.get(currentMarkingIndex));
             updateColoredMarking();
-            activeGuiModel().repaintPlaces();
-            unhighlightDisabledTransitions();
-            updateFireableTransitions();
+            refreshAnimation();
             activeGuiModel().redrawVisibleTokenLists();
-        
-            updateAnimationButtonsEnabled();
             updateMouseOverInformation();
             reportBlockingPlaces();
         }        
@@ -560,188 +532,41 @@ public class Animator {
     
                 List<TimedToken> tokens = placesToTokensCopy.get(place);
                 
-                ArcExpression existingExpression = place.getTokensAsExpression();
-                var tup = rebuildExpressionPreservingAll(tokens, place, existingExpression);
-                tokens = tup.value1();
-                ArcExpression tokenExpression = tup.value2();
-                place.updateTokens(tokens, tokenExpression);
+                place.updateTokens(tokens, tokensToExpression(tokens));
                 placeComponent.setUnderlyingPlace(place);
             }
         }
     }
 
-    private Tuple<List<TimedToken>, ArcExpression> rebuildExpressionPreservingAll(List<TimedToken> tokens, TimedPlace place, ArcExpression existingExpression) {
-        boolean hasAllExpression = existingExpression != null && containsAllExpression(existingExpression);
-        
+    private ArcExpression tokensToExpression(List<TimedToken> tokens) {
         Vector<ArcExpression> numberOfExpressions = new Vector<>();
-        List<TimedToken> newTokens = new ArrayList<>();
-         
-        if (hasAllExpression && existingExpression instanceof AddExpression) {
-            var addExpr = (AddExpression)existingExpression;
-            for (ArcExpression arcExpr : addExpr.getAddExpression()) {
-                if (arcExpr instanceof NumberOfExpression) {
-                    var numOfExpr = (NumberOfExpression)arcExpr;
-                    var expandedExpressions = computeCrossProduct(numOfExpr.getNumberOfExpression());
-                    numberOfExpressions.addAll(expandedExpressions);
-                }
-            }
-
-            for (ArcExpression arcExpr : numberOfExpressions) {
-                if (arcExpr instanceof NumberOfExpression) {
-                    NumberOfExpression numExpr = (NumberOfExpression) arcExpr;
-                    for (ColorExpression ce : numExpr.getNumberOfExpression()) {
-                        Color color = getColorFromExpression(ce, place.getColorType());
-                        if (color != null) {
-                            for (int i = 0; i < numExpr.getNumber(); ++i) {
-                                newTokens.add(new TimedToken(place, BigDecimal.ZERO, color));
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            newTokens = tokens;
-            Map<Color, Integer> numberOfMap = new HashMap<>();
-            for (TimedToken token : tokens) {
-                numberOfMap.merge(token.color(), 1, Integer::sum);
-            }
-
-            numberOfMap.entrySet().stream()
-                .sorted((e1, e2) -> e1.getKey().toString().compareTo(e2.getKey().toString()))
-                .forEach(numberOfEntry -> {
-                    Color color = numberOfEntry.getKey();
-                    int number = numberOfEntry.getValue();
-                    Vector<ColorExpression> colorExpressions = new Vector<>();
-                    if (color.getColorType().equals(ColorType.COLORTYPE_DOT)) {
-                        colorExpressions.add(new DotConstantExpression());
-                    } else if (color.getColorType().isProductColorType()) {
-                        ProductType pt = (ProductType)color.getColorType();
-                        Vector<Color> subColors = color.getTuple();
-                        Vector<ColorExpression> subColorExpressions = new Vector<>();
-                        subColorExpressions.addAll(subColors.stream()
-                                                            .map(UserOperatorExpression::new)
-                                                            .collect(Collectors.toList()));
-    
-                        colorExpressions.add(new TupleExpression(subColorExpressions, pt));
-                    } else {
-                        colorExpressions.add(new UserOperatorExpression(color));
-                    }
-    
-                    numberOfExpressions.add(new NumberOfExpression(number, colorExpressions));
-                });
-        }
-    
-
-        return new Tuple<>(newTokens, new AddExpression(numberOfExpressions));
-    }
-
-    private Color getColorFromExpression(ColorExpression expr, ColorType expectedType) {
-        if (expr instanceof UserOperatorExpression) {
-            return ((UserOperatorExpression)expr).getUserOperator();
-        } else if (expr instanceof TupleExpression) {
-            TupleExpression tupleExpr = (TupleExpression)expr;
-            Vector<Color> components = new Vector<>();
-
-            if (expectedType != null && expectedType.isProductColorType()) {
-                ProductType pt = (ProductType)expectedType;
-                if (pt.getColorTypes().size() != tupleExpr.getColors().size()) return null;
-                int i = 0;
-                for (ColorExpression ce : tupleExpr.getColors()) {
-                    Color c = getColorFromExpression(ce, pt.getColorTypes().get(i));
-                    if (c == null) return null;
-                    components.add(c);
-                    ++i;
-                }
-
-                return new Color(expectedType, 0, components);
-            } else {
-                for (ColorExpression ce : tupleExpr.getColors()) {
-                    Color c = getColorFromExpression(ce, null);
-                    if (c == null) return null;
-                    components.add(c);
-                }
-                
-                return new Color(tupleExpr.getColorType(), 0, components);
-            }
-        } else if (expr instanceof DotConstantExpression) {
-            return ColorType.COLORTYPE_DOT.getFirstColor();
+        Map<Color, Integer> numberOfMap = new HashMap<>();
+        for (TimedToken token : tokens) {
+            numberOfMap.merge(token.color(), 1, Integer::sum);
         }
 
-        return null;
-    }
+        numberOfMap.entrySet().stream()
+            .sorted((e1, e2) -> e1.getKey().toString().compareTo(e2.getKey().toString()))
+            .forEach(numberOfEntry -> {
+                Color color = numberOfEntry.getKey();
+                Vector<ColorExpression> colorExpressions = new Vector<>();
+                if (color.getColorType().equals(ColorType.COLORTYPE_DOT)) {
+                    colorExpressions.add(new DotConstantExpression());
+                } else if (color.getColorType().isProductColorType()) {
+                    ProductType productType = (ProductType)color.getColorType();
+                    Vector<ColorExpression> subColorExpressions = new Vector<>();
+                    subColorExpressions.addAll(color.getTuple().stream()
+                        .map(UserOperatorExpression::new)
+                        .collect(Collectors.toList()));
+                    colorExpressions.add(new TupleExpression(subColorExpressions, productType));
+                } else {
+                    colorExpressions.add(new UserOperatorExpression(color));
+                }
 
-    private Vector<NumberOfExpression> computeCrossProduct(Vector<ColorExpression> colorExprs) {
-        Vector<NumberOfExpression> result = new Vector<>();
-        if (colorExprs.isEmpty()) return result;
-        List<List<ColorExpression>> allOptions = new ArrayList<>();
-        for (ColorExpression ce : colorExprs) {
-            List<ColorExpression> options = new ArrayList<>();
-            if (ce instanceof AllExpression) {
-                AllExpression allExpr = (AllExpression)ce;
-                for (Color c : allExpr.getColorType().getColors()) {
-                    options.add(new UserOperatorExpression(c));
-                }
-            } else if (ce instanceof TupleExpression) {
-                TupleExpression tupleExpr = (TupleExpression)ce;
-                List<List<ColorExpression>> tupleOptions = new ArrayList<>();
-                
-                for (ColorExpression subExpr : tupleExpr.getColors()) {
-                    List<ColorExpression> subOptions = new ArrayList<>();
-                    if (subExpr instanceof AllExpression) {
-                        AllExpression allExpr = (AllExpression)subExpr;
-                        for (Color c : allExpr.getColorType().getColors()) {
-                            subOptions.add(new UserOperatorExpression(c));
-                        }
-                    } else {
-                        subOptions.add(subExpr);
-                    }
+                numberOfExpressions.add(new NumberOfExpression(numberOfEntry.getValue(), colorExpressions));
+            });
 
-                    tupleOptions.add(subOptions);
-                }
-        
-                List<Vector<ColorExpression>> tupleCombos = computeCrossProductHelper(tupleOptions);
-                for (Vector<ColorExpression> combo : tupleCombos) {
-                    options.add(new TupleExpression(combo, (ProductType)tupleExpr.getColorType()));
-                }
-            } else {
-                options.add(ce);
-            }
-            
-            allOptions.add(options);
-        }
-        
-        List<Vector<ColorExpression>> allCombinations = computeCrossProductHelper(allOptions);
-        for (Vector<ColorExpression> combo : allCombinations) {
-            result.add(new NumberOfExpression(1, combo));
-        }
-        
-        return result;
-    }
-    
-    private List<Vector<ColorExpression>> computeCrossProductHelper(List<List<ColorExpression>> options) {
-        List<Vector<ColorExpression>> result = new ArrayList<>();
-        if (options.isEmpty()) {
-            result.add(new Vector<>());
-            return result;
-        }
-        
-        computeCrossProductRecursive(options, 0, new Vector<>(), result);
-        return result;
-    }
-    
-    private void computeCrossProductRecursive(List<List<ColorExpression>> options, int index,
-                                              Vector<ColorExpression> current,
-                                              List<Vector<ColorExpression>> result) {
-        if (index == options.size()) {
-            result.add(new Vector<>(current));
-            return;
-        }
-        
-        for (ColorExpression option : options.get(index)) {
-            current.add(option);
-            computeCrossProductRecursive(options, index + 1, current, result);
-            current.remove(current.size() - 1);
-        }
+        return new AddExpression(numberOfExpressions);
     }
 
     private boolean containsAllExpression(Expression expr) {
@@ -914,11 +739,7 @@ public class Animator {
             addMarking(new TAPNNetworkColoredTransitionStep(transition, bindings, newMarking), newMarking);
 
             updateColoredMarking();
-            activeGuiModel().repaintPlaces();
-            unhighlightDisabledTransitions();
-            updateFireableTransitions();
-
-            updateAnimationButtonsEnabled();
+            refreshAnimation();
         }
     }
 
@@ -969,15 +790,8 @@ public class Animator {
             }
         }
 
-        tab.network().setMarking(next.value1());
-
-        activeGuiModel().repaintPlaces();
-        unhighlightDisabledTransitions();
-        updateFireableTransitions();
-
         addMarking(new TAPNNetworkTimedTransitionStep(transition, next.value2()), next.value1());
-
-        updateAnimationButtonsEnabled();
+        refreshAnimation();
         updateMouseOverInformation();
         reportBlockingPlaces();
 
@@ -992,16 +806,11 @@ public class Animator {
         boolean result = false;
         if (delay.compareTo(new BigDecimal(0))==0 || (currentMarking().isDelayPossible(delay) && !isUrgentTransitionEnabled)) {
             NetworkMarking delayedMarking = currentMarking().delay(delay);
-            tab.network().setMarking(delayedMarking);
             addMarking(new TAPNNetworkTimeDelayStep(delay), delayedMarking);
             result = true;
         }
 
-        activeGuiModel().repaintPlaces();
-        unhighlightDisabledTransitions();
-        updateFireableTransitions();
-
-        updateAnimationButtonsEnabled();
+        refreshAnimation();
         updateMouseOverInformation();
         reportBlockingPlaces();
         return result;
@@ -1045,7 +854,6 @@ public class Animator {
                     for (TimedPlace t : blockingPlaces) {
                         sb.append(t.toString() + "<br />");
                     }
-                    //JOptionPane.showMessageDialog(TAPAALGUI.getApp(), sb.toString());
                     sb.append("</html>");
                     tab.getAnimationController().getOkButton().setEnabled(false);
                     tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
@@ -1061,19 +869,16 @@ public class Animator {
         return tab.currentTemplate().guiModel();
     }
 
+    private void refreshAnimation() {
+        activeGuiModel().repaintPlaces();
+        disableTransitions();
+        updateFireableTransitions();
+        updateAnimationButtonsEnabled();
+    }
+
     private void resethistory() {
         actionHistory.clear();
         markings.clear();
-        currentAction = -1;
-        currentMarkingIndex = 0;
-        tab.getAnimationHistorySidePanel().reset(tab.getLens().isColored());
-        if(tab.getUntimedAnimationHistory() != null){
-            tab.getUntimedAnimationHistory().reset(tab.getLens().isColored());
-        }
-    }
-
-    private void resetHistoryForTracechange() {
-        actionHistory.clear();
         currentAction = -1;
         currentMarkingIndex = 0;
         tab.getAnimationHistorySidePanel().reset(tab.getLens().isColored());
@@ -1195,33 +1000,20 @@ public class Animator {
     }
 
     private List<TimedToken> getTokensToConsume(TimedTransition transition){
-        //If there are only "weight tokens in each place
-        List<TimedToken> result = new ArrayList<TimedToken>();
-        boolean userShouldChoose = false;
-        if(transition.isShared()){
-            for(TimedTransition t : transition.sharedTransition().transitions()){
-                FillListStatus status = fillList(t, result);
-                if(status == FillListStatus.lessThanWeight){
-                    return null;
-                } else if(status == FillListStatus.moreThanWeight){
-                    userShouldChoose = true;
-                    break;
-                }
-            }
-        } else {
-            FillListStatus status = fillList(transition, result);
-            if(status == FillListStatus.lessThanWeight){
+        List<TimedToken> result = new ArrayList<>();
+        var transitions = transition.isShared()
+            ? transition.sharedTransition().transitions()
+            : List.of(transition);
+        for (TimedTransition candidate : transitions) {
+            FillListStatus status = fillList(candidate, result);
+            if (status == FillListStatus.lessThanWeight) {
                 return null;
             } else if(status == FillListStatus.moreThanWeight){
-                userShouldChoose = true;
+                return showSelectSimulatorDialogue(transition);
             }
         }
-
-        if (userShouldChoose){
-            return showSelectSimulatorDialogue(transition);
-        } else {
-            return result;
-        }
+        
+        return result;
     }
 
     private List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
@@ -1244,11 +1036,9 @@ public class Animator {
     }
 
     public void resetForTraceChange() {
-        resetHistoryForTracechange();
+        resethistory();
         removeSetTrace(false);
-        markings.clear();
         markings.add(initialMarking);
-        currentAction = -1;
     }
 
     public void reset(boolean keepInitial){
@@ -1315,22 +1105,14 @@ public class Animator {
     }
 
 
-    private void setEnabledStepbackwardAction(boolean b) {
-        stepbackwardAction.setEnabled(b);
-    }
-
-    private void setEnabledStepforwardAction(boolean b) {
-        stepforwardAction.setEnabled(b);
-    }
-
     public final GuiAction stepforwardAction = TAPAALGUI.getAppGui().stepforwardAction;
     public final GuiAction stepbackwardAction = TAPAALGUI.getAppGui().stepbackwardAction;
 
     public void updateAnimationButtonsEnabled() {
         AnimationHistoryList animationHistory = tab.getAnimationHistorySidePanel();
 
-        setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
-        setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
+        stepforwardAction.setEnabled(animationHistory.isStepForwardAllowed());
+        stepbackwardAction.setEnabled(animationHistory.isStepBackAllowed());
 
     }
 
