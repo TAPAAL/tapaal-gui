@@ -8,7 +8,7 @@ import org.w3c.dom.Node;
 import java.util.ArrayList;
 import java.util.List;
 
-final class XMLQueryParserUtils {
+public final class XMLQueryParserUtils {
     private XMLQueryParserUtils() {}
 
     static TCTLPlaceNode parsePlaceTokensCount(List<Node> children, String error) throws XMLQueryParseException {
@@ -42,7 +42,7 @@ final class XMLQueryParserUtils {
             : new TCTLPlaceNode("", place[0], color);
     }
 
-    private static String parseColor(Node node, String error) throws XMLQueryParseException {
+    public static String parseColor(Node node, String error) throws XMLQueryParseException {
         if ("color-expression".equals(node.getNodeName())) {
             var children = elementChildren(node);
             if (children.size() != 1) throw new XMLQueryParseException(error);
@@ -66,7 +66,7 @@ final class XMLQueryParserUtils {
         throw new XMLQueryParseException(error);
     }
 
-    private static String directText(Node parent) {
+    public static String directText(Node parent) {
         var text = new StringBuilder();
         var children = parent.getChildNodes();
         for (int i = 0; i < children.getLength(); ++i) {
@@ -79,7 +79,7 @@ final class XMLQueryParserUtils {
         return text.toString().trim();
     }
 
-    private static List<Node> elementChildren(Node parent) {
+    public static List<Node> elementChildren(Node parent) {
         var children = parent.getChildNodes();
         var elements = new ArrayList<Node>();
         for (int i = 0; i < children.getLength(); ++i) {

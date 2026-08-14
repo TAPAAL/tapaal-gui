@@ -5,16 +5,16 @@ import dk.aau.cs.TCTL.TCTLPlaceNode;
 import java.util.ArrayList;
 import java.util.List;
 
-final class XMLQueryVisitorUtils {
+public final class XMLQueryVisitorUtils {
     private XMLQueryVisitorUtils() {}
 
-    static String tokensCount(TCTLPlaceNode placeNode) {
+    public static String tokensCount(TCTLPlaceNode placeNode) {
         var place = (placeNode.getTemplate().isEmpty() ? "" : placeNode.getTemplate() + ".") + placeNode.getPlace();
         var color = placeNode.getColor() == null ? "" : tag(colorToXML(placeNode.getColor()), "color-expression");
         return tag(tag(place + color, "place"), "tokens-count");
     }
 
-    static String colorToXML(String color) {
+    public static String colorToXML(String color) {
         if (color == null || color.isBlank()) return "";
         color = color.trim();
         if (color.startsWith("(") && color.endsWith(")")) {
