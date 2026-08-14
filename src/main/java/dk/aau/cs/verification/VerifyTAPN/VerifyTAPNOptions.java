@@ -122,10 +122,6 @@ public class VerifyTAPNOptions extends VerificationOptions{
 			}
 		} 
 		
-		if (!kBoundPresentInRawVerificationOptions) {
-			sb.append("--k-bound 0 ");
-		}
-		
 		if (!tracePresentInRawVerificationOptions) {
 			sb.append(traceArg);
 		}
