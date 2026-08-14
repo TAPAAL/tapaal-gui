@@ -341,7 +341,15 @@ public class TAPNComposer implements ITAPNComposer {
 	}
 	
 	private ArcPath createArcPath(DataLayer currentGuiModel, PlaceTransitionObject source, PlaceTransitionObject target, Arc arc, int offsetX, int offsetY) {
+		if (currentGuiModel == null || source == null || target == null) {
+			return new ArcPath(arc);
+		}
+        
 		Arc guiArc = currentGuiModel.getArcByEndpoints(source, target);
+		if (guiArc == null || guiArc.getArcPath() == null) {
+			return new ArcPath(arc);
+		}
+
 		ArcPath arcPath = guiArc.getArcPath();
 		int arcPathPointsNum = arcPath.getNumPoints();
 		

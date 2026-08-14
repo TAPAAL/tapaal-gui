@@ -332,8 +332,8 @@ public final class GuiFrameController implements GuiFrameControllerActions{
                         if (tab == null) continue;
                         openTab(tab);
 
-                        //Don't auto-layout on empty net, hotfix for issue #1960000, we assume only pnml file does not have layout, and they always only have one component
-                        if(!tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
+                        //Don't auto-layout on empty net or net too big to draw, hotfix for issue #1960000, we assume only pnml file does not have layout, and they always only have one component
+                        if (tab.network().paintNet() && !tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
                             int dialogResult = JOptionPane.showConfirmDialog (TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if(dialogResult == JOptionPane.YES_OPTION) {
                                 SmartDrawDialog.showSmartDrawDialog();
@@ -420,8 +420,8 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
                     for (PetriNetTab tab : tabs) {
                         openTab(tab);
-                        //Don't autolayout on empty net, hotfix for issue #1960000. Imported PNML will only have one template.
-                        if(!tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
+                        //Don't autolayout on empty net or net too big to draw, hotfix for issue #1960000. Imported PNML will only have one template.
+                        if(tab.network().paintNet() && !tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
                             int dialogResult = JOptionPane.showConfirmDialog (TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if(dialogResult == JOptionPane.YES_OPTION) {
                                 SmartDrawDialog.showSmartDrawDialog();
@@ -554,7 +554,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     @Override
     public void showBatchProcessingDialog() {
         if (showSavePendingChangesDialogForAllTabs()) {
-            BatchProcessingDialog.showBatchProcessingDialog(new JList<>(new DefaultListModel<>()));
+            BatchProcessingDialog.showBatchProcessingDialog();
         }
     }
 

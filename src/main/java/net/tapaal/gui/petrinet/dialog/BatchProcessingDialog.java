@@ -32,6 +32,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.undo.UndoManager;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
+import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
@@ -56,14 +57,6 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_UNTIMED = "TAPAAL Untimed CTL Engine (VerifyPN)";
-
-	private static final String name_BFS = "Breadth first search";
-	private static final String name_DFS = "Depth first search";
-	private static final String name_HEURISTIC = "Heuristic search";
-	private static final String name_Random = "Random search";
-	private static final String name_NONE_APPROXIMATION = "None";
-	private static final String name_OVER_APPROXIMATION = "Over-approximation";
-	private static final String name_UNDER_APPROXIMATION = "Under-approximation";
 
 	//Tool tip strings
 	//Tool tips for model panel
@@ -142,6 +135,7 @@ public class BatchProcessingDialog extends JDialog {
 	private CustomJSpinner timeoutValue;
 	private CustomJSpinner oomValue;
 	private final JList<TAPNQuery> ListOfQueries;
+	private final LoadedBatchProcessingModel suppliedModel;
 	
 	private final Timer timeoutTimer = new Timer(30000, e -> timeoutCurrentVerificationTask());
 
@@ -210,15 +204,16 @@ public class BatchProcessingDialog extends JDialog {
 	
 	static BatchProcessingDialog batchProcessingDialog;
 	
-	/* ListOfQueries is used throughout the class to check if BatchProcessing was called from QueryPane
-	(should maybe be boolean)
-	*/
-	public static void showBatchProcessingDialog(JList<TAPNQuery> ListOfQueries){
-		if (ListOfQueries.getModel().getSize() != 0) {
+	public static void showBatchProcessingDialog() {
+		showBatchProcessingDialog(new JList<>(new DefaultListModel<>()), null);
+	}
+
+	public static void showBatchProcessingDialog(JList<TAPNQuery> ListOfQueries, LoadedBatchProcessingModel suppliedModel) {
+		if (suppliedModel != null) {
 			batchProcessingDialog = null;
 		}
 		if (batchProcessingDialog == null) {
-			batchProcessingDialog = new BatchProcessingDialog(TAPAALGUI.getApp(), "Batch Processing", true, ListOfQueries);
+			batchProcessingDialog = new BatchProcessingDialog(TAPAALGUI.getApp(), "Batch Processing", true, ListOfQueries, suppliedModel);
 			batchProcessingDialog.pack();
 			batchProcessingDialog.setPreferredSize(batchProcessingDialog.getSize());
 			//Set the minimum size to 150 less than the preferred, to be consistent with the minimum size of the result panel
@@ -229,23 +224,24 @@ public class BatchProcessingDialog extends JDialog {
 		batchProcessingDialog.setVisible(true);
 	}
 
-	private BatchProcessingDialog(Frame frame, String title, boolean modal, JList<TAPNQuery> ListOfQueries) {
+	private BatchProcessingDialog(Frame frame, String title, boolean modal, JList<TAPNQuery> ListOfQueries, LoadedBatchProcessingModel suppliedModel) {
 		super(frame, title, modal);
 		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent we) {
-				if (!(isQueryListEmpty())) {
+				if (isCalledFromQueryPane()) {
 					batchProcessingDialog = null;
 				}
 				terminateBatchProcessing();
 			}
 		});
 		this.ListOfQueries = ListOfQueries;
+		this.suppliedModel = suppliedModel;
 
 		initComponents();
 		makeShortcuts();
 		//Runs the BatchProcessing if it is called from the QueryPane
-		if (!(isQueryListEmpty())) {
+		if (isCalledFromQueryPane()) {
 			process();
 		}
 	}
@@ -270,16 +266,16 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private void setFileListToTempFile() {
-		if (!(isQueryListEmpty())) {
+		if (isCalledFromQueryPane()) {
 			for (File f : QueryPane.getTemporaryFiles()) {
 				files.add(f);
 			}
 		}
 	}
-	
-	private boolean isQueryListEmpty() {
-		return ListOfQueries.getModel().getSize() == 0;
-	}
+
+    private boolean isCalledFromQueryPane() {
+        return suppliedModel != null;
+    }
 
 	private void initFileListPanel() {
 		JPanel fileListPanel = new JPanel(new GridBagLayout());
@@ -377,10 +373,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridheight = 4;
 		gbc.insets = new Insets(10, 5, 0, 5);
 		topPanel.add(fileListPanel, gbc);
-		//Hides the file list panel if batch processing is run from the tabcomponent
-		if(!(isQueryListEmpty())) {
-			fileListPanel.setVisible(false);
-		}
+		fileListPanel.setVisible(!isCalledFromQueryPane());
 	}
 
 	private void addFiles() {
@@ -425,10 +418,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.weightx = 0;
 		gbc.insets = new Insets(10, 0, 0, 5);
 		topPanel.add(verificationOptionsPanel, gbc);
-		// Hides the verification options if batch processing is run from the tab component
-		if(!(isQueryListEmpty())) {
-			verificationOptionsPanel.setVisible(false);
-		}
+		verificationOptionsPanel.setVisible(!isCalledFromQueryPane());
 	}
 
     private void initOptionsTable() {
@@ -724,7 +714,7 @@ public class BatchProcessingDialog extends JDialog {
 		terminateBatchProcessing();
 		rootPane.getParent().setVisible(false);
 		// Resets batch processing when exiting if batch processing was called from the tab
-		if (!(isQueryListEmpty())) {
+		if (isCalledFromQueryPane()) {
 			batchProcessingDialog = null;
 		}
 	}
@@ -1075,7 +1065,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void process() {
 		tableModel.clear();
-        currentWorker = new BatchProcessingWorker(files, tableModel, getVerificationOptions());
+        currentWorker = new BatchProcessingWorker(files, tableModel, getVerificationOptions(), suppliedModel);
 
 		currentWorker.addPropertyChangeListener(evt -> {
             if (evt.getPropertyName().equals("state")) {
@@ -1139,7 +1129,7 @@ public class BatchProcessingDialog extends JDialog {
 			}
 
 			public void fireFileChanged(FileChangedEvent e) {
-				if(!(isQueryListEmpty())) {
+				if (isCalledFromQueryPane()) {
 					fileStatusLabel.setText(TAPAALGUI.getAppGui().getCurrentTabName());
 				} else {
                     fileStatusLabel.setText(e.fileName());
@@ -1223,7 +1213,7 @@ public class BatchProcessingDialog extends JDialog {
 		fileList.setEnabled(true);
 		addFilesButton.setEnabled(true);
 
-		if (!isQueryListEmpty() || listModel.size() > 0) {
+		if (isCalledFromQueryPane() || listModel.size() > 0) {
 			clearFilesButton.setEnabled(true);
 			startButton.setEnabled(true);
 		} else {
@@ -1500,5 +1490,4 @@ public class BatchProcessingDialog extends JDialog {
         im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
     }
 }
-
 
