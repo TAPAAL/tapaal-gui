@@ -84,6 +84,7 @@ class QueryDialogArithmeticTest {
     @Test
     void placeAndConstantReplacementSelectTheRemainingPlaceholder() {
         assertReplacementSelectsRemainingPlaceholder(new TCTLPlaceNode("P"));
+        assertReplacementSelectsRemainingPlaceholder(new TCTLPlaceNode("TAPN1", "P", "dot"));
         assertReplacementSelectsRemainingPlaceholder(new TCTLConstNode(4));
     }
 

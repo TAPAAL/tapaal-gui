@@ -1273,7 +1273,7 @@ public class QueryDialog extends JPanel {
             addPredicateButton.setVisible(false);
             addPlaceButton.setVisible(true);
             addConstantButton.setVisible(true);
-            colorBox.setVisible(false);
+            colorBox.setVisible(supportsColoredPlaceQueries());
             placeMarking.setVisible(true);
             transitionIsEnabledLabel.setVisible(false);
             
@@ -1294,7 +1294,7 @@ public class QueryDialog extends JPanel {
             boolean isLeaf = current instanceof TCTLPlaceNode || current instanceof TCTLConstNode || current instanceof TCTLStatePlaceHolder;
             templateBox.setEnabled(isLeaf);
             placeTransitionBox.setEnabled(isLeaf);
-            colorBox.setEnabled(false);
+            colorBox.setEnabled(isLeaf);
             placeMarking.setEnabled(isLeaf);
             addPlaceButton.setEnabled(isLeaf);
             addConstantButton.setEnabled(isLeaf);
@@ -1428,8 +1428,7 @@ public class QueryDialog extends JPanel {
         traceBox.setMinimumSize(dimension);
         traceBox.setPreferredSize(dimension);
         traceBox.setMaximumSize(dimension);
-        var arithmetic = currentSelection != null && isInsideArithmetic(currentSelection.getObject());
-        colorBox.setVisible(supportsColoredPlaceQueries() && !arithmetic && !transitionIsSelected());
+        colorBox.setVisible(supportsColoredPlaceQueries() && !transitionIsSelected());
         predicatePanel.revalidate();
     }
 
@@ -1468,7 +1467,7 @@ public class QueryDialog extends JPanel {
         String place = (String) placeTransitionBox.getSelectedItem();
         
         if (place != null) {
-            replaceCurrentSelectionWith(new TCTLPlaceNode(template, place));
+            replaceCurrentSelectionWith(selectedPlaceNode(template));
         }
     }
 
@@ -1556,6 +1555,13 @@ public class QueryDialog extends JPanel {
                 traceBox.setSelectedItem(transitionNode.getTrace());
             }
             placeTransitionBox.setSelectedItem(transitionNode.getTransition());
+            userChangedAtomicPropSelection = true;
+        } else if (current instanceof TCTLPlaceNode) {
+            TCTLPlaceNode placeNode = (TCTLPlaceNode)current;
+            userChangedAtomicPropSelection = false;
+            updateSelectionPlaceNode(placeNode);
+            placeTransitionBox.setSelectedItem(placeNode.getPlace());
+            selectColor(placeNode);
             userChangedAtomicPropSelection = true;
         }
     }
@@ -5518,6 +5524,13 @@ public class QueryDialog extends JPanel {
 
         colorBox.addActionListener(e -> {
             if (userChangedAtomicPropSelection && colorBox.isVisible()) {
+                var oldProp = currentSelection != null ? currentSelection.getObject() : null;
+                if (oldProp != null && isInsideArithmetic(oldProp)) {
+                    if (oldProp instanceof TCTLStatePlaceHolder) return;
+                    updateSelectedLeafToPlace();
+                    return;
+                }
+                
                 updateQueryOnAtomicPropositionChange();
             }
         });
