@@ -42,15 +42,28 @@ final class XMLQueryParserUtils {
             : new TCTLPlaceNode("", place[0], color);
     }
 
-    private static String parseColor(Node expression, String error) throws XMLQueryParseException {
-        var children = elementChildren(expression);
-        if (children.size() != 1 || !"color".equals(children.get(0).getNodeName())) {
-            throw new XMLQueryParseException(error);
+    private static String parseColor(Node node, String error) throws XMLQueryParseException {
+        if ("color-expression".equals(node.getNodeName())) {
+            var children = elementChildren(node);
+            if (children.size() != 1) throw new XMLQueryParseException(error);
+            return parseColor(children.get(0), error);
         }
 
-        var color = ((Element)children.get(0)).getAttribute("id").trim();
-        if (color.isEmpty()) throw new XMLQueryParseException(error);
-        return color;
+        if ("color".equals(node.getNodeName())) {
+            var id = ((Element)node).getAttribute("id").trim();
+            if (id.isEmpty()) throw new XMLQueryParseException(error);
+            return id;
+        }
+
+        if ("tuple".equals(node.getNodeName())) {
+            var children = elementChildren(node);
+            if (children.isEmpty()) throw new XMLQueryParseException(error);
+            var parts = new ArrayList<String>();
+            for (var child : children) parts.add(parseColor(child, error));
+            return "(" + String.join(", ", parts) + ")";
+        }
+        
+        throw new XMLQueryParseException(error);
     }
 
     private static String directText(Node parent) {
