@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
+import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Optional;
@@ -195,6 +196,7 @@ import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.undo.AddQueryCommand;
 import net.tapaal.gui.petrinet.verification.ChooseInclusionPlacesDialog;
+import net.tapaal.gui.petrinet.verification.EngineFeature;
 import net.tapaal.gui.petrinet.verification.EngineSupportOptions;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.RunVerificationBase;
@@ -310,7 +312,6 @@ public class QueryDialog extends JPanel {
     private static final String ANY_COLOR = "Any";
     private static final int PREDICATE_WIDTH = 292;
     private static final int COLORED_PREDICATE_WIDTH = 417;
-    private static final Set<ReductionOption> COLOR_QUERY_ENGINES = Set.of(ReductionOption.VerifyPN);
     private JComboBox<Object> colorBox;
     private JComboBox<String> relationalOperatorBox;
     private JLabel transitionIsEnabledLabel;
@@ -479,7 +480,6 @@ public class QueryDialog extends JPanel {
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private static final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
-	private static final Set<ReductionOption> INITIAL_TOKEN_AGE_ENGINES = Set.of(ReductionOption.VerifyDTAPN);
 	private boolean userChangedAtomicPropSelection = true;
 
     //In order: name of engine, support fastest trace, support deadlock with net degree 2 and (EF or AG), support deadlock with EG or AF, support deadlock with inhibitor arcs
@@ -1418,10 +1418,20 @@ public class QueryDialog extends JPanel {
         return supportsColoredPlaceQueries() ? COLORED_PREDICATE_WIDTH : PREDICATE_WIDTH;
     }
 
+    private EngineSupportOptions getSelectedEngine() {
+        var selected = getReductionOptionAsString();
+        if (selected == null) return null;
+        for (var engine : engineSupportOptions) {
+            if (engine.getNameString().equals(selected)) return engine;
+        }
+        
+        return null;
+    }
+
     private boolean supportsColoredPlaceQueries() {
         if (!lens.isColored() || reductionOption == null) return false;
-        var engine = getReductionOption();
-        return engine != null && COLOR_QUERY_ENGINES.contains(engine);
+        var engine = getSelectedEngine();
+        return engine != null && engine.supports(EngineFeature.COLORED_PLACE_QUERIES);
     }
 
     private void updateColorQueryControls() {
@@ -1727,28 +1737,26 @@ public class QueryDialog extends JPanel {
         ArrayList<String> options = new ArrayList<String>();
 
         disableSymmetryUpdate = true;
-        //The order here should be the same as in EngineSupportOptions
-        boolean[] queryOptions = new boolean[]{
-            fastestTraceRadioButton.isSelected(),
-            (queryHasDeadlock() && (newProperty.toString().contains("EF") || newProperty.toString().contains("AG")) && highestNetDegree <= 2),
-            (queryHasDeadlock() && (newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))),
-            (queryHasDeadlock() && hasInhibitorArcs),
-            tapnNetwork.hasWeights(),
-            hasInhibitorArcs,
-            tapnNetwork.hasUrgentTransitions(),
-            (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")),
-            //we want to know if it is strict
-            !tapnNetwork.isNonStrict(),
-            //we want to know if it is timed
-            lens.isTimed(),
-            (queryHasDeadlock() && highestNetDegree > 2),
-            lens.isGame(),
-            (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) && highestNetDegree > 2,
-            newProperty.hasNestedPathQuantifiers(),
-            lens.isColored(),
-            lens.isColored() && !lens.isTimed(),
-            lens.isStochastic()
-        };
+        EnumSet<EngineFeature> requiredFeatures = EnumSet.noneOf(EngineFeature.class);
+        if (fastestTraceRadioButton.isSelected()) requiredFeatures.add(EngineFeature.FASTEST_TRACE);
+        if (queryHasDeadlock() && (newProperty.toString().contains("EF") || newProperty.toString().contains("AG")) && highestNetDegree <= 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
+        if (queryHasDeadlock() && (newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))) requiredFeatures.add(EngineFeature.DEADLOCK_EG_OR_AF);
+        if (queryHasDeadlock() && hasInhibitorArcs) requiredFeatures.add(EngineFeature.DEADLOCK_WITH_INHIB);
+        if (tapnNetwork.hasWeights()) requiredFeatures.add(EngineFeature.WEIGHTS);
+        if (hasInhibitorArcs) requiredFeatures.add(EngineFeature.INHIBITOR_ARCS);
+        if (tapnNetwork.hasUrgentTransitions()) requiredFeatures.add(EngineFeature.URGENT_TRANSITIONS);
+        if (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) requiredFeatures.add(EngineFeature.EG_OR_AF);
+        if (!tapnNetwork.isNonStrict()) requiredFeatures.add(EngineFeature.STRICT_NETS);
+        if (lens.isTimed()) requiredFeatures.add(EngineFeature.TIMED_NETS);
+        if (queryHasDeadlock() && highestNetDegree > 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_GREATER_THAN_2);
+        if (lens.isGame()) requiredFeatures.add(EngineFeature.GAMES);
+        if ((newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) && highestNetDegree > 2) requiredFeatures.add(EngineFeature.EG_OR_AF_WITH_NET_DEGREE_GREATER_THAN_2);
+        if (newProperty.hasNestedPathQuantifiers()) requiredFeatures.add(EngineFeature.NESTED_QUANTIFICATIONS);
+        if (lens.isColored()) requiredFeatures.add(EngineFeature.COLORED);
+        if (lens.isColored() && !lens.isTimed()) requiredFeatures.add(EngineFeature.ONLY_UNTIMED);
+        if (lens.isStochastic()) requiredFeatures.add(EngineFeature.SMC);
+        if (hasColorSpecificPlaces(newProperty)) requiredFeatures.add(EngineFeature.COLORED_PLACE_QUERIES);
+        if (hasNonzeroInitialTokenAges()) requiredFeatures.add(EngineFeature.NONZERO_INITIAL_TOKEN_AGES);
 
 
         if(useTimeDarts != null){
@@ -1794,7 +1802,7 @@ public class QueryDialog extends JPanel {
         }
         if (lens.isTimed()) {
             for (EngineSupportOptions engine : engineSupportOptions) {
-                if (engine.areOptionsSupported(queryOptions)) {
+                if (engine.areOptionsSupported(requiredFeatures)) {
                     if (engine.getNameString().equals(name_verifyTAPN) && lens.isStochastic()) {
                         continue;
                     }
@@ -1804,14 +1812,6 @@ public class QueryDialog extends JPanel {
             }
         } else {
             options.add(name_UNTIMED);
-        }
-
-        if (hasNonzeroInitialTokenAges()) {
-            options.removeIf(option -> !INITIAL_TOKEN_AGE_ENGINES.contains(getReductionOption(option)));
-        }
-
-        if (hasColorSpecificPlaces(newProperty)) {
-            options.removeIf(option -> !COLOR_QUERY_ENGINES.contains(getReductionOption(option)));
         }
 
         reductionOption.removeAllItems();

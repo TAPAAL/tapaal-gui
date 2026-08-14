@@ -1,27 +1,19 @@
 package net.tapaal.gui.petrinet.verification;
 
+import java.util.EnumSet;
+
 public class VerifyTAPNEngineOptions extends EngineSupportOptions {
 
     public VerifyTAPNEngineOptions() {
         super(
-            "TAPAAL: Continuous Engine (verifytapn)", //name of engine
-            false, // support fastest trace
-            false, // support deadlock with net degree 2 and (EF or AG)
-            false, // support deadlock with EG or AF
-            false, // support deadlock with inhibitor arcs
-            false, // support weights
-            true,  // support inhibitor arcs
-            false, // support urgent transitions
-            false, // support EG or AF
-            true,  // support strict nets
-            true,  // support timed nets/time intervals
-            false, // support deadlock with net degree > 2
-            false, // support games
-            false, // support EG or AF with net degree > 2
-            false, // support for nested quantification
-            true,
-            false,
-            false
+            "TAPAAL: Continuous Engine (verifytapn)",
+            EnumSet.of(
+                EngineFeature.INHIBITOR_ARCS,
+                EngineFeature.STRICT_NETS,
+                EngineFeature.TIMED_NETS,
+                EngineFeature.COLORED,
+                EngineFeature.COLORED_PLACE_QUERIES
+            )
         );
     }
 }
