@@ -12,11 +12,13 @@ public final class VerificationArguments {
     public static OptionalInt getKBound(String arguments) {
         if (arguments == null) return OptionalInt.empty();
         Matcher matcher = K_BOUND.matcher(arguments);
-        return matcher.find() ? OptionalInt.of(Integer.parseInt(matcher.group(1))) : OptionalInt.empty();
+        if (!matcher.find()) return OptionalInt.empty();
+        int bound = Integer.parseInt(matcher.group(1));
+        return bound > 0 ? OptionalInt.of(bound) : OptionalInt.empty();
     }
 
     public static boolean hasKBound(String arguments) {
-        return arguments != null && K_BOUND.matcher(arguments).find();
+        return getKBound(arguments).isPresent();
     }
 
     public static TokenBounds tokenBounds(boolean hasKBound, int modelTokens, int extraTokens) {
