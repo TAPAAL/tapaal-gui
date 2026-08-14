@@ -176,6 +176,7 @@ import dk.aau.cs.verification.SMCSettings;
 import dk.aau.cs.verification.SMCStats;
 import dk.aau.cs.verification.SMCTraceType;
 import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.VerificationArguments;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyCPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
@@ -700,13 +701,7 @@ public class QueryDialog extends JPanel {
             int tokensInModel = transformedModel.value1().getNumberOfTokensInNet();
 
             String rawOptions = rawVerificationOptionsTextArea.getText();
-            Pattern pattern = Pattern.compile("(--k-bound|-k)\\s+(\\d+)");
-            Matcher matcher = pattern.matcher(rawOptions);
-    
-            if (matcher.find()) {
-                int totalTokens = Integer.parseInt(matcher.group(2));
-                capacity = totalTokens - tokensInModel;
-            }
+            capacity = VerificationArguments.getKBound(rawOptions).orElse(tokensInModel) - tokensInModel;
         }
 
         TAPNQuery.TraceOption traceOption = getTraceOption();

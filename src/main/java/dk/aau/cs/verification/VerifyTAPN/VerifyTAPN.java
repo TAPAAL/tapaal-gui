@@ -271,8 +271,9 @@ public class VerifyTAPN implements ModelChecker {
         } else {
             String errorOutput = readOutput(runner.errorOutput());
             String standardOutput = readOutput(runner.standardOutput());
+            var tokenBounds = VerificationArguments.tokenBounds(VerificationArguments.hasKBound(options), model.value1().marking().size(), query.getExtraTokens());
 
-            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, tokenBounds.totalTokens(), tokenBounds.extraTokens(), query);
 
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
@@ -318,7 +319,8 @@ public class VerifyTAPN implements ModelChecker {
 			String standardOutput = readOutput(runner.standardOutput());
 
             TimedArcPetriNet net  = model.value1();
-			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, net.marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+			var tokenBounds = VerificationArguments.tokenBounds(VerifyTAPNOptions.usesKBound(options), net.marking().size(), query.getExtraTokens());
+			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, tokenBounds.totalTokens(), tokenBounds.extraTokens(), query);
 			if (queryResult == null || queryResult.value1() == null) {
 				return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {

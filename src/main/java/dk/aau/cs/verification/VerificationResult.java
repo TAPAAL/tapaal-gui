@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.*;
@@ -54,16 +52,7 @@ public class VerificationResult<TTrace> {
 		this.stats = stats;
 		this.rawOutput = rawOutput;
 
-        if (rawOutput != null) {
-            String[] lines = rawOutput.split(System.getProperty("line.separator"));
-            for (String line : lines) {
-                Matcher matcher = Pattern.compile("\\s*--k-bound\\s*(\\d+)\\s*").matcher(line);
-                if (matcher.find()) {
-                    this.bound = Integer.parseInt(matcher.group(1));
-                    break;
-                }
-            }
-        }
+		bound = VerificationArguments.getKBound(rawOutput).orElse(-1);
 	}
 
     public VerificationResult(QueryResult queryResult, Map<String, TTrace> traceMap, long verificationTime, Stats stats, boolean isSolvedUsingStateEquation, String rawOutput, Tuple<TimedArcPetriNet, NameMapping> unfoldedModel, PetriNetTab unfoldedTab){

@@ -44,9 +44,6 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     private final boolean useTarjan;
     private final boolean useColoredReduction;
 
-    private boolean useRawVerification;
-    private String rawVerificationOptions;
-
     public VerifyPNOptions(
         int extraTokens,
         TraceOption traceOption,
