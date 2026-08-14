@@ -69,8 +69,10 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
@@ -84,6 +86,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.MutableAttributeSet;
@@ -5236,6 +5240,30 @@ public class QueryDialog extends JPanel {
                 label.setFont(label.getFont().deriveFont(ANY_COLOR.equals(value) ? Font.ITALIC : Font.PLAIN));
                 return label;
             }
+        });
+        colorBox.addPopupMenuListener(new PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                var comp = colorBox.getUI().getAccessibleChild(colorBox, 0);
+                if (comp instanceof JPopupMenu popup) {
+                    for (var element : popup.getComponents()) {
+                        if (element instanceof JScrollPane scrollPane) {
+                            if (scrollPane.getHorizontalScrollBar() == null) {
+                                scrollPane.setHorizontalScrollBar(new JScrollBar(JScrollBar.HORIZONTAL));
+                            }
+                            
+                            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {}
         });
 
         Vector<Object> items = new Vector<>(tapnNetwork.activeTemplates().size()+1);
