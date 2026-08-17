@@ -425,4 +425,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Printable, Canva
         viewport.setViewPosition(new Point(scrollX, scrollY));
         SwingUtilities.invokeLater(this::requestFocusInWindow);
     }
+
+    public PetriNetTab getTabContent() {
+        return tabContent;
+    }
 }

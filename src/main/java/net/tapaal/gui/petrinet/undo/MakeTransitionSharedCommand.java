@@ -39,7 +39,7 @@ public class MakeTransitionSharedCommand implements Command {
 
 	@Override
 	public void undo() {
-                undoQueryChanges(sharedTransition, timedTransition);
+        undoQueryChanges(sharedTransition, timedTransition);
 		timedTransition.unshare();
 		timedTransition.setName(oldName);
 	}
