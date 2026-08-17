@@ -28,6 +28,10 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 		this.guiModels = guiModels;
 	}
 
+	private void updateSpinner(VerificationResult<TAPNNetworkTrace> result) {
+		spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
+	}
+
 	@Override
 	protected boolean showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if (result != null && !result.error()) {
@@ -45,14 +49,14 @@ public class RunKBoundAnalysis extends RunVerificationBase {
                         ResourceManager.satisfiedIcon(), options, JOptionPane.OK_OPTION);
 
                     if (answer != JOptionPane.OK_OPTION && result.getRawOutput().contains("max tokens:")) {
-                        spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
+                        updateSpinner(result);
                     } else {
                         return answer != JOptionPane.OK_OPTION;
                     }
                 } else if (modelChecker instanceof VerifyPN) {
-                    spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
+                    updateSpinner(result);
                 } else {
-                    spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
+                    updateSpinner(result);
                     JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                         getAnswerBoundedString(), "Analysis Result",
                         JOptionPane.INFORMATION_MESSAGE, ResourceManager.satisfiedIcon());
@@ -69,28 +73,41 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 		return false;
 	}
 
+	private String formatAnswer(String status, String explanation, String tokenDetail) {
+		return "The net with the specified extra number of tokens is " + status + ".\n\n"
+				+ "This means that the analysis " + explanation + "\n\n"
+				+ (tokenDetail.isEmpty() ? "" : tokenDetail + "\n\n")
+				+ (isColoredUntimed() ? "The boundedness check is performed using the unfolding approach.\n"
+				+ "The number of required extra tokens can be lower when using explicit engine." : "");
+	}
+
 	protected String getAnswerNotBoundedString() {
-		return "The net with the specified extra number of tokens is either unbounded or\n"
-				+ "more extra tokens have to be added in order to achieve an exact analysis.\n\n"
-				+ "This means that the analysis using the currently selected number \n"
-				+ "of extra tokens provides only an under-approximation of the net behaviour.\n"
-				+ "If you think that the net is bounded, try to add more extra tokens in order\n"
-				+ "to achieve exact verification analysis.\n";
+		return formatAnswer(
+				"either unbounded or\nmore extra tokens have to be added in order to achieve an exact analysis",
+				"using the currently selected number \nof extra tokens provides only an under-approximation of the net behaviour.\nIf you think that the net is bounded, try to add more extra tokens in order\nto achieve exact verification analysis.",
+				""
+		);
 	}
 
 	protected String getAnswerBoundedString() {
-		return "The net with the specified extra number of tokens is bounded.\n\n"
-				+ "This means that the analysis will be exact and always give \n"
-				+ "the correct answer.\n\n"
-				+ "The number of extra tokens was automatically lowered to the\n"
-				+ "minimum number of tokens needed for an exact analysis.";
+		return formatAnswer(
+				"bounded",
+				"will be exact and always give \nthe correct answer.",
+				"The number of extra tokens was automatically lowered to the\nminimum number of tokens needed for an exact analysis."
+		);
 	}
 
 	protected String getPNAnswerBoundedString() {
-        return "The net with the specified extra number of tokens is bounded.\n\n"
-            + "This means that the analysis will be exact and always give \n"
-            + "the correct answer.\n\n"
-            + "The number of extra tokens can be lowered to the minimum number\n"
-            + "of tokens needed for an exact analysis.";
+		return formatAnswer(
+				"bounded",
+				"will be exact and always give \nthe correct answer.",
+				"The number of extra tokens can be lowered to the minimum number\nof tokens needed for an exact analysis."
+		);
+	}
+
+    private boolean isColoredUntimed() {
+        boolean isColored = (lens != null && lens.isColored()) || (model != null && model.isColored());
+        boolean isUntimed = (lens != null && !lens.isTimed()) || (lens == null && model != null && model.isUntimed());
+        return isColored && isUntimed;
     }
 }
