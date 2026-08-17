@@ -576,7 +576,7 @@ public class ApproximationWorker {
 	                
 	                OverApproximation overaprx = new OverApproximation();
 
-	                //Create trace TAPN from work trace
+	                //Create trace TAPN from the network trace
                     if (model.network().isColored()) {
                         transformedOriginalModel = approxResult.getUnfoldedModel();
                         net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery = approxResult.getUnfoldedTab().queries().iterator().next();
@@ -876,7 +876,7 @@ public class ApproximationWorker {
 
                     OverApproximation overaprx = new OverApproximation();
 
-                    //Create trace TAPN from work trace
+                    //Create trace TAPN from the network trace
                     if (model.network().isColored()) {
                         transformedOriginalModel = approxResult.getUnfoldedModel();
                         net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery = approxResult.getUnfoldedTab().queries().iterator().next();
