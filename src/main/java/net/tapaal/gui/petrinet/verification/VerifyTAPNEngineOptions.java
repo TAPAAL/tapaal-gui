@@ -12,7 +12,8 @@ public class VerifyTAPNEngineOptions extends EngineSupportOptions {
                 EngineFeature.STRICT_NETS,
                 EngineFeature.TIMED_NETS,
                 EngineFeature.COLORED,
-                EngineFeature.COLORED_PLACE_QUERIES
+                EngineFeature.COLORED_PLACE_QUERIES,
+                EngineFeature.NONZERO_INITIAL_TOKEN_AGES
             )
         );
     }

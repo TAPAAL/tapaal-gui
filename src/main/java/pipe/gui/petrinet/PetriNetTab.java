@@ -329,37 +329,8 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	private boolean checkCurrentEngine(ReductionOption reductionOption, Collection<EngineFeature> requiredFeatures) {
-        EngineSupportOptions engine;
-        switch (reductionOption) {
-            case VerifyDTAPN:
-                engine = new VerifyDTAPNEngineOptions(); 
-                break;
-            case VerifyPN:
-                engine = new VerifyPNEngineOptions();
-                break;
-            case VerifyTAPN:
-                engine = new VerifyTAPNEngineOptions();
-                break;
-            case BROADCAST:
-                engine = new UPPAALBroadcastOptions();
-                break;
-            case DEGREE2BROADCAST:
-                engine = new UPPAALBroadcastDegree2Options();
-                break;
-            case COMBI:
-                engine = new UPPAALCombiOptions();
-                break;
-            case STANDARD:
-                engine = new UPPAALStandardOptions();
-                break;
-            case OPTIMIZEDSTANDARD:
-                engine = new UPPAALOptimizedStandardOptions();
-                break;
-            default:
-                return false;
-        }
-        
-        return engine.areOptionsSupported(requiredFeatures);
+        EngineSupportOptions engine = EngineSupportOptions.fromReductionOption(reductionOption);
+        return engine != null && engine.areOptionsSupported(requiredFeatures);
     }
 
     private TAPNQuery setQueryEngine(TAPNQuery query, EngineSupportOptions engine) {

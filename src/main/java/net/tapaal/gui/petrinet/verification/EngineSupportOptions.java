@@ -1,5 +1,6 @@
 package net.tapaal.gui.petrinet.verification;
 
+import dk.aau.cs.translations.ReductionOption;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
@@ -33,5 +34,29 @@ public class EngineSupportOptions {
 
     public boolean areOptionsSupported(Collection<EngineFeature> queryOptions) {
         return supportedFeatures.containsAll(queryOptions);
+    }
+
+    public static EngineSupportOptions fromReductionOption(ReductionOption reductionOption) {
+        if (reductionOption == null) return null;
+        switch (reductionOption) {
+            case VerifyDTAPN:
+                return new VerifyDTAPNEngineOptions();
+            case VerifyPN:
+                return new VerifyPNEngineOptions();
+            case VerifyTAPN:
+                return new VerifyTAPNEngineOptions();
+            case BROADCAST:
+                return new UPPAALBroadcastOptions();
+            case DEGREE2BROADCAST:
+                return new UPPAALBroadcastDegree2Options();
+            case COMBI:
+                return new UPPAALCombiOptions();
+            case STANDARD:
+                return new UPPAALStandardOptions();
+            case OPTIMIZEDSTANDARD:
+                return new UPPAALOptimizedStandardOptions();
+            default:
+                return null;
+        }
     }
 }
