@@ -22,6 +22,7 @@ import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import java.util.HashMap;
+import java.util.Set;
 import java.io.File;
 import java.io.IOException;
 
@@ -126,9 +127,11 @@ public class Verifier {
         return newQuery;
     }
 
+    public static final Set<ReductionOption> INITIAL_TOKEN_AGE_ENGINES = Set.of(ReductionOption.VerifyDTAPN, ReductionOption.VerifyTAPN);
+
     public static TAPNQuery convertQuery(TAPNQuery query, TAPNLens lens, TimedArcPetriNetNetwork network) {
         TAPNQuery convertedQuery = convertQuery(query, lens);
-        if (hasNonzeroInitialTokenAges(network) && convertedQuery.getReductionOption() != ReductionOption.VerifyDTAPN) {
+        if (hasNonzeroInitialTokenAges(network) && !INITIAL_TOKEN_AGE_ENGINES.contains(convertedQuery.getReductionOption())) {
             convertedQuery = convertedQuery.copy();
             convertedQuery.setReductionOption(ReductionOption.VerifyDTAPN);
         }
