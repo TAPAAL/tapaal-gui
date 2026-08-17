@@ -2,9 +2,8 @@ package pipe.gui.graph;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.axis.ValueAxis;
+import org.jfree.data.Range;
 
 import java.awt.event.MouseAdapter;
 import java.awt.Cursor;
@@ -13,9 +12,21 @@ import java.awt.event.MouseEvent;
 public class DraggableChartPanel extends ChartPanel {
     private int lastX;
     private int lastY;
+    private final Range originalDomainAxisRange;
+    private final Range originalRangeAxisRange;
 
     public DraggableChartPanel(JFreeChart chart) {
         super(chart);
+        var plot = chart.getPlot();
+        if (plot instanceof XYPlot xyPlot) {
+            originalDomainAxisRange = xyPlot.getDomainAxis().getRange();
+            originalRangeAxisRange = xyPlot.getRangeAxis().getRange();
+        } else {
+            originalDomainAxisRange = null;
+            originalRangeAxisRange = null;
+        }
+
+        setMouseWheelEnabled(true);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -37,8 +48,8 @@ public class DraggableChartPanel extends ChartPanel {
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                int deltaX = e.getX() - lastX;
-                int deltaY = e.getY() - lastY;
+                var deltaX = e.getX() - lastX;
+                var deltaY = e.getY() - lastY;
 
                 moveChart(deltaX, deltaY);
 
@@ -48,15 +59,21 @@ public class DraggableChartPanel extends ChartPanel {
         });
     }
 
-    private void moveChart(int deltaX, int deltaY) {
-        Plot plot = getChart().getPlot();
-        if (plot instanceof XYPlot) {
-            XYPlot xyPlot = (XYPlot) plot;
-            ValueAxis domainAxis = xyPlot.getDomainAxis();
-            ValueAxis rangeAxis = xyPlot.getRangeAxis();
+    public void resetView() {
+        if (getChart().getPlot() instanceof XYPlot plot && originalDomainAxisRange != null) {
+            plot.getDomainAxis().setRange(originalDomainAxisRange);
+            plot.getRangeAxis().setRange(originalRangeAxisRange);
+        }
+    }
 
-            double domainShift = domainAxis.getRange().getLength() * deltaX / getWidth();
-            double rangeShift = rangeAxis.getRange().getLength() * deltaY / getHeight();
+    private void moveChart(int deltaX, int deltaY) {
+        var plot = getChart().getPlot();
+        if (plot instanceof XYPlot xyPlot) {
+            var domainAxis = xyPlot.getDomainAxis();
+            var rangeAxis = xyPlot.getRangeAxis();
+
+            var domainShift = domainAxis.getRange().getLength() * deltaX / getWidth();
+            var rangeShift = rangeAxis.getRange().getLength() * deltaY / getHeight();
 
             domainAxis.setRange(domainAxis.getLowerBound() - domainShift, domainAxis.getUpperBound() - domainShift);
             rangeAxis.setRange(rangeAxis.getLowerBound() + rangeShift, rangeAxis.getUpperBound() + rangeShift);
