@@ -1956,6 +1956,11 @@ public class QueryDialog extends JPanel {
     }
 
     private void enableOnlyUntimedStateButtons() {
+        if (currentSelection != null && isInsideArithmetic(currentSelection.getObject())) {
+            disableAllQueryButtons();
+            return;
+        }
+
         existsBox.setEnabled(true);
         existsDiamond.setEnabled(true);
         forAllBox.setEnabled(true);
@@ -6607,6 +6612,16 @@ public class QueryDialog extends JPanel {
             } else {
                 eButton.setEnabled(enable);
             }
+        } else if (isInsideArithmetic(currentSelection.getObject())) {
+            disableAllLTLButtons();
+            addButton.setEnabled(true);
+            subtractButton.setEnabled(true);
+            multiplyButton.setEnabled(true);
+            boolean isLeaf = currentSelection.getObject() instanceof TCTLPlaceNode || currentSelection.getObject() instanceof TCTLConstNode || currentSelection.getObject() instanceof TCTLStatePlaceHolder;
+            templateBox.setEnabled(isLeaf);
+            placeTransitionBox.setEnabled(isLeaf);
+            placeMarking.setEnabled(isLeaf);
+            searchBar.setEnabled(isLeaf);
         } else {
             if (currentSelection.getObject() instanceof LTLANode) {
                 aButton.setEnabled(enable);
@@ -6630,7 +6645,7 @@ public class QueryDialog extends JPanel {
             }
         }
 
-        if (currentSelection == null || (currentSelection != null && (currentSelection.getObject() instanceof LTLENode || currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof TCTLPathPlaceHolder))) {
+        if (currentSelection == null || (currentSelection != null && (currentSelection.getObject() instanceof LTLENode || currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof TCTLPathPlaceHolder || isInsideArithmetic(currentSelection.getObject())))) {
             conjunctionButton.setEnabled(false);
             disjunctionButton.setEnabled(false);
         } else {
@@ -6662,6 +6677,16 @@ public class QueryDialog extends JPanel {
             } else {
                 aButton.setEnabled(true);
             }
+        } else if (isInsideArithmetic(currentSelection.getObject())) {
+            disableAllLTLButtons();
+            addButton.setEnabled(true);
+            subtractButton.setEnabled(true);
+            multiplyButton.setEnabled(true);
+            boolean isLeaf = currentSelection.getObject() instanceof TCTLPlaceNode || currentSelection.getObject() instanceof TCTLConstNode || currentSelection.getObject() instanceof TCTLStatePlaceHolder;
+            templateBox.setEnabled(isLeaf);
+            placeTransitionBox.setEnabled(isLeaf);
+            placeMarking.setEnabled(isLeaf);
+            searchBar.setEnabled(isLeaf);
         } else {
             aButton.setEnabled(false);
             eButton.setEnabled(false);
