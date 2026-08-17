@@ -543,6 +543,8 @@ public class TAPNQuery {
 		useStubbornReduction = newQuery.isStubbornReductionEnabled();
 		useTarOption = newQuery.isTarOptionEnabled();
         useExplicitSearch = newQuery.useExplicitSearch();
+        useRawVerification = newQuery.getRawVerification();
+        rawVerificationPrompt = newQuery.getRawVerificationPrompt();
 	}
 
     public void copyOptions(TAPNQuery query){

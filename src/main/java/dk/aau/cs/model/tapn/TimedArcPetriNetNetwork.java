@@ -5,6 +5,7 @@ import java.util.*;
 import net.tapaal.gui.petrinet.undo.Colored.*;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
+import pipe.gui.Constants;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
@@ -805,6 +806,16 @@ public class TimedArcPetriNetNetwork {
 	
 	public void setPaintNet(boolean paintNet){
 		this.paintNet = paintNet;
+	}
+
+	public boolean isNetDrawable() {
+		if (!paintNet) return false;
+		int totalSize = 0;
+		for (var tapn : allTemplates()) {
+			totalSize += tapn.places().size() + tapn.transitions().size();
+		}
+        
+		return totalSize <= Constants.MAX_NET_SIZE;
 	}
 
 	//For colors

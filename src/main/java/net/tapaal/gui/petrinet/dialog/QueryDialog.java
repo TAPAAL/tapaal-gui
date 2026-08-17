@@ -176,6 +176,7 @@ import dk.aau.cs.verification.SMCSettings;
 import dk.aau.cs.verification.SMCStats;
 import dk.aau.cs.verification.SMCTraceType;
 import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.VerificationArguments;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyCPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
@@ -701,13 +702,7 @@ public class QueryDialog extends JPanel {
             int tokensInModel = transformedModel.value1().getNumberOfTokensInNet();
 
             String rawOptions = rawVerificationOptionsTextArea.getText();
-            Pattern pattern = Pattern.compile("(--k-bound|-k)\\s+(\\d+)");
-            Matcher matcher = pattern.matcher(rawOptions);
-    
-            if (matcher.find()) {
-                int totalTokens = Integer.parseInt(matcher.group(2));
-                capacity = totalTokens - tokensInModel;
-            }
+            capacity = VerificationArguments.getKBound(rawOptions).orElse(tokensInModel) - tokensInModel;
         }
 
         TAPNQuery.TraceOption traceOption = getTraceOption();
@@ -1173,6 +1168,11 @@ public class QueryDialog extends JPanel {
 
         // Move window to the middle of the screen
         guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
+        SwingUtilities.invokeLater(() -> {
+            if (queryDialogue.queryName != null) {
+                queryDialogue.queryName.requestFocusInWindow();
+            }
+        });
         guiDialog.setVisible(true);
 
         return queryDialogue.getQuery();
@@ -1207,6 +1207,19 @@ public class QueryDialog extends JPanel {
             }
         }
         return new TCTLStatePlaceHolder();
+    }
+
+    private TCTLAbstractStateProperty getSelectedStateProperty(int childNumber) {
+        TCTLAbstractProperty selected = currentSelection.getObject();
+        if (selected instanceof TCTLAbstractStateProperty) {
+            return childNumber == 1 ? (TCTLAbstractStateProperty) selected : new TCTLStatePlaceHolder();
+        }
+        
+        return getSpecificChildOfProperty(childNumber, selected);
+    }
+
+    private boolean isQuantifierSelected() {
+        return currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode;
     }
 
     // Update current selection based on position of the caret in the string
@@ -1315,7 +1328,7 @@ public class QueryDialog extends JPanel {
 
         truePredicateButton.setVisible(true);
         falsePredicateButton.setVisible(true);
-        deadLockPredicateButton.setVisible(true);
+        deadLockPredicateButton.setVisible(isCTL());
         verticalSeparator.setVisible(true);
 
         addButton.setEnabled(false);
@@ -1600,6 +1613,7 @@ public class QueryDialog extends JPanel {
         queryField.select(0, 0);
         currentSelection = null;
         disableAllQueryButtons();
+        disableEditingButtons();
     }
 
     private void setSaveButtonsEnabled() {
@@ -1942,6 +1956,11 @@ public class QueryDialog extends JPanel {
     }
 
     private void enableOnlyUntimedStateButtons() {
+        if (currentSelection != null && isInsideArithmetic(currentSelection.getObject())) {
+            disableAllQueryButtons();
+            return;
+        }
+
         existsBox.setEnabled(true);
         existsDiamond.setEnabled(true);
         forAllBox.setEnabled(true);
@@ -2189,11 +2208,11 @@ public class QueryDialog extends JPanel {
 
         if (queryToCreateFrom != null) {
             setupRawVerificationOptionsFromQuery(queryToCreateFrom);
+            updateSelection(newProperty);
         } else {
             setupRawVerificationOptions();
+            clearSelection();
         }
-
-        updateSelection(newProperty);
     }
 
     private void setupFromQuery(TAPNQuery queryToCreateFrom) {
@@ -2746,8 +2765,16 @@ public class QueryDialog extends JPanel {
         if (undoButton != null) undoButton.setEnabled(false);
         if (redoButton != null) redoButton.setEnabled(false);
 
+        clearSelection();
+
         setEnabledOptionsAccordingToCurrentReduction();
         updateRawVerificationOptions();
+
+        SwingUtilities.invokeLater(() -> {
+            if (queryName != null) {
+                queryName.requestFocusInWindow();
+            }
+        });
     }
 
     private void toggleSmc() {
@@ -4017,48 +4044,37 @@ public class QueryDialog extends JPanel {
     private void addTimedQuantificationListeners() {
         // Add action listeners to the query options
         existsBox.addActionListener(e -> {
-            TCTLEGNode property = new TCTLEGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             existsBox.setSelected(true);
-            addPropertyToQuery(property);
+            addPropertyToQuery(new TCTLEGNode(getSelectedStateProperty(1)));
             unselectButtons();
         });
 
         existsDiamond.addActionListener(e -> {
-            TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             existsDiamond.setSelected(true);
             setupExplicitSearch(true);
             depthFirstSearch.setSelected(true);
-            addPropertyToQuery(property);
+            addPropertyToQuery(new TCTLEFNode(getSelectedStateProperty(1)));
             unselectButtons();
         });
 
         forAllBox.addActionListener(e -> {
-            TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             forAllBox.setSelected(true);
             setupExplicitSearch(true);
             depthFirstSearch.setSelected(true);
-            addPropertyToQuery(property);
+            addPropertyToQuery(new TCTLAGNode(getSelectedStateProperty(1)));
             unselectButtons();
         });
 
         forAllDiamond.addActionListener(e -> {
-            TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
             forAllDiamond.setSelected(true);
-            addPropertyToQuery(property);
+            addPropertyToQuery(new TCTLAFNode(getSelectedStateProperty(1)));
             unselectButtons();
         });
     }
 
     private void addSmcQuantificationListerners() {
-        finallyButton.addActionListener(e -> {
-            LTLFNode property = new LTLFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-            addPropertyToQuery(property);
-        });
-
-        globallyButton.addActionListener(e -> {
-            LTLGNode property = new LTLGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-            addPropertyToQuery(property);
-        });
+        finallyButton.addActionListener(e -> addPropertyToQuery(new LTLFNode(getSelectedStateProperty(1))));
+        globallyButton.addActionListener(e -> addPropertyToQuery(new LTLGNode(getSelectedStateProperty(1))));
     }
 
     private void unselectButtons() {
@@ -4071,95 +4087,37 @@ public class QueryDialog extends JPanel {
     private void addUntimedQuantificationListeners() {
         addTimedQuantificationListeners();
 
-        existsNext.addActionListener(e -> {
-            TCTLAbstractPathProperty property;
-            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                property = new TCTLEXNode((TCTLAbstractStateProperty) currentSelection.getObject());
-            } else {
-                property = new TCTLEXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-            }
-            addPropertyToQuery(property);
-        });
+        existsNext.addActionListener(e -> addPropertyToQuery(new TCTLEXNode(getSelectedStateProperty(1))));
 
-        existsUntil.addActionListener(e -> {
-            TCTLAbstractPathProperty property;
-            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                property = new TCTLEUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
-                    new TCTLStatePlaceHolder());
-            } else {
-                property = new TCTLEUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-                    getSpecificChildOfProperty(2, currentSelection.getObject()));
-            }
-            addPropertyToQuery(property);
-        });
+        existsUntil.addActionListener(e -> addPropertyToQuery(
+            new TCTLEUNode(getSelectedStateProperty(1), getSelectedStateProperty(2))));
 
         globallyButton.addActionListener(e -> {
-            LTLGNode property;
-            if (currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode) {
-                property = new LTLGNode();
-            } else {
-                property = new LTLGNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-            }
+            LTLGNode property = isQuantifierSelected() ? new LTLGNode() : new LTLGNode(getSelectedStateProperty(1));
             addPropertyToQuery(property);
             unselectButtons();
         });
 
         finallyButton.addActionListener(e -> {
-            LTLFNode property;
-            if (currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode) {
-                property = new LTLFNode();
-            } else {
-                property = new LTLFNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-            }
+            LTLFNode property = isQuantifierSelected() ? new LTLFNode() : new LTLFNode(getSelectedStateProperty(1));
             addPropertyToQuery(property);
             unselectButtons();
         });
 
-        forAllNext.addActionListener(e -> {
-            TCTLAbstractPathProperty property;
-            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                property = new TCTLAXNode((TCTLAbstractStateProperty) currentSelection.getObject());
-            } else {
-                property = new TCTLAXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-            }
-            addPropertyToQuery(property);
-        });
+        forAllNext.addActionListener(e -> addPropertyToQuery(new TCTLAXNode(getSelectedStateProperty(1))));
 
-        forAllUntil.addActionListener(e -> {
-            TCTLAbstractPathProperty property;
-            if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                property = new TCTLAUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
-                    new TCTLStatePlaceHolder());
-            } else {
-                property = new TCTLAUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-                    getSpecificChildOfProperty(2, currentSelection.getObject()));
-            }
-            addPropertyToQuery(property);
-        });
+        forAllUntil.addActionListener(e -> addPropertyToQuery(
+            new TCTLAUNode(getSelectedStateProperty(1), getSelectedStateProperty(2))));
 
         nextButton.addActionListener(e -> {
-            TCTLAbstractPathProperty property;
-            if (currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode) {
-                property = new LTLXNode();
-            } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                property = new LTLXNode((TCTLAbstractStateProperty) currentSelection.getObject());
-            } else {
-                property = new LTLXNode(getSpecificChildOfProperty(1, currentSelection.getObject()));
-            }
+            LTLXNode property = isQuantifierSelected() ? new LTLXNode() : new LTLXNode(getSelectedStateProperty(1));
             addPropertyToQuery(property);
         });
 
         untilButton.addActionListener(e -> {
-            TCTLAbstractPathProperty property;
-            if (currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode) {
-                property = new LTLUNode();
-            } else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-                property = new LTLUNode((TCTLAbstractStateProperty) currentSelection.getObject(),
-                    new TCTLStatePlaceHolder());
-            } else {
-                property = new LTLUNode(getSpecificChildOfProperty(1, currentSelection.getObject()),
-                    getSpecificChildOfProperty(2, currentSelection.getObject()));
-            }
+            TCTLAbstractPathProperty property = isQuantifierSelected()
+                ? new LTLUNode()
+                : new LTLUNode(getSelectedStateProperty(1), getSelectedStateProperty(2));
             addPropertyToQuery(property);
         });
 
@@ -4225,6 +4183,10 @@ public class QueryDialog extends JPanel {
         addTraceButton.addActionListener(e -> initTraceBoxDialogComponents());
     }
 
+    private boolean isCTL() {
+        return queryType == null || queryType.getSelectedIndex() == 0;
+    }
+
     private void showLTLButtons(boolean isVisible) {
         globallyButton.setVisible(isVisible);
         finallyButton.setVisible(isVisible);
@@ -4232,7 +4194,7 @@ public class QueryDialog extends JPanel {
         untilButton.setVisible(isVisible);
         aButton.setVisible(isVisible);
         eButton.setVisible(isVisible);
-        if (deadLockPredicateButton != null) deadLockPredicateButton.setVisible(!isVisible);
+        if (deadLockPredicateButton != null) deadLockPredicateButton.setVisible(!isVisible && isCTL());
         showCTLButtons(!isVisible);
     }
 
@@ -4262,7 +4224,7 @@ public class QueryDialog extends JPanel {
         showCTLButtons(!isVisible);
         globallyButton.setVisible(isVisible);
         finallyButton.setVisible(isVisible);
-        deadLockPredicateButton.setVisible(isVisible);
+        deadLockPredicateButton.setVisible(isVisible || isCTL());
     }
 
     private void updateSiphonTrap(boolean isCTL) {
@@ -5315,6 +5277,7 @@ public class QueryDialog extends JPanel {
         predicatePanel.add(falsePredicateButton, gbc);
         ++gbc.gridy;
         predicatePanel.add(deadLockPredicateButton, gbc);
+        deadLockPredicateButton.setVisible(isCTL());
 
 
         //Add tool tips for predicate panel
@@ -6303,7 +6266,7 @@ public class QueryDialog extends JPanel {
             useColoredReduction.setEnabled(false);
         }
         
-        boolean isCTL = queryType.getSelectedIndex() == 0;
+        boolean isCTL = isCTL();
         updateSiphonTrap(isCTL);
     
         updateSearchStrategies();
@@ -6649,6 +6612,16 @@ public class QueryDialog extends JPanel {
             } else {
                 eButton.setEnabled(enable);
             }
+        } else if (isInsideArithmetic(currentSelection.getObject())) {
+            disableAllLTLButtons();
+            addButton.setEnabled(true);
+            subtractButton.setEnabled(true);
+            multiplyButton.setEnabled(true);
+            boolean isLeaf = currentSelection.getObject() instanceof TCTLPlaceNode || currentSelection.getObject() instanceof TCTLConstNode || currentSelection.getObject() instanceof TCTLStatePlaceHolder;
+            templateBox.setEnabled(isLeaf);
+            placeTransitionBox.setEnabled(isLeaf);
+            placeMarking.setEnabled(isLeaf);
+            searchBar.setEnabled(isLeaf);
         } else {
             if (currentSelection.getObject() instanceof LTLANode) {
                 aButton.setEnabled(enable);
@@ -6672,7 +6645,7 @@ public class QueryDialog extends JPanel {
             }
         }
 
-        if (currentSelection == null || (currentSelection != null && (currentSelection.getObject() instanceof LTLENode || currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof TCTLPathPlaceHolder))) {
+        if (currentSelection == null || (currentSelection != null && (currentSelection.getObject() instanceof LTLENode || currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof TCTLPathPlaceHolder || isInsideArithmetic(currentSelection.getObject())))) {
             conjunctionButton.setEnabled(false);
             disjunctionButton.setEnabled(false);
         } else {
@@ -6693,7 +6666,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void updateLTLButtons() {
-        if (currentSelection.getObject() == newProperty) {
+        if (currentSelection == null || currentSelection.getObject() == newProperty) {
             String ltlType = checkLTLType();
             disableAllLTLButtons();
             if (ltlType.equals("placeholder")) {
@@ -6704,6 +6677,16 @@ public class QueryDialog extends JPanel {
             } else {
                 aButton.setEnabled(true);
             }
+        } else if (isInsideArithmetic(currentSelection.getObject())) {
+            disableAllLTLButtons();
+            addButton.setEnabled(true);
+            subtractButton.setEnabled(true);
+            multiplyButton.setEnabled(true);
+            boolean isLeaf = currentSelection.getObject() instanceof TCTLPlaceNode || currentSelection.getObject() instanceof TCTLConstNode || currentSelection.getObject() instanceof TCTLStatePlaceHolder;
+            templateBox.setEnabled(isLeaf);
+            placeTransitionBox.setEnabled(isLeaf);
+            placeMarking.setEnabled(isLeaf);
+            searchBar.setEnabled(isLeaf);
         } else {
             aButton.setEnabled(false);
             eButton.setEnabled(false);

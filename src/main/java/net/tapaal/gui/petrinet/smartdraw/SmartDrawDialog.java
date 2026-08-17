@@ -134,8 +134,9 @@ public class SmartDrawDialog extends JDialog {
                 if (event.getPropertyName().equals("unfolding")) {
                     SwingWorker.StateValue stateValue = (SwingWorker.StateValue) event.getNewValue();
                     if (stateValue.equals(SwingWorker.StateValue.DONE)) {
-                        //Don't auto-layout on empty net, hotfix for issue #1960000
-                        if (!TAPAALGUI.getCurrentTab().currentTemplate().getHasPositionalInfo() && (TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getPlaces().length + TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getTransitions().length) > 0) {
+                        //Don't auto-layout on empty net or net too big to draw, hotfix for issue #1960000
+                        PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
+                        if (currentTab != null && currentTab.network().paintNet() && !currentTab.currentTemplate().getHasPositionalInfo() && (currentTab.currentTemplate().guiModel().getPlaces().length + currentTab.currentTemplate().guiModel().getTransitions().length) > 0) {
                             int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if (dialogResult == JOptionPane.YES_OPTION) {
                                 showSmartDrawDialog();
