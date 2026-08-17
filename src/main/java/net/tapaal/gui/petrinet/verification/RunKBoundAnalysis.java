@@ -77,7 +77,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 		return "The net with the specified extra number of tokens is " + status + ".\n\n"
 				+ "This means that the analysis " + explanation + "\n\n"
 				+ (tokenDetail.isEmpty() ? "" : tokenDetail + "\n\n")
-				+ (isColored() ? "The boundedness check is performed using the unfolding approach.\n"
+				+ (isColoredUntimed() ? "The boundedness check is performed using the unfolding approach.\n"
 				+ "The number of required extra tokens can be lower when using explicit engine." : "");
 	}
 
@@ -105,7 +105,9 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 		);
 	}
 
-    private boolean isColored() {
-        return (lens != null && lens.isColored()) || model.isColored();
+    private boolean isColoredUntimed() {
+        boolean isColored = (lens != null && lens.isColored()) || (model != null && model.isColored());
+        boolean isUntimed = (lens != null && !lens.isTimed()) || (lens == null && model != null && model.isUntimed());
+        return isColored && isUntimed;
     }
 }
