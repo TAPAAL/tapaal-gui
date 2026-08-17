@@ -20,6 +20,10 @@ public class LTLANode extends TCTLAbstractPathProperty {
         return trace;
     }
 
+    public void setTrace(String trace) {
+        this.trace = trace;
+    }
+
     public LTLANode(TCTLAbstractStateProperty property, String trace) {
         this.property = property;
         this.property.setParent(this);

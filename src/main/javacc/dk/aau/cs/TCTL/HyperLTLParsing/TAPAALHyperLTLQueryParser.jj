@@ -342,7 +342,7 @@ TCTLAbstractStateProperty AritmeticFactor() :
 }
 {
     (
-    [ LOOKAHEAD(2) trace = <IDENT> "." ] thisProp = Place() { return new HyperLTLPathScopeNode(thisProp, trace.image); }
+    [ LOOKAHEAD(2) trace = <IDENT> "." ] thisProp = Place() { return trace == null ? thisProp : new HyperLTLPathScopeNode(thisProp, trace.image); }
     | num = <NUM> { thisProp = new TCTLConstNode(Integer.parseInt(num.image)); }
     | "(" thisProp = AritmeticExpr() ")"
     )

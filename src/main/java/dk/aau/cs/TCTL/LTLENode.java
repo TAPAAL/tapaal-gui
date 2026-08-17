@@ -44,6 +44,10 @@ public class LTLENode extends TCTLAbstractPathProperty {
         return trace;
     }
 
+    public void setTrace(String trace) {
+        this.trace = trace;
+    }
+
     @Override
     public String toString() {
         String s = "";

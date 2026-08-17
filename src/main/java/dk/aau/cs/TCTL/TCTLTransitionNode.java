@@ -116,4 +116,8 @@ public class TCTLTransitionNode extends TCTLAbstractStateProperty {
 	public String getTrace() {
         return trace;
     }
+
+    public void setTrace(String trace) {
+        this.trace = trace;
+    }
 }
