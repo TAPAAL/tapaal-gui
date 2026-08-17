@@ -21,9 +21,9 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.LegendItem;
 import org.jfree.chart.LegendItemCollection;
-import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
@@ -36,7 +36,6 @@ import pipe.gui.swingcomponents.EscapableDialog;
 
 public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
     private static final String BIN_WIDTH_PLACEHOLDER = "Bin Width: 1";
-
     private final List<Graph> graphs;
     private final boolean showLegend;
     private final boolean piecewise;
@@ -273,7 +272,6 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
             var domainAxis = plot.getDomainAxis();
             domainAxis.setRange(distanceToOrigin - 1, distanceToOrigin + 1);
         } else if (mean != null) {
-            var rangeAxis = plot.getRangeAxis();
             var dashed = new BasicStroke(
                 lineThickness,
                 BasicStroke.CAP_BUTT,
@@ -283,10 +281,7 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
                 0.0f
             );
 
-            var annotation = new XYLineAnnotation(
-                mean, rangeAxis.getLowerBound(), mean, rangeAxis.getUpperBound(), dashed, Color.BLACK
-            );
-            plot.addAnnotation(annotation);
+            plot.addDomainMarker(new ValueMarker(mean, Color.BLACK, dashed));
 
             var lineShape = new Line2D.Double(0, 0, 30, 0);
             var legendItems = showLegend ? plot.getLegendItems() : new LegendItemCollection();
@@ -310,7 +305,37 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
         plot.setRangeGridlinePaint(Color.BLACK);
         plot.setDomainGridlinePaint(Color.BLACK);
 
+        if (graphs.size() == 1 && !pointPlot && !piecewise) {
+            enableAdaptiveSampling(plot, graphs.get(0));
+        }
+
         return chart;
+    }
+
+    static void enableAdaptiveSampling(XYPlot plot, Graph graph) {
+        if (!graph.isContinuous()) return;
+
+        var axis = plot.getDomainAxis();
+        axis.setRange(axis.getRange());
+
+        Runnable updateDataset = () -> {
+            var range = axis.getRange();
+            var series = new XYSeries(graph.getName());
+            for (var point : graph.sample(range.getLowerBound(), range.getUpperBound())) {
+                series.add(point.getX(), point.getY());
+            }
+            
+            plot.setDataset(new XYSeriesCollection(series));
+        };
+
+        axis.addChangeListener(event -> {
+            if (axis.isAutoRange()) {
+                axis.setRange(axis.getRange());
+                return;
+            }
+            updateDataset.run();
+        });
+        updateDataset.run();
     }
 
     private void updateDataset() {
@@ -362,7 +387,8 @@ public class DefaultGraphDialog extends EscapableDialog implements GraphDialog {
             }
 
             for (var point : points) {
-                Require.that(point.getX() >= 0 && point.getY() >= 0, "Negative points are not supported");
+                var validY = point.getY() >= 0 || graph.isContinuous() && Double.isNaN(point.getY());
+                Require.that(point.getX() >= 0 && validY, "Negative points are not supported");
                 series.add(point.getX(), point.getY());
                 hasZeroX |= point.getX() < margin;
                 hasZeroY |= point.getY() < margin;
