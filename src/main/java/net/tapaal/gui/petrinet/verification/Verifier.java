@@ -22,7 +22,6 @@ import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import java.util.HashMap;
-import java.util.Set;
 import java.io.File;
 import java.io.IOException;
 
