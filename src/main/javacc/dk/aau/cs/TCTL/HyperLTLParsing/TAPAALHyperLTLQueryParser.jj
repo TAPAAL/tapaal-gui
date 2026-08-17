@@ -34,6 +34,26 @@ public class TAPAALHyperLTLQueryParser {
         TAPAALHyperLTLQueryParser parser = new TAPAALHyperLTLQueryParser(new StringReader(query));
         return parser.Start();
     }
+
+    private static TCTLAbstractStateProperty wrapPathToState(TCTLAbstractProperty property) {
+        if (property instanceof TCTLAbstractStateProperty) {
+            return (TCTLAbstractStateProperty) property;
+        } else if (property instanceof TCTLAbstractPathProperty) {
+            return new TCTLPathToStateConverter((TCTLAbstractPathProperty)property);
+        }
+        
+        return null;
+    }
+
+    private static TCTLAbstractPathProperty wrapStateToPath(TCTLAbstractProperty property) {
+        if (property instanceof TCTLAbstractPathProperty) {
+            return (TCTLAbstractPathProperty) property;
+        } else if (property instanceof TCTLAbstractStateProperty) {
+            return new TCTLStateToPathConverter((TCTLAbstractStateProperty)property);
+        }
+
+        return null;
+    }
 }
 
     PARSER_END(TAPAALHyperLTLQueryParser)
@@ -118,94 +138,90 @@ TCTLAbstractPathProperty AbstractPathProperty() :
 
 TCTLAbstractPathProperty AllPathProperty() :
 {
-        TCTLAbstractPathProperty pathChild = null;
+        TCTLAbstractProperty pathChild = null;
         Token trace;
 }
 {
-    <A> trace = <IDENT> "(" pathChild = ParanthesesExpr() ")" {return new LTLANode(new TCTLPathToStateConverter(pathChild), trace.image); }
+    <A> trace = <IDENT> "(" pathChild = ParanthesesExpr() ")" {return new LTLANode(wrapPathToState(pathChild), trace.image); }
 }
 
 TCTLAbstractPathProperty ExistsPathProperty() :
 {
-        TCTLAbstractPathProperty pathChild = null;
+        TCTLAbstractProperty pathChild = null;
         Token trace;
 }
 {
-    <E> trace = <IDENT> "(" pathChild = ParanthesesExpr() ")" {return new LTLENode(new TCTLPathToStateConverter(pathChild), trace.image); }
+    <E> trace = <IDENT> "(" pathChild = ParanthesesExpr() ")" {return new LTLENode(wrapPathToState(pathChild), trace.image); }
 }
 
-TCTLAbstractPathProperty ParanthesesExpr() :
+TCTLAbstractProperty ParanthesesExpr() :
 {
-    TCTLAbstractPathProperty pathChild = null;
-    TCTLAbstractStateProperty stateChild = null;
-    TCTLAbstractStateProperty stateChild2 = null;
+    TCTLAbstractProperty pathChild = null;
 }
 {
-
-    pathChild = AbstractPathProperty() {return pathChild;}
-    | "(" pathChild = QuantifierExpr() ")" {return pathChild;}
-    | stateChild = OrExpr() [LOOKAHEAD(2) <U> stateChild2 = OrExpr()] { return (stateChild2 == null ? new TCTLStateToPathConverter(stateChild) : new LTLUNode(stateChild, stateChild2)); }
+    LOOKAHEAD(AbstractPathProperty()) pathChild = AbstractPathProperty() {return pathChild;}
+    | LOOKAHEAD(2) "(" pathChild = AbstractPathProperty() ")" {return pathChild;}
+    | pathChild = OrExpr() {return pathChild; }
 }
 
-TCTLAbstractPathProperty QuantifierExpr() :
+TCTLAbstractProperty OrExpr() :
 {
-    TCTLAbstractStateProperty child = null;
-    TCTLAbstractStateProperty child2 = null;
-}
-{
-
-    <F> child = OrExpr() {return new LTLFNode(child); }
-    | <G> child = OrExpr() {return new LTLGNode(child); }
-    | <X> child = OrExpr() {return new LTLXNode(child); }
-    | child = OrExpr() [LOOKAHEAD(2) <U> child2 = OrExpr()] { return (child2 == null ? new TCTLStateToPathConverter(child) : new LTLUNode(child, child2)); }
-}
-
-
-TCTLAbstractStateProperty OrExpr() :
-{
-    TCTLAbstractStateProperty currentChild;
+    TCTLAbstractProperty currentChild;
     ArrayList<TCTLAbstractStateProperty> disjunctions = new ArrayList<TCTLAbstractStateProperty>();
 }
 {
     currentChild = AndExpr()
-    { disjunctions.add(currentChild); }
+    { disjunctions.add(wrapPathToState(currentChild)); }
     (
     <OR> currentChild = AndExpr()
-    { disjunctions.add(currentChild); }
+    { disjunctions.add(wrapPathToState(currentChild)); }
     )*
     { return disjunctions.size() == 1 ? currentChild : new TCTLOrListNode(disjunctions); }
 }
 
-TCTLAbstractStateProperty AndExpr() :
+TCTLAbstractProperty AndExpr() :
 {
-    TCTLAbstractStateProperty currentChild;
+    TCTLAbstractProperty currentChild;
     ArrayList<TCTLAbstractStateProperty> conjunctions = new ArrayList<TCTLAbstractStateProperty>();
 }
 {
-    currentChild = NotExpr()
-    { conjunctions.add(currentChild); }
+    currentChild = UntilExpr()
+    { conjunctions.add(wrapPathToState(currentChild)); }
     (
-    <AND> currentChild = NotExpr()
-    { conjunctions.add(currentChild); }
+    <AND> currentChild = UntilExpr()
+    { conjunctions.add(wrapPathToState(currentChild)); }
     )*
     { return conjunctions.size() == 1 ? currentChild : new TCTLAndListNode(conjunctions); }
 }
 
-TCTLAbstractStateProperty NotExpr() :
+TCTLAbstractProperty UntilExpr() :
 {
-    TCTLAbstractStateProperty child;
-    TCTLAbstractStateProperty child2 = null;
-    TCTLAbstractPathProperty childConverter;
+    TCTLAbstractProperty left;
+    TCTLAbstractProperty right = null;
 }
 {
-    <NOT> "(" child = OrExpr() [LOOKAHEAD(2) <U> child2 = OrExpr()] ")" { return new TCTLNotNode(child2 == null ? child : new TCTLPathToStateConverter(new LTLUNode(child, child2))); }
-    | child = Factor() { return child; }
-    | "(" childConverter = QuantifierExpr() ")" { return new TCTLPathToStateConverter(childConverter); }
+    left = UnaryExpr()
+    [
+        LOOKAHEAD(2) <U> right = UntilExpr()
+    ]
+    { return (right == null ? left : new LTLUNode(wrapPathToState(left), wrapPathToState(right))); }
 }
 
-TCTLAbstractStateProperty Factor() :
+TCTLAbstractProperty UnaryExpr() :
 {
-    TCTLAbstractStateProperty thisProp;
+    TCTLAbstractProperty child;
+}
+{
+    <NOT> child = UnaryExpr() { return new TCTLNotNode(wrapPathToState(child)); }
+    | <F> child = UnaryExpr() { return new LTLFNode(wrapPathToState(child)); }
+    | <G> child = UnaryExpr() { return new LTLGNode(wrapPathToState(child)); }
+    | <X> child = UnaryExpr() { return new LTLXNode(wrapPathToState(child)); }
+    | child = Factor() { return child; }
+}
+
+TCTLAbstractProperty Factor() :
+{
+    TCTLAbstractProperty thisProp;
     Token temp = null;
     Token transition = null;
     Token trace = null;
@@ -217,9 +233,6 @@ TCTLAbstractStateProperty Factor() :
     | LOOKAHEAD(AtomicProposition()) thisProp = AtomicProposition()
     | LOOKAHEAD(PathScope()) thisProp = PathScope()
     | "(" thisProp = OrExpr() ")"
-    | LOOKAHEAD(ParanthesesExpr()) {
-    thisProp = new TCTLPathToStateConverter(QuantifierExpr()); }
-
     )
     { return thisProp; }
 }

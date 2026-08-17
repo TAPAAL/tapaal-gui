@@ -47,6 +47,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private final List<File> files;
 	private final BatchProcessingResultsTableModel tableModel;
 	private final List<BatchProcessingVerificationOptions> options;
+	private final LoadedBatchProcessingModel suppliedModel;
 	private boolean isExiting = false;
 	private ModelChecker modelChecker;
 	final List<BatchProcessingListener> listeners = new ArrayList<>();
@@ -60,10 +61,15 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private ArrayList<File> filesProcessed;
 
     public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, List<BatchProcessingVerificationOptions> options) {
+		this(files, tableModel, options, null);
+	}
+
+    public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, List<BatchProcessingVerificationOptions> options, LoadedBatchProcessingModel suppliedModel) {
         super();
         this.files = files;
         this.tableModel = tableModel;
         this.options = options;
+		this.suppliedModel = suppliedModel;
     }
 
 	public synchronized void notifyExiting() {
@@ -101,7 +107,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         filesProcessed = new ArrayList<>();
         for (File file : files) {
             fireFileChanged(file.getName());
-            LoadedBatchProcessingModel model = loadModel(file);
+			var model = resolveModel(file);
             this.model = model;
             if (model != null) {
                 try {
@@ -466,6 +472,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			fireVerificationTaskComplete();
 			return null;
 		}
+	}
+
+	LoadedBatchProcessingModel resolveModel(File modelFile) {
+		return suppliedModel != null ? suppliedModel : loadModel(modelFile);
 	}
 
 	@Override

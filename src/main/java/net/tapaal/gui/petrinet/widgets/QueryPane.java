@@ -10,10 +10,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -39,6 +36,7 @@ import net.tapaal.gui.petrinet.undo.RemoveQueriesCommand;
 import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.petrinet.dialog.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.RealConstant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -506,107 +504,14 @@ public class QueryPane extends JPanel implements SidePane {
 
 	private void saveNetAndRunBatchProcessing(List<TAPNQuery> selectedQueries) {
 		tempFiles.clear();
-
-		List<Constant> multiConstants = new ArrayList<>();
-		for (Constant c : tabContent.network().constants()) {
-			if (c.values() != null && c.values().size() > 1) {
-				multiConstants.add(c);
-			}
-		}
-
-	    List<RealConstant> multiRealConstants = new ArrayList<RealConstant>();
-		for (var c : tabContent.network().realConstants()) {
-			if (c.hasMultipleValues()) {
-				multiRealConstants.add(c);
-			}
-		}
-
-		if (multiConstants.isEmpty() && multiRealConstants.isEmpty()) {
-			try {
-				File tf = File.createTempFile(tabContent.getTabTitle(), ".xml");
-				tabContent.writeNetToFile(tf, selectedQueries, tabContent.getLens());
-				tf.deleteOnExit();
-				tempFiles.add(tf);
-				BatchProcessingDialog.showBatchProcessingDialog(queryList);
-			} catch (IOException e) {
-				messenger.displayErrorMessage("Creation of temporary file needed for verification failed.");
-			}
-
-			return;
-		}
-
-		Map<Constant, LinkedHashSet<Integer>> originalValues = new HashMap<>();
-		for (Constant c : multiConstants) {
-			originalValues.put(c, new LinkedHashSet<>(c.values()));
-		}
-
-		Map<RealConstant, LinkedHashSet<Double>> originalRealValues = new HashMap<>();
-		for (RealConstant c : multiRealConstants) {
-			originalRealValues.put(c, new LinkedHashSet<>(c.values()));
-		}
-
 		try {
-			generateTempFilesForCombinations(multiConstants, originalValues, multiRealConstants, originalRealValues, 0, selectedQueries);
-		} finally {
-			for (Constant c : multiConstants) {
-				c.setValues(originalValues.get(c));
-			}
-
-			for (var c : multiRealConstants) {
-				c.setValues(originalRealValues.get(c));
-			}
-		}
-
-		if (!tempFiles.isEmpty()) {
-		    BatchProcessingDialog.showBatchProcessingDialog(queryList);
-		}
-	}
-
-	private void generateTempFilesForCombinations(List<Constant> multiConstants, Map<Constant, LinkedHashSet<Integer>> originalValues,
-			List<RealConstant> multiRealConstants, Map<RealConstant, LinkedHashSet<Double>> originalRealValues,
-			int index, List<TAPNQuery> selectedQueries) {
-		if (index == multiConstants.size() + multiRealConstants.size()) {
-			List<String> parts = new ArrayList<>();
-			for (var c : multiConstants) {
-				parts.add(c.name() + "=" + c.value());
-			}
-
-			for (var c : multiRealConstants) {
-				parts.add(c.name() + "=" + c.value());
-			}
-			String suffix = " [" + String.join(", ", parts) + "]";
-
-			List<TAPNQuery> queryCopies = new ArrayList<>();
-			for (TAPNQuery q : selectedQueries) {
-				TAPNQuery qCopy = q.copy();
-				qCopy.setName(q.getName() + suffix);
-				queryCopies.add(qCopy);
-			}
-
-			try {
-				File tf = File.createTempFile(tabContent.getTabTitle(), ".xml");
-				tf.deleteOnExit();
-				tabContent.writeNetToFile(tf, queryCopies, tabContent.getLens());
-				tempFiles.add(tf);
-			} catch (IOException e) {
-				messenger.displayErrorMessage("Creation of temporary file needed for verification failed.");
-			}
-
-			return;
-		}
-
-		if (index < multiConstants.size()) {
-			Constant c = multiConstants.get(index);
-			for (int val : originalValues.get(c)) {
-				c.setValue(val);
-				generateTempFilesForCombinations(multiConstants, originalValues, multiRealConstants, originalRealValues, index + 1, selectedQueries);
-			}
-		} else {
-			RealConstant c = multiRealConstants.get(index - multiConstants.size());
-			for (double val : originalRealValues.get(c)) {
-				c.setValue(val);
-				generateTempFilesForCombinations(multiConstants, originalValues, multiRealConstants, originalRealValues, index + 1, selectedQueries);
-			}
+			File tf = File.createTempFile(tabContent.getTabTitle(), ".xml");
+			tf.deleteOnExit();
+			tempFiles.add(tf);
+			var model = new LoadedModel(tabContent.network(), List.of(), selectedQueries, List.of(), tabContent.getLens());
+			BatchProcessingDialog.showBatchProcessingDialog(queryList, model);
+		} catch (IOException e) {
+			messenger.displayErrorMessage("Creation of temporary file needed for verification failed.");
 		}
 	}
 

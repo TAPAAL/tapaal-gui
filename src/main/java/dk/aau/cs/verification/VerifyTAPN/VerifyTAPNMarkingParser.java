@@ -37,6 +37,9 @@ public class VerifyTAPNMarkingParser {
 
     public static NetworkMarking parseComposedMarking(TimedArcPetriNetNetwork network, Element element, NameMapping nameMapping) {
         NetworkMarking marking = new NetworkMarking();
+        for (TimedArcPetriNet tapn : network.activeTemplates()) {
+            marking.addMarking(tapn, new LocalTimedMarking());
+        }
         
         parseTokensForPlaces(element,
             place -> {

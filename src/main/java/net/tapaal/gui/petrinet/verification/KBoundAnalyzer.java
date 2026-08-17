@@ -87,7 +87,7 @@ public class KBoundAnalyzer {
         RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, guiModels, spinner, resultShown);
         RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), analyzer);
 
-        analyzer.execute(options, tapnNetwork, query, dataLayerQuery);
+        analyzer.execute(options, tapnNetwork, query, dataLayerQuery, lens);
         dialog.setVisible(true);
     }
 
@@ -165,7 +165,7 @@ public class KBoundAnalyzer {
                 updatedModels.put(net, guiModels.get(net));
             }
         }
-        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), updatedModels, null, true, true);
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), updatedModels, lens, true, true);
 
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 

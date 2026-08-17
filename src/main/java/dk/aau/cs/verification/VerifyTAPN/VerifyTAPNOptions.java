@@ -11,21 +11,21 @@ import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.verification.VerificationArguments;
 import dk.aau.cs.verification.VerificationOptions;
 import pipe.gui.MessengerImpl;
 
 public class VerifyTAPNOptions extends VerificationOptions{
 
 	protected int tokensInModel;
-	protected boolean kBoundPresentInRawVerificationOptions;
 	protected boolean tracePresentInRawVerificationOptions;
 	protected boolean unfold;
 	private final boolean symmetry;
 	private final boolean discreteInclusion;
     private final boolean tarOption;
 	private InclusionPlaces inclusionPlaces;
-	private boolean useRawVerification;
-	private String rawVerificationOptions;
+	protected boolean useRawVerification;
+	protected String rawVerificationOptions;
 	
 	//only used for boundedness analysis
 	private final boolean dontUseDeadPlaces = false;
@@ -107,13 +107,12 @@ public class VerifyTAPNOptions extends VerificationOptions{
 		StringBuilder sb = new StringBuilder();
 
 		// TODO: temporary fix overriding k-bound and trace if using approximation with raw verification
-		kBoundPresentInRawVerificationOptions = rawVerificationOptions.contains("--k-bound") ||
-												rawVerificationOptions.contains("-k");
+		boolean kBoundPresent = VerificationArguments.hasKBound(rawVerificationOptions);
 		tracePresentInRawVerificationOptions = rawVerificationOptions.contains("--trace") ||
-												rawVerificationOptions.contains("-t");
+											rawVerificationOptions.contains("-t");
 
 		if (enabledOverApproximation || enabledUnderApproximation) {
-			if (kBoundPresentInRawVerificationOptions) {
+			if (kBoundPresent) {
 				rawVerificationOptions = rawVerificationOptions.replaceAll("(--k-bound|-k) +\\d+", "$1 " + kBound());
 			}
 			
@@ -121,11 +120,7 @@ public class VerifyTAPNOptions extends VerificationOptions{
 				rawVerificationOptions = rawVerificationOptions.replaceAll("(--trace|-t) +\\d+", "$1 " + traceArg);
 			}
 		} 
-		
-		if (!kBoundPresentInRawVerificationOptions) {
-			sb.append(kBoundArg());
-		}
-		
+
 		if (!tracePresentInRawVerificationOptions) {
 			sb.append(traceArg);
 		}
@@ -213,10 +208,16 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	}
 
 	public boolean kBoundPresentInRawVerification() {
-		return kBoundPresentInRawVerificationOptions;
+		return VerificationArguments.hasKBound(rawVerificationOptions);
 	}
 
 	public boolean tracePresentInRawVerification() {
 		return tracePresentInRawVerificationOptions;
+	}
+
+	public static boolean usesKBound(VerificationOptions options) {
+		return !(options instanceof VerifyTAPNOptions tapnOptions)
+			|| !tapnOptions.useRawVerification
+			|| tapnOptions.kBoundPresentInRawVerification();
 	}
 }

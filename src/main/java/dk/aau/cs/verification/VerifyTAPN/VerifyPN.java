@@ -14,6 +14,7 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.*;
+import java.util.Map;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.gui.petrinet.TAPNLens;
@@ -39,7 +40,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class VerifyPN implements ModelChecker {
 
@@ -252,8 +252,9 @@ public class VerifyPN implements ModelChecker {
         } else {
             String errorOutput = readOutput(runner.errorOutput());
             String standardOutput = readOutput(runner.standardOutput());
+            var tokenBounds = VerificationArguments.tokenBounds(VerificationArguments.hasKBound(options), model.value1().marking().size(), query.getExtraTokens());
 
-            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, tokenBounds.totalTokens(), tokenBounds.extraTokens(), query);
 
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
@@ -324,8 +325,9 @@ public class VerifyPN implements ModelChecker {
             TimedArcPetriNetTrace tapnTrace = null;
             String errorOutput = readOutput(runner.errorOutput());
             String standardOutput = readOutput(runner.standardOutput());
+            var tokenBounds = VerificationArguments.tokenBounds(VerifyTAPNOptions.usesKBound(options), model.value1().getNumberOfTokensInNet(), query.getExtraTokens());
 
-            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().getNumberOfTokensInNet() + query.getExtraTokens(), query.getExtraTokens(), query);
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, tokenBounds.totalTokens(), tokenBounds.extraTokens(), query);
 
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());

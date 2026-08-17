@@ -22,6 +22,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import net.tapaal.gui.petrinet.NameGenerator;
+import pipe.gui.Constants;
 import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -63,7 +64,7 @@ public class PNMLoader {
 
     //If the net is too big, do not make the graphics
     private int netSize = 0;
-    private final int maxNetSize = 4000;
+    private final int maxNetSize = Constants.MAX_NET_SIZE;
     private boolean hasPositionalInfo = false;
     private final LoadTACPN loadTACPN;
 

@@ -26,8 +26,6 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private boolean useStubbornReduction = true;
 	private final boolean partition;
 	private final boolean colorFixpoint;
-	private boolean useRawVerification;
-	private String rawVerificationOptions;
     private boolean parallel = false;
     private boolean benchmark = false;
     private int benchmarkRuns = 100;
