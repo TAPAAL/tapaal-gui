@@ -49,7 +49,7 @@ public class TAPAALLTLQueryParser {
         if (property instanceof TCTLAbstractPathProperty) {
             return (TCTLAbstractPathProperty) property;
         } else if (property instanceof TCTLAbstractStateProperty) {
-            return new TCTLStateToPathConverter((TCTLAbstractStateProperty)p½roperty);
+            return new TCTLStateToPathConverter((TCTLAbstractStateProperty)property);
         }
 
         return null;
