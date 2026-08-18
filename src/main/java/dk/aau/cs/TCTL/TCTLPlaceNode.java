@@ -112,4 +112,14 @@ public class TCTLPlaceNode extends TCTLAbstractStateProperty {
 		var prefix = template.isEmpty() ? color == null ? "" : SHARED + "." : template + ".";
 		return prefix + place + (color == null ? "" : "." + color);
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof TCTLPlaceNode) {
+            TCTLPlaceNode node = (TCTLPlaceNode)o;
+            return template.equals(node.template) && place.equals(node.place);
+        }
+
+        return false;
+    }
 }
