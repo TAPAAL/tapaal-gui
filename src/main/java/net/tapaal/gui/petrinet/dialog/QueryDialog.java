@@ -84,6 +84,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
+import javax.swing.text.DefaultCaret;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -295,6 +296,7 @@ public class QueryDialog extends JPanel {
     private JButton editQueryButton;
 
     private JPanel predicatePanel;
+    private int predicatePanelInitialWidth = 0;
     private JButton addPredicateButton;
     private SearchBar searchBar;
     private Searcher<Tuple<?, String>> searcher;
@@ -1169,6 +1171,11 @@ public class QueryDialog extends JPanel {
 
         // Move window to the middle of the screen
         guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
+        SwingUtilities.invokeLater(() -> {
+            if (queryDialogue.queryField != null) {
+                queryDialogue.queryField.requestFocusInWindow();
+            }
+        });
         guiDialog.setVisible(true);
 
         return queryDialogue.getQuery();
@@ -1274,6 +1281,8 @@ public class QueryDialog extends JPanel {
             addPredicateButton.setVisible(false);
             addPlaceButton.setVisible(true);
             addConstantButton.setVisible(true);
+            placeMarking.setVisible(true);
+            if (!lens.isTimed()) transitionIsEnabledLabel.setVisible(false);
             
             constantRow.add(placeMarking);
             constantRow.add(constantRowStrut);
@@ -1305,8 +1314,6 @@ public class QueryDialog extends JPanel {
             userChangedAtomicPropSelection = true;
 
             updatePredicatesAccordingToSelection(current);
-
-            guiDialog.pack();
             return;
         }
         
@@ -1336,8 +1343,6 @@ public class QueryDialog extends JPanel {
         if (!lens.isTimed()) {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
-
-        guiDialog.pack();
     }
 
     private void refreshPlaceTransitionBox(boolean includeTransitions) {
@@ -1508,6 +1513,15 @@ public class QueryDialog extends JPanel {
             if (scopeNode.getProperty() instanceof TCTLPlaceNode) {
                 updateSelectionPlaceNode((TCTLPlaceNode) scopeNode.getProperty());
                 placeTransitionBox.setSelectedItem(((TCTLPlaceNode)scopeNode.getProperty()).getPlace());
+            } else if (scopeNode.getProperty() instanceof TCTLTransitionNode) {
+                var transitionNode = (TCTLTransitionNode)scopeNode.getProperty();
+                if (transitionNode.getTemplate().equals("")) {
+                    templateBox.setSelectedItem(SHARED);
+                } else {
+                    templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
+                }
+
+                placeTransitionBox.setSelectedItem(transitionNode.getTransition());
             }
 
             userChangedAtomicPropSelection = true;
@@ -1594,18 +1608,20 @@ public class QueryDialog extends JPanel {
     private boolean transitionIsSelected() {
         String itemName = (String) placeTransitionBox.getSelectedItem();
         if (itemName == null) return false;
-        boolean transitionSelected = false;
-        boolean sharedTransitionSelected = false;
+        var selectedTemplate = templateBox.getSelectedItem();
+        if (!SHARED.equals(selectedTemplate) && selectedTemplate instanceof TimedArcPetriNet) {
+            return ((TimedArcPetriNet)selectedTemplate).getTransitionByName(itemName) != null;
+        } else if (SHARED.equals(selectedTemplate)) {
+            return tapnNetwork.getSharedTransitionByName(itemName) != null;
+        }
+
         for (TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
             if (tapn.getTransitionByName(itemName) != null) {
-                transitionSelected = true;
-                break;
+                return true;
             }
         }
-        if (!transitionSelected) {
-            sharedTransitionSelected = tapnNetwork.getSharedTransitionByName(itemName) != null;
-        }
-        return transitionSelected || sharedTransitionSelected;
+
+        return tapnNetwork.getSharedTransitionByName(itemName) != null;
     }
 
     private void deleteSelection() {
@@ -2128,10 +2144,15 @@ public class QueryDialog extends JPanel {
             TCTLAbstractStateProperty property;
 
             if (!lens.isTimed() && transitionIsSelected()) {
-                if(isHyperLTL)
-                    property = new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem(), selectedTrace);
-                else
+                if(isHyperLTL) {
+                    if (currentSelection.getObject() instanceof HyperLTLPathScopeNode) {
+                        property = new HyperLTLPathScopeNode(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem()), selectedTrace);
+                    } else {
+                        property = new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem(), selectedTrace);
+                    }
+                } else {
                     property = new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem());
+                }
             } else if (currentSelection.getObject() instanceof HyperLTLPathScopeNode) {
                 if (isHyperLTL) {
                     property = new HyperLTLPathScopeNode(new TCTLPlaceNode(template, (String)placeTransitionBox.getSelectedItem()), selectedTrace);
@@ -2822,6 +2843,12 @@ public class QueryDialog extends JPanel {
 
         setEnabledOptionsAccordingToCurrentReduction();
         updateRawVerificationOptions();
+
+        SwingUtilities.invokeLater(() -> {
+            if (queryField != null) {
+                queryField.requestFocusInWindow();
+            }
+        });
     }
 
     private void toggleSmc() {
@@ -3805,6 +3832,13 @@ public class QueryDialog extends JPanel {
 
         queryField.setBackground(Color.white);
         queryField.setEditable(false);
+        DefaultCaret caret = new DefaultCaret() {
+            @Override
+            public void setSelectionVisible(boolean visible) {
+                super.setSelectionVisible(true);
+            }
+        };
+        queryField.setCaret(caret);
         queryField.setText(newProperty.toString());
         queryField.setToolTipText(TOOL_TIP_QUERY_FIELD);
 
@@ -5039,30 +5073,27 @@ public class QueryDialog extends JPanel {
     }
 
     private void initPredicationConstructionPanel() {
-        // Lock the width of the predicate panel so it stays the same when switching to arithmetic context.
         predicatePanel = new JPanel(new GridBagLayout()) {
-            private int maxWidth = 0;
-            private int maxHeight = 0;
-
             @Override
             public Dimension getPreferredSize() {
                 Dimension d = super.getPreferredSize();
-                return lockedDimension(d);
+                if (predicatePanelInitialWidth > 0 && d.width < predicatePanelInitialWidth) {
+                    d.width = predicatePanelInitialWidth;
+                }
+                
+                return d;
             }
 
             @Override
             public Dimension getMinimumSize() {
                 Dimension d = super.getMinimumSize();
-                return lockedDimension(d);
-            }
-
-            private Dimension lockedDimension(Dimension d) {
-                if (d.width > maxWidth) maxWidth = d.width;
-                if (d.height > maxHeight) maxHeight = d.height;
-                return new Dimension(maxWidth, maxHeight);
+                if (predicatePanelInitialWidth > 0 && d.width < predicatePanelInitialWidth) {
+                    d.width = predicatePanelInitialWidth;
+                }
+                
+                return d;
             }
         };
-        
         predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
 
         initTracePanels();
@@ -5280,6 +5311,8 @@ public class QueryDialog extends JPanel {
         predicatePanel.add(deadLockPredicateButton, gbc);
         deadLockPredicateButton.setVisible(isCTL());
 
+        predicatePanelInitialWidth = predicatePanel.getPreferredSize().width;
+
 
         //Add tool tips for predicate panel
         placeTransitionBox.setToolTipText(TOOL_TIP_PLACESBOX);
@@ -5299,9 +5332,9 @@ public class QueryDialog extends JPanel {
             if ((!lens.isTimed()) && transitionIsSelected()) {
                 if (queryType.getSelectedIndex() == 2) {
                     String trace = traceBox.getSelectedItem().toString();
-                    addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem(), trace));
+                    addPropertyToQuery(new HyperLTLPathScopeNode(new TCTLTransitionNode(template, (String)placeTransitionBox.getSelectedItem()), trace));
                 } else {
-                    addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem()));
+                    addPropertyToQuery(new TCTLTransitionNode(template, (String)placeTransitionBox.getSelectedItem()));
                 }
             } else {
                 if (queryType.getSelectedIndex() == 2) {
