@@ -42,15 +42,6 @@ public class HyperLTLPathScopeNode extends TCTLAbstractStateProperty {
             return this;
         }
     }
-    @Override
-    public StringPosition[] getChildren() {
-        int start = trace.length();
-        int end = start + property.toString().length();
-        StringPosition position = new StringPosition(start, end, property);
-
-        StringPosition[] children = { position };
-        return children;
-    }
 
     @Override
     public void convertForReducedNet(String templateName) {

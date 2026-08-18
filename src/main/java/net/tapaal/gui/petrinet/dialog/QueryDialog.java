@@ -500,8 +500,6 @@ public class QueryDialog extends JPanel {
     private boolean wasCTLType = true;
     private boolean wasLTLType = true;
     private boolean wasHyperLTLType = true;
-    private boolean isAllPath = false;
-    private boolean isExistsPath = false;
     private boolean updateTraceBox = true;
     private boolean updateTraceBoxQuantification = true;
 
@@ -1414,7 +1412,12 @@ public class QueryDialog extends JPanel {
         String place = (String) placeTransitionBox.getSelectedItem();
         
         if (place != null) {
-            replaceCurrentSelectionWith(new TCTLPlaceNode(template, place));
+            if (queryType.getSelectedIndex() == 2) {
+                String trace = traceBox.getSelectedItem() != null ? traceBox.getSelectedItem().toString() : "";
+                replaceCurrentSelectionWith(new HyperLTLPathScopeNode(new TCTLPlaceNode(template, place), trace));
+            } else {
+                replaceCurrentSelectionWith(new TCTLPlaceNode(template, place));
+            }
         }
     }
 
@@ -1500,6 +1503,18 @@ public class QueryDialog extends JPanel {
             } else {
                 updateTimedQueryButtons(node);
             }
+        } else if (current instanceof HyperLTLPathScopeNode) {
+            HyperLTLPathScopeNode scopeNode = (HyperLTLPathScopeNode)current;
+            userChangedAtomicPropSelection = false;
+            updateTraceBox = false;
+            traceBox.setSelectedItem(scopeNode.getTrace());
+            updateTraceBox = true;
+            if (scopeNode.getProperty() instanceof TCTLPlaceNode) {
+                updateSelectionPlaceNode((TCTLPlaceNode) scopeNode.getProperty());
+                placeTransitionBox.setSelectedItem(((TCTLPlaceNode)scopeNode.getProperty()).getPlace());
+            }
+
+            userChangedAtomicPropSelection = true;
         } else if (current instanceof TCTLTransitionNode) {
             TCTLTransitionNode transitionNode = (TCTLTransitionNode) current;
             userChangedAtomicPropSelection = false;
@@ -3048,90 +3063,63 @@ public class QueryDialog extends JPanel {
             JOptionPane.WARNING_MESSAGE);
     }
 
-    private TCTLAbstractPathProperty getParentForHyperLTLAllPath(TCTLAbstractProperty property) {
-        if(property instanceof TCTLStatePlaceHolder) {
-            return getParentForHyperLTLAllPath(((TCTLStatePlaceHolder) property).getParent());
-        } else if(property instanceof TCTLPathToStateConverter) {
-            return getParentForHyperLTLAllPath(((TCTLPathToStateConverter) property).getParent());
-        } else if(property instanceof TCTLPathPlaceHolder) {
-            return getParentForHyperLTLAllPath(((TCTLPathPlaceHolder) property).getParent());
-        } else if(!((((TCTLAbstractPathProperty) property).getParent()) instanceof LTLANode) && !(property instanceof LTLANode)) {
-            return getParentForHyperLTLAllPath(((TCTLAbstractPathProperty) property).getParent());
+    private void addHyperLTLQuantifier(boolean isUniversal) {
+        String trace = traceBoxQuantification.getSelectedItem() != null ? traceBoxQuantification.getSelectedItem().toString() : "";
+        TCTLAbstractProperty currentSel = currentSelection != null ? currentSelection.getObject() : null;
+        var usedTraces = getUsedTraces(newProperty);
+        if (currentSel instanceof LTLANode) {
+            usedTraces.remove(((LTLANode) currentSel).getTrace());
+        } else if (currentSel instanceof LTLENode) {
+            usedTraces.remove(((LTLENode) currentSel).getTrace());
         }
 
-        if(property instanceof LTLANode) return (TCTLAbstractPathProperty) property;
+        if (usedTraces.contains(trace)) {
+            JOptionPane.showMessageDialog(
+                TAPAALGUI.getApp(),
+                "A quantifier with trace \"" + trace + "\" already exists. Please choose a different trace.",
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        return (TCTLAbstractPathProperty) ((TCTLAbstractPathProperty) property).getParent();
-    }
-
-    private void addAllPathsHyperLTL(TCTLAbstractProperty oldProperty, TCTLAbstractProperty selection, String trace) {
-        if(!(selection instanceof TCTLStatePlaceHolder) && !(selection instanceof TCTLPathPlaceHolder)) {
-            if(selection instanceof TCTLPathToStateConverter) {
-                TCTLAbstractProperty child = ((TCTLPathToStateConverter) selection).getProperty();
-                addAllPathsHyperLTL(oldProperty, child, trace);
-            } else{
-                addAllPathsHyperLTL(oldProperty, ((LTLANode) selection).getProperty(), trace);
-            }
-
-        } else {
-            LTLANode parent = null;
-            TCTLAbstractProperty child = null;
-
-            parent = (LTLANode) getParentForHyperLTLAllPath(selection);
-
-            TCTLPathPlaceHolder placeHolder = new TCTLPathPlaceHolder();
-            child = new LTLANode(ConvertToStateProperty(placeHolder), trace);
-
-            if(parent != null) {
-                parent.setProperty(ConvertToStateProperty((TCTLAbstractPathProperty)child));
-            }
+        if (currentSel instanceof LTLANode || currentSel instanceof LTLENode) {
+            TCTLAbstractStateProperty inner = currentSel instanceof LTLANode
+                ? ((LTLANode) currentSel).getProperty()
+                : ((LTLENode) currentSel).getProperty();
+            TCTLAbstractProperty property = isUniversal ? new LTLANode(inner, trace) : new LTLENode(inner, trace);
+            replacePropertyInQuery(currentSel, property);
+        } else if (newProperty instanceof TCTLPathPlaceHolder) {
+            TCTLAbstractProperty property = isUniversal ? new LTLANode(trace) : new LTLENode(trace);
+            replacePropertyInQuery(newProperty, property);
+        } else if (currentSel instanceof TCTLStatePlaceHolder || currentSel instanceof TCTLPathPlaceHolder) {
+            TCTLAbstractProperty property = ConvertToStateProperty(isUniversal ? new LTLANode(trace) : new LTLENode(trace));
+            replacePropertyInQuery(currentSel, property);
         }
     }
 
     private void addAllPathsToProperty(TCTLAbstractProperty oldProperty, TCTLAbstractProperty selection) {
+        if (queryType.getSelectedIndex() == 2) {
+            addHyperLTLQuantifier(true);
+            return;
+        }
+
         TCTLAbstractProperty property = null;
-        int selectedIndex = queryType.getSelectedIndex();
-        boolean isHyperLTL = selectedIndex == 2;
-        String trace = isHyperLTL ? traceBoxQuantification.getSelectedItem().toString() : "";
         if (oldProperty instanceof LTLANode) {
-            if(!(selectedIndex == 2)) {
-                property = oldProperty;
-            } else {
-                if(currentSelection.getObject().toString().equals("<*>") && isHyperLTL){
-                    // We copy the objects, otherwise it bugs out the undo-manager as it uses the references to the objects
-                    oldProperty = oldProperty.copy();
-                    selection = selection.copy();
-                    addAllPathsHyperLTL(oldProperty, selection, trace);
-
-                    newProperty = selection;
-                    updateSelection(selection);
-
-                    return;
-                } else {
-                    property = isHyperLTL ? new LTLANode(ConvertToStateProperty((TCTLAbstractPathProperty) selection), trace) : new LTLANode();
-                }
-
-            }
+            property = oldProperty;
         } else if (oldProperty instanceof TCTLPathPlaceHolder) {
-            property = isHyperLTL ? new LTLANode(trace) : new LTLANode();
+            property = new LTLANode();
         } else if (oldProperty instanceof TCTLAbstractPathProperty) {
-            property = isHyperLTL ? new LTLANode(ConvertToStateProperty((TCTLAbstractPathProperty) oldProperty), trace) : new LTLANode(ConvertToStateProperty((TCTLAbstractPathProperty) oldProperty));
+            property = new LTLANode(ConvertToStateProperty((TCTLAbstractPathProperty)oldProperty));
         } else if (oldProperty instanceof TCTLNotNode) {
-            property = isHyperLTL ? new LTLANode((TCTLNotNode) oldProperty, trace) : new LTLANode((TCTLNotNode) oldProperty);
+            property = new LTLANode((TCTLNotNode)oldProperty);
             property = ConvertToStateProperty((TCTLAbstractPathProperty) property);
         } else if (oldProperty instanceof TCTLAbstractStateProperty && (selection == null || selection instanceof LTLANode)) {
-            property = isHyperLTL ? new LTLANode((TCTLAbstractStateProperty) oldProperty, trace) : new LTLANode((TCTLAbstractStateProperty) oldProperty);
-            if (!(newProperty instanceof TCTLAbstractPathProperty)) newProperty = ConvertToPathProperty((TCTLAbstractStateProperty) newProperty);
+            property = new LTLANode((TCTLAbstractStateProperty)oldProperty);
+            if (!(newProperty instanceof TCTLAbstractPathProperty))newProperty = ConvertToPathProperty((TCTLAbstractStateProperty)newProperty);
         }
 
         if (property != null && selection != null) {
             UndoableEdit edit = new QueryConstructionEdit(selection, property);
-            if(!(selectedIndex == 2)) {
-                newProperty = newProperty.replace(newProperty, property);
-            } else {
-                newProperty = property;
-            }
-
+            newProperty = newProperty.replace(newProperty, property);
             updateSelection(property);
             undoSupport.postEdit(edit);
             queryChanged();
@@ -3143,49 +3131,29 @@ public class QueryDialog extends JPanel {
     }
 
     private void addExistsPathsToProperty(TCTLAbstractProperty oldProperty, TCTLAbstractProperty selection) {
+        if (queryType.getSelectedIndex() == 2) {
+            addHyperLTLQuantifier(false);
+            return;
+        }
+
         TCTLAbstractProperty property = null;
-        int selectedIndex = queryType.getSelectedIndex();
-        boolean isHyperLTL = selectedIndex == 2;
-        String trace = isHyperLTL ? traceBoxQuantification.getSelectedItem().toString() : "";
-
         if (oldProperty instanceof LTLENode) {
-            if(!(selectedIndex == 2)) {
-                property = oldProperty;
-            } else {
-                if(currentSelection.getObject().toString().equals("<*>") && isHyperLTL){
-                    // We copy the objects, otherwise it bugs out the undo-manager as it uses the references to the objects
-                    oldProperty = oldProperty.copy();
-                    selection = selection.copy();
-                    addExistsPathsHyperLTL(oldProperty, selection, trace);
-
-                    newProperty = selection;
-                    updateSelection(selection);
-
-                    return;
-
-                } else {
-                    property = isHyperLTL ? new LTLENode(ConvertToStateProperty((TCTLAbstractPathProperty) oldProperty), trace) : new LTLENode();
-                }
-            }
+            property = oldProperty;
         } else if (oldProperty instanceof TCTLPathPlaceHolder) {
-            property = isHyperLTL ? new LTLENode(trace) : new LTLENode();
+            property = new LTLENode();
         } else if (oldProperty instanceof TCTLAbstractPathProperty) {
-            property = isHyperLTL ? new LTLENode(ConvertToStateProperty((TCTLAbstractPathProperty) oldProperty), trace) : new LTLENode(ConvertToStateProperty((TCTLAbstractPathProperty) oldProperty));
+            property = new LTLENode(ConvertToStateProperty((TCTLAbstractPathProperty)oldProperty));
         } else if (oldProperty instanceof TCTLNotNode) {
-            property = isHyperLTL ? new LTLENode((TCTLNotNode) oldProperty, trace) : new LTLENode((TCTLNotNode) oldProperty);
+            property = new LTLENode((TCTLNotNode)oldProperty);
             property = ConvertToStateProperty((TCTLAbstractPathProperty) property);
         } else if (oldProperty instanceof TCTLAbstractStateProperty && (selection == null || selection instanceof LTLENode)) {
-            property = isHyperLTL ? new LTLENode((TCTLAbstractStateProperty) oldProperty, trace) : new LTLENode((TCTLAbstractStateProperty) oldProperty);
-            if (!(newProperty instanceof TCTLAbstractPathProperty)) newProperty = ConvertToPathProperty((TCTLAbstractStateProperty) newProperty);
+            property = new LTLENode((TCTLAbstractStateProperty)oldProperty);
+            if (!(newProperty instanceof TCTLAbstractPathProperty))newProperty = ConvertToPathProperty((TCTLAbstractStateProperty)newProperty);
         }
 
         if (property != null && selection != null) {
             UndoableEdit edit = new QueryConstructionEdit(selection, property);
-            if(!(selectedIndex == 2)) {
-                newProperty = newProperty.replace(newProperty, property);
-            } else {
-                newProperty = property;
-            }
+            newProperty = newProperty.replace(newProperty, property);
             updateSelection(property);
             undoSupport.postEdit(edit);
             queryChanged();
@@ -3194,47 +3162,6 @@ public class QueryDialog extends JPanel {
             updateSelection(property);
             queryChanged();
         }
-    }
-
-    private void addExistsPathsHyperLTL(TCTLAbstractProperty oldProperty, TCTLAbstractProperty selection, String trace) {
-        if (!(selection instanceof TCTLStatePlaceHolder) && !(selection instanceof TCTLPathPlaceHolder)) {
-            if(selection instanceof TCTLPathToStateConverter) {
-                TCTLAbstractProperty child = ((TCTLPathToStateConverter) selection).getProperty();
-                addExistsPathsHyperLTL(oldProperty, child, trace);
-            } else {
-                addExistsPathsHyperLTL(oldProperty, ((LTLENode) selection).getProperty(), trace);
-            }
-        } else {
-            LTLENode parent = null;
-            TCTLAbstractProperty child = null;
-
-            parent = (LTLENode) getParentForHyperLTLExistsPath(selection);
-
-
-            TCTLPathPlaceHolder placeHolder = new TCTLPathPlaceHolder();
-            child = new LTLENode(ConvertToStateProperty(placeHolder), trace);
-
-            if(parent != null) {
-                parent.setProperty(ConvertToStateProperty((TCTLAbstractPathProperty)child));
-            }
-
-        }
-    }
-
-    private TCTLAbstractPathProperty getParentForHyperLTLExistsPath(TCTLAbstractProperty property) {
-        if(property instanceof TCTLStatePlaceHolder) {
-            return getParentForHyperLTLExistsPath(((TCTLStatePlaceHolder) property).getParent());
-        } else if(property instanceof TCTLPathToStateConverter) {
-            return getParentForHyperLTLExistsPath(((TCTLPathToStateConverter) property).getParent());
-        } else if(property instanceof TCTLPathPlaceHolder) {
-            return getParentForHyperLTLExistsPath(((TCTLPathPlaceHolder) property).getParent());
-        } else if(!((((TCTLAbstractPathProperty) property).getParent()) instanceof LTLENode) && !(property instanceof LTLENode)) {
-            return getParentForHyperLTLExistsPath(((TCTLAbstractPathProperty) property).getParent());
-        }
-
-        if(property instanceof LTLENode) return (TCTLAbstractPathProperty) property;
-
-        return (TCTLAbstractPathProperty) ((TCTLAbstractPathProperty) property).getParent();
     }
 
 
@@ -4147,62 +4074,21 @@ public class QueryDialog extends JPanel {
         });
 
         aButton.addActionListener(e -> {
-            TCTLAbstractProperty oldProperty = newProperty;
-            if (!(queryType.getSelectedIndex() == 2)) {
+            if (queryType.getSelectedIndex() != 2) {
                 newProperty = removeExistsAllPathsFromProperty(newProperty);
                 addAllPathsToProperty(newProperty, null);
-            } else {
-                // Check if there already exists an all-path with the current trace
-                String selectedTrace = traceBoxQuantification.getSelectedItem().toString();
-                if(oldProperty.toString().contains("A " + selectedTrace)) {
-                    JOptionPane.showMessageDialog(
-                        TAPAALGUI.getApp(),
-                        "An all-path with trace \"" + selectedTrace + "\" already exists. Please chose a different trace.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                    isAllPath = true;
-                    isExistsPath = false;
-                } else {
-                    addAllPathsToProperty(newProperty, oldProperty);
-                    isAllPath = true;
-                    isExistsPath = false;
-                }
+            } else if (traceBoxQuantification.getSelectedItem() != null) {
+                addAllPathsToProperty(newProperty, currentSelection != null ? currentSelection.getObject() : null);
             }
-
-            UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
-            undoSupport.postEdit(edit);
-
-            queryChanged();
         });
 
         eButton.addActionListener(e -> {
-            TCTLAbstractProperty oldProperty = newProperty;
-
             if (queryType.getSelectedIndex() != 2) {
                 newProperty = removeExistsAllPathsFromProperty(newProperty);
                 addExistsPathsToProperty(newProperty, null);
             } else if (traceBoxQuantification.getSelectedItem() != null) {
-                // Check if there already exists an exists-path with the current trace
-                String selectedTrace = traceBoxQuantification.getSelectedItem().toString();
-                if (oldProperty.toString().contains("E " + selectedTrace)) {
-                    JOptionPane.showMessageDialog(
-                        TAPAALGUI.getApp(),
-                        "An exists-path with trace \"" + selectedTrace + "\" already exists. Please chose a different trace.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                    isAllPath = false;
-                    isExistsPath = true;
-                } else {
-                    addExistsPathsToProperty(newProperty, oldProperty);
-                    isAllPath = false;
-                    isExistsPath = true;
-                }
+                addExistsPathsToProperty(newProperty, currentSelection != null ? currentSelection.getObject() : null);
             }
-
-
-            UndoableEdit edit = new QueryConstructionEdit(oldProperty, newProperty);
-            undoSupport.postEdit(edit);
-
-            queryChanged();
-
         });
 
         addTraceButton.addActionListener(e -> initTraceBoxDialogComponents());
@@ -5179,6 +5065,7 @@ public class QueryDialog extends JPanel {
             if (userChangedAtomicPropSelection && placeTransitionBox.getItemCount() > 0) {
                 TCTLAbstractProperty current = currentSelection != null ? currentSelection.getObject() : null;
                 boolean isLeaf = current instanceof TCTLPlaceNode ||
+                                current instanceof HyperLTLPathScopeNode ||
                                 current instanceof TCTLConstNode ||
                                 current instanceof TCTLStatePlaceHolder;
 
@@ -6685,62 +6572,41 @@ public class QueryDialog extends JPanel {
         showHyperLTL(true);
 
         if (currentSelection == null || currentSelection.getObject() == newProperty) {
-            String ltlType = checkLTLType();
             disableAllLTLButtons();
-            if (ltlType.equals("placeholder")) {
-                aButton.setEnabled(enable);
-                eButton.setEnabled(enable);
-                traceBoxQuantification.setEnabled(enable);
-            } else if (ltlType.equals("A")) {
-                aButton.setEnabled(enable);
-                traceBoxQuantification.setEnabled(enable);
-            } else {
-                eButton.setEnabled(enable);
-                traceBoxQuantification.setEnabled(enable);
-            }
+            aButton.setEnabled(enable);
+            eButton.setEnabled(enable);
+            traceBoxQuantification.setEnabled(enable);
         } else if (isInsideArithmetic(currentSelection.getObject())) {
             disableAllLTLButtons();
             addButton.setEnabled(true);
             subtractButton.setEnabled(true);
             multiplyButton.setEnabled(true);
-            boolean isLeaf = currentSelection.getObject() instanceof TCTLPlaceNode || currentSelection.getObject() instanceof TCTLConstNode || currentSelection.getObject() instanceof TCTLStatePlaceHolder;
+            boolean isLeaf = currentSelection.getObject() instanceof TCTLPlaceNode || currentSelection.getObject() instanceof HyperLTLPathScopeNode || currentSelection.getObject() instanceof TCTLConstNode || currentSelection.getObject() instanceof TCTLStatePlaceHolder;
             templateBox.setEnabled(isLeaf);
             placeTransitionBox.setEnabled(isLeaf);
             placeMarking.setEnabled(isLeaf);
             searchBar.setEnabled(isLeaf);
         } else {
-            if (currentSelection.getObject() instanceof LTLANode) {
-                aButton.setEnabled(enable);
-                traceBoxQuantification.setEnabled(enable);
-            } else if (currentSelection.getObject() instanceof LTLENode) {
-                eButton.setEnabled(enable);
-                traceBoxQuantification.setEnabled(enable);
-            } else if (containsOnlyPathProperties(newProperty)) {
-                aButton.setEnabled(enable && newProperty instanceof LTLANode);
-                eButton.setEnabled(enable && newProperty instanceof LTLENode);
-                traceBoxQuantification.setEnabled(enable);
-                globallyButton.setEnabled(true);
-                finallyButton.setEnabled(true);
-                nextButton.setEnabled(true);
-                untilButton.setEnabled(true);
-            } else {
-                aButton.setEnabled(false);
-                eButton.setEnabled(false);
-                traceBoxQuantification.setEnabled(false);
-                globallyButton.setEnabled(true);
-                finallyButton.setEnabled(true);
-                nextButton.setEnabled(true);
-                untilButton.setEnabled(true);
-            }
+            boolean isQuantifier = currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode;
+            boolean allowQuantifiers = enable && (isQuantifier || containsOnlyPathProperties(newProperty));
+            aButton.setEnabled(allowQuantifiers);
+            eButton.setEnabled(allowQuantifiers);
+            traceBoxQuantification.setEnabled(allowQuantifiers);
+
+            globallyButton.setEnabled(!isQuantifier);
+            finallyButton.setEnabled(!isQuantifier);
+            nextButton.setEnabled(!isQuantifier);
+            untilButton.setEnabled(!isQuantifier);
         }
 
-        if (currentSelection == null || (currentSelection != null && (currentSelection.getObject() instanceof LTLENode || currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof TCTLPathPlaceHolder || isInsideArithmetic(currentSelection.getObject())))) {
-            conjunctionButton.setEnabled(false);
-            disjunctionButton.setEnabled(false);
-        } else {
-            conjunctionButton.setEnabled(true);
-            disjunctionButton.setEnabled(true);
-        }
+        boolean disableLogic = currentSelection == null
+            || currentSelection.getObject() instanceof LTLENode
+            || currentSelection.getObject() instanceof LTLANode
+            || currentSelection.getObject() instanceof TCTLPathPlaceHolder
+            || isInsideArithmetic(currentSelection.getObject());
+        conjunctionButton.setEnabled(!disableLogic);
+        disjunctionButton.setEnabled(!disableLogic);
+        negationButton.setEnabled(!disableLogic);
     }
 
     private boolean containsOnlyPathProperties(TCTLAbstractProperty property) {
