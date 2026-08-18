@@ -120,4 +120,14 @@ public class TCTLTransitionNode extends TCTLAbstractStateProperty {
     public void setTrace(String trace) {
         this.trace = trace;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof TCTLTransitionNode) {
+            TCTLTransitionNode node = (TCTLTransitionNode)o;
+            return template.equals(node.template) && transition.equals(node.transition) && trace.equals(node.trace);
+        }
+
+        return false;
+    }
 }

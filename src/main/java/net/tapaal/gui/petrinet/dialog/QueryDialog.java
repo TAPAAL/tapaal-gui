@@ -1169,11 +1169,6 @@ public class QueryDialog extends JPanel {
 
         // Move window to the middle of the screen
         guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
-        SwingUtilities.invokeLater(() -> {
-            if (queryDialogue.queryName != null) {
-                queryDialogue.queryName.requestFocusInWindow();
-            }
-        });
         guiDialog.setVisible(true);
 
         return queryDialogue.getQuery();
@@ -1294,11 +1289,12 @@ public class QueryDialog extends JPanel {
             subtractButton.setEnabled(true);
             multiplyButton.setEnabled(true);
             
-            boolean isLeaf = current instanceof TCTLPlaceNode || current instanceof TCTLConstNode || current instanceof TCTLStatePlaceHolder;
+            boolean isLeaf = current instanceof TCTLPlaceNode || current instanceof HyperLTLPathScopeNode || current instanceof TCTLConstNode || current instanceof TCTLStatePlaceHolder;
             templateBox.setEnabled(isLeaf);
             placeTransitionBox.setEnabled(isLeaf);
             placeMarking.setEnabled(isLeaf);
             searchBar.setEnabled(isLeaf);
+            if (queryType.getSelectedIndex() == 2) traceBox.setEnabled(isLeaf && traceBox.getModel().getSize() > 0);
 
             userChangedAtomicPropSelection = false;
             if (current instanceof TCTLConstNode) {
@@ -1515,6 +1511,12 @@ public class QueryDialog extends JPanel {
             }
 
             userChangedAtomicPropSelection = true;
+        } else if (current instanceof TCTLPlaceNode) {
+            TCTLPlaceNode placeNode = (TCTLPlaceNode)current;
+            userChangedAtomicPropSelection = false;
+            updateSelectionPlaceNode(placeNode);
+            placeTransitionBox.setSelectedItem(placeNode.getPlace());
+            userChangedAtomicPropSelection = true;
         } else if (current instanceof TCTLTransitionNode) {
             TCTLTransitionNode transitionNode = (TCTLTransitionNode) current;
             userChangedAtomicPropSelection = false;
@@ -1523,9 +1525,11 @@ public class QueryDialog extends JPanel {
             } else {
                 templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
             }
+            updateTraceBox = false;
             if (!transitionNode.getTrace().equals("")) {
                 traceBox.setSelectedItem(transitionNode.getTrace());
             }
+            updateTraceBox = true;
             placeTransitionBox.setSelectedItem(transitionNode.getTransition());
             userChangedAtomicPropSelection = true;
         }
@@ -2110,14 +2114,17 @@ public class QueryDialog extends JPanel {
         boolean isHyperLTL = false;
         if (queryType.getSelectedIndex() == 2) {
             isHyperLTL = true;
-            selectedTrace = traceBox.getSelectedItem().toString();
+            if (traceBox.getSelectedItem() != null) {
+                selectedTrace = traceBox.getSelectedItem().toString();
+            }
         }
 
         if (currentSelection != null && (currentSelection.getObject() instanceof TCTLAtomicPropositionNode ||
+            currentSelection.getObject() instanceof HyperLTLPathScopeNode ||
             (!lens.isTimed() && currentSelection.getObject() instanceof TCTLTransitionNode))) {
 
             Object item = templateBox.getSelectedItem();
-            String template = item.equals(SHARED) ? "" : item.toString();
+            String template = (item == null || item.equals(SHARED)) ? "" : item.toString();
             TCTLAbstractStateProperty property;
 
             if (!lens.isTimed() && transitionIsSelected()) {
@@ -2125,6 +2132,12 @@ public class QueryDialog extends JPanel {
                     property = new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem(), selectedTrace);
                 else
                     property = new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem());
+            } else if (currentSelection.getObject() instanceof HyperLTLPathScopeNode) {
+                if (isHyperLTL) {
+                    property = new HyperLTLPathScopeNode(new TCTLPlaceNode(template, (String)placeTransitionBox.getSelectedItem()), selectedTrace);
+                } else {
+                    property = new TCTLPlaceNode(template, (String)placeTransitionBox.getSelectedItem());
+                }
             } else {
                 if(isHyperLTL) {
                     HyperLTLPathScopeNode pathScope = new HyperLTLPathScopeNode(new TCTLPlaceNode(template, (String) placeTransitionBox.getSelectedItem()), selectedTrace);
@@ -2251,7 +2264,7 @@ public class QueryDialog extends JPanel {
             updateSelection(newProperty);
         } else {
             setupRawVerificationOptions();
-            clearSelection();
+            updateSelection(newProperty);
         }
     }
 
@@ -2805,16 +2818,10 @@ public class QueryDialog extends JPanel {
         if (undoButton != null) undoButton.setEnabled(false);
         if (redoButton != null) redoButton.setEnabled(false);
 
-        clearSelection();
+        updateSelection(newProperty);
 
         setEnabledOptionsAccordingToCurrentReduction();
         updateRawVerificationOptions();
-
-        SwingUtilities.invokeLater(() -> {
-            if (queryName != null) {
-                queryName.requestFocusInWindow();
-            }
-        });
     }
 
     private void toggleSmc() {
@@ -4497,12 +4504,25 @@ public class QueryDialog extends JPanel {
         var traceList = getUsedTraces(newProperty);
         var traceBoxVector = new Vector<Object>();
         var traceBoxQuantificationVector = new Vector<Object>();
+
+        String currentQuantifierTrace = null;
+        if (currentSelection != null) {
+            if (currentSelection.getObject() instanceof LTLANode) {
+                currentQuantifierTrace = ((LTLANode) currentSelection.getObject()).getTrace();
+            } else if (currentSelection.getObject() instanceof LTLENode) {
+                currentQuantifierTrace = ((LTLENode) currentSelection.getObject()).getTrace();
+            }
+        }
+
         for (int i = 0; i < traceModel.getSize(); i++) {
-            if (traceList.contains(traceModel.get(i).toString())) {
+            String traceName = traceModel.get(i).toString();
+            if (traceList.contains(traceName)) {
                 traceBoxVector.add(traceModel.get(i));
             }
 
-            traceBoxQuantificationVector.add(traceModel.get(i));
+            if (!traceList.contains(traceName) || traceName.equals(currentQuantifierTrace)) {
+                traceBoxQuantificationVector.add(traceModel.get(i));
+            }
         }
 
         var prevTraceBoxSel = traceBox.getSelectedItem();
@@ -4518,8 +4538,12 @@ public class QueryDialog extends JPanel {
 
         updateTraceBoxQuantification = false;
         traceBoxQuantification.setModel(new DefaultComboBoxModel<>(traceBoxQuantificationVector));
-        if (prevQuantSel != null && traceBoxQuantificationVector.contains(prevQuantSel)) {
+        if (currentQuantifierTrace != null && traceBoxQuantificationVector.contains(currentQuantifierTrace)) {
+            traceBoxQuantification.setSelectedItem(currentQuantifierTrace);
+        } else if (prevQuantSel != null && traceBoxQuantificationVector.contains(prevQuantSel)) {
             traceBoxQuantification.setSelectedItem(prevQuantSel);
+        } else if (!traceBoxQuantificationVector.isEmpty()) {
+            traceBoxQuantification.setSelectedIndex(0);
         }
 
         updateTraceBoxQuantification = true;
@@ -4528,6 +4552,7 @@ public class QueryDialog extends JPanel {
     }
 
     private List<String> getUsedTraces(TCTLAbstractProperty current) {
+        if (current == null) return new java.util.ArrayList<>();
         return new HyperLTLTraceNameVisitor().getTraceContext(current).getTraceNames();
     }
 
@@ -4562,7 +4587,15 @@ public class QueryDialog extends JPanel {
         traceBoxQuantification = new JComboBox<>(new DefaultComboBoxModel<>(tracesVector));
 
         traceBox.addActionListener(e -> {
-            if (updateTraceBox) updateQueryOnAtomicPropositionChange();
+            if (updateTraceBox && userChangedAtomicPropSelection) {
+                var oldProp = currentSelection != null ? currentSelection.getObject() : null;
+                if (isInsideArithmetic(oldProp)) {
+                    if (oldProp instanceof TCTLStatePlaceHolder) return;
+                    updateSelectedLeafToPlace();
+                } else {
+                    updateQueryOnAtomicPropositionChange();
+                }
+            }
         });
         traceBoxQuantification.addActionListener(e -> {
             if (checkTraceBoxQuantification() && updateTraceBoxQuantification) updateQueryOnQuantificationChange();
@@ -6586,6 +6619,7 @@ public class QueryDialog extends JPanel {
             placeTransitionBox.setEnabled(isLeaf);
             placeMarking.setEnabled(isLeaf);
             searchBar.setEnabled(isLeaf);
+            traceBox.setEnabled(isLeaf && traceBox.getModel().getSize() > 0);
         } else {
             boolean isQuantifier = currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode;
             boolean allowQuantifiers = enable && (isQuantifier || containsOnlyPathProperties(newProperty));
