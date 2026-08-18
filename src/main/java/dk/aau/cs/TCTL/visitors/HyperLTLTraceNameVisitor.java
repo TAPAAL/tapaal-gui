@@ -45,12 +45,26 @@ public class HyperLTLTraceNameVisitor extends VisitorBase {
 
     @Override
     public void visit(LTLANode aNode, Object context) {
-        visitQuantifier(aNode, aNode.getProperty(), aNode.getTrace(), (Context)context);
+        var c = (Context)context;
+        c.setHasANodes(true);
+        if (c.hasENodes()) {
+            c.setResult(false);
+            c.setHasAlternatingQuantifiers(true);
+        }
+
+        visitQuantifier(aNode, aNode.getProperty(), aNode.getTrace(), c);
     }
 
     @Override
     public void visit(LTLENode eNode, Object context) {
-        visitQuantifier(eNode, eNode.getProperty(), eNode.getTrace(), (Context)context);
+        var c = (Context)context;
+        c.setHasENodes(true);
+        if (c.hasANodes()) {
+            c.setResult(false);
+            c.setHasAlternatingQuantifiers(true);
+        }
+
+        visitQuantifier(eNode, eNode.getProperty(), eNode.getTrace(), c);
     }
 
     private void visitQuantifier(TCTLAbstractPathProperty node, TCTLAbstractStateProperty property, String trace, Context c) {
@@ -198,6 +212,9 @@ public class HyperLTLTraceNameVisitor extends VisitorBase {
         private boolean hasDuplicateTraces;
         private boolean hasEmptyQuantifierTrace;
         private boolean hasNestedQuantifiers;
+        private boolean hasANodes;
+        private boolean hasENodes;
+        private boolean hasAlternatingQuantifiers;
         private Boolean result = true;
 
         public Boolean getResult() {
@@ -270,6 +287,30 @@ public class HyperLTLTraceNameVisitor extends VisitorBase {
 
         public void setHasNestedQuantifiers(boolean hasNestedQuantifiers) {
             this.hasNestedQuantifiers = hasNestedQuantifiers;
+        }
+
+        public boolean hasANodes() {
+            return hasANodes;
+        }
+
+        public void setHasANodes(boolean hasANodes) {
+            this.hasANodes = hasANodes;
+        }
+
+        public boolean hasENodes() {
+            return hasENodes;
+        }
+
+        public void setHasENodes(boolean hasENodes) {
+            this.hasENodes = hasENodes;
+        }
+
+        public boolean hasAlternatingQuantifiers() {
+            return hasAlternatingQuantifiers;
+        }
+
+        public void setHasAlternatingQuantifiers(boolean hasAlternatingQuantifiers) {
+            this.hasAlternatingQuantifiers = hasAlternatingQuantifiers;
         }
     }
 }
