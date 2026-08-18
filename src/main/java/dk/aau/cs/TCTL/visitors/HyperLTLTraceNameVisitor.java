@@ -7,115 +7,158 @@ import java.util.List;
 
 public class HyperLTLTraceNameVisitor extends VisitorBase {
 
-
     public HyperLTLTraceNameVisitor() {
 
     }
 
     public Context getTraceContext(TCTLAbstractProperty property) {
-        Context c = new Context();
+        var c = new Context();
 
-        property.accept(this,c);
-        return c;
-    }
-
-    public void visit(HyperLTLPathScopeNode pathScopeNode, Object context) {
-        Context c = (Context) context;
-        if(!c.getTraceNames().contains(pathScopeNode.getTrace())) {
-            c.getTraceNames().add(pathScopeNode.getTrace());
+        if (property != null) {
+            property.accept(this, c);
+            if (c.getPathNodes().isEmpty()) {
+                c.setResult(false);
+            }
+        } else {
             c.setResult(false);
         }
 
+        return c;
+    }
+
+    @Override
+    public void visit(HyperLTLPathScopeNode pathScopeNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
+
+        var trace = pathScopeNode.getTrace();
+        if (trace == null || trace.trim().isEmpty() || !c.getTraceNames().contains(trace)) {
+            c.setResult(false);
+            c.setHasUnquantifiedTraces(true);
+        }
+
+        var prevInside = c.isInsidePathScope();
+        c.setInsidePathScope(true);
         pathScopeNode.getProperty().accept(this, context);
+        c.setInsidePathScope(prevInside);
     }
 
+    @Override
     public void visit(LTLANode aNode, Object context) {
-        Context c = (Context) context;
-        if(!c.getTraceNames().contains(aNode.getTrace())) {
-            c.getTraceNames().add(aNode.getTrace());
+        var c = (Context)context;
+        c.setHasANodes(true);
+        if (c.hasENodes()) {
+            c.setResult(false);
+            c.setHasAlternatingQuantifiers(true);
         }
 
-        // Check if we already have an A node with the same trace (illegal)
-        for(int i = 0; i < c.getPathNodes().size(); i++) {
-            TCTLAbstractPathProperty node = c.getPathNodes().get(i);
-            if(node instanceof LTLANode) {
-                if(((LTLANode)node).getTrace().equals(aNode.getTrace())) {
-                    c.setResult(false);
-                }
-            }
-        }
-
-        c.getPathNodes().add(aNode);
-
-        aNode.getProperty().accept(this, context);
-
+        visitQuantifier(aNode, aNode.getProperty(), aNode.getTrace(), c);
     }
 
+    @Override
     public void visit(LTLENode eNode, Object context) {
-        Context c = (Context) context;
-        if(!c.getTraceNames().contains(eNode.getTrace())) {
-            c.getTraceNames().add(eNode.getTrace());
+        var c = (Context)context;
+        c.setHasENodes(true);
+        if (c.hasANodes()) {
+            c.setResult(false);
+            c.setHasAlternatingQuantifiers(true);
         }
 
-        // Check if we already have an E node with the same trace (illegal)
-        for(int i = 0; i < c.getPathNodes().size(); i++) {
-            TCTLAbstractPathProperty node = c.getPathNodes().get(i);
-            if(node instanceof LTLENode) {
-                if(((LTLENode)node).getTrace().equals(eNode.getTrace())) {
-                    c.setResult(false);
-                }
-            }
-        }
-
-        c.getPathNodes().add(eNode);
-
-        eNode.getProperty().accept(this, context);
+        visitQuantifier(eNode, eNode.getProperty(), eNode.getTrace(), c);
     }
 
+    private void visitQuantifier(TCTLAbstractPathProperty node, TCTLAbstractStateProperty property, String trace, Context c) {
+        if (c.isInsideFormulaBody()) {
+            c.setResult(false);
+            c.setHasNestedQuantifiers(true);
+        }
+
+        if (trace == null || trace.trim().isEmpty()) {
+            c.setResult(false);
+            c.setHasEmptyQuantifierTrace(true);
+        } else if (c.getTraceNames().contains(trace)) {
+            c.setResult(false);
+            c.setHasDuplicateTraces(true);
+        } else {
+            c.getTraceNames().add(trace);
+        }
+
+        c.getPathNodes().add(node);
+        property.accept(this, c);
+    }
+
+    @Override
     public void visit(LTLFNode afNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
         afNode.getProperty().accept(this, context);
     }
 
+    @Override
     public void visit(LTLGNode agNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
         agNode.getProperty().accept(this, context);
     }
 
+    @Override
     public void visit(LTLXNode axNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
         axNode.getProperty().accept(this, context);
     }
 
+    @Override
     public void visit(LTLUNode auNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
         auNode.getLeft().accept(this, context);
         auNode.getRight().accept(this, context);
     }
 
+    @Override
     public void visit(TCTLPathToStateConverter pathConverter, Object context) {
         pathConverter.getProperty().accept(this, context);
     }
 
+    @Override
+    public void visit(TCTLStateToPathConverter stateConverter, Object context) {
+        stateConverter.getProperty().accept(this, context);
+    }
+
+    @Override
+    public void visit(TCTLNotNode notNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
+        notNode.getProperty().accept(this, context);
+    }
+
+    @Override
     public void visit(TCTLAndListNode andListNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
         createList(andListNode.getProperties(), context);
     }
 
+    @Override
     public void visit(TCTLOrListNode orListNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
         createList(orListNode.getProperties(), context);
     }
 
+    @Override
+    public void visit(TCTLPlusListNode plusListNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
+        createList(plusListNode.getProperties(), context);
+    }
+
+    @Override
     public void visit(TCTLTermListNode termListNode, Object context) {
-        assert termListNode.getProperties().get(1) instanceof AritmeticOperator;
-        AritmeticOperator operator = (AritmeticOperator)termListNode.getProperties().get(1);
-        String op = operator.toString();
-        switch (op) {
-            case "+":
-                createList(termListNode.getProperties(), context);
-                break;
-            case "*":
-                createList(termListNode.getProperties(), context);
-                break;
-            case "-":
-                createList(termListNode.getProperties(), context);
-                break;
-        }
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
+        createList(termListNode.getProperties(), context);
     }
 
     private void createList(List<TCTLAbstractStateProperty> properties, Object context) {
@@ -126,14 +169,53 @@ public class HyperLTLTraceNameVisitor extends VisitorBase {
 
     @Override
     public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
         atomicPropositionNode.getLeft().accept(this, context);
         atomicPropositionNode.getRight().accept(this, context);
     }
 
+    @Override
+    public void visit(TCTLPlaceNode placeNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
+        if (!c.isInsidePathScope()) {
+            c.setResult(false);
+            c.setHasMissingTraces(true);
+        }
+    }
+
+    @Override
+    public void visit(TCTLTransitionNode transitionNode, Object context) {
+        var c = (Context)context;
+        c.setInsideFormulaBody(true);
+        if (!c.isInsidePathScope()) {
+            var trace = transitionNode.getTrace();
+            if (trace == null || trace.trim().isEmpty() || !c.getTraceNames().contains(trace)) {
+                c.setResult(false);
+                if (trace == null || trace.trim().isEmpty()) {
+                    c.setHasMissingTraces(true);
+                } else {
+                    c.setHasUnquantifiedTraces(true);
+                }
+            }
+        }
+    }
+
     public static class Context {
-        private ArrayList<String> traceNames;
-        private ArrayList<TCTLAbstractPathProperty> pathNodes;
-        private Boolean result;
+        private final List<String> quantifiedTraceNames = new ArrayList<>();
+        private final List<TCTLAbstractPathProperty> pathNodes = new ArrayList<>();
+        private boolean insideFormulaBody;
+        private boolean insidePathScope;
+        private boolean hasMissingTraces;
+        private boolean hasUnquantifiedTraces;
+        private boolean hasDuplicateTraces;
+        private boolean hasEmptyQuantifierTrace;
+        private boolean hasNestedQuantifiers;
+        private boolean hasANodes;
+        private boolean hasENodes;
+        private boolean hasAlternatingQuantifiers;
+        private Boolean result = true;
 
         public Boolean getResult() {
             return this.result;
@@ -143,19 +225,92 @@ public class HyperLTLTraceNameVisitor extends VisitorBase {
             this.result = result;
         }
 
-        public ArrayList<TCTLAbstractPathProperty> getPathNodes() {
+        public List<TCTLAbstractPathProperty> getPathNodes() {
             return this.pathNodes;
         }
 
-        public Context() {
-            traceNames = new ArrayList<String>();
-            pathNodes = new ArrayList<TCTLAbstractPathProperty>();
-            result = true;
+        public List<String> getTraceNames() {
+            return this.quantifiedTraceNames;
         }
 
-        public ArrayList<String> getTraceNames() {
-            return this.traceNames;
+        public boolean isInsideFormulaBody() {
+            return insideFormulaBody;
+        }
+
+        public void setInsideFormulaBody(boolean insideFormulaBody) {
+            this.insideFormulaBody = insideFormulaBody;
+        }
+
+        public boolean isInsidePathScope() {
+            return insidePathScope;
+        }
+
+        public void setInsidePathScope(boolean insidePathScope) {
+            this.insidePathScope = insidePathScope;
+        }
+
+        public boolean hasMissingTraces() {
+            return hasMissingTraces;
+        }
+
+        public void setHasMissingTraces(boolean hasMissingTraces) {
+            this.hasMissingTraces = hasMissingTraces;
+        }
+
+        public boolean hasUnquantifiedTraces() {
+            return hasUnquantifiedTraces;
+        }
+
+        public void setHasUnquantifiedTraces(boolean hasUnquantifiedTraces) {
+            this.hasUnquantifiedTraces = hasUnquantifiedTraces;
+        }
+
+        public boolean hasDuplicateTraces() {
+            return hasDuplicateTraces;
+        }
+
+        public void setHasDuplicateTraces(boolean hasDuplicateTraces) {
+            this.hasDuplicateTraces = hasDuplicateTraces;
+        }
+
+        public boolean hasEmptyQuantifierTrace() {
+            return hasEmptyQuantifierTrace;
+        }
+
+        public void setHasEmptyQuantifierTrace(boolean hasEmptyQuantifierTrace) {
+            this.hasEmptyQuantifierTrace = hasEmptyQuantifierTrace;
+        }
+
+        public boolean hasNestedQuantifiers() {
+            return hasNestedQuantifiers;
+        }
+
+        public void setHasNestedQuantifiers(boolean hasNestedQuantifiers) {
+            this.hasNestedQuantifiers = hasNestedQuantifiers;
+        }
+
+        public boolean hasANodes() {
+            return hasANodes;
+        }
+
+        public void setHasANodes(boolean hasANodes) {
+            this.hasANodes = hasANodes;
+        }
+
+        public boolean hasENodes() {
+            return hasENodes;
+        }
+
+        public void setHasENodes(boolean hasENodes) {
+            this.hasENodes = hasENodes;
+        }
+
+        public boolean hasAlternatingQuantifiers() {
+            return hasAlternatingQuantifiers;
+        }
+
+        public void setHasAlternatingQuantifiers(boolean hasAlternatingQuantifiers) {
+            this.hasAlternatingQuantifiers = hasAlternatingQuantifiers;
         }
     }
-
 }
