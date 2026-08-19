@@ -93,6 +93,14 @@ class QueryDialogArithmeticTest {
     }
 
     @Test
+    void placeNodesWithDifferentColorsAreNotEqual() {
+        var red = new TCTLAtomicPropositionNode(new TCTLPlaceNode("TAPN1", "P", "Red"), "=", new TCTLConstNode(1));
+        var blue = new TCTLAtomicPropositionNode(new TCTLPlaceNode("TAPN1", "P", "Blue"), "=", new TCTLConstNode(1));
+        
+        assertFalse(red.equals(blue));
+    }
+
+    @Test
     void subtractionGroupsTheFirstOperandInAnAdditionList() {
         var sum = pressFirstPlaceholder(new TCTLConstNode(0), "+", 2);
         var selected = (TCTLAbstractStateProperty)sum.findFirstPlaceHolder();

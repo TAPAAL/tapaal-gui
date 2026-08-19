@@ -1605,6 +1605,7 @@ public class QueryDialog extends JPanel {
             userChangedAtomicPropSelection = false;
             updateSelectionPlaceNode(placeNode);
             placeTransitionBox.setSelectedItem(placeNode.getPlace());
+            selectColor(placeNode);
             userChangedAtomicPropSelection = true;
         } else if (current instanceof TCTLTransitionNode) {
             TCTLTransitionNode transitionNode = (TCTLTransitionNode) current;
@@ -1620,13 +1621,6 @@ public class QueryDialog extends JPanel {
             }
             updateTraceBox = true;
             placeTransitionBox.setSelectedItem(transitionNode.getTransition());
-            userChangedAtomicPropSelection = true;
-        } else if (current instanceof TCTLPlaceNode) {
-            TCTLPlaceNode placeNode = (TCTLPlaceNode)current;
-            userChangedAtomicPropSelection = false;
-            updateSelectionPlaceNode(placeNode);
-            placeTransitionBox.setSelectedItem(placeNode.getPlace());
-            selectColor(placeNode);
             userChangedAtomicPropSelection = true;
         }
     }
@@ -5555,10 +5549,12 @@ public class QueryDialog extends JPanel {
                 if (oldProp != null && isInsideArithmetic(oldProp)) {
                     if (oldProp instanceof TCTLStatePlaceHolder) return;
                     updateSelectedLeafToPlace();
+                    guiDialog.pack();
                     return;
                 }
                 
                 updateQueryOnAtomicPropositionChange();
+                guiDialog.pack();
             }
         });
 
