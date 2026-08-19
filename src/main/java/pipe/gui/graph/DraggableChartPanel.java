@@ -8,6 +8,8 @@ import org.jfree.data.Range;
 import java.awt.event.MouseAdapter;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
 
 public class DraggableChartPanel extends ChartPanel {
     private int lastX;
@@ -26,7 +28,8 @@ public class DraggableChartPanel extends ChartPanel {
             originalRangeAxisRange = null;
         }
 
-        setMouseWheelEnabled(true);
+        setMouseWheelEnabled(false);
+        addMouseWheelListener(this::zoomWithWheel);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -78,5 +81,23 @@ public class DraggableChartPanel extends ChartPanel {
             domainAxis.setRange(domainAxis.getLowerBound() - domainShift, domainAxis.getUpperBound() - domainShift);
             rangeAxis.setRange(rangeAxis.getLowerBound() + rangeShift, rangeAxis.getUpperBound() + rangeShift);
         }
+    }
+
+    private void zoomWithWheel(MouseWheelEvent event) {
+        if (!(getChart().getPlot() instanceof XYPlot plot)) return;
+
+        var plotInfo = getChartRenderingInfo().getPlotInfo();
+        Point2D point = translateScreenToJava2D(event.getPoint());
+        if (!plotInfo.getDataArea().contains(point)) return;
+
+        double rotation = event.getPreciseWheelRotation();
+        if (rotation == 0) return;
+
+        boolean notify = plot.isNotify();
+        plot.setNotify(false);
+        double zoomFactor = Math.pow(1.1, rotation);
+        if (isDomainZoomable()) plot.zoomDomainAxes(zoomFactor, plotInfo, point, true);
+        if (isRangeZoomable()) plot.zoomRangeAxes(zoomFactor, plotInfo, point, true);
+        plot.setNotify(notify);
     }
 }
