@@ -1,7 +1,6 @@
 package pipe.gui;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -9,7 +8,6 @@ import java.awt.event.WindowEvent;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -20,8 +18,6 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import com.sun.jna.Platform;
 import net.tapaal.gui.*;
@@ -44,15 +40,12 @@ import pipe.gui.canvas.Grid;
 import pipe.gui.canvas.SelectionManager;
 import net.tapaal.gui.petrinet.dialog.ExportBatchDialog;
 import net.tapaal.gui.petrinet.dialog.ColoredSimulationDialog;
-import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedTransition;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import kotlin.internal.RequireKotlin.Container;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.SearchBar;
@@ -444,7 +437,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             TAPNLens lens = getCurrentTab().getLens();
             if (lens.isColored() && !getCurrentTab().isInAnimationMode()) {
                 PetriNetTab oldTab = getCurrentTab();
-                boolean useExplicit = !lens.isGame() && !lens.isStochastic() && !lens.isTimed();
+                boolean useExplicit = !lens.isGame();
                 ColoredSimulationDialog.showSimulationDialog(oldTab, useExplicit);
                 if (!ColoredSimulationDialog.wasCancelled() && (oldTab != getCurrentTab() || ColoredSimulationDialog.explicitSimulationMode())) {
                     currentTab.ifPresent(tab -> tab.toggleAnimationMode(ColoredSimulationDialog.explicitSimulationMode()));

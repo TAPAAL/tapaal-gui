@@ -48,7 +48,7 @@ public class Verifier {
         return verifytapn;
     }
 
-    private static VerifyDTAPN getVerifydTAPN() {
+    public static VerifyDTAPN getVerifyDTAPN() {
         VerifyDTAPN verifydtapn = new VerifyDTAPN(new FileFinder(), new MessengerImpl());
         verifydtapn.setup();
         return verifydtapn;
@@ -95,6 +95,7 @@ public class Verifier {
             newQuery.setUseStubbornReduction(query.isStubbornReductionEnabled());
             newQuery.setUseTarOption(query.isTarOptionEnabled());
             newQuery.setUseTarjan(query.isTarjan());
+            newQuery.setUseExplicitSearch(query.useExplicitSearch());
         } else if (lens.isTimed() && query.getReductionOption() == ReductionOption.VerifyPN) {
             newQuery = new TAPNQuery(
                 query.getName(),
@@ -115,12 +116,13 @@ public class Verifier {
                 query.isOverApproximationEnabled(),
                 query.isUnderApproximationEnabled(),
                 query.approximationDenominator(),
-                false,
-                false,
-                false,
+                lens.isColored() && query.usePartitioning(),
+                lens.isColored() && query.useColorFixpoint(),
+                lens.isColored() && query.useSymmetricVars(),
                 lens.isColored(),
                 false);
             newQuery.setUseStubbornReduction(query.isStubbornReductionEnabled());
+            newQuery.setUseExplicitSearch(query.useExplicitSearch());
         }
 
         return newQuery;
@@ -147,7 +149,7 @@ public class Verifier {
         if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
             return getVerifyTAPN();
         } else if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
-            return getVerifydTAPN();
+            return getVerifyDTAPN();
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             return getVerifyPN();
         } else {
@@ -170,7 +172,7 @@ public class Verifier {
             modelChecker = getVerifyPN();
         else if ((lens == null && tapnNetwork.isColored()) || (lens != null && lens.isColored()) || tapnNetwork.hasWeights() ||
                 tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasUncontrollableTransitions())
-            modelChecker = getVerifydTAPN();
+            modelChecker = getVerifyDTAPN();
         else
             modelChecker = getVerifyTAPN();
 
@@ -290,6 +292,8 @@ public class Verifier {
 
     public static VerifyTAPNOptions getVerificationOptions(TAPNQuery query, boolean isColored) {
         if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
+            boolean isSmcSimulation = query.isSimulate() && query.getCategory() == TAPNQuery.QueryCategory.SMC;
+            boolean unfold = isColored && (query.getTraceOption() != TAPNQuery.TraceOption.NONE || isSmcSimulation) && !query.useExplicitSearch();
             return new VerifyDTAPNOptions(
                 query.getCapacity(),
                 query.getTraceOption(),
@@ -310,7 +314,7 @@ public class Verifier {
                 getReducedNetFilePath(),
                 query.usePartitioning(),
                 query.useColorFixpoint(),
-                isColored,// Unfold net
+                unfold,// Unfold net
                 query.getRawVerification(),
                 query.getRawVerificationPrompt(),
                 query.isBenchmarkMode(),
@@ -323,7 +327,8 @@ public class Verifier {
                 query.getGranularity(),
                 query.isMaxGranularity(),
                 query.getSmcSettings().getNumericPrecision(),
-                query.getSmcSettings().getSmcSeed()
+                query.getSmcSettings().getSmcSeed(),
+                query.useExplicitSearch()
         );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             boolean unfold = isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE && !query.useExplicitSearch();

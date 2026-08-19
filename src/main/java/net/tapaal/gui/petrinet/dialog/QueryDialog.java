@@ -776,12 +776,13 @@ public class QueryDialog extends JPanel {
         query.setOldCapacity(oldCapacity);
 
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
+        query.setUseExplicitSearch(useExplicitSearch.isSelected());
 
         if (reductionOptionToSet != null && reductionOptionToSet.equals(ReductionOption.VerifyTAPN)) {
             query.setDiscreteInclusion(discreteInclusion.isSelected());
         }
 
-        if(lens.isStochastic()) {
+        if (lens.isStochastic()) {
             query.setCategory(TAPNQuery.QueryCategory.SMC);
             query.setParallel(smcParallel.isSelected());
             VerificationType verificationType = VerificationType.fromOrdinal(smcVerificationType.getSelectedIndex());
@@ -828,9 +829,9 @@ public class QueryDialog extends JPanel {
             /* enableOverApproximation */false,
             /* enableUnderApproximation */false,
             0,
-            lens.isColored()? usePartitioning.isSelected(): false,
-            lens.isColored()? useColorFixpoint.isSelected() : false,
-            lens.isColored()? useSymmetricvars.isSelected() : false,
+            lens.isColored() && usePartitioning.isSelected(),
+            lens.isColored() && useColorFixpoint.isSelected(),
+            lens.isColored() && useSymmetricvars.isSelected(),
             lens.isColored(),
             coloredReduction,
             rawVerificationOptionsEnabled.isSelected(),
@@ -2456,9 +2457,12 @@ public class QueryDialog extends JPanel {
     }
 
     private void setupExplicitSearch(boolean selectExplicitSearch) {
-        if (lens.isColored() && !lens.isGame() && !lens.isStochastic() && !lens.isTimed()) {
+        if (lens.isColored() && !lens.isGame()) {
             useExplicitSearch.setSelected(selectExplicitSearch);
-            setComponentEnabledRecursively(unfoldingOptionsPanel, !selectExplicitSearch);
+            if (!lens.isTimed()) {
+                setComponentEnabledRecursively(unfoldingOptionsPanel, !selectExplicitSearch);
+            }
+
             oldExplicitSearchState = selectExplicitSearch;
         }
     }
@@ -2631,6 +2635,8 @@ public class QueryDialog extends JPanel {
         if (queryToCreateFrom.discreteInclusion()) {
             selectInclusionPlacesButton.setEnabled(true);
         }
+
+        setupExplicitSearch(queryToCreateFrom.useExplicitSearch());
     }
 
     private void setupUntimedReductionOptions(TAPNQuery queryToCreateFrom) {
@@ -3757,6 +3763,16 @@ public class QueryDialog extends JPanel {
                                                            new SMCTraceType("Not satisfied") });
         smcTraceType.setToolTipText(TOOL_TIP_TRACE_TYPE);
         smcTracePanel.add(smcTraceType, subPanelGbc);
+
+        if (lens.isColored()) {
+            subPanelGbc.gridx = 0;
+            subPanelGbc.gridy = 3;
+            subPanelGbc.gridwidth = 2;
+            useExplicitSearch.setText("Show trace in original net");
+            useExplicitSearch.setToolTipText("Maps the trace back to the original colored net instead of opening an unfolded net tab");
+            smcTracePanel.add(useExplicitSearch, subPanelGbc);
+            subPanelGbc.gridwidth = 1;
+        }
   
         smcSettingsPanel.add(smcTracePanel, gbc);
 
@@ -6227,7 +6243,9 @@ public class QueryDialog extends JPanel {
 
         useExplicitSearch.addActionListener(e -> {
             refreshHeuristicButtonText();
-            setComponentEnabledRecursively(unfoldingOptionsPanel, !useExplicitSearch.isSelected());
+            if (!lens.isTimed()) {
+                setComponentEnabledRecursively(unfoldingOptionsPanel, !useExplicitSearch.isSelected());
+            }
             oldExplicitSearchState = useExplicitSearch.isSelected();
         });
 
@@ -6315,6 +6333,12 @@ public class QueryDialog extends JPanel {
         selectInclusionPlacesButton.addActionListener(e -> inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces));
 
         useTimeDarts.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
+
+        if (lens.isColored() && !lens.isGame() && !lens.isStochastic()) {
+            gbc.gridx = 0;
+            gbc.gridy = 4;
+            reductionOptionsPanel.add(useExplicitSearch, gbc);
+        }
     }
 
     private void initUntimedReductionOptions() {
@@ -6487,6 +6511,7 @@ public class QueryDialog extends JPanel {
             refreshDiscreteOptions();
             refreshDiscreteInclusion();
             refreshOverApproximationOption();
+            refreshExplicitSearch();
         } else if (!lens.isTimed()) {
             refreshTraceRefinement();
             refreshTarjan();
@@ -6578,13 +6603,18 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshTarjan() {
-        int selectedIndex = queryType.getSelectedIndex();
-        switch (selectedIndex) {
+        switch (queryType.getSelectedIndex()) {
             case 1:
                 useTarjan.setVisible(true);
-                useTarjan.setEnabled(true);
+                useTarjan.setEnabled(false);
+                useTarjan.setSelected(false);
                 break;
             case 2:
+                useTarjan.setVisible(true);
+                useTarjan.setEnabled(true);
+                useTarjan.setSelected(true);
+                break;
+            case 3:
                 useTarjan.setVisible(true);
                 useTarjan.setEnabled(false);
                 useTarjan.setSelected(false);
@@ -6599,16 +6629,30 @@ public class QueryDialog extends JPanel {
     private boolean oldExplicitSearchState;
 
     private void refreshExplicitSearch() {
-        if (canUseExplicitSearch()) {
-            useExplicitSearch.setSelected(oldExplicitSearchState);
-            useExplicitSearch.setEnabled(true);
-        } else {
-            if (useExplicitSearch.isEnabled()) {
-                oldExplicitSearchState = useExplicitSearch.isSelected();
+        if (lens.isTimed()) {
+            useExplicitSearch.setText("Show trace in original net");
+            useExplicitSearch.setToolTipText("Maps the trace back to the original colored net instead of opening an unfolded net tab");
+            boolean canMap = lens.isColored() && !lens.isGame();
+            useExplicitSearch.setEnabled(canMap);
+            if (canMap) {
+                useExplicitSearch.setSelected(oldExplicitSearchState);
+            } else {
+                useExplicitSearch.setSelected(false);
             }
-            
-            useExplicitSearch.setSelected(false);
-            useExplicitSearch.setEnabled(false);
+        } else {
+            useExplicitSearch.setText("Use explicit search");
+            useExplicitSearch.setToolTipText(TOOL_TIP_USE_EXPLICIT_SEARCH);
+            if (canUseExplicitSearch()) {
+                useExplicitSearch.setSelected(oldExplicitSearchState);
+                useExplicitSearch.setEnabled(true);
+            } else {
+                if (useExplicitSearch.isEnabled()) {
+                    oldExplicitSearchState = useExplicitSearch.isSelected();
+                }
+                
+                useExplicitSearch.setSelected(false);
+                useExplicitSearch.setEnabled(false);
+            }
         }
     }
 
