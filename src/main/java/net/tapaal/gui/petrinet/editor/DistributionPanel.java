@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.DoubleUnaryOperator;
 import java.util.stream.Collectors;
 import java.util.LinkedHashMap;
 
@@ -776,73 +777,50 @@ public class DistributionPanel extends JPanel {
     }
 
     private Graph createGraph(SMCExponentialDistribution distribution) {
-        List<GraphPoint> points = new ArrayList<>();
+        var params = distribution.getParameters();
+        var rate = params.get("rate");
+        var mean = distribution.getMean();
+        DoubleUnaryOperator density = x -> x < 0 ? Double.NaN : rate * Math.exp(-rate * x);
 
-        LinkedHashMap<String, Double> params = distribution.getParameters();
-        double rate = params.get("rate");
-        double mean = distribution.getMean();
-
-        int x = 0;
-        while (true) {
-            double y = rate * Math.exp(-rate * x);
-            if (y < 1e-6) break;
-            points.add(new GraphPoint(x, y));
-            ++x;
-        }
-
-        return new Graph("Exponential Distribution", points, mean);
+        return new Graph("Exponential Distribution", 0, -Math.log(1e-6) / rate, mean, density);
     }
 
     private Graph createGraph(SMCGammaDistribution distribution) {
-        List<GraphPoint> points = new ArrayList<>();
-
-        LinkedHashMap<String, Double> params = distribution.getParameters();
-        double shape = params.get("shape");
-        double scale = params.get("scale");
+        var params = distribution.getParameters();
+        var shape = params.get("shape");
+        var scale = params.get("scale");
 
         Require.that(shape > 0, "Shape must be a positive real");
         Require.that(scale > 0, "Scale must be a positive real");
 
-        double gamma = spougeGammaApprox(shape - 1);
-        double coefficient = 1 / (gamma * Math.pow(scale, shape));
-        double step = 0.1;
+        var gamma = spougeGammaApprox(shape - 1);
+        var coefficient = 1 / (gamma * Math.pow(scale, shape));
+        DoubleUnaryOperator density = x -> x <= 0
+            ? Double.NaN
+            : coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
 
-        // Start at some arbitrary small value to avoid division by zero
-        double x = 1e-300;
-        while (true) {
-            double y = coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
-            if (y < 1e-8 && x > 10) break;
-            points.add(new GraphPoint(x, y));
-            x += step;	
-        }
-
-        return new Graph("Gamma Distribution", points, distribution.getMean());
+        var mean = distribution.getMean();
+        var stddev = Math.sqrt(shape) * scale;
+        return new Graph("Gamma Distribution", 0, mean + 8 * stddev, mean, density);
     }
 
     private Graph createGraph(SMCErlangDistribution distribution) {
-        List<GraphPoint> points = new ArrayList<>();
-
-        LinkedHashMap<String, Double> params = distribution.getParameters();
-        double shape = params.get("shape");
-        double scale = params.get("scale");
+        var params = distribution.getParameters();
+        var shape = params.get("shape");
+        var scale = params.get("scale");
 
         Require.that(shape >= 1 && (shape % 1 == 0), "Shape must be a positive integer");
         Require.that(scale > 0, "Scale must be a positive real");
 
-        double gamma = spougeGammaApprox(shape - 1);
-        double coefficient = 1 / (gamma * Math.pow(scale, shape));
-        double step = 0.1;
+        var gamma = spougeGammaApprox(shape - 1);
+        var coefficient = 1 / (gamma * Math.pow(scale, shape));
+        DoubleUnaryOperator density = x -> x <= 0
+            ? Double.NaN
+            : coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
 
-        // Start at some arbitrary small value to avoid division by zero
-        double x = 1e-300;
-        while (true) {
-            double y = coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
-            if (y < 1e-8 && x > 10) break;
-            points.add(new GraphPoint(x, y));
-            x += step;
-        }
-
-        return new Graph("Erlang Distribution", points, distribution.getMean());
+        var mean = distribution.getMean();
+        var stddev = Math.sqrt(shape) * scale;
+        return new Graph("Erlang Distribution", 0, mean + 8 * stddev, mean, density);
     }
 
     private double spougeGammaApprox(double shape) {
@@ -874,28 +852,21 @@ public class DistributionPanel extends JPanel {
     }
 
     private Graph createGraph(SMCNormalDistribution distribution) {
-        List<GraphPoint> points = new ArrayList<>();
-
-        LinkedHashMap<String, Double> params = distribution.getParameters();
-        double mean = distribution.getMean();
-        double stddev = params.get("stddev");
-        double variance = Math.pow(stddev, 2);
+        var params = distribution.getParameters();
+        var mean = distribution.getMean();
+        var stddev = params.get("stddev");
+        var variance = Math.pow(stddev, 2);
         
-        double coefficient = 1 / Math.sqrt(2 * Math.PI * variance);
-        double step = 0.1 * stddev;
-        double twoVariance = 2 * variance;
-        double negInvTwoVariance = -1 / twoVariance;
+        var coefficient = 1 / Math.sqrt(2 * Math.PI * variance);
+        var twoVariance = 2 * variance;
+        var negInvTwoVariance = -1 / twoVariance;
+        DoubleUnaryOperator density = x -> x < 0
+            ? Double.NaN
+            : coefficient * Math.exp(Math.pow(x - mean, 2) * negInvTwoVariance);
     
-        double min = Math.max(mean - 3 * stddev, 0);
-        double max = mean + 3 * stddev;
-
-        for (double x = min; x <= max; x += step) {
-            double exponent = Math.pow(x - mean, 2) * negInvTwoVariance;
-            double y = coefficient * Math.exp(exponent);
-            points.add(new GraphPoint(x, y));
-        }
-
-        return new Graph("Normal Distribution", points, mean);
+        var min = Math.max(mean - 4 * stddev, 0);
+        var max = mean + 4 * stddev;
+        return new Graph("Normal Distribution", min, max, mean, density);
     }
 
     private List<Graph> createGraphs(SMCUniformDistribution distribution) {
@@ -943,34 +914,26 @@ public class DistributionPanel extends JPanel {
     }
 
     private Graph createGraph(SMCTriangularDistribution distribution) {
-        List<GraphPoint> points = new ArrayList<>();
+        var mean = distribution.getMean();
+        var height = 2 / (distribution.b - distribution.a);
+        DoubleUnaryOperator density = x -> {
+            if (x < distribution.a || x > distribution.b) return 0;
+            if (x == distribution.c) return height;
+            if (x < distribution.c) return height * (x - distribution.a) / (distribution.c - distribution.a);
+            return height * (distribution.b - x) / (distribution.b - distribution.c);
+        };
 
-        double mean = distribution.getMean();
-
-        points.add(new GraphPoint(distribution.a, 0));
-        points.add(new GraphPoint(distribution.c, 2 / (distribution.b - distribution.a)));
-        points.add(new GraphPoint(distribution.b, 0));
-
-        return new Graph("Triangular Distribution", points, mean);
+        return new Graph("Triangular Distribution", distribution.a, distribution.b, mean, density);
     }
 
     private Graph createGraph(SMCLogNormalDistribution distribution) {
-        List<GraphPoint> points = new ArrayList<>();
+        var mean = distribution.getMean();
+        var logStddev = distribution.logStddev;
+        var logMean = distribution.logMean;
+        DoubleUnaryOperator density = x -> x <= 0 ? Double.NaN : distribution.pdf(x);
 
-        double mean = distribution.getMean();
-        double logStddev = distribution.logStddev;
-        double logMean = distribution.logMean;
-
-        double min = Math.exp(logMean - 3 * logStddev);
-        double max = Math.exp(logMean + 3 * logStddev);
-        double step = (max - min) / 1000;
-
-        for (double x = min; x <= max; x += step) {
-            double y = distribution.pdf(x);
-            points.add(new GraphPoint(x, y));
-        }
-
-        return new Graph("Log Normal Distribution", points, mean);
+        var max = Math.exp(logMean + 4 * logStddev);
+        return new Graph("Log Normal Distribution", 0, max, mean, density);
     }
 
     private Graph createGraph(SMCUserDefinedDistribution distribution) {

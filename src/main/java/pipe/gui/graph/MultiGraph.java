@@ -44,7 +44,7 @@ public class MultiGraph extends AbstractGraph {
         return multiGraphMap.entrySet().stream()
             .flatMap(entry -> entry.getValue().entrySet().stream()
                 .map(propertyEntry -> {
-                    Graph graph = propertyEntry.getValue();
+                    var graph = propertyEntry.getValue();
                     graph.setName(entry.getKey() + " - " + propertyEntry.getKey());
                     return graph;
                 }))
@@ -52,7 +52,7 @@ public class MultiGraph extends AbstractGraph {
     }
 
     public MultiGraph copy() {
-        MultiGraph copy = new MultiGraph(
+        var copy = new MultiGraph(
             this.name,
             this.xAxisLabel,
             this.yAxisLabel,
