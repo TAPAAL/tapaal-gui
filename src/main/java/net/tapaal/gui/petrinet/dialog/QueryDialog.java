@@ -2721,7 +2721,7 @@ public class QueryDialog extends JPanel {
 
         Point location = guiDialog.getLocation();
 
-        searchOptionsPanel.setVisible(advancedView && !isSmc);
+        searchOptionsPanel.setVisible(!isSmc);
         if(lens.isColored() && !lens.isTimed()){
             unfoldingOptionsPanel.setVisible(advancedView);
         }
@@ -5753,7 +5753,6 @@ public class QueryDialog extends JPanel {
 
     private void initSearchOptionsPanel() {
         searchOptionsPanel = new JPanel(new GridBagLayout());
-        searchOptionsPanel.setVisible(false);
 
 		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy Options"));
 		searchRadioButtonGroup = new ButtonGroup();
