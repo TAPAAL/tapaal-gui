@@ -151,6 +151,10 @@ public class Animator {
                 this.trace = trace;
                 if (trace.isColoredTrace()) {
                     setColoredTrace(trace);
+                    updateFireableTransitions();
+                    if (trace instanceof ColoredTAPNNetworkTrace coloredTrace && coloredTrace.getTraceType() != TraceType.NOT_EG) {
+                        tab.getAnimationHistorySidePanel().setLastShown(coloredTrace.getTraceType());
+                    }
                 } else {
                     setTimedTrace(trace);
                     TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;

@@ -3764,7 +3764,7 @@ public class QueryDialog extends JPanel {
         smcTraceType.setToolTipText(TOOL_TIP_TRACE_TYPE);
         smcTracePanel.add(smcTraceType, subPanelGbc);
 
-        if (lens.isColored()) {
+        if (lens.isColored() && lens.isStochastic()) {
             subPanelGbc.gridx = 0;
             subPanelGbc.gridy = 3;
             subPanelGbc.gridwidth = 2;

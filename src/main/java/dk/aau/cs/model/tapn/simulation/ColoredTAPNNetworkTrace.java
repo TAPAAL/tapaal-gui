@@ -6,8 +6,11 @@ import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 
+import dk.aau.cs.verification.VerifyTAPN.TraceType;
+
 public class ColoredTAPNNetworkTrace implements TAPNNetworkTrace {
     private final List<TAPNNetworkTraceStep> steps = new ArrayList<TAPNNetworkTraceStep>();
+    private TraceType traceType = TraceType.NOT_EG;
 
     public void add(TAPNNetworkTraceStep step) {
 		steps.add(step);
@@ -31,5 +34,13 @@ public class ColoredTAPNNetworkTrace implements TAPNNetworkTrace {
     @Override
     public boolean isColoredTrace() {
         return true;
+    }
+
+    public TraceType getTraceType() {
+        return traceType;
+    }
+
+    public void setTraceType(TraceType traceType) {
+        this.traceType = traceType;
     }
 }

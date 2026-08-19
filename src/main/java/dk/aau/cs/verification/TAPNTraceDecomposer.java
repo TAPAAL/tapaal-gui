@@ -50,6 +50,7 @@ public class TAPNTraceDecomposer {
 
     private TAPNNetworkTrace decomposeColoredTrace() {
         ColoredTAPNNetworkTrace decomposedTrace = new ColoredTAPNNetworkTrace();
+        decomposedTrace.setTraceType(trace.getTraceType());
         for (PetriNetStep action : trace) {
             decomposedTrace.add(decomposeAction(action));
         }
