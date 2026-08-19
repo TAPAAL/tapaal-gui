@@ -4,12 +4,23 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 import dk.aau.cs.io.NamePurifier;
 
 public class TCTLPlaceNode extends TCTLAbstractStateProperty {
+	private static final String SHARED = "Shared";
 
 	String template;
 	String place;
+	private final String color;
 	public TCTLPlaceNode(String template, String place) {
+		this(template, place, null);
+	}
+
+	public TCTLPlaceNode(String template, String place, String color) {
 		this.template = NamePurifier.purify(template);
 		this.place = NamePurifier.purify(place);
+		this.color = color == null ? null : color.trim();
+	}
+
+	public static TCTLPlaceNode fromManualQuery(String template, String place, String color) {
+		return new TCTLPlaceNode(SHARED.equals(template) ? "" : template, place, color);
 	}
 
 	public TCTLPlaceNode(String place) {
@@ -40,7 +51,7 @@ public class TCTLPlaceNode extends TCTLAbstractStateProperty {
 
     @Override
 	public TCTLAbstractStateProperty copy() {
-		return new TCTLPlaceNode(template, place);
+		return new TCTLPlaceNode(template, place, color);
 	}
 
 	@Override
@@ -91,10 +102,15 @@ public class TCTLPlaceNode extends TCTLAbstractStateProperty {
 	public void setPlace(String place) {
 		this.place = place;
 	}
-	
+
+	public String getColor() {
+		return color;
+	}
+
 	@Override
 	public String toString() {
-		return (template == "" ? "" : template + ".") + place;
+		var prefix = template.isEmpty() ? color == null ? "" : SHARED + "." : template + ".";
+		return prefix + place + (color == null ? "" : "." + color);
 	}
 
     @Override

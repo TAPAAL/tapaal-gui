@@ -38,6 +38,7 @@ import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOptio
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLQueryParseException;
+import dk.aau.cs.TCTL.XMLParsing.XMLQueryParserUtils;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -281,7 +282,7 @@ public class TAPNQueryLoader extends QueryLoader{
     }    
 
     private ObsExpression createPlaceExpression(Element element) {
-        String name = element.getTextContent();
+        String name = XMLQueryParserUtils.directText(element);
         String templateName = null;
         String placeName = null;
 
@@ -328,8 +329,16 @@ public class TAPNQueryLoader extends QueryLoader{
                 placeName = name;
             }
         }
+
+        String color = null;
+        NodeList colorExprs = element.getElementsByTagName("color-expression");
+        if (colorExprs.getLength() > 0) {
+            try {
+                color = XMLQueryParserUtils.parseColor(colorExprs.item(0), "Unable to parse color expression");
+            } catch (XMLQueryParseException e) {}
+        }
     
-        return new ObsPlace(templateName, placeName, network);
+        return new ObsPlace(templateName, placeName, color, network);
     }
 
     public static SMCSettings parseSmcSettings(Element smcTag) {

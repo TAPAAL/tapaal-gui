@@ -9,14 +9,18 @@ import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTermListNode;
+import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedTransition;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.InputSource;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -84,6 +88,7 @@ class QueryDialogArithmeticTest {
     @Test
     void placeAndConstantReplacementSelectTheRemainingPlaceholder() {
         assertReplacementSelectsRemainingPlaceholder(new TCTLPlaceNode("P"));
+        assertReplacementSelectsRemainingPlaceholder(new TCTLPlaceNode("TAPN1", "P", "dot"));
         assertReplacementSelectsRemainingPlaceholder(new TCTLConstNode(4));
     }
 
@@ -140,6 +145,38 @@ class QueryDialogArithmeticTest {
     ) {
         var edit = QueryDialog.createArithmeticEdit(selected, operator);
         return (TCTLAbstractStateProperty)expression.replace(edit.target(), edit.replacement());
+    }
+
+    @Test
+    void tupleColorQueriesSerializeAndParseCorrectly() throws Exception {
+        var comparison = new TCTLAtomicPropositionNode(
+            new TCTLPlaceNode("TAPN1", "P", "(Red, 1)"), "=", new TCTLConstNode(1));
+        var xml = new CTLQueryVisitor().getXMLQueryFor(new TCTLEFNode(comparison), "query", false);
+
+        assertTrue(xml.replaceAll("\\s+", "").contains("<color-expression><tuple><colorid=\"Red\"/><colorid=\"1\"/></tuple></color-expression>"));
+
+        var parsed = parseQuery(xml);
+        assertTrue(parsed.toString().contains("TAPN1.P.(Red, 1)"));
+    }
+
+    @Test
+    void nestedTupleColorQueriesSerializeAndParseCorrectly() throws Exception {
+        var comparison = new TCTLAtomicPropositionNode(
+            new TCTLPlaceNode("TAPN1", "P", "((Red, 1), A)"), "=", new TCTLConstNode(1));
+        var xml = new CTLQueryVisitor().getXMLQueryFor(new TCTLEFNode(comparison), "query", false);
+
+        assertTrue(xml.replaceAll("\\s+", "").contains("<color-expression><tuple><tuple><colorid=\"Red\"/><colorid=\"1\"/></tuple><colorid=\"A\"/></tuple></color-expression>"));
+
+        var parsed = parseQuery(xml);
+        assertTrue(parsed.toString().contains("TAPN1.P.((Red, 1), A)"));
+    }
+
+    private static TCTLAbstractProperty parseQuery(String xml) throws Exception {
+        var dbf = DocumentBuilderFactory.newInstance();
+        var db = dbf.newDocumentBuilder();
+        var doc = db.parse(new InputSource(new java.io.StringReader(xml)));
+        var propNode = doc.getElementsByTagName("property").item(0);
+        return XMLCTLQueryParser.parse(propNode);
     }
 
     private static TCTLTermListNode expression(Object... parts) {

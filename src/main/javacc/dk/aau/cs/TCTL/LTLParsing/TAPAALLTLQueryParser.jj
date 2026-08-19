@@ -295,15 +295,39 @@ TCTLAbstractStateProperty AritmeticFactor() :
 TCTLAbstractStateProperty thisProp;
     Token temp = null;
     Token place;
+	String color = null;
     Token op;
     Token num;
 }
 {
     (
-    [ LOOKAHEAD(2) temp = <IDENT> "." ] place = <IDENT> { thisProp = new TCTLPlaceNode(temp == null ? "" : temp.image, place.image); }
+    [ LOOKAHEAD(2) temp = <IDENT> "." ] place = <IDENT> [ "." color = QueryColor() ] { thisProp = TCTLPlaceNode.fromManualQuery(temp == null ? "" : temp.image, place.image, color); }
     | num = <NUM> { thisProp = new TCTLConstNode(Integer.parseInt(num.image)); }
     | "(" thisProp = AritmeticExpr() ")"
     )
 
     { return thisProp; }
+}
+
+String QueryColor() :
+{
+    Token color;
+    ArrayList<String> tuple = new ArrayList<>();
+}
+{
+    (
+        color = <IDENT> { return color.image; }
+        | color = <NUM> { return color.image; }
+        | "(" color = QueryColorPart() { tuple.add(color.image); }
+            ("," color = QueryColorPart() { tuple.add(color.image); })* ")"
+            { return "(" + String.join(", ", tuple) + ")"; }
+    )
+}
+
+Token QueryColorPart() :
+{
+    Token color;
+}
+{
+    (color = <IDENT> | color = <NUM>) { return color; }
 }

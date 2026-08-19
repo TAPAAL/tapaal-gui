@@ -1,18 +1,25 @@
 package net.tapaal.gui.petrinet.dialog;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -37,21 +44,23 @@ import dk.aau.cs.verification.observations.expressions.ObsPlace;
 import dk.aau.cs.verification.observations.expressions.ObsPlaceHolder;
 import dk.aau.cs.verification.observations.expressions.ObsSubtract;
 import net.tapaal.helpers.Enabler;
-import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.swingcomponents.EscapableDialog;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import java.util.Optional;
+import java.util.Vector;
 import java.util.regex.Pattern;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 
 public class ObservationDialog extends EscapableDialog {
     private static final String SHARED = "Shared";
+    private static final String ANY_COLOR = "Any";
     private static final Pattern namePattern = Pattern.compile("\\w+(?: \\w+)*");
     
     private final DefaultListModel<Observation> observationModel;
@@ -63,6 +72,7 @@ public class ObservationDialog extends EscapableDialog {
 
     private JComboBox<Object> templateComboBox;
     private JComboBox<TimedPlace> placeComboBox;
+    private JComboBox<Object> colorComboBox;
     
     private JPanel placesPanel;
     private JPanel constantsPanel;
@@ -191,32 +201,78 @@ public class ObservationDialog extends EscapableDialog {
             templateComboBox.addItem(SHARED);
         }
 
+        colorComboBox = new JComboBox<>();
+        colorComboBox.setVisible(tapnNetwork.isColored());
+        colorComboBox.setToolTipText("Choose a color for the selected place.");
+        colorComboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                var label = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                label.setFont(label.getFont().deriveFont(ANY_COLOR.equals(value) ? Font.ITALIC : Font.PLAIN));
+                return label;
+            }
+        });
+        colorComboBox.addPopupMenuListener(new PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                var comp = colorComboBox.getUI().getAccessibleChild(colorComboBox, 0);
+                if (comp instanceof JPopupMenu popup) {
+                    for (var element : popup.getComponents()) {
+                        if (element instanceof JScrollPane scrollPane) {
+                            if (scrollPane.getHorizontalScrollBar() == null) {
+                                scrollPane.setHorizontalScrollBar(new JScrollBar(JScrollBar.HORIZONTAL));
+                            }
+                            
+                            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {}
+        });
+
         placeComboBox = new JComboBox<>();
         templateComboBox.addActionListener(e -> {
             placeComboBox.removeAllItems();
-            if (templateComboBox.getSelectedItem().equals(SHARED)) {
-                tapnNetwork.sharedPlaces().forEach(place -> placeComboBox.addItem(place));
-            } else {
-                TimedArcPetriNet template = (TimedArcPetriNet)templateComboBox.getSelectedItem();
-                template.places().forEach(place -> {
-                    if (!place.isShared()) {
-                        placeComboBox.addItem(place);
-                    }
-                });
+            Object selected = templateComboBox.getSelectedItem();
+            if (selected != null) {
+                if (selected.equals(SHARED)) {
+                    tapnNetwork.sharedPlaces().forEach(place -> placeComboBox.addItem(place));
+                } else if (selected instanceof TimedArcPetriNet) {
+                    TimedArcPetriNet template = (TimedArcPetriNet)selected;
+                    template.places().forEach(place -> {
+                        if (!place.isShared()) {
+                            placeComboBox.addItem(place);
+                        }
+                    });
+                }
             }
+            refreshColorComboBox();
         });
+
+        placeComboBox.addActionListener(e -> refreshColorComboBox());
 
         // Initialize the placeComboBox with the first template
         if (templateComboBox.getItemCount() > 0) {
             templateComboBox.setSelectedIndex(0);
         }
+        refreshColorComboBox();
 
         JButton addPlaceButton = new JButton("Add place");
         addPlaceButton.addActionListener(e -> {
             Object template = templateComboBox.getSelectedItem();
             TimedPlace place = (TimedPlace)placeComboBox.getSelectedItem();
-            ObsExpression placeExpr = new ObsPlace(template, place);
-            updateExpression(placeExpr);
+            if (template != null && place != null) {
+                ObsExpression placeExpr = new ObsPlace(template, place, selectedColor());
+                updateExpression(placeExpr);
+            }
         });
 
         GridBagConstraints placesGbc = new GridBagConstraints();
@@ -229,6 +285,10 @@ public class ObservationDialog extends EscapableDialog {
         ++placesGbc.gridy;
         placesGbc.insets = new Insets(5, 10, 0, 10);
         placesPanel.add(placeComboBox, placesGbc);
+        if (tapnNetwork.isColored()) {
+            ++placesGbc.gridy;
+            placesPanel.add(colorComboBox, placesGbc);
+        }
         ++placesGbc.gridy;
         placesPanel.add(addPlaceButton, placesGbc);
 
@@ -492,30 +552,69 @@ public class ObservationDialog extends EscapableDialog {
         ObsExprPosition exprPos = currentExpr.getObjectPosition(pos - 1);
         expressionField.select(exprPos.getStart(), exprPos.getEnd());
         selectedExpr = exprPos.getObject();
-        if (selectedExpr.isPlace()) {
-            String[] placeParts = selectedExpr.toString().split("\\.");
-            String templateName = placeParts[0];
-            String placeName = placeParts[1];
-            Optional<?> selectedTemplateOpt = tapnNetwork.activeTemplates().stream()
-                .filter(t -> t.name().equals(templateName))
-                .findFirst();
-    
-            if (!selectedTemplateOpt.isPresent()) {
-                selectedTemplateOpt = Optional.of(SHARED);
+        if (selectedExpr.isPlace() && selectedExpr instanceof ObsPlace) {
+            ObsPlace obsPlace = (ObsPlace)selectedExpr;
+            Object selectedTemplate = obsPlace.getTemplate();
+            TimedPlace selectedPlace = obsPlace.getPlace();
+            String selectedColorName = obsPlace.getColor();
+
+            if (selectedTemplate != null) {
+                if (selectedTemplate.toString().equals(SHARED) || selectedTemplate.equals(SHARED)) {
+                    templateComboBox.setSelectedItem(SHARED);
+                } else if (selectedTemplate instanceof TimedArcPetriNet) {
+                    templateComboBox.setSelectedItem(selectedTemplate);
+                } else {
+                    TimedArcPetriNet net = tapnNetwork.getTAPNByName(selectedTemplate.toString());
+                    if (net != null) {
+                        templateComboBox.setSelectedItem(net);
+                    }
+                }
             }
-    
-            Object selectedTemplate = selectedTemplateOpt.get();
-            templateComboBox.setSelectedItem(selectedTemplate);
-    
-            if (selectedTemplate.equals(SHARED)) {
-                placeComboBox.setSelectedItem(tapnNetwork.getSharedPlaceByName(placeName));
-            } else {
-                placeComboBox.setSelectedItem(((TimedArcPetriNet)selectedTemplate).getPlaceByName(placeName));
+
+            if (selectedPlace != null) {
+                placeComboBox.setSelectedItem(selectedPlace);
             }
+
+            selectColor(selectedColorName);
         }
     
         Enabler.setAllEnabled(placesPanel, selectedExpr.isLeaf());
         Enabler.setAllEnabled(constantsPanel, selectedExpr.isLeaf());
+    }
+
+    private void refreshColorComboBox() {
+        if (colorComboBox == null) return;
+        var previousSelection = colorComboBox.getSelectedItem();
+        TimedPlace place = (TimedPlace)placeComboBox.getSelectedItem();
+
+        var colors = new Vector<>();
+        colors.add(ANY_COLOR);
+        if (tapnNetwork.isColored() && place != null && place.getColorType() != null) {
+            colors.addAll(place.getColorType().getColors());
+        }
+        colorComboBox.setModel(new DefaultComboBoxModel<>(colors));
+        if (colors.contains(previousSelection)) {
+            colorComboBox.setSelectedItem(previousSelection);
+        }
+    }
+
+    private String selectedColor() {
+        if (!tapnNetwork.isColored() || colorComboBox == null) return null;
+        var color = colorComboBox.getSelectedItem();
+        return color == null || ANY_COLOR.equals(color) ? null : color.toString();
+    }
+
+    private void selectColor(String colorName) {
+        if (colorComboBox == null) return;
+        colorComboBox.setSelectedItem(ANY_COLOR);
+        if (colorName == null) return;
+        for (int i = 1; i < colorComboBox.getItemCount(); ++i) {
+            var color = colorComboBox.getItemAt(i);
+            if (colorName.equals(color.toString())) {
+                colorComboBox.setSelectedItem(color);
+                return;
+            }
+        }
     }
 
     private void updateExpression(ObsExpression newExpr) {
