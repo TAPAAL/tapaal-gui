@@ -2,9 +2,13 @@ package net.tapaal.gui.petrinet.editor;
 
 import net.tapaal.gui.petrinet.undo.Colored.AddColorTypeCommand;
 import net.tapaal.gui.petrinet.undo.Command;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.visitors.PlaceNodeCollectorVisitor;
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import org.jdesktop.swingx.JXComboBox;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.undo.UndoManager;
@@ -37,6 +41,7 @@ public class ColorTypeDialogPanel extends JPanel {
     private final String oldName;
     private final ConstantsPane.ColorTypesListModel colorTypesListModel;
     private final UndoManager undoManager;
+    private final Iterable<TAPNQuery> queries;
 
     private JTextField nameTextField;
     private JComboBox colorTypeComboBox;
@@ -64,23 +69,27 @@ public class ColorTypeDialogPanel extends JPanel {
     private static final int MAXIMUM_INTEGER = 10000;
 
     public ColorTypeDialogPanel(ConstantsPane.ColorTypesListModel colorTypesListModel,
-                                TimedArcPetriNetNetwork network, UndoManager undoManager) {
+                                TimedArcPetriNetNetwork network, UndoManager undoManager,
+                                Iterable<TAPNQuery> queries) {
         oldName = "";
         this.network = network;
         this.colorTypesListModel = colorTypesListModel;
         this.undoManager = undoManager;
+        this.queries = queries;
         initComponents();
         nameTextField.setText(oldName);
 
     }
 
     public ColorTypeDialogPanel(ConstantsPane.ColorTypesListModel colorTypesListModel,
-                                TimedArcPetriNetNetwork network, ColorType colortype, UndoManager undoManager) {
+                                TimedArcPetriNetNetwork network, ColorType colortype, UndoManager undoManager,
+                                Iterable<TAPNQuery> queries) {
         this.oldColorType = colortype;
         oldName = colortype.getName();
         this.undoManager = undoManager;
         this.network = network;
         this.colorTypesListModel = colorTypesListModel;
+        this.queries = queries;
         initComponents();
         initValues();
         colorTypeComboBox.setVisible(false);
@@ -108,7 +117,7 @@ public class ColorTypeDialogPanel extends JPanel {
         if (!(oldColorType instanceof ProductType)) { // Color type is always either ProductType or Cyclic
             if (oldColorType.isIntegerRange()) {
                 colorTypeComboBox.setSelectedIndex(1);
-                for (dk.aau.cs.model.CPN.Color element : oldColorType) {
+                for (Color element : oldColorType) {
                     cyclicModel.addElement(element);
                 }
                 lowerBoundTextField.setText(cyclicModel.get(0).toString());
@@ -116,7 +125,7 @@ public class ColorTypeDialogPanel extends JPanel {
                 upperBoundTextField.setText(cyclicModel.get(cyclicModel.getSize() - 1).toString());
             } else {
                 colorTypeComboBox.setSelectedIndex(0);
-                for (dk.aau.cs.model.CPN.Color element : oldColorType) {
+                for (Color element : oldColorType) {
                     cyclicModel.addElement(element);
                 }
             }
@@ -546,7 +555,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.weighty = 1.0;
 
         cyclicListScrollPane.setVisible(true);
-        cyclicListScrollPane.setBorder(new LineBorder(Color.GRAY));
+        cyclicListScrollPane.setBorder(new LineBorder(java.awt.Color.GRAY));
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.BOTH;
         thirdRow.add(cyclicListScrollPane, gbc);
@@ -632,21 +641,21 @@ public class ColorTypeDialogPanel extends JPanel {
 
         for (Object value : enumList.getSelectedValuesList()) {
             ArrayList<String> emptyMessages = new ArrayList<>();
-            dk.aau.cs.model.CPN.Color color;
+            Color color;
 
-            if (!(value instanceof dk.aau.cs.model.CPN.Color)) {
+            if (!(value instanceof Color)) {
                 ColorType colorType = new ColorType(nameTextField.getText());
-                color = new dk.aau.cs.model.CPN.Color(colorType, indices[counter], value.toString());
+                color = new Color(colorType, indices[counter], value.toString());
             } else {
-                color = (dk.aau.cs.model.CPN.Color) value;
+                color = (Color)value;
             }
-            if (oldColorType == null || network.canColorBeRemoved(color, emptyMessages)) {
+            if (oldColorType == null || canColorBeRemoved(color, emptyMessages)) {
                 cyclicModel.removeElement(value);
                 enumList.setModel(cyclicModel);
             } else if (!emptyMessages.isEmpty()){
                 messages.addAll(emptyMessages);
             }
-            counter++;
+            ++counter;
         }
 
         if (!messages.isEmpty()) {
@@ -656,6 +665,30 @@ public class ColorTypeDialogPanel extends JPanel {
             }
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove color from color type", JOptionPane.WARNING_MESSAGE);
         }
+    }
+
+    private boolean canColorBeRemoved(Color color, List<String> messages) {
+        network.canColorBeRemoved(color, messages);
+        for (var query : queries) {
+            for (var place : PlaceNodeCollectorVisitor.collect(query.getProperty())) {
+                if (usesColor(place, color)) {
+                    messages.add(color.getName() + " is used in query " + query.getName() + "\n");
+                    break;
+                }
+            }
+        }
+        return messages.isEmpty();
+    }
+
+    private boolean usesColor(TCTLPlaceNode placeNode, Color color) {
+        if (placeNode.getColor() == null) return false;
+        var template = network.getTAPNByName(placeNode.getTemplate());
+        var place = placeNode.getTemplate().isEmpty()
+            ? network.getSharedPlaceByName(placeNode.getPlace())
+            : template == null ? null : template.getPlaceByName(placeNode.getPlace());
+        return place != null && place.getColorType().getColors().stream()
+            .filter(candidate -> candidate.toString().equals(placeNode.getColor()))
+            .anyMatch(candidate -> candidate.contains(color));
     }
 
     //productTypePanel contains TopPanel and scrollPanePanel
@@ -702,7 +735,7 @@ public class ColorTypeDialogPanel extends JPanel {
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
-        productTypeComboBox.setBackground(Color.white);
+        productTypeComboBox.setBackground(java.awt.Color.white);
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         topPanel.add(productTypeComboBox,gbc);
@@ -974,14 +1007,13 @@ public class ColorTypeDialogPanel extends JPanel {
                 Integer.parseInt(upperBoundTextField.getText()) < Integer.parseInt(oldColorType.getColors().lastElement().getColorName()) ||
                 Integer.parseInt(lowerBoundTextField.getText()) > Integer.parseInt(oldColorType.getColors().firstElement().getColorName()))) {
             // collect removed colors
-            List<dk.aau.cs.model.CPN.Color> removedColors = new ArrayList<>();
             ArrayList<String> messages = new ArrayList<>();
 
-            for (dk.aau.cs.model.CPN.Color c : oldColorType.getColors()) {
+            for (Color c : oldColorType.getColors()) {
                 if (Integer.parseInt(c.getName()) > Integer.parseInt(upperBoundTextField.getText()) ||
                     Integer.parseInt(c.getName()) < Integer.parseInt(lowerBoundTextField.getText())) {
                     // We need all the messages so we do nothing with the return value
-                    network.canColorBeRemoved(c, messages);
+                    canColorBeRemoved(c, messages);
                 }
             }
 
@@ -1052,7 +1084,7 @@ public class ColorTypeDialogPanel extends JPanel {
                         return;
                     }
                     boolean showDialog = false;
-                    for (dk.aau.cs.model.CPN.Color c : oldColorType.getColors()) {
+                    for (Color c : oldColorType.getColors()) {
                         if (!newColorType.contains(c)) {
                             showDialog = true;
                         }
@@ -1093,7 +1125,7 @@ public class ColorTypeDialogPanel extends JPanel {
                         return;
                     }
                     boolean showDialog = false;
-                    for (dk.aau.cs.model.CPN.Color c : oldColorType.getColors()) {
+                    for (Color c : oldColorType.getColors()) {
                         if (!newColorType.getColors().contains(c)) {
                             showDialog = true;
                             break;
