@@ -2,7 +2,6 @@ package pipe.gui.graph;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,10 +46,10 @@ public class GraphExporter {
             throw new IllegalArgumentException("Cannot export a piecewise graph with empty data.");
         }
 
-        String defaultName = getDefaultName(pieces);
-        Tuple<String, GraphExporterOptions> fileNameAndOptions = displayExportGui(parent, defaultName);
-        String path = fileNameAndOptions.value1();
-        GraphExporterOptions options = fileNameAndOptions.value2();
+        var defaultName = getDefaultName(pieces.get(0));
+        var fileNameAndOptions = displayExportGui(parent, defaultName);
+        var path = fileNameAndOptions.value1();
+        var options = fileNameAndOptions.value2();
         if (path == null || path.isEmpty() || options == null) {
             return;
         }
@@ -64,10 +63,10 @@ public class GraphExporter {
             throw new IllegalArgumentException("Cannot export graph(s) with empty data.");
         }
 
-        String defaultName = getDefaultName(graph);
-        Tuple<String, GraphExporterOptions> fileNameAndOptions = displayExportGui(parent, defaultName);
-        String path = fileNameAndOptions.value1();
-        GraphExporterOptions options = fileNameAndOptions.value2();
+        var defaultName = getDefaultName(graph);
+        var fileNameAndOptions = displayExportGui(parent, defaultName);
+        var path = fileNameAndOptions.value1();
+        var options = fileNameAndOptions.value2();
         if (path == null || path.isEmpty() || options == null) {
             return;
         }
@@ -85,10 +84,10 @@ public class GraphExporter {
             throw new IllegalArgumentException("Cannot export graph(s) with empty data.");
         }
 
-        String defaultName = getDefaultName(graph); 
-        Tuple<String, GraphExporterOptions> fileNameAndOptions = displayExportGui(parent, defaultName);
-        String path = fileNameAndOptions.value1();
-        GraphExporterOptions options = fileNameAndOptions.value2();
+        var defaultName = getDefaultName(graph);
+        var fileNameAndOptions = displayExportGui(parent, defaultName);
+        var path = fileNameAndOptions.value1();
+        var options = fileNameAndOptions.value2();
         if (path == null || path.isEmpty() || options == null) {
             return;
         }
@@ -105,28 +104,28 @@ public class GraphExporter {
     }
 
     private static Tuple<String, GraphExporterOptions> displayExportGui(Component parent, String defaultName) {
-        Object[] possibilities = {"Only the TikZ figure",
+        var possibilities = new String[]{"Only the TikZ figure",
                             "Full compilable LaTex including your figure"};
-        JPanel panel = new JPanel(new GridLayout(5, 1, 5, 5));
+        var panel = new JPanel(new GridLayout(5, 1, 5, 5));
         
         panel.add(new JLabel("Export type:"));
-        JComboBox<Object> outputBox = new JComboBox<>(possibilities);
+        var outputBox = new JComboBox<>(possibilities);
         panel.add(outputBox);
         
         panel.add(new JLabel("Legend position:"));
-        JComboBox<LegendPosition> legendBox = new JComboBox<>(LegendPosition.values());
+        var legendBox = new JComboBox<>(LegendPosition.values());
         panel.add(legendBox);
 
-        JPanel sizePanel = new JPanel(new GridLayout(1, 4, 5, 5));
+        var sizePanel = new JPanel(new GridLayout(1, 4, 5, 5));
         sizePanel.add(new JLabel("Width:"));
-        JTextField widthField = new JTextField("1.0");
+        var widthField = new JTextField("1.0");
         sizePanel.add(widthField);
         sizePanel.add(new JLabel("Height:"));
-        JTextField heightField = new JTextField("1.0");
+        var heightField = new JTextField("1.0");
         sizePanel.add(heightField);
         panel.add(sizePanel);
 
-        DocumentFilter numberFilter = new javax.swing.text.DocumentFilter() {
+        var numberFilter = new DocumentFilter() {
             @Override
             public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
                 if (string == null) return;
@@ -138,7 +137,7 @@ public class GraphExporter {
             @Override
             public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
                 if (text == null) return;
-                String newText = fb.getDocument().getText(0, fb.getDocument().getLength()) + text;
+                var newText = fb.getDocument().getText(0, fb.getDocument().getLength()) + text;
                 if (newText.matches("\\d*\\.?\\d*")) {
                     super.replace(fb, offset, length, text, attrs);
                 }
@@ -148,7 +147,7 @@ public class GraphExporter {
         ((AbstractDocument)widthField.getDocument()).setDocumentFilter(numberFilter);
         ((AbstractDocument)heightField.getDocument()).setDocumentFilter(numberFilter);
 
-        int result = JOptionPane.showConfirmDialog(
+        var result = JOptionPane.showConfirmDialog(
             parent, panel, "Export to TikZ",
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
         );
@@ -161,8 +160,8 @@ public class GraphExporter {
             options.setLegendPosition((LegendPosition)legendBox.getSelectedItem());
             
             try {
-                double width = Double.parseDouble(widthField.getText());
-                double height = Double.parseDouble(heightField.getText());
+                var width = Double.parseDouble(widthField.getText());
+                var height = Double.parseDouble(heightField.getText());
                 options.setWidthMultiplier(width);
                 options.setHeightMultiplier(height);
             } catch (NumberFormatException e) {
@@ -177,10 +176,10 @@ public class GraphExporter {
     }
 
     private static void writeTikzGraph(List<Graph> graphs, String path, GraphExporterOptions options, String xAxisLabel, String yAxisLabel) {
-        double minX = Double.MAX_VALUE;
-        double minY = Double.MAX_VALUE;
-        for (Graph graph : graphs) {
-            for (GraphPoint point : graph.getPoints()) {
+        var minX = Double.MAX_VALUE;
+        var minY = Double.MAX_VALUE;
+        for (var graph : graphs) {
+            for (var point : graph.getPoints()) {
                 if (point.getX() < minX) {
                     minX = point.getX();
                 }
@@ -190,7 +189,7 @@ public class GraphExporter {
             }
         }
 
-        StringBuilder tikzCode = new StringBuilder();
+        var tikzCode = new StringBuilder();
         if (options.isStandalone()) {
             tikzCode.append("\\documentclass{standalone}\n")
                     .append("\\usepackage{pgfplots}\n")
@@ -216,14 +215,14 @@ public class GraphExporter {
             tikzCode.append("\tymin=").append(minY).append(",\n");
         }
 
-        Graph firstGraph = graphs.get(0);
+        var firstGraph = graphs.get(0);
         tikzCode.append("\txlabel={").append(escapeLatex(xAxisLabel)).append("},\n")
                 .append("\tylabel={").append(escapeLatex(yAxisLabel)).append("},\n")
                 .append("\tgrid=major,\n")
                 .append("\tline width=1.2pt,\n");
 
         if (options.showLegend()) {
-            LegendPosition pos = options.getLegendPosition();
+            var pos = options.getLegendPosition();
             tikzCode.append("\tlegend style={at={")
                     .append(pos.getCoordinates())
                     .append("},anchor=")
@@ -234,20 +233,20 @@ public class GraphExporter {
         
         tikzCode.append("]\n");
         
-        Map<String, Color> colorMappings = options.getColorMappings();
-        boolean genColors = colorMappings == null;
+        var colorMappings = options.getColorMappings();
+        var genColors = colorMappings == null;
         if (genColors) {
             colorMappings = new HashMap<>();
         }
 
-        ColorGenerator colorGenerator = new ColorGenerator();
+        var colorGenerator = new ColorGenerator();
         Color plotColor = null;
-        for (Graph graph : graphs) {
-            String style = "solid,";
+        for (var graph : graphs) {
+            var style = "solid,";
             if (options.isMultiGraph()) {
-                String[] nameParts = graph.getName().split(" - ");
-                String observation = nameParts[0];
-                String property = nameParts[1];
+                var nameParts = graph.getName().split(" - ");
+                var observation = nameParts[0];
+                var property = nameParts[1];
 
                 plotColor = options.getColorMappings().get(observation);
                 if (plotColor == null) {
@@ -277,9 +276,9 @@ public class GraphExporter {
                     .append(plotColor.getBlue() / COLOR_NORMALIZER)
                     .append("}] coordinates {\n");
 
-            List<GraphPoint> points = reducePoints(graph.getPoints(), options.getResolution());
+            var points = graph.getPoints();
             tikzCode.append("\t");
-            for (GraphPoint point : points) {
+            for (var point : points) {
                 tikzCode.append("(")
                         .append(point.getX())
                         .append(", ")
@@ -295,9 +294,9 @@ public class GraphExporter {
             }
         }
         
-        boolean showMean = (graphs.size() == 1 || options.isPiecewise()) && firstGraph.getMean() != null;
+        var showMean = (graphs.size() == 1 || options.isPiecewise()) && firstGraph.getMean() != null;
         if (showMean) {
-            double mean = firstGraph.getMean();
+            var mean = firstGraph.getMean();
             tikzCode.append("\\draw[black,dotted,thick] (axis cs:")
                     .append(mean)
                     .append(",\\pgfkeysvalueof{/pgfplots/ymin}) -- (axis cs:")
@@ -338,26 +337,4 @@ public class GraphExporter {
         return graph.getName().toLowerCase().replaceAll(" ", "_") + ".tex";
     }
 
-    private static String getDefaultName(List<Graph> pieces) {
-        return pieces.get(0).getName().toLowerCase().replaceAll(" ", "_") + ".tex";
-    }
-
-    private static List<GraphPoint> reducePoints(List<GraphPoint> points, GraphExporterOptions.Resolution resolution) {
-        if (resolution == GraphExporterOptions.Resolution.HIGH) {
-            return points;
-        }
-
-        List<GraphPoint> reduced = new LinkedList<>();
-        reduced.add(points.get(0));
-        
-        for (int i = 1; i < points.size() - 1; i += resolution.getStep()) {
-            reduced.add(points.get(i));
-        }
-        
-        if (!reduced.contains(points.get(points.size() - 1))) {
-            reduced.add(points.get(points.size() - 1));
-        }
-        
-        return reduced;
-    }
 }
