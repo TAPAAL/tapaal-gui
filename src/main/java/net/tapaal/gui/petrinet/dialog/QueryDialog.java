@@ -487,6 +487,7 @@ public class QueryDialog extends JPanel {
 	private static final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private static final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
 	private boolean userChangedAtomicPropSelection = true;
+	private boolean updatingQueryControls;
 
     //In order: name of engine, support fastest trace, support deadlock with net degree 2 and (EF or AG), support deadlock with EG or AF, support deadlock with inhibitor arcs
     //support weights, support inhibitor arcs, support urgent transitions, support EG or AF, support strict nets, support timed nets/time intervals, support deadlock with net degree > 2
@@ -1277,6 +1278,16 @@ public class QueryDialog extends JPanel {
     }
 
     private void updateQueryButtonsAccordingToSelection() {
+        boolean wasUpdatingQueryControls = updatingQueryControls;
+        updatingQueryControls = true;
+        try {
+            updateQueryButtonsAccordingToSelectionImpl();
+        } finally {
+            updatingQueryControls = wasUpdatingQueryControls;
+        }
+    }
+
+    private void updateQueryButtonsAccordingToSelectionImpl() {
         TCTLAbstractProperty current = currentSelection.getObject();
         if (current instanceof TCTLStateToPathConverter && !lens.isTimed()) {
             current = ((TCTLStateToPathConverter) current).getProperty();
@@ -1361,6 +1372,10 @@ public class QueryDialog extends JPanel {
         if (!lens.isTimed()) {
             setEnablednessOfOperatorAndMarkingBoxes();
         }
+    }
+
+    private boolean userChangedAtomicPropositionControl() {
+        return userChangedAtomicPropSelection && !updatingQueryControls;
     }
 
     private void refreshPlaceTransitionBox(boolean includeTransitions) {
@@ -4735,7 +4750,7 @@ public class QueryDialog extends JPanel {
         traceBoxQuantification = new JComboBox<>(new DefaultComboBoxModel<>(tracesVector));
 
         traceBox.addActionListener(e -> {
-            if (updateTraceBox && userChangedAtomicPropSelection) {
+            if (updateTraceBox && userChangedAtomicPropositionControl()) {
                 var oldProp = currentSelection != null ? currentSelection.getObject() : null;
                 if (isInsideArithmetic(oldProp)) {
                     if (oldProp instanceof TCTLStatePlaceHolder) return;
@@ -5278,7 +5293,7 @@ public class QueryDialog extends JPanel {
             refreshPlaceTransitionBox(!inArithmeticContext);
             setEnablednessOfAddPredicateButton();
 
-            if (userChangedAtomicPropSelection && placeTransitionBox.getItemCount() > 0) {
+            if (userChangedAtomicPropositionControl() && placeTransitionBox.getItemCount() > 0) {
                 TCTLAbstractProperty current = currentSelection != null ? currentSelection.getObject() : null;
                 boolean isLeaf = current instanceof TCTLPlaceNode ||
                                 current instanceof HyperLTLPathScopeNode ||
@@ -5531,7 +5546,7 @@ public class QueryDialog extends JPanel {
 
         placeTransitionBox.addActionListener(e -> {
             refreshColorBox();
-            if (userChangedAtomicPropSelection) {
+            if (userChangedAtomicPropositionControl()) {
                 var oldProp = currentSelection.getObject();
                 if (isInsideArithmetic(oldProp)) {
                     if (oldProp instanceof TCTLStatePlaceHolder) return;
@@ -5544,7 +5559,7 @@ public class QueryDialog extends JPanel {
         });
 
         colorBox.addActionListener(e -> {
-            if (userChangedAtomicPropSelection && colorBox.isVisible()) {
+            if (userChangedAtomicPropositionControl() && colorBox.isVisible()) {
                 var oldProp = currentSelection != null ? currentSelection.getObject() : null;
                 if (oldProp != null && isInsideArithmetic(oldProp)) {
                     if (oldProp instanceof TCTLStatePlaceHolder) return;
@@ -5559,14 +5574,14 @@ public class QueryDialog extends JPanel {
         });
 
         relationalOperatorBox.addActionListener(e -> {
-            if (userChangedAtomicPropSelection) {
+            if (userChangedAtomicPropositionControl()) {
                 updateQueryOnAtomicPropositionChange();
             }
 
         });
 
         placeMarking.addChangeListener(arg0 -> {
-            if (userChangedAtomicPropSelection) {
+            if (userChangedAtomicPropositionControl()) {
                 var oldProp = currentSelection.getObject();
                 if (isInsideArithmetic(oldProp)) {
                     if (oldProp instanceof TCTLStatePlaceHolder) return;
@@ -5578,13 +5593,13 @@ public class QueryDialog extends JPanel {
         });
 
         addPlaceButton.addActionListener(e -> {
-            if (userChangedAtomicPropSelection && isInsideArithmetic(currentSelection.getObject())) {
+            if (userChangedAtomicPropositionControl() && isInsideArithmetic(currentSelection.getObject())) {
                 updateSelectedLeafToPlace();
             }
         });
 
         addConstantButton.addActionListener(e -> {
-            if (userChangedAtomicPropSelection && isInsideArithmetic(currentSelection.getObject())) {
+            if (userChangedAtomicPropositionControl() && isInsideArithmetic(currentSelection.getObject())) {
                 replaceCurrentSelectionWith(new TCTLConstNode((Integer)placeMarking.getValue()));
             }
         });

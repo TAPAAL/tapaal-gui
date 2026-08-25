@@ -101,6 +101,14 @@ class QueryDialogArithmeticTest {
     }
 
     @Test
+    void equalAtomicPredicatesAreRecognizedAsUnchanged() {
+        var first = new TCTLAtomicPropositionNode(new TCTLPlaceNode("P"), "=", new TCTLConstNode(1));
+        var second = new TCTLAtomicPropositionNode(new TCTLPlaceNode("P"), "=", new TCTLConstNode(1));
+
+        assertEquals(first, second);
+    }
+
+    @Test
     void subtractionGroupsTheFirstOperandInAnAdditionList() {
         var sum = pressFirstPlaceholder(new TCTLConstNode(0), "+", 2);
         var selected = (TCTLAbstractStateProperty)sum.findFirstPlaceHolder();
