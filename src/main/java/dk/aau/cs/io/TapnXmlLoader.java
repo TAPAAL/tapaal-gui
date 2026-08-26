@@ -155,7 +155,7 @@ public class TapnXmlLoader {
         parseFeature(doc, network);
 
         Collection<Template> templates = parseTemplates(doc, network, constants);
-		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network).parseQueries();
+		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network, lens != null ? lens.isColored() : network.isColored()).parseQueries();
 
 		if (loadedQueries != null) {
             for (String message : loadedQueries.getMessages()) {

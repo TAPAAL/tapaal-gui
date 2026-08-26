@@ -48,7 +48,11 @@ public class TAPNQueryLoader extends QueryLoader{
 	private final Document doc;
 	
 	public TAPNQueryLoader(Document doc, TimedArcPetriNetNetwork network) {
-		super(network);
+		this(doc, network, network.isColored());
+	}
+
+	public TAPNQueryLoader(Document doc, TimedArcPetriNetNetwork network, boolean isColored) {
+		super(network, isColored);
 		this.doc = doc;
 	}
 	
@@ -177,7 +181,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		}
 
 		if (query != null) {
-			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator, partitioning, colorFixpoint, symmetricVars, network.isColored(), coloredReduction);
+			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, reduction, hashTableSize, extrapolationOption, inclusionPlaces, isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator, partitioning, colorFixpoint, symmetricVars, isColored, coloredReduction);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			parsedQuery.setCategory(detectCategory(query, isCTL, isLTL, isHyperLTL, isSmc));
