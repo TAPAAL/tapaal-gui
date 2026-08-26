@@ -9,6 +9,7 @@ import org.w3c.dom.NodeList;
 
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.LocalTimedMarking;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -26,7 +27,6 @@ public class VerifyTAPNMarkingParser {
         
         parseTokensForPlaces(element, 
             placeId -> tapn.getPlaceByName(placeId),
-            tapn.parentNetwork()::getColorByName,
             tapn.parentNetwork()::getProductColorByConstituents,
             (place, token) -> marking.add(token),
             tapn.parentNetwork()
@@ -50,7 +50,6 @@ public class VerifyTAPNMarkingParser {
 
                 return network.getTAPNByName(originalName.value1()).getPlaceByName(originalName.value2());
             },
-            network::getColorByName,
             network::getProductColorByConstituents,
             (place, token) -> {
                 if (!place.isShared()) {
@@ -72,7 +71,6 @@ public class VerifyTAPNMarkingParser {
     
     private static void parseTokensForPlaces(Element element,
                                            Function<String, TimedPlace> placeResolver,
-                                           Function<String, Color> colorResolver,
                                            Function<Vector<Color>, Color> productColorResolver,
                                            TokenConsumer tokenConsumer,
                                            TimedArcPetriNetNetwork network) {
@@ -88,7 +86,7 @@ public class VerifyTAPNMarkingParser {
                 Node child = childNodes.item(j);
                 if (child.getNodeType() == Node.ELEMENT_NODE) {
                     try {
-                        ArcExpression arcExpr = parseSimpleArcExpression(child, network);
+                        ArcExpression arcExpr = parseSimpleArcExpression(child, network, place.getColorType());
                         placeExpressions.add(arcExpr);
                         expandArcExpressionToTokens(arcExpr, place, tokenConsumer, productColorResolver);
                     } catch (Exception e) {
@@ -114,29 +112,31 @@ public class VerifyTAPNMarkingParser {
         return node;
     }
     
-    private static ArcExpression parseSimpleArcExpression(Node node, TimedArcPetriNetNetwork network) throws Exception {
+    private static ArcExpression parseSimpleArcExpression(Node node, TimedArcPetriNetNetwork network,
+                                                          ColorType colorType) throws Exception {
         String name = node.getNodeName();
         
         if (name.equals("add")) {
             Vector<ArcExpression> constituents = new Vector<>();
             Node child = skipWS(node.getFirstChild());
             while (child != null) {
-                ArcExpression subterm = parseSimpleArcExpression(child, network);
+                ArcExpression subterm = parseSimpleArcExpression(child, network, colorType);
                 constituents.add(subterm);
                 child = skipWS(child.getNextSibling());
             }
             return new AddExpression(constituents);
         } else if (name.equals("numberof")) {
-            return parseNumberOfExpression(node, network);
+            return parseNumberOfExpression(node, network, colorType);
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
-            return parseSimpleArcExpression(child, network);
+            return parseSimpleArcExpression(child, network, colorType);
         } else {
             throw new Exception("Unexpected arc expression node: " + name);
         }
     }
     
-    private static NumberOfExpression parseNumberOfExpression(Node node, TimedArcPetriNetNetwork network) throws Exception {
+    private static NumberOfExpression parseNumberOfExpression(Node node, TimedArcPetriNetNetwork network,
+                                                              ColorType colorType) throws Exception {
         Node child = skipWS(node.getFirstChild());
         
         int number = 1;
@@ -151,7 +151,7 @@ public class VerifyTAPNMarkingParser {
         
         Vector<ColorExpression> colorExprs = new Vector<>();
         while (child != null) {
-            ColorExpression colorExpr = parseColorExpression(child, network);
+            ColorExpression colorExpr = parseColorExpression(child, network, colorType);
             if (colorExpr != null) {
                 colorExprs.add(colorExpr);
             }
@@ -161,25 +161,33 @@ public class VerifyTAPNMarkingParser {
         return new NumberOfExpression(number, colorExprs);
     }
     
-    private static ColorExpression parseColorExpression(Node node, TimedArcPetriNetNetwork network) throws Exception {
+    private static ColorExpression parseColorExpression(Node node, TimedArcPetriNetNetwork network,
+                                                        ColorType colorType) throws Exception {
         String name = node.getNodeName();
         
         if (name.equals("all")) {
             String sortId = node.getAttributes().getNamedItem("declaration").getNodeValue();
-            ColorType colorType = network.getColorTypeByName(sortId);
-            return new AllExpression(colorType);
+            return new AllExpression(network.getColorTypeByName(sortId));
         } else if (name.equals("useroperator")) {
             String colorName = node.getAttributes().getNamedItem("declaration").getNodeValue();
-            Color color = network.getColorByName(colorName);
+            Color color = colorType.getColorByName(colorName);
+            if (color == null) color = network.getColorByName(colorName);
             return new UserOperatorExpression(color);
         } else if (name.equals("tuple")) {
             Vector<ColorExpression> components = new Vector<>();
+            Vector<ColorType> componentTypes = colorType instanceof ProductType
+                ? ((ProductType)colorType).getColorTypes()
+                : new Vector<>();
             Node child = skipWS(node.getFirstChild());
+            int idx = 0;
             while (child != null) {
-                ColorExpression comp = parseColorExpression(child, network);
+                ColorType componentType = idx < componentTypes.size() ? componentTypes.get(idx) : colorType;
+                ColorExpression comp = parseColorExpression(child, network, componentType);
                 if (comp != null) {
                     components.add(comp);
                 }
+
+                ++idx;
                 child = skipWS(child.getNextSibling());
             }
             return new TupleExpression(components);
@@ -191,8 +199,14 @@ public class VerifyTAPNMarkingParser {
             if (rangeNode != null && rangeNode.getNodeName().equals("finiteintrange")) {
                 String start = rangeNode.getAttributes().getNamedItem("start").getNodeValue();
                 String end = rangeNode.getAttributes().getNamedItem("end").getNodeValue();
+
+                if (colorType.isIntegerRange() &&
+                    colorType.getFirstColor().getColorName().equals(start) &&
+                    colorType.getColors().lastElement().getColorName().equals(end)) {
+                    return new UserOperatorExpression(colorType.getColorByName(value));
+                }
                 
-                for (ColorType ct : network.colorTypes()) {
+                for (var ct : network.colorTypes()) {
                     if (ct.isIntegerRange() && 
                         ct.getFirstColor().getColorName().equals(start) &&
                         ct.getColors().lastElement().getColorName().equals(end)) {
@@ -206,7 +220,7 @@ public class VerifyTAPNMarkingParser {
             }
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
-            return parseColorExpression(child, network);
+            return parseColorExpression(child, network, colorType);
         }
         
         return null;
