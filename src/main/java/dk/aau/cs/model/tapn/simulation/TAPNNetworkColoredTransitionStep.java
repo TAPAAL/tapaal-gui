@@ -1,29 +1,16 @@
 package dk.aau.cs.model.tapn.simulation;
 
 import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.TimedToken;
-import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
-
-import java.util.List;
-import java.util.Map;
-
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.Variable;
-import dk.aau.cs.model.tapn.LocalTimedMarking;
+
+import java.util.Map;
 
 public class TAPNNetworkColoredTransitionStep extends TAPNNetworkTraceStep  {
     private final TimedTransition transition;
     private final Map<Variable, Color> bindings;
     private final NetworkMarking marking;
-
-    public TAPNNetworkColoredTransitionStep(TimedTransition transition, Map<Variable, Color> bindings, LocalTimedMarking marking, Map<TimedPlace, List<TimedToken>> sharedPlacesToTokensMap) {
-        this.transition = transition;
-        this.bindings = bindings;
-        NetworkMarking networkMarking = marking.getNetworkMarking().clone();
-        networkMarking.updateMarking(marking, sharedPlacesToTokensMap);
-        this.marking = networkMarking;
-    }
 
     public TAPNNetworkColoredTransitionStep(TimedTransition transition, Map<Variable, Color> bindings, NetworkMarking marking) {
         this.transition = transition;
