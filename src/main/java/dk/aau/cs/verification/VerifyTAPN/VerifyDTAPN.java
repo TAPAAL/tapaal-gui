@@ -343,7 +343,7 @@ public class VerifyDTAPN implements ModelChecker{
                     (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAFNode && !queryResult.value1().isQuerySatisfied()));
             
-                if ((options.traceOption() != TraceOption.NONE && isColored && showTrace || isSMC && options.isSimulate() && isColored) && !options.useExplicitSearch()) {
+                if ((options.traceOption() != TraceOption.NONE && isColored && showTrace || isSMC && options.isSimulate() && isColored) && !options.traceInOriginalNet()) {
                     TapnEngineXmlLoader tapnLoader = new TapnEngineXmlLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
@@ -374,7 +374,7 @@ public class VerifyDTAPN implements ModelChecker{
                 }
 
                 if (isSMC && options.isSimulate()) {
-                    VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.useExplicitSearch());
+                    VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.traceInOriginalNet());
                     BufferedReader reader = new BufferedReader(new StringReader(errorOutput));
                     Map<String, TimedArcPetriNetTrace> parsedTraceMap = traceParser.parseTraces(reader);
                     
@@ -433,7 +433,7 @@ public class VerifyDTAPN implements ModelChecker{
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
 		if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
 
-		VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), ((VerifyTAPNOptions)options).useExplicitSearch());
+		VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.traceInOriginalNet());
 		TimedArcPetriNetTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
 
 		if (trace == null) {

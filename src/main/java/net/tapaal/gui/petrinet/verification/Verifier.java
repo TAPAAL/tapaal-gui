@@ -96,6 +96,7 @@ public class Verifier {
             newQuery.setUseTarOption(query.isTarOptionEnabled());
             newQuery.setUseTarjan(query.isTarjan());
             newQuery.setUseExplicitSearch(query.useExplicitSearch());
+            newQuery.setTraceInOriginalNet(query.traceInOriginalNet());
         } else if (lens.isTimed() && query.getReductionOption() == ReductionOption.VerifyPN) {
             newQuery = new TAPNQuery(
                 query.getName(),
@@ -123,6 +124,7 @@ public class Verifier {
                 false);
             newQuery.setUseStubbornReduction(query.isStubbornReductionEnabled());
             newQuery.setUseExplicitSearch(query.useExplicitSearch());
+            newQuery.setTraceInOriginalNet(query.traceInOriginalNet());
         }
 
         return newQuery;
@@ -293,7 +295,7 @@ public class Verifier {
     public static VerifyTAPNOptions getVerificationOptions(TAPNQuery query, boolean isColored) {
         if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
             boolean isSmcSimulation = query.isSimulate() && query.getCategory() == TAPNQuery.QueryCategory.SMC;
-            boolean unfold = isColored && (query.getTraceOption() != TAPNQuery.TraceOption.NONE || isSmcSimulation) && !query.useExplicitSearch();
+            boolean unfold = isColored && (query.getTraceOption() != TAPNQuery.TraceOption.NONE || isSmcSimulation) && !query.traceInOriginalNet();
             return new VerifyDTAPNOptions(
                 query.getCapacity(),
                 query.getTraceOption(),
@@ -328,7 +330,7 @@ public class Verifier {
                 query.isMaxGranularity(),
                 query.getSmcSettings().getNumericPrecision(),
                 query.getSmcSettings().getSmcSeed(),
-                query.useExplicitSearch()
+                query.traceInOriginalNet()
         );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
             boolean unfold = isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE && !query.useExplicitSearch();

@@ -385,6 +385,7 @@ public class QueryDialog extends JPanel {
     private JCheckBox useTraceRefinement;
     private JCheckBox useTarjan;
     private JCheckBox useExplicitSearch;
+    private JCheckBox traceInOriginalNet;
     // Raw verification options panel
     private JPanel rawVerificationOptionsPanel;
     private JTextArea rawVerificationOptionsTextArea;
@@ -776,7 +777,7 @@ public class QueryDialog extends JPanel {
         query.setOldCapacity(oldCapacity);
 
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
-        query.setUseExplicitSearch(useExplicitSearch.isSelected());
+        query.setTraceInOriginalNet(lens.isColored() && !lens.isGame() && traceInOriginalNet.isSelected());
 
         if (reductionOptionToSet != null && reductionOptionToSet.equals(ReductionOption.VerifyTAPN)) {
             query.setDiscreteInclusion(discreteInclusion.isSelected());
@@ -2449,6 +2450,7 @@ public class QueryDialog extends JPanel {
         setupTarOptionsFromQuery(queryToCreateFrom);
         setupTarjanOptionsFromQuery(queryToCreateFrom);
         setupExplicitSearch(queryToCreateFrom.useExplicitSearch());
+        setupTraceInOriginalNet(queryToCreateFrom.traceInOriginalNet());
 
         if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
@@ -2457,13 +2459,16 @@ public class QueryDialog extends JPanel {
     }
 
     private void setupExplicitSearch(boolean selectExplicitSearch) {
-        if (lens.isColored() && !lens.isGame()) {
+        if (lens.isColored() && !lens.isTimed() && !lens.isGame()) {
             useExplicitSearch.setSelected(selectExplicitSearch);
-            if (!lens.isTimed()) {
-                setComponentEnabledRecursively(unfoldingOptionsPanel, !selectExplicitSearch);
-            }
-
+            setComponentEnabledRecursively(unfoldingOptionsPanel, !selectExplicitSearch);
             oldExplicitSearchState = selectExplicitSearch;
+        }
+    }
+
+    private void setupTraceInOriginalNet(boolean selected) {
+        if (lens.isTimed() && lens.isColored() && !lens.isGame()) {
+            traceInOriginalNet.setSelected(selected);
         }
     }
 
@@ -2636,7 +2641,7 @@ public class QueryDialog extends JPanel {
             selectInclusionPlacesButton.setEnabled(true);
         }
 
-        setupExplicitSearch(queryToCreateFrom.useExplicitSearch());
+        setupTraceInOriginalNet(queryToCreateFrom.traceInOriginalNet());
     }
 
     private void setupUntimedReductionOptions(TAPNQuery queryToCreateFrom) {
@@ -3768,9 +3773,7 @@ public class QueryDialog extends JPanel {
             subPanelGbc.gridx = 0;
             subPanelGbc.gridy = 3;
             subPanelGbc.gridwidth = 2;
-            useExplicitSearch.setText("Show trace in original net");
-            useExplicitSearch.setToolTipText("Maps the trace back to the original colored net instead of opening an unfolded net tab");
-            smcTracePanel.add(useExplicitSearch, subPanelGbc);
+            smcTracePanel.add(traceInOriginalNet, subPanelGbc);
             subPanelGbc.gridwidth = 1;
         }
   
@@ -6239,6 +6242,8 @@ public class QueryDialog extends JPanel {
         useTraceRefinement = new JCheckBox("Use trace abstraction refinement");
         useTarjan = new JCheckBox("Use Tarjan");
         useExplicitSearch = new JCheckBox("Use explicit search");
+        traceInOriginalNet = new JCheckBox("Show trace in original net");
+        traceInOriginalNet.setToolTipText("Maps the trace back to the original colored net instead of opening an unfolded net tab");
 
         useExplicitSearch.addActionListener(e -> {
             refreshHeuristicButtonText();
@@ -6263,6 +6268,7 @@ public class QueryDialog extends JPanel {
         useTraceRefinement.setSelected(false);
         useTarjan.setSelected(true);
         setupExplicitSearch(true);
+        traceInOriginalNet.setSelected(true);
 
         useReduction.setToolTipText(TOOL_TIP_USE_STRUCTURALREDUCTION);
         useColoredReduction.setToolTipText(TOOL_TIP_USE_COLORED_STRUCTURALREDUCTION);
@@ -6336,7 +6342,7 @@ public class QueryDialog extends JPanel {
         if (lens.isColored() && !lens.isGame() && !lens.isStochastic()) {
             gbc.gridx = 0;
             gbc.gridy = 4;
-            reductionOptionsPanel.add(useExplicitSearch, gbc);
+            reductionOptionsPanel.add(traceInOriginalNet, gbc);
         }
     }
 
@@ -6629,18 +6635,10 @@ public class QueryDialog extends JPanel {
 
     private void refreshExplicitSearch() {
         if (lens.isTimed()) {
-            useExplicitSearch.setText("Show trace in original net");
-            useExplicitSearch.setToolTipText("Maps the trace back to the original colored net instead of opening an unfolded net tab");
             boolean canMap = lens.isColored() && !lens.isGame();
-            useExplicitSearch.setEnabled(canMap);
-            if (canMap) {
-                useExplicitSearch.setSelected(oldExplicitSearchState);
-            } else {
-                useExplicitSearch.setSelected(false);
-            }
+            traceInOriginalNet.setEnabled(canMap);
+            if (!canMap) traceInOriginalNet.setSelected(false);
         } else {
-            useExplicitSearch.setText("Use explicit search");
-            useExplicitSearch.setToolTipText(TOOL_TIP_USE_EXPLICIT_SEARCH);
             if (canUseExplicitSearch()) {
                 useExplicitSearch.setSelected(oldExplicitSearchState);
                 useExplicitSearch.setEnabled(true);

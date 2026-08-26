@@ -19,8 +19,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-import com.sun.jna.Platform;
-
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.Variable;
@@ -56,10 +54,6 @@ public class InteractiveHandle {
         try {
             ModelChecker engine = isTimed ? Verifier.getVerifyDTAPN() : Verifier.getVerifyPN();
             engine.setup();
-            if (Platform.isWindows()) {
-                modelPath = '"' + modelPath + '"';
-            }
-
             List<String> initCommand = isTimed
                 ? List.of(engine.getPath(), modelPath, "--interactive-mode")
                 : List.of(engine.getPath(), modelPath, "-C", "--interactive-mode");
@@ -79,6 +73,19 @@ public class InteractiveHandle {
             writer = new BufferedWriter(new OutputStreamWriter(engineProcess.getOutputStream()));
             reader = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
             errorReader = new BufferedReader(new InputStreamReader(engineProcess.getErrorStream()));
+            var errorStream = errorReader;
+            var errorDrainer = new Thread(() -> {
+                try {
+                    String line;
+                    while ((line = errorStream.readLine()) != null) {
+                        if (shouldLog()) {
+                            Logger.log("Interactive engine: " + line);
+                        }
+                    }
+                } catch (IOException ignored) {}
+            }, "interactive-engine-stderr");
+            errorDrainer.setDaemon(true);
+            errorDrainer.start();
 
             registerShutdownHook();
 
@@ -97,16 +104,16 @@ public class InteractiveHandle {
     public static class BindingsResult {
         public final Map<TimedTransition, List<Map<Variable, Color>>> validBindings;
         public final Map<TimedTransition, List<Map<Variable, Color>>> delayEnabledBindings;
-        public final Map<TimedTransition, BigDecimal> minDelayMap;
+        public final Map<TimedTransition, Map<Map<Variable, Color>, BigDecimal>> bindingDelayMap;
 
         public BindingsResult(
             Map<TimedTransition, List<Map<Variable, Color>>> validBindings,
             Map<TimedTransition, List<Map<Variable, Color>>> delayEnabledBindings,
-            Map<TimedTransition, BigDecimal> minDelayMap
+            Map<TimedTransition, Map<Map<Variable, Color>, BigDecimal>> bindingDelayMap
         ) {
             this.validBindings = validBindings;
             this.delayEnabledBindings = delayEnabledBindings;
-            this.minDelayMap = minDelayMap;
+            this.bindingDelayMap = bindingDelayMap;
         }
 
         public BindingsResult(
@@ -138,7 +145,7 @@ public class InteractiveHandle {
         try {
             var amount = delay.intValue();
             var msg = "<delay value=\"" + amount + "\"/>";
-            var xmlResponse = sendMessage(msg, "delay-enabled-bindings");
+            var xmlResponse = sendMessage(msg, "valid-bindings");
             lastBindingsResult = parseBindingsResult(xmlResponse);
             return parseMarking(xmlResponse);
         } catch (Exception e) {
@@ -149,7 +156,7 @@ public class InteractiveHandle {
 
     public NetworkMarking sendTransition(TimedTransition transition, Map<Variable, Color> bindings) {
         try {
-            var expectedTag = isTimed ? "delay-enabled-bindings" : "marking";
+            var expectedTag = isTimed ? "valid-bindings" : "marking";
             var xmlResponse = sendMessage(transition.toBindingXmlStr(bindings, composer), expectedTag);
             if (isTimed) {
                 lastBindingsResult = parseBindingsResult(xmlResponse);
@@ -191,7 +198,7 @@ public class InteractiveHandle {
             var trimmedLine = line.trim();
             if (isTimed) {
                 response.append(line).append("\n");
-                if (trimmedLine.contains("</delay-enabled-bindings>")) {
+                if (trimmedLine.contains("</" + responseTag + ">")) {
                     foundEndTag = true;
                     break;
                 }
@@ -245,25 +252,24 @@ public class InteractiveHandle {
 
         Map<TimedTransition, List<Map<Variable, Color>>> validBindings = new HashMap<>();
         Map<TimedTransition, List<Map<Variable, Color>>> delayEnabledBindings = new HashMap<>();
-        Map<TimedTransition, BigDecimal> minDelayMap = new HashMap<>();
+        Map<TimedTransition, Map<Map<Variable, Color>, BigDecimal>> bindingDelayMap = new HashMap<>();
 
         var validNodes = document.getElementsByTagName("valid-bindings");
         if (validNodes.getLength() > 0) {
-            validBindings = parseBindingsFromNode((Element)validNodes.item(0), null);
+            parseBindingsFromNode((Element)validNodes.item(0), bindingDelayMap, validBindings, delayEnabledBindings);
         }
 
-        var delayNodes = document.getElementsByTagName("delay-enabled-bindings");
-        if (delayNodes.getLength() > 0) {
-            delayEnabledBindings = parseBindingsFromNode((Element)delayNodes.item(0), minDelayMap);
-        }
-
-        return new BindingsResult(validBindings, delayEnabledBindings, minDelayMap);
+        return new BindingsResult(validBindings, delayEnabledBindings, bindingDelayMap);
     }
 
-    private Map<TimedTransition, List<Map<Variable, Color>>> parseBindingsFromNode(Element parentElement, Map<TimedTransition, BigDecimal> minDelayMap) {
-        Map<TimedTransition, List<Map<Variable, Color>>> transitionBindings = new HashMap<>();
+    private void parseBindingsFromNode(
+        Element parentElement,
+        Map<TimedTransition, Map<Map<Variable, Color>, BigDecimal>> bindingDelayMap,
+        Map<TimedTransition, List<Map<Variable, Color>>> validBindingsByTransition,
+        Map<TimedTransition, List<Map<Variable, Color>>> delayBindingsByTransition
+    ) {
         if (parentElement == null) {
-            return transitionBindings;
+            return;
         }
 
         var transitionNodes = parentElement.getElementsByTagName("transition");
@@ -287,12 +293,8 @@ public class InteractiveHandle {
                 }
             }
 
-            if (minDelayMap != null && transitionElement.hasAttribute("min-delay")) {
-                var minDelayStr = transitionElement.getAttribute("min-delay");
-                minDelayMap.put(transition, new BigDecimal(minDelayStr));
-            }
-
             List<Map<Variable, Color>> validBindings = new ArrayList<>();
+            List<Map<Variable, Color>> delayBindings = new ArrayList<>();
             var bindingNodes = transitionElement.getElementsByTagName("binding");
             for (int j = 0; j < bindingNodes.getLength(); ++j) {
                 var bindingElement = (Element)bindingNodes.item(j);
@@ -313,13 +315,19 @@ public class InteractiveHandle {
                     singleBinding.put(variable, color);
                 }
 
-                validBindings.add(singleBinding);
+                if (bindingDelayMap != null && bindingElement.hasAttribute("min-delay")) {
+                    bindingDelayMap
+                        .computeIfAbsent(transition, ignored -> new HashMap<>())
+                        .put(singleBinding, new BigDecimal(bindingElement.getAttribute("min-delay")));
+                    delayBindings.add(singleBinding);
+                } else {
+                    validBindings.add(singleBinding);
+                }
             }
 
-            transitionBindings.put(transition, validBindings);
+            if (!validBindings.isEmpty()) validBindingsByTransition.put(transition, validBindings);
+            if (!delayBindings.isEmpty()) delayBindingsByTransition.put(transition, delayBindings);
         }
-
-        return transitionBindings;
     }
 
     private void registerShutdownHook() {

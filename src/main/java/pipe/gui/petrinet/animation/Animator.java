@@ -292,14 +292,14 @@ public class Animator {
         return initialMarking;
     }
 
-    private Map<TimedTransition, BigDecimal> minDelayMap = new HashMap<>();
+    private Map<TimedTransition, Map<Map<Variable, Color>, BigDecimal>> bindingDelayMap = new HashMap<>();
 
     private void updateValidBindingsMap() {
         if (!isUsingInteractiveEngine) return;
         var result = interactiveEngine.sendMarking(currentMarking());
         validBindingsMap = result.validBindings;
         delayEnabledBindingsMap = result.delayEnabledBindings;
-        minDelayMap = result.minDelayMap;
+        bindingDelayMap = result.bindingDelayMap;
     }
 
     private boolean isColoredTransitionInMap(TimedTransition transition, Map<TimedTransition, ?> map) {
@@ -842,16 +842,17 @@ public class Animator {
             }
 
             if (isDelayEnabledOnly && tab.getLens().isTimed()) {
-                var minDelay = minDelayMap.get(transition);
-                if (minDelay == null && transition.isShared()) {
+                var bindingDelays = bindingDelayMap.get(transition);
+                if (bindingDelays == null && transition.isShared()) {
                     for (var t : transition.sharedTransition().transitions()) {
-                        if (minDelayMap.containsKey(t)) {
-                            minDelay = minDelayMap.get(t);
+                        if (bindingDelayMap.containsKey(t)) {
+                            bindingDelays = bindingDelayMap.get(t);
                             break;
                         }
                     }
                 }
 
+                var minDelay = bindingDelays == null ? null : bindingDelays.get(bindings);
                 if (minDelay == null || minDelay.compareTo(BigDecimal.ZERO) <= 0) {
                     minDelay = BigDecimal.ONE;
                 }
@@ -871,7 +872,7 @@ public class Animator {
             if (interactiveEngine.getLastBindingsResult() != null) {
                 validBindingsMap = interactiveEngine.getLastBindingsResult().validBindings;
                 delayEnabledBindingsMap = interactiveEngine.getLastBindingsResult().delayEnabledBindings;
-                minDelayMap = interactiveEngine.getLastBindingsResult().minDelayMap;
+                bindingDelayMap = interactiveEngine.getLastBindingsResult().bindingDelayMap;
             }
             
             addMarking(new TAPNNetworkColoredTransitionStep(transition, bindings, newMarking), newMarking);

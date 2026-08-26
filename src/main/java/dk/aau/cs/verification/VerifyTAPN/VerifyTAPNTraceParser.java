@@ -42,7 +42,7 @@ import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 
 public class VerifyTAPNTraceParser {
 	private final TimedArcPetriNet tapn;
-    private final boolean useExplicitSearch;
+    private final boolean traceInOriginalNet;
 
 	private String traceNameToParse;
 	
@@ -50,9 +50,9 @@ public class VerifyTAPNTraceParser {
 		this(tapn, false);
 	}
 
-    public VerifyTAPNTraceParser(TimedArcPetriNet tapn, boolean useExplicitSearch) {
+    public VerifyTAPNTraceParser(TimedArcPetriNet tapn, boolean traceInOriginalNet) {
         this.tapn = tapn;
-        this.useExplicitSearch = useExplicitSearch;
+        this.traceInOriginalNet = traceInOriginalNet;
     }
 
 	public TimedArcPetriNetTrace parseTrace(BufferedReader reader) {
@@ -129,7 +129,7 @@ public class VerifyTAPNTraceParser {
                 String tag = childElement.getTagName();
                 if (tag.equals("transition")) {
                     PetriNetStep step;
-                    if (useExplicitSearch) {
+                    if (traceInOriginalNet) {
                         step = parseColoredTransitionStep(childElement);
                     } else {
                         step = parseTransitionStep(childElement);

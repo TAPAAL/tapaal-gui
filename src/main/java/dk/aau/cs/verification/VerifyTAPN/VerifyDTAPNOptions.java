@@ -133,7 +133,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             boolean maxGranularity,
             long numericPrecision,
             Optional<Long> smcSeed,
-            boolean useExplicitSearch
+            boolean traceInOriginalNet
 	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
@@ -159,10 +159,10 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         this.maxGranularity = maxGranularity;
         this.numericPrecision = numericPrecision;
         this.smcSeed = smcSeed;
-        this.useExplicitSearch = useExplicitSearch;
+        this.traceInOriginalNet = traceInOriginalNet;
 
 		// we only force unfolding when traces are involved
-        if (useExplicitSearch) {
+        if (traceInOriginalNet) {
             unfoldedModelPath = null;
             unfoldedQueriesPath = null;
         } else if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation || isSmc && isSimulate && unfold) && !useRawVerification)
@@ -195,8 +195,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         result.append(kBoundArg());
         result.append(deadTokenArg());
         result.append(traceArg(traceOption));
-        if (useExplicitSearch) {
-            result.append(" --map-original-trace ");
+        if (traceInOriginalNet) {
+            result.append(" --trace-original-net ");
         } else if(unfold && trace() != TraceOption.NONE || enabledOverApproximation || enabledUnderApproximation || isSmc && isSimulate && unfold)
         {
             result.append(writeUnfolded());
