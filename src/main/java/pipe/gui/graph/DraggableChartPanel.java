@@ -2,20 +2,34 @@ package pipe.gui.graph;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.axis.ValueAxis;
+import org.jfree.data.Range;
 
 import java.awt.event.MouseAdapter;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
 
 public class DraggableChartPanel extends ChartPanel {
     private int lastX;
     private int lastY;
+    private final Range originalDomainAxisRange;
+    private final Range originalRangeAxisRange;
 
     public DraggableChartPanel(JFreeChart chart) {
         super(chart);
+        var plot = chart.getPlot();
+        if (plot instanceof XYPlot xyPlot) {
+            originalDomainAxisRange = xyPlot.getDomainAxis().getRange();
+            originalRangeAxisRange = xyPlot.getRangeAxis().getRange();
+        } else {
+            originalDomainAxisRange = null;
+            originalRangeAxisRange = null;
+        }
+
+        setMouseWheelEnabled(false);
+        addMouseWheelListener(this::zoomWithWheel);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -37,8 +51,8 @@ public class DraggableChartPanel extends ChartPanel {
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                int deltaX = e.getX() - lastX;
-                int deltaY = e.getY() - lastY;
+                var deltaX = e.getX() - lastX;
+                var deltaY = e.getY() - lastY;
 
                 moveChart(deltaX, deltaY);
 
@@ -48,18 +62,42 @@ public class DraggableChartPanel extends ChartPanel {
         });
     }
 
-    private void moveChart(int deltaX, int deltaY) {
-        Plot plot = getChart().getPlot();
-        if (plot instanceof XYPlot) {
-            XYPlot xyPlot = (XYPlot) plot;
-            ValueAxis domainAxis = xyPlot.getDomainAxis();
-            ValueAxis rangeAxis = xyPlot.getRangeAxis();
+    public void resetView() {
+        if (getChart().getPlot() instanceof XYPlot plot && originalDomainAxisRange != null) {
+            plot.getDomainAxis().setRange(originalDomainAxisRange);
+            plot.getRangeAxis().setRange(originalRangeAxisRange);
+        }
+    }
 
-            double domainShift = domainAxis.getRange().getLength() * deltaX / getWidth();
-            double rangeShift = rangeAxis.getRange().getLength() * deltaY / getHeight();
+    private void moveChart(int deltaX, int deltaY) {
+        var plot = getChart().getPlot();
+        if (plot instanceof XYPlot xyPlot) {
+            var domainAxis = xyPlot.getDomainAxis();
+            var rangeAxis = xyPlot.getRangeAxis();
+
+            var domainShift = domainAxis.getRange().getLength() * deltaX / getWidth();
+            var rangeShift = rangeAxis.getRange().getLength() * deltaY / getHeight();
 
             domainAxis.setRange(domainAxis.getLowerBound() - domainShift, domainAxis.getUpperBound() - domainShift);
             rangeAxis.setRange(rangeAxis.getLowerBound() + rangeShift, rangeAxis.getUpperBound() + rangeShift);
         }
+    }
+
+    private void zoomWithWheel(MouseWheelEvent event) {
+        if (!(getChart().getPlot() instanceof XYPlot plot)) return;
+
+        var plotInfo = getChartRenderingInfo().getPlotInfo();
+        Point2D point = translateScreenToJava2D(event.getPoint());
+        if (!plotInfo.getDataArea().contains(point)) return;
+
+        double rotation = event.getPreciseWheelRotation();
+        if (rotation == 0) return;
+
+        boolean notify = plot.isNotify();
+        plot.setNotify(false);
+        double zoomFactor = Math.pow(1.1, rotation);
+        if (isDomainZoomable()) plot.zoomDomainAxes(zoomFactor, plotInfo, point, true);
+        if (isRangeZoomable()) plot.zoomRangeAxes(zoomFactor, plotInfo, point, true);
+        plot.setNotify(notify);
     }
 }

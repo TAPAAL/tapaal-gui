@@ -12,24 +12,9 @@ public class GraphExporterOptions {
     private double heightMultiplier = 1;
     private double widthMultiplier = 1;
 
-    private Resolution resolution = Resolution.HIGH;
     private LegendPosition legendPosition;
 
     private Map<String, Color> colorMappings;
-
-    public enum Resolution {
-        LOW(4), MEDIUM(2), HIGH(1);
-        
-        private final int step;
-        
-        Resolution(int step) {
-            this.step = step;
-        }
-        
-        public int getStep() {
-            return step;
-        }
-    }
 
     public enum LegendPosition {
         NW("North West", "(0.02,0.98)"),
@@ -75,10 +60,6 @@ public class GraphExporterOptions {
         return isMultiGraph;
     }
 
-    public Resolution getResolution() {
-        return resolution;
-    }
-
     public LegendPosition getLegendPosition() {
         return legendPosition;
     }
@@ -113,10 +94,6 @@ public class GraphExporterOptions {
 
     public void setMultiGraph(boolean isMultiGraph) {
         this.isMultiGraph = isMultiGraph;
-    }
-
-    public void setResolution(Resolution resolution) {
-        this.resolution = resolution;
     }
 
     public void setLegendPosition(LegendPosition legendPosition) {
