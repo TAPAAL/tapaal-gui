@@ -664,7 +664,8 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_SMC_SEED = "64-bit unsigned value to seed the SMC random engine. Will use hardware (if available) or pseudo random engine if left empty.";
     private final static String TOOL_TIP_GRANULARITY = "Uses the given granularity for observations";
 
-    private QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
+    QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
+        guiDialog = me;
         this.tapnNetwork = tapnNetwork;
         this.guiModels = guiModels;
         this.lens = lens;
@@ -1406,29 +1407,39 @@ public class QueryDialog extends JPanel {
         placeNames.sort(String::compareToIgnoreCase);
         Object previousSelection = placeTransitionBox.getSelectedItem();
 
+        boolean wasUpdating = userChangedAtomicPropSelection;
         userChangedAtomicPropSelection = false;
-        placeTransitionBox.setModel(new DefaultComboBoxModel<>(placeNames));
-        if (previousSelection != null && placeNames.contains(previousSelection.toString())) {
-            placeTransitionBox.setSelectedItem(previousSelection);
+        try {
+            placeTransitionBox.setModel(new DefaultComboBoxModel<>(placeNames));
+            if (previousSelection != null && placeNames.contains(previousSelection.toString())) {
+                placeTransitionBox.setSelectedItem(previousSelection);
+            }
+            
+            refreshColorBox();
+        } finally {
+            userChangedAtomicPropSelection = wasUpdating;
         }
-        
-        refreshColorBox();
-        userChangedAtomicPropSelection = true;
     }
 
     private void refreshColorBox() {
-        var previousSelection = colorBox.getSelectedItem();
-        var placeName = (String)placeTransitionBox.getSelectedItem();
-        var template = templateBox.getSelectedItem();
-        var place = SHARED.equals(template)
-            ? tapnNetwork.getSharedPlaceByName(placeName)
-            : template instanceof TimedArcPetriNet ? ((TimedArcPetriNet)template).getPlaceByName(placeName) : null;
+        boolean wasUpdating = userChangedAtomicPropSelection;
+        userChangedAtomicPropSelection = false;
+        try {
+            var previousSelection = colorBox.getSelectedItem();
+            var placeName = (String)placeTransitionBox.getSelectedItem();
+            var template = templateBox.getSelectedItem();
+            var place = SHARED.equals(template)
+                ? tapnNetwork.getSharedPlaceByName(placeName)
+                : template instanceof TimedArcPetriNet ? ((TimedArcPetriNet)template).getPlaceByName(placeName) : null;
 
-        var colors = new Vector<>();
-        colors.add(ANY_COLOR);
-        if (supportsColoredPlaceQueries() && place != null) colors.addAll(place.getColorType().getColors());
-        colorBox.setModel(new DefaultComboBoxModel<>(colors));
-        if (colors.contains(previousSelection)) colorBox.setSelectedItem(previousSelection);
+            var colors = new Vector<>();
+            colors.add(ANY_COLOR);
+            if (supportsColoredPlaceQueries() && place != null) colors.addAll(place.getColorType().getColors());
+            colorBox.setModel(new DefaultComboBoxModel<>(colors));
+            if (colors.contains(previousSelection)) colorBox.setSelectedItem(previousSelection);
+        } finally {
+            userChangedAtomicPropSelection = wasUpdating;
+        }
     }
 
     private String selectedColor() {
@@ -1514,29 +1525,7 @@ public class QueryDialog extends JPanel {
 
     private void updateSelectedLeafToConstant() {
         if (currentSelection == null) return;
-        int value = (Integer) placeMarking.getValue();
-        TCTLAbstractProperty replacement = new TCTLConstNode(value);
-        
-        TCTLAbstractProperty oldProp = currentSelection.getObject();
-        if (!oldProp.equals(replacement)) {
-            UndoableEdit edit = new QueryConstructionEdit(oldProp, replacement);
-            newProperty = newProperty.replace(oldProp, replacement);
-            
-            queryField.setText(newProperty.toString());
-            StringPosition position = newProperty.indexOf(replacement);
-            queryField.select(position.getStart(), position.getEnd());
-            currentSelection = position;
-            
-            updateQueryButtonsAccordingToSelection();
-            if (currentSelection != null) {
-                setEnabledOptionsAccordingToCurrentReduction();
-            } else {
-                disableAllQueryButtons();
-            }
-            
-            undoSupport.postEdit(edit);
-            queryChanged();
-        }
+        replaceCurrentSelectionWith(new TCTLConstNode((Integer)placeMarking.getValue()));
     }
 
     private void replaceCurrentSelectionWith(TCTLAbstractProperty replacement) {
@@ -1571,72 +1560,67 @@ public class QueryDialog extends JPanel {
             updateTraceBoxQuantification = true;
         }
 
-        if (current instanceof TCTLAtomicPropositionNode) {
-            TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) current;
+        boolean wasUpdating = userChangedAtomicPropSelection;
+        userChangedAtomicPropSelection = false;
+        try {
+            if (current instanceof TCTLAtomicPropositionNode) {
+                TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) current;
 
-            // bit of a hack to prevent posting edits to the undo manager when
-            // we programmatically change the selection in the atomic proposition comboboxes etc.
-            // because a different atomic proposition was selected
-            userChangedAtomicPropSelection = false;
-            if (node.getLeft() instanceof TCTLPlaceNode) {
-                updateSelectionPlaceNode((TCTLPlaceNode) node.getLeft());
-            } else if (node.getLeft() instanceof HyperLTLPathScopeNode) {
-                HyperLTLPathScopeNode scopeNode = (HyperLTLPathScopeNode) node.getLeft();
+                if (node.getLeft() instanceof TCTLPlaceNode) {
+                    updateSelectionPlaceNode((TCTLPlaceNode) node.getLeft());
+                } else if (node.getLeft() instanceof HyperLTLPathScopeNode) {
+                    HyperLTLPathScopeNode scopeNode = (HyperLTLPathScopeNode) node.getLeft();
+                    updateTraceBox = false;
+                    traceBox.setSelectedItem(scopeNode.getTrace());
+                    updateTraceBox = true;
+
+                    if (scopeNode.getProperty() instanceof TCTLPlaceNode)
+                        updateSelectionPlaceNode((TCTLPlaceNode) scopeNode.getProperty());
+                }
+                if (!lens.isTimed()) {
+                    updateUntimedQueryButtons(node);
+                } else {
+                    updateTimedQueryButtons(node);
+                }
+            } else if (current instanceof HyperLTLPathScopeNode) {
+                HyperLTLPathScopeNode scopeNode = (HyperLTLPathScopeNode)current;
                 updateTraceBox = false;
                 traceBox.setSelectedItem(scopeNode.getTrace());
                 updateTraceBox = true;
-
-                if (scopeNode.getProperty() instanceof TCTLPlaceNode)
+                if (scopeNode.getProperty() instanceof TCTLPlaceNode) {
                     updateSelectionPlaceNode((TCTLPlaceNode) scopeNode.getProperty());
-            }
-            if (!lens.isTimed()) {
-                updateUntimedQueryButtons(node);
-            } else {
-                updateTimedQueryButtons(node);
-            }
-        } else if (current instanceof HyperLTLPathScopeNode) {
-            HyperLTLPathScopeNode scopeNode = (HyperLTLPathScopeNode)current;
-            userChangedAtomicPropSelection = false;
-            updateTraceBox = false;
-            traceBox.setSelectedItem(scopeNode.getTrace());
-            updateTraceBox = true;
-            if (scopeNode.getProperty() instanceof TCTLPlaceNode) {
-                updateSelectionPlaceNode((TCTLPlaceNode) scopeNode.getProperty());
-                placeTransitionBox.setSelectedItem(((TCTLPlaceNode)scopeNode.getProperty()).getPlace());
-            } else if (scopeNode.getProperty() instanceof TCTLTransitionNode) {
-                var transitionNode = (TCTLTransitionNode)scopeNode.getProperty();
+                    placeTransitionBox.setSelectedItem(((TCTLPlaceNode)scopeNode.getProperty()).getPlace());
+                } else if (scopeNode.getProperty() instanceof TCTLTransitionNode) {
+                    var transitionNode = (TCTLTransitionNode)scopeNode.getProperty();
+                    if (transitionNode.getTemplate().equals("")) {
+                        templateBox.setSelectedItem(SHARED);
+                    } else {
+                        templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
+                    }
+
+                    placeTransitionBox.setSelectedItem(transitionNode.getTransition());
+                }
+            } else if (current instanceof TCTLPlaceNode) {
+                TCTLPlaceNode placeNode = (TCTLPlaceNode)current;
+                updateSelectionPlaceNode(placeNode);
+                placeTransitionBox.setSelectedItem(placeNode.getPlace());
+                selectColor(placeNode);
+            } else if (current instanceof TCTLTransitionNode) {
+                TCTLTransitionNode transitionNode = (TCTLTransitionNode) current;
                 if (transitionNode.getTemplate().equals("")) {
                     templateBox.setSelectedItem(SHARED);
                 } else {
                     templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
                 }
-
+                updateTraceBox = false;
+                if (!transitionNode.getTrace().equals("")) {
+                    traceBox.setSelectedItem(transitionNode.getTrace());
+                }
+                updateTraceBox = true;
                 placeTransitionBox.setSelectedItem(transitionNode.getTransition());
             }
-
-            userChangedAtomicPropSelection = true;
-        } else if (current instanceof TCTLPlaceNode) {
-            TCTLPlaceNode placeNode = (TCTLPlaceNode)current;
-            userChangedAtomicPropSelection = false;
-            updateSelectionPlaceNode(placeNode);
-            placeTransitionBox.setSelectedItem(placeNode.getPlace());
-            selectColor(placeNode);
-            userChangedAtomicPropSelection = true;
-        } else if (current instanceof TCTLTransitionNode) {
-            TCTLTransitionNode transitionNode = (TCTLTransitionNode) current;
-            userChangedAtomicPropSelection = false;
-            if (transitionNode.getTemplate().equals("")) {
-                templateBox.setSelectedItem(SHARED);
-            } else {
-                templateBox.setSelectedItem(tapnNetwork.getTAPNByName(transitionNode.getTemplate()));
-            }
-            updateTraceBox = false;
-            if (!transitionNode.getTrace().equals("")) {
-                traceBox.setSelectedItem(transitionNode.getTrace());
-            }
-            updateTraceBox = true;
-            placeTransitionBox.setSelectedItem(transitionNode.getTransition());
-            userChangedAtomicPropSelection = true;
+        } finally {
+            userChangedAtomicPropSelection = wasUpdating;
         }
     }
 
@@ -1657,11 +1641,9 @@ public class QueryDialog extends JPanel {
         selectColor(placeNode);
         relationalOperatorBox.setSelectedItem(node.getOp());
         placeMarking.setValue(placeMarkingNode.getConstant());
-        userChangedAtomicPropSelection = true;
     }
 
     private void updateUntimedQueryButtons(TCTLAtomicPropositionNode node) {
-        userChangedAtomicPropSelection = false;
         if (node.getLeft() instanceof TCTLPlaceNode || node.getLeft() instanceof HyperLTLPathScopeNode) {
             TCTLPlaceNode placeNode = null;
             if(queryType.getSelectedIndex() == 2) {
@@ -1683,18 +1665,23 @@ public class QueryDialog extends JPanel {
             TCTLConstNode placeMarkingNode = (TCTLConstNode) node.getRight();
             placeMarking.setValue(placeMarkingNode.getConstant());
         }
-        userChangedAtomicPropSelection = true;
     }
 
     private void selectColor(TCTLPlaceNode placeNode) {
-        colorBox.setSelectedItem(ANY_COLOR);
-        if (placeNode.getColor() == null) return;
-        for (int i = 1; i < colorBox.getItemCount(); ++i) {
-            var color = colorBox.getItemAt(i);
-            if (placeNode.getColor().equals(color.toString())) {
-                colorBox.setSelectedItem(color);
-                return;
+        boolean wasUpdating = userChangedAtomicPropSelection;
+        userChangedAtomicPropSelection = false;
+        try {
+            colorBox.setSelectedItem(ANY_COLOR);
+            if (placeNode.getColor() == null) return;
+            for (int i = 1; i < colorBox.getItemCount(); ++i) {
+                var color = colorBox.getItemAt(i);
+                if (placeNode.getColor().equals(color.toString())) {
+                    colorBox.setSelectedItem(color);
+                    return;
+                }
             }
+        } finally {
+            userChangedAtomicPropSelection = wasUpdating;
         }
     }
 
@@ -7549,4 +7536,20 @@ public class QueryDialog extends JPanel {
         smcSeed.setEnabled(!doingBenchmark);
     }
 
+    TCTLAbstractProperty getQueryProperty() {
+        return newProperty;
+    }
+
+    CustomJSpinner getPlaceMarking() {
+        return placeMarking;
+    }
+
+    void setSelectedProperty(TCTLAbstractProperty prop) {
+        StringPosition pos = newProperty.indexOf(prop);
+        if (pos != null) {
+            queryField.select(pos.getStart(), pos.getEnd());
+            currentSelection = pos;
+            updateQueryButtonsAccordingToSelection();
+        }
+    }
 }
