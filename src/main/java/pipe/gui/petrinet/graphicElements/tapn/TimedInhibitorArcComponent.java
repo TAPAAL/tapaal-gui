@@ -4,6 +4,7 @@ import java.awt.geom.Ellipse2D;
 import java.util.Hashtable;
 
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.Constants;
 import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
 import pipe.gui.petrinet.undo.ArcTimeIntervalEditCommand;
@@ -57,7 +58,11 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
 		getNameLabel().setText("");
-        if (getWeight().value() > 1 || displayConstantNames) {
+        if (inhibitorArc != null && isColored()) {
+            getNameLabel().setText(getExpression() == null
+                ? getWeight().nameForSaving(displayConstantNames) + "'" + inhibitorArc.source().getColorType().getName() + ".all"
+                : getExpression().toString());
+        } else if (getWeight().value() > 1 || displayConstantNames) {
             getNameLabel().setText(getWeight().toString(displayConstantNames));
         }
 
@@ -76,6 +81,12 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 
 		this.setLabelPosition();
+	}
+
+	@Override
+	public void setLens(TAPNLens lens) {
+		super.setLens(lens);
+		updateLabel(true);
 	}
 
 	@Override

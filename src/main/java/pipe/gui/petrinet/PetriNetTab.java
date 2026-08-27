@@ -9,7 +9,6 @@ import net.tapaal.gui.*;
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
-import net.tapaal.gui.petrinet.smartdraw.Boundary;
 import net.tapaal.gui.petrinet.smartdraw.Quadtree;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import net.tapaal.gui.petrinet.model.GuiModelManager;
@@ -2872,7 +2871,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 if (!isDragging) {
                     TimedTransitionComponent t = (TimedTransitionComponent) pno;
                     TimedTransition transition = t.underlyingTransition();
-                    if (transition.isDEnabled()) {
+                    if (getLens().isColored() || transition.isDEnabled()) {
                         animator.dFireTransition(transition);
                     }
                 } else {
@@ -3030,7 +3029,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		void transitionLeftClicked(TimedTransitionComponent t) {
 			TimedTransition transition = t.underlyingTransition();
 
-			if (transition.isDEnabled()) {
+			if (getLens().isColored() || transition.isDEnabled()) {
 				animator.dFireTransition(transition);
 			}
 		}

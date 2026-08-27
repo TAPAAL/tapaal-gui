@@ -17,6 +17,7 @@ public class TimedInhibitorArc extends TimedInputArc {
 	
 	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight, ArcExpression expression) {
 		super(source, destination, TimeInterval.ZERO_INF, weight, expression);
+		this.expression = expression;
 	}
 
     public TimedInhibitorArc(TimedPlace source, TimedTransition destination) {
@@ -64,6 +65,6 @@ public class TimedInhibitorArc extends TimedInputArc {
 	}
 	
 	public TimedInhibitorArc copy(TimedArcPetriNet tapn) {
-		return new TimedInhibitorArc(tapn.getPlaceByName(source().name()), tapn.getTransitionByName(destination().name()), interval().copy(), getWeight(), expression.copy());
+		return new TimedInhibitorArc(tapn.getPlaceByName(source().name()), tapn.getTransitionByName(destination().name()), interval().copy(), getWeight(), expression == null ? null : expression.copy());
 	}
 }
