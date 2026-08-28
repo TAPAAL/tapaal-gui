@@ -27,9 +27,15 @@ public abstract class QueryLoader {
     protected final Collection<String> messages = new ArrayList<>(10);
 	
 	protected final TimedArcPetriNetNetwork network;
+	protected final boolean isColored;
 	
 	public QueryLoader(TimedArcPetriNetNetwork network) {
+		this(network, network.isColored());
+	}
+
+	public QueryLoader(TimedArcPetriNetNetwork network, boolean isColored) {
 		this.network = network;
+		this.isColored = isColored;
 	}
 	
 	public LoadedQueries parseQueries() {

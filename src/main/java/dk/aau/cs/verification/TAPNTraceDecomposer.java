@@ -1,13 +1,11 @@
 package dk.aau.cs.verification;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import dk.aau.cs.model.tapn.LocalTimedMarking;
+import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -123,27 +121,26 @@ public class TAPNTraceDecomposer {
             tapnNetwork.getTAPNByName(originalName.value1()).getTransitionByName(originalName.value2());
 
         // Convert names in marking to original names
-        var newPostMarking = new LocalTimedMarking();
-        Map<TimedPlace, List<TimedToken>> sharedPlacesToTokensMap = new HashMap<>();
-        newPostMarking.setNetworkMarking(tapnNetwork.marking());
+        var networkMarking = new NetworkMarking();
+        for (var tapn : tapnNetwork.activeTemplates()) {
+            networkMarking.addMarking(tapn, new LocalTimedMarking());
+        }
 
-        if (step.getPostMarking() != null && step.getPostMarking().getPlacesToTokensMap() != null) {
+        if (step.getPostMarking() != null) {
             for (var entry : step.getPostMarking().getPlacesToTokensMap().entrySet()) {
-                var remappedName = mapping.map(entry.getKey().name());
-                var place = (remappedName.value1() == null || remappedName.value1().isEmpty()) ? 
-                    tapnNetwork.getSharedPlaceByName(remappedName.value2()) : 
-                    tapnNetwork.getTAPNByName(remappedName.value1()).getPlaceByName(remappedName.value2());
+                var entryName = entry.getKey().name();
+                var mappedPlace = mapping.map(entryName);
+                var isSharedPlace = (mappedPlace.value1() == null || mappedPlace.value1().isEmpty());
+                TimedPlace place = isSharedPlace ? 
+                    tapnNetwork.getSharedPlaceByName(mappedPlace.value2()) : 
+                    tapnNetwork.getTAPNByName(mappedPlace.value1()).getPlaceByName(mappedPlace.value2());
 
                 for (var token : entry.getValue()) {
-                    if (place.isShared()) {
-                        sharedPlacesToTokensMap.computeIfAbsent(place, k -> new ArrayList<>()).add(new TimedToken(place, token.age(), token.color()));
-                    } else {
-                        newPostMarking.add(new TimedToken(place, token.age(), token.color()));
-                    }
+                    networkMarking.add(new TimedToken(place, token.age(), token.color()));
                 }
             }
         }
 
-        return new TAPNNetworkColoredTransitionStep(transition, step.bindings(), newPostMarking, sharedPlacesToTokensMap);
+        return new TAPNNetworkColoredTransitionStep(transition, step.bindings(), networkMarking);
     }
 }

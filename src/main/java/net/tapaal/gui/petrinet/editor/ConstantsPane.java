@@ -757,8 +757,8 @@ public class ConstantsPane extends JPanel implements SidePane {
     }
 
     private void showEditManuallyDialog() {
-        UndoManager undoManager = tab.getUndoManager();
-        ManuallyEditDialogPanel panel = new ManuallyEditDialogPanel(colorTypesListModel, variablesListModel,constantsListModel, tab.network(), undoManager);
+        var undoManager = tab.getUndoManager();
+        var panel = new ManuallyEditDialogPanel(colorTypesListModel, variablesListModel, constantsListModel, tab.network(), undoManager, tab.getLens());
         panel.showDialog();
     }
 

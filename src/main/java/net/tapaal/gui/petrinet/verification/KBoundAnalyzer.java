@@ -93,7 +93,7 @@ public class KBoundAnalyzer {
 
 	protected VerifyTAPNOptions verificationOptions() {
 		if(modelChecker instanceof VerifyPN){
-			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.CTL, AlgorithmOption.CERTAIN_ZERO, false, QueryReductionTime.NoTime,false, null, false, true, tapnNetwork.isColored(), false, true, true, true, useRawVerification, rawVerificationPrompt);
+			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.CTL, AlgorithmOption.CERTAIN_ZERO, false, QueryReductionTime.NoTime,false, null, false, true, lens.isColored(), false, true, true, true, useRawVerification, rawVerificationPrompt);
 		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1, dataLayerQuery.getRawVerification(), dataLayerQuery.getRawVerificationPrompt());
 		} else if(modelChecker instanceof VerifyDTAPN){
@@ -101,7 +101,7 @@ public class KBoundAnalyzer {
             boolean gcd = !lens.isGame() && !lens.isStochastic();
             boolean dart = !tapnNetwork.hasUrgentTransitions() && !lens.isGame() && !lens.isStochastic();
 
-			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, gcd, dart, true, false, false, 1, false, true, true, tapnNetwork.isColored(), useRawVerification, rawVerificationPrompt);
+			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, gcd, dart, true, false, false, 1, false, true, true, lens.isColored(), useRawVerification, rawVerificationPrompt);
 		}
 		return null;
 	}

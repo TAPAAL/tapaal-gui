@@ -739,6 +739,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         viewMenu.addSeparator();
 
+        viewMenu.add(buildMenuUiScale());
+
+        viewMenu.addSeparator();
+
         viewMenu.add(incSpacingAction);
 
         viewMenu.add(decSpacingAction);
@@ -783,6 +787,34 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         viewMenu.add(showAdvancedWorkspaceAction);
         viewMenu.add(saveWorkSpaceAction);
         return viewMenu;
+    }
+
+    private JMenu buildMenuUiScale() {
+        var uiScaleMenu = new JMenu("UI Scale");
+        uiScaleMenu.setToolTipText("Applied after restarting TAPAAL");
+
+        var preferences = Preferences.getInstance();
+        var scaleGroup = new ButtonGroup();
+        var presetScales = new int[]{100, 200};
+        var savedScale = preferences.getUiScale();
+
+        for (var scale : presetScales) {
+            var label = (scale == Constants.UI_SCALE_DEFAULT) ? "100% (Default)" : scale + "%";
+            var item = new JRadioButtonMenuItem(label, scale == savedScale);
+            scaleGroup.add(item);
+            item.addActionListener(e -> {
+                if (scale != preferences.getUiScale()) {
+                    preferences.setUiScale(scale);
+                    JOptionPane.showMessageDialog(this,
+                            "Restart TAPAAL to apply the new UI scale.",
+                            "UI Scale", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+            });
+            uiScaleMenu.add(item);
+        }
+
+        return uiScaleMenu;
     }
 
 

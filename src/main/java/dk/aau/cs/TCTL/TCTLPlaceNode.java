@@ -3,6 +3,8 @@ package dk.aau.cs.TCTL;
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 import dk.aau.cs.io.NamePurifier;
 
+import java.util.Objects;
+
 public class TCTLPlaceNode extends TCTLAbstractStateProperty {
 	private static final String SHARED = "Shared";
 
@@ -117,9 +119,14 @@ public class TCTLPlaceNode extends TCTLAbstractStateProperty {
     public boolean equals(Object o) {
         if (o instanceof TCTLPlaceNode) {
             TCTLPlaceNode node = (TCTLPlaceNode)o;
-            return template.equals(node.template) && place.equals(node.place);
+            return template.equals(node.template) && place.equals(node.place) && Objects.equals(color, node.color);
         }
 
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(template, place, color);
     }
 }
