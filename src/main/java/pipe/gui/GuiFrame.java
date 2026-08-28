@@ -802,7 +802,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         var preferences = Preferences.getInstance();
         var scaleGroup = new ButtonGroup();
-        var presetScales = new int[]{50, 75, 100, 125, 150, 175, 200};
+        var presetScales = new int[]{100, 200};
         var savedScale = preferences.getUiScale();
 
         for (var scale : presetScales) {
