@@ -112,7 +112,8 @@ public class TapnEngineXmlLoader {
 		parseSharedTransitions(doc, network, constants);
 		
 		Collection<Template> templates = parseTemplates(doc, network, constants);
-		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network).parseQueries();
+		parseFeature(doc, network);
+		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network, lens != null ? lens.isColored() : network.isColored()).parseQueries();
 
 		if (loadedQueries != null) {
             for (String message : loadedQueries.getMessages()) {
@@ -120,7 +121,6 @@ public class TapnEngineXmlLoader {
             }
         }
 		network.buildConstraints();
-		parseFeature(doc, network);
 		network.setDefaultBound(3); // Ignores k-bounds in .tapn files
 
         if (hasFeatureTag) {

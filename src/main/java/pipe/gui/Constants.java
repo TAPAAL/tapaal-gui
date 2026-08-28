@@ -67,6 +67,8 @@ public class Constants {
 	public static final int ZOOM_MIN = 20;
 	public static final int ZOOM_DEFAULT = 100;
 
+	public static final int UI_SCALE_DEFAULT = 100;
+
 	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 200);
 	public static final Color ANIMATION_BACKGROUND_COLOR = new Color(246, 250, 255);
 	

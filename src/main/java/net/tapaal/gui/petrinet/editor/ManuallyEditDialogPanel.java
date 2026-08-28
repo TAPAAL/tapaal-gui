@@ -34,6 +34,8 @@ import dk.aau.cs.model.CPN.ConstantsParser.ConstantsParser;
 import dk.aau.cs.model.CPN.ConstantsParser.ParseException;
 import dk.aau.cs.model.CPN.ConstantsParser.TokenMgrError;
 
+import net.tapaal.gui.petrinet.TAPNLens;
+
 import javax.swing.JOptionPane;
 
 public class ManuallyEditDialogPanel extends EscapableDialog {
@@ -46,6 +48,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
     private final ConstantsListModel constantsListModel;
     private final TimedArcPetriNetNetwork network;
     private final UndoManager undoManager;
+    private final TAPNLens lens;
 
     private JTextArea constantsArea;
 
@@ -53,13 +56,15 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
                                    VariablesListModel variablesListModel,
                                    ConstantsListModel constantsListModel,
                                    TimedArcPetriNetNetwork network,
-                                   UndoManager undoManager) {
+                                   UndoManager undoManager,
+                                   TAPNLens lens) {
         super(TAPAALGUI.getApp(), "Manually Edit", false);
         this.colorTypesListModel = colorTypesListModel;
         this.variablesListModel = variablesListModel;
         this.constantsListModel = constantsListModel;
         this.network = network;
         this.undoManager = undoManager;
+        this.lens = lens;
 
         init();
     }
@@ -202,12 +207,12 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         JTextArea helpTextArea = new JTextArea();
 
         helpTextArea.setEditable(false);
-        boolean isColored = network.isColored();
-        String helpText = "Syntax for defining " + (isColored ? "color types, variables, and " : "") + "constants:\n" +
+        var isColored = lens.isColored();
+        var helpText = "Syntax for defining " + (isColored ? "color types, variables, and " : "") + "constants:\n" +
                           "const int {ID} = {INTEGER};\n" +
                           "const int {ID} = {{INTEGER}, ..., {INTEGER}};\n" +
                           "e.g. const int a = 5; or const int b = {1, 2, 3}; are valid constants.\n\n" +
-                          (network.isStochastic() ? "Syntax for defining real constants (usable as distribution parameters):\n" +
+                          (lens.isStochastic() ? "Syntax for defining real constants (usable as distribution parameters):\n" +
                             "const real {ID} = {REAL};\n" +
                             "const real {ID} = {{REAL}, ..., {REAL}};\n" +
                             "e.g. const real lambda = 0.5; or const real mu = {0.1, 0.5, 1.0}; are valid real constants.\n\n" : "") +
