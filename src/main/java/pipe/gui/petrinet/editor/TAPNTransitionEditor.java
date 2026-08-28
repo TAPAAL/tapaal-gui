@@ -12,6 +12,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.CPN.Expressions.PlaceHolderGuardExpression;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
 import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
@@ -493,6 +494,18 @@ public class TAPNTransitionEditor extends JPanel {
 	}
 
 	private boolean okButtonHandler(java.awt.event.ActionEvent evt) {
+		var guardExpression = coloredTransitionGuardPanel.getExpression();
+		if (!(guardExpression instanceof PlaceHolderGuardExpression)) {
+			try {
+				guardExpression.validateAndInferColorType();
+			} catch (IllegalArgumentException exception) {
+				JOptionPane.showMessageDialog(this,
+					exception.getMessage(),
+					"Illegal Guard", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		}
+
 		String newName = nameTextField.getText();
 		
 		// Check urgent constrain

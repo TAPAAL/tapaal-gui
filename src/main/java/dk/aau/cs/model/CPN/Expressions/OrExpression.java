@@ -73,6 +73,7 @@ public class OrExpression extends GuardExpression {
     public GuardExpression copy() {
         OrExpression copy = new OrExpression(left, right);
         copy.setSimpleProperty(isSimpleProperty());
+        copy.setColorType(colorType);
 
         return copy;
     }

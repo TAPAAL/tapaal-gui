@@ -42,7 +42,9 @@ public class NotExpression extends GuardExpression {
 
     @Override
     public GuardExpression copy() {
-        return new NotExpression(expr);
+        var copy = new NotExpression(expr);
+        copy.setColorType(colorType);
+        return copy;
     }
 
     @Override
@@ -86,4 +88,3 @@ public class NotExpression extends GuardExpression {
         return false;
     }
 }
-

@@ -122,6 +122,7 @@ public class AndExpression extends GuardExpression {
     public GuardExpression copy() {
         AndExpression copy = new AndExpression(left, right);
         copy.setSimpleProperty(isSimpleProperty());
+        copy.setColorType(colorType);
 
         return copy;
     }

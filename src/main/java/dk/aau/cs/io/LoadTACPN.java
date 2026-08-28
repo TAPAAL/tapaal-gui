@@ -12,7 +12,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import dk.aau.cs.model.CPN.Color;
-import dk.aau.cs.model.CPN.ColorMultiset;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
 import dk.aau.cs.model.CPN.Expressions.AllExpression;
@@ -418,6 +417,17 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
     }
 
     public GuardExpression parseGuardExpression(Node node) throws FormatException {
+        var guardExpression = parseGuardExpressionInternal(node);
+        try {
+            guardExpression.validateAndInferColorType();
+        } catch (IllegalArgumentException exception) {
+            throw new FormatException("Illegal guard: " + exception.getMessage(), exception);
+        }
+
+        return guardExpression;
+    }
+
+    private GuardExpression parseGuardExpressionInternal(Node node) throws FormatException {
         String name = node.getNodeName();
         if (name.matches("lt|lessthan")) {
             Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
@@ -439,10 +449,10 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             return new InequalityExpression(subexps.value1(), subexps.value2());
         } else if (name.equals("not")) {
             Node child = skipWS(node.getFirstChild());
-            GuardExpression childexp = parseGuardExpression(child);
+            GuardExpression childexp = parseGuardExpressionInternal(child);
             return new NotExpression(childexp);
         } else if (name.equals("and")) {
-            Tuple<GuardExpression, GuardExpression> subexps = parseLRGuardExpressions(node);
+            var subexps = parseLRGuardExpressionsInternal(node);
             AndExpression andExpr = new AndExpression(subexps.value1(), subexps.value2());
             Node isSimpleNode = node.getAttributes().getNamedItem("isSimple");
             if (isSimpleNode != null) {
@@ -452,21 +462,23 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         } else if (name.equals("or")) {
             Node left = skipWS(node.getFirstChild());
             Node right = skipWS(left.getNextSibling());
-            if(right == null){
-                return parseGuardExpression(left);
+            if (right == null) {
+                return parseGuardExpressionInternal(left);
             }
-            OrExpression orExpr = new OrExpression(parseGuardExpression(left), parseGuardExpression(right));
+
+            var orExpr = new OrExpression(parseGuardExpressionInternal(left), parseGuardExpressionInternal(right));
             Node isSimpleNode = node.getAttributes().getNamedItem("isSimple");
             if (isSimpleNode != null) {
                 orExpr.setSimpleProperty(Boolean.parseBoolean(isSimpleNode.getNodeValue()));
             }
+
             for (var it = skipWS(right.getNextSibling()); it != null; it = skipWS(it.getNextSibling())){
-                orExpr = new OrExpression(orExpr, parseGuardExpression(it));
+                orExpr = new OrExpression(orExpr, parseGuardExpressionInternal(it));
             }
             return orExpr;
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
-            return parseGuardExpression(child);
+            return parseGuardExpressionInternal(child);
         } else {
             throw new FormatException(String.format("Could not parse %s as a guard expression\n", name));
         }
@@ -480,11 +492,11 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         return new Tuple<>(leftexp, rightexp);
     }
 
-    private Tuple<GuardExpression,GuardExpression> parseLRGuardExpressions(Node node) throws FormatException {
+    private Tuple<GuardExpression,GuardExpression> parseLRGuardExpressionsInternal(Node node) throws FormatException {
         Node left = skipWS(node.getFirstChild());
-        GuardExpression leftexp = parseGuardExpression(left);
+        var leftexp = parseGuardExpressionInternal(left);
         Node right = skipWS(left.getNextSibling());
-        GuardExpression rightexp = parseGuardExpression(right);
+        var rightexp = parseGuardExpressionInternal(right);
         return new Tuple<>(leftexp, rightexp);
     }
 

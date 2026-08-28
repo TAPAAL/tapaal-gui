@@ -600,11 +600,7 @@ public class TapnXmlLoader {
 
         Node conditionNode = getFirstDirectChild(transition, "condition");
         if (conditionNode != null) {
-            try {
-                guardExpr = loadTACPN.parseGuardExpression(getFirstDirectChild(conditionNode, "structure"));
-            } catch (FormatException e) {
-                e.printStackTrace();
-            }
+            guardExpr = loadTACPN.parseGuardExpression(getFirstDirectChild(conditionNode, "structure"));
         }
 		
 		TimedTransition t = new TimedTransition(nameInput, guardExpr);
