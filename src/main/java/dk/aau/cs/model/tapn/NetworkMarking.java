@@ -54,17 +54,6 @@ public class NetworkMarking implements TimedMarking {
 		}
 	}
 
-    public void updateMarking(LocalTimedMarking newMarking, Map<TimedPlace, List<TimedToken>> sharedPlacesToTokensMap) {
-        for (TimedPlace place : newMarking.getPlacesToTokensMap().keySet()) {
-            TimedArcPetriNet tapn = ((LocalTimedPlace)place).model();
-            markings.put(tapn, newMarking);
-        }
-
-        sharedPlacesTokens.clear();
-        for (TimedPlace place : sharedPlacesToTokensMap.keySet()) {
-            sharedPlacesTokens.put(place, sharedPlacesToTokensMap.get(place));
-        }
-    }
 	
 	public LocalTimedMarking getMarkingFor(TimedArcPetriNet tapn) {
 		return markings.get(tapn);
