@@ -1,27 +1,22 @@
 package net.tapaal.gui.petrinet.verification;
 
+import java.util.EnumSet;
+
 public class UPPAALCombiOptions extends EngineSupportOptions {
 
     public UPPAALCombiOptions() {
         super(
-            "UPPAAL: Optimized Broadcast Reduction",//name of engine
-            false,// support fastest trace
-            true,// support deadlock with net degree 2 and (EF or AG)
-            false,// support deadlock with EG or AF
-            false,// support deadlock with inhibitor arcs
-            true, //support weights
-            true, //support inhibitor arcs
-            true,// support urgent transitions
-            true,// support EG or AF
-            true,// support strict nets
-            true,// support timed nets/time intervals
-            false,// support deadlock with net degree > 2
-            false, //support games
-            true, //support EG or AF with net degree > 2);
-            false, //support for nested quantification
-            false,
-            false,
-            false
+            "UPPAAL: Optimized Broadcast Reduction",
+            EnumSet.of(
+                EngineFeature.DEADLOCK_NET_DEGREE_2_EXP,
+                EngineFeature.WEIGHTS,
+                EngineFeature.INHIBITOR_ARCS,
+                EngineFeature.URGENT_TRANSITIONS,
+                EngineFeature.EG_OR_AF,
+                EngineFeature.STRICT_NETS,
+                EngineFeature.TIMED_NETS,
+                EngineFeature.EG_OR_AF_WITH_NET_DEGREE_GREATER_THAN_2
+            )
         );
     }
 }
