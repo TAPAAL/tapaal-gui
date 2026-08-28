@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.Constants;
 import net.tapaal.gui.petrinet.dialog.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -48,6 +49,11 @@ public class TAPAAL {
 
 	
 	public static void main(String[] args) throws Exception {
+		var savedScale = Preferences.getInstance().getUiScale();
+		if (System.getProperty("sun.java2d.uiScale") == null && savedScale != Constants.UI_SCALE_DEFAULT) {
+			System.setProperty("sun.java2d.uiScale", String.valueOf(savedScale / 100.0f));
+		}
+
 		// Create a CommandLineParser using Posix Style
 		CommandLineParser parser = new PosixParser();
 

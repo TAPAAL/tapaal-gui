@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.prefs.BackingStoreException;
 
 import org.jdesktop.swingx.MultiSplitLayout.Split;
+import pipe.gui.Constants;
 
 
 import dk.aau.cs.model.tapn.simulation.DelayMode;
@@ -131,6 +132,14 @@ public class Preferences {
 
 	public boolean getShowTokenAge(){
 		return pref.getBoolean("showTokenAge", true);
+	}
+
+	public void setUiScale(int scale) {
+		pref.putInt("uiScale", scale);
+	}
+
+	public int getUiScale() {
+		return pref.getInt("uiScale", Constants.UI_SCALE_DEFAULT);
 	}
 
 	public void setWindowSize(Dimension size) {
