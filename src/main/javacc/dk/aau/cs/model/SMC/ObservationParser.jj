@@ -16,6 +16,7 @@ import dk.aau.cs.verification.observations.expressions.ObsMultiply;
 import dk.aau.cs.verification.observations.expressions.ObsOperator;
 import dk.aau.cs.model.tapn.TimedPlace;
 import java.io.StringReader;
+import java.util.ArrayList;
 
 public class ObservationParser {
     private static TimedArcPetriNetNetwork network;
@@ -39,6 +40,8 @@ TOKEN:
     <MULTIPLY: "*">
     |
     <DOT: ".">
+    |
+    <COMMA: ",">
     |
     <OPEN_PAREN: "(">
     |
@@ -132,11 +135,12 @@ ObsExpression factor() : {
 
 ObsExpression atom() : {
     Token value, templateName, placeName;
+    String color = null;
 } {
     value = <CONSTANT> 
     { return new ObsConstant(Float.parseFloat(value.image)); }
     |
-    templateName = <ID> <DOT> placeName = <ID>
+    templateName = <ID> <DOT> placeName = <ID> [ <DOT> color = QueryColor() ]
     { 
         try {
             boolean isShared = false;
@@ -152,12 +156,35 @@ ObsExpression atom() : {
             }
 
             if (isShared) {
-                return new ObsPlace("Shared", placeName.image, network);
+                return new ObsPlace("Shared", placeName.image, color, network);
             } else {
-                return new ObsPlace(templateName.image, placeName.image, network);
+                return new ObsPlace(templateName.image, placeName.image, color, network);
             }
         } catch (NullPointerException e) {
             throw new ParseException("Place " + templateName.image + "." + placeName.image + " does not exist in the network");
         }
     }
+}
+
+String QueryColor() :
+{
+    Token color;
+    ArrayList<String> tuple = new ArrayList<String>();
+}
+{
+    (
+        color = <ID> { return color.image; }
+        | color = <CONSTANT> { return color.image; }
+        | <OPEN_PAREN> color = QueryColorPart() { tuple.add(color.image); }
+            (<COMMA> color = QueryColorPart() { tuple.add(color.image); })* <CLOSE_PAREN>
+            { return "(" + String.join(", ", tuple) + ")"; }
+    )
+}
+
+Token QueryColorPart() :
+{
+    Token color;
+}
+{
+    (color = <ID> | color = <CONSTANT>) { return color; }
 }

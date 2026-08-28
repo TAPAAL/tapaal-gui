@@ -749,19 +749,16 @@ public class ConstantsPane extends JPanel implements SidePane {
 
     }
     private void showEditColorTypeDialog(ColorType colorType) {
-        ColorTypeDialogPanel panel;
-        UndoManager undoManager = tab.getUndoManager();
-        if (colorType != null) {
-            panel = new ColorTypeDialogPanel(colorTypesListModel, tab.network(), colorType, undoManager);
-        } else {
-            panel = new ColorTypeDialogPanel(colorTypesListModel, tab.network(), undoManager);
-        }
+        var undoManager = tab.getUndoManager();
+        var panel = colorType != null
+            ? new ColorTypeDialogPanel(colorTypesListModel, tab.network(), colorType, undoManager, tab.queries())
+            : new ColorTypeDialogPanel(colorTypesListModel, tab.network(), undoManager, tab.queries());
         panel.showDialog();
     }
 
     private void showEditManuallyDialog() {
-        UndoManager undoManager = tab.getUndoManager();
-        ManuallyEditDialogPanel panel = new ManuallyEditDialogPanel(colorTypesListModel, variablesListModel,constantsListModel, tab.network(), undoManager);
+        var undoManager = tab.getUndoManager();
+        var panel = new ManuallyEditDialogPanel(colorTypesListModel, variablesListModel, constantsListModel, tab.network(), undoManager, tab.getLens());
         panel.showDialog();
     }
 

@@ -276,9 +276,8 @@ public class XMLQueryParser {
         } else if(nodeName.equals("tokens-count")){
             children = getAllChildren(integerExpression);
 
-            if(children.size() < 1){
-                throw new XMLQueryParseException(ERROR_MESSAGE + nodeName);
-            }
+            var place = XMLQueryParserUtils.parsePlaceTokensCount(children, ERROR_MESSAGE + nodeName);
+            if (place != null) return place;
 
             ArrayList<TCTLAbstractStateProperty> places = 
                 new ArrayList<TCTLAbstractStateProperty>();
