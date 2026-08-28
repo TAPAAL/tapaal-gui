@@ -27,26 +27,27 @@ public class MakeTransitionNewSharedCommand implements Command {
 	
 	@Override
 	public void redo() {
-		tapn.remove(timedTransition); // timedTransition has to be removed in case of reusing its name.
-		if(sharedTransition == null){
+        tapn.remove(timedTransition); // timedTransition has to be removed in case of reusing its name.
+		if (sharedTransition == null) {
 			sharedTransition = new SharedTransition(newName);
 		}
+
 		sharedPanel.addSharedTransition(sharedTransition, multiShare);			
 		sharedTransition.makeShared(timedTransition);
 		tapn.add(timedTransition);
-		
 	}
 
 	@Override
 	public void undo() {
-		tapn.add(timedTransition);
-		
-		if(sharedTransition != null){
+        tapn.remove(timedTransition);
+		if (sharedTransition != null) {
 			sharedPanel.removeSharedTransition(sharedTransition);
 		}
 		
 		timedTransition.unshare();
 		timedTransition.setName(oldName);
+
+        tapn.add(timedTransition);
 	}
 
 }
