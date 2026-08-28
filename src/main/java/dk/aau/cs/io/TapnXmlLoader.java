@@ -890,10 +890,17 @@ public class TapnXmlLoader {
         ArcExpression arcExpr = null;
         List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>();
         Node hlInscription = getFirstDirectChild(arc, "hlinscription");
-        if (hlInscription != null)
+        if (hlInscription != null) {
             hlInscription = getFirstDirectChild(hlInscription, "structure");
-        if (hlInscription != null)
-            arcExpr = loadTACPN.parseArcExpression(hlInscription);
+            Node expression = hlInscription == null ? null : hlInscription.getFirstChild();
+            while (expression != null && !(expression instanceof Element)) {
+                expression = expression.getNextSibling();
+            }
+            
+            if (expression != null) {
+                arcExpr = loadTACPN.parseArcExpression(hlInscription);
+            }
+        }
 
         NodeList intervalNodes = arc.getElementsByTagName("colorinterval");
         if (intervalNodes != null) {

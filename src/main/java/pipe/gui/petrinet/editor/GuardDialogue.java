@@ -147,7 +147,7 @@ public class GuardDialogue extends JPanel
         coloredArcGuardPanel = new ColoredArcGuardPanel(objectToBeEdited, context) {
             @Override
             public void disableOkButton() {
-                if (!isColoredInhibitorArc()) {
+                if (objectToBeEdited.isColored() && !isColoredInhibitorArc()) {
                     okButton.setEnabled(false);
                 }
             }

@@ -60,7 +60,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		getNameLabel().setText("");
         if (inhibitorArc != null && isColored()) {
             getNameLabel().setText(getExpression() == null
-                ? getWeight().nameForSaving(displayConstantNames) + "'" + inhibitorArc.source().getColorType().getName() + ".all"
+                ? getWeight().value() > 1 ? getWeight().toString(displayConstantNames) : ""
                 : getExpression().toString());
         } else if (getWeight().value() > 1 || displayConstantNames) {
             getNameLabel().setText(getWeight().toString(displayConstantNames));
