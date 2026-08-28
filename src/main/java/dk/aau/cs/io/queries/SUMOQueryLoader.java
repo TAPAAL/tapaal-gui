@@ -30,7 +30,11 @@ public class SUMOQueryLoader extends QueryLoader{
 	private final File file;
 
 	public SUMOQueryLoader(File file, TimedArcPetriNetNetwork network) {
-		super(network);
+		this(file, network, network.isColored());
+	}
+
+	public SUMOQueryLoader(File file, TimedArcPetriNetNetwork network, boolean isColored) {
+		super(network, isColored);
 		this.file = file;
 	}
 
@@ -62,7 +66,7 @@ public class SUMOQueryLoader extends QueryLoader{
 			//The number 9999 is the number of extra tokens allowed, this is set high s.t. we don't have to change it manually
 			TAPNQuery query = new TAPNQuery(name, 9999, property, 
 					TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyPN, 
-					true, false, true, true, true, true, HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces(), network.isColored());
+					true, false, true, true, true, true, HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces(), isColored);
 					
 			RenameTemplateVisitor rt = new RenameTemplateVisitor("", network.activeTemplates().get(0).name());
 			query.getProperty().accept(rt, null);
@@ -74,7 +78,7 @@ public class SUMOQueryLoader extends QueryLoader{
 	}
 
 	public static void importQueries(File file, TimedArcPetriNetNetwork network, PetriNetTab tab){
-		SUMOQueryLoader loader = new SUMOQueryLoader(file, network);
+		SUMOQueryLoader loader = new SUMOQueryLoader(file, network, tab.getLens().isColored());
 		LoadedQueries loadedQueries = loader.parseQueries();
         if (loadedQueries.getMessages().size() != 0) {
             String message = "While loading the net we found one or more warnings: \n\n";

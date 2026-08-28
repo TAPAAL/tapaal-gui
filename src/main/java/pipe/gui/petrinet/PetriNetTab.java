@@ -2,14 +2,16 @@ package pipe.gui.petrinet;
 
 import dk.aau.cs.TCTL.Parsing.ParseException;
 import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.visitors.PlaceNodeCollectorVisitor;
 import dk.aau.cs.debug.Logger;
+import java.util.Collection;
+import java.util.EnumSet;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import net.tapaal.gui.*;
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
-import net.tapaal.gui.petrinet.smartdraw.Boundary;
 import net.tapaal.gui.petrinet.smartdraw.Quadtree;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import net.tapaal.gui.petrinet.model.GuiModelManager;
@@ -240,30 +242,31 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         TimedArcPetriNetNetwork net = tab.network();
         for (TAPNQuery q : tab.queries()) {
             boolean smcQuery = q.getCategory() == TAPNQuery.QueryCategory.SMC;
-            boolean[] queryOptions = new boolean[]{
-                q.getTraceOption() == TAPNQuery.TraceOption.FASTEST,
-                (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && net.getHighestNetDegree() <= 2),
-                (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode)),
-                (q.getProperty() instanceof TCTLDeadlockNode && net.hasInhibitorArcs()),
-                net.hasWeights(),
-                net.hasInhibitorArcs(),
-                net.hasUrgentTransitions(),
-                (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode),
-                !net.isNonStrict(),
-                tab.lens.isTimed(),
-                (q.getProperty() instanceof TCTLDeadlockNode && net.getHighestNetDegree() > 2),
-                tab.lens.isGame(),
-                (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2,
-                q.hasUntimedOnlyProperties(),
-                tab.lens.isColored(),
-                tab.lens.isColored() && !tab.lens.isTimed(),
-                smcQuery
-            };
+            EnumSet<EngineFeature> requiredFeatures = EnumSet.noneOf(EngineFeature.class);
+            if (q.getTraceOption() == TAPNQuery.TraceOption.FASTEST) requiredFeatures.add(EngineFeature.FASTEST_TRACE);
+            if (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && net.getHighestNetDegree() <= 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
+            if (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode)) requiredFeatures.add(EngineFeature.DEADLOCK_EG_OR_AF);
+            if (q.getProperty() instanceof TCTLDeadlockNode && net.hasInhibitorArcs()) requiredFeatures.add(EngineFeature.DEADLOCK_WITH_INHIB);
+            if (net.hasWeights()) requiredFeatures.add(EngineFeature.WEIGHTS);
+            if (net.hasInhibitorArcs()) requiredFeatures.add(EngineFeature.INHIBITOR_ARCS);
+            if (net.hasUrgentTransitions()) requiredFeatures.add(EngineFeature.URGENT_TRANSITIONS);
+            if (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) requiredFeatures.add(EngineFeature.EG_OR_AF);
+            if (!net.isNonStrict()) requiredFeatures.add(EngineFeature.STRICT_NETS);
+            if (tab.lens.isTimed()) requiredFeatures.add(EngineFeature.TIMED_NETS);
+            if (q.getProperty() instanceof TCTLDeadlockNode && net.getHighestNetDegree() > 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_GREATER_THAN_2);
+            if (tab.lens.isGame()) requiredFeatures.add(EngineFeature.GAMES);
+            if ((q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2) requiredFeatures.add(EngineFeature.EG_OR_AF_WITH_NET_DEGREE_GREATER_THAN_2);
+            if (q.hasUntimedOnlyProperties()) requiredFeatures.add(EngineFeature.NESTED_QUANTIFICATIONS);
+            if (tab.lens.isColored()) requiredFeatures.add(EngineFeature.COLORED);
+            if (tab.lens.isColored() && !tab.lens.isTimed()) requiredFeatures.add(EngineFeature.ONLY_UNTIMED);
+            if (smcQuery) requiredFeatures.add(EngineFeature.SMC);
+            if (PlaceNodeCollectorVisitor.collect(q.getProperty()).stream().anyMatch(place -> place.getColor() != null)) requiredFeatures.add(EngineFeature.COLORED_PLACE_QUERIES);
+            if (Verifier.hasNonzeroInitialTokenAges(net)) requiredFeatures.add(EngineFeature.NONZERO_INITIAL_TOKEN_AGES);
 
-            boolean hasEngine = tab.checkCurrentEngine(q.getReductionOption(), queryOptions);
+            boolean hasEngine = tab.checkCurrentEngine(q.getReductionOption(), requiredFeatures);
             if (!hasEngine) {
                 for(EngineSupportOptions engine : engineSupportOptions){
-                    if(engine.areOptionsSupported(queryOptions)){
+                    if(engine.areOptionsSupported(requiredFeatures)){
                         q = tab.setQueryEngine(q, engine);
                         hasEngine = true;
                         break;
@@ -325,37 +328,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         }
 	}
 
-	private boolean checkCurrentEngine(ReductionOption reductionOption, boolean[] queryOptions) {
-        EngineSupportOptions engine;
-        switch (reductionOption) {
-            case VerifyDTAPN:
-                engine = new VerifyDTAPNEngineOptions(); 
-                break;
-            case VerifyPN:
-                engine = new VerifyPNEngineOptions();
-                break;
-            case VerifyTAPN:
-                engine = new VerifyTAPNEngineOptions();
-                break;
-            case BROADCAST:
-                engine = new UPPAALBroadcastOptions();
-                break;
-            case DEGREE2BROADCAST:
-                engine = new UPPAALBroadcastDegree2Options();
-                break;
-            case COMBI:
-                engine = new UPPAALCombiOptions();
-                break;
-            case STANDARD:
-                engine = new UPPAALStandardOptions();
-                break;
-            case OPTIMIZEDSTANDARD:
-                engine = new UPPAALOptimizedStandardOptions();
-                break;
-            default:
-                return false;
-        }
-        return engine.areOptionsSupported(queryOptions);
+	private boolean checkCurrentEngine(ReductionOption reductionOption, Collection<EngineFeature> requiredFeatures) {
+        EngineSupportOptions engine = EngineSupportOptions.fromReductionOption(reductionOption);
+        return engine != null && engine.areOptionsSupported(requiredFeatures);
     }
 
     private TAPNQuery setQueryEngine(TAPNQuery query, EngineSupportOptions engine) {

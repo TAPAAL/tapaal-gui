@@ -22,7 +22,6 @@ import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import java.util.HashMap;
-import java.util.Set;
 import java.io.File;
 import java.io.IOException;
 
@@ -127,11 +126,10 @@ public class Verifier {
         return newQuery;
     }
 
-    public static final Set<ReductionOption> INITIAL_TOKEN_AGE_ENGINES = Set.of(ReductionOption.VerifyDTAPN, ReductionOption.VerifyTAPN);
-
     public static TAPNQuery convertQuery(TAPNQuery query, TAPNLens lens, TimedArcPetriNetNetwork network) {
         TAPNQuery convertedQuery = convertQuery(query, lens);
-        if (hasNonzeroInitialTokenAges(network) && !INITIAL_TOKEN_AGE_ENGINES.contains(convertedQuery.getReductionOption())) {
+        EngineSupportOptions engine = EngineSupportOptions.fromReductionOption(convertedQuery.getReductionOption());
+        if (hasNonzeroInitialTokenAges(network) && (engine == null || !engine.supportsNonzeroInitialTokenAges())) {
             convertedQuery = convertedQuery.copy();
             convertedQuery.setReductionOption(ReductionOption.VerifyDTAPN);
         }
@@ -276,7 +274,7 @@ public class Verifier {
             }
 
             RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread);
-            if (tapnNetwork.isColored() && query.getTraceOption() != TAPNQuery.TraceOption.NONE) {
+            if (isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE) {
                 SmartDrawDialog.setupWorkerListener(thread);
             }
             thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), query.getCapacity(), query.getSmcSettings()), query, lens);
@@ -425,7 +423,7 @@ public class Verifier {
                 thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
             }
 
-            if (tapnNetwork.isColored() && query.getTraceOption() != TAPNQuery.TraceOption.NONE) {
+            if (isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE) {
                 SmartDrawDialog.setupWorkerListener(thread);
             }
             thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), query.getCapacity(), query.getSmcSettings()), query, lens);

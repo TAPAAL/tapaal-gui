@@ -48,7 +48,11 @@ public class XMLQueryLoader extends QueryLoader{
     }
 
     public XMLQueryLoader(File file, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories){
-        super(network);
+		this(file, network, queryCategories, network.isColored());
+	}
+
+    public XMLQueryLoader(File file, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories, boolean isColored){
+		super(network, isColored);
         this.file = file;
         this.queryCategories = queryCategories;
     }
@@ -174,7 +178,7 @@ public class XMLQueryLoader extends QueryLoader{
             TAPNQuery query = new TAPNQuery(queryWrapper.getName(), 9999,
                 queryWrapper.getProp(),TraceOption.NONE, SearchOption.HEURISTIC,
                 ReductionOption.VerifyPN, true, false, true, true, true, true, 
-                HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces(), network.isColored());
+                HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces(), isColored);
 
             RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
                 network.activeTemplates().get(0).name());
@@ -302,7 +306,7 @@ public class XMLQueryLoader extends QueryLoader{
     }
 
     public static void importQueries(File file, TimedArcPetriNetNetwork network, PetriNetTab tab){
-        XMLQueryLoader loader = new XMLQueryLoader(file, network);
+		XMLQueryLoader loader = new XMLQueryLoader(file, network, null, tab.getLens().isColored());
 
         // Suppress default error message
         loader.showErrorMessage = false;
