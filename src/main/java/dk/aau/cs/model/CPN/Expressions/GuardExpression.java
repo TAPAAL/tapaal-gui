@@ -18,6 +18,8 @@ public abstract class GuardExpression extends Expression {
 
     public void setColorType(ColorType colorType) { this.colorType = colorType; }
 
+    public void setColorTypeRecursively(ColorType colorType) { setColorType(colorType); }
+
     @Override
     public abstract GuardExpression replace(Expression object1, Expression object2, boolean replaceAllInstances);
 
@@ -48,7 +50,7 @@ public abstract class GuardExpression extends Expression {
             }
         }
 
-        setColorType(inferredColorType);
+        setColorTypeRecursively(inferredColorType);
     }
 
     public abstract Boolean eval(ExpressionContext context);

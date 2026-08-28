@@ -1,9 +1,9 @@
 package dk.aau.cs.io;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Vector;
 import java.util.function.Consumer;
 
@@ -248,16 +248,16 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         throw new FormatException(String.format("Could not parse %s as an usersort\n", node.getNodeName()));
     }
 
-    public ArcExpression parseArcExpression(Node node) throws FormatException {
+    public ArcExpression parseArcExpression(Node node, ColorType colorType) throws FormatException {
         String name = node.getNodeName();
         if (name.equals("numberof")) {
-            return parseNumberOfExpression(node);
+            return parseNumberOfExpression(node, colorType);
         } else if (name.equals("add")) {
             Vector<ArcExpression> constituents = new Vector<>();
     
             Node child = skipWS(node.getFirstChild());
             while (child != null) {
-                ArcExpression subterm = parseArcExpression(child);
+                ArcExpression subterm = parseArcExpression(child, colorType);
                 constituents.add(subterm);
                 child = skipWS(child.getNextSibling());
             }
@@ -270,11 +270,11 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             return addExpr;
         } else if (name.equals("subtract")) {
             Node headchild = skipWS(node.getFirstChild());
-            ArcExpression headexp = parseArcExpression(headchild);
+            ArcExpression headexp = parseArcExpression(headchild, colorType);
     
             Node nextchild = skipWS(headchild.getNextSibling());
             while (nextchild != null) {
-                ArcExpression nextexp = parseArcExpression(nextchild);
+                ArcExpression nextexp = parseArcExpression(nextchild, colorType);
                 SubtractExpression subExpr = new SubtractExpression(headexp, nextexp);
                 headexp.setParent(subExpr);
                 nextexp.setParent(subExpr);
@@ -289,7 +289,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             Integer scalarval = parseNumberConstantExpression(scalar);
     
             Node child = skipWS(scalar.getNextSibling());
-            ArcExpression childexp = parseArcExpression(child);
+            ArcExpression childexp = parseArcExpression(child, colorType);
             ScalarProductExpression scalarExpr = new ScalarProductExpression(scalarval, childexp);
             childexp.setParent(scalarExpr);
             return scalarExpr;
@@ -300,17 +300,17 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             return new NumberOfExpression(1,ceVector);
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
-            return parseArcExpression(child);
+            return parseArcExpression(child, colorType);
         } else if (name.matches("tuple")){
             Vector<ColorExpression> ceVector = new Vector<>();
-            ceVector.add(parseColorExpression(node));
+            ceVector.add(parseColorExpression(node, colorType));
             return new NumberOfExpression(1, ceVector);
         } else {
             throw new FormatException(String.format("Could not parse %s as an arc expression\n", name));
         }
     }
 
-    private NumberOfExpression parseNumberOfExpression(Node node) throws FormatException {
+    private NumberOfExpression parseNumberOfExpression(Node node, ColorType colorType) throws FormatException {
         Node number = skipWS(node.getFirstChild());
         //The number constant may be omitted.
         //In that case, this parsing returns null.
@@ -326,7 +326,7 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         }
         Vector<ColorExpression> colorexps = new Vector<>();
         while (subnode != null) {
-            ColorExpression colorexp = parseColorExpression(subnode);
+            ColorExpression colorexp = parseColorExpression(subnode, colorType);
             colorexps.add(colorexp);
             subnode = skipWS(subnode.getNextSibling());
         }
@@ -347,77 +347,103 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         }
     }
 
-    private ColorExpression parseColorExpression(Node node) throws FormatException {
+    private ColorExpression parseColorExpression(Node node, ColorType expectedType) throws FormatException {
         String name = node.getNodeName();
         if (name.equals("dotconstant")) {
+            if (!expectedType.equals(ColorType.COLORTYPE_DOT)) {
+                throw new FormatException("The dot constant does not belong to color type " + expectedType.getName());
+            }
+
             return new DotConstantExpression();
         } else if (name.equals("variable")) {
             String varname = getAttribute(node, "refvariable").getNodeValue();
             Variable var = variables.get(varname);
             if(var != null){
+                if (!expectedType.equals(var.getColorType())) {
+                    throw new FormatException("Variable " + var.getName() + " does not belong to color type " + expectedType.getName());
+                }
+
                 return new VariableExpression(var);
             } else {
                 return tupleVarExpressions.get(varname);
             }
         } else if (name.equals("useroperator")) {
             String colorname = nc.transform(getAttribute(node, "declaration").getNodeValue());
-            Color color = getColor(colorname);
+            Color color = expectedType.getColorByName(colorname);
+            if (color == null) {
+                throw new FormatException("The guard constant \"" + colorname + "\" does not belong to color type " + expectedType.getName());
+            }
+
             return new UserOperatorExpression(color);
         } else if (name.equals("successor")) {
             Node child = skipWS(node.getFirstChild());
-            ColorExpression childexp = parseColorExpression(child);
+            ColorExpression childexp = parseColorExpression(child, expectedType);
             return new SuccessorExpression(childexp);
         } else if (name.equals("predecessor")) {
             Node child = skipWS(node.getFirstChild());
-            ColorExpression childexp = parseColorExpression(child);
+            ColorExpression childexp = parseColorExpression(child, expectedType);
             return new PredecessorExpression(childexp);
         } else if(name.equals("all")){
             ColorType ct = parseUserSort(node);
+            if (!expectedType.equals(ct)) {
+                throw new FormatException("The all expression does not belong to color type " + expectedType.getName());
+            }
+
             return new AllExpression(ct);
         } else if (name.equals("tuple")) {
             Vector<ColorExpression> colorexps = new Vector<>();
+            if (!(expectedType instanceof ProductType)) {
+                throw new FormatException("A tuple guard expression requires a product color type");
+            }
+            var productType = (ProductType)expectedType;
 
             Node child = skipWS(node.getFirstChild());
+            var index = 0;
             while (child != null) {
-                ColorExpression colorexp = parseColorExpression(child);
+                if (index >= productType.getConstituents().size()) {
+                    throw new FormatException("The tuple guard expression does not match color type " + expectedType.getName());
+                }
+
+                var constituentType = productType.getConstituents().get(index);
+                ColorExpression colorexp = parseColorExpression(child, constituentType);
                 colorexps.add(colorexp);
                 child = skipWS(child.getNextSibling());
+                ++index;
             }
+            if (index != productType.getConstituents().size()) {
+                throw new FormatException("The tuple guard expression does not match color type " + expectedType.getName());
+            }
+
             //Sometimes PNML nets have tuples with only 1 color, we just remove the tuple
             if(colorexps.size() < 2){
                 return colorexps.get(0);
             }
-            return new TupleExpression(colorexps);
+            return new TupleExpression(colorexps, expectedType);
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
-            return parseColorExpression(child);
+            return parseColorExpression(child, expectedType);
         } else if (name.equals("finiteintrangeconstant")){
             String value = getAttribute(node, "value").getNodeValue();
             //we assume first child is finiteintrange
             Node intRangeElement = skipWS(node.getFirstChild());
             String start = getAttribute(intRangeElement, "start").getNodeValue();
             String end = getAttribute(intRangeElement, "end").getNodeValue();
-            return new UserOperatorExpression(findColorForIntRange(value,start,end));
+            var colors = expectedType.getColorList();
+            var color = expectedType.getColorByName(value);
+            if (colors.isEmpty() || !colors.get(0).getColorName().equals(start) ||
+                !colors.get(colors.size() - 1).getColorName().equals(end) || color == null) {
+                throw new FormatException("The guard constant \"" + value + "\" does not belong to color type " + expectedType.getName());
+            }
+
+            return new UserOperatorExpression(color);
 
         } else {
             throw new FormatException(String.format("Could not parse %s as an color expression\n", name));
         }
     }
 
-    /// This will select the wrong color if the is overlap in naming, eg for IntegerRangeExpr (1,2,3,4) & (1,2)
-    private dk.aau.cs.model.CPN.Color getColor(String colorname) throws FormatException {
-        for (ColorType ct : colortypes.values()) {
-            for (dk.aau.cs.model.CPN.Color c : ct) {
-                if (c.getName().equals(colorname)) {
-                    return c;
-                }
-            }
-        }
-        throw new FormatException(String.format("The color \"%s\" was not declared\n", colorname));
-    }
-
     public GuardExpression parseGuardExpression(Node node) throws FormatException {
-        var guardExpression = parseGuardExpressionInternal(node);
+        var guardExpression = parseGuardExpressionInternal(node, inferGuardColorType(node));
         try {
             guardExpression.validateAndInferColorType();
         } catch (IllegalArgumentException exception) {
@@ -427,32 +453,64 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
         return guardExpression;
     }
 
-    private GuardExpression parseGuardExpressionInternal(Node node) throws FormatException {
+    private ColorType inferGuardColorType(Node node) throws FormatException {
+        var pending = new ArrayDeque<Node>();
+        pending.add(node);
+        ColorType type = null;
+        while (!pending.isEmpty()) {
+            var current = pending.removeLast();
+            if (current.getNodeName().equals("variable")) {
+                var id = getAttribute(current, "refvariable").getNodeValue();
+                var variable = variables.get(id);
+                if (variable == null) {
+                    throw new FormatException("Illegal guard: Unknown variable " + id);
+                }
+
+                if (type != null && !type.equals(variable.getColorType())) {
+                    throw new FormatException("Illegal guard: All variables in a guard expression must have the same color type.");
+                }
+
+                type = variable.getColorType();
+            }
+
+            for (var child = current.getFirstChild(); child != null; child = child.getNextSibling()) {
+                pending.add(child);
+            }
+        }
+
+        if (type == null) {
+            throw new FormatException("Illegal guard: There must be at least one variable in the guard expression.");
+        }
+
+        return type;
+    }
+
+    private GuardExpression parseGuardExpressionInternal(Node node, ColorType type) throws FormatException {
         String name = node.getNodeName();
         if (name.matches("lt|lessthan")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node, type);
             return new LessThanExpression(subexps.value1(), subexps.value2());
         } else if (name.matches("gt|greaterthan")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node, type);
             return new GreaterThanExpression(subexps.value1(), subexps.value2());
         } else if (name.matches("leq|lessthanorequal")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node, type);
             return new LessThanEqExpression(subexps.value1(), subexps.value2());
         } else if (name.matches("geq|greaterthanorequal")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node, type);
             return new GreaterThanEqExpression(subexps.value1(), subexps.value2());
         } else if (name.matches("eq|equality")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node, type);
             return new EqualityExpression(subexps.value1(), subexps.value2());
         } else if (name.matches("neq|inequality")) {
-            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node);
+            Tuple<ColorExpression, ColorExpression> subexps = parseLRColorExpressions(node, type);
             return new InequalityExpression(subexps.value1(), subexps.value2());
         } else if (name.equals("not")) {
             Node child = skipWS(node.getFirstChild());
-            GuardExpression childexp = parseGuardExpressionInternal(child);
+            GuardExpression childexp = parseGuardExpressionInternal(child, type);
             return new NotExpression(childexp);
         } else if (name.equals("and")) {
-            var subexps = parseLRGuardExpressionsInternal(node);
+            var subexps = parseLRGuardExpressionsInternal(node, type);
             AndExpression andExpr = new AndExpression(subexps.value1(), subexps.value2());
             Node isSimpleNode = node.getAttributes().getNamedItem("isSimple");
             if (isSimpleNode != null) {
@@ -463,56 +521,41 @@ public class LoadTACPN { //the import feature for CPN and load for TACPN share s
             Node left = skipWS(node.getFirstChild());
             Node right = skipWS(left.getNextSibling());
             if (right == null) {
-                return parseGuardExpressionInternal(left);
+                return parseGuardExpressionInternal(left, type);
             }
 
-            var orExpr = new OrExpression(parseGuardExpressionInternal(left), parseGuardExpressionInternal(right));
+            var orExpr = new OrExpression(parseGuardExpressionInternal(left, type), parseGuardExpressionInternal(right, type));
             Node isSimpleNode = node.getAttributes().getNamedItem("isSimple");
             if (isSimpleNode != null) {
                 orExpr.setSimpleProperty(Boolean.parseBoolean(isSimpleNode.getNodeValue()));
             }
 
             for (var it = skipWS(right.getNextSibling()); it != null; it = skipWS(it.getNextSibling())){
-                orExpr = new OrExpression(orExpr, parseGuardExpressionInternal(it));
+                orExpr = new OrExpression(orExpr, parseGuardExpressionInternal(it, type));
             }
             return orExpr;
         } else if (name.matches("subterm|structure")) {
             Node child = skipWS(node.getFirstChild());
-            return parseGuardExpressionInternal(child);
+            return parseGuardExpressionInternal(child, type);
         } else {
             throw new FormatException(String.format("Could not parse %s as a guard expression\n", name));
         }
     }
 
-    private Tuple<ColorExpression,ColorExpression> parseLRColorExpressions(Node node) throws FormatException {
+    private Tuple<ColorExpression,ColorExpression> parseLRColorExpressions(Node node, ColorType type) throws FormatException {
         Node left = skipWS(node.getFirstChild());
-        ColorExpression leftexp = parseColorExpression(left);
+        ColorExpression leftexp = parseColorExpression(left, type);
         Node right = skipWS(left.getNextSibling());
-        ColorExpression rightexp = parseColorExpression(right);
+        ColorExpression rightexp = parseColorExpression(right, type);
         return new Tuple<>(leftexp, rightexp);
     }
 
-    private Tuple<GuardExpression,GuardExpression> parseLRGuardExpressionsInternal(Node node) throws FormatException {
+    private Tuple<GuardExpression,GuardExpression> parseLRGuardExpressionsInternal(Node node, ColorType type) throws FormatException {
         Node left = skipWS(node.getFirstChild());
-        var leftexp = parseGuardExpressionInternal(left);
+        var leftexp = parseGuardExpressionInternal(left, type);
         Node right = skipWS(left.getNextSibling());
-        var rightexp = parseGuardExpressionInternal(right);
+        var rightexp = parseGuardExpressionInternal(right, type);
         return new Tuple<>(leftexp, rightexp);
-    }
-
-    Color findColorForIntRange(String value, String start, String end) throws FormatException {
-        for(var ct : colortypes.values()){
-            List<Color> colors = ct.getColorList();
-            if (colors.size() == 0) continue;
-            if(colors.get(0).getColorName().equals(start) && colors.get(colors.size()-1).getColorName().equals(end)){
-                for (Color c : ct) {
-                    if (c.getName().equals(value)) {
-                        return c;
-                    }
-                }
-            }
-        }
-        throw new FormatException(String.format("The color \"%s\" was not declared in an int range\n", value));
     }
 
     public AddExpression constructCleanAddExpression(ArcExpression originalExpression) {
