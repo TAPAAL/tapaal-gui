@@ -12,6 +12,8 @@ import net.tapaal.gui.*;
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
+import net.tapaal.gui.petrinet.model.NetworkAnalysis;
+import net.tapaal.gui.petrinet.model.NetworkDisplayPolicy;
 import net.tapaal.gui.petrinet.smartdraw.Quadtree;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import net.tapaal.gui.petrinet.document.DocumentSession;
@@ -184,7 +186,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 throw new Exception("Could not open the selected file, as it does not have the correct format.");
 			}
 
-            if (!parentPaintNet || !loadedModel.network().isNetDrawable()) {
+            if (!parentPaintNet || !NetworkDisplayPolicy.isDrawable(loadedModel.network())) {
                 loadedModel.network().setPaintNet(false);
             }
 
@@ -240,7 +242,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             boolean smcQuery = q.getCategory() == TAPNQuery.QueryCategory.SMC;
             EnumSet<EngineFeature> requiredFeatures = EnumSet.noneOf(EngineFeature.class);
             if (q.getTraceOption() == TAPNQuery.TraceOption.FASTEST) requiredFeatures.add(EngineFeature.FASTEST_TRACE);
-            if (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && net.getHighestNetDegree() <= 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
+            if (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && NetworkAnalysis.highestNetDegree(net) <= 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
             if (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode)) requiredFeatures.add(EngineFeature.DEADLOCK_EG_OR_AF);
             if (q.getProperty() instanceof TCTLDeadlockNode && net.hasInhibitorArcs()) requiredFeatures.add(EngineFeature.DEADLOCK_WITH_INHIB);
             if (net.hasWeights()) requiredFeatures.add(EngineFeature.WEIGHTS);
@@ -249,9 +251,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) requiredFeatures.add(EngineFeature.EG_OR_AF);
             if (!net.isNonStrict()) requiredFeatures.add(EngineFeature.STRICT_NETS);
             if (tab.lens.isTimed()) requiredFeatures.add(EngineFeature.TIMED_NETS);
-            if (q.getProperty() instanceof TCTLDeadlockNode && net.getHighestNetDegree() > 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_GREATER_THAN_2);
+            if (q.getProperty() instanceof TCTLDeadlockNode && NetworkAnalysis.highestNetDegree(net) > 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_GREATER_THAN_2);
             if (tab.lens.isGame()) requiredFeatures.add(EngineFeature.GAMES);
-            if ((q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2) requiredFeatures.add(EngineFeature.EG_OR_AF_WITH_NET_DEGREE_GREATER_THAN_2);
+            if ((q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && NetworkAnalysis.highestNetDegree(net) > 2) requiredFeatures.add(EngineFeature.EG_OR_AF_WITH_NET_DEGREE_GREATER_THAN_2);
             if (q.hasUntimedOnlyProperties()) requiredFeatures.add(EngineFeature.NESTED_QUANTIFICATIONS);
             if (tab.lens.isColored()) requiredFeatures.add(EngineFeature.COLORED);
             if (tab.lens.isColored() && !tab.lens.isTimed()) requiredFeatures.add(EngineFeature.ONLY_UNTIMED);

@@ -197,6 +197,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.Template;
+import net.tapaal.gui.petrinet.model.NetworkAnalysis;
 import net.tapaal.gui.petrinet.undo.AddQueryCommand;
 import net.tapaal.gui.petrinet.verification.ChooseInclusionPlacesDialog;
 import net.tapaal.gui.petrinet.verification.EngineFeature;
@@ -673,8 +674,8 @@ public class QueryDialog extends JPanel {
         inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
         newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
         rootPane = me.getRootPane();
-        isNetDegree2 = tapnNetwork.isDegree2();
-        highestNetDegree = tapnNetwork.getHighestNetDegree();
+        isNetDegree2 = NetworkAnalysis.isDegree2(tapnNetwork);
+        highestNetDegree = NetworkAnalysis.highestNetDegree(tapnNetwork);
         hasInhibitorArcs = tapnNetwork.hasInhibitorArcs();
 
         setLayout(new GridBagLayout());

@@ -1,11 +1,10 @@
 package net.tapaal.gui.petrinet.editor;
 
-import net.tapaal.gui.petrinet.undo.Colored.AddVariableCommand;
-import net.tapaal.gui.petrinet.undo.Colored.UpdateVariableCommand;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import net.tapaal.gui.petrinet.model.NetworkEditService;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.undo.UndoManager;
 import pipe.gui.swingcomponents.EscapableDialog;
@@ -44,11 +43,13 @@ public class VariablesDialogPanel extends JPanel {
     JButton cancelButton;
     private JScrollPane scrollPane;
     private final UndoManager undoManager;
+    private final NetworkEditService networkEditService;
 
     public VariablesDialogPanel(JRootPane pane, ConstantsPane.VariablesListModel listModel, TimedArcPetriNetNetwork network, UndoManager undoManager) throws IOException {
         oldName = "";
         this.network = network;
         this.listModel = listModel;
+        this.networkEditService = new NetworkEditService(network, listModel::updateName);
         initComponents();
         nameTextField.setText(oldName);
         this.undoManager = undoManager;
@@ -60,6 +61,7 @@ public class VariablesDialogPanel extends JPanel {
         oldName = variable.getName();
         this.network = network;
         this.listModel = listModel;
+        this.networkEditService = new NetworkEditService(network, listModel::updateName);
         initComponents();
         nameTextField.setText(oldName);
         this.undoManager = undoManager;
@@ -321,11 +323,12 @@ public class VariablesDialogPanel extends JPanel {
 
         Command cmd;
         if (!oldName.equals("")) {
-            cmd = new UpdateVariableCommand(variable, nameTextField.getText(), colorTypes.get(colorTypeComboBox.getSelectedIndex()), listModel);
+            cmd = networkEditService.updateVariable(variable, nameTextField.getText(), colorTypes.get(colorTypeComboBox.getSelectedIndex()));
         }
         else {
-            cmd = new AddVariableCommand(new Variable(nameTextField.getText(), nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()),
-                network, listModel, network.variables().size());
+            cmd = networkEditService.addVariable(
+                new Variable(nameTextField.getText(), nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()),
+                network.variables().size());
             //listModel.addElement(new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()));
         }
         undoManager.addNewEdit(cmd);

@@ -2,26 +2,14 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
-import net.tapaal.gui.petrinet.undo.Colored.RemoveColorTypeFromNetworkCommand;
-import net.tapaal.gui.petrinet.undo.Colored.RemoveVariableFromNetworkCommand;
-import net.tapaal.gui.petrinet.undo.Colored.UpdateColorTypeCommand;
-import net.tapaal.gui.petrinet.undo.Colored.UpdatePTColorTypeCommand;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
-import pipe.gui.Constants;
-import pipe.gui.MessengerImpl;
-import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
 import dk.aau.cs.model.tapn.event.ConstantsListener;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.StringComparator;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.ITAPNComposer;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposer;
-import pipe.gui.petrinet.undo.UndoManager;
-import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
 public class TimedArcPetriNetNetwork {
 	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
@@ -706,20 +694,6 @@ public class TimedArcPetriNetNetwork {
 		return true;
 	}
 	
-	public boolean isDegree2(){
-		ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
-		Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(this);
-
-		return composedModel.value1().isDegree2();
-	}
-
-    public int getHighestNetDegree(){
-        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
-        Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(this);
-
-        return composedModel.value1().getHighestNetDegree();
-    }
-
 	public boolean isSharedPlaceUsedInTemplates(SharedPlace place) {
 		for(TimedArcPetriNet tapn : this.activeTemplates()){
 			for(TimedPlace timedPlace : tapn.places()){
@@ -822,16 +796,6 @@ public class TimedArcPetriNetNetwork {
 		this.paintNet = paintNet;
 	}
 
-	public boolean isNetDrawable() {
-		if (!paintNet) return false;
-		int totalSize = 0;
-		for (var tapn : allTemplates()) {
-			totalSize += tapn.places().size() + tapn.transitions().size();
-		}
-        
-		return totalSize <= Constants.MAX_NET_SIZE;
-	}
-
 	//For colors
 
     public List<ColorType> colorTypes() { return colorTypes;}
@@ -840,31 +804,6 @@ public class TimedArcPetriNetNetwork {
 
     public List<Variable> variables() {return variables;}
     public void setVariables(List<Variable> newVariables) { variables = newVariables;}
-
-    public void renameColorType(ColorType oldColorType, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager){
-        Integer index = getColorTypeIndex(oldColorType.getName());
-
-        Command command = new UpdateColorTypeCommand(this, oldColorType, colorType, index, colorTypesListModel);
-        command.redo();
-        undoManager.addEdit(command);
-        updateProductTypes(oldColorType, colorType, undoManager);
-    }
-
-    public void updateColorType(ColorType oldColorType, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager) {
-        undoManager.newEdit();
-        renameColorType(oldColorType, colorType, colorTypesListModel, undoManager);
-    }
-
-
-    private void updateProductTypes(ColorType oldColorType, ColorType colorType, UndoManager undoManager){
-        for (ColorType ct : colorTypes) {
-            if (ct instanceof ProductType) {
-                Command command = new UpdatePTColorTypeCommand(oldColorType, colorType, (ProductType)ct);
-                command.redo();
-                undoManager.addEdit(command);
-            }
-        }
-    }
 
     public Integer getColorTypeIndex(String name) {
         for (int i = 0; i < colorTypes.size(); i++) {
@@ -1006,20 +945,6 @@ public class TimedArcPetriNetNetwork {
         variables.add(variable);
     }
 
-    public boolean remove(ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager, ArrayList<String> messages) {
-        Integer index = getColorTypeIndex(colorType.getName());
-
-        if(canColorTypeBeRemoved(colorType, messages)){
-            Command command = new RemoveColorTypeFromNetworkCommand(colorType, this, colorTypesListModel, index);
-            command.redo();
-            undoManager.addEdit(command);
-            //Success
-            return true;
-        }
-
-        return false;
-    }
-
     public boolean canColorTypeBeRemoved(ColorType colorType, List<String> messages){
 	    isColorTypeUsedInProduct(colorType, messages);
         isColorTypeUsedInVariable(colorType, messages);
@@ -1100,15 +1025,6 @@ public class TimedArcPetriNetNetwork {
             if (ct instanceof ProductType && ((ProductType) ct).contains(colorType)) {
                 messages.add("Color type " + colorType.getName() + " is used in product type " + ct.getName() + " \n");
             }
-        }
-    }
-
-    public void remove(Variable variable , ConstantsPane.VariablesListModel variablesListModel, UndoManager undoManager, List<String> messages) {
-	    if (canVariableBeRemoved(variable,messages)) {
-            Integer index = getVariableIndex(variable.getName());
-            Command command = new RemoveVariableFromNetworkCommand(variable, this, variablesListModel, index);
-            command.redo();
-            undoManager.addEdit(command);
         }
     }
 

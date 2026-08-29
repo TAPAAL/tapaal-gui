@@ -941,7 +941,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             UndoManager undoManager = tab.getUndoManager();
             undoManager.newEdit();
             ArrayList<String> messages = new ArrayList<>();
-            network.remove(variable, variablesListModel, undoManager, messages);
+            networkEditService.removeVariable(variable, undoManager, messages);
             if(messages.isEmpty()){
                 //Since we just removed our selection everything is false
                 enableButtons(true);
@@ -1020,7 +1020,7 @@ public class ConstantsPane extends JPanel implements SidePane {
             UndoManager undoManager = tab.getUndoManager();
             undoManager.newEdit();
             ArrayList<String> messages = new ArrayList<>();
-            network.remove(colorType, colorTypesListModel, undoManager, messages);
+            networkEditService.removeColorType(colorType, undoManager, messages);
             if(messages.isEmpty()){
                 //Since we just removed our selection everything is false
                 enableButtons(true);
