@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -57,9 +56,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
 	private final Iterable<Template> templates;
 	private final Iterable<TAPNQuery> queries;
-	private final Iterable<Constant> constants;
-	private final TimedArcPetriNetNetwork network;
     private final writeTACPN writeTACPN;
+    private final TapnModelXmlWriter modelWriter;
     private boolean secondTransport = false;
     private int transporCountID = 0;
     private final TAPNLens lens;
@@ -71,11 +69,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			Iterable<TAPNQuery> queries,
 			Iterable<Constant> constants
     ) {
-		this.network = network;
 		this.templates = templates;
 		this.queries = queries;
-		this.constants = constants;
         writeTACPN = new writeTACPN(network);
+		modelWriter = new TapnModelXmlWriter(network, constants, writeTACPN);
 		this.lens = TAPNLens.Default;
 	}
 
@@ -86,11 +83,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         Iterable<Constant> constants,
         TAPNLens lens
     ) {
-        this.network = network;
         this.templates = templates;
         this.queries = queries;
-        this.constants = constants;
         writeTACPN = new writeTACPN(network);
+        modelWriter = new TapnModelXmlWriter(network, constants, writeTACPN);
         this.lens = lens;
     }
 	
@@ -110,15 +106,13 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		pnmlAttr.setValue("http://www.informatik.hu-berlin.de/top/pnml/ptNetb");
 		pnmlRootNode.setAttributeNode(pnmlAttr);
 
-        writeTACPN.appendDeclarations(document, pnmlRootNode);
-
-        if (lens.isStochastic()) {
-            appendCustomDistributions(document, pnmlRootNode);
-        }
-
-        appendSharedPlaces(document, pnmlRootNode);
-		appendSharedTransitions(document, pnmlRootNode);
-		appendConstants(document, pnmlRootNode);
+		modelWriter.appendNetworkData(
+			document,
+			pnmlRootNode,
+			lens.isColored(),
+			lens.isStochastic(),
+			saveConstantNames
+		);
 		appendTemplates(document, pnmlRootNode);
 
         appendQueries(document, pnmlRootNode);
@@ -206,82 +200,6 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
         return feature;
     }
-
-    private void appendCustomDistributions(Document document, Element root) {
-        for (SMCUserDefinedDistribution cd : network.userDefinedDistributions()) {
-            Element element = document.createElement("custom_distribution");
-            element.setAttribute("name", cd.getName());
-            element.setAttribute("randomStart", String.valueOf(cd.isRandomStart()));
-            for (Double val : cd.getValues()) {
-                Element valElement = document.createElement("value");
-                valElement.setTextContent(val.toString());
-                element.appendChild(valElement);
-            }
-
-            root.appendChild(element);
-        }
-    }
-	
-	private void appendSharedPlaces(Document document, Element root) {
-		for(SharedPlace place : network.sharedPlaces()){
-			Element element = document.createElement("shared-place");
-			element.setAttribute("invariant", place.invariant().toString());
-			element.setAttribute("name", place.name());
-			element.setAttribute("initialMarking", String.valueOf(place.numberOfTokens()));
-			writeInitialMarkingAges(place, element);
-			createColoredInvariants(place, document, element);
-            writeTACPN.appendColoredPlaceDependencies(place, document, element);
-
-            root.appendChild(element);
-		}
-	}
-
-	private void appendSharedTransitions(Document document, Element root) {
-		for(SharedTransition transition : network.sharedTransitions()){
-			Element element = document.createElement("shared-transition");
-			element.setAttribute("name", transition.name());
-			element.setAttribute("urgent", transition.isUrgent()?"true":"false");
-            element.setAttribute("player", transition.isUncontrollable() ? "1" : "0");
-            element.setAttribute("weight", transition.getWeight().nameForSaving(saveConstantNames));
-			element.setAttribute("firingMode", transition.getFiringMode().toString());
-            transition.getDistribution().writeToXml(element, saveConstantNames);
-			root.appendChild(element);
-		}
-	}
-
-	private void appendConstants(Document document, Element root) {
-		for (Constant constant : constants) {
-			Element elem = createConstantElement(constant, document);
-			root.appendChild(elem);
-		}
-
-		for (var constant : network.realConstants()) {
-			Element elem = document.createElement("constant");
-			elem.setAttribute("name", constant.name());
-			elem.setAttribute("type", "real");
-			elem.setAttribute("value", constant.values().stream()
-				.map(String::valueOf).collect(Collectors.joining(",")));
-			root.appendChild(elem);
-		}
-	}
-	
-	private Element createConstantElement(Constant constant, Document document) {
-		Require.that(constant != null, "Error: constant was null");
-		Require.that(document != null, "Error: document was null");
-		
-		Element constantElement = document.createElement("constant");
-		
-		constantElement.setAttribute("name", constant.name());
-		if (constant.hasMultipleValues()) {
-			String valuesStr = constant.values().stream()
-				.map(String::valueOf).collect(Collectors.joining(","));
-			constantElement.setAttribute("value", valuesStr);
-		} else {
-			constantElement.setAttribute("value", String.valueOf(constant.value()));
-		}
-
-		return constantElement;
-	}
 
 	private void appendTemplates(Document document, Element root) {
 		for (Template tapn : templates) {
