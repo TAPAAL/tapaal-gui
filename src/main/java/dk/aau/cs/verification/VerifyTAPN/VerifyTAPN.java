@@ -41,11 +41,11 @@ import dk.aau.cs.util.UnsupportedQueryException;
 
 import com.sun.jna.Platform;
 
-public class VerifyTAPN implements ModelChecker {
-	private static final String NEED_TO_LOCATE_VERIFYTAPN_MSG = "TAPAAL needs to know the location of the file verifytapn.\n\n"
-		+ "Verifytapn is a part of the TAPAAL distribution and it is\n"
-		+ "normally located in the directory lib.";
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import java.nio.file.Path;
 
+public class VerifyTAPN implements ModelChecker {
     private static final String VERIFYTAPN_VERSION_PATTERN = "^VerifyTAPN (\\d+\\.\\d+\\.\\d+)$";
 
 	private static String verifytapnpath = "";
@@ -133,25 +133,65 @@ public class VerifyTAPN implements ModelChecker {
 
 	public boolean setup() {
 		if (isNotSetup()) {
-			messenger.displayInfoMessage(NEED_TO_LOCATE_VERIFYTAPN_MSG, "Locate verifytapn");
-
-			try {
-				File file = fileFinder.ShowFileBrowserDialog("Verifytapn", "",System.getProperty("user.home"));
-				if(file != null){
-					if(file.getName().matches("^verifytapn.*(?:\\.exe)?$")){
-						setPath(file.getAbsolutePath());
-					}else{
-						messenger.displayErrorMessage("The selected executable does not seem to be verifytapn.");
-					}
-				}
-
-			} catch (Exception e) {
-				messenger.displayErrorMessage("There were errors performing the requested action:\n" + e.getMessage(), "Error");
+			Object[] options = {"Download engine", "Select manually", "Cancel"};
+			int choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(),
+				"The verifytapn engine is not configured. What would you like to do?",
+				"Configure verifytapn", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+				null, options, options[0]);
+			if (choice == 0) {
+				downloadEngine();
+			} else if (choice == 1) {
+				selectEngineManually();
 			}
 
 		}
 
 		return !isNotSetup();
+	}
+
+	private void selectEngineManually() {
+		try {
+			File file = fileFinder.ShowFileBrowserDialog("Verifytapn", "", System.getProperty("user.home"));
+			if (file != null) {
+				if (file.getName().matches("^verifytapn.*(?:\\.exe)?$")) {
+					setPath(file.getAbsolutePath());
+				} else {
+					messenger.displayErrorMessage("The selected executable does not seem to be verifytapn.");
+				}
+			}
+		} catch (Exception e) {
+			messenger.displayErrorMessage("There were errors performing the requested action:\n" + e.getMessage(), "Error");
+		}
+	}
+
+	public void downloadEngine() {
+		try {
+			Path directory = chooseDownloadDirectory("verifytapn");
+			if (directory == null) return;
+			Path downloaded = VerificationEngineDownloader.ensureEngine(
+				VerificationEngineDownloader.Engine.VERIFYTAPN, directory);
+			setPath(downloaded.toString());
+		} catch (Exception e) {
+			messenger.displayErrorMessage("The verification engine could not be downloaded:\n" + e.getMessage(), "Download error");
+		}
+	}
+
+	private Path chooseDownloadDirectory(String engineName) throws IOException {
+		String configuredLocation = Preferences.getInstance().getVerificationEngineDownloadLocation();
+		Path defaultDirectory = configuredLocation.isBlank()
+			? VerificationEngineDownloader.defaultDownloadDirectory()
+			: Path.of(configuredLocation);
+		java.nio.file.Files.createDirectories(defaultDirectory);
+
+		JFileChooser chooser = new JFileChooser(defaultDirectory.toFile());
+		chooser.setDialogTitle("Choose download location for " + engineName);
+		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		chooser.setAcceptAllFileFilterUsed(false);
+		if (chooser.showSaveDialog(TAPAALGUI.getApp()) != JFileChooser.APPROVE_OPTION) return null;
+
+		Path selected = chooser.getSelectedFile().toPath().toAbsolutePath().normalize();
+		Preferences.getInstance().setVerificationEngineDownloadLocation(selected.toString());
+		return selected;
 	}
 
 	private boolean isNotSetup() {
@@ -210,20 +250,6 @@ public class VerifyTAPN implements ModelChecker {
 				}
 			}
 
-			// Development builds do not necessarily contain the native engines.
-			// Download the open-source engine bundle once and remember its path.
-			try {
-				File downloadedEngine = VerificationEngineDownloader
-					.ensureEngine(VerificationEngineDownloader.Engine.VERIFYTAPN).toFile();
-				VerifyTAPN v = new VerifyTAPN(new FileFinder(), new MessengerImpl());
-				if (v.isCorrectVersion(downloadedEngine.getAbsolutePath())) {
-					verifytapnpath = downloadedEngine.getAbsolutePath();
-					Preferences.getInstance().setVerifytapnLocation(verifytapnpath);
-					return true;
-				}
-			} catch (IOException ignored) {
-				// Keep the existing manual setup flow when downloading is unavailable.
-			}
 			return false;
 
 	}

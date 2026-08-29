@@ -29,9 +29,13 @@ import org.jetbrains.annotations.Nullable;
 
 import com.sun.jna.Platform;
 
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
@@ -39,14 +43,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class VerifyPN implements ModelChecker {
-
-    private static final String NEED_TO_LOCATE_verifypn_MSG = "TAPAAL needs to know the location of the file verifypn.\n\n"
-        + "Verifypn is a part of the TAPAAL distribution and it is\n"
-        + "normally located in the directory lib.";
 
     public static final String VERIFYPN_EXE_PATTERN = "^verifypn.*(?:\\.exe)?$";
     private static final String VERIFYPN_VERSION_PATTERN = "^VerifyPN.*(\\d+\\.\\d+\\.\\d+).*$";
@@ -145,25 +146,66 @@ public class VerifyPN implements ModelChecker {
 
     public boolean setup() {
         if (isNotSetup()) {
-            messenger.displayInfoMessage(NEED_TO_LOCATE_verifypn_MSG, "Locate verifypn");
 
-            try {
-                File file = fileFinder.ShowFileBrowserDialog("Verifypn", "", System.getProperty("user.home"));
-                if (file != null) {
-                    if (file.getName().matches(VERIFYPN_EXE_PATTERN)) {
-                        setPath(file.getAbsolutePath());
-                    } else {
-                        messenger.displayErrorMessage("The selected executable does not seem to be verifypn.");
-                    }
-                }
-
-            } catch (Exception e) {
-                messenger.displayErrorMessage("There were errors performing the requested action:\n" + e.getMessage(), "Error");
+            Object[] options = {"Download engine", "Select manually", "Cancel"};
+            int choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(),
+                    "The verifypn engine is not configured. What would you like to do?",
+                    "Configure verifypn", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[0]);
+            if (choice == 0) {
+                downloadEngine();
+            } else if (choice == 1) {
+                selectEngineManually();
             }
 
         }
 
         return !isNotSetup();
+    }
+
+    private void selectEngineManually() {
+        try {
+            File file = fileFinder.ShowFileBrowserDialog("Verifypn", "", System.getProperty("user.home"));
+            if (file != null) {
+                if (file.getName().matches(VERIFYPN_EXE_PATTERN)) {
+                    setPath(file.getAbsolutePath());
+                } else {
+                    messenger.displayErrorMessage("The selected executable does not seem to be verifypn.");
+                }
+            }
+        } catch (Exception e) {
+            messenger.displayErrorMessage("There were errors performing the requested action:\n" + e.getMessage(), "Error");
+        }
+    }
+
+    public void downloadEngine() {
+        try {
+            Path directory = chooseDownloadDirectory("verifypn");
+            if (directory == null) return;
+            Path downloaded = VerificationEngineDownloader.ensureEngine(
+                    VerificationEngineDownloader.Engine.VERIFYPN, directory);
+            setPath(downloaded.toString());
+        } catch (Exception e) {
+            messenger.displayErrorMessage("The verification engine could not be downloaded:\n" + e.getMessage(), "Download error");
+        }
+    }
+
+    private Path chooseDownloadDirectory(String engineName) throws IOException {
+        String configuredLocation = Preferences.getInstance().getVerificationEngineDownloadLocation();
+        Path defaultDirectory = configuredLocation.isBlank()
+                ? VerificationEngineDownloader.defaultDownloadDirectory()
+                : Path.of(configuredLocation);
+        java.nio.file.Files.createDirectories(defaultDirectory);
+
+        JFileChooser chooser = new JFileChooser(defaultDirectory.toFile());
+        chooser.setDialogTitle("Choose download location for " + engineName);
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showSaveDialog(TAPAALGUI.getApp()) != JFileChooser.APPROVE_OPTION) return null;
+
+        Path selected = chooser.getSelectedFile().toPath().toAbsolutePath().normalize();
+        Preferences.getInstance().setVerificationEngineDownloadLocation(selected.toString());
+        return selected;
     }
 
     private boolean isNotSetup() {
@@ -223,18 +265,6 @@ public class VerifyPN implements ModelChecker {
             }
         }
 
-        try {
-            File downloadedEngine = VerificationEngineDownloader
-                .ensureEngine(VerificationEngineDownloader.Engine.VERIFYPN).toFile();
-            VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
-            if (v.isCorrectVersion(downloadedEngine.getAbsolutePath())) {
-                verifypnpath = downloadedEngine.getAbsolutePath();
-                Preferences.getInstance().setVerifypnLocation(verifypnpath);
-                return true;
-            }
-        } catch (IOException ignored) {
-            // Keep the existing manual setup flow when downloading is unavailable.
-        }
         return false;
     }
 

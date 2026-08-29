@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -45,9 +44,6 @@ public final class VerificationEngineDownloader {
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(60);
     private static final Object DOWNLOAD_LOCK = new Object();
 
-    private static volatile IOException lastFailure;
-    private static volatile boolean downloadAttempted;
-
     private VerificationEngineDownloader() {
     }
 
@@ -56,7 +52,15 @@ public final class VerificationEngineDownloader {
      * The returned path is stable between application launches.
      */
     public static Path ensureEngine(Engine engine) throws IOException {
-        Path cacheDirectory = cacheDirectory();
+        return ensureEngine(engine, defaultDownloadDirectory());
+    }
+
+    /**
+     * Returns a cached executable in {@code downloadDirectory}, downloading
+     * the platform bundle there if needed.
+     */
+    public static Path ensureEngine(Engine engine, Path downloadDirectory) throws IOException {
+        Path cacheDirectory = downloadDirectory.toAbsolutePath().normalize();
         Path executable = cacheDirectory.resolve(executableFileName(engine));
 
         synchronized (DOWNLOAD_LOCK) {
@@ -64,12 +68,7 @@ public final class VerificationEngineDownloader {
                 return executable;
             }
 
-            if (downloadAttempted && lastFailure != null) {
-                throw lastFailure;
-            }
-
             try {
-                downloadAttempted = true;
                 Files.createDirectories(cacheDirectory);
                 Path bundle = downloadBundle(cacheDirectory);
                 if (bundle.getFileName().toString().endsWith(".zip")) {
@@ -82,23 +81,23 @@ public final class VerificationEngineDownloader {
                     throw new IOException("The downloaded TAPAAL bundle did not contain " + engine.executableName + ".");
                 }
                 return executable;
-            } catch (IOException e) {
-                lastFailure = e;
-                throw e;
             } catch (RuntimeException e) {
-                IOException failure = new IOException("Could not prepare the downloaded TAPAAL verification engines.", e);
-                lastFailure = failure;
-                throw failure;
+                throw new IOException("Could not prepare the downloaded TAPAAL verification engines.", e);
             }
         }
     }
 
     /**
-     * The last download error, useful for logging without showing three
-     * separate dialogs when startup checks all three engines.
+     * The default location used after the user explicitly requests a download.
      */
-    public static Optional<IOException> lastFailure() {
-        return Optional.ofNullable(lastFailure);
+    public static Path defaultDownloadDirectory() throws IOException {
+        String userHome = System.getProperty("user.home");
+        if (userHome == null || userHome.isBlank()) {
+            throw new IOException("The user's home directory is not available.");
+        }
+        PlatformInfo platform = PlatformInfo.current();
+        return Path.of(userHome, ".tapaal", "engines",
+            System.getProperty(BUNDLE_VERSION_PROPERTY, DEFAULT_BUNDLE_VERSION), platform.id);
     }
 
     private static Path downloadBundle(Path cacheDirectory) throws IOException {
@@ -242,15 +241,6 @@ public final class VerificationEngineDownloader {
         if (!Platform.isWindows() && !executable.toFile().setExecutable(true, true)) {
             throw new IOException("Could not make the downloaded engine executable: " + executable);
         }
-    }
-
-    private static Path cacheDirectory() throws IOException {
-        String userHome = System.getProperty("user.home");
-        if (userHome == null || userHome.isBlank()) {
-            throw new IOException("The user's home directory is not available.");
-        }
-        PlatformInfo platform = PlatformInfo.current();
-        return Path.of(userHome, ".tapaal", "engines", System.getProperty(BUNDLE_VERSION_PROPERTY, DEFAULT_BUNDLE_VERSION), platform.id);
     }
 
     private static String executableFileName(Engine engine) {

@@ -50,7 +50,6 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import net.tapaal.resourcemanager.ResourceManager;
-import net.tapaal.verification.VerificationEngineDownloader;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import kotlin.internal.RequireKotlin.Container;
@@ -600,14 +599,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         VerifyTAPN.trySetup();
         VerifyDTAPN.trySetup();
         VerifyPN.trySetup();
-        VerificationEngineDownloader.lastFailure().ifPresent(error -> {
-            Logger.log("Automatic verification engine download failed: " + error.getMessage());
-            JOptionPane.showMessageDialog(this,
-                    "The TAPAAL verification engines could not be downloaded automatically.\n"
-                            + "You can select them manually from Tools > Engine selection.\n\n"
-                            + "Reason: " + error.getMessage(),
-                    "Verification engines unavailable", JOptionPane.WARNING_MESSAGE);
-        });
 
 
         this.setDropTarget(new FileDropTarget() {
