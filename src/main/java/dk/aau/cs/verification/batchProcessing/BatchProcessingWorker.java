@@ -42,6 +42,7 @@ import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.RealConstant;
+import net.tapaal.gui.petrinet.model.QueryMetadataAdapter;
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
 	private final List<File> files;
@@ -358,13 +359,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
     private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query, BatchProcessingVerificationOptions option) throws Exception {
         TAPNQuery queryToVerify = getTAPNQuery(query);
-        queryToVerify.setCategory(query.getCategory());
-        queryToVerify.setVerificationType(query.getVerificationType());
+        queryToVerify.setCategory(QueryMetadataAdapter.toModelCategory(query.getCategory()));
+        queryToVerify.setVerificationType(QueryMetadataAdapter.toModelVerificationType(query.getVerificationType()));
         MapQueryToNewNames(queryToVerify, composedModel.value2());
 
         TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens(), query.getSmcSettings());
-        clonedQuery.setCategory(query.getCategory());
-        clonedQuery.setVerificationType(query.getVerificationType());
+        clonedQuery.setCategory(QueryMetadataAdapter.toModelCategory(query.getCategory()));
+        clonedQuery.setVerificationType(QueryMetadataAdapter.toModelVerificationType(query.getVerificationType()));
         MapQueryToNewNames(clonedQuery, composedModel.value2());
 
         fireVerificationTaskStarted();

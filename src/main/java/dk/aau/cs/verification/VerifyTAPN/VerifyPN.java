@@ -20,7 +20,7 @@ import net.tapaal.TAPAAL;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
+import net.tapaal.gui.petrinet.model.QueryMetadataAdapter;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
@@ -358,7 +358,7 @@ public class VerifyPN implements ModelChecker {
                             newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false, lens.isStochastic()));
 
                             //The query being verified should be the only query
-                            for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network(), query.getCategory())) {
+                            for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network(), QueryMetadataAdapter.toGuiCategory(query.getCategory()))) {
                                 newTab.setInitialName(loadedQuery.getName() + " - unfolded");
                                 loadedQuery.copyOptions(dataLayerQuery);
                                 newTab.addQuery(loadedQuery);
@@ -375,7 +375,7 @@ public class VerifyPN implements ModelChecker {
 
                 ctlOutput = queryResult.value1().isCTL;
 
-                if(query.getCategory() == QueryCategory.HyperLTL && options.traceOption() != TraceOption.NONE) {
+                if(query.getCategory() == TAPNQuery.QueryCategory.HyperLTL && options.traceOption() != TraceOption.NONE) {
                     Map<String, TimedArcPetriNetTrace> parsedTraceMap = traceMap(errorOutput, standardOutput, options, model, exportedModel, query, queryResult);
                     var result = new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), parsedTraceMap, runner.getRunningTime(), queryResult.value2(), false, standardOutput + "\n\n" + errorOutput, model, newTab);
 
@@ -482,7 +482,7 @@ public class VerifyPN implements ModelChecker {
         }
 
         VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.useExplicitSearch());
-        if (query.getCategory() == QueryCategory.HyperLTL) {
+        if (query.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             return traceParser.parseTraces(new BufferedReader(new StringReader(output)));
         }
 
@@ -540,7 +540,7 @@ public class VerifyPN implements ModelChecker {
     }
 
     public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
-        if (query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL || query.getCategory() == QueryCategory.HyperLTL) {
+        if (query.getCategory() == TAPNQuery.QueryCategory.CTL || query.getCategory() == TAPNQuery.QueryCategory.LTL || query.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
             return true;
         }
         return !(query.getProperty() instanceof TCTLEGNode) && !(query.getProperty() instanceof TCTLAFNode);

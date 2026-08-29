@@ -22,6 +22,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import net.tapaal.gui.petrinet.model.QueryMetadataAdapter;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
@@ -88,8 +89,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         MapQueryToNewNames(clonedQuery, transformedModel.value2());
 
         if (dataLayerQuery != null) {
-            clonedQuery.setCategory(dataLayerQuery.getCategory()); // Used by the CTL engine
-            clonedQuery.setVerificationType(dataLayerQuery.getVerificationType());
+            clonedQuery.setCategory(QueryMetadataAdapter.toModelCategory(dataLayerQuery.getCategory())); // Used by the CTL engine
+            clonedQuery.setVerificationType(QueryMetadataAdapter.toModelVerificationType(dataLayerQuery.getVerificationType()));
             clonedQuery.setTraceList(dataLayerQuery.getTraceList());
             clonedQuery.setSMCSettings(dataLayerQuery.getSmcSettings());
         }
