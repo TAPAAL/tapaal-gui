@@ -2,7 +2,7 @@ package net.tapaal.gui.petrinet.undo;
 
 import pipe.gui.petrinet.PetriNetTab;
 
-public class ChangeSpacingEditCommand extends Command {
+public class ChangeSpacingEditCommand implements Command {
 
 	private final double factor;
 	private final PetriNetTab tab;

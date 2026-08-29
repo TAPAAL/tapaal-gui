@@ -22,6 +22,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import net.tapaal.gui.petrinet.NameGenerator;
+import pipe.gui.Constants;
 import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -63,7 +64,7 @@ public class PNMLoader {
 
     //If the net is too big, do not make the graphics
     private int netSize = 0;
-    private final int maxNetSize = 4000;
+    private final int maxNetSize = Constants.MAX_NET_SIZE;
     private boolean hasPositionalInfo = false;
     private final LoadTACPN loadTACPN;
 
@@ -73,7 +74,7 @@ public class PNMLoader {
     }
 
     public LoadedModel load(File file) throws FormatException{
-        try{
+        try {
             return load(new FileInputStream(file));
         } catch (FileNotFoundException e){
             return null;
@@ -106,7 +107,7 @@ public class PNMLoader {
         Node pnmlElement = doc.getElementsByTagName("pnml").item(0);
         Node netNode = getFirstDirectChild(pnmlElement, "net");
 
-        lens = new TAPNLens(false, false, getFirstDirectChild(netNode, "declaration") != null);
+        lens = new TAPNLens(false, false, getFirstDirectChild(netNode, "declaration") != null, false);
 
         String name = getTAPNName(netNode);
 
@@ -194,7 +195,6 @@ public class PNMLoader {
         Point position = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Position);
         String id = NamePurifier.purify(((Element) node).getAttribute("id"));
         ArcExpression colorMarking = null;
-        Point markingOffset = null;
         TimedPlace place;
         InitialMarking marking = parseMarking(getFirstDirectChild(node, "initialMarking"));
         ColorType colorType = ColorType.COLORTYPE_DOT;
@@ -220,13 +220,11 @@ public class PNMLoader {
             "The name: " + id + ", was already used");
         tapn.add(place);
 
-        if (isNetDrawable()) {
-            //We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique
-            TimedPlaceComponent placeComponent;
-            placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y, lens);
-            placeComponent.setUnderlyingPlace(place);
-            template.guiModel().addPetriNetObject(placeComponent);
-        }
+        //We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique
+        TimedPlaceComponent placeComponent;
+        placeComponent = new TimedPlaceComponent(position.x, position.y, id, name.point.x, name.point.y, lens);
+        placeComponent.setUnderlyingPlace(place);
+        template.guiModel().addPetriNetObject(placeComponent);
 
         idResolver.add(tapn.name(), id, id);
 
@@ -234,7 +232,7 @@ public class PNMLoader {
         if (colorMarking != null) {
             ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
             ColorMultiset cm = colorMarking.eval(context);
-            place.setTokenExpression(loadTACPN.constructCleanAddExpression(colorType,cm));
+            place.setTokenExpression(loadTACPN.constructCleanAddExpression(colorMarking));
             for (TimedToken ct : cm.getTokens(place)) {
                 tapn.parentNetwork().marking().add(ct);
             }
@@ -302,13 +300,12 @@ public class PNMLoader {
             "The id: " + id + ", was already used");
         tapn.add(transition);
 
-        if(isNetDrawable()){
-            TimedTransitionComponent transitionComponent =
-                //We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique
-                new TimedTransitionComponent(position.x, position.y, id, name.point.x, name.point.y, 0, lens);
-            transitionComponent.setUnderlyingTransition(transition);
-            template.guiModel().addPetriNetObject(transitionComponent);
-        }
+        TimedTransitionComponent transitionComponent =
+            //We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique
+            new TimedTransitionComponent(position.x, position.y, id, name.point.x, name.point.y, 0, lens);
+        transitionComponent.setUnderlyingTransition(transition);
+        template.guiModel().addPetriNetObject(transitionComponent);
+        
         idResolver.add(tapn.name(), id, id);
     }
 
@@ -551,7 +548,7 @@ public class PNMLoader {
         return tempArc;
     }
 
-    private boolean isNetDrawable(){
+    private boolean isNetDrawable() {
         return netSize <= maxNetSize;
     }
 
@@ -564,5 +561,4 @@ public class PNMLoader {
         }
         return null;
     }
-
 }

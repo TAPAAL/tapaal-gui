@@ -5,7 +5,7 @@ import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 
-public class RenameTimedPlaceCommand extends Command {
+public class RenameTimedPlaceCommand implements Command {
 	private final LocalTimedPlace place;
 	private final String oldName;
 	private final String newName;

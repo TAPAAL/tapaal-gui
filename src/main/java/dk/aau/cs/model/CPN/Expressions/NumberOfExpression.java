@@ -190,6 +190,19 @@ public class NumberOfExpression extends ArcExpression {
         return new NumberOfExpression(number, colorExpressions);
     }
 
+    @Override
+    public ArcExpression getExprConverted(ColorType oldCt, ColorType newCt) {
+        Vector<ColorExpression> colorExpressions = new Vector<>();
+        ColorExpression colorExpression = color.get(0);
+
+        if (colorExpression.colorType == null || colorExpression.colorType.getName().equals(oldCt.getName()) || colorInColorType(colorExpression, oldCt)) {
+            colorExpressions.add(colorExpression.getExprWithNewColorType(newCt));
+        } else {
+            colorExpressions.add(colorExpression);
+        }
+        return new NumberOfExpression(number, colorExpressions);
+    }
+
     private boolean colorInColorType(ColorExpression colorExpression, ColorType colorType) {
         for (Color c : colorType.getColors()) {
             if (colorExpression.containsColor(c)) {

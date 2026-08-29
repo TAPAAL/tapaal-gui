@@ -102,7 +102,7 @@ public class FileBrowser {
 
     public String saveFile(String suggestedName) {
         String ext = fileExtensions[0];
-        if (specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();;
+        if (specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
 
         fileDialog.setDirectory(specifiedPath);
         fileDialog.setFile(suggestedName + (suggestedName.endsWith("." + ext) ? "" : "." + ext));
@@ -159,11 +159,11 @@ public class FileBrowser {
         //So we make a JFileChooser in which we can control it
         if (System.getProperty("os.name").startsWith("Windows")) {
             File selectedDir = null;
-            if (specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();;
+            if (specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
             JFileChooser c = new JFileChooser(specifiedPath);
             c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             c.setDialogTitle("Choose target directory for export");
-            int rVal = c.showSaveDialog(c);
+            int rVal = c.showSaveDialog(TAPAALGUI.getApp());
             if (rVal == JFileChooser.APPROVE_OPTION) {
                 selectedDir = c.getSelectedFile();
                 Preferences.getInstance().setFileBrowserLocation(selectedDir.getPath());

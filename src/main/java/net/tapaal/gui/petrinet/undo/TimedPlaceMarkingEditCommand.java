@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 
 // TODO: Fix this to work on the model class instead of the GUI class
-public class TimedPlaceMarkingEditCommand extends Command {
+public class TimedPlaceMarkingEditCommand implements Command {
 	private final int numberOfTokens;
 	private final TimedPlaceComponent timedPlaceComponent;
 

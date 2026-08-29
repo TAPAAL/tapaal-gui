@@ -101,11 +101,20 @@ public class TimedArcPetriNet {
                 break;
             }
         }
-        if (hasColors || values.getColorTypes().size() > 1 || !values.getVariables().isEmpty()) {
+        if (hasColors || values.getColorTypes().stream().distinct().count()  > 1 || !values.getVariables().isEmpty()) {
             return true;
         }
 
 	    return false;
+    }
+
+    public boolean isStochastic() {
+        for(TimedTransition t : transitions) {
+            if(t.hasCustomDistribution()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 	public void add(TimedTransition transition) {
@@ -454,6 +463,9 @@ public class TimedArcPetriNet {
         int numberOfOrphanPlaces = 0;
 		boolean networkUntimed = true;
 		boolean networkWeighted = false; 
+        boolean isGame = hasUncontrollableTransitions();
+        boolean isColored = isColored();
+        boolean isStochastic = isStochastic();
 		int numberOfUntimedInputArcs = 0;
 		int numberOfUntimedTransportArcs = 0;
                 
@@ -574,13 +586,16 @@ public class TimedArcPetriNet {
 		rowNumber += 2;
 		array[rowNumber++][columnNumber] = networkUntimed ? "yes" : "no";
 		array[rowNumber++][columnNumber] = networkWeighted ? "yes" : "no";
+        array[rowNumber++][columnNumber] = isGame ? "yes" : "no";
+        array[rowNumber++][columnNumber] = isColored ? "yes" : "no";
+        array[rowNumber++][columnNumber] = isStochastic ? "yes" : "no";
         array[rowNumber++][columnNumber] = numberOfOrphanTransitions;
         array[rowNumber++][columnNumber] = numberOfOrphanPlaces;
 	}
 	
 	public Object[][] getStatistics(){
 		
-		Object[][] result = new Object[17][4];
+		Object[][] result = new Object[20][4];
 		int rowNumber = 0;
 		int columnNumber = 0;
 		result[rowNumber++][columnNumber] = "Number of components considered: ";
@@ -598,6 +613,9 @@ public class TimedArcPetriNet {
 		result[rowNumber++][columnNumber] = "Number of shared transitions: ";
 		result[rowNumber++][columnNumber] = "The network is untimed: ";
 		result[rowNumber++][columnNumber] = "The network is weighted: ";
+        result[rowNumber++][columnNumber] = "The network is game: ";
+        result[rowNumber++][columnNumber] = "The network is colored: ";
+        result[rowNumber++][columnNumber] = "The network is stochastic: ";
 		result[rowNumber++][columnNumber] = "Number of orphan transitions: ";
         result[rowNumber++][columnNumber] = "Number of orphan places: ";
 
@@ -638,10 +656,16 @@ public class TimedArcPetriNet {
     public int getNumberOfTokensInNet(){
         int result = 0;
         for (TimedPlace place : places) {
-            if (place.numberOfTokens == 0)
-                result += countTokens(place.tokensAsExpression, 0);
-            else
+            if (place.numberOfTokens == 0) {
+                int tokens = countTokens(place.tokensAsExpression, 0);
+                result += (
+                    (tokens == 0 && marking().getTokensFor(place).size() > 0) ?
+                        marking().getTokensFor(place).size() :
+                        tokens
+                    );
+            } else {
                 result += place.numberOfTokens();
+            }
         }
 
         return result == 0 ? marking().size() : result;
@@ -655,7 +679,7 @@ public class TimedArcPetriNet {
 	    for (ExprStringPosition exprStringPosition : expression.getChildren()) {
 	        Expression child = exprStringPosition.getObject();
 	        if (child instanceof AllExpression) {
-	            result += ((AllExpression) child).size();
+	            result += ((AllExpression) child).size() * numberOf;
             } else if (child instanceof NumberOfExpression) {
 	            result += (countTokens(child, ((NumberOfExpression) child).getNumber()));
             } else {

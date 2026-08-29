@@ -9,7 +9,7 @@ import javax.swing.SwingWorker;
 
 import net.tapaal.gui.petrinet.undo.UpdateNameLabelOffsetCommand;
 import net.tapaal.gui.petrinet.undo.Command;
-import net.tapaal.gui.petrinet.undo.MovePlaceTransitionObjectCommand;
+import net.tapaal.gui.petrinet.undo.MovePetriNetObjectCommand;
 import dk.aau.cs.util.Require;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
@@ -29,12 +29,14 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	final DrawingSurfaceImpl drawingSurface;
     final DataLayer model;
 	final String searchOption;
+	final int halfDimension = 10000;
+	final int range = 45;
 	Point rootPoint;
 	Point rightMostPointUsed = new Point(0, 0);
 
     ArrayList<PlaceTransitionObject> objectsPlaced = new ArrayList<PlaceTransitionObject>();
 	ArrayList<PlaceTransitionObject> placeTransitionObjects = new ArrayList<PlaceTransitionObject>();
-	final ArrayList<Point> pointsReserved = new ArrayList<Point>();
+	final Quadtree pointsReserved = new Quadtree();
 	final UndoManager undoManager;
 	
 	//weights
@@ -81,7 +83,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		getPlaceTransitionObjects(); 
 		processStartingObject(startingObject);
 	}
-	
+
 	private void processStartingObject(String startingObject) {
 		if(!(startingObject.equals("Random")))
 			this.startingObject = model.getPlaceTransitionObjectByName(startingObject);
@@ -138,19 +140,16 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 				}
 			}
 		}
+
 		moveObjectsWithinScreenEdge();
 		removeArcPathPoints();
 		resetLabelsToDefault();
 		
-		
-		
-		
-		
 		return null;
 	}
-	
+
 	private void depthFirstDraw(PlaceTransitionObject parentObject) {
-		ArrayList<Arc> arcsForObject = getAllArcsFromObject(parentObject);
+		List<Arc> arcsForObject = getAllArcsFromObject(parentObject);
 		PlaceTransitionObject objectToPlace;
 		boolean objectPlaced = false;
 		Point parentPoint = new Point(parentObject.getOriginalX(), parentObject.getOriginalY());
@@ -174,13 +173,12 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 					while(!objectPlaced) {
 						layer += 1;
 						//Try different positions for the objects
-						for(int x = (parentPoint.x - (xSpacing*layer)); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
-							for(int y = (parentPoint.y - (ySpacing * layer)); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
+						for(int x = parentPoint.x - (xSpacing*layer); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
+							for(int y = parentPoint.y - (ySpacing * layer); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
 								Point possiblePoint = new Point(x, y);
-								if(!(pointsReserved.contains(possiblePoint))) {
-
+						
+								if(!(pointsReserved.containsWithin(possiblePoint, range))) {
 									int weight = calculateWeight(possiblePoint, layer, getObjectPositionAsPoint(parentObject), objectToPlace);
-
 									if(weight < smallestWeight) {
 										smallestWeight = weight;
 										bestPoint = possiblePoint;
@@ -188,6 +186,7 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 								}
 							}
 						}
+
 						//We try at least minimumIterations times
 						if(layer >= minimumIterations && bestPoint != null) {
 							fireStatusChanged(objectsPlaced.size());
@@ -224,16 +223,16 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		return arcsForObject;
 	}
 	private void moveObject(PlaceTransitionObject object, Point point) {
-		Command command = new MovePlaceTransitionObjectCommand(object, point, drawingSurface);
+		Command command = new MovePetriNetObjectCommand(object, point, drawingSurface);
 		undoManager.addEdit(command);
 		command.redo();
 	}
 	private void reservePoint(Point point) {
-		pointsReserved.add(point);
+		pointsReserved.insert(point);
 	}
 	
 	private void breadthFirstDraw(PlaceTransitionObject parentObject) {
-		ArrayList<Arc> arcsForObject = getAllArcsFromObject(parentObject);
+		List<Arc> arcsForObject = getAllArcsFromObject(parentObject);
 		PlaceTransitionObject objectToPlace;
 		boolean objectPlaced = false;
 		Point parentPoint = new Point(parentObject.getOriginalX(), parentObject.getOriginalY());
@@ -257,16 +256,18 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 					for(int x = (parentPoint.x - (xSpacing*layer)); x <= (parentPoint.x + (xSpacing*layer)); x += xSpacing) {
 						for(int y = (parentPoint.y - (ySpacing * layer)); y <= (parentPoint.y + (ySpacing*layer)); y += ySpacing) {
 							Point possiblePoint = new Point(x, y);
-							int weight = calculateWeight(possiblePoint, layer, getObjectPositionAsPoint(parentObject), objectToPlace);
-
-							if(weight < smallestWeight) {
-								smallestWeight = weight;
-								bestPoint = possiblePoint;
+							if (!(pointsReserved.containsWithin(possiblePoint, range))) {
+								int weight = calculateWeight(possiblePoint, layer, getObjectPositionAsPoint(parentObject), objectToPlace);
+								
+								if(weight < smallestWeight) {
+									smallestWeight = weight;
+									bestPoint = possiblePoint;
+								}
 							}
 						}
 					}
 					//We try at least minimumIterations times
-					if(!(pointsReserved.contains(bestPoint)) && layer >= minimumIterations) {
+					if(layer >= minimumIterations && bestPoint != null) {
 						fireStatusChanged(objectsPlaced.size());
 						moveObject(objectToPlace, bestPoint);
 						checkIfObjectIsNowRightmost(bestPoint);
@@ -392,17 +393,18 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 	}
 	
 	private void removeArcPathPoints() {
-		ArrayList<ArcPathPoint> toRemove = new ArrayList<ArcPathPoint>();
-		for(PetriNetObject object : model.getPNObjects()) {
-			if(object instanceof ArcPathPoint) {
-				ArcPathPoint arcPathPoint = (ArcPathPoint)object;
-				if(!(arcPathPoint.isEndPoint())) {
-					toRemove.add(arcPathPoint);
+		List<ArcPathPoint> toRemove = new ArrayList<ArcPathPoint>();
+		for (var pnObj : model.getPNObjects()) {
+			if (pnObj instanceof Arc) {
+				var arc = (Arc)pnObj;
+				var path = arc.getArcPath();
+				for (int i = 1; i < path.getNumPoints() - 1; ++i) {
+					toRemove.add(path.getPathPoint(i));
 				}
 			}
-
 		}
-		for(ArcPathPoint p : toRemove) {
+
+		for (ArcPathPoint p : toRemove) {
 			Command command = new DeleteArcPathPointEditCommand(p.getArcPath().getArc(), p, p.getIndex(), model);
 			command.redo();
 			undoManager.addEdit(command);
@@ -538,8 +540,6 @@ public class SmartDrawWorker extends SwingWorker<Void, Void>{
 		} else {
 			fireDone(true);
 		}
-
-		
 	}
 
 	//For debugging

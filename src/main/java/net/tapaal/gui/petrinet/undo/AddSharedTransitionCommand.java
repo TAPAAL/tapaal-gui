@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
 import dk.aau.cs.model.tapn.SharedTransition;
 
-public class AddSharedTransitionCommand extends Command {
+public class AddSharedTransitionCommand implements Command {
 	private final SharedTransition transition;
 	private final SharedTransitionsListModel listModel;
 	

@@ -1,13 +1,28 @@
 package dk.aau.cs.model.tapn;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
 import pipe.gui.petrinet.animation.Animator;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -16,6 +31,7 @@ import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.verification.TAPNComposer;
 
 public class TimedTransition extends TAPNElement {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
@@ -28,6 +44,9 @@ public class TimedTransition extends TAPNElement {
 
 	private boolean isUrgent = false;
 	private boolean isUncontrollable = false;
+    private SMCDistribution distribution = SMCDistribution.defaultDistribution();
+    private Probability weight = new DoubleProbability(1.0);
+	private FiringMode firingMode = new RandomFiringMode();
     private GuardExpression guard;
 
 	private SharedTransition sharedTransition;
@@ -47,6 +66,22 @@ public class TimedTransition extends TAPNElement {
 		setUrgent(isUrgent);
 		this.guard = guard;
 	}
+
+    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, SMCDistribution distribution) {
+        setName(name);
+        setUrgent(isUrgent);
+        setDistribution(distribution);
+        this.guard = guard;
+    }
+
+    public TimedTransition(String name, boolean isUrgent, GuardExpression guard, SMCDistribution distribution, Probability weight, FiringMode firingMode) {
+        setName(name);
+        setUrgent(isUrgent);
+        setDistribution(distribution);
+        setWeight(weight);
+		setFiringMode(firingMode);
+        this.guard = guard;
+    }
 
 	public void addTimedTransitionListener(TimedTransitionListener listener){
 		Require.that(listener != null, "listener cannot be null");
@@ -68,6 +103,9 @@ public class TimedTransition extends TAPNElement {
 	
 	protected void setUrgent(boolean value, boolean cascade){
 		isUrgent = value;
+        if (isUrgent) {
+            setDistribution(SMCDistribution.urgent());
+        }
 		if(isShared() && cascade){
 			sharedTransition.setUrgent(value);
 		}
@@ -86,6 +124,45 @@ public class TimedTransition extends TAPNElement {
 	    if (isShared() && cascade) {
 	        sharedTransition.setUncontrollable(isUncontrollable);
         }
+    }
+
+    public SMCDistribution getDistribution() { return distribution; }
+
+    public void setDistribution(SMCDistribution distrib) { setDistribution(distrib, true); }
+
+    public void setDistribution(SMCDistribution distrib, boolean cascade) {
+        this.distribution = distrib;
+        fireDistributionChanged();
+        if (isShared() && cascade) {
+            sharedTransition.setDistribution(distrib);
+        }
+    }
+
+    public Probability getWeight() { return weight; }
+
+    public void setWeight(Probability weight) { setWeight(weight, true); }
+
+    public void setWeight(Probability weight, boolean cascade) {
+        this.weight = weight;
+        if(isShared() && cascade) {
+            sharedTransition.setWeight(weight);
+        }
+    }
+
+	public void setFiringMode(FiringMode firingMode) {
+		this.firingMode = firingMode;
+	}
+
+	public FiringMode getFiringMode() {
+        if (firingMode == null) {
+            firingMode = new RandomFiringMode();
+        }
+        
+        return firingMode;
+	}
+
+    public boolean hasCustomDistribution() {
+        return !this.distribution.equals(SMCDistribution.defaultDistribution());
     }
 	
 	public boolean hasUntimedPreset(){
@@ -170,6 +247,12 @@ public class TimedTransition extends TAPNElement {
 		}
 	}
 
+    private void fireDistributionChanged() {
+		for (TimedTransitionListener listener : listeners){
+			listener.distributionChanged(new TimedTransitionEvent(this));
+		}
+	}
+
 	private boolean isValid(String newName) {
 		return namePattern.matcher(newName).matches();
 	}
@@ -241,7 +324,6 @@ public class TimedTransition extends TAPNElement {
 		} else {
 			result = this.calculateDIntervalAlone();
 		}
-		
 		
 		//Invariants
 		for(TimedArcPetriNet model : model().parentNetwork().activeTemplates()){
@@ -403,9 +485,9 @@ public class TimedTransition extends TAPNElement {
 
 	public TimedTransition copy() {
 	    if(guard == null){
-            return new TimedTransition(name, isUrgent, null);
+            return new TimedTransition(name, isUrgent, null, distribution, weight, firingMode);
         }
-		return new TimedTransition(name, isUrgent, guard.copy());
+		return new TimedTransition(name, isUrgent, guard.copy(), distribution, weight, firingMode);
 	}
 
 	@Override
@@ -510,4 +592,51 @@ public class TimedTransition extends TAPNElement {
             }
         }
 	}
+
+    public String toBindingXmlStr(Map<Variable, Color> bindings, TAPNComposer composer) {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+            Document document = builder.newDocument();
+            
+            Element transitionElement = toXmlElement(bindings, document, composer);
+            document.appendChild(transitionElement);
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(writer));
+
+            return writer.getBuffer().toString().trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } 
+    }
+
+    private Element toXmlElement(Map<Variable, Color> bindings, Document document, TAPNComposer composer) {
+        Element transitionElement = document.createElement("transition");
+        transitionElement.setAttribute("id", composer.composedTransitionName(this));
+
+        Element bindingElement = document.createElement("binding");
+        
+        if (!bindings.isEmpty()) {
+            for (Map.Entry<Variable, Color> binding : bindings.entrySet()) {
+                Element variableElement = document.createElement("variable");
+                variableElement.setAttribute("id", binding.getKey().getId());
+                
+                Element colorElement = document.createElement("color");
+                colorElement.setTextContent(binding.getValue().getName());
+                
+                variableElement.appendChild(colorElement);
+                bindingElement.appendChild(variableElement);
+            }
+        }
+
+        transitionElement.appendChild(bindingElement);
+        
+        return transitionElement;
+    }
 }

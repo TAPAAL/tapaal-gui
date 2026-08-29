@@ -274,7 +274,7 @@ public abstract class Transition extends PlaceTransitionObject {
 		transform.concatenate(Zoomer.getTransform(getZoom()));
 
 		arcIterator = top.iterator();
-		transform.transform(new Point2D.Double(1, 0.5 * TRANSITION_HEIGHT), transformed); // +1 due to rounding making it off by 1
+		transform.transform(new Point2D.Double(1, 0.5 * TRANSITION_HEIGHT), transformed); // 1 on x due to rounding error
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
 
@@ -290,7 +290,7 @@ public abstract class Transition extends PlaceTransitionObject {
 		}
 
 		arcIterator = bottom.iterator();
-		transform.transform(new Point2D.Double(0, -0.5 * TRANSITION_HEIGHT), transformed);
+		transform.transform(new Point2D.Double(-1, -0.5 * TRANSITION_HEIGHT), transformed); // -1 on x due to rounding error
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
 

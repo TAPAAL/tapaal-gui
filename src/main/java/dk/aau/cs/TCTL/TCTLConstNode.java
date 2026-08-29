@@ -37,6 +37,16 @@ public class TCTLConstNode extends TCTLAbstractStateProperty {
 	}
 
 	@Override
+	public boolean equals(Object o) {
+		return o instanceof TCTLConstNode && constant == ((TCTLConstNode)o).constant;
+	}
+
+	@Override
+	public int hashCode() {
+		return Integer.hashCode(constant);
+	}
+
+	@Override
 	public void accept(ITCTLVisitor visitor, Object context) {
 		visitor.visit(this, context);
 
@@ -75,5 +85,4 @@ public class TCTLConstNode extends TCTLAbstractStateProperty {
 	}
 
 }
-
 

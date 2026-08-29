@@ -14,6 +14,7 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.*;
+import java.util.Map;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.gui.petrinet.TAPNLens;
@@ -24,6 +25,9 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
 import org.jetbrains.annotations.Nullable;
+
+import com.sun.jna.Platform;
+
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -35,9 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class VerifyPN implements ModelChecker {
 
@@ -250,8 +252,9 @@ public class VerifyPN implements ModelChecker {
         } else {
             String errorOutput = readOutput(runner.errorOutput());
             String standardOutput = readOutput(runner.standardOutput());
+            var tokenBounds = VerificationArguments.tokenBounds(VerificationArguments.hasKBound(options), model.value1().marking().size(), query.getExtraTokens());
 
-            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, tokenBounds.totalTokens(), tokenBounds.extraTokens(), query);
 
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
@@ -312,7 +315,6 @@ public class VerifyPN implements ModelChecker {
 
     private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws IOException {
         ((VerifyTAPNOptions) options).setTokensInModel(model.value1().getNumberOfTokensInNet()); // TODO: get rid of me
-
         runner = new ProcessRunner(verifypnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
         runner.run();
 
@@ -323,8 +325,9 @@ public class VerifyPN implements ModelChecker {
             TimedArcPetriNetTrace tapnTrace = null;
             String errorOutput = readOutput(runner.errorOutput());
             String standardOutput = readOutput(runner.standardOutput());
+            var tokenBounds = VerificationArguments.tokenBounds(VerifyTAPNOptions.usesKBound(options), model.value1().getNumberOfTokensInNet(), query.getExtraTokens());
 
-            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().getNumberOfTokensInNet() + query.getExtraTokens(), query.getExtraTokens(), query);
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, tokenBounds.totalTokens(), tokenBounds.extraTokens(), query);
 
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
@@ -337,7 +340,7 @@ public class VerifyPN implements ModelChecker {
                     (query.getProperty() instanceof LTLENode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof LTLANode && !queryResult.value1().isQuerySatisfied());
 
-                if (options.traceOption() != TraceOption.NONE && isColored && showTrace) {
+                if (options.traceOption() != TraceOption.NONE && isColored && showTrace && options.unfoldedModelPath() != null) {
                     PNMLoader tapnLoader = new PNMLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
@@ -352,7 +355,7 @@ public class VerifyPN implements ModelChecker {
                         }
 
                         if (tapnTrace != null) {
-                            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
+                            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false, lens.isStochastic()));
 
                             //The query being verified should be the only query
                             for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network(), query.getCategory())) {
@@ -362,7 +365,9 @@ public class VerifyPN implements ModelChecker {
                             }
                         }
                     } catch (FormatException e) {
+                        messenger.displayErrorMessage(e.getMessage());
                         e.printStackTrace();
+                        return null;
                     } catch (NullPointerException | ThreadDeath n) {
                         return null;
                     }
@@ -462,8 +467,8 @@ public class VerifyPN implements ModelChecker {
             return null;
         }
 
-        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
-
+        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.useExplicitSearch());
+   
         return traceParser.parseTrace(new BufferedReader(new StringReader(output)));
     }
 
@@ -476,26 +481,23 @@ public class VerifyPN implements ModelChecker {
             return null;
         }
 
-        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
-        Map<String, TimedArcPetriNetTrace> parsedTracesMap = new LinkedHashMap<>();
-
-        if(query.getCategory() == QueryCategory.HyperLTL) {
-            for(int i = 0; i < query.getTraceList().size(); i++) {
-                traceParser.setTraceToParse(query.getTraceList().get(i));
-                TimedArcPetriNetTrace result = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
-                parsedTracesMap.put(query.getTraceList().get(i), result);
-
-            }
-            return parsedTracesMap;
+        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.useExplicitSearch());
+        if (query.getCategory() == QueryCategory.HyperLTL) {
+            return traceParser.parseTraces(new BufferedReader(new StringReader(output)));
         }
+
         return null;
     }
 
     private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-        return options.toString() + ' ' + modelFile + ' ' + queryFile;
+        return createArgumentString(modelFile, queryFile, options.toString());
     }
 
     private String createArgumentString(String modelFile, String queryFile, String options) {
+        if (Platform.isWindows()) {
+            return options + " \"" + modelFile + "\" \"" + queryFile + "\"";
+        }
+
         return options + ' ' + modelFile + ' ' + queryFile;
     }
 
@@ -553,7 +555,7 @@ public class VerifyPN implements ModelChecker {
     }
 
     public String getHelpOptions() {
-        runner = new ProcessRunner(verifypnpath, "--help");
+        runner = new ProcessRunner(verifypnpath, "--help", this);
         runner.run();
 
         if (!runner.error()) {

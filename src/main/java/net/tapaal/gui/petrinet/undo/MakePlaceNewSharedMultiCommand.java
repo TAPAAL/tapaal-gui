@@ -10,7 +10,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MakePlaceNewSharedMultiCommand extends Command {
+public class MakePlaceNewSharedMultiCommand implements Command {
 
 		private final String newSharedName;
 		private final Context context;
@@ -32,6 +32,8 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 		
 		@Override
 		public void redo() {
+            commands.clear();
+
 			SharedPlace sharedPlace = null;
 			boolean first = true;
 			for(Template template : context.tabContent().allTemplates()) {
@@ -52,7 +54,7 @@ public class MakePlaceNewSharedMultiCommand extends Command {
                         commands.add(command);
                         first = false;
                     } else { //For the rest we make them shared with the recently made place
-                        command = new MakePlaceSharedCommand(context.activeModel(), sharedPlace, component.underlyingPlace(), component, context.tabContent(), true);
+                        command = new MakePlaceSharedCommand(template.model(), sharedPlace, component.underlyingPlace(), component, context.tabContent(), true);
                         command.redo();
                         commands.add(command);
                     }
@@ -62,8 +64,8 @@ public class MakePlaceNewSharedMultiCommand extends Command {
 
 		@Override
 		public void undo() {	
-			for(Command command : commands)
-				command.undo();
+			for (int i = commands.size() - 1; i >= 0; --i) {
+				commands.get(i).undo();
+            }
 		}
 	}
-

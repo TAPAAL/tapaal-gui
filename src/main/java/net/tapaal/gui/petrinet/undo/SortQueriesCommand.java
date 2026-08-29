@@ -6,7 +6,7 @@ import javax.swing.DefaultListModel;
 
 import dk.aau.cs.util.StringComparator;
 
-public class SortQueriesCommand extends Command {
+public class SortQueriesCommand implements Command {
 	
 	final DefaultListModel listModel;
 	Object[] oldOrder;

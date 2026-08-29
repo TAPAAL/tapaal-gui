@@ -6,9 +6,9 @@ public class Constants {
 
     // Engine
     public static final String VERIFYTA_MIN_REV = "4.1.19";
-    public static final String VERIFYTAPN_MIN_REV = "1.3.1";
-    public static final String VERIFYDTAPN_MIN_REV = "3.5.0";
-    public static final String VERIFYPN_MIN_REV = "4.2.1";
+    public static final String VERIFYTAPN_MIN_REV = "1.3.3";
+    public static final String VERIFYDTAPN_MIN_REV = "3.6.2";
+    public static final String VERIFYPN_MIN_REV = "4.4.2";
 
     // GUI
     public static final int PLACE_TRANSITION_HEIGHT = 30;
@@ -64,8 +64,10 @@ public class Constants {
 
 	public static final int ZOOM_DELTA = 10;
 	public static final int ZOOM_MAX = 300;
-	public static final int ZOOM_MIN = 40;
+	public static final int ZOOM_MIN = 20;
 	public static final int ZOOM_DEFAULT = 100;
+
+	public static final int UI_SCALE_DEFAULT = 100;
 
 	public static final Color BACKGROUND_COLOR = new Color(255, 255, 255, 200);
 	public static final Color ANIMATION_BACKGROUND_COLOR = new Color(246, 250, 255);
@@ -78,4 +80,5 @@ public class Constants {
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;
 
 	public static final int MAX_NUMBER_OF_TOKENS_ALLOWED = 9999999;
+	public static final int MAX_NET_SIZE = 4000;
 }

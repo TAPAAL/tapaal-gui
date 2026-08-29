@@ -1,6 +1,9 @@
 .gradle
 .idea
+.vscode
 .r
 .bzr-repo
 build
 out
+bin
+.kotlin

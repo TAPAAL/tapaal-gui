@@ -424,6 +424,12 @@ public class DataLayer {
 			arc.getSource().removeFromArc(arc);
 			arc.getTarget().removeToArc(arc);
 
+			for (ArcPathPoint point : arc.getArcPath().getArcPathPoints()) {
+				petriNetObjects.remove(point);
+				arcPathSet.remove(point);
+				point.setDeleted(true);
+			}
+
 		}else if (pnObject instanceof ArcPathPoint) {
 			arcPathSet.remove(pnObject);
 		}
@@ -609,12 +615,7 @@ public class DataLayer {
 	 * @return A List of all the Place objects
 	 */
 	public Place[] getPlaces() {
-		Place[] returnArray = new Place[placesArray.size()];
-
-		for (int i = 0; i < placesArray.size(); i++) {
-			returnArray[i] = placesArray.get(i);
-		}
-		return returnArray;
+		return placesArray.toArray(new Place[0]);
 	}
 
 	/**
@@ -624,12 +625,7 @@ public class DataLayer {
 	 *         label objects
 	 */
 	public AnnotationNote[] getLabels() {
-		AnnotationNote[] returnArray = new AnnotationNote[labelsArray.size()];
-
-		for (int i = 0; i < labelsArray.size(); i++) {
-			returnArray[i] = labelsArray.get(i);
-		}
-		return returnArray;
+		return labelsArray.toArray(new AnnotationNote[0]);
 	}
 
 	/**
@@ -638,12 +634,7 @@ public class DataLayer {
 	 * @return An List of all the Transition objects
 	 */
 	public Transition[] getTransitions() {
-		Transition[] returnArray = new Transition[transitionsArray.size()];
-
-		for (int i = 0; i < transitionsArray.size(); i++) {
-			returnArray[i] = transitionsArray.get(i);
-		}
-		return returnArray;
+		return transitionsArray.toArray(new Transition[0]);
 	}
 
 	/**
@@ -652,12 +643,7 @@ public class DataLayer {
 	 * @return An List of all the Arc objects
 	 */
 	public Arc[] getArcs() {
-		Arc[] returnArray = new Arc[arcsArray.size()];
-
-		for (int i = 0; i < arcsArray.size(); i++) {
-			returnArray[i] = arcsArray.get(i);
-		}
-		return returnArray;
+		return arcsArray.toArray(new Arc[0]);
 	}
 
 	public Arc getArcByEndpoints(PlaceTransitionObject source, PlaceTransitionObject target) {
@@ -683,7 +669,7 @@ public class DataLayer {
 
         if (transitionID != null) {
             for (Transition transition : transitionsArray) {
-                if (transitionID.equalsIgnoreCase(transition.getId())) {
+                if (transitionID.equals(transition.getId())) {
                     returnTransition = transition;
                 }
             }
@@ -704,7 +690,7 @@ public class DataLayer {
 
         if (transitionName != null) {
             for (Transition transition : transitionsArray) {
-                if (transitionName.equalsIgnoreCase(transition.getName())) {
+                if (transitionName.equals(transition.getName())) {
                     returnTransition = transition;
                 }
             }
@@ -724,7 +710,7 @@ public class DataLayer {
 
         if (placeID != null) {
             for (Place place : placesArray) {
-                if (placeID.equalsIgnoreCase(place.getId())) {
+                if (placeID.equals(place.getId())) {
                     returnPlace = place;
                 }
             }
@@ -744,7 +730,7 @@ public class DataLayer {
 
         if (placeName != null) {
             for (Place place : placesArray) {
-                if (placeName.equalsIgnoreCase(place.getName())) {
+                if (placeName.equals(place.getName())) {
                     returnPlace = place;
                 }
             }

@@ -3,6 +3,8 @@ package net.tapaal.gui.petrinet.verification;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
+import com.sun.jna.Platform;
+
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -52,10 +54,93 @@ public class Verifier {
         return verifydtapn;
     }
 
-    private static VerifyPN getVerifyPN() {
+    public static VerifyPN getVerifyPN() {
         VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
         verifypn.setup();
         return verifypn;
+    }
+
+    public static TAPNQuery convertQuery(TAPNQuery query, TAPNLens lens) {
+        if (lens == null) return query;
+
+        TAPNQuery newQuery = query;
+        if (!lens.isTimed() && query.getReductionOption() != ReductionOption.VerifyPN) {
+            newQuery = new TAPNQuery(
+                query.getName(),
+                query.getCapacity(),
+                query.getProperty().copy(),
+                query.getTraceOption(),
+                query.getSearchOption(),
+                ReductionOption.VerifyPN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                !lens.isGame() && query.useReduction(),
+                null,
+                null,
+                query.inclusionPlaces(),
+                false,
+                false,
+                0,
+                lens.isColored() && query.usePartitioning(),
+                lens.isColored() && query.useColorFixpoint(),
+                lens.isColored() && query.useSymmetricVars(),
+                lens.isColored(),
+                query.useColoredReduction());
+            newQuery.setCategory(TAPNQuery.QueryCategory.CTL);
+            newQuery.setUseSiphontrap(query.isSiphontrapEnabled());
+            newQuery.setUseQueryReduction(query.isQueryReductionEnabled());
+            newQuery.setUseStubbornReduction(query.isStubbornReductionEnabled());
+            newQuery.setUseTarOption(query.isTarOptionEnabled());
+            newQuery.setUseTarjan(query.isTarjan());
+        } else if (lens.isTimed() && query.getReductionOption() == ReductionOption.VerifyPN) {
+            newQuery = new TAPNQuery(
+                query.getName(),
+                query.getCapacity(),
+                query.getProperty().copy(),
+                query.getTraceOption(),
+                query.getSearchOption(),
+                ReductionOption.VerifyDTAPN,
+                query.useSymmetry(),
+                query.useGCD(),
+                query.useTimeDarts(),
+                query.usePTrie(),
+                query.useOverApproximation(),
+                query.useReduction(),
+                null,
+                null,
+                query.inclusionPlaces(),
+                query.isOverApproximationEnabled(),
+                query.isUnderApproximationEnabled(),
+                query.approximationDenominator(),
+                false,
+                false,
+                false,
+                lens.isColored(),
+                false);
+            newQuery.setUseStubbornReduction(query.isStubbornReductionEnabled());
+        }
+
+        return newQuery;
+    }
+
+    public static TAPNQuery convertQuery(TAPNQuery query, TAPNLens lens, TimedArcPetriNetNetwork network) {
+        TAPNQuery convertedQuery = convertQuery(query, lens);
+        EngineSupportOptions engine = EngineSupportOptions.fromReductionOption(convertedQuery.getReductionOption());
+        if (hasNonzeroInitialTokenAges(network) && (engine == null || !engine.supportsNonzeroInitialTokenAges())) {
+            convertedQuery = convertedQuery.copy();
+            convertedQuery.setReductionOption(ReductionOption.VerifyDTAPN);
+        }
+        return convertedQuery;
+    }
+
+    public static boolean hasNonzeroInitialTokenAges(TimedArcPetriNetNetwork network) {
+        return network.activeTemplates().stream()
+            .flatMap(template -> template.places().stream())
+            .flatMap(place -> network.marking().getTokensFor(place).stream())
+            .anyMatch(token -> token.age().signum() != 0);
     }
 
     public static ModelChecker getModelChecker(TAPNQuery query) {
@@ -71,6 +156,10 @@ public class Verifier {
     }
 
     public static String getReducedNetFilePath() {
+        if (Platform.isWindows()) {
+            return "\"" + reducedNetTempFile.getAbsolutePath() + "\"";
+        }
+
         return reducedNetTempFile.getAbsolutePath();
     }
 
@@ -155,17 +244,10 @@ public class Verifier {
         HashMap<TimedArcPetriNet, DataLayer> guiModels,
         boolean onlyCreateReducedNet,
         TAPNLens lens) {
+        query = convertQuery(query, lens, tapnNetwork);
         ModelChecker verifytapn = getModelChecker(query);
 
-
-        try {
-            reducedNetTempFile = File.createTempFile("reduced-", ".pnml");
-        } catch (IOException e) {
-            new MessengerImpl().displayErrorMessage(
-                e.getMessage(),
-                "Error");
-            return;
-        }
+        if (reducedNetTempFile == null) createTempFile();
 
         if (!verifytapn.isCorrectVersion()) {
             new MessengerImpl().displayErrorMessage(
@@ -176,12 +258,40 @@ public class Verifier {
 
         TCTLAbstractProperty inputQuery = query.getProperty();
 
-        int bound = query.getCapacity();
         boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
-        VerifyTAPNOptions verifytapnOptions;
+        VerifyTAPNOptions verifytapnOptions = getVerificationOptions(query, isColored);
+
+        if (inputQuery == null) {
+            return;
+        }
+
+        if (tapnNetwork != null) {
+            RunVerificationBase thread;
+            if (reducedNetTempFile != null) {
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, getReducedNetFilePath(), onlyCreateReducedNet);
+            } else {
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
+            }
+
+            RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread);
+            if (isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE) {
+                SmartDrawDialog.setupWorkerListener(thread);
+            }
+            thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), query.getCapacity(), query.getSmcSettings()), query, lens);
+            dialog.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
+                "There was an error converting the model.",
+                "Conversion error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return;
+    }
+
+    public static VerifyTAPNOptions getVerificationOptions(TAPNQuery query, boolean isColored) {
         if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
-            verifytapnOptions = new VerifyDTAPNOptions(
-                bound,
+            return new VerifyDTAPNOptions(
+                query.getCapacity(),
                 query.getTraceOption(),
                 query.getSearchOption(),
                 query.useSymmetry(),
@@ -197,14 +307,28 @@ public class Verifier {
                 query.isUnderApproximationEnabled(),
                 query.approximationDenominator(),
                 query.isStubbornReductionEnabled(),
-                reducedNetTempFile.getAbsolutePath(),
+                getReducedNetFilePath(),
                 query.usePartitioning(),
                 query.useColorFixpoint(),
-                isColored // Unfold net
-            );
+                isColored,// Unfold net
+                query.getRawVerification(),
+                query.getRawVerificationPrompt(),
+                query.isBenchmarkMode(),
+                query.getBenchmarkRuns(),
+                query.isParallel(),
+                query.getCategory(),
+                query.getNumberOfTraces(),
+                query.getSmcTraceType(),
+                query.isSimulate(),
+                query.getGranularity(),
+                query.isMaxGranularity(),
+                query.getSmcSettings().getNumericPrecision(),
+                query.getSmcSettings().getSmcSeed()
+        );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
-            verifytapnOptions = new VerifyPNOptions(
-                bound,
+            boolean unfold = isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE && !query.useExplicitSearch();
+            return new VerifyPNOptions(
+                query.getCapacity(),
                 query.getTraceOption(),
                 query.getSearchOption(),
                 query.useOverApproximation(),
@@ -217,19 +341,22 @@ public class Verifier {
                 query.isSiphontrapEnabled(),
                 query.isQueryReductionEnabled() ? TAPNQuery.QueryReductionTime.UnlimitedTime : TAPNQuery.QueryReductionTime.NoTime,
                 query.isStubbornReductionEnabled(),
-                reducedNetTempFile.getAbsolutePath(),
+                getReducedNetFilePath(),
                 query.isTarOptionEnabled(),
                 query.isTarjan(),
                 isColored,
-                isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE,
+                unfold,
                 query.usePartitioning(),
                 query.useColorFixpoint(),
                 query.useSymmetricVars(),
-                query.useColoredReduction()
+                query.useColoredReduction(),
+                query.useExplicitSearch(),
+                query.getRawVerification(),
+                query.getRawVerificationPrompt()
             );
         } else {
-            verifytapnOptions = new VerifyTAPNOptions(
-                bound,
+            return new VerifyTAPNOptions(
+                query.getCapacity(),
                 query.getTraceOption(),
                 query.getSearchOption(),
                 query.useSymmetry(),
@@ -240,34 +367,74 @@ public class Verifier {
                 query.isUnderApproximationEnabled(),
                 query.approximationDenominator(),
                 false,
-                isColored
+                isColored,
+                query.getRawVerification(),
+                query.getRawVerificationPrompt()
             );
         }
+    }
+
+    public static void createTempFile() {
+        try {
+            if (reducedNetTempFile == null) {
+                reducedNetTempFile = File.createTempFile("reduced-", ".pnml");
+            }
+        } catch (IOException e) {
+            new MessengerImpl().displayErrorMessage(
+                e.getMessage(),
+                "Error");
+            return;
+        }
+    }
+
+    public static RunVerificationBase runVerifyTAPNSilent(
+        TimedArcPetriNetNetwork tapnNetwork,
+        TAPNQuery query,
+        VerificationCallback callback,
+        HashMap<TimedArcPetriNet, DataLayer> guiModels,
+        boolean onlyCreateReducedNet,
+        TAPNLens lens) {
+        query = convertQuery(query, lens);
+        ModelChecker verifytapn = getModelChecker(query);
+
+        if (reducedNetTempFile == null) createTempFile();
+
+        if (!verifytapn.isCorrectVersion()) {
+            new MessengerImpl().displayErrorMessage(
+                "No " + verifytapn + " specified: The verification is cancelled",
+                "Verification Error");
+            return null;
+        }
+
+        TCTLAbstractProperty inputQuery = query.getProperty();
+
+        boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
+        VerifyTAPNOptions verifytapnOptions = getVerificationOptions(query, isColored);
 
         if (inputQuery == null) {
-            return;
+            return null;
         }
 
         if (tapnNetwork != null) {
             RunVerificationBase thread;
             if (reducedNetTempFile != null) {
-                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, reducedNetTempFile.getAbsolutePath(), onlyCreateReducedNet);
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, getReducedNetFilePath(), onlyCreateReducedNet);
             } else {
                 thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
             }
 
-            RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread);
-            if (tapnNetwork.isColored() && query.getTraceOption() != TAPNQuery.TraceOption.NONE) {
+            if (isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE) {
                 SmartDrawDialog.setupWorkerListener(thread);
             }
-            thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound), query, lens);
-            dialog.setVisible(true);
+            thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), query.getCapacity(), query.getSmcSettings()), query, lens);
+            return thread;
         } else {
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(),
                 "There was an error converting the model.",
                 "Conversion error", JOptionPane.ERROR_MESSAGE);
         }
 
-        return;
+        return null;
     }
+
 }

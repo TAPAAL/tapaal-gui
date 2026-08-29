@@ -8,8 +8,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.util.EnumMap;
 
@@ -23,9 +21,11 @@ import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.action.EditAnnotationBackgroundAction;
 import pipe.gui.petrinet.action.EditAnnotationBorderAction;
 import pipe.gui.petrinet.action.EditNoteAction;
+import pipe.gui.petrinet.undo.AnnotationResizeCommand;
 import pipe.gui.petrinet.undo.AnnotationTextEditCommand;
 import pipe.gui.petrinet.editor.AnnotationPanel;
 import pipe.gui.swingcomponents.EscapableDialog;
+import net.tapaal.gui.petrinet.undo.Command;
 
 public class AnnotationNote extends Note {
 
@@ -189,18 +189,12 @@ public class AnnotationNote extends Note {
 
 		guiDialog.add(new AnnotationPanel(this));
 		guiDialog.setMinimumSize(new Dimension(300, 200));
+		
 		// Make window fit contents' preferred size
-		guiDialog.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				if(isFirstEdit) {
-					getParent().getGuiModel().removePetriNetObject(AnnotationNote.this);
-				}
-			}
-		});
 		guiDialog.pack();
 
 		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
 
 		guiDialog.setResizable(true);
 		guiDialog.setVisible(true);
@@ -208,7 +202,7 @@ public class AnnotationNote extends Note {
 		guiDialog.dispose();
 
 		String newText = note.getText();
-		if (oldText != null && !newText.equals(oldText)) {
+		if (!isFirstEdit && !newText.equals(oldText)) {
 			// Text has been changed
 
 			TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
@@ -217,7 +211,8 @@ public class AnnotationNote extends Note {
 			updateBounds();
 			return true;
 		}
-		return false;
+
+		return isFirstEdit && !newText.isBlank();
 	}
 
 	@Override
@@ -272,6 +267,8 @@ public class AnnotationNote extends Note {
 
 		private final ResizePoint myPoint;
 		private Point start;
+        private Point noteStartPoint;
+        private Dimension noteStartSize;
 
 		public ResizePointHandler(ResizePoint point) {
 			myPoint = point;
@@ -284,13 +281,14 @@ public class AnnotationNote extends Note {
 			myPoint.isPressed = true;
 			myPoint.repaint();
 			start = e.getPoint();
+            noteStartPoint = myPoint.myNote.getLocation();
+            noteStartSize = myPoint.myNote.getNote().getSize();
 		}
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
-
-			myPoint.drag(Grid.getModifiedX(e.getX() - start.x), Grid.getModifiedY(e.getY() - start.y));
+			myPoint.drag(Grid.align(e.getX() - start.x, getZoom()), Grid.align(e.getY() - start.y, getZoom()));
 			myPoint.myNote.updateBounds();
 			myPoint.repaint();
 		}
@@ -299,10 +297,12 @@ public class AnnotationNote extends Note {
 		public void mouseReleased(MouseEvent e) {
 			if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
 
-			myPoint.myNote.setDraggable(true);
-			myPoint.isPressed = false;
-			myPoint.myNote.updateBounds();
-			myPoint.repaint();
+            myPoint.myNote.setDraggable(true);
+            myPoint.isPressed = false;
+
+            Command command = new AnnotationResizeCommand(myPoint, noteStartPoint, noteStartSize);
+            TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(command);
+            command.redo();
 		}
 
 	}
@@ -338,6 +338,10 @@ public class AnnotationNote extends Note {
             );
 			typeMask = type;
 		}
+
+        public Note getNote() {
+            return myNote;
+        }
 
 		//Adjust the point a bit to hit center on corner of box
         @Override

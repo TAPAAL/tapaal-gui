@@ -39,6 +39,10 @@ public class Color {
         return colorType;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
     public boolean contains(Color color) {
         if(tuple != null) {
             for (Color c : tuple) {

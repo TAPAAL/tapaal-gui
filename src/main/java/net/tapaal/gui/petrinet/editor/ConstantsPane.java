@@ -30,14 +30,17 @@ import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.util.Require;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.SortConstantsCommand;
+import net.tapaal.gui.petrinet.undo.SortRealConstantsCommand;
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.RealConstant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import net.tapaal.gui.swingcomponents.NonsearchableJList;
 import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.petrinet.widgets.SidePane;
+
 
 public class ConstantsPane extends JPanel implements SidePane {
 
@@ -48,9 +51,11 @@ public class ConstantsPane extends JPanel implements SidePane {
     private final VariablesListModel variablesListModel;
 	private final JList<?> list;
 	private final ConstantsListModel constantsListModel;
+	private final RealConstantsListModel realConstantsListModel;
 	private JButton editBtn;
 	private JButton removeBtn;
 	private JButton addConstantButton;
+    private JButton manuallyEditBtn;
 
 	private final PetriNetTab tab;
 	private JButton moveUpButton;
@@ -59,16 +64,21 @@ public class ConstantsPane extends JPanel implements SidePane {
 
     private static final String titleBorder = "Global constants, Color types and Variables";
     private static final String titleBorderNoColor = "Global constants";
+    private static final String titleBorderSMC = "Global constants and SMC Settings";
     private static final String titleBorderToolTip = "<html>Declaration of colors types, color variables and global integer constants.<br>To see a summary list press SHIFT + F</html>";
     private static final String titleBorderToolTipNoColor = "Declaration of global constants that can be used in intervals and age invariants";
+    private static final String titleBorderToolTipSmc = "Declaration of global constants that can be used in intervals and age invariants, and editing of SMC engine settings";
 
     private static final String CONSTANTS = "Constants";
+    private static final String REAL_CONSTANTS = "Real constants";
     private static final String COLORTYPES = "Color type";
     private static final String VARIABLES = "Variables";
+    private static final String SMC_SETTINGS = "SMC Settings";
     private final JComboBox<String> constantsColorTypesVariablesComboBox = new JComboBox<>(new String[]{COLORTYPES, VARIABLES, CONSTANTS});
 
 
     private static final String toolTipComboBox = "Switch between constants, colors and variables";
+    private static final String toolTipManuallyEdit = "Manualy edit the values of all constants, color types and variables";
     private static final String toolTipEditConstant = "Edit the value of the selected constant";
     private static final String toolTipRemoveConstant = "Remove the selected constant";
     private static final String toolTipNewConstant = "Create a new constant";
@@ -76,6 +86,14 @@ public class ConstantsPane extends JPanel implements SidePane {
     private final static String toolTipMoveUpConstant = "Move the selected constant up";
     private final static String toolTipMoveDownConstant = "Move the selected constant down";
     private final static String toolTipConstantList = "Shows every constant. displays the name and its assigned value";
+
+    private static final String toolTipEditRealConstant = "Edit the value of the selected real constant";
+    private static final String toolTipRemoveRealConstant = "Remove the selected real constant";
+    private static final String toolTipNewRealConstant = "Create a new real constant";
+    private static final String toolTipSortRealConstants = "Sort the real constants alphabetically";
+    private final static String toolTipMoveUpRealConstant = "Move the selected real constant up";
+    private final static String toolTipMoveDownRealConstant = "Move the selected real constant down";
+    private final static String toolTipRealConstantList = "Shows every real constant. Real constants can be used as distribution parameters on transitions";
 
     private static final String toolTipEditVariable = "Edit the value of the selected variable";
     private static final String toolTipRemoveVariable = "Remove the selected variable";
@@ -104,6 +122,11 @@ public class ConstantsPane extends JPanel implements SidePane {
         colorTypesListModel = new ColorTypesListModel(tab.network());
         variablesListModel = new VariablesListModel(tab.network());
 		constantsListModel = new ConstantsListModel(tab.network());
+		realConstantsListModel = new RealConstantsListModel(tab.network());
+
+		if (tab.getLens().isStochastic()) {
+			constantsColorTypesVariablesComboBox.addItem(REAL_CONSTANTS);
+		}
 		constantsListModel.addListDataListener(new ListDataListener() {
 			public void contentsChanged(ListDataEvent arg0) {				
 			}
@@ -145,6 +168,9 @@ public class ConstantsPane extends JPanel implements SidePane {
 					    if(isDisplayingGlobalConstants()) {
                             Constant c = (Constant) dlm.getElementAt(index);
                             showEditConstantDialog(c);
+                        } else if(isDisplayingRealConstants()) {
+                            var c = (RealConstant)dlm.getElementAt(index);
+                            showEditRealConstantDialog(c);
                         } else if(isDisplayingVariables()){
                             Variable v = (Variable) dlm.getElementAt(index);
                             ArrayList<String> messages = new ArrayList<>();
@@ -158,7 +184,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                         } else{
                             ColorType ct = (ColorType) dlm.getElementAt(index);
                             if((ct).equals(ColorType.COLORTYPE_DOT)) {
-                                JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
+                                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Dot color cannot be edited");
                             }else {
                                 showEditColorTypeDialog(ct);
                             }
@@ -174,8 +200,8 @@ public class ConstantsPane extends JPanel implements SidePane {
 				ListModel model = list.getModel();
 				if (model.getSize()>0 && isDisplayingGlobalConstants()) {
 					Constant c = (Constant) model.getElementAt(list.getSelectedIndex());
-					if (c != null) {
-						if (arg0.getKeyCode() == KeyEvent.VK_LEFT) {										
+					if (c != null && !c.hasMultipleValues()) {
+						if (arg0.getKeyCode() == KeyEvent.VK_LEFT) {
 							if (!(c.lowerBound() == c.value())){
 								Command edit = tab.network().updateConstant(c.name(), new Constant(c.name(), c.value()-1));
 								currentTab.getUndoManager().addNewEdit(edit);
@@ -188,7 +214,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 								currentTab.getUndoManager().addNewEdit(edit);
 								tab.network().buildConstraints();
 							}
-						} 
+						}
 						else if (arg0.getKeyCode() == KeyEvent.VK_UP) {
 							if(list.getSelectedIndex() > 0){
 								highlightConstant(list.getSelectedIndex()-1);
@@ -251,7 +277,6 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 	private void hideIrrelevantInformation(){
 	    if(!tab.getLens().isColored()){
-	        constantsColorTypesVariablesComboBox.setVisible(false);
             setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(titleBorderNoColor),
                 BorderFactory.createEmptyBorder(3, 3, 3, 3))
@@ -265,6 +290,14 @@ public class ConstantsPane extends JPanel implements SidePane {
             moveDownButton.setToolTipText(toolTipMoveDownConstant);
             moveUpButton.setToolTipText(toolTipMoveUpConstant);
             sortButton.setToolTipText(toolTipSortConstants);
+
+            if (tab.getLens().isStochastic()) {
+                constantsColorTypesVariablesComboBox.removeItem(COLORTYPES);
+                constantsColorTypesVariablesComboBox.removeItem(VARIABLES);
+                constantsColorTypesVariablesComboBox.setVisible(true);
+            } else {
+                constantsColorTypesVariablesComboBox.setVisible(false);
+            }
             constantsColorTypesVariablesComboBox.setSelectedItem(CONSTANTS);
 
         } else {
@@ -334,7 +367,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 	private void highlightConstant(int index){
         //TODO: Implement for colors and variables
-        if(isDisplayingColorTypes() || isDisplayingVariables()){
+        if(!isDisplayingGlobalConstants()){
 	        return;
         }
 		ListModel model = list.getModel();
@@ -357,7 +390,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 	
 	public void removeConstantHighlights(){
 	    //TODO: Implement for colors and variables
-        if(isDisplayingColorTypes() || isDisplayingVariables()){
+        if(!isDisplayingGlobalConstants()){
             return;
         }
 		ListModel model = list.getModel();
@@ -416,10 +449,14 @@ public class ConstantsPane extends JPanel implements SidePane {
                 Constant c = (Constant) list.getSelectedValue();
                 showEditConstantDialog(c);
             }
+            else if (isDisplayingRealConstants()) {
+                var c = (RealConstant)list.getSelectedValue();
+                showEditRealConstantDialog(c);
+            }
             else {
                 ColorType ct = (ColorType) list.getSelectedValue();
                 if ((ct).equals(ColorType.COLORTYPE_DOT)) {
-                    JOptionPane.showMessageDialog(null, "Dot color cannot be edited");
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Dot color cannot be edited");
                 } else {
                     showEditColorTypeDialog(ct);
                 }
@@ -438,6 +475,9 @@ public class ConstantsPane extends JPanel implements SidePane {
 		removeBtn.addActionListener(e -> {
             if (isDisplayingGlobalConstants()) {
                 removeConstants();
+            }
+            else if (isDisplayingRealConstants()) {
+                removeRealConstants();
             }
             else if (isDisplayingVariables()) {
                 removeVariables();
@@ -458,6 +498,9 @@ public class ConstantsPane extends JPanel implements SidePane {
             if (isDisplayingGlobalConstants()) {
                 showEditConstantDialog(null);
             }
+            else if (isDisplayingRealConstants()) {
+                showEditRealConstantDialog(null);
+            }
             else if (isDisplayingVariables()) {
                 showEditVariableDialog(null);
             }
@@ -470,6 +513,20 @@ public class ConstantsPane extends JPanel implements SidePane {
 		gbc.gridx = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(addConstantButton, gbc);
+
+        manuallyEditBtn = new JButton("Manual edit");
+        manuallyEditBtn.setToolTipText(toolTipManuallyEdit);
+
+        manuallyEditBtn.addActionListener(e -> {
+            showEditManuallyDialog();
+        });
+
+        gbc = new GridBagConstraints();
+        gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridwidth = 3;
+        gbc.anchor = GridBagConstraints.CENTER;
+        buttonsPanel.add(manuallyEditBtn, gbc);
 	}
 
 	public void showConstants() {
@@ -478,6 +535,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 			return;
 
 		constantsListModel.updateAll();
+		realConstantsListModel.updateAll();
 		updateButtons();
 	}
 
@@ -497,6 +555,16 @@ public class ConstantsPane extends JPanel implements SidePane {
                     moveDownButton.setToolTipText(toolTipMoveDownConstant);
                     moveUpButton.setToolTipText(toolTipMoveUpConstant);
                     sortButton.setToolTipText(toolTipSortConstants);
+                    break;
+                case REAL_CONSTANTS:
+                    list.setModel(realConstantsListModel);
+                    list.setToolTipText(toolTipRealConstantList);
+                    addConstantButton.setToolTipText(toolTipNewRealConstant);
+                    editBtn.setToolTipText(toolTipEditRealConstant);
+                    removeBtn.setToolTipText(toolTipRemoveRealConstant);
+                    moveDownButton.setToolTipText(toolTipMoveDownRealConstant);
+                    moveUpButton.setToolTipText(toolTipMoveUpRealConstant);
+                    sortButton.setToolTipText(toolTipSortRealConstants);
                     break;
                 case COLORTYPES:
                     list.setModel(colorTypesListModel);
@@ -562,6 +630,11 @@ public class ConstantsPane extends JPanel implements SidePane {
                 showConstants();
                 list.setSelectedIndex(index-1);
             }
+            else if(isDisplayingRealConstants() && index > 0) {
+                tab.network().swapRealConstants(index, index-1);
+                realConstantsListModel.updateAll();
+                list.setSelectedIndex(index-1);
+            }
             else if (isDisplayingColorTypes() && index > 0) {
                 tab.network().swapColorTypes(index, index-1);
                 colorTypesListModel.updateName();
@@ -591,6 +664,11 @@ public class ConstantsPane extends JPanel implements SidePane {
                 showConstants();
                 list.setSelectedIndex(index + 1);
             }
+            else if(isDisplayingRealConstants() && index < tab.network().realConstants().size() - 1) {
+                tab.network().swapRealConstants(index, index+1);
+                realConstantsListModel.updateAll();
+                list.setSelectedIndex(index + 1);
+            }
             else if (isDisplayingColorTypes() && index < tab.network().numberOfColorTypes() - 1) {
                 tab.network().swapColorTypes(index, index+1);
                 colorTypesListModel.updateName();
@@ -615,6 +693,11 @@ public class ConstantsPane extends JPanel implements SidePane {
                 tab.getUndoManager().addNewEdit(sortConstantsCommand);
                 sortConstantsCommand.redo();
             }
+            else if (isDisplayingRealConstants()) {
+                Command sortCommand = new SortRealConstantsCommand(tab.network(), ConstantsPane.this);
+                tab.getUndoManager().addNewEdit(sortCommand);
+                sortCommand.redo();
+            }
             else if (isDisplayingVariables()) {
                 variablesListModel.sort();
             }
@@ -634,6 +717,13 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 	private void showEditConstantDialog(Constant constant) {
 		ConstantsDialogPanel panel = new ConstantsDialogPanel(tab.network(), constant);
+
+		panel.showDialog();
+		showConstants();
+	}
+
+	private void showEditRealConstantDialog(RealConstant constant) {
+		var panel = new ConstantsDialogPanel(tab.network(), constant);
 
 		panel.showDialog();
 		showConstants();
@@ -659,13 +749,16 @@ public class ConstantsPane extends JPanel implements SidePane {
 
     }
     private void showEditColorTypeDialog(ColorType colorType) {
-        ColorTypeDialogPanel panel;
-        UndoManager undoManager = tab.getUndoManager();
-        if (colorType != null) {
-            panel = new ColorTypeDialogPanel(colorTypesListModel, tab.network(), colorType, undoManager);
-        } else {
-            panel = new ColorTypeDialogPanel(colorTypesListModel, tab.network(), undoManager);
-        }
+        var undoManager = tab.getUndoManager();
+        var panel = colorType != null
+            ? new ColorTypeDialogPanel(colorTypesListModel, tab.network(), colorType, undoManager, tab.queries())
+            : new ColorTypeDialogPanel(colorTypesListModel, tab.network(), undoManager, tab.queries());
+        panel.showDialog();
+    }
+
+    private void showEditManuallyDialog() {
+        var undoManager = tab.getUndoManager();
+        var panel = new ManuallyEditDialogPanel(colorTypesListModel, variablesListModel, constantsListModel, tab.network(), undoManager, tab.getLens());
         panel.showDialog();
     }
 
@@ -699,6 +792,37 @@ public class ConstantsPane extends JPanel implements SidePane {
         }
 	}
 
+	protected void removeRealConstants() {
+        var model = tab.network();
+        var unremovableConstants = new ArrayList<String>();
+        tab.getUndoManager().newEdit();
+
+        for (Object o : list.getSelectedValuesList()) {
+            String name = ((RealConstant)o).name();
+            Command command = model.removeRealConstant(name);
+            if (command == null) {
+                unremovableConstants.add(name);
+            } else {
+                tab.getUndoManager().addEdit(command);
+            }
+        }
+        showConstants();
+        if (unremovableConstants.size() > 0) {
+            StringBuilder message = new StringBuilder("The following real constants could not be removed: \n");
+
+            for (String name : unremovableConstants) {
+                message.append("   - ");
+                message.append(name);
+                message.append("\n");
+            }
+            message.append("\nYou cannot remove a real constant that is used in the net.\nRemove all references " +
+                           "to the constant(s) in the net and try again.");
+
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message.toString(),
+                "Constant in use", JOptionPane.ERROR_MESSAGE);
+        }
+	}
+
 	private void removeVariables() {
         for (Object variable : list.getSelectedValuesList()) {
             if (variable instanceof Variable) {
@@ -711,7 +835,7 @@ public class ConstantsPane extends JPanel implements SidePane {
         for (Object colorType : list.getSelectedValuesList()) {
             if (colorType instanceof ColorType) {
                 if (colorType.equals(ColorType.COLORTYPE_DOT)) {
-                    JOptionPane.showMessageDialog(null, "Dot color cannot be removed");
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Dot color cannot be removed");
                 } else {
                     colorTypesListModel.removeElement((ColorType) colorType);
                 }
@@ -721,6 +845,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 	public void setNetwork(TimedArcPetriNetNetwork tapnNetwork) {
 		constantsListModel.setNetwork(tapnNetwork);
+		realConstantsListModel.setNetwork(tapnNetwork);
 	}
 
 	public void selectFirst() {
@@ -730,6 +855,10 @@ public class ConstantsPane extends JPanel implements SidePane {
 
     protected boolean isDisplayingGlobalConstants() {
         return constantsColorTypesVariablesComboBox.getSelectedItem().equals(CONSTANTS);
+    }
+
+    protected boolean isDisplayingRealConstants() {
+        return constantsColorTypesVariablesComboBox.getSelectedItem().equals(REAL_CONSTANTS);
     }
 
     protected boolean isDisplayingColorTypes() {
@@ -816,7 +945,7 @@ public class ConstantsPane extends JPanel implements SidePane {
                 updateName();
             } else{
                 String message = "Variable could not be removed for the following reasons: \n\n";
-                message += String.join("", messages);
+                message += String.join("\n", messages);
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, "Could not remove variable", JOptionPane.WARNING_MESSAGE);
             }
         }

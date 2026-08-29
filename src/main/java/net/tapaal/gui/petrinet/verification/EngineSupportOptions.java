@@ -1,56 +1,62 @@
 package net.tapaal.gui.petrinet.verification;
 
+import dk.aau.cs.translations.ReductionOption;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Set;
+
 public class EngineSupportOptions {
-    public final String nameString;
-    public final boolean supportFastestTrace;
-    public final boolean supportDeadlockNetdegree2EForAG;
-    public final boolean supportDeadlockWithInhib;
-    public final boolean supportWeights;
-    public final boolean supportInhibArcs;
-    public final boolean supportUrgentTransitions;
-    public final boolean supportEGorAF;
-    public final boolean supportStrictNets;
-    public final boolean supportTimedNets;
-    public final boolean supportDeadlockNetdegreeGreaterThan2;
-    public final boolean supportGames;
-    public final boolean supportEGorAFWithNetDegreeGreaterThan2;
-    public final boolean supportNestedQuantifications;
-    public final boolean supportColored;
-    public final boolean supportOnlyUntimed;
+    private final String nameString;
+    private final Set<EngineFeature> supportedFeatures;
 
-    public final boolean[] optionsArray;
-    public EngineSupportOptions(String nameString, boolean supportFastestTrace, boolean supportDeadlockNetdegree2EForAG, boolean supportDeadlockEGorAF, boolean supportDeadlockWithInhib,
-                                boolean supportWeights, boolean supportInhibArcs, boolean supportUrgentTransitions, boolean supportEGorAF, boolean supportStrictNets, boolean supportTimedNets,
-                                boolean supportDeadlockNetdegreeGreaterThan2, boolean supportGames, boolean supportEGorAFWithNetDegreeGreaterThan2, boolean supportNestedQuantifications,
-                                boolean supportColored, boolean supportOnlyUntimed){
+    public EngineSupportOptions(String nameString, Set<EngineFeature> supportedFeatures) {
         this.nameString = nameString;
-        this.supportFastestTrace = supportFastestTrace;
-        this.supportDeadlockNetdegree2EForAG = supportDeadlockNetdegree2EForAG;
-        this.supportDeadlockWithInhib = supportDeadlockWithInhib;
-        this.supportWeights = supportWeights;
-        this.supportInhibArcs = supportInhibArcs;
-        this.supportUrgentTransitions = supportUrgentTransitions;
-        this.supportEGorAF = supportEGorAF;
-        this.supportStrictNets = supportStrictNets;
-        this.supportTimedNets = supportTimedNets;
-        this.supportDeadlockNetdegreeGreaterThan2 = supportDeadlockNetdegreeGreaterThan2;
-        this.supportGames = supportGames;
-        this.supportEGorAFWithNetDegreeGreaterThan2 = supportEGorAFWithNetDegreeGreaterThan2;
-        this.supportNestedQuantifications = supportNestedQuantifications;
-        this.supportColored = supportColored;
-        this.supportOnlyUntimed = supportOnlyUntimed;
-        this.optionsArray = new boolean[]{supportFastestTrace, supportDeadlockNetdegree2EForAG, supportDeadlockEGorAF, supportDeadlockWithInhib,
-            supportWeights, supportInhibArcs, supportUrgentTransitions, supportEGorAF, supportStrictNets, supportTimedNets, supportDeadlockNetdegreeGreaterThan2,
-            supportGames, supportEGorAFWithNetDegreeGreaterThan2, supportNestedQuantifications, supportColored, supportOnlyUntimed};
+        this.supportedFeatures = supportedFeatures.isEmpty()
+            ? EnumSet.noneOf(EngineFeature.class)
+            : EnumSet.copyOf(supportedFeatures);
     }
 
-    public boolean areOptionsSupported(boolean[] queryOptions){
-        for(int i = 0; i < optionsArray.length; i++){
-            if(queryOptions[i] == true && optionsArray[i] != true){
-                return false;
-            }
+    public String getNameString() {
+        return nameString;
+    }
+
+    public boolean supports(EngineFeature feature) {
+        return supportedFeatures.contains(feature);
+    }
+
+    public boolean supportsColoredPlaceQueries() {
+        return supports(EngineFeature.COLORED_PLACE_QUERIES);
+    }
+
+    public boolean supportsNonzeroInitialTokenAges() {
+        return supports(EngineFeature.NONZERO_INITIAL_TOKEN_AGES);
+    }
+
+    public boolean areOptionsSupported(Collection<EngineFeature> queryOptions) {
+        return supportedFeatures.containsAll(queryOptions);
+    }
+
+    public static EngineSupportOptions fromReductionOption(ReductionOption reductionOption) {
+        if (reductionOption == null) return null;
+        switch (reductionOption) {
+            case VerifyDTAPN:
+                return new VerifyDTAPNEngineOptions();
+            case VerifyPN:
+                return new VerifyPNEngineOptions();
+            case VerifyTAPN:
+                return new VerifyTAPNEngineOptions();
+            case BROADCAST:
+                return new UPPAALBroadcastOptions();
+            case DEGREE2BROADCAST:
+                return new UPPAALBroadcastDegree2Options();
+            case COMBI:
+                return new UPPAALCombiOptions();
+            case STANDARD:
+                return new UPPAALStandardOptions();
+            case OPTIMIZEDSTANDARD:
+                return new UPPAALOptimizedStandardOptions();
+            default:
+                return null;
         }
-        return true;
     }
-
 }

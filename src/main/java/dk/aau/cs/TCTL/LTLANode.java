@@ -20,6 +20,10 @@ public class LTLANode extends TCTLAbstractPathProperty {
         return trace;
     }
 
+    public void setTrace(String trace) {
+        this.trace = trace;
+    }
+
     public LTLANode(TCTLAbstractStateProperty property, String trace) {
         this.property = property;
         this.property.setParent(this);
@@ -53,8 +57,7 @@ public class LTLANode extends TCTLAbstractPathProperty {
             return "A " + s;
         }
 
-        String subString = property.toString().substring(0,1);
-        if(subString.equals("A"))  {
+        if (property.toString().startsWith("A") || property.toString().startsWith("E")) {
             s = property.toString();
             propertyIsAbstractPath = true;
         } else {
@@ -73,15 +76,15 @@ public class LTLANode extends TCTLAbstractPathProperty {
     @Override
     public StringPosition[] getChildren() {
         int offset = 0;
-        if(!trace.equals("")) {
+        if (!trace.equals("")) {
             offset = trace.length() + 2;
         }
 
         int start = property.isSimpleProperty() ? 0 : 1;
-        if(propertyIsAbstractPath) start -= 1;
+        if (propertyIsAbstractPath) start -= 1;
 
         start = start + 2 + offset;
-        int end = start + property.toString().length() + offset;
+        int end = start + property.toString().length();
 
         StringPosition position = new StringPosition(start, end, property);
 

@@ -10,7 +10,7 @@ import net.tapaal.gui.petrinet.undo.Command;
  * 
  * @author corveau
  */
-public class TransitionRotationEditCommand extends Command {
+public class TransitionRotationEditCommand implements Command {
 
 	final Transition transition;
 	final Integer angle;

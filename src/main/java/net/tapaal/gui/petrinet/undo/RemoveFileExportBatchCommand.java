@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.io.File;
 import java.util.List;
 
-public class RemoveFileExportBatchCommand extends Command {
+public class RemoveFileExportBatchCommand implements Command {
     private final DefaultListModel<File> listModel;
     final List<File> files;
     final File file;

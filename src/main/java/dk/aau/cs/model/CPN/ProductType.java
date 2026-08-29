@@ -108,7 +108,6 @@ public class ProductType extends ColorType {
     public Vector<Color> getColors(){
 
         if (getConstituentCombinationSize() != colorCache.size()) {
-
             Vector<Vector<Color>> tupleColors = new Vector<>();
             for (ColorType ct : constituents) {
                 if (tupleColors.isEmpty()) {
@@ -120,11 +119,11 @@ public class ProductType extends ColorType {
                 } else {
                     Vector<Vector<Color>> newTupleColors = new Vector<>();
                     for (Color color : ct.getColors()) {
-                        Vector<Vector<Color>> tupleColorsClone = (Vector<Vector<Color>>) tupleColors.clone();
-                        for (Vector<Color> tupleColor : tupleColorsClone) {
-                            tupleColor.add(color);
+                        for (Vector<Color> tupleColor : tupleColors) {
+                            Vector<Color> newTupleColor = new Vector<>(tupleColor);
+                            newTupleColor.add(color);
+                            newTupleColors.add(newTupleColor);
                         }
-                        newTupleColors.addAll(tupleColorsClone);
                     }
                     tupleColors = newTupleColors;
                 }
@@ -181,14 +180,20 @@ public class ProductType extends ColorType {
     }
 
     public void replaceColorType(ColorType newColorType, ColorType oldColorType){
+        boolean changed = false;
         for (ColorType ct : constituents){
-            if(ct.equals(oldColorType)){
+            if (ct.equals(oldColorType)) {
                 int index = constituents.indexOf(ct);
                 constituents.set(index, newColorType);
+                changed = true;
             }
         }
-
+        
+        if (changed) {
+            colorCache.clear();
+        }
     }
+
     @Override
     public ColorExpression createColorExpressionForFirstColor() {
         Vector<ColorExpression> tempVec = new Vector<>();

@@ -2,16 +2,12 @@ package pipe.gui;
 
 import java.awt.*;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
 import net.tapaal.gui.GuiFrameController;
 import net.tapaal.resourcemanager.ResourceManager;
-import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.animation.Animator;
-import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.petrinet.PetriNetTab;
 
 import javax.swing.*;

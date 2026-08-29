@@ -1,5 +1,6 @@
 package net.tapaal.gui.petrinet.dialog;
 
+import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.undo.ChangeAllNamesVisibilityCommand;
 import net.tapaal.gui.petrinet.undo.Command;
@@ -43,7 +44,7 @@ public class NameVisibilityPanel extends JPanel {
     public void showNameVisibilityPanel() {
         JOptionPane optionPane = new JOptionPane(this, JOptionPane.INFORMATION_MESSAGE);
 
-        dialog = optionPane.createDialog(DIALOG_TITLE);
+        dialog = optionPane.createDialog(TAPAALGUI.getApp(), DIALOG_TITLE);
         dialog.pack();
         dialog.setVisible(true);
 
@@ -63,7 +64,7 @@ public class NameVisibilityPanel extends JPanel {
         selectedComponent.setSelected(isSelectedComponent);
         allComponents.setSelected(!isSelectedComponent);
 
-        dialog = optionPane.createDialog(DIALOG_TITLE);
+        dialog = optionPane.createDialog(TAPAALGUI.getApp(), DIALOG_TITLE);
         dialog.pack();
         dialog.setVisible(true);
 

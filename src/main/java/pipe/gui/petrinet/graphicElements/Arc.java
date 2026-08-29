@@ -147,8 +147,8 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	protected void setLabelPosition() {
 
 		getNameLabel().setPosition(
-				Grid.getModifiedX(myPath.midPoint.x + Zoomer.getZoomedValue(getNameOffsetX(), getZoom())),
-				Grid.getModifiedY(myPath.midPoint.y + Zoomer.getZoomedValue(getNameOffsetY(), getZoom()))
+				Grid.align((int)myPath.midPoint.x + Zoomer.getZoomedValue(getNameOffsetX(), getZoom()), getZoom()),
+				Grid.align((int)myPath.midPoint.y + Zoomer.getZoomedValue(getNameOffsetY(), getZoom()), getZoom())
 		);
 
 	}
@@ -202,12 +202,19 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 	 * the bounds
 	 */
 	public void updateArcPosition() {
-		if (source != null) {
+        // The positions of end points are mutually dependant, so we update both an extra time
+        if (target != null) {
+            target.updateEndPoint(this);
+        }
+        if (source != null) {
 			source.updateEndPoint(this);
 		}
 		if (target != null) {
 			target.updateEndPoint(this);
 		}
+        if (source != null) {
+            source.updateEndPoint(this);
+        }
 		myPath.createPath();
 	}
 
@@ -291,7 +298,7 @@ public abstract class Arc extends PetriNetObjectWithLabel {
 		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath.getPoint(myPath.getEndIndex()).getY());
 
 		//Rotate to match arrowhead to arc angle
-		g2.rotate(myPath.getEndAngle() + Math.PI);
+		g2.rotate(-myPath.getEndAngle() - Math.PI/2);
 		g2.setColor(java.awt.Color.WHITE);
 
 		g2.transform(Zoomer.getTransform(getZoom()));

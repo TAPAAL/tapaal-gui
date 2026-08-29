@@ -1,7 +1,6 @@
 package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
-import dk.aau.cs.io.NamePurifier;
 
 public class HyperLTLPathScopeNode extends TCTLAbstractStateProperty {
 
@@ -42,15 +41,6 @@ public class HyperLTLPathScopeNode extends TCTLAbstractStateProperty {
             property = property.replace(object1, object2);
             return this;
         }
-    }
-    @Override
-    public StringPosition[] getChildren() {
-        int start = trace.length();
-        int end = start + property.toString().length();
-        StringPosition position = new StringPosition(start, end, property);
-
-        StringPosition[] children = { position };
-        return children;
     }
 
     @Override

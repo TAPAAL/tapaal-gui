@@ -22,7 +22,6 @@ import net.tapaal.resourcemanager.ResourceManager;
  *         ChangeListeners to be notified of changes
  */
 public abstract class GuiAction extends AbstractAction {
-
 	public GuiAction(String name, String tooltip) {
 		this(name, tooltip, (KeyStroke)null);
 	}
@@ -116,5 +115,4 @@ public abstract class GuiAction extends AbstractAction {
     public void setTooltip(String newTooltip){
         putValue(SHORT_DESCRIPTION, newTooltip);
     }
-
 }

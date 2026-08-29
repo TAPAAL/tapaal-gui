@@ -14,13 +14,13 @@ import javax.swing.JSeparator;
 
 import dk.aau.cs.model.tapn.TimedPlace;
 import net.tapaal.gui.petrinet.Template;
-import pipe.gui.*;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import net.tapaal.gui.petrinet.undo.DeleteTimedPlaceCommand;
 import net.tapaal.gui.petrinet.undo.DeleteTimedTransitionCommand;
 import pipe.gui.petrinet.undo.UndoManager;
 
+import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -57,7 +57,7 @@ public class StatisticsPanel extends JPanel{
 
 		JOptionPane optionPane = new JOptionPane(panel, JOptionPane.INFORMATION_MESSAGE);
 		
-		dialog = optionPane.createDialog(DIALOG_TITLE);
+		dialog = optionPane.createDialog(TAPAALGUI.getApp(), DIALOG_TITLE);
 		
 		dialog.pack();
 		dialog.setVisible(true);
@@ -118,7 +118,7 @@ public class StatisticsPanel extends JPanel{
 	private boolean checkIfOrphan(int contentNumber, GridBagConstraints gbc, boolean orphanTransitions) {
         boolean isOrphan = false;
         int rowNumber;
-
+        
         for (int i = 1; i < contents[contents.length - contentNumber].length; i++) {
             if (!contents[contents.length - contentNumber][i].toString().equals("0")) {
                 isOrphan = true;
@@ -196,8 +196,8 @@ public class StatisticsPanel extends JPanel{
                         }
                         cmd.redo();
                     }
-                    contents = template.model().getStatistics();
                 }
+                contents = tab.currentTemplate().model().getStatistics();
                 tab.drawingSurface().repaint();
 
                 location = StatisticsPanel.dialog.getLocationOnScreen();
@@ -208,7 +208,7 @@ public class StatisticsPanel extends JPanel{
                 JOptionPane optionPane = new JOptionPane(StatisticsPanel.this, JOptionPane.INFORMATION_MESSAGE);
 
                 dialog.dispose();
-                dialog = optionPane.createDialog(DIALOG_TITLE);
+                dialog = optionPane.createDialog(TAPAALGUI.getApp(), DIALOG_TITLE);
                 dialog.setLocation(location);
                 dialog.pack();
                 dialog.setVisible(true);
@@ -237,8 +237,8 @@ public class StatisticsPanel extends JPanel{
                         }
                         cmd.redo();
                     }
-                    contents = template.model().getStatistics();
                 }
+                contents = tab.currentTemplate().model().getStatistics();
                 tab.drawingSurface().repaint();
 
                 location = StatisticsPanel.dialog.getLocationOnScreen();
@@ -249,7 +249,7 @@ public class StatisticsPanel extends JPanel{
                 JOptionPane optionPane = new JOptionPane(StatisticsPanel.this, JOptionPane.INFORMATION_MESSAGE);
 
                 dialog.dispose();
-                dialog = optionPane.createDialog(DIALOG_TITLE);
+                dialog = optionPane.createDialog(TAPAALGUI.getApp(), DIALOG_TITLE);
                 dialog.setLocation(location);
                 dialog.pack();
                 dialog.setVisible(true);

@@ -271,11 +271,7 @@ public class WorkflowDialog extends JDialog {
 		setContentPane(panel);
 
 		pack();
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Dimension screenSize = toolkit.getScreenSize();
-		int x = (screenSize.width - getWidth()) / 2;
-		int y = (int) ((screenSize.height - getHeight()) / 2 * 0.5);
-		setLocation(x, y);
+		setLocationRelativeTo(TAPAALGUI.getApp());
 		setResizable(true);
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 	}
@@ -1143,8 +1139,8 @@ public class WorkflowDialog extends JDialog {
                         StringBuilder sb = new StringBuilder();
                         int lineLength = 0;
                         sb.append("<html>");
-                        for(Tuple<String, Integer> stat : result.getTransitionStatistics()){
-                            if(stat.value2() == 0){
+                        for(Tuple<String, Number> stat : result.getTransitionStatistics()){
+                            if(stat.value2().doubleValue() == 0){
                                 if(!hasUnusedTransitions){
                                     hasUnusedTransitions = true;
                                 }else{
@@ -1297,7 +1293,8 @@ public class WorkflowDialog extends JDialog {
 	}
 
 	private void checkBound() {
-		Verifier.analyzeKBound(model, lens, tab.getGuiModels(), (Integer) numberOfExtraTokensInNet.getValue(), numberOfExtraTokensInNet, null);
+		Verifier.analyzeKBound(model, lens, null, (Integer) numberOfExtraTokensInNet.getValue(), numberOfExtraTokensInNet, null);
+		// passing null in the thrid argument instead of tab.getGuiModels() is a workaround the bug lp:2029475
 	}
 
 	private TAPNNetworkTrace mapTraceToRealModel(TAPNNetworkTrace tapnNetworkTrace){

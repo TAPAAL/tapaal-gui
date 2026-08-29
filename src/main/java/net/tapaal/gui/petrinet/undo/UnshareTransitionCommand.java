@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedTransition;
 
-public class UnshareTransitionCommand extends Command {
+public class UnshareTransitionCommand implements Command {
 	private final SharedTransition sharedTransition;
 	private final TimedTransition timedTransition;
 	

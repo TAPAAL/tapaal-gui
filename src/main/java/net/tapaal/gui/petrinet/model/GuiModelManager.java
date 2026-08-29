@@ -1,5 +1,6 @@
 package net.tapaal.gui.petrinet.model;
 
+import dk.aau.cs.verification.observations.Observation;
 import net.tapaal.gui.petrinet.undo.*;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
@@ -243,6 +244,9 @@ public class GuiModelManager {
         require.Not((p1.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
         require.Not((p2.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
+        boolean hasInvariant = p2.hasInvariant() || p2.hasAnyColorInvariant();
+        require.Not((t.underlyingTransition().isUrgent() && hasInvariant), ModelViolation.TransportArcUrgentTransitionAndInvariant);
+
         if (require.failed()) {
             return new Result<>(require.getErrors());
         }
@@ -339,6 +343,7 @@ public class GuiModelManager {
         ArrayList<PetriNetObject> selection = tabContent.drawingSurface().getSelectionObject().getSelection();
         Iterable<TAPNQuery> queries = tabContent.queries();
         HashSet<TAPNQuery> queriesToDelete = new HashSet<>();
+        HashSet<TAPNQuery> queriesWithObservationsToRemove = new HashSet<>();
 
         boolean queriesAffected = false;
         for (PetriNetObject pn : selection) {
@@ -349,6 +354,14 @@ public class GuiModelManager {
                         if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace) place.underlyingPlace()).model().name(), place.underlyingPlace().name())) {
                             queriesAffected = true;
                             queriesToDelete.add(q);
+                        } else if (q.getSmcSettings() != null) {
+                            for (Observation obs : q.getSmcSettings().getObservations()) {
+                                if (obs.getExpression() != null && obs.getExpression().containsPlace(place.underlyingPlace())) {
+                                    queriesAffected = true;
+                                    queriesWithObservationsToRemove.add(q);
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
@@ -365,17 +378,29 @@ public class GuiModelManager {
             }
         }
         StringBuilder s = new StringBuilder();
-        s.append("The following queries are associated with the currently selected objects:\n\n");
-        for (TAPNQuery q : queriesToDelete) {
-            s.append(q.getName());
-            s.append('\n');
+        if (!queriesToDelete.isEmpty()) {
+            s.append("The following queries are associated with the currently selected objects and will be deleted:\n\n");
+            for (TAPNQuery q : queriesToDelete) {
+                s.append(q.getName());
+                s.append('\n');
+            }
+            s.append("\nAre you sure you want to remove the current selection and all associated queries?");
+        } else if (!queriesWithObservationsToRemove.isEmpty()) {
+            s.append("The following queries have observations associated with the currently selected objects:\n\n");
+            for (TAPNQuery q : queriesWithObservationsToRemove) {
+                s.append(q.getName());
+                s.append('\n');
+            }
+            
+            s.append("\nObservations containing the removed objects will be removed from these queries.");
+            s.append("\n\nAre you sure you want to remove the current selection?");
         }
-        s.append("\nAre you sure you want to remove the current selection and all associated queries?");
 
         int choice = queriesAffected ? JOptionPane.showConfirmDialog(
             TAPAALGUI.getApp(), s.toString(), "Warning",
             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
             : JOptionPane.YES_OPTION;
+
 
         if (choice == JOptionPane.YES_OPTION) {
             tabContent.getUndoManager().newEdit(); // new "transaction"
@@ -502,7 +527,7 @@ public class GuiModelManager {
             if (o instanceof TimedTransitionComponent) {
                 TimedTransitionComponent transition = (TimedTransitionComponent) o;
                 if (!transition.underlyingTransition().hasUntimedPreset()) {
-                    JOptionPane.showMessageDialog(null, "Incoming arcs to urgent transitions must have the interval [0,\u221e).", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Incoming arcs to urgent transitions must have the interval [0,\u221e).", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 

@@ -5,7 +5,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.TCTL.visitors.RenameTransitionTCTLVisitor;
 import pipe.gui.petrinet.PetriNetTab;
 
-public class RenameTimedTransitionCommand extends Command {
+public class RenameTimedTransitionCommand implements Command {
 	private final TimedTransition transition;
 	private final String oldName;
 	private final String newName;

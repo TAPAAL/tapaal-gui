@@ -372,7 +372,7 @@ public class ArcPath implements Shape {
 
 	public void setPointLocation(int index, double x, double y) {
 		if (index < pathPoints.size() && index >= 0) {
-			(pathPoints.get(index)).setPointLocation((int)x,(int) y);
+			(pathPoints.get(index)).setPointLocation((int)Math.round(x), (int)Math.round(y));
 		}
 	}
 

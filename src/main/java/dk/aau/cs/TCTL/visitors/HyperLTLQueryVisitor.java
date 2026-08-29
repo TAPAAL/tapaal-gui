@@ -35,8 +35,6 @@ public class HyperLTLQueryVisitor extends VisitorBase {
     private static final String XML_INTEGERGE           = "integer-ge";
     private static final String XML_ISFIREABLE		    = "is-fireable";
     private static final String XML_INTEGERCONSTANT 	= "integer-constant";
-    private static final String XML_TOKENSCOUNT 		= "tokens-count";
-    private static final String XML_PLACE 			    = "place";
     private static final String XML_TRANSITION		    = "transition";
     private static final String XML_INTEGERSUM          = "integer-sum";
     private static final String XML_INTEGERPRODUCT      = "integer-product";
@@ -146,6 +144,14 @@ public class HyperLTLQueryVisitor extends VisitorBase {
         createList(orListNode.getProperties(), context, XML_DISJUNCTION);
     }
 
+    public void visit(TCTLPlusListNode tctlPlusListNode, Object context) {
+        if (tctlPlusListNode.getProperties().size() > 1) {
+            createList(tctlPlusListNode.getProperties(), context, XML_INTEGERSUM);
+        } else if (tctlPlusListNode.getProperties().size() == 1) {
+            tctlPlusListNode.getProperties().get(0).accept(this, context);
+        }
+    }
+
     public void visit(TCTLTermListNode termListNode, Object context) {
         assert termListNode.getProperties().get(1) instanceof AritmeticOperator;
         AritmeticOperator operator = (AritmeticOperator)termListNode.getProperties().get(1);
@@ -196,9 +202,7 @@ public class HyperLTLQueryVisitor extends VisitorBase {
     }
 
     public void visit(TCTLPlaceNode tctlPlaceNode, Object context){
-        XMLQuery.append(startTag(XML_TOKENSCOUNT));
-        XMLQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
-        XMLQuery.append(endTag(XML_TOKENSCOUNT));
+        XMLQuery.append(XMLQueryVisitorUtils.tokensCount(tctlPlaceNode));
     }
 
     public void visit(TCTLTransitionNode tctlTransitionNode, Object context){

@@ -35,8 +35,6 @@ public class CTLQueryVisitor extends VisitorBase {
     private static final String XML_INTEGERGE = "integer-ge";
     private static final String XML_ISFIREABLE = "is-fireable";
     private static final String XML_INTEGERCONSTANT = "integer-constant";
-    private static final String XML_TOKENSCOUNT = "tokens-count";
-    private static final String XML_PLACE = "place";
     private static final String XML_TRANSITION = "transition";
     private static final String XML_INTEGERSUM = "integer-sum";
     private static final String XML_INTEGERPRODUCT = "integer-product";
@@ -174,6 +172,38 @@ public class CTLQueryVisitor extends VisitorBase {
         createList(orListNode.getProperties(), context, XML_DISJUNCTION);
     }
 
+    public void visit(TCTLPlusListNode tctlPlusListNode, Object context) {
+        List<TCTLAbstractStateProperty> properties = tctlPlusListNode.getProperties();
+        if (properties.size() == 1) {
+            properties.get(0).accept(this, context);
+        } else if (containsSubtraction(properties)) {
+            createArithmeticExpression(properties, properties.size() - 1, context);
+        } else {
+            createList(properties, context, XML_INTEGERSUM);
+        }
+    }
+
+    private boolean containsSubtraction(List<TCTLAbstractStateProperty> properties) {
+        for (int i = 1; i < properties.size(); i += 2) {
+            if (properties.get(i).toString().equals("-")) return true;
+        }
+        return false;
+    }
+
+    private void createArithmeticExpression(List<TCTLAbstractStateProperty> properties, int operandIndex, Object context) {
+        if (operandIndex == 0) {
+            properties.get(0).accept(this, context);
+            return;
+        }
+
+        String operator = properties.get(operandIndex - 1).toString();
+        String element = operator.equals("-") ? XML_INTEGERDIFFERENCE : XML_INTEGERSUM;
+        xmlQuery.append(startTag(element));
+        createArithmeticExpression(properties, operandIndex - 2, context);
+        properties.get(operandIndex).accept(this, context);
+        xmlQuery.append(endTag(element));
+    }
+
     public void visit(TCTLTermListNode termListNode, Object context) {
         if (termListNode.getProperties().size() > 1) {
             assert termListNode.getProperties().get(1) instanceof AritmeticOperator;
@@ -229,9 +259,7 @@ public class CTLQueryVisitor extends VisitorBase {
     }
 
     public void visit(TCTLPlaceNode tctlPlaceNode, Object context) {
-        xmlQuery.append(startTag(XML_TOKENSCOUNT));
-        xmlQuery.append(wrapInTag(tctlPlaceNode.toString() + "", XML_PLACE));
-        xmlQuery.append(endTag(XML_TOKENSCOUNT));
+        xmlQuery.append(XMLQueryVisitorUtils.tokensCount(tctlPlaceNode));
     }
 
     public void visit(TCTLTransitionNode tctlTransitionNode, Object context) {

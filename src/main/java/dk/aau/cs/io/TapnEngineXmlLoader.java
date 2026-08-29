@@ -6,6 +6,10 @@ import dk.aau.cs.io.queries.TAPNQueryLoader;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
+import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
+import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
 import kotlin.Pair;
@@ -29,6 +33,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 
 /*
@@ -104,10 +109,11 @@ public class TapnEngineXmlLoader {
             network.add(ColorType.COLORTYPE_DOT);
         }
 		parseSharedPlaces(doc, network, constants);
-		parseSharedTransitions(doc, network);
+		parseSharedTransitions(doc, network, constants);
 		
 		Collection<Template> templates = parseTemplates(doc, network, constants);
-		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network).parseQueries();
+		parseFeature(doc, network);
+		LoadedQueries loadedQueries = new TAPNQueryLoader(doc, network, lens != null ? lens.isColored() : network.isColored()).parseQueries();
 
 		if (loadedQueries != null) {
             for (String message : loadedQueries.getMessages()) {
@@ -115,7 +121,6 @@ public class TapnEngineXmlLoader {
             }
         }
 		network.buildConstraints();
-		parseFeature(doc, network);
 		network.setDefaultBound(3); // Ignores k-bounds in .tapn files
 
         if (hasFeatureTag) {
@@ -140,7 +145,10 @@ public class TapnEngineXmlLoader {
             var isColoredElement = nodeList.item(0).getAttributes().getNamedItem("isColored");
             boolean isColored = isColoredElement == null ? network.isColored() : Boolean.parseBoolean(isColoredElement.getNodeValue());
 
-            lens = new TAPNLens(isTimed, isGame, isColored);
+            var isStochasticElement = nodeList.item(0).getAttributes().getNamedItem("isColored");
+            boolean isStochastic = isStochasticElement == null ? network.isStochastic() : Boolean.parseBoolean(isStochasticElement.getNodeValue());
+
+            lens = new TAPNLens(isTimed, isGame, isColored, isStochastic);
         }
     }
 
@@ -154,7 +162,10 @@ public class TapnEngineXmlLoader {
             var isGame = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isGame").getNodeValue());
             var isColored = Boolean.parseBoolean(nodeList.item(0).getAttributes().getNamedItem("isColored").getNodeValue());
 
-            lens = new TAPNLens(isTimed, isGame, isColored);
+            var stochasticEl = nodeList.item(0).getAttributes().getNamedItem("isStochastic");
+            var isStochastic = stochasticEl != null && Boolean.parseBoolean(stochasticEl.getNodeValue());
+
+            lens = new TAPNLens(isTimed, isGame, isColored, isStochastic);
         }
     }
 
@@ -193,28 +204,59 @@ public class TapnEngineXmlLoader {
         return place;
 	}
 
-	private void parseSharedTransitions(Document doc, TimedArcPetriNetNetwork network) {
+	private void parseSharedTransitions(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) {
 		NodeList sharedTransitionNodes = doc.getElementsByTagName("shared-transition");
 
 		for(int i = 0; i < sharedTransitionNodes.getLength(); i++){
 			Node node = sharedTransitionNodes.item(i);
 
 			if(node instanceof Element){
-				SharedTransition transition = parseSharedTransition((Element)node);
+				SharedTransition transition = parseSharedTransition((Element)node, constants);
 				network.add(transition);
 			}
 		}
 	}
 
-	private SharedTransition parseSharedTransition(Element element) {
+	private SharedTransition parseSharedTransition(Element element, ConstantStore constants) {
 		String name = element.getAttribute("name");
 		boolean urgent = Boolean.parseBoolean(element.getAttribute("urgent"));
         boolean isUncontrollable = element.getAttribute("player").equals("1");
+        String distrib = element.getAttribute("distribution");
+        String weightStr = element.getAttribute("weight");
+		String firingModeStr = element.getAttribute("firingMode");
+        SMCDistribution distribution = SMCDistribution.defaultDistribution();
+        Probability weight = new DoubleProbability(1.0);
+		FiringMode firingMode = new RandomFiringMode();
+        if(!distrib.isEmpty()){
+            distribution = SMCDistribution.parseXml(element, constants);
+        }
+        if(!weightStr.isEmpty()) {
+            weight = Probability.parseProbability(weightStr, constants);
+        }
+		if (!firingModeStr.isEmpty()) {
+			firingMode = getFiringMode(firingModeStr);
+		}
 		
 		SharedTransition st = new SharedTransition(name);
 		st.setUrgent(urgent);
 		st.setUncontrollable(isUncontrollable);
+        st.setDistribution(distribution);
+        st.setWeight(weight);
+		st.setFiringMode(firingMode);
 		return st;
+	}
+
+	private FiringMode getFiringMode(String firingModeStr) {
+		switch (firingModeStr) {
+			case "Oldest":
+				return new OldestFiringMode();
+			case "Youngest":
+				return new YoungestFiringMode();
+			case "Random":
+				return new RandomFiringMode();
+			default:
+				return null;
+		}
 	}
 
 	private Collection<Template> parseTemplates(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
@@ -236,15 +278,20 @@ public class TapnEngineXmlLoader {
 		List<Constant> constants = new ArrayList<Constant>();
 		NodeList constantNodes = doc.getElementsByTagName("constant");
 		for (int i = 0; i < constantNodes.getLength(); i++) {
-			Node c = constantNodes.item(i);
+            Node c = constantNodes.item(i);
+            if (XmlUtil.isDescendantOfTag(c, "watch")) {
+                continue;
+            }
 
-			if (c instanceof Element) {
+			if (c instanceof Element && !"real".equals(((Element) c).getAttribute("type"))) {
 				Constant constant = parseConstant((Element) c);
 				constants.add(constant);
 			}
 		}
+
 		return constants;
 	}
+
 
 	private Template parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
         String name = getTAPNName(tapnNode);
@@ -293,7 +340,7 @@ public class TapnEngineXmlLoader {
 			TimedPlaceComponent place = parsePlace(element, network, template.model(), constants);
 			template.guiModel().addPetriNetObject(place);
 		} else if ("transition".equals(element.getNodeName())) {
-			TimedTransitionComponent transition = parseTransition(element, network, template.model());
+			TimedTransitionComponent transition = parseTransition(element, network, template.model(), constants);
 			template.guiModel().addPetriNetObject(transition);
 		} else if (element.getNodeName().matches("arc|outputArc|inputArc|inhibitorArc|transportArc")) {
             parseAndAddArc(element, template, constants, network);
@@ -364,19 +411,25 @@ public class TapnEngineXmlLoader {
         return new AnnotationNote(text, positionXInput, positionYInput, widthInput, heightInput, borderInput);
 	}
 
-	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {
+	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, ConstantStore constants) {
 		String posX = transition.getAttribute("positionX");
 		String posY = transition.getAttribute("positionY");
 		String nameOffsetX = transition.getAttribute("nameOffsetX");
 		String nameOffsetY = transition.getAttribute("nameOffsetY");
 		String angleStr = transition.getAttribute("angle");
 		String priorityStr = transition.getAttribute("priority");
+        String distrib = transition.getAttribute("distribution");
+        String weightStr = transition.getAttribute("weight");
+		String firingModeStr = transition.getAttribute("firingMode");
 	    int positionXInput = 0;
 		int positionYInput = 0;
 		int nameOffsetXInput = 0;
 		int nameOffsetYInput = 0;
 		int angle = 0;
         int priority = 0;
+        SMCDistribution distribution = SMCDistribution.defaultDistribution();
+        Probability weight = new DoubleProbability(1.0);
+		FiringMode firingMode = new RandomFiringMode();
 		if(!posX.isEmpty()){
 		    positionXInput = (int)Double.parseDouble(posX);
         }
@@ -402,6 +455,16 @@ public class TapnEngineXmlLoader {
 		if(!priorityStr.isEmpty()){
 		    priority = Integer.parseInt(priorityStr);
         }
+        if(!distrib.isEmpty()){
+            distribution = SMCDistribution.parseXml(transition, constants);
+        }
+        if(!weightStr.isEmpty()) {
+            weight = Probability.parseProbability(weightStr, constants);
+        }
+		if (!firingModeStr.isEmpty()) {
+			firingMode = getFiringMode(firingModeStr);
+		}
+
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
 		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
@@ -436,6 +499,9 @@ public class TapnEngineXmlLoader {
 		TimedTransition t = new TimedTransition(nameInput, guardExpr);
 		t.setUrgent(isUrgent);
 		t.setUncontrollable(player.equals("1"));
+        t.setDistribution(distribution);
+        t.setWeight(weight);
+		t.setFiringMode(firingMode);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);
@@ -574,29 +640,98 @@ public class TapnEngineXmlLoader {
 
 	    p.setCtiList(ctiList);
         ExpressionContext context = new ExpressionContext(new HashMap<String, Color>(), loadTACPN.getColortypes());
-        if(colorMarking!= null){
-            ColorMultiset cm = colorMarking.eval(context);
-
-            p.setTokenExpression(loadTACPN.constructCleanAddExpression(p.getColorType(),cm));
-
-
-            for (TimedToken ctElement : cm.getTokens(p)) {
-                network.marking().add(ctElement);
-                //p.addToken(ctElement);
-            }
-
+        List<TimedToken> tokens;
+        if (colorMarking != null) {
+            p.setTokenExpression(colorMarking, loadTACPN.constructCleanAddExpression(colorMarking));
+            tokens = evaluateInitialMarking(colorMarking, p, context);
+            p.setNumberOfTokens(tokens.size());
         } else {
+            tokens = new ArrayList<>(initialMarkingInput);
             for (int i = 0; i < initialMarkingInput; i++) {
                 //Regular tokens will just be dotconstant
-                network.marking().add(new TimedToken(p, ColorType.COLORTYPE_DOT.getFirstColor()));
+                tokens.add(new TimedToken(p, ColorType.COLORTYPE_DOT.getFirstColor()));
             }
-            if(initialMarkingInput > 1) {
+            if (initialMarkingInput > 1) {
                 Vector<ColorExpression> v = new Vector<>();
                 v.add(new DotConstantExpression());
                 Vector<ArcExpression> numbOfExpression = new Vector<>();
                 numbOfExpression.add(new NumberOfExpression(initialMarkingInput, v));
                 p.setTokenExpression(new AddExpression(numbOfExpression));
             }
+        }
+        
+        try {
+            applyInitialMarkingAges(place, tokens);
+        } catch (FormatException e) {
+            e.printStackTrace();
+        }
+
+        tokens.forEach(network.marking()::add);
+    }
+
+    private List<TimedToken> evaluateInitialMarking(ArcExpression expression, TimedPlace place, ExpressionContext context) {
+        List<TimedToken> tokens = new ArrayList<>();
+        Collection<ArcExpression> expressions = expression instanceof AddExpression
+            ? ((AddExpression)expression).getAddExpression()
+            : Collections.singleton(expression);
+
+        for (ArcExpression child : expressions) {
+            for (Map.Entry<Color, Integer> entry : child.eval(context).entrySet()) {
+                for (int i = 0; i < entry.getValue(); ++i) {
+                    tokens.add(new TimedToken(place, entry.getKey()));
+                }
+            }
+        }
+        return tokens;
+    }
+
+    private void applyInitialMarkingAges(Element place, List<TimedToken> tokens) throws FormatException {
+        Node markingAge = getFirstDirectChild(place, "initialMarkingAge");
+        if (markingAge != null) {
+            List<Element> tokenElements = new ArrayList<>();
+            NodeList children = markingAge.getChildNodes();
+            for (int i = 0; i < children.getLength(); ++i) {
+                if (children.item(i) instanceof Element && children.item(i).getNodeName().equals("token")) {
+                    tokenElements.add((Element)children.item(i));
+                }
+            }
+
+            if (tokenElements.size() > tokens.size()) {
+                throw new FormatException("The number of initial token ages does not match the initial marking of place " + place.getAttribute("name") + ".");
+            }
+
+            List<TimedToken> remainingTokens = new ArrayList<>(tokens);
+            for (Element tokenElement : tokenElements) {
+                String color = tokenElement.getAttribute("color");
+                TimedToken matchingToken = color.isEmpty() && !remainingTokens.isEmpty() ? remainingTokens.get(0) : null;
+                if (matchingToken == null) {
+                    for (TimedToken token : remainingTokens) {
+                        if (token.color().toString().equals(color)) {
+                            matchingToken = token;
+                            break;
+                        }
+                    }
+                }
+
+                if (matchingToken == null) {
+                    throw new FormatException("Initial token color " + color + " does not match the initial marking of place " + place.getAttribute("name") + ".");
+                }
+
+                matchingToken.setAge(parseInitialMarkingAge(tokenElement.getAttribute("age"), place));
+                remainingTokens.remove(matchingToken);
+            }
+        }
+    }
+
+    private BigDecimal parseInitialMarkingAge(String value, Element place) throws FormatException {
+        try {
+            BigDecimal age = new BigDecimal(value);
+            if (age.signum() < 0) {
+                throw new FormatException("Initial token ages must be nonnegative.");
+            }
+            return age;
+        } catch (NumberFormatException e) {
+            throw new FormatException("Invalid initial token age in place " + place.getAttribute("name") + ".", e);
         }
     }
 

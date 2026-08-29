@@ -5,7 +5,7 @@ import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
-public class UpdateConstantEditCommand extends Command {
+public class UpdateConstantEditCommand implements Command {
 
 	private final Constant newConstant;
 	private final ConstantStore store;
@@ -22,16 +22,14 @@ public class UpdateConstantEditCommand extends Command {
 
 	@Override
 	public void redo() {
-		store.remove(oldConstant);
-		store.add(newConstant);
+		store.replace(oldConstant, newConstant);
 		model.updateGuardsAndWeightsWithNewConstant(oldConstant.name(), newConstant);
 		TAPAALGUI.getCurrentTab().updateConstantsList();
 	}
 
 	@Override
 	public void undo() {
-		store.remove(newConstant);
-		store.add(oldConstant);
+		store.replace(newConstant, oldConstant);
 		model.updateGuardsAndWeightsWithNewConstant(newConstant.name(), oldConstant);
 		TAPAALGUI.getCurrentTab().updateConstantsList();
 

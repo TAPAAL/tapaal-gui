@@ -1,36 +1,44 @@
 package net.tapaal.gui.petrinet.verification;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import javax.swing.JSpinner;
 
-import dk.aau.cs.TCTL.*;
+import dk.aau.cs.Messenger;
+import dk.aau.cs.TCTL.AritmeticOperator;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLConstNode;
+import dk.aau.cs.TCTL.TCTLPlaceNode;
+import dk.aau.cs.TCTL.TCTLTermListNode;
+import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import net.tapaal.gui.petrinet.TAPNLens;
-import pipe.gui.petrinet.dataLayer.DataLayer;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
-import pipe.gui.TAPAALGUI;
-import pipe.gui.MessengerImpl;
-import dk.aau.cs.Messenger;
-import dk.aau.cs.model.tapn.TAPNQuery;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerifyTAPN.ModelReduction;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
-
-import java.util.HashMap;
-import java.util.ArrayList;
+import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 
 public class KBoundAnalyzer {
 	protected final TimedArcPetriNetNetwork tapnNetwork;
@@ -44,6 +52,9 @@ public class KBoundAnalyzer {
 	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private final net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery;
 
+    private boolean useRawVerification = false;
+    private String rawVerificationPrompt = "";
+
 	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, TAPNLens lens, HashMap<TimedArcPetriNet, DataLayer> guiModels, int k,
                           ModelChecker modelChecker, Messenger messenger, JSpinner tokensControl, net.tapaal.gui.petrinet.verification.TAPNQuery query) {
         this.lens = lens;
@@ -54,6 +65,11 @@ public class KBoundAnalyzer {
         this.guiModels = guiModels;
 		spinner = tokensControl;
         dataLayerQuery = query;
+
+        if (dataLayerQuery != null) {
+            useRawVerification = dataLayerQuery.getRawVerification();
+            rawVerificationPrompt = dataLayerQuery.getRawVerificationPrompt();
+        }
 	}
 
 	public void analyze() {
@@ -71,21 +87,21 @@ public class KBoundAnalyzer {
         RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, guiModels, spinner, resultShown);
         RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), analyzer);
 
-        analyzer.execute(options, tapnNetwork, query, dataLayerQuery);
+        analyzer.execute(options, tapnNetwork, query, dataLayerQuery, lens);
         dialog.setVisible(true);
     }
 
 	protected VerifyTAPNOptions verificationOptions() {
 		if(modelChecker instanceof VerifyPN){
-			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.CTL, AlgorithmOption.CERTAIN_ZERO, false, QueryReductionTime.NoTime,false, null, false, true, tapnNetwork.isColored(), false, true, true, true);
+			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.CTL, AlgorithmOption.CERTAIN_ZERO, false, QueryReductionTime.NoTime,false, null, false, true, lens.isColored(), false, true, true, true, useRawVerification, rawVerificationPrompt);
 		} else if(modelChecker instanceof VerifyTAPN){
-			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1);
+			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1, dataLayerQuery.getRawVerification(), dataLayerQuery.getRawVerificationPrompt());
 		} else if(modelChecker instanceof VerifyDTAPN){
             //gdc and dart can be used together with game
-            boolean gcd = !lens.isGame();
-            boolean dart = !tapnNetwork.hasUrgentTransitions() && !lens.isGame();
+            boolean gcd = !lens.isGame() && !lens.isStochastic();
+            boolean dart = !tapnNetwork.hasUrgentTransitions() && !lens.isGame() && !lens.isStochastic();
 
-			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, gcd, dart, true, false, false, 1, false, true, true, tapnNetwork.isColored());
+			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, gcd, dart, true, false, false, 1, false, true, true, lens.isColored(), useRawVerification, rawVerificationPrompt);
 		}
 		return null;
 	}
@@ -102,7 +118,7 @@ public class KBoundAnalyzer {
         TCTLAbstractProperty property = new TCTLAGNode(child);
 
         TAPNQuery query = new TAPNQuery(property, k);
-        query.setCategory(QueryCategory.CTL);
+        dataLayerQuery.setCategory(QueryCategory.CTL);
 
         return query;
     }
@@ -112,12 +128,12 @@ public class KBoundAnalyzer {
         ArrayList<TCTLAbstractStateProperty> factors = new ArrayList<>();
 
         tapnNetwork.sharedPlaces().forEach(o -> {
-            if (net.getPlaceByName(o.name()) != null && !net.getPlaceByName(o.name()).name().contains("Shared_")) {
-                net.getPlaceByName(o.name()).setName("Shared_" + o.name());
+            if (net.getPlaceByName(o.name()) != null && !net.getPlaceByName(o.name()).name().contains("Shared__")) {
+                net.getPlaceByName(o.name()).setName("Shared__" + o.name());
             }
         });
         tapnNetwork.allTemplates().forEach(o -> o.places().forEach(x -> {
-            if (net.getPlaceByName(x.name()) != null) net.getPlaceByName(x.name()).setName(o.name() + "_" + x.name());
+            if (net.getPlaceByName(x.name()) != null) net.getPlaceByName(x.name()).setName(o.name() + "__" + x.name());
         }));
 
         for (TimedPlace place : net.places()) {
@@ -149,7 +165,7 @@ public class KBoundAnalyzer {
                 updatedModels.put(net, guiModels.get(net));
             }
         }
-        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), updatedModels, null, true, true);
+        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), updatedModels, lens, true, true);
 
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 

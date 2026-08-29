@@ -23,6 +23,12 @@ public interface TabActions {
 
     void zoomIn();
 
+    void setIsAlreadyFitToScreen(boolean alreadyFitToScreen);
+
+    boolean isAlreadyFitToScreen();
+
+    void fitToScreen();
+
     void selectAll();
 
     void deleteSelection();
@@ -35,8 +41,13 @@ public interface TabActions {
     boolean getNetChanged();
 
     void toggleAnimationMode();
+    void toggleAnimationMode(boolean explicit);
 
     void setMode(PetriNetTab.DrawTool mode);
+
+    void enableActionsForSearchBar(boolean enable);
+
+    boolean searchBarHasFocus();
 
     void showStatistics();
 
@@ -61,6 +72,8 @@ public interface TabActions {
     void importTrace();
 
     void zoomTo(int newZoomLevel);
+
+    void search(String query);
 
     String getTabTitle();
 
@@ -93,6 +106,8 @@ public interface TabActions {
     void changeGameFeature(boolean isGame);
 
     void changeColorFeature(boolean isColor);
+
+    void changeStochasticFeature(boolean isStochastic);
 
     void exportPNG();
 

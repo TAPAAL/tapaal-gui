@@ -4,7 +4,7 @@ import pipe.gui.TAPAALGUI;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
 
-public class AddConstantEditCommand extends Command {
+public class AddConstantEditCommand implements Command {
 	private final Constant constant;
 	private final ConstantStore store;
 

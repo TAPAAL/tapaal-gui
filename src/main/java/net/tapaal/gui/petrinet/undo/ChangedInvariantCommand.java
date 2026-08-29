@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedPlace;
 
-public class ChangedInvariantCommand extends Command {
+public class ChangedInvariantCommand implements Command {
 	private final TimedPlace place;
 	private final TimeInvariant oldInvariant;
 	private final TimeInvariant newInvariant;

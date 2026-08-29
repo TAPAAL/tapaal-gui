@@ -38,7 +38,7 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 
-import javax.swing.*;
+import com.sun.jna.Platform;
 
 public class VerifyTAPN implements ModelChecker {
 	private static final String NEED_TO_LOCATE_VERIFYTAPN_MSG = "TAPAAL needs to know the location of the file verifytapn.\n\n"
@@ -225,26 +225,28 @@ public class VerifyTAPN implements ModelChecker {
 		    mapDiscreteInclusionPlacesToNewNames(options, model);
 
         ExportedVerifyTAPNModel exportedModel;
-        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+        TimedArcPetriNet net = model.value1();
+        if (lens != null && lens.isColored() || net.parentNetwork() != null && net.parentNetwork().isColored()) {
             VerifyTAPNExporter exporter = new VerifyTACPNExporter();
-            exportedModel = exporter.export(model.value1(), query, lens, model.value2(), guiModel, dataLayerQuery);
+            exportedModel = exporter.export(net, query, lens, model.value2(), guiModel, dataLayerQuery);
         } else {
             VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-            exportedModel = exporter.export(model.value1(), query, lens, model.value2(), guiModel, dataLayerQuery);
+            exportedModel = exporter.export(net, query, lens, model.value2(), guiModel, dataLayerQuery);
         }
 
         if (exportedModel == null) {
             messenger.displayErrorMessage("There was an error exporting the model");
             return null;
         }
-
+       
 		return verify(options, model, exportedModel, query, dataLayerQuery, lens);
 	}
 
     @Override
     public VerificationResult<TimedArcPetriNetTrace> verifyManually(String options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery, TAPNLens lens) throws Exception {
         VerifyTAPNExporter exporter;
-        if ((lens != null && lens.isColored() || model.value1().parentNetwork().isColored())) {
+        TimedArcPetriNet net = model.value1();
+        if (lens != null && lens.isColored() || net.parentNetwork() != null && net.parentNetwork().isColored()) {
             exporter = new VerifyTACPNExporter();
         } else {
             exporter = new VerifyTAPNExporter();
@@ -269,8 +271,9 @@ public class VerifyTAPN implements ModelChecker {
         } else {
             String errorOutput = readOutput(runner.errorOutput());
             String standardOutput = readOutput(runner.standardOutput());
+            var tokenBounds = VerificationArguments.tokenBounds(VerificationArguments.hasKBound(options), model.value1().marking().size(), query.getExtraTokens());
 
-            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+            Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, tokenBounds.totalTokens(), tokenBounds.extraTokens(), query);
 
             if (queryResult == null || queryResult.value1() == null) {
                 return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
@@ -315,13 +318,14 @@ public class VerifyTAPN implements ModelChecker {
             String errorOutput = readOutput(runner.errorOutput());
 			String standardOutput = readOutput(runner.standardOutput());
 
-			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+            TimedArcPetriNet net  = model.value1();
+			var tokenBounds = VerificationArguments.tokenBounds(VerifyTAPNOptions.usesKBound(options), net.marking().size(), query.getExtraTokens());
+			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, tokenBounds.totalTokens(), tokenBounds.extraTokens(), query);
 			if (queryResult == null || queryResult.value1() == null) {
 				return new VerificationResult<>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
                 TimedArcPetriNetTrace tapnTrace = null;
-
-                boolean isColored = (lens != null && lens.isColored() || model.value1().parentNetwork().isColored());
+                boolean isColored = (lens != null && lens.isColored() || net.parentNetwork() != null && net.parentNetwork().isColored());
                 boolean showTrace = ((query.getProperty() instanceof TCTLEFNode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLAGNode && !queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof TCTLEGNode && queryResult.value1().isQuerySatisfied()) ||
@@ -342,7 +346,7 @@ public class VerifyTAPN implements ModelChecker {
                         }
 
                         if (tapnTrace != null) {
-                            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false));
+                            newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(lens.isTimed(), lens.isGame(), false, lens.isStochastic()));
 
                             //The query being verified should be the only query
                             for (net.tapaal.gui.petrinet.verification.TAPNQuery loadedQuery : UnfoldNet.getQueries(queriesOut, loadedModel.network(), query.getCategory())) {
@@ -386,12 +390,16 @@ public class VerifyTAPN implements ModelChecker {
 		return trace;
 	}
 
-	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-        return options.toString() + ' ' + modelFile + ' ' + queryFile;
-	}
+    private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
+        return createArgumentString(modelFile, queryFile, options.toString());
+    }
 
     private String createArgumentString(String modelFile, String queryFile, String options) {
-	    return options + ' ' + modelFile + ' ' + queryFile;
+        if (Platform.isWindows()) {
+            return options + " \"" + modelFile + "\" \"" + queryFile + "\"";
+        }
+
+        return options + ' ' + modelFile + ' ' + queryFile;
     }
 	
 	private String readOutput(BufferedReader reader) {
@@ -437,7 +445,7 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
     public String getHelpOptions() {
-        runner = new ProcessRunner(verifytapnpath, "--help");
+        runner = new ProcessRunner(verifytapnpath, "--help", this);
         runner.run();
 
         if (!runner.error()) {

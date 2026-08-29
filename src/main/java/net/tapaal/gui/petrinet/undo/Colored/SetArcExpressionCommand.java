@@ -4,7 +4,7 @@ import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.petrinet.graphicElements.Arc;
 
-public class SetArcExpressionCommand extends Command {
+public class SetArcExpressionCommand implements Command {
     private final Arc arc;
     private final ArcExpression oldExpression;
     private final ArcExpression newExpression;

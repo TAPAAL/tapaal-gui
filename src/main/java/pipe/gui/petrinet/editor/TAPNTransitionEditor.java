@@ -9,8 +9,14 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.event.CaretListener;
+import javax.swing.event.*;
 
+import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
+import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
+import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
+import net.tapaal.gui.petrinet.editor.DistributionPanel;
 import net.tapaal.gui.petrinet.undo.*;
 import net.tapaal.swinghelpers.GridBagHelper;
 import net.tapaal.swinghelpers.SwingHelper;
@@ -19,14 +25,8 @@ import net.tapaal.gui.petrinet.editor.ColoredTransitionGuardPanel;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import net.tapaal.gui.petrinet.Context;
-import dk.aau.cs.model.tapn.Bound;
-import dk.aau.cs.model.tapn.SharedTransition;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedOutputArc;
-import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.RequireException;
+import pipe.gui.swingcomponents.EscapableDialog;
 
 import static net.tapaal.swinghelpers.GridBagHelper.Fill;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor;
@@ -36,6 +36,7 @@ public class TAPNTransitionEditor extends JPanel {
 	private static final String untimed_preset_warning = "Incoming arcs to urgent transitions must have the interval [0,\u221e).";
 	private static final String transport_destination_invariant_warning = "Transport arcs going through urgent transitions cannot have an invariant at the destination.";
 	private final TimedTransitionComponent transition;
+    private final EscapableDialog dialog;
 	private final JRootPane rootPane;
 	private final Context context;
 	private JScrollPane scrollPane;
@@ -46,8 +47,9 @@ public class TAPNTransitionEditor extends JPanel {
 	private final int maxNumberOfTransitionsToShowAtOnce = 20;
 	boolean doNewEdit = true;
 
-	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition, Context context) {
-		rootPane = _rootPane;
+	public TAPNTransitionEditor(EscapableDialog _dialog, TimedTransitionComponent _transition, Context context) {
+		dialog = _dialog;
+        rootPane = _dialog.getRootPane();
 		transition = _transition;
 		this.context = context;
 		initComponents();
@@ -62,6 +64,7 @@ public class TAPNTransitionEditor extends JPanel {
 	    if(!transition.isColored() || !coloredTransitionGuardPanel.showGuardPanel()){
 	        coloredTransitionGuardPanel.setVisible(false);
         }
+        distributionPanel.setVisible(transition.isStochastic());
     }
 
 	private void initComponents() {
@@ -84,6 +87,21 @@ public class TAPNTransitionEditor extends JPanel {
 		uncontrollableCheckBox = new JCheckBox("Uncontrollable");
 		attributesCheckBox = new JCheckBox("Show transition name");
 
+        weightField = new JTextField();
+        infiniteWeight = new JCheckBox("∞");
+        useConstantWeight = new JCheckBox("Use constant");
+        ArrayList<String> constants = new ArrayList<>();
+        for(Constant c : context.network().constants()) {
+            constants.add(c.name());
+        }
+        constantsComboBox = new JComboBox<>(new DefaultComboBoxModel<>(constants.toArray(new String[0])));
+        useConstantWeight.setEnabled(!constants.isEmpty());
+        useConstantWeight.addActionListener(act -> displayWeight(parseWeight()));
+		
+		firingModeComboBox = new JComboBox<>(new FiringMode[]{new OldestFiringMode(), new YoungestFiringMode(), new RandomFiringMode()});
+        firingModeComboBox.setToolTipText("Determines what tokens are consumed during random runs");
+
+        distributionPanel = new DistributionPanel(transition, okButton, dialog);
 
 		sharedTransitionsComboBox = new WidthAdjustingComboBox<>(maxNumberOfTransitionsToShowAtOnce);
 		SwingHelper.setPreferredWidth(sharedTransitionsComboBox,290);
@@ -93,10 +111,14 @@ public class TAPNTransitionEditor extends JPanel {
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
                 ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
+                ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setDistribution(distributionPanel.parseDistribution());
+                ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setWeight(parseWeight());
             }else{
                 urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
                 uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
                 coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
+                distributionPanel.displayDistributionFields(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getDistribution());
+                displayWeight(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getWeight());
             }
 		});
 
@@ -118,7 +140,7 @@ public class TAPNTransitionEditor extends JPanel {
 		gridBagConstraints = GridBagHelper.as(2, 1, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(sharedCheckBox, gridBagConstraints);	
 		
-		
+	
 		makeSharedButton = new JButton();
 		makeSharedButton.setText("Make shared");
 		makeSharedButton.setMaximumSize(new java.awt.Dimension(110, 25));
@@ -159,11 +181,15 @@ public class TAPNTransitionEditor extends JPanel {
 		
 		gridBagConstraints = GridBagHelper.as(2, 2, Anchor.WEST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(urgentCheckBox, gridBagConstraints);
+        if(transition.isStochastic()) {
+            urgentCheckBox.setToolTipText("Note: for SMC, it is recommended to prefer setting a constant(0) distribution instead of using urgent transitions");
+        }
 		
 		urgentCheckBox.addActionListener(e -> {
 			if(!isUrgencyOK()){
 				urgentCheckBox.setSelected(false);
 			}
+            distributionPanel.setUrgent(urgentCheckBox.isSelected());
 		});
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -183,11 +209,74 @@ public class TAPNTransitionEditor extends JPanel {
         }
 	
 		rotationLabel.setText("Rotate:");
-		gridBagConstraints = GridBagHelper.as(0,2, Anchor.NORTH, new Insets(3, 3, 3, 3));
+		gridBagConstraints = GridBagHelper.as(0,2, Anchor.EAST, new Insets(3, 3, 3, 3));
 		transitionEditorPanel.add(rotationLabel, gridBagConstraints);
 
-		gridBagConstraints = GridBagHelper.as(1,2, Anchor.NORTHWEST, new Insets(3, 3, 3, 3));
-		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
+        JPanel comboBoxAndCheckBoxPanel = new JPanel(new GridBagLayout());
+        gridBagConstraints = GridBagHelper.as(0, 0, Anchor.WEST, new Insets(3, 3, 3, 3));
+        comboBoxAndCheckBoxPanel.add(rotationComboBox, gridBagConstraints);
+        gridBagConstraints = GridBagHelper.as(1, 0, Anchor.WEST, new Insets(3, 3, 3, 3));
+        comboBoxAndCheckBoxPanel.add(attributesCheckBox, gridBagConstraints);
+
+		gridBagConstraints = GridBagHelper.as(1,2, Anchor.WEST, new Insets(3, 3, 3, 3));
+		transitionEditorPanel.add(comboBoxAndCheckBoxPanel, gridBagConstraints);
+
+        if(context.tabContent().getLens().isStochastic()) {
+            String weightToolTip = "Probability mass of the transition in the event of a firing date collision";
+            JLabel weightLabel = new JLabel("Weight:");
+            weightLabel.setToolTipText(weightToolTip);
+            weightField.setToolTipText(weightToolTip);
+            infiniteWeight.setToolTipText("Selecting weight as an infinity gives an absolute priority of the transition firing in case of several transitions scheduled at the same time");
+            infiniteWeight.addActionListener(act -> weightField.setEnabled(!infiniteWeight.isSelected()));
+
+			String firingModeTooltip = "The firing mode of the transition";
+			JLabel firingModeLabel = new JLabel("Firing mode:");
+            firingModeLabel.setToolTipText(firingModeTooltip);
+
+            gridBagConstraints = GridBagHelper.as(0, 0, Anchor.EAST, new Insets(3, 3, 3, 3));
+            JPanel firingModePanel = new JPanel(new GridBagLayout());
+
+            gridBagConstraints = GridBagHelper.as(0, 0, Anchor.EAST, new Insets(3, 3, 3, 3));
+            firingModePanel.add(firingModeLabel, gridBagConstraints);
+            
+            gridBagConstraints = GridBagHelper.as(1, 0, Anchor.WEST, new Insets(3, 3, 3, 3));
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 0.5;
+            firingModePanel.add(firingModeComboBox, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(2, 0, Anchor.EAST, new Insets(3, 3, 3, 3));
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.weightx = 0;
+            firingModePanel.add(weightLabel, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(3, 0, Anchor.WEST, new Insets(3, 3, 3, 0));
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.weightx = 1.0;
+            firingModePanel.add(weightField, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(4, 0, Anchor.WEST, new Insets(3, 3, 3, 0));
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 1.0;
+            firingModePanel.add(constantsComboBox, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(5, 0, Anchor.WEST, new Insets(3, 3, 3, 3));
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.weightx = 0;
+            firingModePanel.add(infiniteWeight, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(6, 0, Anchor.WEST, new Insets(3, 3, 3, 3));
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.weightx = 0;
+            firingModePanel.add(useConstantWeight, gridBagConstraints);
+
+            gridBagConstraints = GridBagHelper.as(0, 4, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+            gridBagConstraints.gridwidth = 10;
+            distributionPanel.add(firingModePanel, gridBagConstraints);
+        }
+        
+        gridBagConstraints = GridBagHelper.as(0, 3, Fill.HORIZONTAL, new Insets(3, 3, 3, 3));
+        gridBagConstraints.gridwidth = 4;
+        transitionEditorPanel.add(distributionPanel, gridBagConstraints);
 
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
@@ -202,7 +291,19 @@ public class TAPNTransitionEditor extends JPanel {
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		okButton.addActionListener(evt -> {
-			if(okButtonHandler(evt)){
+			String name = nameTextField.getText();
+			if (name != null && name.contains("__")) {
+				int result = JOptionPane.showConfirmDialog(this,
+						"Using double underscores (__) in names is not recommended as it can cause ambiguity issues when using multiple components.\nDo you want to continue?",
+						"Warning",
+						JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE);
+				if (result != JOptionPane.OK_OPTION) {
+					return;
+				}
+			}
+            
+			if (okButtonHandler(evt)) {
 				exit();
 			}
 		});
@@ -222,11 +323,6 @@ public class TAPNTransitionEditor extends JPanel {
 		gridBagConstraints = GridBagHelper.as(0,3, Anchor.EAST, new Insets(5, 0, 8, 3));
 		mainPanel.add(buttonPanel, gridBagConstraints);
 
-		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-		gridBagConstraints = GridBagHelper.as(1,3, Anchor.WEST, new Insets(3, 3, 3, 3));
-		transitionEditorPanel.add(attributesCheckBox, gridBagConstraints);
-
 		gridBagConstraints = GridBagHelper.as(0,1,Anchor.WEST, new Insets(3, 3, 3, 3));
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
@@ -238,6 +334,7 @@ public class TAPNTransitionEditor extends JPanel {
 		scrollPane.setViewportView(mainPanel);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setBorder(null);
 		add(scrollPane, BorderLayout.CENTER);
 	}	
 	
@@ -265,6 +362,24 @@ public class TAPNTransitionEditor extends JPanel {
 		urgentCheckBox.setSelected(transition.isUrgent());
 		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
 		coloredTransitionGuardPanel.initExpr(transition.getGuardExpression());
+
+        if(context.tabContent().getLens().isStochastic()) {
+            distributionPanel.displayDistribution();
+            displayWeight();
+
+			if (transition.underlyingTransition().getFiringMode() == null) {
+				firingModeComboBox.setSelectedIndex(0);
+			} else {
+				FiringMode firingMode = transition.underlyingTransition().getFiringMode();
+
+				for (int i = 0; i < firingModeComboBox.getItemCount(); i++) {
+					if (firingModeComboBox.getItemAt(i).toString().equals(firingMode.toString())) {
+						firingModeComboBox.setSelectedIndex(i);
+						break;
+					}
+				}
+			}
+        }
 
 		if(transition.underlyingTransition().isShared()){
 			switchToNameDropDown();
@@ -305,6 +420,9 @@ public class TAPNTransitionEditor extends JPanel {
 		gbc.fill = GridBagConstraints.BOTH;
 		urgentCheckBox.setSelected(transition.isUrgent());
 		uncontrollableCheckBox.setSelected(transition.isUncontrollable());
+        distributionPanel.displayDistributionFields(transition.underlyingTransition().getDistribution());
+        displayWeight(transition.underlyingTransition().getWeight());
+        uncontrollableCheckBox.setSelected(transition.isUncontrollable());
 		transitionEditorPanel.add(nameTextField, gbc);
 		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
@@ -320,10 +438,14 @@ public class TAPNTransitionEditor extends JPanel {
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUncontrollable(uncontrollableCheckBox.isSelected());
             ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setGuard(coloredTransitionGuardPanel.getExpression());
+            ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setDistribution(distributionPanel.parseDistribution());
+            ((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setWeight(parseWeight());
         }else{
             urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
             uncontrollableCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUncontrollable());
             coloredTransitionGuardPanel.initExpr(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getGuard());
+            distributionPanel.displayDistributionFields(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getDistribution());
+            displayWeight(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).getWeight());
 		}
 		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
@@ -353,17 +475,20 @@ public class TAPNTransitionEditor extends JPanel {
 	};
 	
 	private boolean isUrgencyOK(){
-		if(!transition.hasUntimedPreset()){
+		if (!transition.hasUntimedPreset()) {
 			JOptionPane.showMessageDialog(transitionEditorPanel, untimed_preset_warning, "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		
-		for(TransportArc arc : transition.underlyingTransition().getTransportArcsGoingThrough()){
-			if(arc.destination().invariant().upperBound() != Bound.Infinity){
+		for (TransportArc arc : transition.underlyingTransition().getTransportArcsGoingThrough()){
+            var destination = arc.destination();
+            var hasCtiInvariant = destination.getCtiList().stream().anyMatch(cti -> cti.upperBound() != Bound.Infinity);
+			if (hasCtiInvariant || destination.invariant().upperBound() != Bound.Infinity){
 				JOptionPane.showMessageDialog(transitionEditorPanel, transport_destination_invariant_warning, "Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 		}
+        
 		return true;
 	}
 
@@ -394,12 +519,14 @@ public class TAPNTransitionEditor extends JPanel {
 				command.redo();
 			}catch(RequireException e){
 				context.undoManager().undo();
+                doNewEdit = true;
 				JOptionPane.showMessageDialog(this,"Another transition in the same component is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 		}else{		
 			if(transition.underlyingTransition().model().isNameUsed(newName) && (wasShared || !transition.underlyingTransition().name().equals(newName))){
 				context.undoManager().undo(); 
+                doNewEdit = true;
 				JOptionPane.showMessageDialog(this,
 						"The specified name is already used by another place or transition.",
 						"Error", JOptionPane.ERROR_MESSAGE);
@@ -408,14 +535,15 @@ public class TAPNTransitionEditor extends JPanel {
 			try{
 				String oldName = transition.underlyingTransition().name();
 				if (!oldName.equals(newName)) {
-				transition.underlyingTransition().setName(newName);
-				Command renameCommand = new RenameTimedTransitionCommand(context.tabContent(), transition.underlyingTransition(), oldName, newName);
-				context.undoManager().addEdit(renameCommand);
-				// set name
-				renameCommand.redo();
+                    transition.underlyingTransition().setName(newName);
+                    Command renameCommand = new RenameTimedTransitionCommand(context.tabContent(), transition.underlyingTransition(), oldName, newName);
+                    context.undoManager().addEdit(renameCommand);
+                    // set name
+                    renameCommand.redo();
 				}
 			}catch(RequireException e){
 				context.undoManager().undo(); 
+                doNewEdit = true;
 				JOptionPane.showMessageDialog(this,
 						"Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
 						"Error", JOptionPane.ERROR_MESSAGE);
@@ -431,9 +559,10 @@ public class TAPNTransitionEditor extends JPanel {
 					command.redo();
 				}catch(RequireException e){
 					context.undoManager().undo();
+                    doNewEdit = true;
 					//This is checked as a transition cannot be shared if there exists a place with the same name
 					if(transition.underlyingTransition().model().parentNetwork().isNameUsedForTransitionsOnly(newName)) {
-						int dialogResult = JOptionPane.showConfirmDialog(this, "A transition with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\nThis transition name will be changed into shared one also in all other components.", "Error", JOptionPane.OK_CANCEL_OPTION);
+						int dialogResult = JOptionPane.showConfirmDialog(this, "A transition with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords. \n\nThis transition name will be changed into shared one also in all other components.", "Warning", JOptionPane.OK_CANCEL_OPTION);
 						if(dialogResult == JOptionPane.OK_OPTION) {
 							Command cmd = new MakeTransitionNewSharedMultiCommand(context, newName, transition);
 							cmd.redo();
@@ -442,12 +571,14 @@ public class TAPNTransitionEditor extends JPanel {
 							return false;
 						}
 					} else {
-						JOptionPane.showMessageDialog(this, "A place with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(this, "A place with the specified name already exists in one or more components, or the specified name is invalid.\n\nAcceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Warning", JOptionPane.ERROR_MESSAGE);
 						return false;
 					}
 				}
 				transition.setUrgent(urgentCheckBox.isSelected());
 				transition.setUncontrollable(uncontrollableCheckBox.isSelected());
+                transition.underlyingTransition().setDistribution(distributionPanel.parseDistribution());
+                transition.underlyingTransition().setWeight(parseWeight());
 			}
 		}
 		
@@ -459,6 +590,26 @@ public class TAPNTransitionEditor extends JPanel {
             context.undoManager().addEdit(new ToggleTransitionUncontrollableCommand(transition.underlyingTransition(), context.tabContent()));
             transition.setUncontrollable(uncontrollableCheckBox.isSelected());
         }
+
+        SMCDistribution distribution = distributionPanel.parseDistribution();
+        if(!transition.underlyingTransition().getDistribution().equals(distribution)) {
+            context.undoManager().addEdit(new ChangeTransitionDistributionCommand(transition, transition.underlyingTransition(),distribution));
+            transition.underlyingTransition().setDistribution(distribution);
+        }
+
+        Probability weight = parseWeight();
+        if (!transition.underlyingTransition().getWeight().equals(weight)) {
+            context.undoManager().addEdit(new ChangeProbabilityWeightCommand(transition, transition.underlyingTransition(), weight));
+            transition.underlyingTransition().setWeight(weight);
+        }
+
+        FiringMode firingMode = (FiringMode)firingModeComboBox.getSelectedItem();
+        if (!transition.underlyingTransition().getFiringMode().equals(firingMode)) {
+            context.undoManager().addEdit(new ChangeFiringModeCommand(transition.underlyingTransition(), firingMode));
+            transition.underlyingTransition().setFiringMode(firingMode);
+        }
+
+        context.network().buildConstraints();
 
 		int rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {
@@ -499,7 +650,11 @@ public class TAPNTransitionEditor extends JPanel {
 		return true;
 	}
 
-	public void enableOKButton(boolean enable){
+	public void tryToEnableOkButton(boolean enable) {
+        if (enable && !distributionPanel.canEnableOkButton()) {
+            return;
+        }
+
 	    okButton.setEnabled(enable);
     }
 
@@ -513,6 +668,55 @@ public class TAPNTransitionEditor extends JPanel {
         }
 		exit();
 	}
+
+    private Probability parseWeight() {
+        if(useConstantWeight.isSelected()) {
+            Constant constant = context.network().getConstant((String) constantsComboBox.getSelectedItem());
+            return new ConstantProbability(constant);
+        }
+        if(infiniteWeight.isSelected()) {
+            return new DoubleProbability(Double.POSITIVE_INFINITY);
+        }
+        try {
+            return new DoubleProbability(Double.parseDouble(weightField.getText()));
+        } catch(NumberFormatException e) {
+            return new DoubleProbability(1.0);
+        }
+    }
+
+    private void displayWeight() {
+        displayWeight(transition.underlyingTransition().getWeight());
+    }
+
+    private void displayWeight(Probability weight) {
+        if(weight instanceof ConstantProbability) {
+            displayConstantWeight(weight);
+        } else {
+            displayDoubleWeight(weight);
+        }
+    }
+
+    private void displayConstantWeight(Probability weight) {
+        weightField.setVisible(false);
+        infiniteWeight.setEnabled(false);
+        constantsComboBox.setVisible(true);
+        useConstantWeight.setSelected(true);
+        ConstantProbability constWeight = (ConstantProbability) weight;
+        constantsComboBox.setSelectedItem(constWeight.constant().name());
+    }
+
+    private void displayDoubleWeight(Probability weight) {
+        weightField.setVisible(true);
+        infiniteWeight.setEnabled(true);
+        constantsComboBox.setVisible(false);
+        useConstantWeight.setSelected(false);
+        if(Double.isInfinite(weight.value())) {
+            infiniteWeight.setSelected(true);
+        } else {
+            weightField.setText(String.valueOf(weight.value()));
+        }
+        weightField.setEnabled(!infiniteWeight.isSelected());
+    }
 
 	private JPanel buttonPanel;
 	private JButton cancelButton;
@@ -528,6 +732,14 @@ public class TAPNTransitionEditor extends JPanel {
 
 	private javax.swing.JCheckBox urgentCheckBox;
     private Vector<SharedTransition> sharedTransitions;
+
+    private JTextField weightField;
+    private JCheckBox infiniteWeight;
+    private JCheckBox useConstantWeight;
+    private JComboBox<String> constantsComboBox;
+	private JComboBox<FiringMode> firingModeComboBox;
+
+    private DistributionPanel distributionPanel;
 
     private javax.swing.JCheckBox uncontrollableCheckBox;
 

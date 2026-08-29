@@ -88,8 +88,12 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                 }
                 if (lens.isTimed()) {
                     arcPrint.append("\n");
-                    arcPrint.append(inputArc.interval().toString(showConstantNames));
-                    arcPrint.append("\n");
+                    if (TAPAALGUI.getAppGui().showZeroToInfinityIntervals() || 
+                        !inputArc.interval().toString(showConstantNames).equals("[0,inf)")) {
+                        arcPrint.append(inputArc.interval().toString(showConstantNames));
+                        arcPrint.append("\n");
+                    }
+            
                     List<ColoredTimeInterval> ctiList;
                     ctiList = this.underlyingTimedInputArc().getColorTimeIntervals();
                     for (ColoredTimeInterval coloredTimeInterval : ctiList) {
@@ -142,6 +146,8 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
                 if(((ConstantWeight) getWeight()).constant().hasFocus()){
                     focusedConstant = true;
                 }
+                
+                isvisible = ((ConstantWeight) getWeight()).constant().getVisible();
                 /*if(((ConstantWeight) getWeight()).constant().getVisible()){
                     focusedConstant = false;
                 }*/

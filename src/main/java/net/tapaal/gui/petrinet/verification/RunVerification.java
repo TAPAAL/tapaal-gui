@@ -7,34 +7,22 @@ import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.TCTL.*;
-import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.PNMLoader;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.MemoryMonitor;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
-import net.tapaal.gui.petrinet.TAPNLens;
+import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
 import net.tapaal.swinghelpers.GridBagHelper;
-import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.File;
-import java.util.*;
-import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import static java.util.Objects.nonNull;
 import static net.tapaal.swinghelpers.GridBagHelper.Anchor.WEST;
@@ -82,16 +70,28 @@ public class RunVerification extends RunVerificationBase {
 						iconSelector.getIconFor(result)
 				);
 
-                if (options.traceOption() != TAPNQuery.TraceOption.NONE) {
+                boolean isNetDrawable = true;
+                if (result.getUnfoldedTab() != null) {
+                    isNetDrawable = result.getUnfoldedTab().network().paintNet();
+                }
+
+                if (result.getUnfoldedTab() != null) {
+                    ColorBindingParser parser = new ColorBindingParser();
+                    parser.addBindings(result.getUnfoldedTab().getModel(), result.getRawOutput());
+                }
+
+                if ((options.traceOption() != TAPNQuery.TraceOption.NONE || (lens != null && lens.isStochastic() && options.isSimulate())) && isNetDrawable) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
-                        if ((lens != null && lens.isColored()) || model.isColored()) {
-                            int dialogResult = JOptionPane.showConfirmDialog(null, "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
+                        if (((lens != null && lens.isColored()) || model.isColored()) && !options.useExplicitSearch()) {
+                            int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
                                 TAPAALGUI.openNewTabFromStream(result.getUnfoldedTab());
                             } else return false;
                         }
                         if (result.getTraceMap() == null) {
                             TAPAALGUI.getAnimator().setTrace(result.getTrace());
+                        } else if (lens != null && lens.isStochastic() && options.isSimulate()) {
+                            TAPAALGUI.getAnimator().setTrace(result.getTrace(), result.getTraceMap());
                         } else {
                             Map<String, TAPNNetworkTrace> traceMap = new HashMap<>();
                             for (String key : result.getTraceMap().keySet()) {
@@ -113,9 +113,11 @@ public class RunVerification extends RunVerificationBase {
                             messenger.displayWrappedErrorMessage(message, "No trace generated");
                         }
                     }
+                } else if (!isNetDrawable) {
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The net is too large to be loaded and drawn in the GUI", "Error", JOptionPane.ERROR_MESSAGE);
+                    });
                 }
-
-
 			}
 		} else {
 			//Check if the is something like
@@ -124,7 +126,6 @@ public class RunVerification extends RunVerificationBase {
 			//version GLIB_2.0 not defined in file libc.so.6 with
 			//link time reference
 			//is the error as this (often) means the possibility for a uppaal licence key error
-
             if (((lens != null && lens.isColored()) || model.isColored())) {
                 if (result != null && result.errorMessage().contains("Only weight=1")) {
                     String[] split1 = result.errorMessage().split("between ", 2);
@@ -178,110 +179,14 @@ public class RunVerification extends RunVerificationBase {
         String[] statsStrings = stats.split(System.getProperty("line.separator"));
 
         for (int i = 0; i < statsStrings.length; i++) {
-            GridBagConstraints gbc = GridBagHelper.as(0, i+startOffset, WEST, new Insets(0,0,0,0));
+            GridBagConstraints gbc = GridBagHelper.as(i / 4, (i%4)+startOffset, WEST, new Insets(0, i >= 4 ? 10 : 0,0,0));
             JLabel statLabel = new JLabel(statsStrings[i]);
-            statLabel.setToolTipText(explanations[i]);
+            if(explanations.length > i)
+                statLabel.setToolTipText(explanations[i]);
             panel.add(statLabel, gbc);
         }
         return startOffset+statsStrings.length;
     }
-
-	private JPanel createStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result, boolean transitionPanel) {
-		JPanel headLinePanel = new JPanel(new GridBagLayout());
-		final JPanel fullPanel = new JPanel(new GridBagLayout());
-
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(15, 0, 15, 15);
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.weightx = 2;
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		if (transitionPanel) {
-			headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search.\n"), JLabel.LEFT), gbc);
-		} else {
-			headLinePanel.add(new JLabel(toHTML("Maximum number of tokens per place achieved during the search.\n"), JLabel.LEFT), gbc);
-		}
-
-		//Setup table
-		TableModel model;
-
-		if (transitionPanel) {
-			String[] columnNames = {"Count", "Transition"};
-			Object[][] data = extractArrayFromTransitionStatistics(result);
-			model = new NonEditableModel(data, columnNames);
-		} else {
-			String[] columnNames = {"Max Tokens", "Place"};
-			Object[][] data = extractArrayFromPlaceBoundStatistics(result);
-			model = new NonEditableModel(data, columnNames);
-		}
-		JTable table = new JTable(model);
-
-		Comparator<Object> comparator = (oo1, oo2) -> {
-			boolean isFirstNumeric, isSecondNumeric;
-			String o1 = oo1.toString(), o2 = oo2.toString();
-			isFirstNumeric = o1.matches("\\d+");
-			isSecondNumeric = o2.matches("\\d+");
-			if (isFirstNumeric) {
-				if (isSecondNumeric) {
-					return Integer.valueOf(o2).compareTo(Integer.valueOf(o1));
-				} else {
-					return -1; // numbers always smaller than letters
-				}
-			} else {
-				if (isSecondNumeric) {
-					return 1; // numbers always smaller than letters
-				}
-			}
-			return 0; // we do not compare strings (it is the same all the time)
-		};
-
-		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
-		sorter.setComparator(0, comparator);
-		table.setRowSorter(sorter);
-
-		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-
-		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weightx = 0;
-		gbc.weighty = 0;
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		fullPanel.add(headLinePanel, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		fullPanel.add(scrollPane, gbc);
-
-		// Make window resizeable
-		fullPanel.addHierarchyListener(new HierarchyListener() {
-			public void hierarchyChanged(HierarchyEvent e) {
-				//when the hierarchy changes get the ancestor for the message
-				Window window = SwingUtilities.getWindowAncestor(fullPanel);
-				//check to see if the ancestor is an instance of Dialog and isn't resizable
-				if (window instanceof Dialog) {
-					Dialog dialog = (Dialog) window;
-					if (!dialog.isResizable()) {
-						//set resizable to true
-						dialog.setResizable(true);
-						dialog.setMinimumSize(new Dimension(350, 300));
-						dialog.setPreferredSize(new Dimension(600, 400));
-					}
-				}
-			}
-		});
-
-		return fullPanel;
-	}
 
     private JPanel createRawQueryPanel(final String rawOutput) {
         final JPanel fullPanel = new JPanel(new GridBagLayout());
@@ -320,29 +225,13 @@ public class RunVerification extends RunVerificationBase {
 
         return fullPanel;
     }
-
-	private Object[][] extractArrayFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
-		List<Tuple<String, Integer>> transitionStats = result.getTransitionStatistics();
-		Object[][] out = new Object[transitionStats.size()][2];
-		for (int i = 0; i < transitionStats.size(); i++) {
-			Object[] line = {(transitionStats.get(i).value2() == -1 ? "unknown" : transitionStats.get(i).value2()), transitionStats.get(i).value1()};
-			out[i] = line;
-		}
-		return out;
-	}
-
-	private Object[][] extractArrayFromPlaceBoundStatistics(final VerificationResult<TAPNNetworkTrace> result) {
-		List<Tuple<String,Integer>> placeBoundStats = result.getPlaceBoundStatistics();
-		Object[][] out = new Object[placeBoundStats.size()][2];
-		for (int i=0;i<placeBoundStats.size();i++) {
-			Object[] line = {(placeBoundStats.get(i).value2()==-1 ? "unknown" : placeBoundStats.get(i).value2()),placeBoundStats.get(i).value1()};
-			out[i] = line;
-		}
-		return out;
-        }
         
 	private JPanel createMessagePanel(final VerificationResult<TAPNNetworkTrace> result) {
 		final JPanel panel = new JPanel(new GridBagLayout());
+
+        if(result.getQueryResult().isSMC()) {
+            return new SMCResultPanel(result);
+        }
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -372,13 +261,13 @@ public class RunVerification extends RunVerificationBase {
             if(!result.getTransitionStatistics().isEmpty()) {
                 if (!result.getTransitionStatistics().isEmpty()) {
                     JButton transitionStatsButton = new JButton("Transition Statistics");
-                    transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, true), "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
+                    transitionStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, StatisticsPanel.createPanel(result, true), "Transition Statistics", JOptionPane.INFORMATION_MESSAGE));
                     gbc = GridBagHelper.as(0,4, WEST, new Insets(10, 0, 10, 0));
                     panel.add(transitionStatsButton, gbc);
                 }
                 if (!result.getPlaceBoundStatistics().isEmpty()) {
                     JButton placeStatsButton = new JButton("Place-Bound Statistics");
-                    placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, false), "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
+                    placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, StatisticsPanel.createPanel(result, false), "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
                     gbc = GridBagHelper.as(1,4, WEST, new Insets(10, 0, 10, 0));
                     panel.add(placeStatsButton, gbc);
                 }
@@ -430,7 +319,7 @@ public class RunVerification extends RunVerificationBase {
                 }
                 if (!result.getPlaceBoundStatistics().isEmpty()) {
                     JButton placeStatsButton = new JButton("Place-Bound Statistics");
-                    placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, createStatisticsPanel(result, false), "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
+                    placeStatsButton.addActionListener(arg0 -> JOptionPane.showMessageDialog(panel, StatisticsPanel.createPanel(result, false), "Place-Bound Statistics", JOptionPane.INFORMATION_MESSAGE));
 
                     gbc = GridBagHelper.as(1,4, WEST, new Insets(10, 0, 10, 0));
                     panel.add(placeStatsButton, gbc);
@@ -495,16 +384,5 @@ public class RunVerification extends RunVerificationBase {
         }
 		
 		return panel;
-	}
-	
-	private static class NonEditableModel extends DefaultTableModel {
-
-		NonEditableModel(Object[][] data, String[] columnNames) {
-	        super(data, columnNames);
-	    }
-	    @Override
-	    public boolean isCellEditable(int row, int column) {
-	        return false;
-	    }
 	}
 }

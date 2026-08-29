@@ -5,7 +5,6 @@ import javax.swing.ImageIcon;
 import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.IconSelector;
 import dk.aau.cs.verification.VerificationResult;
-import net.tapaal.gui.petrinet.verification.TAPNQuery;
 
 public class VerifyTAPNIconSelector extends IconSelector {
 
@@ -56,6 +55,13 @@ public class VerifyTAPNIconSelector extends IconSelector {
                     return satisfiedIcon;
                 }
                 break;
+            case PF:
+            case PG:
+                if(result.getQueryResult().isQuantitative() || result.isQuerySatisfied()) {
+                    return satisfiedIcon;
+                } else {
+                    return notSatisfiedIcon;
+                }
             default:
                 return null;
         }

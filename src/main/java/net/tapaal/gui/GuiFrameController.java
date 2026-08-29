@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.lang.UnsupportedOperationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -242,32 +244,32 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
         buffer.append("Credits\n\n");
         buffer.append("TAPAAL GUI and Translations:\n");
-            buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Malo Dautry, \nJakob Dyhr, Louise Foshammer, Malte Neve-Gr\u00E6sb\u00F8ll, ");
-            buffer.append("Lasse Jacobsen, Morten Jacobsen,\nThomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
-            buffer.append("Mads Johannsen,\nKenneth Y. J\u00F8rgensen, Mikael H. M\u00F8ller, Christoffer Moesgaard, Kristian Morsing Pedersen,\nThomas Pedersen, Lena S. Ernstsen, Niels N. Samuelsen, Jiri Srba, Mathias G. S\u00F8rensen,\nJakob H. Taankvist and Peter H. Taankvist\n");
+            buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Malo Dautry, \nTanguy Dubois, Jakob Dyhr, Louise Foshammer, Malte Neve-Gr\u00E6sb\u00F8ll, ");
+            buffer.append("Lasse Jacobsen, \nMorten Jacobsen,Thomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
+            buffer.append("Mads Johannsen,\nKenneth Y. J\u00F8rgensen, Mikael H. M\u00F8ller, Christoffer Moesgaard, Kristian Morsing Pedersen,\nThomas Pedersen, Lena S. Ernstsen, Niels N. Samuelsen, Jiri Srba, Mathias G. S\u00F8rensen,\nJakob H. Taankvist, Peter H. Taankvist and Mikkel Tygesen\n");
 
-            buffer.append("Aalborg University 2008-2023\n\n");
+            buffer.append("Aalborg University 2008-2026\n\n");
 
         buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
             buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-            buffer.append("Aalborg University 2011-2023\n\n");
+            buffer.append("Aalborg University 2011-2026\n\n");
 
         buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
-            buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
-            buffer.append("Mathias G. S\u00F8rensen and Jakob H. Taankvist\n");
-            buffer.append("Aalborg University 2012-2023\n\n");
+            buffer.append("Mathias Andersen, Tanguy Dubois, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
+            buffer.append("Mathias G. S\u00F8rensen, Jakob H. Taankvist and Mikkel Tygesen\n");
+            buffer.append("Aalborg University 2012-2026\n\n");
 
         buffer.append("TAPAAL Untimed Engine (verifypn):\n");
-            buffer.append("Alexander Bilgram, Frederik M. B\u00F8nneland, Jakob Dyhr, Peter Fogh, ");
-            buffer.append("Jonas F. Jensen,\nLasse S. Jensen, Peter G. Jensen, Nicolaj \u00D8. Jensen,");
-            buffer.append("Tobias S. Jepsen,\nMads Johannsen, Kenneth Y. J\u00F8rgensen, Mads Johannsen, Isabella Kaufmann,\n");
-            buffer.append("Andreas H. Klostergaard, S\u00F8ren M. Nielsen, Thomas S. Nielsen, ");
-            buffer.append("Samuel Pastva,\nThomas Pedersen, Jiri Srba, Mathias M. S\u00F8rensen, Peter H. Taankvist, Rasmus G. Tollund,\nNikolaj J. Ulrik, Simon M. Virenfeldt, Lars K. Oestergaard, Emil G. Henriksen,\nAlan M. Khorsid, Esben Nielsen, Theodor Risager, Adam M. St\u00FCck and Andreas S. S\u00F8rensen\n");
-            buffer.append("Aalborg University 2014-2023\n\n");
+            buffer.append("Alexander Bilgram, Emil Normann Brandt, Frederik M. B\u00F8nneland, Jakob Dyhr, Malo Dautry, Peter Fogh, \n");
+            buffer.append("Jens Emil Fink Højriis, Jonas F. Jensen, Emil Gybel Henriksen, Lasse S. Jensen, Peter G. Jensen,\nNicolaj \u00D8. Jensen, ");
+            buffer.append("Tobias S. Jepsen, Mads Johannsen, Kenneth Y. J\u00F8rgensen, Isabella Kaufmann, \n");
+            buffer.append("Alan Mozafar Khorsid, Andreas H. Klostergaard, Esben Nielsen, S\u00F8ren M. Nielsen, \nThomas S. Nielsen, ");
+            buffer.append("Samuel Pastva, Thomas Pedersen, Kira S. Pedersen, Theodor Risager, Jiri Srba, \nAdam M. St\u00FCck, Andreas S. S\u00F8rensen, Mathias M. S\u00F8rensen, Peter H. Taankvist, Rasmus G. Tollund, \nMikkel Tygesen, Nikolaj J. Ulrik, Simon M. Virenfeldt and Lars K. Oestergaard \n");
+            buffer.append("Aalborg University 2014-2026\n\n");
 
 
         buffer.append("\n");
-        JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.getProgramName(),
+        JOptionPane.showMessageDialog(TAPAALGUI.getApp(), buffer.toString(), "About " + TAPAAL.getProgramName(),
                 JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
     }
 
@@ -309,14 +311,17 @@ public final class GuiFrameController implements GuiFrameControllerActions{
                     if(f.exists() && f.isFile() && f.canRead()){
                         FileBrowser.userPath = f.getParent();
 
-                        if (f.getName().toLowerCase().endsWith(".pnml")) {
+                        FileType fileType = inferFileType(f);
+                        if (fileType == FileType.PNML) {
                             filesOpened.add(PetriNetTab.createNewTabFromPNMLFile(f));
-                        } else {
+                        } else if (fileType == FileType.TAPN) {
                             filesOpened.add(PetriNetTab.createNewTabFromFile(f));
+                        } else {
+                            throw new UnsupportedOperationException("The file " + f.getName() + " has an unsupported file extension. Please use a .tapn, .xml or .pnml file.");
                         }
-
                     }
                 }
+
                 return filesOpened;
             }
             @Override
@@ -324,11 +329,12 @@ public final class GuiFrameController implements GuiFrameControllerActions{
                 try {
                     List<PetriNetTab> tabs = get();
                     for (PetriNetTab tab : tabs) {
+                        if (tab == null) continue;
                         openTab(tab);
 
-                        //Don't auto-layout on empty net, hotfix for issue #1960000, we assume only pnml file does not have layout, and they always only have one component
-                        if(!tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
-                            int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                        //Don't auto-layout on empty net or net too big to draw, hotfix for issue #1960000, we assume only pnml file does not have layout, and they always only have one component
+                        if (tab.network().paintNet() && !tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
+                            int dialogResult = JOptionPane.showConfirmDialog (TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if(dialogResult == JOptionPane.YES_OPTION) {
                                 SmartDrawDialog.showSmartDrawDialog();
                             }
@@ -367,6 +373,30 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         }
     }
 
+    private enum FileType {
+        TAPN, PNML, UNKNOWN
+    }
+
+    private FileType inferFileType(File file) {
+        String fileName = file.getName().toLowerCase();
+        try {
+            String content = Files.readString(file.toPath());
+            if (content.contains("<query") || content.contains("<feature") || !content.contains("<page")) {
+                return FileType.TAPN;
+            } else if (content.contains("<pnml")) {
+                return FileType.PNML;
+            }
+        } catch (IOException ignore) {}
+
+        if (fileName.endsWith(".tapn") || fileName.endsWith(".xml")) {
+            return FileType.TAPN;
+        } else if (fileName.endsWith(".pnml")) {
+            return FileType.PNML;
+        } else {
+            return FileType.UNKNOWN;
+        } 
+    }
+
     private void openPNMLFile(File[] files) {
         //Show loading cursor
         guiFrameDirectAccess.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -390,9 +420,9 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
                     for (PetriNetTab tab : tabs) {
                         openTab(tab);
-                        //Don't autolayout on empty net, hotfix for issue #1960000. Imported PNML will only have one template.
-                        if(!tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
-                            int dialogResult = JOptionPane.showConfirmDialog (null, "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                        //Don't autolayout on empty net or net too big to draw, hotfix for issue #1960000. Imported PNML will only have one template.
+                        if(tab.network().paintNet() && !tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
+                            int dialogResult = JOptionPane.showConfirmDialog (TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?","Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if(dialogResult == JOptionPane.YES_OPTION) {
                                 SmartDrawDialog.showSmartDrawDialog();
                             }
@@ -459,7 +489,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
             optionPane.setOptions(new Object[] {updateButton, laterButton, ignoreButton});
 
 
-            final JDialog dialog = optionPane.createDialog(null, "New Version of TAPAAL");
+            final JDialog dialog = optionPane.createDialog(TAPAALGUI.getApp(), "New Version of TAPAAL");
             laterButton.addActionListener(e -> {
                 Preferences.getInstance().setLatestVersion(null);
                 dialog.setVisible(false);
@@ -487,13 +517,12 @@ public final class GuiFrameController implements GuiFrameControllerActions{
         //open the default browser on this page
         try {
             java.awt.Desktop.getDesktop().browse(url);
-        } catch (IOException e) {
+        } catch (IOException | UnsupportedOperationException e) {
             Logger.log("Cannot open the browser.");
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "There was a problem opening the default web browser \n" +
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "There was a problem opening the default web browser \n" +
                             "Please open the url in your browser by entering " + url.toString(),
                     "Error opening browser", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
     }
 
@@ -525,7 +554,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     @Override
     public void showBatchProcessingDialog() {
         if (showSavePendingChangesDialogForAllTabs()) {
-            BatchProcessingDialog.showBatchProcessingDialog(new JList<>(new DefaultListModel<>()));
+            BatchProcessingDialog.showBatchProcessingDialog();
         }
     }
 
@@ -544,9 +573,14 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     private boolean saveAs(TabActions tab) {
         boolean result;
         // save as
-        String path = tab.getTabTitle();
+        String suggestedName = tab.getTabTitle();
+        String path = null;
+        if (tab.getFile() != null) {
+            path = tab.getFile().getParent();
+            suggestedName = tab.getFile().getName();
+        }
 
-        String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(path);
+        String filename = FileBrowser.constructor("Timed-Arc Petri Net", "tapn", path).saveFile(suggestedName);
         if (filename != null) {
             File modelFile = new File(filename);
             tab.saveNet(modelFile);
@@ -704,10 +738,17 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     public void toggleEnabledTransitionsList(){
         setEnabledTransitionsList(!showEnabledTransitions);
     }
-    private void setEnabledTransitionsList(boolean b){
+    
+    @Override
+    public void setEnabledTransitionsList(boolean b) {
         showEnabledTransitions = b;
         guiFrame.setShowEnabledTransitionsSelected(b);
         currentTab.ifPresent(o->o.showEnabledTransitionsList(b));
+    }
+
+    @Override
+    public boolean isEnabledTransitionsListVisible() {
+        return showEnabledTransitions;
     }
 
     @Override

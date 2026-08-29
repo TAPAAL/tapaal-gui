@@ -10,7 +10,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MakeTransitionNewSharedMultiCommand extends Command {
+public class MakeTransitionNewSharedMultiCommand implements Command {
 	private final String newSharedName;
 	private final Context context;
 	private final Transition transition;
@@ -31,6 +31,8 @@ public class MakeTransitionNewSharedMultiCommand extends Command {
 	
 	@Override
 	public void redo() {
+        commands.clear();
+
 		SharedTransition sharedTransition = null;
 		boolean first = true;
 		for(Template template : context.tabContent().allTemplates()) {
@@ -44,7 +46,7 @@ public class MakeTransitionNewSharedMultiCommand extends Command {
                     commands.add(command);
                     first = false;
                 } else { //For the rest we make them shared with the recently made transition
-                    command = new MakeTransitionSharedCommand(context.activeModel(), sharedTransition, component.underlyingTransition(), context.tabContent());
+                    command = new MakeTransitionSharedCommand(template.model(), sharedTransition, component.underlyingTransition(), context.tabContent());
                     command.redo();
                     commands.add(command);
                 }
@@ -54,7 +56,8 @@ public class MakeTransitionNewSharedMultiCommand extends Command {
 
 	@Override
 	public void undo() {	
-		for(Command command : commands)
-			command.undo();
+		for (int i = commands.size() - 1; i >= 0; --i) {
+			commands.get(i).undo();
+        }
 	}
 }

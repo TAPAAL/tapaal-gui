@@ -57,7 +57,7 @@ public class ColorMultiset implements Map<Color, Integer> {
 
     @Override
     public Integer put(Color color, Integer integer) {
-        if (color.getColorType() != colorType) {
+        if (!(color.getColorType().equals(colorType))) {
             throw new IllegalArgumentException(String.format("Type mismatch: Attempted to put %s in multiset of type %s", color.getName(), colorType.getName()));
         }
         //If at most 0, clean key from set

@@ -4,7 +4,9 @@ import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 public class ColorType implements Iterable<Color> {
@@ -24,6 +26,12 @@ public class ColorType implements Iterable<Color> {
         addColor(new Color(this, colors.size(), colorName));
     }
 
+    public void addColors(List<String> colorNames) {
+        for (String c : colorNames) {
+            addColor(c);
+        }
+    }
+
     public String getName() {
         return name;
     }
@@ -40,8 +48,19 @@ public class ColorType implements Iterable<Color> {
         return colors.iterator();
     }
 
-    public Vector<Color> getColors(){
+    public List<Color> getColorList() {
+        return new ArrayList<>(colors);
+    }
+
+    public Vector<Color> getColors() {
         return colors;
+    }
+
+    public boolean isIdentical(ColorType newColorType) {
+        boolean firstColorIdentical = getFirstColor().getColorName().equals(newColorType.getFirstColor().getColorName());
+        boolean lastColorIdentical = getColors().lastElement().getColorName().equals(newColorType.getColors().lastElement().getColorName());
+
+        return firstColorIdentical && lastColorIdentical && !equals(newColorType);
     }
 
     @Override
@@ -52,11 +71,11 @@ public class ColorType implements Iterable<Color> {
 
         if (!object.name.equals(this.name))
             return false;
-
-        if(!object.size().equals(size())){
+ 
+        if (!object.size().equals(size())){
             return false;
         }
-        for(int i = 0; i < colors.size(); i++){
+        for (int i = 0; i < colors.size(); i++){
             if(!colors.get(i).equals(object.colors.get(i))){
                 return false;
             }
@@ -118,7 +137,7 @@ public class ColorType implements Iterable<Color> {
         }
         return false;
     }
-
+    
     public Color getColorByName(String name){
         for (Color c : colors) {
             if(c.getColorName().equals(name)){
@@ -138,5 +157,21 @@ public class ColorType implements Iterable<Color> {
                 return false;
         }
         return true;
+    }
+
+    public Integer getLowerBound() {
+        if (isIntegerRange()) {
+            return Integer.parseInt(colors.get(0).getColorName());
+        }
+        
+        return null;
+    }
+
+    public Integer getUpperBound() {
+        if (isIntegerRange()) {
+            return Integer.parseInt(colors.get(colors.size() - 1).getColorName());
+        }
+        
+        return null;
     }
 }

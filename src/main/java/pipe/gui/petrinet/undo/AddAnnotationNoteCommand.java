@@ -4,7 +4,7 @@ import net.tapaal.gui.petrinet.undo.Command;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.AnnotationNote;
 
-public class AddAnnotationNoteCommand extends Command {
+public class AddAnnotationNoteCommand implements Command {
 
     private final AnnotationNote note;
     private final DataLayer guiModel;

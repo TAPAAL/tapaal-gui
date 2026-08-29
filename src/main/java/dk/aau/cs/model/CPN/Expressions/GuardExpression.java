@@ -15,6 +15,8 @@ public abstract class GuardExpression extends Expression {
 
     public ColorType getColorType() { return colorType; }
 
+    public void setColorType(ColorType colorType) { this.colorType = colorType; }
+
     @Override
     public abstract GuardExpression replace(Expression object1, Expression object2, boolean replaceAllInstances);
 

@@ -8,7 +8,7 @@ import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import net.tapaal.gui.petrinet.Template;
 
-public class SortTemplatesCommand extends Command{
+public class SortTemplatesCommand implements Command{
 	TimedArcPetriNet[] oldOrder;
 	final PetriNetTab tabContent;
 	final TemplateExplorer templateExplorer;

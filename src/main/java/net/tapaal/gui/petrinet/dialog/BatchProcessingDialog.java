@@ -32,6 +32,7 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.undo.UndoManager;
 import pipe.gui.swingcomponents.filebrowser.FileBrowser;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
+import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
@@ -56,14 +57,6 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_UNTIMED = "TAPAAL Untimed CTL Engine (VerifyPN)";
-
-	private static final String name_BFS = "Breadth first search";
-	private static final String name_DFS = "Depth first search";
-	private static final String name_HEURISTIC = "Heuristic search";
-	private static final String name_Random = "Random search";
-	private static final String name_NONE_APPROXIMATION = "None";
-	private static final String name_OVER_APPROXIMATION = "Over-approximation";
-	private static final String name_UNDER_APPROXIMATION = "Under-approximation";
 
 	//Tool tip strings
 	//Tool tips for model panel
@@ -97,6 +90,7 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String NOT_SATISFIED_STRING_SOUNDNESS = "Not Sound";
 	private final static String NOT_SATISFIED_STRING = "Not Satisfied";
     private final static String SATISFIED_STRING = "Satisfied";
+	private final static String PROBABILITY_STRING = "P = ";
     private final static String INCONCLUSIVE_STRING = "Inconclusive";
 	private final static String SATISFIED_SOUNDNESS_STRING = "Sound";
 	private final static String SATISFIED_STRONG_SOUNDNESS_STRING = "Strongly Sound";
@@ -141,6 +135,7 @@ public class BatchProcessingDialog extends JDialog {
 	private CustomJSpinner timeoutValue;
 	private CustomJSpinner oomValue;
 	private final JList<TAPNQuery> ListOfQueries;
+	private final LoadedBatchProcessingModel suppliedModel;
 	
 	private final Timer timeoutTimer = new Timer(30000, e -> timeoutCurrentVerificationTask());
 
@@ -209,42 +204,44 @@ public class BatchProcessingDialog extends JDialog {
 	
 	static BatchProcessingDialog batchProcessingDialog;
 	
-	/* ListOfQueries is used throughout the class to check if BatchProcessing was called from QueryPane
-	(should maybe be boolean)
-	*/
-	public static void showBatchProcessingDialog(JList<TAPNQuery> ListOfQueries){
-		if (ListOfQueries.getModel().getSize() != 0) {
+	public static void showBatchProcessingDialog() {
+		showBatchProcessingDialog(new JList<>(new DefaultListModel<>()), null);
+	}
+
+	public static void showBatchProcessingDialog(JList<TAPNQuery> ListOfQueries, LoadedBatchProcessingModel suppliedModel) {
+		if (suppliedModel != null) {
 			batchProcessingDialog = null;
 		}
 		if (batchProcessingDialog == null) {
-			batchProcessingDialog = new BatchProcessingDialog(TAPAALGUI.getApp(), "Batch Processing", true, ListOfQueries);
+			batchProcessingDialog = new BatchProcessingDialog(TAPAALGUI.getApp(), "Batch Processing", true, ListOfQueries, suppliedModel);
 			batchProcessingDialog.pack();
 			batchProcessingDialog.setPreferredSize(batchProcessingDialog.getSize());
 			//Set the minimum size to 150 less than the preferred, to be consistent with the minimum size of the result panel
 			batchProcessingDialog.setMinimumSize(new Dimension(batchProcessingDialog.getWidth(), batchProcessingDialog.getHeight()-150));
-			batchProcessingDialog.setLocationRelativeTo(null);
+			batchProcessingDialog.setLocationRelativeTo(TAPAALGUI.getApp());
 			batchProcessingDialog.setResizable(true);
 		}
 		batchProcessingDialog.setVisible(true);
 	}
 
-	private BatchProcessingDialog(Frame frame, String title, boolean modal, JList<TAPNQuery> ListOfQueries) {
+	private BatchProcessingDialog(Frame frame, String title, boolean modal, JList<TAPNQuery> ListOfQueries, LoadedBatchProcessingModel suppliedModel) {
 		super(frame, title, modal);
 		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent we) {
-				if (!(isQueryListEmpty())) {
+				if (isCalledFromQueryPane()) {
 					batchProcessingDialog = null;
 				}
 				terminateBatchProcessing();
 			}
 		});
 		this.ListOfQueries = ListOfQueries;
+		this.suppliedModel = suppliedModel;
 
 		initComponents();
 		makeShortcuts();
 		//Runs the BatchProcessing if it is called from the QueryPane
-		if (!(isQueryListEmpty())) {
+		if (isCalledFromQueryPane()) {
 			process();
 		}
 	}
@@ -269,14 +266,16 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private void setFileListToTempFile() {
-		if (!(isQueryListEmpty())) {
-			files.add(QueryPane.getTemporaryFile());
+		if (isCalledFromQueryPane()) {
+			for (File f : QueryPane.getTemporaryFiles()) {
+				files.add(f);
+			}
 		}
 	}
-	
-	private boolean isQueryListEmpty() {
-		return ListOfQueries.getModel().getSize() == 0;
-	}
+
+    private boolean isCalledFromQueryPane() {
+        return suppliedModel != null;
+    }
 
 	private void initFileListPanel() {
 		JPanel fileListPanel = new JPanel(new GridBagLayout());
@@ -374,10 +373,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridheight = 4;
 		gbc.insets = new Insets(10, 5, 0, 5);
 		topPanel.add(fileListPanel, gbc);
-		//Hides the file list panel if batch processing is run from the tabcomponent
-		if(!(isQueryListEmpty())) {
-			fileListPanel.setVisible(false);
-		}
+		fileListPanel.setVisible(!isCalledFromQueryPane());
 	}
 
 	private void addFiles() {
@@ -422,10 +418,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.weightx = 0;
 		gbc.insets = new Insets(10, 0, 0, 5);
 		topPanel.add(verificationOptionsPanel, gbc);
-		// Hides the verification options if batch processing is run from the tab component
-		if(!(isQueryListEmpty())) {
-			verificationOptionsPanel.setVisible(false);
-		}
+		verificationOptionsPanel.setVisible(!isCalledFromQueryPane());
 	}
 
     private void initOptionsTable() {
@@ -521,25 +514,30 @@ public class BatchProcessingDialog extends JDialog {
         gbc.gridx = 1;
         optionsPanel.add(copyOptionButton, gbc);
         copyOptionButton.addActionListener(e -> {
-            int row = verificationTable.getSelectedRow();
-            optionsTable.addRow(new Object[]{
-                verificationTable.getValueAt(row, 0),
-                optionsTable.getRowCount(),
-                verificationTable.getValueAt(row, 2),
-                verificationTable.getValueAt(row, 3),
-                verificationTable.getValueAt(row, 4)
-            });
+            int selectedRow = verificationTable.getSelectedRow();
+			if (selectedRow != -1) {
+				optionsTable.addRow(new Object[]{
+					verificationTable.getValueAt(selectedRow, 0),
+					optionsTable.getRowCount(),
+					verificationTable.getValueAt(selectedRow, 2),
+					verificationTable.getValueAt(selectedRow, 3),
+					verificationTable.getValueAt(selectedRow, 4)
+				});
+			}
         });
 
         JButton removeOptionButton = new JButton("Remove");
         gbc.gridx = 2;
         optionsPanel.add(removeOptionButton, gbc);
         removeOptionButton.addActionListener(e -> {
-            optionsTable.removeRow(verificationTable.getSelectedRow());
-            for (int rowIndex = 0; rowIndex < verificationTable.getRowCount(); rowIndex++) {
-                verificationTable.setValueAt(rowIndex, rowIndex, 1);
-            }
-        });
+			int selectedRow = verificationTable.getSelectedRow();
+			if (selectedRow != -1) {
+				optionsTable.removeRow(selectedRow);
+				for (int rowIndex = 0; rowIndex < verificationTable.getRowCount(); rowIndex++) {
+					verificationTable.setValueAt(rowIndex, rowIndex, 1);
+				}
+			}
+		});
 
         helpDialogPN = new HelpDialog(
             BatchProcessingDialog.this,
@@ -593,7 +591,7 @@ public class BatchProcessingDialog extends JDialog {
 		timeoutValue.setMaximumSize(new Dimension(70, 30));
 		timeoutValue.setMinimumSize(new Dimension(70, 30));
 		timeoutValue.setPreferredSize(new Dimension(70, 30));
-		timeoutValue.setEnabled(true);
+		timeoutValue.setEnabled(false);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -604,7 +602,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		noTimeoutCheckbox = new JCheckBox("Do not use timeout");
 		noTimeoutCheckbox.setToolTipText(TOOL_TIP_NoTimeoutCheckBox);
-		noTimeoutCheckbox.setSelected(false);
+		noTimeoutCheckbox.setSelected(true);
 		noTimeoutCheckbox.addActionListener(e -> {
             if (noTimeoutCheckbox.isSelected()) {
                 timeoutValue.setEnabled(false);
@@ -636,7 +634,7 @@ public class BatchProcessingDialog extends JDialog {
 		oomValue.setMaximumSize(new Dimension(70, 30));
 		oomValue.setMinimumSize(new Dimension(70, 30));
 		oomValue.setPreferredSize(new Dimension(70, 30));
-		oomValue.setEnabled(true);
+		oomValue.setEnabled(false);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -647,7 +645,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		noOOMCheckbox = new JCheckBox("Do not limit memory usage");
 		noOOMCheckbox.setToolTipText(TOOL_TIP_NoOOMCheckBox);
-		noOOMCheckbox.setSelected(false);
+		noOOMCheckbox.setSelected(true);
 		noOOMCheckbox.addActionListener(e -> {
             if (noOOMCheckbox.isSelected()) {
                 oomValue.setEnabled(false);
@@ -678,6 +676,7 @@ public class BatchProcessingDialog extends JDialog {
         }
 
 		timeoutValue.setEnabled(useTimeout());
+		oomValue.setEnabled(useOOM());
 	}
 
 	private List<BatchProcessingVerificationOptions> getVerificationOptions() {
@@ -715,7 +714,7 @@ public class BatchProcessingDialog extends JDialog {
 		terminateBatchProcessing();
 		rootPane.getParent().setVisible(false);
 		// Resets batch processing when exiting if batch processing was called from the tab
-		if (!(isQueryListEmpty())) {
+		if (isCalledFromQueryPane()) {
 			batchProcessingDialog = null;
 		}
 	}
@@ -799,12 +798,13 @@ public class BatchProcessingDialog extends JDialog {
             public void mousePressed(MouseEvent mouseEvent) {
                 JTable source =(JTable) mouseEvent.getSource();
                 Point point = mouseEvent.getPoint();
-                int row = source.rowAtPoint(point);
-                if (mouseEvent.getClickCount() == 2 && source.getSelectedRow() != -1) {
-                    String rawOutput = tableModel.getResult(row).getRawOutput();
-                    if (rawOutput != null && !rawOutput.equals("")) {
+				int viewRow = source.rowAtPoint(point);
+				if (mouseEvent.getClickCount() == 2 && viewRow != -1) {
+					int modelRow = source.convertRowIndexToModel(viewRow);
+					String rawOutput = tableModel.getResult(modelRow).getRawOutput();
+					if (rawOutput != null && !rawOutput.equals("")) {
                         final JPanel panel = new JPanel(new GridBagLayout());
-                        JOptionPane.showMessageDialog(panel, createRawQueryPanel(tableModel.getResult(row).getRawOutput()), "Raw results", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(panel, createRawQueryPanel(rawOutput), "Raw results", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
             }
@@ -1065,8 +1065,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void process() {
 		tableModel.clear();
-
-        currentWorker = new BatchProcessingWorker(files, tableModel, getVerificationOptions());
+        currentWorker = new BatchProcessingWorker(files, tableModel, getVerificationOptions(), suppliedModel);
 
 		currentWorker.addPropertyChangeListener(evt -> {
             if (evt.getPropertyName().equals("state")) {
@@ -1130,7 +1129,7 @@ public class BatchProcessingDialog extends JDialog {
 			}
 
 			public void fireFileChanged(FileChangedEvent e) {
-				if(!(isQueryListEmpty())) {
+				if (isCalledFromQueryPane()) {
 					fileStatusLabel.setText(TAPAALGUI.getAppGui().getCurrentTabName());
 				} else {
                     fileStatusLabel.setText(e.fileName());
@@ -1214,7 +1213,7 @@ public class BatchProcessingDialog extends JDialog {
 		fileList.setEnabled(true);
 		addFilesButton.setEnabled(true);
 
-		if (!isQueryListEmpty() || listModel.size() > 0) {
+		if (isCalledFromQueryPane() || listModel.size() > 0) {
 			clearFilesButton.setEnabled(true);
 			startButton.setEnabled(true);
 		} else {
@@ -1255,7 +1254,7 @@ public class BatchProcessingDialog extends JDialog {
 					boolean isQueryColumn = table.getColumnName(column).equals("Query");
 					if (value != null) {
 						if ((isResultColumn && value.toString().equals(SATISFIED_STRING) || value.toString().equals(SATISFIED_SOUNDNESS_STRING) ||
-                            value.toString().equals(SATISFIED_STRONG_SOUNDNESS_STRING)) || (isQueryColumn && value.toString().equals("TRUE"))) {
+                            value.toString().equals(SATISFIED_STRONG_SOUNDNESS_STRING)) || (isQueryColumn && value.toString().equals("TRUE")) || (isResultColumn && value.toString().contains(PROBABILITY_STRING))) {
                             setBackground(new Color(91, 255, 91)); // light green
                         } else if ((isResultColumn && (value.toString().equals(NOT_SATISFIED_STRING) || value.toString().equals(NOT_SATISFIED_STRING_STRONG_SOUNDNESS) ||
                             value.toString().equals(NOT_SATISFIED_STRING_SOUNDNESS))) || (isQueryColumn && value.toString().equals("FALSE"))) {
@@ -1297,9 +1296,11 @@ public class BatchProcessingDialog extends JDialog {
                     Point mousePos = table.getMousePosition();
                     BatchProcessingVerificationResult result = null;
                     if (mousePos != null) {
-                        result = ((BatchProcessingResultsTableModel) table
-                            .getModel()).getResult(table
-                            .rowAtPoint(mousePos));
+						int viewRow = table.rowAtPoint(mousePos);
+						if (viewRow != -1) {
+							int modelRow = table.convertRowIndexToModel(viewRow);
+							result = ((BatchProcessingResultsTableModel) table.getModel()).getResult(modelRow);
+						}
                     }
 
                     if (table.getColumnName(column).equals("Verification Time"))
@@ -1489,5 +1490,4 @@ public class BatchProcessingDialog extends JDialog {
         im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
     }
 }
-
 

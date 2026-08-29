@@ -7,7 +7,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
 
 import java.util.Map;
 
-public class ChangeAllNamesVisibilityCommand extends Command {
+public class ChangeAllNamesVisibilityCommand implements Command {
     private final Map<PetriNetObject, Boolean> places;
     private final Map<PetriNetObject, Boolean> transitions;
     private final boolean isVisible;

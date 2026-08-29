@@ -23,7 +23,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import net.tapaal.gui.petrinet.Template;
@@ -103,7 +102,7 @@ public class ExportBatchDialog extends JDialog {
 			exportBatchDialog.pack();
 			exportBatchDialog.setPreferredSize(exportBatchDialog.getSize());
 			exportBatchDialog.setMinimumSize(new Dimension(exportBatchDialog.getWidth(), exportBatchDialog.getHeight()));
-			exportBatchDialog.setLocationRelativeTo(null);
+			exportBatchDialog.setLocationRelativeTo(TAPAALGUI.getApp());
 			exportBatchDialog.setResizable(true);
 		}
 		exportBatchDialog.setVisible(true);

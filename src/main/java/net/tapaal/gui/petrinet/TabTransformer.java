@@ -1,5 +1,18 @@
 package net.tapaal.gui.petrinet;
 
+import dk.aau.cs.TCTL.LTLFNode;
+import dk.aau.cs.TCTL.LTLGNode;
+import dk.aau.cs.TCTL.StringPosition;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLAndListNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLNotNode;
+import dk.aau.cs.TCTL.TCTLOrListNode;
+import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
@@ -20,13 +33,16 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.RunningVerificationDialog;
 import pipe.gui.petrinet.PetriNetTab;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
+
+import com.sun.jna.Platform;
 
 public class TabTransformer {
 
@@ -155,7 +171,15 @@ public class TabTransformer {
     }
 
     private static ArcPath createArcPath(DataLayer currentGuiModel, PlaceTransitionObject source, PlaceTransitionObject target, Arc arc) {
+        if (currentGuiModel == null || source == null || target == null) {
+            return new ArcPath(arc);
+        }
+
         Arc guiArc = currentGuiModel.getArcByEndpoints(source, target);
+        if (guiArc == null || guiArc.getArcPath() == null) {
+            return new ArcPath(arc);
+        }
+        
         ArcPath arcPath = guiArc.getArcPath();
         int arcPathPointsNum = arcPath.getNumPoints();
 
@@ -183,25 +207,105 @@ public class TabTransformer {
             }
         }
     }
+    static public void removeDistributionInformation(PetriNetTab tab) {
+        for (Template template : tab.allTemplates()) {
+            for (TimedTransition transition : template.model().transitions()) {
+                if (transition.hasCustomDistribution()) {
+                    transition.setDistribution(SMCDistribution.defaultDistribution());
+                }
+            }
+        }
+    }
+
+    /**
+     * Converts between SMC and reachability queries
+     */
+    public static void convertQueriesToOrFromSmc(Iterable<TAPNQuery> queries) {
+        for (TAPNQuery query : queries) {
+            boolean isSmc = query.getCategory().equals(QueryCategory.SMC);
+            TCTLAbstractProperty property = query.getProperty();
+            query.setProperty(smcConverter(property));
+            query.setCategory(isSmc ? QueryCategory.CTL : QueryCategory.SMC);
+            query.setSmcSettings(SMCSettings.Default());
+        }  
+    }
+
+    private static TCTLAbstractProperty smcConverter(TCTLAbstractProperty property) {
+        TCTLAbstractStateProperty child = getFirstChildOfProperty(property);
+        if (property instanceof LTLFNode) {
+            return new TCTLEFNode(child);
+        } else if (property instanceof LTLGNode) {
+            return new TCTLAGNode(child);
+        } else if (property instanceof TCTLEFNode) {
+            return new LTLFNode(child);
+        }  else if (property instanceof TCTLEGNode) {
+            return new LTLGNode(child);
+        } else if (property instanceof TCTLAFNode) {
+            return new LTLFNode(child);
+        } else if (property instanceof TCTLAGNode) {
+            return new LTLGNode(child);
+        } else if (property instanceof TCTLAndListNode) {
+            TCTLAndListNode andNode = (TCTLAndListNode) property;
+            List<TCTLAbstractStateProperty> properties = andNode.getProperties();
+            List<TCTLAbstractStateProperty> convertedProperties = new ArrayList<>();
+            for (TCTLAbstractStateProperty prop : properties) {
+                convertedProperties.add((TCTLAbstractStateProperty) smcConverter(prop));
+            }
+
+            return new TCTLAndListNode(convertedProperties);
+        } else if (property instanceof TCTLOrListNode) {
+            TCTLOrListNode orNode = (TCTLOrListNode) property;
+            List<TCTLAbstractStateProperty> properties = orNode.getProperties();
+            List<TCTLAbstractStateProperty> convertedProperties = new ArrayList<>();
+            for (TCTLAbstractStateProperty prop : properties) {
+                convertedProperties.add((TCTLAbstractStateProperty) smcConverter(prop));
+            }
+
+            return new TCTLOrListNode(convertedProperties);
+        } else if (property instanceof TCTLNotNode) {
+            TCTLNotNode notNode = (TCTLNotNode) property;
+            return new TCTLNotNode((TCTLAbstractStateProperty) smcConverter(notNode.getProperty()));
+        } else {
+            return property;
+        }
+    }
+
+    private static TCTLAbstractStateProperty getFirstChildOfProperty(TCTLAbstractProperty property) {
+        StringPosition[] children = property.getChildren();
+        for (int i = 0; i < children.length; ++i) {
+            TCTLAbstractProperty child = children[i].getObject();
+            if (child instanceof TCTLAbstractStateProperty) {
+                return (TCTLAbstractStateProperty) child;
+            }
+        }
+
+        return new TCTLStatePlaceHolder();
+    }
+
     static public void removeColorInformation(PetriNetTab tab) {
         tab.network().setColorTypes(List.of(ColorType.COLORTYPE_DOT));
         tab.network().setVariables(new ArrayList<Variable>());
         for (Template template : tab.allTemplates()) {
             for(TimedPlace place : template.model().places()){
+                int numberOfTokens = place.numberOfTokens();
+                var tokenAges = place.tokens().stream().map(TimedToken::age).toList();
                 place.setCtiList(new ArrayList<>());
                 place.setColorType(ColorType.COLORTYPE_DOT);
-                int numberOfTokens = place.tokens().size();
 
-                //kind of hack to convert from coloredTokens to uncolored
-                if(numberOfTokens > 0){
+                Vector<ArcExpression> expressions = new Vector<>();
+                if (numberOfTokens > 0) {
                     Vector<ColorExpression> v = new Vector<>();
                     v.add(new DotConstantExpression());
-                    Vector<ArcExpression> numbOfExpression = new Vector<>();
-                    numbOfExpression.add(new NumberOfExpression(place.numberOfTokens(), v));
-                    place.setTokenExpression(new AddExpression(numbOfExpression));
-                } else if (place.numberOfTokens() > 0) {
-                    place.resetNumberOfTokens();
+                    expressions.add(new NumberOfExpression(numberOfTokens, v));
                 }
+
+                var tokens = new ArrayList<TimedToken>(numberOfTokens);
+                for (var i = 0; i < numberOfTokens; ++i) {
+                    tokens.add(new TimedToken(place, i < tokenAges.size() ? tokenAges.get(i) : BigDecimal.ZERO, ColorType.COLORTYPE_DOT.getFirstColor()));
+                }
+                
+                place.updateTokens(tokens, expressions.isEmpty() ? null : new AddExpression(expressions));
+                place.setNumberOfTokens(numberOfTokens);
             }
 
             for (TimedTransition transition : template.model().transitions()) {
@@ -278,20 +382,6 @@ public class TabTransformer {
 
             }
         }
-
-        boolean showConvertWarning = false;
-        for (var query: tab.queries()) {
-            if (query.isOverApproximationEnabled() || query.isUnderApproximationEnabled()) {
-                query.setUseOverApproximationEnabled(false);
-                query.setUseUnderApproximationEnabled(false);
-                showConvertWarning = true;
-            }
-        }
-        if (showConvertWarning) {
-            new MessengerImpl().displayInfoMessage(
-                "Colored Petri nets do not support over/under approximation and the affected queries are modified so that this feature is disabled.\n" +
-                "Unsupported Query Option");
-        }
     }
 
     public static void unfoldTab(PetriNetTab oldTab, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
@@ -324,12 +414,10 @@ public class TabTransformer {
     }
 
     public static String createUnfoldArgumentString(String modelFile, String queryFile, VerificationOptions options) {
-        return options.toString() +
-            " " +
-            modelFile +
-            " " +
-            queryFile;
+        if (Platform.isWindows()) {
+            return options.toString() + "\"" + modelFile + "\" \"" + queryFile + "\"";
+        }
+
+        return options.toString() + ' ' + modelFile + ' ' + queryFile;
     }
-
-
 }

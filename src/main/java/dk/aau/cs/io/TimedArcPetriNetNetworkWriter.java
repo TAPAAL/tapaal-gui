@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,6 +19,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import dk.aau.cs.TCTL.visitors.SMCQueryVisitor;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
@@ -61,6 +63,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
     private boolean secondTransport = false;
     private int transporCountID = 0;
     private final TAPNLens lens;
+	private boolean saveConstantNames;
 
     public TimedArcPetriNetNetworkWriter(
 			TimedArcPetriNetNetwork network, 
@@ -109,6 +112,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
         writeTACPN.appendDeclarations(document, pnmlRootNode);
 
+        if (lens.isStochastic()) {
+            appendCustomDistributions(document, pnmlRootNode);
+        }
+
         appendSharedPlaces(document, pnmlRootNode);
 		appendSharedTransitions(document, pnmlRootNode);
 		appendConstants(document, pnmlRootNode);
@@ -131,6 +138,12 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	}
 
 	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerException {
+		savePNML(file, true);
+	}
+
+	public void savePNML(File file, boolean saveConstantNames) throws IOException, ParserConfigurationException, DOMException, TransformerException {
+		this.saveConstantNames = saveConstantNames;
+
 		Require.that(file != null, "Error: file to save to was null");
 		
 		try {
@@ -166,6 +179,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         String isTimed = "true";
         String isGame = "true";
         String isColored = "true";
+        String isStochastic = "true";
         if (!lens.isTimed()) {
             isTimed = "false";
         }
@@ -175,19 +189,37 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         if(!lens.isColored()){
             isColored = "false";
         }
-
-        root.appendChild(createFeatureElement(isTimed, isGame, isColored, document));
+        if(!lens.isStochastic()) {
+            isStochastic = "false";
+        }
+        root.appendChild(createFeatureElement(isTimed, isGame, isColored, isStochastic, document));
     }
 
-    private Element createFeatureElement(String isTimed, String isGame, String isColored, Document document) {
+    private Element createFeatureElement(String isTimed, String isGame, String isColored, String isStochastic, Document document) {
         Require.that(document != null, "Error: document was null");
         Element feature = document.createElement("feature");
 
         feature.setAttribute("isTimed", isTimed);
         feature.setAttribute("isGame", isGame);
         feature.setAttribute("isColored", isColored);
+        feature.setAttribute("isStochastic", isStochastic);
 
         return feature;
+    }
+
+    private void appendCustomDistributions(Document document, Element root) {
+        for (SMCUserDefinedDistribution cd : network.userDefinedDistributions()) {
+            Element element = document.createElement("custom_distribution");
+            element.setAttribute("name", cd.getName());
+            element.setAttribute("randomStart", String.valueOf(cd.isRandomStart()));
+            for (Double val : cd.getValues()) {
+                Element valElement = document.createElement("value");
+                valElement.setTextContent(val.toString());
+                element.appendChild(valElement);
+            }
+
+            root.appendChild(element);
+        }
     }
 	
 	private void appendSharedPlaces(Document document, Element root) {
@@ -196,6 +228,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			element.setAttribute("invariant", place.invariant().toString());
 			element.setAttribute("name", place.name());
 			element.setAttribute("initialMarking", String.valueOf(place.numberOfTokens()));
+			writeInitialMarkingAges(place, element);
 			createColoredInvariants(place, document, element);
             writeTACPN.appendColoredPlaceDependencies(place, document, element);
 
@@ -209,6 +242,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			element.setAttribute("name", transition.name());
 			element.setAttribute("urgent", transition.isUrgent()?"true":"false");
             element.setAttribute("player", transition.isUncontrollable() ? "1" : "0");
+            element.setAttribute("weight", transition.getWeight().nameForSaving(saveConstantNames));
+			element.setAttribute("firingMode", transition.getFiringMode().toString());
+            transition.getDistribution().writeToXml(element, saveConstantNames);
 			root.appendChild(element);
 		}
 	}
@@ -216,6 +252,15 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 	private void appendConstants(Document document, Element root) {
 		for (Constant constant : constants) {
 			Element elem = createConstantElement(constant, document);
+			root.appendChild(elem);
+		}
+
+		for (var constant : network.realConstants()) {
+			Element elem = document.createElement("constant");
+			elem.setAttribute("name", constant.name());
+			elem.setAttribute("type", "real");
+			elem.setAttribute("value", constant.values().stream()
+				.map(String::valueOf).collect(Collectors.joining(",")));
 			root.appendChild(elem);
 		}
 	}
@@ -227,8 +272,14 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		Element constantElement = document.createElement("constant");
 		
 		constantElement.setAttribute("name", constant.name());
-		constantElement.setAttribute("value", String.valueOf(constant.value()));
-	
+		if (constant.hasMultipleValues()) {
+			String valuesStr = constant.values().stream()
+				.map(String::valueOf).collect(Collectors.joining(","));
+			constantElement.setAttribute("value", valuesStr);
+		} else {
+			constantElement.setAttribute("value", String.valueOf(constant.value()));
+		}
+
 		return constantElement;
 	}
 
@@ -299,47 +350,14 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			if (query.getCategory() == QueryCategory.LTL){
                 newQuery = createLTLQueryElement(query, document);
             } else if(query.getCategory() == QueryCategory.HyperLTL) {
-			    newQuery = createHyperLTLQueryElement(query, document);
+                newQuery = createHyperLTLQueryElement(query, document);
+            } else if(query.getCategory() == QueryCategory.SMC) {
+                newQuery = createSMCQueryElement(query, document);
             }else {
 				newQuery = createCTLQueryElement(query, document);
 			}
 			root.appendChild(newQuery);
 		}
-	}
-
-	private Element createQueryElement(TAPNQuery query, Document document) {
-		Require.that(query != null, "Error: query was null");
-		Require.that(document != null, "Error: document was null");
-		
-		Element queryElement = document.createElement("query");
-	
-		queryElement.setAttribute("name", query.getName());
-		queryElement.setAttribute("capacity", "" + query.getCapacity());
-		queryElement.setAttribute("query", query.getProperty().toString());
-		queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
-		queryElement.setAttribute("searchOption", "" + query.getSearchOption());
-		queryElement.setAttribute("hashTableSize", "" + query.getHashTableSize());
-		queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
-        queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
-		queryElement.setAttribute("symmetry", "" + query.useSymmetry());
-		queryElement.setAttribute("gcd", "" + query.useGCD());
-		queryElement.setAttribute("timeDarts", "" + query.useTimeDarts());
-		queryElement.setAttribute("pTrie", "" + query.usePTrie());
-		queryElement.setAttribute("discreteInclusion", String.valueOf(query.discreteInclusion()));
-		queryElement.setAttribute("active", "" + query.isActive());
-		queryElement.setAttribute("inclusionPlaces", getInclusionPlacesString(query));
-		queryElement.setAttribute("overApproximation", "" + query.useOverApproximation());
-		queryElement.setAttribute("reduction", "" + query.useReduction());
-		queryElement.setAttribute("enableOverApproximation", "" + query.isOverApproximationEnabled());
-		queryElement.setAttribute("enableUnderApproximation", "" + query.isUnderApproximationEnabled());
-		queryElement.setAttribute("approximationDenominator", "" + query.approximationDenominator());
-        queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
-        queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
-        queryElement.setAttribute("partitioning", "" + query.usePartitioning());
-        queryElement.setAttribute("colorFixpoint", "" + query.useColorFixpoint());
-        queryElement.setAttribute("symmetricVars", "" + query.useSymmetricVars());
-
-		return queryElement;
 	}
 	
 	private Element createCTLQueryElement(TAPNQuery query, Document document) {
@@ -384,6 +402,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("partitioning", "" + query.usePartitioning());
 		queryElement.setAttribute("colorFixpoint", "" + query.useColorFixpoint());
         queryElement.setAttribute("symmetricVars", "" + query.useSymmetricVars());
+        queryElement.setAttribute("useExplicitSearch" , "" + query.useExplicitSearch());
 
         return queryElement;
 	}
@@ -471,6 +490,54 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
         return queryElement;
     }
+
+    private Element createSMCQueryElement(TAPNQuery query, Document document) {
+        Require.that(query != null, "Error: query was null");
+        Require.that(document != null, "Error: document was null");
+
+        Element queryElement = document.createElement("query");
+        SMCQueryVisitor smcQueryVisitor = new SMCQueryVisitor();
+        smcQueryVisitor.buildXMLQuery(query.getProperty(), query.getName(), query.getSmcSettings());
+
+        try {
+            Element doc = DocumentBuilderFactory
+                .newInstance()
+                .newDocumentBuilder()
+                .parse(new ByteArrayInputStream(smcQueryVisitor.getXMLQuery().toString().getBytes()))
+                .getDocumentElement();
+            Node smcTag = doc.getElementsByTagName("smc").item(0);
+            Node formula = doc.getElementsByTagName("formula").item(0);
+            Node observations = doc.getElementsByTagName("observations").item(0);
+            queryElement.appendChild(document.importNode(smcTag, true));
+            if(observations != null) {
+				queryElement.appendChild(document.importNode(observations, true));
+			}
+            queryElement.appendChild(document.importNode(formula, true));
+        } catch (SAXException | ParserConfigurationException | IOException e) {
+            System.out.println(e + " thrown in savePNML() "
+                + ": dataLayerWriter Class : dataLayer Package: filename=\"");
+            return null;
+        }
+
+        queryElement.setAttribute("name", query.getName());
+        queryElement.setAttribute("type", query.getCategory().toString());
+        queryElement.setAttribute("capacity", "" + query.getCapacity());
+        queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
+        queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
+        queryElement.setAttribute("active", "" + query.isActive());
+        queryElement.setAttribute("algorithmOption", "" + query.getAlgorithmOption());
+        queryElement.setAttribute("timeDarts", "" + query.useTimeDarts());
+        queryElement.setAttribute("gcd", "" + query.useGCD());
+        queryElement.setAttribute("parallel", "" + query.isParallel());
+        queryElement.setAttribute("overApproximation", ""	+ false);
+        queryElement.setAttribute("verificationType", query.getVerificationType().toString());
+        queryElement.setAttribute("numberOfTraces", "" + query.getNumberOfTraces());
+        queryElement.setAttribute("smcTraceType", query.getSmcTraceType().toString());
+
+        query.getSmcSettings().getSmcSeed().ifPresent(seed -> queryElement.setAttribute("smcSeed", Long.toUnsignedString(seed)));
+
+        return queryElement;
+    }
 	
 	private Node XMLQueryStringToElement(String formulaString){
 		
@@ -521,7 +588,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		placeElement.setAttribute("id", (inputPlace.getId() != null ? inputPlace.getId() : "error"));
 		placeElement.setAttribute("nameOffsetX", String.valueOf(inputPlace.getNameOffsetX()));
 		placeElement.setAttribute("nameOffsetY", String.valueOf(inputPlace.getNameOffsetY()));
-		placeElement.setAttribute("initialMarking", ((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));
+		placeElement.setAttribute("initialMarking", String.valueOf(inputPlace.getNumberOfTokens()));
+		writeInitialMarkingAges(inputPlace.underlyingPlace(), placeElement);
 		placeElement.setAttribute("invariant", inputPlace.underlyingPlace().invariant().toString());
         writeTACPN.appendColoredPlaceDependencies(inputPlace.underlyingPlace(), document, placeElement);
 
@@ -530,6 +598,31 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         createColoredInvariants(inputPlace.underlyingPlace(), document, placeElement);
         return placeElement;
 	}
+
+	private void writeInitialMarkingAges(TimedPlace place, Element element) {
+		List<TimedToken> tokens = place.tokens();
+		if (tokens.stream().allMatch(token -> token.age().signum() == 0)) {
+			return;
+		}
+
+		Element markingAge = element.getOwnerDocument().createElement("initialMarkingAge");
+		for (TimedToken token : tokens) {
+			if (token.age().signum() == 0) {
+				continue;
+			}
+            
+			Element tokenElement = element.getOwnerDocument().createElement("token");
+			if (lens.isColored()) {
+				tokenElement.setAttribute("color", token.color().toString());
+			}
+
+			tokenElement.setAttribute("age", token.age().toPlainString());
+			markingAge.appendChild(tokenElement);
+		}
+
+		element.appendChild(markingAge);
+	}
+
     private void createColoredInvariants(TimedPlace inputPlace, Document document, Element placeElement) {
         List<ColoredTimeInvariant> ctiList = inputPlace.getCtiList();
 
@@ -539,7 +632,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
             Element colortype = document.createElement("colortype");
             colortype.setAttribute("name", coloredTimeInvariant.getColor().getColorType().getName());
             if (coloredTimeInvariant.equalsOnlyColor(ColoredTimeInvariant.LESS_THAN_INFINITY_AND_STAR)) {
-                placeElement.setAttribute("inscription", coloredTimeInvariant.getInvariantString());
+                placeElement.setAttribute("inscription", coloredTimeInvariant.getInvariantString(saveConstantNames));
             } else {
                 if (coloredTimeInvariant.getColor().getTuple() != null) {
                     for (Color color : coloredTimeInvariant.getColor().getTuple()) {
@@ -552,7 +645,8 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
                     colorEle.setAttribute("value", coloredTimeInvariant.getColor().getColorName());
                     colortype.appendChild(colorEle);
                 }
-                inscription.setAttribute("inscription", coloredTimeInvariant.getInvariantString());
+
+                inscription.setAttribute("inscription", coloredTimeInvariant.getInvariantString(saveConstantNames));
                 invariant.appendChild(inscription);
                 invariant.appendChild(colortype);
                 placeElement.appendChild(invariant);
@@ -597,6 +691,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		transitionElement.setAttribute("priority", "0");
 		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
         transitionElement.setAttribute("player", inputTransition.underlyingTransition().isUncontrollable() ? "1" : "0");
+        transitionElement.setAttribute("weight", inputTransition.underlyingTransition().getWeight().nameForSaving(saveConstantNames));
+		transitionElement.setAttribute("firingMode", inputTransition.underlyingTransition().getFiringMode().toString());
+        inputTransition.underlyingTransition().getDistribution().writeToXml(transitionElement, saveConstantNames);
         writeTACPN.appendColoredTransitionDependencies(inputTransition.underlyingTransition(), document, transitionElement);
 
         return transitionElement;
@@ -627,6 +724,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
                         secondTransport = true;
                     }
                 }
+		
 				arcElement.setAttribute("type", getInputArcTypeAsString((TimedInputArcComponent)inputArc));
 				arcElement.setAttribute("inscription", getGuardAsString((TimedInputArcComponent)inputArc));	
 				arcElement.setAttribute("weight", inputArc.getWeight().nameForSaving(true)+"");
@@ -639,7 +737,10 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 				arcElement.setAttribute("weight", inputArc.getWeight().nameForSaving(true)+"");
 			}
 		}
-		writeTACPN.appendColoredArcsDependencies(inputArc, guiModel, document, arcElement);
+
+        if (!(inputArc instanceof TimedInhibitorArcComponent)) {
+            writeTACPN.appendColoredArcsDependencies(inputArc, guiModel, document, arcElement);
+        }
 
 		return arcElement;
 	}
@@ -655,12 +756,12 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 
         for (ColoredTimeInterval cti : ctiList) {
             if (cti.equalsOnlyColor(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR))) {
-                arcElement.setAttribute("inscription", cti.getInterval());
+                arcElement.setAttribute("inscription", cti.getInterval(saveConstantNames));
             } else {
                 Element interval = document.createElement("colorinterval");
                 Element inscription = document.createElement("inscription");
                 Element colortype = document.createElement("colortype");
-                inscription.setAttribute("inscription", cti.getInterval());
+                inscription.setAttribute("inscription", cti.getInterval(saveConstantNames));
                 colortype.setAttribute("name", cti.getColor().getColorType().getName());
                 if (cti.getColor().getTuple() != null) {
                     for (Color color : cti.getColor().getTuple()) {

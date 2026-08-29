@@ -103,7 +103,29 @@ public class ArcPathPoint extends PetriNetObject {
 		return new Point2D.Double(getPositionX(), getPositionY());
 	}
 
-	public void setPointLocation(int x, int y) {
+    @Override
+    public void setOriginalX(int positionXInput) {
+        if (myArcPath != null && !isEndPoint()) {
+            // Snap to grid
+            super.setOriginalX(positionXInput);
+        } else {
+            originalX = positionXInput;
+            positionX = Zoomer.getZoomedValue(originalX, getZoom());
+        }
+    }
+
+    @Override
+    public void setOriginalY(int positionYInput) {
+        if (myArcPath != null && !isEndPoint()) {
+            // Snap to grid
+            super.setOriginalY(positionYInput);
+        } else {
+            originalY = positionYInput;
+            positionY = Zoomer.getZoomedValue(originalY, getZoom());
+        }
+    }
+
+    public void setPointLocation(int x, int y) {
 		setPositionX(x);
 		setPositionY(y);
 		updateOnMoveOrZoom();
@@ -135,7 +157,7 @@ public class ArcPathPoint extends PetriNetObject {
 	public double getAngle(Point2D.Double p2) {
 		double angle;
 
-        angle = Math.atan2( (getPoint().x - p2.x), (p2.y - getPoint().y) );
+        angle = Math.atan2( (p2.y - getPoint().y), (getPoint().x - p2.x) );
 
 		return angle;
 	}

@@ -79,4 +79,9 @@ public class PlaceHolderArcExpression extends ArcExpression implements PlaceHold
     public ArcExpression getExprWithNewColorType(ColorType ct) {
         return deepCopy();
     }
+
+    @Override
+    public ArcExpression getExprConverted(ColorType oldCt, ColorType newCt) {
+        return deepCopy();
+    }
 }

@@ -14,7 +14,6 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public abstract class TimedPlace {
-
     protected static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
     protected final List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
     protected Tuple<PlaceType, Integer> extrapolation = new Tuple<PlaceType, Integer>(PlaceType.Dead, -2);
@@ -79,7 +78,12 @@ public abstract class TimedPlace {
     }
 
     public void resetNumberOfTokens() {
-        numberOfTokens = 0;
+        this.numberOfTokens = 0;
+    }
+
+    public void resetNumberOfTokensColor() {
+        resetNumberOfTokens();
+        this.tokens().clear();
     }
 
     /**
@@ -173,7 +177,6 @@ public abstract class TimedPlace {
 		TimedPlace other = (TimedPlace) obj;
 		return name() == other.name();
 	}
-
 
     protected void fireMarkingChanged() {
         for(TimedPlaceListener listener : listeners){

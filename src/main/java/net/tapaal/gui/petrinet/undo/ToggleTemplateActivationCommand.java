@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 
-public class ToggleTemplateActivationCommand  extends Command{
+public class ToggleTemplateActivationCommand  implements Command{
 
 	private final TemplateExplorer templateExplorer;
 	private final Template template;

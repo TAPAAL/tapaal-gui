@@ -8,12 +8,14 @@ import javax.swing.JOptionPane;
 import dk.aau.cs.TCTL.XMLParsing.XMLHyperLTLQueryParser;
 import dk.aau.cs.TCTL.XMLParsing.XMLLTLQueryParser;
 import dk.aau.cs.io.LoadedQueries;
+import dk.aau.cs.verification.SMCSettings;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.ExtrapolationOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.HashTableSize;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
+import org.w3c.dom.Element;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
@@ -46,7 +48,11 @@ public class XMLQueryLoader extends QueryLoader{
     }
 
     public XMLQueryLoader(File file, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories){
-        super(network);
+		this(file, network, queryCategories, network.isColored());
+	}
+
+    public XMLQueryLoader(File file, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories, boolean isColored){
+		super(network, isColored);
         this.file = file;
         this.queryCategories = queryCategories;
     }
@@ -101,16 +107,19 @@ public class XMLQueryLoader extends QueryLoader{
             TAPNLens lens = TAPAALGUI.getCurrentTab().getLens();
             boolean isTimed = (lens != null && lens.isTimed()) || network.isTimed();
             boolean isKnownGame = (lens != null && lens.isGame()); // XXX: This is a hack, not sure why network does not know if it a game, also control tag should used to check if query is a game
+            boolean isStochastic = (lens != null && lens.isStochastic());
             boolean canBeCTL = isTimed || canBeCTL(prop);
             boolean canBeLTL = !isTimed && !isKnownGame && canBeLTL(prop);
             boolean canBeHyperLTL = !isTimed && !isKnownGame && canBeHyperLTL(prop);
+            boolean hasSmcTag = TAPNQueryLoader.hasSmcTag(prop);
+            boolean isSmc = isStochastic && hasSmcTag;
 
             int counter = 0;
             if (canBeCTL) counter += 1;
             if (canBeLTL) counter += 1;
             if (canBeHyperLTL) counter += 1;
 
-            if (counter > 1 && choice == -1 && queryCategories == null) {
+            if (counter > 1 && choice == -1 && queryCategories == null && !isSmc) {
                 choice = JOptionPane.showOptionDialog(TAPAALGUI.getApp(),
                     "There were some queries that can be classified as CTL, LTL or HyperLTL. \nHow do you want to import them?",
                     "Choose query category",
@@ -136,11 +145,13 @@ public class XMLQueryLoader extends QueryLoader{
                     isLTL = true;
                 } else if (queryCategories.get(i) == TAPNQuery.QueryCategory.HyperLTL) {
                     isHyperLTL = true;
+                } else if (queryCategories.get(i) == TAPNQuery.QueryCategory.SMC) {
+                    isSmc = true;
                 }
             }
 
             // Update queryWrapper name and property
-            if (isCTL) {
+            if (isCTL && !isSmc) {
                 if (!XMLCTLQueryParser.parse(prop, queryWrapper)) {
                     queries.add(null);
                     continue;
@@ -155,6 +166,11 @@ public class XMLQueryLoader extends QueryLoader{
                     queries.add(null);
                     continue;
                 }
+            } else if (isSmc) {
+                if (!XMLLTLQueryParser.parse(prop, queryWrapper)) {
+                    queries.add(null);
+                    continue;
+                }
             }
 
             // The number 9999 is the number of extra tokens allowed,
@@ -162,23 +178,29 @@ public class XMLQueryLoader extends QueryLoader{
             TAPNQuery query = new TAPNQuery(queryWrapper.getName(), 9999,
                 queryWrapper.getProp(),TraceOption.NONE, SearchOption.HEURISTIC,
                 ReductionOption.VerifyPN, true, false, true, true, true, true, 
-                HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces(), network.isColored());
+                HashTableSize.MB_16, ExtrapolationOption.AUTOMATIC, new InclusionPlaces(), isColored);
 
             RenameTemplateVisitor rt = new RenameTemplateVisitor("", 
                 network.activeTemplates().get(0).name());
 
-            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), isCTL, isLTL, isHyperLTL));
+            query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), isCTL, isLTL, isHyperLTL, isSmc));
             
             if(query.getCategory() == TAPNQuery.QueryCategory.CTL || query.getCategory() == TAPNQuery.QueryCategory.LTL){
             	query.setSearchOption(SearchOption.DFS);
             	query.setUseReduction(true);
-            }
-
-            if(query.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
+            } else if(query.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
                 query.setSearchOption(SearchOption.DFS);
                 query.setTraceList(queryWrapper.getTraceList());
                 query.setUseStubbornReduction(false);
                 query.setUseReduction(false);
+            } else if(query.getCategory() == TAPNQuery.QueryCategory.SMC) {
+                query.setReductionOption(ReductionOption.VerifyDTAPN);
+                SMCSettings smcSettings = SMCSettings.Default();
+                if(hasSmcTag) {
+                    Element smcTag = (Element) ((Element) prop).getElementsByTagName("smc").item(0);
+                    smcSettings = TAPNQueryLoader.parseSmcSettings(smcTag);
+                }
+                query.setSmcSettings(smcSettings);
             }
             
             query.getProperty().accept(rt, null);
@@ -284,7 +306,7 @@ public class XMLQueryLoader extends QueryLoader{
     }
 
     public static void importQueries(File file, TimedArcPetriNetNetwork network, PetriNetTab tab){
-        XMLQueryLoader loader = new XMLQueryLoader(file, network);
+		XMLQueryLoader loader = new XMLQueryLoader(file, network, null, tab.getLens().isColored());
 
         // Suppress default error message
         loader.showErrorMessage = false;

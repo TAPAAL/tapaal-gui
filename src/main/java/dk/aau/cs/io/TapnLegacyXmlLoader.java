@@ -128,6 +128,9 @@ public class TapnLegacyXmlLoader {
 		NodeList constantNodes = tapnDoc.getElementsByTagName("constant");
 		for (int i = 0; i < constantNodes.getLength(); i++) {
 			Node c = constantNodes.item(i);
+            if (XmlUtil.isDescendantOfTag(c, "watch")) {
+                continue;
+            }
 
 			if (c instanceof Element) {
 				parseAndAddConstant((Element) c);

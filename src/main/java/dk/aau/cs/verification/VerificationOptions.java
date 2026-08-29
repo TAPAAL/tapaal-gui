@@ -12,9 +12,12 @@ public abstract class VerificationOptions {
 	protected int approximationDenominator;
 	protected boolean useStateequationCheck;
 	protected int extraTokens;
+
 	protected String reducedModelPath;
-    protected String unfoldedModelPath;
-    protected String unfoldedQueriesPath;
+    protected static String unfoldedModelPath;
+    protected static String unfoldedQueriesPath;
+    protected boolean isSimulate;
+    protected boolean useExplicitSearch;
 
 	public abstract String toString();
 
@@ -51,5 +54,13 @@ public abstract class VerificationOptions {
     }
     public String unfoldedQueriesPath(){
         return unfoldedQueriesPath;
+    }
+
+    public boolean isSimulate(){
+        return isSimulate;
+    }
+
+    public boolean useExplicitSearch() {
+        return useExplicitSearch;
     }
 }

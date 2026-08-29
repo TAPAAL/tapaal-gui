@@ -137,12 +137,23 @@ public class SharedPlaceNamePanel extends JPanel {
 			private boolean updateExistingPlace(String name) {
 				String oldName = placeToEdit.name();
 				
-				if(placeToEdit.network().isNameUsed(name) && !oldName.equals(name)) {
-					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
-					nameField.requestFocusInWindow();
-					return false;
+				if (name.contains("__")) {
+					int result = JOptionPane.showConfirmDialog(SharedPlaceNamePanel.this,
+							"Using double underscores (__) in names is not recommended as it can cause ambiguity issues when using multiple components.\nDo you want to continue?",
+							"Warning",
+							JOptionPane.OK_CANCEL_OPTION,
+							JOptionPane.WARNING_MESSAGE);
+                            
+					if (result != JOptionPane.OK_OPTION) {
+						return false;
+					}
 				}
-				
+
+                if (placeToEdit.network().isNameUsed(name) && !oldName.equals(name)) {
+                    JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
+                    nameField.requestFocusInWindow();
+                    return false;
+                }
 				
 				try{
 					placeToEdit.setName(name);
@@ -163,13 +174,23 @@ public class SharedPlaceNamePanel extends JPanel {
 
 			private boolean addNewSharedPlace(String name) {
 				SharedPlace place = null;
-				try{
-					place = new SharedPlace(name);
-				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
-					nameField.requestFocusInWindow();
-					return false;
-				}
+				   if (name.contains("__")) {
+					   int result = JOptionPane.showConfirmDialog(SharedPlaceNamePanel.this,
+							   "Using double underscores (__) in names is not recommended as it can cause ambiguity issues when using multiple components.\nDo you want to continue?",
+							   "Warning",
+							   JOptionPane.OK_CANCEL_OPTION,
+							   JOptionPane.WARNING_MESSAGE);
+					   if (result != JOptionPane.OK_OPTION) {
+						   return false;
+					   }
+				   }
+				   try{
+					   place = new SharedPlace(name);
+				   }catch(RequireException e){
+					   JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					   nameField.requestFocusInWindow();
+					   return false;
+				   }
 				
 				try{
 					listModel.addElement(place);

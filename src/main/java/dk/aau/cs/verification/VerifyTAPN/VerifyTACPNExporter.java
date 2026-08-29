@@ -7,6 +7,7 @@ import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.verification.NameMapping;
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,19 +32,19 @@ import java.util.List;
 
 public class VerifyTACPNExporter extends VerifyTAPNExporter {
     @Override
-    protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
+    protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel, TAPNLens lens) throws FileNotFoundException {
         if (guiModel == null) {
-            super.outputModel(model, modelFile, mapping, guiModel);
+            super.outputModel(model, modelFile, mapping, null, lens);
             return;
         }
         ArrayList<Template> templates = new ArrayList<>(1);
         ArrayList<TAPNQuery> queries = new ArrayList<>(1);
         templates.add(new Template(model, guiModel, new Zoomer()));
 
-        TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(model.parentNetwork(), templates, queries, model.parentNetwork().constants());
+        TimedArcPetriNetNetworkWriter writerTACPN = new TimedArcPetriNetNetworkWriter(model.parentNetwork(), templates, queries, model.parentNetwork().constants(), lens);
 
         try {
-            writerTACPN.savePNML(modelFile);
+            writerTACPN.savePNML(modelFile, false);
         } catch (IOException | ParserConfigurationException | TransformerException e) {
             e.printStackTrace();
         }
@@ -57,6 +58,7 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
         modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
         modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
         modelStream.append(">\n");
+        outputInitialMarkingAges(p, modelStream, true);
         modelStream.append(colorInformationToXMLString(p));
 
         if (guiModel != null) {
@@ -76,7 +78,10 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
         modelStream.append("player=\"" + (t.isUncontrollable() ? "1" : "0") + "\" ");
         modelStream.append("id=\"" + t.name() + "\" ");
         modelStream.append("name=\"" + t.name() + "\" ");
-        modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
+        modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\" ");
+        modelStream.append("weight=\""+ t.getWeight().nameForSaving(false) + "\" ");
+        modelStream.append("firingMode=\"" + t.getFiringMode().toString() + "\" ");
+        modelStream.append(t.getDistribution().toString());
         modelStream.append(">\n");
         modelStream.append(colorInformationToXMLString(t));
 
@@ -95,11 +100,32 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
     protected void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {
         modelStream.append("<inputArc ");
         modelStream.append("source=\"" + inputArc.source().name() + "\" ");
-        modelStream.append("target=\"" + inputArc.destination().name() + "\">");
-        modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\" ");
+        modelStream.append("target=\"" + inputArc.destination().name() + "\" ");
+        modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\"");
         if (inputArc.getWeight().value() > 1) {
-            modelStream.append("weight=\"" + inputArc.getWeight().nameForSaving(false) + "\"");
+            modelStream.append(" weight=\"" + inputArc.getWeight().nameForSaving(false) + "\"");
         }
+        modelStream.append(">");
+
+        List<ColoredTimeInterval> ctiList = inputArc.getColorTimeIntervals();
+        for (ColoredTimeInterval cti : ctiList) {
+            if (cti.equalsOnlyColor(ColoredTimeInterval.ZERO_INF_DYN_COLOR(Color.STAR_COLOR))) {
+                modelStream.append("inscription=\"" + cti.getInterval().replace("<", "&lt;") + "\" />");
+            } else {
+                modelStream.append("<colorinterval>"); // interval element
+                modelStream.append("<inscription inscription=\"" + cti.getInterval().replace("<", "&lt;") + "\" />");
+                modelStream.append("<colortype name=\"" + cti.getColor().getColorType().getName() + "\">");
+                if (cti.getColor().getTuple() != null) {
+                    for (Color color : cti.getColor().getTuple()) {
+                        modelStream.append("<color value=\"" + color.getColorName() + "\"/>");
+                    }
+                } else {
+                    modelStream.append("<color value=\"" + cti.getColor().getColorName() + "\"/>");
+                }
+                modelStream.append("</colortype></colorinterval>");
+            }
+        }
+
         modelStream.append(colorInformationToXMLString(inputArc.getArcExpression()));
         modelStream.append("</inputArc>\n");
     }
@@ -108,11 +134,13 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
     protected void outputOutputArc(TimedOutputArc outputArc, PrintStream modelStream) {
         modelStream.append("<outputArc ");
         modelStream.append("source=\"" + outputArc.source().name() + "\" ");
-        modelStream.append("target=\"" + outputArc.destination().name() + "\">");
-        modelStream.append("inscription=\"" + outputArc.getWeight().nameForSaving(false) + "\" ");
+        modelStream.append("target=\"" + outputArc.destination().name() + "\" ");
+        modelStream.append("inscription=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
         if (outputArc.getWeight().value() > 1) {
-            modelStream.append("weight=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
+            modelStream.append(" weight=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
         }
+        modelStream.append(">");
+        
         modelStream.append(colorInformationToXMLString(outputArc.getExpression()));
         modelStream.append("</outputArc>\n");
     }
@@ -122,10 +150,11 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
         modelStream.append("inscription=\"" + transArc.interval().toString(false).replace("<", "&lt;") + "\" ");
         modelStream.append("source=\"" + transArc.source().name() + "\" ");
         modelStream.append("transition=\"" + transArc.transition().name() + "\" ");
-        modelStream.append("target=\"" + transArc.destination().name() + "\" ");
+        modelStream.append("target=\"" + transArc.destination().name() + "\"");
         if (transArc.getWeight().value() > 1) {
-            modelStream.append("weight=\"" + transArc.getWeight().nameForSaving(false) + "\"");
+            modelStream.append(" weight=\"" + transArc.getWeight().nameForSaving(false) + "\"");
         }
+        modelStream.append(">");
 
         List<ColoredTimeInterval> ctiList = transArc.getColorTimeIntervals();
         for (ColoredTimeInterval cti : ctiList) {
@@ -147,7 +176,7 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
         }
         modelStream.append(colorInformationToXMLString(transArc.getInputExpression()));
         modelStream.append(colorInformationToXMLString(transArc.getOutputExpression()));
-        modelStream.append("/>\n");
+        modelStream.append("</transportArc>\n");
     }
 
     @Override

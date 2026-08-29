@@ -2,11 +2,17 @@ package dk.aau.cs.verification.batchProcessing;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.*;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
@@ -34,11 +40,14 @@ import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.RealConstant;
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
 	private final List<File> files;
 	private final BatchProcessingResultsTableModel tableModel;
 	private final List<BatchProcessingVerificationOptions> options;
+	private final LoadedBatchProcessingModel suppliedModel;
 	private boolean isExiting = false;
 	private ModelChecker modelChecker;
 	final List<BatchProcessingListener> listeners = new ArrayList<>();
@@ -52,10 +61,15 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private ArrayList<File> filesProcessed;
 
     public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, List<BatchProcessingVerificationOptions> options) {
+		this(files, tableModel, options, null);
+	}
+
+    public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, List<BatchProcessingVerificationOptions> options, LoadedBatchProcessingModel suppliedModel) {
         super();
         this.files = files;
         this.tableModel = tableModel;
         this.options = options;
+		this.suppliedModel = suppliedModel;
     }
 
 	public synchronized void notifyExiting() {
@@ -93,25 +107,112 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
         filesProcessed = new ArrayList<>();
         for (File file : files) {
             fireFileChanged(file.getName());
-            LoadedBatchProcessingModel model = loadModel(file);
+			var model = resolveModel(file);
             this.model = model;
             if (model != null) {
-                Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
-                for (net.tapaal.gui.petrinet.verification.TAPNQuery query : model.queries()) {
-                    if (exiting()) {
-                        return null;
-                    }
-                    if (isModelCheckOnly && filesProcessed.contains(file)) {
-                        continue;
+                try {
+                    List<Constant> multiConstants = new ArrayList<>();
+                    for (Constant c : model.network().constants()) {
+                        if (c.values() != null && c.values().size() > 1) {
+                            multiConstants.add(c);
+                        }
                     }
 
-                    processQuery(file, composedModel, query);
+                    List<RealConstant> multiRealConstants = new ArrayList<>();
+                    for (var c : model.network().realConstants()) {
+                        if (c.hasMultipleValues()) {
+                            multiRealConstants.add(c);
+                        }
+                    }
+
+                    Map<Constant, LinkedHashSet<Integer>> originalValues = new HashMap<>();
+                    for (Constant c : multiConstants) {
+                        originalValues.put(c, new LinkedHashSet<>(c.values()));
+                    }
+
+                    var originalRealValues = new HashMap<RealConstant, LinkedHashSet<Double>>();
+                    for (var c : multiRealConstants) {
+                        originalRealValues.put(c, new LinkedHashSet<>(c.values()));
+                    }
+
+                    try {
+                        generateCombinationsAndProcess(file, model, multiConstants, originalValues, multiRealConstants, originalRealValues, 0);
+                    } finally {
+                        for (Constant c : multiConstants) {
+                            c.setValues(originalValues.get(c));
+                        }
+
+                        for (var c : multiRealConstants) {
+                            c.setValues(originalRealValues.get(c));
+                        }
+                    }
+                } catch (Exception e) {
+                    if (exiting() || isCancelled()) return null;
+                    Logger.log(e);
+                    publishResult(file.getName(), null, "Error processing model", 0, e.toString(), new NullStats(), -1);
                 }
+
+                if (exiting()) return null;
             }
         }
         fireFileChanged("");
         fireStatusChanged("");
         return null;
+    }
+
+    private void generateCombinationsAndProcess(File file, LoadedBatchProcessingModel model,
+            List<Constant> multiConstants, Map<Constant, LinkedHashSet<Integer>> originalValues,
+            List<RealConstant> multiRealConstants, Map<RealConstant, LinkedHashSet<Double>> originalRealValues,
+            int index) throws Exception {
+        if (exiting()) {
+            return;
+        }
+        if (index == multiConstants.size() + multiRealConstants.size()) {
+            String suffix = "";
+            if (!multiConstants.isEmpty() || !multiRealConstants.isEmpty()) {
+                var parts = new ArrayList<String>();
+                for (var c : multiConstants) {
+                    parts.add(c.name() + "=" + c.value());
+                }
+                for (var c : multiRealConstants) {
+                    parts.add(c.name() + "=" + c.value());
+                }
+                suffix = " [" + String.join(", ", parts) + "]";
+            }
+
+            var composedModel = composeModel(model);
+            for (var query : model.queries()) {
+                if (exiting()) {
+                    return;
+                }
+                if (isModelCheckOnly && filesProcessed.contains(file)) {
+                    continue;
+                }
+
+                var queryToProcess = query;
+                if (!suffix.isEmpty()) {
+                    queryToProcess = query.copy();
+                    queryToProcess.setName(query.getName() + suffix);
+                }
+                processQuery(file, composedModel, queryToProcess);
+            }
+
+            return;
+        }
+
+        if (index < multiConstants.size()) {
+            var c = multiConstants.get(index);
+            for (int val : originalValues.get(c)) {
+                c.setValue(val);
+                generateCombinationsAndProcess(file, model, multiConstants, originalValues, multiRealConstants, originalRealValues, index + 1);
+            }
+        } else {
+            var c = multiRealConstants.get(index - multiConstants.size());
+            for (double val : originalRealValues.get(c)) {
+                c.setValue(val);
+                generateCombinationsAndProcess(file, model, multiConstants, originalValues, multiRealConstants, originalRealValues, index + 1);
+            }
+        }
     }
 
 	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel,
@@ -130,11 +231,17 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel,
                               net.tapaal.gui.petrinet.verification.TAPNQuery queryToVerify,
                               BatchProcessingVerificationOptions option) throws Exception {
-        VerificationResult<TimedArcPetriNetTrace> verificationResult = verifyQuery(file, composedModel, queryToVerify, option);
-        if (verificationResult != null) {
-            processVerificationResult(file, queryToVerify, verificationResult, option.getNumber());
-        }
-    }
+		try {
+			VerificationResult<TimedArcPetriNetTrace> verificationResult = verifyQuery(file, composedModel, queryToVerify, option);
+			if (verificationResult != null) {
+				processVerificationResult(file, queryToVerify, verificationResult, option.getNumber());
+			}
+		} catch (Exception e) {
+			if (exiting() || isCancelled()) throw e;
+			Logger.log(e);
+			publishResult(file.getName(), queryToVerify, "Error during verification", 0, e.toString(), new NullStats(), option.getNumber());
+		}
+	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
 		ITAPNComposer composer = new TAPNComposer(new Messenger(){
@@ -185,6 +292,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			String queryResult;
 			if (verificationResult.getQueryResult().isApproximationInconclusive()) {
 				queryResult = "Inconclusive";
+			} else if (verificationResult.getQueryResult().isQuantitative()) {
+				queryResult = verificationResult.getQueryResult().getProbabilityString();
 			} else {
 				queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
 				if (isSoundnessCheck && !verificationResult.isQuerySatisfied())
@@ -196,8 +305,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						queryResult = "Sound";
 				}
 			}
-			if (isInconclusive(verificationResult.getQueryResult(), verificationResult.getUnfoldedModel().value1())) {
-			    queryResult += "Inconclusive";
+			if (verificationResult.getUnfoldedModel() != null && isInconclusive(verificationResult.getQueryResult())) {
+			    queryResult = "Inconclusive";
             }
 			if (query.discreteInclusion() && !verificationResult.isBounded() && ((query.queryType().equals(QueryType.EF) &&
                     !verificationResult.getQueryResult().isQuerySatisfied()) || (query.queryType().equals(QueryType.AG) &&
@@ -218,15 +327,28 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		}		
 	}
 
-	private boolean isInconclusive(QueryResult result, TimedArcPetriNet net) {
-        return (result.getQuery().getExtraTokens() + net.marking().size()) < result.boundednessAnalysis().usedTokens()
-            || result.toString().contains("Only markings with at most");
+	boolean isInconclusive(QueryResult result) {
+        if (result.boundednessAnalysis().boundednessResult() == Boundedness.Bounded) return false;
+
+        QueryType type = result.queryType();
+        if (type == QueryType.EF || type == QueryType.E) return !result.isQuerySatisfied();
+        if (type == QueryType.AG || type == QueryType.A) return result.isQuerySatisfied();
+        return true;
     }
 
 	private void publishResult(String fileName, net.tapaal.gui.petrinet.verification.TAPNQuery query, String verificationResult, long verificationTime, String rawOutput, Stats stats, int optionNumber) {
 		BatchProcessingVerificationResult result;		
-		if (QueryPane.getTemporaryFile() != null && fileName.equals(QueryPane.getTemporaryFile().getName())) {
-			//removes numbers from tempFile so it looks good
+		boolean isTempFile = false;
+		if (QueryPane.getTemporaryFiles() != null) {
+			for (File tf : QueryPane.getTemporaryFiles()) {
+				if (fileName.equals(tf.getName())) {
+					isTempFile = true;
+					break;
+				}
+			}
+		}
+
+		if (isTempFile) {
 			result = new BatchProcessingVerificationResult(TAPAALGUI.getAppGui().getCurrentTabName(), query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), rawOutput, stats, optionNumber);
 		} else {
 			result = new BatchProcessingVerificationResult(fileName, query, verificationResult, verificationTime, MemoryMonitor.getPeakMemory(), rawOutput, stats, optionNumber);
@@ -237,10 +359,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
     private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query, BatchProcessingVerificationOptions option) throws Exception {
         TAPNQuery queryToVerify = getTAPNQuery(query);
         queryToVerify.setCategory(query.getCategory());
+        queryToVerify.setVerificationType(query.getVerificationType());
         MapQueryToNewNames(queryToVerify, composedModel.value2());
 
-        TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens());
+        TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens(), query.getSmcSettings());
         clonedQuery.setCategory(query.getCategory());
+        clonedQuery.setVerificationType(query.getVerificationType());
         MapQueryToNewNames(clonedQuery, composedModel.value2());
 
         fireVerificationTaskStarted();
@@ -255,8 +379,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
             if (option.keepKBound()) {
                 Pattern pattern = Pattern.compile("\\s*(-k|--k-bound)\\s*(\\d+)\\s*", Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(options);
+                int kbound =  query.getCapacity() + model.network().marking().size();
                 if (matcher.find()) {
-                    options = options.replaceFirst(matcher.group(), matcher.group(1) + " " + query.getCapacity() + " ");
+                    options = options.replaceFirst(matcher.group(), " " + matcher.group(1) + " " + kbound + " ");
+                }
+                else {
+                    options = "--k-bound " + kbound + " " + options;
                 }
             }
             return worker.batchWorker(composedModel, options, query, model, modelChecker, queryToVerify, clonedQuery);
@@ -264,7 +392,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
     }
 
 	private TAPNQuery getTAPNQuery(net.tapaal.gui.petrinet.verification.TAPNQuery query) throws Exception {
-		return new TAPNQuery(query.getProperty().copy(), query.getCapacity());
+		return new TAPNQuery(query.getProperty().copy(), query.getCapacity(), query.getSmcSettings());
 	}
 
 	private ModelChecker getModelChecker(net.tapaal.gui.petrinet.verification.TAPNQuery query) {
@@ -291,11 +419,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	public VerificationOptions getVerificationOptionsFromQuery(net.tapaal.gui.petrinet.verification.TAPNQuery query) {
         if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
-            return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());    // XXX DISABLES OverApprox
+            return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isColored(), false, query.getRawVerification(), query.getRawVerificationPrompt());    // XXX DISABLES OverApprox
         } else if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
-            return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false, query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), 0, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isStubbornReductionEnabled(), null, query.usePartitioning(), query.useColorFixpoint(), query.isColored());
+            return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false, query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), 0, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isStubbornReductionEnabled(), null, query.usePartitioning(), query.useColorFixpoint(), query.isColored(), query.getRawVerification(), query.getRawVerificationPrompt(), query.isBenchmarkMode(), query.getBenchmarkRuns(), query.isParallel(), query.getCategory(), query.getNumberOfTraces(), query.getSmcTraceType(), query.isSimulate(), query.getGranularity(), query.isMaxGranularity(), query.getSmcSettings().getNumericPrecision(), query.getSmcSettings().getSmcSeed());
         } else if (query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce) {
-            return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation(), query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.getCategory(), query.getAlgorithmOption(), query.isSiphontrapEnabled(), query.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime, query.isStubbornReductionEnabled(), null, query.isTarOptionEnabled(), query.isTarjan(), query.isColored(), query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars());
+            return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation(), query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.getCategory(), query.getAlgorithmOption(), query.isSiphontrapEnabled(), query.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime, query.isStubbornReductionEnabled(), null, query.isTarOptionEnabled(), query.isTarjan(), query.isColored(), false, query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars(), query.useColoredReduction(), query.useExplicitSearch(), query.getRawVerification(), query.getRawVerificationPrompt());
         } else {
             return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry(), false, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
         }
@@ -346,6 +474,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		}
 	}
 
+	LoadedBatchProcessingModel resolveModel(File modelFile) {
+		return suppliedModel != null ? suppliedModel : loadModel(modelFile);
+	}
+
 	@Override
 	protected void process(List<BatchProcessingVerificationResult> chunks) {
 		for (BatchProcessingVerificationResult result : chunks) {
@@ -358,6 +490,18 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if (isCancelled()) {
 			if (modelChecker != null)
 				modelChecker.kill();
+			return;
+		}
+
+		try {
+			get();
+		} catch (InterruptedException e) {
+			Logger.log(e);
+			new MessengerImpl().displayErrorMessage("Batch processing was interrupted.");
+		} catch (ExecutionException e) {
+			Logger.log(e);
+			Throwable cause = e.getCause();
+			new MessengerImpl().displayErrorMessage("Batch processing stopped unexpectedly.\n" + (cause == null ? e : cause));
 		}
 	}
 	
@@ -367,23 +511,36 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 	
 	private void fireStatusChanged(String status) {
-		for (BatchProcessingListener listener : listeners)
-			listener.fireStatusChanged(new StatusChangedEvent(status));
+		SwingUtilities.invokeLater(() -> {
+			for (BatchProcessingListener listener : listeners) {
+				listener.fireStatusChanged(new StatusChangedEvent(status));
+            }
+		});
 	}
 	
 	private void fireFileChanged(String fileName) {
-		for (BatchProcessingListener listener : listeners)
-			listener.fireFileChanged(new FileChangedEvent(fileName));
+		SwingUtilities.invokeLater(() -> {
+			for (BatchProcessingListener listener : listeners) {
+				listener.fireFileChanged(new FileChangedEvent(fileName));
+            }
+		});
 	}
 	
 	private void fireVerificationTaskComplete() {
 		verificationTasksCompleted++;
-		for (BatchProcessingListener listener : listeners)
-			listener.fireVerificationTaskComplete(new VerificationTaskCompleteEvent(verificationTasksCompleted));
+		VerificationTaskCompleteEvent event = new VerificationTaskCompleteEvent(verificationTasksCompleted);
+		SwingUtilities.invokeLater(() -> {
+			for (BatchProcessingListener listener : listeners) {
+				listener.fireVerificationTaskComplete(event);
+            }
+		});
 	}
 	
 	private void fireVerificationTaskStarted() {
-		for (BatchProcessingListener listener : listeners)
-			listener.fireVerificationTaskStarted();
+		SwingUtilities.invokeLater(() -> {
+			for (BatchProcessingListener listener : listeners) {
+				listener.fireVerificationTaskStarted();
+            }
+		});
 	}
 }

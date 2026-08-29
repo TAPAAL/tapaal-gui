@@ -5,7 +5,7 @@ import java.util.Collection;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.gui.petrinet.PetriNetTab;
 
-public class DeleteQueriesCommand extends Command {
+public class DeleteQueriesCommand implements Command {
 	private final Collection<TAPNQuery> queries;
 	private final PetriNetTab tab;
 	

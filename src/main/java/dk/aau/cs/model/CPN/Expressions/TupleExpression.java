@@ -48,17 +48,15 @@ public class TupleExpression extends ColorExpression {
     @Override
     public boolean containsColor(Color color) {
         boolean containsColor = false;
-        Vector<Color> tuple = color.getTuple();
-        if (tuple != null && tuple.size() == colors.size()) {
-            containsColor = true;
-            for (int i = 0; i < tuple.size(); i++) {
-                if (!colors.get(i).containsColor(tuple.get(i))) {
-                    containsColor = false;
-                    break;
-                }
+        
+        for (int i = 0; i < colors.size(); ++i) {
+            if (colors.get(i).containsColor(color)) {
+                containsColor = true;
+                break;
             }
         }
-        return containsColor || equals(color);
+
+        return containsColor;
     }
 
     @Override

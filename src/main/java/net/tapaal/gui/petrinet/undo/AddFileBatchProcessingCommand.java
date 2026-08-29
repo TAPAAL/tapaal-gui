@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.io.File;
 import java.util.List;
 
-public class AddFileBatchProcessingCommand extends Command{
+public class AddFileBatchProcessingCommand implements Command{
     private final DefaultListModel<File> listModel;
     private final List<File> files;
     private final File file;

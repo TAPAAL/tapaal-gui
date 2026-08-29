@@ -1,0 +1,340 @@
+package pipe.gui.graph;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+
+import dk.aau.cs.util.Tuple;
+import pipe.gui.TAPAALGUI;
+import pipe.gui.graph.GraphExporterOptions.LegendPosition;
+import pipe.gui.swingcomponents.filebrowser.FileBrowser;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
+public class GraphExporter {
+    private static final double COLOR_NORMALIZER = 255.0;
+
+    public static void exportPiecewiseToTikz(List<Graph> pieces) {
+        exportPiecewiseToTikz(pieces, TAPAALGUI.getApp());
+    }
+
+    public static void exportPointPlotToTikz(Graph graph) {
+        exportPointPlotToTikz(graph, TAPAALGUI.getApp());
+    }
+
+    public static void exportToTikz(AbstractGraph graph) {
+        exportToTikz(graph, TAPAALGUI.getApp());
+    }
+    
+    public static void exportPiecewiseToTikz(List<Graph> pieces, Component parent) {
+        if (pieces == null || pieces.isEmpty()) {
+            throw new IllegalArgumentException("Cannot export a piecewise graph with empty data.");
+        }
+
+        var defaultName = getDefaultName(pieces.get(0));
+        var fileNameAndOptions = displayExportGui(parent, defaultName);
+        var path = fileNameAndOptions.value1();
+        var options = fileNameAndOptions.value2();
+        if (path == null || path.isEmpty() || options == null) {
+            return;
+        }
+        
+        options.setPiecewise(true);
+        writeTikzGraph(pieces, path, options, pieces.get(0).getXAxisLabel(), pieces.get(0).getYAxisLabel());
+    }
+
+    public static void exportPointPlotToTikz(Graph graph, Component parent) {
+        if (graph == null || graph.isEmpty()) {
+            throw new IllegalArgumentException("Cannot export graph(s) with empty data.");
+        }
+
+        var defaultName = getDefaultName(graph);
+        var fileNameAndOptions = displayExportGui(parent, defaultName);
+        var path = fileNameAndOptions.value1();
+        var options = fileNameAndOptions.value2();
+        if (path == null || path.isEmpty() || options == null) {
+            return;
+        }
+
+        options.setPointPlot(true);
+        writeTikzGraph(Collections.singletonList(graph), path, options, graph.getXAxisLabel(), graph.getYAxisLabel());
+    }
+
+    public static void exportToTikz(AbstractGraph graph, Component parent) {
+        exportToTikz(graph, parent, null);
+    }
+
+    public static void exportToTikz(AbstractGraph graph, Component parent, Map<String, Color> colorMappings) {
+        if (graph == null || graph.isEmpty()) {
+            throw new IllegalArgumentException("Cannot export graph(s) with empty data.");
+        }
+
+        var defaultName = getDefaultName(graph);
+        var fileNameAndOptions = displayExportGui(parent, defaultName);
+        var path = fileNameAndOptions.value1();
+        var options = fileNameAndOptions.value2();
+        if (path == null || path.isEmpty() || options == null) {
+            return;
+        }
+
+        options.setColorMappings(colorMappings);
+
+        if (graph instanceof MultiGraph) {
+            options.setShowLegend(true);
+            options.setMultiGraph(true);
+            writeTikzGraph(((MultiGraph)graph).getGraphs(), path, options, graph.getXAxisLabel(), graph.getYAxisLabel());
+        } else {
+            writeTikzGraph(Collections.singletonList((Graph)graph), path, options, graph.getXAxisLabel(), graph.getYAxisLabel());
+        }
+    }
+
+    private static Tuple<String, GraphExporterOptions> displayExportGui(Component parent, String defaultName) {
+        var possibilities = new String[]{"Only the TikZ figure",
+                            "Full compilable LaTex including your figure"};
+        var panel = new JPanel(new GridLayout(5, 1, 5, 5));
+        
+        panel.add(new JLabel("Export type:"));
+        var outputBox = new JComboBox<>(possibilities);
+        panel.add(outputBox);
+        
+        panel.add(new JLabel("Legend position:"));
+        var legendBox = new JComboBox<>(LegendPosition.values());
+        panel.add(legendBox);
+
+        var sizePanel = new JPanel(new GridLayout(1, 4, 5, 5));
+        sizePanel.add(new JLabel("Width:"));
+        var widthField = new JTextField("1.0");
+        sizePanel.add(widthField);
+        sizePanel.add(new JLabel("Height:"));
+        var heightField = new JTextField("1.0");
+        sizePanel.add(heightField);
+        panel.add(sizePanel);
+
+        var numberFilter = new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                if (string == null) return;
+                if (string.matches("\\d*\\.?\\d*")) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                if (text == null) return;
+                var newText = fb.getDocument().getText(0, fb.getDocument().getLength()) + text;
+                if (newText.matches("\\d*\\.?\\d*")) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+        };
+
+        ((AbstractDocument)widthField.getDocument()).setDocumentFilter(numberFilter);
+        ((AbstractDocument)heightField.getDocument()).setDocumentFilter(numberFilter);
+
+        var result = JOptionPane.showConfirmDialog(
+            parent, panel, "Export to TikZ",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
+        );
+
+        GraphExporterOptions options = null;
+        String path = null;
+        if (result == JOptionPane.OK_OPTION) {
+            options = new GraphExporterOptions();
+            options.setStandalone(outputBox.getSelectedIndex() == 1);
+            options.setLegendPosition((LegendPosition)legendBox.getSelectedItem());
+            
+            try {
+                var width = Double.parseDouble(widthField.getText());
+                var height = Double.parseDouble(heightField.getText());
+                options.setWidthMultiplier(width);
+                options.setHeightMultiplier(height);
+            } catch (NumberFormatException e) {
+                options.setWidthMultiplier(1.0);
+                options.setHeightMultiplier(1.0);
+            }
+
+            path = FileBrowser.constructor("TikZ figure", "tex", defaultName).saveFile();
+        }
+
+        return new Tuple<>(path, options);
+    }
+
+    private static void writeTikzGraph(List<Graph> graphs, String path, GraphExporterOptions options, String xAxisLabel, String yAxisLabel) {
+        var minX = Double.MAX_VALUE;
+        var minY = Double.MAX_VALUE;
+        for (var graph : graphs) {
+            for (var point : graph.getPoints()) {
+                if (point.getX() < minX) {
+                    minX = point.getX();
+                }
+                if (point.getY() < minY) {
+                    minY = point.getY();
+                }
+            }
+        }
+
+        var tikzCode = new StringBuilder();
+        if (options.isStandalone()) {
+            tikzCode.append("\\documentclass{standalone}\n")
+                    .append("\\usepackage{pgfplots}\n")
+                    .append("\\pgfplotsset{compat=1.18}\n")
+                    .append("\\begin{document}\n");
+        }
+
+        tikzCode.append("\\begin{tikzpicture}\n")
+                .append("\\begin{axis}[\n")
+                .append("\twidth=").append(options.getWidthMultiplier()).append("\\textwidth,\n")
+                .append("\theight=").append(options.getHeightMultiplier()).append("\\textwidth,\n")
+                .append("\tscaled x ticks=false,\n")
+                .append("\tx tick label style={/pgf/number format/fixed},\n");
+        
+        if (minX != Double.MAX_VALUE) {
+            tikzCode.append("\txmin=").append(minX).append(",\n");
+        }
+
+        tikzCode.append("\tscaled y ticks=false,\n")
+                .append("\ty tick label style={/pgf/number format/fixed},\n");
+
+        if (minY != Double.MAX_VALUE) {
+            tikzCode.append("\tymin=").append(minY).append(",\n");
+        }
+
+        var firstGraph = graphs.get(0);
+        tikzCode.append("\txlabel={").append(escapeLatex(xAxisLabel)).append("},\n")
+                .append("\tylabel={").append(escapeLatex(yAxisLabel)).append("},\n")
+                .append("\tgrid=major,\n")
+                .append("\tline width=1.2pt,\n");
+
+        if (options.showLegend()) {
+            var pos = options.getLegendPosition();
+            tikzCode.append("\tlegend style={at={")
+                    .append(pos.getCoordinates())
+                    .append("},anchor=")
+                    .append(pos.toString().toLowerCase())
+                    .append("},\n")
+                    .append("\tlegend cell align=left\n");
+        }
+        
+        tikzCode.append("]\n");
+        
+        var colorMappings = options.getColorMappings();
+        var genColors = colorMappings == null;
+        if (genColors) {
+            colorMappings = new HashMap<>();
+        }
+
+        var colorGenerator = new ColorGenerator();
+        Color plotColor = null;
+        for (var graph : graphs) {
+            var style = "solid,";
+            if (options.isMultiGraph()) {
+                var nameParts = graph.getName().split(" - ");
+                var observation = nameParts[0];
+                var property = nameParts[1];
+
+                plotColor = options.getColorMappings().get(observation);
+                if (plotColor == null) {
+                    plotColor = colorGenerator.nextColor();
+                    colorMappings.put(observation, plotColor);
+                }
+
+                if (property.startsWith("Max")) {
+                    style = "dash pattern=on 2pt off 2pt,";
+                } else if (property.startsWith("Min")) {
+                    style = "dash pattern=on 4pt off 4pt,";
+                }
+            } else if (options.isPiecewise()) {
+                plotColor = plotColor != null ? plotColor : colorGenerator.nextColor();
+            } else {
+                plotColor = colorGenerator.nextColor();
+            }
+
+            tikzCode.append("\\addplot[")
+                    .append(options.isPointPlot() ? "only marks," : "")
+                    .append(style)
+                    .append("color={rgb,1:red,")
+                    .append(plotColor.getRed() / COLOR_NORMALIZER)
+                    .append("; green,")
+                    .append(plotColor.getGreen() / COLOR_NORMALIZER)
+                    .append("; blue,")
+                    .append(plotColor.getBlue() / COLOR_NORMALIZER)
+                    .append("}] coordinates {\n");
+
+            var points = graph.getPoints();
+            tikzCode.append("\t");
+            for (var point : points) {
+                tikzCode.append("(")
+                        .append(point.getX())
+                        .append(", ")
+                        .append(point.getY())
+                        .append(") ");
+            }
+
+            tikzCode.append("};\n");
+            if (options.showLegend()) {
+                tikzCode.append("\\addlegendentry{")
+                        .append(escapeLatex(graph.getName()))
+                        .append("}\n");
+            }
+        }
+        
+        var showMean = (graphs.size() == 1 || options.isPiecewise()) && firstGraph.getMean() != null;
+        if (showMean) {
+            var mean = firstGraph.getMean();
+            tikzCode.append("\\draw[black,dotted,thick] (axis cs:")
+                    .append(mean)
+                    .append(",\\pgfkeysvalueof{/pgfplots/ymin}) -- (axis cs:")
+                    .append(mean)
+                    .append(",\\pgfkeysvalueof{/pgfplots/ymax});\n");
+        }
+
+        tikzCode.append("\\end{axis}\n")
+                .append("\\end{tikzpicture}\n");
+
+        if (options.isStandalone()) {
+            tikzCode.append("\\end{document}\n");
+        }
+
+        try {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+                writer.write(tikzCode.toString());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error writing graph to tikz", e);
+        }
+    }
+
+    private static String escapeLatex(String text) {
+        return text.replace("&", "\\&")
+                   .replace("%", "\\%")
+                   .replace("$", "\\$")
+                   .replace("#", "\\#")
+                   .replace("_", "\\_")
+                   .replace("{", "\\{")
+                   .replace("}", "\\}")
+                   .replace("~", "\\textasciitilde")
+                   .replace("^", "\\textasciicircum")
+                   .replace("\\", "\\textbackslash");
+    }
+
+    private static String getDefaultName(AbstractGraph graph) {
+        return graph.getName().toLowerCase().replaceAll(" ", "_") + ".tex";
+    }
+
+}

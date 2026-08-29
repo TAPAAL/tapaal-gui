@@ -36,7 +36,6 @@ public abstract class ColorComboboxPanel extends JPanel {
     private void initPanel() {
         colorcomboBoxPanel = new JPanel();
         colorcomboBoxPanel.setLayout(new GridBagLayout());
-
         //This panel contains all comboboxes, there can be more than one with ProductTypes
         comboBoxPanel = new JPanel(new GridBagLayout());
         //In case it is a really large product type we have a scrollPane
@@ -140,8 +139,10 @@ public abstract class ColorComboboxPanel extends JPanel {
 
     private JComboBox createColoredCombobox(Context context, ColorType ct, boolean includePlaceHolder) {
         JComboBox combobox = new JComboBox<>();
-        combobox.setRenderer(new ColorComboBoxRenderer(combobox));
+        combobox.setRenderer(new ColorComboBoxRenderer(combobox, 2));
         combobox.setPreferredSize(new Dimension(200,25));
+
+        combobox.setMaximumRowCount(20);
 
         if (includePlaceHolder) {
             combobox.addItem(new PlaceHolderColorExpression());

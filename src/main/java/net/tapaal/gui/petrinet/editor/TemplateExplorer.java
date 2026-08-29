@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
@@ -59,7 +60,6 @@ import dk.aau.cs.TCTL.visitors.ContainsPlaceWithDisabledTemplateVisitor;
 import net.tapaal.gui.swingcomponents.NonsearchableJList;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.SortTemplatesCommand;
-import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -432,6 +432,16 @@ public class TemplateExplorer extends JPanel implements SidePane {
 			exit();
 			return;
 		}
+		if (newName.equalsIgnoreCase("Shared")) {
+			JOptionPane.showMessageDialog(
+							parent.drawingSurface(),
+							"The component name 'Shared' is reserved for the global component and cannot be used.\n\nThe component could not be renamed.",
+							"Error Renaming Component",
+							JOptionPane.ERROR_MESSAGE);
+			exit();
+			showRenameTemplateDialog(newName);
+			return;
+		}
 		if (!isNameAllowed(newName)) {
 			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
@@ -461,6 +471,16 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	
 	private void onOK() {
         String templateName = nameTextField.getText().trim();
+		if (templateName.equalsIgnoreCase("Shared")) {
+			JOptionPane.showMessageDialog(
+							parent.drawingSurface(),
+							"The component name 'Shared' is reserved for the global component and cannot be used.\n\nThe new component could not be created.",
+							"Error Creating Component",
+							JOptionPane.ERROR_MESSAGE);
+			exit();
+			ShowNewTemplateDialog(templateName);
+			return;
+		}
         if(!isNameAllowed(templateName)) {
             JOptionPane.showMessageDialog(parent.drawingSurface(),
                     "Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
@@ -551,11 +571,19 @@ public class TemplateExplorer extends JPanel implements SidePane {
 
 	private void ShowNewTemplateDialog(String nameToShow) {
 		dialog = new EscapableDialog(TAPAALGUI.getApp(), "Enter Component Name", true);
+
 		initComponentsOfNewTemplateDialog(nameToShow);
-		dialog.add(container);
+
+		// setResizable seems to be platform dependent so use scrolling as a fallback
+        JScrollPane scrollPane = new JScrollPane(container);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setBorder(null);
+
+		dialog.add(scrollPane);
 		dialog.setResizable(false);
 		dialog.pack();
-		dialog.setLocationRelativeTo(null);
+		dialog.setLocationRelativeTo(TAPAALGUI.getApp());
 		dialog.setVisible(true);
 	}
 
@@ -635,10 +663,17 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		else {
 			initComponentsOfRenameTemplateDialog(nameToShow);
 		}
-		dialog.add(container);
+
+		// setResizable seems to be platform dependent so use scrolling as a fallback
+        JScrollPane scrollPane = new JScrollPane(container);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setBorder(null);
+
+		dialog.add(scrollPane);
 		dialog.setResizable(false);
 		dialog.pack();
-		dialog.setLocationRelativeTo(null);
+		dialog.setLocationRelativeTo(TAPAALGUI.getApp());
 		dialog.setVisible(true);
 	}
 
@@ -669,6 +704,15 @@ public class TemplateExplorer extends JPanel implements SidePane {
 	public Template selectedModel() {
 		return templateList.getSelectedValue();
 	}
+
+    public void selectTemplate(Template template) {
+        for (int i = 0; i < listModel.getSize(); i++) {
+            if (listModel.getElementAt(i).equals(template)) {
+                templateList.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
 
 	public void updateTemplateList() {
 		int selectedIndex = templateList.getSelectedIndex();
@@ -879,6 +923,5 @@ public class TemplateExplorer extends JPanel implements SidePane {
 				toggleSelection(list.getSelectedIndex());
 			}
 		}
-		
 	}
 }

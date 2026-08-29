@@ -122,7 +122,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="Varpck"/>
+              <variable refvariable="pck"/>
             </subterm>
           </numberof>
         </structure>
@@ -251,7 +251,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="Varpck"/>
+              <variable refvariable="pck"/>
             </subterm>
           </numberof>
         </structure>
@@ -276,7 +276,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="Varpck"/>
+              <variable refvariable="pck"/>
             </subterm>
           </numberof>
         </structure>
@@ -295,7 +295,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="Varpck"/>
+              <variable refvariable="pck"/>
             </subterm>
           </numberof>
         </structure>
@@ -339,7 +339,7 @@
             <feconstant id="vpn" name="packetType"/>
           </cyclicenumeration>
         </namedsort>
-        <variabledecl id="Varpck" name="pck">
+        <variabledecl id="pck" name="pck">
           <usersort declaration="packetType"/>
         </variabledecl>
       </declarations>

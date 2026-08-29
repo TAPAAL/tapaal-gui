@@ -1,5 +1,6 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import com.sun.jna.Platform;
 import dk.aau.cs.verification.VerificationOptions;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 
@@ -53,16 +54,22 @@ public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("--write-unfolded-queries ");
-        result.append(queryOut);
-        result.append(" --write-unfolded-net ");
-        result.append(modelOut);
+        result.append(writeUnfolded());
         result.append(" --search-strategy OverApprox --xml-queries ");
-        for(int i = 0; i < numQueries; ++i){
-            if(i != 0) result.append(",");
+        for (int i = 0; i < numQueries; ++i){
+            if (i != 0) result.append(",");
             result.append(i + 1);
         }
+        result.append(" --bindings ");
 
         return result.toString();
+    }
+
+    private String writeUnfolded() {
+        if (Platform.isWindows()) {
+            return " --write-unfolded-queries " + "\"" + queryOut + "\"" + " --write-unfolded-net " + "\"" + modelOut + "\"";
+        }
+
+        return " --write-unfolded-queries " + queryOut + " --write-unfolded-net " + modelOut + ' ';
     }
 }

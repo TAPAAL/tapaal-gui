@@ -50,8 +50,8 @@ public class TimedOutputArcComponent extends Arc {
 		this.setNameOffsetX(arc.getNameOffsetX());
 		this.setNameOffsetY(arc.getNameOffsetY());
 		this.getNameLabel().setPosition(
-				Grid.getModifiedX((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(getNameOffsetX(), getZoom()))),
-				Grid.getModifiedY((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(getNameOffsetY(), getZoom())))
+				Grid.align((int) (arc.getNameLabel().getXPosition() + Zoomer.getZoomedValue(getNameOffsetX(), getZoom())), getZoom()),
+				Grid.align((int) (arc.getNameLabel().getYPosition() + Zoomer.getZoomedValue(getNameOffsetY(), getZoom())), getZoom())
         );
 		this.lens = arc.lens;
 	}
@@ -104,6 +104,8 @@ public class TimedOutputArcComponent extends Arc {
             if(((ConstantWeight) getWeight()).constant().hasFocus()){
                 focusedConstant = true;
             }
+
+			isvisible = ((ConstantWeight) getWeight()).constant().getVisible();
         }
         if (focusedConstant) {
             getNameLabel().setForeground(Constants.SELECTION_TEXT_COLOUR);
@@ -135,7 +137,7 @@ public class TimedOutputArcComponent extends Arc {
 		guiDialog.pack();
 
 		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
 		guiDialog.setVisible(true);
 
 	}

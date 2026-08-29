@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class VariablesDialogPanel extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -70,11 +71,12 @@ public class VariablesDialogPanel extends JPanel {
 
         dialog = new EscapableDialog(TAPAALGUI.getApp(),
                 panelHeader, true);
+        scrollPane.setBorder(null);
         dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.getRootPane().setDefaultButton(okButton);
         dialog.setResizable(false);
         dialog.pack();
-        dialog.setLocationRelativeTo(null);
+        dialog.setLocationRelativeTo(TAPAALGUI.getApp());
         dialog.setVisible(true);
     }
 
@@ -168,13 +170,16 @@ public class VariablesDialogPanel extends JPanel {
 
     private void createColorTypesComboBox() {
         colorTypes = new ArrayList<>();
-        colorTypes = network.colorTypes();
+        colorTypes = network.colorTypes().stream().filter(f -> !f.isProductColorType() && f != ColorType.COLORTYPE_DOT).collect(Collectors.toList());
+        // We filter out product color types as well as the dot color types because variables cannot be of that type
 
         colorTypeComboBox = new JComboBox();
 
+        colorTypeComboBox.setPreferredSize(new Dimension(330, 30));
+        colorTypeComboBox.setRenderer(new ColorComboBoxRenderer(colorTypeComboBox, -4));
+
         int selectedVariableIndex = 0; int index = 0;
         for (ColorType element : colorTypes) {
-            if(!element.isProductColorType() && element != ColorType.COLORTYPE_DOT){
                 colorTypeComboBox.addItem(element);
                 if (variable != null) {
                     if (element.getName().equals(variable.getColorType().getName())) {
@@ -182,7 +187,6 @@ public class VariablesDialogPanel extends JPanel {
                     }
                 }
                 index += 1;
-            }
         }
 
         if (colorTypeComboBox.getItemCount() <= 0) {
@@ -198,7 +202,7 @@ public class VariablesDialogPanel extends JPanel {
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        container.add(colorTypeComboBox,gbc);
+        container.add(colorTypeComboBox, gbc);
     }
 
     private void createOKButton() {
@@ -320,7 +324,7 @@ public class VariablesDialogPanel extends JPanel {
             cmd = new UpdateVariableCommand(variable, nameTextField.getText(), colorTypes.get(colorTypeComboBox.getSelectedIndex()), listModel);
         }
         else {
-            cmd = new AddVariableCommand(new Variable(nameTextField.getText(), "Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()),
+            cmd = new AddVariableCommand(new Variable(nameTextField.getText(), nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()),
                 network, listModel, network.variables().size());
             //listModel.addElement(new Variable(nameTextField.getText(),"Var" + nameTextField.getText(), (ColorType) colorTypeComboBox.getSelectedItem()));
         }

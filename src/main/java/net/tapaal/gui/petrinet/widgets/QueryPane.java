@@ -27,14 +27,20 @@ import net.tapaal.gui.petrinet.undo.MoveElementDownCommand;
 import net.tapaal.gui.petrinet.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
+import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
+import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.Verifier;
-import net.tapaal.gui.petrinet.undo.AddQueryCommand;
 import net.tapaal.gui.petrinet.undo.RemoveQueriesCommand;
 import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.petrinet.dialog.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.RealConstant;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.dialog.BatchProcessingDialog;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.undo.Command;
@@ -42,6 +48,7 @@ import net.tapaal.gui.petrinet.undo.SortQueriesCommand;
 import net.tapaal.gui.swingcomponents.NonsearchableJList;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
+import javax.swing.JOptionPane;
 
 public class QueryPane extends JPanel implements SidePane {
 
@@ -63,7 +70,7 @@ public class QueryPane extends JPanel implements SidePane {
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;
-	private static File tempFile;
+	private static List<File> tempFiles = new ArrayList<>();
 
 	private static final String toolTipNewQuery = "Create a new query";
 	private static final String toolTipEditQuery="Edit the selected query";
@@ -308,13 +315,15 @@ public class QueryPane extends JPanel implements SidePane {
 		addQueryButton.addActionListener(new ActionListener() {
 
 		    public void actionPerformed(ActionEvent e) {
-				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens(), tabContent);
+                TimedArcPetriNetNetwork network = tabContent.network();
+                TAPNLens lens = tabContent.getLens();
 
-                if(q == null) return;
+                if (lens.isStochastic() && !network.isNonStrict()) {
+                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "SMC queries are only allowed for models with nonstrict intervals.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
-                undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
-                addQuery(q);
-
+				QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, network, tabContent.getGuiModels(), lens, tabContent);
 				updateQueryButtons();
 			}
 		});
@@ -325,6 +334,10 @@ public class QueryPane extends JPanel implements SidePane {
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(addQueryButton, gbc);
 	}
+
+    public UndoManager getUndoManager() {
+        return undoManager;
+    }
 
 	private void swapQueries(int currentIndex, int newIndex) {
 		TAPNQuery temp = listModel.get(currentIndex);
@@ -447,43 +460,65 @@ public class QueryPane extends JPanel implements SidePane {
 
 	}
 
-	private void verifyQuery() {
-		TAPNQuery query = queryList.getSelectedValue();
-		int NumberOfSelectedElements = queryList.getSelectedIndices().length;
+	public void verifyQueries(List<TAPNQuery> queries) {
+		if (queries.isEmpty()) return;
+		TAPNQuery query = queries.get(0);
+		int NumberOfSelectedElements = queries.size();
+		
+		boolean isSmc = query.getCategory() == QueryCategory.SMC;
 
-		if (NumberOfSelectedElements == 1) {
-			if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN)
+		if (isSmc && !tabContent.network().isNonStrict()) {
+			JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The model has strict intervals and can therefore not be verified", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		boolean hasMultipleConstants = false;
+		for (Constant c : tabContent.network().constants()) {
+			if (c.values() != null && c.values().size() > 1) {
+				hasMultipleConstants = true;
+				break;
+			}
+		}
+
+		for (RealConstant c : tabContent.network().realConstants()) {
+			if (c.hasMultipleValues()) {
+				hasMultipleConstants = true;
+				break;
+			}
+		}
+
+		if (NumberOfSelectedElements == 1 && !hasMultipleConstants) {
+			if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN || Verifier.hasNonzeroInitialTokenAges(tabContent.network()))
 				Verifier.runVerifyTAPNVerification(tabContent.network(), query, null, tabContent.getGuiModels(), false, tabContent.lens);
 			else
 				Verifier.runUppaalVerification(tabContent.network(), query);
-		} else if (NumberOfSelectedElements > 1) {
-			saveNetAndRunBatchProcessing();
+		} else if (NumberOfSelectedElements > 1 || hasMultipleConstants) {
+			saveNetAndRunBatchProcessing(queries);
 		}
 	}
-	
-	private void saveNetAndRunBatchProcessing() {
-        List<TAPNQuery> selectedQueries = queryList.getSelectedValuesList();
-        //Saves the net in a temporary file which is used in batchProcessing File is deleted on exit
-		try {
-			tempFile = File.createTempFile(tabContent.getTabTitle(), ".xml");
 
-            tabContent.writeNetToFile(tempFile, selectedQueries, tabContent.getLens());
-			//XXX is it not an error that the tempFile is not passed down to the batchProcessing?
-            // I would think it runs the query on the unsaved net -- kyrke 2022-02-21
-            BatchProcessingDialog.showBatchProcessingDialog(queryList);
-			tempFile.deleteOnExit();
-			if (tempFile == null) {
-				throw new IOException();
-			}
-		} catch(IOException e) {
+	private void verifyQuery() {
+		List<TAPNQuery> selectedQueries = queryList.getSelectedValuesList();
+		verifyQueries(selectedQueries);
+	}
+
+	private void saveNetAndRunBatchProcessing(List<TAPNQuery> selectedQueries) {
+		tempFiles.clear();
+		try {
+			File tf = File.createTempFile(tabContent.getTabTitle(), ".xml");
+			tf.deleteOnExit();
+			tempFiles.add(tf);
+			var model = new LoadedModel(tabContent.network(), List.of(), selectedQueries, List.of(), tabContent.getLens());
+			BatchProcessingDialog.showBatchProcessingDialog(queryList, model);
+		} catch (IOException e) {
 			messenger.displayErrorMessage("Creation of temporary file needed for verification failed.");
 		}
 	}
 
-    public static File getTemporaryFile() {
-		return tempFile;
+	public static Iterable<File> getTemporaryFiles() {
+		return tempFiles;
 	}
-	
+
 	public boolean isQueryPossible() {
 		return (queryList.getModel().getSize() > 0 );
 	}

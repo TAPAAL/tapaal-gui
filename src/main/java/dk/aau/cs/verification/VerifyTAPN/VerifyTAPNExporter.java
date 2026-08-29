@@ -4,12 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collection;
 
 import dk.aau.cs.TCTL.*;
-import dk.aau.cs.TCTL.visitors.HyperLTLQueryVisitor;
-import dk.aau.cs.TCTL.visitors.LTLQueryVisitor;
-import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.*;
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.verification.NameMapping;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -17,15 +14,15 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.SMCUserDefinedDistribution;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
-
-import dk.aau.cs.TCTL.visitors.CTLQueryVisitor;
-import pipe.gui.TAPAALGUI;
+import dk.aau.cs.util.Tuple;
 import pipe.gui.petrinet.graphicElements.Place;
 import pipe.gui.petrinet.graphicElements.Transition;
 
@@ -44,7 +41,7 @@ public class VerifyTAPNExporter {
 
 		try {
             this.model = model;
-            outputModel(model, modelFile, mapping, guiModel);
+            outputModel(model, modelFile, mapping, guiModel, lens);
 
             RenameAllPlacesVisitor placeVisitor = new RenameAllPlacesVisitor(mapping);
 			query.getProperty().accept(placeVisitor, null);
@@ -65,9 +62,12 @@ public class VerifyTAPNExporter {
             } else if (query.getCategory() == QueryCategory.LTL) {
                 LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
-            } else if (query.getCategory() == QueryCategory.HyperLTL){
+            } else if (query.getCategory() == QueryCategory.HyperLTL) {
                 HyperLTLQueryVisitor XMLVisitor = new HyperLTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
+            } else if (query.getCategory() == QueryCategory.SMC) {
+                SMCQueryVisitor XMLVisitor = new SMCQueryVisitor();
+                queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery.getName(), dataLayerQuery.getSmcSettings()));
             } else if (lens != null && lens.isGame()) {
                 CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null, true));
@@ -83,8 +83,26 @@ public class VerifyTAPNExporter {
 
         return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath());
 	}
-	
+
+    public ExportedVerifyTAPNModel exportModel(Tuple<TimedArcPetriNet, NameMapping> composedModel, DataLayer guiModel) {
+        File modelFile = createTempFile(".xml");
+        try {
+            this.model = composedModel.value1();
+            NameMapping mapping = composedModel.value2();
+            outputModel(model, modelFile, mapping, guiModel);
+        } catch (FileNotFoundException e) {
+            System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
+            return null;
+        }
+
+        return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), null);
+    }
+
 	protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel) throws FileNotFoundException {
+        outputModel(model, modelFile, mapping, guiModel, TAPNLens.Default);
+    }
+
+    protected void outputModel(TimedArcPetriNet model, File modelFile, NameMapping mapping, DataLayer guiModel, TAPNLens lens) throws FileNotFoundException {
         PrintStream modelStream = new PrintStream(modelFile);
 
 		modelStream.append("<pnml>\n");
@@ -116,6 +134,10 @@ public class VerifyTAPNExporter {
             outputInhibitorArc(inhibArc, modelStream);
         }
 
+        if (model.parentNetwork() != null && lens != null && lens.isStochastic()) {
+            outputCustomDistributions(modelStream, model);
+        }
+
         modelStream.append("</net>\n");
 		modelStream.append("</pnml>");
 		modelStream.close();
@@ -123,6 +145,17 @@ public class VerifyTAPNExporter {
 
 	protected void outputDeclarations(PrintStream modelStream){
 	    return;
+    }
+
+    protected void outputCustomDistributions(PrintStream modelStream, TimedArcPetriNet model) {
+        for (SMCUserDefinedDistribution cd : model.parentNetwork().userDefinedDistributions()) {
+            modelStream.append("<custom_distribution name=\"" + cd.getName() + "\" randomStart=\"" + cd.isRandomStart() + "\">\n");
+            for (Double val : cd.getValues()) {
+                modelStream.append("<value>" + val + "</value>");
+            }
+
+            modelStream.append("\n</custom_distribution>\n");
+        }
     }
 
 	protected void outputPlace(TimedPlace p, PrintStream modelStream, DataLayer guiModel, NameMapping mapping) {
@@ -139,6 +172,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
         modelStream.append(">\n");
+        outputInitialMarkingAges(p, modelStream, false);
         if (guiPlace == null) {
             outputPosition(modelStream, 0, 0);
         } else {
@@ -147,6 +181,25 @@ public class VerifyTAPNExporter {
 
         modelStream.append("</place>\n");
 	}
+
+    protected void outputInitialMarkingAges(TimedPlace place, PrintStream modelStream, boolean includeColor) {
+        if (place.tokens().stream().allMatch(token -> token.age().signum() == 0)) {
+            return;
+        }
+
+        modelStream.append("<initialMarkingAge>\n");
+        for (TimedToken token : place.tokens()) {
+            if (token.age().signum() != 0) {
+                modelStream.append("<token");
+                if (includeColor) {
+                    modelStream.append(" color=\"" + token.color() + "\"");
+                }
+                modelStream.append(" age=\"" + token.age().toPlainString() + "\"/>\n");
+            }
+        }
+        
+        modelStream.append("</initialMarkingAge>\n");
+    }
 
 	protected void outputTransition(TimedTransition t, PrintStream modelStream, DataLayer guiModel, NameMapping mapping) {
 
@@ -161,6 +214,9 @@ public class VerifyTAPNExporter {
         modelStream.append("player=\"" + (t.isUncontrollable() ? "1" : "0") + "\" ");
         modelStream.append("id=\"" + t.name() + "\" ");
 		modelStream.append("name=\"" + t.name() + "\" ");
+        modelStream.append("weight=\""+ t.getWeight().nameForSaving(false) + "\" ");
+        modelStream.append("firingMode=\"" + t.getFiringMode().toString() + "\" ");
+        modelStream.append(t.getDistribution().toString());
         modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
         modelStream.append(">\n");
 

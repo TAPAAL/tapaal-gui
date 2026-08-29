@@ -8,6 +8,7 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 public class TCTLOrListNode extends TCTLAbstractStateProperty {
 
 	private List<TCTLAbstractStateProperty> properties;
+	private boolean isSimpleProperty;
 
 	public void setProperties(List<TCTLAbstractStateProperty> properties) {
 		this.properties = properties;
@@ -31,7 +32,7 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 
 	public TCTLOrListNode(TCTLOrListNode orListNode) {
 		properties = new ArrayList<TCTLAbstractStateProperty>();
-
+		
 		for (TCTLAbstractStateProperty p : orListNode.properties) {
 			addDisjunct(p.copy());
 		}
@@ -62,7 +63,7 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public boolean isSimpleProperty() {
-		return false;
+		return isSimpleProperty;
 	}
 
 	@Override
@@ -77,11 +78,19 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 				s.append(" or ");
 			}
 
+			if (prop instanceof TCTLOrListNode) {
+				((TCTLOrListNode) prop).setSimpleProperty(isSimpleProperty);
+			}
+
 			s.append(prop.isSimpleProperty() ? prop.toString() : "(" + prop + ")");
 			firstTime = false;
 		}
 
 		return s.toString();
+	}
+
+	public void setSimpleProperty(boolean isSimpleProperty) {
+		this.isSimpleProperty = isSimpleProperty;
 	}
 
 	@Override
@@ -139,18 +148,22 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public TCTLAbstractStateProperty copy() {
-		ArrayList<TCTLAbstractStateProperty> copy = new ArrayList<TCTLAbstractStateProperty>();
+		List<TCTLAbstractStateProperty> copy = new ArrayList<>();
 
 		for (TCTLAbstractStateProperty p : properties) {
 			copy.add(p.copy());
 		}
 
-		return new TCTLOrListNode(copy);
+		TCTLOrListNode orListNode = new TCTLOrListNode(copy);
+		orListNode.setSimpleProperty(isSimpleProperty());
+
+		return orListNode;
 	}
 
 	@Override
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1,
 			TCTLAbstractProperty object2) {
+
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
 			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty) object2;
 			obj2.setParent(parent);

@@ -12,8 +12,6 @@ import java.util.Arrays;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.swinghelpers.CustomJSpinner;
@@ -110,7 +108,7 @@ public class SmartDrawDialog extends JDialog {
         smartDrawDialog.pack();
         smartDrawDialog.setPreferredSize(smartDrawDialog.getSize());
         smartDrawDialog.setMinimumSize(new Dimension(smartDrawDialog.getWidth(), smartDrawDialog.getHeight()));
-        smartDrawDialog.setLocationRelativeTo(null);
+        smartDrawDialog.setLocationRelativeTo(TAPAALGUI.getApp());
         smartDrawDialog.setResizable(false);
         smartDrawDialog.updateLists();
 		smartDrawDialog.enableButtons();
@@ -136,9 +134,10 @@ public class SmartDrawDialog extends JDialog {
                 if (event.getPropertyName().equals("unfolding")) {
                     SwingWorker.StateValue stateValue = (SwingWorker.StateValue) event.getNewValue();
                     if (stateValue.equals(SwingWorker.StateValue.DONE)) {
-                        //Don't auto-layout on empty net, hotfix for issue #1960000
-                        if (!TAPAALGUI.getCurrentTab().currentTemplate().getHasPositionalInfo() && (TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getPlaces().length + TAPAALGUI.getCurrentTab().currentTemplate().guiModel().getTransitions().length) > 0) {
-                            int dialogResult = JOptionPane.showConfirmDialog(null, "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
+                        //Don't auto-layout on empty net or net too big to draw, hotfix for issue #1960000
+                        PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
+                        if (currentTab != null && currentTab.network().paintNet() && !currentTab.currentTemplate().getHasPositionalInfo() && (currentTab.currentTemplate().guiModel().getPlaces().length + currentTab.currentTemplate().guiModel().getTransitions().length) > 0) {
+                            int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if (dialogResult == JOptionPane.YES_OPTION) {
                                 showSmartDrawDialog();
                             }
@@ -199,7 +198,7 @@ public class SmartDrawDialog extends JDialog {
 					
 					@Override
 					public void fireStatusChanged(int objectsPlaced) {
-						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + modelSize);
+						progressLabel.setText("Objects placed: " + objectsPlaced +"/" + (modelSize - 1));
 					}
 					
 					@Override
@@ -244,7 +243,22 @@ public class SmartDrawDialog extends JDialog {
 		this.getRootPane().setDefaultButton(drawButton);
 		drawButton.requestFocus();
 		
-		setContentPane(mainPanel);
+		int extraWidth = 100;
+
+		Dimension preferredSize = mainPanel.getPreferredSize();
+		int preferredWidth = preferredSize.width + extraWidth;
+		int preferredHeight = preferredSize.height;
+
+		Dimension newPreferredSize = new Dimension(preferredWidth, preferredHeight);
+
+		mainPanel.setPreferredSize(newPreferredSize);
+
+		JScrollPane scrollPane = new JScrollPane(mainPanel);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setBorder(null);
+
+		setContentPane(scrollPane);
 	}
 	
 	private void initAdvancedOptionsPanel() {
@@ -566,6 +580,7 @@ public class SmartDrawDialog extends JDialog {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = new Insets(10, 20, 10, 0);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
+
 		mainPanel.add(spacingPanel, gbc);
 	}
 

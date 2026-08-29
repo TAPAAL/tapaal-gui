@@ -218,7 +218,7 @@ public class EngineDialogPanel {
 	private void fitDialog() {
 		if (dialog != null) {
 			dialog.pack();
-			dialog.setLocationRelativeTo(null);	
+			dialog.setLocationRelativeTo(TAPAALGUI.getApp());	
 		}
 	}
 
@@ -704,7 +704,7 @@ public class EngineDialogPanel {
 		dialog.setResizable(false);
 		dialog.setMinimumSize(minimumSize);
 		dialog.pack();
-		dialog.setLocationRelativeTo(null);
+		dialog.setLocationRelativeTo(TAPAALGUI.getApp());
 		dialog.setVisible(true);
 	}
 }

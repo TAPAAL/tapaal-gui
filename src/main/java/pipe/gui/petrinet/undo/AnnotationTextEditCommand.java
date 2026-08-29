@@ -11,7 +11,7 @@ import net.tapaal.gui.petrinet.undo.Command;
  * 
  * @author corveau
  */
-public final class AnnotationTextEditCommand extends Command {
+public final class AnnotationTextEditCommand implements Command {
 
 	final AnnotationNote annotationNote;
 	final String oldText;

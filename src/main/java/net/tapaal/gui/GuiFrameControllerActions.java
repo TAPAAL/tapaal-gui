@@ -53,7 +53,11 @@ public interface GuiFrameControllerActions {
     void toggleZeroToInfinityIntervals();
     void toggleComponents();
     void toggleSharedPT();
+
     void toggleEnabledTransitionsList();
+    void setEnabledTransitionsList(boolean b);
+    boolean isEnabledTransitionsListVisible();
+    
     void toggleDelayEnabledTransitions();
     void toggleDisplayToolTips();
 

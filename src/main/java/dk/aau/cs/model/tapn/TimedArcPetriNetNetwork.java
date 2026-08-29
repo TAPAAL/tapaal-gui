@@ -5,6 +5,7 @@ import java.util.*;
 import net.tapaal.gui.petrinet.undo.Colored.*;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
+import pipe.gui.Constants;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
@@ -23,6 +24,7 @@ public class TimedArcPetriNetNetwork {
 	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
 	private final List<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
 	private final List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
+    private final Map<String, SMCUserDefinedDistribution> userDefinedDistributions = new LinkedHashMap<String, SMCUserDefinedDistribution>();
 	
 	private NetworkMarking currentMarking = new NetworkMarking();
 	private final ConstantStore constants;
@@ -92,6 +94,50 @@ public class TimedArcPetriNetNetwork {
 		if(!(sharedPlaces.contains(sharedPlace)))
 			sharedPlaces.add(sharedPlace);
 	}
+
+    public void add(SMCUserDefinedDistribution distribution) {
+        Require.that(distribution != null, "Distribution cannot be null");
+        userDefinedDistributions.put(distribution.getName(), distribution);
+    }
+
+    public void removeUserDefinedDistribution(String name) {
+        userDefinedDistributions.remove(name);
+    }
+    
+    public void renameUserDefinedDistribution(String oldName, String newName) {
+        if (!userDefinedDistributions.containsKey(oldName)) return;
+
+        SMCUserDefinedDistribution dist = userDefinedDistributions.remove(oldName);
+        dist.setName(newName);
+        userDefinedDistributions.put(newName, dist);
+
+        for (SharedTransition st : sharedTransitions) {
+            if (st.getDistribution() instanceof SMCUserDefinedDistribution) {
+                SMCUserDefinedDistribution d = (SMCUserDefinedDistribution) st.getDistribution();
+                if (d == dist || d.getName().equals(oldName)) {
+                    d.setName(newName);
+                    st.setDistribution(d);
+                }
+            }
+        }
+
+        for (TimedArcPetriNet tapn : tapns) {
+            for (TimedTransition t : tapn.transitions()) {
+                if (t.isShared()) continue;
+                if (t.getDistribution() instanceof SMCUserDefinedDistribution) {
+                    SMCUserDefinedDistribution d = (SMCUserDefinedDistribution) t.getDistribution();
+                    if (d == dist || d.getName().equals(oldName)) {
+                        d.setName(newName);
+                        t.setDistribution(d);
+                    }
+                }
+            }
+        }
+    }
+
+    public List<SMCUserDefinedDistribution> userDefinedDistributions() {
+        return new ArrayList<SMCUserDefinedDistribution>(userDefinedDistributions.values());
+    }
 
 	public boolean isNameUsedForShared(String name){
 		for(SharedTransition transition : sharedTransitions){
@@ -198,6 +244,13 @@ public class TimedArcPetriNetNetwork {
 		constants.buildConstraints(this);
 	}
 
+	public Command addConstant(String name, LinkedHashSet<Integer> vals) {
+		Command cmd = constants.addConstant(name, vals);
+		Constant constant = constants.getConstantByName(name);
+		fireConstantAdded(constant);
+		return cmd;
+	}
+
 	// TODO: Command is a GUI concern. This should not know anything about it
 	public Command addConstant(String name, int val) {
 		Command cmd = constants.addConstant(name, val); 
@@ -223,6 +276,22 @@ public class TimedArcPetriNetNetwork {
 		return cmd;
 	}
 
+    public void updateUserDefinedDistributions(String oldName, String newName) {
+        for (TimedArcPetriNet tapn : allTemplates()) {
+            for (TimedTransition transition : tapn.transitions()) {
+                if (transition.getDistribution() instanceof SMCUserDefinedDistribution) {
+                    SMCUserDefinedDistribution dist = (SMCUserDefinedDistribution) transition.getDistribution();
+                     if (dist.getName().equals(oldName)) {
+                         dist.setName(newName);
+                         transition.setDistribution(dist);
+                     } else if (dist.getName().equals(newName)) {
+                         transition.setDistribution(dist);
+                     }
+                }
+            }
+        }
+    }
+
 	public Command updateConstant(String oldName, Constant constant) {
 		Constant old = constants.getConstantByName(oldName);
 		int index = constants.getIndexOf(old);
@@ -239,10 +308,16 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public void updateGuardsAndWeightsWithNewConstant(String oldName, Constant newConstant) {
+		updateDistributionsWithNewConstant(oldName, newConstant);
+
 		for (TimedArcPetriNet tapn : allTemplates()) {
 			for (TimedPlace place : tapn.places()) {
 				updatePlaceInvariant(oldName, newConstant, place);
 			}
+
+            for (TimedTransition transition : tapn.transitions()) {
+                updateProbability(oldName, newConstant, transition.getWeight());
+            }
 
 			for (TimedInputArc inputArc : tapn.inputArcs()) {
 				updateTimeIntervalAndWeight(oldName, newConstant, inputArc.interval(), inputArc.getWeight());
@@ -292,6 +367,102 @@ public class TimedArcPetriNetNetwork {
 			}
 		}
 		
+	}
+
+    private void updateProbability(String oldName, Constant newConstant, Probability probability) {
+        if(probability instanceof  ConstantProbability) {
+            ConstantProbability cp = (ConstantProbability) probability;
+            if(cp.constant().name().equals(oldName)) {
+                cp.setConstant(newConstant);
+            }
+        }
+    }
+
+	public Command addRealConstant(String name, LinkedHashSet<Double> vals) {
+		return constants.addRealConstant(name, vals);
+	}
+
+	public Command removeRealConstant(String name) {
+		buildConstraints();
+		return constants.removeRealConstant(name);
+	}
+
+	public Command updateRealConstant(String oldName, RealConstant constant) {
+		Command edit = constants.updateRealConstant(oldName, constant, this);
+
+		if (edit != null) {
+			updateDistributionsWithNewConstant(oldName, constant);
+		}
+
+		return edit;
+	}
+
+	public void updateDistributionsWithNewConstant(String oldName, SMCParameterConstant newConstant) {
+		for (var tapn : allTemplates()) {
+			for (var transition : tapn.transitions()) {
+				updateDistributionRefs(oldName, newConstant, transition.getDistribution());
+			}
+		}
+
+		for (var transition : sharedTransitions) {
+			updateDistributionRefs(oldName, newConstant, transition.getDistribution());
+		}
+	}
+
+	private void updateDistributionRefs(String oldName, SMCParameterConstant newConstant, SMCDistribution distribution) {
+		if (distribution == null) return;
+
+		for (var entry : distribution.getParamRefs().entrySet()) {
+			if (entry.getValue().name().equals(oldName)) {
+				entry.setValue(newConstant);
+			}
+		}
+	}
+
+	public void rebindDistributionRefs() {
+		for (var c : constants.getRealConstants()) {
+			updateDistributionsWithNewConstant(c.name(), c);
+		}
+
+		for (var c : constants.getConstants()) {
+			updateDistributionsWithNewConstant(c.name(), c);
+		}
+	}
+
+	public List<RealConstant> realConstants() {
+		return constants.getRealConstants();
+	}
+
+	public RealConstant getRealConstant(String name) {
+		return constants.getRealConstantByName(name);
+	}
+
+	public RealConstant getRealConstant(int index) {
+		return constants.getRealConstantByIndex(index);
+	}
+
+	public void setRealConstants(Iterable<RealConstant> newConstants) {
+		for (var c : newConstants) {
+			constants.add(c);
+		}
+        
+		rebindDistributionRefs();
+	}
+
+	public boolean isNameUsedForRealConstant(String name) {
+		return constants.containsRealConstantByName(name);
+	}
+
+	public void swapRealConstants(int currentIndex, int newIndex) {
+		constants.swapRealConstants(currentIndex, newIndex);
+	}
+
+	public List<RealConstant> sortRealConstants() {
+		return constants.sortRealConstants();
+	}
+
+	public void undoSortRealConstants(List<RealConstant> oldOrder) {
+		constants.undoSortRealConstants(oldOrder);
 	}
 
 	public Collection<Constant> constants() {
@@ -458,6 +629,15 @@ public class TimedArcPetriNetNetwork {
 	    return colorTypes.size() > 1 || variables.size() > 0;
     }
 
+    public boolean isStochastic() {
+        for (TimedArcPetriNet tapn : tapns) {
+            if(tapn.isStochastic()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 	public boolean isUntimed(){
 		for(TimedArcPetriNet t : tapns){
 			if(!t.isUntimed()){
@@ -589,10 +769,14 @@ public class TimedArcPetriNetNetwork {
 			network.add(new SharedTransition(t.name()));	// TODO This is okay for now
 		}
 		
-		for(Constant c : constants()){
-			network.addConstant(c.name(), c.value());
+		for (Constant c : constants()) {
+			if (c.hasMultipleValues()) {
+				network.addConstant(c.name(), c.values());
+			} else {
+				network.addConstant(c.name(), c.value());
+			}
 		}
-		
+
 		for(TimedArcPetriNet t : tapns){
 			TimedArcPetriNet new_t = t.copy();
 			network.add(new_t);
@@ -622,6 +806,16 @@ public class TimedArcPetriNetNetwork {
 	
 	public void setPaintNet(boolean paintNet){
 		this.paintNet = paintNet;
+	}
+
+	public boolean isNetDrawable() {
+		if (!paintNet) return false;
+		int totalSize = 0;
+		for (var tapn : allTemplates()) {
+			totalSize += tapn.places().size() + tapn.transitions().size();
+		}
+        
+		return totalSize <= Constants.MAX_NET_SIZE;
 	}
 
 	//For colors
@@ -683,6 +877,16 @@ public class TimedArcPetriNetNetwork {
         }
         return null;
     }
+	
+	public boolean isIndeticalToExisting(ColorType newColorType) {
+		for (ColorType ct : colorTypes) {
+			if (ct.isIdentical(newColorType)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
     public boolean isNameUsedForColorType(String name) {
         for (ColorType element : colorTypes) {
@@ -724,6 +928,17 @@ public class TimedArcPetriNetNetwork {
         }
         return null;
     }
+
+    public Variable getVariableById(String id) {
+        for (Variable variable : variables) {
+            if (variable.getId().equals(id)) {
+                return variable;
+            }
+        }
+        
+        return null;
+    }
+
     public Color getColorByName(String name){
         for (ColorType element : colorTypes) {
             if(element.getColorByName(name) != null){
@@ -732,6 +947,21 @@ public class TimedArcPetriNetNetwork {
         }
         return null;
     }
+
+    public Color getProductColorByConstituents(Vector<Color> constituents) {
+        for (ColorType ct : colorTypes) {
+            if (ct.isProductColorType()) {
+                for (Color c : ct.getColors()) {
+                    if (c.getTuple() != null && c.getTuple().equals(constituents)) {
+                        return c;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public Variable getVariableByIndex(int index) {
         return variables.get(index);
     }
@@ -776,9 +1006,9 @@ public class TimedArcPetriNetNetwork {
         return false;
     }
 
-    public boolean canColorTypeBeRemoved(ColorType colorType, ArrayList<String> messages){
+    public boolean canColorTypeBeRemoved(ColorType colorType, List<String> messages){
 	    isColorTypeUsedInProduct(colorType, messages);
-        isColorTypeUsedInVaraible(colorType, messages);
+        isColorTypeUsedInVariable(colorType, messages);
 	    for(TimedArcPetriNet tapn : allTemplates()){
             for(TimedPlace p : tapn.places()){
                 if(p.getColorType().equals(colorType)){
@@ -796,7 +1026,7 @@ public class TimedArcPetriNetNetwork {
         return messages.isEmpty();
     }
 
-    private void isColorTypeUsedInVaraible(ColorType colorType, ArrayList<String> messages) {
+    private void isColorTypeUsedInVariable(ColorType colorType, List<String> messages) {
         for (Variable variable : variables) {
             if (variable.getColorType().equals(colorType)) {
                 messages.add("Color type " + variable.getColorType().getName() + " is used in variable " + variable.getName() + "\n");
@@ -804,47 +1034,54 @@ public class TimedArcPetriNetNetwork {
         }
     }
 
-    public boolean canColorBeRemoved(Color color, ArrayList<String> messages) {
-        isColorTypeUsedInProduct(color.getColorType(), messages);
+    public boolean canColorBeRemoved(Color color, List<String> messages) {
         for (TimedArcPetriNet tapn : allTemplates()) {
             for (TimedPlace p : tapn.places()) {
-                if (p.getTokensAsExpression() != null && p.getTokensAsExpression().containsColor(color)) {
+                if (p.getTokensAsExpression() != null && 
+                    p.getTokensAsExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used in a token in place " + p.name() + " \n");
                 }
+                
                 for (ColoredTimeInvariant invariant : p.getCtiList()) {
                     if (invariant.getColor().equals(color)) {
                         messages.add(color.getName() + " is used in an invariant in place " + p.name() + " \n");
                     }
                 }
             }
+
             for (TimedTransition t : tapn.transitions()) {
                 if (t.getGuard() != null && t.getGuard().containsColor(color)) {
                     messages.add(color.getName() + " of color type is used in transition " + t.name() + "\n");
                 }
             }
+
             for (TransportArc arc : tapn.transportArcs()) {
                 if (arc.getInputExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used on transport arc from " + arc.source().name() + " to " + arc.transition() + "\n");
                 }
+
                 if (arc.getOutputExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used on transport arc from " + arc.transition()+ " to " + arc.destination().name() + "\n");
                 }
             }
+
             for (TimedInputArc arc : tapn.inputArcs()) {
                 if (arc.getArcExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used on arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
                 }
             }
+
             for (TimedOutputArc arc : tapn.outputArcs()) {
                 if (arc.getExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used on arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
                 }
             }
         }
+
         return messages.isEmpty();
     }
 
-    private void isColorTypeUsedInProduct(ColorType colorType, ArrayList<String> messages) {
+    private void isColorTypeUsedInProduct(ColorType colorType, List<String> messages) {
         for (ColorType ct : colorTypes) {
             if (ct instanceof ProductType && ((ProductType) ct).contains(colorType)) {
                 messages.add("Color type " + colorType.getName() + " is used in product type " + ct.getName() + " \n");
@@ -890,6 +1127,16 @@ public class TimedArcPetriNetNetwork {
 
                 if (variables.contains(variable)) {
                     messages.add("Variable contained on transport arc " + arc.fromTo());
+                }
+            }
+
+            for (TimedTransition transition : tapn.transitions()) {
+                if (transition.getGuard() != null) {
+                    Set<Variable> variables = new HashSet<>();
+                    transition.getGuard().getVariables(variables);
+                    if (variables.contains(variable)) {
+                        messages.add("Variable contained in guard of transition " + transition.name());
+                    }
                 }
             }
         }

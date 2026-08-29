@@ -140,13 +140,25 @@ public class SharedTransitionNamePanel extends JPanel {
 				
 				String oldName = transitionToEdit.name();
 				
-				if(transitionToEdit.network().isNameUsed(name) && !oldName.equals(name)) {
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
-					nameField.requestFocusInWindow();
-					return false;
+				if (name.contains("__")) {
+					int result = JOptionPane.showConfirmDialog(SharedTransitionNamePanel.this,
+							"Using double underscores (__) in names is not recommended as it can cause ambiguity issues when using multiple components.\nDo you want to continue?",
+							"Warning",
+							JOptionPane.OK_CANCEL_OPTION,
+							JOptionPane.WARNING_MESSAGE);
+                            
+					if (result != JOptionPane.OK_OPTION) {
+						return false;
+					}
 				}
+
+                if (transitionToEdit.network().isNameUsed(name) && !oldName.equals(name)) {
+                    JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
+                    nameField.requestFocusInWindow();
+                    return false;
+                }
 				
-				
+			
 				try{
 					transitionToEdit.setName(name);
 				}catch(RequireException e){
@@ -166,13 +178,24 @@ public class SharedTransitionNamePanel extends JPanel {
 			private boolean addNewSharedTransition(String name) {
 				SharedTransition transition = null;
 				
-				try{
-					transition = new SharedTransition(name);
-				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
-					nameField.requestFocusInWindow();
-					return false;
+				if (name.contains("__")) {
+					int result = JOptionPane.showConfirmDialog(SharedTransitionNamePanel.this,
+							"Using double underscores (__) in names is not recommended as it can cause ambiguity issues when using multiple components.\nDo you want to continue?",
+							"Warning",
+							JOptionPane.OK_CANCEL_OPTION,
+							JOptionPane.WARNING_MESSAGE);
+					if (result != JOptionPane.OK_OPTION) {
+						return false;
+					}
 				}
+
+                try {
+                    transition = new SharedTransition(name);
+                } catch(RequireException e){
+                    JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
+                    nameField.requestFocusInWindow();
+                    return false;
+                }
 				
 				try{
 					listModel.addElement(transition);

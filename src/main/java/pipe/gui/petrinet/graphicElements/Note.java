@@ -7,11 +7,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.geom.RectangularShape;
+import java.awt.Point;
 
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultHighlighter;
 
-import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.undo.AnnotationBorderEditCommand;
@@ -57,6 +57,10 @@ public abstract class Note extends PetriNetObject {
 		updateBounds();
 	}
 
+    public void setInnerNoteSize(Dimension newSize) {
+        note.setSize((int)newSize.getWidth(), (int)newSize.getHeight());
+    }
+
 	/** Calculates the BoundsOffsets used for setBounds() method */
 	public void updateBounds() {
 		int newHeight = note.getPreferredSize().height;
@@ -97,7 +101,7 @@ public abstract class Note extends PetriNetObject {
 		repaint();
 		return new AnnotationBorderEditCommand(this);
 	}
-
+    
 	public JTextArea getNote() {
 		return note;
 	}
@@ -113,6 +117,13 @@ public abstract class Note extends PetriNetObject {
 	public int getNoteHeight() {
 		return note.getHeight();
 	}
+
+    public void setPosition(Point point) {
+        setLocation(point.x, point.y);
+        ((Rectangle)noteRect).setLocation(point);
+        originalX = Zoomer.getUnzoomedValue(point.x, getZoom());
+        originalY = Zoomer.getUnzoomedValue(point.y, getZoom());
+    }
 
 	/** Translates the component by x,y */
 	public void translate(int x, int y) {

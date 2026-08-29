@@ -10,7 +10,7 @@ import dk.aau.cs.util.Require;
 import java.util.Hashtable;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 
-public class MakeTransitionSharedCommand extends Command {
+public class MakeTransitionSharedCommand implements Command {
         private final TimedArcPetriNet tapn;
 	private final SharedTransition sharedTransition;
 	private final TimedTransition timedTransition;

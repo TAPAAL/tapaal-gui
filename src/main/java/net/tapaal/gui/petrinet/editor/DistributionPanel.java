@@ -1,0 +1,987 @@
+package net.tapaal.gui.petrinet.editor;
+
+import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.Require;
+import dk.aau.cs.util.RequireException;
+import net.tapaal.swinghelpers.GridBagHelper;
+import net.tapaal.swinghelpers.SwingHelper;
+import pipe.gui.TAPAALGUI;
+import pipe.gui.graph.Graph;
+import pipe.gui.graph.GraphDialog;
+import pipe.gui.graph.GraphPoint;
+import pipe.gui.graph.DefaultGraphDialog.GraphDialogBuilder;
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.swingcomponents.EscapableDialog;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.function.DoubleUnaryOperator;
+import java.util.stream.Collectors;
+import java.util.LinkedHashMap;
+
+public class DistributionPanel extends JPanel {
+
+    private TimedTransitionComponent transition;
+    private EscapableDialog dialog;
+    private boolean updatingFields;
+
+    private static final String[] continuous =  { "constant", "uniform", "exponential", "normal", "gamma", "erlang", "triangular", "log normal" };
+    private static final String[] discrete =    { "discrete uniform", "geometric" };
+
+    private JRadioButton useContinuousDistribution;
+    private JRadioButton useDiscreteDistribution;
+    private JRadioButton useCustomDistribution;
+    private ButtonGroup distributionCategoryGroup;
+    private JComboBox<String> distributionType;
+    private JButton distributionShowGraph;
+    private JButton manageCustomDistributionsButton;
+    private JButton okButton;
+    private JLabel distributionParam1Label;
+    private JLabel distributionParam2Label;
+    private JLabel distributionParam3Label;
+    private JTextField distributionParam1Field;
+    private JTextField distributionParam2Field;
+    private JTextField distributionParam3Field;
+    private JLabel meanLabel;
+    private JLabel meanValueLabel;
+
+    private JLabel[] paramLabels;
+    private JTextField[] paramFields;
+    private JCheckBox[] paramUseConstant;
+    private JComboBox<Object>[] paramConstantCombos;
+    private JPanel[] paramCells;
+
+    public DistributionPanel(TimedTransitionComponent transition, JButton okButton, EscapableDialog dialog) {
+        this.transition = transition;
+        this.okButton = okButton;
+        this.dialog = dialog;
+        initComponents();
+        displayDistribution();
+    }
+
+    private void initComponents() {
+        useContinuousDistribution = new JRadioButton("Continuous");
+        useDiscreteDistribution = new JRadioButton("Discrete");
+        useCustomDistribution = new JRadioButton("Custom");
+        distributionCategoryGroup = new ButtonGroup();
+        distributionCategoryGroup.add(useContinuousDistribution);
+        distributionCategoryGroup.add(useDiscreteDistribution);
+        distributionCategoryGroup.add(useCustomDistribution);
+        useContinuousDistribution.setSelected(true);
+
+        useContinuousDistribution.addActionListener(act -> updateDistributionCategory());
+        useDiscreteDistribution.addActionListener(act -> updateDistributionCategory());
+        useCustomDistribution.addActionListener(act -> updateDistributionCategory());
+
+        distributionType = new JComboBox<>(continuous);
+        distributionType.setPreferredSize(new Dimension(150, distributionType.getPreferredSize().height));
+        manageCustomDistributionsButton = new JButton("Manage distributions");
+        manageCustomDistributionsButton.setVisible(false);
+        manageCustomDistributionsButton.addActionListener(e -> showManageCustomDistributionsDialog());
+
+        distributionShowGraph = new JButton("Show density");
+        distributionParam1Label = new JLabel();
+        distributionParam2Label = new JLabel();
+        distributionParam3Label = new JLabel();
+        distributionParam1Field = new JTextField(10);
+        distributionParam2Field = new JTextField(10);
+        distributionParam3Field = new JTextField(10);
+
+        paramLabels = new JLabel[]{ distributionParam1Label, distributionParam2Label, distributionParam3Label };
+        paramFields = new JTextField[]{ distributionParam1Field, distributionParam2Field, distributionParam3Field };
+        paramUseConstant = new JCheckBox[3];
+        paramConstantCombos = new JComboBox[3];
+        paramCells = new JPanel[3];
+
+        List<SMCParameterConstant> constantItems = new ArrayList<>();
+        if (transition.underlyingTransition().model() != null) {
+            TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
+            if (network != null) {
+                constantItems.addAll(network.realConstants());
+                constantItems.addAll(network.constants());
+            }
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            final int index = i;
+            paramUseConstant[i] = new JCheckBox("Constant");
+            paramUseConstant[i].setToolTipText("Use a global constant as this parameter");
+            paramUseConstant[i].setEnabled(!constantItems.isEmpty());
+            paramConstantCombos[i] = new JComboBox<>(constantItems.toArray());
+            paramConstantCombos[i].setPreferredSize(new Dimension(150, paramConstantCombos[i].getPreferredSize().height));
+            paramConstantCombos[i].setVisible(false);
+
+            paramUseConstant[i].addActionListener(e -> {
+                boolean useConstant = paramUseConstant[index].isSelected();
+                paramFields[index].setVisible(!useConstant);
+                paramConstantCombos[index].setVisible(useConstant);
+                updateExponentialMeanFromConstant();
+                refreshDistributionPreview();
+                dialog.pack();
+            });
+            paramConstantCombos[i].addActionListener(e -> {
+                updateExponentialMeanFromConstant();
+                refreshDistributionPreview();
+            });
+
+            paramCells[i] = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+            paramCells[i].add(paramFields[i]);
+            paramCells[i].add(paramConstantCombos[i]);
+            paramCells[i].add(paramUseConstant[i]);
+        }
+
+        meanLabel = new JLabel();
+        meanValueLabel = new JLabel();
+        SwingHelper.setPreferredWidth(distributionParam1Field, 150);
+        SwingHelper.setPreferredWidth(distributionParam2Field, 150);
+        SwingHelper.setPreferredWidth(distributionParam3Field, 150);
+        distributionType.addActionListener(actionEvent -> {
+            if (!distributionType.hasFocus()) return;
+            if (useCustomDistribution.isSelected()) {
+                String selectedName = (String)distributionType.getSelectedItem();
+                if (selectedName != null) {
+                    displayDistributionFields(new SMCUserDefinedDistribution(selectedName));
+                }
+            } else {
+                displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
+            }
+        });
+        distributionShowGraph.addActionListener(actionEvent -> showDistributionGraph());
+        DocumentListener updateDistribDisplay = new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                refreshDistributionPreview();
+            }
+            public void removeUpdate(DocumentEvent e) {
+                refreshDistributionPreview();
+            }
+            public void insertUpdate(DocumentEvent e) {
+                refreshDistributionPreview();
+            }
+        };
+
+        final DocumentListener rateFieldListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateMeanFromRate); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateMeanFromRate); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateMeanFromRate); }
+            
+            private void updateMeanFromRate() {
+                if (distributionType.getSelectedItem() != null && distributionType.getSelectedItem().equals(SMCExponentialDistribution.NAME) && 
+                    !updatingFields && distributionParam1Field.hasFocus()) {
+                    try {
+                        updatingFields = true;
+                        String text = distributionParam1Field.getText();
+                        if (!text.isEmpty()) {
+                            double rate = Double.parseDouble(text);
+                            distributionParam2Field.setText(formatValue(1.0 / rate));
+                            distributionParam2Field.setCaretPosition(0);
+                        }
+                    } catch (NumberFormatException ignored) {
+                    } finally {
+                        updatingFields = false;
+                    }
+                }
+            }
+        };
+        
+        final DocumentListener meanFieldListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateRateFromMean); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateRateFromMean); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { SwingUtilities.invokeLater(this::updateRateFromMean); }
+            
+            private void updateRateFromMean() {
+                if (distributionType.getSelectedItem() != null && distributionType.getSelectedItem().equals(SMCExponentialDistribution.NAME) && 
+                    !updatingFields && distributionParam2Field.hasFocus()) {
+                    try {
+                        updatingFields = true;
+                        String text = distributionParam2Field.getText();
+                        if (!text.isEmpty()) {
+                            double mean = Double.parseDouble(text);
+                            distributionParam1Field.setText(formatValue(1.0 / mean));
+                            distributionParam1Field.setCaretPosition(0);
+                        }
+                    } catch (NumberFormatException ignored) {
+                    } finally {
+                        updatingFields = false;
+                    }
+                }
+            }
+        };
+
+        distributionParam1Field.getDocument().addDocumentListener(rateFieldListener);
+        distributionParam2Field.getDocument().addDocumentListener(meanFieldListener);
+
+        distributionParam1Field.getDocument().addDocumentListener(updateDistribDisplay);
+        distributionParam2Field.getDocument().addDocumentListener(updateDistribDisplay);
+        distributionParam3Field.getDocument().addDocumentListener(updateDistribDisplay);
+
+        setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createTitledBorder("Distribution and Firing Mode"));
+        GridBagConstraints gbc = GridBagHelper.as(0,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
+        add(useContinuousDistribution, gbc);
+        gbc.gridx++;
+        add(useDiscreteDistribution, gbc);
+        gbc.gridx++;
+        add(useCustomDistribution, gbc);
+        gbc.gridx++;
+        add(distributionType, gbc);
+        
+        gbc.gridx++;
+        add(manageCustomDistributionsButton, gbc);
+        
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(distributionShowGraph, gbc);
+
+        JPanel paramPanel = new JPanel(new GridBagLayout());
+        gbc = GridBagHelper.as(0,0, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
+        paramPanel.add(distributionParam1Label, gbc);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx++;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paramPanel.add(paramCells[0], gbc);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.EAST;
+        paramPanel.add(distributionParam2Label, gbc);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx++;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paramPanel.add(paramCells[1], gbc);
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx++;
+        gbc.gridwidth = 1;
+        paramPanel.add(meanLabel, gbc);
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.WEST;
+        paramPanel.add(meanValueLabel, gbc);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx -= 5;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.EAST;
+        paramPanel.add(distributionParam3Label, gbc);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx++;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paramPanel.add(paramCells[2], gbc);
+        gbc = GridBagHelper.as(0, 1, GridBagHelper.Anchor.WEST, new Insets(3, 3, 3, 3));
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridwidth = 6;
+        paramPanel.setPreferredSize(new Dimension(765, paramPanel.getPreferredSize().height));
+        add(paramPanel, gbc);
+
+        setUrgent(transition.underlyingTransition().isUrgent());
+    }
+
+    private void refreshDistributionPreview() {
+        SMCDistribution distrib = parseDistribution();
+        if (distrib.getMean() != null && !(distrib instanceof SMCNormalDistribution) && !(distrib instanceof SMCExponentialDistribution)) {
+            meanLabel.setText("Mean :");
+            meanValueLabel.setText(formatValue(distrib.getMean()));
+        } else {
+            meanLabel.setText("");
+            meanValueLabel.setText("");
+        }
+        distributionType.setToolTipText(distrib.explanation());
+    }
+
+    private void updateExponentialMeanFromConstant() {
+        if (!SMCExponentialDistribution.NAME.equals(String.valueOf(distributionType.getSelectedItem()))) {
+            return;
+        }
+
+        boolean rateFromConstant = paramUseConstant[0].isSelected();
+        paramFields[1].setEditable(!rateFromConstant);
+        if (!rateFromConstant || updatingFields) {
+            return;
+        }
+
+        Object selected = paramConstantCombos[0].getSelectedItem();
+        if (selected instanceof SMCParameterConstant) {
+            double rate = ((SMCParameterConstant) selected).paramValue();
+            if (rate != 0) {
+                try {
+                    updatingFields = true;
+                    paramFields[1].setText(formatValue(1.0 / rate));
+                    paramFields[1].setCaretPosition(0);
+                } finally {
+                    updatingFields = false;
+                }
+            }
+        }
+    }
+
+    private void updateDistributionCategory() {
+        updateDistributionCategory(null);
+    }
+
+    private void updateDistributionCategory(String selectedDistribution) {
+        if (useCustomDistribution.isSelected()) {
+            TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
+            List<String> names = network.userDefinedDistributions().stream()
+                .map(SMCUserDefinedDistribution::getName)
+                .collect(Collectors.toList());
+            distributionType.setModel(new DefaultComboBoxModel<>(names.toArray(new String[0])));
+            manageCustomDistributionsButton.setVisible(true);
+            
+            if (!names.isEmpty()) {
+                if (selectedDistribution != null && names.contains(selectedDistribution)) {
+                    distributionType.setSelectedItem(selectedDistribution);
+                    displayDistributionFields(new SMCUserDefinedDistribution(selectedDistribution));
+                } else {
+                    distributionType.setSelectedIndex(0);
+                    displayDistributionFields(new SMCUserDefinedDistribution(names.get(0)));
+                }
+                
+                distributionShowGraph.setEnabled(true);
+                okButton.setEnabled(true);
+            } else {
+                distributionType.setSelectedItem(null);
+                displayCustomDistribution();
+                meanLabel.setText("");
+                meanValueLabel.setText("");
+                distributionShowGraph.setEnabled(false);
+                okButton.setEnabled(false);
+            }
+        } else {
+            distributionShowGraph.setEnabled(true);
+            okButton.setEnabled(true);
+            manageCustomDistributionsButton.setVisible(false);
+            boolean toContinuous = useContinuousDistribution.isSelected();
+            String currentDistribution = String.valueOf(distributionType.getSelectedItem());
+            String a = distributionParam1Field.getText();
+            String b = distributionParam2Field.getText();
+            
+            distributionType.setModel(new DefaultComboBoxModel<>(toContinuous ? continuous : discrete));
+
+            boolean isUniformConversion = (toContinuous && SMCDiscreteUniformDistribution.NAME.equals(currentDistribution)) ||
+                                        (!toContinuous && SMCUniformDistribution.NAME.equals(currentDistribution));
+            
+            if (isUniformConversion) {
+                String targetDistribution = toContinuous ? SMCUniformDistribution.NAME : SMCDiscreteUniformDistribution.NAME;
+                distributionType.setSelectedItem(targetDistribution);
+                displayDistributionFields(SMCDistribution.defaultDistributionFor(targetDistribution));
+                distributionParam1Field.setText(a);
+                distributionParam2Field.setText(b);
+            } else {
+                displayDistributionFields(SMCDistribution.defaultDistributionFor(String.valueOf(distributionType.getSelectedItem())));
+            }
+        }
+
+        dialog.pack();
+    }
+
+    public void setUrgent(boolean urgent) {
+        if(urgent) {
+            displayDistributionFields(SMCDistribution.urgent());
+            distributionType.setEnabled(false);
+            useDiscreteDistribution.setEnabled(false);
+            useContinuousDistribution.setEnabled(false);
+            useCustomDistribution.setEnabled(false);
+            distributionParam1Field.setEnabled(false);
+            paramUseConstant[0].setEnabled(false);
+            paramConstantCombos[0].setEnabled(false);
+        } else {
+            distributionType.setEnabled(true);
+            useDiscreteDistribution.setEnabled(true);
+            useContinuousDistribution.setEnabled(true);
+            useCustomDistribution.setEnabled(true);
+            distributionParam1Field.setEnabled(true);
+            paramUseConstant[0].setEnabled(paramConstantCombos[0].getItemCount() > 0);
+            paramConstantCombos[0].setEnabled(true);
+        }
+    }
+
+    public SMCDistribution parseDistribution() {
+        if(transition.isUrgent()) {
+            return SMCDistribution.urgent();
+        }
+        String type = String.valueOf(distributionType.getSelectedItem());
+        if (useCustomDistribution.isSelected()) {
+             return new SMCUserDefinedDistribution(type);
+        }
+
+        pendingRefs.clear();
+        try {
+            SMCDistribution result = null;
+            switch (type) {
+                case SMCConstantDistribution.NAME:
+                    double value = parseParam("value", 0);
+                    result = new SMCConstantDistribution(value);
+                    break;
+                case SMCUniformDistribution.NAME:
+                    double a = parseParam("a", 0);
+                    double b = parseParam("b", 1);
+                    result = new SMCUniformDistribution(a, b);
+                    break;
+                case SMCExponentialDistribution.NAME:
+                    double rate = parseParam("rate", 0);
+                    result = new SMCExponentialDistribution(rate);
+                    break;
+                case SMCNormalDistribution.NAME:
+                    double mean = parseParam("mean", 0);
+                    double stddev = parseParam("stddev", 1);
+                    result = new SMCNormalDistribution(mean, stddev);
+                    break;
+                case SMCGammaDistribution.NAME:
+                    double shape = parseParam("shape", 0);
+                    double scale = parseParam("scale", 1);
+                    result = new SMCGammaDistribution(shape, scale);
+                    break;
+                case SMCErlangDistribution.NAME:
+                    double eshape = parseIntParam("shape", 0);
+                    double escale = parseParam("scale", 1);
+                    result = new SMCErlangDistribution(eshape, escale);
+                    break;
+                case SMCDiscreteUniformDistribution.NAME:
+                    double da = parseIntParam("a", 0);
+                    double db = parseIntParam("b", 1);
+                    result = new SMCDiscreteUniformDistribution(da, db);
+                    break;
+                case SMCGeometricDistribution.NAME:
+                    double p = parseParam("p", 0);
+                    result = new SMCGeometricDistribution(p);
+                    break;
+                case SMCTriangularDistribution.NAME:
+                    double ta = parseParam("a", 0);
+                    double tb = parseParam("b", 1);
+                    double tc = parseParam("c", 2);
+                    result = new SMCTriangularDistribution(ta, tb, tc);
+                    break;
+                case SMCLogNormalDistribution.NAME:
+                    double logMean = parseParam("logMean", 0);
+                    double logStddev = parseParam("logStddev", 1);
+                    result = new SMCLogNormalDistribution(logMean, logStddev);
+                    break;
+            }
+            if (result != null) {
+                pendingRefs.forEach(result::setParamRef);
+                return result;
+            }
+        } catch(NumberFormatException ignored) {}
+        return SMCDistribution.defaultDistributionFor(type);
+    }
+
+    private final Map<String, SMCParameterConstant> pendingRefs = new LinkedHashMap<>();
+
+    private SMCParameterConstant selectedConstant(int index) {
+        Object selected = paramConstantCombos[index].getSelectedItem();
+        return selected instanceof SMCParameterConstant ? (SMCParameterConstant) selected : null;
+    }
+
+    private double parseParam(String key, int index) {
+        if (paramUseConstant[index].isSelected()) {
+            var constant = selectedConstant(index);
+            if (constant == null) {
+                throw new NumberFormatException("No constant selected");
+            }
+            pendingRefs.put(key, constant);
+            return constant.paramValue();
+        }
+        return Double.parseDouble(paramFields[index].getText().trim());
+    }
+
+    private double parseIntParam(String key, int index) {
+        if (paramUseConstant[index].isSelected()) {
+            return parseParam(key, index);
+        }
+        
+        return Integer.parseInt(paramFields[index].getText().trim());
+    }
+
+    public void displayDistribution() {
+        SMCDistribution distribution = transition.underlyingTransition().getDistribution();
+        displayDistributionFields(distribution);
+    }
+
+    public void displayDistributionFields(SMCDistribution distribution) {
+        if (Arrays.asList(continuous).contains(distribution.distributionName())) {
+            useContinuousDistribution.setSelected(true);
+            distributionType.setModel(new DefaultComboBoxModel<>(continuous));
+            manageCustomDistributionsButton.setVisible(false);
+            distributionShowGraph.setEnabled(true);
+            okButton.setEnabled(true);
+        } else if (Arrays.asList(discrete).contains(distribution.distributionName())) {
+            distributionType.setModel(new DefaultComboBoxModel<>(discrete));
+            useDiscreteDistribution.setSelected(true);
+            manageCustomDistributionsButton.setVisible(false);
+            distributionShowGraph.setEnabled(true);
+            okButton.setEnabled(true);
+        } else if (distribution instanceof SMCUserDefinedDistribution) {
+            useCustomDistribution.setSelected(true);
+            manageCustomDistributionsButton.setVisible(true);
+            TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
+            List<String> names = network.userDefinedDistributions().stream()
+                                        .map(SMCUserDefinedDistribution::getName)
+                                        .collect(Collectors.toList());
+            distributionType.setModel(new DefaultComboBoxModel<>(names.toArray(new String[0])));
+            distributionShowGraph.setEnabled(!names.isEmpty());
+            okButton.setEnabled(!names.isEmpty());
+        }
+        
+        distributionParam1Field.setEditable(true);
+
+        switch (distribution.distributionName()) {
+            case SMCConstantDistribution.NAME:
+                displayParam(0, "Value", distribution, "value");
+                hideParam(1);
+                hideParam(2);
+                break;
+            case SMCUniformDistribution.NAME:
+                displayParam(0, "A", distribution, "a");
+                displayParam(1, "B", distribution, "b");
+                hideParam(2);
+                break;
+            case SMCExponentialDistribution.NAME:
+                displayParam(0, "Rate", distribution, "rate");
+                displayDerivedParam(1, "Mean", formatValue(1.0 / distribution.getResolvedParameters().get("rate")));
+                paramFields[1].setEditable(distribution.getParamRef("rate") == null);
+                hideParam(2);
+                break;
+            case SMCNormalDistribution.NAME:
+                displayParam(0, "Mean", distribution, "mean");
+                displayParam(1, "Std. Dev", distribution, "stddev");
+                hideParam(2);
+                break;
+            case SMCGammaDistribution.NAME:
+                displayParam(0, "Shape", distribution, "shape");
+                displayParam(1, "Scale", distribution, "scale");
+                hideParam(2);
+                break;
+            case SMCErlangDistribution.NAME:
+                displayParam(0, "Shape", distribution, "shape");
+                displayParam(1, "Scale", distribution, "scale");
+                hideParam(2);
+                break;
+            case SMCDiscreteUniformDistribution.NAME:
+                displayParam(0, "A", distribution, "a");
+                displayParam(1, "B", distribution, "b");
+                hideParam(2);
+                break;
+            case SMCGeometricDistribution.NAME:
+                displayParam(0, "P", distribution, "p");
+                hideParam(1);
+                hideParam(2);
+                break;
+            case SMCTriangularDistribution.NAME:
+                displayParam(0, "A", distribution, "a");
+                displayParam(1, "B", distribution, "b");
+                displayParam(2, "C", distribution, "c");
+                break;
+            case SMCLogNormalDistribution.NAME:
+                displayParam(0, "Log Mean", distribution, "logMean");
+                displayParam(1, "Log Std. Dev", distribution, "logStddev");
+                hideParam(2);
+                break;
+            case SMCUserDefinedDistribution.NAME:
+                displayCustomDistribution();
+                break;
+            default:
+                break;
+        }
+        distributionType.setToolTipText(distribution.explanation());
+
+        if (distribution.getMean() != null && !(distribution instanceof SMCNormalDistribution) && !(distribution instanceof SMCExponentialDistribution)) {
+            meanLabel.setText("Mean :");
+            meanValueLabel.setText(String.format("%.3f", distribution.getMean()));
+        } else {
+            meanLabel.setText("");
+            meanValueLabel.setText("");
+        }
+
+        distributionType.setFocusable(false);
+        if (distribution instanceof SMCUserDefinedDistribution) {
+             distributionType.setSelectedItem(((SMCUserDefinedDistribution)distribution).getName());
+        } else {
+             distributionType.setSelectedItem(distribution.distributionName());
+        }
+        distributionType.setFocusable(true);
+        dialog.pack();
+    }
+
+    private void displayParam(int i, String label, SMCDistribution distribution, String key) {
+        paramLabels[i].setText(label + " :");
+        paramLabels[i].setVisible(true);
+        paramCells[i].setVisible(true);
+
+        SMCParameterConstant ref = distribution.getParamRef(key);
+        boolean hasConstants = paramConstantCombos[i].getItemCount() > 0;
+        paramUseConstant[i].setVisible(true);
+        paramUseConstant[i].setEnabled(hasConstants);
+
+        if (ref != null && hasConstants) {
+            paramUseConstant[i].setSelected(true);
+            paramConstantCombos[i].setSelectedItem(ref);
+            paramConstantCombos[i].setVisible(true);
+            paramFields[i].setVisible(false);
+        } else {
+            paramUseConstant[i].setSelected(false);
+            paramFields[i].setText(formatValue(distribution.getParameters().get(key)));
+            paramFields[i].setCaretPosition(0);
+            paramFields[i].setVisible(true);
+            paramConstantCombos[i].setVisible(false);
+        }
+    }
+
+    private void displayDerivedParam(int i, String label, String text) {
+        paramLabels[i].setText(label + " :");
+        paramLabels[i].setVisible(true);
+        paramCells[i].setVisible(true);
+        paramUseConstant[i].setSelected(false);
+        paramUseConstant[i].setVisible(false);
+        paramConstantCombos[i].setVisible(false);
+        paramFields[i].setText(text);
+        paramFields[i].setCaretPosition(0);
+        paramFields[i].setVisible(true);
+    }
+
+    private void hideParam(int i) {
+        paramLabels[i].setVisible(false);
+        paramCells[i].setVisible(false);
+        paramUseConstant[i].setSelected(false);
+    }
+
+    private void displayCustomDistribution() {
+        paramLabels[0].setText("");
+        hideParam(0);
+        hideParam(1);
+        hideParam(2);
+    }
+
+    private void showManageCustomDistributionsDialog() {
+        String previouslySelected = (String)distributionType.getSelectedItem();
+        TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
+
+        SMCUserDefinedDistribution previousDist = null;
+        if (previouslySelected != null) {
+            for (SMCUserDefinedDistribution dist : network.userDefinedDistributions()) {
+                if (dist.getName().equals(previouslySelected)) {
+                    previousDist = dist;
+                    break;
+                }
+            }
+        }
+
+        ManageCustomDistributionsDialog dialog = new ManageCustomDistributionsDialog(network, this);
+        dialog.setVisible(true);
+        if (useCustomDistribution.isSelected()) {
+             if (previousDist != null && network.userDefinedDistributions().contains(previousDist)) {
+                 updateDistributionCategory(previousDist.getName());
+             } else {
+                 updateDistributionCategory(previouslySelected);
+             }
+        }
+    }
+
+    private String formatValue(double value) {
+        DecimalFormat df = new DecimalFormat("#.################", new DecimalFormatSymbols(Locale.ENGLISH));
+        df.setMinimumFractionDigits(1);
+        return df.format(value);
+    }
+
+    private void showDistributionGraph() {
+        SMCDistribution distribution = parseDistribution();
+
+        try {
+            GraphDialog dialog = createGraphDialog(distribution);
+            dialog.display();
+        } catch (RequireException e) {
+            JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "There was an error opening the graph. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private GraphDialog createGraphDialog(SMCDistribution distribution) {
+        String title = "Probability Density Function";
+        GraphDialogBuilder builder = new GraphDialogBuilder();
+
+        if (distribution instanceof SMCConstantDistribution) {
+            Graph graph = createGraph((SMCConstantDistribution) distribution);
+            builder = builder.addGraph(graph).setTitle(title);
+        } else if (distribution instanceof SMCDiscreteUniformDistribution) {
+            Graph graph = createGraph((SMCDiscreteUniformDistribution) distribution);
+            builder = builder.addGraph(graph).setPointPlot(true);
+        } else if (distribution instanceof SMCExponentialDistribution) {
+            Graph graph = createGraph((SMCExponentialDistribution) distribution);
+            builder = builder.addGraph(graph);
+        } else if (distribution instanceof SMCGammaDistribution) {
+            Graph graph = createGraph((SMCGammaDistribution) distribution);
+            builder = builder.addGraph(graph);
+        } else if (distribution instanceof SMCErlangDistribution) {
+            Graph graph = createGraph((SMCErlangDistribution) distribution);
+            builder = builder.addGraph(graph);
+        } else if (distribution instanceof SMCNormalDistribution) {
+            Graph graph = createGraph((SMCNormalDistribution) distribution);
+            builder = builder.addGraph(graph).setTitle(title);
+        } else if (distribution instanceof SMCUniformDistribution) {
+            List<Graph> graphs = createGraphs((SMCUniformDistribution) distribution);
+            builder = builder.addGraphs(graphs).setPiecewise(true);
+        } else if (distribution instanceof SMCGeometricDistribution) {
+            Graph graph = createGraph((SMCGeometricDistribution) distribution);
+            builder = builder.addGraph(graph).setPointPlot(true);
+        } else if (distribution instanceof SMCTriangularDistribution) {
+            Graph graph = createGraph((SMCTriangularDistribution) distribution);
+            builder = builder.addGraph(graph);
+        } else if (distribution instanceof SMCLogNormalDistribution) {
+            Graph graph = createGraph((SMCLogNormalDistribution) distribution);
+            builder = builder.addGraph(graph);
+        } else if (distribution instanceof SMCUserDefinedDistribution) {
+            Graph graph = createGraph((SMCUserDefinedDistribution) distribution);
+            builder = builder.addGraph(graph).setPointPlot(true);
+        }
+
+        return builder.setTitle(title).build();
+    }
+
+    private Graph createGraph(SMCConstantDistribution distribution) {
+        List<GraphPoint> points = new ArrayList<>();
+        LinkedHashMap<String, Double> params = distribution.getParameters();
+        double value = params.get("value");
+
+        points.add(new GraphPoint(value, 0));
+        points.add(new GraphPoint(value, 100));
+
+        return new Graph("Constant Distribution", points, distribution.getMean());
+    }
+
+    private Graph createGraph(SMCDiscreteUniformDistribution distribution) {
+        List<GraphPoint> points = new ArrayList<>();
+
+        LinkedHashMap<String, Double> params = distribution.getParameters();
+        double a = params.get("a");
+        double b = params.get("b");
+        double mean = distribution.getMean();
+
+        double n = b - a + 1;
+
+        for (int x = (int) a; x <= (int) b; ++x) {
+            points.add(new GraphPoint(x, 1 / n));
+        }
+
+        return new Graph("Discrete Uniform Distribution", points, mean);
+    }
+
+    private Graph createGraph(SMCExponentialDistribution distribution) {
+        var params = distribution.getParameters();
+        var rate = params.get("rate");
+        var mean = distribution.getMean();
+        DoubleUnaryOperator density = x -> x < 0 ? Double.NaN : rate * Math.exp(-rate * x);
+
+        return new Graph("Exponential Distribution", 0, -Math.log(1e-6) / rate, mean, density);
+    }
+
+    private Graph createGraph(SMCGammaDistribution distribution) {
+        var params = distribution.getParameters();
+        var shape = params.get("shape");
+        var scale = params.get("scale");
+
+        Require.that(shape > 0, "Shape must be a positive real");
+        Require.that(scale > 0, "Scale must be a positive real");
+
+        var gamma = spougeGammaApprox(shape - 1);
+        var coefficient = 1 / (gamma * Math.pow(scale, shape));
+        DoubleUnaryOperator density = x -> x <= 0
+            ? Double.NaN
+            : coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
+
+        var mean = distribution.getMean();
+        var stddev = Math.sqrt(shape) * scale;
+        return new Graph("Gamma Distribution", 0, mean + 8 * stddev, mean, density);
+    }
+
+    private Graph createGraph(SMCErlangDistribution distribution) {
+        var params = distribution.getParameters();
+        var shape = params.get("shape");
+        var scale = params.get("scale");
+
+        Require.that(shape >= 1 && (shape % 1 == 0), "Shape must be a positive integer");
+        Require.that(scale > 0, "Scale must be a positive real");
+
+        var gamma = spougeGammaApprox(shape - 1);
+        var coefficient = 1 / (gamma * Math.pow(scale, shape));
+        DoubleUnaryOperator density = x -> x <= 0
+            ? Double.NaN
+            : coefficient * Math.pow(x, shape - 1) * Math.exp(-(x / scale));
+
+        var mean = distribution.getMean();
+        var stddev = Math.sqrt(shape) * scale;
+        return new Graph("Erlang Distribution", 0, mean + 8 * stddev, mean, density);
+    }
+
+    private double spougeGammaApprox(double shape) {
+        int a = 10;
+        List<Double> c = new ArrayList<>();
+        c.add(Math.sqrt(2 * Math.PI));
+        for (int k = 1; k < a; ++k) {
+            c.add((Math.pow(-1, k - 1) / factorial(k - 1)) * Math.pow(-k + a, k - 0.5) * Math.exp(-k + a));
+        }
+
+        double sum = c.get(0);
+        for (int k = 1; k < a; ++k) {
+            sum += c.get(k) / (shape + k);
+        }
+
+        double term = Math.pow(shape + a, shape + 0.5) * Math.exp(-shape - a);
+        return term * sum;
+    }
+
+    private int factorial(int n) {
+        int result = 1;
+        if (n == 0) return result;
+
+        for (int i = 1; i <= n; ++i) {
+            result *= i;
+        }
+
+        return result;
+    }
+
+    private Graph createGraph(SMCNormalDistribution distribution) {
+        var params = distribution.getParameters();
+        var mean = distribution.getMean();
+        var stddev = params.get("stddev");
+        var variance = Math.pow(stddev, 2);
+        
+        var coefficient = 1 / Math.sqrt(2 * Math.PI * variance);
+        var twoVariance = 2 * variance;
+        var negInvTwoVariance = -1 / twoVariance;
+        DoubleUnaryOperator density = x -> x < 0
+            ? Double.NaN
+            : coefficient * Math.exp(Math.pow(x - mean, 2) * negInvTwoVariance);
+    
+        var min = Math.max(mean - 4 * stddev, 0);
+        var max = mean + 4 * stddev;
+        return new Graph("Normal Distribution", min, max, mean, density);
+    }
+
+    private List<Graph> createGraphs(SMCUniformDistribution distribution) {
+        List<Graph> graphs = new ArrayList<>(); 
+        
+        List<GraphPoint> pointsG1 = new ArrayList<>();
+        List<GraphPoint> pointsG2 = new ArrayList<>();
+        List<GraphPoint> pointsG3 = new ArrayList<>();  
+
+        LinkedHashMap<String, Double> params = distribution.getParameters();
+        double a = params.get("a");
+        double b = params.get("b");
+        double mean = distribution.getMean();
+
+        pointsG1.add(new GraphPoint(0, 0));
+        pointsG1.add(new GraphPoint(a, 0));
+        pointsG2.add(new GraphPoint(a, 1/(b-a)));
+        pointsG2.add(new GraphPoint(b, 1/(b-a)));
+        pointsG3.add(new GraphPoint(b, 0));
+        pointsG3.add(new GraphPoint(b + a, 0));
+
+        graphs.add(new Graph("Uniform Distribution", pointsG1, mean));
+        graphs.add(new Graph("piece2", pointsG2));
+        graphs.add(new Graph("piece3", pointsG3));
+
+        return graphs;
+    }
+
+    private Graph createGraph(SMCGeometricDistribution distribution) {
+        List<GraphPoint> points = new ArrayList<>();
+
+        LinkedHashMap<String, Double> params = distribution.getParameters();
+        double p = params.get("p");
+
+        double y = p;
+        int x = 0;
+
+        while (y > 0.01 && x < 100) {
+            points.add(new GraphPoint(x, y));
+            y *= (1 - p);
+            ++x;
+        }
+
+        return new Graph("Geometric distribution", points, distribution.getMean());
+    }
+
+    private Graph createGraph(SMCTriangularDistribution distribution) {
+        var mean = distribution.getMean();
+        var height = 2 / (distribution.b - distribution.a);
+        DoubleUnaryOperator density = x -> {
+            if (x < distribution.a || x > distribution.b) return 0;
+            if (x == distribution.c) return height;
+            if (x < distribution.c) return height * (x - distribution.a) / (distribution.c - distribution.a);
+            return height * (distribution.b - x) / (distribution.b - distribution.c);
+        };
+
+        return new Graph("Triangular Distribution", distribution.a, distribution.b, mean, density);
+    }
+
+    private Graph createGraph(SMCLogNormalDistribution distribution) {
+        var mean = distribution.getMean();
+        var logStddev = distribution.logStddev;
+        var logMean = distribution.logMean;
+        DoubleUnaryOperator density = x -> x <= 0 ? Double.NaN : distribution.pdf(x);
+
+        var max = Math.exp(logMean + 4 * logStddev);
+        return new Graph("Log Normal Distribution", 0, max, mean, density);
+    }
+
+    private Graph createGraph(SMCUserDefinedDistribution distribution) {
+        String name = distribution.getName();
+        
+    	TimedArcPetriNetNetwork network = transition.underlyingTransition().model().parentNetwork();
+    	SMCUserDefinedDistribution cd = null;
+    	for (SMCUserDefinedDistribution c : network.userDefinedDistributions()) {
+    		if (c.getName().equals(name)) {
+    			cd = c;
+    			break;
+    		}
+    	}
+    	
+    	if (cd == null) {
+            throw new RequireException("Custom distribution '" + name + "' not found.");
+    	}
+
+        List<Double> values = cd.getValues();
+        if (values.isEmpty()) {
+            throw new RequireException("The distribution contains no values.");
+        }
+        
+        double sum = 0;
+        double min = Double.MAX_VALUE;
+        double max = -Double.MAX_VALUE;
+        TreeMap<Double, Integer> frequencies = new TreeMap<>();
+
+        for (double v : values) {
+        	sum += v;
+            if (v < min) min = v;
+            if (v > max) max = v;
+            frequencies.put(v, frequencies.getOrDefault(v, 0) + 1);
+        }
+
+        List<GraphPoint> points = new ArrayList<>();
+        for (Map.Entry<Double, Integer> entry : frequencies.entrySet()) {
+            points.add(new GraphPoint(entry.getKey(), (double)entry.getValue() / values.size()));
+        }
+
+        return new Graph(distribution.distributionName(), points, sum / values.size());
+    }
+
+    public boolean canEnableOkButton() {
+        if (useCustomDistribution.isSelected()) {
+            return distributionType.getSelectedItem() != null;
+        }
+
+        return true;
+    }
+}

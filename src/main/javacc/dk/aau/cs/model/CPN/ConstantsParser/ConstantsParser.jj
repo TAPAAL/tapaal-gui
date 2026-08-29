@@ -1,0 +1,671 @@
+options {
+    STATIC = false;
+}
+PARSER_BEGIN(ConstantsParser)
+package dk.aau.cs.model.CPN.ConstantsParser;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.RealConstant;
+import dk.aau.cs.model.tapn.SMCParameterConstant;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.CPN.ColorMultiset;
+import dk.aau.cs.model.CPN.Expressions.Expression;
+import dk.aau.cs.model.CPN.Expressions.GuardExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
+import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
+import dk.aau.cs.model.CPN.ProductType;
+
+import javax.swing.JOptionPane;
+import pipe.gui.TAPAALGUI;
+
+public class ConstantsParser {
+    private static final Map<String, Constant> constants = new LinkedHashMap<String, Constant>();
+    private static final Map<String, RealConstant> realConstants = new LinkedHashMap<String, RealConstant>();
+    private static final Map<String, ColorType> colorTypes = new LinkedHashMap<String, ColorType>();
+    private static final Map<String, Variable> variables = new LinkedHashMap<String, Variable>();
+    private static TimedArcPetriNetNetwork network;
+
+    private static class BoolRef {
+        public boolean value;
+
+        public BoolRef(boolean value) {
+            this.value = value;
+        }
+    }
+
+    public static boolean parse(String constantsToParse, TimedArcPetriNetNetwork network) throws ParseException, TokenMgrError {
+        ConstantsParser.network = network;
+        ConstantsParser parser = new ConstantsParser(new StringReader(constantsToParse));
+        constants.clear();
+        realConstants.clear();
+        colorTypes.clear();
+        variables.clear();
+
+        parser.startParsing();
+
+        network.buildConstraints();
+
+        List<Constant> constantsList = new ArrayList<Constant>(constants.values());
+        List<ColorType> colorTypesList = new ArrayList<ColorType>(colorTypes.values());
+        List<Variable> variablesList = new ArrayList<Variable>(variables.values());
+
+        ColorType dot = new ColorType("dot");
+        dot.addColor("dot");    
+        colorTypesList.add(0, dot);
+
+        Map<String, Object> constantsMap = new HashMap<String, Object>();
+        Map<String, Boolean> canBeRemovedBitMap = new HashMap<String, Boolean>();
+        Map<String, List<String>> messages = new HashMap<String, List<String>>();        
+        
+        // Populate maps with constants, color types and variables and if they can be removed
+        for (Constant c : network.constants()) {
+            constantsMap.put(c.name(), c);
+            canBeRemovedBitMap.put(c.name(), !network.getConstantStore().isConstantInUse(c.name()));
+        }
+
+        for (RealConstant rc : network.realConstants()) {
+            constantsMap.put(rc.name(), rc);
+            canBeRemovedBitMap.put(rc.name(), !network.getConstantStore().isRealConstantInUse(rc.name()));
+        }
+
+        for (ColorType ct : network.colorTypes()) {
+            List<String> messagesList = new ArrayList<String>();
+            constantsMap.put(ct.getName(), ct);
+            canBeRemovedBitMap.put(ct.getName(), network.canColorTypeBeRemoved(ct, messagesList));
+            messages.put(ct.getName(), messagesList);
+        }
+
+        for (Variable v : network.variables()) {
+            List<String> messagesList = new ArrayList<String>();
+            constantsMap.put(v.getName(), v);
+            boolean canBeEdited = true;
+            if (variables.containsKey(v.getName())) {
+                ColorType ct = variables.get(v.getName()).getColorType();
+                canBeEdited = ct.equals(v.getColorType());
+            }
+    
+            canBeRemovedBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList) && canBeEdited);
+            messages.put(v.getName(), messagesList);
+        }
+
+        // Generate error messages
+        for (String key : canBeRemovedBitMap.keySet()) {
+            if (constants.containsKey(key) ||
+                realConstants.containsKey(key) ||
+                variables.containsKey(key) && canBeRemovedBitMap.get(key) ||
+                key.equals("dot")) {
+                continue;
+            } else if (variables.containsKey(key) && !canBeRemovedBitMap.get(key)) {
+                boolean skip = false;
+                for (Variable v : network.variables()) {
+                    if (v.getName().equals(key)) {
+                        skip = v.getColorType().getName().equals(variables.get(key).getColorType().getName());
+                        break;
+                    }
+                }
+
+                if (skip) continue;
+            } else if (colorTypes.containsKey(key)) {
+                if (colorTypes.get(key).equals(constantsMap.get(key))) continue;
+
+                ColorType newCt = colorTypes.get(key);
+                ColorType ct = (ColorType)constantsMap.get(key);
+
+                if (ct instanceof ProductType) {
+                    ProductType pct = (ProductType)ct;
+                    ProductType newPct = (ProductType)newCt;
+
+                    boolean isSimiliar = pct.getProductColorTypes().size() == newPct.getProductColorTypes().size() && pct.containsTypes(newPct.getColorTypes());
+                    if (isSimiliar) {
+                        updateColorTypes(pct, newPct);
+                        continue;
+                    }
+                } else {
+    
+                    List<Color> removedColors = new ArrayList<Color>();
+                    for (Color color : ct.getColors()) {
+                        if (!newCt.contains(color)) {
+                            removedColors.add(color);
+                        }
+                    }
+                    
+                    int removeableColors = 0;
+                    for (Color c : removedColors) {
+                        List<String> newMessagesList = new ArrayList<String>();
+                        boolean colorCanBeRemoved = network.canColorBeRemoved(c, newMessagesList);
+                        if (colorCanBeRemoved) {
+                            ++removeableColors;
+                        } else {
+                            List<String> messagesList = new ArrayList<String>();
+                            messagesList.addAll(newMessagesList);
+                            messages.put(key, messagesList);
+                        }
+                    }
+                    
+                    if (removeableColors >= removedColors.size()) {
+                        updateColorTypes(ct, newCt);
+                        continue;
+                    }
+                }
+            }
+
+            Object obj = constantsMap.get(key);
+
+            // If the object is a ColorType, check if all dependent variables are being removed
+            if (obj instanceof ColorType) {
+                ColorType ct = (ColorType)obj;
+                boolean allDependentVariablesBeingRemoved = true;
+                for (Variable v : network.variables()) {
+                    if (v.getColorType().equals(ct)) {
+                        if (variables.containsKey(v.getName())) {
+                            allDependentVariablesBeingRemoved = false;
+                            break;
+                        }
+                    }
+                }
+                
+                if (allDependentVariablesBeingRemoved) {
+                    boolean isUsedInPlace = false;
+                    for (TimedArcPetriNet tapn : network.allTemplates()) {
+                        for (TimedPlace place : tapn.places()) {
+                            if (place.getColorType().getName().equals(ct.getName())) {
+                                isUsedInPlace = true;
+                                break;
+                            }
+                        }
+                        if (isUsedInPlace) break;
+                    }
+
+                    if (!isUsedInPlace) {
+                        continue;
+                    }
+                }
+            }
+
+            if (!canBeRemovedBitMap.get(key)) {
+                String message = "Could not ";
+                String title = "Could not ";
+                if (obj instanceof ColorType && 
+                    colorTypes.containsKey(key) ||
+                    obj instanceof Variable &&
+                    variables.containsKey(key)) {
+                    message += "modify ";
+                    title += "modify constant";
+                } else {
+                    message += "remove ";
+                    title += "remove constant";
+                }
+
+                if (obj instanceof ColorType) {
+                    message += "color type";
+                } else if (obj instanceof Variable) {
+                    message += "variable";
+                } else {
+                    message += "constant";
+                }
+
+                message += " \"" + key + "\"";
+
+                if (!(obj instanceof SMCParameterConstant)) {
+                    message += " for the following reasons:  \n\n";
+                    message += String.join("", messages.get(key));
+                } else {
+                    message += " because it is in use";
+                }
+
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), message, title, JOptionPane.WARNING_MESSAGE);
+
+                return false;
+            }
+        }
+
+        network.getConstantStore().clear();
+        network.setConstants(constantsList);
+        network.setRealConstants(new ArrayList<RealConstant>(realConstants.values()));
+        if (network.isColored()) {
+            network.setColorTypes(colorTypesList);
+            network.setVariables(variablesList);
+        }
+
+        return true;
+    }
+
+    private static void idExists(String id) throws ParseException {
+        if (id.equals("dot")) {
+            throw new ParseException("Name \"dot\" is reserved");
+        }
+
+        if (constants.containsKey(id)) {
+            throw new ParseException("Constant with name \"" + id + "\" already exists");
+        }
+
+        if (realConstants.containsKey(id)) {
+            throw new ParseException("Real constant with name \"" + id + "\" already exists");
+        }
+
+        if (colorTypes.containsKey(id)) {
+            throw new ParseException("Color type with name \"" + id + "\" already exists");
+        }
+
+        if (variables.containsKey(id)) {
+            throw new ParseException("Variable with name \"" + id + "\" already exists");
+        }
+
+        for (ColorType ct : colorTypes.values()) {
+            for (Color c : ct.getColors()) {
+                if (c.getName().equals(id)) {
+                    throw new ParseException("The name \"" + id + "\" is already used as a color in type \"" + ct.getName() + "\"");
+                }
+            }
+        }
+    }
+
+    private static Expression updateGuardTypes(Expression expr, ColorType oldCt, ColorType newCt) {
+        if (expr == null) return null;
+
+        if (expr instanceof UserOperatorExpression) {
+            UserOperatorExpression uoe = (UserOperatorExpression) expr;
+            if (uoe.getUserOperator().getColorType().getName().equals(oldCt.getName())) {
+                return uoe.getExprWithNewColorType(newCt);
+            }
+            return expr;
+        }
+
+        Expression result = expr;
+        for (ExprStringPosition pos : expr.getChildren()) {
+            Expression child = pos.getObject();
+            Expression updatedChild = updateGuardTypes(child, oldCt, newCt);
+            
+            if (updatedChild != child) {
+                result = result.replace(child, updatedChild);
+            }
+        }
+        return result;
+    }
+
+    private static Color getNewColor(Color oldColor, ColorType newCt) {
+        if (newCt instanceof ProductType) {
+            ProductType newPt = (ProductType)newCt;
+            if (oldColor.getTuple() == null) {
+                return null; 
+            }
+            
+            Vector<Color> newTupleColors = new Vector<Color>();
+            Vector<ColorType> newConstituents = (Vector<ColorType>)newPt.getColorTypes();
+            Vector<Color> oldTupleColors = oldColor.getTuple();
+
+            if (newConstituents.size() != oldTupleColors.size()) return null;
+
+            for (int i = 0; i < oldTupleColors.size(); i++) {
+                Color componentColor = getNewColor(oldTupleColors.get(i), newConstituents.get(i));
+                if (componentColor == null) return null;
+                newTupleColors.add(componentColor);
+            }
+            return newPt.getColor(newTupleColors);
+        } else {
+             return newCt.getColorByName(oldColor.getColorName());
+        }
+    }
+
+    private static void updateColorTypes(ColorType ct, ColorType newCt) {
+        for (TimedArcPetriNet tapn : network.allTemplates()) {
+            for (TimedPlace place : tapn.places()) {
+                if (place.getColorType().equals(ct)) {
+                    if (place.getTokensAsExpression() != null) {
+                        place.setTokenExpression(place.getTokensAsExpression().getExprConverted(ct, newCt));
+                    }
+
+                    List<TimedToken> oldTokens = new ArrayList<TimedToken>(place.tokens());
+                    place.setColorType(newCt);
+                    for (TimedToken token : oldTokens) {
+                        if (token.getColor() != null && newCt.contains(token.getColor())) {
+                            place.addToken(new TimedToken(place, token.age(), getNewColor(token.getColor(), newCt)));
+                        }
+                    }
+                }
+
+                ArcExpression expression = place.getExprWithNewColorType(newCt);
+                if (expression != place.getTokensAsExpression()) {
+                    ColorMultiset cm = expression.eval(network.getContext());
+                    if (cm != null) {
+                        List<TimedToken> tokensToAdd = new ArrayList<TimedToken>(place.tokens());
+                        for (TimedToken token : cm.getTokens(place)) {
+                            tapn.marking().remove(token);
+                        }
+
+                        place.updateTokens(tokensToAdd, expression);
+                    }
+                }
+
+                List<ColoredTimeInvariant> invariantsToAdd = new ArrayList<ColoredTimeInvariant>();
+                for (ColoredTimeInvariant invariant : place.getCtiList()) {
+                    if (ct.contains(invariant.getColor())) {
+                        invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), getNewColor(invariant.getColor(), newCt)));
+                    } else {
+                        invariantsToAdd.add(invariant);
+                    }
+                }
+
+                place.setCtiList(invariantsToAdd);
+            }
+
+            for (TimedInputArc arc : tapn.inputArcs()) {
+                if (arc.getArcExpression() != null) {
+                    arc.setExpression(arc.getArcExpression().getExprWithNewColorType(newCt));
+                }
+            }
+
+            for (TimedOutputArc arc : tapn.outputArcs()) {
+                if (arc.getExpression() != null) {
+                    arc.setExpression(arc.getExpression().getExprWithNewColorType(newCt));
+                }
+            }
+
+            for (TimedTransition transition : tapn.transitions()) {
+                if (transition.getGuard() != null) {
+                    Expression updatedGuardExpr = updateGuardTypes(transition.getGuard(), ct, newCt);
+                    GuardExpression newGuard = (GuardExpression) updatedGuardExpr;
+                    newGuard.setColorType(newCt);
+                    transition.setGuard(newGuard);
+                }
+            }
+        }
+    }
+}
+
+PARSER_END(ConstantsParser)
+
+TOKEN :
+{
+    <SEPARATOR: ";">
+    |
+    <EQ: "=">
+    |
+    <COMMA: ",">
+    |
+    <SBRACKET: "[">
+    |
+    <EBRACKET: "]">
+    |
+    <LCURLY: "{">
+    |
+    <RCURLY: "}">
+    |
+    <LT: "<">
+    |
+    <GT: ">">
+    |
+    <IS: "is">
+    |
+    <IN: "in">
+    |
+    <CONST: "const">
+    |
+    <INTTYPE: "int">
+    |
+    <REALTYPE: "real">
+    |
+    <MINUS: "-">
+    |
+    <VAR: "var">
+    |
+    <TYPE: "type">
+    |
+    <#ALPHA: ["a"-"z","A"-"Z"]>
+    |
+    <#ALPHANUM: ["a"-"z","A"-"Z","0"-"9"]>
+    |
+    <INTEGER: ["0"-"9"] | (["1"-"9"] (["0"-"9"])*)>
+    |
+    <REAL: (["0"-"9"])+ "." (["0"-"9"])+>
+    |
+    <ID: <ALPHA> ("_" | <ALPHANUM>)*>
+}
+
+SKIP :
+{
+    " "
+  | "\t"
+  | "\n"
+  | "\r"
+}
+
+void startParsing() :
+{}
+{
+    (values() <SEPARATOR>)* <EOF>
+}
+
+void values() :
+{}
+{
+    constants() |
+    colorTypes() |
+    variables()
+}
+
+void constants() :
+{}
+{
+    <CONST> (<REALTYPE> realConstant() | <INTTYPE> intConstant())
+}
+
+void realConstant() :
+{
+    Token id;
+    String value;
+    List<String> values = new ArrayList<String>();
+}
+{
+    id = <ID> <EQ>
+    (
+        value = realValue() {
+            idExists(id.image);
+            realConstants.put(id.image, new RealConstant(id.image, Double.parseDouble(value)));
+        }
+    |
+        <LCURLY> realSet(values) <RCURLY> {
+            idExists(id.image);
+            LinkedHashSet<Double> setVals = new LinkedHashSet<Double>();
+            for (String s : values) {
+                setVals.add(Double.parseDouble(s));
+            }
+            realConstants.put(id.image, new RealConstant(id.image, setVals));
+        }
+    )
+}
+
+String realValue() :
+{
+    Token val;
+    String sign = "";
+}
+{
+    (<MINUS> { sign = "-"; })? (val = <REAL> | val = <INTEGER>) { return sign + val.image; }
+}
+
+void realSet(List<String> values) :
+{
+    String val;
+}
+{
+    val = realValue() { values.add(val); }
+    (<COMMA> val = realValue() { values.add(val); })*
+}
+
+void intConstant() :
+{
+    Token id, value;
+    List<String> values = new ArrayList<String>();
+}
+{
+    id = <ID> <EQ>
+    (
+        value = <INTEGER> { 
+            idExists(id.image);
+            constants.put(id.image, new Constant(id.image, Integer.parseInt(value.image)));
+        }
+    |
+        <LCURLY> intSet(values) <RCURLY> {
+            idExists(id.image);
+            LinkedHashSet<Integer> setVals = new LinkedHashSet<Integer>();
+            for (String s : values) {
+                setVals.add(Integer.parseInt(s));
+            }
+            constants.put(id.image, new Constant(id.image, setVals));
+        }
+    )
+}
+
+void colorTypes() :
+{
+    Token id;
+    List<String> values = new ArrayList<String>();
+    BoolRef isIntList = new BoolRef(false);
+    BoolRef isProductList = new BoolRef(false); 
+}
+{
+    <TYPE> id = <ID> <IS> (<SBRACKET> (idList(values) | intList(values, isIntList)) <EBRACKET> | <LT> productList(values, isProductList) <GT>) { 
+        ColorType ct = null;
+        if (!network.isColored()) {
+            throw new ParseException("Color types are not allowed in uncolored networks");
+        }
+
+        idExists(id.image);
+
+        if (isProductList.value) {
+            ProductType pct = new ProductType(id.image);
+            for (String product : values) {
+                if (product.equals("dot")) {
+                    ColorType dot = new ColorType("dot");
+                    dot.addColor("dot");
+                    pct.addType(dot);
+                    continue;
+                }
+
+                if (!colorTypes.containsKey(product)) {
+                    throw new ParseException("Color type with name \"" + product + "\" does not exist");
+                }
+
+                pct.addType(colorTypes.get(product));
+            }
+
+            ct = pct;
+        } else if (isIntList.value) {
+            ct = new ColorType(id.image);
+            int lowerBound = Integer.parseInt(values.get(0));
+            int upperBound = Integer.parseInt(values.get(1));
+            
+            if (lowerBound > upperBound) {
+                throw new ParseException("Lower bound must be lower than or equal to upper bound");
+            }
+
+            for (int i = lowerBound; i <= upperBound; ++i) {
+                ct.addColor(Integer.toString(i));
+            }
+        } else {
+            ct = new ColorType(id.image);
+            Set<String> uniqueVals = new HashSet<String>();
+            for (String color : values) {
+                if (!isIntList.value && !uniqueVals.add(color)) {
+                    throw new ParseException("Color type with name \"" + id.image + "\" contains duplicate colors");
+                }
+                
+                if (color.equals(id.image)) {
+                    throw new ParseException("Color type with name \"" + id.image + "\" contains a color with the same name");
+                }
+
+                idExists(color);
+            }
+
+            ct.addColors(values);
+        } 
+
+        colorTypes.put(id.image, ct); 
+    }
+}
+
+void idList(List<String> values) :
+{
+    Token id;
+}
+{
+    id = <ID> { values.add(id.image); } 
+    (<COMMA> id = <ID> { values.add(id.image); })*
+}
+
+void intSet(List<String> values) :
+{
+    Token val;
+}
+{
+    val = <INTEGER> { values.add(val.image); } 
+    (<COMMA> val = <INTEGER> { values.add(val.image); })*
+}
+
+void intList(List<String> values, BoolRef isIntList) :
+{
+    Token val;
+}
+{
+    val = <INTEGER> { values.add(val.image); isIntList.value = true; } 
+    (<COMMA> val = <INTEGER> { values.add(val.image); })
+}
+
+void productList(List<String> values, BoolRef isProductList) :
+{
+    Token type;
+}
+{
+    type = <ID> { values.add(type.image); isProductList.value = true; } 
+    (<COMMA> type = <ID> { values.add(type.image); })*
+}
+
+void variables() :
+{
+    Token type;
+    List<String> ids = new ArrayList<String>();
+}
+{
+    <VAR> idList(ids) <IN> type = <ID> {
+        if (!network.isColored()) {
+            throw new ParseException("Variables are not allowed in uncolored networks");
+        }
+
+        for (String id : ids) {
+            idExists(id);
+            
+            if (type.image.equals("dot")) {
+                throw new ParseException("Can not create a variable of color type \"dot\"");
+            }
+
+            if (!colorTypes.containsKey(type.image)) {
+                throw new ParseException("Color type with name \"" + type.image + "\" does not exist");
+            }
+            
+            variables.put(id, new Variable(id, colorTypes.get(type.image)));
+        }
+    }
+}

@@ -28,15 +28,27 @@ public class NameGenerator {
 
 	public String getNewPlaceName(TimedArcPetriNet net) {
 		int newId = placeIDs.get(net);
+        newId = getNextFreeId(net, PLACE_NAME_PREFIX, newId);
 		placeIDs.put(net, newId + 1);
 		return PLACE_NAME_PREFIX + newId;
 	}
 
 	public String getNewTransitionName(TimedArcPetriNet net) {
 		int newId = transitionIDs.get(net);
+        newId = getNextFreeId(net, TRANSITION_NAME_PREFIX, newId);
 		transitionIDs.put(net, newId + 1);
 		return TRANSITION_NAME_PREFIX + newId;
 	}
+
+    private int getNextFreeId(TimedArcPetriNet net, String prefix, int currentId) {
+        if (net.parentNetwork() != null && net.parentNetwork().isNameUsedForShared(prefix + currentId)) {
+            while (net.parentNetwork().isNameUsedForShared(prefix + currentId)) {
+                ++currentId;
+            }
+        }
+
+        return currentId;
+    }
 
 	public String getNewTemplateName() {
 		return TEMPLATE_NAME_PREFIX + (++tapnId); 

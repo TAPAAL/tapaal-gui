@@ -2,10 +2,13 @@ package pipe.gui.petrinet.graphicElements.tapn;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -14,6 +17,8 @@ import javax.swing.*;
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ExpressionContext;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.petrinet.graphicElements.Place;
@@ -24,6 +29,8 @@ import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.ConstantBound;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -36,7 +43,7 @@ public class TimedPlaceComponent extends Place {
     private dk.aau.cs.model.tapn.TimedPlace place;
     private final dk.aau.cs.model.tapn.event.TimedPlaceListener listener = timedPlaceListener();
 
-    private Window ageOfTokensWindow = new Window(new Frame());
+    private Window ageOfTokensWindow;
     private final Shape dashedOutline = createDashedOutline();
 
     public TimedPlaceComponent (
@@ -78,7 +85,7 @@ public class TimedPlaceComponent extends Place {
             }
 
             public void markingChanged(TimedPlaceEvent e) {
-                repaint();
+                update(true);
             }
         };
     }
@@ -89,6 +96,22 @@ public class TimedPlaceComponent extends Place {
 
     public TimeInvariant getInvariant() {
         return place.invariant();
+    }
+
+    public boolean hasInvariant() {
+        return !(place.invariant().upperBound() instanceof InfBound);
+    }
+
+    public boolean hasAnyColorInvariant() {
+        if (place.getCtiList() != null) {
+            for (ColoredTimeInvariant cti : place.getCtiList()) {
+                if (cti != null && cti.upperBound().value() >= 0) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 
     private String getStringOfTokens() {
@@ -107,8 +130,12 @@ public class TimedPlaceComponent extends Place {
             first = false;
         }
         buffer.append('}');
-
+        
         return buffer.toString();
+    }
+
+    private boolean hasNonZeroTokenAge() {
+        return place.tokens().stream().anyMatch(token -> token.age().signum() != 0);
     }
 
     private String getStringOfColoredTimedTokens() {
@@ -166,8 +193,42 @@ public class TimedPlaceComponent extends Place {
         return buffer.toString();
     }
 
+    private String getColoredTokenExpression() {
+        ArcExpression expression = place.getTokensAsExpression();
+        Collection<ArcExpression> expressions = expression instanceof AddExpression
+            ? ((AddExpression)expression).getAddExpression()
+            : Collections.singleton(expression);
+        List<TimedToken> tokens = place.tokens();
+        ExpressionContext context = isTimed() ? getExpressionContext() : null;
+        StringBuilder buffer = new StringBuilder();
+        int tokenIndex = 0;
+
+        for (ArcExpression child : expressions) {
+            var token = child.toString();
+            if (isTimed() && tokenIndex < tokens.size()) {
+                token = formatTokenWithAge(token, tokens.get(tokenIndex).age());
+                tokenIndex += child.eval(context).values().stream().mapToInt(Integer::intValue).sum();
+            }
+            buffer.append(token).append('\n');
+        }
+
+        return buffer.toString();
+    }
+
+    private ExpressionContext getExpressionContext() {
+        return place.isShared()
+            ? ((SharedPlace)place).network().getContext()
+            : ((LocalTimedPlace)place).model().parentNetwork().getContext();
+    }
+
+    public static String formatTokenWithAge(Object token, BigDecimal age) {
+        return age.signum() == 0
+            ? token.toString()
+            : token + " (age " + age.stripTrailingZeros().toPlainString() + ")";
+    }
+
     public boolean isAgeOfTokensShown() {
-        return ageOfTokensWindow.isVisible();
+        return ageOfTokensWindow != null && ageOfTokensWindow.isVisible();
     }
 
     @Override
@@ -181,7 +242,10 @@ public class TimedPlaceComponent extends Place {
             BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] {5.0f}, 0.0f);
             graphics.setStroke(dashed);
 
+            int margin = 1;
+            graphics.setClip(new Rectangle2D.Double(dashedOutline.getBounds().x - margin, dashedOutline.getBounds().y - margin, dashedOutline.getBounds().width + margin * 2, dashedOutline.getBounds().height + margin * 2));
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
             graphics.draw(dashedOutline);
 
             graphics.setStroke(oldStroke);
@@ -318,9 +382,15 @@ public class TimedPlaceComponent extends Place {
                     break;
             }
         } else{
-            if (marking > 999) {
+            if (marking > 9999) {
                 // XXX could be better...
-                g.drawString("#" + marking, x, y + 20);
+                String subMarking1 = String.valueOf(marking).substring(0, 4);
+                String subMarking2 = String.valueOf(marking).substring(4);
+                g.drawString("#" + subMarking1, x - 5, y + 15);
+                g.drawString(subMarking2, x + 4, y + 25);
+            } else if (marking > 999) {
+                // XXX could be better...
+                g.drawString("#" + marking, x - 5, y + 20);
             } else if (marking > 99) {
                 g.drawString("#" + marking, x, y + 20);
             } else if (marking > 9) {
@@ -413,7 +483,7 @@ public class TimedPlaceComponent extends Place {
         guiDialog.pack();
 
         // Move window to the middle of the screen
-        guiDialog.setLocationRelativeTo(null);
+        guiDialog.setLocationRelativeTo(TAPAALGUI.getApp());
         guiDialog.setVisible(true);
     }
 
@@ -428,6 +498,10 @@ public class TimedPlaceComponent extends Place {
                     buffer.append("\nInv: ");
                     buffer.append(place.invariant().toString(displayConstantNames));
                 }
+                
+                if (isTimed() && !isColored() && hasNonZeroTokenAge()) {
+                    buffer.append("\nAges: ").append(getStringOfTokens());
+                }
                 getNameLabel().setText(buffer.toString());
             }
             if (lens != null && this.isColored()) {
@@ -438,8 +512,11 @@ public class TimedPlaceComponent extends Place {
 
                 if (isTimed()) {
                     //Add default invariant
-                    buffer.append("\nInv: ");
-                    buffer.append(place.invariant().toString(displayConstantNames));
+                    if (!(place.invariant().upperBound() instanceof InfBound)) {
+                        buffer.append("\nInv: ");
+                        buffer.append(place.invariant().toString(displayConstantNames));
+                    }
+                    
                     if (place.getCtiList() != null) {
                         //Add color specific invariants
                         for (ColoredTimeInvariant cti : place.getCtiList()) {
@@ -453,7 +530,7 @@ public class TimedPlaceComponent extends Place {
                 if (TAPAALGUI.getAppGui().showColoredTokens()) {
                     if (underlyingPlace().getTokensAsExpression() != null) {
                         buffer.append("\n");
-                        buffer.append(((AddExpression)underlyingPlace().getTokensAsExpression()).toTokenString());
+                        buffer.append(getColoredTokenExpression());
                     }
                 }
 
@@ -477,6 +554,7 @@ public class TimedPlaceComponent extends Place {
             }
 
             getNameLabel().displayName(attributesVisible);
+            setToolTipText(isTimed() && !isColored() ? "Token ages: " + getStringOfTokens() : null);
 
         } else {
             getNameLabel().setName("");

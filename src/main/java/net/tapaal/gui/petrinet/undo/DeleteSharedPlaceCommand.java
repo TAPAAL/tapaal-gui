@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.model.tapn.SharedPlace;
 
-public class DeleteSharedPlaceCommand extends Command {
+public class DeleteSharedPlaceCommand implements Command {
 	private final SharedPlace place;
 	private final SharedPlacesListModel listModel;
 	

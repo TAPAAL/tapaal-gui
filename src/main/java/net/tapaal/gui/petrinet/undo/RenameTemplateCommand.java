@@ -7,7 +7,7 @@ import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
-public class RenameTemplateCommand extends Command {
+public class RenameTemplateCommand implements Command {
 	private final TemplateExplorer templateExplorer;
 	private final TimedArcPetriNet tapn;
 	private final String oldName;

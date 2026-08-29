@@ -4,7 +4,7 @@ import net.tapaal.gui.petrinet.undo.Command;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.graphicElements.AnnotationNote;
 
-public class DeleteAnnotationNoteCommand extends Command {
+public class DeleteAnnotationNoteCommand implements Command {
 
     private final AnnotationNote note;
     private final DataLayer model;

@@ -112,7 +112,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varv"/>
+              <variable refvariable="v"/>
             </subterm>
           </numberof>
         </structure>
@@ -137,7 +137,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varv"/>
+              <variable refvariable="v"/>
             </subterm>
           </numberof>
         </structure>
@@ -156,7 +156,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varv"/>
+              <variable refvariable="v"/>
             </subterm>
           </numberof>
         </structure>
@@ -181,7 +181,7 @@
               </numberconstant>
             </subterm>
             <subterm>
-              <variable refvariable="varv"/>
+              <variable refvariable="v"/>
             </subterm>
           </numberof>
         </structure>
@@ -210,7 +210,7 @@
             <feconstant id="Voters10" name="Voters"/>
           </cyclicenumeration>
         </namedsort>
-        <variabledecl id="varv" name="v">
+        <variabledecl id="v" name="v">
           <usersort declaration="Voters"/>
         </variabledecl>
       </declarations>

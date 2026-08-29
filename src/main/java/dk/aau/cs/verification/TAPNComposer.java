@@ -220,7 +220,9 @@ public class TAPNComposer implements ITAPNComposer {
 			
 			for (TimedPlace timedPlace : tapn.places()) {			
 				if (!timedPlace.isShared()) {
-					String uniquePlaceName = (!singleComponentNoPrefix || model.activeTemplates().size() > 1) ? composedPlaceName(timedPlace) : timedPlace.name();
+					String uniquePlaceName = (!singleComponentNoPrefix || model.activeTemplates().size() > 1)
+						? ((LocalTimedPlace)timedPlace).model().name() + "__" + timedPlace.name()
+						: timedPlace.name();
 
 					LocalTimedPlace place = null;
 					if (timedPlace.invariant().upperBound() instanceof Bound.InfBound) {					
@@ -284,15 +286,15 @@ public class TAPNComposer implements ITAPNComposer {
                         String uniqueTransitionName = "";
                         if (!singleComponentNoPrefix || model.activeTemplates().size() > 1) {
                             uniqueTransitionName = timedTransition.isShared()
-                                ? "Shared_" + timedTransition.name()
-                                : timedTransition.model().name() + "_" + timedTransition.name();
+                                ? "Shared__" + timedTransition.name()
+                                : timedTransition.model().name() + "__" + timedTransition.name();
                         } else {
                             uniqueTransitionName = timedTransition.isShared()
-                                ? "Shared_" + timedTransition.name()
+                                ? "Shared__" + timedTransition.name()
                                 : timedTransition.name();
                         }
 
-						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent(), timedTransition.getGuard());
+						TimedTransition transition = new TimedTransition(uniqueTransitionName, timedTransition.isUrgent(), timedTransition.getGuard(), timedTransition.getDistribution(), timedTransition.getWeight(), timedTransition.getFiringMode());
 						if (timedTransition.isUncontrollable()) {
 						    transition.setUncontrollable(true);
                         }
@@ -339,7 +341,15 @@ public class TAPNComposer implements ITAPNComposer {
 	}
 	
 	private ArcPath createArcPath(DataLayer currentGuiModel, PlaceTransitionObject source, PlaceTransitionObject target, Arc arc, int offsetX, int offsetY) {
+		if (currentGuiModel == null || source == null || target == null) {
+			return new ArcPath(arc);
+		}
+        
 		Arc guiArc = currentGuiModel.getArcByEndpoints(source, target);
+		if (guiArc == null || guiArc.getArcPath() == null) {
+			return new ArcPath(arc);
+		}
+
 		ArcPath arcPath = guiArc.getArcPath();
 		int arcPathPointsNum = arcPath.getNumPoints();
 		
@@ -645,19 +655,27 @@ public class TAPNComposer implements ITAPNComposer {
 		}
 	}
 
-   public String composedTransitionName(TimedTransition transition) {
+    public String composedTransitionName(TimedTransition transition) {
         if (transition.isShared()) {
-            return "Shared_" + transition.name();
+            return "Shared__" + transition.name();
         } else if (singleComponentNoPrefix) {
             return transition.name();
         } else {
-            return transition.model().name() + "_" + transition.name();
+            return transition.model().name() + "__" + transition.name();
         }
-   }
+    }
    
-   public String composedPlaceName(TimedPlace place) {
-        return  place.isShared() ? "Shared_" + place.name() : ((LocalTimedPlace)place).model().name() + "_" + place.name();
-   }
-   
+    public String composedPlaceName(TimedPlace place) {
+        if (place.isShared()) {
+            return "Shared__" + place.name();
+        } else if (singleComponentNoPrefix) {
+            return place.name();
+        } else {
+            return ((LocalTimedPlace)place).model().name() + "__" + place.name();
+        }
+    }
 
+    public TAPNLens getLens() {
+        return lens;
+    }
 }

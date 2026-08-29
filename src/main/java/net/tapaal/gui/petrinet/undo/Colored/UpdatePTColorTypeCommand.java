@@ -6,7 +6,7 @@ import dk.aau.cs.model.CPN.ProductType;
 
 import java.util.Vector;
 
-public class UpdatePTColorTypeCommand extends Command {
+public class UpdatePTColorTypeCommand implements Command {
     private final ColorType oldColorType;
     private final ColorType newColorType;
     private final ProductType productType;

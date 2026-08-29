@@ -2,6 +2,8 @@ package dk.aau.cs.approximation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
@@ -14,6 +16,8 @@ import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.*;
 import dk.aau.cs.util.Tuple;
@@ -23,27 +27,49 @@ import dk.aau.cs.verification.VerificationResult;
 public class OverApproximation implements ITAPNApproximation {
 	@Override
 	public void modifyTAPN(TimedArcPetriNet net, int approximationDenominator) {
-		// Fix input arcs
+		// Fix input arcs		 
 		for (TimedInputArc arc : net.inputArcs()) {
+			List<ColoredTimeInterval> newIntervals = new ArrayList<ColoredTimeInterval>();
+			for (ColoredTimeInterval cti : arc.getColorTimeIntervals()) {
+				newIntervals.add((ColoredTimeInterval)modifyIntervals(cti, approximationDenominator));
+			}
+			arc.setColorTimeIntervals(newIntervals);
+
 			TimeInterval oldInterval = arc.interval();
 			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
-			
 			arc.setTimeInterval(newInterval);
 		}
-		 
+
 		// Fix transport arcs
 		for (TransportArc arc : net.transportArcs()) {
+			List<ColoredTimeInterval> newIntervals = new ArrayList<ColoredTimeInterval>();
+			for (ColoredTimeInterval cti : arc.getColorTimeIntervals()) {
+				newIntervals.add((ColoredTimeInterval)modifyIntervals(cti, approximationDenominator));
+			}
+			arc.setColorTimeIntervals(newIntervals);
+
 			TimeInterval oldInterval = arc.interval();
 			TimeInterval newInterval = modifyIntervals(oldInterval, approximationDenominator);
-			
 			arc.setTimeInterval(newInterval);
 		}
-		 
+
 		// Fix invariants in places
 		for (TimedPlace place : net.places()) {
-			if ( ! (place.invariant().upperBound() instanceof Bound.InfBound) && place.invariant().upperBound().value() > 0) {					
+			// Color specific invariants
+			List<ColoredTimeInvariant> newInvariants = new ArrayList<ColoredTimeInvariant>();
+			for (ColoredTimeInvariant cti : place.getCtiList()) {
+				if (!(cti.upperBound() instanceof Bound.InfBound) && cti.upperBound().value() > 0) {
+					int newInvariantBound = (int)Math.ceil(cti.upperBound().value() / (double)approximationDenominator);
+					newInvariants.add(new ColoredTimeInvariant(cti.isUpperNonstrict(), new IntBound(newInvariantBound), cti.getColor()));
+				}
+			}
+			place.setCtiList(newInvariants);
+
+			// Default age invariants
+			if (!(place.invariant().upperBound() instanceof Bound.InfBound) && place.invariant().upperBound().value() > 0) {				
 				TimeInvariant oldInvariant = place.invariant();
-				place.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((int) Math.ceil(oldInvariant.upperBound().value() / (double)approximationDenominator))));
+				int newInvariantBound = (int)Math.ceil(oldInvariant.upperBound().value() / (double)approximationDenominator);
+				place.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((newInvariantBound))));
 			}
 		}
 	}
@@ -63,6 +89,17 @@ public class OverApproximation implements ITAPNApproximation {
 		// Calculate the new lower bound
 		IntBound newLowerBound = new IntBound((int) Math.floor(oldInterval.lowerBound().value() / denominator));
 
+		if (oldInterval instanceof ColoredTimeInterval) {
+			ColoredTimeInterval oldColoredInterval = (ColoredTimeInterval)oldInterval;
+			return new ColoredTimeInterval(
+				oldColoredInterval.isLowerBoundNonStrict(),
+				newLowerBound,
+				newUpperBound,
+				oldColoredInterval.isUpperBoundNonStrict(),
+				oldColoredInterval.getColor()
+				);
+		}
+
 		return new TimeInterval(
 			 oldInterval.isLowerBoundNonStrict(),
 			 newLowerBound,
@@ -73,7 +110,7 @@ public class OverApproximation implements ITAPNApproximation {
 
 	public void makeTraceTAPN(Tuple<TimedArcPetriNet, NameMapping> transformedModel, VerificationResult<TAPNNetworkTrace> result, dk.aau.cs.model.tapn.TAPNQuery query) {
 		TimedArcPetriNet net = transformedModel.value1();
-                
+		
 		LocalTimedPlace currentPlace = new LocalTimedPlace("PTRACE0");
 		TimedToken currentToken = new TimedToken(currentPlace, ColorType.COLORTYPE_DOT.getFirstColor());
 		net.add(currentPlace);
@@ -86,31 +123,31 @@ public class OverApproximation implements ITAPNApproximation {
 		blockPlace.addToken(blockToken);
 		
 		// Copy the original transitions
-		ArrayList<TimedTransition> originalTransitions = new ArrayList<TimedTransition>();
+		List<TimedTransition> originalTransitions = new ArrayList<TimedTransition>();
 		for (TimedTransition transition : net.transitions()) {
 			originalTransitions.add(transition);
 		}
 		
 		// Copy the original input arcs
-		ArrayList<TimedInputArc> originalInput = new ArrayList<TimedInputArc>();
+		List<TimedInputArc> originalInput = new ArrayList<TimedInputArc>();
 		for (TimedInputArc inputarc : net.inputArcs()) {
 			originalInput.add(inputarc);
 		}
 		
 		// Copy the original output arcs
-		ArrayList<TimedOutputArc> originalOutput = new ArrayList<TimedOutputArc>();
+		List<TimedOutputArc> originalOutput = new ArrayList<TimedOutputArc>();
 		for (TimedOutputArc outputarc : net.outputArcs()) {
 			originalOutput.add(outputarc);
 		}
 		
 		// Copy the original inhibitor arcs
-		ArrayList<TimedInhibitorArc> originalInhibitor = new ArrayList<TimedInhibitorArc>();
+		List<TimedInhibitorArc> originalInhibitor = new ArrayList<TimedInhibitorArc>();
 		for (TimedInhibitorArc inhibitor : net.inhibitorArcs()) {
 			originalInhibitor.add(inhibitor);
 		}
 		
 		// Copy the original transport arcs
-		ArrayList<TransportArc> originalTransport = new ArrayList<TransportArc>();
+		List<TransportArc> originalTransport = new ArrayList<TransportArc>();
 		for (TransportArc transport : net.transportArcs()) {
 			originalTransport.add(transport);
 		}
@@ -121,10 +158,11 @@ public class OverApproximation implements ITAPNApproximation {
 		boolean traceHasTransitionStep = false;
 		
 		TAPNNetworkTrace trace = result.getTrace();
+		
 		HashMap<Tuple<String, String>, String> nameMap = transformedModel.value2().getOrgToMapped();
 		LocalTimedPlace loopStep = null;
 		boolean delayIsLoopStep = false;
-		
+
 		for(TAPNNetworkTraceStep step : trace) {
 			if (step instanceof TAPNNetworkTimeDelayStep){
 				// Skip if delay step, but check if this step is a delayStep
@@ -150,8 +188,7 @@ public class OverApproximation implements ITAPNApproximation {
 				net.add(new TimedOutputArc(copyTransition, blockPlace));
 				
 				// EG queries, where there is a loopStep, we need to store it for later use.
-				if(step.isLoopStep() || delayIsLoopStep)
-				{
+				if (step.isLoopStep() || delayIsLoopStep) {
 					loopStep = currentPlace;
 					delayIsLoopStep = false;
 				}
@@ -160,7 +197,6 @@ public class OverApproximation implements ITAPNApproximation {
 				net.add(currentPlace);
 				next = new TimedOutputArc(copyTransition, currentPlace);
 				net.add(next);
-				
 				
 				for (TimedInputArc arc : originalInput) {
 					if (arc.destination() == firedTransition) {
@@ -179,7 +215,7 @@ public class OverApproximation implements ITAPNApproximation {
 				}
 				for (TransportArc arc : originalTransport) {
 					if (arc.transition() == firedTransition) {
-						net.add(new TransportArc(arc.source(), copyTransition, arc.destination(), arc.interval(), arc.getWeight()));
+						net.add(new TransportArc(arc.source(), copyTransition, arc.destination(), arc.interval(), arc.getWeight(), arc.getInputExpression(), arc.getOutputExpression()));
 					}
 				}
 				
@@ -188,11 +224,11 @@ public class OverApproximation implements ITAPNApproximation {
 		}
 		
 		// If the trace is a EG trace with a loop, we need to incorporate the loop in traceTAPN
-		if(loopStep != null){
+		if (loopStep != null){
 			net.add(new TimedOutputArc(next.source(), loopStep));
 		}
 		
-		if(traceHasTransitionStep){
+		if (traceHasTransitionStep){
 			net.remove(next);
 			net.remove(currentPlace);
 		}

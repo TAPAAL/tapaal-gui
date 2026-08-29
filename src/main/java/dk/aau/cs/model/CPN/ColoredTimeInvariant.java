@@ -17,6 +17,10 @@ public class ColoredTimeInvariant extends TimeInvariant {
         return new ColoredTimeInvariant(false, Bound.Infinity, color);
     }
 
+    public Bound upperBound() {
+        return super.upperBound();
+    }
+
     public Color getColor() {
         return color;
     }
@@ -67,6 +71,11 @@ public class ColoredTimeInvariant extends TimeInvariant {
     public String getInvariantString() {
         return super.toString();
     }
+
+    public String getInvariantString(boolean displayConstantNames) {
+        return super.toString(displayConstantNames);
+    }
+    
 
     @Override
     public boolean equals(Object o) {

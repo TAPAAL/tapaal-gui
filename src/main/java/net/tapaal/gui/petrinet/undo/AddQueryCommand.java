@@ -3,7 +3,7 @@ package net.tapaal.gui.petrinet.undo;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.gui.petrinet.PetriNetTab;
 
-public class AddQueryCommand extends Command {
+public class AddQueryCommand implements Command {
 	private final TAPNQuery query;
 	private final PetriNetTab tabContent;
 	

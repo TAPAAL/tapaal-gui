@@ -1,8 +1,11 @@
 package net.tapaal.gui.petrinet.verification;
 
 import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.QueryType;
+import dk.aau.cs.verification.SMCSettings;
+import dk.aau.cs.verification.SMCTraceType;
 
 import java.util.ArrayList;
 
@@ -33,7 +36,7 @@ public class TAPNQuery {
 	}
 	
 	public enum QueryCategory{
-		Default, CTL, LTL, HyperLTL
+		Default, CTL, LTL, HyperLTL, SMC
 	}
 	
 	public enum AlgorithmOption{
@@ -42,6 +45,7 @@ public class TAPNQuery {
 
 	private String name;
 	private int capacity;
+	private Integer oldCapacity = null;
 	private TraceOption traceOption;
 	private SearchOption searchOption;
 	private ReductionOption reductionOption;
@@ -82,6 +86,58 @@ public class TAPNQuery {
 	private boolean useStubbornReduction = true;
     private boolean useTarOption = false;
     private boolean useTarjan = false;
+    private boolean useExplicitSearch = false;
+	private boolean useRawVerification = false;
+	private String rawVerificationPrompt;
+
+    private SMCSettings smcSettings = SMCSettings.Default();
+    private boolean benchmark = false;
+    private int benchmarkRuns = 100;
+    private boolean parallel = true;
+    private int granularity = 500;
+    private boolean maxGranularity = false;
+    
+    public enum VerificationType {
+        QUANTITATIVE, QUALITATIVE, SIMULATE;
+
+        public static VerificationType fromOrdinal(int ordinal) {
+            switch (ordinal) {
+                case 1:
+                    return QUALITATIVE;
+                case 2:
+                    return SIMULATE;
+                default:
+                    return QUANTITATIVE;
+            }
+        }
+
+        public static VerificationType fromString(String type) {
+            switch (type) {
+                case "Qualitative":
+                    return QUALITATIVE;
+                case "Simulate":
+                    return SIMULATE;
+                default:
+                    return QUANTITATIVE;
+            }
+        }
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case QUALITATIVE:
+                    return "Qualitative";
+                case SIMULATE:
+                    return "Simulate";
+                default:
+                    return "Quantitative";
+            }
+        }
+    }
+
+    private VerificationType verificationType = VerificationType.QUANTITATIVE;
+    private int numberOfTraces = 1;
+    private SMCTraceType smcTraceType = new SMCTraceType();
 
 	/**
 	 * @param name
@@ -142,6 +198,14 @@ public class TAPNQuery {
         this.useTarjan = useTarjan;
     }
 
+    public boolean useExplicitSearch() {
+        return useExplicitSearch;
+    }
+
+    public void setUseExplicitSearch(boolean useExplicitSearch) {
+        this.useExplicitSearch = useExplicitSearch;
+    }
+
 	public int approximationDenominator() {
 		return this.denominator;
 	}
@@ -168,11 +232,19 @@ public class TAPNQuery {
 		this.capacity = capacity;
 	}
 
+	public void setOldCapacity(int capacity) {
+		this.oldCapacity = capacity;
+	}
+
 	/**
 	 * @return the capacity
 	 */
 	public int getCapacity() {
 		return capacity;
+	}
+
+	public Integer getOldCapacity() {
+		return oldCapacity;
 	}
 
 	public String getQuery() {
@@ -236,7 +308,8 @@ public class TAPNQuery {
 	}
 	
 	public boolean useGCD(){
-		return gcd;
+		return gcd && property != null && queryType() != QueryType.EG && queryType() != QueryType.AF
+			&& !new HasDeadlockVisitor().hasDeadLock(property);
 	}
 	
 	public void setUseGCD(boolean useGCD){
@@ -357,6 +430,22 @@ public class TAPNQuery {
 		return extrapolationOption;
 	}
 
+	public void setRawVerification(boolean useRawVerification) {
+		this.useRawVerification = useRawVerification;
+	}
+
+	public boolean getRawVerification() {
+		return useRawVerification;
+	}
+
+	public void setRawVerificationPrompt(String rawVerificationPrompt) {
+		this.rawVerificationPrompt = rawVerificationPrompt;
+	}
+
+	public String getRawVerificationPrompt() {
+		return rawVerificationPrompt;
+	}
+
     public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
@@ -394,6 +483,14 @@ public class TAPNQuery {
 			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, boolean reduction, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, 
 			int approximationDenominator, boolean partitioning, boolean colorFixpoint, boolean symmetricVars, boolean isColored, boolean coloredReduction) {
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, gcd, timeDart, pTrie, overApproximation, reduction, hashTabelSize, extrapolationOption, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator, partitioning, colorFixpoint, symmetricVars, isColored, coloredReduction, false, "-x 1 ");
+	}
+
+	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
+			TraceOption traceOption, SearchOption searchOption,
+			ReductionOption reductionOption, boolean symmetry, boolean gcd, boolean timeDart, boolean pTrie, boolean overApproximation, boolean reduction, HashTableSize hashTabelSize,
+			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, 
+			int approximationDenominator, boolean partitioning, boolean colorFixpoint, boolean symmetricVars, boolean isColored, boolean coloredReduction, boolean useRawVerification, String rawVerificationPrompt) {
 		this.setName(name);
 		this.setCapacity(capacity);
 		this.property = property;
@@ -417,6 +514,10 @@ public class TAPNQuery {
         this.colorFixpoint = colorFixpoint;
         this.symmetricVars = symmetricVars;
         this.isColored = isColored;
+		this.useRawVerification = useRawVerification;
+		this.rawVerificationPrompt = rawVerificationPrompt;
+		this.useRawVerification = useRawVerification;
+		this.rawVerificationPrompt = rawVerificationPrompt;
 	}
 
 	@Override
@@ -427,6 +528,7 @@ public class TAPNQuery {
 	public void set(TAPNQuery newQuery) {
 		name = newQuery.getName();
 		capacity = newQuery.getCapacity();
+		oldCapacity = newQuery.getOldCapacity();
 		property = newQuery.getProperty();
 		traceOption = newQuery.getTraceOption();
 		searchOption = newQuery.getSearchOption();
@@ -440,6 +542,9 @@ public class TAPNQuery {
 		useQueryReduction = newQuery.isQueryReductionEnabled();
 		useStubbornReduction = newQuery.isStubbornReductionEnabled();
 		useTarOption = newQuery.isTarOptionEnabled();
+        useExplicitSearch = newQuery.useExplicitSearch();
+        useRawVerification = newQuery.getRawVerification();
+        rawVerificationPrompt = newQuery.getRawVerificationPrompt();
 	}
 
     public void copyOptions(TAPNQuery query){
@@ -466,6 +571,19 @@ public class TAPNQuery {
         setExtrapolationOption(query.getExtrapolationOption());
         setUseColoredReduction(query.useColoredReduction());
         setUseTarjan(query.isTarjan());
+		setRawVerification(query.getRawVerification());
+		setRawVerificationPrompt(query.getRawVerificationPrompt());
+        setSmcSettings(query.getSmcSettings());
+        setBenchmarkMode(isBenchmarkMode());
+        setBenchmarkRuns(getBenchmarkRuns());
+        setParallel(isParallel());
+        setGranularity(getGranularity());
+        setMaxGranularity(isMaxGranularity());
+        setUseExplicitSearch(query.useExplicitSearch());
+    }
+
+    public void setProperty(TCTLAbstractProperty property) {
+        this.property = property;
     }
 
 	public InclusionPlaces inclusionPlaces() {
@@ -489,7 +607,11 @@ public class TAPNQuery {
 		copy.setUseQueryReduction(this.isQueryReductionEnabled());
 		copy.setUseStubbornReduction(this.isStubbornReductionEnabled());
 		copy.setUseTarOption(this.isTarOptionEnabled());
-		
+		copy.setSmcSettings(this.getSmcSettings());
+        copy.setBenchmarkMode(this.isBenchmarkMode());
+        copy.setBenchmarkRuns(this.getBenchmarkRuns());
+        copy.setParallel(this.isParallel());
+        copy.setUseExplicitSearch(this.useExplicitSearch());
 		return copy;
 	}
 	
@@ -497,6 +619,8 @@ public class TAPNQuery {
 		if(property instanceof TCTLEFNode) return QueryType.EF;
 		else if(property instanceof TCTLEGNode) return QueryType.EG;
 		else if(property instanceof TCTLAFNode) return QueryType.AF;
+        else if(queryCategory == QueryCategory.SMC && property instanceof LTLFNode) return QueryType.PF;
+        else if(queryCategory == QueryCategory.SMC && property instanceof LTLGNode) return QueryType.PG;
 		else return QueryType.AG;
 	}
 
@@ -532,8 +656,77 @@ public class TAPNQuery {
     	return this.algorithmOption;
     }
 
+    public SMCSettings getSmcSettings() { return this.smcSettings; }
+
+    public void setSmcSettings(SMCSettings newSettings) { this.smcSettings = newSettings; }
+
+    public boolean isBenchmarkMode() { return benchmark; }
+    public void setBenchmarkMode(boolean mode) {
+        benchmark = mode;
+    }
+
+    public int getBenchmarkRuns() { return benchmarkRuns; }
+    public void setBenchmarkRuns(int runs) {
+        benchmarkRuns = runs;
+    }
+
+    public boolean isParallel() { return parallel; }
+    public void setParallel(boolean value) {
+        parallel = value;
+    }
+
+    public void setGranularity(int granularity) {
+        this.granularity = granularity;
+    }
+
+    public int getGranularity() {
+        return granularity;
+    }
+
+    public void setMaxGranularity(boolean maxGranularity) {
+        this.maxGranularity = maxGranularity;
+    }
+
+    public boolean isMaxGranularity() {
+        return maxGranularity;
+    }
+
+    public void setVerificationType(VerificationType verificationType) {
+        this.verificationType = verificationType;
+    }
+
+    public VerificationType getVerificationType() {
+        return verificationType;
+    }
+
+    public void setNumberOfTraces(int numberOfTraces) {
+        this.numberOfTraces = numberOfTraces;
+    }
+
+    public int getNumberOfTraces() {
+        return numberOfTraces;
+    }
+
+    public void setSmcTraceType(SMCTraceType traceType) {
+        this.smcTraceType = traceType;
+    }
+
+    public SMCTraceType getSmcTraceType() {
+        return smcTraceType;
+    }
+
+    public boolean isSimulate() {
+        return verificationType.equals(VerificationType.SIMULATE);
+    }
+
+
+
     public boolean hasUntimedOnlyProperties(){
-        if(!(property instanceof TCTLAFNode || property instanceof TCTLAGNode || property instanceof TCTLEFNode || property instanceof TCTLEGNode)){
+        if(!(
+                property instanceof TCTLAFNode || property instanceof TCTLAGNode ||
+                property instanceof TCTLEFNode || property instanceof TCTLEGNode ||
+                queryType() == QueryType.PF || queryType() == QueryType.PG
+        )){
             return true;
         } else if(property.hasNestedPathQuantifiers()){
             return true;

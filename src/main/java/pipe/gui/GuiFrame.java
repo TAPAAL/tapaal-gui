@@ -1,20 +1,27 @@
 package pipe.gui;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import com.sun.jna.Platform;
 import net.tapaal.gui.*;
@@ -24,6 +31,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
@@ -31,25 +39,30 @@ import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
 import org.jetbrains.annotations.NotNull;
 import pipe.gui.petrinet.action.GuiAction;
+import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.canvas.Grid;
+import pipe.gui.canvas.SelectionManager;
 import net.tapaal.gui.petrinet.dialog.ExportBatchDialog;
-import net.tapaal.gui.petrinet.dialog.UnfoldDialog;
+import net.tapaal.gui.petrinet.dialog.ColoredSimulationDialog;
+import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import kotlin.internal.RequireKotlin.Container;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.SearchBar;
 import pipe.gui.petrinet.animation.SimulatorFocusTraversalPolicy;
+import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.editor.EditorFocusTraversalPolicy;
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
 
 
 public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameActions {
-
-    // for zoom combobox and dropdown
-    private final int[] zoomLevels = {40, 60, 80, 100, 120, 140, 160, 180, 200, 300};
-
     private final String frameTitle;
 
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
@@ -63,13 +76,20 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JMenu viewMenu;
     private JMenu toolsMenu;
     private JToolBar drawingToolBar;
+    private JToolBar searchToolBar;
+    private SearchBar searchBar;
     private final JLabel featureInfoText = new JLabel();
 
     private final JComboBox<String> timeFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
     private final JComboBox<String> gameFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
     private final JComboBox<String> colorFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
+    private final JComboBox<String> stochasticFeatureOptions = new JComboBox<>(new String[]{"No", "Yes"});
 
-    private JComboBox<String> zoomComboBox;
+    private static final String FIT_TO_SCREEN_NAME = "Fit to screen";
+    private static final String FIT_TO_SCREEN_TOOLTIP = "Fit the net to the screen";
+    private static final String FIT_TO_SCREEN_ICON = "Fit to screen.png";
+
+    private JSlider zoomSlider;
 
     private static final int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
@@ -161,6 +181,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction exportBatchAction = new GuiAction("Batch Export of model and queries", "Export multiple nets and queries for the command line use with the verification engines.", KeyStroke.getKeyStroke('D', (shortcutkey + InputEvent.SHIFT_DOWN_MASK))) {
         public void actionPerformed(ActionEvent e) {
+    
+
             ExportBatchDialog.ShowExportBatchDialog();
         }
     };
@@ -232,7 +254,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabActions::verifySelectedQuery);
         }
     };
-    private final GuiAction workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)) {
+    private final GuiAction workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcutkey | InputEvent.SHIFT_DOWN_MASK)) {
         public void actionPerformed(ActionEvent e) {
             currentTab.ifPresent(TabActions::workflowAnalyse);
         }
@@ -257,13 +279,23 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             currentTab.ifPresent(TabActions::zoomIn);
         }
     };
-    private final GuiAction zoomToAction = new GuiAction("Zoom", "Select zoom percentage ", "") {
-        public void actionPerformed(ActionEvent e) {
-            String selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
-            //parse selected zoom level, and strip of %.
-            int newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%", ""));
 
-            currentTab.ifPresent(o -> o.zoomTo(newZoomLevel));
+    private final GuiAction fitToScreenAction = new GuiAction(FIT_TO_SCREEN_NAME, FIT_TO_SCREEN_TOOLTIP, KeyStroke.getKeyStroke('F', shortcutkey | InputEvent.SHIFT_DOWN_MASK)) {
+        public void actionPerformed(ActionEvent e) {
+            currentTab.ifPresent(o -> {
+                if (!o.isAlreadyFitToScreen()) {
+                    o.fitToScreen();
+                    putValue(Action.NAME, "Restore zoom");
+                    putValue(Action.SHORT_DESCRIPTION, "Restore the zoom to 100%");
+                    putValue(Action.SMALL_ICON, ResourceManager.getIcon("Restore zoom.png"));
+                } else {
+                    zoomSlider.setValue(100);
+                    putValue(Action.NAME, FIT_TO_SCREEN_NAME);
+                    putValue(Action.SHORT_DESCRIPTION, FIT_TO_SCREEN_TOOLTIP);
+                    putValue(Action.SMALL_ICON, ResourceManager.getIcon(FIT_TO_SCREEN_ICON));
+                    o.setIsAlreadyFitToScreen(false);
+                }
+            });
         }
     };
 
@@ -325,7 +357,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         }
     };
     private final GuiAction showEnabledTransitionsAction = new GuiAction("Display enabled transitions", "Show/hide the list of enabled transitions", KeyStroke.getKeyStroke('6', shortcutkey), true) {
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {            
             guiFrameController.ifPresent(GuiFrameControllerActions::toggleEnabledTransitionsList);
         }
     };
@@ -409,19 +441,21 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction startAction = new GuiAction("Simulation mode", "Toggle simulation mode (M)", "M", true) {
         public void actionPerformed(ActionEvent e) {
             //XXX: this needs to be refactored, it breaks the abstraction in a really bad way -- 2022-01-23
-            if(getCurrentTab().getLens().isColored() && !getCurrentTab().isInAnimationMode()) {
+            TAPNLens lens = getCurrentTab().getLens();
+            if (lens.isColored() && !getCurrentTab().isInAnimationMode()) {
                 PetriNetTab oldTab = getCurrentTab();
-                UnfoldDialog.showSimulationDialog(oldTab);
-
-                if(!UnfoldDialog.wasCancelled() && oldTab != getCurrentTab()){
-                    currentTab.ifPresent(TabActions::toggleAnimationMode);
+                boolean useExplicit = !lens.isGame() && !lens.isStochastic() && !lens.isTimed();
+                ColoredSimulationDialog.showSimulationDialog(oldTab, useExplicit);
+                if (!ColoredSimulationDialog.wasCancelled() && (oldTab != getCurrentTab() || ColoredSimulationDialog.explicitSimulationMode())) {
+                    currentTab.ifPresent(tab -> tab.toggleAnimationMode(ColoredSimulationDialog.explicitSimulationMode()));
                 } else {
                     this.setSelected(false);
                 }
+
+                ColoredSimulationDialog.resetFlags();
             } else {
                 currentTab.ifPresent(TabActions::toggleAnimationMode);
             }
-
         }
     };
     public final GuiAction stepforwardAction = new GuiAction("Step forward", "Step forward", "released RIGHT") {
@@ -449,6 +483,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent e) {
             boolean isTime = timeFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeTimeFeature(isTime));
+            refreshLensConstraints();
         }
     };
 
@@ -456,6 +491,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent e) {
             boolean isGame = gameFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeGameFeature(isGame));
+            refreshLensConstraints();
         }
     };
 
@@ -463,6 +499,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         public void actionPerformed(ActionEvent e) {
             boolean isColor = colorFeatureOptions.getSelectedIndex() != 0;
             currentTab.ifPresent(o -> o.changeColorFeature(isColor));
+            refreshLensConstraints();
+        }
+    };
+
+    private final GuiAction changeStochasticFeatureAction = new GuiAction("Stochastic", "Change stochastic semantics") {
+        public void actionPerformed(ActionEvent actionEvent) {
+            boolean isStochastic = stochasticFeatureOptions.getSelectedIndex() != 0;
+            currentTab.ifPresent(o -> o.changeStochasticFeature(isStochastic));
+            refreshLensConstraints();
         }
     };
 
@@ -474,8 +519,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JCheckBoxMenuItem showTokenAgeCheckBox;
     private JCheckBoxMenuItem showDelayEnabledTransitionsCheckbox;
     private JCheckBoxMenuItem showColoredTokensCheckbox;
-
-    private JMenu zoomMenu;
 
     public GuiFrame(String title) {
         // HAK-arrange for frameTitle to be initialized and the default file
@@ -523,9 +566,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         featurePanel.add(gameFeatureOptions);
         featurePanel.add(new JLabel("   Color: "));
         featurePanel.add(colorFeatureOptions);
+        featurePanel.add(new JLabel("   Stochastic: "));
+        featurePanel.add(stochasticFeatureOptions);
         timeFeatureOptions.addActionListener(changeTimeFeatureAction);
         gameFeatureOptions.addActionListener(changeGameFeatureAction);
         colorFeatureOptions.addActionListener(changeColorFeatureAction);
+        stochasticFeatureOptions.addActionListener(changeStochasticFeatureAction);
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new GridLayout(1, 2));
@@ -605,7 +651,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             // Grow size of boxes to add room for the resizer
             System.setProperty("apple.awt.showGrowBox", "true");
-
         }
 
         this.setIconImage(ResourceManager.getIcon("icon.png").getImage());
@@ -693,15 +738,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         viewMenu = new JMenu("View");
         viewMenu.setMnemonic('V');
 
-        zoomMenu = new JMenu("Zoom");
-        zoomMenu.setIcon(ResourceManager.getIcon("Zoom.png"));
-
-        addZoomMenuItems(zoomMenu);
-
         viewMenu.add(zoomInAction);
 
         viewMenu.add(zoomOutAction);
-        viewMenu.add(zoomMenu);
+
+        viewMenu.add(fitToScreenAction);
+
+        viewMenu.addSeparator();
+
+        viewMenu.add(buildMenuUiScale());
 
         viewMenu.addSeparator();
 
@@ -749,6 +794,34 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         viewMenu.add(showAdvancedWorkspaceAction);
         viewMenu.add(saveWorkSpaceAction);
         return viewMenu;
+    }
+
+    private JMenu buildMenuUiScale() {
+        var uiScaleMenu = new JMenu("UI Scale");
+        uiScaleMenu.setToolTipText("Applied after restarting TAPAAL");
+
+        var preferences = Preferences.getInstance();
+        var scaleGroup = new ButtonGroup();
+        var presetScales = new int[]{100, 200};
+        var savedScale = preferences.getUiScale();
+
+        for (var scale : presetScales) {
+            var label = (scale == Constants.UI_SCALE_DEFAULT) ? "100% (Default)" : scale + "%";
+            var item = new JRadioButtonMenuItem(label, scale == savedScale);
+            scaleGroup.add(item);
+            item.addActionListener(e -> {
+                if (scale != preferences.getUiScale()) {
+                    preferences.setUiScale(scale);
+                    JOptionPane.showMessageDialog(this,
+                            "Restart TAPAAL to apply the new UI scale.",
+                            "UI Scale", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+            });
+            uiScaleMenu.add(item);
+        }
+
+        return uiScaleMenu;
     }
 
 
@@ -836,9 +909,17 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         JMenuItem clearPreferences = new JMenuItem(clearPreferencesAction);
         toolsMenu.add(clearPreferences);
-
         return toolsMenu;
     }
+
+    private final AbstractAction searchAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (searchBar != null && searchBar.isEnabled()) {
+                searchBar.requestFocusInWindow();
+            }
+        }
+    };
 
     private void buildToolbar() {
 
@@ -875,8 +956,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // Zoom
         toolBar.addSeparator();
         toolBar.add(zoomOutAction).setRequestFocusEnabled(false);
-        addZoomComboBox(toolBar, zoomToAction);
+        addZoomSlider(toolBar);
         toolBar.add(zoomInAction).setRequestFocusEnabled(false);
+        toolBar.add(fitToScreenAction).setRequestFocusEnabled(false);
 
         // Modes
 
@@ -891,6 +973,94 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         drawingToolBar.addSeparator();
         drawingToolBar.setRequestFocusEnabled(false);
 
+        // Search field
+        searchToolBar = new JToolBar();
+        searchToolBar.setFloatable(false);
+        searchToolBar.setRequestFocusEnabled(false);
+
+        searchBar = new SearchBar("Search: ");   
+        JRootPane rootPane = getRootPane();
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = rootPane.getActionMap();
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey), "focusSearchBar");
+        actionMap.put("focusSearchBar", searchAction);
+
+        searchBar.setOnFocusGained(() -> {
+            currentTab.ifPresent(o -> o.setMode(PetriNetTab.DrawTool.SELECT));
+            enableActionsForSearchBar(false);
+
+            if (!searchBar.getSearchText().isEmpty()) {
+                String query = searchBar.getSearchText();
+                currentTab.ifPresent(o -> o.search(query));
+            }
+        });    
+
+        searchBar.setOnFocusLost(() -> {
+            enableActionsForSearchBar(true);
+        });  
+
+        searchBar.setEnabled(false);
+        searchToolBar.add(searchBar);
+
+        searchBar.setOnSearchTextChanged(query -> {
+            if (query == null || query.trim().isEmpty()) {
+                searchBar.hideResults();
+                return;
+            }
+
+            currentTab.ifPresent(o -> o.search(query));
+        });
+
+        searchBar.setOnResultSelected(result -> {
+            if (result == null) return;
+
+            searchBar.clear();
+
+            PetriNetObject selectedObject = null;
+            PetriNetTab tab = (PetriNetTab)currentTab.get();
+            String resultStr = result.value1().toString();
+
+            String templateName = null;
+            String name;
+
+            if (resultStr.contains(".")) {
+                templateName = resultStr.split("\\.")[0];
+                name = resultStr.split("\\.")[1];
+            } else {
+                templateName = result.value2();
+                name = resultStr;
+            }
+            
+            Object resultObj = result.value1();
+            for (Template template : tab.allTemplates()) {
+                if (templateName != null && !template.toString().equals(templateName)) {
+                    continue;
+                }
+
+                DataLayer guiModel = template.guiModel();
+                if (resultObj instanceof TimedPlace) {
+                    selectedObject = guiModel.getPlaceByName(name);
+                } else {
+                    selectedObject = guiModel.getTransitionByName(name);
+                }
+                
+                if (selectedObject != null) {
+                    tab.selectTemplate(template);
+                    break;
+                }
+            }
+        
+            if (selectedObject == null) throw new IllegalStateException("Selected object is null");
+            
+            DrawingSurfaceImpl drawingSurface = tab.drawingSurface();
+            SelectionManager selectionObject = drawingSurface.getSelectionObject();
+            selectionObject.clearSelection();
+
+            selectedObject.select();
+            drawingSurface.scrollToCenter(selectedObject);
+        });
+        
+
         // Create panel to put toolbars in
         JPanel toolBarPanel = new JPanel();
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -904,46 +1074,69 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         JPanel toolBarPaneltmp = new JPanel();
         toolBarPaneltmp.setLayout(new BorderLayout());
         toolBarPaneltmp.add(toolBarPanel, BorderLayout.WEST);
+        
         JToolBar spacer = new JToolBar();
-        spacer.addSeparator();
         spacer.setFloatable(false);
-        toolBarPaneltmp.add(spacer, BorderLayout.CENTER);
+       
+        toolBarPaneltmp.add(searchToolBar, BorderLayout.CENTER);
+        toolBarPaneltmp.add(spacer, BorderLayout.EAST);
 
         // Add to GUI
         getContentPane().add(toolBarPaneltmp, BorderLayout.PAGE_START);
     }
 
-    private void addZoomMenuItems(JMenu zoomMenu) {
-        for (int i = 0; i <= zoomLevels.length - 1; i++) {
-
-            final int zoomper = zoomLevels[i];
-            GuiAction newZoomAction = new GuiAction(zoomLevels[i] + "%", "Select zoom percentage", "") {
-                public void actionPerformed(ActionEvent e) {
-                    currentTab.ifPresent(o -> o.zoomTo(zoomper));
-                }
-            };
-
-            zoomMenu.add(newZoomAction);
-        }
+    private void enableActionsForSearchBar(boolean enable) {
+        exportTraceAction.setEnabled(enable);
+        importTraceAction.setEnabled(enable);
+        verifyAction.setEnabled(enable);
+        showColorTypesVariables.setEnabled(enable);
+        annotationAction.setEnabled(enable);
+        selectAllAction.setEnabled(enable);
+        stepbackwardAction.setEnabled(enable);
+        stepforwardAction.setEnabled(enable);
+        deleteAction.setEnabled(enable);
+        undoAction.setEnabled(enable);
+        redoAction.setEnabled(enable);
+        prevcomponentAction.setEnabled(enable);
+        nextcomponentAction.setEnabled(enable);
+        smartDrawAction.setEnabled(enable);
+        mergeComponentsDialogAction.setEnabled(enable);
+        workflowDialogAction.setEnabled(enable);
+        timeFeatureOptions.setEnabled(enable);
+        gameFeatureOptions.setEnabled(enable);
+        colorFeatureOptions.setEnabled(enable);
+        stochasticFeatureOptions.setEnabled(enable);
+        enableAllActions(enable);
+        currentTab.ifPresent(o -> o.enableActionsForSearchBar(enable));
     }
 
-    private void addZoomComboBox(JToolBar toolBar, Action action) {
-        Dimension zoomComboBoxDimension = new Dimension(100, 28);
+    private void addZoomSlider(JToolBar toolBar) {
+        Dimension zoomSliderDimension = new Dimension(100, 28);
+        zoomSlider = new JSlider(Constants.ZOOM_MIN, Constants.ZOOM_MAX, 100);
+        zoomSlider.setMajorTickSpacing(50);
+        zoomSlider.setToolTipText("Zoom: " + zoomSlider.getValue() + "%");
+        zoomSlider.addChangeListener(e -> {
+            int newZoomLevel = zoomSlider.getValue();
+            currentTab.ifPresent(o -> o.zoomTo(newZoomLevel));
+            zoomSlider.setToolTipText("Zoom: " + newZoomLevel + "%");
+            getCurrentTab().setIsAlreadyFitToScreen(false);
+            fitToScreenAction.putValue(Action.NAME, FIT_TO_SCREEN_NAME);
+            fitToScreenAction.putValue(Action.SHORT_DESCRIPTION, FIT_TO_SCREEN_TOOLTIP);
+            fitToScreenAction.putValue(Action.SMALL_ICON, ResourceManager.getIcon(FIT_TO_SCREEN_ICON));
+        });
+        
+        SwingHelper.setPreferredWidth(zoomSlider, zoomSliderDimension.width);
+        toolBar.add(zoomSlider);
+    }
 
-        String[] zoomExamplesStrings = new String[zoomLevels.length];
-        int i;
-        for (i = 0; i < zoomLevels.length; i++) {
-            zoomExamplesStrings[i] = zoomLevels[i] + "%";
-        }
+    @Override
+    public JSlider getZoomSlider() {
+        return zoomSlider;
+    }
 
-        zoomComboBox = new JComboBox<>(zoomExamplesStrings);
-        zoomComboBox.setEditable(true);
-        zoomComboBox.setSelectedItem("100%");
-        zoomComboBox.setMaximumRowCount(zoomLevels.length);
-        SwingHelper.setPreferredWidth(zoomComboBox,zoomComboBoxDimension.width);
-        zoomComboBox.setAction(action);
-        zoomComboBox.setFocusable(false);
-        toolBar.add(zoomComboBox);
+    @Override
+    public SearchBar getSearchBar() {
+        return searchBar;
     }
 
     private JCheckBoxMenuItem addCheckboxMenuItem(JMenu menu, Action action) {
@@ -1004,10 +1197,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 timeFeatureOptions.setEnabled(true);
                 gameFeatureOptions.setEnabled(true);
                 colorFeatureOptions.setEnabled(true);
+                stochasticFeatureOptions.setEnabled(true);
+                refreshLensConstraints();
 
                 //Enable editor focus traversal policy
                 setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
                 fixBug812694GrayMenuAfterSimulationOnMac();
+
+                searchBar.setEnabled(true);
+
                 break;
 
             case animation:
@@ -1030,8 +1228,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 nextcomponentAction.setEnabled(true);
 
                 deleteAction.setEnabled(false);
-                undoAction.setEnabled(false);
-                redoAction.setEnabled(false);
+                undoAction.setEnabled(true);
+                redoAction.setEnabled(true);
                 verifyAction.setEnabled(false);
 
                 showColorTypesVariables.setEnabled(getCurrentTab().lens.isColored());
@@ -1043,9 +1241,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 timeFeatureOptions.setEnabled(false);
                 gameFeatureOptions.setEnabled(false);
                 colorFeatureOptions.setEnabled(false);
+                stochasticFeatureOptions.setEnabled(false);
 
                 //Enable simulator focus traversal policy
                 setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy(getCurrentTab().getAnimationController().TimeDelayField));
+                
+                searchBar.setEnabled(false);
 
                 break;
             case noNet:
@@ -1074,13 +1275,15 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 timeFeatureOptions.setEnabled(false);
                 gameFeatureOptions.setEnabled(false);
                 colorFeatureOptions.setEnabled(false);
-
+                stochasticFeatureOptions.setEnabled(false);
 
                 enableAllActions(false);
 
                 // Disable All Actions
                 statusBar.changeText("Open a net to start editing");
                 setFocusTraversalPolicy(null);
+
+                searchBar.setEnabled(false);
 
                 break;
         }
@@ -1106,14 +1309,16 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         exportTraceAction.setEnabled(enable);
         importTraceAction.setEnabled(enable);
+        importXMLAction.setEnabled(enable);
+        importSUMOAction.setEnabled(enable);
 
         printAction.setEnabled(enable);
 
         // View
         zoomInAction.setEnabled(enable);
         zoomOutAction.setEnabled(enable);
-        zoomComboBox.setEnabled(enable);
-        zoomMenu.setEnabled(enable);
+        zoomSlider.setEnabled(enable);
+        fitToScreenAction.setEnabled(enable);
 
         decSpacingAction.setEnabled(enable);
         incSpacingAction.setEnabled(enable);
@@ -1142,6 +1347,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // Tools
         netStatisticsAction.setEnabled(enable);
 
+    }
+
+    @Override
+    public void updateZoomSlider(int zoom) {
+        zoomSlider.setValue(zoom);
     }
 
     // set tabbed pane properties and add change listener that updates tab with
@@ -1206,6 +1416,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 pasteAction.setEnabled(true);
                 copyAction.setEnabled(true);
                 cutAction.setEnabled(true);
+                searchBar.setVisible(true);
 
                 break;
             case animation:
@@ -1213,6 +1424,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 pasteAction.setEnabled(false);
                 copyAction.setEnabled(false);
                 cutAction.setEnabled(false);
+                searchBar.setVisible(false);
 
                 break;
             case noNet:
@@ -1223,6 +1435,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 pasteAction.setEnabled(false);
                 copyAction.setEnabled(false);
                 cutAction.setEnabled(false);
+                searchBar.setVisible(false);
                 break;
 
             default:
@@ -1451,19 +1664,6 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         redoAction.setEnabled(flag);
     }
 
-    /**
-     * @author Ben Kirby Remove the listener from the zoomComboBox, so that when
-     * the box's selected item is updated to keep track of ZoomActions
-     * called from other sources, a duplicate ZoomAction is not called
-     */
-    @Override
-    public void updateZoomCombo(int zoom) {
-        ActionListener zoomComboListener = (zoomComboBox.getActionListeners())[0];
-        zoomComboBox.removeActionListener(zoomComboListener);
-        zoomComboBox.setSelectedItem(zoom + "%");
-        zoomComboBox.addActionListener(zoomComboListener);
-    }
-
     private JMenu buildMenuFiles() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic('F');
@@ -1537,12 +1737,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         // .xml file the Example x counter is not incremented when that file
         // is ignored
         if (nets != null && nets.length > 0) {
-            TAPNLens untimedLens = new TAPNLens(false, false, false);
-            TAPNLens timedLens = new TAPNLens(true, false, false);
-            TAPNLens untimedGameLens = new TAPNLens(false, true, false);
-            TAPNLens timedGameLens = new TAPNLens(true, true, false);
-            TAPNLens untimedColorLens = new TAPNLens(false, false, true);
-            TAPNLens timedColorLens = new TAPNLens(true, false, true);
+            TAPNLens untimedLens = new TAPNLens(false, false, false, false);
+            TAPNLens timedLens = new TAPNLens(true, false, false, false);
+            TAPNLens untimedGameLens = new TAPNLens(false, true, false, false);
+            TAPNLens timedGameLens = new TAPNLens(true, true, false, false);
+            TAPNLens untimedColorLens = new TAPNLens(false, false, true, false);
+            TAPNLens timedColorLens = new TAPNLens(true, false, true, false);
+            TAPNLens timedStochasticLens = new TAPNLens(true, false, false, true);
+            TAPNLens timedColorStochasticLens = new TAPNLens(true, false, true, true);
 
             HashMap<TAPNLens, List<String>> netMap = new HashMap<>(){{
                     put(untimedLens, new ArrayList<>());
@@ -1551,6 +1753,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     put(timedGameLens, new ArrayList<>());
                     put(untimedColorLens, new ArrayList<>());
                     put(timedColorLens, new ArrayList<>());
+                    put(timedStochasticLens, new ArrayList<>());
+                    put(timedColorStochasticLens, new ArrayList<>());
             }};
 
             for (String filename : nets) {
@@ -1562,11 +1766,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     try {
                         lens = PetriNetTab.getFileLens(file);
                         if (lens == null) {
-                            lens = new TAPNLens(true, false, false);
+                            lens = new TAPNLens(true, false, false, false);
                         }
                         TAPNLens tmp = lens;
                         netMap.forEach((v, k) -> {
-                            if (v.isTimed() == tmp.isTimed() && v.isGame() == tmp.isGame() && v.isColored() == tmp.isColored()) k.add(filename);
+                            if (v.isTimed() == tmp.isTimed() && v.isGame() == tmp.isGame() && v.isColored() == tmp.isColored() && v.isStochastic() == tmp.isStochastic()) k.add(filename);
                         });
                     } catch (Exception e) {
                         if (netMap.containsKey(timedLens)) netMap.get(timedLens).add(filename);
@@ -1600,6 +1804,14 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             modifier = getModifier(modifier, charKey, netMap.get(untimedColorLens).size());
             charKey = countCharKey(charKey, netMap.get(untimedColorLens).size());
             exampleMenu.add(addExampleNets(netMap.get(timedColorLens), "Timed-Arc Colored Petri nets", charKey, modifier));
+
+            modifier = getModifier(modifier, charKey, netMap.get(timedColorLens).size());
+            charKey = countCharKey(charKey, netMap.get(timedColorLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(timedStochasticLens), "Timed-Arc Stochastic Petri nets", charKey, modifier));
+
+            modifier = getModifier(modifier, charKey, netMap.get(timedStochasticLens).size());
+            charKey = countCharKey(charKey, netMap.get(timedStochasticLens).size());
+            exampleMenu.add(addExampleNets(netMap.get(timedColorStochasticLens), "Timed-Arc Stochastic Colored Petri nets", charKey, modifier));
 
             return exampleMenu;
         }
@@ -1803,6 +2015,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             timeFeatureOptions.setSelectedIndex(features[0] ? 1 : 0);
             gameFeatureOptions.setSelectedIndex(features[1] ? 1 : 0);
             colorFeatureOptions.setSelectedIndex(features[2] ? 1 : 0);
+            stochasticFeatureOptions.setSelectedIndex(features[3] ? 1 : 0);
         }
+        refreshLensConstraints();
+    }
+
+    public void refreshLensConstraints() {
+        boolean stochasticEnabled = stochasticFeatureOptions.getSelectedIndex() != 0;
+        timeFeatureOptions.setEnabled(!stochasticEnabled);
+        gameFeatureOptions.setEnabled(!stochasticEnabled);
+        stochasticFeatureOptions.setEnabled(
+            timeFeatureOptions.getSelectedIndex() != 0 &&
+                gameFeatureOptions.getSelectedIndex() == 0
+        );
     }
 }

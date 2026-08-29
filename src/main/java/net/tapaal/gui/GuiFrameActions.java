@@ -4,9 +4,11 @@ import net.tapaal.helpers.Reference.Reference;
 import pipe.gui.GuiFrame;
 import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.petrinet.PetriNetTab;
+import pipe.gui.petrinet.SearchBar;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.util.List;
+import javax.swing.JSlider;
 
 /**
  * Used to delegate control of the state of AppGUI to tabs
@@ -14,7 +16,11 @@ import java.util.List;
  */
 public interface GuiFrameActions {
 
-    void updateZoomCombo(int zoom);
+    void updateZoomSlider(int zoom);
+
+    JSlider getZoomSlider();
+
+    SearchBar getSearchBar();
 
     void setRedoActionEnabled(boolean b);
 

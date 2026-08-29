@@ -76,7 +76,6 @@ SKIP :
 ArcExpression StartAddExpression() :
 {
 	ArcExpression currentChild;
-	Vector<ArcExpression> constituents = new Vector<ArcExpression>();
 }
 {
 	currentChild = AddExpression() <EOF>
@@ -85,48 +84,54 @@ ArcExpression StartAddExpression() :
 
 ArcExpression AddExpression() :
 {
-	ArcExpression currentChild;
-	Vector<ArcExpression> constituents = new Vector<ArcExpression>();
+    ArcExpression left;
+    ArcExpression right;
+    Token op;
 }
 {
-	currentChild = SubExpression()
-	{ constituents.add(currentChild); }
-	(
-		<PLUS> currentChild = SubExpression()
-		{ constituents.add(currentChild); }
-	)*
-	{ return constituents.size() == 1 ? currentChild : new AddExpression(constituents); }
-}
-
-ArcExpression SubExpression() :
-{
-	ArcExpression left = null;
-	ArcExpression right = null;
-}
-{
-	left = ScalarExpression()
-	(
-		<SUB> right = ScalarExpression()
-	)?
-	{ return right == null ? left : new SubtractExpression(left,right); }
+    left = ScalarExpression()
+    (
+        (op = <PLUS> | op = <SUB>) 
+        right = ScalarExpression()
+        {
+            if (op.kind == PLUS) {
+                AddExpression add = new AddExpression(left, right);
+                left.setParent(add);
+                right.setParent(add);
+                left = add;
+            } else {
+                SubtractExpression sub = new SubtractExpression(left, right);
+                left.setParent(sub);
+                right.setParent(sub);
+                left = sub;
+            }
+        }
+    )*
+    { return left; }
 }
 
 ArcExpression ScalarExpression() :
 {
-	ArcExpression currentChild;
-	Token number;
+    ArcExpression currentChild;
+    Token number;
 }
 {
-	LOOKAHEAD(2147483647) number = <NUM> <MULT> currentChild = AddExpression() { return new ScalarProductExpression(Integer.parseInt(number.image),currentChild); }
-    	| currentChild = term() { return currentChild; }
+    LOOKAHEAD(2147483647) number = <NUM> <MULT> currentChild = AddExpression() 
+    { 
+        ScalarProductExpression scalar = new ScalarProductExpression(Integer.parseInt(number.image), currentChild);
+        currentChild.setParent(scalar);
+        return scalar;
+    }
+    | currentChild = term() { return currentChild; }
 }
 
 ArcExpression term() : {
     ArcExpression childExpression;
 }{
-
-        childExpression = NumberOfExpression() {return childExpression;}
-    | "(" childExpression = AddExpression() ")" {return childExpression;}
+    childExpression = NumberOfExpression() { return childExpression; }
+    | "(" childExpression = AddExpression() ")" {
+        return childExpression;
+    }
 }
 
 NumberOfExpression StartNumberOfExpression() : {
