@@ -68,7 +68,6 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	@Override
 	public void undo() {
         timedPlaceComponent.deselect();
-		guiModel.addPetriNetObject(timedPlaceComponent);
 		tapn.add(timedPlace);
 		
 		if (!timedPlace.isShared()) {
@@ -76,6 +75,9 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 				tapn.addToken(token);
 			}
 		}
+		// Restore the domain object and its marking before the component is
+		// attached; attaching it can repaint immediately and read the marking.
+		guiModel.addPetriNetObject(timedPlaceComponent);
 		
 		for (TAPNQuery q : queriesInclusion) {
 			q.inclusionPlaces().inclusionPlaces().add(timedPlace);
