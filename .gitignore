@@ -7,4 +7,5 @@ build
 out
 bin
 .kotlin
+.tools
 .tapaal-refactor-progress.md
