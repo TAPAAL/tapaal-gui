@@ -1,7 +1,9 @@
 package net.tapaal.gui.petrinet.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ class NetworkEditServiceTest {
         assertEquals(2, network.getConstant("k").value());
 
         add.undo();
-        assertEquals(null, network.getConstant("k"));
+        assertNull(network.getConstant("k"));
         add.redo();
         assertEquals(2, network.getConstant("k").value());
     }
@@ -90,7 +92,7 @@ class NetworkEditServiceTest {
 
         undoManager.newEdit();
         ArrayList<String> colorMessages = new ArrayList<>();
-        assertTrue(edits.removeColorType(colorType, undoManager, colorMessages) == false);
+        assertFalse(edits.removeColorType(colorType, undoManager, colorMessages));
         assertEquals(1, colorMessages.size());
         assertEquals(colorType, network.getColorTypeByName("colors"));
 
