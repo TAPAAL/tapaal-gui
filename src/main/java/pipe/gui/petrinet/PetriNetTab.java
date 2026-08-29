@@ -26,6 +26,7 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.Require;
@@ -239,7 +240,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         TimedArcPetriNetNetwork net = tab.network();
         for (TAPNQuery q : tab.queries()) {
-            boolean smcQuery = q.getCategory() == TAPNQuery.QueryCategory.SMC;
+            boolean smcQuery = q.getCategory() == QueryCategory.SMC;
             EnumSet<EngineFeature> requiredFeatures = EnumSet.noneOf(EngineFeature.class);
             if (q.getTraceOption() == TAPNQuery.TraceOption.FASTEST) requiredFeatures.add(EngineFeature.FASTEST_TRACE);
             if (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && NetworkAnalysis.highestNetDegree(net) <= 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
@@ -295,10 +296,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 q.setReductionOption(ReductionOption.VerifyPN);
                 q.setUseOverApproximationEnabled(false);
                 q.setUseUnderApproximationEnabled(false);
-                if (q.getCategory() == TAPNQuery.QueryCategory.Default)
-                q.setCategory(TAPNQuery.QueryCategory.CTL);
+                if (q.getCategory() == QueryCategory.Default)
+                q.setCategory(QueryCategory.CTL);
             } else {
-                if (q.getCategory() == TAPNQuery.QueryCategory.LTL) {
+                if (q.getCategory() == QueryCategory.LTL) {
                     queriesToRemove.add(q);
                     tab.removeQuery(q);
                 }

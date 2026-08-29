@@ -208,6 +208,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.VerificationType;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.UPPAALBroadcastDegree2Options;
 import net.tapaal.gui.petrinet.verification.UPPAALBroadcastOptions;
 import net.tapaal.gui.petrinet.verification.UPPAALCombiOptions;
@@ -785,7 +786,7 @@ public class QueryDialog extends JPanel {
         }
 
         if(lens.isStochastic()) {
-            query.setCategory(TAPNQuery.QueryCategory.SMC);
+            query.setCategory(QueryCategory.SMC);
             query.setParallel(smcParallel.isSelected());
             VerificationType verificationType = VerificationType.fromOrdinal(smcVerificationType.getSelectedIndex());
             query.setSmcSettings(getSMCSettings());
@@ -840,12 +841,12 @@ public class QueryDialog extends JPanel {
             rawVerificationOptionsTextArea.getText()
         );
         if (queryType.getSelectedIndex() == 1) {
-            query.setCategory(TAPNQuery.QueryCategory.LTL);
+            query.setCategory(QueryCategory.LTL);
         } else if (queryType.getSelectedIndex() == 2) {
-            query.setCategory(TAPNQuery.QueryCategory.HyperLTL);
+            query.setCategory(QueryCategory.HyperLTL);
             query.setTraceList(traceList);
         } else {
-            query.setCategory(TAPNQuery.QueryCategory.CTL);
+            query.setCategory(QueryCategory.CTL);
         }
         query.setUseSiphontrap(useSiphonTrap.isSelected());
         query.setUseQueryReduction(useQueryReduction.isSelected());
@@ -1176,7 +1177,7 @@ public class QueryDialog extends JPanel {
         guiDialog.pack();
 
         // 'hack' for hiding the trace drop-down menu for HyperLTL on intial launch of the query dialogue panel
-        if(queryToRepresent != null && queryToRepresent.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
+        if(queryToRepresent != null && queryToRepresent.getCategory() == QueryCategory.HyperLTL) {
             queryDialogue.showHyperLTL(true);
             guiDialog.pack();
         } else {
@@ -2422,7 +2423,7 @@ public class QueryDialog extends JPanel {
             setupUnfoldingOptionsFromQuery(queryToCreateFrom);
         }
 
-        if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.SMC) {
+        if (queryToCreateFrom.getCategory() == QueryCategory.SMC) {
             setSMCSettings(queryToCreateFrom.getSmcSettings());
             smcParallel.setSelected(queryToCreateFrom.isParallel());
             smcVerificationType.setSelectedIndex(queryToCreateFrom.getVerificationType().ordinal());
@@ -2446,7 +2447,7 @@ public class QueryDialog extends JPanel {
         setupTarjanOptionsFromQuery(queryToCreateFrom);
         setupExplicitSearch(queryToCreateFrom.useExplicitSearch());
 
-        if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
+        if (queryToCreateFrom.getCategory() == QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
         }
 
@@ -2687,12 +2688,12 @@ public class QueryDialog extends JPanel {
 
     private void setupQueryCategoryFromQuery(TAPNQuery queryToCreateFrom) {
         if (!lens.isTimed()) {
-            TAPNQuery.QueryCategory category = queryToCreateFrom.getCategory();
-            if (category.equals(TAPNQuery.QueryCategory.CTL)) {
+            QueryCategory category = queryToCreateFrom.getCategory();
+            if (category.equals(QueryCategory.CTL)) {
                 queryType.setSelectedIndex(0);
-            } else if (category.equals(TAPNQuery.QueryCategory.LTL)) {
+            } else if (category.equals(QueryCategory.LTL)) {
                 queryType.setSelectedIndex(1);
-            } else if (category.equals(TAPNQuery.QueryCategory.HyperLTL)) {
+            } else if (category.equals(QueryCategory.HyperLTL)) {
                 queryType.setSelectedIndex(2);
             }
         }

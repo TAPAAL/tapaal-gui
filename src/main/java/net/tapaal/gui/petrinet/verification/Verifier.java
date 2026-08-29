@@ -8,8 +8,10 @@ import com.sun.jna.Platform;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.model.QueryMetadataAdapter;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
+import dk.aau.cs.verification.VerificationOptions.QueryReductionTime;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
@@ -90,7 +92,7 @@ public class Verifier {
                 lens.isColored() && query.useSymmetricVars(),
                 lens.isColored(),
                 query.useColoredReduction());
-            newQuery.setCategory(TAPNQuery.QueryCategory.CTL);
+            newQuery.setCategory(QueryCategory.CTL);
             newQuery.setUseSiphontrap(query.isSiphontrapEnabled());
             newQuery.setUseQueryReduction(query.isQueryReductionEnabled());
             newQuery.setUseStubbornReduction(query.isStubbornReductionEnabled());
@@ -340,7 +342,7 @@ public class Verifier {
                 query.getCategory(),
                 query.getAlgorithmOption(),
                 query.isSiphontrapEnabled(),
-                query.isQueryReductionEnabled() ? TAPNQuery.QueryReductionTime.UnlimitedTime : TAPNQuery.QueryReductionTime.NoTime,
+                query.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime,
                 query.isStubbornReductionEnabled(),
                 getReducedNetFilePath(),
                 query.isTarOptionEnabled(),

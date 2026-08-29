@@ -1,7 +1,6 @@
 package net.tapaal.gui.petrinet.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -12,17 +11,6 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.verification.QueryType;
 
 class QueryMetadataAdapterTest {
-
-    @Test
-    void mapsQueryCategoriesAtTheGuiModelBoundary() {
-        for (net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory guiCategory
-                : net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.values()) {
-            TAPNQuery.QueryCategory modelCategory = QueryMetadataAdapter.toModelCategory(guiCategory);
-
-            assertEquals(guiCategory.name(), modelCategory.name());
-            assertSame(guiCategory, QueryMetadataAdapter.toGuiCategory(modelCategory));
-        }
-    }
 
     @Test
     void mapsVerificationTypesToTheModel() {

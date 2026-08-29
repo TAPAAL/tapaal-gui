@@ -22,6 +22,7 @@ import dk.aau.cs.TCTL.XMLParsing.QueryWrapper;
 import dk.aau.cs.TCTL.XMLParsing.XMLCTLQueryParser;
 import dk.aau.cs.TCTL.visitors.RenameTemplateVisitor;
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.translations.ReductionOption;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -40,18 +41,18 @@ import pipe.gui.petrinet.PetriNetTab;
 public class XMLQueryLoader extends QueryLoader{
 
     private final File file;
-    private final List<TAPNQuery.QueryCategory> queryCategories;
+    private final List<QueryCategory> queryCategories;
     private final ArrayList<QueryWrapper> faultyQueries = new ArrayList<QueryWrapper>();
 
     public XMLQueryLoader(File file, TimedArcPetriNetNetwork network){
         this(file, network, null);
     }
 
-    public XMLQueryLoader(File file, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories){
+    public XMLQueryLoader(File file, TimedArcPetriNetNetwork network, List<QueryCategory> queryCategories){
 		this(file, network, queryCategories, network.isColored());
 	}
 
-    public XMLQueryLoader(File file, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories, boolean isColored){
+    public XMLQueryLoader(File file, TimedArcPetriNetNetwork network, List<QueryCategory> queryCategories, boolean isColored){
 		super(network, isColored);
         this.file = file;
         this.queryCategories = queryCategories;
@@ -139,13 +140,13 @@ public class XMLQueryLoader extends QueryLoader{
             boolean isHyperLTL = (canBeHyperLTL && counter == 1) || (counter > 1  && choice == 2);
 
             if (queryCategories != null && queryCategories.size() > i) {
-                if (queryCategories.get(i) == TAPNQuery.QueryCategory.CTL) {
+                if (queryCategories.get(i) == QueryCategory.CTL) {
                     isCTL = true;
-                } else if (queryCategories.get(i) == TAPNQuery.QueryCategory.LTL) {
+                } else if (queryCategories.get(i) == QueryCategory.LTL) {
                     isLTL = true;
-                } else if (queryCategories.get(i) == TAPNQuery.QueryCategory.HyperLTL) {
+                } else if (queryCategories.get(i) == QueryCategory.HyperLTL) {
                     isHyperLTL = true;
-                } else if (queryCategories.get(i) == TAPNQuery.QueryCategory.SMC) {
+                } else if (queryCategories.get(i) == QueryCategory.SMC) {
                     isSmc = true;
                 }
             }
@@ -185,15 +186,15 @@ public class XMLQueryLoader extends QueryLoader{
 
             query.setCategory(TAPNQueryLoader.detectCategory(queryWrapper.getProp(), isCTL, isLTL, isHyperLTL, isSmc));
             
-            if(query.getCategory() == TAPNQuery.QueryCategory.CTL || query.getCategory() == TAPNQuery.QueryCategory.LTL){
+            if(query.getCategory() == QueryCategory.CTL || query.getCategory() == QueryCategory.LTL){
             	query.setSearchOption(SearchOption.DFS);
             	query.setUseReduction(true);
-            } else if(query.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
+            } else if(query.getCategory() == QueryCategory.HyperLTL) {
                 query.setSearchOption(SearchOption.DFS);
                 query.setTraceList(queryWrapper.getTraceList());
                 query.setUseStubbornReduction(false);
                 query.setUseReduction(false);
-            } else if(query.getCategory() == TAPNQuery.QueryCategory.SMC) {
+            } else if(query.getCategory() == QueryCategory.SMC) {
                 query.setReductionOption(ReductionOption.VerifyDTAPN);
                 SMCSettings smcSettings = SMCSettings.Default();
                 if(hasSmcTag) {

@@ -33,7 +33,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.RunningVerificationDialog;
 import pipe.gui.petrinet.PetriNetTab;
 

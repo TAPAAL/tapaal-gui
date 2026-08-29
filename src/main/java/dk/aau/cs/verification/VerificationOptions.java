@@ -9,6 +9,18 @@ public abstract class VerificationOptions {
 		BFS, DFS, RANDOM, BatchProcessingKeepQueryOption, HEURISTIC, OVERAPPROXIMATE, DEFAULT, RANDOMHEURISTIC
 	}
 
+	public enum QueryReductionTime {
+		NoTime, ShortestTime, UnlimitedTime
+	}
+
+	public enum WorkflowMode {
+		NOT_WORKFLOW, WORKFLOW_SOUNDNESS, WORKFLOW_STRONG_SOUNDNESS
+	}
+
+	public enum AlgorithmOption {
+		CERTAIN_ZERO, LOCAL
+	}
+
 	protected SearchOption searchOption;
 	protected TraceOption traceOption;
 	protected boolean enabledOverApproximation;

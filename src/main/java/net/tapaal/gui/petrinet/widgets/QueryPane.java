@@ -27,7 +27,7 @@ import net.tapaal.gui.petrinet.undo.MoveElementDownCommand;
 import net.tapaal.gui.petrinet.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.dialog.QueryDialog;

@@ -15,8 +15,6 @@ import javax.swing.SwingWorker;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.*;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -42,7 +40,9 @@ import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.RealConstant;
 import net.tapaal.gui.petrinet.model.QueryMetadataAdapter;
+import dk.aau.cs.verification.VerificationOptions.QueryReductionTime;
 import dk.aau.cs.verification.VerificationOptions.TraceOption;
+import dk.aau.cs.verification.VerificationOptions.WorkflowMode;
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
 	private final List<File> files;
@@ -359,12 +359,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
     private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query, BatchProcessingVerificationOptions option) throws Exception {
         TAPNQuery queryToVerify = getTAPNQuery(query);
-        queryToVerify.setCategory(QueryMetadataAdapter.toModelCategory(query.getCategory()));
+        queryToVerify.setCategory(query.getCategory());
         queryToVerify.setVerificationType(QueryMetadataAdapter.toModelVerificationType(query.getVerificationType()));
         MapQueryToNewNames(queryToVerify, composedModel.value2());
 
         TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens(), query.getSmcSettings());
-        clonedQuery.setCategory(QueryMetadataAdapter.toModelCategory(query.getCategory()));
+        clonedQuery.setCategory(query.getCategory());
         clonedQuery.setVerificationType(QueryMetadataAdapter.toModelVerificationType(query.getVerificationType()));
         MapQueryToNewNames(clonedQuery, composedModel.value2());
 

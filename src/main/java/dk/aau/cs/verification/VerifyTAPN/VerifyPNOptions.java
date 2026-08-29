@@ -6,9 +6,9 @@ import java.util.Map;
 
 import com.sun.jna.Platform;
 
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
+import dk.aau.cs.verification.VerificationOptions.AlgorithmOption;
+import dk.aau.cs.verification.VerificationOptions.QueryReductionTime;
 import dk.aau.cs.verification.VerificationOptions.SearchOption;
 import dk.aau.cs.verification.VerificationOptions.TraceOption;
 import pipe.gui.MessengerImpl;

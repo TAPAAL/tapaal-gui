@@ -17,6 +17,7 @@ import dk.aau.cs.io.PNMLWriter;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
@@ -111,12 +112,12 @@ public class Export {
                 // Attempt to parse and possibly transform the string query using the manual edit parser
                 TCTLAbstractProperty newProperty;
                 try {
-                    if (clonedQuery.getCategory().equals(TAPNQuery.QueryCategory.LTL)) {
+                    if (clonedQuery.getCategory().equals(QueryCategory.LTL)) {
                         newProperty = TAPAALLTLQueryParser.parse(clonedQuery.getProperty().toString());
-                    } else if (clonedQuery.getCategory().equals((TAPNQuery.QueryCategory.HyperLTL))) {
+                    } else if (clonedQuery.getCategory().equals(QueryCategory.HyperLTL)) {
                         isHyperLTL = true;
                         newProperty = TAPAALHyperLTLQueryParser.parse(clonedQuery.getProperty().toString());
-                    } else if (clonedQuery.getCategory().equals((TAPNQuery.QueryCategory.SMC))) {
+                    } else if (clonedQuery.getCategory().equals(QueryCategory.SMC)) {
                         isSMC = true;
                         newProperty = TAPAALLTLQueryParser.parse(clonedQuery.getProperty().toString());
                     } else {
