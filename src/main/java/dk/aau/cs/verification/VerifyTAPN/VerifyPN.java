@@ -24,6 +24,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
+import net.tapaal.verification.VerificationEngineDownloader;
 import org.jetbrains.annotations.Nullable;
 
 import com.sun.jna.Platform;
@@ -220,6 +221,19 @@ public class VerifyPN implements ModelChecker {
                 }
 
             }
+        }
+
+        try {
+            File downloadedEngine = VerificationEngineDownloader
+                .ensureEngine(VerificationEngineDownloader.Engine.VERIFYPN).toFile();
+            VerifyPN v = new VerifyPN(new FileFinder(), new MessengerImpl());
+            if (v.isCorrectVersion(downloadedEngine.getAbsolutePath())) {
+                verifypnpath = downloadedEngine.getAbsolutePath();
+                Preferences.getInstance().setVerifypnLocation(verifypnpath);
+                return true;
+            }
+        } catch (IOException ignored) {
+            // Keep the existing manual setup flow when downloading is unavailable.
         }
         return false;
     }

@@ -25,6 +25,7 @@ import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOptio
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
+import net.tapaal.verification.VerificationEngineDownloader;
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -219,6 +220,19 @@ public class VerifyDTAPN implements ModelChecker{
 				}
 
 			}
+		}
+
+		try {
+			File downloadedEngine = VerificationEngineDownloader
+				.ensureEngine(VerificationEngineDownloader.Engine.VERIFYDTAPN).toFile();
+			VerifyDTAPN v = new VerifyDTAPN(new FileFinder(), new MessengerImpl());
+			if (v.isCorrectVersion(downloadedEngine.getAbsolutePath())) {
+				verifydtapnpath = downloadedEngine.getAbsolutePath();
+				Preferences.getInstance().setVerifydtapnLocation(verifydtapnpath);
+				return true;
+			}
+		} catch (IOException ignored) {
+			// Keep the existing manual setup flow when downloading is unavailable.
 		}
 		return false;
 

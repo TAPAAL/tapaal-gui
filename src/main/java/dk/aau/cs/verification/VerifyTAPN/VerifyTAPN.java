@@ -24,6 +24,7 @@ import pipe.gui.MessengerImpl;
 import pipe.gui.Constants;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
+import net.tapaal.verification.VerificationEngineDownloader;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -207,6 +208,21 @@ public class VerifyTAPN implements ModelChecker {
 					}
 
 				}
+			}
+
+			// Development builds do not necessarily contain the native engines.
+			// Download the open-source engine bundle once and remember its path.
+			try {
+				File downloadedEngine = VerificationEngineDownloader
+					.ensureEngine(VerificationEngineDownloader.Engine.VERIFYTAPN).toFile();
+				VerifyTAPN v = new VerifyTAPN(new FileFinder(), new MessengerImpl());
+				if (v.isCorrectVersion(downloadedEngine.getAbsolutePath())) {
+					verifytapnpath = downloadedEngine.getAbsolutePath();
+					Preferences.getInstance().setVerifytapnLocation(verifytapnpath);
+					return true;
+				}
+			} catch (IOException ignored) {
+				// Keep the existing manual setup flow when downloading is unavailable.
 			}
 			return false;
 
