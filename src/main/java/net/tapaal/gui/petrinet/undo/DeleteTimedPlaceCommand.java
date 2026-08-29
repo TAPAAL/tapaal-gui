@@ -23,14 +23,16 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	private final HashMap<TAPNQuery, List<Observation>> observationsInQuery = new HashMap<TAPNQuery, List<Observation>>();
 
 	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlaceComponent, TimedArcPetriNet tapn, DataLayer guiModel) {
+		this(timedPlaceComponent, tapn, guiModel, TAPAALGUI.getCurrentTab().queries());
+	}
+
+	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlaceComponent, TimedArcPetriNet tapn, DataLayer guiModel, Iterable<TAPNQuery> queries) {
 		super(tapn, guiModel);
 		this.timedPlaceComponent = timedPlaceComponent;
 		tokens = timedPlaceComponent.underlyingPlace().tokens();
 		timedPlace = timedPlaceComponent.underlyingPlace();
 		
-		// queries this place is an inclusion place in 
-		Iterable<TAPNQuery> queries = TAPAALGUI.getCurrentTab().queries();
-		
+		// queries this place is an inclusion place in
 		for (TAPNQuery q : queries) {
 			if(q.inclusionPlaces().inclusionPlaces().contains(timedPlace)){
 				queriesInclusion.add(q);

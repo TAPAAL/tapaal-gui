@@ -398,7 +398,7 @@ public class GuiModelManager {
                 Command cmd = null;
                 if (pnObject instanceof TimedPlaceComponent) {
                     TimedPlaceComponent tp = (TimedPlaceComponent) pnObject;
-                    cmd = new DeleteTimedPlaceCommand(tp, tabContent.modelFor(tabContent.getModel()), tabContent.getModel());
+                    cmd = new DeleteTimedPlaceCommand(tp, tabContent.modelFor(tabContent.getModel()), tabContent.getModel(), tabContent.queries());
                 } else if (pnObject instanceof TimedTransitionComponent) {
                     TimedTransitionComponent transition = (TimedTransitionComponent) pnObject;
                     cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), tabContent.getModel());
