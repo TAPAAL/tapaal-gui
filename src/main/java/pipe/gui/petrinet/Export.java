@@ -19,7 +19,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.ITAPNComposer;
+import dk.aau.cs.verification.ITAPNGuiComposer;
+import dk.aau.cs.verification.TAPNModelComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
@@ -94,7 +95,7 @@ public class Export {
 
     public static void toQueryXML(TimedArcPetriNetNetwork network, String filename, Iterable<TAPNQuery> queries, TAPNLens lens) {
         try {
-            ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), true);
+            TAPNModelComposer composer = new TAPNModelComposer(true);
             NameMapping mapping = composer.transformModel(network).value2();
             Iterator<TAPNQuery> queryIterator = queries.iterator();
             PrintStream queryStream = new PrintStream(filename);
@@ -153,7 +154,7 @@ public class Export {
     public static void toVerifyTAPN(TimedArcPetriNetNetwork network, Iterable<TAPNQuery> queries, String modelFile, String queryFile, boolean isDTAPN) {
         VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 
-        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+        ITAPNGuiComposer composer = new TAPNComposer(new MessengerImpl(), false);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(network);
         TimedArcPetriNet model = transformedModel.value1();
 

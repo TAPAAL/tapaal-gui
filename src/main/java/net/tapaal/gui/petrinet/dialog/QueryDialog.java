@@ -179,7 +179,8 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.util.VerificationCallback;
-import dk.aau.cs.verification.ITAPNComposer;
+import dk.aau.cs.verification.ITAPNGuiComposer;
+import dk.aau.cs.verification.TAPNModelComposer;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.SMCSettings;
@@ -716,7 +717,7 @@ public class QueryDialog extends JPanel {
         int capacity = oldCapacity;
 
         if (rawVerificationOptionsEnabled.isSelected()) {
-            ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+            TAPNModelComposer composer = new TAPNModelComposer(false);
             Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
             int tokensInModel = transformedModel.value1().getNumberOfTokensInNet();
 
@@ -6539,7 +6540,7 @@ public class QueryDialog extends JPanel {
         boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
         VerifyTAPNOptions verifytapnOptions = Verifier.getVerificationOptions(query, isColored);
 
-        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+        TAPNModelComposer composer = new TAPNModelComposer(false);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
         verifytapnOptions.setTokensInModel(transformedModel.value1().getNumberOfTokensInNet());
 
@@ -7098,7 +7099,7 @@ public class QueryDialog extends JPanel {
                 }
 
                 if (xmlFile != null && queryFile != null) {
-                    ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+                    ITAPNGuiComposer composer = new TAPNComposer(new MessengerImpl(), false);
                     Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 
                     if (overApproximationEnable.isSelected()) {

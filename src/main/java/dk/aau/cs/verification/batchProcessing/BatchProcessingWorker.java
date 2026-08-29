@@ -19,7 +19,6 @@ import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.petrinet.widgets.QueryPane;
-import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.approximation.ApproximationWorker;
@@ -245,14 +244,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
-		ITAPNComposer composer = new TAPNComposer(new Messenger(){
-			public void displayInfoMessage(String message) { }
-			public void displayInfoMessage(String message, String title) {}
-			public void displayErrorMessage(String message) {}
-			public void displayErrorMessage(String message, String title) {}
-			public void displayWrappedErrorMessage(String message, String title) {}
-			
-		}, false);
+		TAPNModelComposer composer = new TAPNModelComposer(false);
         return composer.transformModel(model.network());
 	}
 

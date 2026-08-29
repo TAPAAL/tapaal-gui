@@ -349,7 +349,7 @@ public class VerifyDTAPN implements ModelChecker{
                     File queriesOut = new File(options.unfoldedQueriesPath());
                     try {
                         LoadedModel loadedModel = tapnLoader.load(fileOut);
-                        TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
+                        TAPNModelComposer newComposer = new TAPNModelComposer(true);
                         model = newComposer.transformModel(loadedModel.network());
                         
                         if (queryResult.value1() != null) {

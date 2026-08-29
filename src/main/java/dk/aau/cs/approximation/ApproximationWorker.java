@@ -8,7 +8,6 @@ import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.RunVerificationBase;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
-import dk.aau.cs.Messenger;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
@@ -22,12 +21,12 @@ import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.ITAPNComposer;
+import dk.aau.cs.verification.ITAPNGuiComposer;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
-import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.TAPNModelComposer;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationOptions.TraceOption;
@@ -39,7 +38,7 @@ public class ApproximationWorker {
         VerificationOptions options,
         ModelChecker modelChecker,
         Tuple<TimedArcPetriNet, NameMapping> transformedModel,
-        ITAPNComposer composer,
+        ITAPNGuiComposer composer,
         TAPNQuery clonedQuery,
         RunVerificationBase verificationBase,
         TimedArcPetriNetNetwork model,
@@ -1114,14 +1113,7 @@ public class ApproximationWorker {
 	}
 	
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
-		ITAPNComposer composer = new TAPNComposer(new Messenger(){
-			public void displayInfoMessage(String message) { }
-			public void displayInfoMessage(String message, String title) {}
-			public void displayErrorMessage(String message) {}
-			public void displayErrorMessage(String message, String title) {}
-			public void displayWrappedErrorMessage(String message, String title) {}
-			
-		}, false);
+		TAPNModelComposer composer = new TAPNModelComposer(false);
         return composer.transformModel(model.network());
 	}
 }

@@ -24,7 +24,6 @@ import dk.aau.cs.io.writeTACPN;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.TAPNComposer;
 
 public class NetworkMarking implements TimedMarking {
 	private final Map<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
@@ -358,7 +357,7 @@ public class NetworkMarking implements TimedMarking {
         return sb.toString();
     }
 
-    public String toXmlStr(TAPNComposer composer) {
+    public String toXmlStr(ComposedNameProvider composer) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbf.newDocumentBuilder();
@@ -381,7 +380,7 @@ public class NetworkMarking implements TimedMarking {
         }   
     }
 
-    public Element toXmlElement(Document document, TAPNComposer composer) {
+    public Element toXmlElement(Document document, ComposedNameProvider composer) {
         Map<TimedPlace, List<TimedToken>> allPlaces = new HashMap<>();
         for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
             if (entry.getKey().isActive()) {

@@ -3,15 +3,13 @@ package net.tapaal.gui.petrinet.model;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposer;
-import pipe.gui.MessengerImpl;
+import dk.aau.cs.verification.TAPNModelComposer;
 
 /**
  * Application-layer queries that require composing a network. Composition is
- * intentionally kept out of the domain network itself because the composer
- * also knows about GUI layout data.
+ * intentionally kept out of the domain network itself. This path uses the
+ * model-only composer and does not construct a diagram.
  */
 public final class NetworkAnalysis {
     private NetworkAnalysis() {
@@ -26,7 +24,7 @@ public final class NetworkAnalysis {
     }
 
     private static Tuple<TimedArcPetriNet, NameMapping> compose(TimedArcPetriNetNetwork network) {
-        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+        TAPNModelComposer composer = new TAPNModelComposer(false);
         return composer.transformModel(network);
     }
 }
