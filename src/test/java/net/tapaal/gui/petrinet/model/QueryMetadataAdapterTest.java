@@ -33,6 +33,20 @@ class QueryMetadataAdapterTest {
     }
 
     @Test
+    void mapsVerificationOptionsToTheVerificationLayer() {
+        for (net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption guiTraceOption
+                : net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption.values()) {
+            assertEquals(guiTraceOption.name(),
+                QueryMetadataAdapter.toVerificationTraceOption(guiTraceOption).name());
+        }
+        for (net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption guiSearchOption
+                : net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption.values()) {
+            assertEquals(guiSearchOption.name(),
+                QueryMetadataAdapter.toVerificationSearchOption(guiSearchOption).name());
+        }
+    }
+
+    @Test
     void modelQueryRetainsSmcTypingAndSimulationBehavior() {
         TAPNQuery query = new TAPNQuery(new LTLFNode(new TCTLTrueNode()), 0);
         query.setCategory(TAPNQuery.QueryCategory.SMC);

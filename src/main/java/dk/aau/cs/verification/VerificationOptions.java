@@ -1,9 +1,13 @@
 package dk.aau.cs.verification;
 
-import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-
 public abstract class VerificationOptions {
+	public enum TraceOption {
+		FASTEST, SOME, NONE
+	}
+
+	public enum SearchOption {
+		BFS, DFS, RANDOM, BatchProcessingKeepQueryOption, HEURISTIC, OVERAPPROXIMATE, DEFAULT, RANDOMHEURISTIC
+	}
 
 	protected SearchOption searchOption;
 	protected TraceOption traceOption;

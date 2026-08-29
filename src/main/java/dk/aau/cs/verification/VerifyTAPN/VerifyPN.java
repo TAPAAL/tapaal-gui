@@ -21,9 +21,9 @@ import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
 import net.tapaal.gui.petrinet.model.QueryMetadataAdapter;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
+import dk.aau.cs.verification.VerificationOptions.SearchOption;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
 import org.jetbrains.annotations.Nullable;
 
 import com.sun.jna.Platform;

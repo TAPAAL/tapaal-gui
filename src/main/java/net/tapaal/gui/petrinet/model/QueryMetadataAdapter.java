@@ -22,4 +22,14 @@ public final class QueryMetadataAdapter {
         dk.aau.cs.model.tapn.TAPNQuery.QueryCategory category) {
         return net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.valueOf(category.name());
     }
+
+    public static dk.aau.cs.verification.VerificationOptions.TraceOption toVerificationTraceOption(
+        net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption traceOption) {
+        return dk.aau.cs.verification.VerificationOptions.TraceOption.valueOf(traceOption.name());
+    }
+
+    public static dk.aau.cs.verification.VerificationOptions.SearchOption toVerificationSearchOption(
+        net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption searchOption) {
+        return dk.aau.cs.verification.VerificationOptions.SearchOption.valueOf(searchOption.name());
+    }
 }

@@ -6,6 +6,7 @@ import javax.swing.JSpinner;
 import com.sun.jna.Platform;
 
 import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.model.QueryMetadataAdapter;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
@@ -197,8 +198,8 @@ public class Verifier {
         TCTLAbstractProperty inputQuery = input.getProperty();
 
         VerifytaOptions verifytaOptions = new VerifytaOptions(
-            input.getTraceOption(),
-            input.getSearchOption(),
+            QueryMetadataAdapter.toVerificationTraceOption(input.getTraceOption()),
+            QueryMetadataAdapter.toVerificationSearchOption(input.getSearchOption()),
             false,
             input.getReductionOption(),
             input.useSymmetry(),
@@ -292,8 +293,8 @@ public class Verifier {
         if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
             return new VerifyDTAPNOptions(
                 query.getCapacity(),
-                query.getTraceOption(),
-                query.getSearchOption(),
+                QueryMetadataAdapter.toVerificationTraceOption(query.getTraceOption()),
+                QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()),
                 query.useSymmetry(),
                 query.useGCD(),
                 query.useTimeDarts(),
@@ -329,8 +330,8 @@ public class Verifier {
             boolean unfold = isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE && !query.useExplicitSearch();
             return new VerifyPNOptions(
                 query.getCapacity(),
-                query.getTraceOption(),
-                query.getSearchOption(),
+                QueryMetadataAdapter.toVerificationTraceOption(query.getTraceOption()),
+                QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()),
                 query.useOverApproximation(),
                 query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION,
                 query.isOverApproximationEnabled(),
@@ -357,8 +358,8 @@ public class Verifier {
         } else {
             return new VerifyTAPNOptions(
                 query.getCapacity(),
-                query.getTraceOption(),
-                query.getSearchOption(),
+                QueryMetadataAdapter.toVerificationTraceOption(query.getTraceOption()),
+                QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()),
                 query.useSymmetry(),
                 query.useOverApproximation(),
                 query.discreteInclusion(),

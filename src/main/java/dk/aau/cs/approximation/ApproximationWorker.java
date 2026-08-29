@@ -7,7 +7,6 @@ import java.util.Map;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.RunVerificationBase;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import dk.aau.cs.Messenger;
@@ -31,6 +30,7 @@ import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
 import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 

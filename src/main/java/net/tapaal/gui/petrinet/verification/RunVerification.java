@@ -11,6 +11,7 @@ import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
 import net.tapaal.swinghelpers.GridBagHelper;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
@@ -80,7 +81,7 @@ public class RunVerification extends RunVerificationBase {
                     parser.addBindings(result.getUnfoldedTab().getModel(), result.getRawOutput());
                 }
 
-                if ((options.traceOption() != TAPNQuery.TraceOption.NONE || (lens != null && lens.isStochastic() && options.isSimulate())) && isNetDrawable) {
+                if ((options.traceOption() != TraceOption.NONE || (lens != null && lens.isStochastic() && options.isSimulate())) && isNetDrawable) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
                         if (((lens != null && lens.isColored()) || model.isColored()) && !options.useExplicitSearch()) {
                             int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
