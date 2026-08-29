@@ -360,7 +360,6 @@ public class DataLayer {
 	public void addPetriNetObject(PetriNetObject pnObject) {
 
 		pnObject.setGuiModel(this);
-		addToViewIfConnected(pnObject); // Must be called after model is set
 
         //XXX: temp solution to have access to all elements types at once
         petriNetObjects.add(pnObject);
@@ -393,6 +392,10 @@ public class DataLayer {
 		} else {
 			throw new RuntimeException("Unknow element type added");
 		}
+
+		// Register the object completely before attaching it to Swing. Adding to
+		// the view can repaint immediately and inspect the DataLayer/model state.
+		addToViewIfConnected(pnObject);
 		// we reset to null so that the wrong ArrayList can't get added to
 		changeArrayList = null;
 	}

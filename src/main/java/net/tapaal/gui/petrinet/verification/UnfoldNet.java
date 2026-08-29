@@ -9,6 +9,7 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.FormatException;
@@ -221,10 +222,10 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         return null;
     }
 
-    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, TAPNQuery.QueryCategory queryCategory) {
+    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, QueryCategory queryCategory) {
         return getQueries(queryFile, network, List.of(queryCategory));
     }
-    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories) {
+    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, List<QueryCategory> queryCategories) {
         XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network, queryCategories);
         try {
             return new ArrayList<>(queryLoader.parseQueries().getQueries());

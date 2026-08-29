@@ -9,17 +9,21 @@ plugins {
 group 'net.tapaal'
 version '4.0-SNAPSHOT'
 
-var targetJavaVersion = "17"
+var toolchainJavaVersion = 25
+var targetBytecodeVersion = "17"
 var targetKotlinVersion = "2.0"
 
 java {
-    sourceCompatibility = targetJavaVersion
-    targetCompatibility = targetJavaVersion
+    sourceCompatibility = targetBytecodeVersion
+    targetCompatibility = targetBytecodeVersion
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(toolchainJavaVersion)
+    }
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
-        jvmTarget = targetJavaVersion
+        jvmTarget = targetBytecodeVersion
         apiVersion = targetKotlinVersion
         languageVersion = targetKotlinVersion
     }
@@ -75,7 +79,26 @@ dependencies {
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'gui'
+    }
+}
+
+// Swing smoke tests are intentionally opt-in and are run under Xvfb in CI/local development.
+tasks.register('guiTest', Test) {
+    description = 'Runs GUI regression tests; use xvfb-run on headless machines.'
+    group = 'verification'
+    dependsOn testClasses
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'gui'
+    }
+    systemProperty 'java.awt.headless', 'false'
+}
+
+check {
+    dependsOn tasks.named('guiTest')
 }
 
 run {

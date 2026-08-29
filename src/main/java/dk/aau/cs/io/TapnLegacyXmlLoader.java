@@ -199,8 +199,8 @@ public class TapnLegacyXmlLoader {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 		
-		guiModel.addPetriNetObject(tempArc);
 		tapn.add(outputArc);
+		guiModel.addPetriNetObject(tempArc);
 
 		return tempArc;
 	}
@@ -237,9 +237,9 @@ public class TapnLegacyXmlLoader {
 
 				tempArc.setUnderlyingArc(transArc);
 				postsetTransportArc.setUnderlyingArc(transArc);
+				tapn.add(transArc);
 				guiModel.addPetriNetObject(tempArc);
 				guiModel.addPetriNetObject(postsetTransportArc);
-				tapn.add(transArc);
 
 				postsetArcs.remove(targetIn);
 			} else {
@@ -263,9 +263,9 @@ public class TapnLegacyXmlLoader {
 
 				tempArc.setUnderlyingArc(transArc);
 				presetTransportArc.setUnderlyingArc(transArc);
+				tapn.add(transArc);
 				guiModel.addPetriNetObject(presetTransportArc);
 				guiModel.addPetriNetObject(tempArc);
-				tapn.add(transArc);
 
 				presetArcs.remove(sourceIn);
 				transportArcsTimeIntervals.remove(presetTransportArc);
@@ -294,8 +294,8 @@ public class TapnLegacyXmlLoader {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 		
-		guiModel.addPetriNetObject(tempArc);
 		tapn.add(inputArc);
+		guiModel.addPetriNetObject(tempArc);
 
 		return tempArc;
 	}
@@ -322,8 +322,8 @@ public class TapnLegacyXmlLoader {
 		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval,null);
 
 		tempArc.setUnderlyingArc(inhibArc);
-		guiModel.addPetriNetObject(tempArc);
 		tapn.add(inhibArc);
+		guiModel.addPetriNetObject(tempArc);
 
 		return tempArc;
 	}
@@ -534,8 +534,8 @@ public class TapnLegacyXmlLoader {
 				nameOffsetXInput, nameOffsetYInput,
             angle, lens);
 		transition.setUnderlyingTransition(t);
-		guiModel.addPetriNetObject(transition);
 		tapn.add(t);
+		guiModel.addPetriNetObject(transition);
 	}
     //TODO: implement color
     private void parseAndAddPlaceAsOldFormat(Element element, TimedMarking marking) throws FormatException {

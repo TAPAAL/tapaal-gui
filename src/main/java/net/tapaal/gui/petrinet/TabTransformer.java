@@ -33,7 +33,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.RunningVerificationDialog;
 import pipe.gui.petrinet.PetriNetTab;
 
@@ -111,6 +111,7 @@ public class TabTransformer {
                     newArc.setUnderlyingArc(addedArc);
                     newArc.setArcPath(newArcPath);
                     newArc.updateArcPosition();
+                    template.model().add(addedArc);
                     guiModel.addPetriNetObject(newArc);
 
                     //Change the partner
@@ -119,8 +120,7 @@ public class TabTransformer {
 
                     removeTransportArc(arc, guiModel);
 
-                    //Add arc to model and GUI
-                    template.model().add(addedArc);
+                    // Add the partner to the model before attaching its view.
                     template.model().add(arc2.underlyingArc());
 
                 }
@@ -164,6 +164,7 @@ public class TabTransformer {
         newArc.setUnderlyingArc(addedArc);
         newArc.setArcPath(newArcPath);
         newArc.updateArcPosition();
+        template.model().add(addedArc);
         guiModel.addPetriNetObject(newArc);
 
         return newArc;

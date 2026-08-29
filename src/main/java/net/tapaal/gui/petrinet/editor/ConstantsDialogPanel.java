@@ -31,6 +31,7 @@ import net.tapaal.swinghelpers.RequestFocusListener;
 import net.tapaal.swinghelpers.SwingHelper;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.undo.Command;
+import net.tapaal.gui.petrinet.model.NetworkEditService;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.RealConstant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -43,6 +44,7 @@ public class ConstantsDialogPanel extends JPanel {
     }
 
     private final TimedArcPetriNetNetwork model;
+    private final NetworkEditService editService;
     private final Type type;
     private int lowerBound;
     private int upperBound;
@@ -81,6 +83,7 @@ public class ConstantsDialogPanel extends JPanel {
 
     public ConstantsDialogPanel(TimedArcPetriNetNetwork model, Constant constant) {
         this.model = model;
+        this.editService = new NetworkEditService(model, () -> TAPAALGUI.getCurrentTab().updateConstantsList());
         this.type = Type.INT;
         listModel = new DefaultListModel<>();
 
@@ -107,6 +110,7 @@ public class ConstantsDialogPanel extends JPanel {
 
     public ConstantsDialogPanel(TimedArcPetriNetNetwork model, RealConstant constant) {
         this.model = model;
+        this.editService = new NetworkEditService(model, () -> TAPAALGUI.getCurrentTab().updateConstantsList());
         this.type = Type.REAL;
         listModel = new DefaultListModel<>();
 
@@ -584,7 +588,7 @@ public class ConstantsDialogPanel extends JPanel {
                     }
                 }
 
-                Command edit = model.updateConstant(oldName, new Constant(newName, vals));
+                Command edit = editService.updateConstant(oldName, new Constant(newName, vals));
                 if (edit == null) {
                     JOptionPane.showMessageDialog(
                             TAPAALGUI.getApp(),
@@ -600,7 +604,7 @@ public class ConstantsDialogPanel extends JPanel {
                     exit();
                 }
             } else {
-                Command edit = model.addConstant(newName, vals);
+                Command edit = editService.addConstant(newName, vals);
                 
                 if (edit == null) {
                     JOptionPane.showMessageDialog(
@@ -640,7 +644,7 @@ public class ConstantsDialogPanel extends JPanel {
                     return;
                 }
 
-                Command edit = model.updateRealConstant(oldName, new RealConstant(newName, vals));
+                Command edit = editService.updateRealConstant(oldName, new RealConstant(newName, vals));
                 if (edit == null) {
                     showNameInUseError();
                     return;
@@ -650,7 +654,7 @@ public class ConstantsDialogPanel extends JPanel {
                 TAPAALGUI.getCurrentTab().drawingSurface().repaintAll();
                 exit();
             } else {
-                Command edit = model.addRealConstant(newName, vals);
+                Command edit = editService.addRealConstant(newName, vals);
 
                 if (edit == null) {
                     JOptionPane.showMessageDialog(

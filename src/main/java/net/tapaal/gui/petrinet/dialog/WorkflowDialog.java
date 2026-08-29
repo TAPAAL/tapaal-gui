@@ -57,7 +57,7 @@ import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.ExtrapolationOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
+import dk.aau.cs.verification.VerificationOptions.WorkflowMode;
 import pipe.gui.*;
 import net.tapaal.gui.petrinet.verification.Verifier;
 import pipe.gui.petrinet.PetriNetTab;

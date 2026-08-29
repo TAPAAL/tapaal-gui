@@ -12,8 +12,11 @@ import net.tapaal.gui.*;
 import net.tapaal.gui.petrinet.*;
 import net.tapaal.gui.petrinet.model.ModelViolation;
 import net.tapaal.gui.petrinet.model.Result;
+import net.tapaal.gui.petrinet.model.NetworkAnalysis;
+import net.tapaal.gui.petrinet.model.NetworkDisplayPolicy;
 import net.tapaal.gui.petrinet.smartdraw.Quadtree;
 import net.tapaal.gui.petrinet.editor.TemplateExplorer;
+import net.tapaal.gui.petrinet.document.DocumentSession;
 import net.tapaal.gui.petrinet.model.GuiModelManager;
 import net.tapaal.gui.swingcomponents.BugHandledJXMultisplitPane;
 import net.tapaal.gui.petrinet.dialog.NameVisibilityPanel;
@@ -23,6 +26,7 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.SUMOQueryLoader;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.Require;
@@ -137,12 +141,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	//Model and state
 	private final TimedArcPetriNetNetwork tapnNetwork;
 
-	//XXX: Replace with bi-map
-	private final HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<>();
-	public final HashMap<DataLayer, TimedArcPetriNet> guiModelToModel = new HashMap<>();
-
-	//XXX: should be replaced iwth DataLayer->Zoomer, TimedArcPetriNet has nothing to do with zooming
-	private final HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<>();
+	private final DocumentSession documentSession;
 
     private boolean alreadyFitToScreen;
 
@@ -188,7 +187,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 throw new Exception("Could not open the selected file, as it does not have the correct format.");
 			}
 
-            if (!parentPaintNet || !loadedModel.network().isNetDrawable()) {
+            if (!parentPaintNet || !NetworkDisplayPolicy.isDrawable(loadedModel.network())) {
                 loadedModel.network().setPaintNet(false);
             }
 
@@ -241,10 +240,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         TimedArcPetriNetNetwork net = tab.network();
         for (TAPNQuery q : tab.queries()) {
-            boolean smcQuery = q.getCategory() == TAPNQuery.QueryCategory.SMC;
+            boolean smcQuery = q.getCategory() == QueryCategory.SMC;
             EnumSet<EngineFeature> requiredFeatures = EnumSet.noneOf(EngineFeature.class);
             if (q.getTraceOption() == TAPNQuery.TraceOption.FASTEST) requiredFeatures.add(EngineFeature.FASTEST_TRACE);
-            if (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && net.getHighestNetDegree() <= 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
+            if (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEFNode || q.getProperty() instanceof TCTLAGNode) && NetworkAnalysis.highestNetDegree(net) <= 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
             if (q.getProperty() instanceof TCTLDeadlockNode && (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode)) requiredFeatures.add(EngineFeature.DEADLOCK_EG_OR_AF);
             if (q.getProperty() instanceof TCTLDeadlockNode && net.hasInhibitorArcs()) requiredFeatures.add(EngineFeature.DEADLOCK_WITH_INHIB);
             if (net.hasWeights()) requiredFeatures.add(EngineFeature.WEIGHTS);
@@ -253,9 +252,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) requiredFeatures.add(EngineFeature.EG_OR_AF);
             if (!net.isNonStrict()) requiredFeatures.add(EngineFeature.STRICT_NETS);
             if (tab.lens.isTimed()) requiredFeatures.add(EngineFeature.TIMED_NETS);
-            if (q.getProperty() instanceof TCTLDeadlockNode && net.getHighestNetDegree() > 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_GREATER_THAN_2);
+            if (q.getProperty() instanceof TCTLDeadlockNode && NetworkAnalysis.highestNetDegree(net) > 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_GREATER_THAN_2);
             if (tab.lens.isGame()) requiredFeatures.add(EngineFeature.GAMES);
-            if ((q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && net.getHighestNetDegree() > 2) requiredFeatures.add(EngineFeature.EG_OR_AF_WITH_NET_DEGREE_GREATER_THAN_2);
+            if ((q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) && NetworkAnalysis.highestNetDegree(net) > 2) requiredFeatures.add(EngineFeature.EG_OR_AF_WITH_NET_DEGREE_GREATER_THAN_2);
             if (q.hasUntimedOnlyProperties()) requiredFeatures.add(EngineFeature.NESTED_QUANTIFICATIONS);
             if (tab.lens.isColored()) requiredFeatures.add(EngineFeature.COLORED);
             if (tab.lens.isColored() && !tab.lens.isTimed()) requiredFeatures.add(EngineFeature.ONLY_UNTIMED);
@@ -297,10 +296,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 q.setReductionOption(ReductionOption.VerifyPN);
                 q.setUseOverApproximationEnabled(false);
                 q.setUseUnderApproximationEnabled(false);
-                if (q.getCategory() == TAPNQuery.QueryCategory.Default)
-                q.setCategory(TAPNQuery.QueryCategory.CTL);
+                if (q.getCategory() == QueryCategory.Default)
+                q.setCategory(QueryCategory.CTL);
             } else {
-                if (q.getCategory() == TAPNQuery.QueryCategory.LTL) {
+                if (q.getCategory() == QueryCategory.LTL) {
                     queriesToRemove.add(q);
                     tab.removeQuery(q);
                 }
@@ -443,8 +442,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	//GUI
-	private final HashMap<TimedArcPetriNet, Boolean> hasPositionalInfos = new HashMap<>();
-
 	private final JScrollPane drawingSurfaceScroller;
 	private JScrollPane editorSplitPaneScroller;
 	private JScrollPane animatorSplitPaneScroller;
@@ -502,17 +499,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         Require.notNull(lens, "Lens can't be null");
 
         tapnNetwork = network;
+		documentSession = new DocumentSession(network);
         this.lens = lens;
 
-        guiModels.clear();
         for (Template template : templates) {
-            TimedArcPetriNet net = template.model();
-            DataLayer guiModel = template.guiModel();
-
-            guiModels.put(net, guiModel);
-            guiModelToModel.put(guiModel, net);
-            zoomLevels.put(template.model(), template.zoomer());
-            hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
+			documentSession.register(template);
 
             for(PetriNetObject o : template.guiModel().getPetriNetObjects()){
                 o.setLens(this.lens);
@@ -707,7 +698,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public HashMap<TimedArcPetriNet, DataLayer> getGuiModels() {
-		return this.guiModels;
+		return documentSession.diagramSnapshot();
+	}
+
+	public TimedArcPetriNet modelFor(DataLayer diagram) {
+		return documentSession.modelFor(diagram);
 	}
 
     private int newNameCounter = 1;
@@ -916,23 +911,11 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public Iterable<Template> allTemplates() {
-		ArrayList<Template> list = new ArrayList<>();
-		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
-			Template template = new Template(net, guiModels.get(net), zoomLevels.get(net));
-			template.setHasPositionalInfo(hasPositionalInfos.get(net));
-			list.add(template);
-		}
-		return list;
+		return documentSession.templates();
 	}
 
 	public Iterable<Template> activeTemplates() {
-		ArrayList<Template> list = new ArrayList<>();
-		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
-			Template template = new Template(net, guiModels.get(net), zoomLevels.get(net));
-			template.setHasPositionalInfo(hasPositionalInfos.get(net));
-			list.add(template);
-		}
-		return list;
+		return documentSession.activeTemplates();
 	}
 
 	public int numberOfActiveTemplates() {
@@ -946,20 +929,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public void addTemplate(Template template) {
-		tapnNetwork.add(template.model());
-		guiModels.put(template.model(), template.guiModel());
-        guiModelToModel.put(template.guiModel(), template.model());
-		zoomLevels.put(template.model(), template.zoomer());
-		hasPositionalInfos.put(template.model(), template.getHasPositionalInfo());
+		documentSession.add(template);
 		templateExplorer.updateTemplateList();
 	}
 
     public void removeTemplate(Template template) {
-		tapnNetwork.remove(template.model());
-		guiModels.remove(template.model());
-		guiModelToModel.remove(template.guiModel());
-		zoomLevels.remove(template.model());
-		hasPositionalInfos.remove(template.model());
+		documentSession.remove(template);
 		templateExplorer.updateTemplateList();
 	}
 
@@ -1830,7 +1805,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
         network.setColorTypes(tapnNetwork.colorTypes());
         network.setVariables(tapnNetwork.variables());
 
-        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, inlineConstants);
+		TAPNComposer composer = new TAPNComposer(new MessengerImpl(), getGuiModels(), lens, true, inlineConstants);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 
         ArrayList<Template> templates = new ArrayList<>(1);

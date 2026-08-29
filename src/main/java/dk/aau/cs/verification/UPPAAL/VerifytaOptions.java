@@ -3,10 +3,10 @@ package dk.aau.cs.verification.UPPAAL;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.VerificationOptions;
+import dk.aau.cs.verification.VerificationOptions.SearchOption;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
 
 public class VerifytaOptions extends VerificationOptions {
 

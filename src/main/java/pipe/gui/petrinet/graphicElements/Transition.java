@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import javax.swing.*;
 
-import pipe.gui.petrinet.animation.Animator;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
 import pipe.gui.canvas.Zoomer;
@@ -121,7 +120,8 @@ public abstract class Transition extends PlaceTransitionObject {
 
 		if (highlightedEnabled) {
 			g2.setPaint(Constants.ENABLED_TRANSITION_COLOUR);
-		} else if (highlightedDelayEnabled && TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() && !Animator.isUrgentTransitionEnabled()) {
+        } else if (highlightedDelayEnabled && TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions()
+                && !TAPAALGUI.getCurrentTab().network().isUrgentTransitionEnabled()) {
 			g2.setPaint(Constants.YELLOW_TRANSITION_COLOR);
 		} else if (selected) {
 			g2.setPaint(Constants.SELECTION_LINE_COLOUR);

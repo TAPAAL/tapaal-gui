@@ -6,9 +6,12 @@ import javax.swing.JSpinner;
 import com.sun.jna.Platform;
 
 import net.tapaal.gui.petrinet.TAPNLens;
+import net.tapaal.gui.petrinet.model.QueryMetadataAdapter;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
+import dk.aau.cs.verification.VerificationOptions.QueryReductionTime;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
@@ -89,7 +92,7 @@ public class Verifier {
                 lens.isColored() && query.useSymmetricVars(),
                 lens.isColored(),
                 query.useColoredReduction());
-            newQuery.setCategory(TAPNQuery.QueryCategory.CTL);
+            newQuery.setCategory(QueryCategory.CTL);
             newQuery.setUseSiphontrap(query.isSiphontrapEnabled());
             newQuery.setUseQueryReduction(query.isQueryReductionEnabled());
             newQuery.setUseStubbornReduction(query.isStubbornReductionEnabled());
@@ -197,8 +200,8 @@ public class Verifier {
         TCTLAbstractProperty inputQuery = input.getProperty();
 
         VerifytaOptions verifytaOptions = new VerifytaOptions(
-            input.getTraceOption(),
-            input.getSearchOption(),
+            QueryMetadataAdapter.toVerificationTraceOption(input.getTraceOption()),
+            QueryMetadataAdapter.toVerificationSearchOption(input.getSearchOption()),
             false,
             input.getReductionOption(),
             input.useSymmetry(),
@@ -292,8 +295,8 @@ public class Verifier {
         if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
             return new VerifyDTAPNOptions(
                 query.getCapacity(),
-                query.getTraceOption(),
-                query.getSearchOption(),
+                QueryMetadataAdapter.toVerificationTraceOption(query.getTraceOption()),
+                QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()),
                 query.useSymmetry(),
                 query.useGCD(),
                 query.useTimeDarts(),
@@ -329,8 +332,8 @@ public class Verifier {
             boolean unfold = isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE && !query.useExplicitSearch();
             return new VerifyPNOptions(
                 query.getCapacity(),
-                query.getTraceOption(),
-                query.getSearchOption(),
+                QueryMetadataAdapter.toVerificationTraceOption(query.getTraceOption()),
+                QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()),
                 query.useOverApproximation(),
                 query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION,
                 query.isOverApproximationEnabled(),
@@ -339,7 +342,7 @@ public class Verifier {
                 query.getCategory(),
                 query.getAlgorithmOption(),
                 query.isSiphontrapEnabled(),
-                query.isQueryReductionEnabled() ? TAPNQuery.QueryReductionTime.UnlimitedTime : TAPNQuery.QueryReductionTime.NoTime,
+                query.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime,
                 query.isStubbornReductionEnabled(),
                 getReducedNetFilePath(),
                 query.isTarOptionEnabled(),
@@ -357,8 +360,8 @@ public class Verifier {
         } else {
             return new VerifyTAPNOptions(
                 query.getCapacity(),
-                query.getTraceOption(),
-                query.getSearchOption(),
+                QueryMetadataAdapter.toVerificationTraceOption(query.getTraceOption()),
+                QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()),
                 query.useSymmetry(),
                 query.useOverApproximation(),
                 query.discreteInclusion(),

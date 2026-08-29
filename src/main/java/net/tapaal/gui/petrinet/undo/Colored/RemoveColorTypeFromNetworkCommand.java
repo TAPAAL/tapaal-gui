@@ -3,31 +3,30 @@ package net.tapaal.gui.petrinet.undo.Colored;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
 public class RemoveColorTypeFromNetworkCommand implements Command {
 
     private final ColorType colorType;
     private final TimedArcPetriNetNetwork network;
-    private final ConstantsPane.ColorTypesListModel colorTypesListModel;
+    private final Runnable onChange;
     private final int index;
 
-    public RemoveColorTypeFromNetworkCommand(ColorType colorType, TimedArcPetriNetNetwork network, ConstantsPane.ColorTypesListModel colorTypesListModel, int index) {
+    public RemoveColorTypeFromNetworkCommand(ColorType colorType, TimedArcPetriNetNetwork network, int index, Runnable onChange) {
         this.colorType = colorType;
         this.network = network;
-        this.colorTypesListModel = colorTypesListModel;
         this.index = index;
+        this.onChange = onChange == null ? () -> {} : onChange;
     }
 
     @Override
     public void undo() {
         network.colorTypes().add(index, colorType);
-        colorTypesListModel.updateName();
+        onChange.run();
     }
 
     @Override
     public void redo() {
         network.colorTypes().remove(colorType);
-        colorTypesListModel.updateName();
+        onChange.run();
     }
 }

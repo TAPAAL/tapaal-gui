@@ -179,7 +179,8 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.util.VerificationCallback;
-import dk.aau.cs.verification.ITAPNComposer;
+import dk.aau.cs.verification.ITAPNGuiComposer;
+import dk.aau.cs.verification.TAPNModelComposer;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.SMCSettings;
@@ -197,6 +198,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.Template;
+import net.tapaal.gui.petrinet.model.NetworkAnalysis;
 import net.tapaal.gui.petrinet.undo.AddQueryCommand;
 import net.tapaal.gui.petrinet.verification.ChooseInclusionPlacesDialog;
 import net.tapaal.gui.petrinet.verification.EngineFeature;
@@ -207,6 +209,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.VerificationType;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.UPPAALBroadcastDegree2Options;
 import net.tapaal.gui.petrinet.verification.UPPAALBroadcastOptions;
 import net.tapaal.gui.petrinet.verification.UPPAALCombiOptions;
@@ -673,8 +676,8 @@ public class QueryDialog extends JPanel {
         inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
         newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
         rootPane = me.getRootPane();
-        isNetDegree2 = tapnNetwork.isDegree2();
-        highestNetDegree = tapnNetwork.getHighestNetDegree();
+        isNetDegree2 = NetworkAnalysis.isDegree2(tapnNetwork);
+        highestNetDegree = NetworkAnalysis.highestNetDegree(tapnNetwork);
         hasInhibitorArcs = tapnNetwork.hasInhibitorArcs();
 
         setLayout(new GridBagLayout());
@@ -714,7 +717,7 @@ public class QueryDialog extends JPanel {
         int capacity = oldCapacity;
 
         if (rawVerificationOptionsEnabled.isSelected()) {
-            ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+            TAPNModelComposer composer = new TAPNModelComposer(false);
             Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
             int tokensInModel = transformedModel.value1().getNumberOfTokensInNet();
 
@@ -784,7 +787,7 @@ public class QueryDialog extends JPanel {
         }
 
         if(lens.isStochastic()) {
-            query.setCategory(TAPNQuery.QueryCategory.SMC);
+            query.setCategory(QueryCategory.SMC);
             query.setParallel(smcParallel.isSelected());
             VerificationType verificationType = VerificationType.fromOrdinal(smcVerificationType.getSelectedIndex());
             query.setSmcSettings(getSMCSettings());
@@ -839,12 +842,12 @@ public class QueryDialog extends JPanel {
             rawVerificationOptionsTextArea.getText()
         );
         if (queryType.getSelectedIndex() == 1) {
-            query.setCategory(TAPNQuery.QueryCategory.LTL);
+            query.setCategory(QueryCategory.LTL);
         } else if (queryType.getSelectedIndex() == 2) {
-            query.setCategory(TAPNQuery.QueryCategory.HyperLTL);
+            query.setCategory(QueryCategory.HyperLTL);
             query.setTraceList(traceList);
         } else {
-            query.setCategory(TAPNQuery.QueryCategory.CTL);
+            query.setCategory(QueryCategory.CTL);
         }
         query.setUseSiphontrap(useSiphonTrap.isSelected());
         query.setUseQueryReduction(useQueryReduction.isSelected());
@@ -1175,7 +1178,7 @@ public class QueryDialog extends JPanel {
         guiDialog.pack();
 
         // 'hack' for hiding the trace drop-down menu for HyperLTL on intial launch of the query dialogue panel
-        if(queryToRepresent != null && queryToRepresent.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
+        if(queryToRepresent != null && queryToRepresent.getCategory() == QueryCategory.HyperLTL) {
             queryDialogue.showHyperLTL(true);
             guiDialog.pack();
         } else {
@@ -2421,7 +2424,7 @@ public class QueryDialog extends JPanel {
             setupUnfoldingOptionsFromQuery(queryToCreateFrom);
         }
 
-        if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.SMC) {
+        if (queryToCreateFrom.getCategory() == QueryCategory.SMC) {
             setSMCSettings(queryToCreateFrom.getSmcSettings());
             smcParallel.setSelected(queryToCreateFrom.isParallel());
             smcVerificationType.setSelectedIndex(queryToCreateFrom.getVerificationType().ordinal());
@@ -2445,7 +2448,7 @@ public class QueryDialog extends JPanel {
         setupTarjanOptionsFromQuery(queryToCreateFrom);
         setupExplicitSearch(queryToCreateFrom.useExplicitSearch());
 
-        if (queryToCreateFrom.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
+        if (queryToCreateFrom.getCategory() == QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
         }
 
@@ -2686,12 +2689,12 @@ public class QueryDialog extends JPanel {
 
     private void setupQueryCategoryFromQuery(TAPNQuery queryToCreateFrom) {
         if (!lens.isTimed()) {
-            TAPNQuery.QueryCategory category = queryToCreateFrom.getCategory();
-            if (category.equals(TAPNQuery.QueryCategory.CTL)) {
+            QueryCategory category = queryToCreateFrom.getCategory();
+            if (category.equals(QueryCategory.CTL)) {
                 queryType.setSelectedIndex(0);
-            } else if (category.equals(TAPNQuery.QueryCategory.LTL)) {
+            } else if (category.equals(QueryCategory.LTL)) {
                 queryType.setSelectedIndex(1);
-            } else if (category.equals(TAPNQuery.QueryCategory.HyperLTL)) {
+            } else if (category.equals(QueryCategory.HyperLTL)) {
                 queryType.setSelectedIndex(2);
             }
         }
@@ -6537,7 +6540,7 @@ public class QueryDialog extends JPanel {
         boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
         VerifyTAPNOptions verifytapnOptions = Verifier.getVerificationOptions(query, isColored);
 
-        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+        TAPNModelComposer composer = new TAPNModelComposer(false);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
         verifytapnOptions.setTokensInModel(transformedModel.value1().getNumberOfTokensInNet());
 
@@ -7096,7 +7099,7 @@ public class QueryDialog extends JPanel {
                 }
 
                 if (xmlFile != null && queryFile != null) {
-                    ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+                    ITAPNGuiComposer composer = new TAPNComposer(new MessengerImpl(), false);
                     Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 
                     if (overApproximationEnable.isSelected()) {

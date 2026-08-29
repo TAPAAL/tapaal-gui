@@ -3,27 +3,26 @@ package net.tapaal.gui.petrinet.undo.Colored;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
 public class AddVariableCommand implements Command {
     private final Variable variable;
     private final TimedArcPetriNetNetwork network;
-    private final ConstantsPane.VariablesListModel variablesListModel;
+    private final Runnable onChange;
     private final int index;
 
-    public AddVariableCommand(Variable variable, TimedArcPetriNetNetwork network, ConstantsPane.VariablesListModel variablesListModel, int index) {
+    public AddVariableCommand(Variable variable, TimedArcPetriNetNetwork network, int index, Runnable onChange) {
         this.variable = variable;
         this.network = network;
-        this.variablesListModel = variablesListModel;
         this.index = index;
+        this.onChange = onChange == null ? () -> {} : onChange;
     }
     @Override
     public void undo() {
-        new RemoveVariableFromNetworkCommand(variable, network, variablesListModel, index).redo();
+        new RemoveVariableFromNetworkCommand(variable, network, index, onChange).redo();
     }
 
     @Override
     public void redo() {
-        new RemoveVariableFromNetworkCommand(variable, network, variablesListModel, index).undo();
+        new RemoveVariableFromNetworkCommand(variable, network, index, onChange).undo();
     }
 }

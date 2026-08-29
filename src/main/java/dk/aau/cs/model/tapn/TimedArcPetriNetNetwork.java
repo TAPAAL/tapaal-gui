@@ -2,23 +2,14 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
-import net.tapaal.gui.petrinet.undo.Colored.*;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
-import pipe.gui.Constants;
-import pipe.gui.MessengerImpl;
-import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
 import dk.aau.cs.model.tapn.event.ConstantsListener;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.StringComparator;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.ITAPNComposer;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNComposer;
-import pipe.gui.petrinet.undo.UndoManager;
-import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
 public class TimedArcPetriNetNetwork {
 	private final List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
@@ -26,7 +17,7 @@ public class TimedArcPetriNetNetwork {
 	private final List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
     private final Map<String, SMCUserDefinedDistribution> userDefinedDistributions = new LinkedHashMap<String, SMCUserDefinedDistribution>();
 	
-	private NetworkMarking currentMarking = new NetworkMarking();
+	private NetworkMarking currentMarking;
 	private final ConstantStore constants;
 
     private List<ColorType> colorTypes = new ArrayList<ColorType>();
@@ -36,6 +27,7 @@ public class TimedArcPetriNetNetwork {
 	private final List<ConstantsListener> constantsListeners = new ArrayList<ConstantsListener>();
 	
 	private boolean paintNet = true;
+	private boolean urgentTransitionEnabled;
 	
 	public TimedArcPetriNetNetwork() {
 		this(new ConstantStore(), List.of(ColorType.COLORTYPE_DOT));
@@ -44,6 +36,7 @@ public class TimedArcPetriNetNetwork {
 	public TimedArcPetriNetNetwork(ConstantStore constants, List<ColorType> colorTypes){
 		this.constants = constants;
 		this.colorTypes.addAll(colorTypes);
+		this.currentMarking = new NetworkMarking(this);
         buildConstraints();
 	}
 	
@@ -234,7 +227,9 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public void setMarking(NetworkMarking marking) {
+		Require.that(marking != null, "marking must be non-null");
 		currentMarking = marking;
+		currentMarking.setNetwork(this);
 		for (TimedArcPetriNet tapn : tapns) {
 			tapn.setMarking(currentMarking);
 		}
@@ -244,19 +239,16 @@ public class TimedArcPetriNetNetwork {
 		constants.buildConstraints(this);
 	}
 
-	public Command addConstant(String name, LinkedHashSet<Integer> vals) {
-		Command cmd = constants.addConstant(name, vals);
-		Constant constant = constants.getConstantByName(name);
-		fireConstantAdded(constant);
-		return cmd;
+	public Constant addConstant(String name, LinkedHashSet<Integer> vals) {
+		Constant constant = constants.addConstantValue(name, vals);
+		if (constant != null) fireConstantAdded(constant);
+		return constant;
 	}
 
-	// TODO: Command is a GUI concern. This should not know anything about it
-	public Command addConstant(String name, int val) {
-		Command cmd = constants.addConstant(name, val); 
-		Constant constant = constants.getConstantByName(name);
-		fireConstantAdded(constant);
-		return cmd;
+	public Constant addConstant(String name, int val) {
+		Constant constant = constants.addConstantValue(name, val);
+		if (constant != null) fireConstantAdded(constant);
+		return constant;
 	}
 
 	private void fireConstantAdded(Constant constant) {
@@ -266,14 +258,16 @@ public class TimedArcPetriNetNetwork {
 	}
 
 
-	public Command removeConstant(String name) {
+	public Constant removeConstant(String name) {
 		Constant constant = constants.getConstantByName(name);
 		int index = constants.getIndexOf(constant);
-		Command cmd = constants.removeConstant(name);
-		for(ConstantsListener listener : constantsListeners){
-			listener.constantRemoved(new ConstantEvent(constant, index));
+		Constant removed = constants.removeConstantValue(name);
+		if (removed != null) {
+			for(ConstantsListener listener : constantsListeners){
+				listener.constantRemoved(new ConstantEvent(removed, index));
+			}
 		}
-		return cmd;
+		return removed;
 	}
 
     public void updateUserDefinedDistributions(String oldName, String newName) {
@@ -292,19 +286,19 @@ public class TimedArcPetriNetNetwork {
         }
     }
 
-	public Command updateConstant(String oldName, Constant constant) {
+	public Constant updateConstant(String oldName, Constant constant) {
 		Constant old = constants.getConstantByName(oldName);
 		int index = constants.getIndexOf(old);
-		Command edit = constants.updateConstant(oldName, constant, this);
+		Constant updated = constants.updateConstantValue(oldName, constant);
 
-		if (edit != null) {
+		if (updated != null) {
 			updateGuardsAndWeightsWithNewConstant(oldName, constant);
 			for(ConstantsListener listener : constantsListeners){
 				listener.constantChanged(new ConstantChangedEvent(old, constant, index));
 			}
 		}
 
-		return edit;
+		return updated;
 	}
 
 	public void updateGuardsAndWeightsWithNewConstant(String oldName, Constant newConstant) {
@@ -378,17 +372,17 @@ public class TimedArcPetriNetNetwork {
         }
     }
 
-	public Command addRealConstant(String name, LinkedHashSet<Double> vals) {
-		return constants.addRealConstant(name, vals);
+	public RealConstant addRealConstant(String name, LinkedHashSet<Double> vals) {
+		return constants.addRealConstantValue(name, vals);
 	}
 
-	public Command removeRealConstant(String name) {
+	public RealConstant removeRealConstant(String name) {
 		buildConstraints();
-		return constants.removeRealConstant(name);
+		return constants.removeRealConstantValue(name);
 	}
 
-	public Command updateRealConstant(String oldName, RealConstant constant) {
-		Command edit = constants.updateRealConstant(oldName, constant, this);
+	public RealConstant updateRealConstant(String oldName, RealConstant constant) {
+		RealConstant edit = constants.updateRealConstantValue(oldName, constant);
 
 		if (edit != null) {
 			updateDistributionsWithNewConstant(oldName, constant);
@@ -700,20 +694,6 @@ public class TimedArcPetriNetNetwork {
 		return true;
 	}
 	
-	public boolean isDegree2(){
-		ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
-		Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(this);
-
-		return composedModel.value1().isDegree2();
-	}
-
-    public int getHighestNetDegree(){
-        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
-        Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(this);
-
-        return composedModel.value1().getHighestNetDegree();
-    }
-
 	public boolean isSharedPlaceUsedInTemplates(SharedPlace place) {
 		for(TimedArcPetriNet tapn : this.activeTemplates()){
 			for(TimedPlace timedPlace : tapn.places()){
@@ -803,19 +783,17 @@ public class TimedArcPetriNetNetwork {
 	public boolean paintNet() {
 		return paintNet;
 	}
+
+	public boolean isUrgentTransitionEnabled() {
+		return urgentTransitionEnabled;
+	}
+
+	public void setUrgentTransitionEnabled(boolean enabled) {
+		urgentTransitionEnabled = enabled;
+	}
 	
 	public void setPaintNet(boolean paintNet){
 		this.paintNet = paintNet;
-	}
-
-	public boolean isNetDrawable() {
-		if (!paintNet) return false;
-		int totalSize = 0;
-		for (var tapn : allTemplates()) {
-			totalSize += tapn.places().size() + tapn.transitions().size();
-		}
-        
-		return totalSize <= Constants.MAX_NET_SIZE;
 	}
 
 	//For colors
@@ -826,31 +804,6 @@ public class TimedArcPetriNetNetwork {
 
     public List<Variable> variables() {return variables;}
     public void setVariables(List<Variable> newVariables) { variables = newVariables;}
-
-    public void renameColorType(ColorType oldColorType, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager){
-        Integer index = getColorTypeIndex(oldColorType.getName());
-
-        Command command = new UpdateColorTypeCommand(this, oldColorType, colorType, index, colorTypesListModel);
-        command.redo();
-        undoManager.addEdit(command);
-        updateProductTypes(oldColorType, colorType, undoManager);
-    }
-
-    public void updateColorType(ColorType oldColorType, ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager) {
-        undoManager.newEdit();
-        renameColorType(oldColorType, colorType, colorTypesListModel, undoManager);
-    }
-
-
-    private void updateProductTypes(ColorType oldColorType, ColorType colorType, UndoManager undoManager){
-        for (ColorType ct : colorTypes) {
-            if (ct instanceof ProductType) {
-                Command command = new UpdatePTColorTypeCommand(oldColorType, colorType, (ProductType)ct);
-                command.redo();
-                undoManager.addEdit(command);
-            }
-        }
-    }
 
     public Integer getColorTypeIndex(String name) {
         for (int i = 0; i < colorTypes.size(); i++) {
@@ -992,20 +945,6 @@ public class TimedArcPetriNetNetwork {
         variables.add(variable);
     }
 
-    public boolean remove(ColorType colorType, ConstantsPane.ColorTypesListModel colorTypesListModel, UndoManager undoManager, ArrayList<String> messages) {
-        Integer index = getColorTypeIndex(colorType.getName());
-
-        if(canColorTypeBeRemoved(colorType, messages)){
-            Command command = new RemoveColorTypeFromNetworkCommand(colorType, this, colorTypesListModel, index);
-            command.redo();
-            undoManager.addEdit(command);
-            //Success
-            return true;
-        }
-
-        return false;
-    }
-
     public boolean canColorTypeBeRemoved(ColorType colorType, List<String> messages){
 	    isColorTypeUsedInProduct(colorType, messages);
         isColorTypeUsedInVariable(colorType, messages);
@@ -1086,15 +1025,6 @@ public class TimedArcPetriNetNetwork {
             if (ct instanceof ProductType && ((ProductType) ct).contains(colorType)) {
                 messages.add("Color type " + colorType.getName() + " is used in product type " + ct.getName() + " \n");
             }
-        }
-    }
-
-    public void remove(Variable variable , ConstantsPane.VariablesListModel variablesListModel, UndoManager undoManager, List<String> messages) {
-	    if (canVariableBeRemoved(variable,messages)) {
-            Integer index = getVariableIndex(variable.getName());
-            Command command = new RemoveVariableFromNetworkCommand(variable, this, variablesListModel, index);
-            command.redo();
-            undoManager.addEdit(command);
         }
     }
 
