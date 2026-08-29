@@ -31,6 +31,7 @@ import dk.aau.cs.util.Require;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.SortConstantsCommand;
 import net.tapaal.gui.petrinet.undo.SortRealConstantsCommand;
+import net.tapaal.gui.petrinet.model.NetworkEditService;
 import net.tapaal.gui.petrinet.Template;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
@@ -58,6 +59,7 @@ public class ConstantsPane extends JPanel implements SidePane {
     private JButton manuallyEditBtn;
 
 	private final PetriNetTab tab;
+	private final NetworkEditService networkEditService;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;
@@ -115,6 +117,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 	public ConstantsPane(PetriNetTab currentTab) {
 		tab = currentTab;
+		networkEditService = new NetworkEditService(currentTab.network(), currentTab::updateConstantsList);
         list = new NonsearchableJList<>();
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		constantsPanel = new JPanel(new GridBagLayout());
@@ -203,14 +206,14 @@ public class ConstantsPane extends JPanel implements SidePane {
 					if (c != null && !c.hasMultipleValues()) {
 						if (arg0.getKeyCode() == KeyEvent.VK_LEFT) {
 							if (!(c.lowerBound() == c.value())){
-								Command edit = tab.network().updateConstant(c.name(), new Constant(c.name(), c.value()-1));
+								Command edit = networkEditService.updateConstant(c.name(), new Constant(c.name(), c.value()-1));
 								currentTab.getUndoManager().addNewEdit(edit);
 								tab.network().buildConstraints();
 							}
 						}
 						else if (arg0.getKeyCode() == KeyEvent.VK_RIGHT) {
 							if (!(c.upperBound() == c.value())){
-								Command edit = tab.network().updateConstant(c.name(), new Constant(c.name(), c.value()+1));
+								Command edit = networkEditService.updateConstant(c.name(), new Constant(c.name(), c.value()+1));
 								currentTab.getUndoManager().addNewEdit(edit);
 								tab.network().buildConstraints();
 							}
@@ -769,7 +772,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
         for (Object o : list.getSelectedValuesList()) {
             String name = ((Constant)o).name();
-            Command command = model.removeConstant(name);
+			Command command = networkEditService.removeConstant(name);
             if (command == null) {
                 unremovableConstants.add(name);
             } else {
@@ -799,7 +802,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
         for (Object o : list.getSelectedValuesList()) {
             String name = ((RealConstant)o).name();
-            Command command = model.removeRealConstant(name);
+			Command command = networkEditService.removeRealConstant(name);
             if (command == null) {
                 unremovableConstants.add(name);
             } else {

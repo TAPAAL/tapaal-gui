@@ -23,7 +23,6 @@ import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
-import pipe.gui.petrinet.animation.Animator;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
@@ -337,7 +336,7 @@ public class TimedTransition extends TAPNElement {
 		}
 		
 		//prevent delay if urgent transition is enabled
-		if(Animator.isUrgentTransitionEnabled()){
+		if(model().parentNetwork().isUrgentTransitionEnabled()){
 			result = IntervalOperations.intersectingInterval(result, List.of(new TimeInterval(true, new IntBound(0), new IntBound(0), true)));
 		}
 

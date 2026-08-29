@@ -78,6 +78,19 @@ test {
     useJUnitPlatform()
 }
 
+// Swing smoke tests are intentionally opt-in and are run under Xvfb in CI/local development.
+tasks.register('guiTest', Test) {
+    description = 'Runs GUI regression tests; use xvfb-run on headless machines.'
+    group = 'verification'
+    dependsOn testClasses
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'gui'
+    }
+    systemProperty 'java.awt.headless', 'false'
+}
+
 run {
     systemProperties System.getProperties()
 }

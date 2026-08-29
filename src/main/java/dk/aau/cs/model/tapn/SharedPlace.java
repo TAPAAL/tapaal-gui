@@ -6,8 +6,6 @@ import java.util.List;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
-import net.tapaal.gui.petrinet.Template;
-import pipe.gui.TAPAALGUI;
 import dk.aau.cs.util.Tuple;
 
 public class SharedPlace extends TimedPlace{
@@ -55,10 +53,11 @@ public class SharedPlace extends TimedPlace{
 	//XXX Model should not depend on GUI
 	public ArrayList<String> getComponentsUsingThisPlace(){
 		ArrayList<String> components = new ArrayList<String>();
-		for(Template t : TAPAALGUI.getCurrentTab().allTemplates()){
-			TimedPlace tp = t.model().getPlaceByName(SharedPlace.this.name);
+		if (network == null) return components;
+		for(TimedArcPetriNet t : network.allTemplates()){
+			TimedPlace tp = t.getPlaceByName(SharedPlace.this.name);
 			if(tp != null){
-				components.add(t.model().name());
+				components.add(t.name());
 			}
 		}
 		return components;
@@ -102,9 +101,9 @@ public class SharedPlace extends TimedPlace{
 		
 		extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
 
-        //XXX Model should not depend on GUI
-		for(Template t : TAPAALGUI.getCurrentTab().activeTemplates()){
-			TimedPlace tp = t.model().getPlaceByName(SharedPlace.this.name);
+		if (network == null) return new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
+		for(TimedArcPetriNet t : network.activeTemplates()){
+			TimedPlace tp = t.getPlaceByName(SharedPlace.this.name);
 			if(tp != null){
 				cmax = Math.max(cmax, tp.extrapolate().value2());
 				if(tp.extrapolate().value1() == PlaceType.Invariant || (type == PlaceType.Dead && tp.extrapolate().value1() == PlaceType.Standard)){

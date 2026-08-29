@@ -79,17 +79,12 @@ public class Animator {
     private NetworkMarking initialMarking;
 
     private boolean isDisplayingUntimedTrace = false;
-    private static boolean isUrgentTransitionEnabled = false;
 
     private Map<String, TAPNNetworkTrace> traceMap;
 
     private VerifyPNInteractiveHandle interactiveEngine;
     private boolean isUsingInteractiveEngine;
     private Map<TimedTransition, List<Map<Variable, Color>>> validBindingsMap;
-
-    public static boolean isUrgentTransitionEnabled(){
-        return isUrgentTransitionEnabled;
-    }
 
     public Animator(PetriNetTab tab) {
         this.tab = tab;
@@ -306,7 +301,7 @@ public class Animator {
         TransitionFiringComponent transFireComponent = tab.getTransitionFiringComponent();
         transFireComponent.startReInit();
 
-        isUrgentTransitionEnabled = false;
+        tab.network().setUrgentTransitionEnabled(false);
 
         if (tab.getLens().isColored()) {
             updateFireableTransitionsColored(transFireComponent);
@@ -314,7 +309,7 @@ public class Animator {
             outer: for( Template template : tab.activeTemplates()){
                 for (TimedTransition t : template.model().transitions()) {
                     if (t.isUrgent() && t.isEnabled()) {
-                        isUrgentTransitionEnabled = true;
+						tab.network().setUrgentTransitionEnabled(true);
                         break outer;
                     }
                 }
@@ -326,7 +321,7 @@ public class Animator {
                         t.markTransitionEnabled(true);
                         transFireComponent.addTransition(template, t);
                     } else if (TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() &&
-                        t.isDelayEnabled() && !isUrgentTransitionEnabled
+						t.isDelayEnabled() && !tab.network().isUrgentTransitionEnabled()
                     ) {
                         t.markTransitionDelayEnabled(true);
                         transFireComponent.addTransition(template, t);
@@ -653,7 +648,7 @@ public class Animator {
             return;
         }
 
-        if (!TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
+        if (!TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() || tab.network().isUrgentTransitionEnabled()){
             fireTransition(transition);
             return;
         }
@@ -804,7 +799,7 @@ public class Animator {
         }
 
         boolean result = false;
-        if (delay.compareTo(new BigDecimal(0))==0 || (currentMarking().isDelayPossible(delay) && !isUrgentTransitionEnabled)) {
+        if (delay.compareTo(new BigDecimal(0))==0 || (currentMarking().isDelayPossible(delay) && !tab.network().isUrgentTransitionEnabled())) {
             NetworkMarking delayedMarking = currentMarking().delay(delay);
             addMarking(new TAPNNetworkTimeDelayStep(delay), delayedMarking);
             result = true;
@@ -821,7 +816,7 @@ public class Animator {
         try {
             BigDecimal delay = tab.getAnimationController().getCurrentDelay();
 
-            if (isUrgentTransitionEnabled && !delay.equals(BigDecimal.ZERO) ) {
+			if (tab.network().isUrgentTransitionEnabled() && !delay.equals(BigDecimal.ZERO) ) {
                 tab.getAnimationController().getOkButton().setEnabled(false);
 
                 StringBuilder sb = new StringBuilder();

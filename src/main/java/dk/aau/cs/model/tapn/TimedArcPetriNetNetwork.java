@@ -2,7 +2,10 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
-import net.tapaal.gui.petrinet.undo.Colored.*;
+import net.tapaal.gui.petrinet.undo.Colored.RemoveColorTypeFromNetworkCommand;
+import net.tapaal.gui.petrinet.undo.Colored.RemoveVariableFromNetworkCommand;
+import net.tapaal.gui.petrinet.undo.Colored.UpdateColorTypeCommand;
+import net.tapaal.gui.petrinet.undo.Colored.UpdatePTColorTypeCommand;
 import dk.aau.cs.model.CPN.*;
 import dk.aau.cs.model.CPN.Expressions.*;
 import pipe.gui.Constants;
@@ -26,7 +29,7 @@ public class TimedArcPetriNetNetwork {
 	private final List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
     private final Map<String, SMCUserDefinedDistribution> userDefinedDistributions = new LinkedHashMap<String, SMCUserDefinedDistribution>();
 	
-	private NetworkMarking currentMarking = new NetworkMarking();
+	private NetworkMarking currentMarking;
 	private final ConstantStore constants;
 
     private List<ColorType> colorTypes = new ArrayList<ColorType>();
@@ -36,6 +39,7 @@ public class TimedArcPetriNetNetwork {
 	private final List<ConstantsListener> constantsListeners = new ArrayList<ConstantsListener>();
 	
 	private boolean paintNet = true;
+	private boolean urgentTransitionEnabled;
 	
 	public TimedArcPetriNetNetwork() {
 		this(new ConstantStore(), List.of(ColorType.COLORTYPE_DOT));
@@ -44,6 +48,7 @@ public class TimedArcPetriNetNetwork {
 	public TimedArcPetriNetNetwork(ConstantStore constants, List<ColorType> colorTypes){
 		this.constants = constants;
 		this.colorTypes.addAll(colorTypes);
+		this.currentMarking = new NetworkMarking(this);
         buildConstraints();
 	}
 	
@@ -234,7 +239,9 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public void setMarking(NetworkMarking marking) {
+		Require.that(marking != null, "marking must be non-null");
 		currentMarking = marking;
+		currentMarking.setNetwork(this);
 		for (TimedArcPetriNet tapn : tapns) {
 			tapn.setMarking(currentMarking);
 		}
@@ -244,19 +251,16 @@ public class TimedArcPetriNetNetwork {
 		constants.buildConstraints(this);
 	}
 
-	public Command addConstant(String name, LinkedHashSet<Integer> vals) {
-		Command cmd = constants.addConstant(name, vals);
-		Constant constant = constants.getConstantByName(name);
-		fireConstantAdded(constant);
-		return cmd;
+	public Constant addConstant(String name, LinkedHashSet<Integer> vals) {
+		Constant constant = constants.addConstantValue(name, vals);
+		if (constant != null) fireConstantAdded(constant);
+		return constant;
 	}
 
-	// TODO: Command is a GUI concern. This should not know anything about it
-	public Command addConstant(String name, int val) {
-		Command cmd = constants.addConstant(name, val); 
-		Constant constant = constants.getConstantByName(name);
-		fireConstantAdded(constant);
-		return cmd;
+	public Constant addConstant(String name, int val) {
+		Constant constant = constants.addConstantValue(name, val);
+		if (constant != null) fireConstantAdded(constant);
+		return constant;
 	}
 
 	private void fireConstantAdded(Constant constant) {
@@ -266,14 +270,16 @@ public class TimedArcPetriNetNetwork {
 	}
 
 
-	public Command removeConstant(String name) {
+	public Constant removeConstant(String name) {
 		Constant constant = constants.getConstantByName(name);
 		int index = constants.getIndexOf(constant);
-		Command cmd = constants.removeConstant(name);
-		for(ConstantsListener listener : constantsListeners){
-			listener.constantRemoved(new ConstantEvent(constant, index));
+		Constant removed = constants.removeConstantValue(name);
+		if (removed != null) {
+			for(ConstantsListener listener : constantsListeners){
+				listener.constantRemoved(new ConstantEvent(removed, index));
+			}
 		}
-		return cmd;
+		return removed;
 	}
 
     public void updateUserDefinedDistributions(String oldName, String newName) {
@@ -292,19 +298,19 @@ public class TimedArcPetriNetNetwork {
         }
     }
 
-	public Command updateConstant(String oldName, Constant constant) {
+	public Constant updateConstant(String oldName, Constant constant) {
 		Constant old = constants.getConstantByName(oldName);
 		int index = constants.getIndexOf(old);
-		Command edit = constants.updateConstant(oldName, constant, this);
+		Constant updated = constants.updateConstantValue(oldName, constant);
 
-		if (edit != null) {
+		if (updated != null) {
 			updateGuardsAndWeightsWithNewConstant(oldName, constant);
 			for(ConstantsListener listener : constantsListeners){
 				listener.constantChanged(new ConstantChangedEvent(old, constant, index));
 			}
 		}
 
-		return edit;
+		return updated;
 	}
 
 	public void updateGuardsAndWeightsWithNewConstant(String oldName, Constant newConstant) {
@@ -378,17 +384,17 @@ public class TimedArcPetriNetNetwork {
         }
     }
 
-	public Command addRealConstant(String name, LinkedHashSet<Double> vals) {
-		return constants.addRealConstant(name, vals);
+	public RealConstant addRealConstant(String name, LinkedHashSet<Double> vals) {
+		return constants.addRealConstantValue(name, vals);
 	}
 
-	public Command removeRealConstant(String name) {
+	public RealConstant removeRealConstant(String name) {
 		buildConstraints();
-		return constants.removeRealConstant(name);
+		return constants.removeRealConstantValue(name);
 	}
 
-	public Command updateRealConstant(String oldName, RealConstant constant) {
-		Command edit = constants.updateRealConstant(oldName, constant, this);
+	public RealConstant updateRealConstant(String oldName, RealConstant constant) {
+		RealConstant edit = constants.updateRealConstantValue(oldName, constant);
 
 		if (edit != null) {
 			updateDistributionsWithNewConstant(oldName, constant);
@@ -802,6 +808,14 @@ public class TimedArcPetriNetNetwork {
 
 	public boolean paintNet() {
 		return paintNet;
+	}
+
+	public boolean isUrgentTransitionEnabled() {
+		return urgentTransitionEnabled;
+	}
+
+	public void setUrgentTransitionEnabled(boolean enabled) {
+		urgentTransitionEnabled = enabled;
 	}
 	
 	public void setPaintNet(boolean paintNet){

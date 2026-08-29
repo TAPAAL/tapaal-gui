@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 
 import dk.aau.cs.model.tapn.simulation.DelayMode;
-import dk.aau.cs.model.tapn.simulation.ManualDelayMode;
 import dk.aau.cs.model.tapn.simulation.RandomDelayMode;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import pipe.gui.Constants;

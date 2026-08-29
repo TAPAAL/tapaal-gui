@@ -15,7 +15,7 @@ import pipe.gui.Constants;
 
 
 import dk.aau.cs.model.tapn.simulation.DelayMode;
-import dk.aau.cs.model.tapn.simulation.ManualDelayMode;
+import net.tapaal.gui.petrinet.animation.ManualDelayMode;
 import dk.aau.cs.model.tapn.simulation.RandomDelayMode;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 
