@@ -2,12 +2,14 @@ package dk.aau.cs.io
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.ThrowingSupplier
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent
 import java.math.BigDecimal
 
 
+@Tag("gui")
 internal class TapnXmlLoaderTest {
 
     internal class MalformedXML {
@@ -20,6 +22,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class Place {
 
         @Test
@@ -257,6 +260,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class Transition {
         @Test
         fun `Parse Transition`() {
@@ -333,6 +337,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class NetworkModel {
         @Test
         fun `Native tapn round trip preserves network model data`() {
@@ -359,6 +364,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class InputArc {
         @Test
         fun `Parse Input Arc`() {
@@ -378,6 +384,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class OutputArc {
         @Test
         fun `Parse Output Arc`() {
@@ -397,6 +404,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class InhibitorArc {
         @Test
         fun `Inhibitor Arc`() {
@@ -416,6 +424,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class TransportArc {
         @Test
         fun `Transport Arc`() {
@@ -455,6 +464,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class ArcPathPoints {
         @Test
         fun `Parse Arc without arcpathpoints`() {

@@ -3,9 +3,12 @@ package dk.aau.cs.verification;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import dk.aau.cs.Messenger;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -44,6 +47,26 @@ class TAPNModelComposerTest {
         assertEquals(new BigDecimal("1.5"), composed.value1().getPlaceByName("Source").tokens().get(0).age());
         assertEquals("Source", composed.value2().map("Template", "Source"));
         assertEquals("Transition", composed.value2().map("Template", "Transition"));
+    }
+
+    @Test
+    void reportsOrphanTransitionsWhenDiagnosticsAreRequested() {
+        TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+        TimedArcPetriNet template = new TimedArcPetriNet("Template");
+        template.add(new TimedTransition("Orphan"));
+        network.add(template);
+        List<String> messages = new ArrayList<>();
+
+        new TAPNModelComposer(new Messenger() {
+            @Override public void displayInfoMessage(String message) { messages.add(message); }
+            @Override public void displayInfoMessage(String message, String title) { }
+            @Override public void displayErrorMessage(String message) { }
+            @Override public void displayErrorMessage(String message, String title) { }
+            @Override public void displayWrappedErrorMessage(String message, String title) { }
+        }, true).transformModel(network);
+
+        assertEquals(1, messages.size());
+        assertEquals("There are orphan transitions (no incoming and no outgoing arcs) in the model.", messages.get(0));
     }
 
     private static int count(Iterable<?> values) {

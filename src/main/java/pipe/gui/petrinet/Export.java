@@ -95,7 +95,7 @@ public class Export {
 
     public static void toQueryXML(TimedArcPetriNetNetwork network, String filename, Iterable<TAPNQuery> queries, TAPNLens lens) {
         try {
-            TAPNModelComposer composer = new TAPNModelComposer(true);
+            TAPNModelComposer composer = new TAPNModelComposer(new MessengerImpl(), true);
             NameMapping mapping = composer.transformModel(network).value2();
             Iterator<TAPNQuery> queryIterator = queries.iterator();
             PrintStream queryStream = new PrintStream(filename);

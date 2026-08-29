@@ -75,7 +75,9 @@ dependencies {
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'gui'
+    }
 }
 
 // Swing smoke tests are intentionally opt-in and are run under Xvfb in CI/local development.
@@ -89,6 +91,10 @@ tasks.register('guiTest', Test) {
         includeTags 'gui'
     }
     systemProperty 'java.awt.headless', 'false'
+}
+
+check {
+    dependsOn tasks.named('guiTest')
 }
 
 run {
