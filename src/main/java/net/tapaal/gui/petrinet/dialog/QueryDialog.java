@@ -385,7 +385,8 @@ public class QueryDialog extends JPanel {
     private JCheckBox useTraceRefinement;
     private JCheckBox useTarjan;
     private JCheckBox useExplicitSearch;
-    private JCheckBox traceInOriginalNet;
+    private JRadioButton traceInOriginalNet;
+    private JRadioButton traceInUnfoldedNet;
     // Raw verification options panel
     private JPanel rawVerificationOptionsPanel;
     private JTextArea rawVerificationOptionsTextArea;
@@ -779,7 +780,7 @@ public class QueryDialog extends JPanel {
         query.setOldCapacity(oldCapacity);
 
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
-        query.setTraceInOriginalNet(lens.isColored() && !lens.isGame() && traceInOriginalNet.isSelected());
+        query.setTraceInOriginalNet(lens.isColored() && supportsUnfoldedTraceInOriginalNet() && traceInOriginalNet.isSelected());
 
         if (reductionOptionToSet != null && reductionOptionToSet.equals(ReductionOption.VerifyTAPN)) {
             query.setDiscreteInclusion(discreteInclusion.isSelected());
@@ -854,6 +855,7 @@ public class QueryDialog extends JPanel {
         query.setUseTarOption(useTraceRefinement.isSelected());
         query.setUseTarjan(useTarjan.isSelected());
         query.setUseExplicitSearch(useExplicitSearch.isSelected());
+        query.setTraceInOriginalNet(lens.isColored() && supportsUnfoldedTraceInOriginalNet() && traceInOriginalNet.isSelected());
         return query;
     }
 
@@ -1810,6 +1812,7 @@ public class QueryDialog extends JPanel {
         if (newProperty.hasNestedPathQuantifiers()) requiredFeatures.add(EngineFeature.NESTED_QUANTIFICATIONS);
         if (lens.isColored()) requiredFeatures.add(EngineFeature.COLORED);
         if (lens.isColored() && !lens.isTimed()) requiredFeatures.add(EngineFeature.ONLY_UNTIMED);
+        if (useExplicitSearch.isSelected()) requiredFeatures.add(EngineFeature.EXPLICIT_SEARCH);
         if (lens.isStochastic()) requiredFeatures.add(EngineFeature.SMC);
         if (hasColorSpecificPlaces(newProperty)) requiredFeatures.add(EngineFeature.COLORED_PLACE_QUERIES);
         if (hasNonzeroInitialTokenAges()) requiredFeatures.add(EngineFeature.NONZERO_INITIAL_TOKEN_AGES);
@@ -2457,14 +2460,15 @@ public class QueryDialog extends JPanel {
     private void setupExplicitSearch(boolean selectExplicitSearch) {
         if (lens.isColored() && !lens.isTimed() && !lens.isGame()) {
             useExplicitSearch.setSelected(selectExplicitSearch);
-            setComponentEnabledRecursively(unfoldingOptionsPanel, !selectExplicitSearch);
+            setUnfoldingOptimizationsEnabled(!selectExplicitSearch);
             oldExplicitSearchState = selectExplicitSearch;
         }
     }
 
     private void setupTraceInOriginalNet(boolean selected) {
-        if (lens.isTimed() && lens.isColored() && !lens.isGame()) {
+        if (lens.isColored()) {
             traceInOriginalNet.setSelected(selected);
+            traceInUnfoldedNet.setSelected(!selected);
         }
     }
 
@@ -2846,9 +2850,7 @@ public class QueryDialog extends JPanel {
         Point location = guiDialog.getLocation();
 
         searchOptionsPanel.setVisible(!isSmc);
-        if(lens.isColored() && !lens.isTimed()){
-            unfoldingOptionsPanel.setVisible(advancedView);
-        }
+        updateUnfoldingOptionsVisibility();
 
         reductionOptionsPanel.setVisible(advancedView && !isSmc);
         if (lens.isTimed()) {
@@ -3765,14 +3767,6 @@ public class QueryDialog extends JPanel {
         smcTraceType.setToolTipText(TOOL_TIP_TRACE_TYPE);
         smcTracePanel.add(smcTraceType, subPanelGbc);
 
-        if (lens.isColored() && lens.isStochastic()) {
-            subPanelGbc.gridx = 0;
-            subPanelGbc.gridy = 3;
-            subPanelGbc.gridwidth = 2;
-            smcTracePanel.add(traceInOriginalNet, subPanelGbc);
-            subPanelGbc.gridwidth = 1;
-        }
-  
         smcSettingsPanel.add(smcTracePanel, gbc);
 
         smcVerificationType.addActionListener(evt -> {
@@ -5961,7 +5955,7 @@ public class QueryDialog extends JPanel {
         verificationPanel = new JPanel(new GridBagLayout());
 
         initReductionOptionsPanel();
-        if(lens.isColored() && !lens.isTimed()){
+        if(lens.isColored()){
             initUnfoldingOptionsPanel();
         }
         
@@ -6033,27 +6027,34 @@ public class QueryDialog extends JPanel {
         unfoldingOptionsPanel.setVisible(false);
 
         unfoldingOptionsPanel.setBorder(BorderFactory.createTitledBorder("Unfolding Options"));
-        usePartitioning = new JCheckBox("Use partitioning of the colored net");
-        useColorFixpoint = new JCheckBox("Use color fixpoint analysis");
-        useSymmetricvars = new JCheckBox("Use reduction of symmetric variables");
-
-        usePartitioning.setToolTipText(TOOL_TIP_PARTITIONING);
-        useColorFixpoint.setToolTipText(TOOL_TIP_COLOR_FIXPOINT);
-        useSymmetricvars.setToolTipText(TOOL_TIP_SYMMETRIC_VARIABLES);
-
-        usePartitioning.setSelected(true);
-        useColorFixpoint.setSelected(true);
-        useSymmetricvars.setSelected(true);
-
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        unfoldingOptionsPanel.add(usePartitioning, gridBagConstraints);
-        gridBagConstraints.gridy = 1;
-        unfoldingOptionsPanel.add(useColorFixpoint, gridBagConstraints);
-        gridBagConstraints.gridy = 2;
-        unfoldingOptionsPanel.add(useSymmetricvars, gridBagConstraints);
+        if (!lens.isTimed()) {
+            usePartitioning = new JCheckBox("Use partitioning of the colored net");
+            useColorFixpoint = new JCheckBox("Use color fixpoint analysis");
+            useSymmetricvars = new JCheckBox("Use reduction of symmetric variables");
+
+            usePartitioning.setToolTipText(TOOL_TIP_PARTITIONING);
+            useColorFixpoint.setToolTipText(TOOL_TIP_COLOR_FIXPOINT);
+            useSymmetricvars.setToolTipText(TOOL_TIP_SYMMETRIC_VARIABLES);
+
+            usePartitioning.setSelected(true);
+            useColorFixpoint.setSelected(true);
+            useSymmetricvars.setSelected(true);
+
+            unfoldingOptionsPanel.add(usePartitioning, gridBagConstraints);
+            gridBagConstraints.gridy = 1;
+            unfoldingOptionsPanel.add(useColorFixpoint, gridBagConstraints);
+            gridBagConstraints.gridy = 2;
+            unfoldingOptionsPanel.add(useSymmetricvars, gridBagConstraints);
+        }
+
+        if (!lens.isTimed()) gridBagConstraints.gridy++;
+        unfoldingOptionsPanel.add(traceInOriginalNet, gridBagConstraints);
+        gridBagConstraints.gridy++;
+        unfoldingOptionsPanel.add(traceInUnfoldedNet, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -6240,13 +6241,18 @@ public class QueryDialog extends JPanel {
         useTraceRefinement = new JCheckBox("Use trace abstraction refinement");
         useTarjan = new JCheckBox("Use Tarjan");
         useExplicitSearch = new JCheckBox("Use explicit search");
-        traceInOriginalNet = new JCheckBox("Show trace in original net");
-        traceInOriginalNet.setToolTipText("Maps the trace back to the original colored net instead of opening an unfolded net tab");
+        traceInOriginalNet = new JRadioButton("Show trace in original net");
+        traceInUnfoldedNet = new JRadioButton("Show trace in unfolded net");
+        traceInOriginalNet.setToolTipText("Maps the trace back to the original colored net");
+        traceInUnfoldedNet.setToolTipText("Opens the trace in an unfolded net tab");
+        ButtonGroup traceLocationGroup = new ButtonGroup();
+        traceLocationGroup.add(traceInOriginalNet);
+        traceLocationGroup.add(traceInUnfoldedNet);
 
         useExplicitSearch.addActionListener(e -> {
             refreshHeuristicButtonText();
             if (!lens.isTimed()) {
-                setComponentEnabledRecursively(unfoldingOptionsPanel, !useExplicitSearch.isSelected());
+                setUnfoldingOptimizationsEnabled(!useExplicitSearch.isSelected());
             }
             oldExplicitSearchState = useExplicitSearch.isSelected();
         });
@@ -6337,11 +6343,6 @@ public class QueryDialog extends JPanel {
 
         useTimeDarts.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
 
-        if (lens.isColored() && !lens.isGame() && !lens.isStochastic()) {
-            gbc.gridx = 0;
-            gbc.gridy = 4;
-            reductionOptionsPanel.add(traceInOriginalNet, gbc);
-        }
     }
 
     private void initUntimedReductionOptions() {
@@ -6535,6 +6536,7 @@ public class QueryDialog extends JPanel {
     
         updateSearchStrategies();
 		refreshExportButtonText();
+		updateUnfoldingOptionsVisibility();
 
         guiDialog.pack();
 	}
@@ -6633,9 +6635,9 @@ public class QueryDialog extends JPanel {
 
     private void refreshExplicitSearch() {
         if (lens.isTimed()) {
-            boolean canMap = lens.isColored() && !lens.isGame();
+            boolean canMap = lens.isColored() && supportsUnfoldedTraceInOriginalNet();
             traceInOriginalNet.setEnabled(canMap);
-            if (!canMap) traceInOriginalNet.setSelected(false);
+            if (!canMap) traceInUnfoldedNet.setSelected(true);
         } else {
             if (canUseExplicitSearch()) {
                 useExplicitSearch.setSelected(oldExplicitSearchState);
@@ -6651,26 +6653,34 @@ public class QueryDialog extends JPanel {
         }
     }
 
-    private void setComponentEnabledRecursively(Component component, boolean enabled) {
-        if (component == null) {
-            return;
-        }
+    private void updateUnfoldingOptionsVisibility() {
+        if (unfoldingOptionsPanel == null) return;
 
-        if (component instanceof Container) {
-            for (Component child : ((Container) component).getComponents()) {
-                setComponentEnabledRecursively(child, enabled);
-            }
-        }
+        boolean supportsOriginalNetTrace = supportsUnfoldedTraceInOriginalNet();
+        traceInOriginalNet.setVisible(supportsOriginalNetTrace);
+        traceInUnfoldedNet.setVisible(supportsOriginalNetTrace);
+        unfoldingOptionsPanel.setVisible(advancedView && (!lens.isTimed() || supportsOriginalNetTrace));
+    }
 
-        if (!enabled && component instanceof AbstractButton) {
-            ((AbstractButton) component).setSelected(false);
-        }
+    private boolean supportsUnfoldedTraceInOriginalNet() {
+        EngineSupportOptions engine = EngineSupportOptions.fromReductionOption(getReductionOption());
+        return engine != null && engine.supports(EngineFeature.UNFOLDED_TRACE_IN_ORIGINAL_NET);
+    }
 
-        component.setEnabled(enabled);
+    private void setUnfoldingOptimizationsEnabled(boolean enabled) {
+        if (usePartitioning != null) usePartitioning.setEnabled(enabled);
+        if (useColorFixpoint != null) useColorFixpoint.setEnabled(enabled);
+        if (useSymmetricvars != null) useSymmetricvars.setEnabled(enabled);
+        traceInOriginalNet.setEnabled(enabled);
+        traceInUnfoldedNet.setEnabled(enabled);
+        if (!enabled) traceInOriginalNet.setSelected(true);
     }
 
     private boolean canUseExplicitSearch() {
-        return (newProperty.toString().contains("AG") || newProperty.toString().contains("EF")) && !newProperty.hasNestedPathQuantifiers();
+        EngineSupportOptions engine = EngineSupportOptions.fromReductionOption(getReductionOption());
+        return engine != null && engine.supports(EngineFeature.EXPLICIT_SEARCH)
+            && (newProperty.toString().contains("AG") || newProperty.toString().contains("EF"))
+            && !newProperty.hasNestedPathQuantifiers();
     }
 
     private void refreshColoredReduction() {

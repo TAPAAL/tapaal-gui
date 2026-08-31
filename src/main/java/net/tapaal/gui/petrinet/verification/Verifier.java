@@ -333,8 +333,9 @@ public class Verifier {
                 query.traceInOriginalNet()
         );
         } else if (query.getReductionOption() == ReductionOption.VerifyPN) {
-            boolean unfold = isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE && !query.useExplicitSearch();
-            return new VerifyPNOptions(
+            boolean unfold = isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE
+                && !query.useExplicitSearch() && !query.traceInOriginalNet();
+            VerifyPNOptions options = new VerifyPNOptions(
                 query.getCapacity(),
                 query.getTraceOption(),
                 query.getSearchOption(),
@@ -361,6 +362,8 @@ public class Verifier {
                 query.getRawVerification(),
                 query.getRawVerificationPrompt()
             );
+            options.setTraceInOriginalNet(query.traceInOriginalNet() && !query.useExplicitSearch());
+            return options;
         } else {
             return new VerifyTAPNOptions(
                 query.getCapacity(),

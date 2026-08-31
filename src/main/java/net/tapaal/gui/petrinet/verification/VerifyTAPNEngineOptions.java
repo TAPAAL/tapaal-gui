@@ -11,6 +11,7 @@ public class VerifyTAPNEngineOptions extends EngineSupportOptions {
                 EngineFeature.INHIBITOR_ARCS,
                 EngineFeature.STRICT_NETS,
                 EngineFeature.TIMED_NETS,
+                EngineFeature.UNFOLDED_TRACE_IN_ORIGINAL_NET,
                 EngineFeature.COLORED,
                 EngineFeature.COLORED_PLACE_QUERIES,
                 EngineFeature.NONZERO_INITIAL_TOKEN_AGES
