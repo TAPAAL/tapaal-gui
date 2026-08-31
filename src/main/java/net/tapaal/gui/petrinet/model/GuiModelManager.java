@@ -4,7 +4,6 @@ import dk.aau.cs.verification.observations.Observation;
 import net.tapaal.gui.petrinet.undo.*;
 import pipe.gui.petrinet.PetriNetTab;
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.tapn.*;
@@ -206,14 +205,8 @@ public class GuiModelManager {
             t.underlyingTransition()
         );
 
-        ColorType ct = tiha.source().getColorType();
-        AllExpression allExpression = new AllExpression(ct);
-        Vector<ColorExpression> vecColorExpr = new Vector<>();
-        vecColorExpr.add(allExpression);
-        NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-        tiha.setExpression(numbExpr);
-
         TimedInhibitorArcComponent tihac = new TimedInhibitorArcComponent(p, t, tiha);
+        tihac.setLens(tabContent.lens);
 
         if (path != null) {
             tihac.setArcPath(new ArcPath(tihac, path));

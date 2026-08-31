@@ -28,7 +28,6 @@ import net.tapaal.gui.petrinet.editor.ColorComboboxPanel;
 import net.tapaal.gui.petrinet.editor.ColoredTimeInvariantDialogPanel;
 import pipe.gui.Constants;
 import pipe.gui.TAPAALGUI;
-import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.petrinet.graphicElements.PetriNetObject;
@@ -1587,47 +1586,53 @@ public class PlaceEditorPanel extends JPanel {
     }
 
     private void updateArcsAccordingToColorType() {
-        for(Arc arc : place.getPostset()){
+        for (var arc : place.getPostset()) {
             //We know it goes from place to transition so it can be either InputArcComponent or TransportArc or InhibitorArc
-            if(arc instanceof TimedTransportArcComponent){
-                TransportArc transportArc = ((TimedTransportArcComponent)arc).underlyingTransportArc();
-                Vector<ColorExpression> vecColorExpr = new Vector<>();
+            if (arc instanceof TimedTransportArcComponent) {
+                var transportArc = ((TimedTransportArcComponent)arc).underlyingTransportArc();
+                var vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(colorType.createColorExpressionForFirstColor());
-                NumberOfExpression numbExpr = new NumberOfExpression(transportArc.getOutputExpression().weight(), vecColorExpr);
-                Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)arc, transportArc.getInputExpression(),
+                var numbExpr = new NumberOfExpression(transportArc.getOutputExpression().weight(), vecColorExpr);
+                var expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)arc, transportArc.getInputExpression(),
                     numbExpr, transportArc.getOutputExpression(), transportArc.getOutputExpression());
                 expressionsCommand.redo();
                 context.undoManager().addEdit(expressionsCommand);
-            }else if(!(arc instanceof TimedInhibitorArcComponent)){
-                Vector<ColorExpression> vecColorExpr = new Vector<>();
+            } else {
+                if (arc instanceof TimedInhibitorArcComponent && arc.getExpression() == null) {
+                    continue;
+                }
+
+                var weight = arc instanceof TimedInhibitorArcComponent ? arc.getWeight().value() : 1;
+                var vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(colorType.createColorExpressionForFirstColor());
-                NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-                Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
+                var newExpression = new NumberOfExpression(weight, vecColorExpr);
+                var arcExpressionCommand = new SetArcExpressionCommand(arc, arc.getExpression(), newExpression);
                 arcExpressionCommand.redo();
                 context.undoManager().addEdit(arcExpressionCommand);
-
             }
-            if(!(arc instanceof TimedInhibitorArcComponent)){
-                Command arcIntervalCommand = new SetColoredArcIntervalsCommand((TimedInputArcComponent)arc,((TimedInputArcComponent)arc).getCtiList(), new ArrayList<>());
+
+            if (!(arc instanceof TimedInhibitorArcComponent)) {
+                var arcIntervalCommand = new SetColoredArcIntervalsCommand((TimedInputArcComponent)arc, ((TimedInputArcComponent)arc).getCtiList(), new ArrayList<>());
                 arcIntervalCommand.redo();
                 context.undoManager().addEdit(arcIntervalCommand);
             }
         }
-        for(Arc arc : place.getPreset()) {
-            if(arc instanceof TimedTransportArcComponent){
-                TransportArc transportArc = ((TimedTransportArcComponent)arc).underlyingTransportArc();
-                Vector<ColorExpression> vecColorExpr = new Vector<>();
+
+        for (var arc : place.getPreset()) {
+            if (arc instanceof TimedTransportArcComponent) {
+                var transportArc = ((TimedTransportArcComponent)arc).underlyingTransportArc();
+                var vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(colorType.createColorExpressionForFirstColor());
-                NumberOfExpression numbExpr = new NumberOfExpression(transportArc.getInputExpression().weight(), vecColorExpr);
-                Command expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)arc, transportArc.getInputExpression(),
+                var numbExpr = new NumberOfExpression(transportArc.getInputExpression().weight(), vecColorExpr);
+                var expressionsCommand = new SetTransportArcExpressionsCommand((TimedTransportArcComponent)arc, transportArc.getInputExpression(),
                     transportArc.getInputExpression(), transportArc.getOutputExpression(), numbExpr);
                 expressionsCommand.redo();
                 context.undoManager().addEdit(expressionsCommand);
-            }else{
-                Vector<ColorExpression> vecColorExpr = new Vector<>();
+            } else {
+                var vecColorExpr = new Vector<ColorExpression>();
                 vecColorExpr.add(colorType.createColorExpressionForFirstColor());
-                NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-                Command arcExpressionCommand = new SetArcExpressionCommand(arc,arc.getExpression(),numbExpr);
+                var numbExpr = new NumberOfExpression(1, vecColorExpr);
+                var arcExpressionCommand = new SetArcExpressionCommand(arc, arc.getExpression(), numbExpr);
                 arcExpressionCommand.redo();
                 context.undoManager().addEdit(arcExpressionCommand);
             }

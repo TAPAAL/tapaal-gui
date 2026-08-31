@@ -1798,6 +1798,7 @@ public class QueryDialog extends JPanel {
         if (queryHasDeadlock() && hasInhibitorArcs) requiredFeatures.add(EngineFeature.DEADLOCK_WITH_INHIB);
         if (tapnNetwork.hasWeights()) requiredFeatures.add(EngineFeature.WEIGHTS);
         if (hasInhibitorArcs) requiredFeatures.add(EngineFeature.INHIBITOR_ARCS);
+        if (tapnNetwork.hasColoredInhibitorArcs()) requiredFeatures.add(EngineFeature.COLORED_INHIBITOR_ARCS);
         if (tapnNetwork.hasUrgentTransitions()) requiredFeatures.add(EngineFeature.URGENT_TRANSITIONS);
         if (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) requiredFeatures.add(EngineFeature.EG_OR_AF);
         if (!tapnNetwork.isNonStrict()) requiredFeatures.add(EngineFeature.STRICT_NETS);

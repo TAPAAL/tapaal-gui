@@ -185,6 +185,7 @@ public class VerifyTACPNExporter extends VerifyTAPNExporter {
         modelStream.append("source=\"" + inhibArc.source().name() + "\" ");
         modelStream.append("target=\"" + inhibArc.destination().name() + "\">");
         modelStream.append("<inscription><value>" + inhibArc.getWeight().nameForSaving(false) + "</value></inscription>");
+        modelStream.append(colorInformationToXMLString(inhibArc.getArcExpression()));
         modelStream.append("</inhibitorArc>\n");
     }
 

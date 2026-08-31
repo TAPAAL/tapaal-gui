@@ -7,6 +7,7 @@ public enum EngineFeature {
     DEADLOCK_WITH_INHIB,
     WEIGHTS,
     INHIBITOR_ARCS,
+    COLORED_INHIBITOR_ARCS,
     URGENT_TRANSITIONS,
     EG_OR_AF,
     STRICT_NETS,

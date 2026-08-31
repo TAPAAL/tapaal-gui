@@ -556,6 +556,12 @@ public class TimedPlaceComponent extends Place {
             getNameLabel().displayName(attributesVisible);
             setToolTipText(isTimed() && !isColored() ? "Token ages: " + getStringOfTokens() : null);
 
+            for (var arc : getPostset()) {
+                if (arc instanceof TimedInhibitorArcComponent) {
+                    arc.updateLabel(displayConstantNames);
+                }
+            }
+
         } else {
             getNameLabel().setName("");
             getNameLabel().setText("");
