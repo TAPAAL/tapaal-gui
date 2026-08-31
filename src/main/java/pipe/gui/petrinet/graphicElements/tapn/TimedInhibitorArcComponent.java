@@ -3,7 +3,9 @@ package pipe.gui.petrinet.graphicElements.tapn;
 import java.awt.geom.Ellipse2D;
 import java.util.Hashtable;
 
+import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.Constants;
 import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
@@ -59,7 +61,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	public void updateLabel(boolean displayConstantNames) {
 		getNameLabel().setText("");
         if (inhibitorArc != null && isColored()) {
-            getNameLabel().setText(getExpression() == null
+            getNameLabel().setText(isAnyColorExpression()
                 ? getWeight().value() > 1 ? getWeight().toString(displayConstantNames) : ""
                 : getExpression().toString());
         } else if (getWeight().value() > 1 || displayConstantNames) {
@@ -81,6 +83,12 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 
 		this.setLabelPosition();
+	}
+
+	private boolean isAnyColorExpression() {
+		if (getExpression() == null) return true;
+		return getExpression() instanceof NumberOfExpression numberOf && numberOf.getColor().size() == 1
+			&& numberOf.getColor().firstElement() instanceof AllExpression;
 	}
 
 	@Override
