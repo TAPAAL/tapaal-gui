@@ -249,6 +249,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (q.getProperty() instanceof TCTLDeadlockNode && net.hasInhibitorArcs()) requiredFeatures.add(EngineFeature.DEADLOCK_WITH_INHIB);
             if (net.hasWeights()) requiredFeatures.add(EngineFeature.WEIGHTS);
             if (net.hasInhibitorArcs()) requiredFeatures.add(EngineFeature.INHIBITOR_ARCS);
+            if (net.hasColoredInhibitorArcs()) requiredFeatures.add(EngineFeature.COLORED_INHIBITOR_ARCS);
             if (net.hasUrgentTransitions()) requiredFeatures.add(EngineFeature.URGENT_TRANSITIONS);
             if (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) requiredFeatures.add(EngineFeature.EG_OR_AF);
             if (!net.isNonStrict()) requiredFeatures.add(EngineFeature.STRICT_NETS);
@@ -2847,7 +2848,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 if (!isDragging) {
                     TimedTransitionComponent t = (TimedTransitionComponent) pno;
                     TimedTransition transition = t.underlyingTransition();
-                    if (transition.isDEnabled()) {
+                    if (getLens().isColored() || transition.isDEnabled()) {
                         animator.dFireTransition(transition);
                     }
                 } else {
@@ -3005,7 +3006,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		void transitionLeftClicked(TimedTransitionComponent t) {
 			TimedTransition transition = t.underlyingTransition();
 
-			if (transition.isDEnabled()) {
+			if (getLens().isColored() || transition.isDEnabled()) {
 				animator.dFireTransition(transition);
 			}
 		}

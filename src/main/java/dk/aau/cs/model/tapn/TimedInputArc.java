@@ -117,7 +117,7 @@ public class TimedInputArc extends TAPNElement {
 
 	@Override
 	public String toString() {
-		return "From " + source.name() + " to " + destination.name() + " with interval " + interval().toString() + " and arc expression " + expression.toString();
+		return "From " + source.name() + " to " + destination.name() + " with interval " + interval().toString() + " and arc expression " + (expression == null ? "Any" : expression.toString());
 	}
 
     public String fromTo() {

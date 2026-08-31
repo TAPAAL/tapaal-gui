@@ -557,6 +557,10 @@ public class TimedArcPetriNetNetwork {
 		return false;
 	}
 
+	public boolean hasColoredInhibitorArcs() {
+		return tapns.stream().anyMatch(tapn -> tapn.isActive() && tapn.hasColoredInhibitorArcs());
+	}
+
 	public void swapTemplates(int currentIndex, int newIndex) {
 		TimedArcPetriNet temp = tapns.get(currentIndex);
 		tapns.set(currentIndex, tapns.get(newIndex));
@@ -1058,6 +1062,12 @@ public class TimedArcPetriNetNetwork {
             for (TimedInputArc arc : tapn.inputArcs()) {
                 if (arc.getArcExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used on arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
+                }
+            }
+
+            for (TimedInhibitorArc arc : tapn.inhibitorArcs()) {
+                if (arc.getArcExpression() != null && arc.getArcExpression().containsColor(color)) {
+                    messages.add(color.getName() + " is used on inhibitor arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
                 }
             }
 
