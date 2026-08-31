@@ -1071,6 +1071,12 @@ public class TimedArcPetriNetNetwork {
                 }
             }
 
+            for (TimedInhibitorArc arc : tapn.inhibitorArcs()) {
+                if (arc.getArcExpression() != null && arc.getArcExpression().containsColor(color)) {
+                    messages.add(color.getName() + " is used on inhibitor arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
+                }
+            }
+
             for (TimedOutputArc arc : tapn.outputArcs()) {
                 if (arc.getExpression().containsColor(color)) {
                     messages.add(color.getName() + " is used on arc from " + arc.source().name() + " to " + arc.destination().name() + "\n");
