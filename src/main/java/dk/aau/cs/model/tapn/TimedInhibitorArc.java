@@ -1,7 +1,9 @@
 package dk.aau.cs.model.tapn;
 
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -22,6 +24,12 @@ public class TimedInhibitorArc extends TimedInputArc {
 
     public TimedInhibitorArc(TimedPlace source, TimedTransition destination) {
         this(source, destination, TimeInterval.ZERO_INF, new IntWeight(1), null);
+    }
+
+    public boolean hasSpecificColorExpression() {
+        return expression != null && !(expression instanceof NumberOfExpression numberOf
+            && numberOf.getColor().size() == 1
+            && numberOf.getColor().firstElement() instanceof AllExpression);
     }
 
     public List<TimeInterval> getDEnabledInterval(){

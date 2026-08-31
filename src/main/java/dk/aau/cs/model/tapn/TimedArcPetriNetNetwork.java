@@ -557,6 +557,10 @@ public class TimedArcPetriNetNetwork {
 		return false;
 	}
 
+	public boolean hasColoredInhibitorArcs() {
+		return tapns.stream().anyMatch(tapn -> tapn.isActive() && tapn.hasColoredInhibitorArcs());
+	}
+
 	public void swapTemplates(int currentIndex, int newIndex) {
 		TimedArcPetriNet temp = tapns.get(currentIndex);
 		tapns.set(currentIndex, tapns.get(newIndex));
