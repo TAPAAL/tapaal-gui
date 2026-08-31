@@ -48,6 +48,7 @@ import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.swinghelpers.JSplitPaneFix;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
+import org.jdesktop.swingx.MultiSplitLayout.Node;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.action.GuiAction;
@@ -478,6 +479,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	private static final String transitionFiringName = "enabledTransitions";
 	private static final String animControlName = "animControl";
+	private static final double MAX_TEMPLATE_EXPLORER_WEIGHT = 0.25;
+	private static final int SIMULATOR_DIVIDERS_HEIGHT = 14;
+	private static final int MIN_SIMULATOR_HEIGHT = 100;
+	private static final int DEFAULT_SIMULATOR_HEIGHT = 600;
+	private static final int TEMPLATE_EXPLORER_PADDING = 24;
+	private static final int TEMPLATE_ROW_HEIGHT = 18;
 
 	private JSplitPane animationHistorySplitter;
 
@@ -839,6 +846,45 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		animatorSplitPane.add(t, templateExplorerName);
 
 		this.setLeftComponent(animatorSplitPaneScroller);
+
+		SwingUtilities.invokeLater(this::updateSimulatorLayoutWeights);
+	}
+
+	private void updateSimulatorLayoutWeights() {
+		if (animatorSplitPane == null) return;
+
+		var layout = animatorSplitPane.getMultiSplitLayout();
+		Component templateExplorerComponent = layout.getComponentForNode(layout.getNodeForName(templateExplorerName));
+		int desiredTemplateHeight;
+		if (templateExplorerComponent instanceof TemplateExplorer explorer) {
+			desiredTemplateHeight = explorer.getFittedHeight();
+		} else {
+			desiredTemplateHeight = TEMPLATE_EXPLORER_PADDING + Math.max(1, numberOfActiveTemplates()) * TEMPLATE_ROW_HEIGHT;
+		}
+
+		int simulatorHeight = animatorSplitPane.getHeight();
+		if (simulatorHeight <= 0) simulatorHeight = getHeight();
+		if (simulatorHeight <= 0) simulatorHeight = DEFAULT_SIMULATOR_HEIGHT;
+		double availableHeight = Math.max(MIN_SIMULATOR_HEIGHT, simulatorHeight - SIMULATOR_DIVIDERS_HEIGHT);
+		double templateWeight = Math.min(
+			desiredTemplateHeight / availableHeight,
+			MAX_TEMPLATE_EXPLORER_WEIGHT
+		);
+
+		double remainingWeight = 1.0 - templateWeight;
+		double enabledTransitionsWeight = remainingWeight / 3;
+
+		setSimulatorNodeWeight(layout.getNodeForName(templateExplorerName), templateWeight);
+		setSimulatorNodeWeight(layout.getNodeForName(transitionFiringName), enabledTransitionsWeight);
+		setSimulatorNodeWeight(layout.getNodeForName(animControlName), remainingWeight - enabledTransitionsWeight);
+
+		layout.setFloatingDividers(true);
+		layout.layoutByWeight(animatorSplitPane);
+		layout.setFloatingDividers(false);
+	}
+
+	private void setSimulatorNodeWeight(Node node, double weight) {
+		if (node instanceof Leaf leaf) leaf.setWeight(weight);
 	}
 
     public AnimationHistoryList getUntimedAnimationHistory() {
@@ -1182,9 +1228,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     @Override
 	public void setResizeingDefault(){
 		if(animatorSplitPane != null){
-			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(true);
-			animatorSplitPane.getMultiSplitLayout().layoutByWeight(animatorSplitPane);
-			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(false);
+			updateSimulatorLayoutWeights();
 		} else {
 			simulatorModelRoot = null;
 		}
@@ -3385,5 +3429,15 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
     public void setWorkflowDialog(WorkflowDialog dialog) {
         this.workflowDialog = dialog;
+    }
+
+    @Override
+    public boolean isDrawingSurfaceEmpty() {
+        return drawingSurface() == null || drawingSurface().getComponentCount() == 0;
+    }
+
+    @Override
+    public boolean hasQueries() {
+        return queries != null && queries.getQueries().iterator().hasNext();
     }
 }

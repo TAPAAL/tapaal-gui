@@ -1,7 +1,6 @@
 package pipe.gui;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -9,7 +8,6 @@ import java.awt.event.WindowEvent;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -20,8 +18,8 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import com.sun.jna.Platform;
 import net.tapaal.gui.*;
@@ -44,15 +42,12 @@ import pipe.gui.canvas.Grid;
 import pipe.gui.canvas.SelectionManager;
 import net.tapaal.gui.petrinet.dialog.ExportBatchDialog;
 import net.tapaal.gui.petrinet.dialog.ColoredSimulationDialog;
-import net.tapaal.gui.petrinet.editor.TemplateExplorer;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedTransition;
 import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import net.tapaal.resourcemanager.ResourceManager;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import kotlin.internal.RequireKotlin.Container;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPN;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.SearchBar;
@@ -1166,6 +1161,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         switch (mode) {
             case draw:
                 enableAllActions(true);
+                updateExportAndPrintActions();
                 exportTraceAction.setEnabled(false);
                 importTraceAction.setEnabled(false);
 
@@ -1210,6 +1206,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             case animation:
                 enableAllActions(true);
+                updateExportAndPrintActions();
 
                 annotationAction.setEnabled(false);
                 deleteAction.setEnabled(false);
@@ -1288,6 +1285,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 break;
         }
 
+    }
+
+    private void updateExportAndPrintActions() {
+        TabActions tab = currentTab == null ? null : currentTab.get();
+        boolean hasComponents = tab != null && !tab.isDrawingSurfaceEmpty();
+        boolean hasQueries = tab != null && tab.hasQueries();
+        exportPNGAction.setEnabled(hasComponents);
+        exportPSAction.setEnabled(hasComponents);
+        exportToTikZAction.setEnabled(hasComponents);
+        exportToPNMLAction.setEnabled(hasComponents);
+        exportToXMLAction.setEnabled(hasQueries);
+        printAction.setEnabled(hasComponents);
     }
 
     /**
@@ -1667,6 +1676,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JMenu buildMenuFiles() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic('F');
+        fileMenu.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) {
+                updateExportAndPrintActions();
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent e) {}
+
+            @Override
+            public void menuCanceled(MenuEvent e) {}
+        });
 
         fileMenu.add(createAction);
 
