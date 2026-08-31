@@ -3258,60 +3258,29 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     public static final String textforMove = "Select Mode: Click/drag to select objects; drag to move them";
     public static final String textforAnnotation = "Annotation Mode: Right click on an annotation to see menu options; double click to edit";
     public static final String textforDrag = "Drag Mode";
+    public static final String textForUrgentTransition = "Urgent Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+    public static final String textForUrgentUncontrollableTransition = "Urgent Uncontrollable Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+
 
     public void changeStatusbarText(DrawTool type) {
-        switch (type) {
-            case UNCONTROLLABLE_TRANSITION:
-                app.ifPresent(o14 -> o14.setStatusBarText(textforUncontrollableTrans));
+        String statusText = switch (type) {
+            case UNCONTROLLABLE_TRANSITION  -> textforUncontrollableTrans;
+            case PLACE -> textforTAPNPlace;
+            case TRANSITION -> textforTransition;
+            case ARC -> textforArc;
+            case TRANSPORT_ARC -> textforTransportArc;
+            case INHIBITOR_ARC -> textforInhibArc;
+            case ADD_TOKEN -> textforAddtoken;
+            case REMOVE_TOKEN -> textforDeltoken;
+            case SELECT -> textforMove;
+            case DRAW -> textforDrawing;
+            case ANNOTATION -> textforAnnotation;
+            case DRAG -> textforDrag;
+            case URGENT_TRANSITION -> textForUrgentTransition;
+            case URGENT_UNCONTROLLABLE_TRANSITION -> textForUrgentUncontrollableTransition;
+        };
 
-            case PLACE:
-                app.ifPresent(o12 -> o12.setStatusBarText(textforTAPNPlace));
-                break;
-
-            case TRANSITION:
-                app.ifPresent(o11 -> o11.setStatusBarText(textforTransition));
-                break;
-
-            case ARC:
-                app.ifPresent(o9 -> o9.setStatusBarText(textforArc));
-                break;
-
-            case TRANSPORT_ARC:
-                app.ifPresent(o8 -> o8.setStatusBarText(textforTransportArc));
-                break;
-
-            case INHIBITOR_ARC:
-                app.ifPresent(o7 -> o7.setStatusBarText(textforInhibArc));
-                break;
-
-            case ADD_TOKEN:
-                app.ifPresent(o6 -> o6.setStatusBarText(textforAddtoken));
-                break;
-
-            case REMOVE_TOKEN:
-                app.ifPresent(o5 -> o5.setStatusBarText(textforDeltoken));
-                break;
-
-            case SELECT:
-                app.ifPresent(o4 -> o4.setStatusBarText(textforMove));
-                break;
-
-            case DRAW:
-                app.ifPresent(o3 -> o3.setStatusBarText(textforDrawing));
-                break;
-
-            case ANNOTATION:
-                app.ifPresent(o2 -> o2.setStatusBarText(textforAnnotation));
-                break;
-
-            case DRAG:
-                app.ifPresent(o1 -> o1.setStatusBarText(textforDrag));
-                break;
-
-            default:
-                app.ifPresent(o->o.setStatusBarText("To-do (textfor" + type));
-                break;
-        }
+        app.ifPresent(view -> view.setStatusBarText(statusText));
     }
 
 
