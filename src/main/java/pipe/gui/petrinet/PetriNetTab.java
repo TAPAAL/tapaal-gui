@@ -2868,7 +2868,15 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         private int totalX = 0;
         private int totalY = 0;
+        private boolean wasAgeOfTokensShown;
+        private PetriNetObject dragSource;
         private void pnoPressed(PetriNetObject pno, MouseEvent e) {
+            dragSource = pno;
+            wasAgeOfTokensShown = pno instanceof TimedPlaceComponent && ((TimedPlaceComponent) pno).isAgeOfTokensShown();
+            if (pno instanceof TimedPlaceComponent) {
+                ((TimedPlaceComponent)pno).showAgeOfTokens(false);
+            }
+
             if (isInAnimationMode() && pno instanceof TimedTransitionComponent) {
                 dragInit = e.getPoint();
                 justSelected = false;
@@ -2903,6 +2911,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 totalX = 0;
                 totalY = 0;
                 justSelected = false;
+                dragSource = null;
 
                 return;
             }
@@ -2927,10 +2936,19 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 }
             }
 
+            if (wasAgeOfTokensShown && pno instanceof TimedPlaceComponent) {
+                ((TimedPlaceComponent) pno).showAgeOfTokens(true);
+            }
             justSelected = false;
+            wasAgeOfTokensShown = false;
+            dragSource = null;
         }
 
         private void pnoDragged(PetriNetObject pno, MouseEvent e) {
+            if (pno != dragSource) {
+                return;
+            }
+
             if (isInAnimationMode() && pno instanceof TimedTransitionComponent && !pno.isSelected()) {
                 canvas.getSelectionObject().clearSelection();
                 pno.select();
@@ -2945,10 +2963,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
             int previousX = pno.getX();
             int previousY = pno.getY();
-
-            if (!SwingUtilities.isLeftMouseButton(e)) {
-                return;
-            }
 
             if (pno.isDraggable()) {
                 if (!isDragging) {
@@ -3056,6 +3070,10 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 
 		void mouseEnterPTO(PlaceTransitionObject pto) {
+			if (dragSource instanceof TimedPlaceComponent) {
+				return;
+			}
+
 			if (pto instanceof TimedPlaceComponent) {
 				((TimedPlaceComponent) pto).showAgeOfTokens(true);
 			} else if (pto instanceof TimedTransitionComponent) {
