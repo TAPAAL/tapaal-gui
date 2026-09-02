@@ -62,4 +62,9 @@ public abstract class ColorExpression extends Expression {
     }
 
     public abstract ColorExpression getExprWithNewColorType(ColorType ct);
+
+    public static ColorExpression resolveAgainst(ColorExpression expression, ColorExpression other) {
+        var converted = expression.getExprWithNewColorType(other.getColorType());
+        return other.isComparable(converted) ? converted : expression;
+    }
 }

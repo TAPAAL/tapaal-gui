@@ -167,7 +167,11 @@ GuardExpression parseOperatorExpression() :
 {
     left = ColorExpression() op = <OP> right = ColorExpression()
 	{
-       if(!left.isComparable(right)){
+       if (!left.isComparable(right)) {
+           right = ColorExpression.resolveAgainst(right, left);
+           if (!left.isComparable(right)) left = ColorExpression.resolveAgainst(left, right);
+       }
+       if (!left.isComparable(right)) {
            throw new ParseException(left.toString() + " is not comparable to " + right.toString());
        }
        if(op.image.equals("<")) return new LessThanExpression(left,right);
@@ -245,5 +249,3 @@ ColorExpression Element() : {
         return cexpr;
     }
 }
-
-

@@ -50,7 +50,28 @@ public abstract class GuardExpression extends Expression {
             }
         }
 
+        normalizeColorExpressions(this);
         setColorTypeRecursively(inferredColorType);
+    }
+
+    private static void normalizeColorExpressions(GuardExpression expression) {
+        if (expression instanceof LeftRightGuardExpression comparison) {
+            var left = comparison.getLeftExpression();
+            var right = comparison.getRightExpression();
+            if (!left.isComparable(right)) {
+                var converted = ColorExpression.resolveAgainst(right, left);
+                expression.replace(right, converted, false);
+                if (!left.isComparable(converted)) expression.replace(left, ColorExpression.resolveAgainst(left, converted), false);
+            }
+
+            if (!comparison.getLeftExpression().isComparable(comparison.getRightExpression())) {
+                throw new IllegalArgumentException(left + " is not comparable to " + right);
+            }
+        }
+        
+        for (var child : expression.getChildren()) {
+            if (child.getObject() instanceof GuardExpression guard) normalizeColorExpressions(guard);
+        }
     }
 
     public abstract Boolean eval(ExpressionContext context);
