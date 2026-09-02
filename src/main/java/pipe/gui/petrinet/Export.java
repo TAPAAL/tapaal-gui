@@ -172,7 +172,7 @@ public class Export {
         }
     }
 
-    public static void toPostScript(Object g, String filename)
+    public static void toPostScript(DrawingSurfaceImpl g, String filename)
         throws PrintException, IOException {
         // Input document type
         DocFlavor flavour = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
@@ -187,12 +187,16 @@ public class Export {
                 "No suitable factory found for export to PS");
         }
 
-        FileOutputStream f = new FileOutputStream(filename);
-        // Get a print service from the factory, create a print job and print
-        factories[0].getPrintService(f).createPrintJob().print(
-            new SimpleDoc(g, flavour, null),
-            new HashPrintRequestAttributeSet());
-        f.close();
+        boolean gridEnabled = Grid.isEnabled();
+        setupViewForExport(g, gridEnabled);
+        try (FileOutputStream f = new FileOutputStream(filename)) {
+            // Get a print service from the factory, create a print job and print
+            factories[0].getPrintService(f).createPrintJob().print(
+                new SimpleDoc(g, flavour, null),
+                new HashPrintRequestAttributeSet());
+        } finally {
+            resetViewAfterExport(g, gridEnabled);
+        }
     }
 
     public static void toPNG(DrawingSurfaceImpl g, String filename) throws IOException {
@@ -201,12 +205,18 @@ public class Export {
             throw new RuntimeException("No ImageIO exporters can handle PNG");
         }
 
-        File f = new File(filename);
-        BufferedImage img = new BufferedImage(g.getPreferredSize().width, g.getPreferredSize().height, BufferedImage.TYPE_3BYTE_BGR);
-        g.print(img.getGraphics());
-        Rectangle r = g.calculateBoundingRectangle();
-        BufferedImage croppedImg = img.getSubimage(r.x, r.y, r.width, r.height);
-        ImageIO.write(croppedImg, "png", f);
+        boolean gridEnabled = Grid.isEnabled();
+        setupViewForExport(g, gridEnabled);
+        try {
+            File f = new File(filename);
+            BufferedImage img = new BufferedImage(g.getPreferredSize().width, g.getPreferredSize().height, BufferedImage.TYPE_3BYTE_BGR);
+            g.print(img.getGraphics());
+            Rectangle r = g.calculateBoundingRectangle();
+            BufferedImage croppedImg = img.getSubimage(r.x, r.y, r.width, r.height);
+            ImageIO.write(croppedImg, "png", f);
+        } finally {
+            resetViewAfterExport(g, gridEnabled);
+        }
     }
 
     private static void toPrinter(DrawingSurfaceImpl g) throws PrintException {
@@ -214,19 +224,19 @@ public class Export {
         PageFormat pf = pjob.defaultPage();
         pjob.setPrintable(g, pf);
         if (pjob.printDialog()) {
+            boolean gridEnabled = Grid.isEnabled();
+            setupViewForExport(g, gridEnabled);
             try {
                 pjob.print();
             } catch (PrinterException e) {
                 throw new PrintException(e);
+            } finally {
+                resetViewAfterExport(g, gridEnabled);
             }
         }
     }
 
     public static void exportGuiView(DrawingSurfaceImpl g, int format, DataLayer model, TAPNLens lens, PetriNetTab tab) {
-        if (g.getComponentCount() == 0) {
-            return;
-        }
-
         String filename = null;
         filename = tab.getTabTitle();
         // change file extension
@@ -253,9 +263,6 @@ public class Export {
                     break;
             }
         }
-
-        boolean gridEnabled = Grid.isEnabled();
-        setupViewForExport(g, gridEnabled);
 
         try {
             switch (format) {
@@ -321,8 +328,6 @@ public class Export {
                 "There were errors performing the requested action:\n" + e,
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
-
-        resetViewAfterExport(g, gridEnabled);
 
         return;
     }

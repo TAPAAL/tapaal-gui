@@ -134,4 +134,8 @@ public interface TabActions {
     void past();
 
     void print();
+
+    boolean isDrawingSurfaceEmpty();
+
+    boolean hasQueries();
 }
