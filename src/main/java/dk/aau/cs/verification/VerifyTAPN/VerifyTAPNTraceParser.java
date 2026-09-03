@@ -12,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -43,7 +42,7 @@ import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 
 public class VerifyTAPNTraceParser {
 	private final TimedArcPetriNet tapn;
-    private final boolean useExplicitSearch;
+    private final boolean traceInOriginalNet;
 
 	private String traceNameToParse;
 	
@@ -51,9 +50,9 @@ public class VerifyTAPNTraceParser {
 		this(tapn, false);
 	}
 
-    public VerifyTAPNTraceParser(TimedArcPetriNet tapn, boolean useExplicitSearch) {
+    public VerifyTAPNTraceParser(TimedArcPetriNet tapn, boolean traceInOriginalNet) {
         this.tapn = tapn;
-        this.useExplicitSearch = useExplicitSearch;
+        this.traceInOriginalNet = traceInOriginalNet;
     }
 
 	public TimedArcPetriNetTrace parseTrace(BufferedReader reader) {
@@ -130,7 +129,7 @@ public class VerifyTAPNTraceParser {
                 String tag = childElement.getTagName();
                 if (tag.equals("transition")) {
                     PetriNetStep step;
-                    if (useExplicitSearch) {
+                    if (traceInOriginalNet) {
                         step = parseColoredTransitionStep(childElement);
                     } else {
                         step = parseTransitionStep(childElement);
@@ -221,13 +220,13 @@ public class VerifyTAPNTraceParser {
 		TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
 		NodeList tokenNodes = element.getChildNodes();
 		List<TimedToken> consumedTokens = new ArrayList<TimedToken>(tokenNodes.getLength());
-		for(int i = 0; i < tokenNodes.getLength(); i++){
+		for (int i = 0; i < tokenNodes.getLength(); ++i) {
 			Node node = tokenNodes.item(i);
-			if(node instanceof Element){
+			if (node instanceof Element) {
 				Element tokenElement = (Element)node;
+                if (!tokenElement.getTagName().equals("token")) continue;
 
 				TimedPlace place = tapn.getPlaceByName(tokenElement.getAttribute("place"));
-                
 				BigDecimal age = new BigDecimal(tokenElement.getAttribute("age"));
 				boolean greaterThanOrEqual = Boolean.parseBoolean(tokenElement.getAttribute("greaterThanOrEqual"));
 				consumedTokens.add(new TraceToken(place, age, greaterThanOrEqual, ColorType.COLORTYPE_DOT.getFirstColor()));
@@ -240,7 +239,9 @@ public class VerifyTAPNTraceParser {
         ColorBindingParser colorBindingParser = new ColorBindingParser();
         Node bindingsNode = element.getElementsByTagName("bindings").item(0);
         TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
-        Map<Variable, Color> bindings = colorBindingParser.parseBindingsForSingleTransition(nodeToString(bindingsNode), transition.name(), tapn.parentNetwork());
+        Map<Variable, Color> bindings = colorBindingParser.parseBindingsForSingleTransition(
+            nodeToString(bindingsNode), transition.name(), tapn.parentNetwork()
+        );
         return new ColoredTransitionStep(transition, bindings);
     }
 
@@ -265,7 +266,7 @@ public class VerifyTAPNTraceParser {
 
 	private Document loadDocument(String xml) {
 		try {
-			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			var builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			return builder.parse(new InputSource(new StringReader(xml)));
 		} catch (ParserConfigurationException | IOException | SAXException e) {
 			e.printStackTrace();

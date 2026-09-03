@@ -48,6 +48,7 @@ public class TAPNTraceDecomposer {
 
     private TAPNNetworkTrace decomposeColoredTrace() {
         ColoredTAPNNetworkTrace decomposedTrace = new ColoredTAPNNetworkTrace();
+        decomposedTrace.setTraceType(trace.getTraceType());
         for (PetriNetStep action : trace) {
             decomposedTrace.add(decomposeAction(action));
         }
@@ -115,7 +116,7 @@ public class TAPNTraceDecomposer {
 
     private TAPNNetworkTraceStep decomposeColoredTransitionFiring(ColoredTransitionStep step) {
         var originalName = mapping.map(step.transition().name());
-        TimedTransition transition = (originalName.value1() == null || originalName.value1().isEmpty()) ? 
+        var transition = (originalName.value1() == null || originalName.value1().isEmpty()) ? 
             tapnNetwork.getSharedTransitionByName(originalName.value2()).transitions().iterator().next() : 
             tapnNetwork.getTAPNByName(originalName.value1()).getTransitionByName(originalName.value2());
 

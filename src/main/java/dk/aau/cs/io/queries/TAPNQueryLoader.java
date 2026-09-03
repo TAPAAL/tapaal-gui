@@ -108,6 +108,7 @@ public class TAPNQueryLoader extends QueryLoader{
 		boolean colorFixpoint = getUnfoldingOption(queryElement, "colorFixpoint", true);
         boolean symmetricVars = getUnfoldingOption(queryElement, "symmetricVars", true);
         boolean useExplicitSearch = getUnfoldingOption(queryElement, "useExplicitSearch", false);
+        boolean traceInOriginalNet = getUnfoldingOption(queryElement, "traceInOriginalNet", false);
         boolean parallel = getReductionOption(queryElement, "parallel", true);
         VerificationType verificationType = VerificationType.fromString(queryElement.getAttribute("verificationType"));
 
@@ -191,6 +192,7 @@ public class TAPNQueryLoader extends QueryLoader{
 			parsedQuery.setUseStubbornReduction(stubborn);
             parsedQuery.setUseTarOption(useTar);
             parsedQuery.setUseTarjan(useTarjan);
+			parsedQuery.setTraceInOriginalNet(traceInOriginalNet);
 			if (parsedQuery.getCategory() == QueryCategory.CTL){
                 parsedQuery.setUseExplicitSearch(useExplicitSearch);
 				parsedQuery.setAlgorithmOption(getAlgorithmOption(queryElement));

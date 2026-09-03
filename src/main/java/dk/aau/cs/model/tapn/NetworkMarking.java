@@ -4,14 +4,13 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -323,8 +322,8 @@ public class NetworkMarking implements TimedMarking {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
+        var sb = new StringBuilder();
+        for (var entry : markings.entrySet()) {
             sb.append(entry.getKey().name()).append(": ").append(entry.getValue().toString()).append("\n");
         }
 
@@ -333,9 +332,9 @@ public class NetworkMarking implements TimedMarking {
         }
         
         sb.append("Shared Places:\n");
-        for (Entry<TimedPlace, List<TimedToken>> entry : sharedPlacesTokens.entrySet()) {
+        for (var entry : sharedPlacesTokens.entrySet()) {
             sb.append(entry.getKey().name()).append(" -> ");
-            for (TimedToken token : entry.getValue()) {
+            for (var token : entry.getValue()) {
                 sb.append(token.toString()).append(" ");
             }
 
@@ -347,18 +346,18 @@ public class NetworkMarking implements TimedMarking {
 
     public String toXmlStr(TAPNComposer composer) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = dbf.newDocumentBuilder();
-            Document document = builder.newDocument();
+            var dbf = DocumentBuilderFactory.newInstance();
+            var builder = dbf.newDocumentBuilder();
+            var document = builder.newDocument();
             
-            Element markingElement = toXmlElement(document, composer);
+            var markingElement = toXmlElement(document, composer);
             document.appendChild(markingElement);
 
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
+            var transformerFactory = TransformerFactory.newInstance();
+            var transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            StringWriter writer = new StringWriter();
+            var writer = new StringWriter();
             transformer.transform(new DOMSource(document), new StreamResult(writer));
 
             return writer.getBuffer().toString().trim();
@@ -370,7 +369,7 @@ public class NetworkMarking implements TimedMarking {
 
     public Element toXmlElement(Document document, TAPNComposer composer) {
         Map<TimedPlace, List<TimedToken>> allPlaces = new HashMap<>();
-        for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
+        for (var entry : markings.entrySet()) {
             if (entry.getKey().isActive()) {
                 allPlaces.putAll(entry.getValue().getPlacesToTokensMap());
             }
@@ -381,9 +380,9 @@ public class NetworkMarking implements TimedMarking {
         Element markingElement = document.createElement("marking");
 
         writeTACPN writer = null;
+        TimedArcPetriNetNetwork network = null;
         if (!allPlaces.isEmpty()) {
              TimedPlace firstPlace = allPlaces.keySet().iterator().next();
-             TimedArcPetriNetNetwork network = null;
              if (firstPlace instanceof LocalTimedPlace) {
                  network = ((LocalTimedPlace)firstPlace).model().parentNetwork();
              } else if (firstPlace instanceof SharedPlace) {
@@ -394,12 +393,45 @@ public class NetworkMarking implements TimedMarking {
              }
         }
 
-        for (Entry<TimedPlace, List<TimedToken>> entry : allPlaces.entrySet()) {
-            TimedPlace place = entry.getKey();
-            Element placeElement = document.createElement("place");
+        if (network != null && !network.isTimed()) {
+            for (var entry : allPlaces.entrySet()) {
+                var place = entry.getKey();
+                var placeElement = document.createElement("place");
+                placeElement.setAttribute("id", composer.composedPlaceName(entry.getKey()));
+                if (place.getTokensAsExpression() != null && writer != null) {
+                    writer.parseArcExpression(place.getTokensAsExpression(), document, placeElement);
+                }
+                
+                markingElement.appendChild(placeElement);
+            }
+
+            return markingElement;
+        }
+
+        for (var entry : allPlaces.entrySet()) {
+            var place = entry.getKey();
+            var placeElement = document.createElement("place");
             placeElement.setAttribute("id", composer.composedPlaceName(entry.getKey()));
             
-            if (place.getTokensAsExpression() != null && writer != null) {
+            var tokens = entry.getValue();
+            if (tokens != null && !tokens.isEmpty()) {
+                var tokenCounts = new LinkedHashMap<TimedToken, Integer>();
+                for (var token : tokens) {
+                    tokenCounts.put(token, tokenCounts.getOrDefault(token, 0) + 1);
+                }
+
+                for (var tokenEntry : tokenCounts.entrySet()) {
+                    var token = tokenEntry.getKey();
+                    var count = tokenEntry.getValue();
+                    var tokenElement = document.createElement("token");
+                    tokenElement.setAttribute("age", String.valueOf(token.age().intValue()));
+                    tokenElement.setAttribute("count", String.valueOf(count));
+                    if (token.color() != null) {
+                        tokenElement.setAttribute("color", token.color().toString());
+                    }
+                    placeElement.appendChild(tokenElement);
+                }
+            } else if (place.getTokensAsExpression() != null && writer != null) {
                 writer.parseArcExpression(place.getTokensAsExpression(), document, placeElement);
             }
 

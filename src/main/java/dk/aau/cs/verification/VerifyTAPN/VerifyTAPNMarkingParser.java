@@ -1,5 +1,6 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import java.math.BigDecimal;
 import java.util.Vector;
 import java.util.function.Function;
 
@@ -27,7 +28,6 @@ public class VerifyTAPNMarkingParser {
         
         parseTokensForPlaces(element, 
             placeId -> tapn.getPlaceByName(placeId),
-            tapn.parentNetwork()::getProductColorByConstituents,
             (place, token) -> marking.add(token),
             tapn.parentNetwork()
         );
@@ -50,7 +50,6 @@ public class VerifyTAPNMarkingParser {
 
                 return network.getTAPNByName(originalName.value1()).getPlaceByName(originalName.value2());
             },
-            network::getProductColorByConstituents,
             (place, token) -> {
                 if (!place.isShared()) {
                     LocalTimedPlace localPlace = (LocalTimedPlace)place;
@@ -68,17 +67,86 @@ public class VerifyTAPNMarkingParser {
         
         return marking;
     }
-    
+
+    private static Color resolveColorString(String colorStr, TimedArcPetriNetNetwork network) {
+        if ("dot".equals(colorStr) || colorStr == null || colorStr.isEmpty()) {
+            return ColorType.COLORTYPE_DOT.getFirstColor();
+        }
+
+        Color c = network.getColorByName(colorStr);
+        if (c != null) {
+            return c;
+        }
+
+        if (colorStr.startsWith("(") && colorStr.endsWith(")")) {
+            var inner = colorStr.substring(1, colorStr.length() - 1);
+            var parts = inner.split(",");
+            var constituents = new Vector<Color>(parts.length);
+            for (var part : parts) {
+                constituents.add(resolveColorString(part.trim(), network));
+            }
+
+            var prodColor = network.getProductColorByConstituents(constituents);
+            if (prodColor != null) {
+                return prodColor;
+            }
+        }
+
+        return ColorType.COLORTYPE_DOT.getFirstColor();
+    }
+
     private static void parseTokensForPlaces(Element element,
                                            Function<String, TimedPlace> placeResolver,
-                                           Function<Vector<Color>, Color> productColorResolver,
                                            TokenConsumer tokenConsumer,
                                            TimedArcPetriNetNetwork network) {
-        NodeList placeNodes = element.getElementsByTagName("place");
+        var placeNodes = element.getElementsByTagName("place");
         for (int i = 0; i < placeNodes.getLength(); ++i) {
-            Element placeElement = (Element)placeNodes.item(i);
-            String placeId = placeElement.getAttribute("id");
+            var placeElement = (Element)placeNodes.item(i);
+            var placeId = placeElement.getAttribute("id");
             TimedPlace place = placeResolver.apply(placeId);
+            if (place == null) {
+                continue;
+            }
+
+            var tokenNodes = placeElement.getElementsByTagName("token");
+            if (tokenNodes.getLength() > 0) {
+                var placeExpressions = new Vector<ArcExpression>();
+                for (int t = 0; t < tokenNodes.getLength(); ++t) {
+                    var tokenElem = (Element)tokenNodes.item(t);
+                    int age = Integer.parseInt(tokenElem.getAttribute("age"));
+                    int count = Integer.parseInt(tokenElem.getAttribute("count"));
+                    var color = resolveColorString(tokenElem.getAttribute("color"), network);
+
+                    for (int c = 0; c < count; ++c) {
+                        var token = new TimedToken(place, new BigDecimal(age), color);
+                        tokenConsumer.accept(place, token);
+                    }
+
+                    ColorExpression cExpr;
+                    if ("dot".equals(color.getColorName())) {
+                        cExpr = new DotConstantExpression();
+                    } else if (color.getTuple() != null && !color.getTuple().isEmpty()) {
+                        var tupleExprs = new Vector<ColorExpression>();
+                        for (var tupleColor : color.getTuple()) {
+                            tupleExprs.add(new UserOperatorExpression(tupleColor));
+                        }
+                        cExpr = new TupleExpression(tupleExprs);
+                    } else {
+                        cExpr = new UserOperatorExpression(color);
+                    }
+
+                    var cExprVector = new Vector<ColorExpression>();
+                    cExprVector.add(cExpr);
+                    placeExpressions.add(new NumberOfExpression(count, cExprVector));
+                }
+
+                ArcExpression combinedExpression = placeExpressions.size() == 1 
+                    ? placeExpressions.get(0) 
+                    : new AddExpression(placeExpressions);
+                place.setTokenExpression(combinedExpression);
+
+                continue;
+            }
 
             Vector<ArcExpression> placeExpressions = new Vector<>();
             NodeList childNodes = placeElement.getChildNodes();
@@ -88,7 +156,7 @@ public class VerifyTAPNMarkingParser {
                     try {
                         ArcExpression arcExpr = parseSimpleArcExpression(child, network, place.getColorType());
                         placeExpressions.add(arcExpr);
-                        expandArcExpressionToTokens(arcExpr, place, tokenConsumer, productColorResolver);
+                        expandArcExpressionToTokens(arcExpr, place, tokenConsumer, network::getProductColorByConstituents);
                     } catch (Exception e) {
                         System.err.println("Error parsing arc expression for place " + placeId + ": " + e.getMessage());
                         e.printStackTrace();
