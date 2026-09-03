@@ -44,7 +44,7 @@ public class LTLGNode extends TCTLAbstractPathProperty {
 
     @Override
     public boolean isSimpleProperty() {
-        return false;
+        return true;
     }
 
     @Override
