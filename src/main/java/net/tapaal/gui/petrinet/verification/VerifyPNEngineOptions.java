@@ -13,6 +13,7 @@ public class VerifyPNEngineOptions extends EngineSupportOptions {
                 EngineFeature.DEADLOCK_WITH_INHIB,
                 EngineFeature.WEIGHTS,
                 EngineFeature.INHIBITOR_ARCS,
+                EngineFeature.COLORED_INHIBITOR_ARCS,
                 EngineFeature.EG_OR_AF,
                 EngineFeature.DEADLOCK_NET_DEGREE_GREATER_THAN_2,
                 EngineFeature.GAMES,

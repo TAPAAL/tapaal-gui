@@ -10,12 +10,21 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.Expressions.AllExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.TupleExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import net.tapaal.gui.petrinet.Context;
+import net.tapaal.gui.petrinet.undo.Colored.SetArcExpressionCommand;
 import dk.aau.cs.model.tapn.*;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.WidthAdjustingComboBox;
@@ -55,6 +64,7 @@ public class GuardDialogue extends JPanel
 	private WidthAdjustingComboBox<String> rightConstantsComboBox;
 	private JCheckBox weightUseConstant;
 	private WidthAdjustingComboBox<String> weightConstantsComboBox;
+	private JComboBox<Object> inhibitorColorComboBox;
 	private ColoredArcGuardPanel coloredArcGuardPanel;
     final PetriNetObject objectToBeEdited;
     final Context context;
@@ -85,6 +95,7 @@ public class GuardDialogue extends JPanel
         }
 
 		initWeightPanel();
+		initInhibitorColorPanel();
 		initButtonPanel(objectToBeEdited);
 		initColoredArcPanel();
 
@@ -136,7 +147,9 @@ public class GuardDialogue extends JPanel
         coloredArcGuardPanel = new ColoredArcGuardPanel(objectToBeEdited, context) {
             @Override
             public void disableOkButton() {
-                okButton.setEnabled(false);
+                if (objectToBeEdited.isColored() && !isColoredInhibitorArc()) {
+                    okButton.setEnabled(false);
+                }
             }
 
             @Override
@@ -188,9 +201,18 @@ public class GuardDialogue extends JPanel
                         }
                     }
 				}
-				//Update colors
-				coloredArcGuardPanel.onOkColored(undoManager);
-				Weight weight = composeWeight();
+				var weight = composeWeight();
+				// Update colors
+				if (isColoredInhibitorArc()) {
+					var inhibitor = (TimedInhibitorArcComponent)objectToBeEdited;
+					var expression = createInhibitorExpression(weight.value());
+					var command = new SetArcExpressionCommand(inhibitor, inhibitor.getExpression(), expression);
+					command.redo();
+					undoManager.addEdit(command);
+				} else {
+					coloredArcGuardPanel.onOkColored(undoManager);
+				}
+
 				undoManager.addEdit(arc.setGuardAndWeight(guard, weight));
 				context.network().buildConstraints();
 				exit();
@@ -268,10 +290,77 @@ public class GuardDialogue extends JPanel
 		gridBagConstraints.insets = new Insets(0, 0, 5, 0);
 		mainPanel.add(buttonPanel, gridBagConstraints);
 	}
+
+	private boolean isColoredInhibitorArc() {
+		return objectToBeEdited instanceof TimedInhibitorArcComponent && objectToBeEdited.isColored();
+	}
+
+	private void initInhibitorColorPanel() {
+		if (!isColoredInhibitorArc()) {
+			return;
+		}
+
+		var inhibitor = ((TimedInhibitorArcComponent)objectToBeEdited).underlyingTimedInhibitorArc();
+		var colorType = inhibitor.source().getColorType();
+		inhibitorColorComboBox = new JComboBox<>();
+		inhibitorColorComboBox.addItem("Any");
+		for (var color : colorType.getColors()) {
+			inhibitorColorComboBox.addItem(color);
+		}
+
+		inhibitorColorComboBox.setMaximumRowCount(20);
+		SwingHelper.setPreferredWidth(inhibitorColorComboBox, 190);
+
+		var expression = inhibitor.getArcExpression();
+		if (expression instanceof NumberOfExpression numberOf && numberOf.getColor().size() == 1
+			&& !(numberOf.getColor().firstElement() instanceof AllExpression)) {
+			var selectedColor = numberOf.getColor().firstElement().toString();
+			for (var color : colorType.getColors()) {
+				if (color.toString().equals(selectedColor)) {
+					inhibitorColorComboBox.setSelectedItem(color);
+					break;
+				}
+			}
+		}
+
+		var colorLabel = new JLabel("Color:");
+		colorLabel.setLabelFor(inhibitorColorComboBox);
+		var constraints = new GridBagConstraints();
+		constraints.gridx = 0;
+		constraints.gridy = 2;
+		constraints.anchor = GridBagConstraints.WEST;
+		constraints.insets = new Insets(3, 3, 3, 3);
+		weightEditPanel.add(colorLabel, constraints);
+		constraints.gridx = 1;
+		weightEditPanel.add(inhibitorColorComboBox, constraints);
+	}
+
+	private ArcExpression createInhibitorExpression(int weight) {
+		var inhibitor = ((TimedInhibitorArcComponent)objectToBeEdited).underlyingTimedInhibitorArc();
+		var colorType = inhibitor.source().getColorType();
+		var selection = inhibitorColorComboBox.getSelectedItem();
+		if (!(selection instanceof Color color)) {
+			return null;
+		}
+
+		ColorExpression colorExpression;
+		if (color.getTuple() == null) {
+			colorExpression = new UserOperatorExpression(color);
+		} else {
+			var tuple = new Vector<ColorExpression>();
+			for (var constituent : color.getTuple()) {
+				tuple.add(new UserOperatorExpression(constituent));
+			}
+
+			colorExpression = new TupleExpression(tuple, colorType);
+		}
+
+		return new NumberOfExpression(weight, new Vector<>(List.of(colorExpression)));
+	}
 	
 	private void initWeightPanel() {
 		weightEditPanel = new JPanel(new GridBagLayout());
-		weightEditPanel.setBorder(BorderFactory.createTitledBorder("Weight"));
+		weightEditPanel.setBorder(BorderFactory.createTitledBorder(isColoredInhibitorArc() ? "Inhibitor Arc" : "Weight"));
 		
 		label = new JLabel("Weight:");
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();

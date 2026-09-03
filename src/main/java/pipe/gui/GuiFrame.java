@@ -18,6 +18,8 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import com.sun.jna.Platform;
 import net.tapaal.gui.*;
@@ -1159,6 +1161,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         switch (mode) {
             case draw:
                 enableAllActions(true);
+                updateExportAndPrintActions();
                 exportTraceAction.setEnabled(false);
                 importTraceAction.setEnabled(false);
 
@@ -1203,6 +1206,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
             case animation:
                 enableAllActions(true);
+                updateExportAndPrintActions();
 
                 annotationAction.setEnabled(false);
                 deleteAction.setEnabled(false);
@@ -1281,6 +1285,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 break;
         }
 
+    }
+
+    private void updateExportAndPrintActions() {
+        TabActions tab = currentTab == null ? null : currentTab.get();
+        boolean hasComponents = tab != null && !tab.isDrawingSurfaceEmpty();
+        boolean hasQueries = tab != null && tab.hasQueries();
+        exportPNGAction.setEnabled(hasComponents);
+        exportPSAction.setEnabled(hasComponents);
+        exportToTikZAction.setEnabled(hasComponents);
+        exportToPNMLAction.setEnabled(hasComponents);
+        exportToXMLAction.setEnabled(hasQueries);
+        printAction.setEnabled(hasComponents);
     }
 
     /**
@@ -1660,6 +1676,18 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private JMenu buildMenuFiles() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic('F');
+        fileMenu.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) {
+                updateExportAndPrintActions();
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent e) {}
+
+            @Override
+            public void menuCanceled(MenuEvent e) {}
+        });
 
         fileMenu.add(createAction);
 

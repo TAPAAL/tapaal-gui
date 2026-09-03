@@ -15,6 +15,7 @@ public class VerifyDTAPNEngineOptions extends EngineSupportOptions {
                 EngineFeature.DEADLOCK_WITH_INHIB,
                 EngineFeature.WEIGHTS,
                 EngineFeature.INHIBITOR_ARCS,
+                EngineFeature.COLORED_INHIBITOR_ARCS,
                 EngineFeature.URGENT_TRANSITIONS,
                 EngineFeature.EG_OR_AF,
                 EngineFeature.TIMED_NETS,

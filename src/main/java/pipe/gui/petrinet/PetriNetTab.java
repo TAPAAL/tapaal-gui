@@ -48,6 +48,7 @@ import net.tapaal.helpers.Reference.MutableReference;
 import net.tapaal.swinghelpers.JSplitPaneFix;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
+import org.jdesktop.swingx.MultiSplitLayout.Node;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.petrinet.action.GuiAction;
@@ -249,6 +250,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
             if (q.getProperty() instanceof TCTLDeadlockNode && net.hasInhibitorArcs()) requiredFeatures.add(EngineFeature.DEADLOCK_WITH_INHIB);
             if (net.hasWeights()) requiredFeatures.add(EngineFeature.WEIGHTS);
             if (net.hasInhibitorArcs()) requiredFeatures.add(EngineFeature.INHIBITOR_ARCS);
+            if (net.hasColoredInhibitorArcs()) requiredFeatures.add(EngineFeature.COLORED_INHIBITOR_ARCS);
             if (net.hasUrgentTransitions()) requiredFeatures.add(EngineFeature.URGENT_TRANSITIONS);
             if (q.getProperty() instanceof TCTLEGNode || q.getProperty() instanceof TCTLAFNode) requiredFeatures.add(EngineFeature.EG_OR_AF);
             if (!net.isNonStrict()) requiredFeatures.add(EngineFeature.STRICT_NETS);
@@ -478,6 +480,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	private static final String transitionFiringName = "enabledTransitions";
 	private static final String animControlName = "animControl";
+	private static final double MAX_TEMPLATE_EXPLORER_WEIGHT = 0.25;
+	private static final int SIMULATOR_DIVIDERS_HEIGHT = 14;
+	private static final int MIN_SIMULATOR_HEIGHT = 100;
+	private static final int DEFAULT_SIMULATOR_HEIGHT = 600;
+	private static final int TEMPLATE_EXPLORER_PADDING = 24;
+	private static final int TEMPLATE_ROW_HEIGHT = 18;
 
 	private JSplitPane animationHistorySplitter;
 
@@ -839,6 +847,45 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		animatorSplitPane.add(t, templateExplorerName);
 
 		this.setLeftComponent(animatorSplitPaneScroller);
+
+		SwingUtilities.invokeLater(this::updateSimulatorLayoutWeights);
+	}
+
+	private void updateSimulatorLayoutWeights() {
+		if (animatorSplitPane == null) return;
+
+		var layout = animatorSplitPane.getMultiSplitLayout();
+		Component templateExplorerComponent = layout.getComponentForNode(layout.getNodeForName(templateExplorerName));
+		int desiredTemplateHeight;
+		if (templateExplorerComponent instanceof TemplateExplorer explorer) {
+			desiredTemplateHeight = explorer.getFittedHeight();
+		} else {
+			desiredTemplateHeight = TEMPLATE_EXPLORER_PADDING + Math.max(1, numberOfActiveTemplates()) * TEMPLATE_ROW_HEIGHT;
+		}
+
+		int simulatorHeight = animatorSplitPane.getHeight();
+		if (simulatorHeight <= 0) simulatorHeight = getHeight();
+		if (simulatorHeight <= 0) simulatorHeight = DEFAULT_SIMULATOR_HEIGHT;
+		double availableHeight = Math.max(MIN_SIMULATOR_HEIGHT, simulatorHeight - SIMULATOR_DIVIDERS_HEIGHT);
+		double templateWeight = Math.min(
+			desiredTemplateHeight / availableHeight,
+			MAX_TEMPLATE_EXPLORER_WEIGHT
+		);
+
+		double remainingWeight = 1.0 - templateWeight;
+		double enabledTransitionsWeight = remainingWeight / 3;
+
+		setSimulatorNodeWeight(layout.getNodeForName(templateExplorerName), templateWeight);
+		setSimulatorNodeWeight(layout.getNodeForName(transitionFiringName), enabledTransitionsWeight);
+		setSimulatorNodeWeight(layout.getNodeForName(animControlName), remainingWeight - enabledTransitionsWeight);
+
+		layout.setFloatingDividers(true);
+		layout.layoutByWeight(animatorSplitPane);
+		layout.setFloatingDividers(false);
+	}
+
+	private void setSimulatorNodeWeight(Node node, double weight) {
+		if (node instanceof Leaf leaf) leaf.setWeight(weight);
 	}
 
     public AnimationHistoryList getUntimedAnimationHistory() {
@@ -1182,9 +1229,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     @Override
 	public void setResizeingDefault(){
 		if(animatorSplitPane != null){
-			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(true);
-			animatorSplitPane.getMultiSplitLayout().layoutByWeight(animatorSplitPane);
-			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(false);
+			updateSimulatorLayoutWeights();
 		} else {
 			simulatorModelRoot = null;
 		}
@@ -2823,7 +2868,15 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
         private int totalX = 0;
         private int totalY = 0;
+        private boolean wasAgeOfTokensShown;
+        private PetriNetObject dragSource;
         private void pnoPressed(PetriNetObject pno, MouseEvent e) {
+            dragSource = pno;
+            wasAgeOfTokensShown = pno instanceof TimedPlaceComponent && ((TimedPlaceComponent) pno).isAgeOfTokensShown();
+            if (pno instanceof TimedPlaceComponent) {
+                ((TimedPlaceComponent)pno).showAgeOfTokens(false);
+            }
+
             if (isInAnimationMode() && pno instanceof TimedTransitionComponent) {
                 dragInit = e.getPoint();
                 justSelected = false;
@@ -2847,7 +2900,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 if (!isDragging) {
                     TimedTransitionComponent t = (TimedTransitionComponent) pno;
                     TimedTransition transition = t.underlyingTransition();
-                    if (transition.isDEnabled()) {
+                    if (getLens().isColored() || transition.isDEnabled()) {
                         animator.dFireTransition(transition);
                     }
                 } else {
@@ -2858,6 +2911,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 totalX = 0;
                 totalY = 0;
                 justSelected = false;
+                dragSource = null;
 
                 return;
             }
@@ -2882,10 +2936,19 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                 }
             }
 
+            if (wasAgeOfTokensShown && pno instanceof TimedPlaceComponent) {
+                ((TimedPlaceComponent) pno).showAgeOfTokens(true);
+            }
             justSelected = false;
+            wasAgeOfTokensShown = false;
+            dragSource = null;
         }
 
         private void pnoDragged(PetriNetObject pno, MouseEvent e) {
+            if (pno != dragSource) {
+                return;
+            }
+
             if (isInAnimationMode() && pno instanceof TimedTransitionComponent && !pno.isSelected()) {
                 canvas.getSelectionObject().clearSelection();
                 pno.select();
@@ -2900,10 +2963,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
             int previousX = pno.getX();
             int previousY = pno.getY();
-
-            if (!SwingUtilities.isLeftMouseButton(e)) {
-                return;
-            }
 
             if (pno.isDraggable()) {
                 if (!isDragging) {
@@ -3005,12 +3064,16 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		void transitionLeftClicked(TimedTransitionComponent t) {
 			TimedTransition transition = t.underlyingTransition();
 
-			if (transition.isDEnabled()) {
+			if (getLens().isColored() || transition.isDEnabled()) {
 				animator.dFireTransition(transition);
 			}
 		}
 
 		void mouseEnterPTO(PlaceTransitionObject pto) {
+			if (dragSource instanceof TimedPlaceComponent) {
+				return;
+			}
+
 			if (pto instanceof TimedPlaceComponent) {
 				((TimedPlaceComponent) pto).showAgeOfTokens(true);
 			} else if (pto instanceof TimedTransitionComponent) {
@@ -3257,60 +3320,29 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     public static final String textforMove = "Select Mode: Click/drag to select objects; drag to move them";
     public static final String textforAnnotation = "Annotation Mode: Right click on an annotation to see menu options; double click to edit";
     public static final String textforDrag = "Drag Mode";
+    public static final String textForUrgentTransition = "Urgent Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+    public static final String textForUrgentUncontrollableTransition = "Urgent Uncontrollable Transition Mode: Right click on a transition to see menu options [Mouse wheel -> rotate]";
+
 
     public void changeStatusbarText(DrawTool type) {
-        switch (type) {
-            case UNCONTROLLABLE_TRANSITION:
-                app.ifPresent(o14 -> o14.setStatusBarText(textforUncontrollableTrans));
+        String statusText = switch (type) {
+            case UNCONTROLLABLE_TRANSITION  -> textforUncontrollableTrans;
+            case PLACE -> textforTAPNPlace;
+            case TRANSITION -> textforTransition;
+            case ARC -> textforArc;
+            case TRANSPORT_ARC -> textforTransportArc;
+            case INHIBITOR_ARC -> textforInhibArc;
+            case ADD_TOKEN -> textforAddtoken;
+            case REMOVE_TOKEN -> textforDeltoken;
+            case SELECT -> textforMove;
+            case DRAW -> textforDrawing;
+            case ANNOTATION -> textforAnnotation;
+            case DRAG -> textforDrag;
+            case URGENT_TRANSITION -> textForUrgentTransition;
+            case URGENT_UNCONTROLLABLE_TRANSITION -> textForUrgentUncontrollableTransition;
+        };
 
-            case PLACE:
-                app.ifPresent(o12 -> o12.setStatusBarText(textforTAPNPlace));
-                break;
-
-            case TRANSITION:
-                app.ifPresent(o11 -> o11.setStatusBarText(textforTransition));
-                break;
-
-            case ARC:
-                app.ifPresent(o9 -> o9.setStatusBarText(textforArc));
-                break;
-
-            case TRANSPORT_ARC:
-                app.ifPresent(o8 -> o8.setStatusBarText(textforTransportArc));
-                break;
-
-            case INHIBITOR_ARC:
-                app.ifPresent(o7 -> o7.setStatusBarText(textforInhibArc));
-                break;
-
-            case ADD_TOKEN:
-                app.ifPresent(o6 -> o6.setStatusBarText(textforAddtoken));
-                break;
-
-            case REMOVE_TOKEN:
-                app.ifPresent(o5 -> o5.setStatusBarText(textforDeltoken));
-                break;
-
-            case SELECT:
-                app.ifPresent(o4 -> o4.setStatusBarText(textforMove));
-                break;
-
-            case DRAW:
-                app.ifPresent(o3 -> o3.setStatusBarText(textforDrawing));
-                break;
-
-            case ANNOTATION:
-                app.ifPresent(o2 -> o2.setStatusBarText(textforAnnotation));
-                break;
-
-            case DRAG:
-                app.ifPresent(o1 -> o1.setStatusBarText(textforDrag));
-                break;
-
-            default:
-                app.ifPresent(o->o.setStatusBarText("To-do (textfor" + type));
-                break;
-        }
+        app.ifPresent(view -> view.setStatusBarText(statusText));
     }
 
 
@@ -3385,5 +3417,15 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
     public void setWorkflowDialog(WorkflowDialog dialog) {
         this.workflowDialog = dialog;
+    }
+
+    @Override
+    public boolean isDrawingSurfaceEmpty() {
+        return drawingSurface() == null || drawingSurface().getComponentCount() == 0;
+    }
+
+    @Override
+    public boolean hasQueries() {
+        return queries != null && queries.getQueries().iterator().hasNext();
     }
 }

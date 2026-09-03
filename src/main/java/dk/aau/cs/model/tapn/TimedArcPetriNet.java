@@ -424,6 +424,10 @@ public class TimedArcPetriNet {
 	public boolean hasInhibitorArcs() {
 		return inhibitorArcs.size() > 0;
 	}
+
+	public boolean hasColoredInhibitorArcs() {
+		return inhibitorArcs.stream().anyMatch(TimedInhibitorArc::hasSpecificColorExpression);
+	}
 	
 	public boolean isDegree2(){
 		for(TimedTransition t : this.transitions()) {

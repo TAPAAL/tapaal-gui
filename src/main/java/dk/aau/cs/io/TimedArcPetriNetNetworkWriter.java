@@ -742,9 +742,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			}
 		}
 
-        if (!(inputArc instanceof TimedInhibitorArcComponent)) {
-            writeTACPN.appendColoredArcsDependencies(inputArc, guiModel, document, arcElement);
-        }
+        writeTACPN.appendColoredArcsDependencies(inputArc, guiModel, document, arcElement);
 
 		return arcElement;
 	}

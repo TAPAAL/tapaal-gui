@@ -20,6 +20,7 @@ import dk.aau.cs.model.CPN.Expressions.LessThanExpression;
 import dk.aau.cs.model.CPN.Expressions.NotExpression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.CPN.Expressions.OrExpression;
+import dk.aau.cs.model.CPN.Expressions.PlaceHolderArcExpression;
 import dk.aau.cs.model.CPN.Expressions.PredecessorExpression;
 import dk.aau.cs.model.CPN.Expressions.ScalarProductExpression;
 import dk.aau.cs.model.CPN.Expressions.SubtractExpression;
@@ -58,7 +59,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
             } else {
                 arcExpr = ((TimedTransportArcComponent) arc).underlyingTransportArc().getInputExpression();
             }
-            if (arcExpr != null) {
+            if (arcExpr != null && !(arcExpr instanceof PlaceHolderArcExpression)) {
                 arcElement.appendChild(createArcExpressionElement(document, arcExpr));
             }
         } else {
@@ -69,7 +70,7 @@ public class writeTACPN { // both export and save share some of the same syntax 
             } else if (arc instanceof TimedOutputArcComponent) {
                 arcExpr = ((TimedOutputArcComponent) arc).underlyingArc().getExpression();
             }
-            if (arcExpr != null) {
+            if (arcExpr != null && !(arcExpr instanceof PlaceHolderArcExpression)) {
                 arcElement.appendChild(createArcExpressionElement(document, arcExpr));
             }
         }

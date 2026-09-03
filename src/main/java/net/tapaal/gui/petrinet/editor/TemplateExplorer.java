@@ -754,6 +754,14 @@ public class TemplateExplorer extends JPanel implements SidePane {
 		hideButtons();
 		isInAnimationMode = true;
 		updateTemplateList();
+		templateList.setVisibleRowCount(Math.max(1, listModel.size()));
+		if (scrollpane != null) {
+			scrollpane.setMinimumSize(null);
+		}
+	}
+
+	public int getFittedHeight() {
+		return getPreferredSize().height + 2;
 	}
 
     @Override
