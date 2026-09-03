@@ -393,22 +393,27 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction showHomepage = new GuiAction("Visit TAPAAL home", "Visit the TAPAAL homepage") {
         public void actionPerformed(ActionEvent arg0) {
-            guiFrameController.ifPresent(o -> o.openURL("http://www.tapaal.net"));
+            guiFrameController.ifPresent(o -> o.openURL("https://www.tapaal.net"));
         }
     };
     private final GuiAction showAskQuestionAction = new GuiAction("Ask a question", "Ask a question about TAPAAL") {
         public void actionPerformed(ActionEvent arg0) {
-            guiFrameController.ifPresent(o -> o.openURL("https://answers.launchpad.net/tapaal/+addquestion"));
+            guiFrameController.ifPresent(o -> o.openURL("https://github.com/orgs/TAPAAL/discussions"));
         }
     };
     private final GuiAction showReportBugAction = new GuiAction("Report bug", "Report a bug in TAPAAL") {
         public void actionPerformed(ActionEvent arg0) {
-            guiFrameController.ifPresent(o -> o.openURL("https://bugs.launchpad.net/tapaal/+filebug"));
+            guiFrameController.ifPresent(o -> o.openURL("https://github.com/TAPAAL/TAPAAL/issues/new"));
         }
     };
-    private final GuiAction showFAQAction = new GuiAction("Show FAQ", "See TAPAAL frequently asked questions") {
+    private final GuiAction showFeatureRequestAction = new GuiAction("Request a feature", "Suggest a feature for TAPAAL") {
         public void actionPerformed(ActionEvent arg0) {
-            guiFrameController.ifPresent(o -> o.openURL("https://answers.launchpad.net/tapaal/+faqs"));
+            guiFrameController.ifPresent(o -> o.openURL("https://github.com/TAPAAL/TAPAAL/issues/new"));
+        }
+    };
+    private final GuiAction showDocumentationAction = new GuiAction("Visit documentation", "Visit the TAPAAL user documentation") {
+        public void actionPerformed(ActionEvent arg0) {
+            guiFrameController.ifPresent(o -> o.openURL("https://www.tapaal.net/documentation/"));
         }
     };
     private final GuiAction showWiki = new GuiAction("Visit wiki page", "Visit the TAPAAL wiki page") {
@@ -853,9 +858,10 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         helpMenu.addSeparator();
 
-        helpMenu.add(showFAQAction);
         helpMenu.add(showAskQuestionAction);
         helpMenu.add(showReportBugAction);
+        helpMenu.add(showFeatureRequestAction);
+        helpMenu.add(showDocumentationAction);
 
         helpMenu.addSeparator();
 
