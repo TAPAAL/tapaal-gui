@@ -152,17 +152,7 @@ public class VariableExpression extends ColorExpression {
     @Override
     public boolean isComparable(ColorExpression otherExpr){
         otherExpr = otherExpr.getBottomColorExpression();
-        if(otherExpr instanceof TupleExpression){
-            return false;
-        } else if (otherExpr instanceof UserOperatorExpression){
-            UserOperatorExpression otherUserOpExpression = (UserOperatorExpression) otherExpr;
-            return variable.getColorType().equals(otherUserOpExpression.getUserOperator().getColorType());
-        }
-        else if(!(otherExpr instanceof VariableExpression)){
-            return false;
-        }
-        VariableExpression otherUserOpExpression = (VariableExpression) otherExpr;
-        return variable.getColorType().equals(otherUserOpExpression.variable.getColorType());
+        return otherExpr instanceof VariableExpression || otherExpr instanceof UserOperatorExpression;
     }
 
     @Override

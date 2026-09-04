@@ -35,43 +35,48 @@ public abstract class GuardExpression extends Expression {
     public abstract void getVariables(Set<Variable> variables);
 
     public void validateAndInferColorType() {
-        var variables = new HashSet<Variable>();
-        getVariables(variables);
-        if (variables.isEmpty()) {
-            throw new IllegalArgumentException("There must be at least one variable in the guard expression.");
-        }
-
-        ColorType inferredColorType = null;
-        for (var variable : variables) {
-            if (inferredColorType == null) {
-                inferredColorType = variable.getColorType();
-            } else if (!inferredColorType.equals(variable.getColorType())) {
-                throw new IllegalArgumentException("All variables in a guard expression must have the same color type.");
-            }
-        }
-
         normalizeColorExpressions(this);
-        setColorTypeRecursively(inferredColorType);
     }
 
-    private static void normalizeColorExpressions(GuardExpression expression) {
+    private static ColorType normalizeColorExpressions(GuardExpression expression) {
         if (expression instanceof LeftRightGuardExpression comparison) {
             var left = comparison.getLeftExpression();
             var right = comparison.getRightExpression();
-            if (!left.isComparable(right)) {
-                var converted = ColorExpression.resolveAgainst(right, left);
-                expression.replace(right, converted, false);
-                if (!left.isComparable(converted)) expression.replace(left, ColorExpression.resolveAgainst(left, converted), false);
+            var leftVariables = new HashSet<Variable>();
+            var rightVariables = new HashSet<Variable>();
+            left.getVariables(leftVariables);
+            right.getVariables(rightVariables);
+            if (leftVariables.isEmpty() && rightVariables.isEmpty()) {
+                throw new IllegalArgumentException("There must be at least one variable in each comparison.");
+            }
+
+            if (leftVariables.isEmpty()) {
+                expression.replace(left, ColorExpression.resolveAgainst(left, right), false);
+            } else if (rightVariables.isEmpty()) {
+                expression.replace(right, ColorExpression.resolveAgainst(right, left), false);
             }
 
             if (!comparison.getLeftExpression().isComparable(comparison.getRightExpression())) {
                 throw new IllegalArgumentException(left + " is not comparable to " + right);
             }
+
+            var inferredColorType = leftVariables.isEmpty() ? right.getColorType() : left.getColorType();
+            expression.setColorType(inferredColorType);
+            return inferredColorType;
         }
-        
+
+        ColorType inferredColorType = null;
         for (var child : expression.getChildren()) {
-            if (child.getObject() instanceof GuardExpression guard) normalizeColorExpressions(guard);
+            if (child.getObject() instanceof GuardExpression guard) {
+                var childColorType = normalizeColorExpressions(guard);
+                if (inferredColorType == null) {
+                    inferredColorType = childColorType;
+                }
+            }
         }
+
+        expression.setColorType(inferredColorType);
+        return inferredColorType;
     }
 
     public abstract Boolean eval(ExpressionContext context);

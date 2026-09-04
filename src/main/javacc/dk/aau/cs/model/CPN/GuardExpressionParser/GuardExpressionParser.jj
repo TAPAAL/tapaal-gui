@@ -35,7 +35,13 @@ public class GuardExpressionParser {
 	public static GuardExpression parse(String expression, TimedArcPetriNetNetwork inputNetwork) throws ParseException {
 	    network = inputNetwork;
 		GuardExpressionParser parser = new GuardExpressionParser(new StringReader(expression));
-		return parser.StartOrExpr();
+		var guard = parser.StartOrExpr();
+		try {
+			guard.validateAndInferColorType();
+		} catch (IllegalArgumentException exception) {
+			throw new ParseException(exception.getMessage());
+		}
+		return guard;
 	}
 }
 
@@ -167,13 +173,6 @@ GuardExpression parseOperatorExpression() :
 {
     left = ColorExpression() op = <OP> right = ColorExpression()
 	{
-       if (!left.isComparable(right)) {
-           right = ColorExpression.resolveAgainst(right, left);
-           if (!left.isComparable(right)) left = ColorExpression.resolveAgainst(left, right);
-       }
-       if (!left.isComparable(right)) {
-           throw new ParseException(left.toString() + " is not comparable to " + right.toString());
-       }
        if(op.image.equals("<")) return new LessThanExpression(left,right);
        else if(op.image.equals("<=")) return new LessThanEqExpression(left,right);
        else if(op.image.equals(">")) return new GreaterThanExpression(left,right);
