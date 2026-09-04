@@ -209,7 +209,7 @@ public class PNMLoader {
         Node markingNode = getFirstDirectChild(node, "hlinitialMarking");
         if (markingNode instanceof Element) {
             try {
-                colorMarking = loadTACPN.parseArcExpression(((Element) markingNode).getElementsByTagName("structure").item(0));
+                colorMarking = loadTACPN.parseArcExpression(((Element) markingNode).getElementsByTagName("structure").item(0), colorType);
             } catch (FormatException e) {
                 e.printStackTrace();
             }
@@ -361,7 +361,8 @@ public class PNMLoader {
         ArcExpression arcExpression = null;
         Node hlInscriptionNode = getFirstDirectChild(node, "hlinscription");
         if (hlInscriptionNode != null) {
-            arcExpression = loadTACPN.parseArcExpression(getFirstDirectChild(hlInscriptionNode, "structure"));
+            var place = sourcePlace != null ? sourcePlace : targetPlace;
+            arcExpression = loadTACPN.parseArcExpression(getFirstDirectChild(hlInscriptionNode, "structure"), place.getColorType());
         }
 
         if(type != null && type.equals("inhibitor")) {

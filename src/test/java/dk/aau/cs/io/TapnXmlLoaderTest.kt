@@ -1,5 +1,8 @@
 package dk.aau.cs.io
 
+import dk.aau.cs.model.CPN.Expressions.AndExpression
+import dk.aau.cs.model.CPN.Expressions.GuardExpression
+import dk.aau.cs.model.CPN.Expressions.LeftRightGuardExpression
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -417,6 +420,69 @@ internal class TapnXmlLoaderTest {
             }
         }
     }
+
+    class ColoredGuard {
+        @Test
+        fun `comparisons allow different color types`() {
+            for (operator in listOf("lessthan", "lessthanorequal", "equality", "inequality", "greaterthanorequal", "greaterthan")) {
+                Assertions.assertDoesNotThrow {
+                    TapnXmlLoader().load(coloredGuardNet(comparison(operator, variable("x"), variable("y"))).asInpurtStream())
+                }
+            }
+        }
+
+        @Test
+        fun `mixed guard types survive save and load`() {
+            val mixedIntegers = comparison("equality", successor(variable("x")), successor(variable("y")))
+            val mixedEnums = comparison("equality", variable("e"), enumConstant("b0"))
+            val integerConstant = comparison("equality", variable("x"), integerConstant(1, 0, 2))
+            val guardXml = "<and><subterm>$mixedIntegers</subterm><subterm><and><subterm>$mixedEnums</subterm><subterm>$integerConstant</subterm></and></subterm></and>"
+            val loaded = TapnXmlLoader().load(coloredGuardNet(guardXml).asInpurtStream())
+            val guard = loaded.network().allTemplates().first().getTransitionByName("t").guard
+
+            assertGuardOperandTypes(guard, "A", "B", "E", "F", "A", "A")
+
+            val saved = TimedArcPetriNetNetworkWriter(
+                loaded.network(), loaded.templates(), loaded.queries(), loaded.network().constants(), loaded.getLens()
+            ).savePNML().toString()
+            val reloaded = TapnXmlLoader().load(saved.asInpurtStream())
+            val reloadedGuard = reloaded.network().allTemplates().first().getTransitionByName("t").guard
+
+            Assertions.assertEquals(guard.toString(), reloadedGuard.toString())
+            assertGuardOperandTypes(reloadedGuard, "A", "B", "E", "F", "A", "A")
+        }
+
+        @Test
+        fun `every comparison must contain a variable`() {
+            val valid = comparison("equality", variable("x"), variable("y"))
+            val constants = comparison("equality", enumConstant("a0"), enumConstant("b0"))
+            val guard = "<and><subterm>$valid</subterm><subterm>$constants</subterm></and>"
+
+            Assertions.assertThrows(Exception::class.java) {
+                TapnXmlLoader().load(coloredGuardNet(guard).asInpurtStream())
+            }
+        }
+
+        @Test
+        fun `unknown guard variables are rejected`() {
+            val guard = comparison("equality", variable("missing"), variable("x"))
+
+            Assertions.assertThrows(Exception::class.java) {
+                TapnXmlLoader().load(coloredGuardNet(guard).asInpurtStream())
+            }
+        }
+
+        private fun assertGuardOperandTypes(guard: GuardExpression, vararg expected: String) {
+            val outer = guard as AndExpression
+            val nested = outer.rightExpression as AndExpression
+            val comparisons = listOf(outer.leftExpression, nested.leftExpression, nested.rightExpression)
+                .map { it as LeftRightGuardExpression }
+            val actual = comparisons.flatMap {
+                listOf(it.leftExpression.colorType.name, it.rightExpression.colorType.name)
+            }
+            Assertions.assertEquals(expected.toList(), actual)
+        }
+    }
 }
 
 
@@ -434,3 +500,36 @@ fun xmlNet(s:String) : String {
                  </pnml>
             """.trimIndent()
 }
+
+fun coloredGuardNet(guard: String): String {
+    return """
+        <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+        <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+          <declaration><structure><declarations>
+            <namedsort id="A" name="A"><finiteintrange start="0" end="2"/></namedsort>
+            <namedsort id="B" name="B"><finiteintrange start="10" end="12"/></namedsort>
+            <namedsort id="E" name="E"><cyclicenumeration><feconstant id="a0"/><feconstant id="a1"/></cyclicenumeration></namedsort>
+            <namedsort id="F" name="F"><cyclicenumeration><feconstant id="b0"/><feconstant id="b1"/></cyclicenumeration></namedsort>
+            <variabledecl id="x" name="x"><usersort declaration="A"/></variabledecl>
+            <variabledecl id="y" name="y"><usersort declaration="B"/></variabledecl>
+            <variabledecl id="e" name="e"><usersort declaration="E"/></variabledecl>
+          </declarations></structure></declaration>
+          <net active="true" id="guard" type="P/T net">
+            <transition angle="0" displayName="true" id="t" infiniteServer="false" name="t" nameOffsetX="0" nameOffsetY="0" positionX="0" positionY="0" priority="0" urgent="false">
+              <condition><text>guard</text><structure>$guard</structure></condition>
+            </transition>
+          </net>
+        </pnml>
+    """.trimIndent()
+}
+
+fun variable(name: String) = "<subterm><variable refvariable=\"$name\"/></subterm>"
+
+fun successor(expression: String) = "<subterm><successor>$expression</successor></subterm>"
+
+fun enumConstant(name: String) = "<subterm><useroperator declaration=\"$name\"/></subterm>"
+
+fun integerConstant(value: Int, start: Int, end: Int) =
+    "<subterm><finiteintrangeconstant value=\"$value\"><finiteintrange start=\"$start\" end=\"$end\"/></finiteintrangeconstant></subterm>"
+
+fun comparison(operator: String, left: String, right: String) = "<$operator>$left$right</$operator>"

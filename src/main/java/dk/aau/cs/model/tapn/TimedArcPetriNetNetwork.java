@@ -881,16 +881,6 @@ public class TimedArcPetriNetNetwork {
         }
         return null;
     }
-	
-	public boolean isIndeticalToExisting(ColorType newColorType) {
-		for (ColorType ct : colorTypes) {
-			if (ct.isIdentical(newColorType)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
 
     public boolean isNameUsedForColorType(String name) {
         for (ColorType element : colorTypes) {
