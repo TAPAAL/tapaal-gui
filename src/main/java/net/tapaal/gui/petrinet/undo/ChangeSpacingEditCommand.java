@@ -1,26 +1,32 @@
 package net.tapaal.gui.petrinet.undo;
 
+import java.awt.Point;
+import java.util.Map;
+
+import pipe.gui.petrinet.graphicElements.PetriNetObject;
 import pipe.gui.petrinet.PetriNetTab;
 
 public class ChangeSpacingEditCommand implements Command {
 
-	private final double factor;
+	private final Map<PetriNetObject, Point> before;
+	private final Map<PetriNetObject, Point> after;
 	private final PetriNetTab tab;
 
-    public ChangeSpacingEditCommand(double factor, PetriNetTab tabContent) {
+    public ChangeSpacingEditCommand(Map<PetriNetObject, Point> before, Map<PetriNetObject, Point> after, PetriNetTab tabContent) {
         super();
-        this.factor = factor;
+		this.before = before;
+		this.after = after;
         this.tab = tabContent;
     }
 
     @Override
 	public void redo() {
-		tab.changeSpacing(factor);
+		tab.restoreGuiObjectLocations(after);
 	}
 
 	@Override
 	public void undo() {
-		tab.changeSpacing(1/factor);
+		tab.restoreGuiObjectLocations(before);
 	}
 
 }
