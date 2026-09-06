@@ -39,6 +39,7 @@ import net.tapaal.gui.petrinet.editor.ConstantsPane;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel;
 
 import net.tapaal.gui.petrinet.undo.ChangeSpacingEditCommand;
+import net.tapaal.gui.petrinet.undo.PetriNetObjectPositionSnapshot;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.MovePetriNetObjectCommand;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
@@ -2161,7 +2162,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     @Override
     public void increaseSpacing() {
 		double factor = 1.25;
-		Map<PetriNetObject, Point> before = captureGuiObjectLocations();
+		PetriNetObjectPositionSnapshot before = captureGuiObjectLocations();
 		if (changeSpacing(factor)) {
 			getUndoManager().addNewEdit(new ChangeSpacingEditCommand(before, captureGuiObjectLocations(), this));
 		}
@@ -2170,7 +2171,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	@Override
 	public void decreaseSpacing() {
 		double factor = 0.8;
-		Map<PetriNetObject, Point> before = captureGuiObjectLocations();
+		PetriNetObjectPositionSnapshot before = captureGuiObjectLocations();
 		if (changeSpacing(factor)) {
 			getUndoManager().addNewEdit(new ChangeSpacingEditCommand(before, captureGuiObjectLocations(), this));
 		}
@@ -2246,22 +2247,12 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return true;
 	}
 
-	public Map<PetriNetObject, Point> captureGuiObjectLocations() {
-		Map<PetriNetObject, Point> locations = new HashMap<>();
-		for (PetriNetObject object : currentTemplate().guiModel().getPetriNetObjectsWithArcPathPoint()) {
-			locations.put(object, new Point(object.getPositionX(), object.getPositionY()));
-		}
-		return locations;
+	public PetriNetObjectPositionSnapshot captureGuiObjectLocations() {
+		return PetriNetObjectPositionSnapshot.capture(currentTemplate().guiModel().getPetriNetObjectsWithArcPathPoint());
 	}
 
-	public void restoreGuiObjectLocations(Map<PetriNetObject, Point> locations) {
-		for (Map.Entry<PetriNetObject, Point> entry : locations.entrySet()) {
-			PetriNetObject object = entry.getKey();
-			Point location = entry.getValue();
-			object.setPositionX(location.x);
-			object.setPositionY(location.y);
-			object.updateOnMoveOrZoom();
-		}
+	public void restoreGuiObjectLocations(PetriNetObjectPositionSnapshot locations) {
+		locations.restore();
 		currentTemplate().guiModel().repaintAll(true);
 		drawingSurface().updatePreferredSize();
 	}
