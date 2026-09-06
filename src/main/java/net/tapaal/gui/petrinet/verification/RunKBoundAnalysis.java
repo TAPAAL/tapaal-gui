@@ -22,7 +22,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
     private final boolean resultShown;
 
 	public RunKBoundAnalysis(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, JSpinner spinner, boolean resultShown) {
-		super(modelChecker, messenger, null, "", false, spinner);
+		super(modelChecker, messenger, guiModels, "", false, spinner);
 		this.spinner = spinner;
 		this.resultShown = resultShown;
 		this.guiModels = guiModels;

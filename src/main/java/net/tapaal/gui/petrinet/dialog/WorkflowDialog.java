@@ -57,7 +57,7 @@ import net.tapaal.swinghelpers.CustomJSpinner;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.ExtrapolationOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
+import dk.aau.cs.verification.VerificationOptions.WorkflowMode;
 import pipe.gui.*;
 import net.tapaal.gui.petrinet.verification.Verifier;
 import pipe.gui.petrinet.PetriNetTab;
@@ -1053,8 +1053,8 @@ public class WorkflowDialog extends JDialog {
 							+ MemoryMonitor.getPeakMemory());
 					strongSoundnessVerificationStats.setVisible(true);
 
-					pack();
-				});
+						pack();
+					}, tab);
 			}
 		};
 	}
@@ -1256,8 +1256,8 @@ public class WorkflowDialog extends JDialog {
                             for(TAPNNetworkTraceStep step : trace){
                                 ((TimedTAPNNetworkTrace) soundnessResultTrace).add(step);
                             }
-                        }
-                    });
+				}
+			}, tab);
 
                 }
 
@@ -1288,7 +1288,7 @@ public class WorkflowDialog extends JDialog {
 
                     return output;
                 }
-            });
+            }, tab);
         };
 	}
 

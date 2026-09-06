@@ -2,7 +2,8 @@ package dk.aau.cs.verification.VerifyTAPN;
 
 import com.sun.jna.Platform;
 import dk.aau.cs.verification.VerificationOptions;
-import net.tapaal.gui.petrinet.verification.TAPNQuery;
+import dk.aau.cs.verification.VerificationOptions.SearchOption;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
 
 public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
     private final String modelOut;
@@ -39,15 +40,15 @@ public class VerifyDTAPNUnfoldOptions extends VerificationOptions {
     }
 
     @Override
-    public TAPNQuery.TraceOption traceOption() {
+    public TraceOption traceOption() {
         return null;
     }
 
     @Override
-    public void setTraceOption(TAPNQuery.TraceOption option) { }
+    public void setTraceOption(TraceOption option) { }
 
     @Override
-    public TAPNQuery.SearchOption searchOption() {
+    public SearchOption searchOption() {
         return null;
     }
 

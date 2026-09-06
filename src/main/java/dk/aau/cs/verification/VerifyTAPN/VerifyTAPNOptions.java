@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerificationArguments;
 import dk.aau.cs.verification.VerificationOptions;
+import dk.aau.cs.verification.VerificationOptions.SearchOption;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
 import pipe.gui.MessengerImpl;
 
 public class VerifyTAPNOptions extends VerificationOptions{

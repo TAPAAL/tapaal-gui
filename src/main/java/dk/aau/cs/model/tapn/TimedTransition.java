@@ -23,7 +23,6 @@ import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.CPN.Expressions.GuardExpression;
 import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
-import pipe.gui.petrinet.animation.Animator;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
@@ -31,7 +30,6 @@ import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
-import dk.aau.cs.verification.TAPNComposer;
 
 public class TimedTransition extends TAPNElement {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
@@ -337,7 +335,7 @@ public class TimedTransition extends TAPNElement {
 		}
 		
 		//prevent delay if urgent transition is enabled
-		if(Animator.isUrgentTransitionEnabled()){
+		if(model().parentNetwork().isUrgentTransitionEnabled()){
 			result = IntervalOperations.intersectingInterval(result, List.of(new TimeInterval(true, new IntBound(0), new IntBound(0), true)));
 		}
 
@@ -593,7 +591,7 @@ public class TimedTransition extends TAPNElement {
         }
 	}
 
-    public String toBindingXmlStr(Map<Variable, Color> bindings, TAPNComposer composer) {
+    public String toBindingXmlStr(Map<Variable, Color> bindings, ComposedNameProvider composer) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbf.newDocumentBuilder();
@@ -616,7 +614,7 @@ public class TimedTransition extends TAPNElement {
         } 
     }
 
-    private Element toXmlElement(Map<Variable, Color> bindings, Document document, TAPNComposer composer) {
+    private Element toXmlElement(Map<Variable, Color> bindings, Document document, ComposedNameProvider composer) {
         Element transitionElement = document.createElement("transition");
         transitionElement.setAttribute("id", composer.composedTransitionName(this));
 

@@ -102,9 +102,9 @@ public class SmartDrawDialog extends JDialog {
 		}
 	});
 
-	public static void showSmartDrawDialog() {
+	public static void showSmartDrawDialog(PetriNetTab tab) {
         SmartDrawDialog smartDrawDialog;
-        smartDrawDialog = new SmartDrawDialog(TAPAALGUI.getApp(), "Smart Draw", true, TAPAALGUI.getCurrentTab());
+        smartDrawDialog = new SmartDrawDialog(TAPAALGUI.getApp(), "Smart Draw", true, tab);
         smartDrawDialog.pack();
         smartDrawDialog.setPreferredSize(smartDrawDialog.getSize());
         smartDrawDialog.setMinimumSize(new Dimension(smartDrawDialog.getWidth(), smartDrawDialog.getHeight()));
@@ -128,18 +128,17 @@ public class SmartDrawDialog extends JDialog {
 			objectDropdown.addItem(name);
 		}
 	}
-    public static void setupWorkerListener(final SwingWorker<?, ?> worker) {
+    public static void setupWorkerListener(final SwingWorker<?, ?> worker, final PetriNetTab tab) {
 	    if(worker != null){
             worker.addPropertyChangeListener(event -> {
                 if (event.getPropertyName().equals("unfolding")) {
                     SwingWorker.StateValue stateValue = (SwingWorker.StateValue) event.getNewValue();
                     if (stateValue.equals(SwingWorker.StateValue.DONE)) {
                         //Don't auto-layout on empty net or net too big to draw, hotfix for issue #1960000
-                        PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
-                        if (currentTab != null && currentTab.network().paintNet() && !currentTab.currentTemplate().getHasPositionalInfo() && (currentTab.currentTemplate().guiModel().getPlaces().length + currentTab.currentTemplate().guiModel().getTransitions().length) > 0) {
+                        if (tab != null && tab.network().paintNet() && !tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
                             int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
                             if (dialogResult == JOptionPane.YES_OPTION) {
-                                showSmartDrawDialog();
+                                showSmartDrawDialog(tab);
                             }
                         }
                     }

@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import dk.aau.cs.verification.*;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
 import net.tapaal.Preferences;
 import net.tapaal.gui.petrinet.TAPNLens;
 import pipe.gui.petrinet.dataLayer.DataLayer;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Constants;

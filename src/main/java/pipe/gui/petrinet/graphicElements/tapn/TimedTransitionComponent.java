@@ -94,7 +94,7 @@ public class TimedTransitionComponent extends Transition {
                 new AbstractAction("Urgent") {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        TAPAALGUI.getCurrentTab().guiModelManager.toggleUrgentTrans(); //XXX: guiModelManager should prop be passed via popup generator
+                        getOwnerTab().guiModelManager.toggleUrgentTrans(); //XXX: guiModelManager should prop be passed via popup generator
                     }
                 }
             );
@@ -108,7 +108,7 @@ public class TimedTransitionComponent extends Transition {
                 new AbstractAction() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        TAPAALGUI.getCurrentTab().guiModelManager.toggleUncontrollableTrans(); //XXX: guiModelManager should prop be passed via popup generator
+                        getOwnerTab().guiModelManager.toggleUncontrollableTrans(); //XXX: guiModelManager should prop be passed via popup generator
                     }
                 }
             );
@@ -129,7 +129,7 @@ public class TimedTransitionComponent extends Transition {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new TAPNTransitionEditor(guiDialog, this, new Context(TAPAALGUI.getCurrentTab())));
+		contentPane.add(new TAPNTransitionEditor(guiDialog, this, new Context(getOwnerTab())));
 
 		guiDialog.setResizable(true);
 

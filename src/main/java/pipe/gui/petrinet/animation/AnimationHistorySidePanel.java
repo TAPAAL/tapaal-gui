@@ -33,7 +33,7 @@ public class AnimationHistorySidePanel extends JPanel {
         //BorderLayout.Center fill the parent components size
         setLayout(new BorderLayout());
 
-        animBox = new AnimationHistoryList();
+        animBox = new AnimationHistoryList(animator.getTab());
         animBox.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

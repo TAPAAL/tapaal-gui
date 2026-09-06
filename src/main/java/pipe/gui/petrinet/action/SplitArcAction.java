@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 
-import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.graphicElements.Arc;
 
@@ -32,7 +31,7 @@ public class SplitArcAction extends javax.swing.AbstractAction {
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
-		TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
+		selected.getOwnerTab().getUndoManager().addNewEdit(
 				selected.getArcPath().insertPoint(mouseposition, false)
         );
 		selected.getArcPath().showPoints();

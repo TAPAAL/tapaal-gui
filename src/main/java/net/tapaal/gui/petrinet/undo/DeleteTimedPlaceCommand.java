@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -23,14 +22,16 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	private final HashMap<TAPNQuery, List<Observation>> observationsInQuery = new HashMap<TAPNQuery, List<Observation>>();
 
 	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlaceComponent, TimedArcPetriNet tapn, DataLayer guiModel) {
+		this(timedPlaceComponent, tapn, guiModel, guiModel.getOwnerTab().queries());
+	}
+
+	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlaceComponent, TimedArcPetriNet tapn, DataLayer guiModel, Iterable<TAPNQuery> queries) {
 		super(tapn, guiModel);
 		this.timedPlaceComponent = timedPlaceComponent;
 		tokens = timedPlaceComponent.underlyingPlace().tokens();
 		timedPlace = timedPlaceComponent.underlyingPlace();
 		
-		// queries this place is an inclusion place in 
-		Iterable<TAPNQuery> queries = TAPAALGUI.getCurrentTab().queries();
-		
+		// queries this place is an inclusion place in
 		for (TAPNQuery q : queries) {
 			if(q.inclusionPlaces().inclusionPlaces().contains(timedPlace)){
 				queriesInclusion.add(q);
@@ -68,7 +69,6 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	@Override
 	public void undo() {
         timedPlaceComponent.deselect();
-		guiModel.addPetriNetObject(timedPlaceComponent);
 		tapn.add(timedPlace);
 		
 		if (!timedPlace.isShared()) {
@@ -76,6 +76,9 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 				tapn.addToken(token);
 			}
 		}
+		// Restore the domain object and its marking before the component is
+		// attached; attaching it can repaint immediately and read the marking.
+		guiModel.addPetriNetObject(timedPlaceComponent);
 		
 		for (TAPNQuery q : queriesInclusion) {
 			q.inclusionPlaces().inclusionPlaces().add(timedPlace);

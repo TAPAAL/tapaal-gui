@@ -35,6 +35,7 @@ import dk.aau.cs.model.CPN.ConstantsParser.ParseException;
 import dk.aau.cs.model.CPN.ConstantsParser.TokenMgrError;
 
 import net.tapaal.gui.petrinet.TAPNLens;
+import pipe.gui.petrinet.PetriNetTab;
 
 import javax.swing.JOptionPane;
 
@@ -49,6 +50,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
     private final TimedArcPetriNetNetwork network;
     private final UndoManager undoManager;
     private final TAPNLens lens;
+    private final PetriNetTab tab;
 
     private JTextArea constantsArea;
 
@@ -57,7 +59,8 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
                                    ConstantsListModel constantsListModel,
                                    TimedArcPetriNetNetwork network,
                                    UndoManager undoManager,
-                                   TAPNLens lens) {
+                                   TAPNLens lens,
+                                   PetriNetTab tab) {
         super(TAPAALGUI.getApp(), "Manually Edit", false);
         this.colorTypesListModel = colorTypesListModel;
         this.variablesListModel = variablesListModel;
@@ -65,6 +68,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
         this.network = network;
         this.undoManager = undoManager;
         this.lens = lens;
+        this.tab = tab;
 
         init();
     }
@@ -189,7 +193,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
             NetworkState oldState = new NetworkState(network);
             boolean resultOk = ConstantsParser.parse(constantsArea.getText(), network);
             if (resultOk) {
-                Command command = new EditConstantsCommand(oldState, network, colorTypesListModel, variablesListModel);
+                Command command = new EditConstantsCommand(oldState, network, colorTypesListModel, variablesListModel, tab);
                 command.redo();
                 undoManager.addNewEdit(command);
                 SwingUtilities.invokeLater(this::dispose);

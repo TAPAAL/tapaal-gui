@@ -37,7 +37,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Tuple;
 
-public class TAPNComposer implements ITAPNComposer {
+public class TAPNComposer implements ITAPNGuiComposer {
 	private final Messenger messenger;
 	private boolean hasShownMessage = false;
 	private boolean singleComponentNoPrefix = false; // if set to true then nets with only a single component have no prefix before places/transitions 

@@ -205,7 +205,7 @@ public class AnnotationNote extends Note {
 		if (!isFirstEdit && !newText.equals(oldText)) {
 			// Text has been changed
 
-			TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
+			getOwnerTab().getUndoManager().addNewEdit(
 					new AnnotationTextEditCommand(this, oldText, newText)
 			);
 			updateBounds();
@@ -276,7 +276,7 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
+			if(getOwnerTab().isInAnimationMode()) return;
 			myPoint.myNote.setDraggable(false);
 			myPoint.isPressed = true;
 			myPoint.repaint();
@@ -287,7 +287,7 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
+			if(getOwnerTab().isInAnimationMode()) return;
 			myPoint.drag(Grid.align(e.getX() - start.x, getZoom()), Grid.align(e.getY() - start.y, getZoom()));
 			myPoint.myNote.updateBounds();
 			myPoint.repaint();
@@ -295,13 +295,13 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			if(TAPAALGUI.getCurrentTab().isInAnimationMode()) return;
+			if(getOwnerTab().isInAnimationMode()) return;
 
             myPoint.myNote.setDraggable(true);
             myPoint.isPressed = false;
 
             Command command = new AnnotationResizeCommand(myPoint, noteStartPoint, noteStartSize);
-            TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(command);
+            getOwnerTab().getUndoManager().addNewEdit(command);
             command.redo();
 		}
 
@@ -362,7 +362,7 @@ public class AnnotationNote extends Note {
 			if ((typeMask & RIGHT) == RIGHT) {
 				myNote.adjustRight(Zoomer.getUnzoomedValue(x, getZoom()));
 			}
-			TAPAALGUI.getCurrentTab().setNetChanged(true);
+			getOwnerTab().setNetChanged(true);
 		}
 
 		public void myPaintComponent(Graphics g) {

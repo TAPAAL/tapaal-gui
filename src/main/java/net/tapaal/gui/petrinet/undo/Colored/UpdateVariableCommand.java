@@ -3,7 +3,6 @@ package net.tapaal.gui.petrinet.undo.Colored;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
-import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
 public class UpdateVariableCommand implements Command {
     private final Variable variable;
@@ -11,15 +10,15 @@ public class UpdateVariableCommand implements Command {
     private final String oldName;
     private final ColorType newColorType;
     private final ColorType oldColorType;
-    private final ConstantsPane.VariablesListModel listModel;
+    private final Runnable onChange;
 
-    public UpdateVariableCommand(Variable var, String newName, ColorType colorType, ConstantsPane.VariablesListModel listModel){
+    public UpdateVariableCommand(Variable var, String newName, ColorType colorType, Runnable onChange){
         this.variable = var;
         this.newName = newName;
         this.oldName = var.getName();
         this.newColorType = colorType;
         this.oldColorType = var.getColorType();
-        this.listModel = listModel;
+        this.onChange = onChange == null ? () -> {} : onChange;
     }
 
     @Override
@@ -27,7 +26,7 @@ public class UpdateVariableCommand implements Command {
         variable.setColorType(oldColorType);
         variable.setName(oldName);
         variable.setId(oldName);
-        listModel.updateName();
+        onChange.run();
     }
 
     @Override
@@ -35,6 +34,6 @@ public class UpdateVariableCommand implements Command {
         variable.setColorType(newColorType);
         variable.setName(newName);
         variable.setId(newName);
-        listModel.updateName();
+        onChange.run();
     }
 }

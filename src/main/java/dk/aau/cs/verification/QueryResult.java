@@ -146,7 +146,7 @@ public class QueryResult {
     }
 
     public boolean isSMC() {
-        return query.getCategory() == net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory.SMC;
+        return query.getCategory() == TAPNQuery.QueryCategory.SMC;
     }
 
     public boolean isQuantitative() {

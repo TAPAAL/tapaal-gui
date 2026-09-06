@@ -877,8 +877,8 @@ public class TapnEngineXmlLoader {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 
-		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(outputArc);
+		template.guiModel().addPetriNetObject(tempArc);
 
 		return tempArc;
 	}
@@ -935,9 +935,9 @@ public class TapnEngineXmlLoader {
 
 				tempArc.setUnderlyingArc(transArc);
 				postsetTransportArc.setUnderlyingArc(transArc);
+				template.model().add(transArc);
 				template.guiModel().addPetriNetObject(tempArc);
 				template.guiModel().addPetriNetObject(postsetTransportArc);
-				template.model().add(transArc);
 
 				postsetArcs.remove(targetIn);
 			} else {
@@ -980,9 +980,9 @@ public class TapnEngineXmlLoader {
 
 				tempArc.setUnderlyingArc(transArc);
 				presetTransportArc.setUnderlyingArc(transArc);
+				template.model().add(transArc);
 				template.guiModel().addPetriNetObject(presetTransportArc);
 				template.guiModel().addPetriNetObject(tempArc);
-				template.model().add(transArc);
 
 				presetArcs.remove(sourceIn);
 				transportArcsTimeIntervals.remove(presetTransportArc);
@@ -1018,8 +1018,8 @@ public class TapnEngineXmlLoader {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 
-		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(inputArc);
+		template.guiModel().addPetriNetObject(tempArc);
 
 		return tempArc;
 	}
@@ -1040,8 +1040,8 @@ public class TapnEngineXmlLoader {
 		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval, weight, arcExpr);
         TimedInhibitorArcComponent tempArc = new TimedInhibitorArcComponent((TimedPlaceComponent)sourceIn, (TimedTransitionComponent)targetIn, inhibArc);
 		tempArc.setUnderlyingArc(inhibArc);
-		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(inhibArc);
+		template.guiModel().addPetriNetObject(tempArc);
 
 		return tempArc;
 	}

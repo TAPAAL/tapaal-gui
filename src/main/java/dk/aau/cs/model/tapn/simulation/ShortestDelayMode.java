@@ -3,8 +3,6 @@ package dk.aau.cs.model.tapn.simulation;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import pipe.gui.Constants;
-
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.IntervalOperations;
@@ -29,7 +27,7 @@ public class ShortestDelayMode implements DelayMode{
 		if(dInterval.isLowerBoundNonStrict()){
 			return IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
 		} else {
-			return IntervalOperations.getRatBound(dInterval.lowerBound()).getBound().add(delayGranularity, new MathContext(Constants.AGE_PRECISION));
+			return IntervalOperations.getRatBound(dInterval.lowerBound()).getBound().add(delayGranularity, new MathContext(SimulationConstants.AGE_PRECISION));
 		}
 	}
 	

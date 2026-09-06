@@ -10,8 +10,6 @@ import dk.aau.cs.TCTL.visitors.*;
 import net.tapaal.gui.petrinet.TAPNLens;
 import dk.aau.cs.verification.NameMapping;
 import pipe.gui.petrinet.dataLayer.DataLayer;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
-
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.SMCUserDefinedDistribution;
@@ -59,13 +57,13 @@ public class VerifyTAPNExporter {
 			PrintStream queryStream = new PrintStream(queryFile);
             if (query == null) {
                 throw new FileNotFoundException(null);
-            } else if (query.getCategory() == QueryCategory.LTL) {
+            } else if (query.getCategory() == TAPNQuery.QueryCategory.LTL) {
                 LTLQueryVisitor XMLVisitor = new LTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
-            } else if (query.getCategory() == QueryCategory.HyperLTL) {
+            } else if (query.getCategory() == TAPNQuery.QueryCategory.HyperLTL) {
                 HyperLTLQueryVisitor XMLVisitor = new HyperLTLQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), null));
-            } else if (query.getCategory() == QueryCategory.SMC) {
+            } else if (query.getCategory() == TAPNQuery.QueryCategory.SMC) {
                 SMCQueryVisitor XMLVisitor = new SMCQueryVisitor();
                 queryStream.append(XMLVisitor.getXMLQueryFor(query.getProperty(), dataLayerQuery.getName(), dataLayerQuery.getSmcSettings()));
             } else if (lens != null && lens.isGame()) {

@@ -6,6 +6,10 @@ import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.SMCSettings;
 import dk.aau.cs.verification.SMCTraceType;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
+import dk.aau.cs.verification.VerificationOptions.AlgorithmOption;
+import dk.aau.cs.verification.VerificationOptions.QueryReductionTime;
+import dk.aau.cs.verification.VerificationOptions.WorkflowMode;
 
 import java.util.ArrayList;
 
@@ -19,10 +23,6 @@ public class TAPNQuery {
 		BFS, DFS, RANDOM, BatchProcessingKeepQueryOption, HEURISTIC, OVERAPPROXIMATE, DEFAULT, RANDOMHEURISTIC
 	}
 
-	public enum QueryReductionTime {
-	    NoTime, ShortestTime, UnlimitedTime
-    }
-
 	public enum HashTableSize {
 		MB_4, MB_16, MB_64, MB_256, MB_512
 	}
@@ -31,18 +31,6 @@ public class TAPNQuery {
 		AUTOMATIC, NONE, DIFF, LOCAL, LOW_UP
 	}
 	
-	public enum WorkflowMode{
-		NOT_WORKFLOW, WORKFLOW_SOUNDNESS, WORKFLOW_STRONG_SOUNDNESS
-	}
-	
-	public enum QueryCategory{
-		Default, CTL, LTL, HyperLTL, SMC
-	}
-	
-	public enum AlgorithmOption{
-		CERTAIN_ZERO, LOCAL
-	}
-
 	private String name;
 	private int capacity;
 	private Integer oldCapacity = null;

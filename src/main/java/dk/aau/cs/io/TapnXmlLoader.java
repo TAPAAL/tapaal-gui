@@ -827,7 +827,7 @@ public class TapnXmlLoader {
             if (age.signum() < 0) {
                 throw new FormatException("Initial token ages must be nonnegative.");
             }
-            
+
             return age;
         } catch (NumberFormatException e) {
             throw new FormatException("Invalid initial token age in place " + place.getAttribute("name") + ".", e);
@@ -896,7 +896,7 @@ public class TapnXmlLoader {
             while (expression != null && !(expression instanceof Element)) {
                 expression = expression.getNextSibling();
             }
-            
+
             if (expression != null) {
                 arcExpr = loadTACPN.parseArcExpression(hlInscription);
             }
@@ -983,8 +983,8 @@ public class TapnXmlLoader {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 
-		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(outputArc);
+		template.guiModel().addPetriNetObject(tempArc);
 
 		return tempArc;
 	}
@@ -1041,9 +1041,9 @@ public class TapnXmlLoader {
 
 				tempArc.setUnderlyingArc(transArc);
 				postsetTransportArc.setUnderlyingArc(transArc);
+				template.model().add(transArc);
 				template.guiModel().addPetriNetObject(tempArc);
 				template.guiModel().addPetriNetObject(postsetTransportArc);
-				template.model().add(transArc);
 
 				postsetArcs.remove(targetIn);
 			} else {
@@ -1086,9 +1086,9 @@ public class TapnXmlLoader {
 
 				tempArc.setUnderlyingArc(transArc);
 				presetTransportArc.setUnderlyingArc(transArc);
+				template.model().add(transArc);
 				template.guiModel().addPetriNetObject(presetTransportArc);
 				template.guiModel().addPetriNetObject(tempArc);
-				template.model().add(transArc);
 
 				presetArcs.remove(sourceIn);
 				transportArcsTimeIntervals.remove(presetTransportArc);
@@ -1120,8 +1120,8 @@ public class TapnXmlLoader {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 
-		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(inputArc);
+		template.guiModel().addPetriNetObject(tempArc);
 
 		return tempArc;
 	}
@@ -1142,8 +1142,8 @@ public class TapnXmlLoader {
 		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval, weight, arcExpr);
         TimedInhibitorArcComponent tempArc = new TimedInhibitorArcComponent((TimedPlaceComponent)sourceIn, (TimedTransitionComponent)targetIn, inhibArc);
 		tempArc.setUnderlyingArc(inhibArc);
-		template.guiModel().addPetriNetObject(tempArc);
 		template.model().add(inhibArc);
+		template.guiModel().addPetriNetObject(tempArc);
 
 		return tempArc;
 	}

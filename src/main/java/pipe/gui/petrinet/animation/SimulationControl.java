@@ -7,6 +7,9 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -17,6 +20,7 @@ import javax.swing.JSlider;
 import javax.swing.Timer;
 
 import pipe.gui.TAPAALGUI;
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.swingcomponents.EscapableDialog;
 
 public class SimulationControl extends JPanel {
@@ -24,9 +28,14 @@ public class SimulationControl extends JPanel {
 	final JSlider simulationSpeed = new JSlider();
 	final JCheckBox randomSimulation = new JCheckBox("Enable automatic random simulation");
     final JCheckBox randomMode = new JCheckBox("Choose next transition randomly");
-    final Timer timer = new Timer(simulationSpeed.getValue()*20, e -> TAPAALGUI.getCurrentTab().getTransitionFiringComponent().fireSelectedTransition());
+    final Timer timer = new Timer(simulationSpeed.getValue()*20, e -> currentTabProvider.get().ifPresent(tab -> tab.getTransitionFiringComponent().fireSelectedTransition()));
     private static boolean defaultIsRandomTrasition;
     private static SimulationControl instance;
+    private static Supplier<Optional<PetriNetTab>> currentTabProvider = Optional::empty;
+
+    public static void setCurrentTabProvider(Supplier<Optional<PetriNetTab>> provider) {
+        currentTabProvider = Objects.requireNonNull(provider);
+    }
 	
 	public static SimulationControl getInstance(){
 		if(instance == null){
@@ -113,12 +122,12 @@ public class SimulationControl extends JPanel {
 	
 	public void start(){
 		timer.start();
-		TAPAALGUI.getCurrentTab().getTransitionFiringComponent().updateFireButton();
+		currentTabProvider.get().ifPresent(tab -> tab.getTransitionFiringComponent().updateFireButton());
 	}
 	
 	public void stop(){
 		timer.stop();
-		TAPAALGUI.getCurrentTab().getTransitionFiringComponent().updateFireButton();
+		currentTabProvider.get().ifPresent(tab -> tab.getTransitionFiringComponent().updateFireButton());
 	}
 	
 	public boolean isRunning(){

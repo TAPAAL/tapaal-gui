@@ -19,6 +19,7 @@ import dk.aau.cs.verification.observations.expressions.ObsMultiply;
 import dk.aau.cs.verification.observations.expressions.ObsOperator;
 import dk.aau.cs.verification.observations.expressions.ObsPlace;
 import dk.aau.cs.verification.observations.expressions.ObsSubtract;
+import dk.aau.cs.verification.VerificationOptions.AlgorithmOption;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -26,10 +27,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.AlgorithmOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.ExtrapolationOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.HashTableSize;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.TAPNQuery.VerificationType;
@@ -42,6 +41,7 @@ import dk.aau.cs.TCTL.XMLParsing.XMLQueryParserUtils;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.translations.ReductionOption;
 
 public class TAPNQueryLoader extends QueryLoader{
@@ -372,8 +372,8 @@ public class TAPNQueryLoader extends QueryLoader{
         return settings;
     }
 
-	public static TAPNQuery.QueryCategory detectCategory(TCTLAbstractProperty query, boolean isCTL, boolean isLTL, boolean isHyperLTL, boolean isSmc){
-        if (isCTL) return TAPNQuery.QueryCategory.CTL;
+	public static QueryCategory detectCategory(TCTLAbstractProperty query, boolean isCTL, boolean isLTL, boolean isHyperLTL, boolean isSmc){
+        if (isCTL) return QueryCategory.CTL;
         if (isLTL) return QueryCategory.LTL;
         if (isHyperLTL) return QueryCategory.HyperLTL;
         if (isSmc) return QueryCategory.SMC;
@@ -383,13 +383,13 @@ public class TAPNQueryLoader extends QueryLoader{
         // If query is root and state property
         if(query instanceof TCTLAbstractStateProperty){
             if(((TCTLAbstractStateProperty) query).getParent() == null){
-                return TAPNQuery.QueryCategory.CTL;
+                return QueryCategory.CTL;
             }
         }
 
         if(query instanceof TCTLStateToPathConverter ||
 				query instanceof TCTLPathToStateConverter){
-			return TAPNQuery.QueryCategory.CTL;
+			return QueryCategory.CTL;
 		}
 
 		if(query instanceof LTLGNode ||
@@ -398,7 +398,7 @@ public class TAPNQueryLoader extends QueryLoader{
                 query instanceof LTLXNode ||
                 query instanceof LTLANode ||
                 query instanceof LTLENode){
-            return TAPNQuery.QueryCategory.LTL;
+            return QueryCategory.LTL;
         } else if(query instanceof TCTLAFNode ||
                 query instanceof TCTLAGNode ||
                 query instanceof TCTLEFNode ||
@@ -407,30 +407,30 @@ public class TAPNQueryLoader extends QueryLoader{
                 query instanceof TCTLEXNode ||
 				query instanceof TCTLAUNode ||
 				query instanceof TCTLAXNode) {
-            return TAPNQuery.QueryCategory.CTL;
+            return QueryCategory.CTL;
         } else if(query instanceof HyperLTLPathScopeNode){
 		    return QueryCategory.HyperLTL;
         }
 
         // If query is a fireability query
         if(query instanceof TCTLTransitionNode) {
-            return TAPNQuery.QueryCategory.CTL;
+            return QueryCategory.CTL;
         }
         if(query instanceof TCTLPlusListNode){
                 for(TCTLAbstractStateProperty sp : ((TCTLPlusListNode)query).getProperties()) {
-                        if(TAPNQueryLoader.detectCategory(sp, isCTL, isLTL, isHyperLTL, isSmc) == TAPNQuery.QueryCategory.CTL){
-                            return TAPNQuery.QueryCategory.CTL;
+                        if(TAPNQueryLoader.detectCategory(sp, isCTL, isLTL, isHyperLTL, isSmc) == QueryCategory.CTL){
+                            return QueryCategory.CTL;
                         }
                 }
 		}
 		
                 // If any property has been converted
 		for (StringPosition child : children) {
-			if(TAPNQueryLoader.detectCategory(child.getObject(), isCTL, isLTL, isHyperLTL, isSmc) == TAPNQuery.QueryCategory.CTL){
-				return TAPNQuery.QueryCategory.CTL;
+			if(TAPNQueryLoader.detectCategory(child.getObject(), isCTL, isLTL, isHyperLTL, isSmc) == QueryCategory.CTL){
+				return QueryCategory.CTL;
 			} 
 		}
-		return TAPNQuery.QueryCategory.Default;
+		return QueryCategory.Default;
 	}
 	
 	private InclusionPlaces getInclusionPlaces(Element queryElement, TimedArcPetriNetNetwork network) {

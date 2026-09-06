@@ -8,6 +8,7 @@ import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.TAPAAL;
 import pipe.gui.canvas.Grid;
 import pipe.gui.petrinet.dataLayer.DataLayer;
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.canvas.DrawingSurfaceImpl;
 import pipe.gui.Constants;
@@ -88,6 +89,10 @@ public abstract class PetriNetObject extends GraphicalElement implements Drawabl
 	}
 	//XXX: not sure if datalayer should be accessable, but needed for refactorings away from "public" view.
 	public DataLayer getGuiModel() { return this.guiModel;}
+
+	public PetriNetTab getOwnerTab() {
+		return guiModel == null ? null : guiModel.getOwnerTab();
+	}
 
 	public void setId(String idInput) {
 		id = idInput;

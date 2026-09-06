@@ -31,7 +31,6 @@ import net.tapaal.TAPAAL;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.Template;
 import net.tapaal.helpers.Reference.MutableReference;
-import net.tapaal.helpers.Reference.Reference;
 import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import net.tapaal.swinghelpers.SwingHelper;
 import net.tapaal.swinghelpers.ToggleButtonWithoutText;
@@ -61,6 +60,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final String frameTitle;
 
     final MutableReference<GuiFrameControllerActions> guiFrameController = new MutableReference<>();
+    private final MutableReference<TabInteraction> tabInteraction = new MutableReference<>();
 
     private final ExtendedJTabbedPane<PetriNetTab> appTab;
 
@@ -121,7 +121,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction printAction = new GuiAction("Print", "Print", KeyStroke.getKeyStroke('P', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::print);
+            currentTab().ifPresent(TabActions::print);
         }
     };
     private final GuiAction importPNMLAction = new GuiAction("PNML untimed net", "Import an untimed net in the PNML format", KeyStroke.getKeyStroke('X', InputEvent.SHIFT_MASK)) {
@@ -131,47 +131,47 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction importSUMOAction = new GuiAction("SUMO queries (.txt)", "Import SUMO queries in a plain text format") {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::importSUMOQueries);
+            currentTab().ifPresent(TabActions::importSUMOQueries);
         }
     };
     private final GuiAction importXMLAction = new GuiAction("XML queries (.xml)", "Import MCC queries in XML format", KeyStroke.getKeyStroke('R', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::importXMLQueries);
+            currentTab().ifPresent(TabActions::importXMLQueries);
         }
     };
     private final GuiAction exportPNGAction = new GuiAction("PNG", "Export the net to PNG format", KeyStroke.getKeyStroke('G', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::exportPNG);
+            currentTab().ifPresent(TabActions::exportPNG);
         }
     };
     private final GuiAction exportPSAction = new GuiAction("PostScript", "Export the net to PostScript format", KeyStroke.getKeyStroke('T', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::exportPS);
+            currentTab().ifPresent(TabActions::exportPS);
         }
     };
     private final GuiAction exportToTikZAction = new GuiAction("TikZ", "Export the net to LaTex (TikZ) format", KeyStroke.getKeyStroke('L', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::exportTIKZ);
+            currentTab().ifPresent(TabActions::exportTIKZ);
         }
     };
     private final GuiAction exportToPNMLAction = new GuiAction("PNML", "Export the net to PNML format", KeyStroke.getKeyStroke('D', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::exportPNML);
+            currentTab().ifPresent(TabActions::exportPNML);
         }
     };
     private final GuiAction exportToXMLAction = new GuiAction("XML Queries", "Export the queries to XML format", KeyStroke.getKeyStroke('H', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::exportQueryXML);
+            currentTab().ifPresent(TabActions::exportQueryXML);
         }
     };
     private final GuiAction exportTraceAction = new GuiAction("Export trace", "Export the current trace", "") {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::exportTrace);
+            currentTab().ifPresent(TabActions::exportTrace);
         }
     };
     private final GuiAction importTraceAction = new GuiAction("Import trace", "Import trace to simulator", "") {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::importTrace);
+            currentTab().ifPresent(TabActions::importTrace);
         }
     };
     private final GuiAction exportBatchAction = new GuiAction("Batch Export of model and queries", "Export multiple nets and queries for the command line use with the verification engines.", KeyStroke.getKeyStroke('D', (shortcutkey + InputEvent.SHIFT_DOWN_MASK))) {
@@ -184,28 +184,28 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction cutAction = new GuiAction("Cut", "Cut current selection", KeyStroke.getKeyStroke('X', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::cut);
+            currentTab().ifPresent(TabActions::cut);
         }
     };
     private final GuiAction copyAction = new GuiAction("Copy", "Copy current selection", KeyStroke.getKeyStroke('C', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::copy);
+            currentTab().ifPresent(TabActions::copy);
         }
     };
     private final GuiAction pasteAction = new GuiAction("Paste", "Paste", KeyStroke.getKeyStroke('V', shortcutkey)) {
         @Override
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::past);
+            currentTab().ifPresent(TabActions::past);
         }
     };
     private final GuiAction undoAction = new GuiAction("Undo", "Undo", KeyStroke.getKeyStroke('Z', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::undo);
+            currentTab().ifPresent(TabActions::undo);
         }
     };
     private final GuiAction redoAction = new GuiAction("Redo", "Redo", KeyStroke.getKeyStroke('Y', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::redo);
+            currentTab().ifPresent(TabActions::redo);
         }
     };
     private final GuiAction toggleGrid = new GuiAction("Cycle grid", "Change the grid size", "G") {
@@ -216,12 +216,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction alignToGrid = new GuiAction("Align To Grid", "Align Petri net objects to current grid", KeyStroke.getKeyStroke("shift G")) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::alignToGrid);
+            currentTab().ifPresent(TabActions::alignToGrid);
         }
     };
     private final GuiAction netStatisticsAction = new GuiAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.", KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::showStatistics);
+            currentTab().ifPresent(TabActions::showStatistics);
         }
     };
     private final GuiAction batchProcessingAction = new GuiAction("Batch processing", "Batch verification of multiple nets and queries", KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcutkey)) {
@@ -241,43 +241,43 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction showColorTypesVariables = new GuiAction("Show color types/variables/constants", "Opens a floating window showing the global color types/variables/constants for the net", KeyStroke.getKeyStroke(("shift F"))) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::showColorTypesVariables);
+            currentTab().ifPresent(TabActions::showColorTypesVariables);
         }
     };
     private final GuiAction verifyAction = new GuiAction("Verify query", "Verifies the currently selected query", KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::verifySelectedQuery);
+            currentTab().ifPresent(TabActions::verifySelectedQuery);
         }
     };
     private final GuiAction workflowDialogAction = new GuiAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcutkey | InputEvent.SHIFT_DOWN_MASK)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::workflowAnalyse);
+            currentTab().ifPresent(TabActions::workflowAnalyse);
         }
     };
     private final GuiAction smartDrawAction = new GuiAction("Automatic net layout", "Rearrange the Petri net objects", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_DOWN_MASK)) {
         public void actionPerformed(ActionEvent e) {
-            SmartDrawDialog.showSmartDrawDialog();
+            SmartDrawDialog.showSmartDrawDialog(getCurrentTab());
         }
     };
     private final GuiAction mergeComponentsDialogAction = new GuiAction("Merge net components", "Open a composed net in a new tab and use approximated net if enabled", KeyStroke.getKeyStroke(KeyEvent.VK_C, (shortcutkey + InputEvent.SHIFT_MASK))) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::mergeNetComponents);
+            currentTab().ifPresent(TabActions::mergeNetComponents);
         }
     };
     private final GuiAction zoomOutAction = new GuiAction("Zoom out", "Zoom out by 10% ", KeyStroke.getKeyStroke('K', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::zoomOut);
+            currentTab().ifPresent(TabActions::zoomOut);
         }
     };
     private final GuiAction zoomInAction = new GuiAction("Zoom in", "Zoom in by 10% ", KeyStroke.getKeyStroke('J', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::zoomIn);
+            currentTab().ifPresent(TabActions::zoomIn);
         }
     };
 
     private final GuiAction fitToScreenAction = new GuiAction(FIT_TO_SCREEN_NAME, FIT_TO_SCREEN_TOOLTIP, KeyStroke.getKeyStroke('F', shortcutkey | InputEvent.SHIFT_DOWN_MASK)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> {
+            currentTab().ifPresent(o -> {
                 if (!o.isAlreadyFitToScreen()) {
                     o.fitToScreen();
                     putValue(Action.NAME, "Restore zoom");
@@ -296,23 +296,23 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction incSpacingAction = new GuiAction("Increase node spacing", "Increase spacing by 20% ", KeyStroke.getKeyStroke('U', shortcutkey)) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::increaseSpacing);
+            currentTab().ifPresent(TabActions::increaseSpacing);
         }
     };
     private final GuiAction decSpacingAction = new GuiAction("Decrease node spacing", "Decrease spacing by 20% ", KeyStroke.getKeyStroke("shift U")) {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::decreaseSpacing);
+            currentTab().ifPresent(TabActions::decreaseSpacing);
         }
     };
     public final GuiAction deleteAction = new GuiAction("Delete", "Delete selection", "DELETE") {
         public void actionPerformed(ActionEvent arg0) {
-            currentTab.ifPresent(TabActions::deleteSelection);
+            currentTab().ifPresent(TabActions::deleteSelection);
         }
     };
 
     private final GuiAction annotationAction = new GuiAction("Annotation", "Add an annotation (N)", "N", true) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(o -> o.setMode(PetriNetTab.DrawTool.ANNOTATION));
+            currentTab().ifPresent(o -> o.setMode(PetriNetTab.DrawTool.ANNOTATION));
         }
     };
 
@@ -368,7 +368,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     };
     private final GuiAction changeNameVisibility = new GuiAction("Change visibility of transition/place names", "Executing this action will open a dialog where you can hide or show place and transition names", true) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::showChangeNameVisibility);
+            currentTab().ifPresent(TabActions::showChangeNameVisibility);
         }
     };
     private final GuiAction showAdvancedWorkspaceAction = new GuiAction("Show advanced workspace", "Show all panels", false) {
@@ -429,7 +429,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
     private final GuiAction selectAllAction = new GuiAction("Select all", "Select all components", KeyStroke.getKeyStroke('A', shortcutkey)) {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::selectAll);
+            currentTab().ifPresent(TabActions::selectAll);
         }
     };
 
@@ -442,42 +442,42 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 boolean useExplicit = !lens.isGame() && !lens.isStochastic() && !lens.isTimed();
                 ColoredSimulationDialog.showSimulationDialog(oldTab, useExplicit);
                 if (!ColoredSimulationDialog.wasCancelled() && (oldTab != getCurrentTab() || ColoredSimulationDialog.explicitSimulationMode())) {
-                    currentTab.ifPresent(tab -> tab.toggleAnimationMode(ColoredSimulationDialog.explicitSimulationMode()));
+                    currentTab().ifPresent(tab -> tab.toggleAnimationMode(ColoredSimulationDialog.explicitSimulationMode()));
                 } else {
                     this.setSelected(false);
                 }
 
                 ColoredSimulationDialog.resetFlags();
             } else {
-                currentTab.ifPresent(TabActions::toggleAnimationMode);
+                currentTab().ifPresent(TabActions::toggleAnimationMode);
             }
         }
     };
     public final GuiAction stepforwardAction = new GuiAction("Step forward", "Step forward", "released RIGHT") {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::stepForward);
+            currentTab().ifPresent(TabActions::stepForward);
         }
     };
     public final GuiAction stepbackwardAction = new GuiAction("Step backward", "Step backward", "released LEFT") {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::stepBackwards);
+            currentTab().ifPresent(TabActions::stepBackwards);
         }
     };
     private final GuiAction prevcomponentAction = new GuiAction("Previous component", "Previous component", "pressed UP") {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::previousComponent);
+            currentTab().ifPresent(TabActions::previousComponent);
         }
     };
     private final GuiAction nextcomponentAction = new GuiAction("Next component", "Next component", "pressed DOWN") {
         public void actionPerformed(ActionEvent e) {
-            currentTab.ifPresent(TabActions::nextComponent);
+            currentTab().ifPresent(TabActions::nextComponent);
         }
     };
 
     private final GuiAction changeTimeFeatureAction = new GuiAction("Time", "Change time semantics") {
         public void actionPerformed(ActionEvent e) {
             boolean isTime = timeFeatureOptions.getSelectedIndex() != 0;
-            currentTab.ifPresent(o -> o.changeTimeFeature(isTime));
+            currentTab().ifPresent(o -> o.changeTimeFeature(isTime));
             refreshLensConstraints();
         }
     };
@@ -485,7 +485,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction changeGameFeatureAction = new GuiAction("Game", "Change game semantics") {
         public void actionPerformed(ActionEvent e) {
             boolean isGame = gameFeatureOptions.getSelectedIndex() != 0;
-            currentTab.ifPresent(o -> o.changeGameFeature(isGame));
+            currentTab().ifPresent(o -> o.changeGameFeature(isGame));
             refreshLensConstraints();
         }
     };
@@ -493,7 +493,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction changeColorFeatureAction = new GuiAction("Color", "Change color semantics") {
         public void actionPerformed(ActionEvent e) {
             boolean isColor = colorFeatureOptions.getSelectedIndex() != 0;
-            currentTab.ifPresent(o -> o.changeColorFeature(isColor));
+            currentTab().ifPresent(o -> o.changeColorFeature(isColor));
             refreshLensConstraints();
         }
     };
@@ -501,7 +501,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     private final GuiAction changeStochasticFeatureAction = new GuiAction("Stochastic", "Change stochastic semantics") {
         public void actionPerformed(ActionEvent actionEvent) {
             boolean isStochastic = stochasticFeatureOptions.getSelectedIndex() != 0;
-            currentTab.ifPresent(o -> o.changeStochasticFeature(isStochastic));
+            currentTab().ifPresent(o -> o.changeStochasticFeature(isStochastic));
             refreshLensConstraints();
         }
     };
@@ -678,7 +678,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         menuBar.add(buildMenuTools());
 
         if (TAPAAL.IS_DEV) {
-            menuBar.add(DEBUG.buildMenuDEBUG());
+            menuBar.add(DEBUG.buildMenuDEBUG(this::getTabInteraction));
         }
 
         menuBar.add(buildMenuHelp());
@@ -981,12 +981,12 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         actionMap.put("focusSearchBar", searchAction);
 
         searchBar.setOnFocusGained(() -> {
-            currentTab.ifPresent(o -> o.setMode(PetriNetTab.DrawTool.SELECT));
+            currentTab().ifPresent(o -> o.setMode(PetriNetTab.DrawTool.SELECT));
             enableActionsForSearchBar(false);
 
             if (!searchBar.getSearchText().isEmpty()) {
                 String query = searchBar.getSearchText();
-                currentTab.ifPresent(o -> o.search(query));
+                currentTab().ifPresent(o -> o.search(query));
             }
         });    
 
@@ -1003,7 +1003,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                 return;
             }
 
-            currentTab.ifPresent(o -> o.search(query));
+            currentTab().ifPresent(o -> o.search(query));
         });
 
         searchBar.setOnResultSelected(result -> {
@@ -1012,7 +1012,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             searchBar.clear();
 
             PetriNetObject selectedObject = null;
-            PetriNetTab tab = (PetriNetTab)currentTab.get();
+            PetriNetTab tab = currentTab().orElseThrow();
             String resultStr = result.value1().toString();
 
             String templateName = null;
@@ -1102,7 +1102,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         colorFeatureOptions.setEnabled(enable);
         stochasticFeatureOptions.setEnabled(enable);
         enableAllActions(enable);
-        currentTab.ifPresent(o -> o.enableActionsForSearchBar(enable));
+        currentTab().ifPresent(o -> o.enableActionsForSearchBar(enable));
     }
 
     private void addZoomSlider(JToolBar toolBar) {
@@ -1112,7 +1112,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         zoomSlider.setToolTipText("Zoom: " + zoomSlider.getValue() + "%");
         zoomSlider.addChangeListener(e -> {
             int newZoomLevel = zoomSlider.getValue();
-            currentTab.ifPresent(o -> o.zoomTo(newZoomLevel));
+            currentTab().ifPresent(o -> o.zoomTo(newZoomLevel));
             zoomSlider.setToolTipText("Zoom: " + newZoomLevel + "%");
             getCurrentTab().setIsAlreadyFitToScreen(false);
             fitToScreenAction.putValue(Action.NAME, FIT_TO_SCREEN_NAME);
@@ -1288,7 +1288,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     private void updateExportAndPrintActions() {
-        TabActions tab = currentTab == null ? null : currentTab.get();
+        TabActions tab = currentTab().orElse(null);
         boolean hasComponents = tab != null && !tab.isDrawingSurfaceEmpty();
         boolean hasQueries = tab != null && tab.hasQueries();
         exportPNGAction.setEnabled(hasComponents);
@@ -1453,9 +1453,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
 
         // Enable actions based on GUI mode
         enableGUIActions(mode);
-        if (currentTab != null) {
-            currentTab.ifPresent(o -> o.updateEnabledActions(mode));
-        }
+        currentTab().ifPresent(o -> o.updateEnabledActions(mode));
     }
 
     @Override
@@ -1587,12 +1585,23 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
 
-    Reference<TabActions> currentTab = null;
+    @Override
+    public void registerController(GuiFrameControllerActions guiFrameController) {
+        this.guiFrameController.setReference(guiFrameController);
+    }
 
     @Override
-    public void registerController(GuiFrameControllerActions guiFrameController, Reference<TabActions> currentTab) {
-        this.guiFrameController.setReference(guiFrameController);
-        this.currentTab = currentTab;
+    public void registerTabInteraction(TabInteraction tabInteraction) {
+        this.tabInteraction.setReference(tabInteraction);
+    }
+
+    private Optional<PetriNetTab> currentTab() {
+        return tabInteraction.map(TabInteraction::getCurrentTab)
+            .orElse(Optional.empty());
+    }
+
+    public TabInteraction getTabInteraction() {
+        return tabInteraction.get();
     }
 
     @Override
@@ -2024,10 +2033,8 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         return appTab.getSelectedIndex();
     }
 
-    //XXX usage of this function should be replaced by currentTab and not assume PetriNetTab
-    @Deprecated
     private PetriNetTab getCurrentTab() {
-        return TAPAALGUI.getCurrentTab();
+        return currentTab().orElse(null);
     }
 
     @Override

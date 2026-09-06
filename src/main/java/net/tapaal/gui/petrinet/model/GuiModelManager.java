@@ -24,11 +24,11 @@ import java.util.List;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Vector;
 
 public class GuiModelManager {
     //XXX: Instead of having access to the whole tab, it should properly take some sort of model
     private final PetriNetTab tabContent;
+    private final PetriNetModelEditor modelEditor = new PetriNetModelEditor();
 
     private List<Command> pendingEdits = null;
 
@@ -65,27 +65,26 @@ public class GuiModelManager {
         Require.notNull(c, "datalyer can't be null");
         Require.notNull(p, "Point can't be null");
 
-        dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(tabContent.getNameGenerator().getNewPlaceName(tabContent.guiModelToModel.get(c)), ColorType.COLORTYPE_DOT);
+        dk.aau.cs.model.tapn.TimedArcPetriNet model = tabContent.modelFor(c);
+        dk.aau.cs.model.tapn.LocalTimedPlace tp = modelEditor.createPlace(tabContent.getNameGenerator().getNewPlaceName(model));
         TimedPlaceComponent pnObject = new TimedPlaceComponent(p.x, p.y, tp, tabContent.lens);
-        tabContent.guiModelToModel.get(c).add(tp);
+        modelEditor.addPlace(model, tp);
         c.addPetriNetObject(pnObject);
 
-        addCommand(new AddTimedPlaceCommand(pnObject, tabContent.guiModelToModel.get(c), c));
+        addCommand(new AddTimedPlaceCommand(pnObject, model, c));
         return new Result<>(pnObject);
     }
 
     public Result<TimedTransitionComponent, ModelViolation> addNewTimedTransitions(DataLayer c, Point p, boolean isUrgent, boolean isUncontrollable) {
-        dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(tabContent.getNameGenerator().getNewTransitionName(tabContent.guiModelToModel.get(c)));
-
-        transition.setUrgent(isUrgent);
-        transition.setUncontrollable(isUncontrollable);
-        transition.setUrgent(isUrgent);
+        dk.aau.cs.model.tapn.TimedArcPetriNet model = tabContent.modelFor(c);
+        dk.aau.cs.model.tapn.TimedTransition transition = modelEditor.createTransition(
+            tabContent.getNameGenerator().getNewTransitionName(model), isUrgent, isUncontrollable);
         TimedTransitionComponent pnObject = new TimedTransitionComponent(p.x, p.y, transition, tabContent.lens);
 
-        tabContent.guiModelToModel.get(c).add(transition);
+        modelEditor.addTransition(model, transition);
         c.addPetriNetObject(pnObject);
 
-        addCommand(new AddTimedTransitionCommand(pnObject, tabContent.guiModelToModel.get(c), c));
+        addCommand(new AddTimedTransitionCommand(pnObject, model, c));
         return new Result<>(pnObject);
     }
 
@@ -106,24 +105,15 @@ public class GuiModelManager {
         Require.notNull(t, "Transitions can't be null");
 
         var require = new RequirementChecker<ModelViolation>();
-        require.Not(tabContent.guiModelToModel.get(c).hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
+        require.Not(tabContent.modelFor(c).hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
         require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
             return new Result<>(require.getErrors());
         }
 
-        TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
-        ColorType ct = p.underlyingPlace().getColorType();
-        Vector<ColorExpression> vecColorExpr = new Vector<>();
-        vecColorExpr.add(ct.createColorExpressionForFirstColor());
-        NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-        TimedInputArc tia = new TimedInputArc(
-            p.underlyingPlace(),
-            t.underlyingTransition(),
-            TimeInterval.ZERO_INF,
-            numbExpr
-        );
+        TimedArcPetriNet modelNet = tabContent.modelFor(c);
+        TimedInputArc tia = modelEditor.createInputArc(p.underlyingPlace(), t.underlyingTransition());
 
         TimedInputArcComponent tiac = new TimedInputArcComponent(p, t, tia, tabContent.lens);
 
@@ -149,24 +139,15 @@ public class GuiModelManager {
         Require.notNull(t, "Transitions can't be null");
 
         var require = new RequirementChecker<ModelViolation>();
-        require.Not(tabContent.guiModelToModel.get(c).hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace()), ModelViolation.MaxOneArcBetweenTransitionAndPlace);
+        require.Not(tabContent.modelFor(c).hasArcFromTransitionToPlace(t.underlyingTransition(), p.underlyingPlace()), ModelViolation.MaxOneArcBetweenTransitionAndPlace);
         require.Not((p.underlyingPlace().isShared() && t.underlyingTransition().isShared()), ModelViolation.CantHaveArcBetweenSharedPlaceAndTransition);
 
         if (require.failed()) {
             return new Result<>(require.getErrors());
         }
 
-        TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
-        ColorType ct = p.underlyingPlace().getColorType();
-        Vector<ColorExpression> vecColorExpr = new Vector<>();
-        vecColorExpr.add(ct.createColorExpressionForFirstColor());
-        NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-
-        TimedOutputArc toa = new TimedOutputArc(
-            t.underlyingTransition(),
-            p.underlyingPlace(),
-            numbExpr
-        );
+        TimedArcPetriNet modelNet = tabContent.modelFor(c);
+        TimedOutputArc toa = modelEditor.createOutputArc(t.underlyingTransition(), p.underlyingPlace());
 
         TimedOutputArcComponent toac = new TimedOutputArcComponent(t, p, toa, tabContent.lens);
 
@@ -190,7 +171,7 @@ public class GuiModelManager {
         Require.notNull(p, "Place can't be null");
         Require.notNull(t, "Transitions can't be null");
 
-        TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
+        TimedArcPetriNet modelNet = tabContent.modelFor(c);
 
         var require = new RequirementChecker<ModelViolation>();
         require.Not(modelNet.hasArcFromPlaceToTransition(p.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
@@ -200,10 +181,7 @@ public class GuiModelManager {
             return new Result<>(require.getErrors());
         }
 
-        TimedInhibitorArc tiha = new TimedInhibitorArc(
-            p.underlyingPlace(),
-            t.underlyingTransition()
-        );
+        TimedInhibitorArc tiha = modelEditor.createInhibitorArc(p.underlyingPlace(), t.underlyingTransition());
 
         TimedInhibitorArcComponent tihac = new TimedInhibitorArcComponent(p, t, tiha);
         tihac.setLens(tabContent.lens);
@@ -229,7 +207,7 @@ public class GuiModelManager {
         Require.notNull(t, "Transitions can't be null");
         Require.notNull(p2, "Place2 can't be null");
 
-        TimedArcPetriNet modelNet = tabContent.guiModelToModel.get(c);
+        TimedArcPetriNet modelNet = tabContent.modelFor(c);
 
         var require = new RequirementChecker<ModelViolation>();
         require.Not(modelNet.hasArcFromPlaceToTransition(p1.underlyingPlace(), t.underlyingTransition()), ModelViolation.MaxOneArcBetweenPlaceAndTransition);
@@ -246,8 +224,8 @@ public class GuiModelManager {
 
         int groupNr = getNextTransportArcMaxGroupNumber(p1, t);
 
-        TransportArc tta = new TransportArc(p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
-        instantiateArcExpressions(p1, t, p2, tta);
+        TransportArc tta = modelEditor.createTransportArc(
+            p1.underlyingPlace(), t.underlyingTransition(), p2.underlyingPlace());
 
         TimedTransportArcComponent ttac1 = new TimedTransportArcComponent(p1, t, tta, groupNr, tabContent.lens);
         TimedTransportArcComponent ttac2 = new TimedTransportArcComponent(t, p2, tta, groupNr, tabContent.lens);
@@ -273,22 +251,6 @@ public class GuiModelManager {
         addCommand(edit);
 
         return new Result<>(ttac1);
-    }
-
-    private void instantiateArcExpressions(TimedPlaceComponent p1, Transition t, TimedPlaceComponent p2, TransportArc tta) {
-        //make for input
-        ColorType ctin = p1.underlyingPlace().getColorType();
-        Vector<ColorExpression> vecColorExpr = new Vector<>();
-        vecColorExpr.add(ctin.createColorExpressionForFirstColor());
-        NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
-        tta.setInputExpression(numbExpr);
-
-        //make for output
-        ColorType ctout = p2.underlyingPlace().getColorType();
-        vecColorExpr = new Vector<>();
-        vecColorExpr.add(ctout.createColorExpressionForFirstColor());
-        numbExpr = new NumberOfExpression(1, vecColorExpr);
-        tta.setOutputExpression(numbExpr);
     }
 
     private int getNextTransportArcMaxGroupNumber(TimedPlaceComponent p, TimedTransitionComponent t) {
@@ -440,7 +402,7 @@ public class GuiModelManager {
                 Command cmd = null;
                 if (pnObject instanceof TimedPlaceComponent) {
                     TimedPlaceComponent tp = (TimedPlaceComponent) pnObject;
-                    cmd = new DeleteTimedPlaceCommand(tp, tabContent.guiModelToModel.get(tabContent.getModel()), tabContent.getModel());
+                    cmd = new DeleteTimedPlaceCommand(tp, tabContent.modelFor(tabContent.getModel()), tabContent.getModel(), tabContent.queries());
                 } else if (pnObject instanceof TimedTransitionComponent) {
                     TimedTransitionComponent transition = (TimedTransitionComponent) pnObject;
                     cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), tabContent.getModel());

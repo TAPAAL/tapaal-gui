@@ -1,6 +1,5 @@
 package net.tapaal.gui.petrinet.editor;
 
-import net.tapaal.gui.petrinet.undo.Colored.AddColorTypeCommand;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.TCTL.TCTLPlaceNode;
 import dk.aau.cs.TCTL.visitors.PlaceNodeCollectorVisitor;
@@ -8,6 +7,7 @@ import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import net.tapaal.gui.petrinet.model.NetworkEditService;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import org.jdesktop.swingx.JXComboBox;
 import pipe.gui.TAPAALGUI;
@@ -40,6 +40,7 @@ public class ColorTypeDialogPanel extends JPanel {
     private ColorType oldColorType;
     private final String oldName;
     private final ConstantsPane.ColorTypesListModel colorTypesListModel;
+    private final NetworkEditService networkEditService;
     private final UndoManager undoManager;
     private final Iterable<TAPNQuery> queries;
 
@@ -74,6 +75,7 @@ public class ColorTypeDialogPanel extends JPanel {
         oldName = "";
         this.network = network;
         this.colorTypesListModel = colorTypesListModel;
+        this.networkEditService = new NetworkEditService(network, colorTypesListModel::updateName);
         this.undoManager = undoManager;
         this.queries = queries;
         initComponents();
@@ -89,6 +91,7 @@ public class ColorTypeDialogPanel extends JPanel {
         this.undoManager = undoManager;
         this.network = network;
         this.colorTypesListModel = colorTypesListModel;
+        this.networkEditService = new NetworkEditService(network, colorTypesListModel::updateName);
         this.queries = queries;
         initComponents();
         initValues();
@@ -1090,15 +1093,13 @@ public class ColorTypeDialogPanel extends JPanel {
                         }
                     }
                     if (showDialog) {
-                        network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
+                        networkEditService.updateColorType(oldColorType, newColorType, undoManager);
                     } else {
                         undoManager.newEdit();
-                        network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                        colorTypesListModel.updateName();
+                        networkEditService.renameColorType(oldColorType, newColorType, undoManager);
                     }
                 } else {
-                    Command cmd = new AddColorTypeCommand(newColorType,
-                        network, colorTypesListModel, network.colorTypes().size());
+                    Command cmd = networkEditService.addColorType(newColorType, network.colorTypes().size());
                     undoManager.addNewEdit(cmd);
                     cmd.redo();
                 }
@@ -1132,14 +1133,13 @@ public class ColorTypeDialogPanel extends JPanel {
                         }
                     }
                     if (showDialog) {
-                        network.updateColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
+                        networkEditService.updateColorType(oldColorType, newColorType, undoManager);
                     } else {
                         undoManager.newEdit();
-                        network.renameColorType(oldColorType, newColorType, colorTypesListModel, undoManager);
-                        colorTypesListModel.updateName();
+                        networkEditService.renameColorType(oldColorType, newColorType, undoManager);
                     }
                 } else {
-                    Command cmd = new AddColorTypeCommand(newColorType, network, colorTypesListModel, network.colorTypes().size());
+                    Command cmd = networkEditService.addColorType(newColorType, network.colorTypes().size());
                     undoManager.addNewEdit(cmd);
                     cmd.redo();
                 }
@@ -1188,16 +1188,14 @@ public class ColorTypeDialogPanel extends JPanel {
                         showDialog = true;
                     }
                     if (showDialog) {
-                        network.updateColorType(oldColorType, productType, colorTypesListModel, undoManager);
+                        networkEditService.updateColorType(oldColorType, productType, undoManager);
 
                     } else {
                         undoManager.newEdit();
-                        network.renameColorType(oldColorType, productType, colorTypesListModel, undoManager);
-                        colorTypesListModel.updateName();
+                        networkEditService.renameColorType(oldColorType, productType, undoManager);
                     }
                 } else {
-                    Command cmd = new AddColorTypeCommand(productType,
-                        network, colorTypesListModel, network.colorTypes().size());
+                    Command cmd = networkEditService.addColorType(productType, network.colorTypes().size());
                     undoManager.addNewEdit(cmd);
                     cmd.redo();
                 }

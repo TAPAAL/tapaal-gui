@@ -9,17 +9,21 @@ plugins {
 group 'net.tapaal'
 version '4.0-SNAPSHOT'
 
-var targetJavaVersion = "17"
+var toolchainJavaVersion = 25
+var targetBytecodeVersion = "17"
 var targetKotlinVersion = "2.0"
 
 java {
-    sourceCompatibility = targetJavaVersion
-    targetCompatibility = targetJavaVersion
+    sourceCompatibility = targetBytecodeVersion
+    targetCompatibility = targetBytecodeVersion
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(toolchainJavaVersion)
+    }
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
-        jvmTarget = targetJavaVersion
+        jvmTarget = targetBytecodeVersion
         apiVersion = targetKotlinVersion
         languageVersion = targetKotlinVersion
     }
@@ -75,7 +79,49 @@ dependencies {
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'gui'
+    }
+}
+
+// Swing smoke tests are intentionally opt-in and are run under Xvfb in CI/local development.
+tasks.register('guiTest', Test) {
+    description = 'Runs GUI regression tests; use xvfb-run on headless machines.'
+    group = 'verification'
+    dependsOn testClasses
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'gui'
+    }
+    systemProperty 'java.awt.headless', 'false'
+}
+
+tasks.register('verifyNoAmbientCurrentTabAccess') {
+    description = 'Prevents production code from reintroducing the removed static current-tab path.'
+    group = 'verification'
+    doLast {
+        def forbiddenAccess = [
+            'TAPAALGUI.getCurrentTab(',
+            'TAPAALGUI.getAnimator(',
+            'TAPAALGUI.getAppGuiController().getCurrentTab('
+        ]
+        def offenders = fileTree('src/main/java').matching {
+            include '**/*.java'
+            include '**/*.kt'
+        }.files.findAll { sourceFile ->
+            def source = sourceFile.getText('UTF-8')
+            forbiddenAccess.any { access -> source.contains(access) }
+        }
+        if (!offenders.isEmpty()) {
+            throw new GradleException('Ambient current-tab access found in: ' + offenders)
+        }
+    }
+}
+
+check {
+        dependsOn tasks.named('guiTest')
+        dependsOn tasks.named('verifyNoAmbientCurrentTabAccess')
 }
 
 run {
